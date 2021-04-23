@@ -732,36 +732,36 @@ if ($op == 'default') {
 
     $result = [];
 
-    $id = request::int('id');
-    $openid = trim(urldecode(request::str('openid')));
-    $keyword = trim(urldecode(request::str('keyword')));
-
     $query = Principal::agent();
+    $id = request::int('id');
     if ($id) {
         $query->where(['id <>' => $id]);
     }
 
+    $openid = request::str('openid', '', true);
     if ($openid) {
         $query->where(['openid' => $openid]);
     }
 
+    $keyword = request::str('keyword', '', true);
     if ($keyword) {
-        $query = $query->whereOr([
-            'name REGEXP' => $s_keyword,
-            'nickname REGEXP' => $s_keyword,
-            'mobile REGEXP' => $s_keyword,
+        $query->whereOr([
+            'name REGEXP' => $keyword,
+            'nickname REGEXP' => $keyword,
+            'mobile REGEXP' => $keyword,
         ]);
     }
 
-    $query->limit(100);
+    $query->limit(20);
 
+    $result = [];
     /** @var  userModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $result[] = [
             'id' => intval($entry->getId()),
             'openid' => $entry->getOpenid(),
             'nickname' => $entry->getNickname(),
-            'name' => $entry->settings('agentData.name', '未登记'),
+            'name' => $entry->getName(),
             'company' => $entry->settings('agentData.company', '未登记'),
             'mobile' => $entry->getMobile(),
             'avatar' => $entry->getAvatar(),
@@ -769,6 +769,7 @@ if ($op == 'default') {
     }
 
     JSON::success($result);
+
 } elseif ($op == 'viewStatsChart') {
 
     $agent = Agent::get(request::int('id'));
@@ -1897,7 +1898,7 @@ if ($op == 'default') {
     $s_user_list = [];
 
     $query = Principal::gspsor();
-    $s_keyword = request::trim('keyword');
+    $s_keyword = request::trim('keyword', '', true);
     if ($s_keyword != '') {
         $query = $query->whereOr([
             'name REGEXP' => $s_keyword,

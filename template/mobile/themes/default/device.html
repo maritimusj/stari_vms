@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{$tpl['site']['title']}</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		{php \zovye\url(true, CSS_MUI_URL);}
+		{php \zovye\url(true, CSS_SWIPER_URL);}
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				height: 100%;
+			}
+			
+			body {
+				background: linear-gradient(to top right, rgb(255,165,185) 0%, rgb(232,212,186) 25%, rgb(182,255,188) 100%);
+				background: -webkit-linear-gradient(to top right, rgb(255, 165, 185) 0%, rgb(232, 212, 186) 25%, rgb(182, 255, 188) 100%e);
+				background: -o-linear-gradient(to top right, rgb(255, 165, 185) 0%, rgb(232, 212, 186) 25%, rgb(182, 255, 188) 100%);
+				background: -moz-linear-gradient(to top right, rgb(255, 165, 185) 0%, rgb(232, 212, 186) 25%, rgb(182, 255, 188) 100%);
+				background: linear-gradient(to top right, rgb(255, 165, 185) 0%, rgb(232, 212, 186) 25%, rgb(182, 255, 188) 100%);
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #000;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			#bg-swiper-container {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				z-index: -1;
+			}
+			
+			.bg-img {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.way-view {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.way-num {
+				color: #fff;
+				font-size: 20px;
+				background-color: #f80;
+				width: 25px;
+				height: 25px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+			}
+			
+			.way-desc {
+				color: #555;
+				font-size: 16px;
+				margin-left: 5px;
+				font-weight: 500;
+			}
+			
+			.qrcode {
+				width: 40%;
+				margin-top: 10px;
+			}
+			
+			.qrcode-desc {
+				color: #555;
+				margin-top: 5px;
+				font-size: 14px;
+			}
+			
+			.pay-btn {
+				display: inline-block;
+				zoom: 1;
+				display: inline;
+				vertical-align: baseline;
+				margin: 20px 2px 0;
+				outline: none;
+				cursor: pointer;
+				text-align: center;
+				text-decoration: none;
+				font: 16px/100% Arial, Helvetica, sans-serif;
+				font-weight: bold;
+				padding: 1em 2em;
+				text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+				-webkit-border-radius: .5em;
+				-moz-border-radius: .5em;
+				border-radius: .5em;
+				-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+				-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+				box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+				-webkit-border-radius: 2em;
+				-moz-border-radius: 2em;
+				border-radius: 2em;
+			}
+			
+			.pay-btn:hover {
+				text-decoration: none;
+			}
+			
+			.pay-btn:not(.disabled):active {
+				position: relative;
+				top: 1px;
+			}
+			
+			.orange {
+				color: #fef4e9;
+				border: solid 1px #da7c0c;
+				background: #f78d1d;
+				background: -webkit-gradient(linear, left top, left bottom, from(#faa51a), to(#f00));
+				background: -moz-linear-gradient(top, #faa51a, #f00);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#faa51a', endColorstr='#f00');
+			}
+			
+			.orange:hover {
+				background: #f47c20;
+				background: -webkit-gradient(linear, left top, left bottom, from(#f88e11), to(#f00));
+				background: -moz-linear-gradient(top, #f88e11, #f00);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f88e11', endColorstr='#f00');
+			}
+			
+			.orange:active {
+				color: #fcd3a5;
+				background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#DC143C));
+				background: -moz-linear-gradient(top, #f47a20, #DC143C);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#DC143C');
+			}
+			
+            .disabled {
+				color: #fef4e9;
+				background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#333));
+				background: -moz-linear-gradient(top, #eee, #333);
+			}
+		</style>
+	</head>
+
+	<body>
+{php $button_index = 1;}
+{if $tpl['accounts']}
+		<div class="way-view" style="margin-top: -50px;">
+			<span class="way-num">{php echo $button_index++;}</span>
+			<span class="way-desc">免费领取</span>
+		</div>
+		<img class="qrcode" src="{php echo \zovye\Util::tomedia(current($tpl['accounts'])['qrcode']);}" />
+		<span class="qrcode-desc">长按识别二维码免费领取</span>
+{/if}
+{if $tpl['purchase']}
+		<div class="way-view" style="margin-top: 50px;">
+			<span class="way-num">{$button_index}</span>
+			<span class="way-desc" >支付购买</span>
+		</div>
+		<div class="pay-btn orange" onclick="zovye_fn.wxpay()">支付￥{$tpl['purchase']['price_formatted']}元购买</div>
+{/if}
+{if empty($tpl['accounts']) && empty($tpl['purchase'])}
+    <div class="pay-btn disabled">暂时无法领取</div>
+{/if}
+{if $tpl['slides']}
+		<div id="bg-swiper-container" class="swiper-container">
+			<div class="swiper-wrapper ">
+			    {loop $tpl['slides'] $index $item}
+				<div class="swiper-slide bg-swiper-slide">
+					<img class="bg-img " src="{$item['image']}" />
+				</div>
+				{/loop}
+			</div>
+		</div>
+	    {php \zovye\url(true, JS_SWIPER_URL);}
+		<script type="text/javascript">
+			new Swiper('#bg-swiper-container', {
+				autoplay: {
+					delay: 6000,
+					disableOnInteraction: false
+				},
+				speed: 6000,
+				effect: 'fade'
+			});
+		</script>
+{/if}
+    {$tpl['js']['code']}
+	</body>
+</html>

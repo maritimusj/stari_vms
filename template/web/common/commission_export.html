@@ -1,0 +1,323 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .tips {
+        position: absolute;
+        width: 100%;
+        transform: rotate(50deg);
+        text-align: center;
+        right: -40px;
+        top: 13px;
+        background: #fff;
+    }
+    .pay{
+        color: gray;
+        display: inline-block;
+        user-select: none;
+    }
+    .balance {
+        color: #3F51B5;
+    }
+    .tips.wxpay{
+        background: #FF5722;
+    }
+    .tips.free{
+        background: #4CAF50;
+    }
+    .tips.balancex{
+        background: #3F51B5;
+    }
+    #orderlist .profile img{
+        min-width: 45px;
+    }
+    #orderlist .commission{
+        border-radius: 0 10px 10px 0;
+        text-align: center;
+        background-color: #FF5722;
+        color: #fff;
+        user-select: none;
+        cursor: default;
+        position: relative;
+        padding: 1px 0;
+        max-height: 1.6em;
+        font-size: 14px;
+        min-width: 10em;
+    }
+    #orderlist .commission:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border: 18px solid;
+        border-color: #FF5722 transparent transparent transparent;
+        right: -25px;
+        top: -0.5em;
+        display: inline-block;
+        transform: rotate(-90deg);
+        font-size: 14px;
+    }
+    #orderlist tr td.status {
+        position: relative;
+    }
+    #orderlist .status:hover .commission_detail {
+        display: flex;
+    }
+    #orderlist .commission_detail {
+        position: absolute;
+        z-index: 999;
+        background-color: #fff;
+        border: 1px solid #CCC;
+        padding: 20px;
+        min-width: 25em;
+        display: none;
+        flex-direction: column;
+        border-radius: 6px;
+        cursor: default;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+    #orderlist .money {
+        color: #FF5722;
+    }
+
+    #orderlist .gspor:hover:before {
+        content: "分佣";
+        position: absolute;
+        background-color: #009688;
+        color: #fff;
+        width: 45px;
+        text-align: center;
+    }
+
+    #orderlist .gspor.agent_item:hover:before {
+        content: "代理";
+        background-color: #FF5722;
+    }
+    #orderlist .gspor.platform_item:hover:before {
+        content: "平台";
+        background-color: #607D8B;
+    }
+    #orderlist .gspor.keeper_item:hover:before {
+        content: "运营";
+        background-color: #90028B;
+    }
+    #orderlist .gspor.bonus_item:hover:before {
+        content: "奖励";
+        background-color: #9C27B0;
+    }
+    #orderlist .gspor.bonus_item:hover:before {
+        content: "奖励";
+        background-color: #9C27B0;
+    }
+    #orderlist .commission_detail .total {
+        border-bottom: 1px solid #CCC;
+        color: #FF5722;
+        text-align: end;
+        margin-bottom: 1em;
+    }
+    #orderlist .commission_detail .total .title{
+        color: #666;
+        font-size: 1.5em;
+    }
+    #orderlist .gspor {
+        display: flex;
+        align-items: center;
+        margin: 6px 0;
+        justify-content: space-between;
+        position: relative;
+    }
+    #orderlist .gspor .profile {
+        margin-right: 6px;
+        width: 12em;
+        overflow: hidden;
+    }
+    #orderlist .fa-info-circle .order_err_message {
+        position: absolute;
+        width: 200px;
+        background: #FF5722;
+        text-align: center;
+        color: #fff;
+        z-index: 1000;
+        left: 130px;
+        overflow: hidden;
+        box-shadow: 1px 1px 2px 1px #9E9E9E;
+        padding: 6px;
+        display: none;
+        text-shadow: none;
+    }
+
+    #orderlist .fa-info-circle:hover .order_err_message {
+        display: block;
+    }
+
+    #orderlist td .failed {
+        border-color: #FF5722;
+        color: #ff5722;
+    }
+    .orderId{
+        font-size: small;
+        color: #9E9E9E;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'stat'));}">营收统计</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stat'));}">提现统计</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
+    <li role="presentation" class="active"><a href="#">佣金明细</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('account', array('op'=>'platform_stat'));}">平台分成</a></li>
+</ul>
+
+<div  class="panel panel-default">
+     <div class="panel-body">
+        <form id="the_form" action="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}" method="post">
+            <div class="form-group">
+                <label for="select_agent" class="col-md-2 control-label">佣金用户</label>
+                <div class="col-md-5">
+                    <select name="agent_openid" id="select_agent" style="width:100%;">
+                        <option value="0">&lt;请选择用户&gt;</option>
+                        {loop $s_user_list $user}
+                        <option value="{php echo $user->getOpenid()}" {if $s_openid == $user->getOpenid()}selected="selected"{/if}>
+                            {php echo $user->getName()}，手机号码：{php echo $user->getMobile()}
+                        </option>
+                        {/loop}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword" id="keyword_agent" placeholder="请输入手机号码或者名称查找" value="{$s_keyword}">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_agent">查找</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">日期</label>
+                <div class="col-md-8">
+                    <input name="start" type="hidden" value="{php echo $s_date}"/>
+                    <input name="end" type="hidden" value="{php echo $e_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                    <span class="date-title">
+                        {if empty($s_date) && empty($e_date)}
+                        不限时间
+                        {else}
+                        {$s_date} 至{$e_date}
+                        {/if}
+                    </span> <i class="fa fa-calendar"></i>
+                    </button>
+                    <button id="btn_search" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;查询</button>                    
+                    <button id="btn_export" class="btn btn-primary"><i class="fa fa-sign-out"></i>&nbsp;导出</button>
+                </div>
+            </div>
+        </form>
+    <div id="commission-log">
+        {if $logs}
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th style="width:6em;">变动</th>
+                <th style="text-align: center;">说明</th>
+                <th style="width:12em;">时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $logs $index $item}
+            <tr>
+                <td>{php echo $index + 1}</td>
+                <td>
+                    <span style="color:{if $item['xval'] > 0}green;{else}red;{/if}">{$item['xval']}</span>
+                </td>
+                <td>{$item['memo']}</td>
+                <td>{$item['createtime']}</td>
+            </tr>
+            {/loop}
+
+        </tbody>
+        </table>
+        <div id="log-pager"  class="dialog_pager pull-right">
+            {$pager}
+        </div>
+        {elseif $s_openid}
+        <div class="text-center" style="color: #ccc;">
+            暂时没有任务佣金明细！
+        </div>
+        {/if}
+    </div> 
+    </div>
+</div>
+<script>
+    $(function(){
+        function makeUrl(is_export = 0) {
+            const params = new URLSearchParams();
+            params.append('is_export', is_export);
+            params.append('keyword', $('input[name=keyword]').val());
+            params.append('agent_openid', $('select[name=agent_openid]').val());
+            params.append('start', $('input[name=start]').val());
+            params.append('end', $('input[name=end]').val());
+            return $('#the_form').attr("action") + "&" + encodeURI(params.toString());
+        }
+        $('#btn_search').on('click', function(event){
+            event.preventDefault();
+            location.href = makeUrl();
+        })
+        $('#btn_export').on('click', function(event){
+            event.preventDefault();
+            location.href = makeUrl(1);
+        })
+        const open_id = '{$s_openid}' || '';
+        $('#find_agent').click(function () {
+            const keyword = $('input[name=keyword]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('gsp');}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    var isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.openid == open_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                isSelected = '';
+                if (0 == open_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><请选择用户></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    var elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+    });
+</script>
+{template 'common/footer'}

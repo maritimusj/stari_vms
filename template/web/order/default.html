@@ -1,0 +1,649 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201231');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20201231');}
+<style>
+    #search-form {
+        display: none;
+    }
+    #orderlist i.query {
+        color:#ffc107;
+    }
+    #orderlist i.cb {
+        color:#4caf50;
+    }
+    #orderlist i.wi-money:not(.cb,.query) {
+        color:gray;
+    }
+    #orderlist .transactionId {
+        white-space: nowrap;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    {if empty($s_way)}
+    <li role="presentation" class="active"><a href="#">全部</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
+    {/if}
+    {if $s_way=='free'}
+    <li role="presentation" class="active"><a href="#">免费</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
+    {/if}
+    {if $s_way=='fee'}
+    <li role="presentation" class="active"><a href="#">支付</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'fee'));}">支付</a></li>
+    {/if}
+    {if \zovye\App::isUserCenterEnabled()}
+        {if $s_way=='balance'}
+        <li role="presentation" class="active"><a href="#">余额</a></li>
+        {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">余额</a></li>
+        {/if}
+    {/if}
+    {if $s_way=='refund'}
+    <li role="presentation" class="active"><a href="#">退款订单</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款订单</a></li>
+    {/if}
+    {if $s_way=='except'}
+    <li role="presentation" class="active"><a href="#">异常订单</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常订单</a></li>
+    {/if}
+    {if $device || $user}
+    <li role="presentation"  class="active"><a href="#">{php echo $user?$user->getName():''}{if $user && $device} <i class="fa fa-sign-in" style="color:#CCC;"></i> {/if}{php echo $device ? $device->getName() : '';}</a></li>
+    {/if}
+</ul>
+<div class="panel panel-default{if empty($s_way)} panel-first{/if} nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            {if $s_way=='fee' || empty($s_way)}
+            <a href="{php echo $this->createWebUrl('order', array('op'=>'log'));}"><i class="fa fa-fw fa-sliders" title="支付记录"></i></a>
+            {/if}
+            <a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}"><i class="fa fa-fw fa-filter" title="导出订单"></i></a>
+            <a href="{php echo $this->createWebUrl('device', array('op'=>'feed_back'));}"><i class="fa fa-fw fa-flag-o" title="故障反馈"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if empty($s_way)}
+        <div id="search-bar">
+            <div class="text-input">
+                <span>根据条件搜索订单 ...</span>
+                <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+            </div>
+        </div>
+        <div id="search-form">
+            <form action="{php echo $this->createWebUrl('order', array('op'=>'default'));}" method="post">
+                <div class="form-group">
+                    <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                    <div class="col-md-5">
+                        <select name="agent_openid" id="select_agent" style="width:100%;">
+                            <option value="0">&lt;不限&gt;</option>
+                            {loop $ag_res $key $ag_item}
+                            <option value="{$ag_item['openid']}" {if $s_open_id == $ag_item['openid']} selected="selected" {/if}>{$ag_item['nickname']}，手机号码：{$ag_item['mobile']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" id="find_agent" title="搜索代理商"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="select_device" class="col-md-2 control-label">设备</label>
+                    <div class="col-md-5">
+                        <select name="device_id" id="select_device" style="width:100%;">
+                            <option value="0">&lt;不限&gt;</option>
+                            {loop $de_res $key $de_item}
+                            <option value="{$de_item['id']}" {if $s_device_id == $de_item['id']} selected="selected" {/if}>{$de_item['name']}，IMEI：{$de_item['imei']}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="keyword_device" id="keyword_device" placeholder="请输设备名称或IMEI号查找...">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" id="find_device" title="搜索设备"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">订单号</label>
+                    <div class="col-md-8">
+                        <input name="order"  class="form-control" type="text" value="{php echo $s_order}" style="width: 100%;"/>
+                    </div>
+                </div>
+                {if $user_res}
+                <div class="form-group">
+                    <label class="col-md-2 control-label">用户</label>
+                    <div class="col-md-8">
+                        <div class="profile">
+                            <img src="{$user_res['headimgurl']}" />
+                            <span class="nickname operate">
+                                {$user_res['nickname']} <i class="fa fa-times" style="color: gray;" data-op="searchNoUserFilter" title="清除"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="user_id" value="{$s_user_id}">
+                {/if}              
+                <div class="form-group">
+                    <label class="col-md-2 control-label">日期</label>
+                    <div class="col-md-4">
+                        <input name="datelimit[start]" type="hidden" value="{php echo $s_start_date}"/>
+                        <input name="datelimit[end]" type="hidden" value="{php echo $s_end_date}"/>
+                        <button class="btn btn-default daterange daterange-date" type="button">
+                        <span class="date-title">
+                            {if empty($s_start_date) && empty($s_end_date)}
+                            不限时间
+                            {else}
+                            {$s_start_date} 至 {$s_end_date}
+                            {/if}
+                        </span> <i class="fa fa-calendar"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                        <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
+                    </div>
+                    <div class="col-md-6"></div>
+                </div>
+            </form>
+        </div>
+        {/if}
+        {if $orders}
+            <table class="table" id="orderlist">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>来源</th>
+                    <th>商品</th>
+                    <th>图片</th>
+                    <th>
+                        <div>数量(价格/余额)</div>
+                    </th>
+                    <th>用户</th>
+                    <th class="center">归属</th>
+                    <th class="center">设备</th>
+                    <th>
+                        <div>地区(IP定位)</div>
+                        <div>创建时间</div>
+                    </th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $orders $index $order}
+                <tr data-id="{$order['id']}" {if $order['result'] && isset($order['result']['errno']) && $order['result']['errno'] != 0}class="failed"{/if}>
+                    <td>{php echo $index + 1}</td>
+                    <td>
+                        {if $order['price']>0}
+                        <div class="transactionId">
+                            <i class="wi wi-money {$order['src']}" title="{$order['pay_name']}"></i>{$order['transaction_id']}
+                        </div>
+                        <div class="orderId">
+                            {$order['orderId']}
+                        </div>
+                        {else}
+                        <div class="color-gray">
+                            {if $order['account']}
+                            <div class="account-title" title="{php echo $accounts[$order['account']]['title']}">
+                                {if $accounts[$order['account']]}
+                                <img src="{media $accounts[$order['account']]['img']}" alt=""/>
+                                {/if}
+                                {$order['account_title']}
+                            </div>
+                            {elseif $order['voucher']}
+                            提货码：{$order['voucher']['code']}
+                            {else}
+                            &lt;n/a&gt;
+                            {/if}
+                        </div>
+                        {/if}
+                    </td>
+                    <td>
+                        {if $order['goods']}
+                        <div class="name">
+                        {$order['goods']['name']}
+                        <span class="num" data-op="pullsDetail" title="查看出货记录..."> x{$order['num']}</span>
+                        </div>
+                        {/if}
+                    </td>
+                    <td>
+                        {if $order['goods']}
+                        <div class="goods">
+                            <img src="{$order['goods']['img']}"/>
+                        </div>                    
+                        {/if}
+                    </td>
+                    <td class="status">
+                        单价：<span class="price">{php echo number_format($order['goods']['price'] / 100, 2)}</span>
+                        <div class="pay operate">
+                            {if $order['price']>0}
+                            (总计：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
+                                {$order['price']}                            
+                            </span>
+                            {if $order['discount']>0}
+                            <span class="price">{php echo number_format($order['price'] - $order['discount'], 2)}</span>
+                            {/if}
+                            {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0}
+                            <i class="fa fa-info-circle">
+                                <div class="order_err_message">
+                                    <span>{php echo empty($order['refund']) ?  $order["result"]["message"] : $order['refund']['reason']}</span>
+                                </div>
+                            </i>
+                            {/if}
+                            {if $order['refund']}
+                            <span title="{$order['refund']['title']}"> 已退款</span>
+                            {else}
+                            <i class="fa fa-reply-all" title="退款" data-op="refund"></i>
+                            {if $commission_balance}
+                            <i class="fa fa-list" title="佣金记录" data-op="commissionDetail"></i>
+                            {/if}
+                            {/if})
+                            {elseif $order['balance']>0}
+                            (余额：<span class="balance">{$order['balance']} <i class="fa fa-tint disabled"></i></span>)
+                            {else}
+                            (<span class="zeroprice">免费领取</span>)
+                            {/if}
+                        </div>
+                        {if $order['commission']}
+                        <div class="commission_detail local">
+                            <div class="total">
+                                <span class="title">订单佣金 </span><span>￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元</span>
+                            </div>
+                            {if $order['commission']['bonus']}
+                            {loop $order['commission']['bonus'] $index $item}
+                            {php $bonus_user = \zovye\User::get($item['openid'], true);}
+                            {if $bonus_user}
+                            <div class="gspor bonus_item">
+                                <div class="profile">
+                                    <img src="{php echo $bonus_user->getAvatar();}" alt="">
+                                    <span>{php echo $bonus_user->getName()}</span>
+                                    {if $bonus_user->getMobile()}                                
+                                    <span class="mobile" data-mobile="{php echo $bonus_user->getMobile();}" title="{php echo $bonus_user->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                    {/if}
+                                </div>
+                                <div class="income">
+                                    <b>奖励：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                </div>
+                            </div>
+                            {/if}
+                            {/loop}
+                            {/if}
+                            {if $order['commission']['gsp']}
+                            {loop $order['commission']['gsp'] $index $item}
+                            {php $gspor = \zovye\User::get($item['openid'], true);}
+                            {if $gspor}
+                            <div class="gspor">
+                                <div class="profile">
+                                    <img src="{php echo $gspor->getAvatar();}" alt="">
+                                    <span>{php echo $gspor->getName()}</span>
+                                    {if $gspor->getMobile()}                                
+                                    <span class="mobile" data-mobile="{php echo $gspor->getMobile();}" title="{php echo $gspor->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                    {/if}
+                                </div>
+                                <div class="income">
+                                    <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                </div>
+                            </div>
+                            {/if}
+                            {/loop}
+                            {/if}
+                            {if $order['commission']['agent']}
+                            <div class="gspor agent_item">
+                                <div class="profile">
+                                    <img src="{$order['agent']['avatar']}" alt="">
+                                    <span>{$order['agent']['name']}</span>
+                                </div>
+                                <div class="income">
+                                    <b>佣金：</b><span class="money">￥{php echo number_format($order['commission']['agent']['xval']/100, 2)}元</span>
+                                </div>
+                            </div>
+                            {/if}
+                            {if $order['commission']['keepers']}
+                            {loop $order['commission']['keepers'] $index $item}
+                            {php $keeper = \zovye\User::get($item['openid'], true);}
+                            {if $keeper}
+                            <div class="gspor keeper_item">
+                                <div class="profile">
+                                    <img src="{php echo $keeper->getAvatar();}" alt="">
+                                    <span>{php echo $keeper->getName()}</span>
+                                    {if $keeper->getMobile()}                                
+                                    <span class="mobile" data-mobile="{php echo $keeper->getMobile();}" title="{php echo $keeper->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                    {/if}
+                                </div>
+                                <div class="income">
+                                    <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                </div>
+                            </div>
+                            {/if}
+                            {/loop}
+                            {/if}
+                        </div>
+                        {/if}
+                </td>
+                <td>
+                    <div class="profile">
+                        <img src="{$order['user']['avatar']}" />
+                        <span class="nickname">
+                                {if $user}
+                                {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                                {else}
+                                <a filter data-name="user_id" data-val="{$order['user']['id']}" href="{php echo $this->createWebUrl('order', array('user_id' => $order['user']['id'], 'device_id' => $s_device_id));}" title="点击查看{php echo $order['user']['nickname']?:'&lt;匿名用户&gt;'}的订单">
+                                    {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                                </a>
+                                {/if}
+                            </span>
+                    </div>
+                </td>
+                <td class="from">
+                    <div class="account"  style="background-color:#ddd;overflow:hidden;">
+                        <div class="tips {$order['tips']['class']}" style="background-color:{$order['clr']}">
+                            {$order['tips']['text']}
+                        </div>
+                        {if $order['price'] > 0}
+                        <img src="{$order['from']['icon']}" title="{$order['from']['title']}" />
+                        {elseif $order['account']}
+                        <img src="{media $accounts[$order['account']]['img']}" alt=""/>
+                        {elseif $order['voucher'] > 0}
+                        <i class="fa fa-ticket"></i>
+                        {/if}
+                    </div>
+                    {if $order['agent']}
+                    <div class="agent agentId{$order['agentId']}" title="{$order['agent']['level']['title']}" style="background-color: {$order['agent']['level']['clr']}">
+                        <img src="{$order['agent']['avatar']}" alt="">
+                        <span>{$order['agent']['name']}</span>
+                    </div>
+                    {else}
+                    <div class="agent" style="background-color:#9E9E9E;">
+                        <img src="{php echo MODULE_URL.'static/img/warning_icon.jpg'}" alt="">
+                        <span>&lt;未绑定&gt;</span>
+                    </div>
+                    {/if}
+                </td>
+                <td  class="devicename agentId{$order['agentId']}">
+                    {if $order['device']['name']}
+                    <div>
+                        {if $device && $device->getId() == $order['device']['id']}
+                        {$order['device']['name']}
+                        {else}
+                        <a  filter data-name="device_id" data-val="{$order['device']['id']}" href="{php echo $this->createWebUrl('order', array('user_id'=>$s_user_id, 'device_id'=>$order['device']['id']));}" title="点击查看这台设备的订单">{$order['device']['name']}</a>
+                        {/if}
+                        <div class="zovye_qrcode">
+                            <img src="{$order['device']['qrcode']}" />
+                        </div>
+                    </div>
+                    {else}
+                    &lt;未知设备&gt;
+                    {/if}
+                </td>
+                <td>
+                    <div title="{$order['ip']}">{$order['ip_info']}{if $order['isp']}({$order['isp']}){/if}</div>
+                    <div style="color:#9E9E9E;font-size:12px;">{$order['createtime']}</div>
+                </td>
+                <td class="operate">
+                    <!--<i class="fa fa-trash" title="删除"></i>-->
+                </td>
+                </tr>
+            {/loop}
+        </tbody>
+        </table>
+        <div class="pull-right">
+        {$pager}
+        </div>    
+    </div>
+{else}
+    <div style="text-align:center;color:#ccc;">
+        暂时还没有任何订单！
+    </div>
+{/if}
+</div>
+
+<script>
+    const open_id = '{php echo $open_id}' || 0;
+    const device_id = '{php echo $device_id}' || 0;
+
+    const api = {
+        url: "{php echo $this->createWebUrl('order');}",
+    };
+
+    api.showResult = function (params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function (res) {
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if (cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function () {
+            loading && util.loaded();
+        })
+    }
+
+    api.refund = function (id) {
+        api.showResult({ op: 'preRefund', id: id });
+    }
+
+    api.orderRefund = function (id) {
+        const input = $('input[name=num]');
+        if (input) {
+            const min = parseInt(input.attr('min'));
+            const max = parseInt(input.attr('max'));
+            const num = parseInt(input.val());
+            if (num >= min && num <= max) {
+                api.showResult({ op: 'refund', id: id, num: num }, '', true, function () {
+                    $('#modal-message').modal('hide');
+                });
+            } else {
+                input.focus();
+            }
+        }
+    }
+
+    api.commissionDetail = function (id) {
+        api.showResult({ op: 'commissionDetail', id: id });
+    }
+
+    api.pullsDetail = function (id) {
+        api.showResult({ op: 'pullsDetail', id: id });
+    }
+
+    api.searchNoUserFilter = function() {
+        reloadPageWithFilter(params => params.delete('user_id'));
+    }
+
+    function reloadPageWithFilter(fn) {
+        const url = location.href;
+        const index = url.indexOf('?');
+
+        const params = new URLSearchParams(index === -1 ? null : url.substr(index));
+        const agent = $('select[name=agent_openid]').val();
+        if (agent) {
+            params.set('agent_openid', agent);
+        }
+        const device = $('select[name=device_id]').val();
+        if (device) {
+            params.set('device_id', device);
+        }
+        const order = $('input[name=order]').val();
+        if (order) {
+            params.set('order', order);
+        }
+        const start = $('input[name="datelimit[start]"]').val();
+        if (start) {
+            params.set('datelimit[start]', start);
+        }
+        const end = $('input[name="datelimit[end]"]').val();
+        if (end) {
+            params.set('datelimit[end]', end);
+        }
+        if (typeof fn === 'function') {
+            fn(params);
+        }
+
+        const api_url = url.substr(0, index !== -1 ? index : url.length);
+        location.href = api_url + "?" + params.toString();
+    }
+
+    $(function () {
+        const backer = "{$backer}";
+        $('#search-bar').click(function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=order]').focus();
+        })
+
+        if (backer) {
+            $('#search-bar').trigger('click');
+        }
+
+        $('#search-form .btn-close').click(function (e) {
+            if (backer) {
+                location.href = $('#search-form form').attr('action');    
+                setTimeout(function(){util.loading()}, 1000);               
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }
+            e.preventDefault();
+         })
+
+        $('#orderlist').on('click', 'a[filter]', function (e) {
+            const self = this;
+            reloadPageWithFilter(function (params) {
+                const name = $(self).data('name');
+                const val = $(self).data('val');
+                if (name) {
+                    params.set(name, val);
+                }
+            });
+            e.preventDefault();
+        })
+
+        $('.pagination li:not(.active) a').click(function () {
+            setTimeout(function () { util.loading() }, 1000);
+        })
+
+        $('.panel').on('click', '[data-op]', function (e) {
+            const op = $(this).data('op');
+            if (op && api[op]) {
+                const id = $(this).closest('tr').data('id');
+                api[op](id);
+            }
+            e.preventDefault();
+        })
+
+        $('#find_agent').click(function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    let isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.openid == open_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                let isSelected = '';
+                if (0 == open_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><不限></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        $('#find_device').click(function () {
+            const keyword = $('input[name=keyword_device]').val();
+            const agent = $('select[name=agent_openid]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('device');}", { op: 'search', keyword: keyword, openid: agent }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    let isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.id == device_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，IMEI：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.imei)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                let isSelected = '';
+                if (0 == device_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><不限></option>';
+                $('#select_device').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        $('[data-mobile]').each(function () {
+            util.clip(this, $(this).data('mobile'));
+        })
+
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    const elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至 " + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+    })
+</script>
+
+{template 'common/footer'}

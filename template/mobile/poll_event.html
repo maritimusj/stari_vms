@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>称重柜</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <style type="text/css">
+        body {
+            background-color: #eee;
+        }
+
+        .d1 {
+            display: flex;
+            background-color: #fff;
+            margin: .4em auto .8em;
+            padding: .5em;
+            justify-content: space-between;
+        }
+        .d2 {
+            #display: flex;
+            background-color: #fff;
+            margin: 0 auto .8em;
+            padding: .5em;
+
+        }
+        .d3 {
+            #display: flex;
+            background-color: #fff;
+            margin: 0 auto .8em;
+            padding: .5em;
+
+        }
+
+        .d2-item {
+            display: flex;
+            padding-top: .5em;
+            padding-bottom: .5em;
+        }
+        .d2-item-bb {
+            border-bottom: 1px solid #a9a9a9;
+        }
+
+        .d2-title {
+            width: 6em;
+        }
+
+        .d3-item {
+            display: flex;
+            justify-content: space-around;
+            margin: .8em auto;
+        }
+
+        .d3-chi {
+            border: 1px solid #898989;
+            border-radius: .5em;
+            padding: 1em;
+            min-width: 6em;
+        }
+
+        .d3-1 {
+            margin-bottom: .5em;
+        }
+        .d3-2 {
+            text-align: center;
+        }
+
+        .btn {
+            border: 0;
+            text-align: center;
+            width: 100%;
+            padding: .5em;
+            background-color: #16A811;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="J_body">
+    <div class="">
+
+        <div class="d1">
+            <div class="">
+                设备编号：<span id="J_imei">{$arr['d_uid']}</span>
+            </div>
+            <div class="">
+                信号：<span id="J_sign">{$arr['per']}%</span>
+            </div>
+        </div>
+
+        <div class="d2">
+            <div class="d2-item d2-item-bb">
+                <div class="d2-title">温控模式：</div>
+                <div class="" id="J_temp_mod">{$arr['m_mod']}</div>
+            </div>
+            <div class="d2-item d2-item-bb">
+                <div class="d2-title">当前温度：</div>
+                <div class="" id="J_temp">{$arr['temperature']}</div>
+            </div>
+            <div class="d2-item d2-item-bb">
+                <div class="d2-title">门状态：</div>
+                <div class="">
+                    <div >1号门（<span id="J_d0">{$arr['door'][0]}</span>）</div>
+                    <div >2号门（<span id="J_d1">{$arr['door'][1]}</span>）</div>
+                </div>
+            </div>
+            <div class="d2-item">
+                <div class="d2-title">继电器状态：</div>
+                <div class="">
+                    <div >压缩机（<span id="J_j0">{$arr['sw'][0]}</span>）</div>
+                    <div >加热管（<span id="J_j1">{$arr['sw'][1]}</span>）</div>
+                    <div >消毒灯（<span id="J_j2">{$arr['sw'][2]}</span>）</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d3">
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">1号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip0">{$arr['m_price'][0]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw0">{$arr['weights'][0]}</span>克
+                    </div>
+                </div>
+
+                <div class="d3-chi">
+                    <div class="d3-2">2号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip1">{$arr['m_price'][1]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw1">{$arr['weights'][1]}</span>克
+                    </div>
+                </div>
+            </div>
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">3号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip2">{$arr['m_price'][2]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw2">{$arr['weights'][2]}</span>克
+                    </div>
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">4号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip3">{$arr['m_price'][3]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw3">{$arr['weights'][3]}</span>克
+                    </div>
+                </div>
+            </div>
+
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">5号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip4">{$arr['m_price'][4]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw4">{$arr['weights'][4]}</span>克
+                    </div>
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">6号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip5">{$arr['m_price'][5]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw5">{$arr['weights'][5]}</span>克
+                    </div>
+                </div>
+            </div>
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">7号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip6">{$arr['m_price'][6]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw6">{$arr['weights'][6]}</span>克
+                    </div>
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">8号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip7">{$arr['m_price'][7]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw7">{$arr['weights'][7]}</span>克
+                    </div>
+                </div>
+            </div>
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">9号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip8">{$arr['m_price'][8]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw8">{$arr['weights'][8]}</span>克
+                    </div>
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">10号托盘</div>
+                    <div class="d3-1">
+                        单价：<span id="J_ip9">{$arr['m_price'][9]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        重量：<span id="J_iw9">{$arr['weights'][9]}</span>克
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div>
+            <button class="btn" id="J_set">进入设置</button>
+        </div>
+
+    </div>
+
+</div>
+
+{php \zovye\url(true, JS_JQUERY_URL);}
+<script type="text/javascript">
+    var the14thId = "{$the_14th_id}" || 0;
+    var the20thId = "{$the_20th_id}" || 0;
+    var the21thId = "{$the_21th_id}" || 0;
+
+    $(function () {
+
+
+        setInterval(function () {
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'new_event'));}",
+                {
+                    the_14th_id: the14thId,
+                    the_20th_id: the20thId,
+                    the_21th_id: the21thId
+                },
+                function (res) {
+                    res = JSON.parse(res);
+                    var keys = Object.keys(res['arr']);
+                    if (keys.length > 0) {
+                        if (typeof res['arr']['per'] != 'undefined') {
+                            $('#J_sign').html(res['arr']['per']);
+                        }
+                        if (typeof res['arr']['temperature'] != 'undefined') {
+                            $('#J_temp').html(res['arr']['temperature']);
+                        }
+
+                        if (typeof res['arr']['door'] != 'undefined') {
+                            $('#J_d0').html(res['arr']['door'][0]);
+                            $('#J_d1').html(res['arr']['door'][1]);
+                        }
+                        if (typeof res['arr']['sw'] != 'undefined') {
+                            $('#J_j0').html(res['arr']['sw'][0]);
+                            $('#J_j1').html(res['arr']['sw'][1]);
+                            $('#J_j2').html(res['arr']['sw'][2]);
+                        }
+                        if (typeof res['arr']['weights'] != 'undefined') {
+                            $('#J_iw0').html(res['arr']['weights'][0]);
+                            $('#J_iw1').html(res['arr']['weights'][1]);
+                            $('#J_iw2').html(res['arr']['weights'][2]);
+                            $('#J_iw3').html(res['arr']['weights'][3]);
+                            $('#J_iw4').html(res['arr']['weights'][4]);
+                            $('#J_iw5').html(res['arr']['weights'][5]);
+                            $('#J_iw6').html(res['arr']['weights'][6]);
+                            $('#J_iw7').html(res['arr']['weights'][7]);
+                            $('#J_iw8').html(res['arr']['weights'][8]);
+                            $('#J_iw9').html(res['arr']['weights'][9]);
+                        }
+
+                        the14thId = res['the_14th_id'];
+                        the20thId = res['the_20th_id'];
+                    }
+
+                }
+            );
+        }, 1800);
+    });
+
+    $('#J_set').on('click', function(){
+        window.location.href="{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'set_event'));}";
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{if $data}
+<style>
+    .balance {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin: 2em 0;
+        padding: 1em;
+    }
+    .balance .money:before{
+        content:'￥';
+    }
+    .balance .money{
+        color: #4CAF50;
+        font-weight: bold;
+    }
+    .balance .money.neg{
+        color: #FF5722;
+    }
+    .balance .count{
+        color: #607D8B;
+        font-weight: bold;
+    }
+    .balance .brief{
+        text-align: right;
+        padding: 10px;
+    }
+
+    .content div {
+        margin-bottom: 10px;
+    }
+    .content div.btn{
+        margin-top:  1em;
+    }
+    table#list th,table#list td {
+        text-align: center;
+    }
+</style>
+
+{loop $data $index $item}
+<div class="balance">
+    <div class="brief">
+        <div><b>帐户:</b> {$item['uid']}</div>
+        <div>
+            <b>余额:</b> <span class="money">{$item['stats']['amount_formatted']}元</span>
+        </div>                    
+    </div>
+
+    <div class="stats">
+        <table class="table table-bordered" id="list">
+            <thead>
+                <tr class="active">
+                    <th>#</th>
+                    <th class="center">收入交易(次)</th>
+                    <th class="center">收入(元)</th>
+                    <th class="center">支出交易(次)</th>
+                    <th class="center">支出(元)</th>
+                </tr>                
+            </thead>
+
+            {loop $stats_categories $key $data}
+            <tr>
+                <td>{$data['name']}</td>
+                <td>{$item['stats']['income'][$key]['count']}</td>
+                <td><span class="money">{$item['stats']['income'][$key]['amount_formatted']}</span></td>
+                <td>{$item['stats']['expenses'][$key]['count']}</td>
+                <td><span class="money neg">{$item['stats']['expenses'][$key]['amount_formatted']}</span></td>
+            </tr>
+            {/loop}
+        </table>
+
+    </div>
+</div>
+{/loop}
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时没有数据！
+</div>
+{/if}

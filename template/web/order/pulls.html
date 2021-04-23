@@ -1,0 +1,58 @@
+{if $list}
+<table class="table" id="pull-list">
+    <thead>
+        <tr>
+            <td>#</td>
+            <td>原因</td>
+            <td>结果</td> 
+            <td>商品</td>            
+            <td>名称</td>
+            <td>库存</td>
+            <td>时间</td>
+        </tr>
+    </thead>
+    <tbody>
+        {loop $list $index $item}
+        <tr>
+            <td>{php echo $index + 1}</td>
+            <td class="title">{$item['title']}</td>
+            <td class="result">
+                <div class="{php echo $item['result']['errno']?'error':'success'}">
+                    货道：{php echo $item['goods']['cargo_lane'] + 1} -> 
+                    {$item['result']['message']}
+                    {if isset($item['confirm'])}
+                    <span class="{php echo $item['confirm']['errno']?'error':'success'}" title="订单确认结果">(* {php echo
+                        $item['confirm']['message'] ?: '&lt;未知&gt;'})</span>
+                    {/if}
+                    
+                </div>
+            </td>
+            <td class="goods_image">
+                {if $item['goods']}
+                <div class="goods_img">
+                    <img src="{$item['goods']['img']}" />
+                </div>
+                {/if}
+            </td>            
+            <td class="goods">
+                {if $item['goods']}
+                {$item['goods']['name']}
+                {/if}
+            </td>
+            <td>
+                {if $item['goods']}
+                <div class="goods_num">{$item['goods']['num']}</div>
+                {/if}
+            </td>
+            <td>
+                {$item['createtime_formatted']}
+            </td>
+        </tr>
+        {/loop}
+    </tbody>
+</table>
+{else}
+<div style="text-align:center;color:#ccc;">
+    没有找到任何出货记录！
+</div>
+{/if}

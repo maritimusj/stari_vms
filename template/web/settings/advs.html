@@ -1,0 +1,52 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #special fieldset[disabled] label, #special2 fieldset[disabled] input, #special2 fieldset[disabled] table{
+        color: gray;
+    }
+</style>
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item" id="special">
+        <div class="panel-body">
+            {if \zovye\App::isSQMPayEnabled()}
+            <div class="seg">
+                <div class="title">省钱码</div>
+                <div class="form-group">
+                    <label for="appSecret" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="appSecret" id="appSecret" value="{$settings['custom']['SQMPay']['appSecret']}">
+                        <span class="help-block">* 省钱码密钥</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="callbackURL" class="col-md-2 control-label">回调网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$settings['custom']['SQMPay']['cb']}"></i> {$settings['custom']['SQMPay']['cb']}</span>
+                        <span class="help-block">* 省钱码服务成功通知网址</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goodsNum" class="col-md-2 control-label">出货次数</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="goodsNum" id="goodsNum" value="{$settings['custom']['SQMPay']['goodsNum']}" min="1">
+                        <span class="help-block">* 每个用户成功参数活动后，赠送的商品数量，最少为1</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="{$op}">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableInputMask();
+        zovye.enableCopy();
+    })
+</script>
+{template 'common/footer'}

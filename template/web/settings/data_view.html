@@ -1,0 +1,333 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .f-33 {
+        float: left;
+        width: 30%;
+    }
+
+    .cb {
+        clear: both;
+    }
+</style>
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="panel-body operate">
+            <div class="seg">
+                <div class="title">标题</div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=title"></i>
+                        <span>{$dm}&type=title</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">标题：</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control " name="title" id="title" value="{$title}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">总销售额设置</div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=total_sale"></i>
+                        <span>{$dm}&type=total_sale</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="total_sale_init" class="col-md-2 control-label">初始值（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="total_sale_init" id="total_sale_init"
+                               value="{$total_sale_init}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="total_sale_freq" class="col-md-2 control-label">刷新频率（秒）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="total_sale_freq" id="total_sale_freq"
+                               value="{$total_sale_freq}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="total_sale_section1" class="col-md-2 control-label">刷新增长区间值（元）</label>
+                    <div class="col-md-10">
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="total_sale_section1" id="total_sale_section1" value="{$total_sale_section1}">
+                        &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="total_sale_section2" id="total_sale_section2" value="{$total_sale_section2}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">今日销售额设置</div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=today_sale"></i>
+                        <span>{$dm}&type=today_sale</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="today_sale_init" class="col-md-2 control-label">初始值（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="today_sale_init" id="today_sale_init"
+                               value="{$today_sale_init}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="today_sale_freq" class="col-md-2 control-label">刷新频率（秒）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="today_sale_freq" id="today_sale_freq"
+                               value="{$today_sale_freq}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="today_sale_section1" class="col-md-2 control-label">刷新增长区间值（元）</label>
+                    <div class="col-md-10">
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="today_sale_section1" id="today_sale_section1" value="{$today_sale_section1}">
+                        &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="today_sale_section2" id="today_sale_section2" value="{$today_sale_section2}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">订单总数</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=total_order"></i>
+                        <span>{$dm}&type=total_order</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="total_order_init" class="col-md-2 control-label">初始值（笔）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="total_order_init" id="total_order_init"
+                               value="{$total_order_init}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="total_order_freq" class="col-md-2 control-label">刷新频率（笔）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="total_order_freq" id="total_order_freq"
+                               value="{$total_order_freq}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="total_order_section1" class="col-md-2 control-label">刷新增长区间值（元）</label>
+                    <div class="col-md-10">
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="total_order_section1" id="total_order_section1" value="{$total_order_section1}">
+                        &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="total_order_section2" id="total_order_section2" value="{$total_order_section2}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">今日订单数</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=today_order"></i>
+                        <span>{$dm}&type=today_order</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="today_order_init" class="col-md-2 control-label">初始值（笔）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="today_order_init" id="today_order_init"
+                               value="{$today_order_init}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="today_order_freq" class="col-md-2 control-label">刷新频率（笔）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="today_order_freq" id="today_order_freq"
+                               value="{$today_order_freq}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="today_order_section1" class="col-md-2 control-label">刷新增长区间值（元）</label>
+                    <div class="col-md-10">
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="today_order_section1" id="today_order_section1" value="{$today_order_section1}">
+                        &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+                        <input style="display: inline-block; width: 8em;" type="number" class="form-control"
+                               name="today_order_section2" id="today_order_section2" value="{$today_order_section2}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">用户比例</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=user"></i>
+                        <span>{$dm}&type=user</span>
+                    <div class="col-md-10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="user_man" class="col-md-2 control-label">男性（百分比）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="user_man" id="user_man" value="{$user_man}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="user_woman" class="col-md-2 control-label">女性（百分比）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="user_woman" id="user_woman"
+                               value="{$user_woman}">
+                    </div>
+                </div>
+
+            </div>
+            <div class="seg">
+                <div class="title">收入来源</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=income"></i>
+                        <span>{$dm}&type=income</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="income_wx" class="col-md-2 control-label">微信（百分比）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="income_wx" id="income_wx" value="{$income_wx}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="income_ali" class="col-md-2 control-label">支付宝（百分比）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="income_ali" id="income_ali"
+                               value="{$income_ali}">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="seg">
+                <div class="title">商品TOP10</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=goods"></i>
+                        <span>{$dm}&type=goods</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        格式：商品名;数量;刷新频率（秒）;增长值&nbsp;&nbsp;&nbsp;&nbsp;（分号必须是英文状态下输入）
+                    </div>
+                </div>
+                {loop $goods $key $val}
+                <div class="form-group">
+                    <label for="{$key}" class="col-md-2 control-label">{$val}</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="{$key}" id="{$key}" value="{php echo $$key}">
+                    </div>
+                </div>
+                {/loop}
+
+            </div>
+            <div class="seg">
+                <div class="title">地区设备数</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=provinces"></i>
+                        <span>{$dm}&type=provinces</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        格式：设备数;刷新频率（秒）;增长值&nbsp;&nbsp;&nbsp;&nbsp;（分号必须是英文状态下输入）
+                    </div>
+                </div>
+                {php $t_i = 0}
+                <div>
+                {loop $provinces $key $val}
+                    {if $t_i != 0 && $t_i % 3 == 0}
+                    <div>
+                    {/if}
+                        <div class="form-group f-33">
+                            <label for="{$key}" class="col-md-2 control-label">{$val}</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="{$key}" id="{$key}" value="{php echo $$key}">
+                            </div>
+                        </div>
+
+                    {if $t_i % 3 == 2 }
+                        <div class="cb"></div>
+                    </div>
+                    {/if}
+                    {php  $t_i++}
+                {/loop}
+                    <div class="cb"></div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">设备总数</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=device_total"></i>
+                        <span>{$dm}&type=device_total</span>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">全国地图</div>
+                <div class="form-group">
+                    <label for="" class="col-md-2 control-label">API地址：</label>
+                    <div class="col-md-10">
+                        <i class="fa fa-paste" title="复制" data-text="{$dm}&type=device_map"></i>
+                        <span>{$dm}&type=device_map</span>
+                    </div>
+                </div>
+
+                <div>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="form-btn">
+            <input type="hidden" name="save_type" value="data_view">
+            <input type="hidden" name="op" value="save">
+            <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+</form>
+<script>
+        require(['clipboard'], function(ClipboardJS) {
+        const clipboard = new ClipboardJS('.operate i[data-text]', {
+            text: function(trigger) {
+                return $(trigger).attr('data-text');
+            }
+        })
+        clipboard.on('success', function(e) {
+            util.message('复制成功', '', 'success');
+        })
+    })
+</script>
+
+{template 'common/footer'}

@@ -1,0 +1,10 @@
+<form>
+  <fieldset id="revert-form-field">
+      <div class="form-group">
+        <label>请输入(<span style="color:red;font-weight:bold;"> {$confirm_code} </span>)以确认重置设备[ <span style="color:blue;">{$device_name}</span> ]</label>
+        <input type="text" class="form-control" id="confirmcode" placeholder="请输入上面的红字确认码" autofocus="true" autocomplete="false">
+      </div>
+      <button type="button" class="btn btn-danger"  onclick="api.deviceRevert({$device_id})">确定重置设备</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>      
+  </fieldset>
+</form>

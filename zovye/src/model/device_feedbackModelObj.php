@@ -1,0 +1,48 @@
+<?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
+
+namespace zovye\model;
+
+use zovye\base\modelObj;
+
+use function zovye\tb;
+
+/**
+ * @method getRemark()
+ * @method getPics()
+ * @method getText()
+ * @method setRemark($remark)
+ * @method getDeviceId()
+ * @method getUserId()
+ */
+class device_feedbackModelObj extends modelObj
+{
+    public static function getTableName($readOrWrite): string
+    {
+        return tb('device_feedback');
+    }
+
+    /** @var int */
+    protected $id;
+
+    protected $uniacid;
+
+    /** @var int */
+    protected $user_id;
+
+    protected $text;
+
+    protected $pics;
+
+    /** @var int */
+    protected $device_id;
+
+    protected $remark;
+
+    /** @var int */
+    protected $createtime;
+
+}

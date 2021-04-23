@@ -1,0 +1,78 @@
+{if $reps}
+<style>
+    .profile img{
+        width: 32px;
+        height: 32px;
+    }
+    .we7-modal-dialog .modal-body{
+        max-height: unset;
+    }
+    .pay{
+        color: gray;
+        display: inline-block;
+    }
+
+    #orderlist .balance {
+        color: #3F51B5;
+    }
+    #orderlist .wxpay{
+        color: #8BC34A;
+        font-size: 1.2em;
+    }
+    #orderlist .free{
+        color: #4CAF50;
+    }
+    #orderlist .balance i{
+        font-size: 1.2em;
+    }
+    #orderlist .order-from img{
+        width: 32px;
+        max-height: 32px;
+    }
+</style>
+<div id="log-pager">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>设备名称</th>
+            <th>商品名称</th>
+            <th>商品数量</th>
+            <th>时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $reps $index $rep}
+        <tr>
+            <td>{php echo $index + 1}</td>
+            <td>
+                <div class="">
+                    <div>{php echo $rep['device_name']}</div>
+                </div>
+            </td>
+            <td>
+                <div>{php echo $goods_assoc[$rep['goods_id']]['name']}</div>
+            </td>
+            <td>
+                <div class="">
+                    {$rep['num']}
+                </div>
+            </td>
+            <td>
+                <div class="">
+                    {$rep['createtime']}
+                </div>
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    <div class="pull-right">
+        {$pager}
+    </div>
+</div>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时还没有任何订单！
+</div>
+{/if}

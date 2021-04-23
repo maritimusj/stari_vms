@@ -1,0 +1,183 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'stat'));}">营收统计</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stat'));}">提现统计</a></li>
+    <li role="presentation" class="active"><a href="#">订单导出</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}">佣金明细</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('account', array('op'=>'platform_stat'));}">平台分成</a></li>
+</ul>
+<form class="form">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                <div class="col-md-5">
+                    <select name="agent_openid" id="select_agent" style="width:100%;">
+                        <option value="0">&lt;不限&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_agent">查找</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="select_account" class="col-md-2 control-label">公众号</label>
+                <div class="col-md-5">
+                    <select name="account_id" id="select_account" style="width:100%;">
+                        <option value="0">&lt;不限&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_account" id="keyword_account" placeholder="请输入公众号名称查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_account">查找</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="select_device" class="col-md-2 control-label">设备</label>
+                <div class="col-md-5">
+                    <select name="device_id" id="select_device" style="width:100%;">
+                        <option value="0">&lt;不限&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_device" id="keyword_device" placeholder="请输设备ＩＭＥＩ号查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_device">查找</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-md-3 col-md-2 control-label">开始时间</label>
+                <div class="col-md-9 col-md-10 col-lg-10">
+                    {php echo tpl_form_field_date('starttime', $starttime, false)}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-md-3 col-md-2 control-label">截止时间</label>
+                <div class="col-md-9 col-md-10 col-lg-10">
+                    {php echo tpl_form_field_date('endtime', $endtime, false)}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-md-3 col-md-2 control-label">选择字段</label>
+                <div class="col-md-9 col-md-10 col-lg-10">
+                    {loop $headers $index $item}
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="header" value="{$index}" checked> {$item}
+                    </label>
+                    {/loop}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <button type="button" class="btn btn-primary" id="export"><i class="fa fa-sign-out"></i>&nbsp;导出</button>
+    </div>
+</form>
+<script>
+    $(function(){
+        $('#find_agent').click(function(){
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {op:'search', keyword:keyword}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*">_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                    })
+                }
+                html += '<option value="0"><不限></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function(){
+                util.loaded();
+            })
+        })
+
+        $('#find_account').click(function(){
+            const keyword = $('input[name=keyword_account]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('account')}", {op:'search', keyword:keyword}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*">公众号：_2*，_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.title)
+                    })
+                }
+                html += '<option value="0"><不限></option>';
+                $('#select_account').html(html);
+
+            }, 'json').complete(function(){
+                util.loaded();
+            })
+        })
+        $('#find_device').click(function(){
+            const keyword = $('input[name=keyword_device]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('device');}", {op:'search', keyword:keyword}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*">_2*，IMEI：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.imei)
+                    })
+                }
+                html += '<option value="0"><不限></option>';
+                $('#select_device').html(html);
+
+            }, 'json').complete(function(){
+                util.loaded();
+            })
+        })
+
+        function downloadFile(url, filename) {
+            const form = $("<form></form>").attr("action", url).attr("method", "post");
+            form.append($("<input>").attr("type", "hidden").attr("name", "fileName").attr("value", filename));
+            form.appendTo('body').submit().remove();
+        }
+
+        $('#export').click(function(){
+            const agent_openid = $('select[name=agent_openid]').val();
+            const account_id = $('select[name=account_id]').val();
+            const device_id = $('select[name=device_id]').val();
+
+            const starttime = $('input[name=starttime]').val();
+            const endtime = $('input[name=endtime]').val();
+
+            let headers = [];
+            $('input[name=header]:checked').each(function(){
+                headers.push($(this).val());
+            });
+
+            let url = "{php echo $this->createWebUrl('order', array('op' => 'export_do', 'agentopenid' => '__agentid__', 'accountid' => '__accountid__', 'deviceid' => '__deviceid__', 'start' => '__start__', 'end' => '__end__',  'headers'=>'__header__'));}";
+            url = url.replace('__agentid__', agent_openid)
+                .replace('__accountid__', account_id)
+                .replace('__deviceid__', device_id)
+                .replace('__start__', starttime)
+                .replace('__end__', endtime)
+                .replace('__header__', encodeURIComponent(headers.join(',')));
+
+            downloadFile(url, 'order.xls');
+        })
+    })
+</script>
+{template 'common/footer'}

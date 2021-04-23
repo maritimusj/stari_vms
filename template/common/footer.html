@@ -1,0 +1,26 @@
+</div>
+<div class="clearfix"></div>
+<div class="container-fluid footer text-center" role="footer">	
+		{php $icps = iunserializer($_W['setting']['copyright']['icps']);}
+		{if !empty($icps)}
+		{loop $icps $icp}
+		{if $icp['domain'] == $_SERVER['HTTP_HOST']}
+		备案号：<a href="http://beian.miit.gov.cn/" target="_blank">{$icp['icp']}</a>
+		{/if}
+		{/loop}
+		{/if}
+		{if !empty($_W['setting']['copyright']['policeicp']['policeicp_location']) && !empty($_W['setting']['copyright']['policeicp']['policeicp_code'])}
+			<a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={php echo $_W['setting']['copyright']['policeicp']['policeicp_code']}">
+                &nbsp;&nbsp;<img src="./resource/images/icon-police.png" >
+				{php echo $_W['setting']['copyright']['policeicp']['policeicp_location']} {php echo $_W['setting']['copyright']['policeicp']['policeicp_code']}号
+			</a>
+		{/if}
+	</div>
+</div>
+</div>
+
+</div>
+</div>
+{template 'common/footer-base'}
+</body>
+</html>

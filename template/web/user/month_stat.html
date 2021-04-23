@@ -1,0 +1,27 @@
+{if $data}
+<table class="table table-bordered table-hover" style="margin-top:1em;text-align:center;">
+    <thead>
+    <tr class="active">
+        <th style="text-align:center;">月份</th>
+        <th style="text-align:center;">收入金额</th>
+        <th style="text-align:center;">提现金额</th>
+        <th style="text-align:center;">提现手续费</th>
+        <th style="text-align:center;">留存金额</th>
+    </tr>
+    </thead>
+    {loop $data $i $item}
+    <tr>
+        <td>{$i}</td>
+        <td>{php echo number_format(abs($item['income'])/100, 2)} 元</td>
+        <td>{php echo number_format(abs($item['withdraw'])/100, 2)} 元</td>
+        <td>{php echo number_format(abs($item['fee'])/100, 2)} 元</td>
+        <td>{php echo number_format(abs($item['balance'])/100, 2)} 元</td>
+    </tr>
+    {/loop}
+
+</table>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时没有统计信息！
+</div>
+{/if}

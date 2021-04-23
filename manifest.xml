@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://www.we7.cc" versionCode="">
+    <application setting="false">
+        <name><![CDATA[新零售saas系统]]></name>
+        <identifie><![CDATA[zovye_vms]]></identifie>
+        <version><![CDATA[6.0.1]]></version>
+        <type><![CDATA[business]]></type>
+        <ability><![CDATA[新零售saas系统]]></ability>
+        <description><![CDATA[新零售saas系统]]></description>
+        <author><![CDATA[jjs]]></author>
+        <url><![CDATA[]]></url>
+    </application>
+    <platform>
+        <subscribes>
+        </subscribes>
+        <handles>
+        </handles>
+        <rule embed="false"/>
+        <card embed="false"/>
+        <supports>
+            <item type="app"></item>
+        </supports>
+    </platform>
+    <bindings>
+        <cover>
+        </cover>
+        <menu>
+            <entry title="平台首页" do="homepage" state="" direct=""/>
+            <entry title="设备管理" do="device" state="" direct=""/>
+            <entry title="用户管理" do="user" state="" direct=""/>
+            <entry title="代理管理" do="agent" state="" direct=""/>
+            <entry title="提现管理" do="withdraw" state="" direct=""/>
+            <entry title="订单管理" do="order" state="" direct=""/>
+            <entry title="吸粉管理" do="account" state="" direct=""/>
+            <entry title="广告管理" do="adv" state="" direct=""/>
+            <entry title="活码管理" do="qrcode" state="" direct=""/>
+            <entry title="标签管理" do="tags" state="" direct=""/>
+            <entry title="文档管理" do="article" state="" direct=""/>
+            <entry title="型号管理" do="devicetypes" state="" direct=""/>
+            <entry title="商品管理" do="goods" state="" direct=""/>
+            <entry title="版本管理" do="upgrade" state="" direct=""/>
+            <entry title="系统设置" do="settings" state="" direct=""/>
+        </menu>
+    </bindings>
+    <permissions>
+    </permissions>
+    <install><![CDATA[install.php]]></install>
+    <uninstall><![CDATA[uninstall.php]]></uninstall>
+    <upgrade><![CDATA[update.php]]></upgrade>
+</manifest>

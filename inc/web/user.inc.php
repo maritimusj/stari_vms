@@ -1,0 +1,760 @@
+<?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
+
+namespace zovye;
+
+defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\balanceModelObj;
+use zovye\model\commission_balanceModelObj;
+use zovye\model\goodsModelObj;
+use zovye\model\keeper_devicesModelObj;
+use zovye\model\keeperModelObj;
+use zovye\model\prizeModelObj;
+use zovye\model\replenishModelObj;
+use zovye\model\userModelObj;
+use zovye\model\users_vwModelObj;
+
+$op = request::op('default');
+
+$tpl_data = [
+    'user_state_class' => [
+        0 => 'normal',
+        1 => 'banned',
+    ],
+    'op' => $op,
+];
+
+if ($op == 'default') {
+
+    $tpl_data['agent_levels'] = settings('agent.levels');
+
+    $tpl_data['commission_enabled'] = App::isCommissionEnabled();
+
+    $balance_used = App::isUserCenterEnabled();
+    if ($balance_used) {
+        $tpl_data['balance'] = settings('user.balance');
+        $prize_used = App::isUserPrizeEnabled();
+    }
+
+    $credit_used = settings('we7credit.enabled');
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    //身份
+    $s_principal = request::trim('s_principal');
+    if ($s_principal) {
+        switch ($s_principal) {
+            case User::AGENT:
+                $query = Principal::agent();
+                break;
+            case User::PARTNER:
+                $query = Principal::partner();
+                break;
+            case User::KEEPER:
+                $query = Principal::keeper();
+                break;
+            case User::TESTER:
+                $query = Principal::tester();
+                break;
+            case User::GSPOR:
+                $query = Principal::gspsor();
+                break;
+        }
+    }
+
+    if (empty($query)) {
+        $query = User::query();
+    }
+
+    //搜索用户名
+    $s_keywords = urldecode(request::trim('s_keywords'));
+    if ($s_keywords) {
+        if (in_array($s_principal, [User::AGENT, User::PARTNER, User::KEEPER, User::TESTER, User::GSPOR])) {
+            $query->where("(name LIKE '%{$s_keywords}%' OR nickname LIKE '%{$s_keywords}%' OR mobile LIKE '%{$s_keywords}%')");
+        } else {
+            $query->where("(nickname LIKE '%{$s_keywords}%' OR mobile LIKE '%{$s_keywords}%')");
+        }
+    }
+
+    $types = [];
+    $s_type_wx = request::bool('s_type_wx');
+    if ($s_type_wx) {
+        $types[] = User::WX;
+    }
+
+    $s_type_wxapp = request::bool('s_type_wxapp');
+    if ($s_type_wxapp) {
+        $types[] = User::WxAPP;
+    }
+
+    $s_type_ali = request::bool('s_type_ali');
+    if ($s_type_ali) {
+        $types[] = User::ALI;
+    }
+
+    $s_type_api = request::bool('s_type_api');
+    if ($s_type_api) {
+        $types[] = User::API;
+    }
+
+    //当指定了**部分**用户类型时，加入用户app条件过滤
+    if ($types && count($types) < 3) {
+        $query->where(['app' => $types]);
+    }
+
+    $total = $query->count();
+    if ($page > ceil($total / $page_size)) {
+        $page = 1;
+    }
+
+    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
+    $query->page($page, $page_size);
+    $query->orderBy('id desc');
+
+    $users = [];
+    /** @var  users_vwModelObj $user */
+    foreach ($query->findAll() as $user) {
+        $data = [
+            'id' => $user->getId(),
+            'openid' => $user->getOpenid(),
+            'nickname' => $user->getNickname(),
+            'avatar' => $user->getAvatar(),
+            'createtime' => date('Y-m-d H:i:s', $user->getCreatetime()),
+            'mobile' => $user->getMobile(),
+            'state' => $user->getState(),
+            'banned' => $user->isBanned(),
+            'isAgent' => $user->isAgent(),
+            'isPartner' => $user->isPartner(),
+            'isKeeper' => $user->isKeeper(),
+            'isTester' => $user->isTester(),
+            'verified' => $user->isIDCardVerified(),
+            'isLocked' => $user->isLocked()
+        ];
+
+        if ($credit_used) {
+            $data['credit'] = $user->getWe7credit()->total();
+        }
+
+        if (!empty($prize_used)) {
+            $data['prizeNum'] = m('prize')->where(We7::uniacid(['openid' => $user->getOpenid()]))->count();
+        }
+
+        if ($user->isAgent()) {
+            $agent = $user->agent();
+            if ($agent) {
+                $data['agent'] = $agent->getAgentLevel();
+            }
+        } elseif ($user->isPartner()) {
+            $agent = $user->getPartnerAgent();
+            if ($agent) {
+                $data['co_agent'] = $agent->profile();
+            }
+        } elseif ($user->isKeeper()) {
+            /** @var keeperModelObj $keeper */
+            $keeper = $user->getKeeper();
+            if ($keeper) {
+                $agent = $keeper->getAgent();
+                if ($agent) {
+                    $data['co_agent'] = $agent->profile();
+                }
+            }
+        }
+
+        //用户来源信息
+        $from_data = $user->get('fromData', []);
+        if ($from_data) {
+            if (!empty($from_data['device'])) {
+                $data['from'] = "来自设备：{$from_data['device']['name']}";
+            } elseif (!empty($from_data['account'])) {
+                $data['from'] = "来自公众号：{$from_data['account']['name']}，{$from_data['account']['title']}";
+            }
+        }
+
+        $data_arr = $user->settings('verify_18');
+        if ($data_arr['verify']) {
+            $data['verified'] = 1;
+        }
+
+        $data['type'] = User::getUserCharacter($user);
+        $users[] = $data;
+    }
+
+    $tpl_data['s_keywords'] = $s_keywords;
+    $tpl_data['s_type_wx'] = $s_type_wx;
+    $tpl_data['s_type_wxapp'] = $s_type_wxapp;
+    $tpl_data['s_type_ali'] = $s_type_ali;
+    $tpl_data['s_type_api'] = $s_type_api;
+    $tpl_data['s_principal'] = $s_principal;
+    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_api;
+
+    $tpl_data['users'] = $users;
+
+    $this->showTemplate('web//user/default', $tpl_data);
+
+} elseif ($op == 'user_stats') {
+
+    $ids = request::isset('id') ? [request::int('id')] : request::array('ids');
+
+    $result = [];
+
+    if (is_array($ids)) {
+        $commission_balance = App::isCommissionEnabled();
+
+        $query = User::query(['id' => $ids]);
+
+        /** @var userModelObj $user */
+        foreach ($query->findAll() as $user) {
+            if ($user) {
+                $data = [
+                    'id' => $user->getId(),
+                    'free' => $user->getFreeTotal(),
+                    'fee' => $user->getFeeTotal(),
+                    'balance' => $user->getBalanceTotal(),
+                ];
+
+                if ($commission_balance) {
+                    $total = $user->getCommissionBalance()->total();
+                    if ($user->isAgent() || $user->isGSPor() || $user->isKeeper() || $user->isPartner()) {
+                        $data['commission_balance'] = $total;
+                        $data['commission_balance_formatted'] = number_format($total / 100, 2);
+                    }
+                }
+
+                $result[] = $data;
+            }
+        }
+    }
+
+    JSON::success($result);
+
+} elseif ($op == 'ban') {
+
+    $id = request::int('id');
+    if ($id) {
+        $user = User::get($id);
+
+        if ($user) {
+            $user->setState($user->getState() == 0 ? 1 : 0);
+
+            if ($user->save()) {
+                JSON::success(['msg' => '操作成功！', 'banned' => $user->isBanned()]);
+            }
+        }
+    }
+
+    JSON::fail('操作失败');
+
+} elseif ($op == 'reset_mobile') {
+
+    $id = request::int('id');
+    if ($id) {
+        $user = User::get($id);
+        if (empty($user)) {
+            JSON::fail('找不到这个用户！');
+        }
+
+        if ($user->isAgent() || $user->isPartner() || $user->isKeeper()) {
+            JSON::fail('无法操作，请先删除用户身份！');
+        }
+
+        if ($user->setMobile('') && $user->save()) {
+            JSON::success('已清除用户的手机号码！');
+        }
+    }
+
+} elseif ($op == 'reset_idcard_verify') {
+
+    $id = request::int('id');
+    if ($id) {
+        $user = User::get($id);
+        if (empty($user)) {
+            JSON::fail('找不到这个用户！');
+        }
+
+        if ($user->setIDCardVerified('') && $user->save()) {
+            JSON::success('已清除用户的实名认证信息！');
+        }
+    }
+
+} elseif ($op == 'keeper') {
+
+    $id = request::int('id');
+    if ($id > 0) {
+        $user = User::get($id);
+        if ($user && $user->isKeeper()) {
+            $keeper = $user->getKeeper();
+
+            if ($keeper && $keeper->destroy() && $user->setKeeper(false)) {
+                Util::itoast('取消取消运营人员成功！', $this->createWebUrl('user', ['principal' => 'keeper']), 'success');
+            }
+        }
+    }
+
+    Util::itoast('取消取消运营人员失败！', $this->createWebUrl('user', ['principal' => 'keeper']), 'error');
+
+} elseif ($op == 'search') {
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    $query = User::query();
+
+    $keywords = request::trim('keywords');
+    if (!empty($keywords)) {
+        $query->whereOr(
+            [
+                'nickname LIKE' => "%{$keywords}%",
+                'mobile LIKE' => "%{$keywords}%",
+            ]
+        );
+    }
+
+    $passport = request::trim('passport');
+    if (!empty($passport)) {
+        $query->where(
+            [
+                'passport LIKE' => "%{$passport}%",
+            ]
+        );
+    }
+
+    $total = $query->count();
+    $total_page = ceil($total / $page_size);
+    if ($page > $total_page) {
+        $page = 1;
+    }
+
+    $result = [
+        'page' => $page,
+        'pagesize' => $page_size,
+        'totalpage' => $total_page,
+        'total' => $total,
+        'list' => [],
+    ];
+
+    if ($total > 0) {
+        $query->orderBy('id desc');
+        $query->page($page, $page_size);
+
+        /** @var userModelObj $user */
+        foreach ($query->findAll() as $user) {
+            $result['list'][] = [
+                'id' => $user->getId(),
+                'nickname' => $user->getName(),
+                'avatar' => $user->getAvatar(),
+                'mobile' => $user->getMobile(),
+            ];
+        }
+    }
+
+    exit(json_encode($result));
+
+} elseif ($op == 'balance_log') {
+
+    $title = '余额变动记录';
+    $log = [];
+    $pager = '';
+
+    $user = User::get(request::int('id'));
+    if ($user) {
+        $title = "<b>{$user->getName()}</b>的{$title}";
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+        $balance = $user->getBalance();
+        $logQuery = $balance->log();
+        if ($logQuery) {
+            $total = $logQuery->count();
+
+            if ($total > 0) {
+                if ($page > ceil($total / $page_size)) {
+                    $page = 1;
+                }
+
+                $pager = We7::pagination($total, $page, $page_size);
+                $logQuery->orderBy('createtime desc');
+                $logQuery->page($page, $page_size);
+
+                /** @var balanceModelObj $entry */
+                foreach ($logQuery->findAll() as $entry) {
+                    $data = [
+                        'id' => $entry->getId(),
+                        'xval' => $entry->getXVal() > 0 ? '+' . $entry->getXVal() : $entry->getXVal(),
+                        'src' => Balance::desc($entry->getSrc()),
+                        'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                    ];
+
+                    if ($entry->getSrc() == Balance::SYS) {
+
+                        $data['memo'] = '系统每月免费额度赠送';
+
+                    } elseif ($entry->getSrc() == Balance::ORDER) {
+
+                        if (stripos($entry->getMemo(), 'orderid:') !== false) {
+                            $order_id = intval(ltrim($entry->getMemo(), 'orderid:'));
+                            if ($order_id) {
+                                $order = Order::get($order_id);
+                                if ($order) {
+                                    $data['memo'] = "公众号：{$order->getAccount()}";
+                                    $device = Device::get($order->getDeviceId());
+                                    if ($device) {
+                                        $data['memo'] .= "，设备：{$device->getName()}";
+                                    }
+                                }
+                            }
+                        }
+
+                    } elseif ($entry->getSrc() == Balance::CHARGE) {
+                        if (stripos($entry->getMemo(), 'wxorder:') !== false) {
+                            $wx_order = ltrim($entry->getMemo(), 'wxorder:');
+                            if ($wx_order) {
+                                $pay_log = $user->getPayLog($wx_order);
+                                if ($pay_log) {
+                                    $log_data = $pay_log->getData();
+                                    $data['memo'] = "订单号：{$log_data['payResult']['tid']}，金额：{$log_data['payResult']['fee']}元";
+                                }
+                            }
+                        }
+                    }
+
+                    if (empty($data['memo'])) {
+                        $data['memo'] = $entry->getMemo();
+                    }
+
+                    $log[] = $data;
+                }
+            }
+        }
+    }
+
+    $content = $this->fetchTemplate(
+        'web/common/balance-log',
+        [
+            'log' => $log,
+            'pager' => $pager,
+        ]
+    );
+
+    JSON::success(['title' => $title, 'content' => $content]);
+
+} elseif ($op == 'keeper_device') {
+
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $keeper = $user->getKeeper();
+    if (empty($keeper)) {
+        JSON::fail('这个用户不是营运人员！');
+    }
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    $query = Device::query(['keeper_id' => $keeper->getId()]);
+
+    $total = $query->count();
+    $pager = We7::pagination($total, $page, $page_size);
+
+    $query->orderBy('createtime DESC');
+    $query->page($page, $page_size);
+
+    $list = [];
+    /** @var keeper_devicesModelObj $item */
+    foreach ($query->findAll() as $item) {
+        $data = [
+            'id' => $item->getId(),
+            'name' => $item->getName(),
+            'imei' => $item->getImei(),
+        ];
+
+        if ($item->getCommissionFixed() != -1) {
+            $commission_val = number_format(abs($item->getCommissionFixed()) / 100, 2) . '元';
+        } else {
+            $commission_val = $item->getCommissionPercent() . '%';
+        }
+
+        $data['commission'] = $commission_val;
+        $data['kind'] = $item->getKind();
+        $data['way'] = empty($item->getWay()) ? '销售分成' : '补货分成';
+
+        $list[] = $data;
+    }
+
+    $content = $this->fetchTemplate(
+        'web/user/keeper_device',
+        [
+            'devices' => $list,
+            'pager' => $pager,
+        ]
+    );
+
+    JSON::success(['title' => '', 'content' => $content]);
+
+} elseif ($op == 'keeper_replenish') {
+
+    //补货记录
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $pager = '';
+
+    $user = User::get(request::int('id'));
+    $reps = [];
+    $goods_assoc = [];
+    if ($user->isKeeper()) {
+        $keeper = $user->getKeeper();
+        if ($keeper) {
+
+            $query = m('replenish')->query(We7::uniacid(['keeper_id' => $keeper->getId()]));
+            $total = $query->count();
+
+            $goods_arr = [];
+            if ($total > 0) {
+                $pager = We7::pagination($total, $page, $page_size);
+                $query->orderBy('createtime DESC');
+                $query->page($page, $page_size);
+
+                $replenish_res = $query->findAll();
+                /** @var replenishModelObj $item */
+                foreach ($replenish_res as $item) {
+                    $data = [
+                        'num' => $item->getNum(),
+                        'createtime' => date('Y-m-d H:i:s', $item->getCreatetime()),
+                        'goods_id' => $item->getGoodsId(),
+                    ];
+                    $d_data = json_decode($item->getExtra());
+                    $d_name = isset($d_data->device->name) ? $d_data->device->name : '';
+                    $goods_arr[] = $item->getGoodsId();
+                    $data['device_name'] = $d_name;
+
+                    $reps[] = $data;
+                }
+
+                if (!empty($goods_arr)) {
+                    $goods_arr = array_unique($goods_arr);
+                    $goods_res = Goods::query()->where('id IN (' . implode(',', $goods_arr) . ')')->findAll();
+                    /** @var goodsModelObj $item */
+                    foreach ($goods_res as $item) {
+                        $goods_assoc[$item->getId()] = [
+                            'name' => $item->getName(),
+                        ];
+                    }
+                }
+
+            }
+        }
+    }
+
+    $content = $this->fetchTemplate(
+        'web/user/keeper_replenish',
+        [
+            'goods_assoc' => $goods_assoc,
+            'reps' => $reps,
+            'pager' => $pager,
+        ]
+    );
+
+    JSON::success(['title' => '', 'content' => $content]);
+
+} elseif ($op == 'month_stat') {
+
+    $user = User::get(request('id'));
+    $data = [];
+    if ($user) {
+        $openid = $user->getOpenid();
+
+        $res = CommissionBalance::query(['openid' => $openid])->findAll();
+        $c_arr = [
+            CommissionBalance::ORDER_FREE,
+            CommissionBalance::ORDER_BALANCE,
+            CommissionBalance::ORDER_WX_PAY,
+            CommissionBalance::REFUND,
+            CommissionBalance::ORDER_REFUND,
+            CommissionBalance::GSP,
+            CommissionBalance::BONUS,
+        ];
+        /** @var commission_balanceModelObj $item */
+        foreach ($res as $item) {
+            $month_date = date('Y-m', $item->getCreatetime());
+            if (!isset($data[$month_date])) {
+                $data[$month_date]['income'] = 0;
+                $data[$month_date]['withdraw'] = 0;
+                $data[$month_date]['fee'] = 0;
+            }
+
+            $src = $item->getSrc();
+            $x_val = $item->getXVal();
+
+            if (in_array($src, $c_arr)) {
+                $data[$month_date]['income'] += $x_val;
+            } elseif ($src == CommissionBalance::ADJUST) {
+                if ($x_val > 0) {
+                    $data[$month_date]['income'] += $x_val;
+                } else {
+                    $data[$month_date]['withdraw'] += $x_val;
+                }
+            } elseif ($src == CommissionBalance::WITHDRAW) {
+                $data[$month_date]['withdraw'] += $x_val;
+            } elseif ($src == CommissionBalance::FEE) {
+                $data[$month_date]['fee'] += $x_val;
+            }
+
+        }
+    }
+
+    ksort($data);
+
+    $last_month_balance = 0;
+
+    foreach ($data as $key => $item) {
+        $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
+        $last_month_balance = $data[$key]['balance'];
+    }
+
+    krsort($data);
+
+    $content = $this->fetchTemplate(
+        'web/user/month_stat',
+        [
+            'data' => $data,
+        ]
+    );
+
+    JSON::success(['title' => "<b>{$user->getName()}</b>的收提统计", 'content' => $content]);
+
+} elseif ($op == 'unlock') {
+
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('没有找到这个用户！');
+    }
+
+    if (!$user->unlock()) {
+        JSON::fail('失败！');
+    }
+
+    JSON::success('成功！');
+
+} else {
+
+    if ($op == 'balance_edit') {
+
+        $user = User::get(request::int('userid'));
+        if (empty($user)) {
+            JSON::fail('没有找到这个用户！');
+        }
+
+        $content = $this->fetchTemplate(
+            'web/common/balance-edit',
+            [
+                'user' => [
+                    'id' => $user->getId(),
+                    'openid' => $user->getOpenid(),
+                    'nickname' => $user->getNickname(),
+                    'avatar' => $user->getAvatar(),
+                    'isAgent' => $user->isAgent(),
+                    'isPartner' => $user->isPartner(),
+                    'isKeeper' => $user->isKeeper(),
+                    'verified' => $user->isIDCardVerified(),
+                ],
+            ]
+        );
+
+        JSON::success(['title' => '调整用户余额', 'content' => $content]);
+
+    } else {
+
+        if ($op == 'balance_edit_save') {
+
+            $user = User::get(request::int('userid'));
+            if (empty($user)) {
+                JSON::fail('没有找到这个用户！');
+            }
+
+            $total = request::float('total', 0, 2) * 100;
+            if ($total == 0) {
+                JSON::fail('金额不能为零！');
+            }
+
+            if ($user->lock()) {
+                $memo = strval(request('memo'));
+                $r = $user->commission_change(
+                    $total,
+                    CommissionBalance::ADJUST,
+                    [
+                        'admin' => _W('username'),
+                        'ip' => CLIENT_IP,
+                        'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                        'memo' => $memo,
+                    ]
+                );
+                if ($r && $r->update([], true)) {
+                    JSON::success('操作成功 ！');
+                }
+            }
+
+            JSON::fail('保存数据失败！');
+
+        } elseif ($op == 'prize') {
+
+            $user = User::get(intval($_GET['id']));
+            if ($user) {
+
+                $title = "<b>{$user->getName()}</b>的奖品记录";
+
+                $page = max(1, request::int('page'));
+                $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+                $pager = '';
+
+                $prizes = [];
+
+                $query = m('prize')->query();
+                $query->where(We7::uniacid(['openid' => $user->getOpenid()]));
+
+                $total = $query->count();
+                if ($total > 0) {
+
+                    if ($page > ceil($total / $page_size)) {
+                        $page = 1;
+                    }
+
+                    $pager = We7::pagination($total, $page, $page_size);
+
+                    $query->orderBy('createtime DESC');
+                    $query->page($page, $page_size);
+
+                    /** @var prizeModelObj $entry */
+                    foreach ($query->findAll() as $entry) {
+                        $prizes[] = [
+                            'id' => $entry->getId(),
+                            'title' => $entry->getTitle(),
+                            'link' => $entry->getLink(),
+                            'desc' => $entry->getDesc(),
+                            'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                        ];
+                    }
+                }
+
+                $content = $this->fetchTemplate(
+                    'web/prize/prize-log',
+                    [
+                        'prizes' => $prizes,
+                        'pager' => $pager,
+                    ]
+                );
+
+                JSON::success(['title' => $title, 'content' => $content]);
+            }
+
+            JSON::fail('没找到这个用户！');
+        }
+    }
+}

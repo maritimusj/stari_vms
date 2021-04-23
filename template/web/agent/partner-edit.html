@@ -1,0 +1,101 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .agent {
+        display: inline-block;
+    }
+    #navbar a .profile {
+      cursor: default;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+  <li role="presentation" class="active">
+    <a href="#">
+      <div class="agent" title="{$level['title']}">
+        <div class="profile" style="background-color:{$level['clr']}">
+            <img src="{php echo $agent->getAvatar()}">
+            <div class="nickname">{php echo $agent->getName();}</div>                            
+        </div>
+    </div>
+    <div  style="display:inline-block;margin:0 10px;">
+        正在{if $op=='partneradd'}创建{else}编辑{/if}合伙人
+    </div>        
+    <div class="agent" title="{$level['title']}">
+        <div class="profile"  {if $op=='partneredit'}style="background-color:{$level['clr']}"{/if}>
+            <img src="{php echo $user->getAvatar()}">
+            <div class="nickname">{php echo $user->getName();}</div>                            
+        </div>
+    </div>
+  </a>
+</li>
+</ul>
+<form class="form" action="{php echo $this->createWebUrl('agent')}" method="post">
+<div class="panel panel-default panel-first">
+    <div class="heading">      
+    </div>
+    <div class="panel-body">
+        <div class="seg">
+            <div class="title">基本信息</div>
+            <div class="form-group">
+                <label for="name" class="col-md-2 control-label">姓名</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="name" id="name" value="{$partnerData['name']}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="mobile" class="col-md-2 control-label">手机号码</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="mobile" id="mobile" value="{$partnerData['mobile']}" >
+                    <span class="help-block">* 手机号码必须提供，代理商管理小程序需要手机号码才能登录！</span>
+                </div>
+            </div>        
+        </div>
+        <div class="seg">
+            <div class="title">通知设置</div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" name="remainWarning" value="1" {if !isset($notice) || $notice['remainWarning']}checked{/if}>
+                        接收 <big>设备缺货</big> 微信推送通知
+                      </label>
+                    </div>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" name="deviceError" value="1" {if !isset($notice) || $notice['deviceError']}checked{/if}>
+                        接收 <big>设备故障</big> 微信推送通知
+                      </label>
+                    </div>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" name="reviewResult" value="1" {if !isset($notice) || $notice['reviewResult']}checked{/if}>
+                        接收 <big>广告审核结果</big> 微信推送通知
+                      </label>
+                    </div>      
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" name="agentApp" value="1" {if !isset($notice) || $notice['agentApp']}checked{/if}>
+                        接收 <big>代理商申请</big> 微信推送通知
+                      </label>
+                    </div>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" name="agentMsg" value="1" {if !isset($notice) || $notice['agentMsg']}checked{/if}>
+                        接收 <big>消息提醒</big> 微信推送通知
+                      </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-btn">
+    <input type="hidden" name="agentid" value="{php echo $agent->getId();}">
+    <input type="hidden" name="userid" value="{php echo $user->getId();}">
+    <input type="hidden" name="op" value="partnersave">
+    <input type="hidden" name="from" value="{$op}">
+    <button type="submit" class="btn btn-primary">{if $op=='partneradd'}创建{else}保存{/if}</button>
+    <button type="button" class="btn btn-default" onclick='location.href="{$back_url}"'>返回</button>
+</div>
+</form>
+{template 'common/footer'}

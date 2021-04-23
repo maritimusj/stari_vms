@@ -1,0 +1,459 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .radio-inline+.radio-inline, .checkbox-inline+.checkbox-inline {
+        margin-top: 0;
+        margin-right: 10px;
+        margin-left: 0;
+    }
+</style>
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">订单管理</div>
+                <div class="form-group">
+                    <label for="allowAgentRefund" class="col-md-2 control-label">订单退款</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="allowAgentRefund" id="allowAgentRefund" value="1" {if $settings['agent']['order']['refund']}checked{/if}>
+                                允许代理商给用户订单退款
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">小程序</div>
+                <div class="form-group">
+                    <label for="WxAppKey" class="col-md-2 control-label">App ID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="WxAppKey" id="WxAppKey" value="{$settings['agentWxapp']['key']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="WxAppSecret" class="col-md-2 control-label">App Secret</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="WxAppSecret" id="WxAppSecret" value="{$settings['agentWxapp']['secret']}">
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">消息提醒</div>
+                <div class="form-group">
+                    <label for="agentMsg" class="col-md-2 control-label">微信消息模板ID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="agentMsg" id="agentMsg" value="{$settings['agent']['msg_tplid']}">
+                        <span class="help-block">* 管理员给代理商发送消息提醒时使用这个模板ID</span>
+                    </div>
+                </div>
+            </div>
+            <div class="seg" id="special">
+                <div class="title">代理登记</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">邀请登记网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$mobile_url}"></i> {$mobile_url}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">推荐码</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentReferral" id="agentReferral" value="1" {if $settings['agent']['reg']['referral']}checked{/if}>
+                                必须填写推荐码才能注册代理商
+                            </label>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="agentRegMode" class="col-md-2 control-label">自动注册为代理商</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentRegMode" id="agentRegMode" value="1" {if $settings['agent']['reg']['mode']}checked{/if}>
+                                用户提交手机号码后自动成为代理商
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($settings['agent']['reg']['mode'])}disabled{/if} id="agent_reg_mode">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">代理等级</label>
+                    <div class="col-md-10">
+                        <select name="agentRegLevel" style="width:100%">
+                            {loop $settings['agent']['levels'] $index $level}
+                            <option value="{$index}"{if $settings['agent']['reg']['level']==$index} selected{/if} style="color:{$level['clr']}"> {$level['title']} </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="agentRegMode" class="col-md-2 control-label">代理功能</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_tj" value="1" {if ($settings['agent']['reg']['funcs']['F_tj'])}checked{/if}> 出货统计
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_xj" value="1" {if ($settings['agent']['reg']['funcs']['F_xj'])}checked{/if}> 下级代理
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_sb" value="1" {if $settings['agent']['reg']['funcs']['F_sb']}checked{/if}> 设备管理
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_zc" value="1" {if $settings['agent']['reg']['funcs']['F_zc']}checked{/if}> 设备注册
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_qz" value="1" {if $settings['agent']['reg']['funcs']['F_qz']}checked{/if}> 缺货设备
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_gz" value="1" {if $settings['agent']['reg']['funcs']['F_gz']}checked{/if}> 故障设备
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_yy" value="1" {if $settings['agent']['reg']['funcs']['F_yy']}checked{/if}> 运营人员
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_gg" value="1" {if $settings['agent']['reg']['funcs']['F_gg']}checked{/if}> 广告管理
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_xf" value="1" {if $settings['agent']['reg']['funcs']['F_xf']}checked{/if}> 吸粉管理
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_pt" value="1" {if $settings['agent']['reg']['funcs']['F_pt']}checked{/if}> 广告平台
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_wt" value="1" {if $settings['agent']['reg']['funcs']['F_wt']}checked{/if}> 常见问题
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_wd" value="1" {if $settings['agent']['reg']['funcs']['F_wd']}checked{/if}> 文档中心
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_xh" value="1" {if $settings['agent']['reg']['funcs']['F_xh']}checked{/if}> 型号管理
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="F_sp" value="1" {if $settings['agent']['reg']['funcs']['F_sp']}checked{/if}> 商品管理
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="agentCommissionFee" class="col-md-2 control-label">支付订单<br/>手续费（<span id="fee_type_title">{if $settings['agent']['reg']['commission_fee_type'] == 0}元{else}%{/if}</span>）
+                    </label>
+                    <div class="col-md-10">
+                        <div class="control-label checkbox-inline">
+                            <label for="feeType1" class="radio-inline">
+                                <input name="feeType" id="feeType1" type="radio" value="1" {if $settings['agent']['reg']['commission_fee_type'] == 1}checked="checked"{/if} onclick="chfeeTypeTitle('%')">
+                                按百分比&nbsp;
+                            </label>
+                            <label for="feeType0" class="radio-inline">
+                                <input name="feeType" id="feeType0" type="radio" value="0"  {if $settings['agent']['reg']['commission_fee_type'] == 0}checked="checked"{/if} onclick="chfeeTypeTitle('元')">
+                                固定金额 &nbsp;
+                            </label>
+                            <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="agentCommissionFee" id="agentCommissionFee" value="{php echo number_format($settings['agent']['reg']['commission_fee'] /100, 2)}" min="0" step="0.01">
+                            <span class="help-block">* 用户微信支付购买商品，平台扣除相应费用，0表示不扣手续费</span>
+                        </div>
+                    </div>
+                </div>
+                {if \zovye\YZShop::isInstalled()}
+                <div class="form-group">
+                    <label for="YzshopSuperiorRelationship" class="col-md-2 control-label">上级代理商</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="YzshopSuperiorRelationship" id="YzshopSuperiorRelationship" value="1" {if $settings['agent']['reg']['superior'] == 'yz'}checked{/if}>
+                                使用分销商城关系链，自动绑定上级代理商
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                {if $settings['commission']['enabled']}
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="agentRelGsp" class="col-md-2 control-label">三级分佣</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentRelGsp" id="agentRelGsp" value="1" {if $settings['agent']['reg']['rel_gsp']['enabled']}checked{/if}>
+                                是否开启佣金分享功能<span style="color:#666;">（开启后，代理商默认启用三级分佣模式的佣金分享功能）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if  empty($settings['agent']['reg']['mode']) || empty($settings['agent']['reg']['rel_gsp']['enabled'])}disabled{/if} id="agent_rel_gsp_enabled">
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">数值类型</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode_type" value="percent" {if $settings['agent']['reg']['gsp_mode_type'] == 'percent'}checked{/if}>
+                                百分比(%)
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode_type" value="amount"  {if $settings['agent']['reg']['gsp_mode_type'] == 'amount'}checked{/if}>
+                                数值(元)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_gsp_level1" class="col-md-2 control-label"><b>直接上级</b></label>
+                    <div class="col-md-10">
+                        <input type="float" class="form-control" name="rel_gsp_level1" id="rel_gsp_level1" value="{$settings['agent']['reg']['rel_gsp']['level1']}" min="0" max="100">
+                        <span class="help-block">* 直接上级代理商会获得的佣金百分比</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_gsp_level2" class="col-md-2 control-label"><b>上上级</b></label>
+                    <div class="col-md-10">
+                        <input type="float" class="form-control" name="rel_gsp_level2" id="rel_gsp_level2" value="{$settings['agent']['reg']['rel_gsp']['level2']}" min="0" max="100">
+                        <span class="help-block">* 上级的上一级代理会获得的佣金百分比</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_gsp_level3" class="col-md-2 control-label"><b>上上上级</b></label>
+                    <div class="col-md-10">
+                        <input type="float" class="form-control" name="rel_gsp_level3" id="rel_gsp_level3" value="{$settings['agent']['reg']['rel_gsp']['level3']}" min="0" max="100">
+                        <span class="help-block">* 上级的上一级的上级代理会获得的佣金百分比</span>
+                    </div>
+                </div>
+                </fieldset>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="agentBonusEnabled" class="col-md-2 control-label">佣金奖励</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentBonusEnabled" id="agentBonusEnabled" value="1" {if $settings['agent']['reg']['bonus']['enabled']}checked{/if}>
+                                是否开启佣金奖励功能<span style="color:#666;">（开启后，代理商默认启用佣金奖励功能）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if  empty($settings['agent']['reg']['mode']) || empty($settings['agent']['reg']['bonus']['enabled'])}disabled{/if} id="agent_bonus_enabled">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">订单类型</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="freeOrder" value="1" {if $settings['agent']['reg']['bonus']['order']['f']}checked{/if}> 免费订单
+                        </label>
+                        {if $settings['user']['center']['enabled']}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="balanceOrder" value="1" {if $settings['agent']['reg']['bonus']['order']['b']}checked{/if}> 余额订单
+                        </label>
+                        {else}
+                        <input type="hidden" name="balanceOrder" value="{$settings['agent']['reg']['bonus']['order']['b']}">
+                        {/if}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="payOrder" value="1" {if $settings['agent']['reg']['bonus']['order']['p']}checked{/if}> 支付订单
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_bonus_level0" class="col-md-2 control-label"><b>代理商</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_bonus_level0" id="rel_bonus_level0" value="{php echo number_format($settings['agent']['reg']['bonus']['level0'] / 100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 代理商会获得的现金奖励</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_bonus_level1" class="col-md-2 control-label"><b>直接上级</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_bonus_level1" id="rel_bonus_level1" value="{php echo number_format($settings['agent']['reg']['bonus']['level1'] / 100, 2)}"  min="0" step="0.01">
+                        <span class="help-block">* 直接上级代理商会获得的现金奖励</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_bonus_level2" class="col-md-2 control-label"><b>上上级</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_bonus_level2" id="rel_bonus_level2" value="{php echo number_format($settings['agent']['reg']['bonus']['level2'] / 100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 上级的上一级代理会获得的现金奖励</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_bonus_level3" class="col-md-2 control-label"><b>上上上级</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_bonus_level3" id="rel_bonus_level3" value="{php echo number_format($settings['agent']['reg']['bonus']['level3'] / 100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 上级的上一级的上级代理会获得的现金奖励</span>
+                    </div>
+                </div>
+                </fieldset>
+                {/if}
+                </fieldset>
+            </div>
+            {if $settings['commission']['enabled'] && \zovye\YZShop::isInstalled()}
+            <div class="seg" id="special2">
+                <div class="title">分销商城</div>
+                <div class="form-group">
+                    <label for="YzshopGoodsLimits" class="col-md-2 control-label">佣金限制</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="YzshopGoodsLimits" id="YzshopGoodsLimits" value="1" {if $settings['agent']['yzshop']['goods_limits']['enabled']}checked{/if}>
+                                代理商的订单数量没有超过他购买的分佣商品数量时，才能获取佣金（佣金广告和佣金奖励）
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if  empty($settings['agent']['yzshop']['goods_limits']['enabled'])}disabled{/if} id="agent_goods_limits_enabled">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">佣金商品</label>
+                    <div class="col-md-10">
+                        <select name="goodsID" style="width:100%">
+                            {loop $goods $index $item}
+                            <option value="{$item['id']}"{if $item['selected']} selected{/if} {if $item['id'] == 0}disabled{/if}> {$item['title']} </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goodsOR" class="col-md-2 control-label">一个商品对应<br/>佣金订单数量</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="goodsOR" id="goodsOR" value="{php echo $settings['agent']['yzshop']['goods_limits']['OR'] ?: 1}" min="1">
+                        <span class="help-block">* 一个（单位）分销商品允许代理商产生多少佣金订单，超出后的订单将不会产生佣金</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="agentRegMode" class="col-md-2 control-label">订单状态</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="goodsOrderState0" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(0, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 待支付
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="goodsOrderState1" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(1, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 待发货
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="goodsOrderState2" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(2, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 待收货
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="goodsOrderState3" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(3, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 已完成
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="goodsOrderStateN1" value="1" {if is_array($settings['agent']['yzshop']['goods_limits']['order_status']) && in_array(-1, $settings['agent']['yzshop']['goods_limits']['order_status'])}checked{/if}> 已关闭
+                        </label>
+                        <span class="help-block">* 用户的订单数量包括哪些状态的订单</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="restrictGoodsTitle" class="col-md-2 control-label">代理商小程序<br/>商品数量提示语</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="restrictGoodsTitle" id="restrictGoodsTitle" value="{$settings['agent']['yzshop']['goods_limits']['title']}">
+                        <span class="help-block">* 默认提示，佣金商品剩余：{num}{unit}，占位符：{num}数量，{unit}单位</span>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            {/if}
+            <div class="seg">
+                <div class="title">代理等级</div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label">等级 零</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level0" id="level0" value="{$settings['agent']['levels']['level0']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr0', $settings['agent']['levels']['level0']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label">等级 一</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level1" id="level1" value="{$settings['agent']['levels']['level1']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr1', $settings['agent']['levels']['level1']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label">等级 二</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level2" id="level2" value="{$settings['agent']['levels']['level2']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr2', $settings['agent']['levels']['level2']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label">等级 三</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level3" id="level3" value="{$settings['agent']['levels']['level3']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr3', $settings['agent']['levels']['level3']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label">等级 四</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level4" id="level4" value="{$settings['agent']['levels']['level4']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr4', $settings['agent']['levels']['level4']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label">等级 五</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level5" id="level5" value="{$settings['agent']['levels']['level5']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr5', $settings['agent']['levels']['level5']['clr']);}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="agent">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableInputMask();
+        zovye.enableCopy();
+    })
+
+    function chfeeTypeTitle(title) {
+        $("#fee_type_title").html(title);
+    }
+    
+    $(function(){
+        $('#special input[name=agentRegMode]').click(function(){
+            $('#special fieldset#agent_reg_mode').attr('disabled', !$(this).is(':checked'));
+            const checked = $('#special input[name=agentRelGsp]').is(':checked');
+            $('#special fieldset#agent_rel_gsp_enabled').attr('disabled', !checked);
+        })
+
+        $('#special input[name=agentRelGsp]').click(function(){
+            $('#special fieldset#agent_rel_gsp_enabled').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special input[name=agentBonusEnabled]').click(function(){
+            $('#special fieldset#agent_bonus_enabled').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special2 input[name=YzshopGoodsLimits]').click(function(){
+            $('#special2 fieldset#agent_goods_limits_enabled').attr('disabled', !$(this).is(':checked'));
+        })
+    })
+</script>
+{template 'common/footer'}

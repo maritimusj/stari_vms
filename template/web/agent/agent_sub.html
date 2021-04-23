@@ -1,0 +1,354 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #userslist .levels{
+        text-align: center;
+        padding: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .referral {
+        border: 1px solid #4CAF50;
+        border-radius: 6px;
+        padding: 1px 10px;
+        color: #4CAF50;
+        width: 10em;
+        text-align: center;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+</style>
+
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            <div class="agent" title="{$sup['level']['title']}" style="display:inline-block;">
+                <div class="profile" style="background-color:{$sup['level']['clr']}">
+                    <img src="{$sup['headimgurl']}">
+                    <div class="nickname">{$sup['name']}</div>                            
+                </div>
+            </div>
+            的下级代理商
+        </a>
+    </li>
+</ul>
+<div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('agent');}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $agents}
+        <table class="table" id="userslist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>昵称</th>
+                <th>手机号码</th>
+                <th><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
+                <th>
+                    <div><span id="J_ffee" data-sort="{$s_ffee}" style="cursor: pointer;">本月出货</span></div>
+                </th>
+                <th style="text-align:center;"><span id="J_money" data-sort="{$s_money}" style="cursor: pointer;">等级</span></th>
+                <th class="partners">合伙人</th>
+                <th style="text-align:center;">上级代理</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $agents $index $agent}
+            <tr class="{$user_state_class[$agent['state']]}" data-id="{$agent['id']}">
+                <td>{php echo $index + 1}</td>
+                <td>
+                    <!--
+                    <a href="{php echo $this->createWebUrl('agent', array('op' => 'detail', 'agentid' => $agent['id']));}" title="代理商详情">
+                    -->
+                    <div class="profile{if isset($agent['commission'])} commission{/if}">
+                        <img src="{media $agent['avatar']}" role="button">
+                        <span>{php echo $agent['agentData']['name'] ?: $agent['nickname']}</span>
+                    </div>
+                    <!--</a>-->
+                </td>
+                <td>
+                    <div>{$agent['mobile']}</div>
+                    {if $agent['referral']}
+                    <div class="referral">推荐码: {$agent['referral']}</div>
+                    {/if}
+                </td>
+                <td>
+                    {$agent['total']}
+                </td>
+                <td class="operate">
+                    <div class="m_free"><span>免费 {$agent['m']['free']}</span></div>
+                    <div class="m_pay"><span>支付 {$agent['m']['fee']}</span></div>
+                    {if \zovye\App::isUserCenterEnabled() || $agent['m']['balance'] > 0}
+                    <div class="m_balance"><span>{php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'} {$agent['m']['balance']}</span></div>
+                    {/if}
+                </td>
+                <td>
+                    <div class="levels">
+                            <span class="level" style="background-color:{$agent_levels[$agent['agentData']['level']]['clr']}">
+                                {php echo $agent_levels[$agent['agentData']['level']]['title']?:'&lt;未知等级&gt;'}
+                            </span>
+                        {if isset($agent['commission'])}
+                        <div class="commission_log" data-op="viewCommissionLog" title="点击查看详情...">￥<b>{php echo number_format($agent['commission']['money']/100, 2);}</b>元</div>
+                        {/if}
+                    </div>
+                </td>
+                <td class="partners operate">
+                    <span {if empty($agent['partners'])}class="nopartners"{/if}>
+                    {php echo $agent['partners'] ? $agent['partners'].'人' : '&lt;无&gt;'}
+                    </span>
+                </td>
+                <td class="superior">
+                    {if $agent['superior']}
+                    <div>
+                        {php echo $agent['agentData']['superior']['name']?:$agent['superior']->getName();}
+                    </div>
+                    <div>
+                        {php echo $agent['superior']->getMobile();}
+                    </div>
+                    {else}
+                    <div style="color:#ccc;user-select:none;">
+                        &lt;无&gt;
+                    </div>
+                    {/if}
+                </td>
+                <td class="operate"  style="width: 6em;">
+                    <div class="btn-group">
+                        <a class="btn btn-default" href="{php echo $this->createWebUrl('agent', array('op'=>'edit','id'=>$agent['id']));}" title="设置"><i class="fa fa-gear"> </i></a>
+                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                            <span class="fa fa-caret-down"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的设备</a></li>
+                            <li><a href="{php echo $this->createWebUrl('order', array('agent_openid'=>$agent['openid']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的订单</a></li>
+                            <li><a href="{php echo $this->createWebUrl('account', array('agentId'=>$agent['id']));}"> <i class="fa fa-weixin fa-fw"></i> 他的吸粉广告</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li>
+                                <a href="{php echo $this->createWebUrl('agent', array('op'=>'partner','id'=>$agent['id']));}">
+                                    <i class="fa fa-users"></i> 他的合伙人
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_sub','id'=>$agent['id']));}">
+                                    <i class="fa fa-users"></i> 所有下级代理商
+                                </a>
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-op="viewStatsChart"> <i class="fa fa-line-chart fa-fw"></i> 本月统计图</a></li>
+                            <li><a href="#" data-op="viewStats"> <i class="fa fa-list-alt fa-fw"></i> 全部统计数据</a></li>
+                            {if isset($agent['commission'])}
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 佣金明细</a></li>
+                            <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'withdraw', 'agentId'=>$agent['id']));}"><i class="fa fa-credit-card fa-fw"></i> 提现记录</a></li>
+                            {/if}
+                            <li role="separator" class="divider"></li>
+                            <li>
+                                <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$agent['id'], 'from'=>'agent'));}" onclick="if(!confirm('确定要取消用户的代理身份吗？')){return false;}">
+                                    <i class="fa fa-close"></i> 取消代理身份
+                                </a>
+                            </li>
+                            <li>
+                                    <span style="display: block; padding: 3px 20px;">
+                                        <i class="fa fa-user"></i> 代理商ID: {$agent['id']}
+                                    </span>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        <script>
+            $(function(){
+                {if \zovye\YZShop::isInstalled()}
+                const url = "{php echo $this->createWebUrlUrl('agent');}";
+                function refresh_rel(page) {
+                    $.getJSON(url, {op: 'refresh_rel', 'page': page }).then(function(res){
+                        if (res) {
+                            if (res.data) {
+                                if (res.data.more === 'y') {
+                                    refresh_rel(page + 1);
+                                } else if (res.data.more === 'n') {
+                                    location.href = url;
+                                }
+                            }
+                        }
+                    })
+                }
+                $('#refresh_rel').click(function(){
+                    if (confirm("注意，该操作会根据商城关系链重新绑定所有代理商的上级代理，确定要继续吗？")) {
+                        $(this).removeClass('fa-retweet').addClass('fa-refresh fa-spin').attr('title', '正在加载...');
+                        refresh_rel(1);
+                    }
+                })
+                {/if}
+                    $('[data-url]').each(function() {
+                        util.clip(this, $(this).data('url'));
+                    });
+                    $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
+                })
+        </script>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何代理商！
+        </div>
+        {/if}
+    </div>
+</div>
+
+{template 'web/common/search-user'}
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r!=null) return unescape(r[2]); return null; //返回参数值
+    }
+
+    $(function(){
+        $('#J_total').on('click', function(){
+            var s_total = parseInt($(this).data('sort')) || 0;
+            s_total ++;
+            if (s_total == 3) {s_total = 0;}
+
+            var href = window.location.href;
+            var newHref = href;
+            var paramReg = getUrlParam('s_total');
+            if (paramReg === null) {
+                newHref = href+'&s_total='+s_total;
+            } else {
+                newHref = href.replace('s_total='+paramReg, 's_total='+s_total);
+            }
+            window.location.href = newHref;
+        })
+
+        $('#J_ffee').on('click', function(){
+            var s_ffee = parseInt($(this).data('sort')) || 0;
+            s_ffee ++;
+            if (s_ffee == 3) {s_ffee = 0;}
+
+            var href = window.location.href;
+            var newHref = href;
+            var paramReg = getUrlParam('s_ffee');
+            if (paramReg === null) {
+                newHref = href+'&s_ffee='+s_ffee;
+            } else {
+                newHref = href.replace('s_ffee='+paramReg, 's_ffee='+s_ffee);
+            }
+            window.location.href = newHref;
+        })
+
+        $('#J_money').on('click', function(){
+            var s_money = parseInt($(this).data('sort')) || 0;
+            s_money ++;
+            if (s_money == 3) {s_money = 0;}
+
+            var href = window.location.href;
+            var newHref = href;
+            var paramReg = getUrlParam('s_money');
+            if (paramReg === null) {
+                newHref = href+'&s_money='+s_money;
+            } else {
+                newHref = href.replace('s_money='+paramReg, 's_money='+s_money);
+            }
+            window.location.href = newHref;
+        })
+
+        searchDlg.init('user', function(user, typename){
+            if(user && user.id) {
+                if (typename === 'agent') {
+                    location.href = api.url + "&op=create&id=" + user.id;
+                }
+            }
+        })
+        const api = {
+            url: "{php echo $this->createWebUrl('agent');}",
+        }
+        api.showResult = function(params, url) {
+            $.getJSON(url || api.url, params).then(function(res){
+                if(res) {
+                    if(res.status) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', 'error');
+                        }
+                    }
+                }
+            })
+        }
+
+        api.viewMsg = function(id, url) {
+            api.showResult({op: 'viewmsg', id: id}, url);
+        }
+
+        api.viewStatsChart = function(id) {
+            api.showResult({op: 'viewStatsChart', id: id});
+        }
+        api.viewStats = function(id) {
+            api.showResult({op: 'viewstats', id: id});
+        }
+        api.createAgent = function() {
+            api.showResult({op: 'create'});
+        }
+
+        api.showMsgDetail = function(id) {
+            $.getJSON(api.url, {op:'msglist_detail', id: id}).then(function(res){
+                if(res) {
+                    if(res.status) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '','error');
+                        }
+                    }
+                }
+            })
+        }
+
+        api.viewCommissionLog = function(id) {
+            api.showResult({op: 'commission_log', id: id});
+        }
+
+        $('#userslist').on('mouseover', '[data-toggle="popover"]', function(){
+            $(this).popover('show');
+        }).on('mouseleave', '[data-toggle="popover"]', function(){
+            $(this).popover('hide');
+        })
+
+        $("#userslist").on("click", "[data-stats]", function(e){
+            const agentid = $(this).closest('tr').data('id');
+            if(agentid) {
+                api.viewStats(agentid);
+            }
+        })
+
+        $("#userslist").on("click", "[data-op]", function(e){
+            e.preventDefault();
+            const op = $(this).data('op');
+            if(op && api[op]) {
+                const agentid = $(this).closest('tr').data('id');
+                agentid && api[op](agentid);
+            }
+        })
+
+        $("body").on('click', '.dialog_pager .pagination li:not(.active) a', function(e){
+            e.preventDefault();
+            const url = $(this).attr("href");
+            api.showResult({}, url, false);
+        })
+    })
+</script>
+{template 'common/footer'}

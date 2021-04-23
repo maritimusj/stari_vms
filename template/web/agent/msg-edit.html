@@ -1,0 +1,42 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .panel .panel-default {
+        border-top: 1px solid #ddd;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">
+        {if $op=='msgadd'}<i class="fa fa-comments-o"></i> 新建{else}<i class="fa fa-edit"></i> 编辑{/if}消息
+    </a></li>
+</ul>
+<form class="form" action="{php echo $this->createWebUrl('agent');}" method="post">
+<div class="panel panel-default panel-first">
+    <div class="heading">        
+    </div>
+    <div class="panel-body">
+        <div class="form-group">
+            <label for="title" class="col-md-2 control-label">标题</label>
+            <div class="col-md-10">
+                <input type="text" class="form-control" name="title" id="title" value="{php echo $msg ? $msg->getTitle() : ''}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">内容</label>
+            <div class="col-md-10">
+                {php echo tpl_ueditor('content', $msg ? $msg->getContent():'')}
+            </div>
+        </div>        
+    </div>
+</div>
+<div class="form-btn">
+    {if $op=='msgedit'}
+    <input type="hidden" name="id" value="{$id}">
+    {/if}
+    <input type="hidden" name="op" value="msgsave">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <button type="button" class="btn btn-default" onclick="history.back();">返回</button>
+</div>
+</form>
+
+{template 'common/footer'}

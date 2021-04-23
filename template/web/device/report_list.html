@@ -1,0 +1,196 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #devicelist i.allowed {
+        color: green;
+    }
+
+    #devicelist td.status {
+        transition: all 1s;
+    }
+
+    #devicelist .app {
+        position: relative;
+    }
+
+    #devicelist .status:hover .app .devcie-detail {
+        display: flex;
+    }
+
+    #devicelist .app .devcie-detail {
+        position: absolute;
+        z-index: 99;
+        overflow: hidden;
+        background-color: #fff;
+        padding: 16px;
+        border: 1px solid #9E9E9E;
+        border-radius: 6px;
+        display: none;
+        flex-direction: column;
+        width: 260px;
+        top: 20px;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #devicelist .app .devcie-detail .detail-seg {
+        text-align: start;
+        margin: 10px 0;
+    }
+
+    #devicelist .app .devcie-detail .detail-seg .title {
+        font-weight: bold;
+    }
+
+    #devicelist .devcie-detail .sig {
+        display: inline-block;
+        width: 130px;
+        background-color: #f5f5f5;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        text-align: center;
+        vertical-align: top;
+        font-size: smaller;
+        overflow: hidden;
+    }
+
+    #devicelist .devcie-detail .sig div {
+        color: #fff;
+        background: #009688;
+    }
+
+    #devicelist .app.loading {
+        color: rgba(0, 0, 0, .1);
+        display: none;
+    }
+
+    #devicelist .device.loading {
+        color: rgba(0, 0, 0, .1);
+        display: none;
+    }
+
+    #devicelist .status i.loading {
+        color: rgba(0, 0, 0, .6);
+    }
+
+    #devicelist tr .getway {
+        visibility: hidden;
+    }
+
+    #devicelist tr:hover .getway {
+        visibility: visible;
+        color: rgb(238, 238, 238);
+    }
+
+    #devicelist [data-url] {
+        cursor: pointer;
+    }
+
+    #devicelist td.sat {
+        width: 15em;
+    }
+
+    #devicelist .devicename {
+        cursor: default
+    }
+
+    .zovye_qrcode:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translate3d(0, -2px, 0);
+    }
+
+    #devicelist .imei img.qrcode {
+        width: 1.5em;
+        height: 1.5em;
+    }
+
+    #devicelist sup {
+        color: #009688;
+    }
+
+    .zovye_qrcode:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translate3d(0, -2px, 0);
+    }
+
+    table#cargolanes th, table#cargolanes td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    table#cargolanes div.loading {
+        vertical-align: middle;
+        line-height: 2em;
+    }
+
+    table#cargolanes div.loading i {
+        font-size: 1em;
+        color: #4CAF50;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="form-inline" action="{php echo $this->createWebUrl('device', array('op'=>'report_list'))}"
+              method="post" id="search-form">
+            <div class="form-group">
+                <label for="keywords"></label>
+                <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入设备名称或者IMEI"
+                       value="{$filter['keywords']}">
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+
+        </form>
+    </div>
+</div>
+
+{if $agent_filter}
+<div class="agent_filter">
+
+</div>
+{/if}
+<div class="panel panel-default">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回设备列表"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        <table class="table" id="devicelist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th style="width: 20em;">设备名称</th>
+                <th>imei</th>
+                <th>提交原因</th>
+                <th>提交时间</th>
+                <th>姓名</th>
+                <th>联系号码</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $data $index $d}
+            <tr data-fetchid="{$d['id']}">
+                <td>{php echo $index+1}</td>
+                <td>{$d['dname']}</td>
+                <td>{$d['imei']}</td>
+                <td>{$d['result']}</td>
+                <td>{$d['create']}</td>
+                <td>{$d['mname']}</td>
+                <td>{$d['mobile']}</td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div style="float:right;">
+            {$pager}
+        </div>
+        {if empty($data)}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有数据！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+
+</script>
+{template 'common/footer'}

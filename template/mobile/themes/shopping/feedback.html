@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>故障反馈</title>
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				width: 100%;
+			}
+
+			body {
+				background-color: #fff;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 15px;
+				color: #101010;
+				margin: 0;
+				padding: 0;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			}
+
+			#app {
+				width: 100vw;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+
+			.row-view {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				margin-top: 15px;
+			}
+
+			.title {
+				width: 80px;
+				margin-left: 20px;
+			}
+
+			.content {
+				width: calc(100% - 80px - 20px - 20px);
+			}
+
+			.mobile {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			.mobile:active {
+				opacity: 0.7;
+			}
+
+			.call-icon {
+				width: 20px;
+				height: 20px;
+				margin-right: 5px;
+			}
+
+			.textarea {
+				width: calc(100% - 80px - 20px - 20px - 20px);
+				border: none;
+				font-size: 15px;
+				padding: 2px 10px;
+				background-color: #f6f6f6;
+			}
+
+			.imgs {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
+
+			.img-view {
+				width: calc((100vw - 80px - 20px - 20px - 20px)/3);
+				height: calc((100vw - 80px - 20px - 20px - 20px)/3);
+				margin-bottom: 10px;
+				position: relative;
+			}
+
+			.img-view:active {
+				opacity: 0.7;
+			}
+
+			.img-view:nth-child(3n + 2) {
+				margin-left: 10px;
+			}
+
+			.img-view:nth-child(3n + 3) {
+				margin-left: 10px;
+			}
+
+			.add-view {
+				width: 100%;
+				height: 100%;
+				border: 1px dashed #ccc;
+				color: #ccc;
+				font-size: 30px;
+				font-weight: bold;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.add-input {
+				width: calc(100% - 2px);
+				height: calc(100% - 2px);
+				position: absolute;
+				top: 0;
+				left: 0;
+				opacity: 0;
+			}
+
+			.img {
+				width: 100%;
+				height: 100%;
+			}
+
+			.delete {
+				width: 18px;
+				height: 18px;
+				color: #fff;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				position: absolute;
+				top: -5px;
+				right: -5px;
+				background-color: #F56C6C;
+			}
+
+			.submit-btn {
+				width: calc(100% - 40px);
+				padding: 10px 0;
+				background-color: #67C23A;
+				height: 80rpx;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				margin-top: 20px;
+				font-weight: 500;
+				font-size: 30rpx;
+			}
+
+			.submit-btn:active {
+				opacity: 0.7;
+			}
+
+			.mask {
+				width: 100vw;
+				height: 100vh;
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 999;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.toast-view {
+				padding: 10px 40px;
+				border-radius: 10px;
+				background-color: rgba(0, 0, 0, 0.7);
+				color: #fff;
+				margin-top: 75vh;
+			}
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app" v-cloak>
+			<div class="row-view">
+				<span class="title">设备名称：</span>
+				<span class="content">{{name}}</span>
+			</div>
+			<div class="row-view">
+				<span class="title">设备编号：</span>
+				<span class="content">{{imei}}</span>
+			</div>
+			<div class="row-view">
+				<span class="title">故障描述：</span>
+				<textarea class="textarea" rows="4" placeholder="请输入故障描述" v-model="text"></textarea>
+			</div>
+			<div class="row-view">
+				<span class="title">图片上传：</span>
+				<div class="content imgs">
+					<div class="img-view" v-for="(url, index) in imgs" :key="index">
+						<img class="img" :src="url">
+						<div class="delete" @click.stop="deleteImg(index)">X</div>
+					</div>
+					<div class="img-view" v-if="imgs.length < imgs.length + max">
+						<div class="add-view">+</div>
+						<input class="add-input" type="file" accept="image/*" multiple="multiple" @change="chooseImg($event)">
+					</div>
+				</div>
+			</div>
+			<div class="submit-btn" @click="submit">提交</div>
+			<div class="mask" v-if="showMask">
+				<div class="toast-view">{{toast}}</div>
+			</div>
+		</div>
+		{php \zovye\url(true, JS_SWIPER_URL);}
+		{php \zovye\url(true, JS_VUE_URL);}
+		{$tpl['js']['code']}
+		<script type="text/javascript">
+			const app = new Vue({
+				el: '#app',
+				data: {
+					name: "总商会测试机",
+					imei: "866714042004829",
+					mobile: "12345678910",
+					text: "",
+					mobileIcon: "data:image/png;base64,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",
+					files: [],
+					imgs: [],
+					max: 9,
+					pics: [],
+					toast: "",
+					showMask: false
+				},
+				created() {
+					this.imei = this.getQueryVariable("device_imei");
+					this.name = decodeURI(this.getQueryVariable("device_name"));
+					this.mobile = this.getQueryVariable("mobile");
+				},
+				methods: {
+					getQueryVariable(variable) {
+						const query = window.location.search.substring(1);
+						const vars = query.split("&");
+						for (let i = 0; i < vars.length; i++) {
+							let pair = vars[i].split("=");
+							if (pair[0] == variable) {
+								return pair[1];
+							}
+						}
+						return false;
+					},
+					call() {
+						window.location.href = 'tel://' + this.mobile;
+					},
+					chooseImg(event) {
+						let that = this;
+						let files = event.target.files;
+						if (files.length > that.max) {
+							alert("最多选择" + that.max + "张图片")
+							return;
+						} else {
+							that.max = that.max - files.length;
+						}
+						for (let i = 0; i < files.length; i++) {
+							let file = files[i];
+							that.files.push(file);
+							if (file.type.indexOf("image") == 0) {
+								let reader = new FileReader();
+								reader.readAsDataURL(file);
+								reader.onload = function(e) {
+									let newUrl = this.result;
+									that.imgs.push(newUrl);
+								};
+							}
+						}
+					},
+					deleteImg(index) {
+						this.files.splice(index, 1);
+						this.imgs.splice(index, 1);
+						this.max++;
+					},
+					submit() {
+						if (this.text == '') {
+							this.toast = '请输入故障描述';
+							this.showMask = true;
+							setTimeout(() => {
+								this.showMask = false;
+							}, 1000);
+							return;
+						}
+						this.toast = '上传中...';
+						this.showMask = true;
+						if (this.files.length > 0) {
+							this.pics = [];
+							this.uploadFile(0);
+						} else {
+							this.submitData();
+						}
+					},
+					uploadFile(i) {
+						let file = this.files[0];
+						zovye_fn.upload(file).then(res => {
+						    console.log(res);
+							this.pics.push(res);
+							i++;
+							if (i < this.files.length) {
+								this.uploadFile(i);
+							} else {
+								this.submitData();
+							}
+						}).catch((error) => {
+								console.log(error);
+								this.toast = '上传失败，请重试！';
+								setTimeout(() => {
+									this.showMask = false;
+								}, 1000);
+						});
+					},
+					submitData() {
+						zovye_fn.feedback(this.imei, this.text, this.pics).then((msg) => {
+							this.toast = msg;
+							this.showMask = true;
+							setTimeout(() => {
+								window.history.back(-1);
+							}, 1500);
+							})
+							.catch((error) => {
+								console.log(error);
+								this.toast = '上传失败，请重试！';
+								setTimeout(() => {
+									this.showMask = false;
+								}, 1000);
+							});
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

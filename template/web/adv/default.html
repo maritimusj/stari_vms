@@ -1,0 +1,69 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+.type {
+    border: 1px solid gray;
+    text-align: center;
+    background-color: gray;
+    color: #fff;
+}
+</style>
+{template 'web/adv/nav'}
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        <table class="table" id="list">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>标题</th>
+                    <th>
+                        <div>类型</div>
+                    </th>
+                    <th><div>代理商</div></th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $advs $index $item}
+                <tr data-id="{$item['id']}" class="{$item['state_formatted']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>{$item['title']}</td>
+                    <td>
+                        <div class="type type{$item['type']}">{$item['type_formatted']}</div>
+                    </td>
+                    <td>
+                        <div>
+                            {if $agent}
+                            <span></span>
+                            {else}
+                            <span style="color:#CCC;">&lt;平台&gt;</span>
+                            {/if}
+                        </div>
+                    </td>
+                    <td>{$item['createtime_formatted']}</td>
+                    <td class="operate">
+                        <div class="btn-group">
+                          <a class="btn btn-default" href="{php echo $this->createWebUrl('adv', array('op' => 'assign', 'type' => $item['type'], 'id' => $item['id'], 'from_type' => 0));}" title="分配设备"><i class="fa fa-wrench{php echo $item['assigned']?'':' active'}"> </i></a>
+                          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                          <span class="fa fa-caret-down"></span></a>
+                          <ul class="dropdown-menu">
+                            <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'edit', 'id' => $item['id'], 'from_type' => 0));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-op="ban"><i class="fa fa-ban fa-fw"></i> <span>{if $item['state']==zovye\Advertising::NORMAL}禁用？{else}启用？{/if}</span></a></li>
+                            <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'remove', 'id' => $item['id'], 'from_type' => 0));}" onclick="return confirm('确定要删除这个广告吗？');"><i class="fa fa-trash-o fa-fw"></i> 删除？</a></li>
+
+                          </ul>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+    </div>
+</div>
+{template 'web/adv/foot'}
+{template 'common/footer'}

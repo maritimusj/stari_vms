@@ -1,0 +1,59 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #tagslist .tag.empty{
+        background-color: #9e9e9e;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">标签管理</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+    </div>
+    <div class="panel-body">
+        {if $tags && $tags['list']}
+        <div id="tagslist">
+            {loop $tags['list'] $index $tag}
+            <div class="tag{if empty($tag['count'])} empty{/if}" data-id="{$tag['id']}" title="{if empty($tag['count'])}点击删除这个标签{else}点击查看相关设备{/if}">
+                <span>{$tag['title']}</span><span>({$tag['count']})</span>
+            </div>
+            {/loop}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何标签！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    $(function (){
+        function tagDetail(id) {
+            window.location.href = "{php echo $this->createWebUrl('device', array('tag_id'=>'__id__', 'version_id'=>\zovye\request::op('version_id')));}".replace('__id__', id);
+        }
+        const api_url = "{php echo $this->createWebUrl('tags');}";
+        function removeTag(id, fn) {
+            $.getJSON(api_url, {id: id, op: 'remove'}).then(function(res){
+                if (res && res.status) {
+                    if (typeof fn === 'function') {
+                        fn();
+                    }
+                }
+            })
+        }
+
+        $('#tagslist').on('click', '.tag', function(){
+            const self = $(this);
+            const id = self.data('id');
+            if(self.hasClass('empty')) {
+                removeTag(id, function(){
+                    self.remove();
+                })
+            } else {
+                tagDetail(id);
+            }
+        })
+    })
+</script>
+{template 'common/footer'}

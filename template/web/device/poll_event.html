@@ -1,0 +1,184 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template 'web/common/header'}
+
+<style>
+    .s1 {
+        padding-bottom: 1.6em;
+    }
+
+    .s2 {
+        padding-bottom: .8em;
+        border-bottom: 1px solid #a9a9a9;
+    }
+</style>
+
+<ul class="nav nav-tabs" id="navbar">
+    {loop $navs $nav_op $nav_title}
+    {if $op == $nav_op}
+    <li role="presentation" class="active"><a href="#">{$nav_title}</a></li>
+    {else}
+    <li role="presentation"><a
+            href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')));}">{$nav_title}</a>
+    </li>
+    {/if}
+    {/loop}
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-heading">
+
+    </div>
+    <div class="panel-body">
+        {if $events}
+
+        {loop $events $item}
+        <div class="s1" id="J_pollEvent">
+            {if $item['type'] == 14}
+            <div>
+                <h3>上报设备状态(ID:{$item['id']})</h3>
+            </div>
+            <div class="form-group s2 row">
+                <div class="col-md-3">时间：</div>
+                <div class="col-md-9">{$item['time']}</div>
+            </div>
+            <div class="form-group s2 row">
+                <div class="col-md-3">信号强度</div>
+                <div class="col-md-9">{$item['per']}%</div>
+            </div>
+            <div class="form-group s2 row">
+                <div class="col-md-3">SM卡号</div>
+                <div class="col-md-9">{$item['iccid']}</div>
+            </div>
+
+            {/if}
+
+            {if $item['type'] == 20}
+            <div>
+                <h3>上报设备状态(m-report)(ID:{$item['id']})</h3>
+            </div>
+            <div class="form-group s2 row">
+                <div class="col-md-3">时间：</div>
+                <div class="col-md-9">{$item['time']}</div>
+            </div>
+            <div class="form-group s2 row">
+                <div class="col-md-3">电机状态</div>
+                <div class="col-md-9">
+                    {loop $item['sw'] $key $val}
+                    <div>{php echo $key+1}号电机：{$val}</div>
+                    {/loop}
+                </div>
+            </div>
+
+            <div class="form-group s2 row">
+                <div class="col-md-3">门状态</div>
+                <div class="col-md-9">
+                    {loop $item['door'] $key $val}
+                    <div>{php echo $key+1}号门：{$val}</div>
+                    {/loop}
+                </div>
+            </div>
+            <div class="form-group s2 row">
+                <div class="col-md-3">温度</div>
+                <div class="col-md-9">
+                    {$item['temperature']}
+                </div>
+            </div>
+
+            <div class="form-group s2 row">
+                <div class="col-md-3">重量</div>
+                <div class="col-md-9">
+                    {loop $item['weights'] $key $val}
+                    <div>{php echo $key+1}：{$val}克</div>
+                    {/loop}
+                </div>
+            </div>
+            {/if}
+        </div>
+        {/loop}
+
+        {else}
+        <div style="text-align:center;color:#ccc;">
+        </div>
+        {/if}
+    </div>
+</div>
+
+<script>
+    var theFirstId = "{$the_first_id}" || 0;
+    $(function () {
+        setInterval(function () {
+            $.post(
+                "{php echo $this->createWebUrl('device', array('id'=>$device->getId(), 'op'=>'new_event'));}",
+                {the_first_id: theFirstId},
+                function (res) {
+                    res = JSON.parse(res);
+                    var str = '';
+                    if (res.length > 0) {
+                        for (var i in res) {
+                            if (res[i]['type'] == 14) {
+                                str = `<div>
+                                <h3>上报设备状态(ID:${res[i]['id']})</h3>
+                                </div>
+                                <div class="form-group s2 row">
+                                    <div class="col-md-3">时间：</div>
+                                    <div class="col-md-9">${res[i]['time']}</div>
+                                </div>
+                                <div class="form-group s2 row">
+                                    <div class="col-md-3">信号强度</div>
+                                    <div class="col-md-9">${res[i]['per']}%</div>
+                                    </div>
+                                    <div class="form-group s2 row">
+                                    <div class="col-md-3">SM卡号</div>
+                                    <div class="col-md-9">${res[i]['iccid']}</div>
+                                    </div>`;
+                                $('#J_pollEvent').prepend(str);
+                                theFirstId = res[i]['id'];
+                            }
+                            if (res[i]['type'] == 20) {
+                                str = '<div><h3>上报设备状态(m-report)(ID:' + res[i]['id'] + ')</h3></div>';
+                                str += '<div class="form-group s2 row">'
+                                    + '<div class="col-md-3">时间：</div>'
+                                    + '<div class="col-md-9">' + res[i]['time'] + '</div>'
+                                    + '</div>'
+                                    + '<div class="form-group s2 row">'
+                                    + '<div class="col-md-3">电机状态</div>'
+                                    + '<div class="col-md-9">';
+
+                                for (var ii = 0, len = res[i]['sw'].length; ii < len; ii++) {
+                                    str += '<div>' + (ii + 1) + '号电机：' + res[i]['sw'][ii] + '</div>';
+                                }
+                                str += '</div></div>'
+                                    + '<div class="form-group s2 row">'
+                                    + '<div class="col-md-3">门状态</div>'
+                                    + '<div class="col-md-9">';
+
+                                for (var ii = 0, len = res[i]['door'].length; ii < len; ii++) {
+                                    str += '<div>' + (ii + 1) + '号门：' + res[i]['door'][ii] + '</div>';
+                                }
+                                str += '</div></div>'
+                                    + '<div class="form-group s2 row">'
+                                    + '<div class="col-md-3">温度</div>'
+                                    + '<div class="col-md-9">' + res[i]['temperature'] + '</div></div>';
+
+                                str += '<div class="form-group s2 row">'
+                                    + '<div class="col-md-3">重量</div>'
+                                    + '<div class="col-md-9">';
+
+
+                                for (var ii = 0, len = res[i]['weights'].length; ii < len; ii++) {
+                                    str += '<div>' + (ii + 1) + '：' + res[i]['weights'][ii] + '克</div>';
+                                }
+                                str += '</div></div>';
+
+                                $('#J_pollEvent').prepend(str);
+                                theFirstId = res[i]['id'];
+                            }
+
+                        }
+                    }
+                }
+            )
+        }, 2000)
+    })
+</script>
+{template 'common/footer'}

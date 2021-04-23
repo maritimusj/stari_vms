@@ -1,0 +1,37 @@
+{template 'common/header'}
+{php \zovye\url(true, './static/css/assign.css');}
+
+<div id="app">
+    <assign-ctrl>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                测试文字
+            </div>
+            <div class="panel-body">
+
+            </div>
+        </div>
+    </assign-ctrl>
+</div>
+
+<script>
+    const cfg = {
+        data: {devices:[1337, 1336, 1335, 1334, 1333, 1332, 1331, 1330, 1329, 1328, 1327, 1326, 1325, 1324, 1323, 1322, 1321, 1320, 1319, 1318, 1317, 1316, 1315, 1314, 1313, 1312, 1311, 1310, 1309, 1308, 1307, 1306, 1305, 1304, 1303, 1302, 1301, 1300, 1299, 1298, 1297, 1296, 1295, 1294, 1293, 1292, 1291, 1290, 1289, 1288, 1214, 1219, 1224, 1229, 1234, 1209, 1204, 1199, 1189, 1194],
+            agents: [2],
+            groups:[],
+            tags: [3, 6],
+        },
+        agents: "{php echo $this->createWebUrl('agent')}",
+        groups: "{php echo $this->createWebUrl('device', array('op' => 'group'))}",
+        tags: "{php echo $this->createWebUrl('tags')}",
+        devices: "{php echo $this->createWebUrl('device');}",
+        save: "{php echo $this->createWebUrl('device');}",
+        back_url: "{php echo $this->createWebUrl('settings');}",
+    }
+
+    require(['{php \zovye\url(false, 'static/js/assign.min.js?v=20180507001}'], function (m) {
+        m.init(cfg, function (data) {
+            console.log(data);
+        })
+    })
+</script>{template 'common/footer'}

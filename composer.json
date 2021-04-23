@@ -1,0 +1,17 @@
+{
+    "require": {
+        "we7/devtool": "^0.0.5",
+      "ext-mbstring": "*",
+      "ext-iconv": "*",
+      "ext-json": "*",
+      "ext-curl": "*",
+      "ext-libxml": "*",
+      "ext-pdo": "*",
+      "ext-zlib": "*",
+      "ext-zip": "*",
+      "ext-dom": "*",
+      "ext-gd": "*",
+      "ext-simplexml": "*",
+      "ext-openssl": "*"
+    }
+}

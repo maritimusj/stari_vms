@@ -1,0 +1,603 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #devicelist i.allowed {
+        color:green;
+    }
+    #devicelist td.status {
+        transition: all 1s;
+    }
+    #devicelist .app {
+        position: relative;
+    }
+    #devicelist .status:hover .app .devcie-detail {
+        display: flex;
+    }
+    #devicelist .app .devcie-detail {
+        position: absolute;
+        z-index: 99;
+        overflow: hidden;
+        background-color: #fff;
+        padding: 16px;
+        border: 1px solid #9E9E9E;
+        display: none;
+        flex-direction: column;
+        min-width: 300px;
+        top: 20px;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+    #devicelist .app .devcie-detail .detail-seg {
+        text-align: start;
+        margin: 10px 0;
+        white-space: nowrap;
+    }
+    #devicelist .app .devcie-detail .detail-seg .title{
+        font-weight: bold;
+    }
+    #devicelist .devcie-detail .bar{
+        display: inline-block;
+        width: 130px;
+        background-color: #f5f5f5;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+        text-align: center;
+        vertical-align: top;
+        font-size: smaller;
+        overflow: hidden;
+    }
+    #devicelist .devcie-detail .sig div{
+        color: #fff;
+        background: #009688;
+    }
+    #devicelist .devcie-detail .qoe div{
+        color: #fff;
+        background: #ff5722;
+    }
+    #devicelist .app.loading{
+        color: rgba(0, 0, 0, .1);
+        display: none;
+    }
+    #devicelist .device.loading{
+        color: rgba(0, 0, 0, .1);
+        display: none;
+    }
+    #devicelist .status i.loading{
+        color: rgba(0, 0, 0, .6);
+    }
+    #devicelist tr .getway {
+        visibility: hidden;
+        white-space: nowrap;
+    }
+    #devicelist tr:hover .getway{
+        visibility: visible;
+    }
+    #devicelist tr:hover .getway i {
+        color: #ccc;        
+    }
+    #devicelist [data-url] {
+        cursor: pointer;
+    }
+    #devicelist td.sat{
+        width: 15em;
+        font-size: 1em;
+    }
+    #devicelist .devicename {
+        cursor: default
+    }
+    #devicelist .devicename img {
+        width: 15px;
+    }
+    .zovye_qrcode:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translate3d(0, -2px, 0);
+    }
+    #devicelist .imei img.qrcode {
+        width: 1.5em;
+        height: 1.5em;
+    }
+    #devicelist sup {
+        color: #009688;
+    }
+    #devicelist .status .error {
+        color: red;
+    }
+    .zovye_qrcode:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translate3d(0, -2px, 0);
+    }
+    table#cargolanes th, table#cargolanes td{
+        text-align: center;
+        vertical-align: middle;
+    }
+    table#cargolanes div.loading{
+        vertical-align: middle;
+    }
+    table#cargolanes div.loading i{
+        font-size: 1em;
+        color: #4CAF50;
+    }
+    [v-cloak] {
+        display: none;
+    }
+    .tag-page-btn {
+        vertical-align: middle;
+        padding: 6px;
+        cursor: pointer;
+    }
+    .tag-page-btn[disabled] {
+        color: #ccc;
+        cursor: default;
+    }
+    #other label {
+        cursor: pointer;
+        padding-left: 6px;
+    }
+    .badge {
+        margin-left: 6px;
+        background-color: #009688;
+    }
+    .init-loading {
+        text-align: center;
+        color: gray;
+        margin: 10%;
+    }
+    .maintance {
+        color: #f44336;
+    }
+    [data-op="showMonthStats"],[data-op="setNormal"]  {
+        cursor: pointer;
+    }
+</style>
+<div id="appx" v-cloak>
+    <div class="init-loading" v-if="device.list === undefined">
+        <i class="fa fa-spinner fa-spin"></i>&nbsp;加载中...
+    </div>
+    <div class="panel panel-default" v-else>
+        <div class="heading">
+            <span class="operate">
+                {if \zovye\App::isVDeviceSupported()}
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_vd'));}"><i class="fa fa-hdd-o fa-fw" title="添加虚拟设备"></i></a>
+                {/if}
+                {if \zovye\App::isBluetoothDeviceSupported()}
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_bluetooth_device'));}"><i class="fa fa-rss fa-fw" title="添加蓝牙设备"></i></a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'import_bluetooth_device_upload'));}"><i class="fa fa-plus-square fa-fw" title="导入蓝牙设备"></i></a>
+                {/if}
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add'));}"><i class="fa fa-cube fa-fw" title="添加新设备"></i></a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group'));}"><i class="fa fa-cubes fa-fw" title="分组管理"></i></a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'report_list'));}"><i class="fa fa-exclamation fa-fw" title="故障报告列表"></i></a>
+                <i class="fa fa-exchange fa-fw" title="通知所有设备刷新配置？" onclick="api.refresAll();"></i>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'clean_error'));}"><i class="fa fa-undo fa-fw" title="清除所有设备错误代码"></i></a>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div id="search-bar" v-show="expendStatus==0" @click="expendStatus=1">
+                <div class="text-input">
+                    <span>根据条件搜索设备 ...</span>
+                    <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+                </div>
+            </div>
+            <div id="search-form" v-show="expendStatus==1">
+                <form>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">所属代理商</label>
+                        <div class="col-md-5">
+                            <select style="width:100%;" v-model="device.filter.agent">
+                                <option v-for="agent in agent.list" :key="agent.id" :value="agent.id">
+                                    {{agent.name + (agent.mobile ? '，手机号码：' + agent.mobile : '')}}
+                                </option>                            
+                                <option value="" :selected="device.filter.agent === ''">&lt;不限&gt;</option>
+                                <option value="-1" :selected="device.filter.agent === '-1'">&lt;平台&gt;</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="请输入手机号码或者名称查找..." v-model.trim="agent.keyword">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" title="搜索代理商" @click.prevent="searchAgent">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">型号</label>
+                        <div class="col-md-5">
+                            <select style="width:100%;" v-model="device.filter.type">
+                                <option v-for="type in deviceTypes.list" :key="type.id" :value="type.id">
+                                    {{type.title + '（' + type.lanes_total + '货道）'}}
+                                </option>   
+                                <option value="" :selected="device.filter.type === ''">&lt;不限&gt;</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="请输入关键字查找型号..." v-model.trim="deviceTypes.keyword">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" title="搜索型号" @click.prevent="searchDeviceTypes">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">分组</label>
+                        <div class="col-md-5">
+                            <select style="width:100%;" v-model="device.filter.group">
+                                <option v-for="group in group.list" :key="group.id" :value="group.id">
+                                    {{group.title + (group.agent ? '（代理商：' + group.agent.name + '）': '')}}
+                                </option>
+                                <option value="" :selected="device.filter.group === ''">&lt;不限&gt;</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="请输入关键字查找分组..." v-model.trim="group.keyword">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" title="搜索分组" @click.prevent="searchGroup">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label operate">标签
+                            <template v-if="tags.selectedIds.length > 0">
+                                <span class="badge">{{tags.selectedIds.length}}</span>
+                                <i class="fa fa-ban" title="清除所有标签" @click="cleanTagsClicked()"></i>                                
+                            </template>
+                        </label>
+                        <div class="col-md-5" id="tagslist">
+                            <span class="tag-page-btn" title="上一页"
+                            v-if="tags.totalpage > 1"
+                            :disabled="tags.page <= 1 || tags.loading" @click.prevent="tagsPrePage">
+                                <i class="fa fa-angle-double-left"></i>
+                            </span>                            
+                            <div class="tag" v-for="tag in tags.list" :key="tag.id"
+                            :style="{'background-color': tag.selected?'#009688':'#9E9E9E'}"
+                            @click.prevent="selectTag(tag)">
+                                <span>{{tag.title}}</span>
+                                <span v-if="tag.count > 0">({{tag.count}})</span>
+                            </div>
+                            <span class="tag-page-btn" title="下一页"
+                            v-if="tags.totalpage > 1"
+                            :disabled="tags.page >= tags.totalpage || tags.loading" @click.prevent="tagsNextPage">
+                                <i class="fa fa-angle-double-right"></i>
+                            </span>   
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="请输入关键字查找标签..." v-model.trim="tags.keyword">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" title="搜索标签" @click.prevent="searchTags">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">状态</label>
+                        <div class="col-md-10" id="other">
+                            <label>
+                                <input type="checkbox" v-model="device.filter.online">
+                                在线
+                            </label>                              
+                            <label>
+                                <input type="checkbox" v-model="device.filter.offline">
+                                离线
+                            </label>                        
+                            <label>
+                                <input type="checkbox" v-model="device.filter.low">
+                                缺货
+                            </label>
+                            <label>
+                                <input type="checkbox" v-model="device.filter.error">
+                                故障
+                            </label>
+                            <label>
+                                <input type="checkbox" v-model="device.filter.maintenance">
+                                已停用
+                            </label>
+                            {if \zovye\settings('device.lac.enabled')}
+                            <label>
+                                <input type="checkbox" v-model="device.filter.lac">
+                                位置已变动
+                            </label>
+                            {/if}
+                            <label>
+                                <input type="checkbox" v-model="device.filter.lost">
+                                超过{$lost_offset_day}天未上线
+                            </label>
+                            <label>
+                                <input type="checkbox" v-model="device.filter.no_order">
+                                超过{$issuing_offset_day}天未出货
+                            </label>                            
+                            <label>
+                                <input type="checkbox" v-model="device.filter.unbind">
+                                未绑定App
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">关键字</label>
+                        <div class="col-md-8">
+                            <input  class="form-control" type="text" style="width: 100%;" v-model.trim="device.filter.keywords" autofocus="autofocus" ref="defaultInput">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" @click.prevent="searchButtonClicked"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                            <button class="btn btn-default btn-close" title="清除搜索" @click.prevent="searchCancelButtonClicked"><i class="fa fa-ban" style="color: gray;"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <table class="table" id="devicelist">
+                <thead v-show="device.list !== undefined">
+                    <tr>
+                        <th>#</th>
+                        <th></th>
+                        <th>                    
+                            <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>
+                        </th>
+                        <th>
+                            <div data-orderby="agentId" {if $orderby=='agentId'}class="fa {$order}"{/if}>直属代理商</div>
+                        </th>
+                        <th style="min-width:3em;">
+                        </th>
+                        <th>
+                        <div>订单数量</div>
+                            <div><span data-orderby="d_total" {if $orderby=='d_total'}class="fa {$order}"{/if}>今日</span>
+                            /
+                            <span data-orderby="m_total" {if $orderby=='m_total'}class="fa {$order}"{/if}>本月</span></div>
+                        </th>
+                        <th>
+                            <div data-orderby="groupId" {if $orderby=='groupId'}class="fa {$order}"{/if}>分组</div>
+                        </th>
+                        <th>
+                            <div>设备状态</div>
+                        </th>
+                       <th>
+                            加入时间
+                        </th>
+                        <th style="width: 165px;">
+                            出货用时
+                        </th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(o,index) in device.list" :key="o.id" :data-fetchid="o.id" :class="o.model">
+                        <td class="operate">
+                            <template v-if="o.lockedtime">
+                                <i class="fa fa-lock" :title="'锁定时间：' + o.lockedtime" data-op="unlock" :data-index="index + 1"></i>
+                            </template>
+                            <template v-else>
+                                <template v-if="o.s1">
+                                    <span class="operate">
+                                        <i class="fa fa-map-marker" title="设备位置已变动" data-op="confirmLAC" :data-index="index + 1"></i>
+                                    </span>                                    
+                                </template>
+                               <template v-else>
+                                {{index + 1}}
+                               </template>
+                            </template>
+                        </td>
+                        <td style="position:relative;">
+                            <div class="imei">
+                                <img src="{MODULE_URL}static/img/qrcode.svg" class="qrcode" v-if="o.activeQrcode">
+                                <i class="fa fa-qrcode" v-else></i>
+                                <div class="zovye_qrcode" :data-url="o.getUrl" title="点击复制取货链接">
+                                    <img :src="o.qrcode" />
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="devicename" :title="o.address">
+                                {{o.name}}
+                                <template v-if="o.isVD">
+                                    <sup title="虚拟设备">[ 虚拟 ]</sup>
+                                </template>                            
+                                <template v-if="o.isBluetooth">
+                                    <sup :title="'蓝牙设备 ' + o.BUID">[ 蓝牙 ]
+                                </template>
+                                <template v-if="o.isDown">
+                                    <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消">
+                                </template>
+                            </div>
+                        </td>
+                        <td>
+                            <template v-if="typeof o.agent === 'string'">
+                                <div class="agent">                                    
+                                    <div class="profile loading">
+                                        <img/>
+                                        <div class="nickname">{{o.agent}}</div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-if="typeof o.agent === 'object'">
+                                <div class="agent" @click="agentClicked(o.agent)">
+                                    <div class="profile" 
+                                    :style="{backgroundColor:o.agent.level.clr, cursor:device.filter.agent === o.agent.id?'default':'pointer'}"
+                                    :title="device.filter.agent === o.agent.id?'':'点击查看' + o.agent.name + '的所有设备'">
+                                        <img :src="o.agent.avatar">
+                                        <div class="nickname">{{o.agent.name}}</div>
+                                    </div>
+                                </div>                              
+                            </template>
+                            <div class="noagent" v-if="!o.agent">&lt;平台&gt;</div>  
+                        </td>
+                        <td>
+                            <div class="operate">
+                                <div class="getway">
+                                    <i class="fa fa-map-marker" :style="{'color': o.gettype && o.gettype.location ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.location?'需要定位':''"></i>
+                                    <i class="fa fa-street-view" :style="{'color': o.gettype && o.gettype.free ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.free?'关注公众号领取' + (o.gettype.freeLimitsReached?'(已限额)':''):''"></i>
+                                    <i class="fa fa-shopping-cart" :style="{'color': o.gettype && o.gettype.price ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.price?'可支付' + o.gettype.price + '元购买':''"></i>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="sat operate">
+                            <span :class="{today:o.total&&o.total.today>0,zero:o.total&&o.total.today === 0}" :title="o.total&&o.total.today > 0 ?'查看今日统计':'今日暂无订单'">
+                                <i class="fa fa-spinner fa-spin"  title="加载中..." v-if="o.total === undefined"></i>
+                                <span :data-op="o.total&&o.total.today > 0 ? 'showDayStats':''" v-else>{{o.total.today}}</span>
+                            </span>
+                            /
+                            <span :class="{month:o.total&&o.total.month > 0,zero:o.total&&o.total.month === 0}" :title="o.total&&o.total.month > 0 ? '查看月统计':'本月暂无订单'">
+                                <i class="fa fa-spinner fa-spin" title="加载中..." v-if="o.total === undefined"></i>
+                                <span :data-op="o.total&&o.total.month > 0 ? 'showMonthStats':''" v-else>{{o.total.month}}</span>
+                            </span>
+                            &nbsp;<i class="fa fa-list" data-op="orders" title="点击查看这台设备的历史订单..." :style="{'visibility':o.total?'visible':'hidden'}" v-if="o.total !== undefined"></i>
+                        </td>
+                        <td class="group">
+                            <template v-if="o.group">   
+                                <span class="groupname" 
+                                :title="device.filter.group === o.group.id ? '':'点击查看该分组所有设备'" 
+                                :style="{'background-color':o.group.clr, 'cursor': device.filter.group === o.group.id ? 'default':'pointer'}"
+                                @click.prevent="deviceGroupClicked(o.group, o.agent)"
+                                >{{o.group.title}}</span>                        
+                            </template>
+                            <span class="nogroup" v-else>&lt;无分组&gt;</span>
+                        </td>
+                        <td class="status">
+                            <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
+                            <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status">
+                                <div :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
+                                    <div class="devcie-detail">
+                                        <div class="detail-seg">
+                                            <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 
+                                            <div><span class="title">ICCID：</span><span>{{o.ICCID ? o.ICCID : 'n/a'}}</span></div>
+
+                                            <template v-if="o.appId">
+                                                <div><span class="title">AppID：</span><span>{{o.appId}}</span></div>
+                                                <div><span class="title">AppVersion：</span><span>{{o.appVersion ? o.appVersion : 'n/a'}}</span></div>
+                                            </template>
+
+                                            <template v-if="o.sig !== undefined && o.sig != -1">
+                                                <div>
+                                                    <span class="title">信号强度：</span>
+                                                    <div class="bar sig">
+                                                        <div :style="{minWidth:'2em', width: o.sig + '%'}">{{o.sig + '%'}}</div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template v-if="o.qoe != undefined && o.qoe != -1">
+                                                <div>
+                                                    <span class="title">电池电量：</span>
+                                                    <div class="bar qoe">
+                                                        <div :style="{minWidth:'2em',width: o.qoe + '%'}">{{o.qoe + '%'}}</div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <div class="detail-seg" v-if="o.cargo_lanes.length > 0">
+                                            <div v-for="(lane,index) in o.cargo_lanes">
+                                                <span class="title">{{index + 1}}，<span :class="{'text-gray': lane.goods_id === 0}">{{lane.goods_name}}</span>：</span>
+                                                <span>{{lane.num}} / {{lane.capacity}} {{lane.goods_unit_title}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="detail-seg" v-if="(o.lastError && o.lastError.errno) || o.firstMsgTotal || o.lastPing || o.lastOnline">
+                                            <div v-if="o.lastError && o.lastError.errno">
+                                                <span class="title">最近错误：</span>
+                                                <span class="error">{{o.lastError.message}}</span>
+                                            </div>
+                                            <div v-if="o.firstMsgTotal">
+                                                <span class="title">今日重启：</span>
+                                                <span>{{o.firstMsgTotal}}次</span>
+                                            </div>
+                                            <div v-if="o.lastPing">
+                                                <span class="title">最近心跳：</span>
+                                                <span>{{o.lastPing}}</span>
+                                            </div>
+                                            <div v-if="o.lastOnline">
+                                                <span class="title">最后上线：</span>
+                                                <span>{{o.lastOnline}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {{o.createtime}}
+                        </td>
+                        <td>
+                            <div :id="'chart_' + o.id" style="width: 160px;height: 60px;">
+                            </div>
+                        </td>
+                        <td class="operate">
+                            <div class="btn-group">
+                                <a class="btn btn-default" href="#" title="设备出货测试" data-op="deviceTestAll">
+                                    <i class="fa fa-sign-out"></i>
+                                </a>
+                                <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <span class="fa fa-caret-down"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" data-op="deviceEdit"><i class="fa fa-gears fa-fw"></i> 编辑</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" data-op="deviceDetail"><i class="fa fa-navicon fa-fw"></i> 详情</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" data-op="showDayStats"><i class="fa fa-line-chart fa-fw"></i> 今日出货统计</a></li>
+                                    <li><a href="#" data-op="showMonthStats"><i class="fa fa-area-chart fa-fw"></i> 本月出货统计</a></li>
+                                    <li><a href="#" data-op="showAllStats"><i class="fa fa-list-alt fa-fw"></i> 全部出货统计</a></li>
+
+                                    <template v-if="o.isBluetooth">
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="#" data-op="showMaintainRec"><i class="fa fa-cogs"></i> 维护记录</a></li>
+                                        <li role="separator" class="divider"></li>
+                                    </template>                                    
+                                    <template v-else>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量?</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        
+                                        <li v-for="(lane, index) in o.cargo_lanes">
+                                            <a href="#" data-op="deviceReset" :data-params="index">
+                                                <i class="fa fa-level-up fa-fw"></i> 重置货道{{index + 1}}（{{lane.goods_name}}）
+                                            </a>
+                                        </li>
+                                    </template>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li v-if="o.appId"><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新!?</a></li>
+                                    <li class="disabled" v-else><a href="#"><i class="fa fa-cloud-download fa-fw disabled"></i> 推送版本更新!?</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已注册的AppId?</a></li>
+                                    <li><a href="#" data-op="deviceRemove"><i class="fa fa-trash fa-fw"></i> 删除?</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#" data-op="deviceRevertPrompt"><i class="fa fa-plug fa-fw"></i> 重置设备!?</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+    <div class="pull-right" v-if="device.list.length>0">
+        <div>
+            <ul class="pagination pagination-centered">
+                <li v-for="(page, index) in pager" :class="{'active': page.title == device.page}" @click="device.page=page.num()">
+                    <a href="#">{{page.title}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div style="text-align:center;color:#ccc;" v-if="device.list.length == 0">
+        没有任何设备！
+    </div>
+    </div>
+    </div>
+</div>
+<script>
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
+    const echartsUrl = "{php \zovye\url(false, JS_ECHARTS_URL);}";
+    const config = {
+        deviceApiUrl: "{php echo $this->createWebUrl('device');}",
+        agentApiUrl: "{php echo $this->createWebUrl('agent');}",
+        deviceTypesApiUrl: "{php echo $this->createWebUrl('devicetypes');}",
+        tagsApiUrl: "{php echo $this->createWebUrl('tags');}",
+        upgradeApiUrl: "{php echo $this->createWebUrl('upgrade');}",
+        orderApiUrl: "{php echo $this->createWebUrl('order');}",
+        deviceDetailUrl: '{php echo $this->createWebUrl("device", array("op"=>"detail", "id" => "__id__"));}',
+    }
+    const current = {
+        agent: JSON.parse(decodeURIComponent('{php echo urlencode(json_encode($s_agent ?: []))}')),
+        group: JSON.parse(decodeURIComponent('{php echo json_encode($s_group ?: [])}')),
+        deviceType: JSON.parse(decodeURIComponent('{php echo json_encode($s_device_type ?: [])}')),
+        tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
+    }
+</script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210418"></script>
+{template 'common/footer'}

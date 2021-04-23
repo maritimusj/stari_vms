@@ -1,0 +1,115 @@
+{if $orders}
+<style>
+    #list .profile img{
+        width: 32px;
+        height: 32px;
+    }
+    .we7-modal-dialog .modal-body{
+        max-height: unset;
+    }
+    #list .pay{
+        color: gray;
+        display: inline-block;
+    }
+
+    #list .balance {
+        color: #3F51B5;
+    }
+    #list .wxpay{
+        color: #8BC34A;
+        font-size: 1.2em;
+    }
+    #list .free{
+        color: #4CAF50;
+    }
+    #list .balance i{
+        font-size: 1.2em;
+    }
+    #list .order-from img{
+        width: 32px;
+        max-height: 32px;
+    }
+</style>
+<div id="list">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>用户</th>
+            <th>
+                数量(价格/余额)
+            </th>
+
+            <th style="text-align:center;">
+                <div>
+                    来源
+                </div>
+                {if empty($device)}
+                <div>设备</div>
+                {/if}
+            </th>
+
+            <th style="text-align: center;width: 10em;">
+                <div>IP定位</div>
+                <div>创建时间</div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $orders $index $order}
+        <tr>
+            <td>{php echo $index + 1}</td>
+            <td>
+                <div class="profile">
+                    <img src="{$order['user']['avatar']}" />
+                    <span class="nickname">
+                        {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                    </span>
+                </div>
+            </td>
+            <td>
+                <div class="pay">
+                    <span class="num">{$order['num']}</span>
+                    {if $order['price']>0}
+                    (价格：<span class="price {if $order['price']==0}zeroprice{/if}">{$order['price']}</span>)
+                    {elseif $order['balance']>0}
+                    (余额：<span class="balance">{$order['balance']} <i class="fa fa-tint"></i></span>)
+                    {else}
+                    (<span class="zeroprice">免费领取</span>)
+                    {/if}
+                </div>
+            </td>
+
+            <td>
+                <aside class="order-from" style="color:{$order['clr']};text-align:center;">
+                    {if $order['price'] > 0}
+                    <img src="{$order['from']['icon']}" title="{$order['from']['title']}" />
+                    {if $order['refund']}
+                    <div>（已退款）</div>
+                    {/if}
+                    {else}
+                    <img src="{media $accounts[$order['account']]['img']}" />
+                    <div>{php echo $accounts[$order['account']]['title'] ?:'&lt;未知&gt&gt;'}</div>
+                    {/if}
+                </aside>
+                {if empty($device)}
+                {php echo $order['device']['name'] ?: '&lt;未知设备&gt;'}
+                {/if}
+            </td>
+            <td>
+                <div title="{$order['ip']}">{$order['ip_info']}{if $order['isp']}({$order['isp']}){/if}</div>
+                <div style="color:#9E9E9E;font-size:12px;">{$order['createtime']}</div>
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+    </table>
+    <div class="pull-right">
+        {$pager}
+    </div>
+</div>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时还没有任何订单！
+</div>
+{/if}

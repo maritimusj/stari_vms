@@ -1,0 +1,137 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .orderNO{
+        font-size: small;
+        color: #9E9E9E;
+    }
+    .query {
+        cursor: default;
+    }
+    .query.fail {
+        color: red;
+    }
+    .query.success {
+        color: #0f8c47;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
+    {if $op=='log'}
+    <li role="presentation"><a href="#">支付</a></li>
+    <li role="presentation" class="active"><a href="#">支付记录</a></li>
+    {else}
+    <li role="presentation" class="active"><a href="#">支付</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">余额</a></li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-heading">
+    </div>
+    <div class="panel-body">
+        {if $logs}
+        <table class="table" id="orderlist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>订单号</th>
+                <th>状态</th>
+                <th>
+                    金额
+                </th>
+                <th>用户</th>
+                <th>设备</th>
+                <th>
+                    商品
+                </th>
+                <th>
+                    创建时间
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $logs $index $log}
+            <tr>
+                <td>{$log['id']}</td>
+                <td>
+                    <div>
+                        <i class="wi wi-money color-gray" title="{php echo strval($log['data']['pay']['name'])}"></i>
+                        {if isset($log['data']['payResult'])}
+                        {if isset($log['data']['payResult']['transaction_id'])}
+                        {$log['data']['payResult']['transaction_id']}
+                        {elseif isset($log['data']['payResult']['uniontid'])}
+                        {$log['data']['payResult']['uniontid']}
+                        {/if}
+                        {elseif isset($log['data']['queryResult'])}
+                        {$log['data']['queryResult']['transaction_id']}
+                        {/if}                 
+                    </div>
+                    <div class="orderNO">
+                        {if $log['orderNO']}
+                        <a href="{php echo $this->createWebUrl('order', array('order'=>$log['orderNO']));}">{$log['orderNO']}</a>
+                        {elseif $log['orderUID']}
+                        <a href="{php echo $this->createWebUrl('order', array('order'=>$log['orderUID']));}">{$log['orderUID']}</a>
+                        {else}
+                        n/a
+                        {/if}
+                    </div>
+                </td>
+                <td>
+                    {php $payResult = $log['data']['payResult'];}
+                    {if !empty($payResult)}
+                    {if $log['data']['cancelled']}
+                    支付取消
+                    {elseif $log['data']['timeout']}
+                    支付超时
+                    {elseif !is_error($log['data']['payResult'])}
+                    支付成功
+                    {/if}
+                    {else}
+                    {if $log['data']['queryResult']}
+                    {if $log['data']['queryResult']['result'] == 'success'}
+                    支付成功(<span class="query success" title="查询结果">*</span>)
+                    {else}
+                    {$log['data']['queryResult']['message']}(<span class="query fail" title="查询结果">*</span>)
+                    {/if}
+                    {/if}
+                    {/if}
+                    {if $log['data']['refund']}
+                    （已退款）<i class="fa fa-exclamation-circle" title="{$log['data']['refund']['message']}"></i>
+                    {/if}
+                    {if  $log['data']['refund_fail']}
+                    （退款失败）<i class="fa fa-exclamation-circle" title="{$log['data']['refund_fail']['result']['message']}"></i>
+                    {/if}
+                </td>
+                <td>￥{php echo round($log['data']['orderData']['price'] / 100, 2)}</td>
+                <td>
+                    <div class="profile">
+                        <img src="{$log['user']['headimgurl']}" />
+                        <span class="nickname">
+                                {php echo $log['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                            </span>
+                    </div>
+                </td>
+                <td>
+                    {$log['device']['name']}
+                </td>
+                <td>
+                    {php $goods = $log['data']['orderData']['extra']['goods'];}
+                    {$goods['name']}({$goods['price_formatted']})
+                </td>
+                <td>{$log['createtime_formatted']}</td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+    </div>
+    {else}
+    <div style="text-align:center;color:#ccc;">
+        暂时还没有任何订单！
+    </div>
+    {/if}
+</div>
+{template 'common/footer'}

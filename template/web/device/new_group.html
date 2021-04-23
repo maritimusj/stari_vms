@@ -1,0 +1,168 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+
+{if $op == 'new_group'}
+<div class="panel panel-default">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group_add'));}"><i class="fa fa-cubes" title="创建分组"></i></a>
+            <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回设备列表"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $groups}
+        <ul class="nav nav-tabs" id="navbar">
+            {loop $navs $nav_op $nav_title}
+            {if $agent}
+            {if $op == $nav_op}
+            <li role="presentation"  ><a href="{php echo $this->createWebUrl('device', array('op' => 'new_group'));}">{$nav_title}</a></li>
+            {else}
+            <li role="presentation" class="active"><a href="">{$nav_title}</a></li>
+            {/if}
+            {/if}
+            {/loop}
+        </ul>
+        <table class="table" id="grouplist">
+            <thead>
+            <th>名称</th>
+            <th>代理商</th>
+            <th>设备数量</th>
+            <th></th>
+            </thead>
+            <tbody>
+            {loop $groups $index $item}
+            <tr data-id="{$index}">
+                <td class="group">
+                    <span class="groupname" {if $item['clr']} style="background-color:{$item['clr']}"{/if}>{$item['title']}</span>
+                </td>
+                <td>
+                    {if $item['agent']}
+                        <div class="agent" style="display:inline-block;">
+                            <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                <img src="{$item['agent']['avatar']}">
+                                <div class="nickname">{$item['agent']['name']}</div>
+                            </div>
+                        </div>
+                    {else}
+                    <span style="color:gray;">&lt;平台&gt;</span>
+                    {/if}
+                </td>
+                <td>{php echo intval($item['total'])}</td>
+                <td class="operate">
+                    <a href="{php echo $this->createWebUrl('device',array('id'=>$item['id'],'op'=>'new_group_edit'));}">
+                        <i class="fa fa-edit" title="编辑"></i>
+                    </a>
+                    <a href="{php echo $this->createWebUrl('device',array('id'=>$item['id'],'op'=>'new_group_remove'));}" onclick="if(!confirm('确定要删除这个分组吗？')){return false;}">
+                        <i class="fa fa-trash-o" title="删除这个分组？"></i>
+                    </a>
+                    <span style="margin-left: 2em;"> 分组ID：{$item['id']}</span>
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div style="float:right;">
+            {$pager}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何分组！
+        </div>
+        {/if}
+    </div>
+</div>
+{else}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">
+        <i class="fa fa-cubes"></i> 
+        {if $op=='new_group_edit'}编辑{else}添加{/if}分组
+    </a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('device');}" method="post">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+
+            <div class="form-group">
+                <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                <div class="col-md-5">
+                    <select name="agentId" id="select_agent" style="width:100%;">
+                        {if $agent }
+                        <option value="{$agent['id']}">{$agent['name']}，手机号码：{$agent['mobile']}
+                        </option>
+                        {/if}
+                        <option value="0">&lt;无&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_agent" id="keyword_agent"
+                           placeholder="请输入手机号码或者名称查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_agent">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="title" class="col-md-2 control-label">名称</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="title" id="title" value="{php echo $group ? $group['title'] : ''}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">识别颜色</label>
+                <div class="col-md-10">
+                    {php echo tpl_form_field_color('clr', $group ? $group['clr'] : $clr);}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-btn">
+        <input type="hidden" name="op" value="new_group_save">
+        {if $op=='new_group_edit' && $id}
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">保存</button>
+        {else}
+        <button type="submit" class="btn btn-primary">创建</button>
+        {/if}
+        <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('device', array('op'=>'new_group'));}'">返回</button>
+
+    </div>
+</form>
+
+<script>
+    $(function () {
+        $('body').on('click', '#find_agent', function () {
+            const ownerId = $('select[name=agent_id]').val();
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    list.forEach(function (e) {
+                        html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_**!_', e.id === ownerId ? 'selected' : '');
+                    })
+                }
+                html += '<option value="0"><无></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+    })
+</script>
+{/if}
+{template 'common/footer'}

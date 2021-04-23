@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>{$tpl['page']['title']}</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <style type="text/css">
+        html, body {
+            position: relative;
+            height: 100%;
+        }
+        body {
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .desc {
+            margin: 30px 10px 5px 20px;
+        }
+        .top-view {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
+        }
+        .avatar {
+            width: 60px;
+            margin: 10px 20px;
+            border-radius: 50%;
+        }
+        .nickname {
+            color: #000;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .mobile-view {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+        }
+        .mobile-input {
+            border: none;
+            outline: medium;
+            height: 40px;
+            font-size: 16px;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+        .submit-btn {
+            display: inline-block;
+            zoom: 1;
+            display: inline;
+            vertical-align: baseline;
+            margin: 30px 0 0;
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font: 18px/100% Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            padding: .7em 0;
+            min-width: 250px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+            -webkit-border-radius: .5em;
+            -moz-border-radius: .5em;
+            border-radius: .5em;
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius: 2em;
+        }
+        .submit-btn:hover {
+            text-decoration: none;
+        }
+        .orange {
+            color: #fef4e9;
+            border: solid 1px #da7c0c;
+            background: #f78d1d;
+            background: -webkit-gradient(linear, left top, left bottom, from(#faa51a), to(#f00));
+            background: -moz-linear-gradient(top, #faa51a, #f00);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#faa51a', endColorstr='#f00');
+        }
+        .orange:hover {
+            background: #f47c20;
+            background: -webkit-gradient(linear, left top, left bottom, from(#f88e11), to(#f00));
+            background: -moz-linear-gradient(top, #f88e11, #f00);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f88e11', endColorstr='#f00');
+        }
+        .orange:active {
+            color: #fcd3a5;
+            background: -webkit-gradient(linear, left top, left bottom, from(#f47a20), to(#DC143C));
+            background: -moz-linear-gradient(top, #f47a20, #DC143C);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f47a20', endColorstr='#DC143C');
+        }
+        .copyright {
+            font-size: 13px;
+            color: #888;
+            margin-top: 20px;
+        }
+        </style>
+    </head>
+    
+    <body>	
+        <span class="desc">请绑定手机号码</span>
+        <div class="top-view">
+            <img class="avatar" src="{$tpl['user']['avatar']}" />	
+            <span class="nickname">{$tpl['user']['nickname']}</span>
+        </div>
+        <div class="mobile-view">	
+            <span style="margin-left: 20px;">手机号码</span>
+            <input class="mobile-input" type="number" name="mobile" id="mobile" value="{$tpl['user']['mobile']}" placeholder="请输入手机号码" />
+        </div>
+        <button class="submit-btn orange" onclick="submitClick()">提交</button>
+        <div class="copyright">{$tpl['site']['copyrights']}</div>
+        {$tpl['js']['code']}
+        <script type="text/javascript">
+        function submitClick() {
+            const mobile = document.querySelector(".mobile-input").value;
+            zovye_fn.save(mobile);
+            setTimeout(function(){
+                if(wx) {
+                    wx.closeWindow();
+                }                        
+            }, 3000);
+        }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+{if $cargo_lanes}
+<table class="table table-bordered cargo_lanes">
+    <thead>
+        <th>货道</th>
+        <th>商品名称</th>
+        <th>价格</th>
+        <th>容量</th>
+        <th style="width:10em;">当前数量</th>
+    </thead>
+    <tbody>
+    {loop $cargo_lanes $index $item}
+        <tr>
+            <td>
+                <div class="lane">
+                    {php echo $index + 1}
+                    {if $item['is_motor']}
+                    <sup title="电机货道">[ 电机 ]</sup>
+                    {/if}
+                </div>
+            </td>
+            <td>{$item['goods_name']}</td>
+            <td data-price="{$item['goods_price']}">{$item['goods_price_formatted']}</td>
+            <td>{$item['capacity']} {$item['goods_unit_title']}</td>
+            <td>
+                <input type="number" class="form-control capacity" name="lane{$index}_num" value="{$item['num']}" min="0" max="{$item['capacity']}">
+            </td>
+        </tr>
+    {/loop}
+    </tbody>
+</table>
+{else}
+{/if}

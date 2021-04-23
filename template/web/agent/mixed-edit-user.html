@@ -1,0 +1,191 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if $fn=='adduser'}
+            <i class="fa fa-pencil"></i> 添加
+            {else}
+            <i class="fa fa-edit"></i> 编辑
+            {/if}
+            佣金分享用户
+        </a>
+    </li>
+</ul>
+<form action="{php echo $this->createWebUrl('agent');}" method="post"  id="addRoleForm">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+            <span class="operate">
+                <a href="{$back_url}"><i class="fa fa-reply" title="返回"></i></a>
+            </span>        
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <div class="profile">
+                        <img src="{php echo $user ? $user->getAvatar() : ''}">
+                        <span>{php echo $user ? $user->getNickname() : ''}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">免费订单<br/>佣金
+                </label>
+                <div class="col-md-10">
+                    <div class="control-label checkbox-inline text-left">
+                        <label for="freeOrder1" class="radio-inline">
+                            <input name="freeOrderType" id="freeOrder1" type="radio" value="1" data-type="%">
+                            百分比&nbsp;
+                        </label>
+                        <label for="freeOrder0" class="radio-inline">
+                            <input name="freeOrderType" id="freeOrder0" type="radio" value="0" data-type="元">
+                            固定金额 &nbsp;
+                        </label>
+                        <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="freeOrderVal" min="0" step="0.01">
+                        <label class="type-text text-inline"></label>
+                        <span class="help-block">* 用户通过广告免费领取商品时，所产生订单的佣金比例或者金额</span>
+                    </div>
+                </div>
+            </div>
+            {if \zovye\App::isUserCenterEnabled()} 
+            <div class="form-group">
+                <label class="col-md-2 control-label">余额订单<br/>佣金
+                </label>
+                <div class="col-md-10">
+                    <div class="control-label checkbox-inline text-left">
+                        <label for="balanceOrder1" class="radio-inline">
+                            <input name="balanceOrderType" id="balanceOrder1" type="radio" value="1" data-type="%">
+                            百分比&nbsp;
+                        </label>
+                        <label for="balanceOrder0" class="radio-inline">
+                            <input name="balanceOrderType" id="balanceOrder0" type="radio" value="0" data-type="元">
+                            固定金额 &nbsp;
+                        </label>
+                        <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="balanceOrderVal" min="0" step="0.01">
+                        <label class="type-text text-inline"></label>
+                        <span class="help-block">* 用户使用余额购买商品时，所产生订单的佣金比例或者金额</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            <div class="form-group">
+                <label class="col-md-2 control-label">支付订单<br/>佣金
+                </label>
+                <div class="col-md-10">
+                    <div class="control-label checkbox-inline text-left">
+                        <label for="payOrder1" class="radio-inline">
+                            <input name="payOrderType" id="payOrder1" type="radio" value="1" data-type="%">
+                            百分比&nbsp;
+                        </label>
+                        <label for="payOrder0" class="radio-inline">
+                            <input name="payOrderType" id="payOrder0" type="radio" value="0" data-type="元">
+                            固定金额 &nbsp;
+                        </label>
+                        <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="payOrderVal" min="0" step="0.01">
+                        <label class="type-text text-inline"></label>
+                        <span class="help-block">* 用户支付购买商品时，所产生订单的佣金比例或者金额</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+            <input type="hidden" name="op" value="gsp">
+            <input type="hidden" name="fn" value="saveuser">
+            <input type="hidden" name="from" value="mixed">
+            <input type="hidden" name="id" value="{php echo $user->getId();}">
+            <input type="hidden" name="agentid" value="{php echo $agent->getId();}">           
+            <button type="submit" class="btn btn-primary">
+                {if $fn=='adduser'}添加{else}保存{/if}
+            </button>
+            <a role="button" class="btn btn-default" href="{$back_url}">返回</a>
+    </div>
+</form>
+<script>
+    const apiUrl = "{php echo $this->createWebUrl('agent', ['agentid' => $agent->getId(), 'op' => 'gsp']);}";
+    const openid = "{php echo $user ? $user->getOpenid() : ''}";
+    function changeType(target) {
+        const div = target.closest("div");
+        const type = div.find("input:checked").data('type');
+        div.find(".type-text").html(type);
+    }
+    function setFormVal(val) {
+        if (val['f']) {
+            if (val['f']['val_type'] == 'percent') {
+                $('#addRoleForm input#freeOrder1').prop('checked', true);
+            } else {
+                $('#addRoleForm input#freeOrder0').prop('checked', true);
+            }
+            $("#addRoleForm input[name=freeOrderVal]").val(val['f']['val']);
+        } else {
+            $('#addRoleForm input#freeOrder1').prop('checked', false);
+            $('#addRoleForm input#freeOrder0').prop('checked', false);
+            $("#addRoleForm input[name=freeOrderVal]").val('0');
+        }
+        if (val['b']) {
+            if (val['b']['val_type'] == 'percent') {
+                $('#addRoleForm input#balanceOrder1').prop('checked', true);
+            } else {
+                $('#addRoleForm input#balanceOrder0').prop('checked', true);
+            }
+            $("#addRoleForm input[name=balanceOrderVal]").val(val['b']['val']);
+
+        } else {
+            $('#addRoleForm input#balanceOrder1').prop('checked', false);
+            $('#addRoleForm input#balanceOrder0').prop('checked', false);
+            $("#addRoleForm input[name=balanceOrderVal]").val('0');
+        }
+        if (val['p']) {
+            if (val['p']['val_type'] == 'percent') {
+                $('#addRoleForm input#payOrder1').prop('checked', true);
+            } else {
+                $('#addRoleForm input#payOrder0').prop('checked', true);
+            }
+            $("#addRoleForm input[name=payOrderVal]").val(val['p']['val']);
+
+        } else {
+            $('#addRoleForm input#payOrder1').prop('checked', false);
+            $('#addRoleForm input#payOrder0').prop('checked', false);
+            $("#addRoleForm input[name=payOrderVal]").val('0');
+        }
+        changeType($("input[name=freeOrderType]"));
+        changeType($("input[name=balanceOrderType]"));
+        changeType($("input[name=payOrderType]"));
+    }
+    function enableRoleForm(enabled) {
+        $('#addRoleForm select').attr("disabled", !enabled);
+        $('#addRoleForm button').attr("disabled", !enabled);
+        $('#addRoleForm input').attr("disabled", !enabled);  
+        $('#addRoleForm label,#addRoleForm span, #addRoleForm select, #addRoleForm input').css("color", enabled ? "inherit" : "#ccc"); 
+    }
+
+    function getData(uid) {
+        let loading = true;
+        setTimeout(() => {
+            if (loading) {
+                enableRoleForm(false);
+            }            
+        }, 500);
+        
+        $.get(apiUrl, { openid: uid, op: 'gsp', fn: 'get_data' }).then(function (res) {
+            if (res && res.status) {
+                setFormVal(res.data);
+            } else {
+                util.message(res.data.msg, '', 'error');
+            }
+            loading = false;
+            enableRoleForm(true);
+        })
+    }
+
+    $(function() {
+        $('body').on("click", "[data-type]", function () {
+            changeType($(this));
+        })
+        if (openid) {
+            getData(openid);
+        }        
+    })
+</script>
+{template 'common/footer'}

@@ -1,0 +1,127 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template 'web/common/header'}
+<style>
+    .success{
+        color: green;
+        cursor: pointer;
+    }
+    .error{
+        color: red;
+        cursor: pointer;
+    }
+    .goods_img img {
+        width: 100px;
+    }
+
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    {loop $navs $nav_op $nav_title}
+    {if $op == $nav_op}
+    <li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')));}">{$nav_title}</a></li>
+    {/if}
+    {/loop}
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        {if $logs}
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>来源</td>
+                    <td>结果</td>
+                    <td>商品</td>
+                    <td>名称</td>
+                    <td>数量</td>
+                    <td>用户</td>                    
+                    <td>用时</td>
+                    <td>备注</td>
+                    <td>时间</td>
+                </tr>
+            </thead>
+            <tbody>
+            {loop $logs $index $item}
+            <tr>
+                <td>{php echo $index + 1}</td>
+                <td>{$item['title']}</td>
+                <td>
+                    <div class="{php echo $item['result']['errno']?'error':'success'}">
+                        货道：{php echo $item['goods']['cargo_lane'] + 1} -> 
+                        {$item['result']['message']}
+                        {if isset($item['confirm'])}
+                        <span class="{php echo $item['confirm']['errno']?'error':'success'}" title="订单确认结果">(* {php echo $item['confirm']['message'] ?: '&lt;未知&gt;'})</span>
+                        {/if}
+                    </div>
+                </td>
+                <td>
+                    {if $item['goods']}
+                    <div class="goods_img">
+                        <img src="{$item['goods']['img']}" />
+                    </div>
+                    {/if}
+                </td>
+                <td>
+                    {if $item['goods']}
+                    {$item['goods']['name']}
+                    {/if}
+                </td>
+                <td>
+                    {if $item['goods']}
+                    <div class="goods_num">{$item['goods']['num']}</div>
+                    {/if}
+                </td>
+                <td>
+                    {if is_array($item['user'])}
+                    <div class="profile">
+                        <img src="{$item['user']['headimgurl']}" />
+                        <span class="nickname">
+                                {php echo $item['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                            </span>
+                    </div>
+                    {else}
+                    <div>{$item['user']}</div>
+                    {/if}
+                </td>
+                <td>
+                    {if $item['result']['timeUsed']}
+                    <i class="fa fa-clock-o"></i> {php echo number_format($item['result']['timeUsed'] / 1000, 2)}秒
+                    {/if}
+                </td>
+                <td>
+                    {if $item['memo']}
+                    <div>
+                        备注：{$item['memo']}
+                    </div>                    
+                    {/if}
+                    {if $item['result']['orderUID']}
+                    <div>
+                        订单号：{$item['result']['orderUID']}
+                    </div>
+                    {/if}
+                    {if $item['result']['serialNO']}
+                    <div>
+                        流水号：{$item['result']['serialNO']}
+                    </div>
+                    {/if}
+                </td>
+                <td>
+                    {$item['createtime_foramtted']}
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何日志！
+        </div>
+        {/if}
+    </div>
+</div>
+{template 'common/footer'}

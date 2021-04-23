@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>设备注册</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		{php \zovye\url(true, CSS_MUI_URL);}
+		<style>
+		    .profile {
+		        display: flex;
+		        flex-direction:column;
+		        align-items: center;
+		    }
+		    .profile img {
+		        width: 50px;
+		        border-radius: 50%;
+		    }
+		</style>
+    </head>
+    <body>
+		<div class="mui-content">
+            <div class="mui-card">
+                <div class="mui-card-content-inner">
+                    <ul class="mui-table-view">
+                        <li  class="mui-table-view-cell">
+                            设备唯一编码：{php echo $device->getImei();}
+                        </li> 
+                        <li  class="mui-table-view-cell">
+                        </li>
+                    </ul> 
+                    <form class="mui-input-group">
+                    	<div class="mui-input-row">
+                    		<label>名称</label>
+                    		<input type="text" placeholder="请输入名称" value="{php echo $device->getName();}">
+                    	</div>
+                    	<div class="mui-input-row">
+                    		<label>实际容量</label>
+                    		<input type="number" placeholder="请输入容量" value="{php echo intval($device->getCapacity());}">
+                    	</div>
+                    	<div class="mui-input-row">
+                    		<label>投放地址</label>
+                    		<input type="text" class="mui-input-clear" placeholder="请输入地址" data-input-clear="5">
+                    		<span class="mui-icon mui-icon-clear mui-hidden"></span>
+                    	</div>
+                    	<div class="mui-content-padded">
+                    	    <button type="button" class="mui-btn mui-btn-success mui-btn-block" id="reg">注册设备</button>
+                    	</div>
+                    </form>
+				</div>
+            </div>
+        </div>
+        <div style="text-align:center;color:#ccc;">
+            <h6>自动售卖</h6>
+            <h5>&copy;卓一（嘉兴）物联科技有限公司</h5>
+        </div>
+		{php \zovye\url(true, JS_MUI_URL);}
+        {php echo register_jssdk(false);}
+        <script>
+		    wx.ready(function(){
+			    wx.hideAllNonBaseMenuItem();
+			});
+			
+			mui.ready(function(){
+			    mui.init();
+			    const mask = mui.createMask();
+			    
+			    const id = "{php echo $device->getImei() ?: ''}";
+                const regBtn = document.getElementById('reg');
+                if(regBtn) {
+                    regBtn.addEventListener('tap', function(){
+                        mask.show();//显示遮罩
+                        mui.getJSON("{$url}", {op:'reg', id: id}, function(res){
+                            if(res && res['data']) {
+                                const data = res['data'];
+		                        mui.alert(data['msg'], '注册结果', ['关闭'], function(){
+		                            if(res['status'] && wx) {
+		                                wx.closeWindow();
+		                            }
+		                        });
+                            }
+                        });
+                    })
+                }
+			})
+        </script>        
+    </body>
+</html>

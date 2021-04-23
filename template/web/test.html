@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title></title>
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+    
+    <body>
+        <table class="table">
+            <tr>
+                <th>#</th>
+                <th>区域</th>
+                <th>地址</th>
+            </tr>
+            {loop $all $index $item}
+            <tr>
+                <td>{php echo $index + 1}</td>
+                <td>
+                    {$item['area']}
+                </td>
+                <td>
+                    {$item['address']}
+                </td>
+            </tr>
+            {/loop}
+        </table>
+    </body>
+</html>

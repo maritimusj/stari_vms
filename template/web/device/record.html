@@ -1,0 +1,385 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #devicelist i.allowed {
+        color: green;
+    }
+
+    #devicelist td.status {
+        transition: all 1s;
+    }
+
+    #devicelist .app {
+        position: relative;
+    }
+
+    #devicelist .status:hover .app .devcie-detail {
+        display: flex;
+    }
+
+    #devicelist .app .devcie-detail {
+        position: absolute;
+        z-index: 99;
+        overflow: hidden;
+        background-color: #fff;
+        padding: 16px;
+        border: 1px solid #9E9E9E;
+        border-radius: 6px;
+        display: none;
+        flex-direction: column;
+        width: 300px;
+        top: 20px;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #devicelist .app .devcie-detail .detail-seg {
+        text-align: start;
+        margin: 10px 0;
+        white-space: nowrap;
+    }
+
+    #devicelist .app .devcie-detail .detail-seg .title {
+        font-weight: bold;
+    }
+
+    #devicelist .devcie-detail .bar {
+        display: inline-block;
+        width: 130px;
+        background-color: #f5f5f5;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        text-align: center;
+        vertical-align: top;
+        font-size: smaller;
+        overflow: hidden;
+    }
+
+    #devicelist .devcie-detail .sig div {
+        color: #fff;
+        background: #009688;
+    }
+
+    #devicelist .devcie-detail .qoe div {
+        color: #fff;
+        background: #ff5722;
+    }
+
+    #devicelist .app.loading {
+        color: rgba(0, 0, 0, .1);
+        display: none;
+    }
+
+    #devicelist .device.loading {
+        color: rgba(0, 0, 0, .1);
+        display: none;
+    }
+
+    #devicelist .status i.loading {
+        color: rgba(0, 0, 0, .6);
+    }
+
+    #devicelist tr .getway {
+        visibility: hidden;
+    }
+
+    #devicelist tr:hover .getway {
+        visibility: visible;
+        color: rgb(238, 238, 238);
+    }
+
+    #devicelist [data-url] {
+        cursor: pointer;
+    }
+
+    #devicelist td.sat {
+        width: 15em;
+    }
+
+    #devicelist .devicename {
+        cursor: default
+    }
+
+    .zovye_qrcode:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translate3d(0, -2px, 0);
+    }
+
+    #devicelist .imei img.qrcode {
+        width: 1.5em;
+        height: 1.5em;
+    }
+
+    #devicelist sup {
+        color: #009688;
+    }
+
+    .zovye_qrcode:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        transform: translate3d(0, -2px, 0);
+    }
+
+    table#cargolanes th, table#cargolanes td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    table#cargolanes div.loading {
+        vertical-align: middle;
+        line-height: 2em;
+    }
+
+    table#cargolanes div.loading i {
+        font-size: 1em;
+        color: #4CAF50;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="" action="{php echo $this->createWebUrl('device', ['op'=>'maintain_record'])}" method="post"
+              id="the_form">
+
+            <div class="form-group">
+                <label for="select_agent" class="col-md-2 ">设备代理商</label>
+                <div class="col-md-5">
+                    <select name="agent_openid" id="select_agent" style="width:100%;">
+                        <option value="0">&lt;不限&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_agent" id="keyword_agent"
+                           placeholder="请输入手机号码或者名称查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_agent">查找</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="select_device" class="col-md-2 ">设备</label>
+                <div class="col-md-5">
+                    <select name="device_id" id="select_device" style="width:100%;">
+                        <option value="0">&lt;不限&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_device" id="keyword_device"
+                           placeholder="请输设备ＩＭＥＩ号查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_device">查找</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 " for="nickname">操作员</label>
+                <div class="col-md-8">
+                    <input type="text" name="nickname" id="nickname" placeholder="请输入用户呢称查找用户"
+                           value="{$nickname}" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 " for="nickname">类型</label>
+                <div class="col-md-8">
+                    <select name="cate">
+                        <option value="0" {if $cate == 0} selected="selected"{/if}>全部</option>
+                        {loop $rec_type $k $v}
+                        <option value="{$k}" {if $cate == $k} selected="selected"{/if}>{$v}</option>
+                        {/loop}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-2 ">加入日期</label>
+                <div class="col-md-8">
+                    <input name="datelimit[start]" type="hidden" value="{php echo $s_date}"/>
+                    <input name="datelimit[end]" type="hidden" value="{php echo $e_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                <span class="date-title">
+                    {if empty($s_date) && empty($e_date)}
+                    不限时间
+                    {else}
+                    {$s_date} 至{$e_date}
+                    {/if}
+                </span> <i class="fa fa-calendar"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2">
+                    <button id="btn_search" type="submit" class="btn btn-primary">查找</button>
+                    <input id="val_export" type="hidden" name="is_export" value="0">
+                    <button id="btn_export" class="btn btn-success" style="margin-left: 4em;">导出</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        维护记录
+    </div>
+    <div class="panel-body">
+        <table class="table" id="devicelist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>设备名称</th>
+                <th>代理商</th>
+                <th>操作人员</th>
+                <th style="min-width:3em;">类型</th>
+                <th>日期</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $data $index $d}
+            <tr data-fetchid="{$d['id']}" class="{$d['model']}">
+                <td class="operate">
+                    {php echo $index + 1}
+                </td>
+                <td style="position:relative;">
+                    <div class="">
+                        {$device_assoc[$d['deviceId']]}
+                    </div>
+                </td>
+                <td style="position:relative;">
+                    <div class="">
+                        {$agent_assoc[$device_agent_assoc[$d['deviceId']]]}
+                    </div>
+                </td>
+                <td>
+                    {$user_assoc[$d['userId']]}
+                </td>
+                <td>
+                    {$rec_type[$d['cate']]}
+                </td>
+                <td class="sat operate">
+                    {$d['createtime']}
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {if empty($data)}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何记录！
+        </div>
+        {/if}
+    </div>
+</div>
+
+<script>
+    var open_id = '{php echo $open_id}' || 0;
+    var device_id = '{php echo $device_id}' || 0;
+
+    $(function () {
+        $('#find_agent').click(function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    var isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.openid == open_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                isSelected = '';
+                if (0 == open_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><不限></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        $('#find_device').click(function () {
+            const keyword = $('input[name=keyword_device]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('device');}", {op: 'search', keyword: keyword}, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    var isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.id == device_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，IMEI：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.imei)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                isSelected = '';
+                if (0 == device_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><不限></option>';
+                $('#select_device').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    var elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+
+        $('#btn_search').on('click', function(event){
+            event.preventDefault();
+            $('#val_export').val(0);
+            $('#the_form').submit();
+        })
+        $('#btn_export').on('click', function (e) {
+            e.preventDefault();
+            $('#val_export').val(1);
+            $('#the_form').submit();
+        })
+
+        $('#find_agent').trigger('click');
+        $('#find_device').trigger('click');
+    })
+
+</script>
+{template 'common/footer'}

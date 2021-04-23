@@ -1,0 +1,30 @@
+{if $typename == 'text'}
+<form>
+  <div class="form-group">
+    <label for="msgText">请输入消息内容</label>
+    <input type="text" class="form-control" id="msgText" placeholder="请输入文本内容..." {if $media['type'] == 'text'}value="{$media['val']}"{/if}>
+  </div>
+  <div class="form-group">
+    <button type="button" class="btn btn-primary" onclick="saveMsgText()">确定</button>
+  </div>
+</form>
+{elseif $typename == 'image'}
+<div class="imagelist" id="medialist">
+    {loop $list['material_list'] $index $item}
+    <div  data-media_id="{$item['media_id']}" {if $media['type'] == 'image' && $media['val'] == $item['media_id']}selected{/if}>
+        <img src="{$item['attachment']}">
+        <span>{$item['filename']}</span>
+    </div>
+    {/loop}
+</div>
+{elseif $typename == 'mpnews'}
+<div class="mpnewslist"  id="medialist">
+    {loop $list $index $item}
+    <div data-media_id="{$item['media_id']}"  {if $media['type'] == 'mpnews' && $media['val'] == $item['media_id']}selected{/if}>
+        <img src="{$item['items']['0']['thumb_url']}">
+        <span>{$item['items']['0']['title']}</span>
+    </div>
+    {/loop}
+</div>
+{else}
+{/if}

@@ -1,0 +1,858 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #location, #tag_tpl {
+        display: none;
+    }
+    #device_edit_form table.cargo_lanes th {
+        text-align: center;
+    }
+    #device_edit_form table.cargo_lanes td {
+        text-align: center;
+    }
+    #device_edit_form table.cargo_lanes input.capacity {
+        width: 10em;
+        border: 0;
+        margin: 0 auto;
+        text-align: center;
+        display: inline;
+    }
+    #device_edit_form table.cargo_lanes input:focus.capacity {
+        border-color: #66afe9;
+    }
+    
+    .cargo_lanes div.lane {
+        position: relative;
+    }
+    .cargo_lanes .lane sup{
+        color:#66afe9;
+        cursor: default;
+        position: absolute;
+        top: 3px;
+    }
+    #moscaleLabelList {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #moscaleLabelList span {
+        background-color: #9E9E9E;
+        padding: 2px 8px;
+        color: #fff;
+        border-radius: 6px;
+        margin: 3px 1px;
+        cursor: pointer
+    }
+    #moscaleLabelList span.selected{
+        background-color: #FF9800;
+    }
+    #device_types i.fa-edit {
+        visibility: hidden;
+    }
+    #device_types i.fa-trash {
+        display: none;
+    }
+    #device_types tr:hover i.fa-trash {
+        display: inline;
+    }
+    #device_types tr:hover i.fa-edit {
+        visibility: visible;
+    }
+    #device_types tr:hover .index {
+        display: none;
+    }
+    #device_types tr.unknown {
+        color: #ccc;
+    }
+    #device_types span.price {
+        cursor: pointer;
+    }
+    #device_types span.price:hover {
+        color: green;
+    }
+    #device_types .goods_name {
+        cursor: pointer;
+    }
+    #device_types .goods_name:hover {
+        color: green;
+    }
+    #device_types .cargo_lanes th.fixed {
+        min-width: 200px;
+    }
+    [v-cloak] {
+        display: none;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if $op=='edit'}
+            <i class="fa fa-gears"></i> 编辑设备
+            {else}
+            <i class="fa fa-cube"></i> 添加{if $op == 'add_vd'}虚拟{/if}设备
+            {/if}
+        </a>
+    </li>
+</ul>
+<form action="{php echo $this->createWebUrl('device');}" method="post" id="device_edit_form">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+            <span class="operate">
+                <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回"></i></a>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">基本设置</div>
+                <div class="form-group">
+                    <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                    <div class="col-md-5">
+                        <select name="agent_id" id="select_agent" style="width:100%;">
+                            {if $agent}
+                            <option value="{php echo $agent->getId()}">{php echo $agent->getName() . "，手机号码：" . $agent->getMobile()}</option>
+                            {/if}
+                            <option value="0">&lt;无&gt;</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" id="find_agent">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="name" class="col-md-2 control-label">名称</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="name" id="name" value="{php echo $device ? $device->getName() : ''}" required>
+                    </div>
+                </div>
+                {if \zovye\App::isVDeviceSupported() && $op=="add_vd"}
+                <div class="form-group">
+                    <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : $vd_imei}" readonly>
+                        {if empty($device)}
+                        <span class="help-block">* 虚拟设备的硬件IMEI自动生成！</span>
+                        {/if}
+                    </div>
+                </div>
+                {else}
+                <div class="form-group">
+                    <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" {if !empty($device)}readonly{else}required{/if}>
+                        {if empty($device)}
+                        <span class="help-block">* 以后无法修改！</span>
+                        {/if}
+                    </div>
+                </div>
+
+                {if \zovye\App::isBluetoothDeviceSupported() && ($op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice()))}
+                <div class="form-group">
+                    <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="BUID" id="BUID" value="{php echo $device ? $device->getBUID() : ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="select_protocols" class="col-md-2 control-label">蓝牙协议</label>
+                    <div class="col-md-10">
+                        <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
+                            {if empty($device)}
+                            <option value="{php echo  \zovye\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
+                                &lt;请选择蓝牙协议&gt;
+                            </option>
+                            {/if}
+                            {loop $bluetooth['protocols'] $index $item}
+                            <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
+                                {$item['name']} - {$item['title']}
+                            </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="MAC" class="col-md-2 control-label">硬件MAC地址</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="MAC" id="MAC" value="{php echo $device ? $device->getMAC() : ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="Motor" class="col-md-2 control-label">电机数量</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="Motor" id="Motor" value="{php echo $device ? $device->getMotor() : ''}">
+                    </div>
+                </div>
+                {/if}
+                {/if}
+                <div id="device_types" v-cloak>
+                    <div class="form-group">
+                        <label for="select_device_types" class="col-md-2 control-label">设备型号</label>
+                        <div class="col-md-5">
+                            <select name="deviceType" id="select_device_types" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}"
+                            :disabled="loading"
+                            v-model="currentTypeID">
+                                <option v-for="item in list" :value="item['id']" :selected="item['id']==currentTypeID" v-if="list.length>0">
+                                    {{item['title']}}（{{item['lanes_total']}}货道）
+                                </option>
+                                <option value="0">
+                                    &lt;自定义&gt;
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control"  placeholder="请输入关键字搜索" v-model="keywords">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" :disabled="loading" @click="search()">
+                                <i :class="{'fa': true, 'fa-search': !searching, 'fa-spinner fa-pulse': searching}"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label"></label>
+                        <div class="col-md-10" id="lane_detail">
+                            <table  class="table table-bordered cargo_lanes" v-if="currentType && currentType.cargo_lanes">
+                                <thead>
+                                    <th>货道</th>
+                                    <th>商品名称</th>
+                                    <th class="fixed">价格</th>
+                                    <th class="fixed">容量</th>
+                                    <th class="fixed">当前数量</th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}">
+                                        <td>
+                                            <div class="lane operate">
+                                                <span :class="{index: isCustomType}">
+                                                    {{i + 1}}
+                                                    <sup title="电机货道" v-if="lane.is_motor">[ 电机 ]</sup>   
+                                                </span>  
+                                                <i class="fa fa-trash" title="删除" @click="removeLane(lane)" v-if="isCustomType"></i>
+                                            </div>
+                                        </td>
+                                        <td :class="{operate: isCustomType}">
+                                            <span :class="{'goods_name': isCustomType}"  @click="chooseGoods(lane)" title="点击选择商品">{{lane.goods_name}}</span>
+                                            <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span>                                     
+                                        </td>
+                                        <td>
+                                            <div v-show="currentLane == lane">
+                                                <input class="form-control capacity" type="number" 
+                                                :name="'price' + i" 
+                                                min="0" 
+                                                step="0.01"
+                                                ref="price"
+                                                v-model="lane.goods_price"
+                                                @blur="editPriceDone(lane)"
+                                                @keydown.enter.self.prevent="editPriceDone(lane)"
+                                                >
+                                            </div>
+                                            <span 
+                                            :class="{price:isCustomType}" 
+                                            @click="editPrice(lane, i)" 
+                                            v-show="currentLane!=lane"
+                                            title="点击修改价格">¥{{lane.goods_price}}元</span>
+                                        </td>
+                                        <td>
+                                            <template v-if="isCustomType">
+                                                <input type="number" class="form-control capacity" 
+                                                :name="'capacities[' + i + ']'" 
+                                                v-model="lane.capacity" 
+                                                min="0">
+                                                <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
+                                            </template>
+                                            <template v-else>
+                                                {{lane.capacity}} 
+                                            </template>
+                                        <td>
+                                            <input type="number" class="form-control capacity" :name="'lane' + i + '_num'" v-model="lane.num" min="0" :max="lane.capacity">
+                                        </td>  
+                                    </tr>                            
+                                </tbody>
+                            </table>
+                            <div v-if="isCustomType">
+                                <button class="btn btn-success" @click.prevent="addCargoLane" :disabled="loading"><i class="fa fa-plus"></i> 增加货道</button>
+                            </div>  
+                        </div>
+                    </div>                         
+                </div>
+              </div>
+            {if \zovye\App::isBluetoothDeviceSupported() }
+            {if $op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice())}
+            <div class="seg">
+                <div class="title">功能</div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="blueToothScreen1" class="radio-inline">
+                            <input name="blueToothScreen" id="blueToothScreen1" type="radio" value="1" {if $bluetooth['screen'] == 1}checked="checked"{/if}>
+                            有
+                        </label>
+                        <label for="blueToothScreen0" class="radio-inline">
+                            <input name="blueToothScreen" id="blueToothScreen0" type="radio" value="0"  {if $bluetooth['screen'] == 0}checked="checked"{/if} >
+                            无
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">消毒功能</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="blueToothDisinfectant1" class="radio-inline">
+                            <input name="blueToothDisinfectant" id="blueToothDisinfectant1" type="radio" value="1" {if $bluetooth['disinfectant'] == 1}checked="checked"{/if}>
+                            有
+                        </label>
+                        <label for="blueToothDisinfectant0" class="radio-inline">
+                            <input name="blueToothDisinfectant" id="blueToothDisinfectant0" type="radio" value="0"  {if $bluetooth['disinfectant'] == 0}checked="checked"{/if} >
+                            无
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">供电</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="blueToothPowerSupply1" class="radio-inline">
+                            <input name="blueToothPowerSupply" id="blueToothPowerSupply1" type="radio" value="1" {if $bluetooth['power'] == 1}checked="checked"{/if}>
+                            电池供电
+                        </label>
+                        <label for="blueToothPowerSupply0" class="radio-inline">
+                            <input name="blueToothPowerSupply" id="blueToothPowerSupply0" type="radio" value="0"  {if $bluetooth['power'] == 0}checked="checked"{/if} >
+                            外接电源
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            {/if}
+            <div class="seg">
+                <div class="title">扩展设置</div>
+                <!--
+                    <div class="form-group">
+                        <label for="pushAccountMsg" class="col-md-2 control-label">领取后推送公众号消息</label>
+                        <div class="col-md-10">
+                            <select id="pushAccountMsg" name="pushAccountMsg" class="col-md-9">
+                                <option value="none" {if 'none' == $extra['pushAccountMsg']}selected{/if}>&lt;不推送&gt;</option>
+                                <option value="settings" {if empty($extra['pushAccountMsg']) || 'settings' == $extra['pushAccountMsg']}selected{/if}>&lt;全局设置&gt;</option>
+                                {loop $news $item}
+                                <option value="{$item['media_id']}" {if $item['media_id'] ==$extra['pushAccountMsg']}selected{/if}>{$item['items']['0']['title']}</option>
+                                {/loop}
+                            </select>
+                            <span class="col-md-2"><a href="{php echo wurl('platform/material');}" class="btn btn-default" role="button">消息管理</a></span>
+                        </div>
+                    </div>
+                -->
+                <div class="form-group">
+                    <label for="group" class="col-md-2 control-label">分组</label>
+                    <div class="col-md-10">
+                        {if $groups}
+                        <select name="group" id="group" style="width:80%;">
+                            {loop $groups $index $group}
+                            <option value="{$index}" {if $device && $device->getGroupId() == $index}selected{/if}>{$group['title']}</option>
+                            {/loop}
+                            <option value="0" {if empty($device) || ($device && $device->getGroupId() == 0)}selected{/if}>&lt;暂无分组&gt;</option>
+                        </select>
+                        {else}
+                        <div style="color:#ccc;">&lt;暂无分组&gt;</div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address" class="col-md-2 control-label">地址</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="address" id="address" value="{php echo strval($extra['address'])}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">位置</label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_coordinate('location', $baidu_loc);}
+                        <span class="help-block">* {php echo empty($loc['address']) ? '&lt;暂无位置&gt;' : $loc['address']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" class="form-control" name="tags" value="{php echo $device ? $device->getTagsAsText() : ''}">
+                    <label for="tagslist" class="col-md-2 control-label">标签列表</label>
+                    <div class="tag" id="tag_tpl" title="点击取消这个标签">
+                        {{title}}
+                    </div>
+                    <div class="col-md-10" id="tagslist">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newtags" class="col-md-2 control-label"></label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" name="newtags" id="newtags" enter-key="#addTagBtn">
+                        <span class="help-block">* 用英文逗号分隔可以同时添加多个标签！</span>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" id="addTagBtn" title="添加标签">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                {if \zovye\App::isMustFollowAccountEnabled()}
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">购买商品</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="mustFollow0" class="radio-inline">
+                            <input name="mustFollow" id="mustFollow0" type="radio" value="1" {if $extra['mfa']['enable'] == 1}checked="checked"{/if} >
+                            关注公众号后购买
+                        </label>
+                        <label for="mustFollow1" class="radio-inline">
+                            <input name="mustFollow" id="mustFollow1" type="radio" value="0"  {if isset($extra['mfa']['enable']) && $extra['mfa']['enable'] == 0}checked="checked"{/if} >
+                            直接购买
+                        </label>
+                        <label for="mustFollow2" class="radio-inline">
+                            <input name="mustFollow" id="mustFollow2" type="radio" value="-1"  {if !isset($extra['mfa']['enable']) || $extra['mfa']['enable'] == -1}checked="checked"{/if} >
+                            跟随系统设置
+                        </label>
+                        <span class="help-block">用户扫描设备二维码后，引导用户关注公众号后通过公众号进入商品购买页面</span>
+                    </div>
+                </div>
+                {/if}
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">设备状态</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="isDown0" class="radio-inline">
+                            <input name="isDown" id="isDown0" type="radio" value="0" {if !isset($extra['isDown']) || $extra['isDown'] == 0}checked="checked"{/if} >
+                            运行
+                        </label>
+                        <label for="isDown1" class="radio-inline">
+                            <input name="isDown" id="isDown1" type="radio" value="1"  {if $extra['isDown'] == 1}checked="checked"{/if} >
+                            停用
+                        </label>
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+            </div>
+            {if $device && $device->getAppId()}
+            <div class="seg" id="special">
+                <div class="title">APP设置</div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">动态二维码</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="activeQrcode1" class="radio-inline">
+                            <input name="activeQrcode" id="activeQrcode1" type="radio" value="1" {if $extra['activeQrcode'] == 1}checked="checked"{/if} title="开启防刷功能后，二维码领取成功后动刷新！">
+                            开启
+                        </label>
+                        <label for="activeQrcode0" class="radio-inline">
+                            <input name="activeQrcode" id="activeQrcode0" type="radio" value="0"  {if $extra['activeQrcode'] == 0}checked="checked"{/if} >
+                            关闭
+                        </label>
+                        <span class="help-block">* 开启此功能后，用户每次扫码领取成功后，二维码都会重新生成！</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="volume" class="col-md-2 control-label">音量(百分比)</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="volume" id="volume" value="{php echo intval($extra['volume'])}">
+                    </div>
+                </div>
+            </div>
+            {/if}
+            {if $disp}
+            <div class="seg" id="special">
+                <div class="title">小屏设置</div>
+                <div class="form-group">
+                    <label for="first" class="col-md-2 control-label">第一行文字</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="first_txt" id="first" value="{php echo $extra['txt'][0]}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="second" class="col-md-2 control-label">第二行文字</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="second_txt" id="second" value="{php echo $extra['txt'][1]}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="third" class="col-md-2 control-label">第三行文字</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="third_txt" id="third" value="{php echo $extra['txt'][2]}">
+                    </div>
+                </div>
+            </div>
+            {/if}
+            {if \zovye\App::isMoscaleEnabled()}
+            <div id="moscale">
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="device_model" value="{$device_model}">
+        {if $op=='edit' && $id}
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">保存</button>
+        {else}
+        <button type="submit" class="btn btn-primary">创建</button>
+        {/if}
+        <button type="button" class="btn btn-default" onclick="backtolist();">返回</button>
+    </div>
+</form>
+<script>
+    const api = {
+        url: "{php echo $this->createWebUrl('goods');}",
+        dlg: null,
+    }
+
+    api.showResult = function(params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function(res){
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if(cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        api.dlg = util.dialog(res.data.title || '', res.data.content);
+                        api.dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function(){
+            loading && util.loaded();
+        })
+    }
+    
+    api.hide = function () {
+        if (api.dlg) {
+            api.dlg.modal('hide');
+        }
+    }
+
+    api.chooseGoods = function() {
+        api.showResult({op: 'goods', pagesize: 10});
+    }
+
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        const api_url = "{php echo $this->createWebUrl('devicetypes');}";
+        const app = new Vue({
+            el: "#device_types",
+            data: {
+                deviceId: parseInt("{php echo $device? $device->getId() : 0}"),
+                currentTypeID: parseInt("{php echo $device? $device->getDeviceType() : 0}"),
+                keywords: '',
+                list: [],
+                currentType: {
+                    cargo_lanes:[],
+                },
+                error: '',
+                currentLane: null,
+                loading: false,
+                searching: false,
+            },
+            watch: {
+                currentTypeID() {
+                    this.change();
+                },
+                currentType(e) {
+                    console.log(e)
+                }                
+            },
+            computed: {
+                isCustomType() {
+                    return this.currentTypeID === 0 || this.currentTypeID === '0';
+                }
+            },
+            mounted() {
+                this.deviceId > 0 ? this.change(true) : this.search();
+            },
+
+            methods: {
+                search() {
+                    const self = this;
+                    self.searching = true;
+                    $.getJSON(api_url, {keywords: self.keywords, op: 'search'}).then(function (res) {
+                        if(res) {
+                            if (res.status) {
+                                self.list = res.data.list || [];
+                            } else {
+                                self.error = res.data.msg || '&lt;出错了&gt;';
+                            }
+                        }
+                        self.searching = false;
+                    })
+                },
+                change(first = false) {
+                    const self = this;
+                    self.loading = true;
+                    $.getJSON("{php echo $this->createWebUrl('device')}", {op: 'get_lane_detail', deviceid: this.deviceId, typeid: this.currentTypeID}).then(function(res){
+                        if (res) {
+                            if (res.status) {
+                                self.currentType = res.data;
+                                if (first && !self.isCustomType) self.list.push(res.data);
+                            } else {
+                                self.currentType = null;
+                                self.error = res.data.msg || '&lt;出错了&gt;';
+                            }
+                        }
+                        self.loading = false;
+                    })
+                },
+                addCargoLane() {
+                    if (this.isCustomType) {
+                        this.currentType.cargo_lanes.push({
+                            id: 0,
+                            num: 0,
+                            capacity: 0,
+                            goods_id: 0,
+                            goods_name: '<请选择商品>',
+                            goods_price: '0.00',
+                        })
+                    }
+                },
+                removeLane(lane) {
+                    const i = this.currentType.cargo_lanes.findIndex(e => e === lane);
+                    if (i !== -1) {
+                        this.currentType.cargo_lanes.splice(i, 1);
+                    }
+                },
+                chooseGoods(lane){
+                    if (this.isCustomType) {
+                        this.currentLane = lane;
+                        api.chooseGoods();
+                    }
+                },
+                setGoods(goods) {
+                    if (this.currentLane) {
+                        api.hide();
+                        this.currentLane.goods_id = goods.id;
+                        this.currentLane.goods_name = goods.name;
+                        this.currentLane.goods_unit_title = goods.unit_title;
+                        this.currentLane.goods_price = goods.price;
+                        this.editPriceDone(this.currentLane);
+                    }
+                },
+                editPrice(lane, index) {
+                    if (this.isCustomType) {
+                        this.currentLane = lane;
+                        this.$nextTick(function() {
+                            this.$refs.price[index].focus();
+                        })
+                    }                 
+                },
+                editPriceDone(lane) {
+                    this.currentLane = null;
+                    lane.goods_price = parseFloat(lane.goods_price).toFixed(2);
+                }
+            }
+        })
+
+        $(function() {
+            $('body').on('click', '#goodslist tr[data-goods] .name', function(e) {
+                const tr = $(e.currentTarget).closest('tr');
+                const id = tr.data('goods');
+                const name = tr.data('name');
+                const unit_title = tr.data('title');
+                const price = tr.data('price');
+                if (id) {       
+                    app.setGoods({id, name, unit_title, price});
+                }
+            })
+        })
+    })
+</script>
+<script>    
+    function backtolist() {
+        setTimeout(function(){
+            util.loading();
+        }, 1000);
+        window.location.href = "{php echo $this->createWebUrl('device');}"
+    }
+    function renderTags(tags) {
+        const tpl = $('#tag_tpl').clone().removeAttr('id').prop('outerHTML');
+        let html = '';
+        tags.forEach(function(title){
+            html += tpl.replace(/{{title}}/g, title);
+        })
+        $('#tagslist').html(html || '<span style="color:gray;">&lt;暂无标签&gt;</span>');
+        $('input[name=tags]').val(tags.join(','));
+    }
+    {if \zovye\App::isMoscaleEnabled()}
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
+
+    require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
+        moscale.init("#moscale", {
+            moscaleMachineKey: "{$moscaleMachineKey}",
+            label: JSON.parse('{php echo json_encode($moscaleLabelList);}'),
+            savedLabel: JSON.parse('{php echo json_encode($moscaleAreaListSaved);}'),
+            region: JSON.parse('{php echo json_encode($moscaleRegionData);}'),
+            savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
+        })
+    })
+    {/if}
+    $(function(){
+        let tags = [];
+        $('input[name=tags]').val().split(',').forEach(function(title){
+            if (title !== "") {
+                tags.push(title);
+            }
+        })
+        renderTags(tags);
+
+        $('#addTagBtn').click(function(){
+            const titles = $('input[name=newtags]').val().split(',');
+            titles.forEach(function(title){
+                title = $.trim(title);
+                if (title !== "" && tags.indexOf(title) === -1) {
+                    tags.push(title);
+                }
+            })
+            $('input[name=newtags]').val('');
+            renderTags(tags);
+        })
+
+        $('#tagslist').on('click', '.tag', function(){
+            const title = $(this).text().trim();
+            tags = tags.filter(function(e){
+                return e !== title;
+            })
+            renderTags(tags);
+        })
+
+        $('[enter-key]').bind("keypress", function(e){
+            if (e.keyCode === "13") {
+                const target = $(this).attr('enter-key');
+                $(target).click();
+                e.preventDefault();
+            }
+        })
+
+        const ownerId = parseInt("{php echo $agent?$agent->getId() : 0}", 10);
+        $('#find_agent').click(function(){
+            const keyword = $('input[name=keyword_agent]').val();
+            let complete = false;
+            setTimeout(function(){
+                if (!complete) {
+                    util.loading();
+                }
+            }, 1000)
+            $.get("{php echo $this->createWebUrl('agent');}", {op:'search', keyword:keyword}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_**!_', e.id === ownerId ? 'selected' : '');
+                    })
+                }
+                html += '<option value="0"><无></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function(){
+                complete = true;
+                util.loaded();
+            })
+        })
+
+        $('#special input[name=spec]').click(function(){
+            $('#special fieldset').attr('disabled', !$(this).is(':checked'));
+        })
+    })
+</script>
+<script>
+    let backer = "";
+    let agentId = "";
+    $(function(){
+        function reload(url) {
+            api.showResult({}, url);
+        }
+        
+        $('body').on('click', '#search-bar', function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=s_keywords]').focus();
+        })
+
+        $('body').on('click', '#search-form .btn-close', function (e) {
+            if (backer) {
+                api.chooseGoods();
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }       
+            e.preventDefault();     
+         })
+
+        $('body').on('click', '#search_agent', function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword,
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    list.forEach(function (e) {
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', '');
+                    })
+                }
+
+                html += '<option value=""><不限></option><option value="-1"><平台></option>';
+                $('#agent_search_result').html(html);
+
+            }, 'json');
+        })
+
+        function reloadPageWithFilter(fn) {
+            const params = new URLSearchParams();
+
+            const form = $("#search-form form");
+            const s_keywords = $.trim(form.find('input[name=s_keywords]').val());
+            if (s_keywords) {
+                params.append("keywords", s_keywords);
+            }
+            const agentId = $.trim(form.find('select[name=agentId]').val());
+            if (agentId != '') {
+                params.append("agentId", agentId);
+            }
+            if (typeof fn === 'function') {
+                fn(params);
+            }
+            reload(form.attr("action") + "&" + encodeURI(params.toString()));
+        }
+
+        $('body').on('submit', "#search-form form", function(e){
+            reloadPageWithFilter();            
+            e.preventDefault();
+        })
+
+        $('body').on('click', 'a[filter]', function (e) {
+            const self = this;
+            reloadPageWithFilter(function (params) {
+                const name = $(self).data('name');
+                const val = $(self).data('val');
+                if (name) {
+                    params.set(name, val);
+                }
+            });
+            e.preventDefault();
+        })
+
+        $('body').on('click', '.pagination li:not(.active) a', function (e) {
+            e.preventDefault();
+            const url = $(this).attr("href");
+            reload(url);
+        })
+    })
+</script>
+{template 'common/footer'}

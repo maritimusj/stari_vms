@@ -1,0 +1,297 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .tips {
+        position: absolute;
+        width: 100%;
+        transform: rotate(50deg);
+        text-align: center;
+        right: -40px;
+        top: 13px;
+        background: #fff;
+    }
+
+    .pay {
+        color: gray;
+        display: inline-block;
+        user-select: none;
+    }
+
+    .balance {
+        color: #3F51B5;
+    }
+
+    .tips.wxpay {
+        background: #FF5722;
+    }
+
+    .tips.free {
+        background: #4CAF50;
+    }
+
+    .tips.balancex {
+        background: #3F51B5;
+    }
+
+    #orderlist .profile img {
+        min-width: 45px;
+    }
+
+    #orderlist .commission {
+        border-radius: 0 10px 10px 0;
+        text-align: center;
+        background-color: #FF5722;
+        color: #fff;
+        user-select: none;
+        cursor: default;
+        position: relative;
+        padding: 1px 0;
+        max-height: 1.6em;
+        font-size: 14px;
+        min-width: 10em;
+    }
+
+    #orderlist .commission:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border: 18px solid;
+        border-color: #FF5722 transparent transparent transparent;
+        right: -25px;
+        top: -0.5em;
+        display: inline-block;
+        transform: rotate(-90deg);
+        font-size: 14px;
+    }
+
+    #orderlist tr td.status {
+        position: relative;
+    }
+
+    #orderlist .status:hover .commission_detail {
+        display: flex;
+    }
+
+    #orderlist .commission_detail {
+        position: absolute;
+        z-index: 999;
+        background-color: #fff;
+        border: 1px solid #CCC;
+        padding: 20px;
+        min-width: 25em;
+        display: none;
+        flex-direction: column;
+        border-radius: 6px;
+        cursor: default;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #orderlist .money {
+        color: #FF5722;
+    }
+
+    #orderlist .gspor:hover:before {
+        content: "分佣";
+        position: absolute;
+        background-color: #009688;
+        color: #fff;
+        width: 45px;
+        text-align: center;
+    }
+
+    #orderlist .gspor.agent_item:hover:before {
+        content: "代理";
+        background-color: #FF5722;
+    }
+
+    #orderlist .gspor.platform_item:hover:before {
+        content: "平台";
+        background-color: #607D8B;
+    }
+
+    #orderlist .gspor.keeper_item:hover:before {
+        content: "运营";
+        background-color: #90028B;
+    }
+
+    #orderlist .gspor.bonus_item:hover:before {
+        content: "奖励";
+        background-color: #9C27B0;
+    }
+
+    #orderlist .gspor.bonus_item:hover:before {
+        content: "奖励";
+        background-color: #9C27B0;
+    }
+
+    #orderlist .commission_detail .total {
+        border-bottom: 1px solid #CCC;
+        color: #FF5722;
+        text-align: end;
+        margin-bottom: 1em;
+    }
+
+    #orderlist .commission_detail .total .title {
+        color: #666;
+        font-size: 1.5em;
+    }
+
+    #orderlist .gspor {
+        display: flex;
+        align-items: center;
+        margin: 6px 0;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    #orderlist .gspor .profile {
+        margin-right: 6px;
+        width: 12em;
+        overflow: hidden;
+    }
+
+    #orderlist .fa-info-circle .order_err_message {
+        position: absolute;
+        width: 200px;
+        background: #FF5722;
+        text-align: center;
+        color: #fff;
+        z-index: 1000;
+        left: 130px;
+        overflow: hidden;
+        box-shadow: 1px 1px 2px 1px #9E9E9E;
+        padding: 6px;
+        display: none;
+        text-shadow: none;
+    }
+
+    #orderlist .fa-info-circle:hover .order_err_message {
+        display: block;
+    }
+
+    #orderlist td .failed {
+        border-color: #FF5722;
+        color: #ff5722;
+    }
+
+    .orderId {
+        font-size: small;
+        color: #9E9E9E;
+    }
+
+    #list {
+        text-align: center;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'stat'));}">营收统计</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('withdraw', array('op'=>'stat'));}">提现统计</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}">佣金明细</a></li>
+    <li role="presentation"  class="active"><a href="#">平台分成</a></li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        <form action="{php echo $this->createWebUrl('account', array('op'=>'platform_stat'));}" method="post">
+            <div class="form-group">
+                <label class="col-md-2 control-label">日期</label>
+                <div class="col-md-8">
+                    <input name="datelimit[start]" type="hidden" value="{php echo $s_date}"/>
+                    <input name="datelimit[end]" type="hidden" value="{php echo $e_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                    <span class="date-title">
+                        {if empty($s_date) && empty($e_date)}
+                        不限时间
+                        {else}
+                        {$s_date} 至{$e_date}
+                        {/if}
+                    </span> <i class="fa fa-calendar"></i>
+                    </button>
+                    <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;查询</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="panel-body">
+        <table class="table table-bordered" id="list">
+            <thead>
+            <tr class="active">
+                <td>订单分成(总)</td>
+                <td>提现分成(总)</td>
+                <td>合计分成(总)</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    {php echo number_format(abs($total['order_fee'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($total['comm_fee'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($total['total_fee'])/100, 2)} 元
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-body">
+        {if $data}
+        <table class="table">
+            <thead>
+            <tr class="active">
+                <th>日期</th>
+                <th>订单分成</th>
+                <th>提现分成</th>
+                <th>合计分成</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $data $key $item}
+            <tr>
+                <td>{php echo $key}</td>
+                <td>
+                    {php echo number_format(abs($item['order_fee'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($item['comm_fee'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($item['total_fee'])/100, 2)} 元
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        {/if}
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    var elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+    })
+
+</script>
+{template 'common/footer'}

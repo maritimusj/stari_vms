@@ -1,0 +1,179 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #location, #tag_tpl {
+        display: none;
+    }
+    #device_edit_form table.cargo_lanes th {
+        text-align: center;
+    }
+    #device_edit_form table.cargo_lanes td {
+        text-align: center;
+    }
+    #device_edit_form table.cargo_lanes input.capacity {
+        width: 10em;
+        border: 0;
+        text-align: center;
+    }
+    #device_edit_form table.cargo_lanes input:focus.capacity {
+        border-color: #66afe9;
+    }
+    tr.error {
+        text-align: center;
+        color: red;
+    }
+    tr.ok {
+        text-align: center;
+        color: black;
+    }
+    [v-cloak] {
+        display: none;
+    }
+</style>
+<div id="app" v-cloak>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="form-group">
+                    <div class="title">蓝牙设备批量导入</div> 
+                    <label for="excel_file" class="col-md-6 control-label">请选择要上传文件</label>
+                    <input type="file" ref="upload" @change="importFile(event)" style="display: none;">
+                    <button class="btn btn-success" @click="uploadClick">
+                        选择excel文件
+                    </button> 
+                </div>
+                <div class="form-group">            
+                    <table class="table">
+                        <tbody>
+                            <tr v-for="o in list" key="__rowNum__" :class="o.result && o.result.status === false?'error':'ok'">
+                                <td v-text="o.name"></td>
+                                <td v-text="o.imei"></td>
+                                <td v-text="o.agent"></td>
+                                <td v-text="o.buid"></td>
+                                <td v-text="o.protocol"></td>
+                                <td v-text="o.mac"></td>
+                                <td v-text="o.typeid"></td>
+                                <td v-text="o.screen"></td>
+                                <td v-text="o.disinfect"></td>
+                                <td v-text="o.power"></td>
+                                <td v-text="o.group"></td>
+                                <td>
+                                    <div v-if="o.result">{{ o.result.data.msg }}</div>
+                                    <div v-else>请稍等...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <a href="{MODULE_URL}./static/bluetooth_template.xls" style="font-size: 1.2em; font-weight: 700; color: blue;">模板文件</a>
+            </div>   
+        </div>
+    </div>
+</div>
+<form id="the_form1" action="{php echo $this->createWebUrl('device', ['op'=>'import_bluetooth_device']);}" method="post" enctype="multipart/form-data">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">蓝牙电机批量设置</div>
+                <div class="form-group">
+                    <label for="excel_file" class="col-md-6 control-label">上传文件</label>
+                    <div class="col-md-5">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="file" class="form-control" name="file1" id="excel_file1" placeholder="">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="hidden" name="t" value="motor">
+                        <button class="btn btn-success" type="submit" id="submit1">
+                            上传
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-12">
+                    <a href="{MODULE_URL}static/bluetooth_template_motor.xls" style="font-size: 1.2em; font-weight: 700; color: blue;">模板文件</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+{php \zovye\url(true, JS_XLSX_SHIM_URL);}
+<script>
+    const apiURL = "{php echo $this->createWebUrl('device', ['op' => 'create_bluetooth_device']);}";
+
+    require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_XLSX_URL);}"], function (Vue, XLSX) {
+        const X = XLSX;
+        const rABS = typeof FileReader !== "undefined" && (FileReader.prototype || {}).readAsBinaryString;
+        new Vue({
+            el: "#app",
+            data: {
+                list: [],
+            },
+            methods: {
+                uploadClick() {
+                    $(this.$refs.upload).trigger("click");
+                },
+                process(workbook) {
+                    const self = this;
+                    workbook.SheetNames.forEach(function (sheetName) {
+                        const json = X.utils.sheet_to_json(workbook.Sheets[sheetName], {header: ["name", "imei", "agent", "buid", "protocol", "mac", "typeid", "screen", "disinfect", "power", "group"]});
+
+                        fn = function () {
+                            const obj = json.pop();
+                            if (obj) {
+                                self.list.unshift(obj)
+                                $.post(apiURL, obj).then(function (res) {
+                                    Vue.set(obj, "result", res);
+                                    fn();
+                                })
+                            }
+                        }
+
+                        fn();
+                    })
+                },
+                importFile({target}) {
+                    const file = target.files[0];
+                    if (file !== undefined) {
+                        const reader = new FileReader();
+                        const self = this;
+                        reader.onload = function (e) {
+                            const data = e.target.result;
+                            const z = X.read(data, {type: rABS ? 'binary' : 'array'});
+                            const csv = self.process(z);
+                        }
+                        reader.readAsBinaryString(file);
+                    }
+                }
+            }
+        })
+    })
+</script>
+
+<script>
+    $(function () {
+        $('#submit').on('click', function (e) {
+            const fileName = $.trim($('#excel_file').val());
+            if (fileName !== '') {
+
+            } else {
+                e.preventDefault();
+            }
+        })
+
+        $('#submit1').on('click', function (e) {
+            const fileName1 = $.trim($('#excel_file1').val());
+            if (fileName1 !== '') {
+
+            } else {
+                e.preventDefault();
+            }
+        })
+    })
+</script>
+{template 'common/footer'}

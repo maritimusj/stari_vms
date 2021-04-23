@@ -1,0 +1,362 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .tips {
+        position: absolute;
+        width: 100%;
+        transform: rotate(50deg);
+        text-align: center;
+        right: -40px;
+        top: 13px;
+        background: #fff;
+    }
+
+    .pay {
+        color: gray;
+        display: inline-block;
+        user-select: none;
+    }
+
+    .balance {
+        color: #3F51B5;
+    }
+
+    .tips.wxpay {
+        background: #FF5722;
+    }
+
+    .tips.free {
+        background: #4CAF50;
+    }
+
+    .tips.balancex {
+        background: #3F51B5;
+    }
+
+    #orderlist .profile img {
+        min-width: 45px;
+    }
+
+    #orderlist .commission {
+        border-radius: 0 10px 10px 0;
+        text-align: center;
+        background-color: #FF5722;
+        color: #fff;
+        user-select: none;
+        cursor: default;
+        position: relative;
+        padding: 1px 0;
+        max-height: 1.6em;
+        font-size: 14px;
+        min-width: 10em;
+    }
+
+    #orderlist .commission:after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border: 18px solid;
+        border-color: #FF5722 transparent transparent transparent;
+        right: -25px;
+        top: -0.5em;
+        display: inline-block;
+        transform: rotate(-90deg);
+        font-size: 14px;
+    }
+
+    #orderlist tr td.status {
+        position: relative;
+    }
+
+    #orderlist .status:hover .commission_detail {
+        display: flex;
+    }
+
+    #orderlist .commission_detail {
+        position: absolute;
+        z-index: 999;
+        background-color: #fff;
+        border: 1px solid #CCC;
+        padding: 20px;
+        min-width: 25em;
+        display: none;
+        flex-direction: column;
+        border-radius: 6px;
+        cursor: default;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #orderlist .money {
+        color: #FF5722;
+    }
+
+    #orderlist .gspor:hover:before {
+        content: "分佣";
+        position: absolute;
+        background-color: #009688;
+        color: #fff;
+        width: 45px;
+        text-align: center;
+    }
+
+    #orderlist .gspor.agent_item:hover:before {
+        content: "代理";
+        background-color: #FF5722;
+    }
+
+    #orderlist .gspor.platform_item:hover:before {
+        content: "平台";
+        background-color: #607D8B;
+    }
+
+    #orderlist .gspor.keeper_item:hover:before {
+        content: "运营";
+        background-color: #90028B;
+    }
+
+    #orderlist .gspor.bonus_item:hover:before {
+        content: "奖励";
+        background-color: #9C27B0;
+    }
+
+    #orderlist .gspor.bonus_item:hover:before {
+        content: "奖励";
+        background-color: #9C27B0;
+    }
+
+    #orderlist .commission_detail .total {
+        border-bottom: 1px solid #CCC;
+        color: #FF5722;
+        text-align: end;
+        margin-bottom: 1em;
+    }
+
+    #orderlist .commission_detail .total .title {
+        color: #666;
+        font-size: 1.5em;
+    }
+
+    #orderlist .gspor {
+        display: flex;
+        align-items: center;
+        margin: 6px 0;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    #orderlist .gspor .profile {
+        margin-right: 6px;
+        width: 12em;
+        overflow: hidden;
+    }
+
+    #orderlist .fa-info-circle .order_err_message {
+        position: absolute;
+        width: 200px;
+        background: #FF5722;
+        text-align: center;
+        color: #fff;
+        z-index: 1000;
+        left: 130px;
+        overflow: hidden;
+        box-shadow: 1px 1px 2px 1px #9E9E9E;
+        padding: 6px;
+        display: none;
+        text-shadow: none;
+    }
+
+    #orderlist .fa-info-circle:hover .order_err_message {
+        display: block;
+    }
+
+    #orderlist td .failed {
+        border-color: #FF5722;
+        color: #ff5722;
+    }
+
+    .orderId {
+        font-size: small;
+        color: #9E9E9E;
+    }
+
+    #list {
+        text-align: center;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('homepage', array('op'=>'default'));}">首页</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('op'=>'stat'));}">营收统计</a></li>
+    <li role="presentation" class="active"><a href="#">提现统计</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}">订单导出</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_export'));}">佣金明细</a></li>
+    <li role="presentation" ><a href="{php echo $this->createWebUrl('account', array('op'=>'platform_stat'));}">平台分成</a></li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+    <form action="{php echo $this->createWebUrl('withdraw', array('op'=>'stat'));}" method="post">
+        <div class="form-group">
+            <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+            <div class="col-md-5">
+                <select name="agent_openid" id="select_agent" style="width:100%;">
+                    <option value="0">&lt;不限&gt;</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" name="keyword_agent" id="keyword_agent"
+                       placeholder="请输入手机号码或者名称查找">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-default" type="button" id="find_agent">查找</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">日期</label>
+            <div class="col-md-8">
+                <input name="datelimit[start]" type="hidden" value="{php echo $s_date}"/>
+                <input name="datelimit[end]" type="hidden" value="{php echo $e_date}"/>
+                <button class="btn btn-default daterange daterange-date" type="button">
+                <span class="date-title">
+                    {if empty($s_date) && empty($e_date)}
+                    不限时间
+                    {else}
+                    {$s_date} 至{$e_date}
+                    {/if}
+                </span> <i class="fa fa-calendar"></i>
+                </button>
+                <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;查询</button>
+            </div>
+        </div>
+    </form>
+    </div>
+    <div class="panel-body">
+        <table class="table table-bordered" id="list">
+            <thead>
+            <tr class="active">
+                <td>未提现佣金(合计)</td>
+                <td>待打款(合计)</td>
+                <td>已完成(合计)</td>
+                <td>已退回(合计)</td>
+                <td>已打款(合计)</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    {php echo number_format(abs($comm_total)/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($total['unconfirmed'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($total['confirmed'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($total['cancelled'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($total['mchpay'])/100, 2)} 元
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-body">
+        {if $data}
+        <table class="table">
+            <thead>
+            <tr class="active">
+                <td>日期</td>
+                <th>待打款</th>
+                <th>已完成</th>
+                <th>已退回</th>
+                <th>已打款</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $data $key $item}
+            <tr>
+                <td>{php echo $key}</td>
+                <td>
+                    {php echo number_format(abs($item['unconfirmed'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($item['confirmed'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($item['cancelled'])/100, 2)} 元
+                </td>
+                <td>
+                    {php echo number_format(abs($item['mchpay'])/100, 2)} 元
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        {/if}
+    </div>
+</div>
+<script type="text/javascript">
+    var open_id = '{php echo $open_id}' || 0;
+    $(function () {
+        $('#find_agent').click(function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    var isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.openid == open_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                isSelected = '';
+                if (0 == open_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><不限></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    var elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+
+        $('#find_agent').trigger('click');
+    })
+
+</script>
+{template 'common/footer'}

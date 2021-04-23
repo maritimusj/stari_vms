@@ -1,0 +1,41 @@
+<?php
+
+namespace zovye\job\authAccount;
+
+use zovye\Account;
+use zovye\Agent;
+use zovye\CtrlServ;
+use zovye\request;
+use zovye\Job;
+use zovye\model\agentModelObj;
+use zovye\Util;
+
+$agent_id = request::str('agent');
+$accountUID = request::str('account');
+
+$params = [
+    'agent' => $agent_id,
+    'account' => $accountUID,
+];
+
+$op = request::op('default');
+if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
+
+    $acc = Account::findOne(['uid' => $accountUID]);
+    if ($acc) {
+        /** @var agentModelObj $agent_id */
+        $agent = Agent::get($agent_id);
+        if ($agent) {
+            $acc->setAgentId($agent->getId());
+            $acc->save();
+            $params['account'] = $acc->format();
+        } else {
+            $params['error'] = '找不到这个代理商！';
+        }
+    } else {
+        $params['error'] = '找不到这个公众号或者公众号还没有创建！';
+        Job::authAccount($agent_id, $accountUID);
+    }
+}
+
+Util::logToFile('auth_account', $params);

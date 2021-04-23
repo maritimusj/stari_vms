@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>附近售卖机</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+		<style type="text/css">
+			[v-cloak] {
+				display: none;
+			}
+			
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+			}
+			
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			#container {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.list-content {
+				position: fixed;
+				left: 10px;
+				right: 10px;
+				bottom: 25px;
+				background-color: #fff;
+				border-radius: 10px;
+				overflow: hidden;
+				box-shadow: 1px 1px 3px gray;
+			}
+			
+			.header {
+				width: 100%;
+				height: 40px;
+				border-bottom: 1px solid #eee;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+			
+			.header-title {
+				color: #000;
+				font-size: 16px;
+				margin-left: 20px;
+				flex-grow: 1;
+			}
+			
+			.close-img {
+				width: 15px;
+				height: 15px;
+				margin-right: 20px;
+			}
+			
+			.list {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				max-height: 40vh;
+				overflow-y: scroll;
+			}
+			
+			.item-view {
+				width: 100%;
+				min-height: 50px;
+				border-bottom: 1px solid #eee;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+			
+			.item-view:active {
+				background-color: #eee;
+			}
+			
+			.name {
+				color: #000;
+				font-size: 14px;
+				font-weight: 300;
+				margin-left: 20px;
+				width: 40%;
+			}
+			
+			.distance {
+				color: #000;
+				font-size: 14px;
+				font-weight: 300;
+				margin: 0 10px;
+				flex-grow: 1;
+			}
+			
+			.distance-num {
+				color: #000;
+				font-size: 24px;
+				font-weight: bold;
+				margin: 0 10px;
+			}
+			
+			.click-img {
+				width: 20px;
+				margin-right: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="app" v-cloak>
+			<div class="list-content" v-show="loaded">
+				<div class="header">
+					<div class="header-title">附近售卖机<small>（只显示最近<span v-text="machines.length"></span>台）</small></div>
+					<img class="close-img" src="{MODULE_URL}static/img/close_icon.png" @click="closeTap" />
+				</div>
+				<div class="list">
+					<div id="machine-list">
+						<div class="item-view" v-for="machine in machines" @click="machineClick(machine)" >
+							<div class="name">{{machine.name}}</div>
+							<div class="distance">距离<span class="distance-num">{{machine.distance.n}}</span>{{machine.distance.u}}</div>
+							<img class="click-img" src="{MODULE_URL}static/img/click_icon.png" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="https://map.qq.com/api/js?v=2.exp&key=54UBZ-33UWG-XMHQP-I6JPI-AEOBE-6CBBI"></script>
+		<script src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
+		<script src="https://cdn.staticfile.org/zepto/1.0rc1/zepto.min.js"></script>
+		{php \zovye\url(true, JS_VUE_URL);}
+		{$jssdk}
+		<script type="text/javascript">
+			wx && wx.ready(function(){
+			    wx.hideAllNonBaseMenuItem();
+			});
+			
+			new Vue({
+				el: '#app',
+				data: function() {
+					return {
+					    loaded: false,
+						machines: [],
+						earth_radius: 6378137.0,
+						pi: Math.PI
+					}
+				},
+				created: function() {
+					this.init();
+				},
+				methods: {
+					init() {
+						var that = this;
+						var geolocation = new qq.maps.Geolocation("54UBZ-33UWG-XMHQP-I6JPI-AEOBE-6CBBI", "myapp");
+						var options = {
+							timeout: 8000,
+							failTipFlag: true
+						};
+						geolocation.getLocation(
+							function success(res) {
+								//console.log(res)
+								var center = new qq.maps.LatLng(res.lat, res.lng);
+								//定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
+								var map = new qq.maps.Map(document.getElementById("container"), {
+									center: center, // 地图的中心地理坐标。
+									zoom: 13 // 地图的中心地理坐标。
+								});
+								//创建marker
+								var marker = new qq.maps.Marker({
+									position: center,
+									map: map
+								});
+								marker.setIcon(new qq.maps.MarkerImage("{MODULE_URL}static/img/my_position.svg"));
+								//添加到提示窗
+								var info = new qq.maps.InfoWindow({
+									map: map
+								});
+								//获取标记的点击事件
+								qq.maps.event.addListener(marker, 'click', function() {
+									info.open();
+									info.setContent('我的位置');
+									info.setPosition(center);
+								});
+								that.createLocationBtn(map, res.lat, res.lng);
+								that.createListBtn(map);
+								that.getNearbyMachines(map, res.lat, res.lng);
+							},
+							function error(res) {
+								alert("定位失败")
+							}, options);
+					},
+					createLocationBtn(map, lat, lng) {
+						//创建定位按钮
+						var locationBtn = document.createElement("div");
+						var locationIcon = document.createElement('img');
+						locationIcon.src = "{MODULE_URL}static/img/location_icon.png";
+						locationIcon.style.width = "25px";
+						locationIcon.style.height = "25px";
+						//将icon添加到按钮上    
+						locationBtn.appendChild(locationIcon);
+						// 设置样式    
+						locationBtn.style.width = "35px";
+						locationBtn.style.height = "35px";
+						locationBtn.style.cursor = "pointer";
+						locationBtn.style.border = "1px solid #ccc";
+						locationBtn.style.backgroundColor = "rgb(248,248,248)";
+						locationBtn.style.boxShadow = "1px 1px 2px #ccc";
+						locationBtn.style.borderRadius = "3px";
+						locationBtn.style.display = "flex";
+						locationBtn.style.alignItems = "center";
+						locationBtn.style.justifyContent = "center";
+						locationBtn.style.marginRight = "10px";
+						locationBtn.style.marginBottom = "25px";
+						new qq.maps.Control({
+							content: locationBtn,
+							align: qq.maps.ALIGN.BOTTOM_RIGHT,
+							map: map
+						});
+						locationBtn.onclick = function() {
+							map.panTo(new qq.maps.LatLng(lat, lng));
+							map.setZoom(13);
+						};
+					},
+					createListBtn(map) {
+						//创建定位按钮
+						var listBtn = document.createElement("div");
+						var listIcon = document.createElement('img');
+						listIcon.src = "{MODULE_URL}static/img/open_icon.png";
+						listIcon.style.width = "18px";
+						listIcon.style.height = "18px";
+						//将icon添加到按钮上    
+						listBtn.appendChild(listIcon);
+						// 设置样式    
+						listBtn.style.width = "35px";
+						listBtn.style.height = "35px";
+						listBtn.style.cursor = "pointer";
+						listBtn.style.border = "1px solid #ccc";
+						listBtn.style.backgroundColor = "rgb(248,248,248)";
+						listBtn.style.boxShadow = "1px 1px 2px #ccc";
+						listBtn.style.borderRadius = "3px";
+						listBtn.style.display = "flex";
+						listBtn.style.alignItems = "center";
+						listBtn.style.justifyContent = "center";
+						listBtn.style.marginBottom = "70px";
+						listBtn.style.marginRight = "-37px";
+						new qq.maps.Control({
+							content: listBtn,
+							align: qq.maps.ALIGN.BOTTOM_RIGHT,
+							map: map
+						});
+						listBtn.onclick = function() {
+							var list = document.querySelector(".list-content");
+							list.style.display = "block";
+						};
+					},
+					closeTap() {
+						var list = document.querySelector(".list-content");
+						list.style.display = "none";
+					},
+					getNearbyMachines(map, lat, lng) {
+						var that = this;
+						$.ajax({
+							url: "{php echo $this->createMobileUrl('util', array('op'=>'data'));}",
+							type: 'get',
+							async: false,
+							dataType: 'jsonp',
+							jsonp: "callback",
+							jsonpCallback: "success_jsonpCallback",
+							success: function(res) {
+								var machines = res.data || [];
+								//console.log(machines)
+								for(var i = 0; i < machines.length; i++) {
+									(function(machine) {
+										var center = new qq.maps.LatLng(machine.location.lat, machine.location.lng);
+										//创建marker
+										var marker = new qq.maps.Marker({
+											position: center,
+											map: map
+										});
+										marker.setIcon(new qq.maps.MarkerImage("{MODULE_URL}static/img/machine_position.svg"));
+										//添加到提示窗
+										var info = new qq.maps.InfoWindow({
+											map: map
+										});
+										//获取标记的点击事件
+										qq.maps.event.addListener(marker, 'click', function() {
+											info.open();
+											info.setContent(machine.name);
+											info.setPosition(center);
+										});
+									})(machines[i]);
+								}
+								that.initList(machines, lat, lng);
+							}
+						});
+					},
+					initList(machines, lat, lng) {
+
+						for(var i = 0; i < machines.length; i++) {
+							var machine = machines[i];
+							var dst = this.getFlatternDistance(lat, lng, machine.location.lat, machine.location.lng)
+							machine["distance"] = {
+							    'org': dst,
+							    'n' : dst < 1000 ? dst.toFixed(0) : (dst / 1000).toFixed(2),
+							    'u': dst < 1000 ? 'm':'km',
+							}
+						}
+						
+					    machines.sort(this.compare('distance'));
+						machines = machines.splice(0,50);
+						
+						this.machines = machines;
+						//console.log(machines)
+						this.loaded = true;
+					},
+					machineClick(machine) {
+						wx && wx.openLocation({
+                            latitude: machine.location.lat, // 纬度，浮点数，范围为90 ~ -90
+                            longitude: machine.location.lng, // 经度，浮点数，范围为180 ~ -180。
+                            name: machine.name, // 位置名
+                        });
+					},
+					compare(property) {
+						return function(a, b) {
+							var value1 = a[property]['org'];
+							var value2 = b[property]['org'];
+							return value1 - value2;
+						}
+					},
+					getRad(d) {
+						return d * this.pi / 180.0;
+					},
+					getFlatternDistance(lat1, lng1, lat2, lng2) {
+						var f = this.getRad((lat1 + lat2) / 2);
+						var g = this.getRad((lat1 - lat2) / 2);
+						var l = this.getRad((lng1 - lng2) / 2);
+
+						var sg = Math.sin(g);
+						var sl = Math.sin(l);
+						var sf = Math.sin(f);
+
+						var s, c, w, r, d, h1, h2;
+						var a = this.earth_radius;
+						var fl = 1 / 298.257;
+
+						sg = sg * sg;
+						sl = sl * sl;
+						sf = sf * sf;
+
+						s = sg * (1 - sl) + (1 - sf) * sl;
+						c = (1 - sg) * (1 - sl) + sf * sl;
+
+						w = Math.atan(Math.sqrt(s / c));
+						r = Math.sqrt(s * c) / w;
+						d = 2 * w * a;
+						h1 = (3 * r - 1) / 2 / c;
+						h2 = (3 * r + 1) / 2 / s;
+						
+						return d * (1 + fl * (h1 * sf * (1 - sg) - h2 * (1 - sf) * sg));
+					}
+				}
+			})
+		</script>
+	</body>
+
+</html>

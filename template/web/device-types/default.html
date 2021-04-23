@@ -1,0 +1,418 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #editDeviceTypesForm .operate i.fa {
+        font-size: 20px;
+    }
+    #device_type_list th:not(:nth-child(2)), #device_type_list td:not(:nth-child(2)) {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #device_type_list .default_type {
+        color: #4caf50;
+    }
+    #device_type_list a .profile {
+        cursor: pointer;
+    }
+    #search-form {
+        display: none;
+    }
+</style>
+     <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-inbox" title="创建新的设备型号" data-op="addDeviceTypes"></i>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div id="search-bar">
+                <div class="text-input">
+                    <span>根据条件搜索型号 ...</span>
+                    <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+                </div>
+            </div>
+            <div id="search-form">
+                <form action="{php echo $this->createWebUrl('devicetypes', array('op'=>'default'));}" method="post">
+                    <div class="form-group">
+                        <label for="agent_search_result" class="col-md-2 control-label">所属代理商</label>
+                        <div class="col-md-5">
+                            <select name="agent_openid" id="agent_search_result" style="width:100%;">
+                                <option value="">&lt;不限&gt;</option>
+                                <option value="-1" {if $s_agentId===0} selected="selected"{/if}>&lt;平台&gt;</option>
+                                {if $s_agent}
+                                <option value="{$s_agent['openid']}" selected="selected">{$s_agent['name']}，手机号码：{$s_agent['mobile']}</option>
+                                {/if}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" id="search_agent" title="搜索代理商"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">关键字</label>
+                        <div class="col-md-8">
+                            <input name="keywords"  class="form-control" type="text" value="{$s_keywords}" style="width: 100%;"/>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                            <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {if $device_types}
+            <table class="table" id="device_type_list">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>名称</th>
+                    <th>货道数量</th>
+                    <th>设备数量</th>
+                    <th>所属代理商</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $device_types $index $item}
+                <tr data-id="{$item['id']}">
+                    <td>
+                        {php echo $index + 1}
+                        (型号ID：{$item['id']})
+                    </td>
+                    <td class="device_types">
+                        {$item['title']}
+                        {if $item['id'] == $first_type}
+                        <span class="default_type">[默认]</span>
+                        {/if}
+                    </td>
+                    <td>{$item['lanes_total']}</td>
+                    <td>{$item['devices_total']}</td>
+                    <td>
+                        {if $item['agent']}
+                        {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
+                        <a href="{php echo $this->createWebUrl('devicetypes', ['op'=>'device_types', 'agent_openid'=>$item['agent']['openid']]);}">
+                            <div class="agent" title="点击查看{$item['agent']['name']}的全部型号" style="display:inline-block;">
+                                {else}
+                                <div class="agent" style="display:inline-block;">
+                                    {/if}
+                                    <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                        <img src="{$item['agent']['avatar']}">
+                                        <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>
+                                    </div>
+                                </div>
+                                {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
+                        </a>
+                        {/if}
+                        {else}
+                            {if $s_agentId === 0}
+                            <span style="color:gray;">&lt;平台&gt;</span>
+                            {else}
+                            <a href="{php echo $this->createWebUrl('devicetypes', ['op'=>'device_types', 'agent_openid'=>-1]);}" title="查看平台的全部型号">
+                                <span style="color:gray;">&lt;平台&gt;</span>
+                            </a>                            
+                            {/if}
+                        {/if}
+                    </td>
+                    <td>
+                        {$item['createtime_formatted']}
+                    </td>
+                    <td class="operate">
+                        <div class="btn-group">
+                            <a class="btn btn-default" href="#" title="编辑" data-op="editDeviceTypes"><i class="fa fa-edit"> </i></a>
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                                <span class="fa fa-caret-down"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" data-op="viewDevices"><i class="fa fa-cube fa=fw"></i> 查看相关设备</li>
+                                {if empty($item['agent'])}
+                                <li><a href="#" data-op="setFirstType"><i class="fa fa-inbox fa=fw"></i> 切换默认型号</li>
+                                {/if}
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#" data-op="removeDeviceTypes"><i class="fa fa-trash-o fa-fw"></i> 删除</li>
+                                <li>
+                                    <span style="display: block; padding: 3px 20px;">
+                                    <i class="fa fa-cube fa=fw"></i> 型号ID：{$item['id']}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div  class="pull-right">
+                {$pager}
+            </div>
+            {else}
+            <div style="text-align:center;color:#ccc;">
+                暂时还没有任何设备型号！
+            </div>
+            {/if}
+        </div>
+    </div>
+<script>
+    const api = {
+        url: "{php echo $this->createWebUrl('devicetypes');}",
+    }
+
+    api.showResult = function(params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function(res){
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if(cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function(){
+            loading && util.loaded();
+        })
+    }
+
+    api.addDeviceTypes = function() {
+        api.showResult({op: 'addDeviceTypes'});
+    }
+
+    api.editDeviceTypes = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        api.showResult({op: 'editDeviceTypes', id: id});
+    }
+
+    api.setFirstType = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        api.showResult({op: 'setFirstType', id: id}, '', false, function(res){
+            if (res.status) {
+                $('#device_type_list span.default_type').remove();
+                $('#device_type_list').find('tr[data-id='+res.data.typeid+'] td.device_types').append('<span class="default_type">[默认]</span>');
+            }
+        })
+    }
+
+    api.removeDeviceTypes = function(target) {
+        if (confirm('确定要删除这个型号？')) {
+            const tr = target.closest('tr');
+            const id = tr.data('id');
+            api.showResult({op: 'removeDeviceTypes', id: id}, '', false, function(){
+                tr.remove();
+            })
+        }
+    }
+
+    api.viewDevices =function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id !== undefined) {
+            location.href = "{php echo $this->createWebUrl('device', array('types' => '__types__'));}".replace('__types__', id);
+        }
+    }
+
+    function saveDeviceTypes() {
+        let passed = true;
+        $('form#editDeviceTypesForm input[required]').each(function(){
+            if ($(this).val().trim() === '') {
+                passed = false;
+                $(this).focus();
+                return false;
+            }
+        })
+
+        if (passed) {
+            const $data = $('form#editDeviceTypesForm').serialize();
+            $.post(api.url, {op: 'saveDeviceTypes', params: $data}).then(function(res){
+                if (res && res.data.msg) {
+                    util.message(res.data.msg, "{php echo $this->createWebUrl('devicetypes');}", res.status ? 'success':'error');
+                }
+            })
+        }
+    }
+
+    $(function(){
+        $('body').on('click', '[data-op]', function(){
+            const self = $(this);
+            const op = self.data('op');
+            if (api[op]) {
+                api[op](self);
+            }
+        })      
+
+        let J_select_html = '<option value="0">&lt;选择商品&gt;</option>';
+
+        $('body').on('click', 'button#addCargoLane', function(){
+            const uuid = Number(Math.random().toString().substr(3,8) + Date.now()).toString(36);
+            const carCount = $('.w-33').size() + 1;
+            const tpl = `
+<div class="form-group w-33">
+    <label for="" class="col-md-2 control-label"><span class="J_carCount">${carCount}</span>货道</label>
+    <div class="col-md-10">
+        <select class="col-md-4" name="goods[]" id="J_select${uuid}">
+            ${J_select_html}
+        </select>
+        <span class="col-md-3 r-3">
+            <input type="text" class="form-control s-input" id="J_input${uuid}" placeholder="关键词">
+            <button class="btn btn-default J_searchBtn" data-id="${uuid}">
+                <i class="fa fa-search" title="搜索商品"></i>
+            </button>
+        </span>
+        <span class="col-md-1" style="width: 3.2em; padding-right: 0;">
+            <p class="text-right">
+                <label class="control-label">容量</label>
+            </p>
+        </span>
+            <span class="col-md-2" style="min-width: 8em;">
+                <input type="number" class="form-control" name="capacities[]" min="0" required/>
+            </span>
+        <span class="col-md-1 operate">
+            <i class="fa fa-trash-o control-label remove_cargo" title="删除？"></i>
+        </span>
+    </div>
+</div>
+            `;
+            $('#J_cargolane').append(tpl);
+
+        })
+
+        $('body').on('click', 'i.remove_cargo', function(){
+            const formGroup = $(this).closest('.form-group');
+            if (formGroup) {
+                formGroup.remove();
+            }
+            $('.J_carCount').each(function(k, v){
+                $(v).html(k+2);
+            })
+        })
+
+        $('body').on('click', '.J_searchBtn', function(e){
+            e.preventDefault();
+
+            const id = $(this).data('id');
+            const kw = $('#J_input'+id).val();
+
+            $.post("{php echo $this->createWebUrl('devicetypes', array('op'=>'searchGoods'));}", {keywords: kw, id: id}, function(res){
+                if (res.status) {
+                   const id = res.data.id;
+                   if (res.data.list) {
+                       let optStr = '';
+                       res.data.list.forEach(function( v){
+                            optStr += '<option value="'+v.id+'">'+v.name;
+                            if (v.agent) {
+                                optStr += '<代理商：'+v.agent.name+'>';
+                            }
+                            optStr += '</option>';
+                       });
+
+                       if (optStr == '') {
+                           optStr = '<option value="" disabled="disabled" selected><没有找到商品></option>';
+                       } else {
+                            J_select_html = optStr;
+                       }
+                       
+                       $('#J_select'+id).html(optStr);
+                   }
+                }
+            })
+        })
+
+        //搜索
+        const backer = "{$backer}";
+        const open_id = "" || "";
+
+        $('#search-bar').click(function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=keywords]').focus();
+        })
+
+        $('#search-form .btn-close').click(function (e) {
+            if (backer) {
+                location.href = $('#search-form form').attr('action');    
+                setTimeout(function(){util.loading()}, 1000);               
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }       
+            e.preventDefault();     
+         })
+
+         if (backer) {
+            $('#search-bar').trigger('click');
+        }
+
+        $('#search_agent').click(function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    let isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.openid == open_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                let isSelected = '';
+                if (0 == open_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="" ' + isSelected + '><不限></option><option value="-1" ' + isSelected + '><平台></option>';
+                $('#agent_search_result').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    const elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至 " + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+    })
+
+</script>
+{template 'common/footer'}

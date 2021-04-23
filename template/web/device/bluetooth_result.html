@@ -1,0 +1,64 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #location, #tag_tpl {
+        display: none;
+    }
+
+    #device_edit_form table.cargo_lanes th {
+        text-align: center;
+    }
+
+    #device_edit_form table.cargo_lanes td {
+        text-align: center;
+    }
+
+    #device_edit_form table.cargo_lanes input.capacity {
+        width: 10em;
+        border: 0;
+        text-align: center;
+    }
+
+    #device_edit_form table.cargo_lanes input:focus.capacity {
+        border-color: #66afe9;
+    }
+</style>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        {if $fe }
+        <div class="form-group">
+            <div class="col-md-5">
+                文件格式不正确！
+            </div>
+            <div class="col-md-3">
+                {$fe}
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+        {/if}
+
+        <div class="form-group">
+            <div class="col-md-12">成功执行数量：<span class="" style="font-weight: 700; font-size: 1.2em;">{$success_count}</span></div>
+        </div>
+
+        {loop $result_msg $k $v}
+        <div class="form-group">
+            <div class="col-md-12">
+                文件中的行：<span style="color: red; font-size: 1.2em; padding-right: 2em;">{$k}</span>{$v}
+            </div>
+        </div>
+        {/loop}
+
+
+
+    </div>
+</div>
+
+
+<script>
+
+</script>
+{template 'common/footer'}

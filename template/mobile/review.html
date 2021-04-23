@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>广告审核</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+        <link href="{MODULE_URL}/static/testing/pure-min.css" rel="stylesheet">
+        <style>
+            .container {
+                width: calc(100% - 45px);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 0 auto;
+            }
+            .form {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px 10px
+            }
+            .form div {
+                border-bottom: 1px dotted #ccc;
+                width: 100%;
+                margin-top: 6px;
+                margin-bottom: 6px;
+                padding: 10px;
+            }
+            .text,.audio,.video,.image {
+                margin: 10px;
+                width: 100%;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            span.header {
+                font-weight: 100;
+                margin-right: 20px;
+            }
+            .image img {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .center {
+                text-align: center;
+            }
+            .pure-button {
+                color: #fff;
+            }
+            .pure-button.large {
+                width: 150px;
+            }
+            .button-success {
+                background: rgb(28, 184, 65);
+            /* this is a green */
+            }
+            .button-error {
+                background: rgb(202, 60, 60);
+                /* this is a maroon */
+            }
+            span.title {
+                margin-bottom: 20px;
+                display: block;
+                border-left: 6px solid #9E9E9E;
+                padding-left: 10px;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="form">
+                <div class="title">
+                    <span class="header">广告名称</span>{$title}
+                </div>
+                <div>
+                    <span class="header">广告位置</span>{$type}
+                </div>
+                {if $agent}
+                <div>
+                    <span class="header">代理商</span>{$agent['name']}
+                </div>
+                {/if}
+                <div class="center">
+                    <button class="pure-button large button-success pass">通过</button>
+                    <button class="pure-button large button-error reject">拒绝</button>
+                </div>  
+            </div>
+            {if $content}
+            <div class="text">
+                <span class="title">文本</span>
+                <div>
+                    {$content}
+                </div>
+            </div>            
+            {/if}
+            {if $audios}
+            <div>
+                <span class="title">音频</span>
+                <div class="audio">
+                    {loop $audios $audio}
+                    <audio controls="controls">                        
+                        <source src="{$audio}">                        
+                        不支持播放音频
+                      </audio>
+                    {/loop}
+                </div>
+            </div>
+            {/if}
+            {if $videos}
+            <div>
+                <span class="title">音频</span>
+                <div class="video">
+                    {loop $videos $video}
+                    <video width="100%" controls="controls">
+                        <source src="{$video}" />
+                        <object data="{$video}" width="100%">
+                          <embed src="{$video}" width="100%"/>
+                        </object>
+                      </video>
+                    {/loop}
+                </div>
+            </div>
+            {/if}
+            {if $images}
+            <div class="image">
+                <span class="title">图片</span>
+                {loop $images $image}
+                <img src="{$image}">
+                {/loop}
+            </div>
+            {/if}
+        </div>
+        <script src="{php echo JS_JQUERY_URL}"></script>
+        {php echo \zovye\Util::fetchJSSDK(false);}
+        <script>
+            wx.ready(function() {
+                function query(m) {
+                    $.getJSON("{php echo \zovye\Util::murl('util');}", {op: 'adv_review', id: "{$id}", sign: "{$sign}", fn: m}).then(res => {
+                        if (res && res.status) {
+                            if (res.data && res.data.msg) {
+                                alert(res.data.msg);
+                            }
+                        } else {
+                            alert('请求失败！');
+                        }
+                        wx.closeWindow();
+                    })
+                }
+                $('button.pass').click(function() {
+                    query("pass")
+                })
+                $('button.reject').click(function() {
+                    query("reject")
+                })
+            })
+        </script>
+    </body>
+</html>

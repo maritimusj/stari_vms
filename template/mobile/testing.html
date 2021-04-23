@@ -1,0 +1,540 @@
+<html>
+
+<head>
+    <title>主板测试入口v2.1</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="{MODULE_URL}/static/testing/pure-min.css" rel="stylesheet">
+        <link href="{MODULE_URL}/static/testing/animate.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #282537;
+        }
+
+        #scanBtn,
+        #scanBtn2,
+        #scanAllBtn {
+            font-size: 125%;
+            width: 80%;
+            border-radius: 2em;
+        }
+
+        #scanBtn2 {
+            background: red;
+        }
+
+        .lanes {
+            margin: 10px;
+            background: #ccc;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .lanes div {
+            width: 24%;
+            margin: 1px;
+        }
+
+        .lanes div button {
+            width: 100%;
+        }
+
+        .lanes.view {
+            position: absolute;
+            flex-direction: column;
+            margin: 10px;
+            width: calc(100% - 40px);
+            box-shadow: 1px 1px 1px #2196f3;
+            min-height: 30%;
+            padding: 10px;
+            z-index: 99;
+        }
+
+        .lanes.view .title {
+            text-align: center;
+            width: 100%;
+        }
+
+        .lanes.view .title span {
+            text-align: center;
+            width: 30%;
+            background: #FF9800;
+            line-height: 30px;
+            color: #fff;
+            padding: 5px;
+            border-radius: 30px;
+        }
+
+        .lanes.view .task-button {
+            width: 24%;
+            text-align: center;
+            color: #fff;
+            background: #9e9e9e;
+            border: 1px solid #fff;
+            padding: 6px 12px;
+        }
+
+        .lanes.view .task-button.normal {
+            background: #4CAF50;
+        }
+
+        .lanes.view .task-button.error {
+            background: #ff5722;
+        }
+
+        .lanes.view .list {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .lanes.view .list button {
+            width: 24%;
+            margin: 1px;
+        }
+
+        .task {
+            margin: 10px;
+            background: #ccc;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 50px;
+            overflow: hidden;
+        }
+
+        .task .status {
+            background: #009688;
+            color: #fff;
+            border-radius: 30px 0px 0px 30px;
+            padding: 3px 12px 3px 0px;
+            width: 100%;
+            text-align: center;
+            padding-left: 3px;
+            overflow: hidden;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+
+        button.pure-button.pure-button-primary.busy {
+            color: #F44336;
+        }
+
+        sup {
+            text-shadow: 1px 0px 1px;
+        }
+
+        .task .status.error {
+            background: #ff5722;
+        }
+
+        .task .status.offline {
+            background: #9e9e9e;
+        }
+
+        #list .task-button.error.timeout {
+            background: #FFC107;
+        }
+
+        #list .task-button.error.malfunction {
+            background: #f44336;
+        }
+
+        @font-face {
+            font-family: "iconfont";
+            src: url('{MODULE_URL}/static/testing/iconfont.eot?t=1566616411145');
+            /* IE9 */
+            src: url('{MODULE_URL}/static/testing/iconfont.eot?t=1566616411145#iefix') format('embedded-opentype'),
+            /* IE6-IE8 */
+            url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAARMAAsAAAAACoQAAAP/AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDTgqHRIYSATYCJAMcCxAABCAFhG0HfRv3CBEVnAnJfhy4sdOwsp6cNw0roUX65+ChryvfV3fnB7J6N5rZCLytUnfoZA0idgIEzG1uhvwpfNQ72Ar7y0/fkbbM9EL4O/7//VydSyh6N0/rxeT+NzXEJZkkzhIW0kJCxCupQagRC/EMOjhx4d/NeB0CsBRRiWjVplMvPDTqPAGISePHDserJNCEXOCFnY5b9RSxAYMnw/IasD7+vfhAjTyQGIV6U7cxrUfR7HXZiFV+4BukEkncXw4Y3gUKqAQ0iDmdhWmorKMShZ2/XNMKsHhI5OuyH39F3IgNAhYs478itHpsFkAiUPN/PIMDwkFhJs7uF3O4ex5rhYSPv6wQEDFWKIg4VmiIuCEoynKKu8p0z84C5IWoC2IIY9cKGp0XyJjN5GVSRlWzZbFetngmr+LiV/a1W3KxNXfG7XnFtvl2i5/FEmY06bL+eF61jWLqoCnUR3I5W0vf5W6b38BNOGVt0gl0HyWVso84IteYbUdyNduyM/f8jfrnPZq35fZdC+QY/JMZM64+LYBQ33W95bLq0r8V+2R7Hc/bpy+6aawdVEo4NYxaOPAS1JPtEb/06vpeyizcWZB8NG2XOCnfol2X60KZjkNOOHUpHM96Omvc961R7WQ4Xjxuj5jTOxTP2idrPITHkmMlemsXj6Vcb+ZyZEU4xdiuzXI16J8le5ZhtunR0PZ3c1pfRucnmebvFxxPDI9YUG5H+81ra+Q01XKkynyrp3sBchV0Rv7GdOJXm2ZP2LY/b7+wf0FQYVAda3bO4fzSTXZyvumwkTNumTm9f+Op/Fd3aO+TIYoJxYulEHbBuHVfJbM3qzezlcNv59TgrbqST4fiIDYkR0PZyJFybYHZ70Zd9qwpp0FMwR3+eywBIHitYqpA8D9YYqRKhMB3Cz9e2i3RDEDF5BUINrKUmvovfR8vKk/7MDRro29eRg3AvZXXBvJZ+3H/1Shgz38yZiBo//0Ln0q6ehaCRBM9VaK3bcBlaAuyv5EWCwSiJofHnOSGh4LAI3cBEpfCoPAoRdfsSmDISC1w8GgKlora3p2RnGagEDoDUMEKBoJszoMkC+mgyOY6XbMfgSGPCDhkS4FF8SvnI48udYeWjErQgt6gMzQ7k5ZDOvyFfh0Vl31R9UNeumYos6Le/cQZeR9XLH9fiThwTBM82NtwHAkiU49GsiAS2zx3XT+UGZqSgyuGFIEsoG1AxyAz5yuLQ+P3X5C3GilMzDu3/0Fs0VUPSpkCoD9xhuY9l7GLP68ios0BbjiUTMBD5NCoOwiI3Sf1kCEyYYu2qJWLpRyK2fHJ9DofACz1fjcplNDCCEe4wmN352c1pk0qLs7DytRQ3CqsitVzcd3NbOJJAgA=') format('woff2'),
+            url('{MODULE_URL}/static/testing/iconfont.woff?t=1566616411145') format('woff'),
+            url('{MODULE_URL}/static/testing/iconfont.ttf?t=1566616411145') format('truetype'),
+            /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+            url('{MODULE_URL}/static/testing/iconfont.svg?t=1566616411145#iconfont') format('svg');
+            /* iOS 4.1- */
+        }
+
+        .iconfont {
+            font-family: "iconfont" !important;
+            font-size: 16px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .signal {
+            font-size: x-small;
+            padding-right: 3px;
+        }
+
+        .icon-signal-0:before {
+            content: "\e627";
+            color: #9e9e9e;
+        }
+
+        .icon-signal-1:before {
+            content: "\ed05";
+            color: #2f6731;
+        }
+
+        .icon-signal-2:before {
+            content: "\ed06";
+            color: #2f6731;
+        }
+
+        .icon-signal-3:before {
+            content: "\ed07";
+            color: #2f6731;
+        }
+
+        .icon-signal-4:before {
+            content: "\ecf9";
+            color: #2f6731;
+        }
+
+        .icon-signal-5:before {
+            content: "\ed0a";
+            color: #2f6731;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="lanes">
+            <template v-for="lane in lanes" :key="lane.id">
+                <div>
+                    <button class="pure-button"
+                        :class="{'pure-button-primary': lane.selected, 'animated':true, 'flash infinite': lane.state == 'busy'}"
+                        @click="clickLane(lane)" @touchstart="touchstartHandler(lane)"
+                        @touchmove="touchmoveHandler(lane, $event)" @touchend="touchendHandler(lane, $event)">
+                        货道{{lane.id}}
+                        <sup v-if="lane.total>1">x{{lane.total}}</sup>
+                    </button>
+                </div>
+            </template>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1-1" style="text-align:center;margin-top:2em;">
+                <button class="pure-button button-xlarge"
+                    :class="{'pure-button-primary animated flipInX':anylaneSelected}" id="scanBtn" @click="testAll"
+                    :disabled="!anylaneSelected" v-text="anylaneSelected?'扫描设备二维码':'请先选择货道'"></button>
+            </div>
+        </div>
+        <div>
+            <div class="lanes view" v-if="viewObj" @click="viewObj=null">
+                <div class="list" id="list">
+                    <div class="task-button animated"
+                        :class="{error:lane.fail && lane.fail > 0,normal:lane.success&&lane.success>0&&!lane.fail,timeout:lane.errno==9,malfunction:lane.errno==10,'flash infinite': lane.state==='busy'}"
+                        v-for="lane in viewObj.lanes">
+                        货道 {{lane.id}}
+                        <sup v-if="lane.success!==undefined||lane.fail!==undefined">
+                            ( <span v-if="lane.success!==undefined">{{lane.success}}√</span> <span
+                                v-if="lane.fail!==undefined">{{lane.fail}}*</span> )</sup><sup v-else>(...)</sup>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="task" v-if="taskQueue.length>0">
+            <table class="pure-table">
+                <tbody>
+                    <tr v-for="(task,index) in taskQueue" @click="view(task)" :key="task.id">
+                        <td>
+                            <span class="iconfont" :class="'icon-signal-'+task.signal"></span>
+                            <span v-text="task.percent" v-if="task.percent>0" class="signal"></span>
+                        </td>
+                        <td style="padding: 6px 3px;width: 300px;"><span v-text="task.id"></span></td>
+                        <td>
+                            <div class="status animated flipInY"
+                                :class="{error:task.fail&&task.fail > 0, offline:task.offline}">
+                                <span v-if="task.status!='已完成'" v-text="task.status"></span>
+                                <span v-else>
+                                    {{task.status}} (<span v-text="task.success ? task.success+'√':''"></span> <span
+                                        v-text="task.fail ? task.fail+'*':''"></span>)
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {$version}
+    {$jssdk}
+    <script src="{MODULE_URL}/static/testing/axios.min.js"></script>
+    <script src="{MODULE_URL}/static/testing/vue.min.js"></script>
+    <script>
+        const API_URL = "{$api_url}";
+        function scan(cb) {
+            //cb("V648313348946316");return;
+            wx.scanQRCode({
+                needResult: 1,
+                success: function (data) {
+                    if (data && data.resultStr) {
+                        const url = data.resultStr;
+                        const result = url.match(/(device=|id=|\?)(\w{3,})/i);
+                        const id = result ? result[2] : url;
+                        return cb(id);
+                    }
+                    alert('二维码不正确！');
+                }
+            });
+        }
+
+        new Vue({
+            el: "#app",
+            data: {
+                apiUrl: API_URL,
+                lanes: [
+                    { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 }, { id: 9 }, { id: 10 }, { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 }, { id: 16 },
+                ],
+                testing: false,
+                taskQueue: [],
+                viewObj: null,
+            },
+            computed: {
+                anylaneSelected: function () {
+                    return this.lanes.find(function (lane) {
+                        return lane.selected === true;
+                    });
+                }
+            },
+            methods: {
+                setLaneState: function (task, id, state) {
+                    e = task.lanes.find(entry => entry.id === id);
+                    if (e) {
+                        Vue.set(e, "state", state);
+                    }
+                },
+                getResult: function (task, getLaneFN, done, fail, success) {
+                    lane = getLaneFN();
+
+                    const self = this;
+                    self.setLaneState(task, lane.id, "busy");
+
+                    axios.get(self.apiUrl, { params: { imei: task.id, channel: lane.id, op: "test" } }).then(function (res) {
+                        self.setLaneState(task, lane.id, "idle");
+                        return res.data;
+                    }).then(function (res) {
+                        if (res && res.status === true) {
+                            success(task.id, res.data.lane)
+                        } else {
+                            fail(task.id, res.data.lane, res.data.errno || -1);
+                        }
+                        if (!done()) {
+                            self.getResult(task, getLaneFN, done, fail, success);
+                        }
+                    }).catch(function () {
+                        fail(task.id, lane.id);
+                        if (!done()) {
+                            self.getResult(task, getLaneFN, done, fail, success);
+                        }
+                    });
+                },
+
+                getDetail: function (task, cb) {
+                    Vue.set(task, 'online', false);
+                    Vue.set(task, 'signal', 0);
+                    Vue.set(task, 'percent', 0);
+
+                    axios.get(this.apiUrl, { params: { imei: task.id, op: "detail" } }).then(function (res) {
+                        return res.data;
+                    }).then(function (res) {
+                        if (res) {
+                            if (res.status === true) {
+                                Vue.set(task, 'online', res.data.mcb.online);
+                                Vue.set(task, 'signal', res.data.mcb.signal);
+                                Vue.set(task, 'percent', res.data.mcb.percent);
+
+                                cb(res.data.mcb.online);
+                            } else {
+                                cb(false, res.data && res.data.msg || '');
+                            }
+                        }
+                    })
+                },
+
+                testDevice: function (task) {
+                    const self = this;
+                    this.getDetail(task, function (online, msg) {
+                        if (online) {
+                            self.doTestDevice(task);
+                        } else {
+                            task.status = msg || "设备离线";
+                            Vue.set(task, 'fail', 1)
+                            Vue.set(task, 'offline', 1)
+                        }
+                    });
+
+                },
+
+                doTestDevice: function (task) {
+                    lanes = task.lanes.map(function (lane) {
+                        return {
+                            id: lane.id,
+                            total: lane.total,
+                        }
+                    })
+
+                    getlane = function (lanes) {
+                        return function () {
+                            lane = lanes.shift()
+                            if (--lane.total > 0) {
+                                lanes.push(lane);
+                            }
+                            task.status = "货道" + lane.id + "...";
+                            return lane;
+                        }
+                    };
+
+                    done = function (lanes) {
+                        return function () {
+                            if (lanes.length > 0) {
+                                return false;
+                            } else {
+                                task.status = "已完成";
+                                return true;
+                            }
+                        }
+                    };
+
+                    failFN = function (task) {
+                        return function (id, laneid, errno) {
+                            if (task.fail) {
+                                task.fail++;
+                            } else {
+                                Vue.set(task, 'fail', 1)
+
+                            }
+                            lane = task.lanes.find(function (entry) { return entry.id === laneid })
+                            if (lane) {
+                                if (lane.fail) {
+                                    lane.fail++;
+                                    lane.errno = errno
+                                } else {
+                                    Vue.set(lane, 'fail', 1);
+                                    Vue.set(lane, 'errno', errno)
+                                }
+                            }
+                        }
+                    };
+
+                    successFN = function (task) {
+                        return function (id, laneid) {
+                            if (task.success) {
+                                task.success++;
+                            } else {
+                                Vue.set(task, 'success', 1)
+                            }
+                            lane = task.lanes.find(function (entry) { return entry.id === laneid })
+                            if (lane) {
+                                if (lane.success) {
+                                    lane.success++;
+                                } else {
+                                    Vue.set(lane, 'success', 1);
+                                }
+                            }
+                        }
+                    };
+
+                    this.getResult(task, getlane(lanes), done(lanes), failFN(task), successFN(task));
+                },
+                touchstartHandler: function (lane) {
+                    const self = this;
+                    if (lane.timer === undefined) {
+                        lane.timer = setTimeout(function () {
+                            self.longPress(lane);
+                            lane.timer = undefined;
+                        }, 1000);
+                    }
+                },
+                touchmoveHandler: function (lane, event) {
+                    if (lane.total == -1) {
+                        if (event) event.preventDefault();
+                        lane.total = 0
+                    }
+                    if (lane.timer) {
+                        clearTimeout(lane.timer);
+                        lane.timer = undefined;
+                    }
+                },
+                touchendHandler: function (lane, event) {
+                    if (lane.total == -1) {
+                        if (event) event.preventDefault();
+                        lane.total = 0
+                    }
+                    if (lane.timer) {
+                        clearTimeout(lane.timer);
+                        lane.timer = undefined;
+                    }
+                },
+                longPress: function (lane) {
+                    lane.timer = undefined
+                    lane.selected = false
+                    lane.total = -1
+                },
+                clickLane: function (lane) {
+                    if (lane.timer === undefined) {
+                        if (lane.selected) {
+                            lane.total++;
+                        } else {
+                            Vue.set(lane, "selected", true);
+                            Vue.set(lane, "total", 1);
+                        }
+                    }
+                },
+                view: function (task) {
+                    if (task.offline) {
+                        return
+                    }
+                    this.viewObj = this.viewObj === task ? null : task;
+                },
+                testAllForever: function () {
+                    var ids = this.lanes.filter(function (lane) {
+                        return lane.selected === true;
+                    }).map(function (lane) {
+                        return { id: lane.id, total: 1000 };
+                    });
+                    if (ids.length > 0) {
+                        const self = this;
+                        scan(function (id) {
+                            task = {
+                                id: id,
+                                lanes: ids,
+                                status: "等待...",
+                            }
+                            self.taskQueue.unshift(task);
+                            testDevice(task);
+                        });
+                    }
+                },
+                testAll: function () {
+                    var ids = this.lanes.filter(function (lane) {
+                        return lane.selected === true;
+                    }).map(function (lane) {
+                        return { id: lane.id, total: lane.total };
+                    });
+                    if (ids.length > 0) {
+                        const self = this;
+                        scan(function (id) {
+                            task = {
+                                id: id,
+                                lanes: ids,
+                                status: "等待...",
+                            }
+                            self.taskQueue.unshift(task);
+                            self.testDevice(task);
+                        });
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

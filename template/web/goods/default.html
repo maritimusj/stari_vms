@@ -1,0 +1,483 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #addGoodsForm fieldset[disabled] label, #addGoodsForm fieldset[disabled] input, #addGoodsForm fieldset[disabled] table{
+        color: gray;
+    }
+    .modal-open #material-Modal{
+        z-index: 9999;
+    }
+    #goodslist .way span {
+        background-color: gray;
+        color: #fff;
+        padding: 3px 6px;
+        cursor: default;
+        width: 70px;
+        display: inline-block;
+        margin: 1px;
+    }
+    #goodslist .way span:not(.allowed) {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    #goodslist .way span.free.allowed {
+        background-color: #4CAF50;
+    }
+    #goodslist .way span.pay.allowed {
+        background-color: #FF5722;
+    }
+    #goodslist th:not(:nth-child(2)), #goodslist td:not(:nth-child(2)) {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #goodslist .lottery {
+        color: coral;
+    }
+    #goodslist a .profile{
+        cursor: pointer;
+    }
+    #goodslist .goods img {
+        width: 100px;
+    }
+    #goodslist .price {
+        color: #ff9800;
+    }
+    #goodslist .cost-price {
+        color: gray;
+        cursor: default;
+        font-size: 12px;
+    }
+    #search-form {
+        display: none;
+    }
+</style>
+{template "web/goods/nav"}
+    <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-gift fa-fw" title="添加商品" data-op="addGoods"></i>
+                {if \zovye\App::isLotteryGoodsSupported()}
+                <i class="fa fa-ticket fa-fw" title="添加固定货道商品" data-op="addLotteryGoods"></i>
+                {/if}
+                {if \zovye\App::isGoodsVoucherEnabled()}
+                <a href="{php echo $this->createWebUrl('voucher');}">
+                <i class="fa fa-ticket fa-fw" title="提货码管理"></i>
+                </a>
+                {/if}
+                {if $agent}
+                <a href="{php echo $this->createWebUrl('goods');}">
+                <i class="fa fa-reply fa-fw" title="返回全部商品列表"></i>
+                </a>
+                {/if}
+            </span>
+        </div>
+        <div class="panel-body">
+            <div id="search-bar">
+                <div class="text-input">
+                    <span>根据条件搜索商品 ...</span>
+                    <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+                </div>
+            </div>
+            <div id="search-form">
+                <form action="{php echo $this->createWebUrl('goods', array('op'=>'default'));}" method="post">
+                    <div class="form-group">
+                        <label for="agent_search_result" class="col-md-2 control-label">所属代理商</label>
+                        <div class="col-md-5">
+                            <select name="agentId" id="agent_search_result" style="width:100%;">
+                                <option value="" {if empty($s_agentId)} selected="selected"{/if}>&lt;不限&gt;</option>
+                                <option value="-1" {if $s_agentId == -1} selected="selected"{/if}>&lt;平台&gt;</option>
+                                {if $s_agent}
+                                <option value="{$s_agent['id']}" selected="selected">{$s_agent['name']}{if $s_agent['mobile']}，手机号码：{$s_agent['mobile']}{/if}</option>
+                                {/if}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" id="search_agent" title="搜索代理商"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">关键字</label>
+                        <div class="col-md-8">
+                            <input name="s_keywords"  class="form-control" type="text" value="{$s_keywords}" style="width: 100%;"/>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                            <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {if $goods_list}
+            <table class="table" id="goodslist">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>名称</th>
+                    <th>单位</th>
+                    <th>图片</th>
+                    <th>领取方式</th>
+                    <th>
+                        <div>单价</div>
+                        <div class="cost-price">成本价</div>
+                    </th>
+                    <th>所属代理商</th>
+                    <th style="text-align:center;">创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $goods_list $index $item}
+                <tr data-id="{$item['id']}">
+                    <td>
+                        {php echo $index + 1}
+                    </td>
+                    <td>
+                        {$item['name']}
+                        {if $item['lottery']}
+                        <span class="lottery" title="固定货道商品">
+                            <i class="fa fa-fw fa-ticket"></i>
+                        </span>
+                        {/if}
+                    </td>
+                    <td>
+                        {$item['unit_title']}
+                    </td>
+                    <td class="goods">
+                        <img src="{$item['img']}" />
+                    </td>
+                    <td class="way">
+                        <span class="free{if $item['allowFree']} allowed{/if}">关注领取</span>
+                        <span class="pay{if $item['allowPay']} allowed{/if}">支付领取</span>
+                    </td>
+                    <td>
+                        <div>
+                            <span class="price" {if !$item['allowPay']} style="color:#666;"{/if}>
+                            {if $item['allowPay']}
+                            {$item['price_formatted']}
+                            {else}
+                            <del>{$item['price_formatted']}</del>
+                            {/if}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="cost-price" title="成本价">
+                            {if $item['costPrice']}
+                            {$item['costPrice_formatted']}
+                            {/if}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        {if $item['agent']}
+                        {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
+                        <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['op'=>'goods', 'agentId'=>$item['agent']['id']]);}">
+                            <div class="agent" title="点击查看{$item['agent']['name']}全部商品" style="display:inline-block;">
+                                {else}
+                                <div class="agent" style="display:inline-block;">
+                                    {/if}
+                                    <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                        <img src="{$item['agent']['headimgurl']}">
+                                        <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>
+                                    </div>
+                                </div>
+                                {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
+                        </a>
+                        {/if}
+                        {else}
+                            {if $s_agentId != -1}
+                            <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['op'=>'goods', 'agentId'=>-1]);}" title="点击查看所有平台商品">
+                                <span style="color:gray;">&lt;平台&gt;</span>
+                            </a>
+                            {else}
+                            <span style="color:gray;">&lt;平台&gt;</span>
+                            {/if}                        
+                        {/if}
+                    </td>
+                    <td style="text-align:center;">
+                        {$item['createtime_formatted']}
+                    </td>
+                    <td class="operate">
+                        <div class="btn-group">
+                            {if $item['lottery']}
+                            <a class="btn btn-default" href="#" title="编辑" data-op="editLotteryGoods"><i class="fa fa-edit"> </i></a>
+                            {else}
+                            <a class="btn btn-default" href="#" title="编辑" data-op="editGoods"><i class="fa fa-edit"> </i></a>
+                            {/if}
+                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                                <span class="fa fa-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" data-op="editAppendage"><i class="fa fa-external-link fa=fw"></i> 附加信息</li>
+                                <li><a href="#" data-op="viewStats"><i class="fa fa-line-chart fa=fw"></i> 查看统计</li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#" data-op="removeGoods"><i class="fa fa-trash-o fa-fw"></i> 删除</li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div class="pull-right">
+                {$pager}
+            </div>
+            <script>
+                $(function(){
+                    $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
+                });
+            </script>
+            {else}
+            <div style="text-align:center;color:#ccc;">
+                暂时还没有任何商品！
+            </div>
+            {/if}
+        </div>
+    </div>
+<script>
+    const api = {
+        url: "{php echo $this->createWebUrl('goods');}",
+    }
+    api.showResult = function(params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function(res){
+            loading && util.loaded();
+            if(res) {
+                if(typeof cb == 'function') {
+                    if(cb(res)) {
+                        return;
+                    }
+                }
+                if(res.status) {
+                    if(res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if(res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if(res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function(){
+            loading && util.loaded();
+        })
+    }
+    api.editAppendage = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id !== undefined) {
+            api.showResult({op: 'editAppendage', id: id});
+        }
+    }
+    api.viewStats = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id !== undefined) {
+            api.showResult({op: 'viewGoodsStats', id: id});
+        }
+    }
+    api.addGoods = function() {
+        api.showResult({op: 'addGoods'});
+    }
+    api.addLotteryGoods = function() {
+        api.showResult({op: 'addGoods', type: 'lottery'});
+    }
+    api.editLotteryGoods = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id !== undefined) {
+            api.showResult({op: 'editGoods', id: id, type: 'lottery'});
+        }
+    }
+    api.editGoods = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id !== undefined) {
+            api.showResult({op: 'editGoods', id: id});
+        }
+    }
+
+    api.removeGoods = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id && confirm('确定要删除这个商品吗？')) {
+            api.showResult({op: 'removeGoods', id: id}, undefined, false, function(res){
+                if (res && res.status) {
+                    tr.remove();
+                }
+            })
+        }
+    }
+    api.saveGoods = function() {
+        let passed = true;
+        $('form#addGoodsForm input[required]').each(function(){
+            if($(this).val().trim() === '') {
+                passed = false;
+                $(this).focus();
+                return false;
+            }
+        })
+        if (passed) {
+            const data = $('form#addGoodsForm').serialize();
+            $.post(api.url, {op: 'saveGoods', params: data}).then(function(res){
+                if (res && res.data.msg) {
+                    util.message(res.data.msg, "{php echo $this->createWebUrl('goods');}", res.status ? 'success':'error');
+                }
+            })
+        }
+    }
+    api.saveGoodsAppendage = function() {
+        const data = $('form#editAppendageForm').serialize();
+            $('#modal-message').modal('hide');
+            $.post(api.url, {op: 'saveAppendage', params: data}).then(function(res){
+                if (res && res.data.msg) {
+                    util.message(res.data.msg, "", res.status ? 'success':'error');                  
+                }
+            })
+    }
+
+    $(function(){
+        //搜索
+        const backer = "{$backer}";
+        const agentId = "{$s_agent['id']}";
+
+        $('#search-bar').click(function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=s_keywords]').focus();
+        })
+
+        $('#search-form .btn-close').click(function (e) {
+            if (backer) {
+                location.href = $('#search-form form').attr('action');    
+                setTimeout(function(){util.loading()}, 1000);               
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }       
+            e.preventDefault();     
+         })
+
+         if (backer) {
+            $('#search-bar').trigger('click');
+        }
+
+        $('#search_agent').click(function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    let isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.id == agentId) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                let isSelected = '';
+                if (0 == agentId) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="" ' + isSelected + '><不限></option><option value="-1" ' + isSelected + '><平台></option>';
+                $('#agent_search_result').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+
+        function reloadPageWithFilter(fn) {
+            const params = new URLSearchParams();
+
+            const form = $("#search-form form");
+            const s_keywords = $.trim(form.find('input[name=s_keywords]').val());
+            if (s_keywords) {
+                params.append("keywords", s_keywords);
+            }
+            const agentId = $.trim(form.find('select[name=agentId]').val());
+            if (agentId != '') {
+                params.append("agentId", agentId);
+            }
+            if (typeof fn === 'function') {
+                fn(params);
+            }
+            location.href = form.attr("action") + "&" + encodeURI(params.toString());
+            setTimeout(function(){util.loading()}, 1000);
+        }
+
+        $("#search-form form").submit(function(e){
+            reloadPageWithFilter();            
+            e.preventDefault();
+        })
+
+        $('body').on('click', 'a[filter]', function (e) {
+            const self = this;
+            reloadPageWithFilter(function (params) {
+                const name = $(self).data('name');
+                const val = $(self).data('val');
+                if (name) {
+                    params.set(name, val);
+                }
+            });
+            e.preventDefault();
+        })
+
+        $('body').on('click', '[data-op]', function(){
+            const self = $(this);
+            const op = self.data('op');
+            if(api[op]) {
+                api[op](self);
+            }
+        })
+        $('body').on('click', '#find_agent', function() {
+            const ownerId = $('select[name=agentId]').val();
+            const keywords = $('input[name=find_keywords]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {op:'search', keyword:keywords}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_**!_', e.id === ownerId ? 'selected' : '');
+                    })
+                }
+                html += '<option value="0"><无></option>';
+                $('#find_agent_select').html(html);
+
+            }, 'json').complete(function(){
+                util.loaded();
+            })
+        })
+        $('body').on('click', '#addGoodsForm input[type=checkbox]', function(){
+            const val = $(this).val();
+            if (val) {
+                if ($(this).is(':checked')) {
+                    $('#' + val).removeAttr('disabled');
+                } else {
+                    $('#' + val).attr('disabled', true);
+                }
+            }
+        })
+    })
+</script>
+{template 'common/footer'}

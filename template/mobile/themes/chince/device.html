@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>{$tpl['site']['title']}</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		{if $tpl['slides']}
+		{php \zovye\url(true, CSS_SWIPER_URL);}
+		{/if}
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				width: 100%;
+              	background-color: #FBFBFB;
+			}
+			
+			body {
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #000;
+				margin: 0;
+				padding: 0;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			}
+			
+			[v-cloak] {
+				display: none;
+			}
+			
+			.theme-color {
+				background-color: #65ADE4;
+			}
+			
+			.dark-color {
+				background-color: #7A7A7A;
+			}
+			
+			.tab-view {
+				width: 100%;
+				height: 44px;
+				display: flex;
+				flex-direction: row;
+				border-bottom: 2px solid #eee;
+			}
+			
+			.tab {
+				width: 50%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.selected {
+				background-color: #65ADE4;
+				color: #fff;
+			}
+			
+			.main-view {
+				width: 100%;
+				padding-bottom: 25vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+              	background-color: #FBFBFB;
+			}
+			
+			.list {
+				padding: 0 20px 20px;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: space-between;
+			}
+			
+			.good {
+				width: calc((100vw - 50px)*0.48);
+				background-color: #fff;
+				margin-top: 20px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				box-shadow: 5px 5px 5px #ccc;
+				border: 1px solid #eee;
+				padding-bottom: 20px;
+			}
+			
+			.name {
+				color: #fff;
+				font-size: 13px;
+				width: 100%;
+				text-align: center;
+				padding: 3px 0;
+			}
+			
+			.img {
+				width: 80px;
+				height: 80px;
+				border-radius: 50%;
+				margin-top: 20px;
+				box-shadow: 0 0 5px #363636;
+			}
+			
+			.num {
+				color: #fff;
+				margin-top: -25px;
+				margin-right: -50px;
+				border-radius: 50%;
+				min-width: 25px;
+				min-height: 25px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.btn {
+				margin-top: 20px;
+				width: 60%;
+				color: #fff;
+				text-align: center;
+				padding: 3px 0;
+				border-radius: 20px;
+				font-size: 14px;
+				font-weight: 500;
+			}
+			
+			.btn:active {
+				background-color: #7A7A7A;
+			}
+			
+			.swiper-container {
+				width: 100%;
+				height: 25vh;
+				position: fixed;
+				bottom: 0;
+			}
+			
+			.adv-img {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.top-view {
+				width: 100%;
+				height: 10vh;
+				background: -webkit-linear-gradient(left, #65ADE4 25%, #6495ED 75%, #65ADE4);
+				background: -o-linear-gradient(right, #65ADE4 25%, #6495ED 75%, #65ADE4);
+				background: -moz-linear-gradient(right, #65ADE4 25%, #6495ED 75%, #65ADE4);
+				background: linear-gradient(to right, #65ADE4 25%, #6495ED 75%, #65ADE4);
+			}
+			
+			.circle-bg {
+				width: 100%;
+				height: 10vh;
+				overflow: hidden;
+				position: relative;
+				background: -webkit-linear-gradient(left, #65ADE4 25%, #6495ED 75%, #65ADE4);
+				background: -o-linear-gradient(right, #65ADE4 25%, #6495ED 75%, #65ADE4);
+				background: -moz-linear-gradient(right, #65ADE4 25%, #6495ED 75%, #65ADE4);
+				background: linear-gradient(to right, #65ADE4 25%, #6495ED 75%, #65ADE4);
+			}
+			
+			.circle {
+				width: 250vw;
+				height: 250vw;
+				background-color: #FBFBFB;
+				border-top-left-radius: 175vw;
+				border-top-right-radius: 175vw;
+				position: absolute;
+				left: -75vw;
+			}
+			
+			.card {
+				width: 100%;
+				margin-top: -10vh;
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			
+			.card .avatar {
+				width: 80px;
+				height: 80px;
+				border-radius: 50%;
+				margin-top: -40px;
+				box-shadow: 0 0 5px #fff;
+				background-color: #fff;
+				border: 2px solid #fff;
+			}
+			
+			.card .name {
+				color: #555;
+				font-size: 20px;
+				margin-top: 10px;
+				font-weight: 500;
+				text-shadow: 2px 2px 2px #ccc;
+			}
+			
+			.card .qrcode {
+				width: 35vw;
+				margin-top: 20px;
+			}
+			
+			.card .desc {
+				margin-top: 10px;
+				color: #555;
+				font-size: 13px;
+				text-shadow: 2px 2px 2px #ccc;
+			}
+		</style>
+	</head>
+
+	<body ontouchstart>
+		<div id="app" v-cloak>
+			{if $tpl['accounts'] && ($tpl['goods'] || $tpl['purchase'])}
+			<div class="tab-view">
+				<div :class="{tab:true, selected:selected}" @click="freeClick">免费领取</div>
+				<div :class="{tab:true, selected:!selected}" @click="payClick">支付购买</div>
+			</div>
+			{/if}
+			{if $tpl['accounts']}
+			<div class="main-view" v-show="selected">
+				<div class="top-view"></div>
+				<div class="circle-bg">
+					<div class="circle"></div>
+				</div>
+				<div class="card">
+					<img class="avatar" src="{php echo \zovye\Util::tomedia(current($tpl['accounts'])['img']);}" />
+					<span class="name">{php echo current($tpl['accounts'])['title'];}</span>
+					<img class="qrcode" src="{php echo \zovye\Util::tomedia(current($tpl['accounts'])['qrcode']);}" />
+					<span class="desc">「 {php echo html_entity_decode(current($tpl['accounts'])['descr'])} 」</span>
+				</div>
+			</div>
+			{/if}
+			{if $tpl['goods'] || $tpl['purchase']}
+			<div class="main-view" v-show="!selected">
+				<div class="list">
+					{loop $tpl['goods'] $index $item}
+					<div class="good">
+						<span :class="{'name':true, 'theme-color':{php echo $item['num'] != 0 ? 'true':'false'}, 'dark-color':{php echo $item['num'] == 0 ? 'true':'false'}}">{$item['name']}</span>
+						<img class="img" src="{$item['img']}" />
+						<span :class="{'num':true, 'theme-color':{php echo $item['num'] != 0 ? 'true':'false'}, 'dark-color':{php echo $item['num'] == 0 ? 'true':'false'}}">{$item['num']}</span>
+						<div :class="{'btn':true, 'theme-color':{php echo $item['num'] != 0 ? 'true':'false'}, 'dark-color':{php echo $item['num'] == 0 ? 'true':'false'}}" @click="itemTap({$item['id']},{$item['num']})">{php echo $item['num'] ? $item['price_formatted']:'缺货'}</div>
+					</div>
+					{/loop}
+				</div>
+			</div>
+			{/if}
+			{if $tpl['slides']}
+			<div class="swiper-container ">
+				<div class="swiper-wrapper ">
+					{loop $tpl['slides'] $index $item}
+					<div class="swiper-slide ">
+						<img class="adv-img " src="{$item['image']}" />
+					</div>
+					{/loop}
+				</div>
+			</div>
+			{/if}
+		</div>
+		{$tpl['js']['code']}
+		{if $tpl['slides']}
+		{php \zovye\url(true, JS_SWIPER_URL);}
+		{/if}
+		{php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+			(function() {
+				new Vue({
+					el: '#app',
+					data: {
+						selected: {php echo $tpl['accounts'] ? 'true':'false'}
+					},
+					mounted: function() {
+						{if $tpl['slides']}
+						var swiper = new Swiper('.swiper-container', {
+							autoplay: {
+								delay: 5000,
+								disableOnInteraction: false,
+							},
+							speed: 3000,
+							effect: 'fade'
+						});
+						{/if}
+					},
+					methods: {
+						freeClick() {
+							this.selected = true;
+						},
+						payClick() {
+							this.selected = false;
+						},
+						itemTap(id,num) {
+							if(num == 0) {
+								mui.alert('商品缺货');
+							} else {
+								mui.toast('正在加载中，请稍等...');
+		        				zovye_fn.goods_wxpay(id);
+							}
+						}
+					}
+				});
+			})()
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{$tpl['site']['title']}</title>
+    <meta name="viewport"
+        content="width=device-width,initial-scale=0,minimum-scale=0,maximum-scale=0,user-scalable=no" />
+    <style>
+        body {
+            background-color: #f2f2f2;
+            color: #101010;
+            margin: 0;
+            font-size: 5vw;
+        }
+
+        .loading,
+        .offline {
+            width: 100vw;
+            height: 150vh;
+            background-color: #efefef;
+            position: fixed;
+            top: -50vh;
+            left: 0;
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copyrights {
+            z-index: 101;
+            margin-bottom: 0;
+            color: #666;
+            bottom: 0;
+            position: absolute;
+        }
+
+        .loading .icon img,
+        .offline .icon img {
+            margin: 6vw;
+        }
+
+        .icon img {
+            width: 20vw;
+        }
+
+        .wave {
+            z-index: 100;
+            position: absolute;
+            bottom: -3vh;
+            width: 100vw;
+        }
+
+        .wave img {
+            width: 100vw;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="loading" id="container">
+            <div class="icon">
+                <img src="{MODULE_URL}static/img/loading-puff.svg">
+            </div>
+            <span class="text">设备连接中...</span>
+            <div class="copyrights">
+                <span>{$tpl['site']['copyrights']}</span>
+            </div>
+            <div class="wave">
+                <img src="{MODULE_URL}static/img/wave.svg">
+            </div>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    <script>
+        const offlineIcon = '{MODULE_URL}static/img/offline.svg';
+        const smileIcon = '{MODULE_URL}static/img/smile.svg';
+        function setOnline(online) {
+            const c = $('#container');
+            if (online) {
+                c.find('.text').text('转跳中...');
+                return zovye_fn.redirect();
+            }
+
+            c.removeClass('loading');
+            c.addClass('offline');
+
+            c.find('.icon img').attr('src', offlineIcon);
+            c.find('.text').text('设备不在线，请稍后再试！');
+            c.click(function () {
+                c.find('.icon img').attr('src', smileIcon);
+                c.find('.text').text('请稍等...');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            });
+        }
+        $(function () {
+            zovye_fn.getDetail(function (res) {
+                if (res && res.data.mcb && res.data.mcb.online) {
+                    return setOnline(true);
+                }
+                setOnline(false);
+            })
+        })
+    </script>
+</body>
+</html>

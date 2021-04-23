@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{$tpl['page']['title']}</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				height: 100%;
+			}
+			
+			body {
+				background: #fff;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #000;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			
+			.icon {
+				width: 60%;
+				height: 60vw;
+				margin-top: 10%;
+			}
+			
+			.desc {
+				color: #000;
+				font-size: 1.5em;
+				font-weight: 500;
+			}
+			
+			.copyright {
+				position: absolute;
+				color: #888;
+				text-align: center;
+				bottom: 5%;
+			}
+		</style>
+	</head>
+
+	<body>
+	<img src="{MODULE_URL}static/img/location.svg" class="icon" />
+		<span class="desc">正在定位中...</span>
+		<span class="copyright">{$tpl['site']['copyrights']}</span>
+		{$tpl['js']['code']}
+		<script type="text/javascript">
+			    zovye_fn.ready(function(){
+			        zovye_fn.check(function fail(msg){
+			            var icon = document.querySelector(".icon");
+			            var desc = document.querySelector(".desc");
+			            if (icon) {
+			                icon.src = "{MODULE_URL}static/img/error.svg";
+			            }
+			            if (desc) {
+			                desc.textContent = msg;
+			            }
+			        });
+			    })
+		</script>
+	</body>
+</html>

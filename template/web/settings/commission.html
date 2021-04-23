@@ -1,0 +1,167 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #special fieldset[disabled] label, #special2 fieldset[disabled] input, #special2 fieldset[disabled] table{
+        color: gray;
+    }
+    #special fieldset[name=commission_agreement][disabled] {
+        display: none;
+    }
+</style>
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item" id="special">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">基础设置</div>
+                <div class="form-group">
+                    <label for="commission" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                          <label>
+                            <input type="checkbox" name="commission" id="commission" value="1" {if $settings['commission']['enabled']}checked{/if}>
+                            是否启用佣金系统
+                          </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($settings['commission']['enabled'])}disabled{/if} name="commission">
+                <div class="form-group">
+                    <label for="withdraw_min" class="col-md-2 control-label">最低提现金额（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="withdraw_min" id="withdraw_min" value="{$settings['commission']['withdraw']['min']}" min="0">
+                        <span class="help-block">* 0 表示不限最低金额</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="withdraw_max" class="col-md-2 control-label">最高提现金额（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="withdraw_max" id="withdraw_max" value="{$settings['commission']['withdraw']['max']}" min="0">
+                        <span class="help-block">* 0 表示不限最高金额</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="withdraw_maxcount" class="col-md-2 control-label">每月提现次数限制</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="withdraw_maxcount" id="withdraw_maxcount" value="{$settings['commission']['withdraw']['count']['month']}">
+                        <span class="help-block">* 0 表示不限提现次数</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">手续费</label>
+                    <div class="col-md-10">
+                        <div class="col-md-4" style="padding-left:0;">
+                            <input type="number" class="form-control" name="withdraw_fee_permille" id="withdraw_fee_permille" value="{php echo intval($settings['commission']['withdraw']['fee']['permille'])}" min="0" max="1000">
+                            <span class="help-block">* 手续费<b>千分比‰</b></span>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" class="form-control" name="withdraw_fee_min" id="withdraw_fee_min" value="{php echo number_format($settings['commission']['withdraw']['fee']['min'] / 100, 2)}" min="0" step="0.01">
+                            <span class="help-block">* 最低收取手续费（元）</span>
+                        </div>
+                        <div class="col-md-4" style="padding-right:0;">
+                            <input type="number" class="form-control" name="withdraw_fee_max" id="withdraw_fee_max" value="{php echo number_format($settings['commission']['withdraw']['fee']['max'] / 100, 2)}" min="0" step="0.01">
+                            <span class="help-block">* 手续费最高不超过（元）</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="withdraw_maxcount" class="col-md-2 control-label">整额提现</label>
+                    <div class="col-md-10">
+                        <select class="col-md-9" id="withdraw_times" name="withdraw_times" style="width: 80%;">
+                            <option value="0" {if $settings['commission']['withdraw']['times'] == '0'}selected{/if}>&lt;未设置&gt;</option>
+                            <option value="10" {if $settings['commission']['withdraw']['times'] == '10'}selected{/if}>提现金额必须是10的倍数</option>
+                            <option value="100" {if $settings['commission']['withdraw']['times'] == '100'}selected{/if}>提现金额必须是100的倍数</option>
+                            <option value="1000" {if $settings['commission']['withdraw']['times'] == '1000'}selected{/if}>提现金额必须是1000的倍数</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">打款方式</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="withdraw_pay_type" id="withdraw_pay_type1" value="1" {if $settings['commission']['withdraw']['pay_type']}checked{/if}>
+                            自动 <span style="color:gray;">（有提现请求时，自动打款）</span>
+                          </label>
+                        </div>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" name="withdraw_pay_type" id="withdraw_pay_type0" value="0"  {if empty($settings['commission']['withdraw']['pay_type'])}checked{/if}>
+                           手动 <span style="color:gray;">（需要管理员确认，手动打款）</span>
+                          </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">必须绑定银行卡</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="withdraw_bank_card" id="withdraw_bank_card1" value="1" {if $settings['commission']['withdraw']['bank_card']}checked{/if}>
+                                必须 <span style="color:gray;"></span>
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="withdraw_bank_card" id="withdraw_bank_card0" value="0"  {if empty($settings['commission']['withdraw']['bank_card'])}checked{/if}>
+                                不必 <span style="color:gray;"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!---
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">佣金提现网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$withdraw_url}"></i> {$withdraw_url}</span>
+                    </div>
+                </div>
+                -->
+                </fieldset>
+            </div>
+            <div class="seg">
+                <div class="title">佣金广告平台</div>
+                <div class="form-group">
+                    <label for="commission_agreement" class="col-md-2 control-label">用户协议</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                          <label>
+                            <input type="checkbox" name="commission_agreement" id="commission_agreement" value="once" {if $settings['commission']['agreement']['freq']}checked{/if}>
+                            用户必须同意才能使用广告平台
+                          </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($settings['commission']['agreement']['freq'])}disabled{/if} name="commission_agreement">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">协议内容</label>
+                    <div class="col-md-10">
+                    {php echo tpl_ueditor('commission_agreement_content', $settings['commission']['agreement']['content']);}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="commission">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableInputMask();
+        zovye.enableCopy();
+    })
+
+    $(function(){
+        $('#special input[name=commission]').click(function(){
+            $('#special fieldset[name=commission]').attr('disabled', !$(this).is(':checked'));
+        });
+        $('#special input[name=commission_agreement]').click(function(){
+            $('#special fieldset[name=commission_agreement]').attr('disabled', !$(this).is(':checked'));
+        });
+    });
+</script>
+{template 'common/footer'}

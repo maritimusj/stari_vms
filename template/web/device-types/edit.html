@@ -1,0 +1,196 @@
+<style>
+    .we7-modal-dialog {
+        min-width: 1560px !important;
+    }
+    #modal-message .modal-dialog, .we7-modal-dialog {
+        min-width: 1560px!important;
+    }
+    .we7-modal-dialog .modal-content {
+        max-width: 1560px !important;
+    }
+    .w-33 {
+        float: left;
+        width: 46%;
+        margin-right: .5em !important;
+        margin-bottom: 1em !important;
+    }
+    #J_cargolane {
+        position: relative;
+        max-height: 680px;
+        overflow-y: auto;
+        padding: 30px 1px;
+        border: 1px solid #e8e9eb;
+        margin-bottom: 30px;
+    }
+    .s-input {
+        display: inline-block;
+        width: 5em;
+        margin-right: 5px;
+    }
+
+    .r-3 {
+        width: 28% !important;
+    }
+    .r-2 {
+        width: 13% !important;
+    }
+    .J_searchBtn {
+        height: 34px;
+    }
+    .J_carCount {
+        font-size: 20px;
+        font-weight: bolder;
+        margin-right: 6px;
+        color: #8BC34A;
+    }
+</style>
+
+<form class="form-horizontal" id="editDeviceTypesForm">
+    <div class="form-group">
+        <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+        <div class="col-md-5">
+            <select name="agentId" id="select_agent" style="width:100%;">
+                {if $agent_openid}
+                <option value="{$agent_openid}">{php echo $agent_name . "，手机号码：" . $agent_mobile}</option>
+                {/if}
+                <option value="0">&lt;无&gt;</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-default" type="button" id="find_agent">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="title" class="col-md-2 control-label">名称</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="title" name="title" value="{php echo $device_type ? $device_type['title'] : ''}" required>
+        </div>
+    </div>
+    <div id="J_cargolane">
+        <div class="form-group w-33" id="default_cargolane" >
+            <label class="col-md-2 control-label"><span class="J_carCount">1</span>货道</label>
+            <div class="col-md-10">
+                <select class="col-md-4" name="goods[]" id="J_select1">
+                    <option value="0">&lt;选择商品&gt;</option>
+                    {if $device_type['cargo_lanes'][0]['goods_profile']}
+                    <option value="{$device_type['cargo_lanes'][0]['goods_profile']['id']}" selected>
+                        {$device_type['cargo_lanes'][0]['goods_profile']['name']}{if $device_type['cargo_lanes'][0]['goods_profile']['agent']} &lt;代理商：{$device_type['cargo_lanes'][0]['goods_profile']['agent']['name']}>{/if}
+                        </option>
+                    {/if}
+                </select>
+                <span class="col-md-3 r-3">
+            <input type="text" class="form-control s-input" id="J_input1" placeholder="关键词">
+            <button class="btn btn-default J_searchBtn" data-id="1">
+                <i class="fa fa-search" title="搜索商品"></i>
+            </button>
+        </span>
+        <span class="col-md-1" style="width: 3.2em; padding-right: 0;">
+            <p class="text-right">
+            <label class="control-label">容量</label>
+            </p>
+        </span>
+            <span class="col-md-2" style="min-width: 8em;">
+            <input type="number" class="form-control" name="capacities[]" min="0" value="{if $device_type && $device_type['cargo_lanes'][0]}{php echo $device_type['cargo_lanes'][0]['capacity']}{/if}" required/>
+        </span>
+        <span class="col-md-1 operate">
+            <i class="fa fa-lock disabled control-label" title="默认货道无法删除！"></i>
+        </span>
+            </div>
+        </div>
+        {if $device_type['cargo_lanes'] && count($device_type['cargo_lanes']) > 1}
+        {loop $device_type['cargo_lanes'] $index $item}
+        {if $index > 0}
+        <div class="form-group w-33">
+            <label class="col-md-2 control-label"><span class="J_carCount">{php echo $index + 1}</span>货道</label>
+            <div class="col-md-10">
+                <select class="col-md-4" name="goods[]"  id="J_select{php echo $index + 1}">
+                    <option value="0">&lt;选择商品&gt;</option>
+                    {if  $item['goods_profile']}
+                    <option value="{$item['goods_profile']['id']}" selected>
+                        {$item['goods_profile']['name']}{if $item['goods_profile']['agent']} &lt;代理商：{$item['goods_profile']['agent']['name']}>{/if}
+                        </option>
+                    {/if}
+                </select>
+                <span class="col-md-4 r-3">
+                    <input type="text" class="form-control s-input" id="J_input{php echo $index + 1}" placeholder="关键词">
+                    <button class="btn btn-default J_searchBtn" data-id="{php echo $index + 1}">
+                        <i class="fa fa-search" title="搜索商品"></i>
+                    </button>
+                </span>
+                <span class="col-md-1" style="width: 3.2em; padding-right: 0;">
+                    <p class="text-right">
+                        <label class="control-label">容量</label>
+                    </p>
+                </span>
+                <span class="col-md-2" style="min-width: 8em;">
+                    <input type="number" class="form-control" name="capacities[]" value="{$item['capacity']}" min="0" required/>
+                </span>
+                <span class="col-md-1 operate">
+                    <i class="fa fa-trash-o control-label remove_cargo" title="删除？"></i>
+                </span>
+            </div>
+        </div>
+        {/if}
+        {/loop}
+        {/if}
+    </div>
+    <div class="form-group pull-right" id="cargolaneDiv">
+        <div class="col-md-12">
+            <button class="btn btn-success" type="button" title="增加货道" id="addCargoLane"><i class="fa fa-inbox"></i>&nbsp;增加货道</button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="form-group pull-right">
+        <div class="col-md-12">
+            {if $device_type}
+            <input type="hidden" name="id" value="{php echo $device_type?$device_type['id'] : 0}">
+            {/if}
+            <button type="button" class="btn btn-primary" onclick="saveDeviceTypes()">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>
+<script>
+    $(function(){
+        var open_id = 0;
+        $('#find_agent').click(function () {
+            const keyword = $('input[name=keyword_agent]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                op: 'search',
+                keyword: keyword
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    var isSelected = '';
+                    list.forEach(function (e) {
+                        isSelected = '';
+                        if (e.openid == open_id) {
+                            isSelected = 'selected = "selected"';
+                        }
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.openid)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', isSelected);
+                    })
+                }
+                isSelected = '';
+                if (0 == open_id) {
+                    isSelected = 'selected = "selected"';
+                }
+                html += '<option value="0" ' + isSelected + '><不限></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function () {
+                util.loaded();
+            })
+        })
+    })
+</script>

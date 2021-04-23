@@ -1,0 +1,33 @@
+<div id="commission-log">
+{if $logs}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th style="width:6em;">变动</th>
+            <th style="text-align: center;">说明</th>
+            <th style="width:12em;">时间</th>
+        </tr>
+    </thead>
+    <tbody>
+        {loop $logs $index $item}
+        <tr>
+            <td>{php echo $index + 1}</td>
+            <td>
+                <span style="color:{if $item['xval'] > 0}green;{else}red;{/if}">{$item['xval']}</span>
+            </td>
+            <td>{$item['memo']}</td>
+            <td>{$item['createtime']}</td>
+        </tr>
+        {/loop}
+    </tbody>
+</table>
+<div id="log-pager"  class="dialog_pager pull-right">
+{$pager}
+</div>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时没有任何佣金记录！
+</div> 
+{/if}
+</div>

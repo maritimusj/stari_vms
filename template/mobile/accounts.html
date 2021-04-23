@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{$tpl['site']['title']}</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		{if $tpl['slides']}
+		{php \zovye\url(true, CSS_SWIPER_URL);}
+		{/if}
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				height: 100%;
+			}
+			
+			body {
+				background: #fff;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #000;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			
+			.top-view {
+				width: 100%;
+				height: 90vw;
+				background-color: rgb(255, 210, 36);
+			}
+			
+			.qrcode-view {
+				width: 100%;
+				height: 100vw;
+				background-color: rgb(255, 210, 36);
+				border-radius: 50%;
+				position: absolute;
+				left: 0;
+				top: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.small-qrcode-view {
+				width: 80%;
+				height: 80%;
+				border-radius: 50%;
+				border: 5px solid #fff;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-image: url("{MODULE_URL}static/img/more_accounts.jpg");
+				background-size: 100% 100%;
+				-moz-background-size: 100% 100%;
+				-webkit-background-size: 100% 100%;
+			}
+			
+			.qrcode {
+				width: 50%;
+				height: 50%;
+			}
+			
+			.content-view {
+				width: 100%;
+				height: calc(100vh - 70vw - 45vw);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.desc1 {
+				margin: 0 20px;
+				font-size: 16px;
+				text-align: center;
+			}
+			
+			.desc1 b{
+			    font-size: 2em;
+			    color: #f00;
+			    margin: 0 3px;
+			}
+			
+			.desc2 {
+				margin-top: 20px;
+				text-align: center;
+				border: 1px solid #555;
+				border-radius: 10px;
+				padding: 5px 20px;
+				font-size: 18px;
+				font-weight: 500;
+			}
+			
+			.name {
+				color: #FFD224;
+				font-size: 22px;
+				padding: 0 10px;
+				font-weight: 500;
+			}
+			
+			#swiper-container {
+				width: 100%;
+				height: 45vw;
+				position: absolute;
+				left: 0;
+				bottom: 0;
+			}
+			
+			.img {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.qrcode-hidden {
+			    position: absolute;
+			    left: 0;
+			    top: 0;
+			    width: 100%;
+			    height: 100%;
+			    opacity: 0;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div class="top-view"></div>
+		<div class="qrcode-view">
+			<div class="small-qrcode-view">
+				<img class="qrcode" src="{media $tpl['accounts'][0]['img']}" />
+			</div>
+		</div>
+		<div class="content-view"{if empty($tpl['slides'])} style="height: 50%;"{/if}>
+		    <span style="color:gray;font-size:14px;">长按图片识别二维码</span>
+			<span class="desc1">「 还需关注<b>{php echo count($tpl['accounts'])}</b>个公众号 」</span>
+			<span class="desc2">
+				{php echo  $tpl['accounts'][0]['descr'] ?: '长按图片识别二维码'}
+				<img src="{media $tpl['accounts'][0]['img']}" class="qrcode-hidden" />
+			</span>
+		</div>
+		{if $tpl['slides']}
+		<div id="swiper-container" class="swiper-container">
+			<div class="swiper-wrapper ">
+			    {loop $tpl['slides'] $index $item}
+				<div class="swiper-slide bg-swiper-slide">
+					<img class="img " src="{$item['image']}" />
+				</div>
+				{/loop}
+			</div>
+		</div>
+		{php \zovye\url(true, JS_SWIPER_URL);}
+		<script type="text/javascript">
+			var bg_swiper = new Swiper('#swiper-container', {
+				autoplay: {
+					delay: 5000,
+					disableOnInteraction: false
+				},
+				speed: 2000,
+				effect: 'fade'
+			});
+		</script>
+		{/if}
+	</body>
+
+</html>

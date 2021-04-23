@@ -1,0 +1,10 @@
+static/js/*.org.js
+inc/web/test.inc.php
+inc/mobile/test.inc.php
+inc/mobile/debug.inc.php
+zovye/pem
+.idea/
+update
+data/
+zovye/config.php
+.DS_Store

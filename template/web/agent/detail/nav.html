@@ -1,0 +1,18 @@
+<div style="margin-bottom: 1em;display: block;">
+    <div style="position:absolute;float:right;right:2em;top:5.5em;z-index:999;">
+        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative" title="微信昵称：{php echo $agent->getNickname();}，手机号码：{php echo $agent->getMobile()}">
+            <img src="{php echo $agent->getAvatar();}">
+            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            {if $agent->isAgent()}
+            <span class="agent-user">[ 代理商 ]</span>
+            {/if}
+        </div>        
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    {loop $pages $name $item}
+    <li role="presentation"{if ($pagename==$name)} class="active"{/if}>
+        <a href="{if ($pagename==$name)}#{else}{php echo $this->createWebUrl('agent', array('op'=>'detail', 'agentid' => $id, 'pagename'=>$name));}{/if}">{$item['title']}</a>
+    </li>
+    {/loop}
+</ul>

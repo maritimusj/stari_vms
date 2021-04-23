@@ -1,0 +1,237 @@
+<style>
+    #userDialog .searchUserResult{
+        display: flex;
+        flex-wrap: wrap;
+        transition: all 0.5s;
+    }
+    #userDialog .searchUserResult .profile,  #userDialog .searchUserResult .btn-page{
+        display: flex;
+        align-items: center;
+        border-radius: 2em;
+        border: 3px solid rgba(204, 204, 204, 0.5);
+        padding: 2px 1em 2px 2px;
+        margin: 3px;
+        cursor: pointer;
+        user-select: none;
+    }
+    #userDialog .profile.selected {
+        border: 3px solid #fff;
+        background-color: #607D8B;
+        color: #fff;
+        box-shadow: 0 0 1px 2px #607D8B;
+    }
+    #userDialog .searchUserResult .profile.selected:hover{
+        box-shadow: 0 0 1px 2px #607D8B;
+    }
+    #userDialog .searchUserResult .profile:active,
+    #userDialog .searchUserResult .btn-page:active {
+        transform: translate3d(0, 2px, 0);
+    }
+    #userDialog .searchUserResult .profile:hover,  #userDialog .searchUserResult .btn-page:hover{
+        color: #fff;
+        border-color: #fff;
+        background-color: #607D8B;
+         box-shadow: 0 0 1px 2px #607D8B;
+    }
+
+    #userDialog .searchUserResult .btn-page{
+        width: 45px;
+        height: 45px;
+        padding: 3px 9px;
+        border-color: #ddd;
+        background-color: #607D8B;
+        color: #fff;
+    } 
+
+    #userDialog .searchUserResult .btn-page:hover{
+        border-color: #fff;
+    }
+    
+    #userDialog .searchUserResult .profile img{
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+    }
+</style>
+<div class="modal fade" tabindex="-1" role="dialog" id="userDialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form" onkeydown="if(event.keyCode===13){searchDlg.doSearch();return false;}">
+          <div class="form-group">
+                <label for="search_user_keywords" class="col-md-2">昵称/手机</label>
+                <div class="col-md-7">
+                    <input type="text" class="form-control" id="search_user_keywords" placeholder="请输入用户昵称或手机号码">
+                </div>  
+                <button type="button" class="btn btn-default col-md-1" onclick="searchDlg.doSearch()"><i class="fa fa-search"></i></button>
+          </div>
+          <div class="searchUserResult">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-Ok">确定</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/html" id="userProfileTpl">
+    <div class="profile_4_" data-id="_1_" data-nickname="_2_" title="_5_点击选择或取消">
+        <img src="_3_">
+        <div class="nickname">_2_</div>
+    </div>
+</script>
+<script>
+    const searchDlg =  {
+        titles : {user:'查找用户', agent:'查找代理商'},
+        usertype: 'user',
+        multiSel: false,
+        page: 0,
+        selected:[],
+        params: '',
+        isSelected: null,
+        resultFn: function(result){ console.log(result)},
+        init : function(usertype, result) {
+            searchDlg.usertype = usertype || 'user';
+            
+            $('#userDialog .modal-title').html(searchDlg.titles[usertype] || searchDlg.titles['user']);
+            if(typeof result == 'function') {
+                searchDlg.resultFn = result;
+            }
+            
+            $('#userDialog .btn-Ok').click(function(){
+                searchDlg.resultFn(searchDlg.selected, searchDlg.params);
+                searchDlg.hide();
+            })
+            
+            $('#userDialog .searchUserResult').on('click', '.profile', function(){
+                const self = $(this);
+                const id = self.data('id');
+                
+                if(self.hasClass('selected')) {
+                    if(searchDlg.multiSel) {
+                        searchDlg.selected = searchDlg.selected.filter(function(u){
+                            return u.id !== id;
+                        })
+                    }else{
+                       searchDlg.selected = null; 
+                    }
+                } else {
+                    const user = {id: id, nickname: self.data('nickname'), avatar: self.find('img').attr('src')};
+                    if(searchDlg.multiSel) {
+                        const pos = searchDlg.selected.findIndex(function(u) {
+                            return u.id === id;
+                        });
+                        if(pos === -1) {
+                           searchDlg.selected.push(user);
+                        }                        
+                    }else{
+                        searchDlg.selected = user;
+                        self.siblings().removeClass('selected');
+                    }
+                }
+                self.toggleClass('selected');
+            })
+            
+            $('#userDialog').on('click', '.btn-page', function(){
+                if($(this).hasClass('next-page')) {
+                    searchDlg.doSearch(searchDlg.page + 1);
+                }else if($(this).hasClass('pre-page')) {
+                    searchDlg.doSearch(searchDlg.page - 1);
+                }
+            })
+            
+            $('#userDialog').on('hidden.bs.modal', function (e) {
+              $('#userDialog .searchUserResult').html("");
+              $("#userDialog input[id=search_user_keywords]").val("")
+            })
+        },
+        doSearch: function (page) {
+            $("#userDialog .searchUserResult").html("");
+            const seachType = 'search_' + searchDlg.usertype;
+            if(searchDlg[seachType]) {
+                (searchDlg[seachType])(page);
+            }
+        },
+        apiQuery: function(type, page) {
+            const keywords = $("#userDialog input[id=search_user_keywords]").val();
+            $.getJSON("{url 'site/entry/user' array('m' => APP_NAME)}", 
+                {   op: 'search', 
+                    passport: type, 
+                    keywords:keywords,
+                    page: page || 1,
+                    
+                }).then(function(res){
+                    searchDlg.showResult(res);
+            });            
+        },
+        search_agent: function (page) {
+             searchDlg.apiQuery('agent', page);
+        },
+        search_user: function (page) {
+             return searchDlg.apiQuery('', page);
+        },
+        nextpage: function(){
+            searchDlg.doSearch(searchDlg.page + 1);
+        },
+        prepage: function() {
+            searchDlg.doSearch(searchDlg.page - 1);
+        },
+        showResult: function(res) {
+            let str = '';
+            if(res) {
+                if(res.page) {
+                    searchDlg.page = res.page;
+                }
+                const tpl = $('#userProfileTpl').html();
+                (res.list || []).forEach(function(entry) {
+                    str += tpl.replace(/_1_/g, entry['id']).
+                            replace(/_2_/g, entry['nickname']).
+                            replace(/_3_/g, entry['avatar']).
+                            replace(/_4_/g, searchDlg.isSelected(entry)).
+                            replace(/_5_/g, entry['mobile'] ? '手机号码：' + entry['mobile'] + '，' : '');
+                })
+                
+                if(res.page < res.totalpage) {
+                    str += '<div class="btn-page next-page" title="下一页">&gt;&gt;</div>'
+                }
+
+                if(res.page > 1) {
+                    str = '<div class="btn-page pre-page" title="上一页">&lt;&lt;</div>' + str;
+                }
+            }
+            $("#userDialog .searchUserResult").html(str);
+        },
+        hide: function() {
+            $('#userDialog').modal('hide');
+            searchDlg.selected = null;
+            searchDlg.multiSel = false;
+            searchDlg.isSelected = null;
+        },
+        choose: function (params) {
+            searchDlg.multiSel = false;
+            searchDlg.selected = null;
+            searchDlg.isSelected = function(user) {
+                return user && user.id && searchDlg.selected && searchDlg.selected.id === user.id ? ' selected':'';
+            };
+            searchDlg.params = params;
+            $('#userDialog').modal('show');
+        },
+        chooseMulti: function (params) {
+            searchDlg.multiSel = true;
+            searchDlg.selected = [];
+            searchDlg.isSelected = function(user) {
+                return user && searchDlg.selected.findIndex(function(u){
+                    return u.id === user.id;
+                }) !== -1 ? ' selected' : '';
+            };
+            searchDlg.params = params;
+            $('#userDialog').modal('show');
+        },        
+    };
+</script>

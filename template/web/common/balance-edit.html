@@ -1,0 +1,35 @@
+<form class="form-horizontal" id="editUserBalanceForm">
+    <div class="form-group">
+        <div class="col-md-2">
+        </div>
+        <div class="col-md-10">
+        <div class="profile{if $user['agent']} agent {$user['agent']['level']}{/if}">
+            <img src="{$user['avatar']}" />
+            <div>
+                <span class="nickname">
+                    {php echo $user['nickname']?:'&lt;匿名用户&gt;'}
+                </span>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="total" class="col-md-2 control-label">金额（元）</label>
+        <div class="col-md-10">
+          <input type="text" class="form-control" id="total" name="total"  required>
+          <span class="help-block">* 金额不能为零，正数增加用户余额，负数减少用户余额。</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="memo" class="col-md-2 control-label">说明</label>
+        <div class="col-md-10">
+          <input type="text" class="form-control" id="memo" name="memo" value="" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <button type="button" class="btn btn-primary" onclick="api.saveUserBalanceLog({$user['id']})">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

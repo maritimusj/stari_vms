@@ -1,0 +1,98 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
+          <div class="form-group">
+            <label for="keywords"></label>
+            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入关键字查找..." value="{$keywords}">
+          </div>
+          <input type="hidden" name="type" value="{$type}">
+          {if isset($filter_agentId)}
+          <input type="hidden" name="agentId" value="{$filter_agentId}">
+          {/if}
+          {if $filter_media}
+          <input type="hidden" name="media" value="{$filter_media}">
+          {/if}
+          <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+        </form>
+    </div>
+</div>
+{if $import_notice}
+<div class="alert alert-warning alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {$import_notice}
+  <div style="padding: 2em 0;">
+    <a type="button" class="btn btn-primary" href="{php echo $this->createWebUrl('adv', array('op' => 'import_advs'));}">确定</a>
+    <a type="button" class="btn btn-default" href="{php echo $this->createWebUrl('adv', array('op' => 'import_advs', 'cancel' => 1));}">取消</a>
+  </div>
+</div>
+{/if}
+<script>
+    $(function(){
+        $('#search-form').submit(function(){
+            const url = $(this).attr("action");
+            const keywords = $(this).find("input[name=keywords]").val();
+            location.href = url + "&keywords=" + encodeURIComponent(keywords);
+            return false;
+        })
+    })
+</script>
+<ul class="nav nav-tabs" id="navbar">
+    {loop $navs $index $e}
+        {if $e['type'] == zovye\Advertising::SCREEN && $type == $e['type']}
+            {if isset($filter_agentId) || $filter_media}
+                <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => zovye\Advertising::SCREEN));}">设备屏幕</a></li>
+                {if isset($filter_agentId) && $filter_media}
+                    <li role="presentation">
+                        <a href="{php echo $this->createWebUrl('adv', array('type' => zovye\Advertising::SCREEN, 'agentId'=>$filter_agentId));}">
+                            {php echo $filter_agent?$filter_agent->getName():'平台'}的<b>设备屏幕广告</b>
+                        </a>
+                    </li>
+                {/if}
+                <li role="presentation" class="active">
+                    <a href="#">
+                        <span class="x">
+                            {if isset($filter_agentId)}{php echo $filter_agent?$filter_agent->getName():'平台'}{if !$filter_media}<b>设备屏幕广告</b>{/if}{/if}{if $filter_media}{if isset($filter_agentId)}的{/if}<b>{$media_data[$filter_media]['title']}</b><b>设备屏幕广告</b>{/if}
+                        </span>
+                    </a>
+                </li>
+            {else}
+                <li role="presentation" class="active"><a href="#">{$e['title']}</a></li>
+            {/if}
+        {else}
+            {if $type == $e['type']}
+                {if isset($filter_agentId)}
+                    <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => $e['type']));}">{$e['title']}</a></li>
+                    
+                    {if $e['type'] == zovye\Advertising::PUSH_MSG && $filter_msgtype}
+                        <li role="presentation" class="active">
+                            <a href="#">
+                                {php echo $filter_agent?$filter_agent->getName():'平台'}的<b>{$wx_data[$filter_msgtype]['title']}消息推送广告</b>
+                            </a>
+                        </li>                        
+                    {else}
+                        <li role="presentation" class="active">
+                            <a href="#">
+                                {php echo $filter_agent?$filter_agent->getName():'平台'}的<b>{$e['title']}广告</b>                       
+                            </a>
+                        </li>
+                    {/if}
+                {else}
+                    {if $e['type'] == zovye\Advertising::PUSH_MSG && $filter_msgtype}
+                    <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => $e['type']));}">{$e['title']}</a></li>
+                    <li role="presentation" class="active">
+                        <a href="#">
+                            <b>{$wx_data[$filter_msgtype]['title']}{$e['title']}广告</b>
+                        </a>
+                    </li>
+                    {else}
+                        <li role="presentation" class="active"><a href="#">{$e['title']}</a></li>
+                    {/if}                    
+                {/if}
+            {else}
+                <li role="presentation"><a href="{php echo $this->createWebUrl('adv', array('type' => $e['type']));}">{$e['title']}</a></li>
+            {/if}
+       
+        {/if}
+
+    {/loop}
+</ul>

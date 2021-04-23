@@ -1,0 +1,37 @@
+{if $m_all}
+<table class="table table-bordered table-hover" style="margin-top:1em;text-align:center;">
+<thead>
+ <tr class="active">
+    <th style="text-align:center;">月份</th>
+    <th style="text-align:center;">免费</th>
+    <th style="text-align:center;">收费</th>
+    <th style="text-align:center;">
+        {php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'}
+    </th>
+    <th style="text-align:center;">小计</th>
+</tr>                           
+</thead>
+{loop $m_all $i $item}
+{php $total_x = $total_x + $item['total'];}
+<tr data-id="{php echo ($agent ? $agent->getId() : 0) . ':' . $i}">
+   <td class="operate">{$i} <i class="fa fa-wrench" title="修复" data-op="repair"></i></td>
+   <td>{$item['free']}</td>
+   <td>{$item['fee']}</td>
+   <td>{$item['balance']}</td>
+   <td>{$item['total']}</td>
+</tr>
+{/loop}
+<tr>
+<td colspan="5">
+    <div  class="pull-right">
+        总计：{$total_x}
+        {php $total_x = 0;}        
+    </div>
+</td> 
+</tr>
+</table>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时没有统计信息！
+</div> 
+{/if}

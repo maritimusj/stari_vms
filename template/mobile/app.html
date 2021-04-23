@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>设备注册</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		{php \zovye\url(true, CSS_MUI_URL);}
+    </head>
+    <body>
+        <header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon"></a>
+			<h1 class="mui-title">请选择要注册的设备</h1>
+			<a id="scan" class="mui-icon mui-icon-eye mui-pull-right" style="color: #999;"></a>
+		</header>
+		<div class="mui-content">
+           
+                {if $devices}
+                 <div class="mui-card">
+				<ul class="mui-table-view" id="deviceslist">
+                {loop $devices $index $device}
+					<li class="mui-table-view-cell">
+						<ul class="mui-table-view">
+							<li class="mui-table-view-cell">
+							    <h4>名称：{$device['name']}</h4>
+							</li>
+							<li class="mui-table-view-cell">
+							    IMEI：{$device['IMEI']}							    
+							    <button type="button" class="mui-btn mui-btn-danger mui-btn-outlined" data-id="{$device['IMEI']}" style="float:right;">
+						                注册</button>
+							</li>
+							
+						</ul>
+					</li>
+                {/loop}
+				</ul>
+				</div>	
+				{else}
+                    <div style="text-align:center;color:#ccc;margin:2em;">
+                        暂时没有可选设备
+                    </div> 
+				{/if}
+				    
+		</div>
+		{php \zovye\url(true, JS_MUI_URL);}
+        {$js_code}
+        <script>
+            const appId = "{php echo $appId ?: ''}";
+          
+            function bindDevice(appId, deviceId) {
+		        mui.confirm("确定要把此app注册到该设备吗？\r\n\r\nAppID: [ " + appId + " ]\r\nDeviceID: [ " + deviceId + " ]\r\n\r\n", "注册确认", ['确认', '取消'], function(e){
+		            if(e.index === 0) {
+		                mui.getJSON("{php echo $this->createMobileUrl('app');}", {op:'bind', id:deviceId, appId:appId}, function(data){
+		                    if(data && data['msg']) {
+		                        mui.alert(data['msg'], '结果', ['确定'], function(){
+		                            if(data['status'] && wx) {
+		                                wx.closeWindow()
+		                            }
+		                        })
+		                    }
+		                })
+		            }
+		        })                
+            }
+            
+            function scanDevice(){
+                wx.scanQRCode({
+                    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+                    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+                    success: function (res) {
+                        const str = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+						if (str) {
+							const v = str.match(/(app=|id=|\?)(\w{3,})/i);
+							const id = v ? v[2] : str;
+							bindDevice(appId, id);
+						}
+                    }
+                })
+            }
+
+		    wx.ready(function(){
+			    wx.hideAllNonBaseMenuItem();
+    		    {if empty($devices)}
+    		        setTimeout('scanDevice()', 500);
+    		    {/if}
+			})
+			
+			mui.init();
+			mui.ready(function(){
+			    document.title = "appID:" + appId;
+                mui("#deviceslist").on('click', '.mui-btn', function(){
+                    const deviceId = this.dataset["id"];
+                    if(deviceId) {
+                        bindDevice(appId, deviceId);
+                    }
+                })
+           
+			    const scanBtn = document.getElementById('scan');
+			    if(scanBtn) {
+			        scanBtn.addEventListener('tap', scanDevice);
+			    }
+            })
+		</script>
+    </body>
+</html>

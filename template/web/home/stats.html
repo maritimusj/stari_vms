@@ -1,0 +1,43 @@
+<div class="panel panel-default" >
+    <table class="table table-bordered" id="list">
+        <thead>
+        <tr class="active">
+            <td>设备</td>
+            <td>在线</td>
+            <td>离线</td>
+            <td>用户</td>
+            <td>代理商</td>
+            <td>广告</td>
+        </tr>
+        </thead>
+        <tr>
+            <td>{$data['total']['device']} 台</td>
+            <td>{$device_stat['on']} 台</td>
+            <td>{$device_stat['off']} 台</td>
+            <td>{$data['total']['user']} 人</td>
+            <td>{$data['total']['agent']} 人</td>
+            <td>{$data['total']['advs']} 个</td>
+        </tr>
+    </table>
+    <table class="table table-bordered" id="list">
+        <thead>
+        <tr class="active">
+            <td></td>
+            {loop $stats_titles $key $s_title}
+            <td>{$s_title}</td>
+            {/loop}
+        </tr>
+        </thead>
+
+        {loop $rows $index $row}
+        <tr>
+            <td  class="active">{$row['title']}</td>
+            {loop $stats_titles $key $s_title}
+            <td>
+                {$data['stats'][$key][$index]} {$row['unit']}
+            </td>
+            {/loop}
+        </tr>
+        {/loop}
+    </table>
+</div>

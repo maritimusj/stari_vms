@@ -1,0 +1,581 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #userlist td div.stats{
+        text-align: center;
+        padding: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    {loop $agent_levels $index $data}
+    .profile.agent.{$index} {
+    border-top-color: {$data['clr']};
+    border-bottom-color: {$data['clr']};
+    background-color: {$data['clr']};
+    }
+    .profile.agent.{$index} .agent-user{
+    background-color: {$data['clr']};
+    }
+    .partner-user {
+        margin-left: 10px;
+        color: gray;
+    }
+    {/loop}
+
+    .commission_log i.fa-list, .commission_log i.balance-edit {
+        display: none;
+        color: #fff;
+        margin-left: 6px;
+    }
+
+    .commission_log i.fa-list, .commission_log i.balance-edit{
+        display: inline;
+    }
+
+    .fa-weixin {
+        color: #4CAF50;
+    }
+    svg[data-icon="alipay"]{
+        color: #03A9F4;
+        width: 1.5em;
+    }
+    #search-form {
+        display: none;
+    }
+    span.tester-user {
+        color: #8bc34a;
+    }
+    [data-url] {
+        cursor: pointer;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    {if empty($s_principal)}
+    <li role="presentation" class="active"><a href="#">全部用户</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user');}">全部用户</a></li>
+    {/if}
+    {if $s_principal=='agent'}
+    <li role="presentation" class="active"><a href="#">代理商</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'agent'));}">代理商</a></li>
+    {/if}
+    {if $s_principal=='partner'}
+    <li role="presentation" class="active"><a href="#">合伙人</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'partner'));}">合伙人</a></li>
+    {/if}
+    {if $s_principal=='keeper'}
+    <li role="presentation" class="active"><a href="#">运营人员</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'keeper'));}">运营人员</a></li>
+    {/if}
+    {if $s_principal=='tester'}
+    <li role="presentation" class="active"><a href="#">测试人员</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'tester'));}">测试人员</a></li>
+    {/if}
+    {if $commission_enabled}
+    {if $s_principal=='gspor'}
+    <li role="presentation" class="active"><a href="#">佣金用户</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('user', array('s_principal' => 'gspor'));}">佣金用户</a></li>
+    {/if}
+    {/if}
+</ul>
+<div class="panel panel-default{if empty($s_principal)} panel-first{/if} nav-tab-item">
+    <div class="panel-body">
+        <div id="search-bar">
+            <div class="text-input">
+                <span>根据条件搜索用户 ...</span>
+                <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+            </div>
+        </div>
+        <div id="search-form">
+            <form action="{php echo $this->createWebUrl('user', array('op'=>'default'));}" method="post">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">来源</label>
+                    <div class="col-md-10" id="other">
+                        <label>
+                            <input type="checkbox" name="s_type_wx" value="1" {if $s_type_wx} checked{/if}>
+                            微信
+                        </label>                              
+                        <label>
+                            <input type="checkbox" name="s_type_wxapp" value="1" {if $s_type_wxapp} checked{/if}>
+                            微信小程序
+                        </label>                        
+                        <label>
+                            <input type="checkbox" name="s_type_ali" value="1" {if $s_type_ali} checked{/if}>
+                            支付宝
+                        </label>
+                        <label>
+                            <input type="checkbox" name="s_type_api" value="1" {if $s_type_api} checked{/if}>
+                            第三方API用户
+                        </label>                        
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">关键字</label>
+                    <div class="col-md-8">
+                        <input name="s_keywords"  class="form-control" type="text" value="{$s_keywords}" placeholder="请输入用户昵称或者手机号码" style="width: 100%;"/>
+                    </div>
+                    <div class="col-md-2">
+                        {if $s_principal}
+                        <input name="s_principal" type="hidden" value="{$s_principal}" />
+                        {/if}
+                        <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                        <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {if $users}
+        <table class="table" id="userlist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>昵称</th>
+                {if $commission_enabled}
+                <th style="width: 200px;">账户余额</th>
+                {/if}
+                <th>来源</th>                
+                {if $principal == 'partner' || $principal == 'keeper'}
+                <th>代理商</th>
+                {/if}
+                {if $credit_used}
+                <th>积分</th>
+                {/if}
+                {if $balance_used}
+                <th>
+                    <span data-orderby="balance" {if $orderby=='balance'}class="fa {$order}"{/if}>余额({$balance['title']})</span>
+                </th>
+                {if $prize_used}
+                <th>
+                    <span data-orderby="prize_total" {if $orderby=='prize_total'}class="fa {$order}"{/if}>奖品</span>
+                </th>
+                {/if}
+                {/if}
+                <th>
+                    <div>订单数量</div>
+                    <div><span data-orderby="free_total" {if $orderby=='free_total'}class="fa {$order}"{/if}>免费</span>
+                        /
+                        <span data-orderby="fee_total" {if $orderby=='fee_total'}class="fa {$order}"{/if}>支付</span>
+                        /
+                        {if $balance_used}
+                        <span data-orderby="balance_total" {if $orderby=='balance_total'}class="fa {$order}"{/if}>余额</span></div>
+                    {else}
+                    其它
+                    {/if}
+    </div>
+    </th>
+    <th><span data-orderby="createtime" {if $orderby=='createtime'}class="fa {$order}"{/if}>加入时间</span></th>
+    <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {loop $users $index $item}
+    <tr class="{$user_state_class[$item['state']]}" data-id="{$item['id']}">
+        <td>
+            {if $item['isLocked']}
+            <div class="operate">
+                <i class="fa fa-lock" data-op="unlock"></i>
+            </div>
+            {else}
+            {php echo $index + 1}
+            {/if}
+        </td>
+        <td>
+            <div class="profile{if $item['agent']} agent {$item['agent']['level']}{/if}"{if $item['from']} title="{$item['from']}"{/if}>
+                <img src="{$item['avatar']}" />
+                <div>
+                    <span class="nickname">
+                        {php echo $item['nickname']?:'&lt;匿名用户&gt;'}
+                        {if $item['verified']}
+                        <i class="fa fa-bookmark" style="color:#8BC34A;" title="已通过实名认证"></i>
+                        {/if}
+                    </span>
+                    {if $item['agent']}
+                    <span class="agent-user">[ {php echo $item['agent']['title']} ]</span>
+                    {/if}
+                    {if $item['isPartner']}
+                    <a href="{php echo $this->createWebUrl('agent', array('op'=>'partner', 'id'=>$item['partnerAgent']['id']));}">
+                        <span class="partner-user" title="{$item['partnerAgent']['level']['title']}合伙人" style="color:{$item['co_agent']['level']['clr']}">
+                            <i class="fa fa-users"></i>
+                        </span>
+                    </a>
+                    {/if}
+                    {if $item['isTester']}
+                    <span class="tester-user">
+                        <i class="wi wi-system-info" title="测试员"></i>
+                    </span>                
+                    {/if}
+                    <div>
+                        {if $item['mobile']}
+                        <span class="mobile" data-mobile="{$item['mobile']}" title="点击复制"><i class="fa fa-mobile"></i> {$item['mobile']}</span>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </td>
+{if $commission_enabled}
+<td>
+    <div class="commission_log" style="display:none;">
+    </div>
+</td>
+{/if}
+<td>
+    <span class="fa fa-ali fa-fw" data-url="{$item['openid']}">
+        <img src="{$item['type']['icon']}" style="width:inherit;" title="{$item['type']['title']} {$item['openid']}">
+    </span>
+</td>
+{if $principal == 'partner' || $principal == 'keeper'}
+<td>
+    <div class="agent" style="display:inline-block;">
+        <div class="profile" style="background-color:{$item['co_agent']['level']['clr']}">
+            <img src="{$item['co_agent']['headimgurl']}" alt="">
+            <div class="nickname">{php echo cutstr($item['co_agent']['name'], 10, true);}</div>
+        </div>
+    </div>
+</td>
+{/if}
+{if $credit_used}
+<td>
+    {$item['credit']}
+</td>
+{/if}
+{if $balance_used}
+<td class="operate">
+    <span>{$item['balance']} <i class="fa fa-tint balance_log" title="点击查看余额变动记录..." data-op="balanceLog"></i></span>
+</td>
+{if $prize_used}
+<td class="operate">
+    <span>{$item['prizeNum']} <i class="fa fa-gift" title="点击查看奖品记录..." data-op="giftLog"></i></span>
+</td>
+{/if}
+{/if}
+<td class="operate">
+    <div class="stats">
+        <div>
+            <span class="free">{php echo isset($item['orders']) ? $item['orders']['free'] : '<i class="fa fa-spinner fa-spin"  title="加载中..."></i>'}</span>/<span class="fee">{php echo isset($item['orders']) ? $item['orders']['fee'] : '<i class="fa fa-spinner fa-spin"  title="加载中..."></i>'}</span>/<span class="balance">{php echo isset($item['orders']) ? $item['orders']['balance'] : '<i class="fa fa-spinner fa-spin"  title="加载中..."></i>'}</span>
+
+            <i class="fa fa-list" title="查看订单列表..." data-op="orderList"></i>
+        </div>
+    </div>
+</td>
+<td>{$item['createtime']}</td>
+<td class="operate">
+    <div class="btn-group">
+        <a class="btn btn-default" href="#" title="{php echo $item['banned']?'启用':'禁用'}" data-op="userBan">
+            <i class="fa fa-ban"> </i>
+        </a>
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+            <span class="fa fa-caret-down"></span></a>
+        <ul class="dropdown-menu">
+            {if $item['isKeeper']}
+            <li><a href="{php echo $this->createWebUrl('user', array('op'=>'keeper', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的运营人员身份吗？')){return false;}"><i class="fa fa-user-times fa-fw"></i> 取消运营人员</a></li>
+            <li><a href="#" data-op="keeperDevices" ><i class="fa fa-hdd-o fa-fw"></i> 运营的设备</a></li>
+            <li><a href="#" data-op="keeperReplenish" ><i class="fa fa-sign-in fa-fw"></i> 补货记录</a></li>
+            <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>
+            {/if}
+            {if $item['isAgent']}
+                <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的代理商身份吗？')){return false;}"><i class="fa fa-diamond fa-fw"></i> 取消代理商身份</a></li>
+                <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>
+            {else}
+                {if empty($item['isPartner'])}
+                <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'create', 'id'=>$item['id']));}"><i class="fa fa-diamond fa-fw"></i> 设置代理商</a></li>
+                {else}
+                <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'partner_remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消合伙人身份吗？')){return false;}"><i class="fa fa-users fa-fw"></i> 取消合伙人身份</a></li>
+                {/if}
+            {/if}
+            {if $item['isTester']}
+                <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的测试员身份吗？')){return false;}"><i class="wi wi-system-info fa-fw"></i> 取消测试员身份</a></li>
+            {else}
+                <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'create', 'id'=>$item['id']));}"><i class="wi wi-system-info fa-fw"></i> 设置测试员</a></li>
+            {/if}
+            {if empty($item['isAgent']) && empty($item['isPartner']) && $item['mobile']}
+            <li role="separator" class="divider"></li>
+            <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
+            {/if}
+            <li role="separator" class="divider"></li>
+            {if $balance_used}
+            <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>
+            {/if}
+            <li><a href="#" data-op="orderList"><i class="fa fa-list fa-fw"></i> 领取记录</a></li>
+            {if $prize_used}
+            <li><a href="#" data-op="giftLog"><i class="fa fa-gift fa-fw"></i> 奖品列表</a></li>
+            {/if}
+            {if $item['verified']}
+            <li role="separator" class="divider"></li>
+            <li><a href="#" data-op="resetIDCardVerify"><i class="fa fa-bookmark fa-fw"></i> 清除实名认证</a></li>
+            {/if}
+        </ul>
+    </div>
+</td>
+</tr>
+{/loop}
+</tbody>
+</table>
+<div class="pull-right">
+    {$pager}
+</div>
+<script>
+    $(function(){
+        $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
+    });
+</script>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时还没有任何用户！
+</div>
+{/if}
+</div>
+</div>
+<script>
+    const api = {
+        url: "{php echo $this->createWebUrl('user');}",
+        ordersUrl: "{php echo $this->createWebUrl('order');}",
+        formUrl: "{php echo $this->createWebUrl('user', array('principal' => $principal))}",
+    }
+
+    require(["daterangepicker"], function () {
+        $(function () {
+            $(".daterange.daterange-date").each(function () {
+                const elm = this;
+                $(this).daterangepicker({
+                    startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                    endDate: $(elm).prev().val() || moment("不限", "Y"),
+                    format: "YYYY-MM-DD",
+                    clear: 1
+                }, function (start, end) {
+                    start = start.toDateStr().indexOf("0000-01-01") !== -1 ? "" : start.toDateStr();
+                    end = end.toDateStr().indexOf("0000-01-01") !== -1 ? "" : end.toDateStr();
+                    const html = (start === "" ? "不限时间" : start) + (start === "" && end === "" ? "" : (" 至" + end))
+                    $(elm).find(".date-title").html(html);
+                    $(elm).prev().prev().val(start);
+                    $(elm).prev().val(end);
+                })
+            })
+        })
+    })
+
+    api.showResult = function(params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function(res){
+            loading && util.loaded();
+            if(res) {
+                if(typeof cb == 'function') {
+                    if(cb(res)) {
+                        return;
+                    }
+                }
+                if(res.status) {
+                    if(res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if(res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if(res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status?'success':'error');
+                }
+            }
+        }).fail(function(){
+            loading && util.loaded();
+        })
+    }
+    
+    api.userBan = function(userid) {
+        const tr = $("tr[data-id='" + userid + "']");
+        api.showResult({op: 'ban', id: userid}, '', false, function(res){
+            const banned = res && res.data && res.data.banned;
+            tr.removeClass('normal banned').addClass(banned ? 'banned':'normal');
+            tr.find("[data-op=userBan]").attr('title', banned ? '启用':'禁用');
+        })
+    }
+
+    api.viewCommissionLog = function(userid) {
+        api.showResult({op: 'commission_log', id: userid}, "{php echo $this->createWebUrl('agent');}");
+    }
+
+    api.resetMobile = function(userid) {
+        if (confirm('确定要清除用户已登记的手机号码吗？')) {
+            api.showResult({op: 'reset_mobile', id: userid});
+        }
+    }
+    api.resetIDCardVerify = function(userid) {
+        if (confirm('确定要清除用户的实名认证信息吗？')) {
+            api.showResult({op: 'reset_idcard_verify', id: userid});
+        }
+    }
+    api.balanceLog = function(userid) {
+        api.showResult({op: 'balance_log', id: userid});
+    }
+
+    api.giftLog = function(userid) {
+        api.showResult({op: 'prize', id: userid});
+    }
+    api.orderList = function(id) {
+        api.showResult({user_id: id}, api.ordersUrl);
+    }
+    api.balanceEdit = function(id, event) {
+        api.showResult({userid: id, op: "balance_edit"});
+        event.stopPropagation();
+    }
+    api.saveUserBalanceLog = function(id) {
+        const total = $('input[name=total]').val();
+        const memo = $('input[name=memo]').val();
+        api.showResult({userid: id, total: total, memo: memo, op: "balance_edit_save"}, '', false, function(){
+            $('#modal-message').modal('hide');
+            api.getUserStats([id]);
+        })
+    }
+
+    api.getUserStats = function(ids) {
+        $.post(api.url, {op: 'user_stats', ids: ids}).then(function(res){
+            if(res && res.status && $.isArray(res.data)) {
+                $.each(res.data, function(i, stats){
+                    const tr = $('tr[data-id=' + stats.id + ']');
+                    tr.find('.stats .free').text(stats.free || 0);
+                    tr.find('.stats .fee').text(stats.fee || 0);
+                    tr.find('.stats .balance').text(stats.balance || 0);
+                    if (stats.commission_balance !== undefined) {
+                        tr.find('.commission_log').html(
+                            "<span class=\"price operate\">￥<b>" + stats.commission_balance_formatted + "</b> <i class=\"fa fa-list\"  data-op=\"viewCommissionLog\" title=\"点击查看详情...\"></i><i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='balanceEdit'></i></span>"
+                        ).show();
+                    }
+                })
+            }
+        })
+    }
+
+    api.keeperDevices = function(userid) {
+        api.showResult({op: 'keeper_device', id: userid});
+    }
+
+    api.keeperReplenish = function (userid) {
+        api.showResult({op: 'keeper_replenish', id: userid});
+    }
+
+    api.monthStat = function (userid) {
+        api.showResult({op: 'month_stat', id: userid});
+    }
+
+    api.unlock = function(userid) {
+        api.showResult({op: 'unlock', id: userid});
+    }
+
+    $(function(){
+        $('[data-url]').each(function(){
+            util.clip(this, $(this).data('url'));
+        })
+
+        const backer = "{$backer}";
+
+        $('#search-bar').click(function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=s_keywords]').focus();
+        })
+
+        $('#search-form .btn-close').click(function (e) {
+            if (backer) {
+                location.href = $('#search-form form').attr('action');    
+                setTimeout(function(){util.loading()}, 1000);               
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }       
+            e.preventDefault();     
+         })
+
+         if (backer) {
+            $('#search-bar').trigger('click');
+        }
+
+        function reloadPageWithFilter(fn) {
+            const params = new URLSearchParams();
+
+            const form = $("#search-form form");
+            const s_principal = form.find('input[name=s_principal]').val();
+            if (s_principal) {
+                params.append("s_principal", s_principal);
+            }
+            const s_keywords = $.trim(form.find('input[name=s_keywords]').val());
+            if (s_keywords) {
+                params.append("s_keywords", s_keywords);
+            }
+
+            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api'].forEach(stype => {
+                const s_type = $(form.find('[name=' + stype + ']:checked')).val();
+                if (s_type) {
+                    params.append(stype, s_type);
+                }                
+            })
+
+            if (typeof fn === 'function') {
+                fn(params);
+            }
+            location.href = form.attr("action") + "&" + encodeURI(params.toString());
+            setTimeout(function(){util.loading()}, 1000);
+        }
+
+        $("#search-form form").submit(function(e){
+            reloadPageWithFilter();            
+            e.preventDefault();
+        })
+         
+        $('#userlist').on('click', '[data-op]', function(e){
+            const op = $(this).data('op');
+            if(api[op]) {
+                const userid = $(this).closest('tr').data('id');
+                api[op](userid, e);
+            }
+            e.preventDefault();
+        })
+
+        $('[data-mobile]').each(function(){
+            util.clip(this, $(this).data('mobile'));
+        })
+
+        const ids = [];
+        $('#userlist [data-id]').each(function(){
+            ids.push($(this).data('id'));
+        })
+        if(ids) {
+            api.getUserStats(ids);
+        }
+        $("body").on('click', '#log-pager .pagination li:not(.active) a', function(e){
+            const url = $(this).attr("href");
+            $.getJSON(url).then(function(res){
+                if(res) {
+                    if(res.status) {
+                        const dlg = util.dialog(res.data.title || '变动记录', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', 'error');
+                        }
+                    }
+                }
+            })
+            e.preventDefault();
+        })
+
+        $("body").on('click', '#list .pagination li:not(.active) a', function(e){
+            e.preventDefault();
+
+            const url = $(this).attr("href");
+            api.showResult({}, url, false);
+        })
+
+        $("body").on('click', '#keeperDevice .pagination li:not(.active) a', function(e){
+            e.preventDefault();
+            const url = $(this).attr("href");
+            api.showResult({}, url, false);
+        })
+    })
+</script>
+{template 'common/footer'}

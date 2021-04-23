@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{$tpl['site']['title']}</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<style>
+			body {
+				background-color: #FFFFFF;
+			}
+			.top-view {
+				margin-top: 20%;
+				text-align: center;
+				font-size: 3em;
+				color: #000000;
+				font-weight: 400;
+			}			
+			.desc-view {
+				text-align: center;
+				margin-top: 20%;
+				font-size: 1.3em;
+				font-weight: 300;
+			}			
+			.img-view {
+				width: 60%;
+				margin: 20% auto;
+				text-align: center;
+			}			
+			.scan-img {
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mui-content" style="background-color: #FFFFFF;" >
+			<div class="top-view">扫一扫</div>
+			<div class="desc-view">请扫描现场设备上的二维码</div>
+			<div class="img-view">
+				<img class="scan-img" src="{MODULE_URL}static/img/lbz-bg-scan.png" />
+            </div>
+			<div style="text-align:center;color:#ccc;">
+                <div>{$tpl['site']['copyrights']}</div>
+                <div>version: {$tpl['theme']}</div>
+			</div>
+		</div>
+        {$tpl['js']['code']}
+        <script>
+            $('body').on('tap', function(){
+                zovye_fn.scan();
+            });
+        </script>
+	</body>
+</html>

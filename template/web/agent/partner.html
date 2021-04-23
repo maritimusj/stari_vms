@@ -1,0 +1,114 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #navbar a .profile {
+      cursor: default;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            <div class="agent" title="{$level['title']}" style="display:inline-block;">
+                <div class="profile" style="background-color:{$level['clr']}">
+                    <img src="{php echo $agent->getAvatar()}">
+                    <div class="nickname">{php echo $agent->getName();}</div>                            
+                </div>
+            </div>
+            的合伙人
+        </a>
+    </li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+        <span class="operate">
+            <i class="fa fa-user-plus" title="添加合伙人" onclick="showUserDlg()"></i>
+            <a href="{php echo $this->createWebUrl('agent');}"><i class="fa fa-reply" title="返回代理商列表"></i></a>
+        </span>        
+    </div>
+    <div class="panel-body">
+        <table class="table" id="partnerlist">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>昵称</th>
+                    <th>姓名</th>
+                    <th>手机号码</th>
+                    <th>加入时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $partners $index $item}
+                <tr data-id="{$item['id']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>
+                        <div class="profile">
+                            <img src="{$item['avatar']}">
+                            {$item['nickname']}
+                        </div>
+                        
+                    </td>
+                    <td>{$item['name']}</td>
+                    <td>{$item['mobile']}</td>
+                    <td>{$item['createtime']}</td>
+                    <td class="operate">
+                        <i class="fa fa-envelope" title="他的消息..." data-op="viewmsg"></i>
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partneredit', 'agentid'=>$agent->getId(), 'partnerid'=>$item['id']));}"><i class="fa fa-gear" title="参数设置"></i></a>
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partnerremove', 'agentid'=>$agent->getId(), 'partnerid'=>$item['id']));}" onclick="if(!confirm('确定要删除这个合伙人吗？')){return false;}"><i class="fa fa-trash-o" title="删除？"></i></a>                        
+                    </td>         
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+    </div>
+</div>
+{template 'web/common/search-user'}
+<script>
+    const api = {
+        url: "{php echo $this->createWebUrl('agent', array('agentid' => $id));}",    
+    }
+    
+    api.showResult = function(params, url) {
+        $.getJSON(url || api.url, params).then(function(res){
+            if(res) {
+                if(res.status) {
+                    const dlg = util.dialog(res.data.title || '', res.data.content);
+                    dlg.modal('show')
+                }else{
+                    if(res.data && res.data.msg) {
+                        util.message(res.data.msg, '', 'error');
+                    }
+                }
+            }
+        })
+    }
+
+    api.viewmsg = function(id) {
+        api.showResult({
+            op:'viewmsg',
+            id: id,
+        })
+    }
+    
+    $('#partnerlist').on('click', '.operate i', function(){
+        const op = $(this).data('op')    ;
+        if(op && api[op]){
+            const id = $(this).closest('tr').data('id');
+            api.viewmsg(id);
+        }
+    })
+    
+    searchDlg.init('user', function(user, typename){
+        if(user && user.id && typename === 'partner') {
+            location.href = api.url + '&' + $.param({
+                'userid': user.id,
+                'op': 'partneradd',
+            })
+        }
+    })
+
+    function showUserDlg() {
+        searchDlg.choose('partner');
+    }
+</script>
+{template 'common/footer'}

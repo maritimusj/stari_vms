@@ -1,0 +1,35 @@
+{if $m_all}
+<table class="table table-bordered table-hover" style="margin-top:1em;text-align:center;">
+    <thead>
+    <tr class="active">
+        <th style="text-align:center;">月份</th>
+        <th style="text-align:center;">免费</th>
+        <th style="text-align:center;">收费</th>
+        <th style="text-align:center;">
+            {php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'}
+        </th>
+        <th style="text-align:center;">小计</th>
+    </tr>
+    </thead>
+    {loop $m_all $i $item}
+    <tr data-op="showMonthStats" data-fetchid="{$device_id}" data-month="{$item['month']}" title="点击查看{$i}的出货统计">
+        <td>{$i}</td>
+        <td>{$item['free']}</td>
+        <td>{$item['fee']}</td>
+        <td>{$item['balance']}</td>
+        <td>{$item['total']}</td>
+    </tr>
+    {/loop}
+    <tr>
+        <td colspan="5">
+            <div  class="pull-right">
+                总计：{$total}
+            </div>
+        </td>
+    </tr>
+</table>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时没有统计信息！
+</div>
+{/if}

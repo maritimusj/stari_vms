@@ -1,0 +1,61 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template 'web/common/header'}
+
+<ul class="nav nav-tabs" id="navbar">
+{loop $navs $nav_op $nav_title}
+{if $op == $nav_op}
+<li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
+{else}
+<li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')));}">{$nav_title}</a></li>
+{/if}
+{/loop}
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'detail'=>1, 'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')));}"><i class="fa fa-cog" title="查看消息报文内容"></i></a>
+        </span>        
+    </div>
+    <div class="panel-body">
+        {if $events}
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>事件</td>
+                    <td>时间</td>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $events $index $item}
+                <tr>
+                    <td>{$item['id']}</td>
+                    <td>{$item['title']}</td>
+                    <td>
+                        {$item['createtime_foramtted']}
+                    </td>
+                </tr>
+                {if $item['extra']}
+                <tr>
+                    <td colspan="3">
+                        <code>
+                            {$item['extra']}
+                        </code>
+                    </td>
+                </tr>
+                {/if}
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何日志！
+        </div>
+        {/if}
+    </div>
+</div>
+{template 'common/footer'}

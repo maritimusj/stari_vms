@@ -1,0 +1,94 @@
+<form class="form-horizontal" id="addGoodsForm">
+    {if !isset($goods) || $goods['id'] > 0}
+    <div class="form-group">
+        <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+        <div class="col-md-5">
+            <select name="agentId" id="find_agent_select" style="width:100%;">
+                {if $goods && $goods['agent']}
+                <option value="{$goods['agent']['id']}">{php echo $goods['agent']['name'] . "，手机号码：" . $goods['agent']['mobile']}</option>
+                {/if}
+                <option value="0">&lt;无&gt;</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-default" type="button" id="find_agent">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+    {/if}
+    <div class="form-group">
+        <label for="goodsName" class="col-md-2 control-label">商品名称</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="goodsName" name="goodsName" value="{php echo !empty($goods)?$goods['name'] : ''}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">图片</label>
+        <div class="col-md-10">
+            {php echo tpl_form_field_image('goodsImg', $goods?$goods['img'] : '');}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">详情图片</label>
+        <div class="col-md-10">
+            {php echo tpl_form_field_image('detailImg', $goods?$goods['detailImg'] : '');}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="goodsUnitTitle" class="col-md-2 control-label">商品单位</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="goodsUnitTitle" name="goodsUnitTitle" value="{php echo !empty($goods)?$goods['unit_title'] : ''}" required>
+            <span class="help-block">* 单位名称，比如：个、包、支、盒等等，默认单位名称是“包”</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="goodsUnitTitle" class="col-md-2 control-label">商品长度</label>
+        <div class="col-md-10">
+            <input type="number" class="form-control" id="goodsLaneID" name="goodsLaneID" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['size'] : ''}" min="1" required>
+            <span class="help-block">* 单位:毫米，请输入单个商品长度，用于设备切割商品！</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">领取方式</label>
+        <div class="col-md-10">
+            <label class="checkbox-inline">
+                <input type="checkbox" name="allowFree" value="balance" {if empty($goods) || $goods['allowFree']}checked{/if}> 关注领取
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="allowPay" value="price" {if empty($goods) || $goods['allowPay']}checked{/if}> 支付领取
+            </label>
+        </div>
+    </div>
+    <fieldset {if $goods && !$goods['allowPay']}disabled{/if} id="price">
+    <div class="form-group">
+        <label for="goodsPrice" class="col-md-2 control-label">单价（元）</label>
+        <div class="col-md-10">
+            <input type="number" class="form-control" id="goodsPrice" name="goodsPrice" step="0.01" value="{php echo !empty($goods)? number_format($goods['price'] / 100, 2) : 0}">
+            <span class="help-block">* 用户使用微信支付购买时的价格</span>
+        </div>
+    </div>
+    </fieldset>
+    {if empty($goods['agent'])}
+    <div class="form-group">
+        <label for="syncAll" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <label class="checkbox-inline">
+                <input type="checkbox" id="syncAll" name="syncAll" value="1" {if $goods && $goods['sync']}checked{/if}> 复制该商品到所有代理商
+            </label>
+        </div>
+    </div>
+    {/if}
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: center;">
+            {if $goods}
+            <input type="hidden" name="goodsId" value="{php echo !empty($goods)?$goods['id'] : -1}">
+            {/if}
+            <button type="button" class="btn btn-primary" onclick="api.saveGoods()">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

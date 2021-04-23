@@ -1,0 +1,90 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings', ['op' => 'upgrade', 'fn' => 'exec']);}"  method="POST">
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        {if $upgrade['error']}
+        <div style="text-align:center;color:#ccc;">
+            {$upgrade['error']}
+        </div>
+        {else}
+            {if $upgrade['download']}
+            <table class="table">
+                <thead>
+                    <th>#</th>
+                    <th>远程</th>
+                    <th>本地</th>
+                    <th>大小</th>
+                    <th>日期</th>
+                    <th>操作</th>
+                </thead>
+                <tbody>
+                {loop $upgrade['download'] $i $e}
+                    <tr>
+                        <td>{php echo $i + 1}</td>
+                        <td>{$e['filename']}</td>
+                        <td>{$e['dest']}</td>
+                        <td>{$e['size']}</td>
+                        <td>{$e['createtime']}</td>
+                        <td>下载</td>
+                    </tr>
+                {/loop}
+                {loop $upgrade['copy'] $j $e}
+                    <tr>
+                        <td>{php echo count($upgrade['download']) + $j + 1}</td>
+                        <td>{$e['filename']}</td>
+                        <td>{$e['dest']}</td>
+                        <td>{$e['size']}</td>
+                        <td>{$e['createtime']}</td>
+                        <td>复制</td>
+                    </tr>
+                {/loop}
+                {loop $upgrade['move'] $k $e}
+                    <tr>
+                        <td>{php echo count($upgrade['download']) +count($upgrade['copy']) + $k + 1}</td>
+                        <td>{$e['filename']}</td>
+                        <td>{$e['dest']}</td>
+                        <td>{$e['size']}</td>
+                        <td>{$e['createtime']}</td>
+                        <td>移动</td>
+                    </tr>
+                {/loop}
+                {loop $upgrade['remove'] $z $e}
+                <tr>
+                    <td>{php echo count($upgrade['download']) + count($upgrade['copy']) + count($upgrade['move']) + $z + 1}</td>
+                    <td>{$e['filename']}</td>
+                    <td>{$e['dest']}</td>
+                    <td>{$e['size']}</td>
+                    <td>{$e['createtime']}</td>
+                    <td>删除</td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div class="form-btn">
+                <button type="submit" class="btn btn-primary">升级</button>
+            </div>
+            {else}
+            <div style="text-align:center;color:#ccc;">
+                暂时没有更新可用！
+            </div>
+            {/if}
+        {/if}
+    </div>
+</div>    
+</form>
+<script>
+    $(function() {
+        $('form').submit(function(e) {
+            if (!confirm('确定要执行执行系统更新吗？')) {
+                e.preventDefault();
+                return;
+            }
+            setTimeout(() => {
+                util.loading();
+            }, 500);
+        })
+    })
+</script>
+{template 'common/footer'}

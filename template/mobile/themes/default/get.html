@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{$tpl['site']['title']}</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		{if $tpl['slides']}
+		{php \zovye\url(true, CSS_SWIPER_URL);}
+		{/if}
+		{php \zovye\url(true, 'static/css/get.css?v=20180325004');}
+	</head>
+	<body>
+	   <div id="myv">
+            <div id="vout">
+                <canvas width="100%" height="100%"></canvas>
+            </div>
+        </div>
+        {if !empty($tpl['user'])}
+		<div class="top-view">
+			<div class="user-view">
+				<img class="user-avatar" src="{$tpl['user']['avatar']}" />
+				<div class="user-info">
+					<div class="user-name">{$tpl['user']['nickname']}</div>
+					{if $tpl['balance']}
+                        <div class="user-count">{$tpl['balance']['title']}：
+						    <div class="coin">
+						        <span id="balance">{php echo $tpl['user']['balance'];}</span><span id="minus"></span>
+						        </div>{$tpl['balance']['unit']}
+						</div>
+					{/if}
+				</div>
+				{if $tpl['balance']}
+				<div style="display:flex;flex-direction:column;align-items:flex-end;">
+    				<div class="vip-view" onclick="zovye_fn.usercenter()">
+    					<img class="vip-icon" src="{MODULE_URL}static/img/vip_icon.png" />
+    					<div class="vip-text">会员中心</div>
+    					<img class="right-arrow" src="{MODULE_URL}static/img/right_arrow.png" />
+    				</div>
+				</div>
+				{else}
+				<div class="vip-view">
+					<img class="vip-icon" src="{MODULE_URL}static/img/vip_icon.png" />
+					<div class="vip-text" style="padding-right:10px;">{$tpl['site']['title']}</div>
+				</div>				
+				{/if}
+			</div>
+			<button class="button05" id="btn">{if $tpl['balance']}点击{else}免费{/if}领取</button>
+			{if $tpl['balance'] && $tpl['account']['balanceDeductNum'] > 0}
+			<div class="postscript">领取需要：{$tpl['account']['balanceDeductNum']}{$tpl['balance']['unit']}{$tpl['balance']['title']}</div>
+			{/if}
+		</div>
+		{/if}
+		{if $tpl['slides']}
+		<!-- Swiper -->
+		<div class=" swiper-container" style="box-shadow: -1px -1px 6px #000;">
+			<div class="swiper-wrapper ">
+			    {loop $tpl['slides'] $index $item}
+				<div class="swiper-slide">
+				    <a href="{php echo $item['url']?:'#'}">
+				        <img class="adv-img" src="{$item['image']}" />
+				    </a>
+				</div>
+				{/loop}
+			</div>
+			<!-- Add Pagination -->
+			<!--<div class="swiper-pagination "></div>-->
+		</div>
+		{/if}
+		{if !$tpl['balance']}
+		<div class="mask" style="display: none;" id="mask-div">
+			<div class="card">
+				<div class="card-top">
+					<img class="card-avatar" src="{media $tpl['account']['img']}" />
+				</div>
+				<div style="margin-top: 18%;padding: 0 10px;text-align: center;">
+					<div class="card-name">{$tpl['account']['title']}<span class="card-title">免费送您一包纸</span></div>
+				</div>
+				<div class="card-content">共享，让生活更美好！</div>
+			</div>
+			<div class="close-btn orange" onclick="maskClose()">关闭</div>
+		</div>
+        {else}
+		<div class="mask" style="display: none;" id="mask-div">
+			<div class="card">
+				<div class="card-top">
+					<img class="card-avatar" src="{media $tpl['account']['img']}" />
+				</div>
+				<div style="margin-top: 18%;padding: 0 10px;text-align: center;">
+					<div class="card-name">{$tpl['account']['title']}<span class="card-title">温馨提醒</span></div>
+				</div>
+				<div class="card-content"></div>
+				<div class="card-bottom">
+					<span onclick="zovye_fn.usercenter()">点击进入会员中心 >></span>
+				</div>
+			</div>
+			<div class="close-btn orange" onclick="maskClose()">关闭</div>
+		</div>
+		{/if}
+		{$tpl['js']['code']}
+		<!-- Swiper JS -->
+		<script type="text/javascript">
+		    var counter = {
+		        num : 3,
+		        cb: null,
+		        el: null,
+		        timerid: null,
+		        init: function(sel, num, cb) {
+		            counter.num = num;
+		            counter.cb = cb;
+		            counter.el = document.querySelector(sel);
+		            if(counter.el) {
+		                counter.el.addEventListener('click', this.onclick.bind(this));
+		            }
+		        },
+		        start:function(text){
+		            counter.el.setAttribute('disabled', true);
+		            counter.el.classList.remove('success', 'fail');
+		            counter.el.classList.add('countdown');
+		            var originText = counter.el.innerText;
+		            counter.el.innerText = text;
+		            return originText;
+		        },
+		        stop:function(text, clsname){
+		            clearInterval(counter.timerid);
+                    counter.el.removeAttribute('disabled');
+		            counter.timerid = null;
+		            counter.el.innerText = text;
+		            counter.el.classList.remove('countdown');
+		            if(clsname) {
+		                 counter.el.classList.add(clsname);
+		            }
+		        },
+		        
+		        doit: function() {
+		            if(counter.timerid == null && counter.el) {
+	        		        var num =  counter.num;
+        		            var originText = counter.start(num + 's');
+         		            counter.timerid = setInterval(function(){
+        		                num --;
+        		                if(num < 0) {
+        		                    counter.stop(originText);
+        		                }else{
+        		                    counter.el.innerText = num + 's';
+        		                }
+        		            }, 1000);
+        		           
+    		                if(typeof counter.cb === 'function') {
+        		                    counter.cb({success: function(data){
+        		                        counter.stop(data, 'success');
+        		                    }, fail:function(data){
+        		                        counter.stop(data, 'fail');
+        		                    }
+		                        });
+		                    }    		            
+		            }else{
+		               wx.closeWindow();
+		            }
+		        },
+		        
+		        onclick: function(e) {
+                    this.doit();
+		        }
+		    };
+
+			$(function(){
+				var timeout = parseInt("{$tpl['timeout']}");
+                counter.init('#btn', timeout, function(op){
+                    zovye_fn.getx(function(res){
+                        if(res) {
+                            if(res.data && res.data['msg']) {
+                               
+                                maskShow(res.data['msg'] || '领取失败！');
+                            }
+                            if(res.status == true) {
+                                op.success(res.data['text'] ||  '成功');
+                                if(res.data.ok) {
+                                    maskShow(res.data['text'] || '成功', function() {
+                                        if(res.data.balance != undefined && res.data.change != undefined) {
+                                            setBalance(res.data.balance, res.data.change);
+                                        }
+            							if(res.data['url']) {
+            								setTimeout(function(){
+            									location.href = res.data['url'];
+            								}, 1000);
+            							}
+                                    });
+                                }
+                            }else{
+                                op.fail(res.data['text'] || '失败');
+    							if(res.data && res.data['url']) {
+    								setTimeout(function(){
+    									location.href = res.data['url'];
+    								}, 2000);
+    							}
+                            }
+                            return;
+                        }
+                        op.fail('请重试');
+                    })
+                });
+                
+                counter.doit();
+			});
+		</script>
+		{if $tpl['slides']}
+		{php \zovye\url(true, JS_SWIPER_URL);}
+		<script>
+		    var swiper = new Swiper('.swiper-container', {
+				loop: false,
+				autoplay: {
+					delay: 2500,
+					disableOnInteraction: false,
+				},
+				pagination: {
+					el: '.swiper-pagination',
+					clickable: true,
+				}
+			});
+		</script>
+		{/if}
+		<script type="text/javascript ">
+			var cb = null;
+			function setBalance(balance, change) {
+				var minus = document.querySelector("#minus");
+				minus.style.display = "inline-block";
+				
+				if(balance != undefined) {
+					var el = document.querySelector("#balance");
+				    el.innerHTML = balance;					    
+				}
+				
+				if(change != undefined && change != 0) {
+					var el = document.querySelector("#minus");
+				    el.innerHTML = change;					    
+				}
+				
+				setTimeout(function(){
+					minus.style.display = "none";
+				}, 3000);
+
+			}
+			function maskShow(title, fn) {
+				var mask = document.querySelector(".mask");
+				if (mask) {
+				    if (typeof title) {
+				        $('#mask-div').find('.card-content').html(title);
+				    }
+				    mask.style.display = "flex";
+				    if (typeof fn == 'function') {
+				         cb = fn;
+				    }
+				}
+			}
+			function maskClose() {
+				var mask = document.querySelector(".mask");
+				if (mask) {
+				    mask.style.display = "none";
+				    if (typeof cb == 'function') {
+				       cb();
+				       cb = null;
+				    }
+				}
+			}
+		</script>
+		<script src="{MODULE_URL}static/js/vector.js"></script>
+		<script>
+		    var victor = new Victor("myv", "vout");
+            victor(["#ac0908", "#cd5726"]).set();
+		</script>
+	</body>
+
+</html>

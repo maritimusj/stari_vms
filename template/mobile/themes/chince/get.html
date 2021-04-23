@@ -1,0 +1,414 @@
+<!doctype html>
+<head>
+	<meta charset="UTF-8" />
+	<title>{$tpl['site']['title']}</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	{php \zovye\url(true, CSS_MUI_URL);}
+	{if $tpl['slides']}
+	{php \zovye\url(true, CSS_SWIPER_URL);}
+	{/if}
+	<style type="text/css">
+		html,
+		body {
+			position: relative;
+			height: 100%;
+		}
+		
+		body {
+			font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+			font-size: 14px;
+			color: #000;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			background: #fff url({php echo MODULE_URL . 'template/mobile/themes/bluesky/images/bg.jpeg';});
+			background-size: 100% 100%;
+			-moz-background-size: 100% 100%;
+			-webkit-background-size: 100% 100%;
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+		
+		.main-view {
+			width: 100%;
+			height: 75vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+		}
+		
+		.avatar {
+			width: 25%;
+			height: 25vw;
+			border-radius: 50%;
+			border: 3px solid #fff;
+		}
+		
+		.nickname {
+			color: #000;
+			font-size: 20px;
+			margin-top: 5px;
+			font-weight: 500;
+		}
+		
+		.coin {
+			color: #000;
+			font-size: 14px;
+			margin-top: 3px;
+		}
+		
+		.get-btn {
+			display: inline-block;
+			zoom: 1;
+			display: inline;
+			vertical-align: baseline;
+			margin: 50px 0 0;
+			outline: none;
+			cursor: pointer;
+			text-align: center;
+			text-decoration: none;
+			font: 18px/100% Arial, Helvetica, sans-serif;
+			font-weight: bold;
+			padding: .9em 0;
+			min-width: 200px;
+			text-shadow: 0 1px 1px rgba(0, 0, 0, .3);
+			-webkit-border-radius: .5em;
+			-moz-border-radius: .5em;
+			border-radius: .5em;
+			-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+			-moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+			box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+			-webkit-border-radius: 2em;
+			-moz-border-radius: 2em;
+			border-radius: 2em;
+		}
+		
+		.get-btn:hover {
+			text-decoration: none;
+		}
+		
+		.get-btn:not(.disabled):active {
+			position: relative;
+			top: 1px;
+		}
+        .green {
+			color: #fefefe;
+			border: solid 1px #83d8ad;
+			background: #83d8ad;
+			background: -webkit-gradient(linear, left top, left bottom, from(#83d8ad), to(#0f8c47));
+			background: -moz-linear-gradient(top, #83d8ad, #0f8c47);
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#83d8ad', endColorstr='#0f8c47');
+		}
+		.blue {
+			color: #fefefe;
+			border: solid 1px #65ADE4;
+			background: #65ADE4;
+			background: -webkit-gradient(linear, left top, left bottom, from(#65ADE4), to(#4169E1));
+			background: -moz-linear-gradient(top, #65ADE4, #4169E1);
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#65ADE4', endColorstr='#4169E1');
+		}
+		
+		.disabled {
+			border: solid 1px #aaa;
+			color: #fef4e9;
+			background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#333));
+			background: -moz-linear-gradient(top, #eee, #333);
+		}
+		
+		.tips {
+			color: #F5F5F5;
+			font-size: 14px;
+			width: 100%;
+			text-align: center;
+			background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%, #6495ED 40%, #6495ED 60%, , rgba(255, 255, 255, 0) 100%);
+			background: -o-linear-gradient(right, rgba(255, 255, 255, 0) 0%, #6495ED 40%, #6495ED 60%, , rgba(255, 255, 255, 0) 100%);
+			background: -moz-linear-gradient(right, rgba(255, 255, 255, 0) 0%, #6495ED 40%, #6495ED 60%, , rgba(255, 255, 255, 0) 100%);
+			background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #6495ED 40%, #6495ED 60%, rgba(255, 255, 255, 0) 100%);
+			margin-top: 20px;
+			padding: 3px 0;
+		}
+		
+		.swiper-container {
+			width: 100%;
+			height: 25vh;
+		}
+		
+		.adv-img {
+			width: 100%;
+			height: 100%;
+		}
+		
+		.vip-view {
+			position: absolute;
+			bottom: 20px;
+			text-decoration: none;
+			color: #007AFF;
+		}
+		
+		.mask {
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			left: 0;
+			top: 0;
+			z-index: 999;
+			background-color: rgba(0, 0, 0, 0.5);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+		
+		.mask .title {
+			font-size: 18px;
+			color: #fff;
+			padding: 10px;
+		}
+		
+		.goods-list {
+			width: 90%;
+			max-height: 70vh;
+			background-color: #fff;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-around;
+			flex-wrap: wrap;
+			overflow-y: auto;
+			padding-bottom: 20px;
+		}
+		
+		.good {
+			width: 46%;
+			background-color: #fff;
+			margin-top: 20px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			box-shadow: 5px 5px 5px #ccc;
+			border: 1px solid #eee;
+			padding-bottom: 20px;
+		}
+		
+		.good .name {
+			color: #fff;
+			font-size: 13px;
+			width: 100%;
+			text-align: center;
+			padding: 3px 0;
+		}
+		
+		.good .img {
+			width: 80px;
+			height: 80px;
+			border-radius: 50%;
+			margin-top: 20px;
+			box-shadow: 0 0 5px #363636;
+		}
+		
+		.empty {
+            filter: grayscale(100%);
+            opacity: 0.66;
+		}
+		
+		.good .num {
+			color: #fff;
+			padding: 3px;
+			margin-top: -25px;
+			margin-right: -50px;
+			border-radius: 50%;
+			min-width: 20px;
+			min-height: 20px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		
+		.good .btn {
+			margin-top: 20px;
+			width: 60%;
+			color: #fff;
+			text-align: center;
+			padding: 3px 0;
+			border-radius: 20px;
+			font-size: 14px;
+			font-weight: 500;
+		}
+		
+		.good .btn:active {
+			background-color: #7A7A7A;
+		}
+		
+		.theme-color {
+			background-color: #65ADE4;
+		}
+		
+		.dark-color {
+			background-color: #7A7A7A;
+		}
+		
+		.line {
+			width: 1px;
+			height: 30px;
+			background-color: #fff;
+		}
+		
+		.close {
+			color: #fff;
+			border: 1px solid #fff;
+			font-size: 13px;
+			padding: 2px 5px;
+		}
+	</style>
+</head>
+
+<body ontouchstart>
+	<div id="app" v-cloak>
+		<div class="main-view">
+			<img class="avatar" src="{$tpl['user']['avatar']}" />
+			<span class="nickname">{$tpl['user']['nickname']}</span>
+			{if $tpl['balance']}
+			<span class="coin">{$tpl['balance']['title']}：<span v-text="balance"></span>{$tpl['balance']['unit']}</span>
+				<button :class="{'get-btn': true, 'disabled': loading, 'blue': !get_result, 'green': get_result}" @click="showGoodsDlg(true)" v-text="btnTitle"></button>
+    			{if $tpl['account']['balanceDeductNum'] > 0}
+    			<span class="tips">领取消耗：{$tpl['account']['balanceDeductNum']}{$tpl['balance']['unit']}{$tpl['balance']['title']}</span>
+    			{/if}
+			<a class="vip-view" onclick="zovye_fn.usercenter()">会员中心有惊喜 &gt;&gt;</a>
+			{else}
+			    <button :class="{'get-btn': true, 'disabled': loading, 'blue': !get_result, 'green': get_result}" @click="showGoodsDlg(true)" v-text="btnTitle"></button>
+			{/if}
+		</div>
+		{if $tpl['slides']}
+		<div class=" swiper-container" style="box-shadow: -1px -1px 6px #000;" v-once>
+			<div class="swiper-wrapper ">
+			    {loop $tpl['slides'] $index $item}
+				<div class="swiper-slide">
+				    <a href="{php echo $item['url']?:'#'}">
+				        <img class="adv-img" src="{$item['image']}" />
+				    </a>
+				</div>
+				{/loop}
+			</div>
+		</div>
+		{/if}
+		<div :class="{'mask': true, 'empty': loading}" v-show="showGoods">
+			<span class="title">请选择您需要的商品</span>
+			<div class="goods-list">
+				<div :class="{good: true, 'empty':item.num==0}" v-for="(item,index) in list" :key="item.id" v-if="item.allow_free">
+					<span class="name theme-color">{{item.name}}</span>
+					<img class="img" :src="item.img" />
+					<div class="btn theme-color" @click="getGoods(item.id)">{{item.num != 0 ?'选择':'缺货'}}</div>
+				</div>
+			</div>
+			<div class="line"></div>
+			<div class="close theme-color" @click="showGoodsDlg(false)">关闭</div>
+		</div>
+	</div>
+	{if $tpl['slides']}
+	{php \zovye\url(true, JS_SWIPER_URL);}
+	<script>
+	$(function(){
+		var swiper = new Swiper('.swiper-container', {
+			autoplay: {
+				delay: 5000,
+				disableOnInteraction: false,
+			},
+			speed: 3000,
+			effect: 'fade'
+		});
+	})
+	</script>
+	{/if}
+	{$tpl['js']['code']}
+	{php \zovye\url(true, JS_MUI_URL);}
+	{php \zovye\url(true, JS_VUE_URL);}
+	<script>
+		(function() {
+			new Vue({
+				el: '#app',
+				data: function() {
+					return {
+						list: [],
+						balance: "{php echo $tpl['user']['balance'];}",
+						showGoods: false,
+						btnTitle: '免费领取',
+						loading: false,
+						intervalid: null,
+						default_time: parseInt("{$tpl['timeout']}"),
+						get_result: false,
+					}
+				},
+				created: function() {
+				    var self = this;
+                    zovye_fn.getGoodsList(function(res) {
+                        if (res && res.status && res.data.goods) {
+                            self.list = res.data.goods;
+                        }
+                    })
+				},
+				methods: {
+				    showGoodsDlg: function (show) {
+                        if (!this.loading && !this.get_result) {
+                            this.showGoods = show;
+                        }
+				    },
+					getGoods: function(id) {
+					    this.startTicker();
+					    const self = this;
+					    zovye_fn.getGoods(id, function(res){
+					        if (res) {
+					            if (res.status) {
+					                self.get_result = true;
+					                if (res.data.balance) {
+					                    self.balance = res.data.balance;
+					                }
+					            }
+					            if (res.data.text) {
+					                self.stopTicker(res.data.text);
+					            } else {
+					                self.stopTicker(res.status ? '领取成功':'领取失败');
+					            }
+						        
+					            if (res.data.msg) {
+					                mui.toast(res.data.msg);
+					            }
+
+    							if(res.data && res.data['url']) {
+    								setTimeout(function(){
+    									location.href = res.data['url'];
+    								}, 2000);
+    							}
+					        }
+					    })
+					},
+					startTicker:function() {
+					    
+					    const self = this;
+					    
+					    self.loading = true;
+					    self.showGoods = false;
+					    
+					    var time = self.default_time;
+                        self.intervalid = setInterval(function(){
+					       self.btnTitle = time + "s";
+    						if(time == 0) {
+                                self.stopTicker('已超时');
+    						} else {
+    							time --;
+    						}
+					    }, 1000);
+					},
+					stopTicker:function(title) {
+					    this.loading = false;
+					    this.btnTitle = title;
+					    clearInterval(this.intervalid);
+					},
+				}
+			});
+		})()
+	</script>
+</body>
+
+</html>

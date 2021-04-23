@@ -1,0 +1,219 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #goodslist img{
+        width: 100px;
+    }
+    #goodslist .limitGoodsNum{
+        cursor: default;
+    }
+    #goodslist .limitGoodsList {
+        width: 500px;
+        position: absolute;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background: #fff;
+        z-index: 999;
+    }
+    #goodslist .limitGoodsList img{
+        width: 60px;
+    }
+    #goodslist .gray{
+        color: #ccc;
+    }
+    .slide-fade-enter-active {
+      transition: all .6s ease;
+    }
+    .slide-fade-leave-active {
+      transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+    .slide-fade-enter, .slide-fade-leave-to
+    /* .slide-fade-leave-active below version 2.1.8 */ {
+      transform: translateX(10px);
+      opacity: 0;
+    }
+</style>
+{template "web/goods_voucher/nav"}
+<div id="app" v-cloak>
+    <div class="panel panel-default nav-tab-item">
+        <div class="panel-heading">
+            <span class="operate">
+                <a href="{php echo $this->createWebUrl('voucher', ['op'=>'add']);}">
+                    <i class="fa fa-ticket fa-fw" title="创建提货码"></i>
+                </a>
+            </span>        
+        </div>
+        <div class="panel-body">
+            <div v-if="list.length>0">
+                <table class="table" id="goodslist">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>商品名</th>
+                        <th>商品</th>
+                        <th>数量</th>
+                        <th>已赠送</th>
+                        <th>有效期限</th>
+                        <th>限定商品</th>
+                        <th>代理商</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody is="transition-group" name="slide-fade" mode="out-in">
+                    <tr v-for="(item, index) in list" :class="{'banned': !item.enabled}" :key="item.id">
+                        <td>{{index+1}}</td>
+                        <td>
+                            <div v-text="item.goods.name"></div>
+                        </td>
+                        <td class="goods">
+                            <div>
+                                <img :src="item.goods.img" />
+                            </div>
+                        </td>
+                        <td>
+                            <span class="total">{{item.total}}</span>
+                        </td>
+                        <td>
+                            <span class="total">{{item.usedTotal}}</span>
+                        </td>
+                        <td>
+                            <div v-if="item.begin_formatted && item.end_formatted">
+                                <span v-text="item.begin_formatted"></span> - <span v-text="item.end_formatted"></span>
+                            </div>
+                            <div class="gray" v-else>
+                                &lt;无&gt;
+                            </div>
+                        </td>
+                        <td style="position:relative;" class="not-gray" @mouseover="showLimitGoodsList(item, true)"  @mouseout="showLimitGoodsList(item, false)">
+                            <div :class="['limitGoodsNum', item.limitGoodsNum > 0 ? '' : 'gray']">
+                                {{item.limitGoodsNum > 0 ? item.limitGoodsNum : '&lt;不限&gt;'}}
+                            </div>
+                            <div class="limitGoodsList" v-show="item.limitGoodsNum > 0 && item.limitGoodsList && item.showLimitGoodsList">
+                                <div style="margin: 10px 3px;font-weight: bolder;">用户购买下列商品时，赠送此提货码</div>
+                                <table class="table">
+                                    <tr v-for="(g,i) in item.limitGoodsList" :key="g.id">
+                                        <td>{{i + 1}}</td>
+                                        <td>{{g.name}}</td>
+                                        <td>
+                                            <img :src="g.img">
+                                        </td>
+                                        <td>{{g.price_formatted}}/{{g.unit_title}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="profile" style="background-color:{{item.agent.level_clr}}" v-if="item.agent">
+                                <img :src="item.agent.avatar">
+                                <div class="nickname">{{item.agent.nickname}}</div>
+                            </div>
+                            <div class="gray" v-else>&lt;平台&gt;</div>
+                        </td>
+                        <td>
+                            <span v-text="item.createtime_formatted"></span>
+                        </td>
+                        <td class="operate">
+                            <div class="btn-group">
+                              <a class="btn btn-default" href="#" title="分配设备" @click="assign(item)" :title="item.assignedStatus"><i :class="['fa', 'fa-wrench',item.assigned ? '' :' active']"> </i></a>
+                              <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                              <span class="fa fa-caret-down"></span></a>
+                              <ul class="dropdown-menu">
+                                <li><a href="#" @click.prevent="edit(item)"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#" @click.prevent="enable(item)"><i class="fa fa-ban fa-fw"></i> <span>{{item.enabled?'禁用':'启用'}}</span></a></li>
+                                <li><a href="#" @click.prevent="remove(item)"><i class="fa fa-trash-o fa-fw"></i> 删除？</a></li>
+                              </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div class="pull-right" v-html="pager">
+                </div>
+            </div>
+            <div style="text-align:center;color:#ccc;" v-else>
+                暂时还没有任何提货码！
+            </div>
+        </div>
+    </div>  
+</div>
+
+<script>
+    let apiUrl = "{php echo $this->createWebUrl('voucher', ['op'=>'list']);}";
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el:"#app",
+            data:{
+                agentLevels:[],
+                list: [],
+                pager: '',
+            },
+            methods: {
+                pagerClicked: function(event) {
+                    if (event) {
+                        apiUrl = event.target.href;
+                        this.loadList();
+                    }
+                },
+                loadList: function() {
+                    const self = this;
+                    $.get(apiUrl).then(function(res) {
+                        if (res && res.status) {
+                            self.list = res.data.vouchers;
+                            self.pager = res.data.pager;
+                            self.agentLevels = res.data.agent_levels;
+                        }
+                    });
+                },
+                getLimitGoodsList: function(item) {
+                    $.get(apiUrl, {op:"limitGoods", id: item.id}).then(function(res) {
+                        if (res && res.status && Array.isArray(res.data)) {
+                            Vue.set(item, 'limitGoodsList', res.data);
+                        }
+                    })
+                },
+                showLimitGoodsList: function(item, show) {
+                    if (show && item.limitGoodsList === undefined) {
+                        this.getLimitGoodsList(item);
+                    }
+                    Vue.set(item, 'showLimitGoodsList', show);
+                },
+                assign: function(item) {
+                    window.location.href = apiUrl + "&op=assign&id=" + item.id;
+                },
+                remove:function(item) {
+                    if (confirm('确定要删除这个提货码？')) {
+                        const self = this;
+                        $.get(apiUrl, {op:"remove", id: item.id}).then(function(res) {
+                            if (res && res.status) {
+                                self.loadList();
+                            }
+                        })
+                    }
+                },
+                edit: function(item) {
+                    window.location.href = apiUrl + "&op=edit&id=" + item.id;
+                },
+                enable: function(item) {
+                    $.get(apiUrl, {op:"enable", id: item.id}).then(function(res) {
+                        if (res && res.status) {
+                            item.enabled = res.data.enabled;
+                        }
+                    })
+                }
+            },
+            mounted: function() {
+                const self = this;
+                $('body').on('click', '#app .pagination li:not(.active) a', function(e){
+                    e.preventDefault();
+                    self.pagerClicked(e);
+                })
+                
+                self.loadList();
+            },
+        })
+    })
+</script>

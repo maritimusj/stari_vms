@@ -1,0 +1,143 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #goodslist .goods img{
+        width: 100px;
+    }
+    #goodslist .code {
+        font-weight: bold;
+        color: #03A9F4;
+    }
+    #goodslist .gray{
+        color: #ccc;
+    }
+</style>
+{template "web/goods_voucher/nav"}
+<div id="app" v-cloak>
+    <div class="panel panel-default nav-tab-item">
+        <div class="panel-heading">
+            <span class="operate">
+                <a href="{php echo $this->createWebUrl('voucher', ['op'=>'add']);}">
+                    <i class="fa fa-ticket fa-fw" title="创建提货码"></i>
+                </a>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div v-if="list.length>0">
+                <table class="table" id="goodslist">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>商品</th>
+                        <th>商品图片</th>
+                        <th>提货码</th>
+                        <th>拥有人</th>
+                        <th>有效期限</th>
+                        <th v-if="type=='used'">使用人</th>
+                        <th v-if="type=='used'">使用时间</th>
+                        <th v-if="type=='used'">设备</th>
+                        <th>创建时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(log, index) in list" :key="log.id">
+                        <td>{{index + 1}}</td>
+                        <td>
+                            <div v-if="log.goods">{{log.goods.name}}</div>
+                        </td>
+                        <td class="goods">
+                            <div v-if="log.goods">
+                                <img :src="log.goods.img" />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="code">{{log.code}}</div>
+                        </td>
+                        <td>
+                            <div class="profile" v-if="log.owner">
+                                <img :src="log.owner.headimgurl" />
+                                <span class="nickname">
+                                            {{log.owner.name? log.owner.name :  log.owner.nickname}}
+                                    </span>
+                            </div>
+                        </td>
+                        <td>
+                            <div v-if="log.begin_formatted && log.end_formatted">
+                                <span v-text="log.begin_formatted"></span> - <span v-text="log.end_formatted"></span>
+                            </div>
+                            <div class="gray" v-else>
+                                &lt;无&gt;
+                            </div>
+                        </td>
+                        <td v-if="type=='used'">
+                            <div class="profile" v-if="log.usedUser">
+                                <img :src="log.usedUser.headimgurl" />
+                                <span class="nickname">
+                                            {{log.usedUser.name? log.usedUser.name :  log.usedUser.nickname}}
+                                    </span>
+                            </div>
+                        </td>
+                        <td v-if="type=='used'">
+                            <span v-if="log.usedtime_formatted">{{log.usedtime_formatted}}</span>
+                        </td>
+                        <td v-if="type=='used'">
+                            <div v-if="log.device">
+                                {{log.device.name || 'n/a'}}
+                            </div>
+                        </td>
+                        <td>{{log.createtime_formatted}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="pull-right" v-html="pager">
+                </div>
+            </div>
+            <div style="text-align:center;color:#ccc;" v-else>
+                暂时还没有任何记录！
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let apiUrl = "{php echo $this->createWebUrl('voucher', ['op'=>'logs', 'type' => $type]);}";
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el:"#app",
+            data:{
+                type: '',
+                list: [],
+                pager: '',
+            },
+            methods: {
+                pagerClicked: function(event) {
+                    if (event) {
+                        apiUrl = event.target.href;
+                        this.loadList();
+                    }
+                },
+                loadList: function() {
+                    const self = this;
+                    $.get(apiUrl).then(function(res) {
+                        if (res && res.status) {
+                            self.type = res.data.type;
+                            self.list = res.data.logs;
+                            self.pager = res.data.pager;
+                        }
+                    });
+                },
+            },
+            mounted: function() {
+                const self = this;
+                $('body').on('click', '#app .pagination li:not(.active) a', function(e){
+                    e.preventDefault();
+                    self.pagerClicked(e);
+                })
+
+                self.loadList();
+            },
+        })
+    })
+</script>

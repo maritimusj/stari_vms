@@ -1,0 +1,265 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{if $op == 'default'}
+<style>
+.type span {
+    background: gray;
+    padding: 3px 9px;
+    color: #fff;
+    user-select: none;
+}
+.owner a:hover {
+    text-shadow: 1px 1px 1px #9E9E9E;
+    color: #9E9E9E;
+}
+.type.image span{
+    background-color: #4CAF50;
+}
+
+.type.video span{
+    background-color: #FF9800;
+}
+
+.type.audio span{
+    background-color: #2196F3;
+}
+
+.type.srt span{
+    background-color: #607D8B;
+}
+
+#list td {
+    vertical-align: middle;
+}
+
+#list div.owner{
+    display: flex;
+}
+#list div.owner .agent {
+    margin: 0;
+}
+#list .review_quest {
+    color: #ff9800;
+}
+.type a span:hover, a .agent .profile:hover {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+}
+</style>
+{template 'web/adv/nav'}
+<div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('adv', array('op'=>'add','type'=>zovye\Advertising::SCREEN, 'media'=>'image'));}"><i class="fa fa-fw {$media_data['image']['icon']}" title="添加{$media_data['image']['title']}广告"></i>
+            </a>            
+            <a href="{php echo $this->createWebUrl('adv', array('op'=>'add','type'=>zovye\Advertising::SCREEN, 'media'=>'video'));}"><i class="fa fa-fw {$media_data['video']['icon']}" title="添加{$media_data['video']['title']}广告"></i>
+            </a>
+            <a href="{php echo $this->createWebUrl('adv', array('op'=>'add','type'=>zovye\Advertising::SCREEN, 'media'=>'audio'));}"><i class="fa fa-fw {$media_data['audio']['icon']}" title="添加{$media_data['audio']['title']}广告"></i>
+            </a>
+            <a href="{php echo $this->createWebUrl('adv', array('op'=>'add','type'=>zovye\Advertising::SCREEN, 'media'=>'srt'));}"><i class="fa fa-fw {$media_data['srt']['icon']}" title="添加{$media_data['srt']['title']}广告"></i>
+            </a>            
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $advs}
+        <table class="table" id="list">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>标题</th>
+                    <th>审核</th>
+                    <th>代理商</th>
+                    <th>
+                        <div>类型</div>
+                    </th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $advs $index $item}
+                <tr data-id="{$item['id']}" class="{$item['state_formatted']}">
+                    <td>
+                        {php echo $index + 1}
+                    </td>
+                    <td>{$item['title']}</td>
+                    <td>
+                        {if $item['review']}
+                        <div class="review">
+                            {if $item['review']['result'] == zovye\ReviewResult::WAIT}
+                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewpassed', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-check" title="通过审核"></i></a>
+                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewrejected', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-close" title="拒绝发布"></i></a>
+                            {/if}
+                        </div>
+                        {/if}
+                        {if $item['review'] && $item['review']['result'] != zovye\ReviewResult::PASSED}
+                             {if $item['review']['result'] == zovye\ReviewResult::REJECTED}
+                                <i class="fa fa-times" style="color:#f44336" title="已拒绝"></i>
+                            {/if}
+                        {else}
+                            <i class="fa fa-check-square-o" style="color:#8BC34A" title="已通过"></i>
+                        {/if}
+                    </td>
+                    <td>
+                        <div  class="owner">
+                            {if $item['agent']}
+                                {if $filter_agentId && $filter_agentId == $item['agent']['id']}
+                                    <div class="agent" title="{$item['agent']['name']}">
+                                        <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                            <img src="{$item['agent']['avatar']}">
+                                            <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>   
+                                        </div>
+                                    </div>
+                                {else}
+                                    {if $filter_media}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=>$item['agent']['id'], 'type'=>$type, 'media'=>$filter_media]);}" title="点击查看{$item['agent']['name']}的{$item['media_formatted']}广告">
+                                    {else}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=>$item['agent']['id'], 'type'=>$type]);}" title="点击查看{$item['agent']['name']}的广告">
+                                    {/if}
+                                      <div class="agent">
+                                            <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                                <img src="{$item['agent']['avatar']}">
+                                                <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>   
+                                            </div>
+                                        </div>                 
+                                    </a>
+                                {/if}
+                            {else}
+                                <div style="color:#CCC;">
+                                {if isset($filter_agentId)}
+                                &lt;平台&gt;
+                                {else}
+                                    {if $filter_media}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=> 0, 'type'=>$type, 'media'=>$filter_media]);}" title="点击查看所有平台{$item['media_formatted']}广告">
+                                    &lt;平台&gt;
+                                    </a>
+                                    {else}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=> 0, 'type'=>$type]);}" title="点击查看所有平台广告">
+                                    &lt;平台&gt;
+                                    </a>
+                                    {/if}
+                                {/if}
+                                </div>
+                            {/if}
+                        </div>
+                    </td>
+                    <td class="type {$item['media']}"> 
+                        {if $filter_media}
+                            <span>{$item['media_formatted']}</span>
+                        {else}
+                            {if isset($filter_agentId)}
+                                <a href="{php echo $this->createWebUrl('adv', array('type'=>$item['type'], 'media'=>$item['media'], 'agentId'=>$filter_agentId));}" title="点击查看{php echo $filter_agent?$filter_agent->getName().'的':'平台'}{$item['media_formatted']}广告">
+                                    <span>{$item['media_formatted']}</span>
+                                </a>
+                            {else}
+                                <a href="{php echo $this->createWebUrl('adv', array('type'=>$item['type'], 'media'=>$item['media']));}"  title="点击查看{$item['media_formatted']}广告">
+                                    <span>{$item['media_formatted']}</span>
+                                </a>
+                            {/if}
+                        {/if}
+                    </td>
+                    <td>{$item['createtime_formatted']}</td>
+                    <td class="operate">
+                        <div class="btn-group">
+                          <a class="btn btn-default" href="{php echo $this->createWebUrl('adv', array('op' => 'assign', 'type' => $type, 'id' => $item['id'], 'from_type' => $item['type']));}" title="分配设备"><i class="fa fa-wrench{php echo $item['assigned']?'':' active'}"> </i></a>
+                          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                          <span class="fa fa-caret-down"></span></a>
+                          <ul class="dropdown-menu">
+                            <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'edit', 'id' => $item['id'], 'from_type'=> $item['type']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
+                           <li>
+                               {if $item['media'] == 'srt'}
+                               <a href="#"  data-text="{$item['text']}"><i class="fa fa-eye fa-fw" data-op="view"></i> 查看</a>
+                               {else}
+                               <a href="{$item['url']}" target="_blank"><i class="fa fa-eye fa-fw"></i> 预览</a>
+                               {/if}
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-op="refresh"><i class="fa fa-exchange fa-fw"></i> 刷新</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-op="ban"><i class="fa fa-ban fa-fw"></i> <span>{if $item['state']==zovye\Advertising::NORMAL}禁用？{else}启用？{/if}</span></a></li>
+                            <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'remove', 'id' => $item['id'], 'from_type' => $item['type']));}" onclick="return confirm('确定要删除这个广告吗？');"><i class="fa fa-trash-o fa-fw"></i> 删除？</a></li>
+                          </ul>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+    {else}
+        <div style="text-align:center;color:#ccc;margin-bottom:2em;">
+            暂时没有任何内容！
+        </div>
+    {/if}
+    </div>
+</div>
+{template 'web/adv/foot'}
+{elseif $op == 'add' || $op == 'edit'}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">
+           <i class="fa {$media_data[$media]['icon']}"></i> 
+           {if $op=='edit'}编辑{else}添加{/if}{php echo zovye\Advertising::desc($type)}{$media_data[$media]['title']}广告
+    </a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('adv', array('type'=>$type));}" method="post">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="title" class="col-md-2 control-label">广告名称</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="title" id="title" value="{$title}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{php echo $media_data[$media]['title']}</label>
+                <div class="col-md-10">
+                    {if $media == 'image'}
+                        {php echo tpl_form_field_image('url', $url)}
+                    {elseif $media == "video"}
+                        {php echo tpl_form_field_video('url', $url)}
+                    {elseif $media == "audio"}
+                        {php echo tpl_form_field_audio('url', $url)}
+                    {elseif $media == 'srt'}
+                        <input type="text" class="form-control" name="text"  value="{$text}"/>
+                    {/if}
+                </div>
+            </div>
+            {if $media == 'image'}
+            <div class="form-group">
+                <label for="duration" class="col-md-2 control-label">停留时间（秒）</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="duration" id="duration" value="{php echo $duration ?: 10}" min="1" required>
+                </div>
+            </div>
+            {/if}
+            {if in_array($media, ['image', 'video', 'srt'])}
+            <div class="form-group">
+                <label for="duration" class="col-md-2 control-label">屏幕区域代码</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="area" id="area" value="{php echo $area ?: 0}" min="0">
+                    <span class="help-block">* 如果APP版本不支持区域划分，可忽略</span>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div> 
+    <div class="form-btn">
+        <input type="hidden" name="from_type" value="{$from_type}">
+        <input type="hidden" name="from_op" value="{$op}">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="media" value="{$media}">
+        {if $op=='edit'}
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">保存</button>
+        {else}
+        <button type="submit" class="btn btn-primary">提交</button>
+        {/if}                    
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('adv', array('type' => $type));}">返回</a>
+    </div>     
+</form>
+{elseif $op == 'preview'}
+{/if}
+{template 'common/footer'}

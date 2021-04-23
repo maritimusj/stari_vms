@@ -1,0 +1,25 @@
+<ul class="nav nav-tabs" id="navbar">
+    {if empty($type) == 'default'}
+    <li role="presentation" class="active"><a href="#">全部</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('voucher');}">全部</a></li>
+    {/if}
+    
+    {if $type == 'unused'}
+    <li role="presentation"  class="active"><a href="#">未使用</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('voucher', ['type' => 'unused']);}">未使用</a></li>
+    {/if}
+    
+    {if $type == 'used'}
+    <li role="presentation"  class="active"><a href="#">已使用</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('voucher', ['type' => 'used']);}">已使用</a></li>
+    {/if}
+    
+    {if $type == 'expired'}
+    <li role="presentation"  class="active"><a href="#">已过期</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('voucher', ['type' => 'expired']);}">已过期</a></li>
+    {/if}
+</ul>

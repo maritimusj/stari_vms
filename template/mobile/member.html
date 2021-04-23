@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>111</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+</head>
+
+<body>
+
+
+<div >
+
+    {php echo $user->getNickname()}
+
+    <img src="{php echo $user->getAvatar() }">
+</div>
+<br><br>
+
+{loop $orders $order}
+
+
+<div>
+    {if $order['uniontid']}
+    <i class="wi wi-money color-gray"></i>{$order['uniontid']}
+    {else}
+    {$order['orderId']}
+    {/if}
+</div>
+<div class="orderId">
+    {$order['orderId']}
+</div>
+
+{if $order['goods']}
+<div class="name {if $order["result"] && $order["result"]["errno"] != 0}failed{/if}">
+{$order['goods']['name']}
+</div>
+{/if}
+
+<div class="pay">
+    <span class="num">{$order['num']}</span>
+    {if $order['price']>0}
+    (价格：<span class="price {if $order['price']==0}zeroprice{/if}">{$order['price']}</span>)
+    {elseif $order['balance']>0}
+    (余额：<span class="balance">{$order['balance']} <i class="fa fa-tint"></i></span>)
+    {else}
+    (<span class="zeroprice">免费领取</span>)
+    {/if}
+</div>
+
+
+
+{if $order['price']>0}
+(价格：<span class="price {if $order['price']==0}zeroprice{/if}">{$order['price']}</span>
+{if $order["result"] && $order["result"]["errno"] != 0}
+<i class="fa fa-info-circle">
+    <div class="order_err_message">
+        <span>{$order["result"]["message"]}</span>
+    </div>
+</i>
+{/if}
+{if $order['refund']}
+<span title="{$order['refund']}"> 已退款</span>
+{else}
+<i class="fa fa-reply-all" title="退款" data-op="refund"></i>
+{/if})
+{elseif $order['balance']>0}
+(余额：<span class="balance">{$order['balance']} <i class="fa fa-tint disabled"></i></span>)
+{else}
+(<span class="zeroprice">免费领取</span>)
+{/if}
+
+
+<td  class="devicename">
+    <aside class="order-from" style="color:{$order['clr']}">
+        {if $order['price'] > 0}
+        <i class="fa fa-weixin wxpay"></i>
+        <span  title="订单号：{$order['orderId']}">微信支付</span>
+        {if $order['refund']}
+        <span title="{$order['refund']}">（已退款）</span>
+        {/if}
+        {else}
+        <img src="{media $accounts[$order['account']]['img']}" />
+        <span>{php echo $accounts[$order['account']]['title'] ?:'&lt;未知&gt;'}</span>
+        {/if}
+    </aside>
+    {if empty($device)}
+    {php echo $order['device']['name'] ?: '<未知设备>'}
+    {/if}
+</td>
+
+
+{/loop}
+
+
+{$pager}
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

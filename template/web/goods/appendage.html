@@ -1,0 +1,45 @@
+<form class="form-horizontal" id="editAppendageForm">
+    <div class="form-group">
+        <label for="goodsName" class="col-md-2 control-label">商品名称</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="goodsName" name="goodsName" value="{$goods['name']}" readonly>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="mfrs" class="col-md-2 control-label">生产厂家</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="mfrs" name="mfrs" value="{$appendage['mfrs']}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="tel" class="col-md-2 control-label">联系电话</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="tel" name="tel" value="{$appendage['tel']}">
+        </div>
+    </div>    
+    <div class="form-group">
+        <label for="lot" class="col-md-2 control-label">批号</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="lot" name="lot" value="{$appendage['lot']}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="spec" class="col-md-2 control-label">规格</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="spec" name="spec" value="{$appendage['spec']}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="exp" class="col-md-2 control-label">有效期</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" id="exp" name="exp" value="{$appendage['exp']}">
+        </div>
+    </div>
+    <div class="form-group">
+         <div class="col-md-offset-2 col-md-10">
+            <input type="hidden" name="goodsId" value="{$goods['id']}">
+            <button type="button" class="btn btn-primary" onclick="api.saveGoodsAppendage()">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

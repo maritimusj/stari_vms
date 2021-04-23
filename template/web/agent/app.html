@@ -1,0 +1,92 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<ul class="nav nav-tabs" id="navbar">
+  <li role="presentation"><a href="{php echo $this->createWebUrl('agent');}">所有代理商</a></li>
+  <li role="presentation"  class="active"><a href="#">合作申请</a></li>
+  <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op'=>'msg'));}">消息推送</a></li> 
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        {if $apps}
+        <table class="table" id="agentApplist">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>姓名</th>
+                    <th>手机号码</th>
+                    <th>地区</th>
+                    <th>推荐人</th>
+                    <th>时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $apps $index $item}
+                <tr class="appstate_{$item['state']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>{$item['name']}</td>
+                    <td>{$item['mobile']}</td>
+                    <td>{$item['address']}</td>
+                    <td>{$item['referee']}</td>
+                    <td>{$item['createtime']}</td>
+                    <td class="state">
+                        <span>
+                            {php echo zovye\AgentApp::desc($item['state']);}
+                        </span>
+                    </td>
+                    <td class="operate">
+                        <i class="fa fa-reply-all" title="转发给其它代理商" data-id="{$item['id']}"></i>
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'appStateChecked', 'id'=>$item['id']));}">
+                        {if $item['state']==zovye\AgentApp::WAIT}
+                        <i class="fa fa-eye" title="设置为已查看"></i></a>
+                        {else}
+                        <i class="fa fa-eye-slash" title="设置为查看"></i>                     
+                        {/if}
+                        </a>
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'appRemove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要删除这条请求信息吗？')){return false;}">
+                            <i class="fa fa-trash-o" title="删除？"></i>
+                        </a>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时没有任何代理商申请！
+        </div> 
+        {/if}
+    </div>
+</div>
+{template 'web/common/search-user'}
+<script>
+    const forwardApi = "{php echo $this->createWebUrl('agent');}";
+        searchDlg.init('agent', function(agents, params){
+            if(agents && agents.length > 0) {
+                $.getJSON(forwardApi, 
+                {
+                    op:'forwardapp', 
+                    agentids: agents.map(function(agent){ return agent.id; }), 
+                    id: params.appid,
+                    
+                }).then(function(res){
+                    if(res && res.data['msg']) {
+                        util.message(res.data['msg'], '', res.status ?'success':'error');
+                    }
+                })            
+            }
+    })
+    $(function(){
+        $('#agentApplist').on('click', '.operate i.fa-reply-all', function(){
+            const id = $(this).data('id');
+            if(id) {
+                searchDlg.chooseMulti({appid: id});
+            }
+        })
+    })
+</script>
+{template 'common/footer'}

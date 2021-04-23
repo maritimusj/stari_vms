@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>称重柜设置</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <style type="text/css">
+        body {
+            background-color: #eee;
+        }
+
+        .d1 {
+            display: flex;
+            background-color: #fff;
+            margin: .4em auto .8em;
+            padding: .5em;
+            justify-content: space-between;
+        }
+        .d2 {
+            #display: flex;
+            background-color: #fff;
+            margin: 0 auto .8em;
+            padding: .5em;
+
+        }
+        .d3 {
+            #display: flex;
+            background-color: #fff;
+            margin: 0 auto .8em;
+            padding: .5em;
+
+        }
+
+        .d2-item {
+            display: flex;
+            padding-top: .5em;
+            padding-bottom: .5em;
+        }
+        .d2-item-bb {
+            border-bottom: 1px solid #a9a9a9;
+        }
+
+        .d2-title {
+            width: 6em;
+        }
+
+        .d3-item {
+            display: flex;
+            justify-content: space-around;
+            margin: .8em auto;
+        }
+
+        .d3-chi {
+            border: 1px solid #898989;
+            border-radius: .5em;
+            padding: 1em;
+            min-width: 6em;
+        }
+
+        .d3-1 {
+            margin-bottom: .5em;
+            font-size: .8em;
+        }
+        .d3-2 {
+            text-align: center;
+        }
+
+        .d4 {
+            background-color: #fff;
+            margin: .4em auto .8em;
+            padding: .5em;
+        }
+        .d4-1 {
+            margin-bottom: .5em;
+        }
+
+        input {
+            width: 3.5em;
+        }
+
+        .btn {
+            text-align: center;
+            padding: .4em 1.6em;
+            border-radius: .4em;
+            color: #000;
+        }
+        .btn-on {
+            background-color: #16A811;
+        }
+
+        .btn-off {
+            background-color: #d9d9d9;
+        }
+
+        .btn-on1 {
+            background-color: #ff8000;
+        }
+        .btn-off1 {
+            background-color: #c9c9c9;
+        }
+
+        .btn-cc {
+            text-align: center;
+            padding: .2em .4em;
+            border-radius: .4em;
+            color: #000;
+        }
+
+
+        #J_temp_save, #J_price_save {
+            width: 8em;
+            margin: auto;
+            border: 0;
+            text-align: center;
+
+            padding: .5em;
+            background-color: #16A811;
+        }
+
+        .t-c {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="J_body">
+    <div class="">
+
+        <div class="d1">
+
+        </div>
+
+        <div class="d2">
+            <div class="d2-item d2-item-bb">
+                <div class="d2-title">1号门</div>
+                <div class="" >
+                    {if isset($arr['door'][0])}
+                    {if $arr['door'][0] == 1}
+                    <button id="J_d0" class="btn btn-on">开门</button>
+                    {else}
+                    <button id="J_d0" class="btn btn-off" disabled="disabled">开门</button>
+                    {/if}
+                    {/if}
+                </div>
+            </div>
+            <div class="d2-item d2-item-bb">
+                <div class="d2-title">2号门</div>
+                <div class="" >
+                    {if isset($arr['door'][1])}
+                    {if $arr['door'][1] == 1}
+                    <button id="J_d1"  class="btn btn-on">开门</button>
+                    {else}
+                    <button id="J_d1" class="btn btn-off" disabled="disabled">开门</button>
+                    {/if}
+                    {/if}
+                </div>
+            </div>
+            <div class="d2-item d2-item-bb">
+                <div class="d2-title">消毒灯</div>
+                <div class="">
+                    {if isset($arr['sw'][2])}
+                    {if $arr['sw'][2] == 1}
+                    <button class="J_sw3 btn btn-on1" data-val="1">打开</button>
+                    <button class="J_sw3 btn btn-off1" data-val="0">关闭</button>
+                    {else}
+                    <button class="J_sw3 btn btn-off1" data-val="1">打开</button>
+                    <button class="J_sw3 btn btn-on1" data-val="0">关闭</button>
+                    {/if}
+                    {/if}
+                </div>
+            </div>
+            <div class="d2-item">
+                <div class="d2-title">温控模式</div>
+                <div class="">
+                    {if $set_data['mod'] == '制冷'}
+                    <button class="J_mode btn btn-on1" data-val="0">制冷</button>
+                    <button class="J_mode btn btn-off1" data-val="1">制热</button>
+                    {else}
+                    <button class="J_mode btn btn-off1" data-val="0">制冷</button>
+                    <button class="J_mode btn btn-on1" data-val="1">制热</button>
+                    {/if}
+                </div>
+            </div>
+        </div>
+
+        <div class="d4">
+            <div>
+                <div style="float: left;" class="d4-1">最低温度：<input id="J_t1" type="number" value="{$set_data['t1']}"></div>
+                <div style="float: left; margin-left: 2em;" class="d4-1">最高温度：<input id="J_t2" type="number"  value="{$set_data['t2']}"></div>
+                <div style="clear: both;"></div>
+            </div>
+            <div class="t-c">
+                <button id="J_temp_save">保存</button>
+            </div>
+        </div>
+
+        <div class="d3">
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">1号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp0">{$set_data['price'][0]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p0" value="">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="1">校准</button></div>
+                </div>
+
+                <div class="d3-chi">
+                    <div class="d3-2">2号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp1">{$set_data['price'][1]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p1">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="2">校准</button></div>
+
+                </div>
+            </div>
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">3号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp2">{$set_data['price'][2]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p2">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="3">校准</button></div>
+
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">4号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp3">{$set_data['price'][3]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p3">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="4">校准</button></div>
+
+                </div>
+            </div>
+
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">5号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp4">{$set_data['price'][4]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p4">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="5">校准</button></div>
+
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">6号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp5">{$set_data['price'][5]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p5">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="6">校准</button></div>
+
+                </div>
+            </div>
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">7号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp6">{$set_data['price'][6]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p6">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="7">校准</button></div>
+
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">8号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp7">{$set_data['price'][7]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p7">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="8">校准</button></div>
+
+                </div>
+            </div>
+            <div class="d3-item">
+                <div class="d3-chi">
+                    <div class="d3-2">9号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp8">{$set_data['price'][8]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p8">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="9">校准</button></div>
+
+                </div>
+                <div class="d3-chi">
+                    <div class="d3-2">10号托盘</div>
+                    <div class="d3-1">
+                        原价格：<span id="J_pp9">{$set_data['price'][9]}</span>元
+                    </div>
+                    <div class="d3-1">
+                        新价格：<input type="number" id="J_p9">
+                    </div>
+                    <div><button class="btn-cc J_cc" data-num="10">校准</button></div>
+
+                </div>
+            </div>
+
+            <div class="t-c">
+                <button id="J_price_save">一键修改</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{php \zovye\url(true, JS_JQUERY_URL);}
+<script type="text/javascript">
+    var the14thId = "{$the_14th_id}" || 99999999;
+    var the20thId = "{$the_20th_id}" || 0;
+    var the21thId = "{$the_21th_id}" || 0;
+
+    $(function () {
+
+
+        setInterval(function () {
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'new_event'));}",
+                {
+                    the_14th_id: the14thId,
+                    the_20th_id: the20thId,
+                    the_21th_id: the21thId
+                },
+                function (res) {
+                    res = JSON.parse(res);
+                    var keys = Object.keys(res['arr']);
+                    if (keys.length > 0) {
+
+                        if (typeof res['arr']['door'] != 'undefined') {
+                            if (res['arr']['door'][0] == '关') {
+                                $('#J_d0').removeClass('btn-off').addClass('btn-on').removeAttr("disabled");
+                            }
+                            if (res['arr']['door'][1] == '关') {
+                                $('#J_d1').removeClass('btn-off').addClass('btn-on').removeAttr("disabled");
+                            }
+                        }
+                        if (typeof res['arr']['sw'] != 'undefined') {
+                            /*
+                            if (res['arr']['sw'][2] == '空闲') {
+                                $($('.J_sw3')[0]).removeClass('btn-on1').addClass('btn-off1');
+                                $($('.J_sw3')[1]).removeClass('btn-off1').addClass('btn-on1');
+                            } else {
+                                $($('.J_sw3')[0]).removeClass('btn-off1').addClass('btn-on1');
+                                $($('.J_sw3')[1]).removeClass('btn-on1').addClass('btn-off1');
+                            }
+                            */
+                        }
+
+                        the14thId = res['the_14th_id'];
+                        the20thId = res['the_20th_id'];
+                    }
+
+                }
+            );
+        }, 1800);
+
+
+        $('#J_d0').on('click', function(){
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'door'));}",
+                {
+                    door: 0
+                },
+                function (res) {
+                    res = JSON.parse(res);
+                    if (res['status']) {
+                        $('#J_d0').removeClass('btn-on').addClass('btn-off').attr("disabled",true);
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+        $('#J_d1').on('click', function(){
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'door'));}",
+                {
+                    door: 1
+                },
+                function (res) {
+                    res = JSON.parse(res);
+                    if (res['status']) {
+                        $('#J_d1').removeClass('btn-on').addClass('btn-off').attr("disabled",true);
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+
+        $('.J_sw3').on('click', function () {
+            var val = $(this).data('val');
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'sw'));}",
+                {val: val},
+                function (res) {
+                    res = JSON.parse(res);
+                    if (res['status']) {
+                        if (val == 1) {
+                            $($('.J_sw3')[0]).removeClass('btn-off1').addClass('btn-on1');
+                            $($('.J_sw3')[1]).removeClass('btn-on1').addClass('btn-off1');
+                        } else {
+                            $($('.J_sw3')[0]).removeClass('btn-on1').addClass('btn-off1');
+                            $($('.J_sw3')[1]).removeClass('btn-off1').addClass('btn-on1');
+                        }
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+
+        $('.J_mode').on('click', function () {
+            var val = $(this).data('val');
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'mode'));}",
+                {val: val},
+                function (res) {
+                    res = JSON.parse(res);
+                    if (res['status']) {
+                        if (val == 0) {
+                            $($('.J_mode')[0]).removeClass('btn-off1').addClass('btn-on1');
+                            $($('.J_mode')[1]).removeClass('btn-on1').addClass('btn-off1');
+                        } else {
+                            $($('.J_mode')[0]).removeClass('btn-on1').addClass('btn-off1');
+                            $($('.J_mode')[1]).removeClass('btn-off1').addClass('btn-on1');
+                        }
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+        //
+        $('#J_temp_save').on('click', function(){
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'temp'));}",
+                {
+                    t1: $('#J_t1').val(),
+                    t2: $('#J_t2').val()
+                },
+                function(res){
+                    res = JSON.parse(res);
+                    if (res['status']) {
+                        //
+                        alert(res['data']['message']);
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+        //
+        $('.J_cc').on('click', function(){
+            var num = $(this).data('num');
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'cc'));}",
+                {num: num},
+                function(res){
+                    res = JSON.parse(res);
+                    console.log(res);
+                    if (res['status']) {
+
+                        alert(res['data']['message']);
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+
+        $('#J_price_save').on('click', function () {
+            $.post(
+                "{php echo $this->createMobileUrl('device', array('id'=>$device->getId(), 'op'=>'save_set', 'type'=>'price'));}",
+                {
+                    p0: $('#J_p0').val(),
+                    p1: $('#J_p1').val(),
+                    p2: $('#J_p2').val(),
+                    p3: $('#J_p3').val(),
+                    p4: $('#J_p4').val(),
+                    p5: $('#J_p5').val(),
+                    p6: $('#J_p6').val(),
+                    p7: $('#J_p7').val(),
+                    p8: $('#J_p8').val(),
+                    p9: $('#J_p9').val(),
+                },
+                function(res){
+                    res = JSON.parse(res);
+                    if (res['status']) {
+                        $('#J_p0').val('');
+                        $('#J_p1').val('');
+                        $('#J_p2').val('');
+                        $('#J_p3').val('');
+                        $('#J_p4').val('');
+                        $('#J_p5').val('');
+                        $('#J_p6').val('');
+                        $('#J_p7').val('');
+                        $('#J_p8').val('');
+                        $('#J_p9').val('');
+                        $('#J_pp0').html(res['price'][0]);
+                        $('#J_pp1').html(res['price'][1]);
+                        $('#J_pp2').html(res['price'][2]);
+                        $('#J_pp3').html(res['price'][3]);
+                        $('#J_pp4').html(res['price'][4]);
+                        $('#J_pp5').html(res['price'][5]);
+                        $('#J_pp6').html(res['price'][6]);
+                        $('#J_pp7').html(res['price'][7]);
+                        $('#J_pp8').html(res['price'][8]);
+                        $('#J_pp9').html(res['price'][9]);
+                        alert(res['data']['message']);
+                    } else {
+                        alert(res['data']['message']);
+                    }
+                }
+            );
+        });
+    });
+
+
+</script>
+</body>
+</html>

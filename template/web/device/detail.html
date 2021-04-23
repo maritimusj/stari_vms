@@ -1,0 +1,260 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .right-content {
+        overflow: hidden;
+    }
+    .screen .adv .carousel, 
+    .screen .adv .carousel .carousel-inner,
+    .screen .adv .carousel-inner .item,
+    .screen .adv .carousel-inner .item div,
+    .screen .adv .carousel-inner .item video{
+        width: 100%;
+        height: 100%;
+    }
+    #screen.offline {
+        filter: grayscale(100%);
+        opacity: 0.66;
+    }
+    .accounts{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .accounts .item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 6px;
+        margin: 6px;
+        border-radius: 6px;
+        width: 160px;
+    }
+    .accounts .item:hover{
+        box-shadow: 0 5px 10px #9E9E9E;
+        transform: translate3d(0, -6px, 0);
+    }
+    .accounts .item img.headimg {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 1px solid gray;
+    }
+    
+    .accounts .item img.qrcode {
+        margin: 10px 0;
+        width: 100px;
+        height: 100px;
+    }
+    
+    a:hover {
+        color: inherit;
+        text-decoration: none;
+    }
+    table#cargolanes th, table#cargolanes td{
+        text-align: center;
+        vertical-align: middle;
+    }
+    table#cargolanes div.loading{
+        vertical-align: middle;
+        line-height: 2em;
+    }
+    table#cargolanes div.loading i{
+        font-size: 1em;
+        color: #4CAF50;
+    }  
+</style>
+<ul class="nav nav-tabs" id="navbar">
+{loop $navs $nav_op $nav_title}
+{if $op == $nav_op}
+<li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
+{else}
+<li role="presentation"><a href="{php echo $this->createWebUrl('device', ['op' => $nav_op, 'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')]);}">{$nav_title}</a></li>
+{/if}
+{/loop}
+</ul>
+<div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>        
+    </div>
+    <div class="panel-body">
+        {if $config}
+        <div class="screen{if empty($app_online)} offline{/if}" id="screen">
+            <div class="adv">
+                {if $config['data']['advs']}
+                <div class="carousel slide" data-ride="carousel">
+                 <div class="carousel-inner" role="listbox">
+                    {loop $config['data']['advs'] $index $item}
+                    {if in_array($item['type'], array('image', 'video'))}
+                    <div class="item{if $index == 0} active{/if}" >
+                        {if $item['type'] == 'video'}
+                          <video id="my-video" class="video-js" preload="auto" data-setup="{}">
+                            <source src="{$item['url']}" type='video/mp4'>
+                          </video>
+                        {elseif $item['type'] == 'image'}
+                        <img src="{$item['url']}">
+                        {/if}
+                    </div>
+                    {/if}
+                    {/loop}
+                  </div>
+                </div>
+                {/if}
+            </div>
+            <div class="banner">
+                <img src="{$config['data']['qrcode']}" class="qrcode">
+                {if $config['data']['banner']}
+                <img src="{$config['data']['banner']}" class="guid">
+                {/if}
+            </div>
+            <div class="title">
+                {if !empty($config['data']['payload'])}
+                <span class="remain">当前剩余<span class="num">{$config['data']['payload']['remain']}/{$config['data']['payload']['capacity']}</span>包</span>
+                {/if}
+            </div>
+            <div class="scr_border">
+                <div class="buttons">
+                    <i class="fa fa-dot-circle-o"{if $deviceOnline} style="color:#fff"{/if}  title="{php echo $mcb_online ? '控制器在线':'控制器已离线'}"></i>
+                </div>
+                <i class="fa fa-info-circle" {if  $appOnline}style="color:#fff;"{/if} title="{php echo $app_online ? 'App在线':'App已离线'}"></i>
+            </div>
+        </div>
+        {/if}
+        {if $day_stats}
+        <div class="seg">
+            <div class="title">今日统计</div>
+            {$day_stats}
+        </div>
+        {/if}
+        {if $month_stats}
+        <div class="seg">
+            <div class="title">本月统计</div>
+            {$month_stats}
+        </div>
+        {/if} 
+
+            {if $config['data']['advs']}
+            <div class="seg">
+                <div class="title">屏幕广告</div>
+                {loop $config['data']['advs'] $item}
+                <div class="advlist">
+                    <div class="adv_title">{$item['title']}</div>
+                    <div class="adv_type {$item['type']}">{$media[$item['type']]['title']}</div>
+                    <div class="adv_url">{$item['url']}</div>
+                </div>
+                {/loop}
+            </div>
+            {/if}
+            {if $config['data']['srt']}
+            <div class="seg">
+                <div class="title">屏幕字幕</div>
+                <div  style="display:flex;">
+                {loop $config['data']['srt']['subs'] $text}
+                <div class="advlist">
+                    <div class="adv_url}"><pre>{$text}</pre></div>
+                </div>
+                {/loop}
+                </div>
+            </div>
+            {/if}
+            {if $accounts}
+            <div class="seg">
+                <div class="title">关注领取</div>
+                <div class="accounts">
+                    {loop $accounts $index $item}
+                    <a href="{$item['edit_url']}">
+                        <div class="item" style="background-color:{$item['clr']}" title="{$item['title']}">
+                            <img src="{media $item['img']}" class="headimg" />
+                            <img src="{media $item['qrcode']}" class="qrcode" />
+                            <div class="descr">{$item['descr']}</div>
+                        </div>                        
+                    </a>
+                    {/loop}
+                </div>
+            </div>
+            {/if}    
+            {if $payload['cargo_lanes']}
+            <div class="seg">
+                <div class="title">设备货道</div>
+                <div class="advlist">
+                    <table class="table table-bordered cargolanes" id="cargolanes">
+                        <thead>
+                            <th>货道</th>
+                            <th>商品名称</th>
+                            <th>价格</th>
+                            <th>容量</th>
+                            <th>当前商品数量</th>
+                        </thead>
+                        <tbody>
+                            {loop $payload['cargo_lanes'] $index $item}
+                            <tr data-fetchid="{php echo $device ? $device->getId() : 0;}">
+                                <td>货道{php echo $index + 1}</td>
+                                <td{if empty($item['goods_id'])} class="text-gray"{/if}>{$item['goods_name']}</td>
+                                <td>{$item['goods_price_formatted']}</td>
+                                <td>{$item['capacity']} {$item['goods_unit_title']}</td>
+                                <td>{$item['num']} {$item['goods_unit_title']}</td>
+                            </tr>
+                            {/loop}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {/if}      
+            {if $last_error_notify}
+            <div class="seg">
+                <div class="title">上次故障通知</div>
+                <div class="advlist">
+                    <div class="adv_title"><i class="fa fa-clock-o"></i> 通知时间</div>
+                    <div class="adv_type">{php echo $is_device_notify_timeout?'已超时':'冷却中'}</div>
+                    <div class="adv_url">{php echo date('Y-m-d H:i:s', $last_error_notify['createtime']);}</div>
+                </div>
+            </div>
+            {/if}
+            {if $last_remain_warning}
+            <div class="seg">
+                <div class="title">上次设备缺货通知</div>
+                <div class="advlist">
+                    <div class="adv_title"><i class="fa fa-clock-o"></i> 通知时间</div>
+                    <div class="adv_type">{php echo $is_last_remain_warning_timeout?'已超时':'冷却中'}</div>
+                    <div class="adv_url">{php echo date('Y-m-d H:i:s', $last_remain_warning['createtime']);}</div>
+                </div>
+            </div>
+            {/if}
+            
+            {if $last_apk_update}
+            <div class="seg">
+                <div class="title">上次app更新推送</div>
+                <div class="advlist">
+                    <div class="adv_title">{php echo $last_apk_update['title']}</div>
+                    <div class="adv_type">{php echo $last_apk_update['version']}</div>
+                    <div class="adv_url">时间： {php echo date('Y-m-d H:i:s', $last_apk_update['time']);} 网址：{php echo $last_apk_update['url']}</div>
+                </div>
+            </div>
+            {/if}
+            
+            {if $first_total}
+            <div class="seg">
+                <div class="title">重启记录</div>
+                <div class="advlist">
+                    <div class="adv_title">今日重启</div>
+                    <div class="adv_url"><span  style="color:#f00;">{$first_total}</span>次</div>
+                </div>
+            </div>
+            {/if}
+    {if $config}
+            <div class="seg">
+                <div class="title">设备配置</div>
+                    <pre>
+{php echo json_encode($config['data'], JSON_PRETTY_PRINT);}
+                    </pre>
+            </div>
+        </div>
+    {/if}
+</div>
+<script>
+$(function(){
+    $('.carousel').carousel();
+})
+</script>
+{template 'common/footer'}

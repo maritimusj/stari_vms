@@ -1,0 +1,1451 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+
+<style>
+    .order_type {
+        background: #ccc;
+        padding: 3px 6px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        color: #f7f8fa;
+        margin: 1px;
+        cursor: default;
+    }
+    .mixed_order_type {
+        margin: 1px 1px;
+        background: #ccc;
+        color: #f7f8fa;
+        width: 100px;
+        text-align: center;
+        padding: 3px 6px;
+        cursor: default;
+    }
+    .order_type.f,.mixed_order_type.f {
+        border-color: #777;
+        background: #8bc34a;
+    }
+    .order_type.f.none,
+    .mixed_order_type.f.none,
+    .order_type.b.none,
+    .mixed_order_type.b.none,
+    .order_type.p.none,
+    .mixed_order_type.p.none{
+        border-color: #777;
+        background: #ccc;
+    }
+    .order_type.b,.mixed_order_type.b {
+        border-color: #777;
+        background: #ffc107;
+    }
+    .order_type.p,.mixed_order_type.p {
+        border-color: #777;
+        background: #03a9f4;
+    }
+    .mixed_order_type .name {
+        margin-right: 6px;
+    }
+    .mixed_order_type span.percent:after {
+        content: '%';
+    }
+    .mixed_order_type span.amount:after {
+        content: '元';
+    }
+    .rel {
+        cursor: pointer;
+    }
+</style>
+
+<div style="margin-bottom: 1em;display: block;">
+    <div style="position:absolute;float:right;right:2em;top:1em;z-index: 99;">
+        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative">
+            <img src="{php echo $agent->getAvatar();}">
+            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            {if $agent->isAgent()}
+            <span class="agent-user">[ 代理商 ]</span>
+            {/if}
+        </div>
+    </div>
+</div>
+
+{if $op == 'agent_base' || $op == 'create' || $op == 'edit'}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">基本信息</a></li>
+    {if $agent->isAgent()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_notice', 'id'=>$id));}">通知设置</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_funcs', 'id'=>$id));}">功能设置</a></li>
+    {if \zovye\App::isCommissionEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_commission', 'id'=>$id));}">佣金设置</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_payment', 'id'=>$id));}">支付</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_misc', 'id'=>$id));}">其它</a></li>
+    {/if}
+</ul>
+<form action="{php echo $this->createWebUrl('agent');}" method="post">
+    <div class="panel panel-default panel-first nav-tab-item">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">代理信息</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">代理等级</label>
+                    <div class="col-md-10">
+                        <select name="level" style="width:100%">
+                            {loop $agent_levels $index $level}
+                            <option value="{$index}"{if $agent_data['level']==$index} selected{/if} style="color:{$level['clr']}"> {$level['title']} </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="license" class="col-md-2 control-label">授权证书号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="license" id="license" value="{$agent_data['license']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">所属上级</label>
+                    <div class="col-md-5">
+                        <select name="superior" id="selectagent" style="width:100%;">
+                            {if $superior}
+                            <option value="{php echo $superior->getOpenid();}">{php echo $superior_data['name']?:'未登记';}，手机号码：{php echo $superior->getMobile()?:'未登记';}，公司：{php echo $superior_data['company']?:'未登记'}</option>
+                            {/if}
+                            <option value="0">&lt;无&gt;</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="keyword" id="keyword" placeholder="请输入手机号码或者名称查找">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" id="findAgent"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">基本信息</div>
+                <div class="form-group">
+                    <label for="name" class="col-md-2 control-label">姓名</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="name" id="name" value="{$agent_data['name']}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="mobile" class="col-md-2 control-label">手机号码</label>
+                    <div class="col-md-10">
+                        <input type="tel" class="form-control" name="mobile" id="mobile" value="{php echo $agent ? $agent->getMobile():''}" required>
+                        <span class="help-block">* 手机号码必须提供，代理商管理小程序需要手机号码才能登录！</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="company" class="col-md-2 control-label">公司名称</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="company" id="company" value="{$agent_data['company']}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">所在区域</label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_district('area', $agent_data['area']);}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="agent_base" value="1">
+        <input type="hidden" name="from" value="{$op}">
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">
+            {if $agent->isAgent()}保存{else}创建{/if}
+        </button>
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
+    </div>
+</form>
+<script>
+    require(['jquery', 'util'], function($, util){
+        $(function(){
+            $('#findAgent').click(function(){
+                util.loading();
+                const level = $('select[name=level]').val();
+                const keyword = $("input[name=keyword]").val();
+
+                $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {op:'search', level:level, keyword:keyword}, function(res){
+                    let html = '';
+                    if(res.status) {
+                        const list = res.data || [];
+                        list.forEach(function(e) {
+                            html += '<option value="_1*">_2*，手机号码：_3*，公司：_4*</option>'
+                                .replace('_1*', e.openid)
+                                .replace('_2*', e.name)
+                                .replace('_3*', e.mobile)
+                                .replace('_4*', e.company);
+                        })
+                    }
+                    html += '<option value="0"><无></option>';
+                    $('#selectagent').html(html);
+
+                }, 'json').complete(function(){
+                    util.loaded();
+                })
+            })
+        })
+    })
+</script>
+{elseif $op == 'agent_notice'}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_base', 'id'=>$id));}">基本信息</a></li>
+    <li role="presentation" class="active"><a href="#">通知设置</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_funcs', 'id'=>$id));}">功能设置</a></li>
+    {if \zovye\App::isCommissionEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_commission', 'id'=>$id));}">佣金设置</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_payment', 'id'=>$id));}">支付</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_misc', 'id'=>$id));}">其它</a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('agent');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">微信通知</div>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="remainWarning" value="1" {if !isset($agent_data['notice']) || $agent_data['notice']['remainWarning']}checked{/if}>
+                                接收 <big>设备缺货</big> 微信推送通知
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="deviceError" value="1" {if !isset($agent_data['notice']) ||$agent_data['notice']['deviceError']}checked{/if}>
+                                接收 <big>设备故障</big> 微信推送通知
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="deviceOnline" value="1" {if !isset($agent_data['notice']) ||$agent_data['notice']['deviceOnline']}checked{/if}>
+                                接收 <big>设备上下线</big> 微信推送通知
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="reviewResult" value="1" {if !isset($agent_data['notice']) ||$agent_data['notice']['reviewResult']}checked{/if}>
+                                接收 <big>广告审核结果</big> 微信推送通知
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentApp" value="1" {if !isset($agent_data['notice']) ||$agent_data['notice']['agentApp']}checked{/if}>
+                                接收 <big>代理商申请</big> 微信推送通知
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentMsg" value="1" {if !isset($agent_data['notice']) ||$agent_data['notice']['agentMsg']}checked{/if}>
+                                接收 <big>消息提醒</big> 微信推送通知
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="agent_notice" value="1">
+        <input type="hidden" name="from" value="{$op}">
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">
+            {if $agent->isAgent()}保存{else}创建{/if}
+        </button>
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
+    </div>
+</form>
+{elseif $op == 'agent_funcs'}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_base', 'id'=>$id));}">基本信息</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_notice', 'id'=>$id));}">通知设置</a></li>
+    <li role="presentation" class="active"><a href="#">功能设置</a></li>
+    {if \zovye\App::isCommissionEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_commission', 'id'=>$id));}">佣金设置</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_payment', 'id'=>$id));}">支付</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_misc', 'id'=>$id));}">其它</a></li>
+</ul>
+<style>
+    form .seg .checkbox-inline {
+        margin: 10px 10px 0 0;
+    }
+</style>
+<form action="{php echo $this->createWebUrl('agent');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">小程序后台</div>
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_tj" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_tj'])}checked{/if}> 出货统计
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_xj" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_xj'])}checked{/if}> 下级代理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_sb" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_sb'])}checked{/if}> 设备管理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_zc" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_zc'])}checked{/if}> 设备注册
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_qz" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_qz'])}checked{/if}> 缺货设备
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_gz" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_gz'])}checked{/if}> 故障设备
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_yy" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_yy'])}checked{/if}> 运营人员
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_gg" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_gg'])}checked{/if}> 广告管理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_xf" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_xf'])}checked{/if}> 吸粉管理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_pt" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_pt'])}checked{/if}> 广告平台
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_wt" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_wt'])}checked{/if}> 常见问题
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_wd" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_wd'])}checked{/if}> 文档中心
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_xh" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_xh'])}checked{/if}> 型号管理
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="F_sp" value="1" {if (!isset($agent_data['funcs']) || $agent_data['funcs']['F_sp'])}checked{/if}> 商品管理
+                    </label>
+                </div>
+            </div>
+            {if \zovye\App::isCustomWxAppEnabled()}
+            <div class="seg">
+                <div class="title">小程序</div>
+                <div class="form-group">
+                    <label for="WxAppKey" class="col-md-2 control-label">App ID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="WxAppKey" id="WxAppKey" value="{$agent_data['wx']['app']['key']}">
+                        <span class="help-block">* 代理商独立小程序appID</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="WxAppSecret" class="col-md-2 control-label">App Secret</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="WxAppSecret" id="WxAppSecret" value="{$agent_data['wx']['app']['secret']}">
+                        <span class="help-block">* 代理商独立小程序app secret</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="agent_funcs" value="1">
+        <input type="hidden" name="from" value="{$op}">
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">
+            {if $agent->isAgent()}保存{else}创建{/if}
+        </button>
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
+    </div>
+</form>
+<script>
+    $(function(){
+        const maskE = $('<div title="点击编辑">×××已隐藏×××</div>');
+        $('form .inputMask').each(function(){
+            const self = $(this);
+            const x = maskE.clone();
+            x.attr('class', self.attr('class')).click(function(){
+                x.hide();
+                self.show().focus();
+            })
+            x.insertBefore(self);
+            self.removeClass('inputMask').hide();
+            self.blur(function(){
+                x.show();
+                self.hide();
+            })
+        })
+    })
+</script>
+{elseif $op == 'agent_commission'}
+<style>
+    #special2 fieldset[disabled] label,
+    #special2 fieldset[disabled] input,
+    #special2 fieldset[disabled] table {
+        color: gray;
+    }
+    #special2 fieldset[disabled]{
+        display: none;
+    }
+    #userlist td .detail{
+        text-align: center;
+        padding: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_base', 'id'=>$id));}">基本信息</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_notice', 'id'=>$id));}">通知设置</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_funcs', 'id'=>$id));}">功能设置</a></li>
+    {if \zovye\App::isCommissionEnabled()}
+    <li role="presentation" class="active"><a href="#">佣金设置</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_payment', 'id'=>$id));}">支付</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_misc', 'id'=>$id));}">其它</a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('agent');}" method="post" id="commission-form">
+    <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+            {if $agent_data['commission']['enabled']}
+            <button type="button" class="btn btn-danger pull-right" data-op="exit">退出分佣</button>
+            {/if}
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-10">
+                    {if empty($agent_data['commission']['enabled'])}
+                    代理还没有加入佣金系统，是否立即加入？ <button type="button" class="btn btn-success"  data-op="join">点击加入</button>
+                    {/if}
+                </div>
+            </div>
+            {if $agent_data['commission']['enabled']}
+            <div class="seg" id="special">
+                <div class="title">支付领取</div>
+                <div class="form-group">
+                    <label for="commission_fee" class="col-md-2 control-label">手续费</label>
+                    <div class="col-md-10">
+                        <div class="control-label checkbox-inline">
+                            <label for="feeType1" class="radio-inline">
+                                <input name="feeType" id="feeType1" type="radio" value="1" {if $agent_data['commission']['fee_type'] == 1}checked="checked"{/if} onclick="chfeeTypeTitle('%')">
+                                按百分比&nbsp;
+                            </label>
+                            <label for="feeType0" class="radio-inline">
+                                <input name="feeType" id="feeType0" type="radio" value="0"  {if $agent_data['commission']['fee_type'] == 0}checked="checked"{/if} onclick="chfeeTypeTitle('元')">
+                                固定金额 &nbsp;
+                            </label>
+                            <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="commission_fee" id="commission_fee" value="{php echo number_format($agent_data['commission']['fee'] /100, 2)}" min="0" step="0.01">
+                            <span id="fee_type_title">{if $agent_data['commission']['fee_type']==1}%{else}元{/if}</span>
+                            <span class="help-block">* 用户微信支付购买商品，平台扣除相应费用，0表示不扣手续费</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg" id="special2">
+                <div class="title">佣金分享</div>
+                <div class="form-group">
+                    <label for="gsp_enabled" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="gsp_enabled" id="gsp_enabled" value="1" {if $agent_data['gsp']['enabled']}checked{/if}>
+                                是否开启佣金分享功能
+                            </label>
+                        </div>
+                    </div>
+                </div>                
+                <fieldset {if empty($agent_data['gsp']['enabled'])}disabled{/if} id="gsp">
+                
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">分佣模式</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode" value="rel" {if $agent_data['gsp']['mode'] == 'rel'}checked{/if}>
+                                三级分佣 <span style="color:gray;">（代理商所得佣金与上级分佣）</span>
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode" value="free"  {if $agent_data['gsp']['mode'] == 'free'}checked{/if}>
+                                自由分佣 <span style="color:gray;">（自由指定用户参与分佣）</span>
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode" value="mixed"  {if $agent_data['gsp']['mode'] == 'mixed'}checked{/if}>
+                                混合分佣 <span style="color:gray;">（根据订单类型分别指定不同佣金）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <fieldset {if empty($agent_data['gsp']['enabled']) || $agent_data['gsp']['mode']!='rel'}disabled{/if} id="gsp_mode_rel_settings">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">订单类型</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="freeOrderGSP" value="1" {if $agent_data['gsp']['order']['f']}checked{/if}> 免费订单
+                        </label>
+                        {if \zovye\App::isUserCenterEnabled()}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="balanceOrderGSP" value="1" {if $agent_data['gsp']['order']['b']}checked{/if}> 余额订单
+                        </label>
+                        {else}
+                        <input type="hidden" name="balanceOrderGSP" value="{$agent_data['gsp']['order']['b']}">
+                        {/if}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="payOrderGSP" value="1" {if $agent_data['gsp']['order']['p']}checked{/if}> 支付订单
+                        </label>
+                        <span class="help-block">* 参与佣金分享的订单类型，只有勾选的订单类型才会参与佣金分享</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">计算方式</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode_type" value="percent" {if $agent_data['gsp']['mode_type'] == 'percent'}checked{/if}>
+                                百分比(%)
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="gsp_mode_type" value="amount"  {if $agent_data['gsp']['mode_type'] == 'amount'}checked{/if}>
+                                固定金额(元)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_level1" class="col-md-2 control-label"><b>直接上级</b></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_level1" id="rel_level1" value="{php echo number_format($agent_data['gsp']['rel'][level1] / 100, 2);}" min="0.00" max="100.00" step="0.01">
+                        <span class="help-block">* 直接上级代理商会获得的佣金百分比或金额</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_level2" class="col-md-2 control-label"><b>上上级</b></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_level2" id="rel_level2" value="{php echo number_format($agent_data['gsp']['rel'][level2] / 100, 2);}" min="0.00" max="100.00" step="0.01">
+                        <span class="help-block">* 上级的上一级代理会获得的佣金百分比或金额</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="rel_level3" class="col-md-2 control-label"><b>上上上级</b></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="rel_level3" id="rel_level3" value="{php echo number_format($agent_data['gsp']['rel'][level3] / 100, 2);}" min="0.00" max="100.00" step="0.01">
+                        <span class="help-block">* 上级的上一级的上级代理会获得的佣金百分比或金额</span>
+                    </div>
+                </div>
+                </fieldset>
+                <fieldset {if empty($agent_data['gsp']['enabled']) || $agent_data['gsp']['mode']!='free'}disabled{/if} id="gsp_mode_free_settings">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        {if $free_gsp_users}
+                        <table class="table" id="userlist">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>用户</th>
+                                <th></th>
+                                <th>佣金</th>
+                                <th>加入时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {loop $free_gsp_users $index $item}
+                            {if $item}
+                            <tr data-id="{$item['id']}">
+                                <td>{php echo $index + 1}</td>
+                                <td>
+                                    <div class="profile">
+                                        <img src="{$item['avatar']}" />
+                                        <span>{$item['nickname']}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {loop $item['order_type'] $index $o}
+                                    {if \zovye\App::isUserCenterEnabled()} 
+                                    <span class="order_type {if $o}{$index}{/if}" title="{if $index == 'f'}免费订单{elseif $index == 'b'}余额订单{elseif $index == 'p'}支付订单{/if}">{if $index == 'f'}免费{/if}{if $index == 'b'}余额{/if}{if $index == 'p'}支付{/if}</span>
+                                    {else}
+                                    {if $index != 'b'}
+                                    <span class="order_type {if $o}{$index}{/if}" title="{if $index == 'f'}免费订单{elseif $index == 'p'}支付订单{/if}">{if $index == 'f'}免费{/if}{if $index == 'p'}支付{/if}</span>
+                                    {/if}
+                                    {/if}                                    
+                                    {/loop}
+                                </td>
+                                <td>
+                                    {if $item['percent']}
+                                    {$item['percent']}%
+                                    {else}
+                                    ¥{php echo number_format($item['amount'], 2)}
+                                    {/if}
+                                </td>
+                                <td>
+                                    {$item['createtime_formatted']}
+                                </td>
+                                <td class="operate">
+                                    <!--<i class="fa fa-wrench" title="指定设备" data-gsp-op="config"></i>-->
+                                    <i class="fa fa-cog" title="设置" data-gsp-op="free_edit"></i>
+                                    <i class="fa fa-trash-o" title="删除" data-gsp-op="free_remove"></i>
+                                </td>
+                            </tr>
+                            {/if}
+                            {/loop}
+                            </tbody>
+                        </table>
+                        {else}
+                        <span class="help-block">提示：暂时还没有任何佣金分享用户，点击以下按钮添加...</span>
+                        {/if}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-success" onclick="searchDlg.choose('free');">
+                            <i class="fa fa-user"></i>
+                            添加用户
+                        </button>
+                    </div>
+                </div>
+                </fieldset>
+                <fieldset {if empty($agent_data['gsp']['enabled']) || $agent_data['gsp']['mode']!='mixed'}disabled{/if} id="gsp_mode_mixed_settings">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            {if $mixed_gsp_users}
+                            <table class="table" id="rolelist">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>用户</th>
+                                    <th>角色</th>
+                                    <th>佣金</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {php $mixed_index = 1}
+                                {loop $mixed_gsp_users $index $item}
+                                {if $item}
+                                <tr data-id="{$item['id']}">
+                                    <td>{php echo $mixed_index ++;}</td>
+                                    <td>
+                                        <div class="profile">
+                                            <img src="{$item['avatar']}" />
+                                            <span>{$item['nickname']}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {if $index == '[level1]'}
+                                        <span class="rel level1" data-op="editRole" data-level="[level1]">直接上级（一级）</span>
+                                        {elseif $index == '[level2]'}
+                                        <span class="rel level2" data-op="editRole" data-level="[level2]">上上级（二级）</span>
+                                        {elseif $index == '[level3]'}
+                                        <span class="rel level3" data-op="editRole" data-level="[level3]">上上上级（三级）</span>
+                                        {else}
+                                        {/if}
+                                    </td>
+                                    <td>
+                                        {if $item['f']}
+                                        <div class="mixed_order_type f{if $item['f']['val'] == 0} none{/if}">
+                                            <span class="name">免费</span><span class="{$item['f']['val_type']}">{$item['f']['val']}</span>
+                                        </div>                                        
+                                        {/if}
+                                        {if \zovye\App::isUserCenterEnabled() && $item['b']}
+                                        <div class="mixed_order_type b{if $item['b']['val'] == 0} none{/if}">
+                                            <span class="name">余额</span><span class="{$item['b']['val_type']}">{$item['b']['val']}</span>
+                                        </div>                                        
+                                        {/if}
+                                        {if $item['p']}
+                                        <div class="mixed_order_type p{if $item['p']['val'] == 0} none{/if}">
+                                            <span class="name">支付</span><span class="{$item['p']['val_type']}">{$item['p']['val']}</span>
+                                        </div>                                        
+                                        {/if}
+                                    </td>
+                                    <td class="operate">
+                                        <!--<i class="fa fa-wrench" title="指定设备" data-gsp-op="config"></i>-->
+                                        
+                                        {if !in_array($index, ['[level1]', '[level2]', '[level3]'])}
+                                        <i class="fa fa-cog" title="设置" data-gsp-op="mixed_edit"></i>
+                                        <i class="fa fa-trash-o" title="删除" data-gsp-op="mixed_remove"></i>
+                                        {/if}
+                                    </td>
+                                </tr>
+                                {/if}
+                                {/loop}
+                                </tbody>
+                            </table>
+                            {else}
+                            <span class="help-block">提示：暂时还没有任何佣金分享用户，点击以下按钮添加...</span>
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div type="button" class="btn btn-success" data-op="addRole">
+                                <i class="fa fa-users" data-op="addRole"></i>
+                                设置角色
+                            </div>
+                            <button type="button" class="btn btn-success" onclick="searchDlg.choose('mixed');">
+                                <i class="fa fa-user"></i>
+                                添加用户
+                            </button>
+                        </div>
+                    </div>
+                    </fieldset>
+                </fieldset>
+            </div>
+            <div class="seg" id="special3">
+                <div class="title">佣金奖励</div>
+                <div class="form-group">
+                    <label for="agentBonusEnabled" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentBonusEnabled" id="agentBonusEnabled" value="1" {if $agent_data['bonus']['enabled']}checked{/if}>
+                                是否开启佣金奖励功能<span style="color:#666;">（开启后，代理商以及其上级代理商会获取平台的佣金奖励）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if  empty($agent_data['bonus']['enabled'])}disabled{/if} id="agent_bonus_enabled">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">订单类型</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="freeOrder" value="1" {if $agent_data['bonus']['order']['f']}checked{/if}> 免费订单
+                        </label>
+                        {if \zovye\App::isUserCenterEnabled()}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="balanceOrder" value="1" {if $agent_data['bonus']['order']['b']}checked{/if}> 余额订单
+                        </label>
+                        {else}
+                        <input type="hidden" name="balanceOrder" value="{$agent_data['bonus']['order']['b']}">
+                        {/if}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="payOrder" value="1" {if $agent_data['bonus']['order']['p']}checked{/if}> 支付订单
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bonus_level0" class="col-md-2 control-label"><b>代理商</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="bonus_level0" id="bonus_level0" value="{php echo number_format($agent_data['bonus']['level0'] / 100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 代理商会获得的现金奖励</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bonus_level1" class="col-md-2 control-label"><b>直接上级</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="bonus_level1" id="bonus_level1" value="{php echo number_format($agent_data['bonus']['level1'] / 100, 2)}"  min="0" step="0.01">
+                        <span class="help-block">* 直接上级代理商会获得的现金奖励</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bonus_level2" class="col-md-2 control-label"><b>上上级</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="bonus_level2" id="bonus_level2" value="{php echo number_format($agent_data['bonus']['level2'] / 100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 上级的上一级代理会获得的现金奖励</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bonus_level3" class="col-md-2 control-label"><b>上上上级</b><br/>获得奖励（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="bonus_level3" id="bonus_level3" value="{php echo number_format($agent_data['bonus']['level3'] / 100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 上级的上一级的上级代理会获得的现金奖励</span>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="commission" value="{php echo $agent_data['commission']['enabled'] ? 1 : 0}">
+        <input type="hidden" name="agent_commission" value="1">
+        <input type="hidden" name="from" value="{$op}">
+        <input type="hidden" name="id" value="{$id}">
+
+        {if $agent_data['commission']['enabled']}
+        <button type="submit" class="btn btn-primary">
+            保存
+        </button>
+        {/if}
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
+    </div>
+</form>
+{template 'web/common/search-user'}
+<script>
+    function chfeeTypeTitle(title) {
+        $("#fee_type_title").html(title);
+    }
+
+    const api = {
+        url: "{php echo $this->createWebUrl('agent', array('agentid' => $id));}",
+    }
+
+    api.showResult = function (params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function (res) {
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if (cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function () {
+            loading && util.loaded();
+        })
+    }
+
+     api.remove = function (id, from) {
+        if (confirm('确定要删除这个用户吗？')) {
+            api.showResult({ op: 'gsp', fn: 'removeuser', id: id, from }, null, false, function (res) {
+                if (res.status) {
+                    $('tr[data-id=' + id + ']').remove();
+                    return true;
+                }
+            })
+        }
+    }
+
+    api.free_remove = function (id) {
+        api.remove(id, 'free');
+    }
+
+    api.mixed_remove = function (id) {
+        api.remove(id, 'mixed');
+    }
+
+    api.edit = function (id, from) {
+        location.href = api.url + "&op=gsp&fn=edituser&id=" + id + "&from=" + from;
+    }
+
+    api.free_edit = function (id) {
+        api.edit(id, 'free');
+    }
+
+    api.mixed_edit = function (id) {
+        api.edit(id, 'mixed');
+    }
+
+    api.addRole = function () {
+        api.showResult({ op: 'gsp', fn: 'add_role' })
+    }
+    
+    api.editRole = function (self) {
+        const level = self.data('level');
+        api.showResult({ op: 'gsp', fn: 'add_role',  level: level });
+    }
+
+    api.saveRole = function () {
+        const form = $("#addRoleForm").serialize();
+        $.post(api.url, form).then(function (res) {
+            if (res && res.data.msg) {
+                util.message(res.data.msg, "", res.status ? 'success':'error');
+            }
+        })
+    }
+
+    searchDlg.init('user', function (user, from) {
+        if (user && user.id) {
+            location.href = api.url + "&op=gsp&fn=adduser&id=" + user.id + "&from=" + from;            
+        }
+    })
+
+    function changeType(target) {
+        const div = target.closest("div");
+        const type = div.find("input:checked").data('type');
+        div.find(".type-text").html(type);
+    }
+
+    function setFormVal(val) {
+        if (val['f']) {
+            if (val['f']['val_type'] == 'percent') {
+                $('#addRoleForm input#freeOrder1').prop('checked', true);
+            } else {
+                $('#addRoleForm input#freeOrder0').prop('checked', true);
+            }
+            $("#addRoleForm input[name=freeOrderVal]").val(val['f']['val']);
+        } else {
+            $('#addRoleForm input#freeOrder1').prop('checked', false);
+            $('#addRoleForm input#freeOrder0').prop('checked', false);
+            $("#addRoleForm input[name=freeOrderVal]").val('0');
+        }
+        if (val['b']) {
+            if (val['b']['val_type'] == 'percent') {
+                $('#addRoleForm input#balanceOrder1').prop('checked', true);
+            } else {
+                $('#addRoleForm input#balanceOrder0').prop('checked', true);
+            }
+            $("#addRoleForm input[name=balanceOrderVal]").val(val['b']['val']);
+
+        } else {
+            $('#addRoleForm input#balanceOrder1').prop('checked', false);
+            $('#addRoleForm input#balanceOrder0').prop('checked', false);
+            $("#addRoleForm input[name=balanceOrderVal]").val('0');
+        }
+        if (val['p']) {
+            if (val['p']['val_type'] == 'percent') {
+                $('#addRoleForm input#payOrder1').prop('checked', true);
+            } else {
+                $('#addRoleForm input#payOrder0').prop('checked', true);
+            }
+            $("#addRoleForm input[name=payOrderVal]").val(val['p']['val']);
+
+        } else {
+            $('#addRoleForm input#payOrder1').prop('checked', false);
+            $('#addRoleForm input#payOrder0').prop('checked', false);
+            $("#addRoleForm input[name=payOrderVal]").val('0');
+        }
+        changeType($("input[name=freeOrderType]"));
+        changeType($("input[name=balanceOrderType]"));
+        changeType($("input[name=payOrderType]"));
+    }
+
+    function enableRoleForm(enabled) {
+        $('#addRoleForm select').attr("disabled", !enabled);
+        $('#addRoleForm button').attr("disabled", !enabled);
+        $('#addRoleForm input').attr("disabled", !enabled);
+        $('#addRoleForm label,#addRoleForm span, #addRoleForm select, #addRoleForm input').css("color", enabled ? "" : "#ccc"); 
+    }
+
+    function getRole(level) {
+        let loading = true;
+        setTimeout(() => {
+            if (loading) {
+                enableRoleForm(false);
+            }            
+        }, 500);
+        
+        $.get(api.url, { level: level, op: 'gsp', fn: 'get_role' }).then(function (res) {
+            if (res && res.status) {
+                setFormVal(res.data);
+            } else {
+                util.message(res.data.msg, '', 'error');
+            }
+            loading = false;
+            enableRoleForm(true);
+        })
+    }
+
+    $(function () {
+        $('body').on('change', "select[name=level]", function () {
+            const level = $(this).val();
+            getRole(level);
+        })
+        $('body').on("click", "[data-type]", function () {
+            changeType($(this));
+        })
+        $('#commission-form button[data-op]').click(function () {
+            const form = $('#commission-form');
+            const type = $(this).data('op');
+            if (type === 'exit') {
+                form.find('input[name=commission]').val(0);
+            } else {
+                form.find('input[name=commission]').val(1);
+            }
+            form.submit();
+        })
+
+        function checkMode() {
+            const mode = $('#special2 input[name=gsp_mode]:checked').val();
+            $('#special2 fieldset#gsp_mode_rel_settings').attr('disabled', mode !== 'rel');
+            $('#special2 fieldset#gsp_mode_free_settings').attr('disabled', mode !== 'free');
+            $('#special2 fieldset#gsp_mode_mixed_settings').attr('disabled', mode !== 'mixed');
+        }
+
+        $('#special2 input[name=gsp_enabled]').click(function () {
+            $('#special2 fieldset#gsp').attr('disabled', !$(this).is(':checked'));
+            checkMode();
+        })
+
+        $('#special3 input[name=agentBonusEnabled]').click(function () {
+            $('#special3 fieldset#agent_bonus_enabled').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special2 input[name=gsp_mode]').click(checkMode);
+
+        $('#gsp_mode_free_settings').on('click', '[data-gsp-op]', function () {
+            const self = $(this);
+            const op = self.data('gsp-op');
+            const id = $(this).closest('tr').data('id');
+            if (api[op]) {
+                api[op](id);
+            }
+        })
+
+        $('#gsp_mode_mixed_settings').on('click', '[data-op]', function (e) {
+            const self = $(this);
+            const op = self.data('op');
+            if (api[op]) {
+                api[op](self);
+            }
+        })
+
+        $('#gsp_mode_mixed_settings').on('click', '[data-gsp-op]', function () {
+            const self = $(this);
+            const op = self.data('gsp-op');
+            const id = $(this).closest('tr').data('id');
+            if (api[op]) {
+                api[op](id);
+            }
+        })
+    })
+</script>
+{elseif $op == 'agent_misc'}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_base', 'id'=>$id));}">基本信息</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_notice', 'id'=>$id));}">通知设置</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_funcs', 'id'=>$id));}">功能设置</a></li>
+    {if \zovye\App::isCommissionEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_commission', 'id'=>$id));}">佣金设置</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_payment', 'id'=>$id));}">支付</a></li>
+    <li role="presentation" class="active"><a href="#">其它</a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('agent');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+            <div class="seg" id="special2">
+                <div class="title">定位</div>
+                <div class="form-group">
+                    <label for="locationEnabled" class="col-md-2 control-label">用户定位</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="locationEnabled" id="locationEnabled" value="1" {if $agent_data['location']['validate']['enabled']}checked{/if}>
+                                用户扫描设备二维码后，先确认用户和设备的定位距离
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($agent_data['location']['validate']['enabled'])}disabled{/if}>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">有效范围（米）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="locationDistance" id="locationDistance" value="{$agent_data['location']['validate']['distance']}" min="1">
+                        <span class="help-block">* 只有在设备有效范围以内，才可以领取或购买（请在代理商小程序端保存设备定位信息）</span>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            <div class="seg">
+                <div class="title">设备</div>
+                <div class="form-group">
+                    <label for="siteTitle" class="col-md-2 control-label">设备领取页面标题</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="siteTitle" id="siteTitle" value="{$agent_data['misc']['siteTitle']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">设备领取页面logo</label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_image('image', $agent_data['misc']['siteLogo'])}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="remainWarning" class="col-md-2 control-label">缺货通知</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="remainWarning" id="remainWarning" value="{$agent_data['device']['remainWarning']}" required>
+                        <span class="help-block">* 当设备商品少于指定数量时，发送缺货通知，0表示永远不通知</span>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">其它</div>
+                <!--
+                <div class="form-group">
+                    <label for="maxAccounts" class="col-md-2 control-label">限制公众号显示数量</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="maxAccounts" id="maxAccounts" value="{$agent_data['misc']['maxAccounts']}">
+                        <span class="help-block">* 关注公众号页面中最多显示公众号数量, 0表示不限制</span>
+                    </div>
+                </div>
+                -->
+                <div class="form-group">
+                    <label for="maxFree" class="col-md-2 control-label">用户每天的免费额度</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="maxFree" id="maxFree" value="{$agent_data['misc']['maxFree']}">
+                        <span class="help-block">* 用户每天可免费领取的最大次数, 0表示系统默认。</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">工厂权限</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="power1" class="radio-inline">
+                            <input name="power" id="power1" type="radio" value="1" {if $agent_data['misc']['power'] == 1}checked="checked"{/if}>
+                            开启
+                        </label>
+                        <label for="power0" class="radio-inline">
+                            <input name="power" id="power0" type="radio" value="0"  {if !isset($agent_data['misc']['power']) || $agent_data['misc']['power'] == 0}checked="checked"{/if}>
+                            关闭
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">自动退款(该代理商)</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="auto_ref1" class="radio-inline">
+                            <input name="auto_ref" id="auto_ref1" type="radio" value="1" {if $agent_data['misc']['auto_ref'] == 1}checked="checked"{/if}>
+                            开启
+                        </label>
+                        <label for="auto_ref2" class="radio-inline">
+                            <input name="auto_ref" id="auto_ref2" type="radio" value="2"  {if $agent_data['misc']['auto_ref'] == 2}checked="checked"{/if}>
+                            关闭
+                        </label>
+                        <label for="auto_ref0" class="radio-inline">
+                            <input name="auto_ref" id="auto_ref0" type="radio" value="0"  {if !isset($agent_data['misc']['auto_ref']) || $agent_data['misc']['auto_ref'] == 0}checked="checked"{/if}>
+                            跟随系统设置
+                        </label>
+                    </div>
+                </div>
+                {if \zovye\App::isMustFollowAccountEnabled()}
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">购买商品</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="mustFollow0" class="radio-inline">
+                            <input name="mustFollow" id="mustFollow0" type="radio" value="1" {if $agent_data['mfa']['enable'] == 1}checked="checked"{/if} >
+                            关注公众号后购买
+                        </label>
+                        <label for="mustFollow1" class="radio-inline">
+                            <input name="mustFollow" id="mustFollow1" type="radio" value="0"  {if isset($agent_data['mfa']['enable']) && $agent_data['mfa']['enable'] == 0}checked="checked"{/if} >
+                            直接购买
+                        </label>
+                        <label for="mustFollow2" class="radio-inline">
+                            <input name="mustFollow" id="mustFollow2" type="radio" value="-1"  {if !isset($agent_data['mfa']['enable']) || $agent_data['mfa']['enable'] == -1}checked="checked"{/if} >
+                            跟随系统设置
+                        </label>
+                        <span class="help-block">用户扫描设备二维码后，引导用户关注公众号后通过公众号进入商品购买页面</span>
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="agent_misc" value="1">
+        <input type="hidden" name="from" value="{$op}">
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">
+            {if $agent->isAgent()}保存{else}创建{/if}
+        </button>
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
+    </div>
+</form>
+<script>
+    $(function(){
+        $('#special2 input[name=locationEnabled]').click(function(){
+            $('#special2 fieldset').attr('disabled', !$(this).is(':checked'));
+        })
+    })
+</script>
+{elseif $op == 'agent_payment'}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_base', 'id'=>$id));}">基本信息</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_notice', 'id'=>$id));}">通知设置</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_funcs', 'id'=>$id));}">功能设置</a></li>
+    {if \zovye\App::isCommissionEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_commission', 'id'=>$id));}">佣金设置</a></li>
+    {/if}
+    <li role="presentation" class="active"><a href="#">支付</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('agent', array('op' => 'agent_misc', 'id'=>$id));}">其它</a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('agent');}" method="post">
+    <div class="panel panel-default nav-tab-item" id="special">
+        <div class="heading">
+            {if  $agent_data['pay']['wx']['enable'] || $agent_data['pay']['lcsw']['enable']}
+            <div class="alert alert-warning alert-dismissible" role="alert" style="width: 35em;margin-bottom:0;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>注意：</strong> 代理商已开启自定义支付，提现申请会被拒绝！！
+            </div>
+            {/if}
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">扫呗</div>
+                <div class="form-group">
+                    <label for="lcsw" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="lcsw" id="lcsw" value="1" {if $agent_data['pay']['lcsw']['enable']}checked{/if}>
+                                是否启用（请联系客服开通）
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($agent_data['pay']['lcsw']['enable'])}disabled{/if} name="lcsw">
+                <div class="form-group">
+                    <label for="merchant_no" class="col-md-2 control-label">商户号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$agent_data['pay']['lcsw']['merchant_no']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="terminal_id" class="col-md-2 control-label">终端号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="terminal_id" id="terminal_id" value="{$agent_data['pay']['lcsw']['terminal_id']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="access_token" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="access_token" id="access_token" value="{$agent_data['pay']['lcsw']['access_token']}">
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            <div class="seg">                
+                {if $agent_data['pay']['SQB']}
+                <div class="title">收钱吧（已激活）</div>
+                <div class="form-group">
+                    <label for="vendor_key" class="col-md-2 control-label">终端名称</label>
+                    <div class="col-md-10">
+                        <span class="form-control">{$agent_data['pay']['SQB']['title']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vendor_key" class="col-md-2 control-label">终端号</label>
+                    <div class="col-md-10">
+                        <span class="form-control">{$agent_data['pay']['SQB']['sn']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label">终端密钥</label>
+                    <div class="col-md-10">
+                        <span class="form-control inputMask">{$agent_data['pay']['SQB']['key']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <button class="btn btn-danger" data-op="disableSQB">
+                            <i class="fa fa-ban"></i> 取消
+                        </button>
+                    </div>
+                </div>
+                {else}
+                <div class="title">收钱吧</div>
+                <div class="form-group">
+                    <label for="vendor_sn" class="col-md-2 control-label">序列号</label>
+                    <div class="col-md-10">
+                        <input type="hidden"  name="app_id" value="2021032000003690">
+                        <input type="text" class="form-control" name="vendor_sn" id="vendor_sn" value="91801297">
+                        <span class="help-block">* 服务商序列号，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vendor_key" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="vendor_key" id="vendor_key">
+                        <span class="help-block">* 服务商密钥，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label">激活码</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="code" id="code">
+                        <span class="help-block">* 终端激活码，服务商后台生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <button class="btn btn-success" data-op="enableSQB">
+                            <i class="fa fa-check"></i> 激活
+                        </button>
+                    </div>
+                </div>
+                {/if}
+            </div>
+            <div class="seg">
+                <div class="title">微信支付</div>
+                <div class="form-group">
+                    <label for="wx" class="col-md-2 control-label">微信支付</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="wx" id="wx" value="1" {if $agent_data['pay']['wx']['enable']}checked{/if}>
+                                是否启用
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($agent_data['pay']['wx']['enable'])}disabled{/if} name="wx">
+                <div class="form-group">
+                    <label for="wxAppID" class="col-md-2 control-label">公众号 appID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxAppID" id="wxAppID" value="{$agent_data['pay']['wx']['appid']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wxxAppID" class="col-md-2 control-label">小程序 appID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxxAppID" id="wxxAppID" value="{$agent_data['pay']['wx']['wxappid']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wxAppKey" class="col-md-2 control-label">api 密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="wxAppKey" id="wxAppKey" value="{$agent_data['pay']['wx']['key']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wxMCHID" class="col-md-2 control-label">商户号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$agent_data['pay']['wx']['mch_id']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="certPEM" class="col-md-2 control-label">证书</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$agent_data['pay']['wx']['pem']['cert']}</textarea>
+                        <span class="help-block">* 微信退款API证书文件，要求pem格式</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="keyPEM" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="keyPEM" id="keyPEM">{$agent_data['pay']['wx']['pem']['key']}</textarea>
+                        <span class="help-block">* 微信退款API密钥文件，要求pem格式</span>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <input type="hidden" name="from" value="{$op}">
+        <input type="hidden" name="id" value="{$id}">
+        <input type="hidden" name="agent_payment" value="1">
+        <button type="submit" class="btn btn-primary">保存</button>
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
+    </div>
+</form>
+<script>
+    $(function(){
+        const maskE = $('<div title="点击编辑">×××已隐藏×××</div>');
+        $('form .inputMask').each(function(){
+            const self = $(this);
+            const x = maskE.clone();
+            x.attr('class', self.attr('class')).click(function(){
+                x.hide();
+                self.show().focus();
+            })
+            x.insertBefore(self);
+            self.removeClass('inputMask').hide();
+            self.blur(function(){
+                x.show();
+                self.hide();
+            })
+        })
+    })
+</script>
+<script>
+    $(function(){
+        $('[data-url]').each(function(){
+            util.clip(this, $(this).data('url'));
+        })
+
+        $('#special input[name=userLocationEnabled]').click(function(){
+            $('#special fieldset').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special input[name=wx]').click(function(){
+            $('#special fieldset[name=wx]').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special input[name=lcsw]').click(function(){
+            $('#special fieldset[name=lcsw]').attr('disabled', !$(this).is(':checked'));
+        })
+
+        const apiUrl = "{php echo $this->createWebUrl('agent', ['id' => $id])}";
+
+        $('button[data-op]').click(function(event) {
+            event.preventDefault();
+
+            const op = $(this).data('op');
+            if (op == 'enableSQB') {
+                const params =  {
+                    'op': 'enableSQB',
+                    'app_id': $('input[name=app_id]').val(),
+                    'vendor_sn': $.trim($('input[name=vendor_sn]').val()),
+                    'vendor_key': $.trim($('input[name=vendor_key').val()),
+                    'code': $.trim($('input[name=code]').val()),
+                }
+                if (params['vendor_key'] === '') {
+                    $('input[name=vendor_key').siblings('.inputMask').click()
+                    return;
+                }
+                if (params['code'] === '') {
+                    $('input[name=code').focus()
+                    return;
+                }                
+                $.getJSON(apiUrl, params).then(function(res) {
+                    if (res) {
+                        if (res.status) {
+                            $('button[data-op=enableSQB]').attr('disabled', true).hide();
+                            util.message(res.data && res.data.msg || '激活成功！', '', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);             
+                        } else {
+                            const msg = res.data.msg || '失败！';
+                            util.message(msg, '', 'error');
+                        }
+                    }
+                })
+            } else if (op == 'disableSQB') {
+                if (!confirm('确定要取消收钱吧的激活状态吗？')) {
+                    return;
+                }
+                $.getJSON(apiUrl, {op: 'disableSQB'}).then(function(res) {
+                    if (res) {
+                        if (res.status) {
+                            $('button[data-op=disableSQB]').attr('disabled', true).hide();
+                            util.message(res.data && res.data.msg || '已取消！', '', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);
+                        } else {
+                            const msg = res.data.msg || '失败！';
+                            util.message(msg, '', 'error');
+                        }
+                    }
+                })
+            }
+        })
+    })
+</script>
+{/if}
+
+{template 'common/footer'}

@@ -1,0 +1,306 @@
+{template 'common/header'}
+{if DEBUG}
+<!--<div class="alert alert-warning alert-dismissible" role="alert">-->
+<!--  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+<!--  <strong>警告，</strong> 模块当前处于调试模式！请修改模块目录下，zovye/include/constants.php中的DEBUG常量值！-->
+<!--</div>-->
+{/if}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default panel-first nav-tab-item">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">界面</div>
+                <div class="form-group">
+                    <label for="theme" class="col-md-2 control-label">领取界面</label>
+                    <div class="col-md-10">
+                        <select name="theme" class="form-control" id="theme">
+                            {loop $themes $index $item}
+                            <option value="{$item}"{if $get_schema==$item} selected{/if}> {$item} </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="siteTitle" class="col-md-2 control-label">页面标题</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="siteTitle" id="siteTitle" value="{$settings['misc']['siteTitle']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="siteCopyrights" class="col-md-2 control-label">版权信息</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="siteCopyrights" id="siteCopyrights" value="{$settings['misc']['siteCopyrights']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="banner" class="col-md-2 control-label">屏幕引导图</label>
+                    <div class="col-md-10" id="banner">
+                        {php echo tpl_form_field_image('banner', $settings['misc']['banner']);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="siteWarning" class="col-md-2 control-label">购买提醒</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="siteWarning" id="siteWarning" value="{$settings['misc']['siteWarning']}">
+                    </div>
+                </div>
+            </div>
+            <div class="seg" id="special">
+                <div class="title">附近售卖机</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">网址链接</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$loc_url}"></i> {$loc_url}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="userLocationEnabled" class="col-md-2 control-label">用户定位</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="userLocationEnabled" id="userLocationEnabled" value="1" {if $settings['user']['location']['validate']['enabled']}checked{/if}>
+                                用户扫描设备二维码后，先确认用户和设备的定位距离
+                            </label>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="siteWarning" class="col-md-2 control-label">腾讯LBS key</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="lbsKey" id="lbsKey" value="{$lbsKey}">
+                        <span class="help-block">* 指定腾讯LBS服务的APP KEY</span>
+                    </div>
+                </div>
+                <fieldset {if empty($settings['user']['location']['validate']['enabled'])}disabled{/if}>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">有效范围（米）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="userLocationDistance" id="userLocationDistance" value="{$settings['user']['location']['validate']['distance']}" min="1">
+                        <span class="help-block">* 只有在设备有效范围以内，才可以领取或者购买（请在代理商小程序端保存设备定位信息）</span>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            <div class="seg">
+                <div class="title">型号和商品</div>
+                <div class="form-group">
+                    <label for="allowAgentEditGoods" class="col-md-2 control-label">代理商管理商品</label>
+                    <div class="col-md-10">
+                        <div class="checkbox col-md-7">
+                            <label>
+                                <input type="checkbox" name="allowAgentEditGoods" id="allowAgentEditGoods" value="1" {if $settings['goods']['agent']['edit']}checked{/if}>
+                                是否允许代理商在小程序上管理商品
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="autoRollbackOrder" class="col-md-2 control-label">自动退款</label>
+                    <div class="col-md-10">
+                        <div class="checkbox col-md-7">
+                            <label>
+                                <input type="checkbox" name="autoRollbackOrder" id="autoRollbackOrder" value="1" {if $settings['order']['rollback']['enabled']}checked{/if}>
+                                设备故障，出货失败后是否自动退款
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="orderGoodsMaxNum" class="col-md-2 control-label">最多购买商品数量</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="orderGoodsMaxNum" id="orderGoodsMaxNum" value="{php echo intval($settings['order']['goods']['maxNum']);}">
+                        <span class="help-block">* 限制用户单次购买的商品数量（0表示不限制）</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">出货策略</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="shipmentBalance1" class="radio-inline">
+                            <input name="shipmentBalance" id="shipmentBalance1" type="radio" value="1" {if !empty($settings['device']['shipment']['balanced'])}checked="checked"{/if}>
+                            平衡出货
+                        </label>
+                        <label for="shipmentBalance0" class="radio-inline">
+                            <input name="shipmentBalance" id="shipmentBalance0" type="radio" value="0"  {if empty($settings['device']['shipment']['balanced'])}checked="checked"{/if}>
+                            顺序出货
+                        </label>
+                        <span class="help-block">* 平衡出货：库存多的货道优先出货；顺序出货：库存少的货道优先出货。</span>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="goodsImageProxyURL" class="col-md-2 control-label">图片压缩服务网址</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="goodsImageProxyURL" id="goodsImageProxyURL" value="{php echo trim($settings['goods']['image']['proxy']['url']);}">
+                        <span class="help-block">* 请输入图片压缩服务器完整URL地址</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goodsImageProxySecret" class="col-md-2 control-label">图片压缩服务密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="goodsImageProxySecret" id="goodsImageProxySecret" value="{php echo trim($settings['goods']['image']['proxy']['secret']);}">
+                        <span class="help-block">* 请输入图片压缩服务器加密密钥</span>
+                    </div>
+                </div>                
+            </div>
+            <div class="seg">
+                <div class="title">其它</div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">陌生设备</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="newDevice1" class="radio-inline">
+                            <input name="newDeviceAutoJoin" id="newDevice1" type="radio" value="1" {if $settings['device']['autoJoin'] == 1}checked="checked"{/if}>
+                            自动加入
+                        </label>
+                        <label for="newDevice0" class="radio-inline">
+                            <input name="newDeviceAutoJoin" id="newDevice0" type="radio" value="0"  {if $settings['device']['autoJoin'] == 0}checked="checked"{/if}>
+                            不处理
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">设备产生错误停机</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="errorDown1" class="radio-inline">
+                            <input name="errorDown" id="errorDown1" type="radio" value="1" {if $settings['device']['errorDown'] == 1}checked="checked"{/if}>
+                            是
+                        </label>
+                        <label for="errorDown0" class="radio-inline">
+                            <input name="errorDown" id="errorDown0" type="radio" value="0"  {if !isset($settings['device']['errorDown']) || $settings['device']['errorDown'] == 0}checked="checked"{/if}>
+                            否
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="remainWarning" class="col-md-2 control-label">缺货通知</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="remainWarning" id="remainWarning" value="{$settings['device']['remainWarning']}" required>
+                        <span class="help-block">* 当设备商品少于指定数量时，发送缺货通知（0表示永远不通知）</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="waitTimeout" class="col-md-2 control-label">等待出货时间（秒）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="waitTimeout" id="waitTimeout" value="{$settings['device']['waitTimeout']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">故障处理</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="clearErrorCode" id="clearErrorCode1" value="1" {if $settings['device']['clearErrorCode']}checked{/if}>
+                                自动 <span style="color:gray;">（正常出货后自动清除错误代码）</span>
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="clearErrorCode" id="clearErrorCode0" value="0"  {if empty($settings['device']['clearErrorCode'])}checked{/if}>
+                                手动 <span style="color:gray;">（需要维护人员提交故障处理表单）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="remainWarning" class="col-md-2 control-label">设备不活跃天数</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="lost" id="lost" value="{$settings['device']['lost']}" required>
+                        <span class="help-block">* 可以搜索超过指定天数的设备</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="remainWarning" class="col-md-2 control-label">设备最后出货天数</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="issuing" id="issuing" value="{$settings['device']['issuing']}" required>
+                        <span class="help-block">* 可以搜索超过指定天数的设备</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">测试网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$test_url}"></i> {$test_url}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">高级</div>
+                <div class="form-group">
+                    <label for="lockRetries" class="col-md-2 control-label">设备锁定重试次数</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="lockRetries" id="lockRetries" value="{$settings['device']['lockRetries']}" min="0">
+                        <span class="help-block">* 设备锁定失败时，进行多少次重试(0表示不进行重试)</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lockRetryDelay" class="col-md-2 control-label">设备锁定重试间隔（秒）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="lockRetryDelay" id="lockRetryDelay" value="{$settings['device']['lockRetryDelay']}" min="0">
+                        <span class="help-block">* 设备锁定重试等待间隔</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lockTimeout" class="col-md-2 control-label">超时自动解锁（秒）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="lockTimeout" id="lockTimeout" value="{$settings['device']['lockTimeout']}" min="0">
+                        <span class="help-block">* 设备锁定超过时间多少秒后，出货前会自动解锁设备。（0表示不自动解锁设备）</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="v1ActiveCodeEnabled" class="col-md-2 control-label">带屏主板变码</label>
+                    <div class="col-md-10">
+                        <div class="checkbox col-md-7">
+                            <label>
+                                <input type="checkbox" name="v1ActiveCodeEnabled" id="v1ActiveCodeEnabled" value="1" {if $settings['device']['v1']['activecode']['enabled']}checked{/if}>
+                                自动开启带屏主板的变码功能
+                            </label>
+                            <span class="help-block">* 开启后带屏主板会自动打开变码功能</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vDevice" class="col-md-2 control-label">虚拟设备</label>
+                    <div class="col-md-10">
+                        <div class="checkbox col-md-7">
+                            <label>
+                                <input type="checkbox" name="vDevice" id="vDevice" value="1" {if $settings['device']['v-device']['enabled']}checked{/if}>
+                                开启虚拟设备功能
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lacConfirm" class="col-md-2 control-label">设备位置</label>
+                    <div class="col-md-10">
+                        <div class="checkbox col-md-7">
+                            <label>
+                                <input type="checkbox" name="lacConfirm" id="lacConfirm" value="1" {if $settings['device']['lac']['enabled']}checked{/if}>
+                                记录设备位置变化
+                            </label>
+                            <span class="help-block">* 如果设备位置发生了变化，则显示提示图标（基站定位）</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="device">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableInputMask();
+        zovye.enableCopy();
+    })
+    $(function(){
+        $('#special input[name=userLocationEnabled]').click(function(){
+            $('#special fieldset').attr('disabled', !$(this).is(':checked'));
+        })
+    })
+</script>
+{template 'common/footer'}

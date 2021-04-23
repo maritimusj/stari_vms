@@ -1,0 +1,268 @@
+<?php
+
+namespace zovye\api\wx;
+
+use zovye\model\agentModelObj;
+use zovye\App;
+use zovye\request;
+use zovye\JSON;
+use zovye\model\keeperModelObj;
+use zovye\LoginData;
+use zovye\User;
+use zovye\model\userModelObj;
+use zovye\Wx;
+use zovye\State;
+use function zovye\_W;
+use function zovye\error;
+use function zovye\settings;
+
+class common
+{
+    public static function getDecryptedWxUserData(): array
+    {
+        $code = request::str('code');
+        $iv = request::str('iv');
+        $encrypted_data = request::str('encryptedData');
+
+        $vendorUID = request::trim('vendor');
+        if ($vendorUID == 'v1') {
+            $config = settings('agentWxapp', []);
+        } else {
+            $agent = \zovye\Agent::get($vendorUID, true);
+            if (empty($agent)) {
+                return error(State::ERROR, '找不到指定的代理商！');
+            }
+            $config = $agent->agentData('app.wx', []);
+        }
+
+        if (empty($config)) {
+            return error(State::ERROR, '小程序配置为空！');
+        }
+
+        if (empty($code) || empty($iv) || empty($encrypted_data)) {
+            return error(State::ERROR, '缺少必要的请求参数！');
+        }
+
+        return Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);
+    }
+
+    public static function getToken(): string
+    {
+        return request::str('token');
+    }
+
+    public static function getUser($token = null): userModelObj
+    {
+        static $user = null;
+
+        if ($user) {
+            return $user;
+        }
+
+        if (empty($token)) {
+            $token = common::getToken();
+        }
+
+        if (empty($token)) {
+            JSON::fail('请先登录后再请求数据！[101]');
+        }
+
+        $login_data = LoginData::get($token, [
+            LoginData::AGENT,
+            LoginData::AGENT_WEB,
+            LoginData::KEEPER,
+        ]);
+
+        if (empty($login_data)) {
+            JSON::fail('请先登录后再请求数据！[102]');
+        }
+
+        if ($login_data->getSrc() == LoginData::KEEPER) {
+            $keeper = \zovye\Keeper::get($login_data->getUserId());
+            if (empty($keeper)) {
+                JSON::fail('请先登录后再请求数据！[103]');
+            }
+            $user = $keeper->getUser();
+
+        } else {
+            $user = User::get($login_data->getUserId());
+        }
+
+        if (empty($user)) {
+            JSON::fail('请先登录后再请求数据！[104]');
+        }
+
+        if ($user->isBanned()) {
+            $login_data->destroy();
+            JSON::fail('暂时无法使用，请联系管理员！');
+        }
+
+        return $user;
+    }
+
+    /**
+     * 获取当前已登录的用户.
+     *
+     * @param $token
+     *
+     * @return agentModelObj
+     */
+    public static function getAgent($token = null): agentModelObj
+    {
+        $user = self::getUser($token);
+
+        if (!$user->isAgent() && !$user->isPartner()) {
+            JSON::fail('您还不是我们的代理商，请联系我们！');
+        }
+
+        return $user->agent();
+    }
+
+    public static function getAgentOrKeeper()
+    {
+        if (empty($token)) {
+            $token = common::getToken();
+        }
+
+        $keeper = null;
+
+        $login_data = LoginData::get($token, [LoginData::AGENT, LoginData::AGENT_WEB]);
+        if (empty($login_data)) {
+            $login_data = LoginData::get($token, LoginData::KEEPER);
+            if (empty($login_data)) {
+                JSON::fail('请先登录后再请求数据![202]');
+            }
+
+            /** @var keeperModelObj $keeper */
+            $keeper = \zovye\Keeper::findOne(['id' => $login_data->getUserId()]);
+        } else {
+            $user = User::get($login_data->getUserId());
+        }
+
+        if (empty($keeper) && empty($user)) {
+            JSON::fail('请先登录后再请求数据！[203]');
+        }
+
+        if (empty($user)) {
+            $user = $keeper;
+        }
+
+        return $user;
+    }
+
+    /**
+     * 生成用户的GUID.
+     *
+     * @param userModelObj $target
+     *
+     * @return string
+     */
+    public static function getGUID(userModelObj $target): string
+    {
+        $id = $target ? $target->getId() : false;
+
+        $session_key = '';
+
+        $login_data = LoginData::get(common::getToken());
+        if ($login_data) {
+            $session_key = $login_data->getSessionKey();
+        }
+
+        if (empty($session_key)) {
+            $session_key = _W('token');
+        }
+
+        return sha1("{$session_key}{$id}");
+    }
+
+    /**
+     * @param $assign_data
+     * @param array|string $fn
+     * @param callable|null $cb
+     *
+     * @return bool
+     */
+    public static function checkFuncs($assign_data, $fn, $cb = null): bool
+    {
+        //空$assign_data认为是拥有全部权限
+        if (isset($assign_data)) {
+            $fn = is_array($fn) ? $fn : explode(',', $fn);
+            if ($fn) {
+                foreach ($fn as $name) {
+                    if (is_callable($cb)) {
+                        $res = $cb($name);
+                        if ($res === false) {
+                            return false;
+                        } elseif ($res === true) {
+                            continue;
+                        }
+                    }
+
+                    if (empty($assign_data[trim($name)])) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 代理商功能权限检查，没有设置禁止时，默认为允许.
+     *
+     * @param $fn
+     * @param bool $get_result
+     *
+     * @return bool
+     */
+    public static function checkCurrentUserPrivileges($fn, $get_result = false): bool
+    {
+        $user = common::getAgent();
+
+        $commission_state = App::isCommissionEnabled() && $user->settings('agentData.commission.enabled');
+
+        $funcs = $user->settings('agentData.funcs');
+        $res = common::checkFuncs($funcs, $fn, function ($name) use ($commission_state) {
+            if ($name == 'F_cm') {
+                return $commission_state;
+            } else {
+                return 'n/a';
+            }
+        }
+        );
+
+        if ($get_result) {
+            return $res;
+        } else {
+            if (!$res) {
+                JSON::fail('没有权限访问这个功能，请联系管理员！');
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param userModelObj $user
+     *
+     * @return array
+     */
+    public static function setUserBank(userModelObj $user): array
+    {
+        $bankData = [
+            'realname' => request::trim('realname'),
+            'bank' => request::trim('bank'),
+            'branch' => request::trim('branch'),
+            'account' => request::trim('account'),
+            'address' => [
+                'province' => request::trim('province'),
+                'city' => request::trim('city'),
+            ],
+        ];
+
+        $user->updateSettings('agentData.bank', $bankData);
+
+        return ['msg' => '保存成功！'];
+    }
+}

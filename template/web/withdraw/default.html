@@ -1,0 +1,349 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #commission-log .user img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+    }
+    #commission-log .event {
+         color:#9E9E9E;
+    }
+
+    #commission-log .wxpay i{
+        color: #4CAF50;
+    }
+    #commission-log .wxpay i{
+        font-size: 1em;
+    }
+    #commission-log .wxpay .money{
+        color:#FF5722;
+    }
+    #commission-log .way .free{
+        color:gray;
+    }
+    #commission-log .balance .num {
+        color:blue;
+    }
+    #commission-log td{
+        vertical-align: middle;
+    }
+    #withdraw-list td{
+        vertical-align: middle;
+    }
+    #withdraw-list .state{
+        text-align: center;
+        width: 6em;
+        padding: 5px 10px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        color: #ccc;
+        user-select: none;
+    }
+    #withdraw-list .updatetime{
+        color: #666;
+        font-size: .8em;
+        padding: 5px 10px;
+    }
+    #withdraw-list .state.confirmed{
+        border-color: #5cb85c;
+        color: #5cb85c;
+    }
+    #withdraw-list .state.mchpay{
+        border-color: #ca4242;
+        color: #ca4242;
+    }
+    #withdraw-list .state.cancelled{
+        border-color: #f0ad4e;
+        color: #f0ad4e;
+    }
+    #withdraw-list .mobile{
+        cursor: pointer;
+    }
+    #withdraw-list .price{
+        color: #4CAF50;
+    }
+    .paymentNO {
+        font-size: small;
+        color: #9E9E9E;
+    }
+    .proposer {
+        position: relative;
+    }
+    .proposer .bank-info{
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        box-shadow: 3px 3px  #9E9E9E;
+        padding: 1em;
+        border: 1px solid #9E9E9E;;
+        min-width: 20em;
+        z-index: 99;
+    }    
+    .proposer .bank-info table{
+        margin-bottom: 0;
+    }
+    .proposer.fixed .bank-info {
+        box-shadow: 6px 6px rgb(0, 0, 0.1);
+    }
+    .proposer.fixed .bank-info, .proposer:hover .bank-info {
+        display: block;
+    }
+	.state {
+		white-space: nowrap;
+	}
+    .qrcode1 {
+        width: 8em;
+        height: 8em;
+    }
+    .J_qrcode {
+        width: 1.5em;
+        height: 1.5em;
+        cursor: pointer;
+        position: relative;
+    }
+    .J_qrcode .wx-qrcode,.J_qrcode .ali-qrcode {
+	    width: 300px;
+	    height: 400px;
+    }
+    .J_qrcode img.wx-qrcode, .J_qrcode img.ali-qrcode {
+        background-color: #fff;
+        box-shadow: 3px 3px  #9E9E9E;
+        padding: 1em;
+        border: 1px solid #9E9E9E;
+        z-index: 99;
+        left: 10px;
+    	display: none;
+    }
+    .J_qrcode:hover  img.wx-qrcode {
+    	display: block;
+    	position: absolute;
+    }
+    .J_qrcode:hover  img.ali-qrcode {
+    	display: block;
+    	position: absolute;
+    }
+</style>
+{if $commission_enabled}
+<ul class="nav nav-tabs" id="navbar">
+{if empty($user)}
+    <li role="presentation" class="active">
+        <a href="{php echo $this->createWebUrl('withdraw');}">
+        提现管理
+        </a>
+    </li>
+ {else}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('withdraw');}">
+        全部
+        </a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="#">
+        <b>{$user['name']}</b>的提现申请
+        </a>
+    </li>
+{/if}    
+</ul>
+<div class="panel panel-default {if empty($user)}panel-first{/if}">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('withdraw', array('op'=>'export'));}" target="_blank"><i class="fa fa-filter" title="导出"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $apps}
+        <table class="table" id="withdraw-list">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>申请方</th>
+                    <th>手号码</th>
+                    <th>金额</th>
+                    <th>收款二维码</th>
+                    <th>申请人</th>
+                    <th>提交时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $apps $index $item}
+                <tr data-id="{$item['id']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>
+                        <div class="profile">
+                            <img src="{media $item['agent']['avatar']}" />
+                            {if empty($user)}
+                                <a href="{php echo $this->createWebUrl('withdraw', ['op' => 'default', 'agentId' => $item['agent']['id']]);}" title="点击查看{$item['agent']['name']}所有申请">
+                                    {$item['agent']['name']}
+                                </a>
+                            {else}
+                                {$item['agent']['name']}
+                            {/if}
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            {if $item['agent']['mobile']}
+                            <a href="{php echo $this->createWebUrl('agent', ['keywords' => $item['agent']['mobile']]);}" title="搜索这个代理商">
+                                <span class="mobile" title="搜索代理商">{$item['agent']['mobile']}</span>
+                            </a>
+                            {/if}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="price">
+                            ￥{$item['xval']}
+                        </div>
+                        {if $item['paymentNO']}
+                        <div class="paymentNO">
+                            <i class="wi wi-money color-gray"></i>{$item['paymentNO']}
+                        </div>
+                        {/if}
+                    </td>
+                    <td>
+                    	<div class="agent-qrcode">
+	                        {if $item['agent']['qrcode']['wx']}
+	                        <span class="J_qrcode">
+	                            <img style="width:inherit;" src="{MODULE_URL}static/img/wxapp.jpg" />
+	                            <img class="wx-qrcode" src="{$item['agent']['qrcode']['wx']}" />
+	                        </span>
+	                        {/if}
+	                        {if $item['agent']['qrcode']['ali'] }
+	                        <span class="J_qrcode">
+	                            <img style="width:inherit;" src="{MODULE_URL}static/img/alipay.jpg" />
+	                            <img class="ali-qrcode" src="{$item['agent']['qrcode']['ali']}" />
+	                        </span>
+	                        {/if}
+                    	</div>
+                    </td>
+                    <td>
+                        <div class="proposer operate">
+                            {$item['name']}
+                            {if $item['agent']['bank']}
+                            <i class="fa fa-credit-card"></i>
+                            <div class="bank-info">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <td>卡号</td><td>{$item['agent']['bank']['account']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>姓名</td><td>{$item['agent']['bank']['realname']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>开户行</td><td>{$item['agent']['bank']['bank']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>开户支行</td><td>{$item['agent']['bank']['branch']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>地址</td><td>{$item['agent']['bank']['address']['province']}{$item['agent']['bank']['address']['city']}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            {/if}
+                        </div>
+                    </td>
+                    <td>{$item['createtime']}</td>
+                    <td class="operate">
+                        {if empty($item['state'])}
+                            {if $mch_pay_enabled}
+                            <button type="button" class="btn btn-danger btn-sm"  data-op="pay" title="打款到代理商微信?">打款</button>
+                            {/if}
+                            <button type="button" class="btn btn-success btn-sm" data-op="confirm" title="标记为已经打款完成">已完成</button>
+                            <button type="button" class="btn btn-warning btn-sm" data-op="refund" title="退款到代理商的佣金帐户">退回</button> 
+                        {else}
+                            <span class="state {$item['state']}" title="操作时间：{$item['updatetime_formatted']}">{$item['state_formatted']}</span>
+                        {/if}
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;margin-bottom:2em;">
+            没有任何提现申请！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    $(function(){
+        $('.proposer').on('click', 'i.fa-credit-card', function(){
+            $(this).closest('tr').siblings().find('.proposer').removeClass('fixed');
+            $(this).closest('.proposer').toggleClass('fixed'); 
+        })
+        
+        const api = {
+            url: "{php echo $this->createWebUrl('withdraw');}",
+        }
+        
+        api.showResult = function(params, url, cb) {
+            $.getJSON(url || api.url, params).done(function(res){
+                if(res) {
+                    if(res.status && res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', res.status?'success':'error');
+                        }
+                    }
+                    if (typeof cb == 'function') {
+                        cb(res.status);
+                    }
+                }
+            })
+        }
+        
+        api.pay = function(id, cb) {
+            if (confirm('确定要给代理打款吗？')) {
+                api.showResult({op: 'withdraw_pay', id: id}, null, cb);
+            }
+        }
+        
+        api.confirm = function(id, cb) {
+            if (confirm('确定要把这笔提现标记为已打款吗？')) {
+                api.showResult({op: 'withdraw_confirm', id: id}, null, cb);
+            }
+        }
+        
+        api.refund = function(id, cb) {
+            if (confirm('确定退款到代理商佣金帐户吗？')) {
+                api.showResult({op: 'withdraw_refund', id: id}, null, cb);
+            }
+        }
+        
+        $('#withdraw-list').on('click', '[data-op]', function(){
+            const self = $(this);
+            const op = self.data('op');
+            if (api[op]) {
+                const tr = self.closest('tr');
+                const id = tr.data('id');
+                api[op](id, function(res){
+                    if(res) {
+                        $('<span>')
+                        .text({'refund':'已退款', 'pay':'已打款', 'confirm': '已完成'}[op])
+                        .addClass('state')
+                        .addClass({'refund':'cancelled', 'pay':'mchpay', 'confirm': 'confirmed'}[op])
+                        .appendTo(self.closest('td.operate'));
+                        self.siblings('button').remove();
+                        self.remove();
+                    }
+                })
+            }
+        })
+    })
+</script>
+{else}
+<div style="text-align:center;color:#ccc;margin-bottom:2em;">
+    没有开启佣金系统！
+</div>
+{/if}

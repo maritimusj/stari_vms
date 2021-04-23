@@ -1,0 +1,210 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<div  id="app">
+    <form action="{php echo $this->createWebUrl('voucher');}" method="post" id="edit_form" @submit.prevent="submit">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {if $op=='edit'}
+                <i class="fa fa-ticket fa-fw"></i> 编辑提货码
+                {else}
+                <i class="fa fa-ticket fa-fw"></i> 添加提货码
+                {/if}
+                <span class="operate">
+                <a href="{php echo $this->createWebUrl('voucher');}" id="backUrl"><i class="fa fa-reply" title="返回"></i></a>
+            </span>
+            </div>
+            <div class="panel-body">
+                <div class="form-group" id="default_cargolane">
+                    <label class="col-md-2 control-label">绑定商品</label>
+                    <div class="col-md-10">
+                        <select style="width:100%;"  name="goodsId" v-model="goodsId">
+                            <option value="-1">&lt;选择商品&gt;</option>
+                            <option :value="g.id" v-for="g in goodsList" :key="g.id">
+                                {{g.name}} <span v-text="g.name"></span> <div v-if="g.agent">{{g.agent ? "<代理商：" + g.agent.name + ">" : ''}}</div>
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="capacity" class="col-md-2 control-label">生成数量</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control col-md-8" min="1" name="total" v-model.number="total">
+                        <span class="help-block">* 批量生成提货码数量</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="percent" class="col-md-2 control-label">时间限制</label>
+                    <div class="col-md-10">
+                    <span class="col-md-2 checkbox">
+                        <label>
+                          <input type="checkbox" name="validate" v-model="validate">启用
+                        </label>
+                    </span>
+                        <span class="col-md-5">{php echo tpl_form_field_date('begin', $prizeData['begin']);}</span>
+                        <span class="col-md-5">{php echo tpl_form_field_date('end', $prizeData['end']);}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div v-for="(id,index) in goodsLimitIds">
+                        <label for="capacity" class="col-md-2 control-label">
+                            <span v-if="index == 0">购买限定商品赠送</span>
+                        </label>
+                        <div class="col-md-10" :style="index == 0? '' : 'padding-top: 10px;'">
+                            <select style="width:96%;" @change="changeLimitGoods(index, event)" name="goods[]">
+                                <option value="-1" :selected="id===-1">&lt;选择商品&gt;</option>
+                                <option :value="g.id" v-for="g in goodsList" :key="g.id" :selected="id==g.id" :disabled="g.selected && goodsLimitIds[index] != g.id">
+                                    {{g.name}} <span v-text="g.name"></span> <div v-if="g.agent">{{g.agent ? "<代理商：" + g.agent.name + ">" : ''}}</div>
+                                </option>
+                            </select>
+                            <span class="operate"><i class="fa fa-trash-o control-label" title="删除？" @click="remove(index)"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <button class="btn btn-normal" type="button" title="增加商品" @click="addLimitGoods" :disabled="!moreGoods"><i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-btn">
+            <input type="hidden" name="op" value="save">
+            <input type="hidden" name="id" :value="voucherId" v-if="voucherId > 0">
+            <button type="submit" class="btn btn-primary" v-if="voucherId > 0">保存</button>
+            <button type="submit" class="btn btn-primary" v-else>创建</button>
+            <button type="button" class="btn btn-default" @click="goBack">返回</button>
+        </div>
+    </form>
+</div>
+<script>
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        const apiUrl = "{php echo $this->createWebUrl('voucher');}";
+        const goodsApiUrl = "{php echo $this->createWebUrl('goods', ['op'=>'search']);}";
+        new Vue({
+            el:"#app",
+            data:{
+                voucherId: parseInt('{$voucher_id}'),
+                voucher:{},
+                page: 1,
+                goodsList:[],
+                goodsId: -1,
+                total: 1,
+                validate: 0,
+                goodsLimitIds:[-1],
+            },
+            mounted: function() {
+                const self = this;
+                let loading = true;
+                setTimeout(function () {
+                    if (loading) {
+                        util.loading();
+                    }
+                }, 2000);
+                $.get(goodsApiUrl, {page: this.page, pagesize:1000}).then(function(res) {
+                    if (res && res.status) {
+                        self.goodsList = res.data.list;
+                    }
+                    if (self.voucherId > 0) {
+                        $.get(apiUrl, {op: "detail", id: self.voucherId}, 'json').then(function(res) {
+                            if (res && res.status) {
+                                self.voucher = res.data;
+                                self.goodsId = self.voucher.goodsId;
+                                self.total = self.voucher.total;
+                                self.goodsLimitIds = self.voucher.limitGoods || [];
+                                self.goodsLimitIds.forEach(function(id) {
+                                    self.setGoods(id, true);
+                                });
+                                self.addLimitGoods();
+                                if (self.voucher.begin) {
+                                    $('input[name=begin]').val(self.voucher.begin_formatted);
+                                }
+                                if (self.voucher.end) {
+                                    $('input[name=end]').val(self.voucher.end_formatted);
+                                }
+                                if (self.voucher.begin && self.voucher.end) {
+                                    self.validdate = true;
+                                }
+                            }
+                        }).always(function(){
+                            loading = false;
+                            util.loaded();
+                        })
+                    }
+                }, 'json').always(function(){
+                    loading = false;
+                    util.loaded();
+                })
+            },
+            computed: {
+                moreGoods: function() {
+                    return this.goodsLimitIds.length < this.goodsList.length;
+                }
+            },
+            methods:{
+                isGoodsOk: function(id) {
+                    return this.goodsLimitIds.indexOf(id) === -1;
+                },
+                setGoods: function(id, selected) {
+                    const goodsId = parseInt(id);
+                    const goods = this.goodsList.find(function(g) {
+                        return g.id == goodsId;
+                    });
+                    if (goods) {
+                        Vue.set(goods, 'selected', selected);
+                    }
+                },
+                addLimitGoods: function() {
+                    if (this.goodsLimitIds.length < this.goodsList.length) {
+                        this.goodsLimitIds.push(-1);
+                    }
+                },
+                changeLimitGoods: function(index, event) {
+                    const goodsId = event.target.value;
+                    this.setGoods(this.goodsLimitIds[index],false);
+                    this.setGoods(goodsId,true);
+                    this.goodsLimitIds.splice(index, 1, event.target.value);
+                    if (index === this.goodsLimitIds.length - 1) {
+                        this.addLimitGoods();
+                    }
+                },
+                remove: function(index) {
+                    const goodsId = this.goodsLimitIds[index];
+                    this.setGoods(goodsId, false);
+                    if (this.goodsLimitIds.length === 1) {
+                        this.goodsLimitIds = [-1];
+                    } else {
+                        this.goodsLimitIds.splice(index, 1);
+                    }
+
+                },
+                submit: function() {
+                    if (this.goodsId !== -1) {
+                        const self = this;
+                        util.loading();
+                        $.post($('#edit_form').attr('action'), $('#edit_form').serialize()).then(function(res) {
+                            if (res) {
+                                if(res.status) {
+                                    if (!self.voucherId) {
+                                        self.goodsId = -1;
+                                        self.goodsNum = 1;
+                                        self.goodsLimitIds = [-1];
+                                        self.validate = 0;
+                                        self.goodsList.forEach(function(g) {
+                                            Vue.set(g, 'selected', false);
+                                        });
+                                    }
+                                }
+                                alert(res.data.msg);
+                            }
+                        }).always(function(){util.loaded();});
+                    }
+                },
+                goBack: function() {
+                    window.location.replace($('#backUrl').attr('href'));
+                }
+            }
+        })
+    })
+</script>

@@ -1,0 +1,59 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .tips {
+        text-align: center;
+        font-size: larger;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="heading">
+    </div>
+    <div class="panel-body">
+        <div class="tips">
+            系统需要升级，请耐心等待(<span class="current">{$total}</span>)... 
+        </div>
+    </div>
+</div>
+<script>
+    $(function() {
+        const api_url = "{php echo $this->createWebUrl('migrate', ['op' => 'step'])}";
+        function step() {
+            $.getJSON(api_url).then(function(res) {
+                if (!res || !res.status) {
+                    alert('升级失败，请联系管理员！');
+                } else {
+
+                    if (res.data.remain > 0) {
+                        $('.current').text(res.data.remain);
+                    } else {
+                        $('.current').text('完成');
+                    }
+                    
+                    if (res.data.result) {
+                        step();
+                    } else {
+                        if (res.data.url) {
+                            $('.tips').html('升级完成！<span class="seconds">3</span>秒后自动转跳到首页...');
+                            let seconds = 3;
+                            setInterval(() => {
+                                --seconds;
+                                if (seconds > 0) {
+                                    $('.seconds').text(seconds);
+                                }                                
+                            }, 1000);
+                            setTimeout(() => {
+                                window.location.replace(res.data.url);
+                            }, 3000);
+                        } else {
+                            $('.tips').text('升级完成！');
+                        }
+                    }
+                }
+            })
+        }
+
+        step();
+    })
+</script>
+{template 'common/footer'}

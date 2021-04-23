@@ -1,0 +1,55 @@
+{if  \zovye\settings('ctrl.sys.ui.botton.background-color', '#93c47d') &&  \zovye\settings('ctrl.sys.ui.border.color', '#38761d')}
+<style>
+.panel-content {
+    padding: 1px;
+}
+
+.panel-body .seg .title {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+    box-shadow: 0px 0px 0px 1px {php echo \zovye\settings('ctrl.sys.ui.border.color');};
+}
+.panel-body .seg {
+    border-color: {php echo \zovye\settings('ctrl.sys.ui.border.color');};
+}
+#userDialog .searchUserResult .profile:hover, #userDialog .searchUserResult .btn-page:hover {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+    box-shadow: 0px 0px 1px 2px {php echo \zovye\settings('ctrl.sys.ui.border.color');};
+}
+#userDialog .searchUserResult .btn-page {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+#userDialog .profile.selected {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+    box-shadow: 0px 0px 1px 2px {php echo \zovye\settings('ctrl.sys.ui.border.color');};
+}
+#app .item:hover {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+    box-shadow: 0px 0px 1px 2px {php echo \zovye\settings('ctrl.sys.ui.border.color');};
+}
+#app .item.simple {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+#orderlist .devicename:hover div {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+.screen .adv{
+    background-image: url({MODULE_URL}static/img/bk.jpeg);background-repeat:no-repeat; background-size:100% 100%;-moz-background-size:100% 100%;
+}
+.page_item span:first-child {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+.panel-menu .list-group-item:not(.list-group-more).active, .panel-menu .list-group-item:not(.list-group-more):hover, .skin-black .panel-menu .list-group-item:not(.list-group-more):hover, .panel-menu .skin-black .head .navbar-left>li.list-group-item:not(.list-group-more):hover {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+.head .navbar-left .active, .head .navbar-left>li:hover, .head .navbar-left .panel-menu .list-group-item:not(.list-group-more):hover, .panel-menu .head .navbar-left .list-group-item:not(.list-group-more):hover, .skin-black .head .navbar-left>li:hover {
+    border-bottom-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+.btn-primary, .btn-primary:hover {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+    border-color: {php echo \zovye\settings('ctrl.sys.ui.border.color');};
+}
+.panel-menu .list-group-item:not(.list-group-more).active, .panel-menu .list-group-item:not(.list-group-more):hover, .skin-black .panel-menu .list-group-item:not(.list-group-more):hover, .panel-menu .skin-black .head .navbar-left>li.list-group-item:not(.list-group-more):hover {
+    background-color: {php echo \zovye\settings('ctrl.sys.ui.botton.background-color');};
+}
+</style>
+{/if}

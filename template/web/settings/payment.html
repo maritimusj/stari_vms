@@ -1,0 +1,323 @@
+{template 'common/header'}
+{if DEBUG}
+<!--<div class="alert alert-warning alert-dismissible" role="alert">-->
+<!--  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+<!--  <strong>警告，</strong> 模块当前处于调试模式！请修改模块目录下，zovye/include/constants.php中的DEBUG常量值！-->
+<!--</div>-->
+{/if}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item" id="special">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">扫呗</div>
+                <div class="form-group">
+                    <label for="lcsw" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="lcsw" id="lcsw" value="1" {if $settings['pay']['lcsw']['enable']}checked{/if}>
+                                是否启用（请联系客服开通）
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($settings['pay']['lcsw']['enable'])}disabled{/if} name="lcsw">
+                <div class="form-group">
+                    <label for="merchant_no" class="col-md-2 control-label">商户号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$settings['pay']['lcsw']['merchant_no']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="terminal_id" class="col-md-2 control-label">终端号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="terminal_id" id="terminal_id" value="{$settings['pay']['lcsw']['terminal_id']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="access_token" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="access_token" id="access_token" value="{$settings['pay']['lcsw']['access_token']}">
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            <div class="seg">                
+                {if $settings['pay']['SQB']}
+                <div class="title">收钱吧（已激活）</div>
+                <div class="form-group">
+                    <label for="vendor_key" class="col-md-2 control-label">终端名称</label>
+                    <div class="col-md-10">
+                        <span class="form-control">{$settings['pay']['SQB']['title']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vendor_key" class="col-md-2 control-label">终端号</label>
+                    <div class="col-md-10">
+                        <span class="form-control">{$settings['pay']['SQB']['sn']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label">终端密钥</label>
+                    <div class="col-md-10">
+                        <span class="form-control inputMask">{$settings['pay']['SQB']['key']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <button class="btn btn-danger" data-op="disableSQB">
+                            <i class="fa fa-ban"></i> 取消
+                        </button>
+                    </div>
+                </div>
+                {else}
+                <div class="title">收钱吧</div>
+                <div class="form-group">
+                    <label for="vendor_sn" class="col-md-2 control-label">序列号</label>
+                    <div class="col-md-10">
+                        <input type="hidden"  name="app_id" value="2021032000003690">
+                        <input type="text" class="form-control" name="vendor_sn" id="vendor_sn" value="91801297">
+                        <span class="help-block">* 服务商序列号，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vendor_key" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="vendor_key" id="vendor_key">
+                        <span class="help-block">* 服务商密钥，仅用于激活，*** 不会保存到当前系统中 ***</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label">激活码</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="code" id="code">
+                        <span class="help-block">* 终端激活码，服务商后台生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="code" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <button class="btn btn-success" data-op="enableSQB">
+                            <i class="fa fa-check"></i> 激活
+                        </button>
+                    </div>
+                </div>
+                {/if}
+            </div>
+            <div class="seg">
+                <div class="title">微信支付</div>
+                <div class="form-group">
+                    <label for="wx" class="col-md-2 control-label">微信支付</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="wx" id="wx" value="1" {if $settings['pay']['wx']['enable']}checked{/if}>
+                                是否启用
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($settings['pay']['wx']['enable'])}disabled{/if} name="wx">
+                <div class="form-group">
+                    <label for="wxAppID" class="col-md-2 control-label">公众号 appID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxAppID" id="wxAppID" value="{$settings['pay']['wx']['appid']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wxxAppID" class="col-md-2 control-label">小程序 appID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxxAppID" id="wxxAppID" value="{$settings['pay']['wx']['wxappid']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wxAppKey" class="col-md-2 control-label">api 密钥</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="wxAppKey" id="wxAppKey" value="{$settings['pay']['wx']['key']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="wxMCHID" class="col-md-2 control-label">商户号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$settings['pay']['wx']['mch_id']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="certPEM" class="col-md-2 control-label">证书</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$settings['pay']['wx']['pem']['cert']}</textarea>
+                        <span class="help-block">* 微信退款API证书文件，要求pem格式</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="keyPEM" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="keyPEM" id="keyPEM">{$settings['pay']['wx']['pem']['key']}</textarea>
+                        <span class="help-block">* 微信退款API密钥文件，要求pem格式</span>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            <div class="seg">
+                <div class="title">支付宝 H5</div>
+
+                <div class="form-group">
+                    <label for="ali_appid" class="col-md-2 control-label">appID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="ali_appid" id="ali_appid" value="{$settings['ali']['appid']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ali_pubkey" class="col-md-2 control-label">支付宝公钥</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="ali_pubkey" id="ali_pubkey">{$settings['ali']['pubkey']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ali_prikey" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="ali_prikey" id="ali_prikey">{$settings['ali']['prikey']}</textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="seg">
+                <div class="title">支付宝 小程序</div>
+
+                <div class="form-group">
+                    <label for="alixapp_id" class="col-md-2 control-label">appID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="alixapp_id" id="alixapp_id" value="{$settings['alixapp']['id']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="alixapp_pubkey" class="col-md-2 control-label">支付宝公钥</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="alixapp_pubkey" id="alixapp_pubkey">{$settings['alixapp']['pubkey']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="alixapp_prikey" class="col-md-2 control-label">密钥</label>
+                    <div class="col-md-10">
+                        <textarea type="text" class="form-control inputMask" name="alixapp_prikey" id="alixapp_prikey">{$settings['alixapp']['prikey']}</textarea>
+                    </div>
+                </div>
+            </div>
+            {if \zovye\App::isChannelPayEnabled()}
+            <div class="seg">
+                <div class="title">阿旗（京东）</div>
+
+                <div class="form-group">
+                    <label for="channelPayKey" class="col-md-2 control-label">app key</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="channelPayKey" id="channelPayKey" value="{$settings['pay']['channel']['key']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="channelPaySecret" class="col-md-2 control-label">app secret</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="channelPaySecret" id="channelPaySecret" value="{$settings['pay']['channel']['secret']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">回调网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$channel_cb_url}"></i> {$channel_cb_url}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">转跳网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$channel_forward_url}"></i> {$channel_forward_url}</span>
+                    </div>
+                </div>                
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="payment">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableInputMask();
+        zovye.enableCopy();
+    })
+
+    $(function(){
+        $('#special input[name=userLocationEnabled]').click(function(){
+            $('#special fieldset').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special input[name=wx]').click(function(){
+            $('#special fieldset[name=wx]').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special input[name=lcsw]').click(function(){
+            $('#special fieldset[name=lcsw]').attr('disabled', !$(this).is(':checked'));
+        })
+
+        const apiUrl = "{php echo $this->createWebUrl('settings')}";
+
+        $('button[data-op]').click(function(event) {
+            event.preventDefault();
+
+            const op = $(this).data('op');
+            if (op == 'enableSQB') {
+                const params =  {
+                    'op': 'enableSQB',
+                    'app_id': $('input[name=app_id]').val(),
+                    'vendor_sn': $.trim($('input[name=vendor_sn]').val()),
+                    'vendor_key': $.trim($('input[name=vendor_key').val()),
+                    'code': $.trim($('input[name=code]').val()),
+                }
+                if (params['vendor_key'] === '') {
+                    $('input[name=vendor_key').siblings('.inputMask').click()
+                    return;
+                }
+                if (params['code'] === '') {
+                    $('input[name=code').focus()
+                    return;
+                }                
+                $.getJSON(apiUrl, params).then(function(res) {
+                    if (res) {
+                        if (res.status) {
+                            util.message(res.data && res.data.msg || '激活成功！', '', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);             
+                        } else {
+                            const msg = res.data.msg || '失败！';
+                            util.message(msg, '', 'error');
+                        }
+                    }
+                })
+            } else if (op == 'disableSQB') {
+                if (!confirm('确定要取消收钱吧的激活状态吗？')) {
+                    return;
+                }
+                $.getJSON(apiUrl, {op: 'disableSQB'}).then(function(res) {
+                    if (res) {
+                        if (res.status) {
+                            util.message(res.data && res.data.msg || '已取消！', '', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 3000);
+                        } else {
+                            const msg = res.data.msg || '失败！';
+                            util.message(msg, '', 'error');
+                        }
+                    }
+                })
+            }
+        })
+    })
+</script>
+{template 'common/footer'}

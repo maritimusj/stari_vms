@@ -1,0 +1,306 @@
+#orderlist td,
+#orderlist th {
+    vertical-align: middle;
+    transition: all 0.3s ease;
+}
+
+#orderlist .price {
+    color: #4caf50;
+}
+
+#orderlist .price:before {
+    content: '￥';
+    padding-right: 3px;
+}
+
+#orderlist .price.zeroprice {
+    opacity: .6;
+    color: gray;
+}
+
+#orderlist .num {
+    color: #2196F3;
+    font-style: italic;
+}
+
+#orderlist tr td.from {
+    position: relative;
+    width: 120px;
+    height: 80px;
+    padding: 0;
+    border-top: 1px solid #fff;
+    transition: all 0.5s;
+}
+
+#orderlist .devicename {
+    width: 15em;
+    overflow: hidden;
+    text-align: center;
+}
+
+#orderlist td .name {
+    cursor: default;
+    font-size: larger;
+    white-space: nowrap;
+}
+
+#orderlist .devicename div {
+    border: 3px solid transparent;
+    padding: 3px 10px;
+    text-overflow: ellipsis;
+    margin: 0 auto;
+}
+
+#orderlist .account,
+#orderlist .agent {
+    color: #fff;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-width: 120px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    user-select: none;
+    -moz-user-select: none;
+}
+
+#orderlist .agent {
+    display: none;
+}
+
+#orderlist tr td.from:hover .agent {
+    display: flex;
+}
+
+#orderlist tr td.from:hover .account {
+    display: none;
+}
+
+#orderlist .account img,
+#orderlist .agent img {
+    margin-right: 10px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+#orderlist .tips {
+    position: absolute;
+    width: 100%;
+    transform: rotate(50deg);
+    text-align: center;
+    right: -40px;
+    top: 13px;
+    background: #fff;
+}
+#orderlist .pay{
+    color: gray;
+    display: inline-block;
+    user-select: none;
+}
+#orderlist .balance {
+    color: #3F51B5;
+}
+#orderlist .tips.wxpay{
+    background: #FF5722;
+}
+#orderlist .tips.free{
+    background: #4CAF50;
+}
+#orderlist .tips.balancex{
+    background: #3F51B5;
+}
+#orderlist [data-op] {
+    cursor: pointer;
+}
+#orderlist .goods img{
+    min-width: 45px;
+    width: 100px;
+}
+#orderlist .profile img{
+    min-width: 45px;
+}
+#orderlist .commission{
+    border-radius: 0 10px 10px 0;
+    text-align: center;
+    background-color: #FF5722;
+    color: #fff;
+    user-select: none;
+    cursor: default;
+    position: relative;
+    padding: 1px 0;
+    max-height: 1.6em;
+    font-size: 14px;
+    min-width: 10em;
+}
+#orderlist .commission:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 18px solid;
+    border-color: #FF5722 transparent transparent transparent;
+    right: -25px;
+    top: -0.5em;
+    display: inline-block;
+    transform: rotate(-90deg);
+    font-size: 14px;
+}
+#orderlist tr td.status {
+    position: relative;
+    white-space: nowrap;
+}
+#orderlist .status:hover .commission_detail {
+    display: flex;
+}
+#orderlist .commission_detail {
+    position: absolute;
+    z-index: 999;
+    background-color: #fff;
+    border: 1px solid #CCC;
+    padding: 30px;
+    min-width: 30em;
+    display: none;
+    flex-direction: column;
+    cursor: default;
+    box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+}    
+#orderlist .money {
+    color: #FF5722;
+}
+#orderlist .gspor:hover:before {
+    content: "分佣";
+    position: absolute;
+    background-color: #009688;
+    color: #fff;
+    width: 45px;
+    text-align: center;
+}
+#orderlist .gspor.agent_item:hover:before {
+    content: "代理";
+    background-color: #FF5722;
+}
+#orderlist .gspor.platform_item:hover:before {
+    content: "平台";
+    background-color: #607D8B;
+}
+#orderlist .gspor.keeper_item:hover:before {
+    content: "运营";
+    background-color: #90028B;
+}
+#orderlist .gspor.bonus_item:hover:before {
+    content: "奖励";
+    background-color: #9C27B0;
+}
+#orderlist .gspor.bonus_item:hover:before {
+    content: "奖励";
+    background-color: #9C27B0;
+}
+#orderlist .commission_detail .total {
+    border-bottom: 1px solid #CCC;
+    color: #FF5722;
+    text-align: end;
+    margin-bottom: 1em;
+}
+#orderlist .commission_detail .total .title{
+    color: #666;
+    font-size: 1.5em;
+}
+#orderlist .gspor {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+    justify-content: space-between;
+    position: relative;
+}
+#orderlist .gspor .profile {
+    margin-right: 6px;
+    width: 15em;
+    overflow: hidden;
+}
+#orderlist .fa-info-circle .order_err_message {
+    position: absolute;
+    width: 200px;
+    background: #FF5722;
+    text-align: center;
+    color: #fff;
+    z-index: 1000;
+    left: 130px;
+    overflow: hidden;
+    box-shadow: 1px 1px 2px 1px #9E9E9E;
+    padding: 6px;
+    display: none;
+    text-shadow: none;
+}
+#orderlist .account .fa {
+    font-size: 40px;
+    color: #607d8b;
+}
+#orderlist .fa-info-circle:hover .order_err_message {
+    display: block;
+}
+#orderlist .discount {
+    color: #ccc;
+    text-decoration-line: line-through;
+}
+#orderlist tr.failed .price,#orderlist tr.failed .name {
+    border-color: #FF5722;
+    color: #ff5722;
+}
+#orderlist td .mobile {
+    margin-left: 6px;
+}
+#orderlist td .mobile:hover {
+    color: #607D8B;
+}    
+#orderlist .orderId{
+    font-size: small;
+    color: #9E9E9E;
+}
+#orderlist .account-title img {
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    margin-right: 6px;
+}
+#orderlist .account-title {
+    cursor: default;
+}
+.success{
+    color: green;
+    cursor: pointer;
+}
+#pull-list tr td {
+    vertical-align: middle;
+}
+#pull-list td.result {
+    min-width: 12em;
+}
+#pull-list td.title {
+    min-width: 5em;
+}
+.error{
+    color: red;
+}
+.goods_img img {
+    width: 60px;
+}
+.orderUID {
+    margin-top: 10px;
+}
+.zovye_qrcode img {
+    width: 160px;
+    height: 160px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    transform: translate3d(0, -2px, 0);
+    position: absolute;
+    z-index: 99;
+    display: none;
+}
+.devicename:hover .zovye_qrcode img {
+    display: block;
+}
+

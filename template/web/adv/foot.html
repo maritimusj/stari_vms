@@ -1,0 +1,51 @@
+<script>
+    $(function(){
+        const api = {
+            url: "{php echo $this->createWebUrl('adv');}",
+        }
+        
+        api.showResult = function(params, url, fn) {
+            $.getJSON(url || api.url, params).done(function(res){
+                if(res) {
+                    if(res.status && res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                            if(typeof fn == 'function') {
+                                fn(res);
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        
+        api.refresh = function(id){
+            api.showResult({op: 'refresh', id: id});
+        }
+        
+        api.ban = function(id) {
+            api.showResult({op: 'ban', id: id}, '', function(res){
+                if(res && res.data) {
+                    $('tr[data-id=' + id + ']').removeClass('normal banned').addClass(res.data.state === 0 ? 'normal' : 'banned');
+                    $('tr[data-id=' + id + '] .operate a[data-op="ban"] span').text(res.data.state === 0 ? '禁用？' : '启用？');
+                }
+            })
+        }
+        
+        $('#list').on('click', '[data-op]', function(){
+            const op = $(this).data('op');
+            if (api[op]) {
+                const id = $(this).closest('tr').data('id');
+                api[op](id);
+            }
+        })
+
+        $('#list').on('click', '[data-text]', function() {
+            var content = decodeURIComponent($(this).data('text'));
+            util.message(content, '', 'info');
+        })
+    })
+</script>

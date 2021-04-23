@@ -1,0 +1,468 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #accountlist td span.schema.loading{
+        border-color: #ddd;
+    }
+    #accountlist td.detail{
+        width: 15em;
+        opacity: 1;
+    }
+    #accountlist .more{
+        display: none;
+        color: #fff;
+        padding-top: 3px;
+    }
+    #accountlist .limit:hover .more{
+        display: block;
+    }
+     #accountlist .limit .first{
+        padding-top: 1em;
+    }
+    #accountlist div.limit{
+        cursor: default;
+        z-index: 999;
+        width: 15em;
+        height: calc(100% + 1em);
+        bottom: 0;
+        position: absolute;
+        border-radius: 1em 1em 0 0;
+    }
+    #accountlist .profile .commission{
+        display: inline-block;
+        color: #f00;
+    }
+    #accountlist div.limit:hover{
+        text-shadow: 1px 1px #666;
+        height: calc(100% + 4em);
+        box-shadow: 0 0 6px 3px rgba(0, 0, 0, 0.1);
+    }
+    #accountlist .ercode {
+        text-align: center;
+        width: 20px;
+        margin: 0 auto;
+        position: relative;
+    }    
+    #accountlist .ercode .zovye_qrcode {
+        position: absolute;
+        display: none;
+        background-color: #ccc;
+        width: 150px;
+        z-index: 999;
+        left: 30px;
+        border: 1px solid #ccc;
+    }
+    #accountlist .state.auth {
+        color: #4CAF50;
+        margin-left: 6px;
+    }
+    #accountlist .state.video {
+        color: #cf1010;
+        margin-left: 6px;
+    }    
+    #accountlist .orderno {
+        color: #9E9E9E;
+        cursor: default;
+    }
+    #accountlist .orderno.spec {
+        color: #ffc107;
+    }
+    #accountlist .orderno.normal {
+        color: #0787ff;
+    }
+    #accountlist .orderno:hover {
+        color: #666;
+    }
+    .operate:hover .auth-weixin:hover {
+        color: #4CAF50;
+        text-shadow: 1px 1px 1px #CDDC39;
+    }
+    .agent .profile:hover {
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+    }
+    .profile sup{
+        color:#f00;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
+          <div class="form-group">
+            <label for="keywords"></label>
+            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入帐号或名称搜索..." value="{$keywords}">
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+        </form>
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    {if empty($agent)}
+        {if $banned}
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">正常</a></li>
+            <li role="presentation" class="active"><a href="#">已隐藏的公众号</a></li>
+        {else}
+            <li role="presentation" class="active"><a href="#">正常</a></li>
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', array('banned'=>1));}">已隐藏的公众号</a></li>
+        {/if}
+    {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">正常</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['banned'=>1]);}">已隐藏的公众号</a></li>
+        {if $banned}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['agentId'=>$agent->getId()]);}">{php echo $agent->getName()}</a></li>
+        <li role="presentation" class="active"><a href="#"><b>{php echo $agent->getName()}</b>已隐藏的公众号</a></li>
+        {else}
+        <li role="presentation" class="active"><a href="#">{php echo $agent->getName()}</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['agentId'=>$agent->getId(), 'banned'=>1]);}"><b>{php echo $agent->getName()}</b>已隐藏的公众号</a></li>
+        {/if}
+    {/if}
+</ul>
+<div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
+            {if \zovye\App::isWxPlatformEnabled()}
+            <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
+            {/if}
+        </span>       
+    </div>
+    <div class="panel-body">
+        {if $accounts || $one_res}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        <div>公众号名称</div>
+                    </th>
+                    <th>
+                        <div>所属代理</div>
+                        <div>名称</div>
+                    </th>
+                    <th>领取周期</th>
+                    <th>详情 <i class="fa fa-share-alt" title="分佣"></i></th>
+                    <th>关注二维码</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {if !$banned}
+            {loop $one_res $index $res}
+                <tr data-id="{$res['id']}">
+                <td>
+                    <span class="orderno spec"  title="排序值">{if $res['orderno']}{$res['orderno']}{else}#{/if}</span>
+                </td>
+                <td>
+                    <div class="profile">
+                        <img src="{$res['img']}">
+                        <span>{$res['name']}</span>
+                    </div>
+                </td>
+                <td class="desc">
+                </td>
+                <td class="desc">
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td class="operate">
+                    <div class="btn-group">
+                        <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$res['id']))}" title="分配设备">
+                            <i class="fa fa-wrench{if empty($res['assigned'])} active{/if}"></i>
+                        </a>
+                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                            <span class="fa fa-caret-down"></span>
+                        </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$res['id']));}">
+                                <i class="fa fa-edit fa-fw"></i> 编辑
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="#" data-url="{$res['url']}" onclick="return false;">
+                                <i class="fa fa-arrow-circle-right fa-fw"></i> 通知回调链接
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="#"  data-op="viewFansCount">
+                                <i class="fa fa-users fa-fw"></i> 统计净增粉量
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="#"  data-op="viewStats">
+                                <i class="fa fa-area-chart fa-fw"></i> 查看本月统计
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-op="viewHistoryStats">
+                                <i class="fa fa-line-chart fa-fw"></i> 查看历史数据
+                            </a>
+                        </li>
+                    </ul>
+                    </div>
+                </td>
+
+                </tr>
+                {/loop}
+                {/if}
+                {loop $accounts $index $a}
+                <tr {if $a['banned']}class="banned"{/if} data-id="{$a['id']}">
+                    <td>
+                        <span class="orderno normal"  title="排序值">{if $a['orderno']}{$a['orderno']}{else}#{/if}</span>
+                    </td>
+                    <td>
+                        <div class="profile">
+                            <img src="{media $a['img']}">
+                            <span>{if $a['commission'] && $a['commission']['money'] > 0}
+                                <span class="commission" title="佣金：{php echo number_format($a['commission']['money']/100, 2)}元">*</span>
+                            {/if}{$a['name']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
+                            {if $a['state'] == \zovye\Account::AUTH}
+                            {if $a['service'] == 2}
+                            <span class="state auth" title="授权接入的服务号"><i class="fa fa-check-circle"></i></span>
+                            {else}
+                            <span class="state auth" title="授权接入的订阅号"><i class="fa fa-check-circle-o"></i></span>
+                            {/if}
+                            {elseif $a['state'] == \zovye\Account::VIDEO}
+                            <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
+                            {/if}
+                        </div>
+                    </td>
+                    <td class="desc">
+                        <div style="margin-bottom:10px;">
+                            {if $a['agent'] && (empty($agent) || $agent->getId() != $a['agent']['id'])}
+                            <a href="{php echo $this->createWebUrl('account', ['agentId'=>$a['agent']['id'], 'banned' => $banned]);}">
+                                <div class="agent" title="点击查看{$a['agent']['name']}全部公众号" style="display:inline-block;">
+                                    <div class="profile" style="background-color:{$a['agent']['level']['clr']}">
+                                        <img src="{$a['agent']['avatar']}">
+                                        <div class="nickname">{php echo cutstr($a['agent']['name'], 10, true);}</div>
+                                    </div>
+                                </div>
+                            </a>
+                            {else}
+                            <span style="color:gray;">&lt;平台&gt;</span>
+                            {/if}
+                        </div>
+                        <div>
+                            {$a['title']}
+                        </div>
+                    </td>
+                    <td class="desc">
+                        <span class="schema schema_{$a['scname']}" style="border-bottom:4px solid #fff;box-shadow: 0px 2px 0px 0px {$a['clr']};" title="{if $a['count']}每人每{php echo zovye\Schema::desc($a['scname'])}可领取{$a['count']}包{/if}{if $a['sccount']}，每{php echo zovye\Schema::desc($a['scname'])}最多送出{$a['sccount']}包{/if}">
+                            {php echo zovye\Schema::desc($a['scname'])}
+                        </span>
+                    </td>
+                    {if $a['src'] == 0}
+                    <td class="detail" style="position:relative;">
+                        <div class="limit" style="background-color:{$a['clr']}" >
+                            {if $a['groupname']}<div class="group" title="分组名称：{$a['groupname']}" style="color:{$a['clr']}">{$a['groupname']}</div>{/if}
+                            <div class="first" title="总计订单：{$a['orders']}{if $a['orderlimits']} ，最大订单数量限制：{$a['orderlimits']}{/if}"><span class="count">{$a['count']}</span>次/{php echo zovye\schema::desc($a['scname'])}</div>
+                            <div class="more" title="总计订单：{$a['orders']}{if $a['orderlimits']} ，最大订单数量限制：{$a['orderlimits']}{/if}">每人最多<span class="total">{$a['total']}</span>次</div>
+                            {if $a['commission'] && $a['commission']['money'] > 0}
+                                <span class="more commission" title="每包佣金：{php echo number_format($a['commission']['money']/100, 2)}元"><i class="fa fa-share-alt"></i> 已参加分佣</span>
+                            {/if}
+                        </div>
+                    </td>
+                    <td style="position:relative;">
+                        <div class="ercode loading">
+                            <i class="fa fa-qrcode"></i>
+                            <div class="zovye_qrcode"  data-src="{media $a['qrcode']}">
+                            </div>
+                        </div>
+                    </td>
+                    {else}
+                    <td>
+                        <div>
+                            <div style="padding: 1.5em;">
+                                <span>由广告联盟平台决定</span>
+                            </div>
+                        </div>
+
+                    </td>
+                    <td>
+                        <i class="fa fa-qrcode" title="动态二维码"></i>
+                    </td>
+                    {/if}
+
+                    <td class="operate">
+                        <div class="btn-group">
+                            {if $banned}
+                            <a  class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'ban','id'=>$a['id']))}" title="启用"><i class="fa fa-eye"></i></a>
+                            {else}
+                             <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id']))}" title="分配设备"><i class="fa fa-wrench{if empty($a['assigned'])} active{/if}"></i></a>
+                            {/if}
+
+                          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                          <span class="fa fa-caret-down"></span></a>
+                          <ul class="dropdown-menu">
+                            <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
+                            {if $a['more_url']}
+                            <li role="separator" class="divider"></li>
+                            {loop $a['more_url'] $index $xurl}
+                            {if $xurl}
+                            <li><a href="#" data-url="{$xurl}"  onclick="return false;"><i class="fa fa-external-link-square fa-fw"></i> 领取链接 [{php echo $index + 1}]</a></li>
+                            {/if}
+                            {/loop}
+                            {/if}
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"  data-op="viewFansCount"><i class="fa fa-users fa-fw"></i> 统计净增粉量</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#"  data-op="viewStats"><i class="fa fa-area-chart fa-fw"></i> 查看本月统计</a></li>
+                            <li><a href="#" data-op="viewHistoryStats"><i class="fa fa-line-chart fa-fw"></i> 查看历史数据</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li>
+                                {if $banned}
+                                <li>
+                                    <a href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id']))}">
+                                    <i class="fa fa-wrench fa-fw"></i> 分配设备
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                {else}
+                                <a href="{php echo $this->createWebUrl('account', array('op'=>'ban','id'=>$a['id']))}">
+                                {if $a['banned']}<i class="fa fa-eye fa-fw"></i> 启用{else}<i class="fa fa-eye-slash fa-fw"></i> 隐藏{/if}
+                                </a>
+                                {/if}
+                            </li>
+                            <li>
+                                <a href="#" onclick="if(confirm('确定要删除这个公众号吗？')){location.href='{php echo $this->createWebUrl('account', array('op'=>'remove','id'=>$a['id']))}'}">
+                                    <i class="fa fa-trash fa-fw"></i> 删除?
+                                </a>
+                            </li>
+                          </ul>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        <script>
+            $(function(){
+                $('.pagination li:not(.active) a').click(function(){ setTimeout(function(){util.loading()}, 1000)});
+            })
+        </script>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何公众号！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    $(function(){
+        $('body').on('hidden.bs.modal', function() {
+            $('.modal').remove();
+        })
+        
+        $('#search-form').submit(function(){
+            const url = $(this).attr("action");
+            const keywords = $(this).find("input[name=keywords]").val();
+            location.href = url + "&keywords=" + encodeURIComponent(keywords);
+
+            return false;
+        })
+
+        $('#accountlist [data-url]').each(function(){
+            util.clip(this, $(this).data('url'));
+        })
+
+        const api = {
+            url: "{php echo $this->createWebUrl('account');}",
+        }
+
+        api.showResult = function(params, url) {
+            $.getJSON(url || api.url, params).done(function(res){
+                if(res) {
+                    if(res.status) {
+                        if (res.data && res.data.content) {
+                            const dlg = util.dialog(res.data.title || '', res.data.content);
+                            dlg.modal('show');
+                        }else{
+                            if(res.data && res.data.msg) {
+                                util.message(res.data.msg, '', 'success');
+                            }
+                        }
+
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', 'error');
+                        }
+                    }
+                }
+            })
+        }
+
+        api.accountAuthorize = function(id) {
+            api.showResult({
+                op: 'accountAuthorize',
+            })
+        }
+
+        api.viewFansCount = function(id) {
+            api.showResult({
+                op: 'viewFansCount',
+                id: id,
+            })
+        }
+
+        api.viewStats = function(id, month) {
+            api.showResult({
+                op: 'viewStats',
+                id: id,
+                month: month,
+            })
+        }
+
+        api.viewHistoryStats = function(id) {
+            api.showResult({
+                id: id,
+                op: 'viewHistoryStats',
+            })
+        }
+
+        $("#accountlist").on('mouseover', '.ercode.loading', function(){
+            const co = $(this).removeClass('loading').find('.zovye_qrcode');
+            const src = co.data("src");
+            if(src) {
+                co.html('<img src="'+ src + '">');
+            }else{
+                $(this).attr("title", "没有指定二维码！");
+                co.remove();
+            }
+        })
+
+        $("#accountlist").on("click", ":not(.loading)[data-op]", function(e){
+            const self = $(this);
+            const op = self.data('op');
+            if(op && api[op]){
+                const id = self.closest('tr').data('id');
+                if(id) {
+                    self.addClass('loading');
+                    api[op](id);
+                    self.removeClass('loading');
+                } else {
+                    api[op]();
+                }
+            }
+            e.preventDefault();
+        })
+
+        $("body").on("click", "[data-month] i.fa-line-chart", function(e){
+            const self = $(this);
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            const month = tr.data('month');
+            api.viewStats(id, month);
+        })
+    })
+</script>
+{template 'common/footer'}

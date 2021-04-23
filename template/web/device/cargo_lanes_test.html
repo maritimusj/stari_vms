@@ -1,0 +1,38 @@
+<div>
+    {if $params['cargo_lanes']}
+    <table class="table table-bordered cargolanes operate" id="cargolanes">
+        <thead>
+            <th>货道</th>
+            <th>商品名称</th>
+            <th>容量</th>
+            <th>当前商品数量</th>
+            {if empty($item['is_vd'])}
+            <th>操作</th>
+            {/if}
+        </thead>
+        <tbody>
+            {loop $params['cargo_lanes'] $index $item}
+            <tr data-fetchid="{$device_id}">
+                <td>货道{php echo $index + 1}</td>
+                <td>
+                    <span {if empty($item['goods_id'])}class="text-gray"{/if}>
+                        {$item['goods_name']}
+                    </span>
+                </td>
+                <td>{$item['capacity']} {$item['goods_unit_title']}</td>
+                <td>{$item['num']} {$item['goods_unit_title']}</td>
+                {if empty($item['is_vd'])}
+                <td class="test_btn">
+                    <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="点击测试"></i>
+                </td>
+                {/if}
+            </tr>
+            {/loop}
+        </tbody>
+    </table>
+    {else}
+    <div style="text-align:center;color:#ccc;">
+        <i class="fa fa-question-circle"></i> 请检查设备型号是否正确！
+    </div>
+    {/if}
+</div>

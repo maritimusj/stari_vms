@@ -1,0 +1,29 @@
+{if $prizes}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th></th>
+            <th style="width:10em;">奖品</th>
+            <th>说明</th>
+            <th style="width:12em;">时间</th>
+        </tr>
+    </thead>
+    <tbody>
+        {loop $prizes $index $item}
+        <tr>
+            <td>{php echo $index + 1}</td>
+            <td>{$item['title']}</td>
+            <td>{$item['desc']}</td>
+            <td>{$item['createtime']}</td>
+        </tr>
+        {/loop}
+    </tbody>
+</table>
+<div class="pull-right" id="log-pager">
+{$pager}
+</div>
+{else}
+<div style="text-align:center;color:#ccc;">
+    暂时没有任何奖品记录！
+</div> 
+{/if}

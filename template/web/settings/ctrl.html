@@ -1,0 +1,236 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .right-content {
+        overflow: hidden;
+    }
+</style>
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="panel-body">
+            <div class="seg" id="ctrlserv" style="padding-top: 3em;">
+                <div class="title">远程服务器</div>
+                <div class="form-group">
+                    <div class="page_item">
+                        <span>程序版本</span>
+                        <span title="build date: {$build}" class="duration">{$version}</span>
+                    </div>
+                    <div class="page_item">
+                        <span>当前时间</span>
+                        <span class="duration">{php echo $formatted_now ?: 'n/a'}</span>
+                    </div>
+                    <div class="page_item">
+                        <span>运行时长</span>
+                        <span class="duration">{php echo $formatted_duration ?: 'n/a'}</span>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="controlAddr" class="col-md-2 control-label">apiURL</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="controlAddr" id="controlAddr"
+                            value="{$settings['ctrl']['url']}">
+                        <span class="help-block">* 授权服务器地址</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="appKey" class="col-md-2 control-label">appKey</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="appKey" id="appKey"
+                            value="{$settings['ctrl']['appKey']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="appSecret" class="col-md-2 control-label">appSecret</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="appSecret" id="appSecret"
+                            value="{$settings['ctrl']['appSecret']}">
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">回调网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址"
+                                data-url="{$cb_url}"></i> {$cb_url}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="checkSign" id="checkSign" value="1" {if $settings['ctrl']['checkSign']}checked{/if}>
+                                检查控制中心签名是否正确<span style="color:gray;">（签名错误则忽略通知消息）</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">本地服务器</div>
+                <div class="form-group">
+                    <div class="page_item">
+                        <span>重置升级</span>
+                        <span class="duration operate">
+                            <i class="fa fa-reply-all" title="点击重置升级" data-op="reset"></i>
+                        </span>
+                    </div>
+                    {if $is_locked}
+                    <div class="page_item">
+                        <span>锁定状态</span>
+                        <span class="duration operate">已锁定
+                            <i class="fa fa-lock" title="点击解除锁定" data-op="unlock"></i>
+                        </span>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">功能选项</div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="vDevice" id="v-device" value="1" {if $settings['device']['v-device']['enabled']}checked{/if}>
+                                开启虚拟设备功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="lotteryGoods" id="v-lottery-goods" value="1" {if $settings['goods']['lottery']['enabled']}checked{/if}>
+                                开启固定货道商品功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="idCardVerify" id="v-idcard-verify" value="1" {if $settings['idcard']['verify']['enabled']}checked{/if}>
+                                开启实名认证功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="bluetoothDevice" id="bluetoothDevice" value="1" {if $settings['device']['bluetooth']['enabled']}checked{/if}>
+                                开启蓝牙设备支持
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="goodsVoucher" id="goodsVoucher" value="1" {if $settings['goods']['voucher']['enabled']}checked{/if}>
+                                开启提货码功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="agentWxApp" id="agentWxApp" value="1" {if $settings['agent']['wx']['app']['enabled']}checked{/if}>
+                                开启代理商独立小程序功能
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">第三方接入</div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="wxPlatform" id="wxPlatform" value="1" {if $settings['account']['wx']['platform']['enabled']}checked{/if}>
+                                允许微信第三方平台接入
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="jfbFAN" id="jfbFAN" value="1" {if $settings['jfb']['fan']['enabled']}checked{/if}>
+                                开启准粉吧吸粉功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="moscalesFAN" id="moscalesFAN" value="1" {if $settings['moscale']['fan']['enabled']}checked{/if}>
+                                开启公锤平台吸粉功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="yunfenbaFAN" id="yunfenbaFAN" value="1" {if $settings['yunfenba']['fan']['enabled']}checked{/if}>
+                                开启云粉吧吸粉功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="AQiinfoFAN" id="AQiinfoFAN" value="1" {if $settings['AQiinfo']['fan']['enabled']}checked{/if}>
+                                开启阿旗平台吸粉功能
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">定制功能</div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="mustFollow" id="mustFollow" value="1" {if $settings['custom']['mustFollow']['enabled']}checked{/if}>
+                                购买商品需要先关注公众号（该功能需要手机端特定皮肤支持）
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="channelPay" id="channelPay" value="1" {if $settings['custom']['channelPay']['enabled']}checked{/if}>
+                                启用阿旗（京东）优惠支付功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="SQMPay" id="SQMPay" value="1" {if $settings['custom']['SQMPay']['enabled']}checked{/if}>
+                                启用省钱码优惠活动功能
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="ctrl">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('settings');}");
+        zovye.op('reset', function(self, next) {
+            if (confirm('确定要重置升级吗？')) {
+                next();
+            }
+        })
+        m.enableInputMask();
+    });
+</script>
+{template 'common/footer'}

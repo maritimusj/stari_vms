@@ -1,0 +1,54 @@
+{template 'common/header'}
+{php \zovye\url(true, './static/css/assign.css?v=20180422001');}
+<style>
+    dd{
+        color: gray;
+    }
+</style>
+<div id="app">
+    <assign-ctrl>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <dl class="dl-horizontal">
+                <dt>公众号帐号</dt>
+                <dd>{$account['name']}</dd>                    
+                <dt>名称</dt>
+                <dd>{$account['title']}</dd>
+
+                {if $account['agent']}
+                <dt>代理商</dt>
+                <dd>
+                    {$account['agent']['name']}
+                </dd>
+                {/if}
+                </dl>
+            </div>
+        </div>
+    </assign-ctrl>
+</div>
+
+<script>
+    const cfg = {
+        id: "{$id}",
+        multi: {php echo intval(zovye\settings('advs.assign.multi'));},
+        data: JSON.parse('{$assign_data}'),
+        agents: "{php echo $this->createWebUrl('agent')}",
+        groups: "{php echo $this->createWebUrl('device', array('op' => 'group'))}",
+        tags: "{php echo $this->createWebUrl('tags')}",
+        devices: "{php echo $this->createWebUrl('device');}",
+        save: "{php echo $this->createWebUrl('account', array('op' => 'saveAssignData'));}",
+        back_url: "{php echo $this->createWebUrl('account');}",
+    }
+    require(['{php echo MODULE_URL}static/js/assign.min.js?v=20180507001'], function (m) {
+        m.init(cfg, function (res) {
+            $.post(cfg.save, {id: cfg.id, data: JSON.stringify(res)}, function(res){
+                if (res) {
+                    if (res.data && res.data.msg) {
+                         alert(res.data.msg);
+                    }
+                }
+            })
+            return true;
+        })
+    })
+</script>{template 'common/footer'}

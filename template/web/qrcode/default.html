@@ -1,0 +1,185 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{if $op=='default'}
+<style>
+    table#qrcodelist tr td{
+        vertical-align: middle;
+    }
+    #qrcode {
+        position: relative;
+    }
+    #qrcode:hover img{
+        display: inline-block;
+    }
+    #qrcode img{
+        display: none;
+        position: absolute;
+        left: -280px;
+        top: 18px;
+        border: 1px solid #9E9E9E;
+        z-index: 99;
+        width: 300px;
+        height: 300px;
+    }
+    #qrcode img:hover{
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        transform: translate3d(0, -2px, 0);
+        cursor: pointer;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">全部活码</a></li>
+</ul>
+<div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <span id="qrcode">
+                <i class="fa fa-fw fa-qrcode"></i>
+                <img src="{php echo tomedia(isset($config['qrcode'])? $config['qrcode']:'')}" data-url="{php echo $config['url']?:''}" title="点击复制网址"/>
+            </span>
+            <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'add'));}"  title="添加活码转跳">
+                <i class="fa fa-fw fa-pencil"></i>
+            </a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $qrcodes}
+        <table class="table" id="qrcodelist">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>名称</th>
+                <th>网址</th>
+                <th>访问人数/次数</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop $qrcodes $index $item}
+            <tr data-id="{$item['id']}" {if $item['state'] == \zovye\Advertising::BANNED}class="banned" title="已禁用！"{/if}>
+            <td>{php echo $index + 1}</td>
+            <td>{$item['title']}</td>
+            <td class="operate">
+                {$item['extra']['url']}
+            </td>
+            <td>
+                {php echo (int)$item['extra']['visited']['count']} / {php echo (int)$item['extra']['visited']['total']}
+            </td>
+            <td>{$item['createtime_formatted']}</td>
+            <td class="operate">
+                <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'edit', 'id'=>$item['id']));}"><i class="fa fa-edit" title="编辑"></i></a>
+                {if $item['state'] == \zovye\Advertising::NORMAL}
+                <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'ban', 'id'=>$item['id']));}"><i class="fa fa-eye-slash" title="禁用"></i></a>
+                {else}
+                <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'ban', 'id'=>$item['id']));}"><i class="fa fa-eye" title="启用"></i></a>
+                {/if}
+                <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'remove', 'id'=>$item['id']));}"><i class="fa fa-trash-o" title="删除？"  onclick="return confirm('确定要删除这个活码吗？');"></i></a>
+            </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        {else}
+        <div style="text-align:center;color:#ccc;">
+            暂时还没有任何活码！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    $(function(){
+        $('[data-url]').each(function(){
+            util.clip(this, $(this).data('url'));
+        });
+    });
+</script>
+{elseif $op=='add' || $op == 'edit'}
+<style>
+    #qrcode_form .form-control.tpl-district {
+        display: none;
+        visibility: hidden;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">
+        {if $op=='add'}<i class="fa fa-pencil"></i> 添加{else}<i class="fa fa-edit"></i> 编辑{/if}活码转跳
+    </a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('qrcode');}" method="post" id="qrcode_form">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+            <span class="operate">
+                <a href="{php echo $this->createWebUrl('qrcode');}"><i class="fa fa-reply" title="返回"></i></a>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">基本设置</div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">名称</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="title" id="title" value="{$data['title']}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="priority" class="col-md-2 control-label">地区</label>
+                    <div class="col-md-10">
+                        {php echo \tpl_form_field_district('area', $data['extra']['area']);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gender" class="col-md-2 control-label">性别</label>
+                    <div class="col-md-10">
+                        <select class="col-md-8" id="gender" name="gender">
+                            <option value="0" {if $data['extra']['sex'] == \zovye\User::UNKNOWN}selected{/if}>不限</option>
+                            <option value="1" {if $data['extra']['sex'] == \zovye\User::MALE}selected{/if}>男</option>
+                            <option value="2" {if $data['extra']['sex'] == \zovye\User::FEMALE}selected{/if}>女</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phoneos" class="col-md-2 control-label">手机类型</label>
+                    <div class="col-md-10">
+                        <select class="col-md-8" id="phoneos" name="phoneos">
+                            <option value="unknown" {if $data['extra']['phoneos'] == 'unknown'}selected{/if}>不限</option>
+                            <option value="ios"{ {if $data['extra']['phoneos'] == 'ios'}selected{/if}>iphone</option>
+                            <option value="android" {if $data['extra']['phoneos'] == 'android'}selected{/if}}>android</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="url" class="col-md-2 control-label">目标网址</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="url" id="url" value="{$data['extra']['url']}" required>
+                        <span class="help-block">* 请以http://或者https://开头，用户匹配成功后，转跳到这个网站。可用占位符，设备shadowID: {device_uid}, 用户openid: {user_uid}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seg">
+                <div class="title">其它</div>
+                <div class="form-group">
+                    <label for="priority" class="col-md-2 control-label">排序</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="priority" id="priority" value="{$data['extra']['priority']}">
+                        <span class="help-block">* 可选，默认为0。数字越大，优先级越高</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        {if $op=='edit'}
+        <input type="hidden" name="id" value="{$data['id']}">
+        <button type="submit" class="btn btn-primary">保存</button>
+        {else}
+        <button type="submit" class="btn btn-primary">提交</button>
+        {/if}
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('qrcode');}">返回</a>
+    </div>
+</form>
+{/if}
+{template 'common/footer'}

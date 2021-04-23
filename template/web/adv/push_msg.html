@@ -1,0 +1,353 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{if $op == 'default'}
+<style>
+    .type span {
+        background: gray;
+        padding: 3px 9px;
+        color: #fff;
+        user-select: none;
+    }
+    
+    .type.image span{
+        background-color: #8BC34A;
+    }
+    
+    .type.mpnews span{
+        background-color: #E91E63;
+    }
+    
+    .type.text span{
+        background-color: #607D8B;
+    }
+    #list td {
+        vertical-align: middle;
+    }
+    .type a span:hover {
+        box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.2);
+    }
+    #list div.owner{
+        display: flex;
+    }
+</style>
+{template 'web/adv/nav'}
+<div class="panel panel-default nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('adv', array('op'=>'add','type'=>$type));}"><i class="fa fa-fw fa-comments-o" title="添加{php echo zovye\Advertising::desc($type);}广告"></i>
+            </a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $advs}
+        <table class="table" id="list">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>标题</th>
+                    <th>审核</th>
+                    <th>代理商</th>
+                    <th>消息类型</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $advs $index $item}
+                <tr data-id="{$item['id']}" class="{$item['state_formatted']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>{$item['title']}</td>
+                    <td>
+                        {if $item['review']}
+                        <div class="review">
+                            {if $item['review']['result'] == zovye\ReviewResult::WAIT}
+                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewpassed', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-check" title="通过审核"></i></a>
+                            <a href="{php echo $this->createWebUrl('adv', array('op'=>'reviewrejected', 'type'=>$item['type'], 'id'=>$item['id']));}"><i class="fa fa-close" title="拒绝发布"></i></a>
+                            {/if}
+                        </div>
+                        {/if}
+                        {if $item['review'] && $item['review']['result'] != zovye\ReviewResult::PASSED}
+                             {if $item['review']['result'] == zovye\ReviewResult::REJECTED}
+                                <i class="fa fa-times" style="color:#f44336" title="已拒绝"></i>
+                            {/if}
+                        {else}
+                            <i class="fa fa-check-square-o" style="color:#8BC34A" title="已通过"></i>
+                        {/if}
+                    </td>
+                    <td>
+                        <div  class="owner">
+                            {if $item['agent']}
+                                {if $filter_agent && $filter_agent->getId() == $item['agent']['id']}
+                                    <div class="agent" title="{$item['agent']['name']}">
+                                        <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                            <img src="{$item['agent']['avatar']}">
+                                            <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>   
+                                        </div>
+                                    </div>
+                                {else}
+                                    {if $filter_media}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=>$item['agent']['id'], 'type'=>$type, 'media'=>$filter_media]);}" title="点击查看{$item['agent']['name']}的{$item['media_formatted']}广告">
+                                    {else}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=>$item['agent']['id'], 'type'=>$type]);}" title="点击查看{$item['agent']['name']}的广告">
+                                    {/if}
+                                      <div class="agent">
+                                            <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                                <img src="{$item['agent']['avatar']}">
+                                                <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>   
+                                            </div>
+                                      </div>
+                                    </a>
+                                {/if}
+                            {else}
+                                <div style="color:#CCC;">
+                                {if isset($filter_agentId)}
+                                &lt;平台&gt;
+                                {else}
+                                    {if $filter_media}
+                                    <a href="{php echo $this->createWebUrl('adv', ['agentId'=> 0, 'type'=>$type, 'media'=>$filter_media]);}" title="点击查看所有平台{$item['media_formatted']}广告">
+                                    &lt;平台&gt;
+                                    </a>
+                                    {else}
+                                        {if $filter_msgtype}
+                                        <a href="{php echo $this->createWebUrl('adv', ['agentId'=> 0, 'type'=>$type, 'msgtype' => $filter_msgtype]);}" title="点击查看所有平台广告">
+                                            &lt;平台&gt;
+                                            </a>
+                                        {else}
+                                        <a href="{php echo $this->createWebUrl('adv', ['agentId'=> 0, 'type'=>$type]);}" title="点击查看所有平台广告">
+                                            &lt;平台&gt;
+                                            </a>
+                                        {/if}
+
+                                    {/if}
+                                {/if}
+                                </div>
+                            {/if}
+                        </div>
+                    </td>
+                    <td class="type {$item['msg_type']}">
+                        {if $filter_msgtype}
+                        <span>{$item['msg_typename']}</span>
+                        {else}
+                            {if isset($filter_agentId)}
+                            <a href="{php echo $this->createWebUrl('adv', array('agentId'=>$filter_agentId,'type'=>$type, 'msgtype'=>$item['msg_type']));}" title="点击查看所有{$item['msg_typename']}推送广告">
+                                <span>{$item['msg_typename']}</span>
+                            </a>
+                            {else}
+                            <a href="{php echo $this->createWebUrl('adv', array('type'=>$type, 'msgtype'=>$item['msg_type']));}" title="点击查看所有{$item['msg_typename']}推送广告">
+                                <span>{$item['msg_typename']}</span>
+                            </a>
+                            {/if}
+                        {/if}
+                    </td>
+                    <td>{$item['createtime_formatted']}</td>
+                    <td class="operate">
+                        <div class="btn-group">
+                          <a class="btn btn-default" href="{php echo $this->createWebUrl('adv', array('op' => 'assign', 'type' => $type, 'id' => $item['id'], 'from_type' => $item['type']));}" title="分配设备"><i class="fa fa-wrench{php echo $item['assigned']?'':' active'}"> </i></a>
+                          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                          <span class="fa fa-caret-down"></span></a>
+                          <ul class="dropdown-menu">
+                            <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'edit', 'id' => $item['id'], 'from_type'=> $item['type']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" data-op="ban"><i class="fa fa-ban fa-fw"></i> <span>{if $item['state']==zovye\Advertising::NORMAL}禁用？{else}启用？{/if}</span></a></li>
+                            <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'remove', 'id' => $item['id'], 'from_type' => $item['type']));}" onclick="return confirm('确定要删除这个广告吗？');"><i class="fa fa-trash-o fa-fw"></i> 删除？</a></li>
+                          </ul>
+                        </div>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div style="text-align:center;color:#ccc;margin-bottom:2em;">
+            暂时没有任何内容！
+        </div>
+        {/if}
+    </div>
+</div>
+{template 'web/adv/foot'}
+{elseif $op == 'add' || $op == 'edit'}
+<style>
+    .imagelist, .mpnewslist {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .imagelist img, .mpnewslist img{
+        width: 200px;
+    }
+    
+    div[data-media_id] {
+        position: relative;
+        margin: 3px;
+        border: 6px solid #fff;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    div[data-media_id][selected] {
+        border-color: #FF5722;
+        box-shadow: 3px 3px 3px 0 grey;
+    }
+    
+    div[data-media_id]:hover {
+        background: rgba(158, 158, 158, 0.10);
+        border-color: rgba(255, 152, 0, 0.6);
+        box-shadow: 3px 3px 3px 0 grey;
+    }
+    
+    div[data-media_id] span{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: rgba(255, 152, 0, 0.6);
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        text-shadow: 1px 1px #000;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">
+        <i class="fa fa-image"></i> 
+        {if $op=='edit'}编辑{else}添加{/if}{php echo zovye\Advertising::desc($type)}广告
+    </a></li>
+</ul>
+<form action="{php echo $this->createWebUrl('adv', array('type'=>$type));}" method="post" id="config-form">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="title" class="col-md-2 control-label">广告名称</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" name="title" id="title" value="{$title}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="pushAccountMsg" class="col-md-2 control-label">消息类型</label>
+                <div class="col-md-10">
+                    <select class="col-md-9" id="pushAccountMsg" name="pushAccountMsg_type">
+                        <option value="text" {if $msg['type'] == 'text'}selected{/if}>文本</option>
+                        <option value="image" {if $msg['type'] == 'image'}selected{/if}>图片</option>
+                        <option value="mpnews" {if $msg['type'] == 'mpnews'}selected{/if}>图文</option>
+                    </select>
+                    <input type="hidden" name="pushAccountMsg_val" value="{$msg['val']}">
+                    <span class="col-md-2"><button type="button" class="btn btn-default" id="pushAccountMsgConfig">消息设置</button></span>
+                </div>                        
+            </div>
+
+            <div class="form-group">
+                <label for="pushAccountMsgDelay" class="col-md-2 control-label">延迟推送消息(秒)</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="pushAccountMsg_delay" id="pushAccountMsgDelay" value="{$delay}">
+                    <span class="help-block">* 用户领取或者购买成功，系统等待几秒后推送消息, 0表示不等待</span>
+                </div>
+            </div>                    
+
+        </div>
+    </div> 
+    <div class="form-btn">
+        <input type="hidden" name="from_type" value="{$from_type}">
+        <input type="hidden" name="from_op" value="{$op}">
+        <input type="hidden" name="op" value="save">
+        {if $op=='edit'}
+        <input type="hidden" name="id" value="{$id}">
+        <button type="submit" class="btn btn-primary">保存</button>
+        {else}
+        <button type="submit" class="btn btn-primary">提交</button>
+        {/if}                    
+        <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('adv', array('type' => $type));}">返回</a>
+    </div>     
+</form>
+<script>
+    const title = {
+        text: '设置文本',
+        image: '选择图片',
+        mpnews: '设置图文',
+    }
+    
+    function change_btn_status(){
+        const typename = $('#pushAccountMsg').val();
+        $('fieldset#pushAccountMsgDelayGroup').attr('disabled', typename === 'none');
+        if(typename === 'none') {
+            $('#pushAccountMsgConfig').hide();
+        } else {
+            $('#pushAccountMsgConfig').show();
+            $('#pushAccountMsgConfig').text(title[typename]);
+            $('#pushAccountMsgConfig').data('type', typename);
+            const media = $('input[name=pushAccountMsg_val]').data('media');
+            $('#pushAccountMsgConfig').removeClass('btn-default btn-danger btn-success').
+            addClass(media && media.type === typename ? 'btn-success' : 'btn-danger');
+        }
+    }
+    
+    function saveMsgText() {
+        const text = $('input[id=msgText]').val();
+        $('input[name=pushAccountMsg_val]').data('media', {
+            type: 'text',
+            val: text,
+        });
+        $('#pushAccountMsgConfig').removeClass('btn-danger').addClass('btn-success');
+        $('#modal-message').modal('hide');
+    }
+    
+    $(function(){
+        const media = JSON.parse('{php echo json_encode($msg);}');
+        if(media && media.type) {console.log(media);
+            $('input[name=pushAccountMsg_val]').data('media', media);
+        }
+        
+        $('#config-form').submit(function(){
+            const typename = $('[name=pushAccountMsg_type]').val();
+            const media = $('input[name=pushAccountMsg_val]').data('media');
+            if(typename !== 'none' && (!media || typename !== media.type)) {
+                $('#pushAccountMsgConfig').trigger('click');
+                return false;
+            }
+            $('input[name=pushAccountMsg_val]').val(media.val);
+            return true;
+        })
+        
+        $('body').on('click', 'div[data-media_id]', function(){
+            const media_id = $(this).data('media_id');
+            $('input[name=pushAccountMsg_val]').data('media', {
+                type: $('#pushAccountMsg').val(),
+                val: media_id,
+            });
+            $('#pushAccountMsgConfig').removeClass('btn-danger').addClass('btn-success');
+            $('#modal-message').modal('hide');
+        })
+        
+        $('#pushAccountMsgConfig').click(function(){
+            
+            const id = '{php echo intval($id);}';
+            const typename = $(this).data('type');
+            const media = $('input[name=pushAccountMsg_val]').data('media');
+            
+            $.getJSON("{php echo $this->createWebUrl('adv')}", { op:'wxmsg', id: id, typename: typename, media: media }).then(function(res){
+                if(res) {
+                    if(res.status && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '注意', res.data.content);
+                        dlg.modal('show')
+                    } else {
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', 'error');
+                        }                        
+                    }
+                }
+            })
+        })
+
+        $('#pushAccountMsg').change(function(){
+            change_btn_status();
+            $('input[name=pushAccountMsg_val]').val('');
+        })
+
+        change_btn_status();
+    })
+</script>
+{/if}
+{template 'common/footer'}
+

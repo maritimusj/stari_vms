@@ -70,6 +70,8 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
  *
  * @method getCreatetime()
  * @method getRank()
+ * @method getS1()
+ * @method setS1(int $int)
  */
 class deviceModelObj extends modelObj
 {
@@ -658,8 +660,10 @@ class deviceModelObj extends modelObj
         } else {
             return;
         }
+
         $i_w = imagesx($im);
         $i_h = imagesy($im);
+
         $x_offset = ($i_w + 44 - 18 * strlen($text)) / 2;
         $n_w = $i_w + 44;
         $n_h = $i_h + 44;
@@ -677,6 +681,7 @@ class deviceModelObj extends modelObj
         } elseif (strpos(strtolower($ext), 'png') !== false) {
             imagepng($im2, $file);
         }
+
         imagedestroy($im);
         imagedestroy($im2);
     }
@@ -688,29 +693,16 @@ class deviceModelObj extends modelObj
     public function createQrcodeFile(): bool
     {
         $url = $this->getUrl();
-        $qrcode_file = Util::createQrcodeFile("device.{$this->imei}", $url);
+
+        $qrcode_file = Util::createQrcodeFile("device.{$this->imei}", $url, function ($filename) {
+            $this->renderTxt($filename, $this->imei);
+        });
+
         if (is_error($qrcode_file)) {
             return $qrcode_file;
         }
 
-        $this->renderTxt(ATTACHMENT_ROOT . $qrcode_file, $this->imei);
         $this->setQrcode($qrcode_file);
-
-        if (!$this->save()) {
-            return error(State::ERROR, '创建二维码文件失败！');
-        }
-        return true;
-    }
-
-    public function createWxAppQrcodeFile()
-    {
-        $res = Util::createWxAppQrcodeFile($this->imei, Device::WX_APP_ENTRY_PAGE);
-        if (is_error($res)) {
-            return $res;
-        }
-
-        $this->renderTxt(ATTACHMENT_ROOT . $res, $this->imei);
-        $this->setQrcode($res);
 
         if (!$this->save()) {
             return error(State::ERROR, '创建二维码文件失败！');
@@ -2434,7 +2426,7 @@ class deviceModelObj extends modelObj
         return $stats;
     }
 
-    public function confirmLAC()
+    public function confirmLAC(): bool
     {
         $this->setS1(0);
         return $this->save();

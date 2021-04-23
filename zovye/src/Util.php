@@ -1123,53 +1123,14 @@ HTML_CONTENT;
     }
 
     /**
-     * 创建小程序二维码
-     *
-     * @param $id
-     * @param $page
-     * @return string|array
-     */
-    public static function createWxAppQrcodeFile($id, $page)
-    {
-        $wxApp = Wx::getWxApp();
-
-        $res = $wxApp->getCodeUnlimit($id, $page);
-        if (is_error($res)) {
-            Util::logToFile('qrcode', ['error' => $res]);
-            return $res;
-        }
-
-        $dirname = 'zovye/wxapp/';
-        $filename = "{$id}.png";
-
-        $full_filename = self::getAttachmentFileName($dirname, $filename);
-
-        if (false === file_put_contents($full_filename, $res)) {
-            return error(State::ERROR, '无法保存文件！');
-        }
-
-        if (file_exists($full_filename)) {
-            try {
-                @We7::file_remote_upload("{$dirname}{$filename}");
-            } catch (Exception $e) {
-                self::logToFile('createWxAppQrcodeFile', $e->getMessage());
-            }
-
-            return "{$dirname}{$filename}";
-        }
-
-        return error(State::ERROR, '创建文件失败！');
-    }
-
-    /**
      * 创建二维码 $id = type.uid形式指定.
      *
      * @param $id
      * @param $text
-     *
+     * @param callable|null $cb
      * @return string|array
      */
-    public static function createQrcodeFile($id, $text)
+    public static function createQrcodeFile($id, $text, callable $cb = null)
     {
         if (stripos($id, '.') !== false) {
             list($type, $id) = explode('.', $id, 2);
@@ -1196,8 +1157,12 @@ HTML_CONTENT;
         QRcode::png($text, $full_filename, $error_correction_level, $matrix_point_size);
 
         if (file_exists($full_filename)) {
+            if ($cb != null ) {
+                $cb($full_filename);
+            }
+
             try {
-                @We7::file_remote_upload("{$dirname}{$filename}");
+                We7::file_remote_upload("{$dirname}{$filename}");
             } catch (Exception $e) {
                 self::logToFile('createQrcodeFile', $e->getMessage());
             }

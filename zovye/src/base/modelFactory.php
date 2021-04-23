@@ -185,7 +185,7 @@ class modelFactory
     {
         $id = is_object($obj) ? $obj->getId() : $obj;
 
-        return "zovye:{$this->shortName}:{$id}";
+        return APP_NAME . ":{$this->shortName}:{$id}";
     }
 
     /**

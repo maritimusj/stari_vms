@@ -75,7 +75,7 @@ CODE;
 
     protected function cacheKey($name): string
     {
-        return "zovye:settings:" . We7::uniacid() . ":{$this->title}:{$name}";
+        return APP_NAME . ":settings:" . We7::uniacid() . ":{$this->title}:{$name}";
     }
 
     /**
@@ -178,9 +178,9 @@ CODE;
     {
         $ret = [];
         $keys = is_array($key) ? $key : [$key];
+        
 
         foreach ($keys as $entry) {
-
             if ($this->use_cache) {
                 $val = We7::cache_read($this->cacheKey($entry));
                 if (!is_error($val) && $val) {

@@ -188,7 +188,7 @@ class modelObjFinder extends SqlParser
 
             if ($this->conditionOr) {
                 if ($this->condition) {
-                    $sql .= ' AND (' . implode(' OR ', $this->conditionOr) . ')';
+                    $sql .= ' AND ' . implode(' OR ', $this->conditionOr);
                 } else {
                     $sql .= ' WHERE ' . implode(' OR ', $this->conditionOr);
                 }

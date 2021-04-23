@@ -279,7 +279,7 @@ class SqlParser
             ++$index;
         }
 
-        return ' SELECT ' . implode(',', $select);
+        return 'SELECT ' . implode(',', $select);
     }
 
     public static function parseLimit($limit, $inpage = true)

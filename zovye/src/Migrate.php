@@ -64,9 +64,11 @@ class Migrate
                     $url = Util::murl('migrate');
                 } else {
                     $url = Util::url('migrate', [], false);
+                    app()->forceUnlock();
                 }
+
                 Util::redirect($url);
-                exit();
+                exit(); 
             }
             return true;
         }

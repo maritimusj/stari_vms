@@ -14,7 +14,6 @@ if ($op == 'default') {
 
     $task = Migrate::getNewTask();
     if (empty($task)) {
-
         $home = Util::url('homepage');
         Util::redirect($home);
         exit();
@@ -26,7 +25,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'step') {
 
-    for ($i = 0; $i < 6; $i++) {
+    for ($i = 0; $i < 3; $i++) {
         $locker = app()->lock();
 
         if ($locker && $locker->isLocked()) {

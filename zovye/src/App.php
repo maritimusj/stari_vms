@@ -4,6 +4,7 @@ namespace zovye;
 
 use zovye\model\userModelObj;
 use zovye\model\agentModelObj;
+use zovye\model\deviceModelObj;
 
 class App
 {
@@ -246,8 +247,17 @@ class App
      * false 表示库存少的货道优先出货：顺序出货
      * @return bool
      */
-    public static function shipmentBalance(): bool
+    public static function shipmentBalance(deviceModelObj $device = null): bool
     {
+        if ($device) {
+            $agent = $device->getAgent();
+            if ($agent) {
+                $balanced = $agent->settings('agentData.device.shipment.balanced');
+                if (isset($balanced)) {
+                    return !empty($balanced);
+                }
+            }
+        }
         return !empty(settings('device.shipment.balanced'));
     }
 

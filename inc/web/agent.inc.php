@@ -577,6 +577,9 @@ if ($op == 'default') {
 
             $user->updateSettings('agentData.device', [
                     'remainWarning' => request::int('remainWarning'),
+                    'shipment' => [
+                        'balanced' => request::bool('shipmentBalance') ? 1 : 0,
+                    ]
                 ]
             );
 

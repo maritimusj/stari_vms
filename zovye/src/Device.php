@@ -226,7 +226,7 @@ class Device extends State
     public static function getGoods(deviceModelObj $device, int $goods_id): array
     {
         $result = ['num' => 0];
-        if (App::shipmentBalance()) {
+        if (App::shipmentBalance($device)) {
             $match_fn = function ($lane) use ($goods_id, &$result) {
                 return $lane['goods'] == $goods_id && $lane['num'] > 0 && $lane['num'] > $result['num'];
             };

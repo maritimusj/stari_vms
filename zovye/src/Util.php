@@ -323,7 +323,7 @@ class Util
                 'str' => $str,
                 'file' => $file,
                 'line' => $line,
-            ], true);
+            ], false);
         }, E_ALL ^ E_NOTICE);
 
         set_exception_handler(function (Throwable $e) {

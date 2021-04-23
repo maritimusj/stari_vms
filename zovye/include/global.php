@@ -19,9 +19,7 @@ CtrlServ::setHttpClient(new we7HttpClient());
 
 //启动应用
 try {
-
     app()->run();
-
 } catch (Exception $e) {
     Util::logToFile("app", [
         'error' => $e->getMessage(),

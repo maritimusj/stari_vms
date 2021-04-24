@@ -41,7 +41,10 @@ class group
             }
         } else {
             //代理商与平台的 分组
-            $query->where("agent_id = {$user->getAgentId()} Or agent_id=0");
+            $query->whereOr([
+                'agent_id' => $user->getAgentId(),
+                'agent_id' => 0,                
+            ]);
         }
 
         $total = $query->count();
@@ -60,21 +63,22 @@ class group
 
             /** @var device_groupsModelObj $entry */
             foreach ($query->findAll() as $entry) {
-                $query_arr['group_id'] = $entry->getId();
-                if ($entry->getAgentId() == 0) {
-                    //平台
-                    $query_arr['agent_id'] = $user->getAgentId();
-                }
-                $count = Device::query($query_arr)->count();
-
-                $result['list'][] = [
+                $data = [
                     'id' => intval($entry->getId()),
                     'title' => $entry->getTitle(),
                     'clr' => $entry->getClr(),
-                    'agentId' => $entry->getAgentId(),
-                    'count' => $count,
-                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                    'agentId' => $entry->getAgentId(),                    
+                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),                    
                 ];
+
+                $cond = ['group_id' => $entry->getId()];
+                if ($guid) {
+                    $cond['agent_id'] = $user->getAgentId();
+                }
+                
+                $data['count'] = intval(Device::query($cond)->count());
+
+                $result['list'][] = $data;
             }
         }
 

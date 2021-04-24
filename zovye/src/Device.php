@@ -561,6 +561,9 @@ class Device extends State
 
         $device->resetPayload();
 
+        //设备分组
+        $device->setGroupId(0);
+
         //设备类型
         $device->setDeviceType(DeviceTypes::UNKNOWN_TYPE);
 

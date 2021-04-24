@@ -762,7 +762,10 @@ class agent
 
         $group_id = request::int('group');
         if ($group_id > 0) {
-            $query = Device::query(['group_id' => $group_id]);
+            $query = Device::query([
+                'agent_id' => $user->getAgentId(), 
+                'group_id' => $group_id,
+            ]);
             /** @var deviceModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $device_ids[] = $entry->getImei();
@@ -774,10 +777,6 @@ class agent
                 $device = \zovye\api\wx\device::getDevice($device_id, $user);
                 if (is_error($device)) {
                     return $device;
-                }
-
-                if ($device->getAgentId() != $user->getAgentId()) {
-                    return error(State::ERROR, '只有该设备代理商才能执行这个操作！');
                 }
 
                 if (Device::bind($device, $target) && $device->save()) {

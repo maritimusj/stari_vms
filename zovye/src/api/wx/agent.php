@@ -985,7 +985,7 @@ class agent
             ];
 
             $pay_result = $order->getExtraData('payResult');
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $data['orderId']);
+            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : '');
 
             $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
 

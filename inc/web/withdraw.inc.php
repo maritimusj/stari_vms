@@ -369,7 +369,7 @@ if ($op == 'withdraw_pay') {
     $tpl_data['open_id'] = $agent_openid;
     $tpl_data['data'] = $data;
     $tpl_data['total'] = $total;
-    $tpl_data['comm_total'] = abs(CommissionBalance::query()->get('sum(x_val)'));
+    $tpl_data['comm_total'] = abs($query->get('sum(x_val)'));
 
     $this->showTemplate('web/withdraw/stat', $tpl_data);
 }

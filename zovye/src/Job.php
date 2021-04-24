@@ -130,8 +130,7 @@ class Job
 
     public static function withdraw($user_id, $amount): bool
     {
-        return CtrlServ::scheduleJob('withdraw', ['id' => $user_id, 'amount' => $amount]
-        );
+        return CtrlServ::scheduleJob('withdraw', ['id' => $user_id, 'amount' => $amount]);
     }
 
     public static function createSpecialAccountOrder($params = []): bool

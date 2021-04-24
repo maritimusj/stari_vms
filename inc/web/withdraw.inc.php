@@ -307,6 +307,10 @@ if ($op == 'withdraw_pay') {
 
 } elseif ($op == 'stat') {
 
+    $query = CommissionBalance::query([
+        'src' => CommissionBalance::WITHDRAW,
+    ]);
+
     //统计
     $date_limit = request::array('datelimit');
     if ($date_limit['start']) {
@@ -322,18 +326,15 @@ if ($op == 'withdraw_pay') {
         $e_date = new DateTime('next day');
     }
 
-    $condition = [
-        'src' => CommissionBalance::WITHDRAW,
+    $query->where([
         'createtime >=' => $s_date->getTimestamp(),
         'createtime <' => $e_date->getTimestamp(),
-    ];
+    ]);
 
     $agent_openid = request::str('agent_openid');
     if (!empty($agent_openid)) {
-        $condition['openid'] = $agent_openid;
+        $query->where(['openid' => $agent_openid]);
     }
-
-    $query = CommissionBalance::query($condition);
 
     $data = [];
     $total = [

@@ -85,6 +85,7 @@ class device
                 'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),
             ],
             'extra' => [
+                'iccid' => $device->getIccid(),
                 'location' => $extra['location'] ?: null,
                 'volume' => intval($extra['volume']),
                 'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,

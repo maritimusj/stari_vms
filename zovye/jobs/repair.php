@@ -11,7 +11,7 @@ use function zovye\is_error;
 
 $op = request::op('default');
 $data = [
-    'id' => request::int('agent'),
+    'agent' => request::int('agent'),
     'month' => request::str('month'),
 ];
 
@@ -20,10 +20,10 @@ $log = [
 ];
 
 if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
-    $agent = Agent::get($data['id']);
+    $agent = Agent::get($data['agent']);
     if (empty($agent)) {
         $log['error'] = '找不到这个代理商！';
-        writeLogAndExit();
+        writeLogAndExit($log);
     }
 
     $start = microtime(true);
@@ -53,11 +53,10 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
     $log['error'] = '参数或签名错误！';
 }
 
+writeLogAndExit($log);
 
-function writeLogAndExit()
+function writeLogAndExit($log)
 {
-    global $log;
-
-    Util::logToFile('withdraw', $log);
+    Util::logToFile('repair', $log);
     Job::exit();
 }

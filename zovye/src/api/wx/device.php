@@ -452,6 +452,14 @@ class device
             }
 
             $result[$m] = $data;
+
+            $repair = $agent->settings('repair', []);
+            if ($repair) {
+                $result['repair'] = [
+                    'state' => $repair['status'],
+                ];
+            }
+
         } else {
             //首页
             $remainWarning = settings('device.remainWarning', 1);
@@ -474,11 +482,6 @@ class device
                 'free' => $data['free'] + $data['balance'],
                 'fee' => $data['fee'],
             ];
-
-            $repair = $agent->settings('repair', []);
-            if ($repair) {
-                $result['repair'] = $repair['status'];
-            }
         }
 
         return $result;

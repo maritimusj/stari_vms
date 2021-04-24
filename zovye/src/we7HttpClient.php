@@ -59,7 +59,7 @@ class we7HttpClient implements IHttpClient
         }
 
         if (!is_error($resp)) {
-            if ($resp['content']) {
+            if ($resp['code'] == 200 && $resp['content']) {
                 $result = json_decode($resp['content'], true);
                 if ($result !== false && $result !== null) {
                     return $result;

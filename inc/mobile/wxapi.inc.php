@@ -60,7 +60,7 @@ router::exec($op, [
     'SetAgentProfile' => '\zovye\api\wx\agent::setAgentProfile',
     'GetAgentProfile' => '\zovye\api\wx\agent::getAgentProfile',
     'GetKeeperDeviceList' => '\zovye\api\wx\agent::keeperDeviceList',
-    'Repair' => '\zovye\api\wx\api\agent::repair',
+    'Repair' => '\zovye\api\wx\agent::repair',
 
     'DeviceOnline' => '\zovye\api\wx\device::getDeviceOnline',
     'DeviceGoods' => '\zovye\api\wx\device::deviceGoods',

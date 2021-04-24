@@ -159,6 +159,6 @@ class Job
 
     public static function repairAgentMonthStats($agent_id, $month): bool
     {
-        return CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'moth' => $month]);
+        return CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]);
     }
 }

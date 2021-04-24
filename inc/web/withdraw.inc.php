@@ -217,11 +217,18 @@ if ($op == 'withdraw_pay') {
         JSON::fail($balance_obj);
     }
 
-    if ($balance_obj->update(['state' => 'confirmed', 'admin' => _W('username')], true)) {
-        JSON::success('操作成功！');
+    $result = Util::transactionDo(function () use ($balance_obj) {
+        if ($balance_obj->update(['state' => 'confirmed', 'admin' => _W('username')], true)) {
+            return true;
+        }
+        return error(State::ERROR, '数据保存失败！');
+    });
+
+    if (is_error($result)) {
+        JSON::fail($result);
     }
 
-    JSON::fail('操作失败！');
+    JSON::success('操作成功！');
 
 } elseif ($op == 'withdraw_refund') {
 

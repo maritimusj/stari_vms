@@ -6,6 +6,7 @@
 
 namespace zovye\model;
 
+use zovye\Account;
 use zovye\App;
 use zovye\User;
 use zovye\Util;
@@ -25,7 +26,6 @@ use function zovye\is_error;
  * @method getOpenid()
  * @method getNum()
  * @method getBalance()
- * @method getAccount()
  * @method getOrderId()
  * @method getAgentId()
  * @method getDeviceId()
@@ -94,7 +94,7 @@ class orderModelObj extends modelObj
     public function getAccount($obj = false)
     {
         if ($obj) {
-            return \zovye\Account::findOne(['name' => $this->account]);
+            return Account::findOne(['name' => $this->account]);
         }
         return $this->account;
     }

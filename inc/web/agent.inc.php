@@ -858,22 +858,10 @@ if ($op == 'default') {
     if ($date === false) {
         JSON::fail('时间格式不正确！');
     }
-    $begin = (new DateTime)->setTimestamp($date->getTimestamp());
-    $end = (new DateTime)->setTimestamp($date->getTimestamp());
-    $end->modify('+1 month');
 
-    while ($begin < $end) {
-        $day = $begin->format('Y-m-d');
-        $result = Util::transactionDo(function () use ($agent, $day) {
-            if (!Stats::repair($agent, $day)) {
-                return err('修复失败：{$day}！');
-            }
-            return ['message' => 'ok'];
-        });
-        if (is_error($result)) {
-            JSON::fail($result);
-        }
-        $begin->modify('+1 day');
+    $result = Agent::repairMonthStats($agent, $date);
+    if (is_error($result)) {
+        JSON::fail($result);
     }
 
     JSON::success('修复完成！');

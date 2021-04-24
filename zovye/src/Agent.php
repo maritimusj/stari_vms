@@ -2,6 +2,9 @@
 
 namespace zovye;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
@@ -176,5 +179,41 @@ class Agent
             }
         }
         return $result;
+    }
+
+    public static function repairMonthStats($agent, $datetime = '')
+    {
+        $date = null;
+        if (is_string($datetime)) {
+            try {
+                $date = new DateTimeImmutable($datetime);
+            } catch (Exception $e) {
+            }
+        } elseif ($datetime instanceof DateTimeInterface) {
+            $date = $datetime;
+        }
+
+        if (!$date) {
+            $date = new DateTimeImmutable();
+        }
+
+        $begin = $date->modify('first day of this month');
+        $end = $date->modify('first day of next month');
+
+        while ($begin < $end) {
+            $day = $begin->format('Y-m-d');
+            /** @var array $result */
+            $result = Util::transactionDo(function () use ($agent, $day) {
+                if (!Stats::repair($agent, $day)) {
+                    return err('修复失败：{$day}！');
+                }
+                return true;
+            });
+            if (is_error($result)) {
+                return $result;
+            }
+            $begin = $begin->modify('next day');
+        }
+        return true;
     }
 }

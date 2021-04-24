@@ -224,7 +224,7 @@ class device
 
         if ($user->isAgent() || $user->isPartner()) {
             common::checkCurrentUserPrivileges('F_sb');
-            $device = self::getDevice(request('id'), $user->isAgent() ? $user->getAgent(): $user->getPartnerAgent());
+            $device = self::getDevice(request('id'), $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent());
             if (is_error($device)) {
                 return $device;
             }
@@ -474,6 +474,11 @@ class device
                 'free' => $data['free'] + $data['balance'],
                 'fee' => $data['fee'],
             ];
+
+            $repair = $agent->settings('repair', []);
+            if ($repair) {
+                $result['repair'] = $repair['status'];
+            }
         }
 
         return $result;

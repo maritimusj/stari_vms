@@ -1851,4 +1851,42 @@ class agent
 
         return ['device_stat' => $device_stat, 'data' => $data];
     }
+
+
+    public static function repair()
+    {
+        $user = common::getAgent();
+        $agent =$user->isPartner() ?  $user->getPartnerAgent() : $user;
+
+        $repairData = $agent->settings('repair', []);
+
+        $cleanFN = function () use ($agent){
+            $agent->updateSettings('repair', []);
+            $agent->save();
+        };
+
+        if (is_error($repairData['error'])) {
+            $cleanFN();
+            return $repairData['error'];
+        }
+
+        if ($repairData['status'] == 'finished') {
+            $cleanFN();
+            return '刷新已完成！';
+        }
+
+        if ($repairData['status'] == 'busy') {
+            return '正在刷新缓存中，请稍等！';
+        }
+
+        if (Job::repairAgentMonthStats($agent->getAgentId(), request::str('month'))) {
+            $agent->updateSettings('repair', [
+                'status' => 'busy',
+            ]);
+            $agent->save();
+            return '已启动后台刷新任务，请耐心等待完成！';
+        }
+
+        return error(State::ERROR, '无法启动修复任务，请联系管理员！');
+    }
 }

@@ -280,7 +280,6 @@ if ($op == 'default') {
         'title' => '订单退款',
         'content' => $content,
     ]);
-
 } elseif ($op == 'refund') {
 
     $id = request::int('id');
@@ -387,194 +386,220 @@ if ($op == 'default') {
     JSON::success(['title' => '详情', 'content' => $content]);
 } elseif ($op == 'export') {
 
-    $tpl_data['headers'] = getHeaders();
+    $all_headers = getHeaders();    
+    unset($all_headers['#'], $all_headers['ID']);
+
+    $tpl_data['headers'] = $all_headers;
+    $tpl_data['s_date'] = (new DateTime('first day of this month'))->format('Y-m-d');
+    $tpl_data['e_date'] = (new DateTime())->format('Y-m-d');
+
     $this->showTemplate('web/order/export', $tpl_data);
 
 } elseif ($op == 'export_do') {
 
     set_time_limit(60);
 
-    $agent_openid = request::str('agentopenid');
+    $agent_openid = request::str('agent_openid');
     $account_id = request::int('accountid');
     $device_id = request::int('deviceid');
+
     $headers = explode(',', request::str('headers'));
+    if (empty($headers)) {
+        $headers = ['order_no', 'createtime'];
+    } 
+
+    array_unshift($headers, 'ID');
+    array_unshift($headers, '#');
 
     $query = Order::query();
     if ($agent_openid) {
-        $agent = Agent::get($agent_openid, true);
-        if ($agent) {
-            $query->where(['agent_id' => $agent->getId()]);
+        $agent = User::get($agent_openid, true);
+        if (empty($agent)) {
+            Util::itoast('找不到指定的代理商！', Util::url('order', ['op' => 'export']), 'error');
         }
+        $query->where(['agent_id' => $agent->getId()]);
     }
 
     if ($account_id) {
         $account = Account::get($account_id);
-        if ($account) {
-            $query->where(['account' => $account->getName()]);
+        if (empty($account)) {
+            Util::itoast('找不到指定的公众号！', Util::url('order', ['op' => 'export']), 'error');
         }
+        $query->where(['account' => $account->getName()]);
     }
 
     if ($device_id) {
         $device = Device::get($device_id);
-        if ($device) {
-            $query->where(['device_id' => $device->getId()]);
+        if (empty($device)) {
+            Util::itoast('找不到指定的设备！', Util::url('order', ['op' => 'export']), 'error');
         }
+        $query->where(['device_id' => $device->getId()]);
     }
 
-    if (request::has('start')) {
-        $start = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
-        if ($start) {
-            $query->where(['createtime >=' => $start->getTimestamp()]);
-        }
+    $date_start = request::str('start');
+    if ($date_start) {
+        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_start . ' 00:00:00');
     }
 
-    if (request::has('end')) {
-        $end = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
-        if ($end) {
-            $end->modify('next day');
-            $query->where(['createtime <' => $end->getTimestamp()]);
-        }
+    if (!$s_date) {
+        $s_date = new DateTime('first day of this month 00:00:00');
     }
+
+    $date_end = request::str('end');
+    if ($date_end) {
+        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_end . ' 00:00:00');
+    } 
+    if (!$e_date) {
+        $e_date = new DateTime();
+    }
+
+    $e_date = $e_date->modify('next day 00:00:00');
+
+    $query->where([
+        'createtime >=' => $s_date->getTimestamp(),
+        'createtime <' => $e_date->getTimestamp(),
+    ]);
 
     $query->orderBy('id DESC');
 
     $result = [];
-    if (!empty($headers)) {
-        /** @var orderModelObj $entry */
-        foreach ($query->findAll() as $entry) {
 
-            $user = User::get($entry->getOpenid(), true);
-            $goods = Goods::data($entry->getGoodsId());
-            $device = Device::get($entry->getDeviceId());
+    /** @var orderModelObj $entry */
+    foreach ($query->findAll() as $index => $entry) {
 
-            $data = [];
-            foreach ($headers as $header) {
-                $getter = null;
-                switch ($header) {
-                    case 'id':
-                        $data[$header] = $entry->getId();
-                        break;
-                    case 'order_no':
-                        $data[$header] = 'NO.' . $entry->getOrderId();
-                        break;
-                    case 'pay_no':
-                        $pay_result = $entry->getExtraData('payResult');
-                        if ($pay_result) {
-                            if (isset($pay_result['uniontid'])) {
-                                $data[$header] = $pay_result['uniontid'];
-                            } elseif (isset($pay_result['transaction_id'])) {
-                                $data[$header] = $pay_result['transaction_id'];
-                            } else {
-                                $data[$header] = '';
-                            }
-                        } else {
-                            $data[$header] = '';
-                        }
+        $user = User::get($entry->getOpenid(), true);
+        $goods = Goods::data($entry->getGoodsId());
+        $device = Device::get($entry->getDeviceId());
 
-                        break;
-                    case 'pay_type':
-                        $data[$header] = User::getUserCharacter($entry->getUser())['title'];
-                        break;
-                    case 'openid':
-                        $data[$header] = $user ? $user->getOpenid() : '';
-                        break;
-                    case 'username':
-                        $data[$header] = $user ? str_replace('"', '', $user->getName()) : '';
-                        break;
-                    case 'sex':
-                        if ($user) {
-                            $profile = $user->profile();
-                            $data[$header] = $profile['sex'] == 1 ? '男' : ($profile['sex'] == 2 ? '女' : '未知');
+        $data = [];
+
+        foreach ($headers as $header) {
+            switch ($header) {
+                case '#':
+                    $data[$header] = $index + 1;
+                    break;
+                case 'ID':
+                    $data[$header] = $entry->getId();
+                    break;
+                case 'order_no':
+                    $data[$header] = 'NO.' . $entry->getOrderId();
+                    break;
+                case 'pay_no':
+                    $pay_result = $entry->getExtraData('payResult');
+                    if ($pay_result) {
+                        if (isset($pay_result['uniontid'])) {
+                            $data[$header] = $pay_result['uniontid'];
+                        } elseif (isset($pay_result['transaction_id'])) {
+                            $data[$header] = $pay_result['transaction_id'];
                         } else {
                             $data[$header] = '';
                         }
-                        break;
-                    case 'region':
-                        if ($user) {
-                            $profile = $user->profile();
-                            $data[$header] = "{$profile['country']} {$profile['province']} {$profile['city']}";
-                        } else {
-                            $data[$header] = '';
-                        }
-                        break;
-                    case 'ip':
-                        $data[$header] = $entry->getIp();
-                        break;
-                    case 'address':
-                        $info = $entry->get('ip_info', []);
-                        if ($info) {
-                            $json = json_decode($info, true);
-                            if ($json) {
-                                $data[$header] = "{$json['data']['region']}{$json['data']['city']}{$json['data']['district']}";
-                            } else {
-                                $data[$header] = '';
-                            }
-                        } else {
-                            $data[$header] = '';
-                        }
-                        break;
-                    case 'goods_name':
-                        $data[$header] = str_replace('"', '', $goods['name']);
-                        break;
-                    case 'goods_num':
-                        $data[$header] = $entry->getNum();
-                        break;
-                    case 'goods_price':
-                        $data[$header] = number_format($entry->getPrice() / 100, 2);
-                        break;
-                    case 'way':
-                        if ($entry->getPrice() > 0) {
-                            $data[$header] = '现金';
-                        } elseif ($entry->getBalance() > 0) {
-                            $data[$header] = '余额';
-                        } else {
-                            $data[$header] = '免费';
-                        }
-                        break;
-                    case 'refund':
-                        if ($entry->getPrice() > 0 && $entry->getExtraData('refund')) {
-                            $data[$header] = '已退款';
-                        } else {
-                            $data[$header] = '';
-                        }
-                        break;
-                    case 'refund_time':
-                        if ($entry->getPrice() > 0 && $entry->getExtraData('refund')) {
-                            $time = $entry->getExtraData('refund.createtime');
-                            $data[$header] = date('Y-m-d H:i:s', $time);
-                        } else {
-                            $data[$header] = '';
-                        }
-                        break;
-                    case 'account_title':
-                        $account = Account::findOne(['name' => $entry->getAccount()]);
-                        $title = $account ? $account->getTitle() : $entry->getAccount();
-                        $data[$header] = str_replace('"', '', $title);
-                        break;
-                    case 'agent':
-                        $agent = Agent::get($entry->getAgentId());
-                        $name = $agent ? $agent->getName() : $entry->getExtraData('agent.name', '');
-                        $data[$header] = str_replace('"', '', $name);
-                        break;
-                    case 'device_title':
-                        $data[$header] = $device ? str_replace('"', '', $device->getName()) : '';
-                        break;
-                    case 'device_imei':
-                        $data[$header] = $device ? $device->getImei() : $entry->getExtraData('device.imei', '');
-                        break;
-                    case 'createtime':
-                        $data[$header] = date('Y-m-d H:i:s', $entry->getCreatetime());
-                        break;
-                    default:
+                    } else {
                         $data[$header] = '';
-                }
+                    }
+                    break;
+                case 'pay_type':
+                    $data[$header] = User::getUserCharacter($entry->getUser())['title'];
+                    break;
+                case 'openid':
+                    $data[$header] = $user ? $user->getOpenid() : '';
+                    break;
+                case 'username':
+                    $data[$header] = $user ? str_replace('"', '', $user->getName()) : '';
+                    break;
+                case 'sex':
+                    if ($user) {
+                        $profile = $user->profile();
+                        $data[$header] = $profile['sex'] == 1 ? '男' : ($profile['sex'] == 2 ? '女' : '未知');
+                    } else {
+                        $data[$header] = '';
+                    }
+                    break;
+                case 'region':
+                    if ($user) {
+                        $profile = $user->profile();
+                        $data[$header] = "{$profile['country']} {$profile['province']} {$profile['city']}";
+                    } else {
+                        $data[$header] = '';
+                    }
+                    break;
+                case 'ip':
+                    $data[$header] = $entry->getIp();
+                    break;
+                case 'address':
+                    $info = $entry->get('ip_info', []);
+                    if ($info) {
+                        $json = json_decode($info, true);
+                        if ($json) {
+                            $data[$header] = "{$json['data']['region']}{$json['data']['city']}{$json['data']['district']}";
+                        } else {
+                            $data[$header] = '';
+                        }
+                    } else {
+                        $data[$header] = '';
+                    }
+                    break;
+                case 'goods_name':
+                    $data[$header] = str_replace('"', '', $goods['name']);
+                    break;
+                case 'goods_num':
+                    $data[$header] = $entry->getNum();
+                    break;
+                case 'goods_price':
+                    $data[$header] = number_format($entry->getPrice() / 100, 2);
+                    break;
+                case 'way':
+                    if ($entry->getPrice() > 0) {
+                        $data[$header] = '现金';
+                    } elseif ($entry->getBalance() > 0) {
+                        $data[$header] = '余额';
+                    } else {
+                        $data[$header] = '免费';
+                    }
+                    break;
+                case 'refund':
+                    if ($entry->getPrice() > 0 && $entry->getExtraData('refund')) {
+                        $data[$header] = '已退款';
+                    } else {
+                        $data[$header] = '';
+                    }
+                    break;
+                case 'refund_time':
+                    if ($entry->getPrice() > 0 && $entry->getExtraData('refund')) {
+                        $time = $entry->getExtraData('refund.createtime');
+                        $data[$header] = date('Y-m-d H:i:s', $time);
+                    } else {
+                        $data[$header] = '';
+                    }
+                    break;
+                case 'account_title':
+                    $account = Account::findOne(['name' => $entry->getAccount()]);
+                    $title = $account ? $account->getTitle() : $entry->getAccount();
+                    $data[$header] = str_replace('"', '', $title);
+                    break;
+                case 'agent':
+                    $agent = Agent::get($entry->getAgentId());
+                    $name = $agent ? $agent->getName() : $entry->getExtraData('agent.name', '');
+                    $data[$header] = str_replace('"', '', $name);
+                    break;
+                case 'device_title':
+                    $data[$header] = $device ? str_replace('"', '', $device->getName()) : '';
+                    break;
+                case 'device_imei':
+                    $data[$header] = $device ? $device->getImei() : $entry->getExtraData('device.imei', '');
+                    break;
+                case 'createtime':
+                    $data[$header] = date('Y-m-d H:i:s', $entry->getCreatetime());
+                    break;
+                default:
+                    $data[$header] = '';
             }
-            $result[] = $data;
         }
+        $result[] = $data;
     }
 
-    $column = array_values(array_intersect_key(getHeaders(), array_flip($headers)));
-
+    $all_headers = getHeaders();
+    $column = array_values(array_intersect_key($all_headers, array_flip($headers)));
     Util::exportExcel('order', $column, $result);
 } elseif ($op == 'log') {
 
@@ -684,7 +709,8 @@ if ($op == 'default') {
 function getHeaders(): array
 {
     return [
-        'id' => '订单ID',
+        '#' => '#',
+        'ID' => 'ID',
         'order_no' => '订单号',
         'pay_no' => '支付号',
         'pay_type' => '支付类型',

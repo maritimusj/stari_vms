@@ -54,15 +54,19 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-xs-12 col-md-3 col-md-2 control-label">开始时间</label>
-                <div class="col-md-9 col-md-10 col-lg-10">
-                    {php echo tpl_form_field_date('starttime', $starttime, false)}
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-xs-12 col-md-3 col-md-2 control-label">截止时间</label>
-                <div class="col-md-9 col-md-10 col-lg-10">
-                    {php echo tpl_form_field_date('endtime', $endtime, false)}
+                <label class="col-md-2 control-label">日期</label>
+                <div class="col-md-8">
+                    <input name="datelimit[start]" type="hidden" value="{php echo $s_date}"/>
+                    <input name="datelimit[end]" type="hidden" value="{php echo $e_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                    <span class="date-title">
+                        {if empty($s_date) && empty($e_date)}
+                        不限时间
+                        {else}
+                        {$s_date} 至{$e_date}
+                        {/if}
+                    </span> <i class="fa fa-calendar"></i>
+                    </button>
                 </div>
             </div>
             <div class="form-group">
@@ -160,15 +164,15 @@
             const account_id = $('select[name=account_id]').val();
             const device_id = $('select[name=device_id]').val();
 
-            const starttime = $('input[name=starttime]').val();
-            const endtime = $('input[name=endtime]').val();
+            const starttime = $('input[name="datelimit[start]"]').val();
+            const endtime = $('input[name="datelimit[end]"]').val();
 
             let headers = [];
             $('input[name=header]:checked').each(function(){
                 headers.push($(this).val());
             });
 
-            let url = "{php echo $this->createWebUrl('order', array('op' => 'export_do', 'agentopenid' => '__agentid__', 'accountid' => '__accountid__', 'deviceid' => '__deviceid__', 'start' => '__start__', 'end' => '__end__',  'headers'=>'__header__'));}";
+            let url = "{php echo $this->createWebUrl('order', array('op' => 'export_do', 'agent_openid' => '__agentid__', 'accountid' => '__accountid__', 'deviceid' => '__deviceid__', 'start' => '__start__', 'end' => '__end__',  'headers'=>'__header__'));}";
             url = url.replace('__agentid__', agent_openid)
                 .replace('__accountid__', account_id)
                 .replace('__deviceid__', device_id)
@@ -177,6 +181,27 @@
                 .replace('__header__', encodeURIComponent(headers.join(',')));
 
             downloadFile(url, 'order.xls');
+        })
+
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    var elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
         })
     })
 </script>

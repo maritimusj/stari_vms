@@ -328,12 +328,12 @@ if ($op == 'withdraw_pay') {
         'createtime <' => $e_date->getTimestamp(),
     ];
 
-    $agent_openid = request('agent_openid');
+    $agent_openid = request::str('agent_openid');
     if (!empty($agent_openid)) {
         $condition['openid'] = $agent_openid;
     }
 
-    $res = CommissionBalance::query($condition)->findAll();
+    $query = CommissionBalance::query($condition);
 
     $data = [];
     $total = [
@@ -344,51 +344,27 @@ if ($op == 'withdraw_pay') {
     ];
 
     /** @var commission_balanceModelObj $item */
-    foreach ($res as $item) {
-
+    foreach ($query->findAll() as $item) {
         $state = $item->getExtraData('state');
         if (empty($state)) {
             $state = 'unconfirmed';
         }
-        $create_date = date('Y-m-d', $item->getCreatetime());
-        if (!isset($data[$create_date])) {
-            $data[$create_date]['unconfirmed'] = 0;
-            $data[$create_date]['confirmed'] = 0;
-            $data[$create_date]['cancelled'] = 0;
-            $data[$create_date]['mchpay'] = 0;
+        $created_at = date('Y-m-d', $item->getCreatetime());
+        if (!isset($data[$created_at])) {
+            $data[$created_at]['unconfirmed'] = 0;
+            $data[$created_at]['confirmed'] = 0;
+            $data[$created_at]['cancelled'] = 0;
+            $data[$created_at]['mchpay'] = 0;
         }
         $val = $item->getXVal();
-        $data[$create_date][$state] += $val;
+        $data[$created_at][$state] += $val;
         $total[$state] += $val;
     }
 
     ksort($data);
 
-    $ids = [];
-    $query = User::query()->where("passport REGEXP 'gspor'");
-    foreach ($query->findAll() as $item) {
-        $ids[] = $item->getId();
-    }
-
-    $comm_total = 0;
-    if (!empty($ids)) {
-        $commission_balance = App::isCommissionEnabled();
-        $query = User::query(['id' => $ids]);
-
-        /** @var userModelObj $user */
-        foreach ($query->findAll() as $user) {
-            if ($user) {
-                if ($commission_balance) {
-                    $total = $user->getCommissionBalance()->total();
-                    if ($user->isAgent() || $user->isGSPor() || $user->isKeeper() || $user->isPartner()) {
-                        $comm_total += $total;
-                    }
-                }
-            }
-        }
-    }
-
     $tpl_data['s_date'] = $s_date->format('Y-m-d');
+    $e_date->modify('-1 day');
     $tpl_data['e_date'] = $e_date->format('Y-m-d');
     $tpl_data['open_id'] = $agent_openid;
     $tpl_data['data'] = $data;

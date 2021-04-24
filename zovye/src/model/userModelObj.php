@@ -57,13 +57,13 @@ class userModelObj extends modelObj
     /** @var int */
     protected $id;
 
-    /** @var int*/
+    /** @var int */
     protected $uniacid;
 
     /** @var int */
     protected $state;
 
-    /** @var int*/
+    /** @var int */
     protected $app;
 
     /** @var string */
@@ -103,7 +103,7 @@ class userModelObj extends modelObj
     {
         return parent::getSettingsKeyNew($key, userModelObj::class);
     }
-    
+
     protected function getSettingsKey($key): string
     {
         $classname = str_replace('zovye\model', 'lltjs', userModelObj::class);
@@ -134,7 +134,7 @@ class userModelObj extends modelObj
     public function isApiUser(): bool
     {
         return $this->app == User::API;
-    }   
+    }
 
     public function profile(): array
     {
@@ -646,9 +646,7 @@ class userModelObj extends modelObj
             $params['pem']['cert'] = $file['cert_filename'];
             $params['pem']['key'] = $file['key_filename'];
 
-            $pay = new WxMCHPay($params);
-            $res = $pay->transferTo($this->openid, $trade_no, $n, $desc);
-
+            $res = (new WxMCHPay($params))->transferTo($this->openid, $trade_no, $n, $desc);
             if (is_error($res)) {
                 return $res;
             }

@@ -751,6 +751,7 @@ if ($op == 'default') {
     $tpl_data['total'] = $total;
 
     $tpl_data['s_date'] = $s_date->format('Y-m-d');
+    $e_date->modify('-1 day');
     $tpl_data['e_date'] = $e_date->format('Y-m-d');
 
     $this->showTemplate('web/account/platform_stat', $tpl_data);

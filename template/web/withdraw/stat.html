@@ -233,8 +233,7 @@
         <table class="table table-bordered" id="list">
             <thead>
             <tr class="active">
-                <td>未提现佣金(合计)</td>
-                <td>待打款(合计)</td>
+                <td>待处理(合计)</td>
                 <td>已完成(合计)</td>
                 <td>已退回(合计)</td>
                 <td>已打款(合计)</td>
@@ -242,9 +241,6 @@
             </thead>
             <tbody>
             <tr>
-                <td>
-                    {php echo number_format(abs($comm_total)/100, 2)} 元
-                </td>
                 <td>
                     {php echo number_format(abs($total['unconfirmed'])/100, 2)} 元
                 </td>
@@ -267,7 +263,7 @@
             <thead>
             <tr class="active">
                 <td>日期</td>
-                <th>待打款</th>
+                <th>待处理</th>
                 <th>已完成</th>
                 <th>已退回</th>
                 <th>已打款</th>

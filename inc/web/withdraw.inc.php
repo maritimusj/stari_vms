@@ -319,7 +319,7 @@ if ($op == 'withdraw_pay') {
         $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
         $e_date->modify('next day');
     } else {
-        $e_date = new DateTime('first day of next month 00:00:00');
+        $e_date = new DateTime('next day');
     }
 
     $condition = [
@@ -369,7 +369,6 @@ if ($op == 'withdraw_pay') {
     $tpl_data['open_id'] = $agent_openid;
     $tpl_data['data'] = $data;
     $tpl_data['total'] = $total;
-    $tpl_data['comm_total'] = abs($query->get('sum(x_val)'));
 
     $this->showTemplate('web/withdraw/stat', $tpl_data);
 }

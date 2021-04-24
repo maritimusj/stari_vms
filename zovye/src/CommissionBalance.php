@@ -72,20 +72,22 @@ class CommissionBalance extends State
 
         if ($n > 0) {
             $trade_no = "r{$r->getId()}d{$r->getCreatetime()}";
-            $res = $user->MCHPay($n, $trade_no, '佣金提现');
-            if (is_error($res)) {
-                return $res;
-            }
-
-            if ($r->update(
-                [
+            //先写数据再执行操作
+            if ($r->update([
                     'state' => 'mchpay',
                     'trade_no' => $trade_no,
                     'admin' => _W('username'),
+                ],true)) {
+
+                $res = $user->MCHPay($n, $trade_no, '佣金提现');
+                if (is_error($res)) {
+                    return $res;
+                }
+
+                $r->update([
                     'mchpayResult' => $res,
-                ],
-                true
-            )) {
+                ]);
+
                 return true;
             }
         }

@@ -170,13 +170,13 @@ if ($op == 'export') {
 
 function getAndCheckWithdraw($id)
 {
-    /** @var commission_balanceModelObj $cb */
-    $cb = CommissionBalance::findOne(['id' => $id, 'src' => CommissionBalance::WITHDRAW]);
-    if (empty($cb)) {
+    /** @var commission_balanceModelObj $balance_obj */
+    $balance_obj = CommissionBalance::findOne(['id' => $id, 'src' => CommissionBalance::WITHDRAW]);
+    if (empty($balance_obj)) {
         return error(State::ERROR, '操作失败，请刷新页面后再试！');
     }
 
-    $openid = $cb->getOpenid();
+    $openid = $balance_obj->getOpenid();
     $user = User::get($openid, true);
     if (empty($user)) {
         return error(State::ERROR, '找不到这个用户！');
@@ -186,21 +186,24 @@ function getAndCheckWithdraw($id)
         return error(State::ERROR, '用户无法锁定，请重试！');
     }
 
-    if ($cb->getUpdatetime()) {
+    if ($balance_obj->getUpdatetime()) {
         return error(State::ERROR, '操作失败，请刷新页面后再试！');
     }
 
-    return $cb;
+    return $balance_obj;
 }
 
 if ($op == 'withdraw_pay') {
 
-    $cb = getAndCheckWithdraw(request::int('id'));
-    if (is_error($cb)) {
-        JSON::fail($cb);
+    $balance_obj = getAndCheckWithdraw(request::int('id'));
+    if (is_error($balance_obj)) {
+        JSON::fail($balance_obj);
     }
 
-    $result = CommissionBalance::MCHPay($cb);
+    $result = Util::transactionDo(function () use ($balance_obj) {
+        return CommissionBalance::MCHPay($balance_obj);
+    });
+
     if (is_error($result)) {
         JSON::fail($result);
     }
@@ -209,12 +212,12 @@ if ($op == 'withdraw_pay') {
 
 } elseif ($op == 'withdraw_confirm') {
 
-    $cb = getAndCheckWithdraw(request::int('id'));
-    if (is_error($cb)) {
-        JSON::fail($cb);
+    $balance_obj = getAndCheckWithdraw(request::int('id'));
+    if (is_error($balance_obj)) {
+        JSON::fail($balance_obj);
     }
 
-    if ($cb->update(['state' => 'confirmed', 'admin' => _W('username')], true)) {
+    if ($balance_obj->update(['state' => 'confirmed', 'admin' => _W('username')], true)) {
         JSON::success('操作成功！');
     }
 
@@ -222,30 +225,30 @@ if ($op == 'withdraw_pay') {
 
 } elseif ($op == 'withdraw_refund') {
 
-    $cb = getAndCheckWithdraw(request::int('id'));
-    if (is_error($cb)) {
-        JSON::fail($cb);
+    $balance_obj = getAndCheckWithdraw(request::int('id'));
+    if (is_error($balance_obj)) {
+        JSON::fail($balance_obj);
     }
 
     $res = Util::transactionDo(
-        function () use ($cb) {
-            $user = User::get($cb->getOpenid(), true);
+        function () use ($balance_obj) {
+            $user = User::get($balance_obj->getOpenid(), true);
             if (empty($user)) {
                 return error(State::ERROR, '找不到这个用户！');
             }
 
             $commission_balance = $user->getCommissionBalance();
 
-            $total = abs($cb->getXVal());
+            $total = abs($balance_obj->getXVal());
 
             //把手续费等相关费用一起退回
-            $gcr = $cb->getExtraData('gcr', []);
+            $gcr = $balance_obj->getExtraData('gcr', []);
             if ($gcr && is_array($gcr)) {
                 $crs = [];
                 foreach ($gcr as $id) {
                     /** @var commission_balanceModelObj $cr */
                     $cr = CommissionBalance::findOne(['id' => $id]);
-                    if (empty($cr) || $cr->getExtraData('gid') != $cb->getId()) {
+                    if (empty($cr) || $cr->getExtraData('gid') != $balance_obj->getId()) {
                         return error(State::ERROR, '处理相关记录出错，请联系管理员！');
                     }
 
@@ -259,7 +262,7 @@ if ($op == 'withdraw_pay') {
                     $total,
                     CommissionBalance::REFUND,
                     [
-                        'withdraw_id' => $cb->getId(),
+                        'withdraw_id' => $balance_obj->getId(),
                         'admin' => _W('username'),
                     ]
                 );
@@ -284,7 +287,7 @@ if ($op == 'withdraw_pay') {
                     }
                 }
 
-                if ($cb->update(['state' => 'cancelled', 'refund_id' => $r->getId()], true)) {
+                if ($balance_obj->update(['state' => 'cancelled', 'refund_id' => $r->getId()], true)) {
                     return ['message' => '申请已取消，金额已退款到代理商佣金帐户！'];
                 }
             }

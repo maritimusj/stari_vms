@@ -140,11 +140,10 @@ class User
             }
             if ($is_openid) {
                 $cond['openid'] = strval($id);
-                $user = self::findOne($cond);
             } else {
-                $cond['id'] = intval($id);
-                $user = self::findOne($cond);
+                $cond['id'] = intval($id);                
             }
+            $user = self::findOne($cond);
             if ($user) {
                 $cache[$user->getId()] = $user;
                 $cache[$user->getOpenid()] = $user;

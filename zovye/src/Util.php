@@ -409,6 +409,7 @@ include './index.php';
         }
 
         $result = $fn();
+        
         We7::cache_write($key, [
             'time' => time(),
             'v' => $result,

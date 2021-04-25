@@ -576,6 +576,7 @@ $tpl_data['navs'] = [
     'device' => '设备',
     'user' => '用户',
     'agent' => '代理商',
+    'wxapp' => '小程序',
     'commission' => '佣金',
     'advs' => '广告',
     'account' => '公众号',
@@ -587,6 +588,10 @@ $tpl_data['navs'] = [
 
 if (!$settings['custom']['SQMPay']['enabled']) {
     unset($tpl_data['navs']['advs']);
+}
+
+if (!App::isCustomWxAppEnabled()) {
+    unset($tpl_data['navs']['wxapp']);
 }
 
 if ($op == 'account') {
@@ -686,6 +691,46 @@ if ($op == 'account') {
             ];
         }
     }
+
+} elseif ($op == 'wxapp') {
+    $query = WxApp::query();
+
+    $keyword = request::trim('keyword');
+    if (!empty($keywords)) {
+        $query->where([
+            'name REGEXP' => $keyword,
+            'key REGEXP' => $keyword,
+        ]);
+        $tpl_data['s_keyword'] = $keyword;
+    }
+
+    $total = $query->count();
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    if ($page > ceil($total / $page_size)) {
+        $page = 1;
+    }
+    
+    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
+    $query->page($page, $page_size);
+    $query->orderBy('id desc');
+
+    $list = [];
+    foreach($query->findAll() as $wxapp) {
+        $data = [
+            'id' => $wxapp->getId(),
+            'name' => $wxapp->getName(),
+            'key' => $wxapp->getKey(),
+            'secret' => $wxapp->getSecret(),
+            'createtime_formatted' => date('Y-m-d H:i:s', $wxapp->getCreatetime()),
+        ];
+        $list[] = $data;
+    }
+
+    $tpl_data['list'] = $list;
 
 } elseif ($op == 'user') {
 

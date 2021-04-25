@@ -52,7 +52,6 @@
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-op="ban"><i class="fa fa-ban fa-fw"></i> <span>{if $item['state']==zovye\Advertising::NORMAL}禁用？{else}启用？{/if}</span></a></li>
                             <li><a href="{php echo $this->createWebUrl('adv', array('type' => $item['type'], 'op' => 'remove', 'id' => $item['id'], 'from_type' => 0));}" onclick="return confirm('确定要删除这个广告吗？');"><i class="fa fa-trash-o fa-fw"></i> 删除？</a></li>
-
                           </ul>
                         </div>
                     </td>

@@ -1,0 +1,109 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template "web/settings/nav"}
+<div class="panel panel-default nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <i class="fa fa-plus fa-fw" title="添加小程序" data-op="add"></i>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table" id="list">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>名称</th>
+                    <th>AppID</th>
+                    <th>App secret</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {loop $list $index $item}
+                <tr data-id="{$item['id']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>{$item['name']}</td>
+                    <td>
+                        {$item['key']}
+                    </td>
+                    <td>
+                        <span class="text-muted">&lt;已隐藏&gt;</span>
+                        <span class="operate text-url"><i class="fa fa-paste" title="复制网址" data-secret="{$item['secret']}"></i></span>
+                    </td>
+                    <td>{$item['createtime_formatted']}</td>
+                    <td class="operate">
+                        <i class="fa fa-edit" title="编辑" data-op="edit"></i>
+                        <i class="fa fa-trash-o" title="删除？" data-op="remove"></i>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        {else}
+        <div class="text-center text-muted">
+            暂时还没有任何小程序！
+        </div>  
+        {/if}
+    </div>
+</div>
+<script>
+    const apiUrl = "{php echo $this->createWebUrl('wxapp');}";
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
+    require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
+        
+    });
+
+    function saveWxApp() {
+        const form = $('#wxAppForm');
+        if (form.find('input[name=wxAppName]').val().trim() == '') {
+            form.find('input[name=wxAppName]').focus();
+            return;
+        }
+        if (form.find('input[name=wxAppKey]').val().trim() == '') {
+            form.find('input[name=wxAppKey]').focus();
+            return;
+        }
+        if (form.find('input[name=wxAppSecret]').val().trim() == '') {
+            form.find('input[name=wxAppSecret]').focus();
+            return;
+        }
+        const data = $('#wxAppForm').serialize();
+        $.post(apiUrl, {op: 'save', params: data}, function(res) {
+            if (res) {            
+                if (!res.status) {
+                    util.message(res.data.msg, "", 'error');
+                } else {
+                    util.message(res.data.msg, "{php echo $this->createWebUrl('settings', ['op' => 'wxapp']);}", 'success');
+                }       
+            }
+        });
+    }
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('wxapp');}");
+        zovye.op('edit', function(self, next) {
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id});
+        })
+
+        zovye.op('save', saveWxApp);
+
+        zovye.op('remove', function(self, next) {
+            if (!confirm('确定删除这个小程序吗？')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+               if (res && res.status) {
+                    tr.remove();
+               }
+            });
+        })
+        zovye.enableCopy('secret');
+    });
+</script>
+{template 'common/footer'}

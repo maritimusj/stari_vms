@@ -530,10 +530,14 @@ class device
 
             return Util::cachedCall(30, function() use($device) {
                 $result = [
-                    'mcb' => $device->isMcbOnline(),
+                    'mcb' => [
+                        'online' => $device->isMcbOnline(),
+                    ],
                 ];
                 if ($device->getAppId()) {
-                    $result['app'] =  $device->isAppOnline();
+                    $result['app'] =  [
+                        'online' => $device->isAppOnline(),
+                    ];
                 }                
                 return $result;
             });

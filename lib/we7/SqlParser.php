@@ -240,7 +240,7 @@ class SqlParser
     public static function parseSelect($field = array(), $alias = '')
     {
         if (empty($field) || '*' == $field) {
-            return ' SELECT *';
+            return 'SELECT *';
         }
         if (!is_array($field)) {
             $field = array($field);

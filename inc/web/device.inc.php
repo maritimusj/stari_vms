@@ -500,7 +500,11 @@ if ($op == 'list') {
         JSON::fail([]);
     }
 
-    JSON::success($device->getPullStats());
+    $result = Util::cachedCall(30, function() use($device) {
+        return $device->getPullStats();
+    }, $device->getId());
+
+    JSON::success($result);
 
 } elseif ($op == 'device_data') {
 

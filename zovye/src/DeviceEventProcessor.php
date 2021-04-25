@@ -709,16 +709,7 @@ class DeviceEventProcessor
      */
     public static function onMcbReset(array $data = [])
     {
-        $device = Device::get($data['uid'], true);
-        if ($device) {
-            $code = $device->getProtocolV1Code();
-            if ($code) {
-                $device->mcbNotify('reset', $code, [
-                    'pw' => $code,
-                    'delay' => 60,
-                ]);
-            }
-        }
+
     }
 
 

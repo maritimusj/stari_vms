@@ -289,7 +289,7 @@ class Util
      * @param boolean $append 是否是追加模式
      * @return bool
      */
-    public static function logToFile(string $name, $data, $trace = false, $append = true): bool
+    public static function logToFile(string $name, $data, $append = true): bool
     {
         static $cache = [];
 
@@ -301,17 +301,14 @@ class Util
 
         print_r($data);
 
-        if ($trace) {
-            echo PHP_EOL . "=======>>>>>>>" . PHP_EOL;
-            debug_print_backtrace();
-        }
-
         echo PHP_EOL;
 
-        $cache[] = ob_get_clean();
+        $cache[$log_filename][] = ob_get_clean();
 
-        register_shutdown_function(function() use($log_filename, $append, $cache) {
-            file_put_contents($log_filename, $cache, $append ? FILE_APPEND : null);
+        register_shutdown_function(function() use($cache) {
+            foreach($cache as $filename => $data) {
+                file_put_contents($filename, $data, FILE_APPEND);
+            }
         });
 
         return true;

@@ -540,7 +540,7 @@ class device
                     ];
                 }                
                 return $result;
-            });
+            }, $device->getId());
         }
 
         return [];

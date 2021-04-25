@@ -365,6 +365,17 @@ class device
         ];
 
         if (request::has('date')) {
+            //统计修复状态
+            $v = $user->isAgent() ? $user : $user->getPartnerAgent();
+            if ($v) {
+                $repair = $v->settings('repair', []);
+                if ($repair) {
+                    $result['repair'] = [
+                        'state' => $repair['status'],
+                    ];
+                }                
+            }
+
             $arr = explode('-', request::str('date'));
             if (count($arr) == 2) {
                 //月份的每一天
@@ -453,14 +464,6 @@ class device
             }
 
             $result[$m] = $data;
-
-            $repair = $agent->settings('repair', []);
-            if ($repair) {
-                $result['repair'] = [
-                    'state' => $repair['status'],
-                ];
-            }
-
         } else {
             //首页
             $remainWarning = settings('device.remainWarning', 1);

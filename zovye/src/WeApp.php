@@ -78,9 +78,9 @@ class WeApp extends Settings
         global $do;
 
         if ($do != 'migrate') {
-            Util::cachedCall(function() {
+            Util::cachedCall(10, function() {
                 Migrate::detect(true);
-            }, 10);
+            });
         }
 
         class_alias(__NAMESPACE__ . '\Site', lcfirst(APP_NAME) . 'ModuleSite');

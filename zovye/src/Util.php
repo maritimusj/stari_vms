@@ -404,9 +404,9 @@ include './index.php';
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
     }
 
-    public static function cachedCall(callable $fn, $interval_seconds = 1)
+    public static function cachedCall($interval_seconds, callable $fn, ...$params)
     {
-        $key = App::uid(6) . hashFN($fn);
+        $key = App::uid(6) . hashFN($fn, ...$params);
 
         $last = We7::cache_read($key);
         if ($last && is_array($last) && time() - intval($last['time']) < $interval_seconds) {

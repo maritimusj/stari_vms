@@ -296,7 +296,6 @@ function url($tag, ...$names)
     }
 }
 
-
 if (!function_exists('array_key_first')) {
     function array_key_first(array $arr)
     {
@@ -305,4 +304,28 @@ if (!function_exists('array_key_first')) {
         }
         return NULL;
     }
+}
+
+function __hashFN(callable $fn, ...$val)
+{
+    $reflect = new \ReflectionFunction($fn);
+    $data = [
+        $reflect->getFileName(),
+        $reflect->getStartLine(),
+        $reflect->getEndLine(), 
+    ];
+    foreach ($val as $v) {
+        $data[] = $v;
+    }
+    return md5(implode('', $data));
+}
+
+function __once(callable $fn, ...$val)
+{
+    static $cache = [];
+    $v = __hashFN($fn, ...$val);
+    if (!isset($cache[$v])) {
+        $cache[$v] = $fn();
+    }
+    return $cache[$v];
 }

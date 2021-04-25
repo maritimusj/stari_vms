@@ -297,7 +297,7 @@ class Util
 
         ob_start();
 
-        $cache[] = PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ pid:' . getmypid(). ", " . microtime(true) . " ]---------------------------------------" . PHP_EOL;
+        $cache[] = PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
 
         print_r($data);
 
@@ -402,6 +402,16 @@ chdir('{$appPath}');
 include './index.php';
 ";
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
+    }
+
+    public static function intervalDo(callable $fn, $interval_seconds = 1)
+    {
+        $key = App::uid(6) . __hashFN($fn);
+        $last = We7::cache_read($key);
+        if (time() - intval($last) > $interval_seconds) {
+            We7::cache_write($key, time());
+            $fn();
+        }
     }
 
     public static function isAssigned($data, deviceModelObj $device): bool

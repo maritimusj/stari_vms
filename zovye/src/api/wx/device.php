@@ -521,7 +521,22 @@ class device
                 return $device;
             }
 
-            return $device->getOnlineDetail();
+            if ($device->isVDevice() || $device->isBlueToothDevice()) {
+                return [
+                    'mcb' => [ 'online' => true ],
+                    'app' => [ 'online' => true ],
+                ];
+            }
+
+            return Util::cachedCall(10, function() use($device) {
+                $result = [
+                    'mcb' => $device->isMcbOnline(),
+                ];
+                if ($device->getAppId()) {
+                    $result['app'] =  $device->isAppOnline();
+                }                
+                return $result;
+            });
         }
 
         return [];

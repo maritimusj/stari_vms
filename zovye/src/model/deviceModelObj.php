@@ -1422,7 +1422,7 @@ class deviceModelObj extends modelObj
 
     public function getOnlineDetail(): array
     {
-        if ($this->isVDevice()) {
+        if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
                 'mcb' => [ 'online' => true ],
                 'app' => [ 'online' => true ],

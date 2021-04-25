@@ -673,4 +673,17 @@ class userModelObj extends modelObj
         }
         return $this->settings("last.active.{$name}", $default);
     }
+
+    public function isWxAppAllowed($appID): bool
+    {
+        $agent = $this->isAgent() ? $this->agent() : $this->getPartnerAgent();
+        if ($agent) {
+            $config = $agent->agentData('app.wx', []);
+            if (empty($config) || empty($config['key'])) {
+                return true;
+            }
+            return $config['key'] === $appID;
+        }
+        return false;
+    }
 }

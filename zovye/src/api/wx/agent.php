@@ -108,8 +108,12 @@ class agent
 
         $user = User::findOne(['mobile' => $mobile]);
         if ($user) {
+            if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
+                return error(State::ERROR, '登录失败，无法使用这个小程序！');
+            }
+
             if (!($user->isAgent() || $user->isPartner())) {
-                return error(State::ERROR, '您还不是我们的代理商,立即注册?');
+                return error(State::ERROR, '您还不是我们的代理商，立即注册?');
             }
 
             //清除原来的登录信息
@@ -1461,6 +1465,10 @@ class agent
         $user = User::findONe(['mobile' => $mobile]);
         if (empty($user)) {
             return error(State::ERROR, '找不到这个用户！');
+        }
+
+        if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
+            return error(State::ERROR, '登录失败，无法使用这个小程序！');
         }
 
         if ($user->isBanned()) {

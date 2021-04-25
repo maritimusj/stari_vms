@@ -74,10 +74,6 @@ class keeper
                 JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);
             }
 
-            if ($user->isAgent() || $user->isPartner()) {
-                return error(State::ERROR, '您已经是我们的代理商！');
-            }
-
             $keepers = \zovye\Keeper::query(['mobile' => $mobile]);
             if (empty($keepers)) {
                 return error(State::ERROR, '找不到相应的运营人员信息！');
@@ -93,6 +89,9 @@ class keeper
                 }
                 $agent = $keeper->getAgent();
                 if ($agent) {
+                    if ($res['config'] && !$agent->isWxAppAllowed($res['config']['key'])) {
+                       continue;
+                    }
                     $keeper_data[] = [
                         'id' => intval($keeper->getId()),
                         'user_id' => $user->getId(),

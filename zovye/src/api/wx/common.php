@@ -12,8 +12,10 @@ use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Wx;
 use zovye\State;
+use zovye\WxApp;
 use function zovye\_W;
 use function zovye\error;
+use function zovye\is_error;
 use function zovye\settings;
 
 class common
@@ -28,11 +30,14 @@ class common
         if ($vendorUID == 'v1') {
             $config = settings('agentWxapp', []);
         } else {
-            $agent = \zovye\Agent::get($vendorUID, true);
-            if (empty($agent)) {
-                return error(State::ERROR, '找不到指定的代理商！');
+            $app = WxApp::get($vendorUID, true);
+            if (empty($app)) {
+                return error(State::ERROR, '找不到指定的小程序配置！');
             }
-            $config = $agent->agentData('app.wx', []);
+            $config = [
+                'key' => $app->getKey(),
+                'secret' => $app->getSecret(),
+            ];
         }
 
         if (empty($config)) {
@@ -43,7 +48,13 @@ class common
             return error(State::ERROR, '缺少必要的请求参数！');
         }
 
-        return Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);
+        $result = Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        $result['config'] = $config;
+        return $result;
     }
 
     public static function getToken(): string

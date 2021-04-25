@@ -676,13 +676,23 @@ class userModelObj extends modelObj
 
     public function isWxAppAllowed($appID): bool
     {
-        $agent = $this->isAgent() ? $this->agent() : $this->getPartnerAgent();
+        $agent = null;
+        if ($this->isAgent()) {
+            $agent = $this->agent();
+        } elseif ($this->isPartner()) {
+            $agent = $this->getPartnerAgent();
+        } elseif ($this->isKeeper()) {
+            $keeper = $this->getKeeper();
+            if ($keeper) {
+                $agent = $keeper->getAgent();
+            }
+        }
         if ($agent) {
-            $config = $agent->agentData('app.wx', []);
-            if (empty($config) || empty($config['key'])) {
+            $config = $agent->agentData('wx.app', []);
+            if (empty($config) || empty($config['key'])) {                
                 return true;
             }
-            return $config['key'] === $appID;
+            return $config['key'] === $appID || $config['key'] === settings('agentWxapp.key', '');
         }
         return false;
     }

@@ -1404,30 +1404,32 @@ class agent
     }
 
     public static function getAgentStat($agent, $s_ts, $e_ts): array
-    {
-        $query = Order::query([
-            'agent_id' => $agent->getId(),
-            'createtime >=' => $s_ts,
-            'createtime <' => $e_ts,
-        ]);
-
-        list($priceTotal, $orderTotal) = $query->get(['sum(price)', 'count(*)']);
-
-        $commissionTotal = CommissionBalance::query([
-            'openid' => $agent->getOpenid(),
-            'src' => [
-                CommissionBalance::ORDER_FREE,
-                CommissionBalance::ORDER_BALANCE,
-                CommissionBalance::ORDER_WX_PAY,
-                CommissionBalance::ORDER_REFUND,
-                CommissionBalance::GSP,
-                CommissionBalance::BONUS,
-            ],
-            'createtime >=' => $s_ts,
-            'createtime <' => $e_ts
-        ])->get('sum(x_val)');
-
-        return ['price_all' => intval($priceTotal), 'order' => intval($orderTotal), 'comm' => intval($commissionTotal)];
+    {   
+        return Util::cachedCall(10, function() use($agent, $s_ts, $e_ts) {
+            $query = Order::query([
+                'agent_id' => $agent->getId(),
+                'createtime >=' => $s_ts,
+                'createtime <' => $e_ts,
+            ]);
+    
+            list($priceTotal, $orderTotal) = $query->get(['sum(price)', 'count(*)']);
+    
+            $commissionTotal = CommissionBalance::query([
+                'openid' => $agent->getOpenid(),
+                'src' => [
+                    CommissionBalance::ORDER_FREE,
+                    CommissionBalance::ORDER_BALANCE,
+                    CommissionBalance::ORDER_WX_PAY,
+                    CommissionBalance::ORDER_REFUND,
+                    CommissionBalance::GSP,
+                    CommissionBalance::BONUS,
+                ],
+                'createtime >=' => $s_ts,
+                'createtime <' => $e_ts
+            ])->get('sum(x_val)');
+    
+            return ['price_all' => intval($priceTotal), 'order' => intval($orderTotal), 'comm' => intval($commissionTotal)];
+        }, $agent->getId(), $s_ts, $e_ts);
     }
 
     public static function loginQR(): array
@@ -1526,7 +1528,7 @@ class agent
         $user = agent::getUserByGUID(request('guid'));
         if ($user) {
 
-            $dt = new DateTime('tomorrow');
+            $dt = new DateTime('next day');
             $end_date = $dt->format('Y-m-d 00:00:00');
             $dt->modify('-1 month');
             $start_date = $dt->format('Y-m-d 23:59:59');
@@ -1643,213 +1645,220 @@ class agent
 
     public static function homepageOrderStat(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgent();        
 
-        $agent_id = $user->getAgentId();
-
-        if (request::has('start')) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
-        } else {
-            $s_date = new DateTime('first day of this month 00:00:00');
-        }
-
-        if (request::has('end')) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
-            $e_date->modify('next day');
-        } else {
-            $e_date = new DateTime('first day of next month 00:00:00');
-        }
-
-        $condition = [
-            'agent_id' => $agent_id,
-            'createtime >=' => $s_date->getTimestamp(),
-            'createtime <' => $e_date->getTimestamp(),
-        ];
-
-        $res = Device::query(['agent_id' => $agent_id])->findAll();
-        $devices = [];
-        $device_keys = [];
-
-        /** @var deviceModelObj $item */
-        foreach ($res as $item) {
-            $devices[] = [
-                'id' => $item->getId(),
-                'name' => $item->getName(),
-                'imei' => $item->getImei(),
+        return Util::cachedCall(10, function() use ($user) {
+            $agent_id = $user->getAgentId();
+            if (request::has('start')) {
+                $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
+            } else {
+                $s_date = new DateTime('first day of this month 00:00:00');
+            }
+    
+            if (request::has('end')) {
+                $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
+                $e_date->modify('next day');
+            } else {
+                $e_date = new DateTime('first day of next month 00:00:00');
+            }
+    
+            $condition = [
+                'agent_id' => $agent_id,
+                'createtime >=' => $s_date->getTimestamp(),
+                'createtime <' => $e_date->getTimestamp(),
             ];
-            $device_keys[] = $item->getId();
-        }
-
-        $device_id = request::int('deviceid');
-        if ($device_id != 0) {
-            $d_id = request::int('deviceid');
-            if (in_array($d_id, $device_keys)) {
-                $condition['device_id'] = $d_id;
-            } else {
-                $condition['device_id'] = -1;
+    
+            $res = Device::query(['agent_id' => $agent_id])->findAll();
+            $devices = [];
+            $device_keys = [];
+    
+            /** @var deviceModelObj $item */
+            foreach ($res as $item) {
+                $devices[] = [
+                    'id' => $item->getId(),
+                    'name' => $item->getName(),
+                    'imei' => $item->getImei(),
+                ];
+                $device_keys[] = $item->getId();
             }
-        }
-
-        $data = [];
-        $total = [
-            'income' => 0,
-            'refund' => 0,
-            'receipt' => 0,
-            'wx_income' => 0,
-            'wx_refund' => 0,
-            'wx_receipt' => 0,
-            'ali_income' => 0,
-            'ali_refund' => 0,
-            'ali_receipt' => 0,
-        ];
-
-        $res = Order::query($condition)->orderBy('createtime DESC')->findAll();
-
-        /** @var orderModelObj $item */
-        foreach ($res as $item) {
-            $amount = $item->getCommissionPrice();
-
-            $create_date = date('Y-m-d', $item->getCreatetime());
-            if (!isset($data[$create_date])) {
-                $data[$create_date]['income'] = 0;
-                $data[$create_date]['refund'] = 0;
-                $data[$create_date]['receipt'] = 0;
-                $data[$create_date]['wx_income'] = 0;
-                $data[$create_date]['wx_refund'] = 0;
-                $data[$create_date]['wx_receipt'] = 0;
-                $data[$create_date]['ali_income'] = 0;
-                $data[$create_date]['ali_refund'] = 0;
-                $data[$create_date]['ali_receipt'] = 0;
-            }
-
-            $is_alipay = User::isAliUser($item->getOpenid());
-
-            $data[$create_date]['income'] += $amount;
-            $total['income'] += $amount;
-            if ($is_alipay) {
-                $data[$create_date]['ali_income'] += $amount;
-                $total['ali_income'] += $amount;
-            } else {
-                $data[$create_date]['wx_income'] += $amount;
-                $total['wx_income'] += $amount;
-            }
-            if ($item->getExtraData('refund')) {
-                //如果是退款
-                $data[$create_date]['refund'] += $amount;
-                $total['refund'] += $amount;
-                if ($is_alipay) {
-                    $data[$create_date]['ali_refund'] += $amount;
-                    $total['ali_refund'] += $amount;
+    
+            $device_id = request::int('deviceid');
+            if ($device_id != 0) {
+                $d_id = request::int('deviceid');
+                if (in_array($d_id, $device_keys)) {
+                    $condition['device_id'] = $d_id;
                 } else {
-                    $data[$create_date]['wx_refund'] += $amount;
-                    $total['wx_refund'] += $amount;
-                }
-            } else {
-                $data[$create_date]['receipt'] += $amount;
-                $total['receipt'] += $amount;
-                if ($is_alipay) {
-                    $data[$create_date]['ali_receipt'] += $amount;
-                    $total['ali_receipt'] += $amount;
-                } else {
-                    $data[$create_date]['wx_receipt'] += $amount;
-                    $total['wx_receipt'] += $amount;
+                    $condition['device_id'] = -1;
                 }
             }
-        }
-        $format_data = [];
-        foreach ($data as $k => $v) {
-            $v['date'] = $k;
-            $format_data[] = $v;
-        }
-
-        return [
-            'data' => $format_data,
-            'total' => $total,
-            'devices' => $devices,
-            's_date' => $s_date,
-            'e_date' => $e_date,
-            'deviceid' => $device_id,
-        ];
+    
+            $data = [];
+            $total = [
+                'income' => 0,
+                'refund' => 0,
+                'receipt' => 0,
+                'wx_income' => 0,
+                'wx_refund' => 0,
+                'wx_receipt' => 0,
+                'ali_income' => 0,
+                'ali_refund' => 0,
+                'ali_receipt' => 0,
+            ];
+    
+            $res = Order::query($condition)->orderBy('createtime DESC')->findAll();
+    
+            /** @var orderModelObj $item */
+            foreach ($res as $item) {
+                $amount = $item->getCommissionPrice();
+    
+                $create_date = date('Y-m-d', $item->getCreatetime());
+                if (!isset($data[$create_date])) {
+                    $data[$create_date]['income'] = 0;
+                    $data[$create_date]['refund'] = 0;
+                    $data[$create_date]['receipt'] = 0;
+                    $data[$create_date]['wx_income'] = 0;
+                    $data[$create_date]['wx_refund'] = 0;
+                    $data[$create_date]['wx_receipt'] = 0;
+                    $data[$create_date]['ali_income'] = 0;
+                    $data[$create_date]['ali_refund'] = 0;
+                    $data[$create_date]['ali_receipt'] = 0;
+                }
+    
+                $is_alipay = User::isAliUser($item->getOpenid());
+    
+                $data[$create_date]['income'] += $amount;
+                $total['income'] += $amount;
+                if ($is_alipay) {
+                    $data[$create_date]['ali_income'] += $amount;
+                    $total['ali_income'] += $amount;
+                } else {
+                    $data[$create_date]['wx_income'] += $amount;
+                    $total['wx_income'] += $amount;
+                }
+                if ($item->getExtraData('refund')) {
+                    //如果是退款
+                    $data[$create_date]['refund'] += $amount;
+                    $total['refund'] += $amount;
+                    if ($is_alipay) {
+                        $data[$create_date]['ali_refund'] += $amount;
+                        $total['ali_refund'] += $amount;
+                    } else {
+                        $data[$create_date]['wx_refund'] += $amount;
+                        $total['wx_refund'] += $amount;
+                    }
+                } else {
+                    $data[$create_date]['receipt'] += $amount;
+                    $total['receipt'] += $amount;
+                    if ($is_alipay) {
+                        $data[$create_date]['ali_receipt'] += $amount;
+                        $total['ali_receipt'] += $amount;
+                    } else {
+                        $data[$create_date]['wx_receipt'] += $amount;
+                        $total['wx_receipt'] += $amount;
+                    }
+                }
+            }
+            $format_data = [];
+            foreach ($data as $k => $v) {
+                $v['date'] = $k;
+                $format_data[] = $v;
+            }
+    
+            return [
+                'data' => $format_data,
+                'total' => $total,
+                'devices' => $devices,
+                's_date' => $s_date,
+                'e_date' => $e_date,
+                'deviceid' => $device_id,
+            ];
+        }, $user->getId());
     }
 
     public static function homepageDefault(): array
     {
-        $condition = [];
-
         $user = common::getAgent();
-        $agent_id = $user->getAgentId();
-        $condition['agent_id'] = $agent_id;
 
-        $device_stat = [
-            'all' => 0,
-            'on' => 0,
-            'off' => 0,
-        ];
+        list($stats, $data) = Util::cachedCall(10, function() use($user) {
 
-        $time_less_15 = new DateTime('-15 min');
-        $power_time = $time_less_15->getTimestamp();
-        $device_stat['all'] = Device::query($condition)->count();
-        $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
-        $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
+            $agent_id = $user->getAgentId();
 
-        $data = [
-            'all' => [
-                'n' => 0, //全部交易数量
-            ],
-            'today' => [
-                'n' => 0, //今日交易数量,
-            ],
-            'yesterday' => [
-                'n' => 0, //昨日交易数量,
-            ],
-            'last7days' => [
-                'n' => 0, //近7日交易数量
-            ],
-            'month' => [
-                'n' => 0, //本月交易数量
-            ],
-            'lastmonth' => [
-                'n' => 0, //上月交易数量,
-            ],
-        ];
+            $condition = [];
+            $condition['agent_id'] = $agent_id;
+    
+            $device_stat = [
+                'all' => 0,
+                'on' => 0,
+                'off' => 0,
+            ];
+    
+            $time_less_15 = new DateTime('-15 min');
+            $power_time = $time_less_15->getTimestamp();
+            $device_stat['all'] = Device::query($condition)->count();
+            $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
+            $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
+    
+            $data = [
+                'all' => [
+                    'n' => 0, //全部交易数量
+                ],
+                'today' => [
+                    'n' => 0, //今日交易数量,
+                ],
+                'yesterday' => [
+                    'n' => 0, //昨日交易数量,
+                ],
+                'last7days' => [
+                    'n' => 0, //近7日交易数量
+                ],
+                'month' => [
+                    'n' => 0, //本月交易数量
+                ],
+                'lastmonth' => [
+                    'n' => 0, //上月交易数量,
+                ],
+            ];
+    
+            $date = new DateTime();
+            $date->modify('today');
+            $today = $date->format('Y-m-d');
+            $today_timestamp = $date->getTimestamp();
+            $date->modify('yesterday');
+            $yesterday_timestamp = $date->getTimestamp();
+            $date->modify($today);
+            $date->modify('tomorrow');
+            $tomorrow_timestamp = $date->getTimestamp();
+            $date->modify($today);
+            $date->modify('+7 days');
+            $last7days_timestamp = $date->getTimestamp();
+            $date->modify($today);
+            $date->modify('first day of last month');
+            $fl_mon_timestamp = $date->getTimestamp();
+            $date->modify($today);
+            $date->modify('first day of this month');
+            $ft_mon_timestamp = $date->getTimestamp();
+    
+            $data['all']['n'] = Order::query($condition)->count();
+            $data['today']['n'] = Order::query($condition)
+                ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $tomorrow_timestamp)
+                ->count();
+            $data['yesterday']['n'] = Order::query($condition)
+                ->where('createtime >= ' . $yesterday_timestamp . ' and createtime < ' . $today_timestamp)
+                ->count();
+            $data['last7days']['n'] = Order::query($condition)
+                ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $last7days_timestamp)
+                ->count();
+            $data['month']['n'] = Order::query($condition)
+                ->where('createtime >= ' . $ft_mon_timestamp . ' and createtime < ' . $tomorrow_timestamp)
+                ->count();
+            $data['lastmonth']['n'] = Order::query($condition)
+                ->where('createtime >= ' . $fl_mon_timestamp . ' and createtime < ' . $ft_mon_timestamp)
+                ->count();
 
-        $date = new DateTime();
-        $date->modify('today');
-        $today = $date->format('Y-m-d');
-        $today_timestamp = $date->getTimestamp();
-        $date->modify('yesterday');
-        $yesterday_timestamp = $date->getTimestamp();
-        $date->modify($today);
-        $date->modify('tomorrow');
-        $tomorrow_timestamp = $date->getTimestamp();
-        $date->modify($today);
-        $date->modify('+7 days');
-        $last7days_timestamp = $date->getTimestamp();
-        $date->modify($today);
-        $date->modify('first day of last month');
-        $fl_mon_timestamp = $date->getTimestamp();
-        $date->modify($today);
-        $date->modify('first day of this month');
-        $ft_mon_timestamp = $date->getTimestamp();
+            return [$device_stat, $data];
+        }, $user->getId());
 
-        $data['all']['n'] = Order::query($condition)->count();
-        $data['today']['n'] = Order::query($condition)
-            ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $tomorrow_timestamp)
-            ->count();
-        $data['yesterday']['n'] = Order::query($condition)
-            ->where('createtime >= ' . $yesterday_timestamp . ' and createtime < ' . $today_timestamp)
-            ->count();
-        $data['last7days']['n'] = Order::query($condition)
-            ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $last7days_timestamp)
-            ->count();
-        $data['month']['n'] = Order::query($condition)
-            ->where('createtime >= ' . $ft_mon_timestamp . ' and createtime < ' . $tomorrow_timestamp)
-            ->count();
-        $data['lastmonth']['n'] = Order::query($condition)
-            ->where('createtime >= ' . $fl_mon_timestamp . ' and createtime < ' . $ft_mon_timestamp)
-            ->count();
-
-        return ['device_stat' => $device_stat, 'data' => $data];
+        return ['device_stat' => $stats, 'data' => $data];
     }
 
 

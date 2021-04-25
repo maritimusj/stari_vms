@@ -778,14 +778,14 @@ if ($op == 'default') {
     }
 
     $title = date('Y年n月');
-    $data = Stats::chartDataOfMonth($agent, time(), "代理商：{$agent->getName()}({$title})");
-
     $content = $this->fetchTemplate(
         'web/agent/stats',
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => $data,
+            'chart' => Util::cachedCall(30, function() use($agent, $title) {
+                return Stats::chartDataOfMonth($agent, time(), "代理商：{$agent->getName()}({$title})");
+            }, $agent->getId()),
         ]
     );
 
@@ -797,52 +797,55 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $first_order_datetime = $agent->settings('agentData.stats.first_order');
-    if (empty($first_order_datetime)) {
-
-        /** @var orderModelObj $first_order */
-        $first_order = Order::query(['agent_id' => $agent->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
-        if ($first_order) {
-            $first_order_datetime = (int)$first_order->getCreatetime();
-            $agent->updateSettings('agentData.stats.first_order', $first_order_datetime);
+    $result = Util::cachedCall(10, function() use($agent) {
+        $first_order_datetime = $agent->settings('agentData.stats.first_order');
+        if (empty($first_order_datetime)) {
+    
+            /** @var orderModelObj $first_order */
+            $first_order = Order::query(['agent_id' => $agent->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
+            if ($first_order) {
+                $first_order_datetime = (int)$first_order->getCreatetime();
+                $agent->updateSettings('agentData.stats.first_order', $first_order_datetime);
+            }
         }
-    }
-
-    if (empty($first_order_datetime)) {
-        JSON::fail('代理商暂时没有任何订单！');
-    }
-
-    $last_order_datetime = $agent->settings('agentData.stats.last_order');
-    if (empty($last_order_datetime)) {
-
-        /** @var orderModelObj $last_order */
-        $last_order = Order::query(['agent_id' => $agent->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
-        if ($last_order) {
-            $last_order_datetime = (int)$last_order->getCreatetime();
+    
+        if (empty($first_order_datetime)) {
+            return error(State::ERROR, '代理商暂时没有任何订单！');
         }
-    }
-
-    $months = [];
-
-    try {
-        $begin = new DateTime('@' . $first_order_datetime);
-        $end = new DateTime('@' . $last_order_datetime);
-
-        $end = $end->modify('first day of next month');
-        $end->modify('-1 day');
-        do {
-            $months[$begin->format('Y年m月')] = $agent->getMTotal($begin->format('Y-m'));
-            $begin->modify('first day of next month');
-        } while ($begin < $end);
-    } catch (Exception $e) {
-        JSON::fail('获取数据出错！');
-    }
+    
+        $last_order_datetime = $agent->settings('agentData.stats.last_order');
+        if (empty($last_order_datetime)) {
+    
+            /** @var orderModelObj $last_order */
+            $last_order = Order::query(['agent_id' => $agent->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
+            if ($last_order) {
+                $last_order_datetime = (int)$last_order->getCreatetime();
+            }
+        }
+    
+        $months = [];
+    
+        try {
+            $begin = new DateTime('@' . $first_order_datetime);
+            $end = new DateTime('@' . $last_order_datetime);
+    
+            $end = $end->modify('first day of next month');
+            $end->modify('-1 day');
+            do {
+                $months[$begin->format('Y年m月')] = $agent->getMTotal($begin->format('Y-m'));
+                $begin->modify('first day of next month');
+            } while ($begin < $end);
+        } catch (Exception $e) {
+            return error(State::ERROR, '获取数据失败！');
+        }
+        return $months;
+    }, $agent->getId());
 
     $content = $this->fetchTemplate(
         'web/agent/agent-stats',
         [
             'agent' => $agent,
-            'm_all' => $months,
+            'm_all' => $result,
         ]
     );
 
@@ -859,7 +862,10 @@ if ($op == 'default') {
         JSON::fail('时间格式不正确！');
     }
 
-    $result = Agent::repairMonthStats($agent, $date);
+    $result = Util::cachedCall(3, function() use ($agent, $date) {
+        return Agent::repairMonthStats($agent, $date);
+    }, $agent->getId(), $state);
+
     if (is_error($result)) {
         JSON::fail($result);
     }

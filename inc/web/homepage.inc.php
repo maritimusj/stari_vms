@@ -14,55 +14,56 @@ $op = request::op('default');
 
 if ($op == 'stats') {
 
-    $rows = [
-        'n' => ['title' => '订单数量', 'unit' => '单'],
-        'f' => ['title' => '净增用户', 'unit' => '人'],
-    ];
+    $data = Util::cachedCall(30, function () {
+        $rows = [
+            'n' => ['title' => '订单数量', 'unit' => '单'],
+            'f' => ['title' => '净增用户', 'unit' => '人'],
+        ];
 
-    $stats_titles = [
-        'today' => '今日',
-        'yesterday' => '昨日',
-        'last7days' => '近7日',
-        'month' => '本月',
-        'lastmonth' => '上月',
-        'all' => '全部',
-    ];
+        $stats_titles = [
+            'today' => '今日',
+            'yesterday' => '昨日',
+            'last7days' => '近7日',
+            'month' => '本月',
+            'lastmonth' => '上月',
+            'all' => '全部',
+        ];
 
-    $data = Stats::brief();
-    $device_stat = [
-        'on' => 0,
-        'off' => 0,
-    ];
+        $data = Stats::brief();
+        $device_stat = [
+            'on' => 0,
+            'off' => 0,
+        ];
 
-    $all_device = Device::query()->count();
-    $time_less_15 = new DateTime('-15 min');
-    $power_time = $time_less_15->getTimestamp();
+        $all_device = Device::query()->count();
+        $time_less_15 = new DateTime('-15 min');
+        $power_time = $time_less_15->getTimestamp();
 
-    $device_stat['on'] = Device::query('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
-    $device_stat['off'] = $all_device - $device_stat['on'];
-
-    $content = $this->fetchTemplate(
-        'web/home/stats',
-        [
+        $device_stat['on'] = Device::query('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
+        $device_stat['off'] = $all_device - $device_stat['on'];
+        
+        return [
             'stats_titles' => $stats_titles,
             'rows' => $rows,
             'data' => $data,
             'device_stat' => $device_stat,
-        ]
-    );
+        ];
+    });
+
+    $content = $this->fetchTemplate('web/home/stats', $data);
 
     JSON::success(['content' => $content]);
 
 } elseif ($op == 'agents_chartdata') {
 
-    $n = request::int('n', 10);
-    $data = Stats::chartDataOfAgents($n);
-
     $content = $this->fetchTemplate(
         'web/home/chart',
         [
             'chartid' => Util::random(10),
-            'data' => $data,
+            'data' => Util::cachedCall(30, function() {
+                    $n = request::int('n', 10);
+                    return Stats::chartDataOfAgents($n);
+                }),
         ]
     );
 
@@ -70,14 +71,14 @@ if ($op == 'stats') {
 
 } elseif ($op == 'devices_chartdata') {
 
-    $n = request::int('n', 10);
-    $data = Stats::chartDataOfDevices($n);
-
     $content = $this->fetchTemplate(
         'web/home/chart',
         [
             'chartid' => Util::random(10),
-            'data' => $data,
+            'data' => Util::cachedCall(30, function() {
+                $n = request::int('n', 10);
+                return Stats::chartDataOfDevices($n);
+            }),
         ]
     );
 
@@ -85,14 +86,14 @@ if ($op == 'stats') {
 
 } elseif ($op == 'accounts_chartdata') {
 
-    $n = request('n', 10);
-    $data = Stats::chartDataOfAccounts($n);
-
     $content = $this->fetchTemplate(
         'web/home/chart',
         [
             'chartid' => Util::random(10),
-            'data' => $data,
+            'data' => Util::cachedCall(30, function() {
+                $n = request('n', 10);
+                return Stats::chartDataOfAccounts($n);
+            }),
         ]
     );
 

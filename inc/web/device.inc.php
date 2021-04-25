@@ -368,6 +368,7 @@ if ($op == 'list') {
 
     $devices['serial'] = request::str('serial') ?: strval(microtime(true));
     JSON::success($devices);
+    
 } elseif ($op == 'search') {
 
     $result = [];
@@ -1180,21 +1181,23 @@ if ($op == 'list') {
     }
     $tpl_data['accounts'] = $accounts;
 
-    $data = Stats::chartDataOfDay($device, time());
     $tpl_data['day_stats'] = $this->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
-            'chart' => $data,
+            'chart' => Util::cachedCall(30, function() use($device) {
+                return Stats::chartDataOfDay($device, time());
+            }, $device->getId()),
         ]
     );
 
-    $data = Stats::chartDataOfMonth($device, time());
     $tpl_data['month_stats'] = $this->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
-            'chart' => $data,
+            'chart' => Util::cachedCall(30, function() use($device) {
+                return Stats::chartDataOfMonth($device, time());
+            }, $device->getId()),
         ]
     );
 
@@ -1367,14 +1370,14 @@ if ($op == 'list') {
     }
 
     $title = date('n月d日');
-    $data = Stats::chartDataOfDay($device, time(), "设备：{$device->getName()}({$title})");
-
     $content = $this->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => $data,
+            'chart' => Util::cachedCall(30, function() use($device, $title) {
+                return Stats::chartDataOfDay($device, time(), "设备：{$device->getName()}({$title})");
+            }, $device->getId()),
         ]
     );
 
@@ -1399,11 +1402,14 @@ if ($op == 'list') {
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => $data,
+            'chart' => Util::cachedCall(30, function() use($device, $month, $title) {
+                return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}({$title})");
+            }, $device->getId(), $month),
         ]
     );
 
     JSON::success(['title' => '', 'content' => $content]);
+
 } elseif ($op == 'allstats') {
 
     //全部出货统计
@@ -1412,92 +1418,94 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    //开始 结束
-    $first_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
-    $last_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
-    if ($first_order) {
-        $first_order_datetime = intval($first_order->getCreatetime());
-    } else {
-        $first_order_datetime = time();
-    }
-    if ($last_order) {
-        $last_order_datetime = intval($last_order->getCreatetime());
-    } else {
-        $last_order_datetime = time();
-    }
-
-    $total_num = 0;
-    $months = [];
-    try {
-        $begin = new DateTime('@' . $first_order_datetime);
-        $end = new DateTime('@' . $last_order_datetime);
-
-        $end = $end->modify('last day of this month');
-
-        while ($begin < $end) {
-            $result = [
-                'total' => 0,
-                'free' => 0,
-                'fee' => 0,
-                'balance' => 0,
-            ];
-
-            $begin->modify('first day of this month');
-            $begin->modify('00:00:00');
-
-            $t_begin = $begin->getTimestamp();
-
-            $month = $begin->format('Y-m-d');
-            $title = $begin->format('Y年m月');
-
-            $begin->modify('first day of next month');
-            $t_end = $begin->getTimestamp();
-
-            $free = Order::query()->where([
-                'device_id' => $device->getId(),
-                'price' => 0,
-                'balance' => 0,
-                'createtime >=' => $t_begin,
-                'createtime <' => $t_end
-            ])->get('sum(num)');
-
-            $result['free'] = intval($free);
-
-            $fee = Order::query()->where([
-                'device_id' => $device->getId(),
-                'price >' => 0,
-                'createtime >=' => $t_begin,
-                'createtime <' => $t_end,
-            ])->get('sum(num)');
-
-            $result['fee'] = intval($fee);
-
-            $balance = Order::query()->where([
-                'device_id' => $device->getId(),
-                'balance >' => 0,
-                'createtime >=' => $t_begin,
-                'createtime <' => $t_end,
-            ])->get('sum(num)');
-
-            $result['balance'] = intval($balance);
-
-            $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
-            $total_num += $result['total'];
-
-            $result['month'] = $month;
-            $months[$title] = $result;
+    list($m, $total) = Util::cachedCall(30, function() use($device) {
+        //开始 结束
+        $first_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
+        $last_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
+        if ($first_order) {
+            $first_order_datetime = intval($first_order->getCreatetime());
+        } else {
+            $first_order_datetime = time();
         }
-    } catch (Exception $e) {
+        if ($last_order) {
+            $last_order_datetime = intval($last_order->getCreatetime());
+        } else {
+            $last_order_datetime = time();
+        }
 
-        JSON::fail('获取数据出错！');
-    }
+        $total_num = 0;
+        $months = [];
+        try {
+            $begin = new DateTime('@' . $first_order_datetime);
+            $end = new DateTime('@' . $last_order_datetime);
 
+            $end = $end->modify('last day of this month');
+
+            while ($begin < $end) {
+                $result = [
+                    'total' => 0,
+                    'free' => 0,
+                    'fee' => 0,
+                    'balance' => 0,
+                ];
+
+                $begin->modify('first day of this month');
+                $begin->modify('00:00:00');
+
+                $t_begin = $begin->getTimestamp();
+
+                $month = $begin->format('Y-m-d');
+                $title = $begin->format('Y年m月');
+
+                $begin->modify('first day of next month');
+                $t_end = $begin->getTimestamp();
+
+                $free = Order::query()->where([
+                    'device_id' => $device->getId(),
+                    'price' => 0,
+                    'balance' => 0,
+                    'createtime >=' => $t_begin,
+                    'createtime <' => $t_end
+                ])->get('sum(num)');
+
+                $result['free'] = intval($free);
+
+                $fee = Order::query()->where([
+                    'device_id' => $device->getId(),
+                    'price >' => 0,
+                    'createtime >=' => $t_begin,
+                    'createtime <' => $t_end,
+                ])->get('sum(num)');
+
+                $result['fee'] = intval($fee);
+
+                $balance = Order::query()->where([
+                    'device_id' => $device->getId(),
+                    'balance >' => 0,
+                    'createtime >=' => $t_begin,
+                    'createtime <' => $t_end,
+                ])->get('sum(num)');
+
+                $result['balance'] = intval($balance);
+
+                $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+                $total_num += $result['total'];
+
+                $result['month'] = $month;
+                $months[$title] = $result;
+            }
+            return [$months, $total_num];
+        } catch (Exception $e) {            
+        }
+        
+        return [];
+    });
     $content = $this->fetchTemplate(
         'web/device/all-stats',
         [
             'device' => $device,
-            'm_all' => $months,
-            'total' => $total_num,
+            'm_all' => $m,
+            'total' => $total,
             'device_id' => $device->getId(),
         ]
     );

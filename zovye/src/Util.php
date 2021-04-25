@@ -295,7 +295,7 @@ class Util
 
         ob_start();
 
-        $cache[] = PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
+        echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
 
         print_r($data);
 

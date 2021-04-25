@@ -399,6 +399,13 @@ include './index.php';
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
     }
 
+    /**
+     * 缓存指定函数的调用结果，在指定时间内在重复调用
+     * @param $interval_seconds
+     * @param callable $fn
+     * @param mixed ...$params 用来同一个函数应用了不同的参数的情况
+     * @return mixed
+     */
     public static function cachedCall($interval_seconds, callable $fn, ...$params)
     {
         $key = App::uid(6) . hashFN($fn, ...$params);

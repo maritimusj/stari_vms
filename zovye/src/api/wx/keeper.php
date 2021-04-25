@@ -586,6 +586,10 @@ class keeper
         return $result;
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     public static function deviceList(): array
     {
         $keeper = keeper::getKeeper();

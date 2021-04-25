@@ -513,10 +513,8 @@ class device
         }
 
         if (request::has('id')) {
-            $user = common::getAgent();
-
             /** @var deviceModelObj|array $device */
-            $device = device::getDevice(request::trim('id'), $user);
+            $device = $device = \zovye\Device::find(request::str('id'), ['imei', 'shadow_id']);
             if (is_error($device)) {
                 return $device;
             }

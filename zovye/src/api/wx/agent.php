@@ -371,6 +371,7 @@ class agent
      * 获取设备列表.
      *
      * @return array
+     * @throws Exception
      */
     public static function deviceList(): array
     {

@@ -522,19 +522,11 @@ class device
      * @return array
      * @throws Exception
      */
-    public static function getDeviceList(userModelObj $user, modelObjFinder $query, bool $onlineStatus = true): array
+    public static function getDeviceList(userModelObj $user, modelObjFinder $query, bool $onlineStatus = null): array
     {
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
             $query->where("(name LIKE '%{$keyword}%' OR imei LIKE '%{$keyword}%')");
-        }
-
-        if (request::isset('online')) {
-            if (request::bool('online')) {
-                $query->where('(last_ping IS NULL || UNIX_TIMESTAMP()-last_ping>300)');
-            } else {
-                $query->where('(last_ping IS NOT NULL && UNIX_TIMESTAMP()-last_ping<300)');
-            }
         }
 
         //简单信息
@@ -542,6 +534,10 @@ class device
         $date = request::trim('date', '');
         $month = request::trim('month', '');
         $keeper_id = request::int('keeperid');
+
+        if (!isset($online_status)) {
+            $onlineStatus = request::bool('online');
+        }
 
         $total = $query->count();
 

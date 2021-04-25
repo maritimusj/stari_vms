@@ -575,7 +575,7 @@ class agent
         if ($device->getAgentId()) {
             //已绑定设备
             if ($device->isOwnerOrSuperior($user)) {
-                $result = \zovye\api\wx\device::formatDeviceInfo($user, $device, false, 0, false);
+                $result = \zovye\api\wx\device::formatDeviceInfo($user, $device);
 
                 if ($group) {
                     $result['group']['id'] = $group->getId();

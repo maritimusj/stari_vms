@@ -729,8 +729,6 @@ if ($op == 'default') {
     Util::itoast(empty($res['message']) ? '操作失败！' : $res['message'], $this->createWebUrl($from), 'error');
 } elseif ($op == 'search') {
 
-    $result = [];
-
     $query = Principal::agent();
     $id = request::int('id');
     if ($id) {
@@ -856,14 +854,15 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $date = DateTimeImmutable::createFromFormat('Y年m月d H:i:s', request::str('month') . '01 00:00:00');
+    $month = request::str('month');
+    $date = DateTimeImmutable::createFromFormat('Y年m月d H:i:s', $month . '01 00:00:00');
     if ($date === false) {
         JSON::fail('时间格式不正确！');
     }
 
     $result = Util::cachedCall(3, function() use ($agent, $date) {
         return Agent::repairMonthStats($agent, $date);
-    }, $agent->getId(), $state);
+    }, $agent->getId(), $month);
 
     if (is_error($result)) {
         JSON::fail($result);
@@ -1942,13 +1941,13 @@ if ($op == 'default') {
     if (request::bool('is_export')) {
         if (empty($user)) {
             Util::itoast('请指定用户！', '', 'error');
+            exit();
         }
 
         set_time_limit(60);
 
         //导出
         $logs = [];
-        $file_name = '无数据';
         $title_arr = [
             '#',
             '金额',

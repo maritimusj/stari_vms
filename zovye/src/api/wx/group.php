@@ -41,7 +41,7 @@ class group
             }
         } else {
             //代理商与平台的 分组
-            $query->whereOr(['agent_id' => $user->getAgentId()]);
+            $query->where(['agent_id' => $user->getAgentId()]);
         }
 
         $total = $query->count();

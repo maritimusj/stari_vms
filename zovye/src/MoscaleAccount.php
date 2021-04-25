@@ -98,32 +98,36 @@ class MoscaleAccount
 
     public static function getLabelList(): array
     {
-        $acc = Account::findOne(['state' => Account::MOSCALE]);
-        if ($acc) {
-            $config = $acc->settings('config', []);
-            $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
-            $result = $moscale->fetchLabelList();
-            if (is_array($result['data'])) {
-                return $result['data'];
+        return Util::cachedCall(30, function() {
+            $acc = Account::findOne(['state' => Account::MOSCALE]);
+            if ($acc) {
+                $config = $acc->settings('config', []);
+                $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
+                $result = $moscale->fetchLabelList();
+                if (is_array($result['data'])) {
+                    return $result['data'];
+                }
             }
-        }
 
-        return [];
+            return [];           
+        });
     }
 
     public static function getRegionData(): array
     {
-        $acc = Account::findOne(['state' => Account::MOSCALE]);
-        if ($acc) {
-            $config = $acc->settings('config', []);
-            $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
-            $result = $moscale->fetchRegionData();
-            if (is_array($result['data'])) {
-                return $result['data'];
+        return Util::cachedCall(30, function () {
+            $acc = Account::findOne(['state' => Account::MOSCALE]);
+            if ($acc) {
+                $config = $acc->settings('config', []);
+                $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
+                $result = $moscale->fetchRegionData();
+                if (is_array($result['data'])) {
+                    return $result['data'];
+                }
             }
-        }
 
-        return [];
+            return [];            
+        });
     }
 
     public static function cb($params = [])
@@ -234,11 +238,6 @@ class MoscaleAccount
 
         $result = $this->post(self::API_URL, $data);
 
-        Util::logToFile('moscale_query', [
-            'request' => $data,
-            'result' => $result,
-        ]);
-
         if ($result['code'] != 200) {
             return error(intval($result['code']), empty($result['msg']) ? '发生错误' : $result['msg']);
         }
@@ -248,7 +247,14 @@ class MoscaleAccount
 
     private function post($url, $data): array
     {
-        return Util::post($url, $data);
+        $result = Util::post($url, $data);
+
+        // Util::logToFile('moscale_query', [
+        //     'request' => $data,
+        //     'result' => $result,
+        // ]);
+
+        return $result;
     }
 
     private function sign($data)

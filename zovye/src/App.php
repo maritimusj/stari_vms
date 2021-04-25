@@ -15,17 +15,19 @@ class App
      */
     public static function uid($len = null): string
     {
-        $uid = sha1(_W('config.setting.authkey') . We7::uniacid());
-        if ($len > 0) {
-            return substr($uid, 0, $len);
-        }
-
-        return $uid;
+        return __once(function() use ($len) {
+            $uid = sha1(_W('config.setting.authkey') . We7::uniacid());
+            if ($len > 0) {
+                return substr($uid, 0, $len);
+            }
+        }, $len);
     }
 
     public static function isLocationValidateEnabled(): bool
     {
-        return !empty(settings('user.location.validate.enabled'));
+        return __once(function() {
+            return !empty(settings('user.location.validate.enabled'));
+        });
     }
 
     /**
@@ -34,7 +36,9 @@ class App
      */
     public static function isAdvsQrcodeTrackerSupported(): bool
     {
-        return !empty(settings('advs.qrcode_tracker.enabled'));
+        return __once(function() {
+            return !empty(settings('advs.qrcode_tracker.enabled'));
+        });        
     }
 
     /**
@@ -43,12 +47,16 @@ class App
      */
     public static function isSiteUrlEnabled(): bool
     {
-        return !empty(settings('advs.site_url.enabled'));
+        return __once(function() {
+            return !empty(settings('advs.site_url.enabled'));
+        });        
     }
 
     public static function isAdvsReviewEnabled(): bool
     {
-        return settings('agent.advs.review.enabled') !== 0;
+        return __once(function() {
+            return settings('agent.advs.review.enabled') !== 0;
+        });        
     }
 
     /**
@@ -57,7 +65,9 @@ class App
      */
     public static function isVDeviceSupported(): bool
     {
-        return !empty(settings('device.v-device.enabled'));
+        return __once(function() {
+            return !empty(settings('device.v-device.enabled'));
+        });        
     }
 
     /**
@@ -66,7 +76,9 @@ class App
      */
     public static function isLotteryGoodsSupported(): bool
     {
-        return !empty(settings('goods.lottery.enabled'));
+        return __once(function() {
+            return !empty(settings('goods.lottery.enabled'));
+        });        
     }
 
     /**
@@ -75,12 +87,16 @@ class App
      */
     public static function isIDCardVerifyEnabled(): bool
     {
-        return self::isIDCardVerifySupported() && settings('user.verify.enabled');
+        return __once(function() {
+            return self::isIDCardVerifySupported() && settings('user.verify.enabled');
+        });        
     }
 
     public static function isIDCardVerifySupported(): bool
     {
-        return !empty(settings('idcard.verify.enabled'));
+        return __once(function() {
+            return !empty(settings('idcard.verify.enabled'));
+        });        
     }
 
     /**
@@ -89,7 +105,9 @@ class App
      */
     public static function isBluetoothDeviceSupported(): bool
     {
-        return !empty(settings('device.bluetooth.enabled'));
+        return __once(function() {
+            return !empty(settings('device.bluetooth.enabled'));
+        });        
     }
 
     /**
@@ -98,7 +116,9 @@ class App
 
     public static function isGoodsVoucherEnabled(): bool
     {
-        return !empty(settings('goods.voucher.enabled'));
+        return __once(function() {
+            return !empty(settings('goods.voucher.enabled'));
+        });        
     }
 
     /**
@@ -107,7 +127,9 @@ class App
      */
     public static function isJfbEnabled(): bool
     {
-        return !empty(settings('jfb.fan.enabled'));
+        return __once(function() {
+            return !empty(settings('jfb.fan.enabled'));
+        });        
     }
 
     /**
@@ -116,7 +138,9 @@ class App
      */
     public static function isMoscaleEnabled(): bool
     {
-        return !empty(settings('moscale.fan.enabled'));
+        return __once(function() {
+            return !empty(settings('moscale.fan.enabled'));            
+        });
     }
 
     /**
@@ -125,7 +149,9 @@ class App
      */
     public static function isYunfenbaEnabled(): bool
     {
-        return !empty(settings('yunfenba.fan.enabled'));
+        return __once(function() {
+            return !empty(settings('yunfenba.fan.enabled'));            
+        });
     }
 
     /**
@@ -134,7 +160,9 @@ class App
      */
     public static function isAQiinfoEnabled(): bool
     {
-        return !empty(settings('AQiinfo.fan.enabled'));
+        return __once(function() {
+            return !empty(settings('AQiinfo.fan.enabled'));            
+        });
     }
 
     /**
@@ -143,102 +171,142 @@ class App
      */
     public static function isUserCenterEnabled(): bool
     {
-        return !empty(settings('user.center.enabled'));
+        return __once(function() {
+            return !empty(settings('user.center.enabled'));
+        });
     }
 
     public static function isUserPrizeEnabled(): bool
     {
-        return !empty(settings('user.prize.enabled'));
+        return __once(function() {
+            return !empty(settings('user.prize.enabled'));            
+        });
     }
 
     public static function maxUserPrizeTimes(): int
     {
-        return settings('user.prize.max_times', 10);
+        return __once(function() {
+            return settings('user.prize.max_times', 10);            
+        });
     }
 
     public static function isCommissionEnabled(): bool
     {
-        return !empty(settings('commission.enabled'));
+        return __once(function() {            
+            return !empty(settings('commission.enabled'));
+        });
     }
 
     public static function isAgentGSPEnabled(): bool
     {
-        return !empty(settings('agent.reg.rel_gsp.enabled'));
+        return __once(function() {            
+            return !empty(settings('agent.reg.rel_gsp.enabled'));
+        });
     }
 
     public static function isAgentBonusEnabled(): bool
     {
-        return !empty(settings('agent.reg.bonus.enabled'));
+        return __once(function() {            
+            return !empty(settings('agent.reg.bonus.enabled'));
+        });
     }
 
     public static function isAgentReferralEnabled(): bool
     {
-        return !empty(settings('agent.reg.referral'));
+        return __once(function() {            
+            return !empty(settings('agent.reg.referral'));
+        });
     }
 
     public static function agentRegMode(): int
     {
-        return settings('agent.reg.mode', Agent::REG_MODE_NORMAL);
+        return __once(function() {            
+            return settings('agent.reg.mode', Agent::REG_MODE_NORMAL);
+        });
     }
 
     public static function userLocationValidateDistance($default = 0): int
     {
-        return intval(settings('user.location.validate.distance', $default));
+        return __once(function() use($default) {            
+            return intval(settings('user.location.validate.distance', $default));
+        }, $default);
     }
 
     public static function agentDefaultCommissionFeeType(): int
     {
-        return intval(settings('agent.reg.commission_fee_type'));
+        return __once(function() {            
+            return intval(settings('agent.reg.commission_fee_type'));
+        });
     }
 
     public static function agentDefaultCommissionFee(): int
     {
-        return intval(settings('agent.reg.commission_fee'));
+        return __once(function() {            
+            return intval(settings('agent.reg.commission_fee'));
+        });
     }
 
     public static function agentDefaultGSP(): array
     {
-        return settings('agent.reg.rel_gsp', []);
+        return __once(function() {            
+            return settings('agent.reg.rel_gsp', []);
+        });
     }
 
     public static function agentDefaultGSDModeType(): string
     {
-        return settings('agent.reg.gsp_mode_type', 'percent');
+        return __once(function() {            
+            return settings('agent.reg.gsp_mode_type', 'percent');
+        });
     }
 
     public static function agentDefaultBonus(): array
     {
-        return settings('agent.reg.bonus', []);
+        return __once(function() {            
+            return settings('agent.reg.bonus', []);
+        });
     }
 
     public static function agentDefaultFuncs(): array
     {
-        return settings('agent.reg.funcs', []);
+        return __once(function() {            
+            return settings('agent.reg.funcs', []);
+        });
     }
 
     public static function agentDefaultLevel(): string
     {
-        return settings('agent.reg.level', 'level0');
+        return __once(function() {            
+            return settings('agent.reg.level', 'level0');
+        });
     }
 
     public static function deviceAutoJoin(): bool
     {
-        return !empty(settings('device.autoJoin'));
+        return __once(function() {            
+            return !empty(settings('device.autoJoin'));
+        });
     }
 
     public static function deviceWaitTimeout(): int
     {
-        return intval(settings('device.waitTimeout')) ?: DEFAULT_DEVICE_WAIT_TIMEOUT;
+        return __once(function() {            
+            return intval(settings('device.waitTimeout')) ?: DEFAULT_DEVICE_WAIT_TIMEOUT;
+        });
     }
 
     public static function isUserVerify18Enabled(): bool
     {
-        return !empty(settings('user.verify18.enabled'));
+        return __once(function() {            
+            return !empty(settings('user.verify18.enabled'));
+        });
     }
 
     public static function we7CreditEnabled(): bool
     {
-        return !empty(settings('we7credit.enabled'));
+        return __once(function() {            
+            return !empty(settings('we7credit.enabled'));
+        });
     }
 
     /**
@@ -249,16 +317,19 @@ class App
      */
     public static function shipmentBalance(deviceModelObj $device = null): bool
     {
-        if ($device) {
-            $agent = $device->getAgent();
-            if ($agent) {
-                $balanced = $agent->settings('agentData.device.shipment.balanced');
-                if (isset($balanced)) {
-                    return !empty($balanced);
+        return __once(function() use ($device) {    
+            if ($device) {
+                $agent = $device->getAgent();
+                if ($agent) {
+                    $balanced = $agent->settings('agentData.device.shipment.balanced');
+                    if (isset($balanced)) {
+                        return !empty($balanced);
+                    }
                 }
             }
-        }
-        return !empty(settings('device.shipment.balanced'));
+            return !empty(settings('device.shipment.balanced'));                    
+        }, $device ? $device->getId() : '');
+
     }
 
     public static function isHttpsWebsite(): bool
@@ -268,42 +339,55 @@ class App
 
     public static function orderMaxGoodsNum(): int
     {
-        return intval(settings('order.goods.maxNum')) ?: 100;
+        return __once(function() {            
+            return intval(settings('order.goods.maxNum')) ?: 100;
+        });
     }
 
 
     public static function imageProxyURL(): string
     {
-        return strval(settings('goods.image.proxy.url'));
+        return __once(function() {            
+            return strval(settings('goods.image.proxy.url'));
+        });
     }
 
     public static function imageProxySecretKey(): string
     {
-        return strval(settings('goods.image.proxy.secret'));
+        return __once(function() {            
+            return strval(settings('goods.image.proxy.secret'));
+        });
     }
 
     public static function remainWarningNum(agentModelObj $agent = null): int
     {
-        $remainWarning = 0;
-        if ($agent) {
-            $remainWarning = intval($agent->settings('agentData.device.remainWarning', 0));
-        }
+        return __once(function() use ($agent) {  
+            $remainWarning = 0;
+            if ($agent) {
+                $remainWarning = intval($agent->settings('agentData.device.remainWarning', 0));
+            }
 
-        if ($remainWarning < 1) {
-            $remainWarning = intval(settings('device.remainWarning', 1));
-        }
+            if ($remainWarning < 1) {
+                $remainWarning = intval(settings('device.remainWarning', 1));
+            }
 
-        return $remainWarning;
+            return $remainWarning;                      
+        }, $agent ? $agent->getId() : '');
+
     }
 
     public static function isWxPlatformEnabled(): bool
     {
-        return boolval(settings('account.wx.platform.enabled'));
+        return __once(function() {            
+            return boolval(settings('account.wx.platform.enabled'));
+        });
     }
 
     public static function isMustFollowAccountEnabled(): bool
     {
-        return boolval(settings('custom.mustFollow.enabled'));
+        return __once(function() {            
+            return boolval(settings('custom.mustFollow.enabled'));
+        });
     }
 
     public static function setContainer(userModelObj $user)
@@ -338,16 +422,22 @@ class App
 
     public static function isChannelPayEnabled(): bool
     {
-        return boolval(settings('custom.channelPay.enabled'));
+        return __once(function() {            
+            return boolval(settings('custom.channelPay.enabled'));
+        });
     }
 
     public static function isSQMPayEnabled(): bool
     {
-        return boolval(settings('custom.SQMPay.enabled'));
+        return __once(function() {            
+            return boolval(settings('custom.SQMPay.enabled'));
+        });
     }
 
     public static function isCustomWxAppEnabled(): bool
     {
-        return boolval(settings('agent.wx.app.enabled'));
+        return __once(function() {            
+            return boolval(settings('agent.wx.app.enabled'));
+        });
     }
 }

@@ -39,13 +39,12 @@ class Migrate
         if (!$debug) {
             return [];
         }
-        $history = app()->get('migrate', []);
 
-        if (We7::pdo_tableexists(APP_NAME . '_migration')) {
-            $query = self::query(['result' => 0]);
-            foreach ($query->findAll() as $entry) {
-                $history[$entry->getName()] = $entry->getCreatetime();
-            }            
+        $history = [];
+
+        $query = self::query(['result' => 0]);
+        foreach ($query->findAll() as $entry) {
+            $history[$entry->getName()] = $entry->getCreatetime();
         }
 
         $task = array_diff_key(self::all(), $history);

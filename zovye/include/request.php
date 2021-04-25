@@ -103,7 +103,7 @@ class request
 
     public static function trim(string $name, string $default = '', $urldecode = false): string
     {
-        return trim(request::str($name, $default, $urldecode));
+        return trim(request::str($name, $default, $urldecode)) ?: $default;
     }
 
     public static function array(string $name, array $default = []): array

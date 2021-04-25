@@ -40,7 +40,7 @@ class group
                 $query->where(['agent_id' => $res->getAgentId()]);
             }
         } else {
-            //代理商与平台的 分组
+            //代理商分组
             $query->where(['agent_id' => $user->getAgentId()]);
         }
 

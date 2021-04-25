@@ -285,11 +285,9 @@ class Util
      * 输出指定变量到文件中
      * @param string $name 日志名称
      * @param mixed $data 数据
-     * @param bool $trace 是否打印调用栈
-     * @param boolean $append 是否是追加模式
      * @return bool
      */
-    public static function logToFile(string $name, $data, $append = true): bool
+    public static function logToFile(string $name, $data): bool
     {
         static $cache = [];
 
@@ -328,7 +326,7 @@ class Util
                 'str' => $str,
                 'file' => $file,
                 'line' => $line,
-            ], false);
+            ]);
         }, E_ALL ^ E_NOTICE);
 
         set_exception_handler(function (Throwable $e) {

@@ -373,7 +373,7 @@ class device
                     $result['repair'] = [
                         'state' => $repair['status'],
                     ];
-                }                
+                }
             }
 
             $arr = explode('-', request::str('date'));
@@ -510,6 +510,18 @@ class device
             if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                 return $res['data'];
             }
+        }
+
+        if (request::has('id')) {
+            $user = common::getAgent();
+
+            /** @var deviceModelObj|array $device */
+            $device = device::getDevice(request::trim('id'), $user);
+            if (is_error($device)) {
+                return $device;
+            }
+
+            return $device->getOnlineDetail();
         }
 
         return [];

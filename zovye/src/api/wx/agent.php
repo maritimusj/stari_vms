@@ -563,6 +563,7 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
+        /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request('id'));
         if (is_error($device)) {
             return $device;

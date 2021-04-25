@@ -305,7 +305,9 @@ class Util
 
         register_shutdown_function(function() use($cache) {
             foreach($cache as $filename => $data) {
-                file_put_contents($filename, $data, FILE_APPEND);
+                if ($filename && $data) {
+                    file_put_contents($filename, $data, FILE_APPEND);
+                }
             }
         });
 
@@ -416,7 +418,7 @@ include './index.php';
         }
 
         $result = $fn();
-        
+
         We7::cache_write($key, [
             'time' => time(),
             'v' => $result,

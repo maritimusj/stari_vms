@@ -620,10 +620,14 @@ class device
                     }
                 }
                 if ($date) {
-                    $data['stats']['day'] = intval($device->getDTotal(['total'], $date));
+                    $data['stats']['day'] = Util::cachedCall(10, function() use($device, $date) {
+                        return intval($device->getDTotal(['total'], $date));
+                    }, $device->getId(), $date);
                 }
                 if ($month) {
-                    $data['stats']['month'] = intval($device->getMTotal(['total'], $month));
+                    $data['stats']['month'] = Util::cachedCall(10, function() use($device, $month) {
+                        return intval($device->getMTotal(['total'], $month));
+                    }, $device->getId(), $month);
                 }
                 $result['list'][] = $data;
             }

@@ -7,6 +7,8 @@
 
 namespace zovye;
 
+use ReflectionException;
+use ReflectionFunction;
 use zovye\base\model;
 use zovye\base\modelFactory;
 
@@ -41,7 +43,7 @@ function m(string $name): modelFactory
     }
 
     $model = $loader->load($name);
-    
+
     if (empty($model)) {
         trigger_error('module object is null', E_USER_ERROR);
     }
@@ -66,7 +68,7 @@ function settings(string $key = '', $default = null)
     if (!isset($cache[$key])) {
         $cache[$key] = app()->settings($key, $default);
     }
-    
+
     return $cache[$key];
 }
 
@@ -197,7 +199,7 @@ function getArray($array, $key = '', $default = null)
     $val = $array;
 
     $keys = is_array($key) ? $key : explode('.', $key);
-    
+
     for ($i = 0; $i < count($keys); $i++) {
 
         $sub_key = $keys[$i];
@@ -205,7 +207,7 @@ function getArray($array, $key = '', $default = null)
         if ($sub_key !== '' && isset($val[$sub_key])) {
 
             $val = $val[$sub_key];
-            
+
         } else {
             return $default;
         }
@@ -306,24 +308,28 @@ if (!function_exists('array_key_first')) {
     }
 }
 
-function __hashFN(callable $fn, ...$val)
+function hashFN(callable $fn, ...$val): string
 {
-    $reflect = new \ReflectionFunction($fn);
-    $data = [
-        $reflect->getFileName(),
-        $reflect->getStartLine(),
-        $reflect->getEndLine(), 
-    ];
-    foreach ($val as $v) {
-        $data[] = $v;
+    try {
+        $reflect = new ReflectionFunction($fn);
+        $data = [
+            $reflect->getFileName(),
+            $reflect->getStartLine(),
+            $reflect->getEndLine(),
+        ];
+        foreach ($val as $v) {
+            $data[] = $v;
+        }
+        return md5(implode('', $data));
+    } catch (ReflectionException $e) {
+        die($e->getMessage());
     }
-    return md5(implode('', $data));
 }
 
-function __once(callable $fn, ...$val)
+function onceCall(callable $fn, ...$val)
 {
     static $cache = [];
-    $v = __hashFN($fn, ...$val);
+    $v = hashFN($fn, ...$val);
     if (!isset($cache[$v])) {
         $cache[$v] = $fn();
     }

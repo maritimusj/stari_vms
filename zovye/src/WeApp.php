@@ -78,7 +78,7 @@ class WeApp extends Settings
         global $do;
 
         if ($do != 'migrate') {
-            Util::intervalDo(function() {
+            Util::cachedCall(function() {
                 Migrate::detect(true);
             }, 10);
         }

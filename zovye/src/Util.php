@@ -404,14 +404,22 @@ include './index.php';
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
     }
 
-    public static function intervalDo(callable $fn, $interval_seconds = 1)
+    public static function cachedCall(callable $fn, $interval_seconds = 1)
     {
-        $key = App::uid(6) . __hashFN($fn);
+        $key = App::uid(6) . hashFN($fn);
+
         $last = We7::cache_read($key);
-        if (time() - intval($last) > $interval_seconds) {
-            We7::cache_write($key, time());
-            $fn();
+        if ($last && is_array($last) && time() - intval($last['time']) < $interval_seconds) {
+            return $last['v'];
         }
+
+        $result = $fn();
+        We7::cache_write($key, [
+            'time' => time(),
+            'v' => $result,
+        ]);
+
+        return $result;
     }
 
     public static function isAssigned($data, deviceModelObj $device): bool

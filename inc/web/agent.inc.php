@@ -496,7 +496,6 @@ if ($op == 'default') {
             if (App::isCustomWxAppEnabled()) {
                 $user->updateSettings('agentData.wx.app', [
                     'key' => request::trim('WxAppKey'),
-                    'secret' => request::trim('WxAppSecret'),
                 ]);
             }
         }

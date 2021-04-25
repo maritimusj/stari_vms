@@ -291,11 +291,13 @@ class Util
      */
     public static function logToFile(string $name, $data, $trace = false, $append = true): bool
     {
-        $log_filename = self::logFileName($name);
+        static $cache = [];
+
+        $log_filename = self::logFileName($name);   
 
         ob_start();
 
-        echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . "---------------------------------------" . PHP_EOL;
+        $cache[] = PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ pid:' . getmypid(). ", " . microtime(true) . " ]---------------------------------------" . PHP_EOL;
 
         print_r($data);
 
@@ -306,7 +308,13 @@ class Util
 
         echo PHP_EOL;
 
-        return file_put_contents($log_filename, ob_get_clean(), $append ? FILE_APPEND : null) !== false;
+        $cache[] = ob_get_clean();
+
+        register_shutdown_function(function() use($log_filename, $append, $cache) {
+            file_put_contents($log_filename, $cache, $append ? FILE_APPEND : null);
+        });
+
+        return true;
     }
 
     public static function setErrorHandler()

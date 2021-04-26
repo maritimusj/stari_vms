@@ -45,7 +45,7 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
+                            <input type="text" class="form-control" name="keyword_agent_dlg" id="keyword_agent" placeholder="请输入手机号码或者名称查找...">
                         </div>
                         <div class="col-md-2">
                             <button class="btn btn-default" type="button" id="search_agent" title="搜索代理商"><i class="fa fa-search"></i></button>
@@ -358,11 +358,11 @@
         }
 
         $('#search_agent').click(function () {
-            const keyword = $('input[name=keyword_agent]').val();
+            const keyword = $('input[name=keyword_agent_dlg]').val();
             util.loading();
             $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
                 op: 'search',
-                keyword: keyword
+                keyword: keyword,
             }, function (res) {
                 let html = '';
                 if (res.status) {

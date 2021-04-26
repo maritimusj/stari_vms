@@ -10,3 +10,4 @@ zovye/config.php
 .DS_Store
 api.php
 payment/*.php
+.vscode

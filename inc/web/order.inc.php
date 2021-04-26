@@ -69,10 +69,7 @@ if ($op == 'default') {
 
     $way = request::str('way');
     if ($way == 'free') {
-        $query->where([
-            'price' => 0,
-            'balance' => 0,
-        ]);
+        $query->where(['price' => 0, 'balance' => 0]);
     } elseif ($way == 'fee') {
         $query->where(['price >' => 0]);
     } elseif ($way == 'balance') {
@@ -81,6 +78,8 @@ if ($op == 'default') {
         $query->where(['refund' => 1]);
     } elseif ($way == 'except') {
         $query->where(['result_code >' => 0]);
+    } else if ($way == 'sqm') {
+        $query->where(['src' => Order::SQM]);
     }
 
     $keyword = request::str('keyword');

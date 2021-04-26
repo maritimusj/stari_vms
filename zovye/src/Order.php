@@ -42,6 +42,7 @@ class Order extends State
         self::ERR_INTERNAL => '系统错误！',
     ];
 
+    //订单来源
     const PAY = 0;
     const ACCOUNT = 1;
     const SQM = 2;

@@ -438,7 +438,6 @@ if ($op == 'list') {
         $devices = Device::query(['id' => $ids])->findAll();
 
         $online_ids = [];
-        $devices_status = [];
         /** @var deviceModelObj $entry */
         foreach ($devices as $entry) {
             if ($entry->isBlueToothDevice() || $entry->isVDevice()) {
@@ -447,10 +446,14 @@ if ($op == 'list') {
             $online_ids['uid'][] = $entry->getImei();
         }
 
-        $res = CtrlServ::v2_query('detail', [], json_encode($online_ids), 'application/json');
-        if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
-            $devices_status = $res['data'];
-        }
+        $ids_str = json_encode($online_ids);
+        $devices_status = Util::cachedCall(10, function() use($ids_str) {            
+            $res = CtrlServ::v2_query('detail', [], $ids_str, 'application/json');
+            if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
+                return $res['data'];
+            }
+            return [];
+        }, $ids_str);
 
         /** @var deviceModelObj $entry */
         foreach ($devices as $entry) {
@@ -501,7 +504,7 @@ if ($op == 'list') {
         JSON::fail([]);
     }
 
-    $result = Util::cachedCall(30, function() use($device) {
+    $result = Util::cachedCall(60, function() use($device) {
         return $device->getPullStats();
     }, $device->getId());
 

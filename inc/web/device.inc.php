@@ -180,8 +180,9 @@ if ($op == 'list') {
         ];
         $res = $entry->getAgent();
         if ($res) {
-            $data['agent'] = $res->getName();
+            $data['agent'] = $res->profile();
         }
+        
         if (App::isVDeviceSupported()) {
             $data['isVD'] = $entry->isVDevice();
         }
@@ -611,11 +612,6 @@ if ($op == 'list') {
 
             $data['device_type'] = $entry->getDeviceType();
             $data = array_merge($data, $entry->getPayload(true));
-
-            $res = $entry->getAgent();
-            if ($res && $res->isAgent()) {
-                $data['agent'] = $res->profile();
-            }
 
             $statistic = $entry->get('firstMsgStatistic', []);
             if ($statistic) {

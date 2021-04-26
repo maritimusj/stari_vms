@@ -488,7 +488,7 @@
                                                 </div>
                                             </template>
                                         </div>
-                                        <div class="detail-seg" v-if="o.cargo_lanes.length > 0">
+                                        <div class="detail-seg" v-if="o.cargo_lanes && o.cargo_lanes.length > 0">
                                             <div v-for="(lane,index) in o.cargo_lanes">
                                                 <span class="title">{{index + 1}}，<span :class="{'text-gray': lane.goods_id === 0}">{{lane.goods_name}}</span>：</span>
                                                 <span>{{lane.num}} / {{lane.capacity}} {{lane.goods_unit_title}}</span>

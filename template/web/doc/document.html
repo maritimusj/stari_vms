@@ -1,5 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{php \zovye\url(true, CSS_ANIMATE_URL);}
 
 {if $op == 'art' || $op == 'default'}
 <ul class="nav nav-tabs" id="navbar">
@@ -10,7 +11,7 @@
 <div class="panel panel-default panel-first nav-tab-item">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('article', array('op'=>'art_add'));}"><i class="fa fa-pencil" title="添加文章"></i></a>
+            <a href="{php echo $this->createWebUrl('article', array('op'=>'art_add'));}"><i class="fa fa-pencil animate__bounceIn" title="添加文章"></i></a>
         </span>
     </div>
     <div class="panel-body">
@@ -44,7 +45,7 @@
             {$pager}
         </div>        
         {else}
-        <div style="text-align:center;color:#ccc;margin-bottom:2em;">
+        <div class="text-center text-muted">
             暂时还没有任何文章！
         </div>        
         {/if}
@@ -59,7 +60,7 @@
 <div class="panel panel-default  nav-tab-item">
     <div class="heading" style="background-color:#fff;border-bottom:0px;">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('article', array('op'=>'files_add'));}"><i class="fa fa-plus" title="添加附加"></i></a>
+            <a href="{php echo $this->createWebUrl('article', array('op'=>'files_add'));}"><i class="fa fa-plus animate__bounceIn" title="添加附加"></i></a>
         </span>
     </div>
     <div class="panel-body">
@@ -93,7 +94,7 @@
                         <!--<td>{$item['total']}</td>-->
                         <td>{$item['createtime']}</td>
                         <td class="operate">
-                            <a href="{php echo $this->createWebUrl('article', array('op'=>'files_edit','id'=>$item['id']))}"><i class="fa fa-edit" title="编辑"></i></a>
+                            <a href="{php echo $this->createWebUrl('article', array('op'=>'files_edit','id'=>$item['id']))}"><i class="fa fa-edit " title="编辑"></i></a>
                             <a href="{php echo $this->createWebUrl('article', array('op'=>'files_remove','id'=>$item['id']))}"><i class="fa fa-trash-o" title="删除？" onclick="if(!confirm('确定要删除这个附件吗？')){return false;}"></i></a>
                         </td>
                     </tr>
@@ -104,7 +105,7 @@
             {$pager}
         </div>        
         {else}
-        <div style="text-align:center;color:#ccc;margin-bottom:2em;">
+        <div class="text-center text-muted">
             暂时还没有任何附件！
         </div>        
         {/if}
@@ -119,7 +120,7 @@
 <div class="panel panel-default nav-tab-item">
     <div class="heading" style="background-color:#fff;border-bottom:0px;">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('article', array('op'=>'faq_add'));}"><i class="fa fa-comment-o" title="添加ＦＡＱ"></i></a>
+            <a href="{php echo $this->createWebUrl('article', array('op'=>'faq_add'));}"><i class="fa fa-comment-o animate__bounceIn" title="添加ＦＡＱ"></i></a>
         </span>
     </div>    
     <div class="panel-body" id="faqlist">
@@ -142,7 +143,7 @@
             {$pager}
         </div>         
         {else}
-        <div style="text-align:center;color:#ccc;margin-bottom:2em;">
+        <div class="text-center text-muted">
             暂时还没有任何FAQ！
         </div>     
         {/if}

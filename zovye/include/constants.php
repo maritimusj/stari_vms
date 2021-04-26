@@ -86,6 +86,7 @@ define('JS_ECHARTS_URL', 'https://cdn.staticfile.org/echarts/5.0.2/echarts.commo
 
 define('JS_SWIPER_URL', 'https://cdn.staticfile.org/Swiper/4.5.1/js/swiper.min.js');
 define('CSS_SWIPER_URL', 'https://cdn.staticfile.org/Swiper/4.5.1/css/swiper.min.css');
+define('CSS_ANIMATE_URL', 'https://cdn.staticfile.org/animate.css/4.1.1/animate.min.css');
 
 define('UPGRADE_URL', 'http://127.0.0.1:9012');
 

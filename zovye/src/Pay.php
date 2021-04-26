@@ -33,6 +33,9 @@ class Pay
     //收钱吧
     const SQB = 'SQB';
 
+    //省钱码
+    const SQM = 'SQM';
+
     /**
      * 获取支付需要的Js，函数会根据指定的设备和用户，获取特定的支付配置
      * @param deviceModelObj $device

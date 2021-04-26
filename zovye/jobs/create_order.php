@@ -213,11 +213,11 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
     $voucher = $params['voucher'];
 
     $order_data = [
+        'src' => Order::ACCOUNT,
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
         'agent_id' => $device->getAgentId(),
         'device_id' => $device->getId(),
-        'src' => empty($acc) ? 10 : 1, //10表示来源于取货码
         'name' => $goods['name'],
         'goods_id' => $goods['id'],
         'num' => 1,
@@ -239,7 +239,9 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         ],
     ];
 
+
     if ($voucher) {
+        $order_data['src'] = Order::VOUCHER;
         $order_data['extra']['voucher'] = [
             'id' => $voucher->getId(),
         ];

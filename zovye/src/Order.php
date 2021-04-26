@@ -42,6 +42,11 @@ class Order extends State
         self::ERR_INTERNAL => '系统错误！',
     ];
 
+    const PAY = 0;
+    const ACCOUNT = 1;
+    const SQM = 2;
+    const VOUCHER = 10;    
+
     /**
      * @param array $condition
      * @return ModelObjFinderProxy

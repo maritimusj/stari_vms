@@ -1512,7 +1512,7 @@ HTML_CONTENT;
                 'openid' => $user->getOpenid(),
                 'agent_id' => $device->getAgentId(),
                 'device_id' => $device->getId(),
-                'src' => $acc ? 1 : 10, //10表示来源于取货码
+                'src' => Order::ACCOUNT,
                 'name' => $goods['name'],
                 'goods_id' => $goods['id'],
                 'num' => 1,
@@ -1538,6 +1538,7 @@ HTML_CONTENT;
             }
 
             if ($voucher) {
+                $order_data['src'] = Order::VOUCHER;
                 $order_data['extra']['voucher'] = [
                     'id' => $voucher->getId(),
                 ];

@@ -20,6 +20,7 @@ use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use function zovye\err;
+use function zovye\getArray;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -176,6 +177,7 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
     $goods_data = $pay_log->getGoods();
 
     $order_data = [
+        'src' => Order::PAY,
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
         'agent_id' => $device->getAgentId(),
@@ -211,10 +213,18 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
     }
 
     if (!empty($voucher)) {
-        $order_data['src'] = 10; //10表示来源于取货码
+        $order_data['src'] = Order::VOUCHER;
         $order_data['extra']['voucher'] = [
             'id' => $voucher->getId(),
         ];
+    } else {
+        $pay_type = getArray($order_data, 'extra.payResult.type');
+        switch ($pay_type) {
+            case Pay::SQM:
+                $order_data['src'] = Order::SQM;
+                break;
+            default:
+        }
     }
 
     $agent = $device->getAgent();

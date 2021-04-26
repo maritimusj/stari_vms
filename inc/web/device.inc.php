@@ -1090,11 +1090,7 @@ if ($op == 'list') {
 
     exit(-1);
 } elseif ($op == 'deviceTest') {
-
-    if (empty(settings('ctrl.url'))) {
-        JSON::fail('请到系统设置中，正确配置控制中心url后再进行出货测试！');
-    }
-
+    
     $id = request::int('id');
     if ($id) {
         /** @var deviceModelObj $device */

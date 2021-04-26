@@ -127,7 +127,7 @@
         </span>       
     </div>
     <div class="panel-body">
-        {if $accounts || $one_res}
+        {if $accounts || ($one_res && !$banned)}
         <table class="table">
             <thead>
                 <tr>
@@ -351,7 +351,7 @@
             })
         </script>
         {else}
-        <div style="text-align:center;color:#ccc;">
+        <div class="text-center text-muted">
             暂时还没有任何公众号！
         </div>
         {/if}

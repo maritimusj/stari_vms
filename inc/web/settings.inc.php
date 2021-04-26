@@ -320,6 +320,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             if (empty($settings['custom']['SQMPay']['goodsNum'])) {
                 $settings['custom']['SQMPay']['goodsNum'] = 1;
             }
+            $settings['custom']['SQMPay']['bonus'] = max(0, request::float('bonus', 0, 2)) * 100;
         }
     } elseif ($save_type == 'account') {
         if (App::isWxPlatformEnabled()) {

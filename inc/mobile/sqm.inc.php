@@ -46,11 +46,13 @@ if ($op == 'default') {
             throw new Exception('商品数量不足！');
         }
    
-        $money = request::json('money');
+        //使用后台设置的佣金金额做为支付金额，为代理商分佣
+        //$bonus = request::json('money', $goodsData['price']);
+        $bonus = intval(settings('custom.SQMPay.bonus', 0));
         $result = SQM::createOrder($device, $user, $goodsData['id'], $num, [
             'task_record_id' => request::json('task_record_id', ''),
             'timestamp' => request::json('timestamp', time()),
-            'price' => $money ? $money : $goodsData['price'],
+            'price' => $bonus,
             'serial' => request::json('task_record_id'),
         ]);
         

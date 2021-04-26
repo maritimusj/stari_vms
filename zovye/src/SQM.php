@@ -37,17 +37,12 @@ class SQM
         return strtoupper(md5(implode('&', $arr) . "&appsecret={$app_secret}")) === $data['sign'];
     }
 
-    public static function createOrder(deviceModelObj $device, userModelObj $user, $goods_id, $num, $params = []): bool
+    public static function createOrder(deviceModelObj $device, userModelObj $user, $goodsData, $num, $params = []): bool
     {
-        $goods = Goods::get($goods_id);
-        if (empty($goods)) {
-           return false;
-        }
-
         $params['level'] = LOG_GOODS_ADVS;
         $params['total'] = $num;
 
-        list($order_no, $pay_log) = Pay::prepareDataWithPay('SQM', $device, $user, Goods::format($goods), $params);
+        list($order_no, $pay_log) = Pay::prepareDataWithPay('SQM', $device, $user, $goodsData, $params);
 
         if (is_error($order_no)) {
             return false;

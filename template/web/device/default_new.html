@@ -144,7 +144,13 @@
     .maintance {
         color: #f44336;
     }
-    [data-op="showMonthStats"],[data-op="setNormal"]  {
+    .busy .operate i {
+        visibility: hidden;
+    }
+    .busy i {
+        color: #ccc;
+    }
+    .operate [data-op="showMonthStats"],.operate [data-op="setNormal"]  {
         cursor: pointer;
     }
 </style>
@@ -599,5 +605,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210418"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=202100426"></script>
 {template 'common/footer'}

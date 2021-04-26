@@ -8,6 +8,7 @@ namespace zovye;
 
 use Exception;
 use DateTimeImmutable;
+use DateTimeInterface;
 use zovye\Contract\ISettings;
 use zovye\model\agentModelObj;
 use zovye\model\orderModelObj;
@@ -196,6 +197,8 @@ class Stats
             $day = time();
         } elseif (is_string($day)) {
             $day = strtotime($day);
+        } elseif ($day instanceof DateTimeInterface) {
+            $day = $day->getTimestamp();
         }
 
         $chart = [];
@@ -261,6 +264,8 @@ class Stats
             $day = time();
         } elseif (is_string($day)) {
             $day = strtotime($day);
+        } elseif ($day instanceof DateTimeInterface) {
+            $day = $day->getTimestamp();
         }
 
         $chart = [];
@@ -670,6 +675,8 @@ class Stats
             $day = time();
         } elseif (is_string($day)) {
             $day = strtotime($day);
+        } elseif ($day instanceof DateTimeInterface) {
+            $day = $day->getTimestamp();
         }
 
         try {

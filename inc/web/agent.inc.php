@@ -774,15 +774,20 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $title = date('Y年n月');
+    $datetime = DateTime::createFromFormat('Y年m月', request::trim('month'));
+    if (!$datetime) {
+        $datetime = new DateTime();
+    }
+
+    $title = $datetime->format('Y年n月');
     $content = $this->fetchTemplate(
         'web/agent/stats',
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => Util::cachedCall(30, function() use($agent, $title) {
-                return Stats::chartDataOfMonth($agent, time(), "代理商：{$agent->getName()}({$title})");
-            }, $agent->getId()),
+            'chart' => Util::cachedCall(30, function() use($agent, $datetime, $title) {
+                return Stats::chartDataOfMonth($agent, $datetime, "代理商：{$agent->getName()}({$title})");
+            }, $agent->getId(), $title),
         ]
     );
 
@@ -794,7 +799,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $result = Util::cachedCall(10, function() use($agent) {
+    $result = Util::cachedCall(30, function() use($agent) {
         $first_order_datetime = $agent->settings('agentData.stats.first_order');
         if (empty($first_order_datetime)) {
     

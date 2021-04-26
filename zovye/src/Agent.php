@@ -181,7 +181,7 @@ class Agent
         return $result;
     }
 
-    public static function repairMonthStats($agent, $datetime = '')
+    public static function repairMonthStats($obj, $datetime = '')
     {
         $date = null;
         if (is_string($datetime)) {
@@ -191,6 +191,8 @@ class Agent
             }
         } elseif ($datetime instanceof DateTimeInterface) {
             $date = $datetime;
+        } elseif (is_int($datetime)) {
+            $date = (new DateTimeImmutable())->setTimestamp($datetime);
         }
 
         if (!$date) {
@@ -203,8 +205,8 @@ class Agent
         while ($begin < $end) {
             $day = $begin->format('Y-m-d');
             /** @var array $result */
-            $result = Util::transactionDo(function () use ($agent, $day) {
-                if (!Stats::repair($agent, $day)) {
+            $result = Util::transactionDo(function () use ($obj, $day) {
+                if (!Stats::repair($obj, $day)) {
                     return err('修复失败：{$day}！');
                 }
                 return true;

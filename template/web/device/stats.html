@@ -6,10 +6,10 @@
         const myChart = echarts.init(document.getElementById("{$chartid}"));
         const option = JSON.parse('{php echo json_encode($chart);}');
         option['grid'] = {
-            top: '60px',
-            left: '60px',
-            right: '30px',
-            bottom: '60px',
+            top: '40px',
+            left: '30px',
+            right: '10px',
+            bottom: '40px',
         }
         myChart.setOption(option);
         window.addEventListener("resize", function () {

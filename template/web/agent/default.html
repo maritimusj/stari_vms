@@ -397,11 +397,17 @@
         self.closest('table').addClass('busy');
         
         const [agent, month] = data.split(':');
-        api.showResult({op: 'repair', agent, month}, undefined, false, function(){
+        api.showResult({op: 'repair', agent, month}, undefined, false, function() {
             self.toggleClass('fa-wrench fa-spinner fa-pulse').attr('data-op', 'repair');
             self.closest('td').addClass('operate');
             self.closest('table').removeClass('busy');
         });
+    }
+    api.showMonthStats = function(data, e) {
+        const self = $(e.target);
+        const tr = self.closest('tr');
+        const [id, month] = data.split(':');
+        api.showResult({ op: 'viewStatsChart', id, month });
     }
     $("#userslist").on("click", "[data-stats]", function (e) {
         const agent_id = $(this).closest('tr').data('id');

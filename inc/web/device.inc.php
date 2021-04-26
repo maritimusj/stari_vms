@@ -1399,7 +1399,6 @@ if ($op == 'list') {
     }
 
     $title = date('Y年n月', $month);
-    $data = Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}({$title})");
 
     $content = $this->fetchTemplate(
         'web/device/stats',
@@ -1414,6 +1413,23 @@ if ($op == 'list') {
 
     JSON::success(['title' => '', 'content' => $content]);
 
+} elseif ($op == 'repairMonthStats') {
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $month = strtotime(request::str('month'));
+    if (empty($month)) {
+        $month = time();
+    }
+
+    if (Agent::repairMonthStats($device, $month)) {
+        JSON::success('修复完成！');
+    }
+
+    JSON::success('修复失败！');
+    
 } elseif ($op == 'allstats') {
 
     //全部出货统计

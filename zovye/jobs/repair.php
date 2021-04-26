@@ -6,6 +6,7 @@ use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Job;
 use zovye\request;
+use zovye\Stats;
 use zovye\Util;
 use function zovye\is_error;
 
@@ -28,7 +29,7 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
 
     $start = microtime(true);
 
-    $result = Agent::repairMonthStats($agent, $log['month']);
+    $result = Stats::repairMonthData($agent, $log['month']);
     if (is_error($result)) {
         $agent->updateSettings('repair', [
             'error' => $result,

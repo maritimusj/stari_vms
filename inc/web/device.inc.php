@@ -1424,7 +1424,7 @@ if ($op == 'list') {
         $month = time();
     }
 
-    if (Agent::repairMonthStats($device, $month)) {
+    if (Stats::repairMonthData($device, $month)) {
         JSON::success('修复完成！');
     }
 

@@ -180,42 +180,4 @@ class Agent
         }
         return $result;
     }
-
-    public static function repairMonthStats($obj, $datetime = '')
-    {
-        $date = null;
-        if (is_string($datetime)) {
-            try {
-                $date = new DateTimeImmutable($datetime);
-            } catch (Exception $e) {
-            }
-        } elseif ($datetime instanceof DateTimeInterface) {
-            $date = $datetime;
-        } elseif (is_int($datetime)) {
-            $date = (new DateTimeImmutable())->setTimestamp($datetime);
-        }
-
-        if (!$date) {
-            $date = new DateTimeImmutable();
-        }
-
-        $begin = $date->modify('first day of this month');
-        $end = $date->modify('first day of next month');
-
-        while ($begin < $end) {
-            $day = $begin->format('Y-m-d');
-            /** @var array $result */
-            $result = Util::transactionDo(function () use ($obj, $day) {
-                if (!Stats::repair($obj, $day)) {
-                    return err('修复失败：{$day}！');
-                }
-                return true;
-            });
-            if (is_error($result)) {
-                return $result;
-            }
-            $begin = $begin->modify('next day');
-        }
-        return true;
-    }
 }

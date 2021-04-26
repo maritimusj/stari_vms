@@ -418,6 +418,10 @@ include './index.php';
         }
 
         $result = $fn();
+        if (is_error($result)) {
+            We7::cache_delete($key);
+            return $result;
+        }
 
         We7::cache_write($key, [
             'time' => time(),

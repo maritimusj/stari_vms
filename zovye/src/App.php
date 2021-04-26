@@ -20,6 +20,7 @@ class App
             if ($len > 0) {
                 return substr($uid, 0, $len);
             }
+            return $uid;
         }, $len);
     }
 

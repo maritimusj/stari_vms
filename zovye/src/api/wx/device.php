@@ -493,6 +493,38 @@ class device
 
     public static function getDeviceOnline(): array
     {
+        if (request::has('id')) {
+            /** @var deviceModelObj|array $device */
+            $device = $device = \zovye\Device::find(request::str('id'), ['imei', 'shadow_id']);
+            if (is_error($device)) {
+                return $device;
+            }
+
+            if ($device->isVDevice() || $device->isBlueToothDevice()) {
+                return [
+                    'mcb' => [ 'online' => true ],
+                    'app' => [ 'online' => true ],
+                ];
+            }
+
+            $result =  Util::cachedCall(1, function() use($device) {
+                $result = [
+                    'mcb' => [                        
+                        'online' => $device->isMcbOnline(),
+                    ],
+                ];
+                if ($device->getAppId()) {
+                    $result['app'] =  [
+                        'online' => $device->isAppOnline(),
+                    ];
+                }                
+                return $result;
+            }, $device->getId());
+
+            Util::logToFile('debug', $result);
+            return $result;
+        }
+
         $ids = [];
 
         $mcbIDs = request::array('mcb');
@@ -510,35 +542,6 @@ class device
             if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                 return $res['data'];
             }
-        }
-
-        if (request::has('id')) {
-            /** @var deviceModelObj|array $device */
-            $device = $device = \zovye\Device::find(request::str('id'), ['imei', 'shadow_id']);
-            if (is_error($device)) {
-                return $device;
-            }
-
-            if ($device->isVDevice() || $device->isBlueToothDevice()) {
-                return [
-                    'mcb' => [ 'online' => true ],
-                    'app' => [ 'online' => true ],
-                ];
-            }
-
-            return Util::cachedCall(30, function() use($device) {
-                $result = [
-                    'mcb' => [
-                        'online' => $device->isMcbOnline(),
-                    ],
-                ];
-                if ($device->getAppId()) {
-                    $result['app'] =  [
-                        'online' => $device->isAppOnline(),
-                    ];
-                }                
-                return $result;
-            }, $device->getId());
         }
 
         return [];

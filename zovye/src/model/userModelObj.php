@@ -689,11 +689,8 @@ class userModelObj extends modelObj
         }
         if ($agent) {
             $config = $agent->agentData('wx.app', []);
-            if (empty($config) || empty($config['key'])) {                
-                return true;
-            }
-            return $config['key'] === $appID || $config['key'] === settings('agentWxapp.key', '');
+            return empty($config) || empty($config['key']) || $config['key'] === $appID;
         }
-        return false;
+        return $appID === settings('agentWxapp.key', '');
     }
 }

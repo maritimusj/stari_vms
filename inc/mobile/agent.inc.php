@@ -32,5 +32,5 @@ if ($op == 'reg') {
 
 } elseif ($op == 'login_scan') {
 
-    Util::resultAlert('请使用微信扫描二维码登录，谢谢！', 'success');
+    Util::resultAlert('请使用微信小程序扫描二维码登录，谢谢！', 'warning');
 }

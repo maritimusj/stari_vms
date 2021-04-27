@@ -507,7 +507,7 @@ class device
                 ];
             }
 
-            $result =  Util::cachedCall(1, function() use($device) {
+            $result =  Util::cachedCall(30, function() use($device) {
                 $result = [
                     'mcb' => [                        
                         'online' => $device->isMcbOnline(),

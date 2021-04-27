@@ -367,11 +367,11 @@ class We7
      */
     public static function tablename(string $table): string
     {
-        if (empty(_W('config.db.master'))) {
-            return "`" . _W('config.db.tablepre') . $table . "`";
+        if (empty(Util::config('db.master'))) {
+            return "`" . Util::config('db.tablepre') . $table . "`";
         }
 
-        return "`" . _W('config.db.master.tablepre') . $table . "`";
+        return "`" . Util::config('db.master.tablepre') . $table . "`";
     }
 
     /**
@@ -381,7 +381,12 @@ class We7
     {
         static $db = null;
         if (!isset($db)) {
-            $db = new db(Util::config('db'));
+            $config = Util::config('db');
+            if (empty($config['master']['host']) && empty($config['master']['username'])) {
+               $db = call_user_func('pdo');
+            } else {
+                $db = new db($config);
+            }           
         }
         return $db;
     }

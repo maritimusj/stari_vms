@@ -36,7 +36,7 @@ class Util
                 $config = require_once($configfile);
             } else {
                 $config = _W('config', []);
-            }            
+            }
         }
         return getArray($config, $sub);
     }

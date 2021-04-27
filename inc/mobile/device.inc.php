@@ -459,7 +459,7 @@ if ($op == 'default') {
 
 } else if ($op == 'detail') {
 
-    $device = Device::get(request('id'));
+    $device = Device::get(request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }

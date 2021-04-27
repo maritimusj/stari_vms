@@ -22,8 +22,15 @@
                 <div class="form-group">
                     <label for="callbackURL" class="col-md-2 control-label">回调网址</label>
                     <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$settings['custom']['SQMPay']['cb']}"></i> {$settings['custom']['SQMPay']['cb']}</span>
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="$cbURL"></i> {$cbURL}</span>
                         <span class="help-block">* 省钱码服务成功通知网址</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="jsCode" class="col-md-2 control-label">统计Js代码</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="js" id="jsCode" value="{$settings['custom']['SQMPay']['js']}">
+                        <span class="help-block">* 用户扫描设备二维码后打的页面加载，方便统计展现</span>
                     </div>
                 </div>
                 <div class="form-group">

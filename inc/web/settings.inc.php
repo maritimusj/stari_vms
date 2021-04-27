@@ -321,8 +321,9 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
     } elseif ($save_type == 'advs') {        
         if ($settings['custom']['SQMPay']['enabled']) {
             $settings['custom']['SQMPay']['appSecret'] = request::trim('appSecret');
-            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);
-            $settings['custom']['SQMPay']['cb'] = Util::murl('sqm', []);
+            $settings['custom']['SQMPay']['js'] = request::str('js');
+
+            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);            
             if (empty($settings['custom']['SQMPay']['goodsNum'])) {
                 $settings['custom']['SQMPay']['goodsNum'] = 1;
             }
@@ -818,6 +819,10 @@ if ($op == 'account') {
         $tpl_data['idcard_balance'] = $res['data']['msg'];
     }
 
+} elseif ($op == 'advs') {
+    if ($settings['custom']['SQMPay']['enabled']) {
+        $tpl_data['cbURL'] = SQM::getCallbackUrl();
+    }    
 } elseif ($op == 'notice') {
 
     if ($settings['notice']['reviewAdminUserId']) {

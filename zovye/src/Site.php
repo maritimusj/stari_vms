@@ -239,7 +239,6 @@ JSCODE;
         $this->showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
     }
 
-
     /**
      * 设备页面，通常展示了可用的关注二维码列表和支付信息.
      * @param array $params
@@ -421,6 +420,12 @@ JSCODE;
         }
 
         $tpl['js']['code'] .= "\r\n</script>";
+
+        if (App::isSQMPayEnabled()) {
+            $js = htmlspecialchars_decode(SQM::getJs(), ENT_QUOTES);
+            $tpl['js']['code'] .= "\r\n{$js}\r\n";
+        }
+
         $this->showTemplate(Theme::file('device'), ['tpl' => $tpl]);
     }
 

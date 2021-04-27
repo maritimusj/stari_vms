@@ -7,6 +7,16 @@ use zovye\model\userModelObj;
 
 class SQM 
 {
+    public static function getCallbackUrl(): string
+    {
+        return Util::murl('sqm', []);
+    }
+
+    public static function getJs(): string
+    {
+        return strval(settings('custom.SQMPay.js'));
+    }
+
     public static function getGoodsNum(): int 
     {
         $num = settings('custom.SQMPay.goodsNum', 1);

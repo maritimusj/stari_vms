@@ -188,11 +188,9 @@ class agent
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
             Util::logToFile('wxapi', $res);
-        } else {
-            return agent::doUserLogin($res);
-        }
-
-        return error(State::ERROR, '用户登录失败，请稍后再试！[103]');
+        } 
+        
+        return agent::doUserLogin($res);
     }
 
     /**

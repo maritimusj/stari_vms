@@ -7,17 +7,17 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="wxAppKey" class="col-md-2 control-label">App ID</label>
+        <label for="wxAppKey" class="col-md-2 control-label">AppID</label>
         <div class="col-md-10">
             <input type="text" class="form-control" id="wxAppKey" name="wxAppKey" value="{php echo $wxapp?$wxapp->getKey() : ''}" required>
-            <span class="help-block">* 微信小程序的app ID</span>
+            <span class="help-block">* 微信AppID(小程序ID)</span>
         </div>
     </div>
     <div class="form-group">
-        <label for="wxAppSecret" class="col-md-2 control-label">App secret</label>
+        <label for="wxAppSecret" class="col-md-2 control-label">AppSecret</label>
         <div class="col-md-10">
             <input type="text" class="form-control" id="wxAppSecret" name="wxAppSecret" value="{php echo $wxapp?$wxapp->getSecret() : ''}" required>
-            <span class="help-block">* 微信小程序的app secret</span>
+            <span class="help-block">* 微信AppSecret(小程序密钥)</span>
         </div>
     </div>
     <div class="form-group pull-right">

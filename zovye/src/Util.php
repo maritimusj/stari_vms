@@ -31,7 +31,12 @@ class Util
     {
         static $config = null;
         if (!isset($config)) {
-            $config = require_once(ZOVYE_CORE_ROOT . 'config.php');
+            $configfile = ZOVYE_CORE_ROOT . 'config.php';
+            if (file_exists($configfile)) {
+                $config = require_once($configfile);
+            } else {
+                $config = _W('config', []);
+            }            
         }
         return getArray($config, $sub);
     }

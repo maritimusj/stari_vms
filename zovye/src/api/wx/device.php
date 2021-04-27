@@ -61,7 +61,7 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'location' => $extra['location'] ?: null,
+                    'location' => isEmptyArray($extra['location']) ? null : $extra['location'],
                     'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
                 ],
             ];
@@ -170,10 +170,10 @@ class device
         }
 
         //设备默认显示代理商的地区
-        if (empty($result['extra']['location']['area'])) {
+        if (isEmptyArray($result['extra']['location']['area'])) {
             if ($agent) {
                 $agent_data = $agent->getAgentData();
-                if ($agent_data['area']) {
+                if (!isEmptyArray($agent_data['area'])) {
                     $result['extra']['location']['area'] = array_values($agent_data['area']);
                 }
             }

@@ -8,6 +8,20 @@
 namespace zovye;
 
 $sql = <<<SQL
+CREATE TABLE `ims_zy_saas_migration` ( 
+    `id` INT NOT NULL AUTO_INCREMENT , 
+    `uniacid` int(11) NOT NULL DEFAULT '0',
+    `name` VARCHAR(64) NOT NULL , 
+    `filename` VARCHAR(256) NOT NULL , 
+    `result` TINYINT NOT NULL  DEFAULT '0', 
+    `error` TEXT, 
+    `begin` INT NOT NULL , 
+    `end` INT NOT NULL , 
+    `createtime` INT NOT NULL , 
+    PRIMARY KEY (`id`), 
+    UNIQUE (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_weapp_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',

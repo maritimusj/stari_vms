@@ -34,9 +34,9 @@ class Migrate
         return $task;
     }
 
-    public static function getNewTask($debug = true): array
+    public static function getNewTask(): array
     {
-        if (!$debug) {
+        if (!We7::pdo_tableexists(APP_NAME . '_migration')) {
             return [];
         }
 
@@ -116,17 +116,11 @@ class Migrate
             $data['error'] = $result['message'];
         }
 
-        if (We7::pdo_tableexists(APP_NAME . '_migration')) {
-            if(!self::create($data)) {
-                Util::logToFile('migrate', [
-                    'error' => '无法保存migrate记录！',
-                ]);
-            }
-        } else {
-            $history = app()->get('migrate', []);
-            $history[$name] = time();
-            app()->set('migrate', $history);
-        }
+        if(!self::create($data)) {
+            Util::logToFile('migrate', [
+                'error' => '无法保存migrate记录！',
+            ]);
+        }        
 
         return !is_error($result);
     }

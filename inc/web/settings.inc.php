@@ -17,10 +17,16 @@ $op = request::op('device');
 $settings = settings();
 
 if ($op == 'save') {
+    $url = _W('siteroot');
     Util::createApiRedirectFile('api.php', '', [
         'memo' => '这个文件是小程序请求转发程序!',
-    ], function () {
+    ], function () use ($url) {
         return "
+header(\"Access-Control-Allow-Origin: {$url}\");
+header(\"Access-Control-Allow-Methods: GET,POST\");
+header(\"Access-Control-Allow-Headers: Content-Type, LLT-API\");
+header(\"Access-Control-Max-Age: 86400\");
+
 if (isset(\$_SERVER['HTTP_LLT_API'])) {
     \$_GET['do'] = 'wxapi';
     \$_GET['vendor'] = strval(\$_SERVER['HTTP_LLT_API']);

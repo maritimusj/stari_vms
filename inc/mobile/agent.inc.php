@@ -29,5 +29,8 @@ if ($op == 'reg') {
     }
 
     JSON::fail('注册失败，请与管理员联系！');
-}
 
+} elseif ($op == 'login_scan') {
+
+    Util::resultAlert('请使用微信扫描二维码登录，谢谢！', 'success');
+}

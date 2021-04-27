@@ -1440,9 +1440,13 @@ class agent
 
     public static function loginQR(): array
     {
-        $uniq_str = uniqid(mt_rand(), true);
-        $url = Util::murl('usercenter', ['op' => 'login_scan', 'uniq' => $uniq_str]);
-        return ['data' => $url];
+        $url = Util::murl('agent', [
+            'op' => 'login_scan',
+            'uniq' => Util::random(32),
+        ]);
+        return [
+            'data' => $url,
+        ];
     }
 
     public static function loginScan(): array
@@ -1482,7 +1486,8 @@ class agent
         }
 
         //清除原来的登录信息
-        foreach (LoginData::agentWeb(['user_id' => $user->getId()])->findAll() as $entry) {
+        $query = LoginData::agentWeb(['user_id' => $user->getId()]);
+        foreach ($query->findAll() as $entry) {
             $entry->destroy();
         }
 

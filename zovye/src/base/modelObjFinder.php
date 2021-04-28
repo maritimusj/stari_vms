@@ -70,12 +70,11 @@ class modelObjFinder extends SqlParser
         $res = parent::parseParameter($condition, $or ? 'OR' : 'AND');
         if (!is_error($res)) {
             if ($or) {
-                $this->conditionOr[] = "({$res['fields']})";
+                $this->conditionOr[] = "{$res['fields']}";
             } else {
-                $this->condition[] = "({$res['fields']})";
+                $this->condition[] = "{$res['fields']}";
             }
             $this->params = array_merge($this->params, $res['params']);
-
             return true;
         } elseif (DEBUG) {
             trigger_error('sqlParser has occurred an error!', E_USER_ERROR);
@@ -188,7 +187,7 @@ class modelObjFinder extends SqlParser
 
             if ($this->conditionOr) {
                 if ($this->condition) {
-                    $sql .= ' AND ' . implode(' OR ', $this->conditionOr);
+                    $sql .= ' AND (' . implode(' OR ', $this->conditionOr) . ')';
                 } else {
                     $sql .= ' WHERE ' . implode(' OR ', $this->conditionOr);
                 }

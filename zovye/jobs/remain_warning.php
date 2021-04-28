@@ -82,7 +82,7 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
 
                 $log['data'] = $notify_data;
 
-                foreach (Util::getNotifyOpenids($agent, 'remainWarning') as $openid) {
+                foreach (Util::getNotifyOpenIds($agent, 'remainWarning') as $openid) {
                     $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $notify_data);
                 }
 

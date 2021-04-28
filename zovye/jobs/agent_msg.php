@@ -55,7 +55,7 @@ if ($op == 'agent_msg' && CtrlServ::checkJobSign(['id' => request('id')])) {
                         continue;
                     }
 
-                    foreach (Util::getNotifyOpenids($agent, 'agentMsg') as $id => $openid) {
+                    foreach (Util::getNotifyOpenIds($agent, 'agentMsg') as $id => $openid) {
                         $data['agent_id'] = $id;
                         if (m('agent_msg')->create($data)) {
                             $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $notify_data);

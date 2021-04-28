@@ -40,7 +40,7 @@ if ($op == 'device_online' && CtrlServ::checkJobSign($data)) {
             //通过微信模板消息给代理商推送消息
             $agent = $device->getAgent();
             if ($agent) {
-                foreach (Util::getNotifyOpenids($agent, 'deviceOnline') as $openid) {
+                foreach (Util::getNotifyOpenIds($agent, 'deviceOnline') as $openid) {
                     $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $data);
                 }
             }

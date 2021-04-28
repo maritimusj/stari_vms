@@ -650,9 +650,9 @@ if ($op == 'account') {
         $tpl_data['build'] = $res['data']['build'] ?: 'n/a';
 
         if ($res['data']['start']) {
-            $tpl_data['formatted_duration'] = Util::getFormattedPeroid($res['data']['start']);
+            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($res['data']['start']);
         } else if ($res['data']['startTime']) {
-            $tpl_data['formatted_duration'] = Util::getFormattedPeroid($res['data']['startTime']);
+            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($res['data']['startTime']);
         }
 
         if ($res['data']['now']) {

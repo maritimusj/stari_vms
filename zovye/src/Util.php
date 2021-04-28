@@ -31,9 +31,9 @@ class Util
     {
         static $config = null;
         if (!isset($config)) {
-            $configfile = ZOVYE_CORE_ROOT . 'config.php';
-            if (file_exists($configfile)) {
-                $config = require_once($configfile);
+            $config_filename = ZOVYE_CORE_ROOT . 'config.php';
+            if (file_exists($config_filename)) {
+                $config = require_once($config_filename);
             } else {
                 $config = _W('config', []);
             }
@@ -296,7 +296,7 @@ class Util
     {
         static $cache = [];
 
-        $log_filename = self::logFileName($name);   
+        $log_filename = self::logFileName($name);
 
         ob_start();
 
@@ -308,8 +308,8 @@ class Util
 
         $cache[$log_filename][] = ob_get_clean();
 
-        register_shutdown_function(function() use($cache) {
-            foreach($cache as $filename => $data) {
+        register_shutdown_function(function () use ($cache) {
+            foreach ($cache as $filename => $data) {
                 if ($filename && $data) {
                     file_put_contents($filename, $data, FILE_APPEND);
                 }
@@ -351,7 +351,7 @@ class Util
     public static function createApiRedirectFile(string $filename, string $do, array $params = [], callable $fn = null)
     {
         We7::mkDirs(dirname(ZOVYE_ROOT . $filename));
-        
+
         $headers = is_array($params['headers']) ? $params['headers'] : [];
         unset($params['headers']);
 
@@ -407,10 +407,10 @@ include './index.php';
     }
 
     /**
-     * 缓存指定函数的调用结果，在指定时间内在重复调用
+     * 缓存指定函数的调用结果，指定时间内不再重复调用
      * @param $interval_seconds
      * @param callable $fn
-     * @param mixed ...$params 用来同一个函数应用了不同的参数的情况
+     * @param mixed ...$params 用来区分同一个函数应用了不同的参数的情况
      * @return mixed
      */
     public static function cachedCall($interval_seconds, callable $fn, ...$params)
@@ -423,7 +423,7 @@ include './index.php';
         }
 
         $result = $fn();
- 
+
         We7::cache_write($key, [
             'time' => time(),
             'v' => $result,
@@ -830,7 +830,7 @@ include './index.php';
         }
 
         if (_W('container') == 'wechat') {
-            $jssdk = Util::fetchJSSDK(false);
+            $jssdk = Util::fetchJSSDK();
             $js = <<<JS1
 {$jssdk}
 <script type="text/javascript">
@@ -919,7 +919,7 @@ HTML_CONTENT;
      *
      * @return array
      */
-    public static function getNotifyOpenids(agentModelObj $agent, string $type): array
+    public static function getNotifyOpenIds(agentModelObj $agent, string $type): array
     {
         $result = [];
 
@@ -1096,7 +1096,7 @@ HTML_CONTENT;
      *
      * @throws
      */
-    public static function getFormattedPeroid($ts): string
+    public static function getFormattedPeriod($ts): string
     {
         $time = (new DateTime())->setTimestamp($ts);
         $interval = (new DateTime())->diff($time);
@@ -1120,14 +1120,15 @@ HTML_CONTENT;
     }
 
     /**
-     * 修正微擎payresult回调时，tomedia函数工作不正常的问题.
+     * 修正微擎payResult回调时，toMedia函数工作不正常的问题.
      *
      * @param $src
+     * @param bool $use_image_proxy
      * @param bool $local_path
      *
      * @return mixed
      */
-    public static function toMedia($src, $use_image_proxy = false, $local_path = false)
+    public static function toMedia($src, $use_image_proxy = false, $local_path = false): string
     {
         if (empty(_W('attachurl'))) {
             We7::load()->model('attachment');
@@ -1193,7 +1194,7 @@ HTML_CONTENT;
         QRcode::png($text, $full_filename, $error_correction_level, $matrix_point_size);
 
         if (file_exists($full_filename)) {
-            if ($cb != null ) {
+            if ($cb != null) {
                 $cb($full_filename);
             }
 
@@ -1225,25 +1226,14 @@ HTML_CONTENT;
         return 'error';
     }
 
+    /**
+     * 下载指定的二维码
+     * @param $url
+     * @return string
+     */
     public static function downloadQRCode($url): string
     {
         return self::download($url, 'download/qrcode/', '{hash}.png');
-    }
-
-    /**
-     * 返回设备错误描述.
-     *
-     * @param $code
-     *
-     * @return string
-     */
-    public static function descDevice($code): string
-    {
-        if (Device::has($code)) {
-            return Device::desc($code);
-        }
-
-        return "未知故障，代码[{$code}]";
     }
 
     /**
@@ -1508,7 +1498,7 @@ HTML_CONTENT;
             $acc = $params['account'];
 
             /** @var orderModelObj $order */
-            $order= $params['order'];
+            $order = $params['order'];
 
             /** @var goods_voucher_logsModelObj $voucher */
             $voucher = $params['voucher'];
@@ -1811,31 +1801,6 @@ HTML_CONTENT;
     }
 
     /**
-     * 根据两点间的经纬度计算距离，返回的单位是米(m)。
-     * from: http://blog.mofeiwo.com/php实现两个坐标之间的距离/.
-     *
-     * @param $lng1
-     * @param $lat1
-     * @param $lng2
-     * @param $lat2
-     *
-     * @return int
-     */
-    public static function calcDistance($lng1, $lat1, $lng2, $lat2)
-    {
-        //将角度转为狐度
-        $radLat1 = deg2rad($lat1); //deg2rad()函数将角度转换为弧度
-        $radLat2 = deg2rad($lat2);
-        $radLng1 = deg2rad($lng1);
-        $radLng2 = deg2rad($lng2);
-        $a = $radLat1 - $radLat2;
-        $b = $radLng1 - $radLng2;
-        return 2 * asin(
-                sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2))
-            ) * 6378.137 * 1000;
-    }
-
-    /**
      * 是否需要对用户进行定位操作.
      * @param userModelObj $user
      * @param deviceModelObj $device
@@ -1871,9 +1836,9 @@ HTML_CONTENT;
         $accounts = [];
 
         //获取多个关注公众号设置
-        $qrcodes = $account->get('qrcodesData', []);
-        if ($qrcodes && is_array($qrcodes)) {
-            $accounts = $qrcodes;
+        $qr_codes = $account->get('qrcodesData', []);
+        if ($qr_codes && is_array($qr_codes)) {
+            $accounts = $qr_codes;
         }
 
         //如果没有开启关注多个公众号，但开启了公众号推广，则加入推广公众号
@@ -2033,6 +1998,7 @@ HTML_CONTENT;
     /**
      * @param string $do
      * @param array $params
+     * @param bool $eid
      * @return mixed
      */
     public static function url($do = '', array $params = [], $eid = true)
@@ -2123,10 +2089,10 @@ HTML_CONTENT;
             );
 
             //设置默认型号
-            $typeid = settings('device.multi-types.first', 0);
-            $device_type = DeviceTypes::get($typeid);
+            $type_id = settings('device.multi-types.first', 0);
+            $device_type = DeviceTypes::get($type_id);
             if (!empty($device_type)) {
-                $data['device_type'] = $typeid;
+                $data['device_type'] = $type_id;
             }
 
             $device = Device::create($data);
@@ -2246,80 +2212,6 @@ HTML_CONTENT;
         return $ids;
     }
 
-    private static function parseResult($line): array
-    {
-        $result = [];
-        $data = explode(',', $line);
-
-        foreach ($data as $entry) {
-            $entry = trim($entry);
-            if (empty($entry)) {
-                continue;
-            }
-
-            if (!isset($result['agent']) && preg_match(REGULAR_MOBILE, $entry)) {
-                $agent = Agent::query(['mobile' => $entry])->findOne();
-                if ($agent) {
-                    $result['agent'] = $agent;
-                    continue;
-                }
-            }
-
-            if (!isset($result['keeper']) && preg_match(REGULAR_MOBILE, $entry)) {
-                $keeper = Keeper::query(['mobile' => $entry])->findOne();
-                if ($keeper) {
-                    $result['keeper'] = $keeper;
-                    continue;
-                }
-            }
-
-            if (!isset($result['device_type']) && is_numeric($entry)) {
-                $device_type = DeviceTypes::get($entry);
-                if ($device_type) {
-                    $result['device_type'] = $device_type;
-                    continue;
-                }
-            }
-
-            $matches = [];
-            if ($res = preg_match_all('/^[abc]{1,3}$/i', $entry, $matches)) {
-                if (!isset($result['screen']) && stripos($matches[0][0], 'a')) {
-                    $result['screen'] = true;
-                }
-                if (!isset($result['disinfectant']) && stripos($matches[0][0], 'b')) {
-                    $result['disinfectant'] = true;
-                }
-                if (!isset($result['battery']) && stripos($matches[0][0], 'c')) {
-                    $result['battery'] = true;
-                }
-                continue;
-            }
-
-            if (!isset($result['imei']) && is_numeric($entry) && strlen($entry) >= 15) {
-                $result['imei'] = $entry;
-                continue;
-            }
-
-            if (!isset($result['uid'])) {
-                $result['uid'] = strval($entry);
-            }
-        }
-
-        return $result;
-    }
-
-    function csvToArray($filename): array
-    {
-        $result = [];
-        if (($handle = fopen($filename, "r")) !== FALSE) {
-            while (($line = fgets($handle)) !== FALSE) {
-                $result[] = self::parseResult($line);
-            }
-            fclose($handle);
-        }
-        return $result;
-    }
-
     public static function descAssignedStatus($assign_data): string
     {
         if (isEmptyArray($assign_data) || (isset($assign_data['all']) && empty($assign_data['all']))) {
@@ -2328,20 +2220,6 @@ HTML_CONTENT;
             return '已分配全部设备';
         }
         return '已指定部分设备';
-    }
-
-    public static function buildUrl($parsed_url): string
-    {
-        $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-        $port = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-        $pass = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
-        $pass = ($user || $pass) ? "$pass@" : '';
-        $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-        $query = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-        return "$scheme$user$pass$host$port$path$query$fragment";
     }
 
     public static function getDeviceAdvs($device_uid, $type, $max_total): array
@@ -2374,30 +2252,12 @@ HTML_CONTENT;
         return $result;
     }
 
-    /**
-     * 获取后台设置的管理员维护公众号
-     */
-    public static function getAdminAccount(): array
-    {
-        $admin_account_name = settings('misc.adminAccount');
-        if ($admin_account_name) {
-            $uid = Account::makeUID($admin_account_name);
-            $account = Account::findOne(['uid' => $uid]);
-            if ($account) {
-                return [
-                    'uid' => $account->getUid(),
-                    'title' => $account->getTitle(),
-                    'descr' => $account->getDescription(),
-                    'img' => strval(Util::toMedia($account->getImg())),
-                    'qrcode' => strval(Util::toMedia($account->getQrcode())),
-                    'clr' => $account->getClr(),
-                    'url' => $account->getUrl(),
-                ];
-            }
-        }
-        return [];
-    }
 
+    /**
+     * 获取指定图片的由压缩服务器代理后的URL
+     * @param $image_url
+     * @return string
+     */
     public static function getImageProxyURL($image_url): string
     {
         if (empty($image_url)) {
@@ -2420,6 +2280,10 @@ HTML_CONTENT;
         return "{$url}{$signStr}/{$image_url}";
     }
 
+    /**
+     * 是否在支付宝APP中
+     * @return bool
+     */
     public static function isAliAppContainer(): bool
     {
         $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
@@ -2435,6 +2299,12 @@ HTML_CONTENT;
         return false;
     }
 
+    /**
+     * 使用GET请求指定API
+     * @param string $url
+     * @param int $timeout
+     * @return string|null
+     */
     public static function get(string $url, int $timeout = 3): ?string
     {
         $ch = curl_init();
@@ -2460,6 +2330,14 @@ HTML_CONTENT;
         return $response;
     }
 
+    /**
+     * 使用POST请求指定URL
+     * @param string $url
+     * @param array $data
+     * @param bool $json
+     * @param int $timeout
+     * @return array
+     */
     public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3): array
     {
         $ch = curl_init();
@@ -2499,11 +2377,19 @@ HTML_CONTENT;
         return isset($result) ? $result : error(State::ERROR, '无法解析返回的数据！');
     }
 
+    /**
+     * 重定向客户端浏览器
+     * @param string $url
+     */
     public static function redirect(string $url)
     {
         header("Location:{$url}", true, 302);
     }
 
+    /**
+     * 返回省份列表
+     * @return string[]
+     */
     public static function getProvinceList(): array
     {
         return [

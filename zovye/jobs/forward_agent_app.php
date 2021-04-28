@@ -36,7 +36,7 @@ if ($op == 'forward_agent_app' && CtrlServ::checkJobSign(['id' => request('id'),
                 $agent = Agent::get($id);
                 if ($agent) {
                     $result = [];
-                    foreach (Util::getNotifyOpenids($agent, 'agentApp') as $openid) {
+                    foreach (Util::getNotifyOpenIds($agent, 'agentApp') as $openid) {
 
                         $res = Wx::sendTplNotice($openid, $tpl_id, $notify_data);
                         $result[] = [

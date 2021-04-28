@@ -36,7 +36,7 @@ if ($op == 'adv_review_result' && CtrlServ::checkJobSign(['id' => request('id')]
         if ($agent) {
             $log['agent'] = $agent->getName();
 
-            foreach (Util::getNotifyOpenids($agent, 'reviewResult') as $openid) {
+            foreach (Util::getNotifyOpenIds($agent, 'reviewResult') as $openid) {
                 $res = Wx::sendTplNotice(
                     $openid,
                     $tpl_id,

@@ -20,7 +20,7 @@ class we7HttpClient implements IHttpClient
      * @param int $timeout
      * @return mixed
      */
-    public function request(string $url, string $method = 'GET', $headers = '', $data = '', $timeout = 120)
+    public function request(string $url, string $method = 'GET', $headers = '', $data = '', $timeout = 60)
     {
         $extra = [
             'CURLOPT_CUSTOMREQUEST' => $method,

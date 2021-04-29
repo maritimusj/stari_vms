@@ -82,9 +82,6 @@ if ($op === 'create') {
         JSON::fail('创建支付任务失败！');
     }
 
-    //显示出货动画
-    $device->showFakeQrcode();
-
     $data['orderNO'] = $order_no;
 
     JSON::success($data);
@@ -112,13 +109,6 @@ if ($op === 'create') {
 
     $pay_log = Pay::getPayLog($order_no);
     if ($pay_log) {
-        $order_data = $pay_log->getData('orderData');
-
-        //恢复屏幕二维码
-        $device = Device::find($order_data['deviceId'], ['id', 'imei', 'shadow_id']);
-        if ($device) {
-            $device->hideFakeQrcode();
-        }
 
         $pay_log->setData('cancelled', ['createtime' => time()]);
         $pay_log->save();

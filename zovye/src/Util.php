@@ -1466,9 +1466,6 @@ HTML_CONTENT;
             return error(State::FAIL, '商品货道配置不正确');
         }
 
-        //让设备显示出货提示
-        $device->showFakeQrcode(true);
-
         $log_data = [
             'user' => $user->profile(),
             'goods' => $goods,

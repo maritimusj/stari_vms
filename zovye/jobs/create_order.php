@@ -138,9 +138,6 @@ function prepare(string $order_no)
     //事件：设备已锁定
     EventBus::on('device.locked', $eventData);
 
-    //让设备显示出货提示
-    $device->showFakeQrcode(true);
-
     $log_data = [
         'user' => $user->profile(),
         'goods' => $goods,

@@ -1640,35 +1640,6 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 通知app显示出货动画
-     * @param bool $auto_hide
-     * @return bool
-     */
-    public function showFakeQrcode(bool $auto_hide = false): bool
-    {
-        $result = $this->isActiveQrcodeEnabled() && $this->set('fakeQrcodeData', time()) && $this->appNotify('fakeQrcode');
-        if ($result && $auto_hide) {
-            //脚本结束后通知设备恢复二维码
-            register_shutdown_function(function () {
-                $this->hideFakeQrcode();
-            });
-        }
-        return $result;
-    }
-
-    /**
-     * 如果设备已显示出货动画，则隐藏动画并更新二维码
-     * @return bool
-     */
-    public function hideFakeQrcode(): bool
-    {
-        if ($this->has('fakeQrcodeData')) {
-            return $this->remove('fakeQrcodeData') && $this->updateQrcode();
-        }
-        return true;
-    }
-
-    /**
      * 通知mcb更新配置
      * @param $code
      * @param array $data

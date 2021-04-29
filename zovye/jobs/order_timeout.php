@@ -40,15 +40,6 @@ if ($op == 'order_timeout' && CtrlServ::checkJobSign(['orderNO' => $order_no])) 
                     $pay_log->setData('timeout', ['createtime' => time()]);
                     $pay_log->save();
                 }
-
-                $order_data = $data['orderData'];
-                //恢复屏幕二维码
-                $device = Device::get($order_data['deviceId']);
-                if ($device) {
-                    $device->hideFakeQrcode();
-                    $log['updateQrcode'] = $device->getName();
-                }
-
                 $log['data'] = $data;
                 return Util::logToFile('order_timeout', $log);
             }

@@ -86,9 +86,6 @@ function process($order_no)
         throw new Exception('订单已经存在！');
     }
 
-    //让设备显示出货提示
-    $device->showFakeQrcode(true);
-
     //事件：设备已锁定
     EventBus::on('device.locked', [
         'device' => $device,

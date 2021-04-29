@@ -19,6 +19,7 @@ use zovye\model\pay_logsModelObj;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
+use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\getArray;
 use function zovye\is_error;
@@ -31,7 +32,19 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
     try {
         process($order_no);
     } catch (ExceptionNeedsRefund $e) {
-        refund($order_no, $e->getNum(), $e->getDevice(), $e->getMessage());
+        $device = $e->getDevice();
+        if ($device) {
+            refund($order_no, $e->getNum(), $device, $e->getMessage());
+        }
+    } catch (ZovyeException $e) {
+        $device = $e->getDevice();
+        if ($device) {
+            $device->appShowMessage($e->getMessage(), 'error');
+        }
+        Util::logToFile('order_create_multi', [
+            'orderNO' => $order_no,
+            'error' => $e->getMessage(),
+        ]);
     } catch (Exception $e) {
         Util::logToFile('order_create_multi', [
             'orderNO' => $order_no,
@@ -154,10 +167,12 @@ function process($order_no)
 
             ExceptionNeedsRefund::throwWithN($device, $total - $success, '部分商品出货失败！');
 
-        } else {
-            $order->setExtraData('pull.result', ['message' => '出货完成！']);
-            $order->save();
         }
+
+        $order->setExtraData('pull.result', ['message' => '出货完成！']);
+        $order->save();
+
+        $device->appShowMessage('出货完成，欢迎下次使用！');
     }
 }
 
@@ -328,7 +343,12 @@ function refund(string $order_no, int $num, deviceModelObj $device, string $reas
                 'msg' => '启动退款任务！',
                 'error' => $result,
             ]);
+            $device->appShowMessage('退款失败，请联系客服，谢谢！', 'error');
+        } else {
+            $device->appShowMessage('正在退款，请稍后再试，谢谢！', 'error');
         }
+    } else {
+        $device->appShowMessage($reason, 'error');
     }
 }
 

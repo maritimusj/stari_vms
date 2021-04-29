@@ -17,6 +17,7 @@ use zovye\Order;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
+use zovye\ZovyeException;
 use function zovye\is_error;
 
 $account_id = request::str('account');
@@ -38,33 +39,33 @@ $params = [
 $op = request::op('default');
 
 if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
-
     try {
+        /** @var deviceModelObj $device */
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            ZovyeException::throwWith('找不到指定的设备:' . $device_id, -1);
+        }
+
         /** @var userModelObj $user */
         $user = User::get($user_id);
         if (empty($user) || $user->isBanned()) {
-            throw new RuntimeException('找不到指定的用户或者已禁用!');
+            ZovyeException::throwWith('找不到指定的用户或者已禁用!', -1, $device);
         }
 
         if (!$user->lock()) {
-            throw new RuntimeException('用户锁定失败!');
+            ZovyeException::throwWith('用户锁定失败!', -1, $device);
         }
 
         $account = Account::get($account_id);
         if (empty($account)) {
-            throw new RuntimeException('找不到指定公众号！');
+            ZovyeException::throwWith('找不到指定公众号！', -1, $device);
         }
 
-        /** @var deviceModelObj $device */
-        $device = Device::get($device_id);
-        if (empty($device)) {
-            throw new RuntimeException('找不到指定的设备:' . $device_id);
-        }
 
         if (!empty($order_uid)) {
             $order = Order::get($order_uid, true);
             if ($order && $order->getResultCode() == 0) {
-                throw new RuntimeException('订单已经存在！');
+                ZovyeException::throwWith('订单已经存在！', -1, $device);
             }
         }
 
@@ -72,17 +73,17 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             //检查用户是否允许
             $res = Util::isAvailable($user, $account, $device);
             if (is_error($res)) {
-                throw new RuntimeException('无法领取:' . $res['message']);
+                ZovyeException::throwWith($res['message'], $device);
             }
         }
 
         $goods = empty($goods_id) ? $device->getGoodsByLane(0) : $device->getGoods($goods_id);
         if (empty($goods)) {
-            throw new RuntimeException('找不到商品！');
+            ZovyeException::throwWith('找不到商品！', -1, $device);
         }
 
         if ($goods['num'] < 1) {
-            throw new RuntimeException('商品数量不足！');
+            ZovyeException::throwWith('商品数量不足！', -1, $device);
         }
 
         $data = [
@@ -103,12 +104,22 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             $data[] = $order;
         }
 
-        $result = Util::openDevice($data);
+        try {
 
-        $params['result'] = $result;
+            $result = Util::openDevice($data);
+            $params['result'] = $result;
 
-    } catch (Exception $e) {
+        } catch (Exception $e) {
+            ZovyeException::throwWith($e->getMessage(), $e->getCode(), $device);
+        }
+
+    } catch (ZovyeException $e) {
         $params['error'] = $e->getMessage();
+
+        $device = $e->getDevice();
+        if ($device) {
+            $device->appShowMessage($e->getMessage(), 'error');
+        }
     }
 } else {
     $params['error'] = '参数签名检验失败！';

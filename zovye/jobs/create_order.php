@@ -25,6 +25,7 @@ use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
+use zovye\ZovyeException;
 use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
@@ -36,24 +37,36 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
     try {
         prepare($order_no);
     } catch (ExceptionNeedsRefund $e) {
-        $refund = Helper::NeedAutoRefund($e->getDevice());
+        $device = $e->getDevice();
+        $refund = Helper::NeedAutoRefund($device);
         if ($refund) {
             $res = Job::refund($order_no, $e->getMessage());
             if (empty($res) || is_error($res)) {
+                $device->appShowMessage('退款失败，请联系客服，谢谢！');
                 return Util::logToFile('order_create', [
                     'orderNO' => $order_no,
                     'msg' => '启动退款任务！',
                     'error' => $res,
                 ]);
+            } else {
+                $device->appShowMessage('正在退款，请稍后再试，谢谢！');
             }
         }
-
         return Util::logToFile('order_create', [
             'orderNO' => $order_no,
             'refund' => $refund,
             'error' => $e->getMessage(),
         ]);
 
+    } catch (ZovyeException $e) {
+        $device = $e->getDevice();
+        if ($device) {
+            $device->appShowMessage($e->getMessage(), 'error');
+        }
+        Util::logToFile('order_create_multi', [
+            'orderNO' => $order_no,
+            'error' => $e->getMessage(),
+        ]);
     } catch (Exception $e) {
         return Util::logToFile('order_create', [
             'orderNO' => $order_no,
@@ -329,7 +342,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
             $voucher->setUsedUserId($user->getId());
             $voucher->setUsedtime(time());
             if (!$voucher->save()) {
-                return [error(State::ERROR, '出货失败：使用取货码失败！'), null];
+                return [error(State::ERROR, '使用取货码失败！'), null];
             }
         }
     }

@@ -59,12 +59,13 @@ try {
 
     //出货流程，EventBus会抛出异常
     $result = Util::openDevice(['level' => LOG_GOODS_GETX, $device, $user, $account, 'goodsId' => $goods_id, 'online' => false]);
-
     if (is_error($result)) {
         $response = [
             'text' => $result['errno'] > 0 ? '请重试' : '领取失败',
             'msg' => $result['message'],
         ];
+
+        $device->appShowMessage('出货失败，请稍后再试！', 'error');
 
         //失败转跳
         $url = $device->getRedirectUrl('fail')['url'];
@@ -74,6 +75,8 @@ try {
 
         JSON::fail($response);
     }
+
+    $device->appShowMessage('出货成功，欢迎下次使用！');
 
     $response = [
         'ok' => $result['orderid'] ? 1 : 0,
@@ -101,6 +104,9 @@ try {
 
     $response = ['text' => '领取失败', 'msg' => $e->getMessage()];
     if (isset($device)) {
+
+        $device->appShowMessage('出货失败，请稍后再试！', 'error');
+
         //失败转跳
         $url = $device->getRedirectUrl('fail')['url'];
         if (!empty($url)) {

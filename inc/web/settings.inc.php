@@ -175,8 +175,29 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
 
-        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;        
+        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0; 
 
+        $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
+        if ($settings['app']['first']['enabled']) {
+            $module_url =  str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
+            $files = [
+                [
+                    'filename' => IA_ROOT . '/index.php',
+                    'content' =>"<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();"
+                ],
+                [
+                    'filename' => IA_ROOT . '/framework/bootstrap.inc.php',
+                    'append' => true,
+                    'content' => "\r\n\r\n\$_GPC['referer'] = '{$module_url}';"
+                ],
+            ];            
+            foreach($files as $file) {
+                $content = file_get_contents($file['filename']);
+                if ($content && stripos($content, $module_url) === false) {
+                    file_put_contents($file['filename'], $file['content'], $file['append'] ? FILE_APPEND : 0);
+                }    
+            }
+        }
     } elseif ($save_type == 'agent') {
         $settings['agentWxapp'] = [
             'key' => request::trim('WxAppKey'),
@@ -809,7 +830,6 @@ if ($op == 'account') {
         }
     }
 
-
     $res = CtrlServ::v2_query('idcard/balance');
     $tpl_data['idcard_balance'] = 0;
 
@@ -820,9 +840,11 @@ if ($op == 'account') {
     }
 
 } elseif ($op == 'advs') {
+
     if ($settings['custom']['SQMPay']['enabled']) {
         $tpl_data['cbURL'] = SQM::getCallbackUrl();
     }    
+
 } elseif ($op == 'notice') {
 
     if ($settings['notice']['reviewAdminUserId']) {

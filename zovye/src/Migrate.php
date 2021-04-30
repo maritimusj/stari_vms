@@ -10,7 +10,7 @@ class Migrate
 {
     public static function execSQL($sql)
     {
-        $prefix = Util::config('db.master.tablepre');
+        $prefix = Util::config('db.master.tablepre') ?: Util::config('db.tablepre');
         $tb_name = APP_NAME;
 
         $sql = preg_replace('/ims_/', $prefix, $sql);

@@ -391,11 +391,11 @@ if ($op == 'default') {
 
         $mobile = request::trim('mobile');
         if (empty($mobile) || !preg_match(REGULAR_MOBILE, $mobile)) {
-            Util::itoast('手机号码无效！', $this->createWebUrl('agent', ['op' => 'create', 'id' => $id]), 'error');
+            Util::itoast('手机号码无效！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
         }
 
         if (User::findOne(['mobile' => $mobile, 'id <>' => $user->getId()])) {
-            Util::itoast('手机号码已经被其它用户使用！', $this->createWebUrl('agent', ['op' => 'create', 'id' => $id]), 'error');
+            Util::itoast('手机号码已经被其它用户使用！',  $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
         }
 
         $name = request::trim('name');
@@ -411,7 +411,7 @@ if ($op == 'default') {
         if ($openid_s) {
             $superior = Agent::get($openid_s, true);
             if (empty($superior) || !$superior->isAgent() || $superior->getId() == $user->getId()) {
-                Util::itoast('请选择正确的上级用户！', $this->createWebUrl('agent', ['op' => 'edit', 'id' => $id]), 'error');
+                Util::itoast('请选择正确的上级用户！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
             }
 
             if ($superior->getId() != $user->getSuperiorId()) {
@@ -629,11 +629,11 @@ if ($op == 'default') {
         } else {
             //使用控制中心推送通知
             Job::newAgent($user->getId());
-            Util::itoast('代理商设置成功！', $this->createWebUrl('agent', ['op' => 'edit', 'id' => $id]), 'success');
+            Util::itoast('代理商设置成功！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'success');
         }
     }
 
-    Util::itoast('保存失败！', $this->createWebUrl('agent', ['op' => request('from'), 'id' => $id]), 'error');
+    Util::itoast('保存失败！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
 } elseif ($op == 'enableSQB') {
 
     $agent = Agent::get(request::int('id'));

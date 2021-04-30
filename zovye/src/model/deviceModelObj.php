@@ -780,17 +780,16 @@ class deviceModelObj extends modelObj
         return false;
     }
 
-    public function appShowMessage($msg, $type = 'success', $duration = 6): bool
+    public function appShowMessage($msg, $type = 'success'): bool
     {
-        if ($this->app_id) {
-            return CtrlServ::appNotify($this->app_id, 'message', [
-                'msg' => $msg,
-                'type' => $type,
-                'duration' => $duration * 1000,
-            ]);
-        }
-
-        return false;
+        return $this->appNotify('message', [
+            'content' => $msg,
+            'type' => $type,
+            'style' => [
+                'background' => '#ff0000',
+                'text' => '#ffffff'
+            ],
+        ]);
     }
 
     /**

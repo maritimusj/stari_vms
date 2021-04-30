@@ -11,8 +11,25 @@ class Job
         exit(CtrlServ::HANDLE_OK);
     }
 
-    public static function refund($order_no, $message, $num = 0, $reset_payload = false): bool
+    /**
+     * 启动一个退款任务，如果订单符合退款条件，就会发起退款操作
+     * @param $order_no
+     * @param $message
+     * @param int $num 退货数量，0表示全部
+     * @param false $reset_payload
+     * @param int $delay 指定时间后才开始检查
+     * @return bool
+     */
+    public static function refund($order_no, $message, $num = 0, $reset_payload = false, $delay = 0): bool
     {
+        if ($delay > 0) {
+            return CtrlServ::scheduleDelayJob('refund', [
+                'orderNO' => $order_no,
+                'num' => $num,
+                'reset' => $reset_payload,
+                'message' => urlencode($message),
+            ], $delay);
+        }
         return CtrlServ::scheduleJob('refund', [
             'orderNO' => $order_no,
             'num' => $num,

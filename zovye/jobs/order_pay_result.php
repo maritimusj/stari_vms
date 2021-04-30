@@ -46,6 +46,9 @@ if ($op == 'order_pay_result' && CtrlServ::checkJobSign(['orderNO' => $order_no,
         if (time() - $start < 30) {
             //重新加入一个支付结果检查任务
             $log['job schedule'] = Job::orderPayResult($order_no, $start);
+        } else {
+            //5分钟检查订单并执行退款
+            Job::refund($order_no, '获取支付结果失败，订单超时！', 0, false, 300);
         }
         $log['error'] = $res;
         writeLogAndExit($log);

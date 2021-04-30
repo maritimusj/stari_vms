@@ -46,8 +46,6 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
                 'type' => get_class($e),
                 'code' => $e->getCode(),
                 'msg' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
             ];
         }
         return Util::logToFile('refund', $log);

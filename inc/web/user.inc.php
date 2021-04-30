@@ -107,7 +107,13 @@ if ($op == 'default') {
         $query->where(['app' => $types]);
     }
 
-    $total = $query->count();
+    $query->orderBy('id desc');
+
+    //使用自增长id做为总数，数据量大时使用$query->count()效率太低，
+    //注意：需要先调用$query->orderBy('id desc'); 
+    $last = $query->findOne();
+    $total = $last ? $last->getId() : 0;
+
     if ($page > ceil($total / $page_size)) {
         $page = 1;
     }
@@ -115,8 +121,7 @@ if ($op == 'default') {
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
     $query->page($page, $page_size);
-    $query->orderBy('id desc');
-
+   
     $users = [];
     /** @var  users_vwModelObj $user */
     foreach ($query->findAll() as $user) {

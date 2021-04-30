@@ -598,7 +598,7 @@ if ($op == 'default') {
     }
 
     $all_headers = getHeaders();
-    $column = array_values(array_intersect_key($all_headers, array_flip($headers)));
+    $column = array_values(array_intersect_key($all_headers, array_flip($headers)));    
     Util::exportExcel('order', $column, $result);
 } elseif ($op == 'log') {
 
@@ -607,7 +607,11 @@ if ($op == 'default') {
 
     $query = m('user_logs')->where(['level' => LOG_PAY])->orderBy('id DESC');
 
-    $total = $query->count();
+    //使用自增长id做为总数，数据量大时使用$query->count()效率太低，
+    //注意：需要先调用$query->orderBy('id desc'); 
+    $last = $query->findOne();
+    $total = $last ? $last->getId() : 0;
+    
     if (ceil($total / $page_size) < $page) {
         $page = 1;
     }

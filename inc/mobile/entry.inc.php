@@ -175,8 +175,7 @@ if ($user->isBanned()) {
 if (App::isUserVerify18Enabled()) {
     if(!$user->isIDCardVerified()) {
         $this->showTemplate(Theme::file('verify_18'), [
-            'tpl' => '',
-            'verify18' => $verify18,
+            'verify18' => settings('user.verify_18', []),
             'entry_url' => $this->createMobileUrl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
         ]);
     }

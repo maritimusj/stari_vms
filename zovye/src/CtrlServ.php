@@ -145,13 +145,37 @@ class CtrlServ
                 }
             }
 
-            $headers['zovye-key'] = $appKey;
-            $headers['zovye-sign'] = self::makeCtrlServerSign(settings('ctrl.appKey', ''), settings('ctrl.appSecret', ''), $params['nostr']);
+            if ($version == 'v1') {
+                $sign = self::makeCtrlServerSignV1($method, $params);
+
+                $headers['llt-appkey'] = $appKey;
+                $headers['llt-sign'] = $sign;
+            } else {
+                $headers['zovye-key'] = $appKey;
+                $headers['zovye-sign'] = self::makeCtrlServerSign(settings('ctrl.appKey', ''), settings('ctrl.appSecret', ''), $params['nostr']);                
+            }
 
             return self::$http_client->request($ctrlServerUrl, $method, $headers, $body);
         }
 
         return error(State::ERROR, '没有配置请求对象！');
+    }
+
+    /**
+     * 生成控制中心通信签名
+     * @param $method
+     * @param array $params
+     * @return string
+     */
+    public static function makeCtrlServerSignV1($method, array $params): string
+    {
+        $params['appkey'] = settings('ctrl.appKey');
+        $params['appsecret'] = settings('ctrl.appSecret');
+        $params['method'] = $method;
+
+        ksort($params);
+
+        return sha1(strtolower(http_build_query($params)));
     }
 
     /**

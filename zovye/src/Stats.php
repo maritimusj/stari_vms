@@ -615,7 +615,7 @@ class Stats
         $data['all']['f'] = $query->count();
 
         $today = strtotime('today');
-        $data['today']['f'] = $query->resetAll()->where(['createtime >=' => strtotime('today')])->count();
+        $data['today']['f'] = $query->resetAll()->where(['createtime >=' => $today])->count();
 
         $yesterday = strtotime('yesterday');
         $data['yesterday']['f'] = $query->resetAll()->where(['createtime >=' => $yesterday, 'createtime <' => $today])->count();
@@ -632,9 +632,7 @@ class Stats
         $total = [
             'device' => Device::query()->count(),
             'agent' => Agent::query()->count(),
-            'advs' => Account::query(['state' => 1])->count() + Advertising::query(
-                    ['state <>' => Advertising::DELETED]
-                )->count(),
+            'advs' => Account::query(['state' => 1])->count() + Advertising::query(['state <>' => Advertising::DELETED])->count(),
             'user' => User::query()->count(),
         ];
 

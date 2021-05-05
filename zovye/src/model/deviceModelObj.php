@@ -780,15 +780,30 @@ class deviceModelObj extends modelObj
         return false;
     }
 
-    public function appShowMessage($msg, $type = 'success'): bool
+    public function appShowMessage($msg, $type = 'success', $style = null): bool
     {
+        static $styles = [
+            'success' => [
+                'background' => '#67C23A',
+                'text' => '#ffffff'
+            ],
+            'warn' => [
+                'background' => '#E6A23C',
+                'text' => '#ffffff'
+            ],
+            'error' => [
+                'background' => '#F56C6C',
+                'text' => '#ffffff'
+            ],
+            'info' => [
+                'background' => '#409EFF',
+                'text' => '#ffffff'
+            ],
+        ];
         return $this->appNotify('message', [
             'content' => $msg,
             'type' => $type,
-            'style' => [
-                'background' => '#ff0000',
-                'text' => '#ffffff'
-            ],
+            'style' => isset($style) ? $style : $styles[$style],
         ]);
     }
 

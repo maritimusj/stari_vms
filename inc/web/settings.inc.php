@@ -188,7 +188,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 [
                     'filename' => IA_ROOT . '/framework/bootstrap.inc.php',
                     'append' => true,
-                    'content' => "\r\n\r\n\$_GPC['referer'] = '{$module_url}';"
+                    'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '{$module_url}';\r\n}"
                 ],
             ];            
             foreach($files as $file) {

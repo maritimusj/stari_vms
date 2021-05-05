@@ -666,18 +666,19 @@ if ($op == 'account') {
 
     $res = CtrlServ::query();
     if (!is_error($res)) {
+        $data = empty($res['data']) ? $res : $res['data'];
 
-        $tpl_data['version'] = $res['data']['version'] ?: 'n/a';
-        $tpl_data['build'] = $res['data']['build'] ?: 'n/a';
+        $tpl_data['version'] = $data['version'] ?: 'n/a';
+        $tpl_data['build'] = $data['build'] ?: 'n/a';
 
-        if ($res['data']['start']) {
-            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($res['data']['start']);
-        } else if ($res['data']['startTime']) {
-            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($res['data']['startTime']);
+        if ($data['start']) {
+            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['start']);
+        } else if ($data['startTime']) {
+            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['startTime']);
         }
 
-        if ($res['data']['now']) {
-            $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($res['data']['now'])->format("Y-m-d H:i:s");
+        if ($data['now']) {
+            $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
     }
 } elseif ($op == 'unlock') {

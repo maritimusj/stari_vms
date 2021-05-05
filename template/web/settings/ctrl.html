@@ -16,14 +16,18 @@
                         <span>程序版本</span>
                         <span title="build date: {$build}" class="duration">{$version}</span>
                     </div>
+                    {if $formatted_now}
                     <div class="page_item">
                         <span>当前时间</span>
                         <span class="duration">{php echo $formatted_now ?: 'n/a'}</span>
                     </div>
+                    {/if}
+                    {if $formatted_duration}
                     <div class="page_item">
                         <span>运行时长</span>
                         <span class="duration">{php echo $formatted_duration ?: 'n/a'}</span>
                     </div>
+                    {/if}
                 </div>
                 <div class="seg-divider"></div>
                 <div class="form-group">

@@ -499,15 +499,18 @@ class agent
             $device->setDeviceType($type_id);
         }
 
-        $type_data = isset($device_type) ? DeviceTypes::format($device_type) : [];
-        $extra['cargo_lanes'] = [];
-        $prices = request::array('price');
-        $num = request::array('num');
-        foreach ($type_data['cargo_lanes'] as $index => $lane) {
-            $extra['cargo_lanes']["l{$index}"] = [
-                'price' => intval($prices[$index]),
-                'num' => max(0, intval($num[$index])),
-            ];
+        //如果是自定义型号
+        if ($device->getDeviceType() == 0) {
+            $type_data = isset($device_type) ? DeviceTypes::format($device_type) : [];
+            $extra['cargo_lanes'] = [];
+            $prices = request::array('price');
+            $num = request::array('num');
+            foreach ($type_data['cargo_lanes'] as $index => $lane) {
+                $extra['cargo_lanes']["l{$index}"] = [
+                    'price' => intval($prices[$index]),
+                    'num' => max(0, intval($num[$index])),
+                ];
+            }
         }
 
         //修改位置信息

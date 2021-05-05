@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use DateTime;
 use Exception;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -575,7 +576,6 @@ class Stats
 
         $stats = $entry->get('statsData', []);
         if ($stats) {
-
             $y = date('Y'); //年
             $n = date('n'); //月
             //$z = date('z'); //一年中的第几天
@@ -612,28 +612,41 @@ class Stats
         }
 
         $query = User::query();
-        $data['all']['f'] = $query->count();
+
+        $lastUser = $query->orderBy('id desc')->findOne();
+        $data['all']['f'] = $lastUser ? $lastUser->getId() : 0;
 
         $today = strtotime('today');
         $data['today']['f'] = $query->resetAll()->where(['createtime >=' => $today])->count();
+       
+        $data['yesterday']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function() use ($query, $today) {
+            $yesterday = strtotime('yesterday');
+            return $query->resetAll()->where([
+                'createtime >=' => $yesterday, 
+                'createtime <' => $today,
+            ])->count();
+        });
 
-        $yesterday = strtotime('yesterday');
-        $data['yesterday']['f'] = $query->resetAll()->where(['createtime >=' => $yesterday, 'createtime <' => $today])->count();
-
-        $last7days = strtotime(date('Y-m-d 00:00:00', strtotime('-7 days')));
-        $data['last7days']['f'] = $query->resetAll()->where(['createtime >=' => $last7days])->count();
+        $data['last7days']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function() use($query) {
+            $last7days = strtotime(date('Y-m-d 00:00:00', strtotime('-7 days')));
+            return $query->resetAll()->where(['createtime >=' => $last7days])->count();
+        });
 
         $month = strtotime(date('Y-m-01 00:00:00'));
-        $data['month']['f'] = $query->resetAll()->where(['createtime >=' => $month])->count();
+        $data['month']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function() use ($query, $month) {            
+            return $query->resetAll()->where(['createtime >=' => $month])->count();
+        });
 
-        $lastmonth = strtotime(date('Y-m-01 00:00:00', strtotime('-1 month')));
-        $data['lastmonth']['f'] = $query->resetAll()->where(['createtime >=' => $lastmonth, 'createtime <' => $month])->count();
+        $data['lastmonth']['f'] = Util::cachedCallUtil(new DateTime('first day of next month 00:00:00'), function() use ($query, $month) {
+            $lastmonth = strtotime(date('Y-m-01 00:00:00', strtotime('-1 month')));
+            return $query->resetAll()->where(['createtime >=' => $lastmonth, 'createtime <' => $month])->count();
+        });
 
         $total = [
             'device' => Device::query()->count(),
             'agent' => Agent::query()->count(),
             'advs' => Account::query(['state' => 1])->count() + Advertising::query(['state <>' => Advertising::DELETED])->count(),
-            'user' => User::query()->count(),
+            'user' => intval($data['all']['f']),
         ];
 
         return [

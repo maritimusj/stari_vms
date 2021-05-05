@@ -11,6 +11,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use ali\aop\request\AlipayUserInfoShareRequest;
 use DateTime;
+use DateTimeInterface;
 use Exception;
 use QRcode;
 use RuntimeException;
@@ -415,7 +416,7 @@ include './index.php';
      */
     public static function cachedCall($interval_seconds, callable $fn, ...$params)
     {
-        $key = App::uid(6) . hashFN($fn, ...$params);
+        $key = App::uid(6) . 'delay' . hashFN($fn, ...$params);
 
         $last = We7::cache_read($key);
         if ($last && is_array($last) && time() - intval($last['time']) < $interval_seconds) {
@@ -426,6 +427,25 @@ include './index.php';
 
         We7::cache_write($key, [
             'time' => time(),
+            'v' => $result,
+        ]);
+
+        return $result;
+    }
+
+    public static function cachedCallUtil($expired, callable $fn, ...$params)
+    {
+        $key = App::uid(6) . 'expired' . hashFN($fn, ...$params);
+
+        $data = We7::cache_read($key);
+        if ($data && is_array($data) && time() <= intval($data['time'])) {
+            return $data['v'];
+        }
+
+        $result = $fn();
+
+        We7::cache_write($key, [
+            'time' => $expired instanceof DateTimeInterface ? $expired->getTimestamp() : intval($expired),
             'v' => $result,
         ]);
 

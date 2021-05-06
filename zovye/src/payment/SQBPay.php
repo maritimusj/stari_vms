@@ -3,6 +3,7 @@
 namespace zovye\payment;
 
 use SQB\pay;
+use zovye\App;
 use zovye\Contract\IPay;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -33,7 +34,35 @@ class SQBPay implements IPay
 
     public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
     {
-        return err('不支持小程序支付！');
+        $SQB = $this->getSQB();
+        $notify_url = _W('siteroot');
+        $path = 'addons/' . APP_NAME . '/';
+
+        if (mb_strpos($notify_url, $path) === false) {
+            $notify_url .= $path;
+        }
+
+        if (App::isAliUser()) {
+            $notify_url .= 'payment/alixapp.php';
+        } else {
+            $notify_url .= 'payment/SQB.php';
+        }
+
+        $res = $SQB->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
+
+        Util::logToFile('xapppay', [
+            'params' => [
+                'user_uid' => $user_uid,
+                'order_no' => $order_no,
+                'price' => $price,
+                'device_uid' => $device_uid,
+                'body' => $body,
+                'notify_url' => $notify_url,
+            ],
+            'res' => $res,
+        ]);
+
+        return $res['wap_pay_request'];
     }
 
     public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')

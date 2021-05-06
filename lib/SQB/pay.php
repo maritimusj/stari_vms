@@ -3,6 +3,7 @@
 namespace SQB;
 
 use we7\ihttp;
+use zovye\App;
 use zovye\State;
 use function zovye\err;
 use function zovye\error;
@@ -86,8 +87,39 @@ fwIDAQAB
         ]);
     }
 
+    public function xAppPay($user_uid, $order_no, $amount, $device_uid, $desc = '', $notify_url = '')
+    {
+        $params = [];
+        $params['terminal_sn'] = $this->config['sn'];       //收钱吧终端ID
+        $params['client_sn'] = $order_no;                    //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
+        $params['total_amount'] = "{$amount}";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
+
+        if (App::isAliUser()) {
+            $params['payway'] = '2';
+        } elseif (App::isWxUser()) {
+            $params['payway'] = '3';
+        } else {
+            return err('支付环境不支持！');
+        }
+
+        $params['sub_payway'] = '4'; //小程序支付请传'4'
+        $params['payer_uid'] = $user_uid;
+        $params['subject'] = $desc;
+        $params['operator'] = 'sys';
+
+        if (!empty($notify_url)) {
+            $params['notify_url'] = $notify_url;
+        }
+
+        $params['reflect'] = $device_uid;
+
+        $path = '/upay/v2/precreate';
+        return $this->requestApi("{$this->api}{$path}", $params);
+    }
+
     public function wapApiPro($orderNO, $amount, $deviceUID, $desc = '', $notifyURL = '', $returnURL = ''): string
     {
+        $params = [];
         $params['terminal_sn'] = $this->config['sn'];       //收钱吧终端ID
         $params['client_sn'] = $orderNO;                    //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
         $params['total_amount'] = "{$amount}";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账

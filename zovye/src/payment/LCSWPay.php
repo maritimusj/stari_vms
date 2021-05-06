@@ -74,7 +74,7 @@ class LCSWPay implements IPay
 
         $res = $lcsw->xAppPay($params);
 
-        Util::logToFile('xapppay', [
+        Util::logToFile('lcsw_xapppay', [
             'params' => $params,
             'res' => $res,
         ]);

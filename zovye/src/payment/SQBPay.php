@@ -50,7 +50,7 @@ class SQBPay implements IPay
 
         $res = $SQB->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
 
-        Util::logToFile('xapppay', [
+        Util::logToFile('sqb_xapppay', [
             'params' => [
                 'user_uid' => $user_uid,
                 'order_no' => $order_no,
@@ -62,7 +62,11 @@ class SQBPay implements IPay
             'res' => $res,
         ]);
 
-        return $res['wap_pay_request'];
+        if ($res['result_code'] !== 'PRECREATE_SUCCESS') {
+            return err($res['error_message']);
+        }
+
+        return is_array($res['data']['wap_pay_request']) ? $res['data']['wap_pay_request'] : [];
     }
 
     public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')

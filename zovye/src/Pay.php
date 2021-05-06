@@ -68,10 +68,12 @@ class Pay
         if (is_error($pay)) {
             return $pay;
         }
+
         list($order_no,) = self::prepareDataWithPay($pay->getName(), $device, $user, $goods, $pay_data);
         if (is_error($order_no)) {
             return ['', $order_no];
         }
+
         return [$pay, $order_no];
     }
 

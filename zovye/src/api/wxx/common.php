@@ -1187,6 +1187,7 @@ class common
 
     public static function doUserLogin($res): array
     {
+        Util::logToFile("user", $res);
         $openid = strval($res['openId']);
         $user = User::get($openid, true, User::WxAPP);
         if (empty($user)) {

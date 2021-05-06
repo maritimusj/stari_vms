@@ -26,10 +26,14 @@ class common
         $iv = request::str('iv');
         $encrypted_data = request::str('encryptedData');
 
+        if (empty($code) || empty($iv) || empty($encrypted_data)) {
+            return error(State::ERROR, '缺少必要的请求参数！');
+        }
+
+        $config = settings('agentWxapp', []);
+
         $vendorUID = request::trim('vendor');
-        if ($vendorUID == 'v1') {
-            $config = settings('agentWxapp', []);
-        } else {
+        if (!empty($vendorUID) && $vendorUID != 'v1' && $vendorUID != $config['key']) {
             $app = WxApp::get($vendorUID, true);
             if (empty($app)) {
                 return error(State::ERROR, '找不到指定的小程序配置！');
@@ -42,10 +46,6 @@ class common
 
         if (empty($config)) {
             return error(State::ERROR, '小程序配置为空！');
-        }
-
-        if (empty($code) || empty($iv) || empty($encrypted_data)) {
-            return error(State::ERROR, '缺少必要的请求参数！');
         }
 
         $result = Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);

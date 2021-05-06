@@ -96,10 +96,8 @@ fwIDAQAB
 
         if (App::isAliUser()) {
             $params['payway'] = '2';
-        } elseif (App::isWxUser()) {
+        } else{
             $params['payway'] = '3';
-        } else {
-            return err('支付环境不支持！');
         }
 
         $params['sub_payway'] = '4'; //小程序支付请传'4'

@@ -84,6 +84,11 @@ class Wx
         }
 
         $res['session_key'] = $_SESSION['session_key'];
+
+        if (!empty($auth_data['openid'])) {
+            $res['openId'] = $auth_data['openid'];
+        }
+        
         return $res;
     }
 }

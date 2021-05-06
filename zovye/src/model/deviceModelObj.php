@@ -2383,7 +2383,7 @@ class deviceModelObj extends modelObj
                 }
             }
 
-            $result['goods'] = array_values((array)$result['goods']);
+            $result = array_values((array)$result['goods']);
         }
 
         return $result;

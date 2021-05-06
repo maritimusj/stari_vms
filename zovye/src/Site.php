@@ -294,10 +294,10 @@ JSCODE;
                     }
                 }
             } else {
-                $tpl = array_merge($tpl, $device->getGoodsList($user));
+                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user)]);
             }
         } else {
-            $tpl = array_merge($tpl, $device->getGoodsList($user));
+            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user)]);
         }
 
         //如果无法领取，则清除访问记录

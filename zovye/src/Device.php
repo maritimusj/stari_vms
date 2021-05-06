@@ -261,7 +261,7 @@ class Device extends State
             }
         }
 
-        return $result['num'] > 0 ? $result : [];
+        return $result;
     }
 
     /**

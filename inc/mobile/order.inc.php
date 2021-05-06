@@ -52,7 +52,7 @@ if ($op === 'create') {
 
     $total = min(App::orderMaxGoodsNum(), max(request::int('total'), 1));
 
-    if ($device->getGoodsTotal($goods['id']) < $total) {
+    if ($goods['num'] < $total) {
         JSON::fail('对不起，商品数量不足！');
     }
 

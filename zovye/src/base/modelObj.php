@@ -35,6 +35,7 @@ class modelObj implements ISettings
     const OP_READ = 1;
     const OP_WRITE = 2;
 
+    /** @var int */
     protected $id;
 
     private $factory;

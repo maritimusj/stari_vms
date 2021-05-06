@@ -2351,7 +2351,6 @@ class deviceModelObj extends modelObj
                     $goods_data['num'] = $entry['num'];
                     if ($this->getDeviceType() == 0 && isset($entry['goods_price'])) {
                         $goods_data['price'] = $entry['goods_price'];
-                        $goods_data['price_formatted'] = '¥' . number_format($goods_data['price'] / 100, 2) . '元';
                     }
                 }
 
@@ -2359,6 +2358,11 @@ class deviceModelObj extends modelObj
                     $key = "goods{$goods_data['id']}";
                     if ($result['goods'][$key]) {
                         $result['goods'][$key]['num'] += intval($goods_data['num']);
+                        //如果相同商品设置了不同价格，则使用更高的价格
+                        if ($result['goods'][$key]['price'] < $goods_data['price']) {
+                            $result['goods'][$key]['price'] = $goods_data['price'];
+                            $result['goods'][$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
+                        }
                     } else {
                         $result['goods'][$key] = [
                             'id' => $goods_data['id'],
@@ -2366,14 +2370,14 @@ class deviceModelObj extends modelObj
                             'img' => $goods_data['img'],
                             'detail_img' => $goods_data['detailImg'],
                             'price' => $goods_data['price'],
-                            'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2),
+                            'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2) . '元',
                             'num' => intval($goods_data['num']),
                         ];
 
                         if (!empty($user)) {
                             $discount = User::getUserDiscount($user, $goods_data);
                             $result['goods'][$key]['discount'] = $discount;
-                            $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2);
+                            $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
                         }
                     }
                 }

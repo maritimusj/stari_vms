@@ -225,7 +225,12 @@ class Device extends State
      */
     public static function getGoods(deviceModelObj $device, int $goods_id): array
     {
-        $result = ['num' => 0];
+        $result = Goods::data($goods_id);
+        if (empty($result)) {
+            return [];
+        }
+
+        $result['num'] = 0;
         if (App::shipmentBalance($device)) {
             $match_fn = function ($lane) use ($goods_id, &$result) {
                 return $lane['goods'] == $goods_id && $lane['num'] > 0 && $lane['num'] > $result['num'];
@@ -244,18 +249,14 @@ class Device extends State
 
         $payload = self::getPayload($device);
         foreach ($payload['cargo_lanes'] as $index => $lane) {
+            if ($lane['goods'] == $goods_id) {
+                $result['num'] += $lane['num'];
+            }
             if ($match_fn($lane)) {
-                $goods_data = Goods::data($goods_id);
-                if ($goods_data) {
-                    $v = [
-                        'num' => $lane['num'],
-                        'cargo_lane' => $index,
-                    ];
-                    if ($device->getDeviceType() == 0 && isset($lane['goods_price'])) {
-                        $v['price'] = $lane['goods_price'];
-                        $v['price_formatted'] = '¥' . number_format($v['price'] / 100, 2) . '元';
-                    }
-                    $result = array_merge($goods_data, $v);
+                $result['cargo_lane'] = $index;
+                if ($device->getDeviceType() == 0 && isset($lane['goods_price'])) {
+                    $result['price'] = $lane['goods_price'];
+                    $result['price_formatted'] = '¥' . number_format($result['price'] / 100, 2) . '元';
                 }
             }
         }

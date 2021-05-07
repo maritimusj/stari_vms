@@ -1721,11 +1721,51 @@ if ($op == 'list') {
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
     $this->showTemplate('web/device/report_list', $tpl_data);
+
+} elseif ($op == 'group') {
+    $query = Group::query();
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    $total = $query->count();
+    $total_page = ceil($total / $page_size);
+    if ($page > $total_page) {
+        $page = 1;
+    }
+
+    $query->page($page, $page_size);
+
+    $keywords = request::trim('keywords');
+    if ($keywords) {
+        $query->where(['title REGEXP' => $keywords]);
+    }
+
+    $result     = [
+        'page'      => $page,
+        'total'     => $total,
+        'totalpage' => $total_page,
+        'list'      => [],
+    ];
+
+    foreach ($query->findAll() as $entry) {
+        $result['list'][] = [
+            'id' => $entry->getId(),
+            'title' => $entry->getTitle(),
+            'clr' => $entry->getClr(),
+            'total' => (int) Device::query(['group_id' => $id])->count(),
+        ];
+    }
+
+    $result['serial'] = request::trim('serial') ?: microtime(true) . '';
+
+    Util::resultJSON(true, $result);
+    
 } elseif ($op == 'group_search') {
 
     $query = Group::query();
 
-    $keyword = request::trim('keyword');
+    $keyword = request::trim('keywords');
     if ($keyword) {
         $query->where(['title REGEXP' => $keyword]);
     }

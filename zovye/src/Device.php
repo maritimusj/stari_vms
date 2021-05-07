@@ -248,11 +248,17 @@ class Device extends State
         }
 
         $payload = self::getPayload($device);
+
+        $total = 0;
         foreach ($payload['cargo_lanes'] as $index => $lane) {
+            //统计商品总库存
             if ($lane['goods'] == $goods_id) {
-                $result['num'] += $lane['num'];
-            }
+                $total += $lane['num'];
+            }          
+              
+            //根据出货策略匹配货道
             if ($match_fn($lane)) {
+                $result['num'] = $lane['num'];
                 $result['cargo_lane'] = $index;
                 if ($device->getDeviceType() == 0 && isset($lane['goods_price'])) {
                     $result['price'] = $lane['goods_price'];
@@ -261,6 +267,7 @@ class Device extends State
             }
         }
 
+        $result['num'] = $total;
         return $result;
     }
 

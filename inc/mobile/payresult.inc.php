@@ -105,7 +105,7 @@ if ($op == 'default') {
             'result' => $res,
         ]);
     
-        exit($res['message']);
+        exit(Pay::getResponse(false));
     }
 
     exit($res);

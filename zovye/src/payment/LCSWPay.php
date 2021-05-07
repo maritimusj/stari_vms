@@ -414,10 +414,6 @@ JSCODE;
 
     public function getResponse(bool $ok = true)
     {
-        if ($ok) {
-            return self::RESPONSE_OK;
-        }
-
-        return false;
+        return self::RESPONSE_OK;
     }
 }

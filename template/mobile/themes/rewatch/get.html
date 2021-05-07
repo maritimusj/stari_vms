@@ -47,6 +47,7 @@
 			.desc {
 				margin-top: 10px;
 				font-size: 16px;
+				font-weight: bolder;
 				text-align: center;
 			}
 
@@ -231,13 +232,15 @@
 								} else if (this.goods.length == 1) {
 									this.showStatus = true;
 									if (this.goods[0].num == 0) {
-										this.desc = "库存不足";
+										this.desc = "库存不足！";
 										this.status = 2;
 									} else {
 										this.doit(this.goods[0].id);
 									}
 								} else if (this.goods.length == 0) {
-									alert("没有可用商品！");
+									this.showStatus = true;
+									this.desc = "没有可用商品！";
+									this.status = 2;
 								}
 							}
 						})
@@ -262,7 +265,7 @@
 								if (res) {
 									clearInterval(this.interval)
 									this.status = res.status ? 1 : 2;
-									this.desc = res.status ? '领取成功<br/>如未取到商品，请重试' : '领取失败';
+									this.desc = res.status ? '领取成功！<br/><br/>如未取到商品，请扫码重试' : '领取失败！';
 									if (res.data && res.data['url']) {
 										setTimeout(function () {
 											window.location.href = res.data['url'];

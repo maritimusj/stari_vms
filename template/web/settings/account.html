@@ -119,14 +119,24 @@
                 <div class="form-group">
                     <label for="orderRetryLastTime" class="col-md-2 control-label">领取失败后重试</label>
                     <div class="col-md-10">
-                        <select id="orderRetryLastTime" name="orderRetryLastTime" style="width: 80%;">
-                            <option value="0" {if $settings['order']['retry']['last'] == '0'}selected{/if}>&lt;不启用&gt;</option>
-                            <option value="5" {if $settings['order']['retry']['last'] == '5'}selected{/if}>5分钟内</option>
-                            <option value="10" {if $settings['order']['retry']['last'] == '10'}selected{/if}>10分钟内</option>
-                            <option value="30" {if $settings['order']['retry']['last'] == '30'}selected{/if}>30分钟内</option>
-                            <option value="60" {if $settings['order']['retry']['last'] == '60'}selected{/if}>一小时内</option>
-                        </select>
-                        <span class="help-block">* 用户免费领取出货失败后，一定时间内，可以扫码重试</span>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <select id="orderRetryLastTime" name="orderRetryLastTime" style="width: 80%;">
+                                    <option value="0" {if $settings['order']['retry']['last'] == '0'}selected{/if}>&lt;不启用&gt;</option>
+                                    <option value="5" {if $settings['order']['retry']['last'] == '5'}selected{/if}>5分钟内</option>
+                                    <option value="10" {if $settings['order']['retry']['last'] == '10'}selected{/if}>10分钟内</option>
+                                    <option value="30" {if $settings['order']['retry']['last'] == '30'}selected{/if}>30分钟内</option>
+                                    <option value="60" {if $settings['order']['retry']['last'] == '60'}selected{/if}>一小时内</option>
+                                </select>
+                                <span class="help-block">* 在指定的时间内可以扫码重试</span>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control" name="orderRetryMaxCount" id="orderRetryMaxCount" value="{php echo intval($settings['order']['retry']['max'])}" min="0" step="1">
+                                <span class="help-block">* 重试最多不能超过指定次数，0表示不限制</span>
+                            </div>
+                            <div class="col-md-6">
+                            </div>                              
+                        </div>                      
                     </div>
                 </div>
                 <div class="seg-divider"></div>

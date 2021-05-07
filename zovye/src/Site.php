@@ -395,27 +395,29 @@ JSCODE;
 JSCODE;
         }
         //检查用户在该设备上最近失败的免费订单
-        $minutes = settings('order.retry.last', 0);
-        if ($minutes > 0) {
-            $order = Order::findOne([
+        $retry = settings('order.retry', []);
+        if ($retry['last'] > 0) {
+            $order = Order::query()->where([
                 'openid' => $user->getOpenid(),
                 'device_id' => $device->getId(),
                 'result_code <>' => 0,
                 'price' => 0,
                 'balance' => 0,
-                'createtime >' => strtotime("-{$minutes} minute"),
-            ]);
+                'createtime >' => strtotime("-{$retry['last']} minute"),
+            ])->orderBy('id desc')->findOne();
             if ($order) {
-                $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
-                $tpl['js']['code'] .= <<<JSCODE
-    \r\nzovye_fn.retryOrder = function (cb) {
-        $.get("{$order_retry_url}").then(function (res) {
-            if (typeof cb === 'function') {
-                cb(res);
-            }
-        })
-    }
+                if (empty($retry['max']) || $order->getExtraData('retry.total', 0) < $retry['max']) {
+                    $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
+                    $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.retryOrder = function (cb) {
+    $.get("{$order_retry_url}").then(function (res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    })
+}
 JSCODE;
+                }
             }
         }
 

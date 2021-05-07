@@ -367,6 +367,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['misc']['accountsPromote'] = request::bool('accountsPromote') ? 1 : 0;
 
         $settings['order']['retry']['last'] = request::int('orderRetryLastTime');
+        $settings['order']['retry']['max'] = request::int('orderRetryMaxCount');
 
         if (App::isMoscaleEnabled()) {
             $settings['moscale']['fan']['key'] = request::trim('moscaleMachineKey');

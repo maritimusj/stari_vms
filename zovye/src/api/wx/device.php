@@ -130,7 +130,7 @@ class device
         $payload = $device->getPayload(true);
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
-                $lane['goods_price'] = number_format(intval($lane['goods_price']) / 100, 2);
+                $lane['goods_price'] = intval($lane['goods_price']);
                 return $lane;
             }, $payload['cargo_lanes']);
         } else {

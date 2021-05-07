@@ -565,7 +565,7 @@ class agent
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(request('id'));
+        $device = \zovye\api\wx\device::getDevice(request::str('id'));
         if (is_error($device)) {
             return $device;
         }
@@ -584,17 +584,20 @@ class agent
                     $result['group']['clr'] = $group->getClr();
                 }
 
-                $detail = $device->getOnlineDetail();
-                if ($detail) {
-                    $device->setSig(intval($detail['mcb']['RSSI']));
-                    $device->save();
+                if (request::bool('online', true)) {
+                    $detail = $device->getOnlineDetail();
+                    if ($detail) {
+                        $device->setSig(intval($detail['mcb']['RSSI']));
+                        $device->save();
 
-                    $result['status']['sig'] = $device->getSig();
-                    $result['status']['online'] = $detail['mcb']['online'];
-                    if (isset($detail['app']['online'])) {
-                        $result['app']['online'] = $detail['app']['online'];
+                        $result['status']['sig'] = $device->getSig();
+                        $result['status']['online'] = $detail['mcb']['online'];
+                        if (isset($detail['app']['online'])) {
+                            $result['app']['online'] = $detail['app']['online'];
+                        }
                     }
                 }
+
             } else {
                 return error(State::ERROR, '没有权限管理这个设备！');
             }

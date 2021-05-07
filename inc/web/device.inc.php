@@ -1753,7 +1753,7 @@ if ($op == 'list') {
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
-            'total' => (int) Device::query(['group_id' => $id])->count(),
+            'total' => (int) Device::query(['group_id' => $entry->getId()])->count(),
         ];
     }
 

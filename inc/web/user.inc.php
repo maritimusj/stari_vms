@@ -75,9 +75,16 @@ if ($op == 'default') {
     $s_keywords = urldecode(request::trim('s_keywords'));
     if ($s_keywords) {
         if (in_array($s_principal, [User::AGENT, User::PARTNER, User::KEEPER, User::TESTER, User::GSPOR])) {
-            $query->where("(name LIKE '%{$s_keywords}%' OR nickname LIKE '%{$s_keywords}%' OR mobile LIKE '%{$s_keywords}%')");
+            $query->whereOr([
+                'name LIKE' => "%{$s_keywords}%",
+                'nickname LIKE' => "%{$s_keywords}%",
+                'mobile LIKE' => "%{$s_keywords}%",
+            ]);
         } else {
-            $query->where("(nickname LIKE '%{$s_keywords}%' OR mobile LIKE '%{$s_keywords}%')");
+            $query->whereOr([
+                'nickname LIKE' => "%{$s_keywords}%",
+                'mobile LIKE' => "%{$s_keywords}%",
+            ]);
         }
     }
 

@@ -229,7 +229,11 @@ class mp
 
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
-            $query->where("(name LIKE '%{$keyword}%' OR title LIKE '%{$keyword}%' OR descr LIKE '%{$keyword}%')");
+            $query->whereOr([
+                'name LIKE' => "%{$keyword}%",
+                'title LIKE' => "%{$keyword}%",
+                'descr LIKE' => "%{$keyword}%",
+            ]);
         }
 
         $total = $query->count();

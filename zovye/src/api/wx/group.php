@@ -24,11 +24,11 @@ class group
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
 
-        $keyword = request::trim('keyword');
-
         $query = \zovye\Group::query();
+
+        $keyword = request::trim('keyword');
         if (!empty($keyword)) {
-            $query->where("title LIKE '%{$keyword}%'");
+            $query->where(['title LIKE' => "%{$keyword}%"]);
         }
 
         $guid = request::str('guid');

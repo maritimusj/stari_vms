@@ -85,7 +85,10 @@ if ($op == 'default') {
     $keywords = request::trim('keywords');
     $tpl_data['keywords'] = $keywords;
     if ($keywords) {
-        $query->where("nickname LIKE '%{$keywords}%' OR mobile LIKE '%{$keywords}%'");
+        $query->whereOr([
+            'nickname LIKE' => "%{$keywords}%",
+            'mobile LIKE' => "%{$keywords}%",
+        ]);
     }
 
     $referral_enabled = App::isAgentReferralEnabled();

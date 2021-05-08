@@ -1080,7 +1080,10 @@ class agent
 
         $keyword = request::trim('keyword');
         if ($keyword) {
-            $query->where("(name LIKE '%{$keyword}%' OR mobile LIKE '%{$keyword}%')");
+            $query->whereOr([
+                'name LIKE' => "%{$keyword}%",
+                'mobile LIKE' => "%{$keyword}%",
+            ]);
         }
 
         $superior_guid = '';
@@ -1195,8 +1198,8 @@ class agent
         $s_query = m('settings_user');
         $s_arr = [];
         if ($s_query) {
-            $s_query = $s_query->query(We7::uniacid([]));
-            $s_res = $s_query->where("name LIKE '%partnerData'")->findAll();
+            $s_query = $s_query->query(We7::uniacid([]))->where(['name LIKE' => '%partnerData']);
+            $s_res = $s_query->findAll();
             $_reg = '/.+:(.+):.+/';
             foreach ($s_res as $val) {
                 $s_data = unserialize($val->getData());

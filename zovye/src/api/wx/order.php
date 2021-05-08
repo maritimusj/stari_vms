@@ -128,7 +128,10 @@ class order
 
         $order_no = request::trim('order');
         if ($order_no) {
-            $query->where("order_id LIKE '%{$order_no}%' OR extra REGEXP '\"transaction_id\":\"[0-9]*{$order_no}[0-9]*\"'");
+            $query->whereOr([
+                'order_id LIKE' => "%{$order_no}%",
+                'extra REGEXP' => "\"transaction_id\":\"[0-9]*{$order_no}[0-9]*\"",
+            ]);
         }
 
         $way = request::trim('way');

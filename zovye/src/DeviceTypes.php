@@ -109,7 +109,9 @@ class DeviceTypes
 
         $keywords = $params['keywords'];
         if ($keywords) {
-            $query->where("title LIKE '%{$keywords}%'");
+            $query->where([
+                'title LIKE' => "%{$keywords}%",
+            ]);
         }
 
         $total = $query->count();

@@ -39,7 +39,10 @@ if ($op == 'default') {
 
     $keywords = trim(urldecode(request::str('keywords')));
     if ($keywords) {
-        $query->where("(name LIKE '%{$keywords}%' OR title LIKE '%{$keywords}%')");
+        $query->whereOr([
+            'name LIKE' => "%{$keywords}%",
+            'title LIEK' => "%{$keywords}%",
+        ]);
     }
 
     $total = $query->count();
@@ -158,12 +161,15 @@ if ($op == 'default') {
 } elseif ($op == 'search') {
 
     $result = [];
-    $keyword = trim(urldecode(request::str('keyword')));
-
+    
     $query = Account::query();
 
+    $keyword = trim(urldecode(request::str('keyword')));
     if ($keyword) {
-        $query->where("(name LIKE '%{$keyword}%' OR title LIKE '%{$keyword}%')");
+        $query->whereOr([
+            'name LIKE' => "%{$keyword}%",
+            'title LIKE' => "%{$keyword}%",
+        ]);
     }
 
     $query->limit(100);

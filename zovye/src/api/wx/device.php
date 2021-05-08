@@ -558,7 +558,12 @@ class device
     {
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
-            $query->where("(name LIKE '%{$keyword}%' OR imei LIKE '%{$keyword}%')");
+            if ($keyword) {
+                $query->whereOr([
+                    'name LIKE' => "%{$keyword}%",
+                    'imei LIKE' => "%{$keyword}%",
+                ]);                
+            }
         }
 
         //简单信息
@@ -837,7 +842,10 @@ class device
 
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
-            $query->where("(name LIKE '%{$keyword}%' OR imei LIKE '%{$keyword}%')");
+            $query->where([
+                'name LIKE' => "%{$keyword}%",
+                'imei LIKE' => "%{$keyword}%",
+            ]);
         }
 
         $total = $query->count();

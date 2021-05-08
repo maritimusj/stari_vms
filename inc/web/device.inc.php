@@ -94,7 +94,12 @@ if ($op == 'list') {
     //关键字
     $keywords = request::trim('keywords');
     if (!empty($keywords)) {
-        $query->where("(name LIKE '%{$keywords}%' OR imei LIKE '%{$keywords}%' OR app_id LIKE '%{$keywords}%' OR iccid LIKE '%{$keywords}%')");
+        $query->whereOr([
+            'name LIKE' => "%{$keywords}%",
+            'imei LIKE' => "%{$keywords}%",
+            'app_id LIKE' => "%{$keywords}%",
+            'iccid LIKE' => "%{$keywords}%",
+        ]);
     }
 
     //只显示有问题设备
@@ -310,7 +315,12 @@ if ($op == 'list') {
     //搜索关键字
     $keywords = request::trim('keywords');
     if ($keywords) {
-        $query->where("(name LIKE '%{$keywords}%' OR imei LIKE '%{$keywords}%' OR app_id LIKE '%{$keywords}%' OR iccid LIKE '%{$keywords}%')");
+        $query->whereOr([
+            'name LIKE' => "%{$keywords}%",
+            'imei LIKE' => "%{$keywords}%",
+            'app_id LIKE' => "%{$keywords}%",
+            'iccid LIKE' => "%{$keywords}%",
+        ]);
     }
 
     //指定tags
@@ -386,7 +396,10 @@ if ($op == 'list') {
 
     $keyword = trim(urldecode(request('keyword')));
     if ($keyword) {
-        $query->where("(imei LIKE '%{$keyword}%' || name LIKE '%{$keyword}%')");
+        $query->whereOr([
+            'imei LIKE' => "%{$keyword}%",
+            'name LIKE' => "%{$keyword}%",
+        ]);
     }
 
     if (request::has('page')) {
@@ -1972,7 +1985,10 @@ if ($op == 'list') {
 
     $user_ids = [];
     if ($nickname != '') {
-        $user_res = User::query("(nickname LIKE '%{$nickname}%' OR mobile LIKE '%{$nickname}%')")->findAll();
+        $user_res = User::query()->whereOr([
+            'nickname LIKE' => "%{$nickname}%",
+            'mobile LIKE' => "%{$nickname}%",
+        ])->findAll();
         foreach ($user_res as $item) {
             $user_ids[] = $item->getId();
         }
@@ -2169,7 +2185,10 @@ if ($op == 'list') {
 
     $user_ids = [];
     if ($nickname != '') {
-        $user_res = User::query("(nickname LIKE '%{$nickname}%' OR mobile LIKE '%{$nickname}%')")->findAll();
+        $user_res = User::query()->whereOr([
+            'nickname LIKE' => "%{$nickname}%",
+            'mobile LIKE' => "%{$nickname}%",
+        ])->findAll();
         foreach ($user_res as $item) {
             $user_ids[] = $item->getId();
         }

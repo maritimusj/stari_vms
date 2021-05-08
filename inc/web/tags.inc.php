@@ -44,7 +44,7 @@ if ($op == 'default') {
     //搜索关键字
     $keywords = request::trim('keywords');
     if ($keywords) {
-        $query->where("title LIKE '%{$keywords}%'");
+        $query->where(['title LIKE' => "%{$keywords}%"]);
     }
 
     $total = $query->count();

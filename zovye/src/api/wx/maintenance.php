@@ -118,7 +118,10 @@ class maintenance
 
         $device_ids = [];
         if ($device != '') {
-            $device_res = Device::query()->where("(name LIKE '%{$device}%' OR imei LIKE '%{$device}%')")->findAll();
+            $device_res = Device::query()->whereOr([
+                'name LIKE' => "%{$device}%",
+                'imei LIKE' => "%{$device}%",
+            ])->findAll();
             foreach ($device_res as $item) {
                 $device_ids[] = $item->getId();
             }
@@ -155,7 +158,7 @@ class maintenance
         $s_arr = [];
         if ($s_query) {
             $s_query = $s_query->query(We7::uniacid([]));
-            $s_res = $s_query->where("name LIKE '%partnerData'")->findAll();
+            $s_res = $s_query->where(['name LIKE' => '%partnerData'])->findAll();
             $_reg = '/.+:(.+):.+/';
             foreach ($s_res as $val) {
                 $s_data = unserialize($val->getData());

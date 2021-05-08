@@ -59,7 +59,7 @@ if ($op == 'default') {
 
     $keywords = request::trim('keywords');
     if ($keywords) {
-        $condition['goods_name LIKE'] = '%' . $keywords . '%';
+        $condition['goods_name LIKE'] = "%{$keywords}%";
     }
 
     $page = max(1, request::int('page'));

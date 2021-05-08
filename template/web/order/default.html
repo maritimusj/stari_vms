@@ -214,7 +214,7 @@
                         {if $order['goods']}
                         <div class="name">
                         {$order['goods']['name']}
-                        <span class="num" data-op="pullsDetail" title="查看出货记录..."> x{$order['num']}</span>
+                        <span class="num"{if $order['pull_logs']===true} data-op="pullsDetail" title="查看出货记录..."{else} title="{$order['pull_logs']}"{/if}> x{$order['num']}</span>
                         </div>
                         {/if}
                     </td>

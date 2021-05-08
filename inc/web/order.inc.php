@@ -213,7 +213,10 @@ if ($op == 'default') {
         } else {
             $data['result'] = $entry->getExtraData('pull.result', []);
         }
-
+        $device = $entry->getDevice();
+        if ($device) {
+            $data['pull_logs'] = !$device->isVDevice() && !$device->isBlueToothDevice() ? true : '没有出货记录';
+        }
         $orders[] = $data;
     }
 

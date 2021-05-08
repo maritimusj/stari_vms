@@ -987,7 +987,7 @@ class common
 
     public static function aliAuthCode(): array
     {
-        $auth_code = request('authcode');
+        $auth_code = request::str('authcode');
 
         $aop = new AopClient();
         $aop->appId = settings('alixapp.id');
@@ -1017,7 +1017,7 @@ class common
                     ];
                 }
             } else {
-                if (user::create(['openid' => $user_id, 'app' => User::ALI])) {
+                if (User::create(['openid' => $user_id, 'app' => User::ALI])) {
                     $user_info['user_id'] = $user_id;
                 } else {
                     return err('保存用户失败!');

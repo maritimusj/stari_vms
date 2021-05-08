@@ -103,13 +103,11 @@ fwIDAQAB
         $params['sub_payway'] = '4'; //小程序支付请传'4'
         $params['payer_uid'] = $user_uid;
         $params['subject'] = $desc;
-        $params['operator'] = 'sys';
+        $params['operator'] = $device_uid;
 
         if (!empty($notify_url)) {
             $params['notify_url'] = $notify_url;
         }
-
-        $params['reflect'] = $device_uid;
 
         $path = '/upay/v2/precreate';
         return $this->requestApi("{$this->api}{$path}", $params);

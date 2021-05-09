@@ -26,6 +26,7 @@ use zovye\Keeper;
 use zovye\Locker;
 use zovye\Account;
 use zovye\CtrlServ;
+use function zovye\getArray;
 use function zovye\m;
 use function zovye\tb;
 use zovye\Advertising;
@@ -458,6 +459,20 @@ class deviceModelObj extends modelObj
         return '';
     }
 
+    private function getMigratedLanesData($path = '', $default = null)
+    {
+        $data = $this->get('cargo_lanes');
+        if ($data) {
+            return getArray($data, $path, $default);
+        }
+
+        $data = $this->settings('extra.cargo_lanes');
+        if ($this->set('cargo_lanes', $data)) {
+            $this->updateSettings('extra.cargo_lanes', null);
+        }
+         return getArray($data, $path, $default);
+    }
+
     public function setLane($lane, $num = null, $price = null): bool
     {
         $prefix = $this->migrateLanesData();
@@ -481,14 +496,12 @@ class deviceModelObj extends modelObj
 
     public function getLane($lane): array
     {
-        $prefix = $this->migrateLanesData();
-        return (array)$this->settings("{$prefix}cargo_lanes.l{$lane}", []);
+        return (array)$this->getMigratedLanesData("l{$lane}", []);
     }
 
     public function getCargoLanes(): array
     {
-        $prefix = $this->migrateLanesData();
-        return (array)$this->settings("{$prefix}cargo_lanes", []);
+        return (array)$this->getMigratedLanesData('', []);
     }
 
     public function setCargoLanes(array $lanes_data): bool

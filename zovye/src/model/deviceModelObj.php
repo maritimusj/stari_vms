@@ -443,20 +443,36 @@ class deviceModelObj extends modelObj
         return empty($address) ? $default : $address;
     }
 
+    private function migrateLanesData(): string
+    {
+        $prefix = 'extra.';
+        $data = $this->settings('extra.cargo_lanes');
+        if (is_array($data)) {
+            if (!$this->set('cargo_lanes', $data)) {
+                return $prefix;
+            }
+            if (!$this->updateSettings('extra.cargo_lanes', null)) {
+                return $prefix;
+            }
+        }
+        return '';
+    }
+
     public function setLane($lane, $num = null, $price = null): bool
     {
+        $prefix = $this->migrateLanesData();
         if (is_array($num)) {
-            return $this->updateSettings("extra.cargo_lanes.l{$lane}", $num);
+            return $this->updateSettings("{$prefix}cargo_lanes.l{$lane}", $num);
         }
 
         if (is_numeric($num)) {
-            if (!$this->updateSettings("extra.cargo_lanes.l{$lane}.num", intval($num))) {
+            if (!$this->updateSettings("{$prefix}cargo_lanes.l{$lane}.num", intval($num))) {
                 return false;
             }
         }
 
         if (is_numeric($price)) {
-            if (!$this->updateSettings("extra.cargo_lanes.l{$lane}.price", intval($price))) {
+            if (!$this->updateSettings("{$prefix}cargo_lanes.l{$lane}.price", intval($num))) {
                 return false;
             }
         }
@@ -465,17 +481,20 @@ class deviceModelObj extends modelObj
 
     public function getLane($lane): array
     {
-        return (array)$this->settings("extra.cargo_lanes.l{$lane}", []);
+        $prefix = $this->migrateLanesData();
+        return (array)$this->settings("{$prefix}cargo_lanes.l{$lane}", []);
     }
 
     public function getCargoLanes(): array
     {
-        return (array)$this->settings('extra.cargo_lanes', []);
+        $prefix = $this->migrateLanesData();
+        return (array)$this->settings("{$prefix}cargo_lanes", []);
     }
 
     public function setCargoLanes(array $lanes_data): bool
     {
-        return $this->updateSettings('extra.cargo_lanes', $lanes_data);
+        $prefix = $this->migrateLanesData();
+        return $this->updateSettings("{$prefix}cargo_lanes", $lanes_data);
     }
 
     public function profile(): array

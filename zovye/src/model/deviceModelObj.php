@@ -443,6 +443,41 @@ class deviceModelObj extends modelObj
         return empty($address) ? $default : $address;
     }
 
+    public function setLane($lane, $num = null, $price = null): bool
+    {
+        if (is_array($num)) {
+            return $this->updateSettings("extra.cargo_lanes.l{$lane}", $num);
+        }
+
+        if (is_numeric($num)) {
+            if (!$this->updateSettings("extra.cargo_lanes.l{$lane}.num", intval($num))) {
+                return false;
+            }
+        }
+
+        if (is_numeric($price)) {
+            if (!$this->updateSettings("extra.cargo_lanes.l{$lane}.price", intval($num))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function getLane($lane): array
+    {
+        return (array)$this->settings("extra.cargo_lanes.l{$lane}", []);
+    }
+
+    public function getCargoLanes(): array
+    {
+        return (array)$this->settings('extra.cargo_lanes', []);
+    }
+
+    public function setCargoLanes(array $lanes_data): bool
+    {
+        return $this->updateSettings('extra.cargo_lanes', $lanes_data);
+    }
+
     public function profile(): array
     {
         return [

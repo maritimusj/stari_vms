@@ -257,13 +257,13 @@ class device
             }
 
             $lane = request::int('lane');
-            $laneData = $device->settings("extra.cargo_lanes.l{$lane}", []);
+            $laneData = $device->getLane($lane);
             if (empty($laneData)) {
                 return error(State::ERROR, '货道不正确！');
             }
 
             $num = request::int('num');
-            $device->updateSettings("extra.cargo_lanes.l{$lane}.num", $num);
+            $device->setLane($lane, $num);
 
             return ['msg' => '设置成功！'];
         }

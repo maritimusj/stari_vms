@@ -169,7 +169,7 @@ class Device extends State
                 }
             }
 
-            $lanes_data = $device->settings('extra.cargo_lanes', []);
+            $lanes_data = $device->getCargoLanes();
             $lowest = null;
             foreach ($data as $lane => $num) {
                 if (isset($cargo_lanes[$lane])) {
@@ -206,7 +206,7 @@ class Device extends State
 
             //把remain设备为货道商品最少的数量
             $device->setRemain(intval($lowest));
-            $device->updateSettings('extra.cargo_lanes', $lanes_data);
+            $device->setCargoLanes($lanes_data);
         } else {
             Util::logToFile("resetPayload", [
                 'error' => '货道数据错误！',
@@ -290,7 +290,7 @@ class Device extends State
         if ($res && is_array($res['cargo_lanes'])) {
             $data['cargo_lanes'] = $res['cargo_lanes'];
 
-            $lanes_data = $device->settings('extra.cargo_lanes', []);
+            $lanes_data = $device->getCargoLanes();
 
             foreach ($data['cargo_lanes'] as $index => &$lane) {
                 $laneId = "l{$index}";

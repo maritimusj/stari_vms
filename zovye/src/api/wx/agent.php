@@ -1133,7 +1133,7 @@ class agent
 
                     $data = [
                         'guid' => common::getGUID($agent),
-                        'name' => $agent_data['name'] ?: $agent->getNickname(),
+                        'name' => $agent->getName(),
                         'avatar' => $agent->getAvatar(),
                         'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
                         'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
@@ -1142,8 +1142,11 @@ class agent
                         'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
                     ];
 
-                    $gsp = $agent->settings('agentData.gsp', []);
+                    $gsp = $agent->settings('agentData.gsp', []);Util::logToFile('debug', $gsp);
                     if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
+                        foreach((array)$gsp['rel'] as $level => $val) {
+                            $gsp['rel'][$level] = number_format($val / 100, 2);
+                        }
                         $data['gsp_rel'] = $gsp['rel'];
                         $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
                     }
@@ -1358,7 +1361,7 @@ class agent
                             if ($h_key) {
                                 $data = [
                                     'guid' => common::getGUID($agent),
-                                    'name' => $agent_data['name'] ?: $agent->getNickname(),
+                                    'name' => $agent->getName(),
                                     'avatar' => $agent->getAvatar(),
                                     'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
                                     'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
@@ -1369,7 +1372,9 @@ class agent
 
                                 $gsp = $agent->settings('agentData.gsp', []);
                                 if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
-                                    $data['gsp_rel'] = $gsp['rel'];
+                                    foreach((array)$gsp['rel'] as $level => $val) {
+                                        $gsp['rel'][$level] = number_format($val / 100, 2);
+                                    }
                                     $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
                                 }
 

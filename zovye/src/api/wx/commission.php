@@ -192,7 +192,7 @@ class commission
         common::checkCurrentUserPrivileges('F_cm');
 
         $guid = request::trim('guid');
-        $val = min(100, max(0, request::int('val')));
+        $val =  min(10000, max(0, request::float('val', 0, 2) * 100));
         $level = min(3, max(0, request::int('level')));
 
         $agent = agent::getUserByGUID($guid);

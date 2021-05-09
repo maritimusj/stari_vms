@@ -164,9 +164,7 @@ class Account extends State
         }
 
         $sort_then_slice_accounts = function (&$arr, $max) {
-
             $total = count($arr);
-
             if ($total > 1) {
                 //按order no从大到小,对公众号排序
                 uasort(
@@ -184,9 +182,7 @@ class Account extends State
         };
 
         $shuffle_accounts = function (&$arr) {
-
             if (count($arr) > 1) {
-
                 //如果所有公众号的排序值一样，则打乱排序
                 $first = current($arr);
                 $last = end($arr);
@@ -672,7 +668,6 @@ class Account extends State
         }
 
         if ($list) {
-
             krsort($list);
 
             foreach ($list as $fn) {
@@ -697,7 +692,6 @@ class Account extends State
                     } else {
                         $account['qrcode'] = './resource/images/nopic.jpg';
                     }
-                    
                 }
                 if (isset($account['media'])) {
                     if ($account['media']) {
@@ -705,7 +699,6 @@ class Account extends State
                     } else {
                         $account['media'] = './resource/images/nopic.jpg';
                     }
-                    
                 }                   
             }
         }
@@ -750,8 +743,7 @@ class Account extends State
         //按order_no从大到小,对公众号排序
         usort($accounts, function ($a, $b) {
             return intval($b['order_no']) - intval($a['order_no']);
-        }
-        );
+        });
 
         $first = (array)$accounts[0];
 

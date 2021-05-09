@@ -220,7 +220,8 @@ class group
             $res = \zovye\Group::get($id);
             if ($res) {
                 $cache[$id] = [
-                    'id' => intval($res->getId()),
+                    'id' => $res->getId(),
+                    'agent_id' => $res->getAgentId(),
                     'title' => $res->getTitle(),
                     'clr' => $res->getClr(),
                 ];

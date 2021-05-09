@@ -154,7 +154,10 @@ class device
         }
 
         if ($device->getGroupId()) {
-            $result['group'] = group::getDeviceGroup($device->getGroupId());
+            $groupData = group::getDeviceGroup($device->getGroupId());
+            if (!empty($groupData['agent_id']) && $groupData['agent_id'] == $device->getAgentId()) {
+                $result['group'] = $groupData;
+            }
         }
 
         //电量

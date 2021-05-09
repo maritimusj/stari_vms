@@ -465,8 +465,10 @@ class agent
         $device->setRank($rank);
 
         //指定group id
-        $group = request::int('group');
-        $device->setGroupId($group);
+        if (request::isset('group')) {
+            $group = request::int('group');
+            $device->setGroupId($group);            
+        }
 
         $extra = $device->get('extra', []);
 

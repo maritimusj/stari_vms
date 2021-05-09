@@ -472,7 +472,7 @@ class deviceModelObj extends modelObj
         }
 
         if (is_numeric($price)) {
-            if (!$this->updateSettings("{$prefix}cargo_lanes.l{$lane}.price", intval($num))) {
+            if (!$this->updateSettings("{$prefix}cargo_lanes.l{$lane}.price", intval($price))) {
                 return false;
             }
         }

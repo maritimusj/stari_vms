@@ -7,6 +7,8 @@ use zovye\model\userModelObj;
 class AliTicket
 {
     const API_URL = 'https://c.api.aqiinfo.com/ChannelAliApi/AliTicket';
+    const API_VM_URL = 'https://c.api.aqiinfo.com/ChannelApi';
+
     const RESPONSE = '{"code":200}';
 
     private $app_key;

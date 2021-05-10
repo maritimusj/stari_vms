@@ -91,6 +91,10 @@ if ($op == 'default') {
             'type' => Advertising::QRCODE,
             'title' => '推广二维码',
         ],
+        [
+            'type' => Advertising::PASSWD,
+            'title' => '口令',
+        ],
     ];
 
     $url_params = [];
@@ -238,6 +242,11 @@ if ($op == 'default') {
 
                 $data['text'] = $entry->getExtraData('text');
                 $data['image'] = $entry->getExtraData('image');
+
+            } elseif ($type == Advertising::PASSWD) {
+
+                $data['code'] = $entry->getExtraData('code');
+                $data['text'] = $entry->getExtraData('text');
             }
 
             $advs[] = $data;
@@ -432,6 +441,12 @@ if ($op == 'default') {
             $tpl_data['app_id'] = $adv->getExtraData('app_id');
             $tpl_data['app_path'] = $adv->getExtraData('app_path');
             $tpl_data['url'] = $adv->getExtraData('url');
+
+        } elseif ($type == Advertising::PASSWD) {
+
+            $tpl_data['code'] = $adv->getExtraData('code');
+            $tpl_data['text'] = $adv->getExtraData('text');
+
         }
     }
 

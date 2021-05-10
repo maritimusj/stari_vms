@@ -30,6 +30,7 @@ class Advertising extends State
     const LINK = 9; //推广链接
     const GOODS = 10; //商品推荐
     const QRCODE = 11; //推广二维码
+    const PASSWD = 12; //用于推广的口令
 
     public static $template_files = [
         self::UNKNOWN => 'default',
@@ -43,7 +44,7 @@ class Advertising extends State
         self::LINK => 'link',
         self::GOODS => 'goods',
         self::QRCODE => 'qrcode',
-
+        self::PASSWD => 'passwd',
     ];
 
     protected static $title = [
@@ -58,6 +59,7 @@ class Advertising extends State
         self::LINK => '推广链接',
         self::GOODS => '商品推荐',
         self::QRCODE => '推广二维码',
+        self::PASSWD => '口令',
     ];
 
     /**
@@ -287,6 +289,11 @@ class Advertising extends State
 
             $extra['text'] = trim($params['text']);
             $extra['image'] = trim($params['image']);
+
+        } elseif ($type == Advertising::PASSWD) {
+
+            $extra['code'] = trim($params['code']);
+            $extra['text'] = trim($params['text']);
 
         } else {
             $extra['url'] = trim($params['url']);

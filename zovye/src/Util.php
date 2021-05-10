@@ -188,6 +188,15 @@ class Util
         return [];
     }
 
+    protected static function getAliUserSex($gender)
+    {
+        switch($gender) {
+            case 'm': return 1;
+            case 'f': return 2;
+            default: return 0;
+        }
+    }
+
     public static function getAliUser(string $code, deviceModelObj $device = null): ?userModelObj
     {
         try {
@@ -199,7 +208,6 @@ class Util
             $request = new AlipaySystemOauthTokenRequest();
             $request->setGrantType('authorization_code');
             $request->setCode($code);
-
 
             $result = $aop->execute($request);
 
@@ -217,6 +225,8 @@ class Util
             if ($result->alipay_user_info_share_response->code !== '10000') {
                 throw new RuntimeException('获取用户信息失败：' . $result->alipay_user_info_share_response->sub_msg);
             }
+
+            Util::logToFile('ali', $result->alipay_user_info_share_response);
 
             $ali_user_id = $result->alipay_user_info_share_response->user_id;
             $nick_name = $result->alipay_user_info_share_response->nick_name;
@@ -244,14 +254,22 @@ class Util
                     ];
 
                     $user->set('fromData', $params['from']);
-                    $user->save();
                 }
-            } else {
+            }
+            
+            if ($user) {
                 $user->setNickname($nick_name);
                 $user->setAvatar($avatar);
-                $user->save();
+                $user->set('fansData', [
+                    'province' => $result->alipay_user_info_share_response->province,
+                    'city' => $result->alipay_user_info_share_response->city,
+                    'sex' => self::getAliuserSex($result->alipay_user_info_share_response->gender),
+                ]);
+                $user->save();                
             }
+
             return $user;
+
         } catch (Exception $e) {
             Util::logToFile('error', [
                 'msg' => '获取阿里用户身份失败！',

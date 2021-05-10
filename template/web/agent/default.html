@@ -117,7 +117,11 @@
                         </div>
                     </td>
                     <td>
+                        {if $agent['total'] > 0}
+                        <a href="{php echo $this->createWebUrl('device', ['agentId' => $agent['id']])}" title="点击查看代理商的设备列表...">{$agent['total']}</a>
+                        {else}
                         {$agent['total']}
+                        {/if}
                     </td>
                     <td class="operate">
                         <div class="m_free"><span>免费 {$agent['m']['free']}</span></div>

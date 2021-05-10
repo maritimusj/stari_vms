@@ -23,7 +23,17 @@ class AliTicket
         $this->app_secret = $app_secret;
     }
 
-    public function fetch(userModelObj $user, deviceModelObj $device)
+    public static function fetch(userModelObj $user, deviceModelObj $device)
+    {
+        $config = settings('custom.aliTicket', []);
+        if (isEmptyArray($config) || empty($config['key'])) {
+            return err('未配置！');
+        }
+
+        return (new AliTicket($config['key'], $config['secret']))->fetchOne($user, $device);
+    }
+
+    public function fetchOne(userModelObj $user, deviceModelObj $device)
     {
         $profile = $user->profile();
         $params = [
@@ -31,7 +41,6 @@ class AliTicket
             'exUid' => $profile['openid'],
             'city'  => $profile['city'],
             'vmid'  => $device->getImei(),
-            'sex'   => $profile['sex'],
             'extra' => "zovye:{$device->getShadowId()}",
             'time'  => time(),
         ];

@@ -129,13 +129,15 @@ if (Util::isAliAppContainer()) {
     if (request::op() == 'auth_alipay') {
         $code = request::str('auth_code');
         if (empty($code)) {
-            Util::resultAlert('获取用户信息失败！', 'error');
+            Util::resultAlert('获取用户auth_code失败！', 'error');
         }
 
         $user = Util::getAliUser($code, $device);
 
         if ($user) {
             App::setContainer($user);
+        } else {
+            Util::resultAlert('获取用户信息失败！', 'error');
         }
 
         $redirect = Util::murl('entry', [

@@ -49,6 +49,26 @@
                 </div>
             </div>
             {/if}
+            {if \zovye\App::isCustomAliTicketEnabled()}
+            <div class="seg">
+                <div class="title">天猫拉新</div>
+                <div class="form-group">
+                    <label for="appKey" class="col-md-2 control-label">AppKey</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="aliTicketAppKey" id="appKey" value="{$settings['custom']['aliTicket']['key']}">
+                        <span class="help-block">* 天猫拉新所使用的app key</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="appSecret" class="col-md-2 control-label">ApSecret</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="aliTicketAppSecret" id="appSecret" value="{$settings['custom']['aliTicket']['secret']}">
+                        <span class="help-block">* 天猫拉新所使用的app secret</span>
+                    </div>
+                </div>
+
+            </div>
+            {/if}
         </div>
     </div>
     <div class="form-btn">

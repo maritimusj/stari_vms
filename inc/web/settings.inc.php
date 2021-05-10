@@ -149,6 +149,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['goods']['voucher']['enabled'] = request::bool('goodsVoucher') ? 1 : 0;
 
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
+        $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;        
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
 
@@ -349,6 +350,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 $settings['custom']['SQMPay']['goodsNum'] = 1;
             }
             $settings['custom']['SQMPay']['bonus'] = max(0, request::float('bonus', 0, 2)) * 100;
+        }
+        if ($settings['custom']['aliTicket']['enabled']) {
+            $settings['custom']['aliTicket']['key'] = request::trim('aliTicketAppKey');
+            $settings['custom']['aliTicket']['secret'] = request::trim('aliTicketAppSecret');
         }
     } elseif ($save_type == 'account') {
         if (App::isWxPlatformEnabled()) {

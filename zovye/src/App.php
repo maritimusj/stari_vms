@@ -441,4 +441,9 @@ class App
             return boolval(settings('agent.wx.app.enabled'));
         });
     }
+
+    public static function isCustomAliTicketEnabled(): bool
+    {
+        return boolval(settings('custom.aliTicket.enabled'));
+    }
 }

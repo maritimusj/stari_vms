@@ -1053,23 +1053,31 @@ if ($op == 'list') {
     }
 
     $type_data = DeviceTypes::format($device_type);
-    $extra['cargo_lanes'] = [];
+    $cargo_lanes = [];
     foreach ($type_data['cargo_lanes'] as $index => $lane) {
-        $extra['cargo_lanes']["l{$index}"] = [
+        $cargo_lanes["l{$index}"] = [
             'num' => max(0, request::int("lane{$index}_num")),
         ];
         if ($device_type->getDeviceId() == $device->getId()) {
-            $extra['cargo_lanes']["l{$index}"]['price'] = request::float("price{$index}", 0, 2) * 100;
+            $cargo_lanes["l{$index}"]['price'] = request::float("price{$index}", 0, 2) * 100;
         }
+    }
+    
+    if (!$device->setCargoLanes($cargo_lanes)) {
+        Util::itoast('保存型号数据失败！', We7::referer(), 'error');
     }
 
     //合并extra
     $extra = array_merge($device->get('extra', []), $extra);
 
+    if (!$device->set('extra', $extra)) {
+        Util::itoast('保存扩展数据失败！', We7::referer(), 'error');
+    }
+
     $device->setTagsFromText($tags);
     $device->setDeviceModel(request('device_model'));
 
-    if ($device->save() && $device->set('extra', $extra)) {
+    if ($device->save()) {
         //更新公众号缓存
         $device->updateAccountData();
         $device->updateScreenAdvsData();

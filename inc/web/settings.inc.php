@@ -354,6 +354,11 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         if ($settings['custom']['aliTicket']['enabled']) {
             $settings['custom']['aliTicket']['key'] = request::trim('aliTicketAppKey');
             $settings['custom']['aliTicket']['secret'] = request::trim('aliTicketAppSecret');
+            $settings['custom']['aliTicket']['goodsNum'] = request::int('aliTicketGoodsNum', 1);            
+            if (empty($settings['custom']['aliTicket']['goodsNum'])) {
+                $settings['custom']['aliTicket']['goodsNum'] = 1;
+            }
+            $settings['custom']['aliTicket']['bonus'] = max(0, request::float('aliTicketBonus', 0, 2)) * 100;
         }
     } elseif ($save_type == 'account') {
         if (App::isWxPlatformEnabled()) {
@@ -850,7 +855,9 @@ if ($op == 'account') {
 
     if ($settings['custom']['SQMPay']['enabled']) {
         $tpl_data['cbURL'] = SQM::getCallbackUrl();
-    }    
+    }
+
+    $tpl_data['aliTicketURL'] = AliTicket::getCallbackUrl();
 
 } elseif ($op == 'notice') {
 

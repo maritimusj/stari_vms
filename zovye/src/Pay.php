@@ -79,7 +79,12 @@ class Pay
 
     public static function prepareDataWithPay(string $pay_name, deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
     {
-        $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));
+        if ($pay_data['order_no']) {
+            $partial = $pay_data['order_no'];
+        } else {
+            $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));  
+        }
+
         $order_no = "U{$user->getId()}D{$device->getId()}" . $partial;
 
         $pay_data = array_merge_recursive($pay_data, [

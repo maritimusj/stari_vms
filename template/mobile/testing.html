@@ -277,7 +277,7 @@
                 success: function (data) {
                     if (data && data.resultStr) {
                         const url = data.resultStr;
-                        const result = url.match(/(device=|id=|\?)(\w{3,})/i);
+                        const result = url.match(/(device=|id=|IMEI:|\?)(\w{3,})/i);
                         const id = result ? result[2] : url;
                         return cb(id);
                     }

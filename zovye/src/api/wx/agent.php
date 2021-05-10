@@ -1142,7 +1142,7 @@ class agent
                         'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
                     ];
 
-                    $gsp = $agent->settings('agentData.gsp', []);Util::logToFile('debug', $gsp);
+                    $gsp = $agent->settings('agentData.gsp', []);
                     if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
                         foreach((array)$gsp['rel'] as $level => $val) {
                             $gsp['rel'][$level] = number_format($val / 100, 2);

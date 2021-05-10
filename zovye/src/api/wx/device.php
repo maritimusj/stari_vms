@@ -524,7 +524,6 @@ class device
                 return $result;
             }, $device->getId());
 
-            Util::logToFile('debug', $result);
             return $result;
         }
 

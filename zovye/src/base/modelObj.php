@@ -325,7 +325,6 @@ class modelObj implements ISettings
 
     public function save(): bool
     {
-        Util::logToFile('debug', $this->__getData());
         if ($this->factory) {
             return $this->factory->__saveToDb($this);
         }

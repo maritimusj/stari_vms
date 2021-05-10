@@ -32,7 +32,7 @@ class Advertising extends State
     const QRCODE = 11; //推广二维码
     const PASSWD = 12; //用于推广的口令
 
-    public static $template_files = [
+    public static $names = [
         self::UNKNOWN => 'default',
         self::SCREEN => 'screen',
         self::ACCOUNT => 'account',
@@ -124,6 +124,11 @@ class Advertising extends State
         }
 
         return null;
+    }
+
+    public static function getTypeId($name)
+    {
+        return array_search(strtolower($name), self::$names);
     }
 
     /**

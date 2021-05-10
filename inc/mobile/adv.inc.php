@@ -8,10 +8,15 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$type = request::int('typeid');
+if (request::has('typeid')) {
+    $type_id = request::int('typeid');
+} else {
+    $type = request::trim('type');
+    $type_id = Advertising::getTypeId($type);
+}
+
 $num = request::int('num', 10);
 $device_id = request::str('deviceid');
-
 
 $user = Util::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
@@ -23,7 +28,7 @@ if (empty($device)) {
     JSON::fail('找不到这个设备');
 }
 
-$result = Util::getDeviceAdvs($device_id, $type, $num);
+$result = Util::getDeviceAdvs($device_id, $type_id, $num);
 if (is_error($result)) {
     JSON::fail($result);
 }

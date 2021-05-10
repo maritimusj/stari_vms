@@ -347,7 +347,13 @@ JSCODE;
        })
     }
     zovye_fn.getAdvs = function(typeid, num, cb) {
-        $.get("{$adv_api_url}", {typeid, num}).then(function(res){
+        const params = {num};
+        if (typeof typeid == 'number') {
+            params['typeid'] = typeid;
+        } else {
+            params['type'] = typeid;
+        }
+        $.get("{$adv_api_url}", params).then(function(res){
             if (res && res.status) {
                 if (typeof cb === 'function') {
                     cb(res.data);

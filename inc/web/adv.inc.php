@@ -594,5 +594,5 @@ if ($op == 'default') {
     Util::itoast('审核操作失败！', $this->createWebUrl('adv', ['type' => $type]), 'error');
 }
 
-$filename = Advertising::$template_files[$type];
+$filename = Advertising::$names[$type];
 $this->showTemplate("web/adv/{$filename}", $tpl_data);

@@ -202,183 +202,51 @@ if ($op == 'list') {
 
     JSON::success($devices);
 } else if ($op == 'default') {
-
-    if (!request::is_ajax()) {
-        $tpl_data = [
-            'lost_offset_day' => intval(settings('device.lost', 1)),
-            'issuing_offset_day' => intval(settings('device.issuing', 1)),
-        ];
-        //指定代理商
-        $agent_id = request::int('agentId');
-        if ($agent_id) {
-            $agent = Agent::get($agent_id);
-            if (empty($agent)) {
-                Util::itoast('找不到这个代理商！', $this->createWebUrl('device'), 'error');
-            }
-            $tpl_data['s_agent'] = $agent->profile();
-        }
-
-        $tags_id = request::int('tag_id');
-        if ($tags_id) {
-            $tag = m('tags')->findOne(['id' => $tags_id]);
-            if (empty($tag)) {
-                Util::itoast('找不到这个标签！', $this->createWebUrl('device'), 'error');
-            }
-            $tpl_data['s_tags'] = [
-                [
-                    'id' => intval($tag->getId()),
-                    'title' => strval($tag->getTitle()),
-                    'count' => intval($tag->getCount()),
-                ],
-            ];
-        }
-
-        $this->showTemplate('web/device/default_new', $tpl_data);
-    }
-
-    //分配设备控件查询设备详情
-    if (request::has('id')) {
-        $device = Device::get(request::int('id'));
-        if ($device) {
-            $data = [
-                'id' => intval($device->getId()),
-                'name' => strval($device->getName()),
-                'IMEI' => strval($device->getImei()),
-                'appId' => strval($device->getAppId()),
-            ];
-            $agent = $device->getAgent();
-            if ($agent) {
-                $data['agent'] = $agent->getName();
-            }
-            JSON::success($data);
-        }
-
-        JSON::fail('没有找到这个设备');
-    }
-
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-
-    $order_by = request::str('orderby');
-    if ($order_by && in_array($order_by, ['id', 'createtime', 'imei', 'agentId', 'groupId', 'd_total', 'm_total'])) {
-        $order = in_array(strtolower(request('order')), ['desc', 'asc']) ? request('order') : 'desc';
-    } else {
-        $order_by = 'createtime';
-        $order = 'DESC';
-    }
-
-    $query = Device::query();
-
-    //搜索指定ID
-    if (request::has('ids')) {
-        if (is_string(request('ids'))) {
-            $ids = explode(',', request::str('ids'));
-        } elseif (is_array((request('ids')))) {
-            $ids = request::array('ids');
-        } else {
-            $ids = [request::int('ids')];
-        }
-        foreach ($ids as $index => $id) {
-            $id = intval($id);
-            if ($id > 0) {
-                $ids[$index] = $id;
-            }
-        }
-        if ($ids) {
-            $query->where(['id' => $ids]);
-        }
-    }
-
-    //指定分组
-    if (request::isset('groupId')) {
-        $group_id = request::int('groupId');
-        if ($group_id > 0) {
-            $group = Group::get($group_id);
-            if (empty($group)) {
-                Util::itoast('找不到这个分组！', $this->createWebUrl('device'), 'error');
-            }
-            $query->where(['group_id' => $group_id]);
-        } else {
-            $query->where(['group_id' => 0]);
-        }
-    }
-
+    $tpl_data = [
+        'lost_offset_day' => intval(settings('device.lost', 1)),
+        'issuing_offset_day' => intval(settings('device.issuing', 1)),
+    ];
     //指定代理商
     $agent_id = request::int('agentId');
     if ($agent_id) {
         $agent = Agent::get($agent_id);
-        if ($agent) {
-            $query->where(['agent_id' => $agent_id]);
+        if (empty($agent)) {
+            Util::itoast('找不到这个代理商！', $this->createWebUrl('device'), 'error');
         }
+        $tpl_data['s_agent'] = $agent->profile();
     }
 
-    //搜索关键字
-    $keywords = request::trim('keywords');
-    if ($keywords) {
-        $query->whereOr([
-            'name LIKE' => "%{$keywords}%",
-            'imei LIKE' => "%{$keywords}%",
-            'app_id LIKE' => "%{$keywords}%",
-            'iccid LIKE' => "%{$keywords}%",
-        ]);
-    }
-
-    //指定tags
-    if (request::has('tagids')) {
-        $tag_ids = request::is_array('tagids') ? request::array('tagids') : [request::int('tagids')];
-        /** @var tagsModelObj $tag */
-        foreach (m('tags')->where(We7::uniacid(['id' => $tag_ids]))->findAll() as $tag) {
-            $query->where("tags_data REGEXP '<{$tag->getId()}>'");
+    $tags_id = request::int('tag_id');
+    if ($tags_id) {
+        $tag = m('tags')->findOne(['id' => $tags_id]);
+        if (empty($tag)) {
+            Util::itoast('找不到这个标签！', $this->createWebUrl('device'), 'error');
         }
-    }
-
-    //只显示问题设备
-    if (request::bool('errorDevice')) {
-        $query->where(['error_code <>' => 0]);
-    }
-
-    //只显示缺货设备
-    if (request::bool('lowRemain')) {
-        $remainWarning = intval(settings('device.remainWarning', 1));
-        $query->where(['remain <' => $remainWarning]);
-    }
-
-    //只显绑定有APP设备
-    if (request::isset('unreg')) {
-        if (request::bool('unreg')) {
-            $query->where("(app_id IS NULL OR app_id='')");
-            $filter['unreg'] = 1;
-        } else {
-            $query->where("(app_id IS NOT NULL AND app_id<>'')");
-        }
-    }
-
-    if (request::isset('types')) {
-        $query->where(['device_type' => request::int('types')]);
-    }
-
-    $query->page($page, $page_size);
-    $query->orderBy("{$order_by} {$order}");
-
-    $devices = [];
-
-    /** @var deviceModelObj $entry */
-    foreach ($query->findAll() as $entry) {
-        $data = [
-            'id' => intval($entry->getId()),
-            'name' => strval($entry->getName()),
-            'IMEI' => strval($entry->getImei()),
-            'appId' => strval($entry->getAppId()),
+        $tpl_data['s_tags'] = [
+            [
+                'id' => intval($tag->getId()),
+                'title' => strval($tag->getTitle()),
+                'count' => intval($tag->getCount()),
+            ],
         ];
-        $res = $entry->getAgent();
-        if ($res) {
-            $data['agent'] = $res->getName();
-        }
-        $devices['list'][] = $data;
     }
 
-    $devices['serial'] = request::str('serial') ?: strval(microtime(true));
-    JSON::success($devices);
+    if (request::has('types')) {
+        $typeid = request::int('types');
+        $type = DeviceTypes::get($typeid);
+        if (empty($type)) {
+            Util::itoast('找不到这个型号！', $this->createWebUrl('device'), 'error');
+        }
+        $tpl_data['s_device_type'] = [
+            [
+                'id' => $type->getId(),
+                'title' => $type->getTitle(),
+                'lanes_total' => count($type->getCargoLanes()),
+            ]
+        ];
+    }
+
+    $this->showTemplate('web/device/default_new', $tpl_data);
     
 } elseif ($op == 'search') {
 

@@ -444,33 +444,38 @@ class deviceModelObj extends modelObj
         return empty($address) ? $default : $address;
     }
 
+    /**
+     * 迁移货道数据
+     */
     private function migrateLanesData(): string
     {
-        $prefix = 'extra.';
-        $data = $this->settings('extra.cargo_lanes');
+        $data = $this->settings('cargo_lanes');
         if (is_array($data)) {
-            if (!$this->set('cargo_lanes', $data)) {
-                return $prefix;
-            }
-            if (!$this->updateSettings('extra.cargo_lanes', null)) {
-                return $prefix;
-            }
+            return '';
         }
-        return '';
-    }
+    
+        $data = $this->settings('extra.cargo_lanes', []);
+        if ($this->set('cargo_lanes', $data)) {
+            return '';
+        }
 
+        return 'extra.';
+    }
+    
+    /**
+     * 迁移货道数据
+     */
     private function getMigratedLanesData($path = '', $default = null)
     {
         $data = $this->get('cargo_lanes');
-        if ($data) {
+        if (is_array($data)) {
             return getArray($data, $path, $default);
         }
 
-        $data = $this->settings('extra.cargo_lanes');
-        if ($this->set('cargo_lanes', $data)) {
-            $this->updateSettings('extra.cargo_lanes', null);
-        }
-         return getArray($data, $path, $default);
+        $data = $this->settings('extra.cargo_lanes', []);
+        $this->set('cargo_lanes', $data);
+
+        return getArray($data, $path, $default);
     }
 
     public function setLane($lane, $num = null, $price = null): bool

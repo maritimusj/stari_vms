@@ -179,6 +179,16 @@ class AliTicket
         return md5(hash_hmac('sha1', $str, $secret, true));
     }
 
+    public static function getDeviceJoinStatus(deviceModelObj $device)
+    {
+        $config = settings('custom.aliTicket', []);
+        if (isEmptyArray($config) || empty($config['key'])) {
+            return err('未配置！');
+        }
+
+        return (new AliTicket($config['key'], $config['secret']))->vmStatus($device);
+    }
+
     public static function getCallbackUrl()
     {
         return Util::murl('ali', ['op' => 'ticket']);
@@ -267,9 +277,9 @@ class AliTicket
         return true;
     }
 
-    public static function getSceneList($sub = '')
+    public static function getSceneList()
     {
-        static $sences = [
+        return [
             '政府机构' => ['政府机构'],
             '医院/医疗机构' => [
                 '综合医院',
@@ -401,16 +411,12 @@ class AliTicket
                 '驾校',
             ],
         ];
-
-        if (empty($sub)) {
-            return array_keys($sences);
-        }
-        return isset($sences[$sub]) ? $sences[$sub] : [];
     }
 
     public static function getDeviceTypes()
     {
         return [
+            '售货机',
             '摇摇车',
             '共享打印机',
             '共享纸巾',
@@ -426,8 +432,7 @@ class AliTicket
             '娃娃机',
             '店头互动游戏',
             '商场大屏互动游戏',
-            '互动游戏',
-            '售货机',
+            '互动游戏',            
         ];
     }
 }

@@ -340,7 +340,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['commission']['agreement']['version'] = sha1($settings['commission']['agreement']['content']);
         }
 
-    } elseif ($save_type == 'advs') {        
+    } elseif ($save_type == 'advs') {      
+
         if ($settings['custom']['SQMPay']['enabled']) {
             $settings['custom']['SQMPay']['appSecret'] = request::trim('appSecret');
             $settings['custom']['SQMPay']['js'] = request::str('js');
@@ -351,6 +352,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             }
             $settings['custom']['SQMPay']['bonus'] = max(0, request::float('bonus', 0, 2)) * 100;
         }
+        
         if ($settings['custom']['aliTicket']['enabled']) {
             $settings['custom']['aliTicket']['key'] = request::trim('aliTicketAppKey');
             $settings['custom']['aliTicket']['secret'] = request::trim('aliTicketAppSecret');
@@ -360,7 +362,9 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             }
             $settings['custom']['aliTicket']['bonus'] = max(0, request::float('aliTicketBonus', 0, 2)) * 100;
         }
+
     } elseif ($save_type == 'account') {
+
         if (App::isWxPlatformEnabled()) {
             $settings['account']['wx']['platform']['config']['appid'] = request::trim('wxPlatformAppID');
             $settings['account']['wx']['platform']['config']['secret'] = request::trim('wxPlatformAppSecret');

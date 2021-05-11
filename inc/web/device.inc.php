@@ -2538,7 +2538,7 @@ if ($op == 'list') {
     $tpl_data['the_first_id'] = $the_first_id;
 
     $this->showTemplate('web/device/poll_event', $tpl_data);
-} elseif ($op = 'new_event') {
+} elseif ($op == 'new_event') {
 
     $device = Device::get(request('id'));
     if (empty($device)) {
@@ -2604,4 +2604,27 @@ if ($op == 'list') {
         }
         echo json_encode($events);
     }
+
+} elseif ($op == 'aliTicket') {
+
+    $result = [];
+
+    $id = request::int('id');
+    if ($id > 0) {
+        $device = Device::get($id);
+        if (empty($device)) {
+            JSON::fail('找不到这个设备！');
+        }
+    }
+
+    $fn = request::trim('fn');
+    if ($fn == 'detail') {
+        $result['device_types'] = AliTicket::getDeviceTypes();
+        $result['scenes'] = AliTicket::getSceneList();
+        if ($device) {
+            $result['status'] = AliTicket::getDeviceJoinStatus($device);
+        }
+    }
+
+    JSON::success($result);    
 }

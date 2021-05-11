@@ -4,6 +4,10 @@
     #special fieldset[disabled] label, #special2 fieldset[disabled] input, #special2 fieldset[disabled] table{
         color: gray;
     }
+    .btn-success {
+        background-color: #9E9E9E;
+        border-color: #9E9E9E;
+    }
 </style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
@@ -86,6 +90,15 @@
                         <input type="number" class="form-control" name="aliTicketBonus" id="aliTicketBonus" value="{php echo number_format($settings['custom']['aliTicket']['bonus'] / 100, 2)}" min="0" step="0.01">
                         <span class="help-block">* 设备代理商获得的佣金金额，单位：元</span>
                     </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="reviewAdminUser" class="col-md-2 control-label">选择设备</label>                    
+                    <div class="col-md-8">
+                        <a href="{php echo $this->createWebUrl('adv', array('op'=>'aliTicketAssign'))}" class="btn btn-success">
+                            <i class="fa fa-wrench fa-fw" title="分配设备"></i>
+                        </a>
+                    </div>                    
                 </div>
             </div>
             {/if}

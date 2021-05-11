@@ -78,6 +78,21 @@
     #device_types .cargo_lanes th.fixed {
         min-width: 200px;
     }
+    .scene_list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    span.scene {
+        background-color: #9E9E9E;
+        padding: 2px 8px;
+        color: #fff;
+        border-radius: 6px;
+        margin: 3px 1px;
+        cursor: pointer;
+    }
+    span.scene.selected {
+        background-color: #8bc34a;
+    }
     [v-cloak] {
         display: none;
     }
@@ -478,6 +493,45 @@
             <div id="moscale">
             </div>
             {/if}
+            {if \zovye\App::isCustomAliTicketEnabled()}
+            <div class="seg"  id="aliTicket" v-cloak>
+                <div class="title">天猫拉新设置</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">设备类型</label>
+                    <div class="col-md-10">
+                        <select name="deviceType">
+                            <option v-for="v in deviceTypes">{{v}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="second" class="col-md-2 control-label">第一场景</label>
+                    <div class="col-md-10 scene_list">
+                        <span :class="{'scene':true, 'selected': scene.first == e}" v-for="e in firstSceneList" @click="setFirstScene(e);">{{e}}</span>
+                        <input type="hidden" name="firstScene" v-model="scene.first">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="second" class="col-md-2 control-label">第二场景</label>
+                    <div class="col-md-10 scene_list">
+                        <span :class="{'scene':true, 'selected': scene.second == e}" v-for="e in secondSceneList" @click="setSecondScene(e)">{{e}}</span>
+                        <input type="hidden" name="secondScene" v-model="scene.second">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">所在区域</label>
+                    <div class="col-md-10" v-once>
+                        {php echo tpl_form_field_district('area', $agent_data['area']);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address" class="col-md-2 control-label">具体地址</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="address" id="address" v-model="address">
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
     <div class="form-btn">
@@ -535,6 +589,78 @@
     api.chooseGoods = function() {
         api.showResult({op: 'goods', pagesize: 10});
     }
+
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}', 'district'], function($, Vue, dis) {
+        const api_url = "{php echo $this->createWebUrl('device', ['op' => 'aliTicket'])}";
+        const app = new Vue({
+            el: "#aliTicket",
+            data: {
+                deviceId: parseInt("{php echo $device? $device->getId() : 0}"),
+                deviceTypes: [],
+                scene: {
+                    list: {},
+                    first: '',
+                    second: '',
+                },
+                address: '',
+            },
+            computed: {
+                firstSceneList() {
+                    return [...Object.keys(this.scene.list)];
+                },
+                secondSceneList() {
+                    if (this.scene.first != '') {
+                        return this.scene.list[this.scene.first] || [];
+                    }
+                    return [];
+                },
+            },
+            mounted() {
+                this.getDetail();
+				$(".tpl-district-container").each(function(){
+					var elms = {};
+					elms.province = $(this).find(".tpl-province")[0];
+					elms.city = $(this).find(".tpl-city")[0];
+					elms.district = $(this).find(".tpl-district")[0];
+					var vals = {};
+					vals.province = $(elms.province).attr("data-value");
+					vals.city = $(elms.city).attr("data-value");
+					vals.district = $(elms.district).attr("data-value");
+					dis.render(elms, vals, {withTitle: true});
+				});
+            },
+            methods: {
+                getDetail() {
+                    const self = this;
+                    $.get(api_url, {fn: 'detail', id: this.deviceId}).then(res => {
+                        if (res && res.status) {
+                            self.deviceTypes = res.data.device_types || [];
+                            self.scene.list = res.data.scenes || [];
+                            if (self.firstSceneList.length > 0) {
+                                self.setFirstScene(self.firstSceneList[0]);
+                            }
+                        }
+                    })
+                },
+                setFirstScene(scene) {
+                    if (scene != this.scene.first) {
+                        this.scene.first = scene;
+                        if (this.secondSceneList.length > 0) {
+                            this.setSecondScene(this.secondSceneList[0]);
+                        }
+                    }                    
+                },
+                setSecondScene(scene) {
+                    if (scene != this.scene.second) {
+                        this.scene.second = scene;
+                    }  
+                },
+                regionChange (data) {
+                    console.log(data)
+                },
+            }
+        });
+    });
 
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         const api_url = "{php echo $this->createWebUrl('devicetypes');}";
@@ -692,6 +818,9 @@
             savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
         })
     })
+    {/if}
+    {if \zovye\App::isCustomAliTicketEnabled()}
+
     {/if}
     $(function(){
         let tags = [];

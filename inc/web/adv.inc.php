@@ -592,6 +592,29 @@ if ($op == 'default') {
     }
 
     Util::itoast('审核操作失败！', $this->createWebUrl('adv', ['type' => $type]), 'error');
+
+} elseif ($op == 'aliTicketAssign') {
+
+    $assigned = Config::aliTicket('assign', []);
+
+    $this->showTemplate('web/adv/assign_ali_ticket', [
+        'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
+        'assign_data' => json_encode($assigned),
+        'agent_url' => $this->createWebUrl('agent'),
+        'group_url' => $this->createWebUrl('device', array('op' => 'group')),
+        'tag_url' => $this->createWebUrl('tags'),
+        'device_url' => $this->createWebUrl('device'),
+        'save_url' => $this->createWebUrl('adv', array('op' => 'saveAliTicketAssignData')),
+        'back_url' => $this->createWebUrl('settings', ['op' => 'advs']),
+    ]);
+
+} elseif ($op == 'saveAliTicketAssignData') {
+    
+    $data = request::is_string('data') ? json_decode(htmlspecialchars_decode(request::str('data')), true) : request('data');
+    if (Config::aliTicket('assign', $data, true)) {
+        JSON::success('保存成功！');
+    }
+    JSON::fail('保存失败！');
 }
 
 $filename = Advertising::$names[$type];

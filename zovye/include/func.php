@@ -74,7 +74,7 @@ function settings(string $key = '', $default = null)
 
 function updateSettings(string $key, $val): bool
 {
-    unset($__settings_cache, $key);
+    unset($__settings_cache[$key]);
     return app()->updateSettings($key, $val);
 }
 

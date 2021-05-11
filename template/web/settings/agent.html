@@ -426,6 +426,48 @@
                     </div>
                 </div>
             </div>
+            <div class="seg" id="special3">
+                <div class="title">代理商协议</div>
+                <div class="form-group">
+                    <label for="agent_agreement" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                          <label>
+                            <input type="checkbox" name="agent_agreement" id="agent_agreement" value="1" {if $agreement['agent']['enabled']}checked{/if}>
+                            代理商第一次登录管理平台时，必须先同意协议
+                          </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($agreement['agent']['enabled'])}disabled{/if} name="agent_agreement">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                    {php echo tpl_ueditor('agent_agreement_content', $agreement['agent']['content']);}
+                    </div>
+                </div>                
+            </div>
+            <div class="seg" id="special4">
+                <div class="title">营运人员协议</div>
+                <div class="form-group">
+                    <label for="keeper_agreement" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                          <label>
+                            <input type="checkbox" name="keeper_agreement" id="keeper_agreement" value="1" {if $agreement['keeper']['enabled']}checked{/if}>
+                            营运人员第一次登录管理平台时，必须先同意协议
+                          </label>
+                        </div>
+                    </div>
+                </div>
+                <fieldset {if empty($agreement['keeper']['enabled'])}disabled{/if} name="keeper_agreement">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                    {php echo tpl_ueditor('keeper_agreement_content', $agreement['keeper']['content']);}
+                    </div>
+                </div>                
+            </div>
         </div>
     </div>
     <div class="form-btn">
@@ -462,6 +504,14 @@
         $('#special2 input[name=YzshopGoodsLimits]').click(function(){
             $('#special2 fieldset#agent_goods_limits_enabled').attr('disabled', !$(this).is(':checked'));
         })
+       
+        $('#special3 input[name=agent_agreement]').click(function(){
+            $('#special3 fieldset[name=agent_agreement]').attr('disabled', !$(this).is(':checked'));
+        })
+
+        $('#special4 input[name=keeper_agreement]').click(function(){
+            $('#special4 fieldset[name=keeper_agreement]').attr('disabled', !$(this).is(':checked'));
+        })        
     })
 </script>
 {template 'common/footer'}

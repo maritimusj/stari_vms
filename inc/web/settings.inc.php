@@ -306,6 +306,17 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             }
         }
 
+        Config::agent('agreement', [
+            'agent' => [
+                'enabled' => request::bool('agent_agreement'),
+                'content' => request::trim('agent_agreement_content'),
+            ],
+            'keeper' => [
+                'enabled' => request::bool('keeper_agreement'),
+                'content' => request::trim('keeper_agreement_content'),
+            ],
+        ], true);
+
     } elseif ($save_type == 'commission') {
         $settings['commission']['enabled'] = request::bool('commission') ? 1 : 0;
 
@@ -736,6 +747,9 @@ if ($op == 'account') {
             ];
         }
     }
+
+    $tpl_data['agreement'] = Config::agent('agreement', []);
+    //var_dump($tpl_data);exit();
 
 } elseif ($op == 'wxapp') {
     $query = WxApp::query();

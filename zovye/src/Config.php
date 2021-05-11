@@ -16,4 +16,12 @@ class Config
         return globalConfig('ali_ticket', $key, $v);
     }
 
+    public static function agent($key, $v = null, $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('agent', $key, $v);
+        }
+
+        return globalConfig('agent', $key, $v);
+    }
 }

@@ -90,7 +90,7 @@ class keeper
                 $agent = $keeper->getAgent();
                 if ($agent) {
                     if ($res['config'] && !$agent->isWxAppAllowed($res['config']['key'])) {
-                       continue;
+                        continue;
                     }
                     $keeper_data[] = [
                         'id' => intval($keeper->getId()),
@@ -121,11 +121,16 @@ class keeper
                 }
 
                 if (LoginData::create($data)) {
-                    return [
+                    $result = [
                         'token' => $token,
                         'profile' => $keeper_data,
                         'msg' => '登录成功!',
                     ];
+                    $agreement = \zovye\Config::agent('agreement.keeper', []);
+                    if ($agreement && $agreement['enabled']) {
+                        $result['agreement'] = $agreement['content'];
+                    }
+                    return $result;
                 }
             }
         }
@@ -761,7 +766,7 @@ class keeper
             if ($device->getMAC()) {
                 $result['device']['mac'] = $device->getMAC();
             }
-        } else{
+        } else {
             $result['device'] = new stdClass();
         }
 

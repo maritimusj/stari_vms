@@ -23,6 +23,7 @@ router::exec($op, [
     'DeviceSetNum' => '\zovye\api\wx\device::deviceReset',
 
     'Reg' => '\zovye\api\wx\agent::reg',
+    'PreLogin' => '\zovye\api\wx\agent::preLogin',
     'Login' => '\zovye\api\wx\agent::login',
     'LoginQR' => '\zovye\api\wx\agent::loginQR',
     'LoginScan' => '\zovye\api\wx\agent::loginScan',

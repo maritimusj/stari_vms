@@ -178,6 +178,23 @@ class agent
         return error(State::ERROR, '您还不是我们的代理商,立即注册?[102]');
     }
 
+    public static function preLogin(): array
+    {
+        $result = [
+            //邀请登记手机号码网址
+            'url' => Util::murl('mobile'),
+            'debug' => 0,
+        ];
+
+        //是否为微信审核模式
+        $data = include ZOVYE_ROOT . DIRECTORY_SEPARATOR . 'debug.php';
+        if ($data) {
+            $result['debug'] = intval($data['debug']);
+        }
+
+        return $result;
+    }
+
     /**
      * 用户登录，小程序必须提交code,encryptedData和iv值
      *
@@ -188,9 +205,18 @@ class agent
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
             Util::logToFile('wxapi', $res);
-        } 
-        
-        return agent::doUserLogin($res);
+        }
+
+        $result = agent::doUserLogin($res);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        $agreement = \zovye\Config::agent('agreement.agent', []);
+        if ($agreement['enabled']) {
+            $result['agreement'] = $agreement['content'];
+        }
+        return $result;
     }
 
     /**
@@ -467,7 +493,7 @@ class agent
         //指定group id
         if (request::isset('group')) {
             $group = request::int('group');
-            $device->setGroupId($group);            
+            $device->setGroupId($group);
         }
 
         $extra = $device->get('extra', []);
@@ -599,7 +625,6 @@ class agent
                         }
                     }
                 }
-
             } else {
                 return error(State::ERROR, '没有权限管理这个设备！');
             }
@@ -775,7 +800,7 @@ class agent
         $group_id = request::int('group');
         if ($group_id > 0) {
             $query = Device::query([
-                'agent_id' => $user->getAgentId(), 
+                'agent_id' => $user->getAgentId(),
                 'group_id' => $group_id,
             ]);
             /** @var deviceModelObj $entry */
@@ -1144,7 +1169,7 @@ class agent
 
                     $gsp = $agent->settings('agentData.gsp', []);
                     if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
-                        foreach((array)$gsp['rel'] as $level => $val) {
+                        foreach ((array)$gsp['rel'] as $level => $val) {
                             $gsp['rel'][$level] = number_format($val / 100, 2);
                         }
                         $data['gsp_rel'] = $gsp['rel'];
@@ -1372,7 +1397,7 @@ class agent
 
                                 $gsp = $agent->settings('agentData.gsp', []);
                                 if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
-                                    foreach((array)$gsp['rel'] as $level => $val) {
+                                    foreach ((array)$gsp['rel'] as $level => $val) {
                                         $gsp['rel'][$level] = number_format($val / 100, 2);
                                     }
                                     $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
@@ -1424,16 +1449,16 @@ class agent
     }
 
     public static function getAgentStat($agent, $s_ts, $e_ts): array
-    {   
-        return Util::cachedCall(10, function() use($agent, $s_ts, $e_ts) {
+    {
+        return Util::cachedCall(10, function () use ($agent, $s_ts, $e_ts) {
             $query = Order::query([
                 'agent_id' => $agent->getId(),
                 'createtime >=' => $s_ts,
                 'createtime <' => $e_ts,
             ]);
-    
+
             list($priceTotal, $orderTotal) = $query->get(['sum(price)', 'count(*)']);
-    
+
             $commissionTotal = CommissionBalance::query([
                 'openid' => $agent->getOpenid(),
                 'src' => [
@@ -1447,7 +1472,7 @@ class agent
                 'createtime >=' => $s_ts,
                 'createtime <' => $e_ts
             ])->get('sum(x_val)');
-    
+
             return ['price_all' => intval($priceTotal), 'order' => intval($orderTotal), 'comm' => intval($commissionTotal)];
         }, $agent->getId(), $s_ts, $e_ts);
     }
@@ -1674,33 +1699,33 @@ class agent
 
     public static function homepageOrderStat(): array
     {
-        $user = common::getAgent();        
+        $user = common::getAgent();
 
-        return Util::cachedCall(10, function() use ($user) {
+        return Util::cachedCall(10, function () use ($user) {
             $agent_id = $user->getAgentId();
             if (request::has('start')) {
                 $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
             } else {
                 $s_date = new DateTime('first day of this month 00:00:00');
             }
-    
+
             if (request::has('end')) {
                 $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
                 $e_date->modify('next day');
             } else {
                 $e_date = new DateTime('first day of next month 00:00:00');
             }
-    
+
             $condition = [
                 'agent_id' => $agent_id,
                 'createtime >=' => $s_date->getTimestamp(),
                 'createtime <' => $e_date->getTimestamp(),
             ];
-    
+
             $res = Device::query(['agent_id' => $agent_id])->findAll();
             $devices = [];
             $device_keys = [];
-    
+
             /** @var deviceModelObj $item */
             foreach ($res as $item) {
                 $devices[] = [
@@ -1710,7 +1735,7 @@ class agent
                 ];
                 $device_keys[] = $item->getId();
             }
-    
+
             $device_id = request::int('deviceid');
             if ($device_id != 0) {
                 $d_id = request::int('deviceid');
@@ -1720,7 +1745,7 @@ class agent
                     $condition['device_id'] = -1;
                 }
             }
-    
+
             $data = [];
             $total = [
                 'income' => 0,
@@ -1733,13 +1758,13 @@ class agent
                 'ali_refund' => 0,
                 'ali_receipt' => 0,
             ];
-    
+
             $res = Order::query($condition)->orderBy('createtime DESC')->findAll();
-    
+
             /** @var orderModelObj $item */
             foreach ($res as $item) {
                 $amount = $item->getCommissionPrice();
-    
+
                 $create_date = date('Y-m-d', $item->getCreatetime());
                 if (!isset($data[$create_date])) {
                     $data[$create_date]['income'] = 0;
@@ -1752,9 +1777,9 @@ class agent
                     $data[$create_date]['ali_refund'] = 0;
                     $data[$create_date]['ali_receipt'] = 0;
                 }
-    
+
                 $is_alipay = User::isAliUser($item->getOpenid());
-    
+
                 $data[$create_date]['income'] += $amount;
                 $total['income'] += $amount;
                 if ($is_alipay) {
@@ -1792,7 +1817,7 @@ class agent
                 $v['date'] = $k;
                 $format_data[] = $v;
             }
-    
+
             return [
                 'data' => $format_data,
                 'total' => $total,
@@ -1808,25 +1833,25 @@ class agent
     {
         $user = common::getAgent();
 
-        list($stats, $data) = Util::cachedCall(10, function() use($user) {
+        list($stats, $data) = Util::cachedCall(10, function () use ($user) {
 
             $agent_id = $user->getAgentId();
 
             $condition = [];
             $condition['agent_id'] = $agent_id;
-    
+
             $device_stat = [
                 'all' => 0,
                 'on' => 0,
                 'off' => 0,
             ];
-    
+
             $time_less_15 = new DateTime('-15 min');
             $power_time = $time_less_15->getTimestamp();
             $device_stat['all'] = Device::query($condition)->count();
             $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
             $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
-    
+
             $data = [
                 'all' => [
                     'n' => 0, //全部交易数量
@@ -1847,7 +1872,7 @@ class agent
                     'n' => 0, //上月交易数量,
                 ],
             ];
-    
+
             $date = new DateTime();
             $date->modify('today');
             $today = $date->format('Y-m-d');
@@ -1866,7 +1891,7 @@ class agent
             $date->modify($today);
             $date->modify('first day of this month');
             $ft_mon_timestamp = $date->getTimestamp();
-    
+
             $data['all']['n'] = Order::query($condition)->count();
             $data['today']['n'] = Order::query($condition)
                 ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $tomorrow_timestamp)
@@ -1894,11 +1919,11 @@ class agent
     public static function repair()
     {
         $user = common::getAgent();
-        $agent =$user->isPartner() ?  $user->getPartnerAgent() : $user;
+        $agent = $user->isPartner() ?  $user->getPartnerAgent() : $user;
 
         $repairData = $agent->settings('repair', []);
 
-        $cleanFN = function () use ($agent){
+        $cleanFN = function () use ($agent) {
             $agent->updateSettings('repair', []);
             $agent->save();
         };

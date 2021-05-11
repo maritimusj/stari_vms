@@ -601,9 +601,9 @@
     const current = {
         agent: JSON.parse(decodeURIComponent('{php echo urlencode(json_encode($s_agent ?: []))}')),
         group: JSON.parse(decodeURIComponent('{php echo json_encode($s_group ?: [])}')),
-        deviceType: JSON.parse(decodeURIComponent('{php echo json_encode($s_device_type ?: [])}')),
+        deviceTypes: JSON.parse(decodeURIComponent('{php echo json_encode($s_device_type ?: [])}')),
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=202100427"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=202100428"></script>
 {template 'common/footer'}

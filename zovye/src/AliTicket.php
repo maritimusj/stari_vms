@@ -1,4 +1,5 @@
 <?php
+
 namespace zovye;
 
 use zovye\model\deviceModelObj;
@@ -14,32 +15,17 @@ class AliTicket
     private $app_key;
     private $app_secret;
 
-    public static function getCallbackUrl()
-    {
-        return Util::murl('ali', ['op' => 'ticket']);
-    }
-
     public function __construct(string $app_key, string $app_secret)
     {
         $this->app_key = $app_key;
         $this->app_secret = $app_secret;
     }
 
-    public static function fetch(userModelObj $user, deviceModelObj $device)
-    {
-        $config = settings('custom.aliTicket', []);
-        if (isEmptyArray($config) || empty($config['key'])) {
-            return err('未配置！');
-        }
-
-        return (new AliTicket($config['key'], $config['secret']))->fetchOne($user, $device);
-    }
-
     public function fetchOne(userModelObj $user, deviceModelObj $device)
     {
         $profile = $user->profile();
         $params = [
-            'appKey'=> $this->app_key,
+            'appKey' => $this->app_key,
             'exUid' => $profile['openid'],
             'city'  => $profile['city'],
             'vmid'  => $device->getImei(),
@@ -75,6 +61,109 @@ class AliTicket
         return $result['data'];
     }
 
+    public function syncVM($device_uid, $params = [])
+    {
+        $params = [
+            'appKey' => $this->app_key,
+            'vmid' => $device_uid,
+            'province' => strval($params['province']),
+            'city' => strval($params['city']),
+            'district' => strval($params['district']),
+            'name' => strval($params['name']),
+            'addressDetail' => strval($params['address']),
+            'floor' => strval($params['floor']),
+            'firstScene' => strval($params['firstScene']),
+            'secondScene' => strval($params['secondScene']),
+            'deviceType' => strval($params['deviceType']),
+            'deviceModel' => strval($params['deviceModel']),
+            'time' => time(),
+        ];
+
+        $params['ufsign'] = self::sign($params, $this->app_secret);
+
+        $result = Util::post(self::API_VM_URL . '/SyncVm', $params);
+
+        if (empty($result)) {
+            return err('返回数据为空！');
+        }
+
+        if (is_error($result)) {
+            return $result;
+        }
+
+        if ($result['code'] != 200) {
+            return err(empty($result['msg']) ? '接口返回错误！' : $result['msg']);
+        }
+
+        return true;
+    }
+
+    public function vmStatus($device_uid)
+    {
+        $params = [
+            'appKey' => $this->app_key,
+            'vmid' => $device_uid,
+            'time' => time(),
+        ];
+
+        $params['ufsign'] = self::sign($params, $this->app_secret);
+
+        $result = Util::post(self::API_VM_URL . '/VmStatus', $params);
+
+        if (empty($result)) {
+            return err('返回数据为空！');
+        }
+
+        if (is_error($result)) {
+            return $result;
+        }
+
+        if ($result['code'] != 200) {
+            return err(empty($result['msg']) ? '接口返回错误！' : $result['msg']);
+        }
+
+        return true;
+    }
+
+    public function CancelVm($device_uid)
+    {
+        $params = [
+            'appKey' => $this->app_key,
+            'vmid' => $device_uid,
+            'time' => time(),
+        ];
+
+        $params['ufsign'] = self::sign($params, $this->app_secret);
+
+        $result = Util::post(self::API_VM_URL . '/VmStatus', $params);
+
+        if (empty($result)) {
+            return err('返回数据为空！');
+        }
+
+        if (is_error($result)) {
+            return $result;
+        }
+
+        if ($result['code'] != 200) {
+            return err(empty($result['msg']) ? '接口返回错误！' : $result['msg']);
+        }
+
+        return true;
+    }
+
+    public function verifyData($params)
+    {
+        if (!App::isCustomAliTicketEnabled()) {
+            return err('该功能没有启用！');
+        }
+        if ($params['appKey'] !== $this->app_key || self::sign($params, $this->app_secret) !== $params['ufsign']) {
+            return err('签名校验失败！');
+        }
+        return true;
+    }
+
+
     public static function sign($data, $secret)
     {
         unset($data['ufsign']);
@@ -90,15 +179,19 @@ class AliTicket
         return md5(hash_hmac('sha1', $str, $secret, true));
     }
 
-    public function verifyData($params)
+    public static function getCallbackUrl()
     {
-        if (!App::isCustomAliTicketEnabled()) {
-            return err('该功能没有启用！');
+        return Util::murl('ali', ['op' => 'ticket']);
+    }
+
+    public static function fetch(userModelObj $user, deviceModelObj $device)
+    {
+        $config = settings('custom.aliTicket', []);
+        if (isEmptyArray($config) || empty($config['key'])) {
+            return err('未配置！');
         }
-        if ($params['appKey'] !== $this->app_key || self::sign($params, $this->app_secret) !== $params['ufsign']) {
-            return err('签名校验失败！');
-        }
-        return true;
+
+        return (new AliTicket($config['key'], $config['secret']))->fetchOne($user, $device);
     }
 
     public static function cb()
@@ -115,7 +208,7 @@ class AliTicket
         $user = User::get(request::json('exUid'), true);
         if (empty($user)) {
             return err('找不到这个用户！');
-        } 
+        }
 
         $extra = explode(':', request::json('extra'), 3);
         if (count($extra) != 2 || $extra[0] !== 'zovye') {
@@ -160,7 +253,7 @@ class AliTicket
         ];
 
         $pay_log->setData('payResult', $payResult);
-        
+
         $pay_log->setData('create_order.createtime', time());
         if (!$pay_log->save()) {
             return err('无法保存数据！');
@@ -172,5 +265,169 @@ class AliTicket
         }
 
         return true;
+    }
+
+    public static function getSceneList($sub = '')
+    {
+        static $sences = [
+            '政府机构' => ['政府机构'],
+            '医院/医疗机构' => [
+                '综合医院',
+                '妇幼医院/产科',
+                '体检中心',
+                '口腔齿科',
+                '儿科医院',
+                '综合药房/保健品销售',
+                '社区医院',
+                '专科医院',
+                '其他诊疗机构',
+            ],
+            '学校' => [
+                '小学',
+                '中学',
+                '高中',
+                '普通高等学校',
+                '成人高等学校',
+            ],
+            '休闲娱乐' => [
+                '电影院',
+                '演出/展览馆/文化艺术',
+                'KTV/酒吧',
+                '按摩/足疗/洗浴/汗蒸',
+                '游乐游艺',
+                '中医养生',
+                '游乐园',
+                '温泉',
+            ],
+            '网吧网咖' => [
+                '网咖',
+                '电竞馆',
+            ],
+            '生活服务' => [
+                '健身/体育/游泳/球类运动/舞蹈',
+                '亲子/早教/儿童服务',
+                '美容/美甲',
+                '美发沙龙',
+                '银行/邮局/储蓄',
+                '房屋地产',
+                '宠物医院',
+                '宠物店',
+                '通信营业厅',
+                '彩票销售点/保险营业厅',
+                '物流配送站',
+                '社会公共服务机构',
+                '其他',
+            ],
+            '社区' => [
+                '中高端社区',
+                '普通社区',
+            ],
+            '商超' => [
+                '大卖场/连锁超市',
+                '便利店',
+
+            ],
+            '酒店' => [
+                '高档酒店（4~5星）',
+                '经济连锁',
+                '民宿',
+                '度假村',
+                '公寓',
+            ],
+            '街边零售' => [
+                '单一品牌零售店',
+                '集合品牌零售店',
+                '体验型零售店/书店/手作',
+            ],
+            '街边餐饮' => [
+                '中高端餐厅（客单100起）',
+                '快餐小吃/面包甜点/咖啡',
+            ],
+            '交通出行' => [
+                '机场',
+                '火车站',
+                '地铁站',
+                '公交站',
+                '汽车站',
+                '加油站',
+                '轮船站',
+                '高速公路服务区',
+                '停车场',
+                '过境口岸',
+            ],
+            '公共区域/设施' => [
+                '城市观光道',
+                '城市绿化带',
+                '城市公园/景区',
+            ],
+            '办公场所/园区' => [
+                'CBD',
+                '工业园区',
+                '创业园区',
+                '联合办公/SOHO',
+                '部队',
+                '写字楼',
+                '研究场所',
+                '员工宿舍',
+            ],
+            '百货/购物中心' => [
+                '（场内）电影院',
+                '（场内）演出/展览馆/文化艺术',
+                '（场内）KTV/酒吧',
+                '（场内）游乐游艺',
+                '（场内）健身/体育/游泳/球类运动/舞蹈',
+                '（场内）亲子/早教/儿童服务',
+                '（场内）美容/美甲',
+                '（场内）美发沙龙',
+                '（场内）中高端餐厅（客单100起）',
+                '（场内）快餐小吃/面包甜点/咖啡',
+                '（场内）单一品牌零售店',
+                '（场内）集合品牌零售店',
+                '（场内）体验型零售店/书店/手作',
+                '（场内）大卖场/连锁超市',
+                '（场内）便利店',
+                '大堂/中厅/走道',
+                '步行街',
+                '商业街',
+                '小吃街',
+                '家具建材城',
+                '百货批发',
+                '数码城',
+            ],
+            '爱车' => [
+                '汽车保养维修中心',
+                '4S店/汽车销售',
+                '汽车租赁店',
+                '驾校',
+            ],
+        ];
+
+        if (empty($sub)) {
+            return array_keys($sences);
+        }
+        return isset($sences[$sub]) ? $sences[$sub] : [];
+    }
+
+    public static function getDeviceTypes()
+    {
+        return [
+            '摇摇车',
+            '共享打印机',
+            '共享纸巾',
+            '体重秤',
+            '洗衣机',
+            '聚合支付',
+            '兑币机',
+            '唱歌机',
+            '按摩椅',
+            '智慧迎宾屏',
+            '共享充电宝',
+            '互动拍照',
+            '娃娃机',
+            '店头互动游戏',
+            '商场大屏互动游戏',
+            '互动游戏',
+            '售货机',
+        ];
     }
 }

@@ -62,19 +62,51 @@ function tb(string $name): string
  * @param mixed $default
  * @return mixed
  */
+static $__settings_cache = [];
 function settings(string $key = '', $default = null)
 {
-    static $cache = [];
-    if (!isset($cache[$key])) {
-        $cache[$key] = app()->settings($key, $default);
+    if (!isset($__settings_cache[$key])) {
+        $__settings_cache[$key] = app()->settings($key, $default);
     }
 
-    return $cache[$key];
+    return $__settings_cache[$key];
 }
 
 function updateSettings(string $key, $val): bool
 {
+    unset($__settings_cache, $key);
     return app()->updateSettings($key, $val);
+}
+
+/**
+ * 其它全局设置
+ */
+static $__global_config_cache = [];
+function globalConfig(string $name, $path = '', $default = null) 
+{
+    if (empty($name)) {
+        return $default;
+    }
+
+    if (!isset($__global_config_cache[$name])) {
+        $__global_config_cache[$name] = app()->get($name, []);
+    }
+
+   return getArray($__global_config_cache[$name], $path, $default);
+}
+
+function updateGlobalConfig(string $name, $path, $val): bool
+{
+    if (empty($name)) {
+        return false;
+    }
+
+    unset($__global_config_cache[$name]);
+
+    $config = app()->get($name, []);
+    setArray($config, $path, $val);
+
+    return app()->set($name, $config);
 }
 
 /**

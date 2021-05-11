@@ -1430,6 +1430,11 @@ if ($op == 'default') {
 
         $logs = [];
         if ($total > 0) {
+            //检查有佣金记录的用户的佣金用户身份是否存在
+            if (!$user->isGSPor()) {
+                $user->setPrincipal(User::GSPOR);
+                $user->save();
+            }
 
             $pager = We7::pagination($total, $page, $page_size);
             $query->page($page, $page_size);

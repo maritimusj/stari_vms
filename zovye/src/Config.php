@@ -16,6 +16,9 @@ class Config
         return globalConfig('ali_ticket', $key, $v);
     }
 
+    /**
+     * 代理商相关配置
+     */
     public static function agent($key, $v = null, $update = false)
     {
         if ($update) {

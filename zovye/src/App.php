@@ -4,6 +4,7 @@ namespace zovye;
 
 use zovye\model\userModelObj;
 use zovye\model\agentModelObj;
+use zovye\model\device_typesModelObj;
 use zovye\model\deviceModelObj;
 
 class App
@@ -445,5 +446,14 @@ class App
     public static function isCustomAliTicketEnabled(): bool
     {
         return boolval(settings('custom.aliTicket.enabled'));
+    }
+
+    public static function getDefaultDeviceType():? device_typesModelObj
+    {
+        $typeid = settings('device.multi-types.first');
+        if ($typeid) {
+            return DeviceTypes::get($typeid);
+        }
+        return null;
     }
 }

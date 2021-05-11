@@ -348,6 +348,11 @@ class Device extends State
                     'remain' => DEFAULT_DEVICE_CAPACITY,
                 ];
 
+                $defaultType = App::getDefaultDeviceType();
+                if ($defaultType) {
+                    $data['device_type'] = $defaultType->getId();
+                }
+                    
                 $device = Device::create($data);
                 if ($device) {
                     $device->setCapacity(DEFAULT_DEVICE_CAPACITY);

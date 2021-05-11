@@ -202,7 +202,14 @@ class device
         //findDevice可以查找到使用shadowId的设备
         $device = \zovye\Device::find($id, ['imei', 'shadow_id']);
         if (empty($device)) {
-            $device = Util::activeDevice($id);
+            $params = [];
+
+            $defaultType = App::getDefaultDeviceType();
+            if ($defaultType) {
+                $params['device_type'] = $defaultType->getId();
+            }
+            
+            $device = Util::activeDevice($id, $params);
             if (is_error($device)) {
                 return error(State::ERROR, '找不到这个设备，请重新扫描二维码！');
             }

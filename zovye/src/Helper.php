@@ -33,7 +33,7 @@ class Helper
             }
         }
 
-        return settings('order.rollback.enabled');
+        return settings('order.rollback.enabled', false);
     }
 
     /**

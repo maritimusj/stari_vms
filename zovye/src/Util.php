@@ -226,7 +226,7 @@ class Util
                 throw new RuntimeException('获取用户信息失败：' . $result->alipay_user_info_share_response->sub_msg);
             }
 
-            Util::logToFile('ali', $result->alipay_user_info_share_response);
+            //Util::logToFile('ali', $result->alipay_user_info_share_response);
 
             $ali_user_id = $result->alipay_user_info_share_response->user_id;
             $nick_name = $result->alipay_user_info_share_response->nick_name;

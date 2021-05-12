@@ -35,7 +35,7 @@ class AliTicket
 
         $params['ufsign'] = self::sign($params, $this->app_secret);
 
-        $result = Util::post(self::API_URL, $params);
+        $result = Util::post(self::API_URL, $params, false);
 
         Util::logToFile('ali_ticket', [
             'request' => $params,
@@ -81,7 +81,7 @@ class AliTicket
 
         $params['ufsign'] = self::sign($params, $this->app_secret);
 
-        $result = Util::post(self::API_VM_URL . '/SyncVm', $params);
+        $result = Util::post(self::API_VM_URL . '/SyncVm', $params, false);
 
         if (empty($result)) {
             return err('返回数据为空！');
@@ -108,7 +108,7 @@ class AliTicket
 
         $params['ufsign'] = self::sign($params, $this->app_secret);
 
-        $result = Util::post(self::API_VM_URL . '/VmStatus', $params);
+        $result = Util::post(self::API_VM_URL . '/VmStatus', $params, false);
 
         if (empty($result)) {
             return err('返回数据为空！');
@@ -135,7 +135,7 @@ class AliTicket
 
         $params['ufsign'] = self::sign($params, $this->app_secret);
 
-        $result = Util::post(self::API_VM_URL . '/VmStatus', $params);
+        $result = Util::post(self::API_VM_URL . '/VmStatus', $params, false);
 
         if (empty($result)) {
             return err('返回数据为空！');

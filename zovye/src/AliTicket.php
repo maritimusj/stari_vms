@@ -321,14 +321,15 @@ class AliTicket
             return err('找不到商品！');
         }
 
-        if ($goods['num'] < $config['goodsNum']) {
+        $total = max(1, intval($config['goodsNum']));
+        if ($goods['num'] < $total) {
             return err('商品库存数量不够！');
         }
 
         $price = intval($config['bonus']);
         list($order_no, $pay_log) = Pay::prepareDataWithPay('ali_ticket', $device, $user, $goods, [
             'level' => LOG_GOODS_ADVS,
-            'total' => $config['goodsNum'],
+            'total' => $total,
             'price' => $price,
             'order_no' => $data['tradeNo'],
         ]);

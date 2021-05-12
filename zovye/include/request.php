@@ -14,7 +14,7 @@ function setW(string $name, $val)
 
 function request(string $name, $default = null)
 {
-    return isset($GLOBALS['_GPC'][$name]) ? $GLOBALS['_GPC'][$name] : $default;
+    return getArray($GLOBALS['_GPC'], $name, $default);
 }
 
 class request

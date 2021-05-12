@@ -187,7 +187,7 @@ if ($op == 'list') {
         if ($res) {
             $data['agent'] = $res->profile();
         }
-        
+
         if (App::isVDeviceSupported()) {
             $data['isVD'] = $entry->isVDevice();
         }
@@ -247,7 +247,6 @@ if ($op == 'list') {
     }
 
     $this->showTemplate('web/device/default_new', $tpl_data);
-    
 } elseif ($op == 'search') {
 
     $result = [];
@@ -328,7 +327,7 @@ if ($op == 'list') {
         }
 
         $ids_str = json_encode($online_ids);
-        $devices_status = Util::cachedCall(10, function() use($ids_str) {            
+        $devices_status = Util::cachedCall(10, function () use ($ids_str) {
             $res = CtrlServ::v2_query('detail', [], $ids_str, 'application/json');
             if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                 return $res['data'];
@@ -376,7 +375,6 @@ if ($op == 'list') {
     }
 
     JSON::success($result);
-
 } elseif ($op == 'device_stats') {
 
     $id = request::int('id');
@@ -385,12 +383,11 @@ if ($op == 'list') {
         JSON::fail([]);
     }
 
-    $result = Util::cachedCall(60, function() use($device) {
+    $result = Util::cachedCall(60, function () use ($device) {
         return $device->getPullStats();
     }, $device->getId());
 
     JSON::success($result);
-
 } elseif ($op == 'device_data') {
 
     $ids = request::has('id') ? [request::int('id')] : request('ids');
@@ -780,7 +777,9 @@ if ($op == 'list') {
     if (App::isMoscaleEnabled()) {
         $extra['moscale'] = [
             'key' => request::trim('moscaleMachineKey'),
-            'label' => array_map(function($e) { return intval($e);}, explode(',', request::trim('moscaleLabel'))),
+            'label' => array_map(function ($e) {
+                return intval($e);
+            }, explode(',', request::trim('moscaleLabel'))),
             'region' => [
                 'province' => request::int('province_code'),
                 'city' => request::int('city_code'),
@@ -930,7 +929,7 @@ if ($op == 'list') {
             $cargo_lanes["l{$index}"]['price'] = request::float("price{$index}", 0, 2) * 100;
         }
     }
-    
+
     if (!$device->setCargoLanes($cargo_lanes)) {
         Util::itoast('保存型号数据失败！', We7::referer(), 'error');
     }
@@ -946,6 +945,29 @@ if ($op == 'list') {
     $device->setDeviceModel(request('device_model'));
 
     if ($device->save()) {
+
+        //保存其它广告需要的配置
+        if (App::isCustomAliTicketEnabled()) {
+            $join = request::bool('JoinAliTicket');
+            $device->updateSettings('aliTicket', [
+                'join' => $join,
+                'province' => request::trim('area.province'),
+                'city' => request::trim('area.city'),
+                'district' => request::trim('area.district'),
+                'name' => request::trim(''),
+                'addressDetail' => request::trim('addressDetail'),
+                'floor' => request::trim('floor'),
+                'firstScene' => request::trim('firstScene'),
+                'secondScene' => request::trim('secondScene'),
+                'deviceType' => request::trim('deviceType'),
+            ]);
+            if ($join) {
+                AliTicket::registerDevice($device);
+            } else {
+                AliTicket::unregisterDevice($device);
+            }            
+        }
+
         //更新公众号缓存
         $device->updateAccountData();
         $device->updateScreenAdvsData();
@@ -982,7 +1004,7 @@ if ($op == 'list') {
 
     exit(-1);
 } elseif ($op == 'deviceTest') {
-    
+
     $id = request::int('id');
     if ($id) {
         /** @var deviceModelObj $device */
@@ -1073,7 +1095,7 @@ if ($op == 'list') {
         'web/device/stats',
         [
             'chartid' => Util::random(10),
-            'chart' => Util::cachedCall(30, function() use($device) {
+            'chart' => Util::cachedCall(30, function () use ($device) {
                 return Stats::chartDataOfDay($device, time());
             }, $device->getId()),
         ]
@@ -1083,7 +1105,7 @@ if ($op == 'list') {
         'web/device/stats',
         [
             'chartid' => Util::random(10),
-            'chart' => Util::cachedCall(30, function() use($device) {
+            'chart' => Util::cachedCall(30, function () use ($device) {
                 return Stats::chartDataOfMonth($device, time());
             }, $device->getId()),
         ]
@@ -1263,7 +1285,7 @@ if ($op == 'list') {
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => Util::cachedCall(30, function() use($device, $title) {
+            'chart' => Util::cachedCall(30, function () use ($device, $title) {
                 return Stats::chartDataOfDay($device, time(), "设备：{$device->getName()}({$title})");
             }, $device->getId()),
         ]
@@ -1289,14 +1311,13 @@ if ($op == 'list') {
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => Util::cachedCall(30, function() use($device, $month, $title) {
+            'chart' => Util::cachedCall(30, function () use ($device, $month, $title) {
                 return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}({$title})");
             }, $device->getId(), $month),
         ]
     );
 
     JSON::success(['title' => '', 'content' => $content]);
-
 } elseif ($op == 'repairMonthStats') {
     $device = Device::get(request::int('id'));
     if (empty($device)) {
@@ -1313,7 +1334,6 @@ if ($op == 'list') {
     }
 
     JSON::success('修复失败！');
-    
 } elseif ($op == 'allstats') {
 
     //全部出货统计
@@ -1322,7 +1342,7 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    list($m, $total) = Util::cachedCall(30, function() use($device) {
+    list($m, $total) = Util::cachedCall(30, function () use ($device) {
         //开始 结束
         $first_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
         $last_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
@@ -1399,9 +1419,9 @@ if ($op == 'list') {
                 $months[$title] = $result;
             }
             return [$months, $total_num];
-        } catch (Exception $e) {            
+        } catch (Exception $e) {
         }
-        
+
         return [];
     });
     $content = $this->fetchTemplate(
@@ -1481,7 +1501,6 @@ if ($op == 'list') {
     }
 
     JSON::success();
-
 } elseif ($op == 'confirmLAC') {
 
     $id = request::int('id');
@@ -1493,8 +1512,7 @@ if ($op == 'list') {
     }
 
     JSON::success();
-
-}  elseif ($op == 'setNormal') {
+} elseif ($op == 'setNormal') {
 
     $id = request::int('id');
     if ($id) {
@@ -1505,7 +1523,6 @@ if ($op == 'list') {
     }
 
     JSON::success();
-
 } elseif ($op == 'refresh') {
 
     $device = Device::get(request::int('id'));
@@ -1610,7 +1627,6 @@ if ($op == 'list') {
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
     $this->showTemplate('web/device/report_list', $tpl_data);
-
 } elseif ($op == 'group') {
     $query = Group::query();
 
@@ -1649,7 +1665,6 @@ if ($op == 'list') {
     $result['serial'] = request::trim('serial') ?: microtime(true) . '';
 
     Util::resultJSON(true, $result);
-    
 } elseif ($op == 'group_search') {
 
     $query = Group::query();
@@ -2472,7 +2487,6 @@ if ($op == 'list') {
         }
         echo json_encode($events);
     }
-
 } elseif ($op == 'aliTicket') {
 
     $result = [];
@@ -2483,6 +2497,8 @@ if ($op == 'list') {
         if (empty($device)) {
             JSON::fail('找不到这个设备！');
         }
+
+        $result['config'] = $device->settings('aliTicket', []);
     }
 
     $fn = request::trim('fn');
@@ -2490,9 +2506,10 @@ if ($op == 'list') {
         $result['device_types'] = AliTicket::getDeviceTypes();
         $result['scenes'] = AliTicket::getSceneList();
         if ($device) {
-            $result['status'] = AliTicket::getDeviceJoinStatus($device);
+            $status = AliTicket::getDeviceJoinStatus($device);
+            $result['status'] = is_error($status) ? 0 : 1;
         }
     }
 
-    JSON::success($result);    
+    JSON::success($result);
 }

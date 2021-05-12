@@ -37,7 +37,8 @@ class AliTicket
 
         $result = Util::post(self::API_URL, $params, false);
 
-        Util::logToFile('ali_ticket', [
+        Util::logToFile('aliTicket', [
+            'method' => 'fetch',
             'request' => $params,
             'response' => $result,
         ]);
@@ -70,7 +71,7 @@ class AliTicket
             'city' => strval($params['city']),
             'district' => strval($params['district']),
             'name' => strval($params['name']),
-            'addressDetail' => strval($params['address']),
+            'addressDetail' => strval($params['addressDetail']),
             'floor' => strval($params['floor']),
             'firstScene' => strval($params['firstScene']),
             'secondScene' => strval($params['secondScene']),
@@ -82,6 +83,12 @@ class AliTicket
         $params['ufsign'] = self::sign($params, $this->app_secret);
 
         $result = Util::post(self::API_VM_URL . '/SyncVm', $params, false);
+
+        Util::logToFile('aliTicket', [
+            'method' => 'syncVm',
+            'params' => $params,
+            'response' => $result,
+        ]);
 
         if (empty($result)) {
             return err('返回数据为空！');
@@ -110,6 +117,12 @@ class AliTicket
 
         $result = Util::post(self::API_VM_URL . '/VmStatus', $params, false);
 
+        Util::logToFile('aliTicket', [
+            'method' => 'VmStatus',
+            'params' => $params,
+            'response' => $result,
+        ]);
+
         if (empty($result)) {
             return err('返回数据为空！');
         }
@@ -135,7 +148,13 @@ class AliTicket
 
         $params['ufsign'] = self::sign($params, $this->app_secret);
 
-        $result = Util::post(self::API_VM_URL . '/VmStatus', $params, false);
+        $result = Util::post(self::API_VM_URL . '/CancelVm', $params, false);
+
+        Util::logToFile('aliTicket', [
+            'method' => 'cancelVm',
+            'request' => $params,
+            'response' => $result,
+        ]);
 
         if (empty($result)) {
             return err('返回数据为空！');
@@ -186,7 +205,31 @@ class AliTicket
             return err('未配置！');
         }
 
-        return (new AliTicket($config['key'], $config['secret']))->vmStatus($device);
+        return (new AliTicket($config['key'], $config['secret']))->vmStatus($device->getImei());
+    }
+
+    public static function registerDevice(deviceModelObj $device)
+    {
+        $config = settings('custom.aliTicket', []);
+        if (isEmptyArray($config) || empty($config['key'])) {
+            return err('未配置！');
+        }
+        $params = $device->settings('aliTicket', []);
+        $params['deviceModel'] = $device->getDeviceModel();
+        $params['name'] = $device->getName();
+        return (new AliTicket($config['key'], $config['secret']))->syncVM($device->getImei(), $params);
+    }
+
+    public static function unregisterDevice(deviceModelObj $device)
+    {
+        $config = settings('custom.aliTicket', []);
+        if (isEmptyArray($config) || empty($config['key'])) {
+            return err('未配置！');
+        }
+        $params = $device->settings('aliTicket', []);
+        $params['deviceModel'] = $device->getDeviceModel();
+        $params['name'] = $device->getName();
+        return (new AliTicket($config['key'], $config['secret']))->CancelVm($device->getImei());
     }
 
     public static function getCallbackUrl()

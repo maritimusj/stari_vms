@@ -93,6 +93,12 @@
     span.scene.selected {
         background-color: #8bc34a;
     }
+    span.regOk {
+        color: forestgreen;
+    }
+    span.unReg {
+        color: gray;
+    }
     [v-cloak] {
         display: none;
     }
@@ -496,40 +502,67 @@
             {if \zovye\App::isCustomAliTicketEnabled()}
             <div class="seg"  id="aliTicket" v-cloak>
                 <div class="title">天猫拉新设置</div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">设备类型</label>
-                    <div class="col-md-10">
-                        <select name="deviceType">
-                            <option v-for="v in deviceTypes">{{v}}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="second" class="col-md-2 control-label">第一场景</label>
-                    <div class="col-md-10 scene_list">
-                        <span :class="{'scene':true, 'selected': scene.first == e}" v-for="e in firstSceneList" @click="setFirstScene(e);">{{e}}</span>
-                        <input type="hidden" name="firstScene" v-model="scene.first">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="second" class="col-md-2 control-label">第二场景</label>
-                    <div class="col-md-10 scene_list">
-                        <span :class="{'scene':true, 'selected': scene.second == e}" v-for="e in secondSceneList" @click="setSecondScene(e)">{{e}}</span>
-                        <input type="hidden" name="secondScene" v-model="scene.second">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">所在区域</label>
-                    <div class="col-md-10" v-once>
-                        {php echo tpl_form_field_district('area', $agent_data['area']);}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="address" class="col-md-2 control-label">具体地址</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="address" id="address" v-model="address">
-                    </div>
-                </div>
+                <template v-if="loading">
+                    <div class="text-center text-muted">正在加载中...</div>
+                </template>
+                <template v-else>
+                    <div class="form-group">
+                        <label for="JoinAliTicket" class="col-md-2 control-label">是否参与</label>
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="checkbox col-md-7">
+                                    <label>
+                                        <input type="checkbox" name="JoinAliTicket" id="JoinAliTicket" v-model="join">
+                                        该设备参与天猫拉新活动<span :class="[regStatus? 'regOk' : 'unReg']" v-if="join"> ({{regStatus ? '已注册成功' : '未注册成功'}})</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <div v-show="join">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">设备类型</label>
+                            <div class="col-md-10">
+                                <select name="deviceType" v-model="deviceType">
+                                    <option v-for="v in deviceTypes">{{v}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="second" class="col-md-2 control-label">第一场景</label>
+                            <div class="col-md-10 scene_list">
+                                <span :class="{'scene':true, 'selected': scene.first == e}" v-for="e in firstSceneList" @click="setFirstScene(e);">{{e}}</span>
+                                <input type="hidden" name="firstScene" v-model="scene.first">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="second" class="col-md-2 control-label">第二场景</label>
+                            <div class="col-md-10 scene_list">
+                                <span :class="{'scene':true, 'selected': scene.second == e}" v-for="e in secondSceneList" @click="setSecondScene(e)">{{e}}</span>
+                                <input type="hidden" name="secondScene" v-model="scene.second">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">所在区域</label>
+                            <div class="col-md-10" v-once>
+                                {php echo tpl_form_field_district('area', $agent_data['area']);}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="addressDetail" class="col-md-2 control-label">具体地址</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="addressDetail" id="addressDetail" v-model="addressDetail">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="floor" class="col-md-2 control-label">所在楼层</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="floor" id="floor" v-model="floor">
+                            </div>
+                        </div>                          
+                    </div>                  
+                </template>
+
             </div>
             {/if}
         </div>
@@ -596,13 +629,23 @@
             el: "#aliTicket",
             data: {
                 deviceId: parseInt("{php echo $device? $device->getId() : 0}"),
+                loading: true,
+                join: false,
                 deviceTypes: [],
+                deviceType: '',
                 scene: {
                     list: {},
                     first: '',
                     second: '',
                 },
-                address: '',
+                addressDetail: '',
+                floor: '',
+                area: {
+                    province: undefined,
+                    city: undefined,
+                    district: undefined,
+                },
+                regStatus: undefined,
             },
             computed: {
                 firstSceneList() {
@@ -615,29 +658,59 @@
                     return [];
                 },
             },
+            watch: {
+                loading: function(val, old) {
+                    if (!val) {
+                        const self = this;
+                        this.$nextTick(function() {
+                            $(".tpl-district-container").each(function(){               
+                                const elms = {};
+                                elms.province = $(this).find(".tpl-province")[0];
+                                elms.city = $(this).find(".tpl-city")[0];
+                                elms.district = $(this).find(".tpl-district")[0];
+                                dis.render(elms, {
+                                    province: self.area.province,
+                                    city: self.area.city,
+                                    district: self.area.district,
+                                }, {withTitle: true});
+                            })                              
+                        })
+                        
+                    }
+                }
+            },
             mounted() {
-                this.getDetail();
-				$(".tpl-district-container").each(function(){
-					var elms = {};
-					elms.province = $(this).find(".tpl-province")[0];
-					elms.city = $(this).find(".tpl-city")[0];
-					elms.district = $(this).find(".tpl-district")[0];
-					var vals = {};
-					vals.province = $(elms.province).attr("data-value");
-					vals.city = $(elms.city).attr("data-value");
-					vals.district = $(elms.district).attr("data-value");
-					dis.render(elms, vals, {withTitle: true});
-				});
+                const self = this;
+                this.getDetail()
             },
             methods: {
                 getDetail() {
                     const self = this;
+                    self.loading = true;
                     $.get(api_url, {fn: 'detail', id: this.deviceId}).then(res => {
+                        self.loading = false;
                         if (res && res.status) {
-                            self.deviceTypes = res.data.device_types || [];
-                            self.scene.list = res.data.scenes || [];
-                            if (self.firstSceneList.length > 0) {
-                                self.setFirstScene(self.firstSceneList[0]);
+                            const data = res.data || {};
+                            self.deviceTypes = data.device_types || [];
+                            self.scene.list = data.scenes || [];
+                            self.regStatus = data.status;
+                            if (typeof data.config.deviceType != 'undefined') {
+                                self.join = data.config['join'];
+                                self.deviceType = data.config['deviceType'];
+                                self.setFirstScene(data.config['firstScene']);
+                                self.setSecondScene(data.config['secondScene']);
+                                self.addressDetail = data.config['addressDetail'];
+                                self.floor = data.config['floor'];
+                                self.area.province = data.config['province'] || '';
+                                self.area.city = data.config['city'] || '';
+                                self.area.district = data.config['district'] || '';
+                            } else {
+                                if (self.deviceTypes.length > 0) {
+                                    self.deviceType = self.deviceTypes[0];
+                                }                      
+                                if (self.firstSceneList.length > 0) {
+                                    self.setFirstScene(self.firstSceneList[0]);
+                                }
                             }
                         }
                     })

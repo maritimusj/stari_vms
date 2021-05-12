@@ -323,7 +323,7 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_order` (
   KEY `order_id` (`order_id`),
   KEY `agent_id` (`agent_id`),
   KEY `openid` (`openid`),
-  KEY `ip` (`ip`),
+  KEY `result` (`result_code`),
   KEY `createtime` (`createtime`),
   KEY `updatetime` (`updatetime`),    
   KEY `account` (`account`)

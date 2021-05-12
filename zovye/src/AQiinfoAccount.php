@@ -39,7 +39,8 @@ class AQiinfoAccount
             //请求API
             $AQiinfo = new AQiinfoAccount($config['key'], $config['secret']);
             $result = $AQiinfo->fetchOne($device, $user);
-            if (is_error($result)) {
+
+            if (is_error($result) || empty($result['ticket']) || empty($result['url'])) {
                 Util::logToFile('AQiinfo', [
                     'user' => $user->profile(),
                     'acc' => $acc->getName(),
@@ -55,7 +56,16 @@ class AQiinfoAccount
                     $data['name'] = $result['name'];
                 }
 
-                $data['redirect_url'] = $result['url'];
+                $res = Util::createQrcodeFile("aqiinfo{$result['ticket']}", $result['url']);
+                if (is_error($res)) {
+                    Util::logToFile('AQiinfo', [
+                        'error' => 'fail to createQrcode file',
+                        'result' => $res,
+                    ]);
+                    $data['redirect_url'] = $result['url'];
+                } else {
+                    $data['url'] = Util::toMedia($res);
+                }
 
                 return [$data];
             }

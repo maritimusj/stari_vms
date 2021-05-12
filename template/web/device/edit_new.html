@@ -513,7 +513,7 @@
                                 <div class="checkbox col-md-7">
                                     <label>
                                         <input type="checkbox" name="JoinAliTicket" id="JoinAliTicket" v-model="join">
-                                        该设备参与天猫拉新活动<span :class="[regStatus? 'regOk' : 'unReg']" v-if="join"> ({{regStatus ? '已注册成功' : '未注册成功'}})</span>
+                                        该设备参与天猫拉新活动<span :class="[regStatus? 'regOk' : 'unReg']" v-if="join && regStatus !== undefined"> ({{regInfo}})</span>
                                     </label>
                                 </div>
                             </div>
@@ -646,6 +646,7 @@
                     district: undefined,
                 },
                 regStatus: undefined,
+                regMsg: undefined,
             },
             computed: {
                 firstSceneList() {
@@ -657,6 +658,13 @@
                     }
                     return [];
                 },
+                regInfo() {
+                    let msg = this.regStatus ? '已注册成功' : '未注册成功';
+                    if (this.regMsg) {
+                        msg = msg + "：" + this.regMsg;
+                    }
+                    return msg;
+                }
             },
             watch: {
                 loading: function(val, old) {
@@ -694,6 +702,7 @@
                             self.deviceTypes = data.device_types || [];
                             self.scene.list = data.scenes || [];
                             self.regStatus = data.status;
+                            self.regMsg = data.error || '';
                             if (typeof data.config.deviceType != 'undefined') {
                                 self.join = data.config['join'];
                                 self.deviceType = data.config['deviceType'];

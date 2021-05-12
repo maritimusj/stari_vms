@@ -2505,9 +2505,10 @@ if ($op == 'list') {
     if ($fn == 'detail') {
         $result['device_types'] = AliTicket::getDeviceTypes();
         $result['scenes'] = AliTicket::getSceneList();
-        if ($device) {
+        if (isset($device) && $result['config']['join']) {
             $status = AliTicket::getDeviceJoinStatus($device);
             $result['status'] = is_error($status) ? 0 : 1;
+            $result['error'] = is_error($status) ? $status['message'] : '';      
         }
     }
 

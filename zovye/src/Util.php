@@ -885,8 +885,22 @@ include './index.php';
     }
 </script>
 JS1;
+        } elseif (Util::isAliAppContainer()) {
+$js =<<<JS2
+<script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
+<script>
+const url = "{$redirect}";
+function xclose(){
+    if(url) {
+        location.href = url;
+    }else{
+        ap && ap.exitApp();
+    }
+}
+</script>
+JS2;
         } else {
-            $js = <<<JS2
+            $js = <<<JS3
 <script type="text/javascript">
     const url = "{$redirect}";
     function xclose(){
@@ -895,7 +909,7 @@ JS1;
         }
     }
 </script>
-JS2;
+JS3;
         }
 
         $css_url = _W('siteroot') . 'app/resource/css/common.min.css?v=20160906';

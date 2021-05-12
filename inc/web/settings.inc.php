@@ -1171,6 +1171,16 @@ if ($op == 'account') {
         Util::itoast('创建收钱吧支付入口文件失败！');
     }
 
+    if (false === Util::createApiRedirectFile('/payment/SQBAlipay.php', 'payresult', [
+            'headers' => [
+                'HTTP_USER_AGENT' => 'SQBAlipay_notify',
+            ],
+            'op' => 'notify',
+            'from' => 'SQBAlipay',
+        ])) {
+        Util::itoast('创建收钱吧支付入口文件失败！');
+    }    
+
     if (updateSettings('pay.SQB', [
         'enable' => 1,
         'sn' => $result['terminal_sn'],

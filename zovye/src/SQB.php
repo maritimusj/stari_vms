@@ -6,6 +6,8 @@ namespace zovye;
 
 class SQB
 {
+    const RESPONSE = 'success';
+
     public static function activate($app_id, $vendor_sn, $vendor_key, $code)
     {
         $pay = new \SQB\pay([

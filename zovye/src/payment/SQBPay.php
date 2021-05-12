@@ -43,7 +43,7 @@ class SQBPay implements IPay
         }
 
         if (App::isAliUser()) {
-            $notify_url .= 'payment/alixapp.php';
+            $notify_url .= 'payment/SQBAlipay.php';
         } else {
             $notify_url .= 'payment/SQB.php';
         }

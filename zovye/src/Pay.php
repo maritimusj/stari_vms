@@ -171,7 +171,48 @@ class Pay
     {
         return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
     }
+    public static function notifySQBAlipay($data)
+    {
+        if (empty($data) || $data['status'] !== 'SUCCESS' || $data['order_status'] !== 'PAID') {
+            return error(State::FAIL, empty($input_format['return_msg']) ? '无法解析input数据' : $data['return_msg']);
+        }
+        $data = [
+            'deviceUID' => $data['attach'],
+            'orderNO' => $data['terminal_trace'],
+            'total' => intval($data['total_fee']),
+            'transaction_id' => $data['out_trade_no'],
+            'raw' => $data,
+        ];
 
+        if (empty($data)) {
+            return error(State::ERROR, '回调数据为空！');
+        }
+
+        $device = Device::get($data['deviceUID'], true);
+        if (empty($device)) {
+            return error(State::ERROR, '找不到这个设备！');
+        }
+
+        $pay_log = self::getPayLog($data['orderNO']);
+        if (empty($pay_log)) {
+            return error(State::ERROR, '找不对支付记录！');
+        }
+
+        $pay_log->setData('payResult', $data);
+        $pay_log->setData('create_order.createtime', time());
+
+        if (!$pay_log->save()) {
+            return error(State::ERROR, '保存支付记录失败！');
+        }
+
+        //创建一个回调执行创建订单，出货任务
+        $res = Job::createOrder($data['orderNO'], $device);
+        if (empty($res) || is_error($res)) {
+            return error(State::ERROR, '创建订单任务失败！');
+        }
+
+        return SQB::RESPONSE;
+    }
     public static function notifyAliXApp(string $input)
     {
         $input_format = json_decode($input, true);
@@ -216,9 +257,8 @@ class Pay
         return '{"return_code":"01","return_msg":"SUCCESS"}';
     }
 
-    public static function notifyChannel(string $name, string $input)
+    public static function notifyChannel($data)
     {
-        $data = json_decode($input, true);
         // if (!ChannelPay::checkSign($data)) {
         //     return err('签名检验失败！');
         // }

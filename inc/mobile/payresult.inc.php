@@ -66,46 +66,29 @@ if ($op == 'default') {
     Util::resultAlert(request::trim('error_message'), 'error');
     
 } elseif ($op == 'notify') {
-    $input = request::raw();
 
-    if ($_GET['from'] == 'alixapp') {
-
-        $res = Pay::notifyAliXApp($input);
-
-    } elseif ($_GET['from'] == 'channel') {
-
-        Util::extraAjaxJsonData();
-
-        $input = json_encode([
-            'appKey' => request::str('appKey'),
-            'ticket' => request::str('ticket'),
-            'exSkuId' => request::str('exSkuId'),
-            'outTradeNo' => request::str('outTradeNo'),
-            'tradeNo' => request::str('tradeNo'),
-            'amount' => request::int('amount'),
-            'time' => request::str('time'),
-            'ufsign' => request::str('ufsign'),
-        ]);
-
-        $res = Pay::notifyChannel($_GET['from'], $input);
-
-        Util::logToFile('channel', [
-            'input' => $input,
-            'result' => $res,
-        ]);
-        
-    } else {
-        $res = Pay::notify($_GET['from'], $input);
+    switch($_GET['from']) {
+        case 'alixapp':
+            $res = Pay::notifyAliXApp(request::raw());
+            break;
+        case 'channel':
+            $res = Pay::notifyChannel(request::json());
+            break;
+        case 'SQBAlipay':
+            $res = Pay::notifySQBAlipay(request::json());
+            break;
+        default:
+            $res = Pay::notify($_GET['from'], request::raw());            
     }
     
     if (is_error($res)) { 
         Util::logToFile('notify', [
             'from' => $_GET['from'],
-            'input' => $input,
+            'input' => request::raw(),
             'result' => $res,
         ]);
     
-        exit(Pay::getResponse(false));
+        exit(Pay::getResponse($_GET['from']));
     }
 
     exit($res);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -113,7 +114,7 @@ class Account extends State
             'descr' => html_entity_decode($entry->getDescription()),
             'url' => strval($entry->getUrl()),
             'clr' => strval($entry->getClr()),
-            'img' => $entry->isSpecial() ? $entry->getImg() : Util::toMedia($entry->getImg()),            
+            'img' => $entry->isSpecial() ? $entry->getImg() : Util::toMedia($entry->getImg()),
             'scname' => strval($entry->getScname()),
             'total' => intval($entry->getTotal()),
             'count' => intval($entry->getCount()),
@@ -384,7 +385,6 @@ class Account extends State
                 $assign_data['devices'] = array_diff($assign_data['devices'], $dst['devices']['list']);
                 $assign_data['tags'] = array_diff($assign_data['tags'], $dst['tags']['list']);
                 $assign_data['groups'] = array_diff($assign_data['groups'], $dst['groups']['list']);
-
             } else {
                 //绑定操作
                 if (!empty($params['overwrite'])) {
@@ -573,7 +573,6 @@ class Account extends State
                     'msg' => '谢谢关注，请点击{url}领取商品！',
                 ],
             ]);
-
         } else {
             if (empty($account->getTitle())) {
                 $account->setTitle(getArray($profile, 'authorizer_info.nick_name', '未知'));
@@ -667,6 +666,45 @@ class Account extends State
             });
         }
 
+        //天猫拉新活动
+        if (App::isCustomAliTicketEnabled()) {
+            $config = settings('custom.aliTicket', []);
+
+            $no = intval($config['no']);
+            $list["no{$no}"] = function () use ($user, $device, $no) {
+                $result = AliTicket::fetch($user, $device);
+                if (empty($result) || empty($result['ticket']) || empty($result['url'])) {
+                    return err('返回数据不正确！');
+                }
+
+                if (is_error($result)) {
+                    return $result;
+                }
+
+                $data = [
+                    'name' => $result['name'],
+                    'title' => $result['name'],
+                    'descr' => $result['name'],
+                    'clr' => Util::randColor(),
+                    'img' => AliTicket::HEAD_IMAGE_URL,
+                    'orderno' => $no,
+                ];
+
+                $res = Util::createQrcodeFile("ali_ticket{$result['ticket']}", $result['url']);
+                if (is_error($res)) {
+                    Util::logToFile('aliTicket', [
+                        'error' => 'fail to createQrcode file',
+                        'result' => $res,
+                    ]);
+                    $data['redirect_url'] = $result['url'];
+                } else {
+                    $data['url'] = Util::toMedia($res);
+                }
+                
+                return $data;
+            };
+        }
+
         if ($list) {
             krsort($list);
 
@@ -699,7 +737,7 @@ class Account extends State
                     } else {
                         $account['media'] = './resource/images/nopic.jpg';
                     }
-                }                   
+                }
             }
         }
 

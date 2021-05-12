@@ -10,6 +10,8 @@ class AliTicket
     const API_URL = 'https://c.api.aqiinfo.com/ChannelAliApi/AliTicket';
     const API_VM_URL = 'https://c.api.aqiinfo.com/ChannelApi';
 
+    const HEAD_IMAGE_URL = MODULE_URL . 'static/img/tmall.jpeg';
+
     const RESPONSE = '{"code":200}';
 
     private $app_key;

@@ -149,7 +149,7 @@ class LCSWPay implements IPay
         if (App::isAliUser()) {
             return [
                 'orderNO' => $order_no,
-                'tradeNo' => $res['ali_trade_no'],
+                'tradeNO' => $res['ali_trade_no'],
             ];
         }
 

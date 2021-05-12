@@ -71,7 +71,7 @@ if (is_error($res)) {
 }
 
 $no_str = Util::random(32);
-$order_uid = substr("U{$user->getId()}D{$device->getId()}{$no_str }", 0, 32);
+$order_uid = substr("U{$user->getId()}D{$device->getId()}{$no_str }", 0, MAX_ORDER_NO_LEN);
 
 Job::createSpecialAccountOrder([
     'device' => $device->getId(),

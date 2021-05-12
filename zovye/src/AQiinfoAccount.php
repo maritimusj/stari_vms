@@ -125,7 +125,7 @@ class AQiinfoAccount
             }
 
             $trade_no = empty($params['tradeNo']) ? Util::random(32, true) : $params['tradeNo'] . Util::random(32);
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$trade_no}", 0, 32);
+            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$trade_no}", 0, MAX_ORDER_NO_LEN);
 
             $acc = $res['account'];
 

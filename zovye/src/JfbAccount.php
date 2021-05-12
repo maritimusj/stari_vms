@@ -123,7 +123,7 @@ class JfbAccount
                     throw new RuntimeException('找不对这个设备:' . $params['device']);
                 }
         
-                $order_uid = substr("U{$user->getId()}D{$device->getId()}{$params['sign']}" . Util::random(32), 0, 32);
+                $order_uid = substr("U{$user->getId()}D{$device->getId()}{$params['sign']}" . Util::random(32), 0, MAX_ORDER_NO_LEN);
         
                 $acc = $res['account'];
 

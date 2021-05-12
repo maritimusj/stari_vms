@@ -67,6 +67,8 @@ define('DEFAULT_IMAGE_DURATION', 10); //图片广告默认停留时间（秒）
 define('OBJ_LOCKED_UID', 'locked_uid');
 define('UNLOCKED', 'n/a');
 
+define('MAX_ORDER_NO_LEN', 32);
+
 define('DEVICE_FORWARDER_URL', 'http://z.ph6618.cn:6699/?id={imei}');
 define('FLUSH_DEVICE_FORWARDER_URL', 'http://z.ph6618.cn:6699/cache/flush?id={imei}');
 

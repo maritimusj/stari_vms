@@ -85,7 +85,7 @@ class Pay
             $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));  
         }
 
-        $order_no = "U{$user->getId()}D{$device->getId()}" . $partial;
+        $order_no = substr("U{$user->getId()}D{$device->getId()}" . $partial, 0, MAX_ORDER_NO_LEN);
 
         $pay_data = array_merge_recursive($pay_data, [
             'device' => $device->getId(),
@@ -96,8 +96,8 @@ class Pay
             ],
             'orderData' => [
                 'orderNO' => $order_no,
-                'num' => empty($pay_data['total']) ? 1 : $pay_data['total'],
-                'price' => empty($pay_data['price']) ? $goods['price'] : $pay_data['price'],
+                'num' => isset($pay_data['total']) ? $pay_data['total'] : 1,
+                'price' => isset($pay_data['price']) ? $pay_data['price'] : $goods['price'],
                 'ip' => CLIENT_IP,
                 'extra' => [
                     'goods' => $goods,

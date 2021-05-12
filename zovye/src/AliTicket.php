@@ -325,7 +325,7 @@ class AliTicket
             return err('商品库存数量不够！');
         }
 
-        $price = intval($config['price']);
+        $price = intval($config['bonus']);
         list($order_no, $pay_log) = Pay::prepareDataWithPay('ali_ticket', $device, $user, $goods, [
             'level' => LOG_GOODS_ADVS,
             'total' => $config['goodsNum'],

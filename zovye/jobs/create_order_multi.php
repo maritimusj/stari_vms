@@ -94,7 +94,7 @@ function process($order_no)
     if (!$device->lockAcquire($retries, $delay)) {
         ExceptionNeedsRefund::throwWith($device, '设备被占用！');
     }
-   
+
     if (Order::exists($order_no)) {
         throw new Exception('订单已经存在！');
     }

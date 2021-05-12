@@ -23,8 +23,7 @@ class request
     {
         static $data = null;
         if (!isset($data)) {
-            $input = file_get_contents('php://input');
-            $res = json_decode($input, true);
+            $res = json_decode(self::raw(), true);
             $data = $res ? $res : [];
         }
         return getArray($data, $key, $default);
@@ -62,8 +61,16 @@ class request
 
     public static function raw(): string
     {
-        $result = file_get_contents('php://input');
-        return $result === false ? '' : $result;
+        $result = null;
+
+        if (!isset($result)) {
+            $result = file_get_contents('php://input');
+            if ($result === false) {
+                $result = '';
+            }
+        }
+        
+        return $result;
     }
 
     public static function header($name)

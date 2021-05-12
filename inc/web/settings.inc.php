@@ -372,6 +372,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 $settings['custom']['aliTicket']['goodsNum'] = 1;
             }
             $settings['custom']['aliTicket']['bonus'] = max(0, request::float('aliTicketBonus', 0, 2)) * 100;
+            $settings['custom']['aliTicket']['title'] = request::trim('aliTicketTitle');
             $settings['custom']['aliTicket']['no'] = request::int('aliTicketNo');
         }
 

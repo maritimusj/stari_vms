@@ -260,18 +260,26 @@ JSCODE;
             $tpl['accounts'] = Account::getAvailableList($device, $user, [
                 'exclude' => $params['exclude'],
             ]);
-            foreach ($tpl['accounts'] as $index => $account) {
-                if (!empty($account['redirect_url'])) {
-                    //链接转跳前，先判断设备是否在线
-                    if ($device->isMcbOnline()) {
-                        Util::redirect($account['redirect_url']);
-                        exit('正在转跳...');
-                    }
-                    unset($tpl['accounts'][$index]);
-                }
-            }
         } else {
             $tpl['accounts'] = [];
+            //天猫拉新活动
+            if (App::isCustomAliTicketEnabled()) {
+                $result = AliTicket::fetchAsAccount($user, $device, true);
+                if (!is_error($result)) {
+                    $tpl['accounts'][] = $result;
+                }
+            }          
+        }
+        
+        foreach ($tpl['accounts'] as $index => $account) {
+            if (!empty($account['redirect_url'])) {
+                //链接转跳前，先判断设备是否在线
+                if ($device->isMcbOnline()) {
+                    Util::redirect($account['redirect_url']);
+                    exit('正在转跳...');
+                }
+                unset($tpl['accounts'][$index]);
+            }
         }
 
         //如果设置必须关注公众号以后才能购买商品

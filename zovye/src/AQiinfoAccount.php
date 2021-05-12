@@ -64,7 +64,7 @@ class AQiinfoAccount
                     ]);
                     $data['redirect_url'] = $result['url'];
                 } else {
-                    $data['url'] = Util::toMedia($res);
+                    $data['qrcode'] = Util::toMedia($res);
                 }
 
                 return [$data];

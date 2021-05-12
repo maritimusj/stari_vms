@@ -666,45 +666,6 @@ class Account extends State
             });
         }
 
-        //天猫拉新活动
-        if (App::isCustomAliTicketEnabled()) {
-            $config = settings('custom.aliTicket', []);
-
-            $no = intval($config['no']);
-            $list["no{$no}"] = function () use ($user, $device, $no) {
-                $result = AliTicket::fetch($user, $device);
-                if (empty($result) || empty($result['ticket']) || empty($result['url'])) {
-                    return err('返回数据不正确！');
-                }
-
-                if (is_error($result)) {
-                    return $result;
-                }
-
-                $data = [
-                    'name' => $result['name'],
-                    'title' => $result['name'],
-                    'descr' => $result['name'],
-                    'clr' => Util::randColor(),
-                    'img' => AliTicket::HEAD_IMAGE_URL,
-                    'orderno' => $no,
-                ];
-
-                $res = Util::createQrcodeFile("ali_ticket{$result['ticket']}", $result['url']);
-                if (is_error($res)) {
-                    Util::logToFile('aliTicket', [
-                        'error' => 'fail to createQrcode file',
-                        'result' => $res,
-                    ]);
-                    $data['redirect_url'] = $result['url'];
-                } else {
-                    $data['url'] = Util::toMedia($res);
-                }
-                
-                return $data;
-            };
-        }
-
         if ($list) {
             krsort($list);
 

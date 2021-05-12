@@ -249,6 +249,42 @@ class AliTicket
         return (new AliTicket($config['key'], $config['secret']))->fetchOne($user, $device);
     }
 
+    public static function fetchAsAccount(userModelObj $user, deviceModelObj $device, $redirect = false)
+    {
+        $result = AliTicket::fetch($user, $device);
+        if (empty($result) || empty($result['ticket']) || empty($result['url'])) {
+            return err('返回数据不正确！');
+        }
+
+        if (is_error($result)) {
+            return $result;
+        }
+
+        $data = [
+            'name' => $result['name'],
+            'title' => settings('custom.aliTicket.title', $result['name']),
+            'descr' => $result['name'],
+            'clr' => Util::randColor(),
+            'img' => AliTicket::HEAD_IMAGE_URL,
+        ];
+
+        if ($redirect) {
+            $data['redirect_url'] = $result['url'];
+        } else {
+            $res = Util::createQrcodeFile("ali_ticket{$result['ticket']}", $result['url']);
+            if (is_error($res)) {
+                Util::logToFile('aliTicket', [
+                    'error' => 'fail to createQrcode file',
+                    'result' => $res,
+                ]);            
+            } else {
+                $data['qrcode'] = Util::toMedia($res);
+                $data['url'] = Util::toMedia($res);
+            }
+        }        
+        return $data;
+    }
+
     public static function cb()
     {
         $config = settings('custom.aliTicket', []);

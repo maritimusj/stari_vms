@@ -175,9 +175,6 @@ class AliTicket
 
     public function verifyData($params)
     {
-        if (!App::isCustomAliTicketEnabled()) {
-            return err('该功能没有启用！');
-        }
         if ($params['appKey'] !== $this->app_key || self::sign($params, $this->app_secret) !== $params['ufsign']) {
             return err('签名校验失败！');
         }
@@ -291,17 +288,25 @@ class AliTicket
         if (empty($config) || empty($config['key']) || empty($config['secret'])) {
             return err('配置不正确！');
         }
-        $res = (new AliTicket($config['key'], $config['secret']))->verifyData(request::json());
+
+        $raw = request::raw();
+        if (empty($raw)) {
+            return err('数据为空！');
+        }
+
+        parse_str($raw, $data);
+
+        $res = (new AliTicket($config['key'], $config['secret']))->verifyData($data);
         if (is_error($res)) {
             return $res;
         }
 
-        $user = User::get(request::json('exUid'), true);
+        $user = User::get($data['exUid'], true);
         if (empty($user)) {
             return err('找不到这个用户！');
         }
 
-        $extra = explode(':', request::json('extra'), 3);
+        $extra = explode(':', $data['extra'], 3);
         if (count($extra) != 2 || $extra[0] !== 'zovye') {
             return err('回调数据不正确！');
         }
@@ -325,7 +330,7 @@ class AliTicket
             'level' => LOG_GOODS_ADVS,
             'total' => $config['goodsNum'],
             'price' => $price,
-            'order_no' => request::json('tradeNo'),
+            'order_no' => $data['tradeNo'],
         ]);
 
         if (is_error($order_no)) {
@@ -336,7 +341,7 @@ class AliTicket
             'result' => 'success',
             'type' => 'AliTicket',
             'orderNO' => $order_no,
-            'transaction_id' => request::json('tradeNo'),
+            'transaction_id' => $data['tradeNo'],
             'total' => $price,
             'paytime' => time(),
             'openid' => $user->getOpenid(),

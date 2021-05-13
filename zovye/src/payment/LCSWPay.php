@@ -99,7 +99,7 @@ class LCSWPay implements IPay
      */
     public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
     {
-        return self::createPay(function ($lcsw, $params) {
+        return $this->createPay(function ($lcsw, $params) {
             return $lcsw->xAppPay($params);
         }, $user_uid, $device_uid, $order_no, $price, $body);
     }
@@ -115,7 +115,7 @@ class LCSWPay implements IPay
      */
     public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '', array $goodsDetail = []): array
     {
-        return self::createPay(function ($lcsw, $params) use ($goodsDetail) {
+        return $this->createPay(function ($lcsw, $params) use ($goodsDetail) {
             if ($goodsDetail) {
                 $params['goods_detail'] = json_encode($goodsDetail);
             }

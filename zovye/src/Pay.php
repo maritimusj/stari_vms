@@ -130,13 +130,7 @@ class Pay
         $price = empty($pay_data['price']) ? $goods['price'] : $pay_data['price'];
 
         if (is_callable([$pay, $fn])) {
-            $res = $pay->$fn(
-                $user->getOpenid(),
-                $device->getImei(),
-                $order_no,
-                $price,
-                $title
-            );
+            $res = $pay->$fn($user->getOpenid(), $device->getImei(), $order_no, $price, $title);
         } else {
             $res = error(State::ERROR, 'unknown pay function');
         }

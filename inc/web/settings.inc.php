@@ -561,6 +561,16 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             }
         }
 
+        if ($settings['SQB']['enable']) {
+            Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
+                'headers' => [
+                    'HTTP_USER_AGENT' => 'SQB_notify',
+                ],
+                'op' => 'notify',
+                'from' => 'SQB',
+            ]);
+        }
+
     } elseif ($save_type == 'data_view') {
         $db_arr = [];
         $res = m('data_view')->findAll();
@@ -1158,16 +1168,6 @@ if ($op == 'account') {
         ])) {
         Util::itoast('创建收钱吧支付入口文件失败！');
     }
-
-    if (false === Util::createApiRedirectFile('/payment/SQBAlipay.php', 'payresult', [
-            'headers' => [
-                'HTTP_USER_AGENT' => 'SQBAlipay_notify',
-            ],
-            'op' => 'notify',
-            'from' => 'SQBAlipay',
-        ])) {
-        Util::itoast('创建收钱吧支付入口文件失败！');
-    }    
 
     if (updateSettings('pay.SQB', [
         'enable' => 1,

@@ -169,65 +169,6 @@ class Pay
         return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
     }
 
-    /**
-     * @param $data
-     * @throws Exception
-     */
-    protected static function processNotify($data)
-    {
-        $device = Device::get($data['deviceUID'], true);
-        if (empty($device)) {
-            throw new Exception('找不到这个设备！');
-        }
-
-        $pay_log = self::getPayLog($data['orderNO']);
-        if (empty($pay_log)) {
-            throw new Exception('找不对支付记录！');
-        }
-
-        $pay_log->setData('payResult', $data);
-        $pay_log->setData('create_order.createtime', time());
-
-        if (!$pay_log->save()) {
-            throw new Exception('保存支付记录失败！');
-        }
-
-        //创建一个回调执行创建订单，出货任务
-        $res = Job::createOrder($data['orderNO'], $device);
-        if (empty($res) || is_error($res)) {
-            throw new Exception('创建订单任务失败！');
-        }
-    }
-
-    public static function notifySQBAlipay($json): string
-    {
-        try {
-            if (empty($json)) {
-                throw new Exception('回调数据为空！');
-            }
-
-            if ($json['status'] !== 'SUCCESS' || $json['order_status'] !== 'PAID') {
-                throw new Exception('订单状态：' . $json['order_status']);
-            }
-
-            $data = [
-                'deviceUID' => $json['operator'],
-                'orderNO' => $json['client_sn'],
-                'total' => intval($json['total_amount']),
-                'transaction_id' => $json['trade_no'],
-                'raw' => $json,
-            ];
-
-            self::processNotify($data);
-        } catch (Exception $e) {
-            Util::logToFile('notifySQBAlipay', [
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        return SQB::RESPONSE;
-    }
-
     public static function notifyChannel($json): string
     {
         try {

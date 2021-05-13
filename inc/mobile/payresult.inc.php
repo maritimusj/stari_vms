@@ -77,9 +77,6 @@ if ($op == 'default') {
         case 'channel':
             $res = Pay::notifyChannel(request::json());
             break;
-        case 'SQBAlipay':
-            $res = Pay::notifySQBAlipay(request::json());
-            break;
         default:
             $res = Pay::notify($_GET['from'], request::raw());            
     }

@@ -32,7 +32,7 @@ class SQBPay implements IPay
         return new pay($this->config);
     }
 
-    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
+    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
     {
         $SQB = $this->getSQB();
         $notify_url = _W('siteroot');
@@ -69,7 +69,7 @@ class SQBPay implements IPay
         return is_array($res['data']['wap_pay_request']) ? $res['data']['wap_pay_request'] : [];
     }
 
-    public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '')
+    public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
     {
         $SQB = $this->getSQB();
         $notify_url = _W('siteroot');
@@ -87,7 +87,7 @@ class SQBPay implements IPay
         ];
     }
 
-    public function getPayJs(deviceModelObj $device, userModelObj $user)
+    public function getPayJs(deviceModelObj $device, userModelObj $user): string
     {
         $device_uid = $device->getImei();
 

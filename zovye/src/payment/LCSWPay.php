@@ -38,15 +38,7 @@ class LCSWPay implements IPay
         ]);
     }
 
-    /**
-     * @param string $user_uid
-     * @param string $device_uid
-     * @param string $order_no
-     * @param int $price
-     * @param string $body
-     * @return mixed
-     */
-    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
+    protected function createPay(callable $fn, string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
     {
         $lcsw = $this->getLCSW();
 
@@ -68,7 +60,7 @@ class LCSWPay implements IPay
             'notify_url' => $notify_url,
         ];
 
-        $res = $lcsw->xAppPay($params);
+        $res = $fn($lcsw, $params);
 
         Util::logToFile('lcsw_xapppay', [
             'params' => $params,
@@ -82,6 +74,7 @@ class LCSWPay implements IPay
         if (App::isAliUser()) {
             return [
                 'orderNO' => $order_no,
+                'tradeNO' => $res['ali_trade_no'],
                 'tradeNo' => $res['ali_trade_no'],
             ];
         }
@@ -102,62 +95,32 @@ class LCSWPay implements IPay
      * @param string $order_no
      * @param int $price
      * @param string $body
+     * @return mixed
+     */
+    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
+    {
+        return self::createPay(function ($lcsw, $params) {
+            return $lcsw->xAppPay($params);
+        }, $user_uid, $device_uid, $order_no, $price, $body);
+    }
+
+    /**
+     * @param string $user_uid
+     * @param string $device_uid
+     * @param string $order_no
+     * @param int $price
+     * @param string $body
      * @param array $goodsDetail
      * @return mixed
      */
     public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '', array $goodsDetail = []): array
     {
-        $lcsw = $this->getLCSW();
-
-        $notify_url = _W('siteroot');
-        $path = 'addons/' . APP_NAME . '/';
-
-        if (mb_strpos($notify_url, $path) === false) {
-            $notify_url .= $path;
-        }
-
-        $notify_url .= 'payment/lcsw.php';
-
-        $params = [
-            'userUID' => $user_uid,
-            'deviceUID' => $device_uid,
-            'orderNO' => $order_no,
-            'price' => $price,
-            'body' => $body,
-            'notify_url' => $notify_url,
-        ];
-
-        if ($goodsDetail) {
-            $params['goods_detail'] = json_encode($goodsDetail);
-        }
-
-        $res = $lcsw->Jspay($params);
-
-        Util::logToFile('js_pay', [
-            'params' => $params,
-            'res' => $res,
-        ]);
-
-        if (is_error($res)) {
-            return $res;
-        }
-
-        if (App::isAliUser()) {
-            return [
-                'orderNO' => $order_no,
-                'tradeNO' => $res['ali_trade_no'],
-                'tradeNo' => $res['ali_trade_no'],//兼容早期版本支付宝H5
-            ];
-        }
-
-        return [
-            'appId' => $res['appId'],
-            'timeStamp' => $res['timeStamp'],
-            'nonceStr' => $res['nonceStr'],
-            'package' => $res['package_str'],
-            'signType' => $res['signType'],
-            'paySign' => $res['paySign'],
-        ];
+        return self::createPay(function ($lcsw, $params) use ($goodsDetail) {
+            if ($goodsDetail) {
+                $params['goods_detail'] = json_encode($goodsDetail);
+            }
+            return $lcsw->Jspay($params);
+        }, $user_uid, $device_uid, $order_no, $price, $body);
     }
 
     public function getPayJs(deviceModelObj $device, userModelObj $user): string
@@ -403,7 +366,7 @@ JSCODE;
         ];
     }
 
-    public function checkResult(array $data = [])
+    public function checkResult(array $data = []): bool
     {
         $lcsw = $this->getLCSW();
 
@@ -418,17 +381,17 @@ JSCODE;
             'terminal_id' => $data['terminal_id'],
             'terminal_trace' => $data['terminal_trace'],
             'terminal_time' => $data['terminal_time'],
-            'total_fee'=> $data['total_fee'],
-            'end_time'=> $data['end_time'],
-            'out_trade_no'=> $data['out_trade_no'],
-            'channel_trade_no'=> $data['channel_trade_no'],
-            'attach'=> $data['attach'],
+            'total_fee' => $data['total_fee'],
+            'end_time' => $data['end_time'],
+            'out_trade_no' => $data['out_trade_no'],
+            'channel_trade_no' => $data['channel_trade_no'],
+            'attach' => $data['attach'],
         ]);
-      
-        return  $sign === $data['key_sign'];
+
+        return $sign === $data['key_sign'];
     }
 
-    public function getResponse(bool $ok = true)
+    public function getResponse(bool $ok = true): string
     {
         return self::RESPONSE_OK;
     }

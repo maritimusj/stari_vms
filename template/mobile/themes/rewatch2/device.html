@@ -179,8 +179,6 @@
 </div>
 {$tpl['js']['code']}
 {php \zovye\url(true, JS_VUE_URL, JS_SWIPER_URL);}
-<script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
-<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 <script type="text/javascript">
 		const initData = {
 			imei: "{$tpl['device']['imei']}",
@@ -219,6 +217,8 @@
 		};
 </script>
 {php \zovye\url(true, 'static/m/rewatch2/device.js?v=202105102011');}
+<script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
+<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 {if !empty($tpl['site']['warning'])}
 <script type="text/javascript">
 		(function() {

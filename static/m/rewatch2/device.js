@@ -45,7 +45,7 @@ const app = new Vue({
             data: null
         }
     },
-    mounted () {
+    mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
             let array = [];
             data.forEach(e => {
@@ -82,7 +82,7 @@ const app = new Vue({
             }
         });
     },
-    created () {
+    created() {
         if (typeof zovye_fn.retryOrder === 'function') {
             zovye_fn.retryOrder((res) => {
                 if (res.status) {
@@ -119,14 +119,16 @@ const app = new Vue({
             this.remain = zovye_fn.getDeviceRemain();
         }
         zovye_fn.getAdvs('passwd', 1, (data) => {
-            this.passwd = {
-                visible: true,
-                data: data[0]
-            };
+            if (data.length > 0) {
+                this.passwd = {
+                    visible: true,
+                    data: data[0]
+                };                
+            }
         })
     },
     methods: {
-        visibilitychange () {
+        visibilitychange() {
             document.addEventListener('visibilitychange', () => {
                 this.isHidden = document.hidden;
                 if (this.isHidden === true && this.video.interval) {
@@ -138,26 +140,26 @@ const app = new Vue({
                 }
             });
         },
-        swiperClick (item) {
+        swiperClick(item) {
             if (item.url) {
                 window.location.href = item.url;
             }
         },
-        groupClick (item) {
+        groupClick(item) {
             window.location.href = item.data.url;
         },
-        saleClick (item) {
+        saleClick(item) {
             if (item.data.url) {
                 window.location.href = item.data.url;
             }
         },
-        categoryClick (index) {
+        categoryClick(index) {
             this.categories.forEach((e, i) => {
                 e.se = i === index;
             });
             this.categoryIndex = index;
         },
-        goodsClick (item) {
+        goodsClick(item) {
             if (item.num === 0) {
                 this.showToast('已售罄');
             } else {
@@ -169,7 +171,7 @@ const app = new Vue({
                 }
             }
         },
-        buyClick (item) {
+        buyClick(item) {
             if (item.num === 0) {
                 this.showToast('已售罄');
             } else {
@@ -187,7 +189,7 @@ const app = new Vue({
                 }
             }
         },
-        showToast (title) {
+        showToast(title) {
             this.toast.title = title;
             if (!this.toast.show) {
                 this.toast.show = true;
@@ -196,7 +198,7 @@ const app = new Vue({
                 }, 2000);
             }
         },
-        unescape (string) {
+        unescape(string) {
             return string
                 .replace(string ? /&(?!#?\w+;)/g : /&/g, '&amp;')
                 .replace(/&lt;/g, "<")
@@ -204,24 +206,24 @@ const app = new Vue({
                 .replace(/&quot;/g, "\"")
                 .replace(/&#39;/g, "\'");
         },
-        msClick () {
+        msClick() {
             if (this.ms.url) {
                 window.location.href = this.ms.url;
             }
         },
-        orderClick () {
+        orderClick() {
             zovye_fn.redirectToOrder();
         },
-        feedbackClick () {
+        feedbackClick() {
             zovye_fn.redirectToFeedBack();
         },
-        reduceClick (item) {
+        reduceClick(item) {
             if (item.count > 1) {
                 item.count--;
                 item.price_formatted = '￥' + (item.price * item.count / 100).toFixed(2);
             }
         },
-        increaseClick (item) {
+        increaseClick(item) {
             if (item.count < item.num && item.count < this.max) {
                 item.count++;
                 item.price_formatted = '￥' + (item.price * item.count / 100).toFixed(2);
@@ -234,7 +236,7 @@ const app = new Vue({
                 });
             }
         },
-        playClick (item) {
+        playClick(item) {
             const that = this;
             that.video.data = item;
             that.video.countdown = item.duration;
@@ -245,13 +247,13 @@ const app = new Vue({
                     src: that.video.data.media
                 }]
             };
-            that.video.player = videojs('player', options, function onPlayerReady () {
+            that.video.player = videojs('player', options, function onPlayerReady() {
                 this.play();
                 that.video.visible = true;
                 that.playVideo();
             });
         },
-        playVideo () {
+        playVideo() {
             this.video.interval = setInterval(() => {
                 this.video.countdown--;
                 if (this.video.countdown === 0) {
@@ -260,7 +262,7 @@ const app = new Vue({
             }, 1000);
             this.playRequest();
         },
-        playRequest () {
+        playRequest() {
             zovye_fn.play(this.video.data.uid, this.video.data.duration - this.video.countdown, (res) => {
                 if (res.redirect) {
                     window.location.replace(res.redirect)
@@ -273,7 +275,7 @@ const app = new Vue({
                 }
             });
         },
-        alertConfirmClick () {
+        alertConfirmClick() {
             zovye_fn.closeWindow && zovye_fn.closeWindow();
         },
         onCopy() {
@@ -285,7 +287,7 @@ const app = new Vue({
     }
 });
 
-function marquee () {
+function marquee() {
     const scrollWidth = $('#affiche').width();
     const textWidth = $('.affiche_text').width();
     let i = scrollWidth;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * www.zovye.com
  * Author: jjs
@@ -129,7 +130,8 @@ class Pay
         $price = empty($pay_data['price']) ? $goods['price'] : $pay_data['price'];
 
         if (is_callable([$pay, $fn])) {
-            $res = $pay->$fn($user->getOpenid(),
+            $res = $pay->$fn(
+                $user->getOpenid(),
                 $device->getImei(),
                 $order_no,
                 $price,
@@ -223,7 +225,6 @@ class Pay
             ];
 
             self::processNotify($data);
-
         } catch (Exception $e) {
             Util::logToFile('notifySQBAlipay', [
                 'error' => $e->getMessage(),
@@ -253,7 +254,6 @@ class Pay
             ];
 
             self::processNotify($data);
-
         } catch (Exception $e) {
             Util::logToFile('notifyAliXApp', [
                 'error' => $e->getMessage(),
@@ -321,55 +321,66 @@ class Pay
      */
     public static function notify(string $name, string $input)
     {
-        //获取一个临时的pay对象
-        $pay = self::makePayObj($name);
-        if (is_error($pay)) {
-            return $pay;
+        $pay = null;
+        try {
+            //获取一个临时的pay对象
+            $pay = self::makePayObj($name);
+            if (is_error($pay)) {
+                throw new Exception($pay['message']);
+            }
+
+            $data = $pay->decodeData($input);
+            if (empty($data)) {
+                throw new Exception('回调数据为空！');
+            }
+
+            if (is_error($data)) {
+                throw new Exception($data['message']);
+            }
+
+            $device = Device::get($data['deviceUID'], true);
+            if (empty($device)) {
+                throw new Exception('找不到这个设备！');
+            }
+
+            //获取一个配置完整的pay对象
+            $pay = self::getActivePayObj($device, $name);
+            if (is_error($pay)) {
+                throw new Exception($pay['message']);
+            }
+
+            if (!$pay->checkResult($data['raw'])) {
+                throw new Exception('回调数据异常！');
+            }
+
+            $pay_log = self::getPayLog($data['orderNO']);
+            if (empty($pay_log)) {
+                throw new Exception('找不对支付记录！');
+            }
+
+            $pay_log->setData('payResult', $data);
+            $pay_log->setData('create_order.createtime', time());
+
+            if (!$pay_log->save()) {
+                throw new Exception('保存支付记录失败！');
+            }
+
+            //创建一个回调执行创建订单，出货任务
+            $res = Job::createOrder($data['orderNO'], $device);
+            if (empty($res) || is_error($res)) {
+                throw new Exception('创建订单任务失败！');
+            }
+
+            return $pay->getResponse(true);
+        } catch (Exception $e) {
+            Util::logToFile('pay', [
+                'error' => $e->getMessage(),
+                'name' => $name,
+                'input' => $input,
+            ]);
+
+            return isset($pay) ? $pay->getResponse(false) : $e->getMessage();
         }
-
-        $data = $pay->decodeData($input);
-        if (is_error($data)) {
-            return $data;
-        }
-
-        if (empty($data)) {
-            return error(State::ERROR, '回调数据为空！');
-        }
-
-        $device = Device::get($data['deviceUID'], true);
-        if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
-        }
-
-        //获取一个配置完整的pay对象
-        $pay = self::getActivePayObj($device, $name);
-        if (is_error($pay)) {
-            return $pay;
-        }
-
-        if (!$pay->checkResult($data['raw'])) {
-            return error(State::ERROR, '回调数据异常！');
-        }
-
-        $pay_log = self::getPayLog($data['orderNO']);
-        if (empty($pay_log)) {
-            return error(State::ERROR, '找不对支付记录！');
-        }
-
-        $pay_log->setData('payResult', $data);
-        $pay_log->setData('create_order.createtime', time());
-
-        if (!$pay_log->save()) {
-            return error(State::ERROR, '保存支付记录失败！');
-        }
-
-        //创建一个回调执行创建订单，出货任务
-        $res = Job::createOrder($data['orderNO'], $device);
-        if (empty($res) || is_error($res)) {
-            return error(State::ERROR, '创建订单任务失败！');
-        }
-
-        return $pay->getResponse(true);
     }
 
     /**
@@ -586,8 +597,10 @@ class Pay
 
             We7::mkDirs($dir);
 
-            if (file_put_contents($pem_file['cert_filename'], $pem['cert']) !== false &&
-                file_put_contents($pem_file['key_filename'], $pem['key']) !== false) {
+            if (
+                file_put_contents($pem_file['cert_filename'], $pem['cert']) !== false &&
+                file_put_contents($pem_file['key_filename'], $pem['key']) !== false
+            ) {
                 return $pem_file;
             } else {
                 Util::logToFile("getPEMFile", [

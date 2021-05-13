@@ -14,7 +14,7 @@ class pay
     const WX_PAY = '010';
     const ALI_PAY = '020';
 
-    private $api = "http://pay.lcsw.cn/lcsw";
+    private $api = "https://pay.lcsw.cn/lcsw";
 
     private $config;
     private $pay_type;

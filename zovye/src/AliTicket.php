@@ -184,12 +184,13 @@ class AliTicket
 
     public static function sign($data, $secret)
     {
-        unset($data['ufsign']);
-
         ksort($data);
 
         $arr = [];
         foreach ($data as $key => $val) {
+            if ($key == 'ufsign') {
+                continue;
+            }
             $arr[] = "{$key}={$val}";
         }
 

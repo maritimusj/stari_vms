@@ -184,12 +184,13 @@ class AQiinfoAccount
 
     public static function sign(array $data, string $secret): string
     {
-        unset($data['ufsign']);
-
         ksort($data);
 
         $arr = [];
         foreach ($data as $key => $val) {
+            if ($key == 'ufsign') {
+                continue;
+            }
             $arr[] = "{$key}={$val}";
         }
 

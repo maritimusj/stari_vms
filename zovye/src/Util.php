@@ -311,11 +311,20 @@ class Util
      * @param mixed $data 数据
      * @return bool
      */
+    
+    static $log_cache = [];
+
     public static function logToFile(string $name, $data): bool
     {
-        static $cache = [];
-
-        $log_filename = self::logFileName($name);
+        if (empty(self::$log_cache)) {
+            register_shutdown_function(function () {
+                foreach (self::$log_cache as $filename => $data) {
+                    if ($filename && $data) {
+                        file_put_contents($filename, $data, FILE_APPEND);
+                    }
+                }
+            });
+        }
 
         ob_start();
 
@@ -325,15 +334,9 @@ class Util
 
         echo PHP_EOL;
 
-        $cache[$log_filename][] = ob_get_clean();
-
-        register_shutdown_function(function () use ($cache) {
-            foreach ($cache as $filename => $data) {
-                if ($filename && $data) {
-                    file_put_contents($filename, $data, FILE_APPEND);
-                }
-            }
-        });
+        $log_filename = self::logFileName($name);       
+         
+        self::$log_cache[$log_filename][] = ob_get_clean(); 
 
         return true;
     }

@@ -234,35 +234,6 @@ class Pay
         return SQB::RESPONSE;
     }
 
-    public static function notifyAliXApp($input): string
-    {
-        try {
-            if (empty($input)) {
-                throw new Exception('回调数据为空！');
-            }
-
-            if ($input['result_code'] !== '01') {
-                throw new Exception($input['return_msg']);
-            }
-
-            $data = [
-                'deviceUID' => $input['attach'],
-                'orderNO' => $input['terminal_trace'],
-                'total' => intval($input['total_fee']),
-                'transaction_id' => $input['out_trade_no'],
-                'raw' => $input,
-            ];
-
-            self::processNotify($data);
-        } catch (Exception $e) {
-            Util::logToFile('notifyAliXApp', [
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        return '{"return_code":"01","return_msg":"SUCCESS"}';
-    }
-
     public static function notifyChannel($json): string
     {
         try {

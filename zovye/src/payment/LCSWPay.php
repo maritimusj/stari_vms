@@ -57,11 +57,7 @@ class LCSWPay implements IPay
             $notify_url .= $path;
         }
 
-        if (App::isAliUser()) {
-            $notify_url .= 'payment/alixapp.php';
-        } else {
-            $notify_url .= 'payment/lcsw.php';
-        }
+        $notify_url .= 'payment/lcsw.php';
 
         $params = [
             'userUID' => $user_uid,
@@ -150,6 +146,7 @@ class LCSWPay implements IPay
             return [
                 'orderNO' => $order_no,
                 'tradeNO' => $res['ali_trade_no'],
+                'tradeNo' => $res['ali_trade_no'],//兼容早期版本支付宝H5
             ];
         }
 

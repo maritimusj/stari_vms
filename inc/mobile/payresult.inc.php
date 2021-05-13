@@ -59,6 +59,7 @@ if ($op == 'default') {
     ]);
 
 } elseif ($op == 'SQB') {
+
     if (request::trim('is_success') == 'T') {
         Util::resultAlert('支付成功！');
     }
@@ -67,10 +68,12 @@ if ($op == 'default') {
     
 } elseif ($op == 'notify') {
 
+    Util::logToFile('payresult', [
+        'from' => $_GET['from'],
+        'raw' => request::raw(),
+    ]);
+
     switch($_GET['from']) {
-        case 'alixapp':
-            $res = Pay::notifyAliXApp(request::json());
-            break;
         case 'channel':
             $res = Pay::notifyChannel(request::json());
             break;

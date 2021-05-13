@@ -544,18 +544,6 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['alixapp']['pubkey'] = request::trim('alixapp_pubkey');
         $settings['alixapp']['prikey'] = request::trim('alixapp_prikey');
 
-        if (!isEmptyArray($settings['alixapp'])) {
-            if (false === Util::createApiRedirectFile('payment/alixapp.php', 'payresult', [
-                    'headers' => [
-                        'HTTP_USER_AGENT' => 'alix_notify',
-                    ],
-                    'op' => 'notify',
-                    'from' => 'alixapp',
-                ])) {
-                Util::itoast('创建阿里支付入口文件失败！');
-            }
-        }
-
         $settings['pay']['channel'] = [
             'key' => request::trim('channelPayKey'),
             'secret' => request::trim('channelPaySecret'),

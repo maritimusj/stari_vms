@@ -385,7 +385,7 @@ class Advertising extends State
         return $slides;
     }
 
-    public static function pass($id, $admin = '') 
+    public static function pass($id, $admin = ''): bool
     {  
         if ($id > 0) {
             $adv = Advertising::get($id);
@@ -417,7 +417,7 @@ class Advertising extends State
         return false;
     }
 
-    public static function reject($id)
+    public static function reject($id): bool
     {
         if ($id > 0) {
             $adv = Advertising::get($id);

@@ -461,9 +461,12 @@ class deviceModelObj extends modelObj
 
         return 'extra.';
     }
-    
+
     /**
      * 迁移货道数据
+     * @param string $path
+     * @param null $default
+     * @return mixed
      */
     private function getMigratedLanesData($path = '', $default = null)
     {

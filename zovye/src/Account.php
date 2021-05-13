@@ -144,6 +144,9 @@ class Account extends State
     public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         $accounts = $device->getNormalAccounts();
+        if (empty($accounts)) {
+            return $accounts;
+        }
 
         $groups = [];
         foreach ($accounts as $uid => $entry) {
@@ -671,10 +674,8 @@ class Account extends State
 
             foreach ($list as $fn) {
                 $result = $fn();
-                if ($result) {
-                    if (!is_error($result)) {
-                        return $result;
-                    }
+                if ($result && !is_error($result)) {
+                    return $result;
                 }
             }
         }

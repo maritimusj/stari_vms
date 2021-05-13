@@ -72,11 +72,6 @@ if ($op == 'save') {
                 'deviceOnline' => 1,
             ],
             'funcs' => App::agentDefaultFuncs(),
-            'purchase' => [
-                'enabled' => 1,
-                'name' => '',
-                'price' => 0,
-            ],
             'superior' => [],
             'location' => [
                 'validate' => [

@@ -453,11 +453,6 @@ if ($op == 'default') {
                     'agentMsg' => 1,
                 ],
                 'funcs' => Util::getAgentFNs(),
-                'purchase' => [
-                    'enabled' => settings('purchase.enabled') ? 1 : 0,
-                    'name' => '',
-                    'price' => 0,
-                ],
                 'superior' => $superior_data,
                 'location' => [
                     'validate' => [

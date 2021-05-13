@@ -309,7 +309,7 @@ JSCODE;
         }
 
         //如果无法领取，则清除访问记录
-        if (empty($tpl['accounts']) && empty($tpl['purchase'])) {
+        if (empty($tpl['accounts']) && empty($tpl['goods'])) {
             $user->remove('last');
         }
 

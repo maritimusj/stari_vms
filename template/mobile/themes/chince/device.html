@@ -216,7 +216,7 @@
 
 	<body ontouchstart>
 		<div id="app" v-cloak>
-			{if $tpl['accounts'] && ($tpl['goods'] || $tpl['purchase'])}
+			{if $tpl['accounts'] && $tpl['goods']}
 			<div class="tab-view">
 				<div :class="{tab:true, selected:selected}" @click="freeClick">免费领取</div>
 				<div :class="{tab:true, selected:!selected}" @click="payClick">支付购买</div>
@@ -236,7 +236,7 @@
 				</div>
 			</div>
 			{/if}
-			{if $tpl['goods'] || $tpl['purchase']}
+			{if $tpl['goods']}
 			<div class="main-view" v-show="!selected">
 				<div class="list">
 					{loop $tpl['goods'] $index $item}

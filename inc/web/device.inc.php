@@ -556,12 +556,10 @@ if ($op == 'list') {
         $agent = $device->getAgent();
 
         $tpl_data['agent'] = $agent;
-        $tpl_data['allowWxPay'] = settings('purchase.enabled') && (empty($agent) || $agent->settings('agentData.purchase.enabled'));
     } else {
         if ($op == 'add_vd') {
             $tpl_data['vd_imei'] = 'V' . Util::random(15, true);
         }
-        $tpl_data['allowWxPay'] = settings('purchase.enabled');
     }
 
     if ($op == 'add_vd' || (isset($device) && $device->isVDevice())) {

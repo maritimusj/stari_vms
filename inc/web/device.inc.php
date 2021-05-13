@@ -2121,7 +2121,7 @@ if ($op == 'list') {
     }
 
     $tpl_data['s_date'] = $s_date->format('Y-m-d');
-    $tpl_data['e_date'] = $e_date->format('Y-m-d');
+    $tpl_data['e_date'] = $e_date->modify('-1 day')->format('Y-m-d');
     $tpl_data['device_id'] = $device_id;
     $tpl_data['data'] = $data;
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);

@@ -8,6 +8,7 @@
 
 namespace zovye;
 
+use Exception;
 use zovye\Contract\IPay;
 use zovye\model\pay_logsModelObj;
 use zovye\payment\SQBPay;
@@ -82,7 +83,7 @@ class Pay
         if ($pay_data['order_no']) {
             $partial = $pay_data['order_no'];
         } else {
-            $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));  
+            $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));
         }
 
         $order_no = substr("U{$user->getId()}D{$device->getId()}" . $partial, 0, MAX_ORDER_NO_LEN);
@@ -171,121 +172,132 @@ class Pay
     {
         return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
     }
-    public static function notifySQBAlipay($data)
+
+    /**
+     * @param $data
+     * @throws Exception
+     */
+    protected static function processNotify($data)
     {
-        if (empty($data) || $data['status'] !== 'SUCCESS' || $data['order_status'] !== 'PAID') {
-            return error(State::FAIL, empty($input_format['return_msg']) ? '无法解析input数据' : $data['return_msg']);
-        }
-        $data = [
-            'deviceUID' => $data['attach'],
-            'orderNO' => $data['terminal_trace'],
-            'total' => intval($data['total_fee']),
-            'transaction_id' => $data['out_trade_no'],
-            'raw' => $data,
-        ];
-
-        if (empty($data)) {
-            return error(State::ERROR, '回调数据为空！');
-        }
-
         $device = Device::get($data['deviceUID'], true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            throw new Exception('找不到这个设备！');
         }
 
         $pay_log = self::getPayLog($data['orderNO']);
         if (empty($pay_log)) {
-            return error(State::ERROR, '找不对支付记录！');
+            throw new Exception('找不对支付记录！');
         }
 
         $pay_log->setData('payResult', $data);
         $pay_log->setData('create_order.createtime', time());
 
         if (!$pay_log->save()) {
-            return error(State::ERROR, '保存支付记录失败！');
+            throw new Exception('保存支付记录失败！');
         }
 
         //创建一个回调执行创建订单，出货任务
         $res = Job::createOrder($data['orderNO'], $device);
         if (empty($res) || is_error($res)) {
-            return error(State::ERROR, '创建订单任务失败！');
+            throw new Exception('创建订单任务失败！');
+        }
+    }
+
+    public static function notifySQBAlipay($json): string
+    {
+        try {
+            if (empty($json)) {
+                throw new Exception('回调数据为空！');
+            }
+
+            if ($json['status'] !== 'SUCCESS' || $json['order_status'] !== 'PAID') {
+                throw new Exception('订单状态：' . $json['order_status']);
+            }
+
+            $data = [
+                'deviceUID' => $json['operator'],
+                'orderNO' => $json['client_sn'],
+                'total' => intval($json['total_amount']),
+                'transaction_id' => $json['trade_no'],
+                'raw' => $json,
+            ];
+
+            self::processNotify($data);
+
+        } catch (Exception $e) {
+            Util::logToFile('notifySQBAlipay', [
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return SQB::RESPONSE;
     }
-    public static function notifyAliXApp(string $input)
+
+    public static function notifyAliXApp($input): string
     {
-        $input_format = json_decode($input, true);
-        if (empty($input_format) || $input_format['result_code'] !== '01') {
-            return error(State::FAIL, empty($input_format['return_msg']) ? '无法解析input数据' : $input_format['return_msg']);
-        }
-        $data = [
-            'deviceUID' => $input_format['attach'],
-            'orderNO' => $input_format['terminal_trace'],
-            'total' => intval($input_format['total_fee']),
-            'transaction_id' => $input_format['out_trade_no'],
-            'raw' => $input_format,
-        ];
+        try {
+            if (empty($input)) {
+                throw new Exception('回调数据为空！');
+            }
 
-        if (empty($data)) {
-            return error(State::ERROR, '回调数据为空！');
-        }
+            if ($input['result_code'] !== '01') {
+                throw new Exception($input['return_msg']);
+            }
 
-        $device = Device::get($data['deviceUID'], true);
-        if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
-        }
+            $data = [
+                'deviceUID' => $input['attach'],
+                'orderNO' => $input['terminal_trace'],
+                'total' => intval($input['total_fee']),
+                'transaction_id' => $input['out_trade_no'],
+                'raw' => $input,
+            ];
 
-        $pay_log = self::getPayLog($data['orderNO']);
-        if (empty($pay_log)) {
-            return error(State::ERROR, '找不对支付记录！');
-        }
+            self::processNotify($data);
 
-        $pay_log->setData('payResult', $data);
-        $pay_log->setData('create_order.createtime', time());
-
-        if (!$pay_log->save()) {
-            return error(State::ERROR, '保存支付记录失败！');
-        }
-
-        //创建一个回调执行创建订单，出货任务
-        $res = Job::createOrder($data['orderNO'], $device);
-        if (empty($res) || is_error($res)) {
-            return error(State::ERROR, '创建订单任务失败！');
+        } catch (Exception $e) {
+            Util::logToFile('notifyAliXApp', [
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return '{"return_code":"01","return_msg":"SUCCESS"}';
     }
 
-    public static function notifyChannel($data)
+    public static function notifyChannel($json): string
     {
-        // if (!ChannelPay::checkSign($data)) {
-        //     return err('签名检验失败！');
-        // }
+        try {
+            if (!ChannelPay::checkSign($json)) {
+                throw new Exception('签名检验失败！');
+            }
 
-        $out_trade_no = $data['outTradeNo'];
+            $out_trade_no = $json['outTradeNo'];
 
-        $pay_log = self::getPayLog($out_trade_no);
-        if (empty($pay_log)) {
-            return err('找不对支付记录！');
-        }
+            $pay_log = self::getPayLog($out_trade_no);
+            if (empty($pay_log)) {
+                throw new Exception('找不对支付记录！');
+            }
 
-        $pay_log->setData('payResult', $data);
-        $pay_log->setData('create_order.createtime', time());
+            $pay_log->setData('payResult', $json);
+            $pay_log->setData('create_order.createtime', time());
 
-        if (!$pay_log->save()) {
-            return err('保存支付记录失败！');
-        }
+            if (!$pay_log->save()) {
+                throw new Exception('保存支付记录失败！');
+            }
 
-        $device = Device::get($pay_log->getDeviceId());
-        if (empty($device)) {
-            return err('找不到这个设备！');
-        }
+            $device = Device::get($pay_log->getDeviceId());
+            if (empty($device)) {
+                throw new Exception('找不到这个设备！');
+            }
 
-        //创建一个回调执行创建订单，出货任务
-        $res = Job::createOrder($out_trade_no, $device);
-        if (empty($res) || is_error($res)) {
-            return err('创建订单任务失败！');
+            //创建一个回调执行创建订单，出货任务
+            $res = Job::createOrder($out_trade_no, $device);
+            if (empty($res) || is_error($res)) {
+                throw new Exception('创建订单任务失败！');
+            }
+        } catch (Exception $e) {
+            Util::logToFile('notifyChannel', [
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return '{"code":200}';
@@ -484,7 +496,7 @@ class Pay
             } elseif ($params['SQB']['enable']) {
                 $data = $params['SQB'];
                 $data['name'] = 'SQB';
-            }  elseif ($params['wx']['enable']) {
+            } elseif ($params['wx']['enable']) {
                 $data = $params['wx'];
                 $data['name'] = 'wx';
             } elseif ($params['ali']['enable']) {
@@ -609,7 +621,7 @@ class Pay
         //微信公众号支付或小程序支付
         if ($name == self::WX || $name == self::WxAPP) {
             return new WXPay();
-        }        
+        }
 
         //支付宝支付
         if ($name == self::ALI) {

@@ -28,7 +28,6 @@ class ChannelPay
 
     public function makeSign($params = []): string
     {
-        $params['appKey'] = $this->app_key;
         ksort($params);
 
         $aQuery = [];
@@ -58,7 +57,7 @@ class ChannelPay
         if (empty($settings) || empty($settings['key']) || empty($settings['secret'])) {
             return false;
         }
-        return (new ChannelPay($settings['key'], $settings['secret']))->makeSign($data) == $data['ufsign'];
+        return (new ChannelPay($settings['key'], $settings['secret']))->makeSign($data) === $data['ufsign'];
     }
 
     /**

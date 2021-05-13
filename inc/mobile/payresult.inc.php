@@ -69,7 +69,7 @@ if ($op == 'default') {
 
     switch($_GET['from']) {
         case 'alixapp':
-            $res = Pay::notifyAliXApp(request::raw());
+            $res = Pay::notifyAliXApp(request::json());
             break;
         case 'channel':
             $res = Pay::notifyChannel(request::json());
@@ -79,16 +79,6 @@ if ($op == 'default') {
             break;
         default:
             $res = Pay::notify($_GET['from'], request::raw());            
-    }
-    
-    if (is_error($res)) { 
-        Util::logToFile('notify', [
-            'from' => $_GET['from'],
-            'input' => request::raw(),
-            'result' => $res,
-        ]);
-    
-        exit(Pay::getResponse($_GET['from']));
     }
 
     exit($res);

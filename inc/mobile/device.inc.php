@@ -64,22 +64,26 @@ if ($op == 'default') {
         JSON::fail('找不到用户！');
     }
 
-    $device_id = request::int('device');
-    $text = request::str('text');
-    $pics = request::array('pics');
-
-    $device = Device::get($device_id, true);
+    $device_imei = request::str('device');
+    $device = Device::get($device_imei, true);
 
     if (!$device) {
-        JSON::fail('找不到设备！');
+        JSON::fail('找不到这台设备！');
     }
+
+    $text = request::trim('text');
+    $pics = request::array('pics');
+
+    if (empty($text)) {
+        JSON::fail('请输入反馈内容！');
+    }
+
     $data = [
         'device_id' => $device->getId(),
         'user_id' => $user->getId(),
         'text' => $text,
         'pics' => serialize($pics),
         'createtime' => time(),
-
     ];
 
     if (m('device_feedback')->create($data)) {

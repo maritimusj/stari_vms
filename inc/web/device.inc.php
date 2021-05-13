@@ -2042,14 +2042,6 @@ if ($op == 'list') {
     }
 } else if ($op == 'feed_back') {
 
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-
-    $device_id = request::int('device_id');
-
-    $date_time = new DateTime();
-    $date_time->modify('first day of this month');
-
     $date_limit = request::array('datelimit');
     if ($date_limit['start']) {
         $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
@@ -2063,36 +2055,13 @@ if ($op == 'list') {
     } else {
         $e_date = new DateTime('first day of next month 00:00:00');
     }
-
+    
     $condition = [
         'createtime >=' => $s_date->getTimestamp(),
         'createtime <' => $e_date->getTimestamp(),
     ];
 
-    $agent_openid = request::str('agent_openid');
-    $nickname = request::trim('nickname');
-
-    $user_ids = [];
-    if ($nickname != '') {
-        $user_res = User::query()->whereOr([
-            'nickname LIKE' => "%{$nickname}%",
-            'mobile LIKE' => "%{$nickname}%",
-        ])->findAll();
-        foreach ($user_res as $item) {
-            $user_ids[] = $item->getId();
-        }
-    }
-
-    $device_ids = [];
-    if (!empty($agent_openid)) {
-        $agent = Agent::get($agent_openid, true);
-        if ($agent) {
-            $device_res = Device::query(['agent_id' => $agent->getId()])->findAll();
-            foreach ($device_res as $item) {
-                $device_ids[] = $item->getId();
-            }
-        }
-    }
+    $device_id = request::int('device_id');
 
     if (!empty($device_id)) {
         $condition['device_id'] = $device_id;
@@ -2100,19 +2069,8 @@ if ($op == 'list') {
 
     $query = m('device_feedback')->query($condition);
 
-    if (empty($user_ids)) {
-        $query->where('id = -1');
-    } else {
-        $user_ids = array_unique($user_ids);
-        $query->where(['user_id' => $user_ids]);
-    }
-
-    if (empty($device_ids)) {
-        $query->where('id = -1');
-    } else {
-        $device_ids = array_unique($device_ids);
-        $query->where(['device_id' => $device_ids]);
-    }
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
 
     $total = $query->count();
     if ($page > ceil($total / $page_size)) {
@@ -2120,98 +2078,63 @@ if ($op == 'list') {
     }
 
     $query->orderBy('id DESC');
-    $res = $query->page($page, $page_size)->findAll();
+    $query->page($page, $page_size);
 
     $data = [];
-    $user_ids = [];
-    $device_ids = [];
-
     /** @var device_feedbackModelObj $item */
-    foreach ($res as $item) {
+    foreach ($query->findAll() as $item) {
         $pics = unserialize($item->getPics());
         if ($pics === false) {
             $pics = [];
+        } else {
+            foreach($pics as $index => $pic) {
+                $pics[$index] = Util::toMedia($pic);
+            }            
         }
-        $arr = [
-            'id' => $item->getId(),
-            'deviceId' => $item->getDeviceId(),
-            'userId' => $item->getUserId(),
 
+        $arr = [
+            'id' => $item->getId(),                  
             'text' => $item->getText(),
             'pics' => $pics,
             'remark' => $item->getRemark(),
-
             'createtime' => date('Y-m-d H:i:s', $item->getCreatetime()),
         ];
 
+        $user = User::get($item->getUserId());
+        if ($user) {
+            $arr['user'] = $user->profile();
+        }
+
+        $device = Device::get($item->getDeviceId());
+        if ($device) {
+            $arr['device'] = [
+                'imei' => $device->getImei(),
+                'name' => $device->getName(),
+            ];
+            $agent = $device->getAgent();
+            if ($agent) {
+                $arr['agent'] = $agent->profile();
+            }            
+        }
+
         $data[] = $arr;
-        $user_ids[] = $item->getUserId();
-        $device_ids[] = $item->getDeviceId();
     }
 
-    $user_assoc = [];
-    if (!empty($user_ids)) {
-
-        $user_ids = array_unique($user_ids);
-        $user_res = User::query('id IN (' . implode(',', $user_ids) . ')')->findAll();
-
-        /** @var userModelObj $item */
-        foreach ($user_res as $item) {
-            $user_assoc[$item->getId()] = $item->getNickname();
-        }
-    }
-
-    $device_assoc = [];
-    $device_agent_assoc = [];
-    $agent_ids = [];
-
-    if (!empty($device_ids)) {
-
-        $device_ids = array_unique($device_ids);
-        $device_res = Device::query('id IN (' . implode(',', $device_ids) . ')')->findAll();
-
-        /** @var deviceModelObj $item */
-        foreach ($device_res as $item) {
-            $device_assoc[$item->getId()] = $item->getName() . ', ' . $item->getImei();
-            $device_agent_assoc[$item->getId()] = $item->getAgentId();
-            $agent_ids[] = $item->getAgentId();
-        }
-    }
-
-    $agent_assoc = [];
-    $agent_assoc[0] = '平台';
-
-    if (!empty($agent_ids)) {
-        $agent_ids = array_unique($agent_ids);
-        $agent_res = m('agent_vw')->where('id IN(' . implode(',', $agent_ids) . ')')->findAll();
-
-        /** @var agent_vwModelObj $item */
-        foreach ($agent_res as $item) {
-            $agent_assoc[$item->getId()] = $item->getNickname();
-        }
-    }
-
-    $tpl_data['s_date'] = $s_date;
-    $tpl_data['e_date'] = $e_date;
-    $tpl_data['nickname'] = $nickname;
+    $tpl_data['s_date'] = $s_date->format('Y-m-d');
+    $tpl_data['e_date'] = $e_date->format('Y-m-d');
     $tpl_data['device_id'] = $device_id;
-    $tpl_data['open_id'] = $agent_openid;
-
     $tpl_data['data'] = $data;
-    $tpl_data['user_assoc'] = $user_assoc;
-    $tpl_data['device_assoc'] = $device_assoc;
-    $tpl_data['device_agent_assoc'] = $device_agent_assoc;
-    $tpl_data['agent_assoc'] = $agent_assoc;
-
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
-    $tpl_data['attach_url'] = We7::attachment_set_attach_url();
-
+    
     $this->showTemplate('web/device/feedback', $tpl_data);
 } else if ($op == 'deal_fb') {
 
     //处理反馈
-    $id = request('id');
-    $remark = request('remark');
+    $id = request::int('id');
+    $remark = request::trim('remark');
+    if (empty($remark)) {
+        JSON::fail('请输入处理内容！');
+    }
 
     /** @var device_feedbackModelObj $res */
     $res = m('device_feedback')->findOne(['id' => $id]);
@@ -2226,13 +2149,13 @@ if ($op == 'list') {
     }
 } else if ($op == 'add_fb') {
 
-    $id = request('id');
+    $id = request::int('id');
 
     /** @var device_feedbackModelObj $res */
     $res = m('device_feedback')->findOne(['id' => $id]);
     if ($res) {
         if ($res->getRemark() != '') {
-            JSON::fail('已处理该数据！');
+            JSON::fail('已处理该故障！');
         }
     } else {
         JSON::fail('找不到该记录！');
@@ -2241,6 +2164,10 @@ if ($op == 'list') {
     $pics = unserialize($res->getPics());
     if ($pics === false) {
         $pics = [];
+    } else {
+        foreach($pics as $index => $pic) {
+            $pics[$index] = Util::toMedia($pic);
+        }
     }
 
     $content = $this->fetchTemplate(
@@ -2250,7 +2177,6 @@ if ($op == 'list') {
             'id' => $res->getId(),
             'text' => $res->getText(),
             'pics' => $pics,
-            'attach_url' => We7::attachment_set_attach_url(),
         ]
     );
 

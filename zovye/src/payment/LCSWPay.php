@@ -388,7 +388,11 @@ JSCODE;
     public function decodeData(string $input): array
     {
         $data = json_decode($input, true);
-        if (empty($data) || $data['result_code'] !== '01') {
+        if (empty($data)) {
+            return error(State::FAIL, '数据为空！');
+        }
+
+        if ($data['result_code'] !== '01') {
             return error(State::FAIL, $data['return_msg']);
         }
 
@@ -404,12 +408,27 @@ JSCODE;
 
     public function checkResult(array $data = [])
     {
-        if (empty($data) || $data['result_code'] !== '01') {
-            return error(State::FAIL, $data['return_msg']);
-        }
+        $lcsw = $this->getLCSW();
 
-        //检查签名
-        return true;
+        $sign = $lcsw->sign([
+            'return_code' => $data['return_code'],
+            'return_msg' => $data['return_msg'],
+            'result_code' => $data['result_code'],
+            'pay_type' => $data['pay_type'],
+            'user_id' => $data['user_id'],
+            'merchant_name' => $data['merchant_name'],
+            'merchant_no' => $data['merchant_no'],
+            'terminal_id' => $data['terminal_id'],
+            'terminal_trace' => $data['terminal_trace'],
+            'terminal_time' => $data['terminal_time'],
+            'total_fee'=> $data['total_fee'],
+            'end_time'=> $data['end_time'],
+            'out_trade_no'=> $data['out_trade_no'],
+            'channel_trade_no'=> $data['channel_trade_no'],
+            'attach'=> $data['attach'],
+        ]);
+      
+        return  $sign === $data['key_sign'];
     }
 
     public function getResponse(bool $ok = true)

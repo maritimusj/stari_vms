@@ -36,15 +36,16 @@ class pay
             ksort($params);
         }
 
-        $str = '';
-        foreach ($params as $key => $val) {
-            $str .= "&{$key}={$val}";
+        $arr = [];
+        foreach ($params as $key => $val) {  
+            if ($key == 'key_sign') {
+                continue;
+            }
+            $arr[] = "{$key}={$val}";
         }
 
-        $str .= "&access_token={$this->config['access_token']}";
-        $str = trim($str,  '&');
-
-        return md5($str);
+        $arr[] = "access_token={$this->config['access_token']}";
+        return md5(implode('&', $arr));
     }
 
     public function requestApi($url, $params) {

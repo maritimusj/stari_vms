@@ -8,7 +8,7 @@
 namespace zovye;
 
 $sql = <<<SQL
-CREATE TABLE `ims_zy_saas_migration` ( 
+CREATE TABLE `ims_zovye_vms_migration` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
     `uniacid` int(11) NOT NULL DEFAULT '0',
     `name` VARCHAR(64) NOT NULL , 

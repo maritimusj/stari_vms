@@ -2,10 +2,19 @@
 
 namespace zovye;
 
+/**
+ * 全局配置越来越大，这个类主要用来独立部分配置
+ * Class Config
+ * @package zovye
+ */
 class Config
 {
     /**
      * 天猫拉新相关配置
+     * @param $key
+     * @param null $v
+     * @param bool $update
+     * @return mixed
      */
     public static function aliTicket($key, $v = null, $update = false)
     {
@@ -18,6 +27,10 @@ class Config
 
     /**
      * 代理商相关配置
+     * @param $key
+     * @param null $v
+     * @param bool $update
+     * @return mixed
      */
     public static function agent($key, $v = null, $update = false)
     {

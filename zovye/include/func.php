@@ -62,37 +62,49 @@ function tb(string $name): string
  * @param mixed $default
  * @return mixed
  */
-static $__settings_cache = [];
+class __ZOVYE_SETTINGS__
+{
+    static $cache = [];
+}
+
 function settings(string $key = '', $default = null)
 {
-    if (!isset($__settings_cache[$key])) {
-        $__settings_cache[$key] = app()->settings($key, $default);
+    if (!isset(__ZOVYE_SETTINGS__::$cache[$key])) {
+        __ZOVYE_SETTINGS__::$cache[$key] = app()->settings($key, $default);
     }
 
-    return $__settings_cache[$key];
+    return __ZOVYE_SETTINGS__::$cache[$key];
 }
 
 function updateSettings(string $key, $val): bool
 {
-    unset($__settings_cache[$key]);
+    unset(__ZOVYE_SETTINGS__::$cache[$key]);
     return app()->updateSettings($key, $val);
 }
 
 /**
  * 其它全局设置
+ * @param string $name
+ * @param string $path
+ * @param null $default
+ * @return mixed|null
  */
-static $__global_config_cache = [];
-function globalConfig(string $name, $path = '', $default = null) 
+class __ZOVYE_CONFIG__
+{
+    static $cache = [];
+}
+
+function globalConfig(string $name, $path = '', $default = null)
 {
     if (empty($name)) {
         return $default;
     }
 
-    if (!isset($__global_config_cache[$name])) {
-        $__global_config_cache[$name] = app()->get($name, []);
+    if (!isset(__ZOVYE_CONFIG__::$cache[$name])) {
+        __ZOVYE_CONFIG__::$cache[$name] = app()->get($name, []);
     }
 
-   return getArray($__global_config_cache[$name], $path, $default);
+    return getArray(__ZOVYE_CONFIG__::$cache[$name], $path, $default);
 }
 
 function updateGlobalConfig(string $name, $path, $val): bool
@@ -101,7 +113,7 @@ function updateGlobalConfig(string $name, $path, $val): bool
         return false;
     }
 
-    unset($__global_config_cache[$name]);
+    unset(__ZOVYE_CONFIG__::$cache[$name]);
 
     $config = app()->get($name, []);
     setArray($config, $path, $val);

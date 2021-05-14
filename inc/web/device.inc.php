@@ -949,15 +949,15 @@ if ($op == 'list') {
             $join = request::bool('JoinAliTicket');
             $device->updateSettings('aliTicket', [
                 'join' => $join,
-                'province' => request::trim('area.province'),
-                'city' => request::trim('area.city'),
-                'district' => request::trim('area.district'),
-                'name' => request::trim(''),
-                'addressDetail' => request::trim('addressDetail'),
-                'floor' => request::trim('floor'),
-                'firstScene' => request::trim('firstScene'),
-                'secondScene' => request::trim('secondScene'),
-                'deviceType' => request::trim('deviceType'),
+                'province' => request::trim('aliTicketArea.province'),
+                'city' => request::trim('aliTicketArea.city'),
+                'district' => request::trim('aliTicketArea.district'),
+                'name' => $device->getName(),
+                'addressDetail' => request::trim('aliTicketAddress'),
+                'floor' => request::trim('aliTicketFloor'),
+                'firstScene' => request::trim('aliTicketFirstScene'),
+                'secondScene' => request::trim('aliTicketSecondScene'),
+                'deviceType' => request::trim('aliTicketDeviceType'),
             ]);
             if ($join) {
                 AliTicket::registerDevice($device);

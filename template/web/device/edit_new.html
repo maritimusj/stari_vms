@@ -523,7 +523,7 @@
                         <div class="form-group">
                             <label class="col-md-2 control-label">设备类型</label>
                             <div class="col-md-10">
-                                <select name="deviceType" v-model="deviceType">
+                                <select name="aliTicketDeviceType" v-model="deviceType">
                                     <option v-for="v in deviceTypes">{{v}}</option>
                                 </select>
                             </div>
@@ -532,32 +532,32 @@
                             <label for="second" class="col-md-2 control-label">第一场景</label>
                             <div class="col-md-10 scene_list">
                                 <span :class="{'scene':true, 'selected': scene.first == e}" v-for="e in firstSceneList" @click="setFirstScene(e);">{{e}}</span>
-                                <input type="hidden" name="firstScene" v-model="scene.first">
+                                <input type="hidden" name="aliTicketFirstScene" v-model="scene.first">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="second" class="col-md-2 control-label">第二场景</label>
                             <div class="col-md-10 scene_list">
                                 <span :class="{'scene':true, 'selected': scene.second == e}" v-for="e in secondSceneList" @click="setSecondScene(e)">{{e}}</span>
-                                <input type="hidden" name="secondScene" v-model="scene.second">
+                                <input type="hidden" name="aliTicketSecondScene" v-model="scene.second">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-md-2 control-label">所在区域</label>
                             <div class="col-md-10" v-once>
-                                {php echo tpl_form_field_district('area', $agent_data['area']);}
+                                {php echo tpl_form_field_district('aliTicketArea', $agent_data['area']);}
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="addressDetail" class="col-md-2 control-label">具体地址</label>
                             <div class="col-md-10">
-                                <input type="text" class="form-control" name="addressDetail" id="addressDetail" v-model="addressDetail">
+                                <input type="text" class="form-control" name="aliTicketAddress" id="addressDetail" v-model="addressDetail">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="floor" class="col-md-2 control-label">所在楼层</label>
                             <div class="col-md-10">
-                                <input type="text" class="form-control" name="floor" id="floor" v-model="floor">
+                                <input type="text" class="form-control" name="aliTicketFloor" id="floor" v-model="floor">
                             </div>
                         </div>                          
                     </div>                  

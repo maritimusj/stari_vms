@@ -244,12 +244,12 @@ JS_CODE;
     /**
      * 检验支付回调数据
      * @param array $data
-     * @return array|bool
+     * @return bool
      */
-    public function checkResult(array $data = [])
+    public function checkResult(array $data = []): bool
     {
         if ($data['return_code'] != 'SUCCESS' || $data['result_code'] != 'SUCCESS') {
-            return error(State::ERROR, $data['return_msg']);
+            return false;
         }
 
         $wx = $this->getWx();

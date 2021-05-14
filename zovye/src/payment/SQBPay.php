@@ -198,7 +198,7 @@ JS_CODE;
         return err($res['error_message']);
     }
 
-    public function decodeData(string $input)
+    public function decodeData(string $input): array
     {
         $data = json_decode($input, true);
         if ($data['status'] === 'SUCCESS' && $data['order_status'] === 'PAID') {
@@ -215,13 +215,13 @@ JS_CODE;
         return err('异常数据！');
     }
 
-    public function checkResult(array $data = [])
+    public function checkResult(array $data = []): bool
     {
         $SQB = $this->getSQB();
         return $SQB->checkSign(request::raw(), request::header('HTTP_AUTHORIZATION'));
     }
 
-    public function getResponse(bool $ok = true)
+    public function getResponse(bool $ok = true): string
     {
         return 'success';
     }

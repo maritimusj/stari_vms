@@ -2161,22 +2161,12 @@ if ($op == 'list') {
         JSON::fail('找不到该记录！');
     }
 
-    $pics = unserialize($res->getPics());
-    if ($pics === false) {
-        $pics = [];
-    } else {
-        foreach($pics as $index => $pic) {
-            $pics[$index] = Util::toMedia($pic);
-        }
-    }
-
     $content = $this->fetchTemplate(
         'web/device/deal_fb',
         [
             'chartid' => Util::random(10),
             'id' => $res->getId(),
             'text' => $res->getText(),
-            'pics' => $pics,
         ]
     );
 

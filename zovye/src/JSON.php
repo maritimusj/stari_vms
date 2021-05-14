@@ -8,6 +8,14 @@ use Exception;
 
 class JSON
 {
+    public static function result($data)
+    {
+        if (is_error($data) || $data instanceof Exception) {
+            self::fail($data);
+        }
+        self::success($data);
+    }
+
     public static function success($data = [])
     {
         if (is_string($data)) {

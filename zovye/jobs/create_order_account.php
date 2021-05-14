@@ -70,15 +70,17 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
                 }
 
                 $max_retries = intval(\zovye\settings('order.retry.max', 0));
-                $total = intval($order->getExtraData('retry.total', 0));
-                
-                if ($total >= $max_retries) {
-                    ZovyeException::throwWith('已超过最大重试次数！', -1, $device); 
-                }
+                if (!empty($max_retries)) {
+                    $total = intval($order->getExtraData('retry.total', 0));
+                    
+                    if ($total >= $max_retries) {
+                        ZovyeException::throwWith('已超过最大重试次数！', -1, $device); 
+                    }
 
-                $order->setExtraData('retry.total', $total + 1);
-                if (!$order->save()) {
-                    ZovyeException::throwWith('订单数据无法保存！', -1, $device); 
+                    $order->setExtraData('retry.total', $total + 1);
+                    if (!$order->save()) {
+                        ZovyeException::throwWith('订单数据无法保存！', -1, $device); 
+                    }
                 }
             }
         }

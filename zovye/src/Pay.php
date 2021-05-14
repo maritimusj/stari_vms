@@ -547,10 +547,6 @@ class Pay
             return error(State::ERROR, '不支付支付原生支付！');
         }
 
-        if ($name == 'SQB') {
-            return new SQBPay();
-        }
-
         return error(State::ERROR, '不支持的支付类型！');
     }
 

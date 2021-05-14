@@ -1,23 +1,23 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
 <style>
-    #devicelist i.allowed {
+    #list i.allowed {
         color: green;
     }
 
-    #devicelist td.status {
+    #list td.status {
         transition: all 1s;
     }
 
-    #devicelist .app {
+    #list .app {
         position: relative;
     }
 
-    #devicelist .status:hover .app .devcie-detail {
+    #list .status:hover .app .devcie-detail {
         display: flex;
     }
 
-    #devicelist .app .devcie-detail {
+    #list .app .devcie-detail {
         position: absolute;
         z-index: 99;
         overflow: hidden;
@@ -32,17 +32,17 @@
         box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
     }
 
-    #devicelist .app .devcie-detail .detail-seg {
+    #list .app .devcie-detail .detail-seg {
         text-align: start;
         margin: 10px 0;
         white-space: nowrap;
     }
 
-    #devicelist .app .devcie-detail .detail-seg .title {
+    #list .app .devcie-detail .detail-seg .title {
         font-weight: bold;
     }
 
-    #devicelist .devcie-detail .bar {
+    #list .devcie-detail .bar {
         display: inline-block;
         width: 130px;
         background-color: #f5f5f5;
@@ -54,48 +54,48 @@
         overflow: hidden;
     }
 
-    #devicelist .devcie-detail .sig div {
+    #list .devcie-detail .sig div {
         color: #fff;
         background: #009688;
     }
 
-    #devicelist .devcie-detail .qoe div {
+    #list .devcie-detail .qoe div {
         color: #fff;
         background: #ff5722;
     }
 
-    #devicelist .app.loading {
+    #list .app.loading {
         color: rgba(0, 0, 0, .1);
         display: none;
     }
 
-    #devicelist .device.loading {
+    #list .device.loading {
         color: rgba(0, 0, 0, .1);
         display: none;
     }
 
-    #devicelist .status i.loading {
+    #list .status i.loading {
         color: rgba(0, 0, 0, .6);
     }
 
-    #devicelist tr .getway {
+    #list tr .getway {
         visibility: hidden;
     }
 
-    #devicelist tr:hover .getway {
+    #list tr:hover .getway {
         visibility: visible;
         color: rgb(238, 238, 238);
     }
 
-    #devicelist [data-url] {
+    #list [data-url] {
         cursor: pointer;
     }
 
-    #devicelist td.sat {
+    #list td.sat {
         width: 15em;
     }
 
-    #devicelist .devicename {
+    #list .devicename {
         cursor: default
     }
 
@@ -104,12 +104,12 @@
         transform: translate3d(0, -2px, 0);
     }
 
-    #devicelist .imei img.qrcode {
+    #list .imei img.qrcode {
         width: 1.5em;
         height: 1.5em;
     }
 
-    #devicelist sup {
+    #list sup {
         color: #009688;
     }
 
@@ -136,6 +136,10 @@
 
     .fb-img {
         width: 100px;
+        height: 100px;
+        margin: 3px;
+        border: 1px solid #ccc;
+        padding: 3px;
         cursor: pointer;
     }
 
@@ -195,7 +199,7 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <table class="table" id="devicelist">
+        <table class="table" id="list">
             <thead>
                 <tr>
                     <th>#</th>

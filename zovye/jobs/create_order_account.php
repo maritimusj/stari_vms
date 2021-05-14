@@ -7,7 +7,6 @@
 namespace zovye\job\createOrderAccount;
 
 use Exception;
-use RuntimeException;
 use zovye\Account;
 use zovye\CtrlServ;
 use zovye\Device;

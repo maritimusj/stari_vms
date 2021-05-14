@@ -141,4 +141,4 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
 
 $params['serial'] = request::str('serial');
 
-Util::logToFile('account', $params);
+Util::logToFile('create_order_account', $params);

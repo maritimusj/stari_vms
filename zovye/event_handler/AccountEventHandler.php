@@ -10,6 +10,7 @@ use Exception;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\model\accountModelObj;
+use zovye\model\orderModelObj;
 
 class AccountEventHandler
 {
@@ -20,13 +21,13 @@ class AccountEventHandler
      * @param accountModelObj|null $account
      * @throws Exception
      */
-    public static function onDeviceBeforeLock(deviceModelObj $device, userModelObj $user, accountModelObj $account = null)
+    public static function onDeviceBeforeLock(deviceModelObj $device, userModelObj $user, accountModelObj $account = null, orderModelObj $order = null)
     {
-        if ($account != null) {
+        if ($account && empty($order)) {
+            //检查用户是否允许
             $res = Util::isAvailable($user, $account, $device);
             if (is_error($res)) {
-                $user->remove('last');
-                throw new Exception($res['message'], State::ERROR);
+                ZovyeException::throwWith($res['message'], -1, $device);
             }
         }
     }

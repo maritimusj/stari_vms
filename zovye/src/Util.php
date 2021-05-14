@@ -1486,6 +1486,7 @@ HTML_CONTENT;
             'user' => $user,
             'account' => $account,
             'voucher' => $voucher,
+            'order' => $order,
         ];
 
         //事件：设备已锁定
@@ -1719,8 +1720,8 @@ HTML_CONTENT;
             'result' => $result,
             'orderid' => isset($order) ? $order->getId() : 0,
             'change' => isset($order) ? -$order->getBalance() : 0,
-            'title' => '出货成功',
-            'msg' => '请注意，出货成功',
+            'title' => '出货完成',
+            'msg' => '请注意，出货完成。如未领取到商品，请扫码重试！',
         ];
     }
 

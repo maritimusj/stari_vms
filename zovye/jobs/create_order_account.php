@@ -83,14 +83,6 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             }
         }
 
-        if (empty($order)) {
-            //检查用户是否允许
-            $res = Util::isAvailable($user, $account, $device);
-            if (is_error($res)) {
-                ZovyeException::throwWith($res['message'], -1, $device);
-            }
-        }
-
         $goods = empty($goods_id) ? $device->getGoodsByLane(0) : $device->getGoods($goods_id);
         if (empty($goods)) {
             ZovyeException::throwWith('找不到商品！', -1, $device);

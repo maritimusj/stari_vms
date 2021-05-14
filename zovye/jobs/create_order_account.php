@@ -18,7 +18,6 @@ use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\ZovyeException;
-use function zovye\is_error;
 
 $account_id = request::str('account');
 $device_id = request::str('device');

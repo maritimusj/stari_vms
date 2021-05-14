@@ -105,7 +105,7 @@ if ($op == 'default') {
     if ($limit['start']) {
         $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'] . ' 00:00:00');
         if ($start) {
-            $tpl_data['s_start_date'] = $limit['start'];
+            $tpl_data['s_start_date'] = $start->format('Y-m-d');
             $query->where(['createtime >=' => $start->getTimestamp()]);
         }
     }
@@ -113,7 +113,7 @@ if ($op == 'default') {
     if ($limit['end']) {
         $end = DateTime::createFromFormat('Y-m-d H:i:s', $limit['end'] . ' 00:00:00');
         if ($end) {
-            $tpl_data['s_end_date'] = $limit['end'];
+            $tpl_data['s_end_date'] = $end->format('Y-m-d');
             $end->modify('next day');
             $query->where(['createtime <' => $end->getTimestamp()]);
         }
@@ -137,8 +137,8 @@ if ($op == 'default') {
             'user_id' => $user_id,
             'device_id' => $device_id,
             'order' => $order_no,
-            'datelimit[start]' => $limit['start'],
-            'datelimit[end]' => $limit['end'],
+            'datelimit[start]' => $start ? $start->format('Y-m-d') : '',
+            'datelimit[end]' => $end ? $end->format('Y-m-d') : '',
             'filter' => 1,
         ];
 

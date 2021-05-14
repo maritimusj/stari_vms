@@ -162,18 +162,18 @@
 		<video id="player" class="video-js" width="100%" height="100%" x5-video-player-type="h5-page" playsinline>
         </video>
 	</div>
-	<div class="mask" v-if="retryMsg">
-	    <div class="alert-view">
-	        <span class="title">提示</span>
-	        <span class="content">{{retryMsg}}</span>
-	        <div class="confirm" @click="alertConfirmClick">确定</div>
-	    </div>
-	</div>
 	<div class="mask" v-if="passwd.visible">
 		<div class="alert-view">
 	        <span class="title">提示</span>
 	        <span class="content">{{passwd.data.data.text}}</span>
 	        <div class="confirm" v-clipboard:copy="passwd.data.data.code" v-clipboard:success="onCopy" v-clipboard:error="onError">确定</div>
+	    </div>
+	</div>
+	<div class="mask" v-if="retryMsg">
+	    <div class="alert-view">
+	        <span class="title">提示</span>
+	        <span class="content">{{retryMsg}}</span>
+	        <div class="confirm" @click="alertConfirmClick">确定</div>
 	    </div>
 	</div>
 </div>

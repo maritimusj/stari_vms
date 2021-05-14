@@ -47,7 +47,12 @@ const app = new Vue({
 			interval: null,
 			player: null
 		},
-		isHidden: null
+		isHidden: null,
+		retryMsg: '',
+        passwd: {
+            visible: false,
+            data: null
+        }
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -104,15 +109,16 @@ const app = new Vue({
         });
     },
     created() {
+        if (typeof zovye_fn.retryOrder === 'function') {
+            zovye_fn.retryOrder((res) => {
+                if (res.status) {
+                    this.retryMsg = res.data.message;
+                }
+            })
+        }
         this.visibilitychange();
         this.imei = this.imei.substring(this.imei.length - 6);
-        zovye_fn.getDetail((res) => {
-            if (res.data.mcb && res.data.mcb.online) {
-                this.online = true;
-            } else {
-                this.online = false;
-            }
-        });
+
         zovye_fn.getAdvs(10, 10, (data) => {
             this.sales = data;
         });
@@ -141,6 +147,14 @@ const app = new Vue({
         if (typeof zovye_fn.getDeviceRemain === 'function') {
             this.remain = zovye_fn.getDeviceRemain();
         }
+        zovye_fn.getAdvs('passwd', 1, (data) => {
+            if (data.length > 0) {
+                this.passwd = {
+                    visible: true,
+                    data: data[0]
+                };                
+            }
+        })
     },
     methods: {
         visibilitychange() {
@@ -288,7 +302,16 @@ const app = new Vue({
     			    }, 1000)
 			    }
 			});
-		}
+		},
+        alertConfirmClick() {
+            zovye_fn.closeWindow && zovye_fn.closeWindow();
+        },
+        onCopy() {
+            this.passwd.visible = false;
+        },
+        onError() {
+            this.passwd.visible = false;
+        }
     }
 });
 

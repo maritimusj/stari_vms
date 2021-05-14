@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use DateTimeImmutable;
+use Exception;
 use zovye\model\userModelObj;
 use zovye\base\modelObjFinder;
 use zovye\model\agentModelObj;
@@ -676,5 +678,184 @@ class Device extends State
     public static function findByMoscaleKey($key): ?deviceModelObj
     {
         return self::findOne(['shadow_id' => $key]);
+    }
+
+    public static function search() {
+        try {
+            $query = Device::query();
+
+            //指定代理商
+            if (request::isset('agent_id')) {
+                $agent_id = request::int('agent_id');
+                if ($agent_id == 0) {
+                    $query->where(['agent_id' => 0]);
+                } else {
+                    $agent = Agent::get($agent_id);
+                    if (empty($agent)) {
+                        throw new Exception('找不到这个代理商！');
+                    }
+                    $query->where(['agent_id' => $agent->getId()]);
+                }
+            }
+        
+            //分组
+            if (request::isset('group_id')) {
+                $group_id = request::int('group_id');
+                if ($group_id == 0) {
+                    $query->where(['group_id' => $group_id]);
+                } else {
+                    $group = Group::get($group_id);
+                    if (empty($group)) {
+                        throw new Exception('找不到这个分组！');
+                        
+                    }
+                    $query->where(['group_id' => $group_id]);
+                }
+            }
+        
+            //型号
+            if (request::isset('device_type')) {
+                $device_type_id = request::int('device_type');
+                if ($device_type_id == 0) {
+                    $query->where(['device_type' => 0]);
+                } else {
+                    $device_type = DeviceTypes::get($device_type_id);
+                    if (empty($device_type)) {
+                        throw new Exception('找不到这个型号！');
+                        
+                    }
+                    $query->where(['device_type' => $device_type->getId()]);
+                }
+            }
+        
+            //标签
+            $tag_ids = [];
+            if (request::has('tag_ids')) {
+                $tag_ids = request::array('tag_ids');
+            }
+            if (request::has('tag_id')) {
+                $tag_ids[] = request::int('tag_id');
+            }
+        
+            $tag_ids = array_unique($tag_ids);
+            if ($tag_ids) {
+                $tags_query = m('tags')->where(['id' => $tag_ids]);
+                foreach ($tags_query->findAll() as $tag) {
+                    $query->where("tags_data REGEXP '<{$tag->getId()}>'");
+                }
+            }
+        
+            //关键字
+            $keywords = request::trim('keywords');
+            if (!empty($keywords)) {
+                $query->whereOr([
+                    'name LIKE' => "%{$keywords}%",
+                    'imei LIKE' => "%{$keywords}%",
+                    'app_id LIKE' => "%{$keywords}%",
+                    'iccid LIKE' => "%{$keywords}%",
+                ]);
+            }
+        
+            //只显示有问题设备
+            if (request::bool('error')) {
+                $query->where(['error_code <>' => 0]);
+            }
+        
+            //缺货设备
+            if (request::bool('low')) {
+                $remain_warning = intval(settings('device.remainWarning', 1));
+                $query->where(['remain <' => $remain_warning]);
+            }
+        
+            //位置已变化        
+            if (request::bool('lac')) {
+                $query->where(['s1' => 1]);
+            }
+        
+            $now = new DateTimeImmutable();
+        
+            if (request::isset('online')) {
+                $online_time = $now->modify('-15 min');
+                //在线状态
+                if (request::bool('online')) {
+                    $query->where(['last_ping >' => $online_time->getTimestamp()]);
+                } elseif (request::bool('offline')) {
+                    $query->where(['last_ping <' => $online_time->getTimestamp()]);
+                }
+            }
+        
+            //长时间不在线
+            if (request::bool('lost')) {
+                $offset = intval(settings('device.lost', 1));
+                $offset_time = $now->modify("-{$offset} days");
+                $query->where(['last_online <' => $offset_time->getTimestamp()]);
+            }
+        
+            //长时间不出货
+            if (request::bool('no_order')) {
+                $offset = intval(settings('device.issuing', 1));
+                $offset_time = $now->modify("-{$offset} days");
+                $query->where(['last_order <' => $offset_time->getTimestamp()]);
+            }
+        
+            //维护状态
+            if (request::bool('maintenance')) {
+                $query->where(['status' => Device::STATUS_MAINTENANCE]);
+            }
+        
+            //App未绑定
+            if (request::bool('unbind')) {
+                $query->where("(app_id IS NULL OR app_id='')");
+            }
+            $page = max(1, request::int('page'));
+            $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        
+            $total = $query->count();
+            $total_page = ceil($total / $page_size);
+            if ($page > $total_page) {
+                $page = 1;
+            }
+        
+            $devices = [
+                'total' => $total,
+                'page' => $page,
+                'totalpage' => $total_page,
+                'list' => [],
+            ];
+        
+            $query->page($page, $page_size);
+            $query->orderBy('id desc');
+        
+            /** @var deviceModelObj $entry */
+            foreach ($query->findAll() as $entry) {
+                $data = [
+                    'id' => intval($entry->getId()),
+                    'name' => strval($entry->getName()),
+                    'IMEI' => strval($entry->getImei()),
+                    'appId' => strval($entry->getAppId()),
+                    'qrcode' => $entry->getQrcode(),
+                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                ];
+                $res = $entry->getAgent();
+                if ($res) {
+                    $data['agent'] = $res->profile();
+                }
+        
+                if (App::isVDeviceSupported()) {
+                    $data['isVD'] = $entry->isVDevice();
+                }
+        
+                if (App::isBluetoothDeviceSupported()) {
+                    if ($entry->isBlueToothDevice()) {
+                        $data['isBluetooth'] = true;
+                    }
+                }
+                $devices['list'][] = $data;
+            }
+        
+            return $devices;
+        } catch(Exception $e) {
+            return err($e->getMessage());
+        }
     }
 }

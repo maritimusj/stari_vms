@@ -544,7 +544,7 @@ class Pay
 
         //支付宝支付
         if ($name == self::ALI) {
-            return error(State::ERROR, '不支付支付原生支付！');
+            return error(State::ERROR, '支付宝原生支付暂不可用！');
         }
 
         return error(State::ERROR, '不支持的支付类型！');

@@ -153,7 +153,7 @@ class Goods
 
         $keywords = trim(urldecode($params['keywords']));
         if ($keywords) {
-            $query->where("name LIKE '%{$keywords}%'");
+            $query->where(['name LIKE' => "%{$keywords}%"]);
         }
 
         $total = $query->count();

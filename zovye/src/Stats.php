@@ -11,6 +11,7 @@ use Exception;
 use DateTimeImmutable;
 use DateTimeInterface;
 use zovye\Contract\ISettings;
+use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
@@ -704,6 +705,10 @@ class Stats
                 $query->where(['agent_id' => $obj->getId()]);
             } elseif ($obj instanceof deviceModelObj) {
                 $query->where(['device_id' => $obj->getId()]);
+            } elseif ($obj instanceof accountModelObj) {
+                $query->where(['account' => $obj->getName()]);
+            } else {
+                return false;
             }
 
             $stats = $obj->get('statsData', []);
@@ -773,7 +778,7 @@ class Stats
                 'b' => $b,
                 'f' => $f,
             ];
-
+            
             return $obj->set('statsData', $stats);
 
         } catch (Exception $e) {

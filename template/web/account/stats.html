@@ -5,6 +5,12 @@
    require(["{php \zovye\url(false, JS_ECHARTS_URL);}"], function(echarts){
         const myChart = echarts.init(document.getElementById("{$chartid}"));
         const option = JSON.parse('{php echo json_encode($chart);}');
+        option['grid'] = {
+            top: '40px',
+            left: '30px',
+            right: '10px',
+            bottom: '40px',
+        }
         myChart.setOption(option);
     })
 </script>

@@ -631,7 +631,7 @@ if ($op == 'default') {
 
     $title = $acc->getTitle();
 
-    $time = request('month') ? date('Y-') . request::int('month') . date('-01 00:00:00') : 'today';
+    $time = request::has('month') ? date('Y-') . request::int('month') . date('-01 00:00:00') : 'today';
 
     $caption = date('Y年n月', strtotime($time));
     $data = Stats::chartDataOfMonth($acc, $time, "公众号：{$title}({$caption})");

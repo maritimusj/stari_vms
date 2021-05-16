@@ -430,7 +430,8 @@
             })
         }
 
-        api.viewStats = function(id, month) {
+        api.viewStats = function(id, self) {
+            const month = self.closest('tr').data('month');
             api.showResult({
                 op: 'viewStats',
                 id: id,
@@ -460,7 +461,7 @@
 
         api.showMonthStats = function(id, self) {
             const month = self.closest('tr').data('month');
-            api.viewStats(id, month);
+            api.viewStats(id, self);
         }
         
         $("#accountlist").on('mouseover', '.ercode.loading', function(){

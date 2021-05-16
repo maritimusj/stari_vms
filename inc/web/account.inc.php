@@ -154,6 +154,7 @@ if ($op == 'default') {
         'accounts' => $accounts,
         'banned' => $banned,
         'pager' => $pager,
+        'keywords' => $keywords,
         'search_url' => $this->createWebUrl('account', ['banned' => $banned]),
         'one_res' => $one_res
     ]);
@@ -666,6 +667,24 @@ if ($op == 'default') {
     );
 
     JSON::success(['title' => "<b>{$title}</b>的出货统计", 'content' => $content]);
+
+} elseif ($op == 'repairMonthStats') {
+
+    $account = Account::get(request::int('id'));
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    $month = strtotime(request::str('month'));
+    if (empty($month)) {
+        $month = time();
+    }
+
+    if (Stats::repairMonthData($account, $month)) {
+        JSON::success('修复完成！');
+    }
+
+    JSON::success('修复失败！');
 
 } elseif ($op == 'viewFansCount') {
 

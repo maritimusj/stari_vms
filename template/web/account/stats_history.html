@@ -9,6 +9,7 @@
         {php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'}
     </th>
     <th style="text-align:center;">小计</th>
+    <th class="text-center">操作</th>
 </tr>                           
 </thead>
 {loop $m_all $i $item}
@@ -18,17 +19,20 @@
 <tr  data-id="{$id}" data-month="{$i}">
    <td class="operate">
        {$i}月
-       <i class="fa fa-line-chart" title="查看本月统计"></i>
     </td>
     <td>{$item['f']}</td>
     <td>{$item['p']}</td>
     <td>{$item['b']}</td>
     <td>{$total}</td>
+    <td class="operate">
+        <i class="fa fa-wrench fa-fw" data-op="repairMonthStats"  title="修复{$i}的统计"></i>
+        <i class="fa fa-area-chart fa-fw" data-op="showMonthStats"  title="查看{$i}的统计"></i>
+    </td>
 </tr>
 {/if}
 {/loop}
 <tr>
-<td colspan="5">
+<td colspan="6">
     <div  class="pull-right">
         总计：{$total_x}
         {php $total_x = 0;}        

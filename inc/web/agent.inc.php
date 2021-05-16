@@ -845,7 +845,7 @@ if ($op == 'default') {
         'web/agent/agent-stats',
         [
             'agent' => $agent,
-            'm_all' => $result,
+            'm_all' => is_error($result) ? [] : $result,
         ]
     );
 

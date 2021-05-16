@@ -83,6 +83,12 @@
     .profile sup{
         color:#f00;
     }
+    .busy .operate i {
+        visibility: hidden;
+    }
+    .busy i {
+        color: #ccc;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -360,7 +366,11 @@
 <script>
     $(function(){
         $('body').on('hidden.bs.modal', function() {
-            $('.modal').remove();
+            $('.modal').each((i, e) => {
+                if ($(e).is(':hidden')) {
+                    $(e).remove();
+                }
+            });
         })
         
         $('#search-form').submit(function(){
@@ -379,25 +389,31 @@
             url: "{php echo $this->createWebUrl('account');}",
         }
 
-        api.showResult = function(params, url) {
-            $.getJSON(url || api.url, params).done(function(res){
-                if(res) {
-                    if(res.status) {
+        api.showResult = function (params, url, loading, cb) {
+            loading && util.loading();
+            $.getJSON(url || api.url, params).done(function (res) {
+                loading && util.loaded();
+                if (res) {
+                    if (typeof cb == 'function') {
+                        if (cb(res)) {
+                            return;
+                        }
+                    }
+                    if (res.status) {
                         if (res.data && res.data.content) {
                             const dlg = util.dialog(res.data.title || '', res.data.content);
                             dlg.modal('show');
-                        }else{
-                            if(res.data && res.data.msg) {
-                                util.message(res.data.msg, '', 'success');
-                            }
-                        }
-
-                    }else{
-                        if(res.data && res.data.msg) {
-                            util.message(res.data.msg, '', 'error');
                         }
                     }
+                    if (res.message && res.type) {
+                        util.message(res.message, '', res.type);
+                    }
+                    if (res.data && res.data.msg) {
+                        util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                    }
                 }
+            }).fail(function () {
+                loading && util.loaded();
             })
         }
 
@@ -429,6 +445,24 @@
             })
         }
 
+        api.repairMonthStats = function(id, self) {
+            self.toggleClass('fa-wrench fa-spinner fa-pulse').removeAttr('data-op');
+            self.closest('td').removeClass('operate');
+            self.closest('table').addClass('busy');
+            
+            const month = self.closest('tr').data('month');
+            api.showResult({op: 'repairMonthStats', id, month}, undefined, false, function() {
+                self.toggleClass('fa-wrench fa-spinner fa-pulse').attr('data-op', 'repair');
+                self.closest('td').addClass('operate');
+                self.closest('table').removeClass('busy');
+            });
+        }
+
+        api.showMonthStats = function(id, self) {
+            const month = self.closest('tr').data('month');
+            api.viewStats(id, month);
+        }
+        
         $("#accountlist").on('mouseover', '.ercode.loading', function(){
             const co = $(this).removeClass('loading').find('.zovye_qrcode');
             const src = co.data("src");
@@ -440,28 +474,24 @@
             }
         })
 
-        $("#accountlist").on("click", ":not(.loading)[data-op]", function(e){
+        $("body").on("click", ":not(.loading)[data-op]", function(e){
             const self = $(this);
             const op = self.data('op');
             if(op && api[op]){
                 const id = self.closest('tr').data('id');
                 if(id) {
                     self.addClass('loading');
-                    api[op](id);
+                    api[op](id, self);
                     self.removeClass('loading');
                 } else {
-                    api[op]();
+                    api[op](self);
                 }
             }
             e.preventDefault();
         })
 
         $("body").on("click", "[data-month] i.fa-line-chart", function(e){
-            const self = $(this);
-            const tr = self.closest('tr');
-            const id = tr.data('id');
-            const month = tr.data('month');
-            api.viewStats(id, month);
+
         })
     })
 </script>

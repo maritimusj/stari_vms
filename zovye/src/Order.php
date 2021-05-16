@@ -97,21 +97,17 @@ class Order extends State
      */
     public static function refundBy($order_no, $total = 0): bool
     {
+        //退款
+        $res = Pay::refund($order_no, $total);
+
+        //记录退款结果
         $pay_log = Pay::getPayLog($order_no);
         if ($pay_log) {
-            $pay_result = $pay_log->getData('payResult');
-            if ($pay_result['result'] == 'success' || $pay_log->getData('finished')) {
-                //退款
-                $res = Pay::refund($order_no, $total);
-
-                $pay_log->setData(is_error($res) ? 'refund_fail' : 'refund', $res);
-                $pay_log->save();
-
-                return !$res && !is_error($res);
-            }
+            $pay_log->setData(is_error($res) ? 'refund_fail' : 'refund', $res);
+            $pay_log->save();
         }
 
-        return false;
+        return !$res && !is_error($res);
     }
 
     public static function queryStatus($serialNO)

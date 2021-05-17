@@ -161,7 +161,7 @@ $this->mobilePage(
             [
                 'nickname' => $user->getNickname(),
                 'avatar' => $user->getAvatar(),
-                'mobile' => $user->getMobile(),
+                'mobile' => request::has('mobile') ? request::str('mobile') : $user->getMobile(),
             ],
     ]
 );

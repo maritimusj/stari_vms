@@ -9,6 +9,7 @@ use Exception;
 use stdClass;
 use zovye\App;
 use zovye\CommissionBalance;
+use zovye\Config;
 use zovye\Device;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
@@ -70,7 +71,7 @@ class keeper
 
             $user = User::findOne(['mobile' => $mobile]);
             if (empty($user)) {
-                $url = Util::murl('keeper');
+                $url = Util::murl('keeper', ['mobile' => $mobile]);
                 JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);
             }
 
@@ -126,7 +127,7 @@ class keeper
                         'profile' => $keeper_data,
                         'msg' => '登录成功!',
                     ];
-                    $agreement = \zovye\Config::agent('agreement.keeper', []);
+                    $agreement = Config::agent('agreement.keeper', []);
                     if ($agreement && $agreement['enabled']) {
                         $result['agreement'] = $agreement['content'];
                     }

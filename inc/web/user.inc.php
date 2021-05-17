@@ -319,7 +319,7 @@ if ($op == 'default') {
         return true;
     });
 
-    if (is_error($reuslt)) {
+    if (is_error($result)) {
         Util::itoast($result['message'], $this->createWebUrl('user', ['principal' => 'keeper']), 'error');
     }
 

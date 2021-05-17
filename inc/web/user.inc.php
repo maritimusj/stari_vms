@@ -312,8 +312,14 @@ if ($op == 'default') {
         }
 
         $keeper = $user->getKeeper();
-        if ($keeper && !$keeper->destroy()) {
-           return error(State::ERROR, '删除数据失败！');
+        if ($keeper) {
+            //清除原来的登录信息
+            foreach (LoginData::keeper(['user_id' => $keeper->getId()])->findAll() as $entry) {
+                $entry->destroy();
+            }
+            if (!$keeper->destroy()) {
+                return error(State::ERROR, '删除数据失败！');
+             }
         }
 
         return true;

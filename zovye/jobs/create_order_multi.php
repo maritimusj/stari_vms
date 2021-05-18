@@ -189,7 +189,7 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
     $goods_data = $pay_log->getGoods();
 
     $order_data = [
-        'src' => Order::PAY,
+        'src' => intval($pay_log->getData('src', Order::PAY)),
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
         'agent_id' => $device->getAgentId(),

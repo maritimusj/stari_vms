@@ -105,7 +105,7 @@ class Pay
                     'goods' => $goods,
                 ],
                 'createtime' => time(),
-            ]
+            ],
         ]);
 
         $pay_log = self::createPayLog($user, $order_no, $pay_data);

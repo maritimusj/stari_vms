@@ -46,6 +46,7 @@ class Order extends State
     const PAY = 0;
     const ACCOUNT = 1;
     const SQM = 2;
+    const ALI_TICKET = 3;
     const VOUCHER = 10;    
 
     /**

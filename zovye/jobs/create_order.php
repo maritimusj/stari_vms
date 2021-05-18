@@ -160,9 +160,10 @@ function prepare(string $order_no)
     ];
 
     $params = [
+        'src' => intval($pay_log->getData('src', Order::PAY)),
         'device' => $device,
         'user' => $user,
-        'ip' => $pay_log->getData('orderData.ip'),
+        'ip' => strval($pay_log->getData('orderData.ip')),
         'payResult' => [
             'result' => 'success',
             'from' => $pay_result['from'],
@@ -223,7 +224,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
     $voucher = $params['voucher'];
 
     $order_data = [
-        'src' => Order::ACCOUNT,
+        'src' => $params['src'],
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
         'agent_id' => $device->getAgentId(),
@@ -267,7 +268,9 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         return [error(State::FAIL, '领取失败，创建订单失败'), null];
     }
 
+    unset($params['src']);
     unset($params['ip']);
+
     $params['order'] = $order;
 
     try {

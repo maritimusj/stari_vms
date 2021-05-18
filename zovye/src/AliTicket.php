@@ -329,10 +329,11 @@ class AliTicket
 
         $price = intval($config['bonus']);
         list($order_no, $pay_log) = Pay::prepareDataWithPay('ali_ticket', $device, $user, $goods, [
+            'order_no' => $data['tradeNo'],
+            'src' => Order::ALI_TICKET,
             'level' => LOG_GOODS_ADVS,
             'total' => $total,
             'price' => $price,
-            'order_no' => $data['tradeNo'],
         ]);
 
         if (is_error($order_no)) {

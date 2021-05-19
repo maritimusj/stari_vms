@@ -143,7 +143,7 @@ class Account extends State
      */
     public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
-        $accounts = $device->getNormalAccounts();
+        $accounts = $device->getAccounts();
         if (empty($accounts)) {
             return $accounts;
         }
@@ -685,7 +685,7 @@ class Account extends State
         if (!empty($accounts)) {
             foreach ($accounts as &$account) {
                 //如果是授权公众号，需要使用场景二维码替换原二维码
-                self::updateAuthAccountQRCode($account, $user, $device);
+                self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                 if (isset($account['qrcode'])) {
                     if ($account['qrcode']) {
                         $account['qrcode'] = Util::toMedia($account['qrcode']);
@@ -707,35 +707,40 @@ class Account extends State
     }
 
     /**
-     * 把一个或者多个公众号中类型为AUTH的公众号二维码替换成带参数的二维码
-     * @param array $account
-     * @param userModelObj $user
-     * @param deviceModelObj $device
+     * 把授权公众号二维码替换成带参数的二维码
+     * @param array $account_data
+     * @param mixed $params
+     * @return array|string
      */
-    public static function updateAuthAccountQRCode(array &$account, userModelObj $user, deviceModelObj $device)
+    public static function updateAuthAccountQRCode(array &$account_data, $params)
     {
-        if ($account['state'] == Account::AUTH) {
-            $result = Account::getAuthorizerQrcodeById($account['id'], $user->getId() . ':' . $device->getId());
+        if ($account_data['state'] == Account::AUTH) {
+            $str = is_array($params) ? implode(':', $params) : strval($params);
+            $result = Account::getAuthorizerQrcodeById($account_data['id'], $str);
             if (is_error($result)) {
                 Util::logToFile('wxplatform', [
                     'fn' => 'devicePage',
                     'error' => $result,
                 ]);
+                return $result;
             } else {
-                $account['qrcode'] = $result['url'];
+                $account_data['qrcode'] = $result['url'];
+                return strval($result['url']);
             }
         }
+
+        return err('不是授权接入的公众号！');
     }
 
     /**
      * 根据上次 uid 获取下个公众号
      * @param deviceModelObj $device
-     * @param $lastUID
+     * @param $last_uid
      * @return array
      */
-    public static function getNext(deviceModelObj $device, $lastUID): array
+    public static function getNext(deviceModelObj $device, $last_uid): array
     {
-        $accounts = $device->getNormalAccounts();
+        $accounts = $device->getAccounts();
         if (empty($accounts)) {
             return [];
         }
@@ -747,12 +752,12 @@ class Account extends State
 
         $first = (array)$accounts[0];
 
-        if (empty($lastUID)) {
+        if (empty($last_uid)) {
             return $first;
         }
 
         foreach ($accounts as $index => $account) {
-            if ($account['uid'] == $lastUID) {
+            if ($account['uid'] == $last_uid) {
                 $account = (array)$accounts[$index + 1];
                 if ($account) {
                     return $account;

@@ -405,9 +405,16 @@ class WxPlatform
                 return ['message' => $push_msg];
             }
 
-            list($user_id, $device_id) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 2);
+            list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
+            if ($prefix != App::uid(6)) {
+                return [];
+            }
 
-            $user = User::get($user_id);
+            if ($first == 'device') {
+                return [];
+            }
+
+            $user = User::get($first);
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
             }
@@ -416,7 +423,7 @@ class WxPlatform
                 throw new RuntimeException('用户已被禁用！');
             }
 
-             $device = Device::get($device_id);
+             $device = Device::get($second);
 
             if (empty($device)) {
                 throw new RuntimeException('找不到这个设备！');

@@ -453,7 +453,7 @@ class deviceModelObj extends modelObj
         if (is_array($data)) {
             return '';
         }
-    
+
         $data = $this->settings('extra.cargo_lanes', []);
         if ($this->set('cargo_lanes', $data)) {
             return '';
@@ -682,21 +682,21 @@ class deviceModelObj extends modelObj
      */
     public function updateQrcode($force = false): bool
     {
+        $need_notify = false;
         if ($this->isBlueToothDevice()) {
             if (empty($this->qrcode) || $force) {
-                $this->createQrcodeFile();
+                $need_notify = $this->createQrcodeFile();
             }
         } else {
             //无论什么情况都要更换shadowId!
             $this->resetShadowId();
 
             if ($force || $this->isActiveQrcodeEnabled() || empty($this->qrcode)) {
-                $this->createQrcodeFile();
-                return $this->updateAppQrcode();
+                $need_notify = $this->createQrcodeFile();
             }
         }
 
-        return true;
+        return $need_notify ? $this->updateAppQrcode() : false;
     }
 
     /**
@@ -815,9 +815,13 @@ class deviceModelObj extends modelObj
     public function updateAppQrcode(): bool
     {
         $data = [
-            'qrcode' => $this->getQrcode(),
-            'qrcode_url' => $this->getUrl(),
+            'qrcode' => $this->getAccountQRCode(),
         ];
+
+        if (empty($data['qrcode'])) {
+            $data['qrcode'] = $this->getQrcode();
+            $data['qrcode_url'] = $this->getUrl();
+        }
 
         return $this->appNotify('config', $data);
     }
@@ -835,7 +839,7 @@ class deviceModelObj extends modelObj
         return $url . "{$f}v={$ts}";
     }
 
-    public function getGroup()
+    public function getGroup(): ?device_groupsModelObj
     {
         return Group::get($this->getGroupId());
     }
@@ -900,7 +904,7 @@ class deviceModelObj extends modelObj
     {
         $uid = strval($uid) ?: Util::random(6);
         $uid = "{$uid}:" . time();
-        $res = We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [ OBJ_LOCKED_UID => $uid ], ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]);
+        $res = We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => $uid], ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]);
         if ($res) {
             $this->locked_uid = $uid;
             return $uid;
@@ -917,7 +921,7 @@ class deviceModelObj extends modelObj
     public function unlock($uid): bool
     {
         if ($uid) {
-            return We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [ OBJ_LOCKED_UID => UNLOCKED ], ['id' => $this->getId(), OBJ_LOCKED_UID => $uid]);
+            return We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId(), OBJ_LOCKED_UID => $uid]);
         }
 
         return false;
@@ -931,9 +935,9 @@ class deviceModelObj extends modelObj
     {
         $lastNotify = $this->get('lastOnlineNotify');
         if (empty($lastNotify) || time() - $lastNotify['createtime'] > settings(
-            'notice.delay.deviceOnlineDelay',
-            1
-        ) * 60) {
+                'notice.delay.deviceOnlineDelay',
+                1
+            ) * 60) {
             return true;
         }
 
@@ -1002,9 +1006,9 @@ class deviceModelObj extends modelObj
     {
         $lastNotify = $this->getLastRemainWarning();
         if (empty($lastNotify) || time() - $lastNotify['createtime'] > settings(
-            'notice.delay.remainWarning',
-            1
-        ) * 3600) {
+                'notice.delay.remainWarning',
+                1
+            ) * 3600) {
             return true;
         }
 
@@ -1044,6 +1048,24 @@ class deviceModelObj extends modelObj
         }
 
         return $str ? implode(',', $titles) : $titles;
+    }
+
+    public function getAccountQRCode(): string
+    {
+        if (App::useAccountQRCode()) {
+            $accounts = $this->getAccounts(Account::AUTH);
+            foreach ($accounts as $index => $account) {
+                $obj = Account::get($account['id']);
+                if ($obj && $obj->useAccountQRCode()) {
+                    $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'device', $this->getId()]);
+                    if (!is_error($res)) {
+                        return $account['url'];
+                    }
+                }
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -1096,12 +1118,17 @@ class deviceModelObj extends modelObj
 
         //其它配置
         $cfg = [
-            'qrcode' => strval($this->getQrcode()),
-            'qrcode_url' => strval($this->getUrl()),
             'banner' => strval(Util::toMedia($banner)),
             'volume' => intval($vol),
             'advs' => $advs,
         ];
+
+        $cfg['qrcode'] = $this->getAccountQRCode();
+
+        if (empty($cfg['qrcode'])) {
+            $cfg['qrcode'] = strval($this->getQrcode());
+            $cfg['qrcode_url'] = strval($this->getUrl());
+        }
 
         //商品库存
         $cfg = array_merge($cfg, Device::getPayload($this));
@@ -1463,7 +1490,7 @@ class deviceModelObj extends modelObj
      */
     public function accountsUpdated(): bool
     {
-        $accounts = $this->getAccounts(true);
+        $accounts = $this->getAssignedAccounts(true);
         $accounts_cached_data = $this->get('accountsData', []);
 
         if (empty($accounts_cached_data) && empty($accounts)) {
@@ -1473,15 +1500,20 @@ class deviceModelObj extends modelObj
         return $accounts_cached_data['lastupdate'] != $accounts['lastupdate'];
     }
 
-    public function getNormalAccounts(): array
+    public function getAccounts($state_filter = [Account::NORMAL, Account::VIDEO, Account::AUTH]): array
     {
-        $accounts = $this->getAccounts();
+        $result = [];
+
+        $state_filter = is_array($state_filter) ? $state_filter : [$state_filter];
+
+        $accounts = $this->getAssignedAccounts();
         foreach ($accounts as $index => $account) {
-            if (!in_array($account['state'], [Account::NORMAL, Account::VIDEO, Account::AUTH])) {
-                unset($accounts[$index]);
+            if (in_array($account['state'], $state_filter)) {
+                $result[$index] = $account;
             }
         }
-        return $accounts;
+
+        return $result;
     }
 
     /**
@@ -1489,7 +1521,7 @@ class deviceModelObj extends modelObj
      * @param bool $ignore_cache
      * @return array
      */
-    public function getAccounts($ignore_cache = false): array
+    public function getAssignedAccounts($ignore_cache = false): array
     {
         $accounts = [];
 
@@ -1526,8 +1558,8 @@ class deviceModelObj extends modelObj
     {
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
-                'mcb' => [ 'online' => true ],
-                'app' => [ 'online' => true ],
+                'mcb' => ['online' => true],
+                'app' => ['online' => true],
             ];
         }
         $res = CtrlServ::v2_query("device/{$this->imei}");
@@ -1886,13 +1918,13 @@ class deviceModelObj extends modelObj
             }
         }
 
-        for (;;) {
+        for (; ;) {
             if ((new Locker($this))->isLocked()) {
                 return true;
             }
 
             $retries--;
-            
+
             if ($retries <= 0) {
                 return false;
             }
@@ -2489,7 +2521,7 @@ class deviceModelObj extends modelObj
                 $time_used = intval($result_data['timeUsed']);
                 if ($time_used > 0) {
                     $stats[] = round($time_used / 1000, 2);
-                }                
+                }
             }
         }
 
@@ -2499,7 +2531,7 @@ class deviceModelObj extends modelObj
                 'data' => $stats,
             ]);
         }
-        
+
         return $stats;
     }
 

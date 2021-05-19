@@ -283,7 +283,7 @@ if ($op == 'list') {
                 }
             }
 
-            $accounts = $entry->getAccounts();
+            $accounts = $entry->getAssignedAccounts();
             if ($accounts) {
                 $data['gettype']['free'] = true;
             }
@@ -916,7 +916,7 @@ if ($op == 'list') {
     $tpl_data['first_msg_statistic'] = $device->settings('firstMsgStatistic');
     $tpl_data['first_total'] = intval($tpl_data['firstMsgStatistic'][date('Ym')][date('d')]['total']);
 
-    $accounts = $device->getAccounts();
+    $accounts = $device->getAssignedAccounts();
     if ($accounts) {
         foreach ($accounts as &$entry) {
             $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);

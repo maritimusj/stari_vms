@@ -290,7 +290,7 @@ JSCODE;
                     if ($account) {
                         $uid = $account['uid'];
 
-                        Account::updateAuthAccountQRCode($account, $user, $device);
+                        Account::updateAuthAccountQRCode($account, [App::uid(6), $user->get(), $device->getId()]);
                         if ($account) {
                             $tpl['accounts'][] = $account;
                         }

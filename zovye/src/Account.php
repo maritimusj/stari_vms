@@ -684,6 +684,12 @@ class Account extends State
         $accounts = Account::match($device, $user, ['admin', 'max' => settings('misc.maxAccounts', 0)]);
         if (!empty($accounts)) {
             foreach ($accounts as &$account) {
+                if (App::useAccountQRCode()) {
+                    $obj = Account::get($account['id']);
+                    if (empty($obj) || $obj->useAccountQRCode()) {
+                        continue;
+                    }
+                }
                 //如果是授权公众号，需要使用场景二维码替换原二维码
                 self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                 if (isset($account['qrcode'])) {
@@ -758,6 +764,12 @@ class Account extends State
         }
 
         foreach ($accounts as $index => $account) {
+            if (App::useAccountQRCode()) {
+                $obj = Account::get($account['id']);
+                if (empty($obj) || $obj->useAccountQRCode()) {
+                    continue;
+                }
+            }
             if ($account['uid'] == $last_uid) {
                 $account = (array)$accounts[$index + 1];
                 if ($account) {

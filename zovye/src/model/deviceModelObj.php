@@ -1056,11 +1056,13 @@ class deviceModelObj extends modelObj
             $accounts = $this->getAccounts(Account::AUTH);
             foreach ($accounts as $index => $account) {
                 $obj = Account::get($account['id']);
-                if ($obj && $obj->useAccountQRCode()) {
-                    $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'device', $this->getId()], false);
-                    if (!is_error($res)) {
-                        return $account['url'];
-                    }
+                if (empty($obj) || !$obj->useAccountQRCode()) {
+                    continue;
+                }
+
+                $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'device', $this->getId()], false);
+                if (!is_error($res)) {
+                    return $account['url'];
                 }
             }
         }
@@ -1147,7 +1149,7 @@ class deviceModelObj extends modelObj
      * @param bool $random
      * @return array|null
      */
-    public function getOneAdv($type, $random = false)
+    public function getOneAdv($type, $random = false): ?array
     {
         $advs = $this->getAdvs($type);
         if (!isEmptyArray($advs)) {

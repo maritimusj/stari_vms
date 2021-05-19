@@ -395,23 +395,25 @@ class WxPlatform
 
             $config = $acc->settings('config.open', []);
 
-            $push_msg = '';
-            if ($config['msg']) {
-                $str = strval($config['msg']);
-                if (stripos($str, '{url}') !== false && stripos($str, '{/url}') !== false) {
-                    $arr = explode('{url}', $str, 2);
-                    $text = $arr[0];
-                    $arr = explode('{/url}', $arr[1], 2);
-                    $text .= '<a href="' . $acc->getUrl() . '">' . $arr[0] . '</a>' . $arr[1];
-                } else {
-                    $text = str_replace('{url}', "<a href=\"{$acc->getUrl()}\">这里</a>", $str);
+            $makePushMsgFN = function($url) use ($config){
+                if ($config['msg']) {
+                    $str = strval($config['msg']);
+                    if (stripos($str, '{url}') !== false && stripos($str, '{/url}') !== false) {
+                        $arr = explode('{url}', $str, 2);
+                        $text = $arr[0];
+                        $arr = explode('{/url}', $arr[1], 2);
+                        $text .= '<a href="' . $url . '">' . $arr[0] . '</a>' . $arr[1];
+                    } else {
+                        $text = str_replace('{url}', "<a href=\"{$url}\">这里</a>", $str);
+                    }
+                    return $text;
                 }
-                $push_msg = $text;
-            }
+                return '';
+            };
 
             //出货时机是用户点击链连后，直接指定回推送的消息
             if (!empty($config['timing'])) {
-                return ['message' => $push_msg];
+                return ['message' => $makePushMsgFN($acc->getUrl())];
             }
 
             list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
@@ -419,8 +421,16 @@ class WxPlatform
                 return [];
             }
 
+            $device = Device::get($second);
+
+            if (empty($device)) {
+                throw new RuntimeException('找不到这个设备！');
+            }
+
             if ($first == 'device') {
-                return [];
+                return [
+                    'message' => $makePushMsgFN($device->getUrl()),
+                ];
             }
 
             $user = User::get($first);
@@ -432,15 +442,9 @@ class WxPlatform
                 throw new RuntimeException('用户已被禁用！');
             }
 
-             $device = Device::get($second);
-
-            if (empty($device)) {
-                throw new RuntimeException('找不到这个设备！');
-            }
-
             $goods = $device->getGoodsByLane(0);
             if (empty($goods)) {
-                ZovyeException::throwWith('没有指定商品，请联系管理员！', -1, $device);
+                ZovyeException::throwWith('道货（1）没有商品，请联系管理员！', -1, $device);
             }
 
             if ($goods['num'] < 1) {
@@ -466,7 +470,7 @@ class WxPlatform
                 'extra' => [],
             ]);
 
-            return ['message' => $push_msg];
+            return ['message' => $makePushMsgFN($acc->getUrl())];
 
         } catch (ZovyeException $e) {
             $device = $e->getDevice();

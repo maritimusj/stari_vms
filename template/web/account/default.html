@@ -312,7 +312,15 @@
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
                             {if !(\zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2)}
-                            <li><a href="#" data-op="useAccountQRCode" onclick="return false;"><i class="fa fa-desktop fa-fw"></i> 设为设备二维码</a></li>
+                            <li>
+                                <a href="#" data-op="useAccountQRCode" onclick="return false;"><i class="fa fa-desktop fa-fw"></i>
+                                    {if $a['useAccountQRCode']}
+                                    取消设备二维码
+                                    {else}
+                                    设为设备二维码
+                                    {/if}
+                                </a>
+                            </li>
                             {/if}
                             {if $a['more_url']}
                             <li role="separator" class="divider"></li>
@@ -474,6 +482,11 @@
             api.showResult({
                 id: id,
                 op: 'useAccountQRCode',
+            }, undefined, false, function(res) {
+                if (res && res.status) {
+                    console.log(self.find('i'))
+                    self.closest('tr').find('.ercode i').toggleClass('fa-desktop').toggleClass('fa-qrcode');
+                }
             })
         }
         

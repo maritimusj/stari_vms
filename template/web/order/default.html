@@ -371,10 +371,12 @@
                         {/if}
                     </div>
                     {if $order['agent']}
-                    <div class="agent agentId{$order['agentId']}" title="{$order['agent']['level']['title']}" style="background-color: {$order['agent']['level']['clr']}">
-                        <img src="{$order['agent']['avatar']}" alt="">
-                        <span>{$order['agent']['name']}</span>
-                    </div>
+                    <a filter data-name="agent_openid" data-val="{$order['agent']['openid']}" href="{php echo $this->createWebUrl('order', array('agent_openid' => $order['agent']['openid']));}" title="查看代理商{$order['agent']['name']}的订单">
+                        <div class="agent agentId{$order['agentId']}" style="background-color: {$order['agent']['level']['clr']}">
+                            <img src="{$order['agent']['avatar']}" alt="">
+                            <span>{$order['agent']['name']}</span>
+                        </div>
+                    </a>
                     {else}
                     <div class="agent" style="background-color:#9E9E9E;">
                         <img src="{php echo MODULE_URL.'static/img/warning_icon.jpg'}" alt="">
@@ -388,7 +390,7 @@
                         {if $device && $device->getId() == $order['device']['id']}
                         {$order['device']['name']}
                         {else}
-                        <a  filter data-name="device_id" data-val="{$order['device']['id']}" href="{php echo $this->createWebUrl('order', array('user_id'=>$s_user_id, 'device_id'=>$order['device']['id']));}" title="点击查看这台设备的订单">{$order['device']['name']}</a>
+                        <a filter data-name="device_id" data-val="{$order['device']['id']}" href="{php echo $this->createWebUrl('order', array('user_id'=>$s_user_id, 'device_id'=>$order['device']['id']));}" title="点击查看这台设备的订单">{$order['device']['name']}</a>
                         {/if}
                         <div class="zovye_qrcode">
                             <img src="{$order['device']['qrcode']}" />

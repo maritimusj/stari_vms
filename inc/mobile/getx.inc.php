@@ -76,7 +76,7 @@ try {
         JSON::fail($response);
     }
 
-    $device->appShowMessage('出货成功，欢迎下次使用！');
+    $device->appShowMessage('领取成功，欢迎下次使用！');
 
     $response = [
         'ok' => $result['orderid'] ? 1 : 0,

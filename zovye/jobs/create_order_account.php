@@ -17,6 +17,7 @@ use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\ZovyeException;
+use function zovye\is_error;
 
 $account_id = request::str('account');
 $device_id = request::str('device');
@@ -111,13 +112,17 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
         }
 
         try {
-
             $result = Util::openDevice($data);
             $params['result'] = $result;
 
+            if (is_error($result)) {
+                ZovyeException::throwWith($result['message'], -1, $device);
+            }
         } catch (Exception $e) {
             ZovyeException::throwWith($e->getMessage(), $e->getCode(), $device);
         }
+
+        $device->appShowMessage('领取成功，欢迎下次使用！');
 
     } catch (ZovyeException $e) {
         $params['error'] = $e->getMessage();

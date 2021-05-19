@@ -424,12 +424,12 @@ class WxPlatform
 
             $goods = $device->getGoodsByLane(0);
             if (empty($goods)) {
-                throw new RuntimeException('没有指定商品，请联系管理员！');
+                ZovyeException::throwWith('没有指定商品，请联系管理员！', -1, $device);
             }
 
             if ($goods['num'] < 1) {
-                throw new RuntimeException('当前商品库存不足！');
-            }
+                ZovyeException::throwWith('当前商品库存不足！', -1, $device);
+              }
 
             if (DEBUG) {
                 Util::logToFile('wxplatform', [
@@ -451,6 +451,15 @@ class WxPlatform
             ]);
 
             return ['message' => $push_msg];
+
+        } catch (ZovyeException $e) {
+            $device = $e->getDevice();
+            if ($device) {
+                $device->appShowMessage($e->getMessage(), 'error');
+            }
+
+            return err($e->getMessage());
+
         } catch (Exception $e) {
             return err($e->getMessage());
         }

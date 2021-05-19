@@ -477,16 +477,16 @@ class Account extends State
         return self::createSpecialAccount(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
     }
 
-    public static function getAuthorizerQrcodeById(int $id, string $sceneStr): array
+    public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
     {
         $account = self::get($id);
         if (empty($account)) {
             return err('找不到这个公众号！');
         }
-        return self::getAuthorizerQrcode($account, $sceneStr);
+        return self::getAuthorizerQrcode($account, $sceneStr, $temporary);
     }
 
-    public static function getAuthorizerQrcode(accountModelObj $account, string $sceneStr): array
+    public static function getAuthorizerQrcode(accountModelObj $account, string $sceneStr, $temporary = true): array
     {
         $auth_data = $account->get('authdata', []);
         if (empty($auth_data)) {
@@ -516,7 +516,7 @@ class Account extends State
 
         $access_token = getArray($auth_data, 'authorization_info.authorizer_access_token', '');
 
-        return WxPlatform::getAuthQRCode($access_token, $sceneStr);
+        return WxPlatform::getAuthQRCode($access_token, $sceneStr, $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE);
     }
 
     public static function createOrUpdateFromWxPlatform(int $agent_id, string $app_id, array $auth_result = [])
@@ -710,13 +710,14 @@ class Account extends State
      * 把授权公众号二维码替换成带参数的二维码
      * @param array $account_data
      * @param mixed $params
+     * @param bool $temporary
      * @return array|string
      */
-    public static function updateAuthAccountQRCode(array &$account_data, $params)
+    public static function updateAuthAccountQRCode(array &$account_data, $params, $temporary = true)
     {
         if ($account_data['state'] == Account::AUTH) {
             $str = is_array($params) ? implode(':', $params) : strval($params);
-            $result = Account::getAuthorizerQrcodeById($account_data['id'], $str);
+            $result = Account::getAuthorizerQrcodeById($account_data['id'], $str, $temporary);
             if (is_error($result)) {
                 Util::logToFile('wxplatform', [
                     'fn' => 'devicePage',

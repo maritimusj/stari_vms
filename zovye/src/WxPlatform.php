@@ -19,6 +19,9 @@ class WxPlatform
     const CREATE_AUTHORIZER_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={TOKEN}';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={TICKET}';
 
+    const PERM_QRCODE = 'QR_LIMIT_STR_SCENE';
+    const TEMP_QRCODE = 'QR_STR_SCENE';
+
     public static function getPlatform(): ?Platform
     {
         static $config = null;
@@ -236,18 +239,24 @@ class WxPlatform
         return err('暂时无法请求！');
     }
 
-    public static function getAuthQRCode($token, string $scene): array
+    public static function getAuthQRCode($token, string $scene, $action = self::TEMP_QRCODE): array
     {
         $url = str_replace('{TOKEN}', $token, self::CREATE_AUTHORIZER_QRCODE_URL);
-        $result = Util::post($url, [
-            'expire_seconds' => 3600,
-            'action_name' => 'QR_STR_SCENE',
+        $params = [
+            'action_name' => $action,
             'action_info' => [
                 'scene' => [
                     'scene_str' => $scene,
                 ]
             ]
-        ]);
+        ];
+
+        if ($action == self::TEMP_QRCODE) {
+            //微信官方临时二维码默认30秒失效
+            $params['expire_seconds'] = 3600;
+        }
+
+        $result = Util::post($url, $params);
 
         //Util::logToFile('wxplatform', $result);
 

@@ -456,4 +456,12 @@ class App
         }
         return null;
     }
+
+    public static function useAccountQRCode(): bool
+    {
+        return onceCall(function() {
+            return boolval(settings('custom.useAccountQRCode.enabled'));
+        });
+    }
+    
 }

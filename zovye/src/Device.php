@@ -428,9 +428,9 @@ class Device extends State
      *
      * @param mixed $id
      *
-     * @return mixed
+     * @return ?deviceModelObj
      */
-    public static function getFromAppId($id)
+    public static function getFromAppId($id): ?deviceModelObj
     {
         if ($id) {
             if (self::cacheExists($id)) {

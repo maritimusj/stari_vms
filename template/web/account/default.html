@@ -275,9 +275,12 @@
                     </td>
                     <td style="position:relative;">
                         <div class="ercode loading">
+                            {if $a['useAccountQRCode']}
+                            <i class="fa fa-desktop"></i>
+                            {else}
                             <i class="fa fa-qrcode"></i>
-                            <div class="zovye_qrcode"  data-src="{media $a['qrcode']}">
-                            </div>
+                            {/if}                            
+                            <div class="zovye_qrcode"  data-src="{media $a['qrcode']}"></div>
                         </div>
                     </td>
                     {else}
@@ -308,6 +311,9 @@
                             <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
+                            {if !(\zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2)}
+                            <li><a href="#" data-op="useAccountQRCode" onclick="return false;"><i class="fa fa-desktop fa-fw"></i> 设为设备二维码</a></li>
+                            {/if}
                             {if $a['more_url']}
                             <li role="separator" class="divider"></li>
                             {loop $a['more_url'] $index $xurl}
@@ -462,6 +468,13 @@
         api.showMonthStats = function(id, self) {
             const month = self.closest('tr').data('month');
             api.viewStats(id, self);
+        }
+
+        api.useAccountQRCode = function(id, self) {
+            api.showResult({
+                id: id,
+                op: 'useAccountQRCode',
+            })
         }
         
         $("#accountlist").on('mouseover', '.ercode.loading', function(){

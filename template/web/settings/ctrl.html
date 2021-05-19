@@ -215,6 +215,14 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
                             <label>
+                                <input type="checkbox" name="useAccountQRCode" id="useAccountQRCode" value="1" {if $settings['custom']['useAccountQRCode']['enabled']}checked{/if}>
+                                使用授权公众号二维码替换屏幕设备二维码（关注公众号以后再进入设备页面）
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
                                 <input type="checkbox" name="channelPay" id="channelPay" value="1" {if $settings['custom']['channelPay']['enabled']}checked{/if}>
                                 启用阿旗（京东）优惠支付功能
                             </label>

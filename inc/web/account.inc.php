@@ -81,11 +81,15 @@ if ($op == 'default') {
                 'orderlimits' => $entry->getOrderLimits(),
                 'banned' => $entry->isBanned(),
                 'url' => $entry->getUrl(),
-                'assigned' => !isEmptyArray($entry->get('assigned')),
+                'assigned' => !isEmptyArray($entry->get('assigned')),                
             ];
 
             if ($entry->isAuth()) {
                 $data['service'] = $entry->getServiceType();
+            }
+
+            if (App::useAccountQRCode()) {
+                $data['useAccountQRCode'] = $entry->useAccountQRCode();
             }
 
             //关注多个二维码
@@ -796,4 +800,26 @@ if ($op == 'default') {
     );
 
     JSON::success(['title' => "公众号接入授权", 'content' => $content]);
+
+} elseif ($op == 'useAccountQRCode') {
+
+    if (!App::useAccountQRCode()) {
+        JSON::fail('未启用这个功能！');
+    }
+
+    $account = Account::get(request::int('id'));
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    // if (!$account->isAuth() || $account->getServiceType() !== 2) {
+    //     JSON::fail('只能是授权接入的服务号才能设置为屏幕二维码！');
+    // }
+
+    $enable = $account->useAccountQRCode();
+    if ($account->useAccountQRCode(!$enable)) {
+        JSON::success($enable ? '已取消成功！' : '已设置成功！');
+    }
+
+    JSON::fail('设置失败！');
 }

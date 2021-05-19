@@ -266,4 +266,14 @@ class accountModelObj extends modelObj
         return $this->settings('profile.authorizer_info.service_type_info.id', 0);
     }
 
+    /**
+     * 使用这个授权服务号的二维码做为设备二维码，推送到APP上显示
+     */
+    public function useAccountQRCode($enable = null) 
+    {
+        if (isset($enable)) {
+            return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
+        }
+        return boolval($this->settings('misc.useAccountQRCode', 0));
+    }
 }

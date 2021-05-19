@@ -860,19 +860,19 @@ class deviceModelObj extends modelObj
         static $styles = [
             'success' => [
                 'background' => '#67C23A',
-                'text' => '#ffffff'
+                'text' => '#FFFFFF'
             ],
             'warn' => [
                 'background' => '#E6A23C',
-                'text' => '#ffffff'
+                'text' => '#FFFFFF'
             ],
             'error' => [
                 'background' => '#F56C6C',
-                'text' => '#ffffff'
+                'text' => '#FFFFFF'
             ],
             'info' => [
                 'background' => '#409EFF',
-                'text' => '#ffffff'
+                'text' => '#FFFFFF'
             ],
         ];
         return $this->appNotify('message', [

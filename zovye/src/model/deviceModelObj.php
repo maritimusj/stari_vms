@@ -878,7 +878,7 @@ class deviceModelObj extends modelObj
         return $this->appNotify('message', [
             'content' => $msg,
             'type' => $type,
-            'style' => isset($style) ? $style : $styles[$style],
+            'style' => isset($style) ? $style : $styles[$type],
         ]);
     }
 

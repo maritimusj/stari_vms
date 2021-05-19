@@ -812,9 +812,9 @@ if ($op == 'default') {
         JSON::fail('找不到这个公众号！');
     }
 
-    // if (!$account->isAuth() || $account->getServiceType() !== 2) {
-    //     JSON::fail('只能是授权接入的服务号才能设置为屏幕二维码！');
-    // }
+    if (!$account->isAuth() || $account->getServiceType() !== 2) {
+        JSON::fail('只能是授权接入的服务号才能设置为屏幕二维码！');
+    }
 
     $enable = $account->useAccountQRCode();
     if ($account->useAccountQRCode(!$enable)) {

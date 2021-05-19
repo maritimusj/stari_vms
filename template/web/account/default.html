@@ -311,7 +311,7 @@
                             <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
-                            {if !(\zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2)}
+                            {if \zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2}
                             <li>
                                 <a href="#" data-op="useAccountQRCode" onclick="return false;"><i class="fa fa-desktop fa-fw"></i>
                                     {if $a['useAccountQRCode']}

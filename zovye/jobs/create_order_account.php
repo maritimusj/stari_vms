@@ -116,7 +116,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             $params['result'] = $result;
 
             if (is_error($result)) {
-                ZovyeException::throwWith($result['message'], -1, $device);
+                throw new Exception($result['message']);
             }
         } catch (Exception $e) {
             ZovyeException::throwWith($e->getMessage(), $e->getCode(), $device);

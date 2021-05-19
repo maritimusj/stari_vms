@@ -1001,7 +1001,7 @@
          })
 
         $('body').on('click', '#search_agent', function () {
-            const keyword = $('input[name=keyword_agent]').val();
+            const keyword = $('#search-form input[name=keyword_agent]').val();console.log(keyword);
             $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
                 op: 'search',
                 keyword: keyword,
@@ -1039,6 +1039,9 @@
             if (typeof fn === 'function') {
                 fn(params);
             }
+
+            params.append("pagesize", 10);
+            
             reload(form.attr("action") + "&" + encodeURI(params.toString()));
         }
 

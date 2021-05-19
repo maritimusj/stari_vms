@@ -807,6 +807,13 @@ class Device extends State
             if (request::bool('unbind')) {
                 $query->where("(app_id IS NULL OR app_id='')");
             }
+
+            //指定设备id获取设备列表
+            if (request::has('ids')) {
+                $ids = request::array('ids', []);
+                $query->where(['id' => $ids]);
+            }
+            
             $page = max(1, request::int('page'));
             $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
         

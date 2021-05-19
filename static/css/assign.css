@@ -93,6 +93,28 @@
 .item.device {
     padding: 3px;
     border-radius: 2em;
+    position: relative;
+}
+
+.item.device .detail {
+    display: none;
+}
+
+.item.device:hover .detail {
+    background: #fff;
+    width: 120px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    color: #000;
+    border: 1px solid #ccc;
+    padding: 6px 15px 6px 12px;
+    z-index: 99;
+    top: 39px;
+    overflow: hidden;
 }
 
 .item.simple {

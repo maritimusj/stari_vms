@@ -683,10 +683,11 @@ class Account extends State
         //获取本地可用公众号列表
         $accounts = Account::match($device, $user, ['admin', 'max' => settings('misc.maxAccounts', 0)]);
         if (!empty($accounts)) {
-            foreach ($accounts as &$account) {
+            foreach ($accounts as $index => &$account) {
                 if (App::useAccountQRCode()) {
                     $obj = Account::get($account['id']);
                     if (empty($obj) || $obj->useAccountQRCode()) {
+                        unset($accounts[$index]);
                         continue;
                     }
                 }

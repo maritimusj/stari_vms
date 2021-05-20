@@ -1054,7 +1054,7 @@ class deviceModelObj extends modelObj
     {
         if (App::useAccountQRCode()) {
             $accounts = $this->getAccounts(Account::AUTH);
-            foreach ($accounts as $index => $account) {
+            foreach ($accounts as $account) {
                 $obj = Account::get($account['id']);
                 if (empty($obj) || !$obj->useAccountQRCode()) {
                     continue;
@@ -1062,7 +1062,7 @@ class deviceModelObj extends modelObj
 
                 $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'device', $this->getId()], false);
                 if (!is_error($res)) {
-                    return $account['url'];
+                    return $account['qrcode'];
                 }
             }
         }

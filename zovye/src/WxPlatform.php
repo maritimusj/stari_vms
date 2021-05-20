@@ -320,28 +320,56 @@ class WxPlatform
                     'fn' => 'handleAuthorizerEvent[2]',
                     'error' => $result,
                 ]);
+
+                $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
             }
 
-            $message = is_error($result) ? "发生错误：{$result['message']}" : strval($result['message']);
-            if (!empty($message)) {
-                $xml_msg = self::getToUserMsg($msg['ToUserName'], $msg['FromUserName'], $message, time());
-                return self::getEncryptedMsg($xml_msg);
+            if (!empty($result)) {
+                return self::getEncryptedMsg($result);
             }
         }
 
         return self::SUCCESS_RESPONSE;
     }
 
-    public static function getToUserMsg(string $from_user_name, string $to_user_name, string $msg, int $ts): string
+    public static function createToUserTextMsg(string $from_user, string $to_user, string $text, int $timestamp = 0): string
     {
         return We7::array2xml([
-            'ToUserName' => $to_user_name,
-            'FromUserName' => $from_user_name,
-            'CreateTime' => $ts,
+            'ToUserName' => $to_user,
+            'FromUserName' => $from_user,
+            'CreateTime' => empty($timestamp) ? time() : $timestamp,
             'MsgType' => 'text',
-            'Content' => $msg,
+            'Content' => $text,
         ]);
     }
+
+    /**
+     * 创建一个推送给指定用户的图文消息
+     * @param string $from_user
+     * @param string $to_user
+     * @param array $params 参数：['title'] 标题，['desc'] 描述，['image']图片，['url']链接
+     * @param int $timestamp
+     * @return string
+     */
+    public static function createToUserNewsMsg(string $from_user, string $to_user, array $params = [], int $timestamp = 0): string
+    {
+        return We7::array2xml([
+            'ToUserName' => $to_user,
+            'FromUserName' => $from_user,
+            'CreateTime' => empty($timestamp) ? time() : $timestamp,
+            'MsgType' => 'news',
+            'ArticleCount' => 1,
+            'Articles' => [
+                'item' => [
+                    'Title' => $params['title'],
+                    'Description' => $params['desc'],
+                    'PicUrl' => $params['image'],
+                    'Url' => $params['url'],
+                ],
+            ],
+        ]);
+    }
+
 
     public static function getEncryptedMsg(string $msg): string
     {
@@ -379,7 +407,7 @@ class WxPlatform
         return [];
     }
 
-    public static function open($msg): array
+    public static function open($msg)
     {
         try {
             $res = self::verifyData($msg);
@@ -393,27 +421,9 @@ class WxPlatform
                 throw new RuntimeException('找不到指定的公众号：' . $account_name);
             }
 
-            $config = $acc->settings('config.open', []);
-
-            $makePushMsgFN = function($url) use ($config){
-                if ($config['msg']) {
-                    $str = strval($config['msg']);
-                    if (stripos($str, '{url}') !== false && stripos($str, '{/url}') !== false) {
-                        $arr = explode('{url}', $str, 2);
-                        $text = $arr[0];
-                        $arr = explode('{/url}', $arr[1], 2);
-                        $text .= '<a href="' . $url . '">' . $arr[0] . '</a>' . $arr[1];
-                    } else {
-                        $text = str_replace('{url}', "<a href=\"{$url}\">这里</a>", $str);
-                    }
-                    return $text;
-                }
-                return '';
-            };
-
             //出货时机是用户点击链连后，直接指定回推送的消息
             if (!empty($config['timing'])) {
-                return ['message' => $makePushMsgFN($acc->getUrl())];
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
             list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
@@ -428,9 +438,7 @@ class WxPlatform
             }
 
             if ($first == 'device') {
-                return [
-                    'message' => $makePushMsgFN($device->getUrl()),
-                ];
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
             }
 
             $user = User::get($first);
@@ -449,7 +457,7 @@ class WxPlatform
 
             if ($goods['num'] < 1) {
                 ZovyeException::throwWith('当前商品库存不足！', -1, $device);
-              }
+            }
 
             if (DEBUG) {
                 Util::logToFile('wxplatform', [
@@ -470,7 +478,7 @@ class WxPlatform
                 'extra' => [],
             ]);
 
-            return ['message' => $makePushMsgFN($acc->getUrl())];
+            return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
 
         } catch (ZovyeException $e) {
             $device = $e->getDevice();

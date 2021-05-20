@@ -10,6 +10,8 @@ use zovye\Account;
 use zovye\base\modelObj;
 
 use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\Util;
+use zovye\WxPlatform;
 use function zovye\tb;
 
 /**
@@ -273,12 +275,49 @@ class accountModelObj extends modelObj
 
     /**
      * 使用这个授权服务号的二维码做为设备二维码，推送到APP上显示
+     * @param null $enable
+     * @return bool
      */
-    public function useAccountQRCode($enable = null) 
+    public function useAccountQRCode($enable = null): bool
     {
         if (isset($enable)) {
             return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
         }
         return boolval($this->settings('misc.useAccountQRCode', 0));
+    }
+
+    public function getOpenMsg($from, $to, $redirect_url = ''): string
+    {
+        $config = $this->settings('config.open', []);
+        if ($config['msg']) {
+            $str = strval($config['msg']);
+            if ($redirect_url) {
+                if (stripos($str, '{url}') !== false && stripos($str, '{/url}') !== false) {
+                    $arr = explode('{url}', $str, 2);
+                    $text = $arr[0];
+                    $arr = explode('{/url}', $arr[1], 2);
+                    $text .= '<a href="' . $redirect_url . '">' . $arr[0] . '</a>' . $arr[1];
+                } else {
+                    $text = str_replace('{url}', "<a href=\"{$redirect_url}\">这里</a>", $str);
+                }
+            } else {
+                $text = $str;
+            }
+
+            return WxPlatform::createToUserTextMsg($from, $to, $text);
+
+        } elseif ($config['news']) {
+            $params = [
+                'title' => strval($config['news']['title']),
+                'desc' => strval($config['news']['desc']),
+                'image' => Util::toMedia($config['news']['image']),
+            ];
+            if ($redirect_url) {
+                $params['url'] = $redirect_url;
+            }
+            return WxPlatform::createToUserNewsMsg($from, $to, $params);
+        }
+
+        return '';
     }
 }

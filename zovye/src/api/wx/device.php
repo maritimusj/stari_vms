@@ -61,7 +61,7 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'location' => isEmptyArray($extra['location']) ? null : $extra['location'],
+                    'location' => isEmptyArray($extra['location.tecent']) ? null : $extra['location.tencent'],
                     'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
                 ],
             ];
@@ -86,7 +86,7 @@ class device
             ],
             'extra' => [
                 'iccid' => $device->getIccid(),
-                'location' => $extra['location'] ?: null,
+                'location' => $extra['location']['tencent'] ?: null,
                 'volume' => intval($extra['volume']),
                 'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
             ],
@@ -167,7 +167,7 @@ class device
         }
 
         //app报告的位置数据
-        $app_loc = $device->get('location', null);
+        $app_loc = $device->get('location.tencent', null);
         if ($app_loc && is_array($app_loc)) {
             $result['app']['location'] = $app_loc;
         }

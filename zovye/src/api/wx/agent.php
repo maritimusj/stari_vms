@@ -551,7 +551,7 @@ class agent
         }
 
         if (!empty($location['lat']) && !empty($location['lng'])) {
-            setArray($extra, 'location', $location);
+            setArray($extra, 'location.tencent', $location);
         }
 
         //音量

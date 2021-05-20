@@ -370,16 +370,8 @@ if ($op == 'list') {
 
         $extra = $device->get('extra');
 
-        $loc = empty($extra['location']) ? [] : $extra['location'];
+        $loc = empty($extra['location']['baidu']) ? [] : $extra['location']['baidu'];
         $tpl_data['loc'] = $loc;
-
-        if ($loc['lng'] && $loc['lat']) {
-            $baidu_loc = Util::convert2Baidu($loc['lng'], $loc['lat']);
-            if ($baidu_loc) {
-                $tpl_data['baidu_loc'] = $baidu_loc;
-                $device->updateSettings('extra.location.baidu', $baidu_loc);
-            }
-        }
 
         $tpl_data['device'] = $device;
         $tpl_data['extra'] = $extra;
@@ -621,29 +613,6 @@ if ($op == 'list') {
         ];
     }
 
-    $location = request::array('location');
-    $lng = $location['lng'];
-    $lat = $location['lat'];
-
-    if ($lng && $lat) {
-        $res = Util::convert2Tencent($lng, $lat);
-        if ($res) {
-            $extra['location']['lng'] = floatval($res['lng']);
-            $extra['location']['lat'] = floatval($res['lat']);
-            $addr = Util::getLocation($extra['location']['lng'], $extra['location']['lat']);
-            if ($addr) {
-                $extra['location']['area'] = [
-                    $addr['province'],
-                    $addr['city'],
-                    $addr['district'],
-                ];
-                $extra['location']['address'] = $addr['address'];
-            }
-        }
-    } else {
-        //清除位置信息
-        $extra['location'] = [];
-    }
 
     if (empty($data['name']) || empty($data['imei'])) {
         Util::itoast('设备名称或IMEI不能为空！', We7::referer(), 'error');
@@ -659,11 +628,11 @@ if ($op == 'list') {
 
     $data['device_type'] = $type_id;
 
-    if (App::isBluetoothDeviceSupported() && request('device_model') == Device::BLUETOOTH_DEVICE) {
+    if (App::isBluetoothDeviceSupported() && request::str('device_model') == Device::BLUETOOTH_DEVICE) {
         $extra['bluetooth'] = [
-            'protocol' => request('blueToothProtocol'),
-            'uid' => request('BUID'),
-            'mac' => request('MAC'),
+            'protocol' => request::str('blueToothProtocol'),
+            'uid' => request::trim('BUID'),
+            'mac' => request::trim('MAC'),
             'motor' => request::int('Motor'),
             'screen' => request::int('blueToothScreen') ? 1 : 0,
             'power' => request::int('blueToothPowerSupply') ? 1 : 0,
@@ -767,6 +736,31 @@ if ($op == 'list') {
         Util::itoast('保存型号数据失败！', We7::referer(), 'error');
     }
 
+    $location = request::array('location');
+    $extra['location']['baidu']['lat'] = $location['lat'];
+    $extra['location']['baidu']['lng'] = $location['lng'];
+
+    $saved_baidu_loc = $device->settings('extra.location.baidu', []);
+    if (strval($saved_baidu_loc['lng']) != strval($location['lng']) 
+        || strval($saved_baidu_loc['lat']) != strval($location['lat'])) {
+            $addr = Util::getLocation($location['lng'], $location['lat']);
+            if ($addr) {
+                $extra['location']['baidu']['area'] = [
+                    $addr['province'],
+                    $addr['city'],
+                    $addr['district'],
+                ];
+                $extra['location']['baidu']['address'] = $addr['address'];
+            } else {
+                $extra['location']['area'] = [];
+                $extra['location']['address'] = [];
+            }
+    } else {
+        $extra['location']['baidu'] = $device->settings('extra.location.baidu');
+    }
+
+    $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
+
     //合并extra
     $extra = array_merge($device->get('extra', []), $extra);
 
@@ -778,7 +772,6 @@ if ($op == 'list') {
     $device->setDeviceModel(request('device_model'));
 
     if ($device->save()) {
-
         //保存其它广告需要的配置
         if (App::isCustomAliTicketEnabled()) {
             $join = request::bool('JoinAliTicket');

@@ -242,6 +242,11 @@ class accountModelObj extends modelObj
         return $this->getType() == Account::AUTH;
     }
 
+    public function getAssignData(): array
+    {
+        return (array)$this->get('assigned', []);
+    }
+
     public function destroy(): bool
     {
         $this->remove('qrcodesData');

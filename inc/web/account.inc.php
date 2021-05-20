@@ -617,6 +617,9 @@ if ($op == 'default') {
 
     $account = Account::get($id);
     if ($account) {
+        if ($account->useAccountQRCode()) {
+            CtrlServ::appNotifyAll($account->getAssignData(), $data);
+        }
         if ($account->set('assigned', $data) && Account::updateAccountData()) {
             JSON::success('设置已经保存成功！');
         }
@@ -818,6 +821,7 @@ if ($op == 'default') {
 
     $enable = $account->useAccountQRCode();
     if ($account->useAccountQRCode(!$enable)) {
+        CtrlServ::appNotifyAll($account->getAssignData());
         JSON::success($enable ? '已取消成功！' : '已设置成功！');
     }
 

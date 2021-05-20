@@ -4,6 +4,9 @@
     .disabled {
         color: #ccc;
     }
+    #text-config,#news-config {
+        display: none;
+    }
 </style>
 <form action="{php echo $this->createWebUrl('account');}" method="post">
     <div class="panel panel-default">
@@ -197,7 +200,7 @@
                         <label for="orderno" class="col-md-2 control-label">排序</label>
                         <div class="col-md-10">
                             <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
-                            <span class="help-block">* 可选，默认为0。数字越大，优先级越高。用户于多个特殊吸粉平台的请求顺序。</span>
+                            <span class="help-block">* 可选，默认为0。数字越大，优先级越高。用户于多个特殊吸粉平台的请求顺序</span>
                         </div>
                     </div>
                     {if \zovye\App::isUserCenterEnabled()}
@@ -212,8 +215,8 @@
                     {if \zovye\App::isWxPlatformEnabled() && $account && $account->isAuth()}
                     <div class="seg-divider"></div>
                     <div class="form-group">
-                        <label class="col-xs-12 col-md-2 col-md-2 control-label">出货时机</label>
-                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label class="col-md-2 control-label">出货时机</label>
+                        <div class="col-md-8">
                             <label for="scan" class="radio-inline{if $account->getServiceType() != 2} disabled{/if}">
                                 <input name="OpenTiming" id="scan" type="radio" value="0" {if $account->getServiceType() != 2} disabled{else}{if empty($config['open']['timing'])}checked="checked"{/if}{/if}>
                                 扫码进入公众号
@@ -222,16 +225,48 @@
                                 <input name="OpenTiming" id="link" type="radio" value="1"  {if $config['open']['timing'] == 1}checked="checked"{/if}>
                                 打开取货链接
                             </label>
-                            <span class="help-block">* 请选择出货时机，用户扫码进入公众号后立即出货或用户打开取货页面后出货。</span>
+                            <span class="help-block">* 请选择出货时机，用户扫码进入公众号后立即出货或用户打开取货页面后出货</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="OpenMsg" class="col-md-2 control-label">消息推送</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="OpenMsg" id="OpenMsg" value="{$config['open']['msg']}">
-                            <span class="help-block">* 用户扫码进入公众号后，给用户推送消息。(使用 <b>{url}</b> 或者<b>{url}文字{/url}</b>占位符可以加入取货链接)</span>
+                            <select style="width: 100%;" name="openMsgType" id="openMsgType">
+                                <option value="text" {if isset($config['open']['msg'])}selected{/if}>文本消息</option>
+                                <option value="news" {if isset($config['open']['news'])}selected{/if}>图文消息</option>
+                            </select>
+                            <span class="help-block">* 用户扫码进入公众号后，给用户推送消息</span>
                         </div>
-                    </div>                
+                    </div>
+                    <div class="form-group" id="text-config">
+                        <label for="openTextMsg" class="col-md-2 control-label"></label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="openTextMsg" id="openTextMsg" value="{$config['open']['msg']}">
+                            <span class="help-block">* 使用 <b>{url}</b> 或者<b>{url}文字{/url}</b>占位符可以加入取货链接</span>
+                        </div>
+                    </div>
+                    <div id="news-config">
+                        <div class="form-group" >
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="openNewsTitle" value="{$config['open']['news']['title']}">
+                                <span class="help-block">* 图文消息标题</span>
+                            </div>                        
+                        </div>
+                        <div class="form-group" >
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="openNewsDesc" value="{$config['open']['news']['desc']}">
+                                <span class="help-block">* 图文消息内容</span>
+                            </div>                        
+                        </div>
+                        <div class="form-group" >
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-10">
+                                {php echo tpl_form_field_image('openNewsImage', $config['open']['news']['image']);}
+                            </div>                        
+                        </div>
+                    </div>
                     {/if}
                     {if \zovye\App::isJfbEnabled() && $account && $account->isJFB()}
                     <div class="seg-divider"></div>
@@ -319,15 +354,47 @@
                 </div>
                 {/if}
             {else}
-                <div class="seg">
-                    <div class="form-group">
-                        <label for="OpenMsg" class="col-md-2 control-label">消息推送</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="OpenMsg" id="OpenMsg" value="{$config['open']['msg']}">
-                            <span class="help-block">* 用户扫码进入公众号后，给用户推送消息。(使用 <b>{url}</b> 或者<b>{url}文字{/url}</b>占位符可以加入取货链接)</span>
-                        </div>
-                    </div> 
+            <div class="seg">
+                <div class="form-group">
+                    <label for="OpenMsg" class="col-md-2 control-label">消息推送</label>
+                    <div class="col-md-10">
+                        <select style="width: 100%;" name="openMsgType" id="openMsgType">
+                            <option value="text" {if isset($config['open']['msg'])}selected{/if}>文本消息</option>
+                            <option value="news" {if isset($config['open']['news'])}selected{/if}>图文消息</option>
+                        </select>
+                        <span class="help-block">* 用户扫码进入公众号后，给用户推送消息</span>
+                    </div>
                 </div>
+                <div class="form-group" id="text-config">
+                    <label for="openTextMsg" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="openTextMsg" id="openTextMsg" value="{$config['open']['msg']}">
+                        <span class="help-block">* 使用 <b>{url}</b> 或者<b>{url}文字{/url}</b>占位符可以加入取货链接</span>
+                    </div>
+                </div>
+                <div id="news-config">
+                    <div class="form-group" >
+                        <label class="col-md-2 control-label"></label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="openNewsTitle" value="{$config['open']['news']['title']}">
+                            <span class="help-block">* 图文消息标题</span>
+                        </div>                        
+                    </div>
+                    <div class="form-group" >
+                        <label class="col-md-2 control-label"></label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="openNewsDesc" value="{$config['open']['news']['desc']}">
+                            <span class="help-block">* 图文消息内容</span>
+                        </div>                        
+                    </div>
+                    <div class="form-group" >
+                        <label class="col-md-2 control-label"></label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_image('openNewsImage', $config['open']['news']['image']);}
+                        </div>                        
+                    </div>
+                </div>
+            </div>
             {/if}
         </div>
     </div>
@@ -348,7 +415,7 @@
 
 <script>
     $(function(){
-        var open_id = 0;
+        const open_id = 0;
         $('#find_agent').click(function () {
             const keyword = $('input[name=keyword_agent]').val();
             util.loading();
@@ -359,7 +426,7 @@
                 let html = '';
                 if (res.status) {
                     const list = res.data || [];
-                    var isSelected = '';
+                    let isSelected = '';
                     list.forEach(function (e) {
                         isSelected = '';
                         if (e.openid == open_id) {
@@ -383,7 +450,22 @@
                 util.loaded();
             })
         })
-        console.log('done');
+    })
+
+    $(function() {        
+        function change(v) {            
+            ['text', 'news'].forEach(e => {
+                if (e == v) {
+                    $('#' + e + '-config').show();
+                } else {
+                    $('#' + e + '-config').hide();
+                }
+            })  
+        }
+        change("{php echo isset($config['open']['msg']) ? 'text':'news'}");
+        $('#openMsgType').change(function() {
+            change($(this).val());
+        })
     })
 </script>
 {template 'common/footer'}

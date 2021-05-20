@@ -275,13 +275,26 @@ if ($op == 'default') {
                     'secret' => request::trim('secret'),
                 ]);
             } elseif ($account->isAuth()) {
-                $account->set('config', [
+                $timing = $account->getServiceType() == 2 ? request::int('OpenTiming') : 1;
+                $config = [
                     'type' => Account::AUTH,
-                    'open' => [
-                        'timing' => $account->getServiceType() == 2 ? request::int('OpenTiming') : 1,
-                        'msg' => request::str('OpenMsg'),
-                    ]
-                ]);
+                ];
+                if (request::str('openMsgType') == 'text') {
+                    $config['open'] = [
+                        'timing' => $timing,
+                        'msg' => request::str('openTextMsg'),
+                    ];
+                } elseif (request::str('openMsgType') == 'news') {
+                    $config['open'] = [
+                        'timing' => $timing,
+                        'news' => [
+                            'title' => request::trim('openNewsTitle'),
+                            'desc' => request::trim('openNewsDesc'),
+                            'image' => request::trim('openNewsImage'),
+                        ],
+                    ];
+                }
+                $account->set('config', $config);
             } else {
                 $data['img'] = request::trim('img');
             }

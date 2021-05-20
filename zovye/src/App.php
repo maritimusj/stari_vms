@@ -32,28 +32,6 @@ class App
         });
     }
 
-    /**
-     * 是否开启二维码附加用户跟踪数据功能
-     * @return bool
-     */
-    public static function isAdvsQrcodeTrackerSupported(): bool
-    {
-        return onceCall(function() {
-            return !empty(settings('advs.qrcode_tracker.enabled'));
-        });        
-    }
-
-    /**
-     * 是否开启网站吸粉广告
-     * @return bool
-     */
-    public static function isSiteUrlEnabled(): bool
-    {
-        return onceCall(function() {
-            return !empty(settings('advs.site_url.enabled'));
-        });        
-    }
-
     public static function isAdvsReviewEnabled(): bool
     {
         return onceCall(function() {

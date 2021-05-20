@@ -11,6 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\Job;
 
+use zovye\PlaceHolder;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -2155,7 +2156,7 @@ class deviceModelObj extends modelObj
             $url = settings("misc.redirect.{$when}.url");
         }
 
-        return ['url' => $url, 'delay' => intval($delay)];
+        return ['url' => PlaceHolder::url($url, [ $this ]), 'delay' => intval($delay)];
     }
 
     /**

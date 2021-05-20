@@ -304,7 +304,6 @@
                             {else}
                              <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id']))}" title="分配设备"><i class="fa fa-wrench{if empty($a['assigned'])} active{/if}"></i></a>
                             {/if}
-
                           <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                           <span class="fa fa-caret-down"></span></a>
                           <ul class="dropdown-menu">
@@ -313,12 +312,15 @@
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
                             {if \zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2}
                             <li>
-                                <a href="#" data-op="useAccountQRCode" onclick="return false;"><i class="fa fa-desktop fa-fw"></i>
-                                    {if $a['useAccountQRCode']}
-                                    取消设备二维码
-                                    {else}
-                                    设为设备二维码
-                                    {/if}
+                                <a href="#" data-op="useAccountQRCode" onclick="return false;">
+                                    <i class="fa fa-desktop fa-fw"></i>
+                                    <span class="text">
+                                        {if $a['useAccountQRCode']}
+                                        取消设备二维码
+                                        {else}
+                                        设为设备二维码
+                                        {/if}
+                                    </span>
                                 </a>
                             </li>
                             {/if}
@@ -484,8 +486,11 @@
                 op: 'useAccountQRCode',
             }, undefined, false, function(res) {
                 if (res && res.status) {
-                    console.log(self.find('i'))
-                    self.closest('tr').find('.ercode i').toggleClass('fa-desktop').toggleClass('fa-qrcode');
+                    const tr = self.closest('tr');
+                    tr.find('.ercode i').toggleClass('fa-desktop').toggleClass('fa-qrcode');
+                    const textCtrl = tr.find('[data-op="useAccountQRCode"] .text');
+                    const newText = textCtrl.text() == '取消设备二维码' ? '设为设备二维码' : '取消设备二维码';
+                    textCtrl.text(newText);
                 }
             })
         }

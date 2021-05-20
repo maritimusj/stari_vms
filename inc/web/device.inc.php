@@ -1263,7 +1263,7 @@ if ($op == 'list') {
     JSON::success(['title' => "<b>{$device->getName()}</b>的出货统计", 'content' => $content]);
 } elseif ($op == 'refresh_all') {
 
-    if (CtrlServ::advsNotifyAll(['all' => 1])) {
+    if (Advertising::notifyAll(['all' => 1])) {
         JSON::success('已通知有设备更新！');
     }
 

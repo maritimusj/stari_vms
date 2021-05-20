@@ -450,9 +450,9 @@ class App
 
     public static function getDefaultDeviceType():? device_typesModelObj
     {
-        $typeid = settings('device.multi-types.first');
-        if ($typeid) {
-            return DeviceTypes::get($typeid);
+        $id = settings('device.multi-types.first');
+        if ($id) {
+            return DeviceTypes::get($id);
         }
         return null;
     }

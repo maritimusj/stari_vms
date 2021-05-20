@@ -274,7 +274,7 @@ if ($op == 'default') {
 
         $assign_data = $adv->settings('assigned', []);
         if ($assign_data) {
-            if (CtrlServ::advsNotifyAll([], $assign_data, $adv)) {
+            if (Advertising::notifyAll([], $assign_data)) {
                 JSON::success('已通知设备更新！');
             }
         }
@@ -340,7 +340,7 @@ if ($op == 'default') {
     $origin_data = $adv->settings('assigned', []);
     if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
         if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-            if (CtrlServ::advsNotifyAll($origin_data, $data, $adv)) {
+            if (Advertising::notifyAll($origin_data, $data)) {
                 JSON::success('设置已经保存成功，已通知设备更新！');
             } else {
                 JSON::success('设置已经保存成功，通知设备失败！');
@@ -507,7 +507,7 @@ if ($op == 'default') {
 
             if ($adv->getType() == Advertising::SCREEN) {
                 //通知设备更新屏幕广告
-                CtrlServ::advsNotifyAll($assign_data, [], $adv);
+                Advertising::notifyAll($assign_data, []);
             }
 
             Util::itoast('删除成功！', $this->createWebUrl('adv', ['type' => $from_type]), 'success');
@@ -530,7 +530,7 @@ if ($op == 'default') {
             if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
                 //通知设备更新屏幕广告
                 $assign_data = $adv->settings('assigned', []);
-                CtrlServ::advsNotifyAll($assign_data, [], $adv);
+                Advertising::notifyAll($assign_data, []);
             }
 
             JSON::success([

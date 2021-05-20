@@ -7,7 +7,6 @@
 namespace zovye;
 
 use zovye\Contract\IHttpClient;
-use zovye\model\advertisingModelObj;
 
 class CtrlServ
 {
@@ -208,10 +207,10 @@ class CtrlServ
      * 通知设备app更新设置
      * @param $app_id
      * @param string $op
-     * @param array $payloadData
+     * @param array $payload
      * @return bool
      */
-    public static function appNotify($app_id, $op = 'update', $payloadData = []): bool
+    public static function appNotify($app_id, $op = 'update', $payload = []): bool
     {
         if ($app_id) {
 
@@ -219,7 +218,7 @@ class CtrlServ
             $data = json_encode(
                 [
                     'op' => $op,
-                    'data' => $payloadData,
+                    'data' => $payload,
                     'serial' => microtime(true) . '',
                 ]
             );
@@ -234,42 +233,24 @@ class CtrlServ
         return false;
     }
 
-    /**
-     * 通知相关终端更新广告
-     * @param array $origin_data 原始分配信息
-     * @param array $data 新的分配信息
-     * @param advertisingModelObj $adv 广告对象
-     * @return boolean
-     *  [
-     *  'all' => true/false,    //全部设备
-     *  'agents' => [],         //代理商
-     *  'groups' => [],         //分组
-     *  'tags' => [],           //标签
-     *  'devices' => [],        //设备
-     *  );
-     */
-
-    public static function advsNotifyAll(array $origin_data, array $data = [], $adv = null): bool
+    public static function appNotifyAll(array $original, array $data = [], $op = 'update', $payload = []): bool
     {
         $topics = [];
 
         if ($data['all']) {
-            if (!$origin_data['all']) {
+            if (!$original['all']) {
                 $topics[] = 'tag/' . Topic::encrypt();
             }
         } else {
-            if ($origin_data['all']) {
+            if ($original['all']) {
                 $topics[] = 'tag/' . Topic::encrypt();
             } else {
                 if (isset($data['all']) && $data['all'] == false) {
-                    $all = $origin_data;
+                    $all = $original;
                 } else {
                     $all = $data;
-                    foreach ($origin_data as $key => $entry) {
-                        $all[$key] = $all[$key] ? array_merge(
-                            array_diff($all[$key], $entry),
-                            array_diff($entry, $all[$key])
-                        ) : $entry;
+                    foreach ($original as $key => $entry) {
+                        $all[$key] = $all[$key] ? array_merge(array_diff($all[$key], $entry), array_diff($entry, $all[$key])) : $entry;
                         if (empty($all[$key])) {
                             unset($all[$key]);
                         }
@@ -300,31 +281,22 @@ class CtrlServ
         }
 
         if ($topics) {
+            $data = [
+                'op' => $op,
+                'serial' => microtime(true) . '',
+            ];
 
-            $serial = microtime(true);
-            $content = json_encode(['op' => 'update', 'serial' => "{$serial}"]);
-            $body = ['topics' => $topics, 'data' => $content];
-
-            $res = self::query('misc/publish', [], $body);
-            if (!is_error($res)) {
-                if ($adv) {
-                    $adv->set(
-                        'lastupdate',
-                        [
-                            'notifier' => [
-                                'topics' => $topics,
-                                'data' => $content,
-                            ],
-                            'ts' => time(),
-                            'serial' => $serial,
-                        ]
-                    );
-                }
-
-                return true;
+            if ($payload) {
+                $data['data'] = $payload;
             }
 
-            return false;
+            $body = [
+                'topics' => $topics,
+                'data' => json_encode($data),
+            ];
+
+            $res = self::query('misc/publish', [], $body);
+            return !is_error($res);
         }
 
         return true;

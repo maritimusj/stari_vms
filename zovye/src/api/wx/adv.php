@@ -6,7 +6,6 @@ namespace zovye\api\wx;
 use Exception;
 use zovye\Advertising;
 use zovye\model\advertisingModelObj;
-use zovye\CtrlServ;
 use zovye\Device;
 use zovye\model\device_groupsModelObj;
 use zovye\request;
@@ -64,7 +63,7 @@ class adv
 
         $origin_data = $adv->get('assigned', []);
         if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
-            if (CtrlServ::advsNotifyAll($origin_data, $data, $adv)) {
+            if (Advertising::notifyAll($origin_data, $data)) {
                 return ['msg' => '保存成功！！'];
             }
             return ['msg' => '保存成功！？'];
@@ -297,8 +296,7 @@ class adv
         $assign_data = $adv->settings('assigned', []);
 
         if (Advertising::update($adv) && $adv->destroy()) {
-            CtrlServ::advsNotifyAll($assign_data, []);
-
+            Advertising::notifyAll($assign_data, []);
             return ['msg' => "{$title}删除成功！"];
         }
 
@@ -400,7 +398,7 @@ class adv
 
         $origin_data = $adv->get('assigned', []);
         if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
-            if (CtrlServ::advsNotifyAll($origin_data, $data, $adv)) {
+            if (Advertising::notifyAll($origin_data, $data)) {
                 return ['msg' => '保存成功！'];
             }
         }

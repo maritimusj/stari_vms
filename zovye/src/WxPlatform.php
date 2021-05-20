@@ -380,17 +380,17 @@ class WxPlatform
         return '';
     }
 
-    public static function subscribe(array $msg): array
+    public static function subscribe(array $msg)
     {
         return self::open($msg);
     }
 
-    public static function scan(array $msg): array
+    public static function scan(array $msg)
     {
         return self::open($msg);
     }
 
-    public static function unsubscribe(array $msg): array
+    public static function unsubscribe(array $msg)
     {
         unset($msg);
         return err('unsubscribe unimplemented!');

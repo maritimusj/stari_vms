@@ -256,11 +256,7 @@ JSCODE;
         $user = $tpl['user']['_obj'];
         
 
-        if (!App::isAliUser()) {
-            $tpl['accounts'] = Account::getAvailableList($device, $user, [
-                'exclude' => $params['exclude'],
-            ]);
-        } else {
+        if (App::isAliUser()) {
             $tpl['accounts'] = [];
             //天猫拉新活动
             if (App::isCustomAliTicketEnabled()) {
@@ -268,7 +264,11 @@ JSCODE;
                 if (!is_error($result)) {
                     $tpl['accounts'][] = $result;
                 }
-            }          
+            }    
+        } else {
+            $tpl['accounts'] = Account::getAvailableList($device, $user, [
+                'exclude' => $params['exclude'],
+            ]);
         }
         
         foreach ($tpl['accounts'] as $index => $account) {

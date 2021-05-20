@@ -237,9 +237,12 @@ if (Util::mustValidateLocation($user, $device)) {
     $this->locationPage($tpl_data);
 }
 
-if ($account && is_error(Util::isAvailable($user, $account, $device))) {
-    $user->remove('last');
-    $account = null;
+if ($account)  {
+    $res = Util::isAvailable($user, $account, $device);
+    if (is_error($res)) {
+        $user->remove('last');
+        $account = null;        
+    }
 }
 
 if (empty($account)) {

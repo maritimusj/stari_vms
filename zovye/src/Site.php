@@ -212,29 +212,29 @@ JSCODE;
         }
 JSCODE;
         //检查用户在该设备上最近失败的免费订单
-//         $minutes = settings('order.retry.last', 0);
-//         if ($minutes > 0) {
-//             $order = Order::findOne([
-//                 'openid' => $user->getOpenid(),
-//                 'device_id' => $device->getId(),
-//                 'result_code <>' => 0,
-//                 'price' => 0,
-//                 'balance' => 0,
-//                 'createtime >' => strtotime("-{$minutes} minute"),
-//             ]);
-//             if ($order) {
-//                 $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
-//                 $tpl['js']['code'] .= <<<JSCODE
-//     \r\nzovye_fn.retryOrder = function (cb) {
-//         $.get("{$order_retry_url}").then(function (res) {
-//             if (typeof cb === 'function') {
-//                 cb(res);
-//             }
-//         })
-//     }
-// JSCODE;
-//             }
-//         }
+        //         $minutes = settings('order.retry.last', 0);
+        //         if ($minutes > 0) {
+        //             $order = Order::findOne([
+        //                 'openid' => $user->getOpenid(),
+        //                 'device_id' => $device->getId(),
+        //                 'result_code <>' => 0,
+        //                 'price' => 0,
+        //                 'balance' => 0,
+        //                 'createtime >' => strtotime("-{$minutes} minute"),
+        //             ]);
+        //             if ($order) {
+        //                 $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
+        //                 $tpl['js']['code'] .= <<<JSCODE
+        //     \r\nzovye_fn.retryOrder = function (cb) {
+        //         $.get("{$order_retry_url}").then(function (res) {
+        //             if (typeof cb === 'function') {
+        //                 cb(res);
+        //             }
+        //         })
+        //     }
+        // JSCODE;
+        //             }
+        //         }
         $tpl['js']['code'] .= "\r\n</script>";
         $this->showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
     }
@@ -254,7 +254,6 @@ JSCODE;
 
         /** @var userModelObj $user */
         $user = $tpl['user']['_obj'];
-        
 
         if (App::isAliUser()) {
             $tpl['accounts'] = [];
@@ -264,13 +263,13 @@ JSCODE;
                 if (!is_error($result)) {
                     $tpl['accounts'][] = $result;
                 }
-            }    
+            }
         } else {
             $tpl['accounts'] = Account::getAvailableList($device, $user, [
                 'exclude' => $params['exclude'],
             ]);
         }
-        
+
         foreach ($tpl['accounts'] as $index => $account) {
             if (!empty($account['redirect_url'])) {
                 //链接转跳前，先判断设备是否在线
@@ -1026,7 +1025,7 @@ ready(function(){
 </script>
 HTML;
 
-        echo($html);
+        echo ($html);
         exit();
     }
 }

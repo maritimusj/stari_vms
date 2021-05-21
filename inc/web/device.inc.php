@@ -271,7 +271,10 @@ if ($op == 'list') {
                     'freeLimitsReached' => $entry->isFreeLimitsReached(),
                     'location' => $entry->needValidateLocation(),
                 ],
-                'address' => $entry->getAddress(),
+                'address' => [
+                    'web' => $entry->settings('extra.location.baidu.address', ''),
+                    'agent' => $entry->settings('extra.location.tencent.address', ''),
+                ],
                 'isDown' => $entry->settings('extra.isDown', 0),
             ];
 

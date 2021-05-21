@@ -1,6 +1,54 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
 <style>
+    #devicelist .device-qrcode {
+        position: relative;
+    }
+    #devicelist .devicename {
+        position: relative;
+    }
+    #devicelist .address {
+        display: none;
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        z-index: 99;
+        padding: 6px 10px;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: flex-start;
+        align-items: flex-start;
+        width: 400px;
+        overflow: hidden;
+        white-space: nowrap;
+        left: 60px;
+        transition: all 0.3s;
+        box-shadow: 5px 5px 1px rgb(158 158 158 / 50%);
+    }
+    #devicelist .devicename:hover .address {
+        display: flex;
+    }
+    #devicelist .address .li {
+        margin: 6px;
+        width: 100%;
+        text-align: left;
+    }
+    #devicelist .address .title {
+        font-weight: 800;
+        padding: 3px 6px;
+        color: #fff;
+    }
+    #devicelist .address .web.title {
+         background: #4caf50;
+    }
+    #devicelist .address .agent.title {
+         background: #ffc107;
+    }
+    #devicelist .address .addr {
+        border-bottom: 1px solid #000;
+        width: 100%;
+    }
     #devicelist i.allowed {
         color:green;
     }
@@ -385,7 +433,7 @@
                                </template>
                             </template>
                         </td>
-                        <td style="position:relative;">
+                        <td class="device-qrcode">
                             <div class="imei">
                                 <img src="{MODULE_URL}static/img/qrcode.svg" class="qrcode" v-if="o.activeQrcode">
                                 <i class="fa fa-qrcode" v-else></i>
@@ -395,7 +443,7 @@
                             </div>
                         </td>
                         <td>
-                            <div class="devicename" :title="o.address">
+                            <div class="devicename">
                                 {{o.name}}
                                 <template v-if="o.isVD">
                                     <sup class="vdevice" title="虚拟设备">[ 虚拟 ]</sup>
@@ -406,6 +454,16 @@
                                 <template v-if="o.isDown">
                                     <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消">
                                 </template>
+                                <div class="address" v-if="o.address && (o.address.web || o.address.agent)">
+                                    <div class="li" v-if="o.address.web">
+                                        <span class="web title">后台位置</span>
+                                        <span class="addr">{{o.address.web}}</span>
+                                    </div>
+                                    <div class="li" v-if="o.address.agent">
+                                        <span class="agent title">代理商位置</span>
+                                        <span class="addr">{{o.address.agent}}</span>
+                                    </div>                                    
+                                </div>
                             </div>
                         </td>
                         <td>

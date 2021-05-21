@@ -13,10 +13,6 @@ if (empty($user) || $user->isBanned()) {
 $op = request::op('default');
 
 //验证
-$verify_18 = 'verify_18';
-$settings = settings();
-$verify_tpl = $settings['notice']['sms']['verify'];
-
 if ($op == 'default') {
 
     $order_no = request::str('orderNO');

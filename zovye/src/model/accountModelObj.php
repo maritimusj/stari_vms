@@ -283,7 +283,7 @@ class accountModelObj extends modelObj
         if (isset($enable)) {
             return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
         }
-        return boolval($this->settings('misc.useAccountQRCode', 0));
+        return \zovye\App::useAccountQRCode() && boolval($this->settings('misc.useAccountQRCode', 0));
     }
 
     public function getOpenMsg($from, $to, $redirect_url = ''): string

@@ -438,9 +438,9 @@ class deviceModelObj extends modelObj
 
     public function getAddress($default = ''): string
     {
-        $address = $this->settings('extra.address', '');
+        $address = $this->settings('extra.location.baidu.address', '');
         if (empty($address)) {
-            $address = $this->settings('extra.location.address', '');
+            $address = $this->settings('extra.location.tencent.address', '');
         }
         return empty($address) ? $default : $address;
     }

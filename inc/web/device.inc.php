@@ -1033,6 +1033,16 @@ if ($op == 'list') {
             $data['memo'] = '公众号:' . $acc['name'];
         }
 
+        $order_id = $entry->getData('order');
+        if ($order_id) {
+            $order = Order::get($order_id);
+            if ($order) {
+                $data['order'] = [
+                    'uid' => $order->getOrderNO(),
+                ];
+            }
+        }
+
         $logs[] = $data;
     }
 

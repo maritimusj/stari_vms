@@ -94,11 +94,11 @@
                     {if $item['memo']}
                     <div>
                         备注：{$item['memo']}
-                    </div>                    
+                    </div>
                     {/if}
-                    {if $item['result']['orderUID']}
+                    {if $item['order']['uid']}
                     <div>
-                        订单号：{$item['result']['orderUID']}
+                        订单号：{$item['order']['uid']}
                     </div>
                     {/if}
                     {if $item['result']['serialNO']}

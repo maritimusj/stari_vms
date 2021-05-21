@@ -29,7 +29,7 @@ class WeApp extends Settings
      * @param $filename
      * @param array $tpl_data
      */
-    public static function showTemplate($filename, array $tpl_data = [])
+    public function showTemplate($filename, array $tpl_data = [])
     {
         $tpl_data['_GPC'] = $GLOBALS['_GPC'];
         $tpl_data['_W'] = $GLOBALS['_W'];
@@ -242,7 +242,7 @@ class WeApp extends Settings
 
         ob_start();
 
-        include WeApp::template($name);
+        include self::template($name);
 
         return ob_get_clean();
     }
@@ -306,7 +306,7 @@ class WeApp extends Settings
     })
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('scan'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('scan'), ['tpl' => $tpl]);
     }
 
     /**
@@ -375,7 +375,7 @@ JSCODE;
         //             }
         //         }
         $tpl['js']['code'] .= "\r\n</script>";
-        self::showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
     }
 
     /**
@@ -579,7 +579,7 @@ JSCODE;
             $tpl['js']['code'] .= "\r\n{$js}\r\n";
         }
 
-        self::showTemplate(Theme::file('device'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('device'), ['tpl' => $tpl]);
     }
 
     /**
@@ -669,7 +669,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('get'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('get'), ['tpl' => $tpl]);
     }
 
     /**
@@ -715,7 +715,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('usercenter'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('usercenter'), ['tpl' => $tpl]);
     }
 
     /**
@@ -744,7 +744,7 @@ JSCODE;
 </script>
 JSCODE;
 
-        self::showTemplate(Theme::file('myprizes'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('myprizes'), ['tpl' => $tpl]);
     }
 
     /**
@@ -822,7 +822,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('charge'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('charge'), ['tpl' => $tpl]);
     }
 
     /**
@@ -904,7 +904,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('mobile'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('mobile'), ['tpl' => $tpl]);
     }
 
     public function keeperPage($params = [])
@@ -956,7 +956,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('keeper'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('keeper'), ['tpl' => $tpl]);
     }
 
     /**
@@ -1026,7 +1026,7 @@ JSCODE;
 </script>
 JSCODE;
 
-        self::showTemplate(Theme::file('location'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('location'), ['tpl' => $tpl]);
     }
 
     /**
@@ -1074,7 +1074,7 @@ JSCODE;
 <script>
 </script>
 JSCODE;
-        self::showTemplate(Theme::file('accounts'), ['tpl' => $tpl, 'url' => $api_url]);
+        $this->showTemplate(Theme::file('accounts'), ['tpl' => $tpl, 'url' => $api_url]);
     }
 
     public function idCardPage($params = [])
@@ -1129,7 +1129,7 @@ JSCODE;
 </script>
 JSCODE;
 
-        self::showTemplate(Theme::file('idcard'), ['tpl' => $tpl]);
+        $this->showTemplate(Theme::file('idcard'), ['tpl' => $tpl]);
     }
 
     public function aliAuthPage($cb_url)

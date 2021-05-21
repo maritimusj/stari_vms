@@ -1953,6 +1953,6 @@ class agent
             return ['state' => 'busy', 'msg' => '已启动后台刷新任务，请耐心等待完成！'];
         }
 
-        return error(State::ERROR, '无法启动修复任务，请联系管理员！');
+        return error(State::ERROR, '无法启动刷新任务，请联系管理员！');
     }
 }

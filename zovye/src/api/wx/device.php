@@ -61,7 +61,7 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'location' => isEmptyArray($extra['location.tecent']) ? null : $extra['location.tencent'],
+                    'location' => isEmptyArray($extra['location']['tencent']) ? null : $extra['location']['tencent'],
                     'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
                 ],
             ];
@@ -86,7 +86,7 @@ class device
             ],
             'extra' => [
                 'iccid' => $device->getIccid(),
-                'location' => $extra['location']['tencent'] ?: null,
+                'location' => isEmptyArray($extra['location']['tencent']) ? null : $extra['location']['tencent'],
                 'volume' => intval($extra['volume']),
                 'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
             ],
@@ -167,21 +167,21 @@ class device
         }
 
         //app报告的位置数据
-        $app_loc = $device->get('location.tencent', null);
+        $app_loc = $device->settings('location', []);
         if ($app_loc && is_array($app_loc)) {
             $result['app']['location'] = $app_loc;
         }
 
         //设备默认显示代理商的地区
-        if (isEmptyArray($result['extra']['location']['area'])) {
+        if (isEmptyArray($result['location']['area'])) {            
             if ($agent) {
                 $agent_data = $agent->getAgentData();
                 if (!isEmptyArray($agent_data['area'])) {
-                    $result['extra']['location']['area'] = array_values($agent_data['area']);
+                    $result['location']['area'] = array_values($agent_data['area']);
                 }
             }
         } else {
-            $result['extra']['location']['area'] = array_values($result['extra']['location']['area']);
+            $result['location']['area'] = array_values($result['location']['area']);
         }
 
         return $result;

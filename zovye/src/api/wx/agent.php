@@ -869,8 +869,7 @@ class agent
         if ($total > 0) {
             /** @var deviceModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
-                $extra = $entry->get('extra', []);
-                $address = $extra['location']['address'] ?: '<地址未登记>';
+                $address = $entry->settings('extra.location.tencent.address') ?: '<地址未登记>';
                 $result['list'][] = [
                     'id' => $entry->getImei(),
                     'name' => $entry->getName(),

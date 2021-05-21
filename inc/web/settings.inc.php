@@ -952,7 +952,7 @@ if ($op == 'account') {
 
     $res = Util::getWe7Material($typename, request('page'), request('pagesize'));
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/account/msg',
         [
             'typename' => $typename,
@@ -968,7 +968,7 @@ if ($op == 'account') {
 
 } elseif ($op == 'prizes') {
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/prize/list',
         [
             'entries' => Prize::all(),
@@ -1131,7 +1131,7 @@ if ($op == 'account') {
     ];
 
     if (array_key_exists($type, $types)) {
-        $content = $this->fetchTemplate(
+        $content = app()->fetchTemplate(
             "web/prize/prize-{$type}",
             [
                 'id' => $id,
@@ -1303,4 +1303,4 @@ if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {
 $tpl_data['op'] = $op;
 $tpl_data['settings'] = $settings;
 
-$this->showTemplate("web/settings/{$op}", $tpl_data);
+app()->showTemplate("web/settings/{$op}", $tpl_data);

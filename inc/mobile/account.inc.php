@@ -100,5 +100,5 @@ if ($op == 'default') {
     );
 
     //领取页面
-    $this->getPage($tpl_data);
+    app()->getPage($tpl_data);
 }

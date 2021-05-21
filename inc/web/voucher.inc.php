@@ -19,10 +19,10 @@ $tpl_data = [
 if ($op == 'default') {
 
     if (empty($type)) {
-        $this->showTemplate("web/goods_voucher/default", $tpl_data);
+        app()->showTemplate("web/goods_voucher/default", $tpl_data);
     }
 
-    $this->showTemplate("web/goods_voucher/logs", $tpl_data);
+    app()->showTemplate("web/goods_voucher/logs", $tpl_data);
 
 } elseif ($op == 'logs') {
 
@@ -126,7 +126,7 @@ if ($op == 'default') {
         $tpl_data['voucher_id'] = request::int('id');
     }
 
-    $this->showTemplate("web/goods_voucher/edit", $tpl_data);
+    app()->showTemplate("web/goods_voucher/edit", $tpl_data);
 
 } elseif ($op == 'save') {
 
@@ -262,7 +262,7 @@ if ($op == 'default') {
     $id = request::int('id');
     $voucher = GoodsVoucher::get($id);
     if ($voucher) {
-        $this->showTemplate('web/goods_voucher/assign', [
+        app()->showTemplate('web/goods_voucher/assign', [
             'voucher' => GoodsVoucher::format($voucher, true),
             'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
             'assign_data' => json_encode($voucher->getExtraData('assigned', [])),

@@ -165,7 +165,7 @@ if ($op == 'export') {
 
     $tpl_data['apps'] = $apps;
 
-    $this->showTemplate('web/withdraw/default', $tpl_data);
+    app()->showTemplate('web/withdraw/default', $tpl_data);
 }
 
 function getAndCheckWithdraw($id)
@@ -371,5 +371,5 @@ if ($op == 'withdraw_pay') {
     $tpl_data['data'] = $data;
     $tpl_data['total'] = $total;
 
-    $this->showTemplate('web/withdraw/stat', $tpl_data);
+    app()->showTemplate('web/withdraw/stat', $tpl_data);
 }

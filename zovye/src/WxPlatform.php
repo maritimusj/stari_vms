@@ -191,6 +191,11 @@ class WxPlatform
         return $notify_url;
     }
 
+    /**
+     * 获取授权接入的授权页面网址
+     * @param array $params
+     * @return string
+     */
     public static function getPreAuthUrl(array $params = []): string
     {
         $preAuthCode = self::getPreAuthCode();

@@ -70,7 +70,7 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
         $tpl_data['art'] = $art;
     }
 
-    $this->showTemplate('web/doc/article-op', $tpl_data);
+    app()->showTemplate('web/doc/article-op', $tpl_data);
 
 } elseif ($op == 'art_remove') {
 
@@ -170,7 +170,7 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
         $tpl_data['archive'] = m('files')->findOne(We7::uniacid(['id' => $id]));
     }
 
-    $this->showTemplate('web/doc/files-op', $tpl_data);
+    app()->showTemplate('web/doc/files-op', $tpl_data);
 
 } elseif ($op == 'files_save') {
 
@@ -278,7 +278,7 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
     $tpl_data['id'] = $id;
     $tpl_data['type'] = 'faq';
 
-    $this->showTemplate('web/doc/article-op', $tpl_data);
+    app()->showTemplate('web/doc/article-op', $tpl_data);
 
 } elseif ($op == 'faq_remove') {
 
@@ -296,4 +296,4 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
     Util::itoast('删除失败！', $this->createWebUrl('article', ['op' => 'faq']), 'error');
 }
 
-$this->showTemplate('web/doc/document', $tpl_data);
+app()->showTemplate('web/doc/document', $tpl_data);

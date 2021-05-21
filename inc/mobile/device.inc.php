@@ -191,7 +191,7 @@ if ($op == 'default') {
     $tpl_data['arr'] = $arr;
     $tpl_data['device'] = $device;
 
-    $this->showTemplate(Theme::file('poll_event'), $tpl_data);
+    app()->showTemplate(Theme::file('poll_event'), $tpl_data);
 
 } elseif ($op == 'new_event') {
 
@@ -329,7 +329,7 @@ if ($op == 'default') {
     $tpl_data['the_21th_id'] = $the_21th_id;
     $tpl_data['device'] = $device;
 
-    $this->showTemplate(Theme::file('set_event'), $tpl_data);
+    app()->showTemplate(Theme::file('set_event'), $tpl_data);
 
 
 } elseif ($op == 'save_set') {

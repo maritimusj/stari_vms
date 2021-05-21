@@ -20,7 +20,7 @@ if (empty($user) || $user->isBanned() || !$user->isTester()) {
 
 $op = request::op();
 if (empty($op)) {
-    $this->showTemplate('testing', [
+    app()->showTemplate('testing', [
         'api_url' => Util::murl('testing'),
         'jssdk' => Util::fetchJSSDK(),
     ]);

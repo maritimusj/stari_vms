@@ -69,7 +69,7 @@ if ($op == 'default' || $op == 'device_types') {
     $tpl_data['pager'] = $pager;
     $tpl_data['backer'] = $tpl_data['s_agent'] || $tpl_data['s_keywords'] || isset($tpl_data['s_agentId']);
 
-    $this->showTemplate('web/device-types/default', $tpl_data);
+    app()->showTemplate('web/device-types/default', $tpl_data);
 
 } elseif ($op == 'addDeviceTypes' || $op == 'editDeviceTypes') {
 
@@ -105,7 +105,7 @@ if ($op == 'default' || $op == 'device_types') {
         }        
     }
 
-    $content = $this->fetchTemplate('web/device-types/edit', $tpl_data);
+    $content = app()->fetchTemplate('web/device-types/edit', $tpl_data);
 
     JSON::success([
         'title' => $op == 'addDeviceTypes' ? '添加设备型号' : '编辑设备型号',

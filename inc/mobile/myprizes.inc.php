@@ -63,4 +63,4 @@ if (App::isUserPrizeEnabled()) {
     }
 }
 
-$this->myPrizesPage($tpl_data);
+app()->myPrizesPage($tpl_data);

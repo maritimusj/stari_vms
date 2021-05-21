@@ -44,14 +44,14 @@ if ($op == 'default' || $op == 'goods') {
     $tpl_data['backer'] = $keywords || $agent_id != 0;
 
     if (request::is_ajax()) {
-        $content = $this->fetchTemplate('web/goods/choose', $tpl_data);
+        $content = app()->fetchTemplate('web/goods/choose', $tpl_data);
 
         JSON::success([
             'title' => '选择商品',
             'content' => $content,
         ]);
     }
-    $this->showTemplate('web/goods/default', $tpl_data);
+    app()->showTemplate('web/goods/default', $tpl_data);
 
 } elseif ($op == 'search') {
 
@@ -86,9 +86,9 @@ if ($op == 'default' || $op == 'goods') {
     }
 
     if (empty(request('type'))) {
-        $content = $this->fetchTemplate('web/goods/edit', $params);
+        $content = app()->fetchTemplate('web/goods/edit', $params);
     } else {
-        $content = $this->fetchTemplate('web/goods/edit_lottery', $params);
+        $content = app()->fetchTemplate('web/goods/edit_lottery', $params);
     }
 
     JSON::success([
@@ -229,7 +229,7 @@ if ($op == 'default' || $op == 'goods') {
         JSON::fail('找不到这个商品！');
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/goods/appendage',
         [
             'goods' => Goods::format($goods),
@@ -284,7 +284,7 @@ if ($op == 'default' || $op == 'goods') {
     $title = date('n月d日');
     $data = Stats::chartDataOfDay($goods, time(), "商品：{$goods->getName()}({$title})");
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/goods/stats',
         [
             'chartid' => Util::random(10),

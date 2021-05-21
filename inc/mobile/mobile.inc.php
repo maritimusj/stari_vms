@@ -155,7 +155,7 @@ if ($op == 'save') {
     }
 }
 
-$this->mobilePage(
+app()->mobilePage(
     [
         'user' =>
             [

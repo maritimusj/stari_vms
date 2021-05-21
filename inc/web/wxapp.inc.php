@@ -22,7 +22,7 @@ if ($op == 'add' || $op == 'edit') {
         $tpl_data['wxapp'] = $wxapp;
     }  
 
-    $content = $this->fetchTemplate('web/wxapp/edit_new', $tpl_data);
+    $content = app()->fetchTemplate('web/wxapp/edit_new', $tpl_data);
     JSON::success([
         'title' => $op == 'add' ? '创建小程序' : '编辑小程序',
         'content' => $content,

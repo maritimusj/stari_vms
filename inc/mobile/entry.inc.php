@@ -91,7 +91,7 @@ if ($device_id) {
             )) {
             //设备扫描页面
             $tpl_data = Util::getTplData([$user, $account]);
-            $this->scanPage($tpl_data);
+            app()->scanPage($tpl_data);
         }
 
         //记录公众号ID
@@ -159,7 +159,7 @@ if (Util::isAliAppContainer()) {
             'account' => $account_id,
             'xid' => $xid,
         ]);
-        $this->aliAuthPage($cb_url);
+        app()->aliAuthPage($cb_url);
     }
 }
 
@@ -176,7 +176,7 @@ if ($user->isBanned()) {
 
 if (App::isUserVerify18Enabled()) {
     if(!$user->isIDCardVerified()) {
-        $this->showTemplate(Theme::file('verify_18'), [
+        app()->showTemplate(Theme::file('verify_18'), [
             'verify18' => settings('user.verify_18', []),
             'entry_url' => $this->createMobileUrl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
         ]);
@@ -187,7 +187,7 @@ if ($from == 'device') {
     if (time() - $device->settings('last.online', 0) > 60) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = Util::getTplData([$device, $user]);
-        $this->devicePreparePage($tpl_data);
+        app()->devicePreparePage($tpl_data);
     }
     $user->remove('last');
 } else {
@@ -205,7 +205,7 @@ if (is_callable($cb)) {
 if (empty($device)) {
     //设备扫描页面
     $tpl_data = Util::getTplData([$user, $account]);
-    $this->scanPage($tpl_data);
+    app()->scanPage($tpl_data);
 }
 
 //检查用户定位
@@ -234,7 +234,7 @@ if (Util::mustValidateLocation($user, $device)) {
     );
 
     //定位页面
-    $this->locationPage($tpl_data);
+    app()->locationPage($tpl_data);
 }
 
 if ($account)  {
@@ -256,7 +256,7 @@ if (empty($account)) {
     $tpl_data = Util::getTplData([$user, $device]);
     $tpl_data['from'] = $from;
     //设备首页
-    $this->devicePage($tpl_data);
+    app()->devicePage($tpl_data);
 }
 
 //处理多个关注二维码
@@ -267,7 +267,7 @@ if ($more_accounts) {
     $tpl_data['accounts'] = $more_accounts;
 
     //显示更多关注页面
-    $this->moreAccountsPage($tpl_data);
+    app()->moreAccountsPage($tpl_data);
 }
 
 $ticket_data = [
@@ -294,4 +294,4 @@ $tpl_data = Util::getTplData(
 );
 
 //领取页面
-$this->getPage($tpl_data);
+app()->getPage($tpl_data);

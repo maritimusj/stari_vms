@@ -233,6 +233,14 @@ class CtrlServ
         return false;
     }
 
+    /**
+     * 根据设备分配数据，计算需要通知的APP, 并推送通知
+     * @param array $original 原分配数据
+     * @param array $data 新的分配数据
+     * @param string $op 命令
+     * @param array $payload 数据
+     * @return bool
+     */
     public static function appNotifyAll(array $original, array $data = [], $op = 'update', $payload = []): bool
     {
         $topics = [];

@@ -8,4 +8,4 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$this->showTemplate('web/common/assign');
+app()->showTemplate('web/common/assign');

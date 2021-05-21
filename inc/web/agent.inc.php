@@ -164,7 +164,7 @@ if ($op == 'default') {
 
     $tpl_data['agent_levels'] = $agent_levels;
 
-    $this->showTemplate('web/agent/default', $tpl_data);
+    app()->showTemplate('web/agent/default', $tpl_data);
 } elseif ($op == 'agent_sub') {
     $tpl_data = [
         'user_state_class' => [
@@ -252,7 +252,7 @@ if ($op == 'default') {
 
     $tpl_data['sup'] = $sup_agent->profile();
 
-    $this->showTemplate('web/agent/agent_sub', $tpl_data);
+    app()->showTemplate('web/agent/agent_sub', $tpl_data);
 } elseif (in_array($op, ['create', 'edit', 'agent_base', 'agent_funcs', 'agent_notice', 'agent_commission', 'agent_misc', 'agent_payment'])) {
 
     $id = request::int('id');
@@ -365,7 +365,7 @@ if ($op == 'default') {
         }
     }
 
-    $this->showTemplate('web/agent/edit', [
+    app()->showTemplate('web/agent/edit', [
         'op' => $op,
         'agent_levels' => $agent_levels,
         'id' => $id,
@@ -778,7 +778,7 @@ if ($op == 'default') {
     }
 
     $title = $datetime->format('Y年n月');
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/agent/stats',
         [
             'chartid' => Util::random(10),
@@ -841,7 +841,7 @@ if ($op == 'default') {
         return $months;
     }, $agent->getId());
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/agent/agent-stats',
         [
             'agent' => $agent,
@@ -911,7 +911,7 @@ if ($op == 'default') {
         }
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/agent/agent-msg',
         [
             'agent' => $agent,
@@ -946,7 +946,7 @@ if ($op == 'default') {
         }
     }
 
-    $this->showTemplate('web/agent/partner', [
+    app()->showTemplate('web/agent/partner', [
         'op' => $op,
         'id' => $id,
         'agent' => $agent,
@@ -978,7 +978,7 @@ if ($op == 'default') {
 
     $partner_data['mobile'] = $user->getMobile();
 
-    $this->showTemplate('web/agent/partner-edit', [
+    app()->showTemplate('web/agent/partner-edit', [
         'op' => $op,
         'agent_id' => $agent_id,
         'user_id' => $user_id,
@@ -1012,7 +1012,7 @@ if ($op == 'default') {
     $agent_data = $agent->getAgentData();
     $notice = $agent_data['partners'][$user->getId()]['notice'] ?: [];
 
-    $this->showTemplate('web/agent/partner-edit', [
+    app()->showTemplate('web/agent/partner-edit', [
         'op' => $op,
         'agent_id' => $agent_id,
         'user_id' => $user_id,
@@ -1148,7 +1148,7 @@ if ($op == 'default') {
         ];
     }
 
-    $this->showTemplate('web/agent/app', [
+    app()->showTemplate('web/agent/app', [
         'op' => $op,
         'pager' => $pager,
         'apps' => $apps,
@@ -1228,7 +1228,7 @@ if ($op == 'default') {
         ];
     }
 
-    $this->showTemplate('web/agent/msg', [
+    app()->showTemplate('web/agent/msg', [
         'op' => $op,
         'pager' => $pager,
         'messages' => $messages,
@@ -1246,7 +1246,7 @@ if ($op == 'default') {
         }
     }
 
-    $this->showTemplate('web/agent/msg-edit', $tpl_data);
+    app()->showTemplate('web/agent/msg-edit', $tpl_data);
 } elseif ($op == 'msgsave') {
 
     $id = request::int('id');
@@ -1363,7 +1363,7 @@ if ($op == 'default') {
         $tpl_data['back_url'] = $this->createWebUrl('agent', ['op' => 'partner', 'id' => $user->getAgentId()]);
     }
 
-    $this->showTemplate('web/agent/agent-msg', $tpl_data);
+    app()->showTemplate('web/agent/agent-msg', $tpl_data);
 } elseif ($op == 'msglist_remove') {
 
     $id = request::int('id');
@@ -1440,7 +1440,7 @@ if ($op == 'default') {
             }
         }
 
-        $content = $this->fetchTemplate(
+        $content = app()->fetchTemplate(
             'web/common/commission-log',
             [
                 'user' => $user,
@@ -1518,7 +1518,7 @@ if ($op == 'default') {
                     $tpl_data['val'] = number_format($data['amount'] / 100, 2);
                 }
             }
-            $this->showTemplate('web/agent/free-edit-user', $tpl_data);
+            app()->showTemplate('web/agent/free-edit-user', $tpl_data);
         } elseif ($from == 'mixed') {
             if ($fn == 'adduser') {
                 $user = User::get(request::int('id'));
@@ -1545,7 +1545,7 @@ if ($op == 'default') {
                 $tpl_data['user'] = $user;
             }
 
-            $this->showTemplate('web/agent/mixed-edit-user', $tpl_data);
+            app()->showTemplate('web/agent/mixed-edit-user', $tpl_data);
         } else {
             Util::resultAlert('不正确的操作！', 'error');
         }
@@ -1676,7 +1676,7 @@ if ($op == 'default') {
 
         $tpl_data['level'] = request::trim('level', '');
 
-        $content = $this->fetchTemplate('web/agent/gsp-add-role', $tpl_data);
+        $content = app()->fetchTemplate('web/agent/gsp-add-role', $tpl_data);
         JSON::success([
             'title' => '设置角色',
             'content' => $content,
@@ -1806,7 +1806,7 @@ if ($op == 'default') {
         ];
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/agent/keepers',
         [
             'list' => $result,
@@ -1888,7 +1888,7 @@ if ($op == 'default') {
 
     $page_name = request::trim('page_name', 'default');
 
-    $this->showTemplate("web/agent/detail/{$page_name}", [
+    app()->showTemplate("web/agent/detail/{$page_name}", [
         'pages' => $pages,
         'id' => $id,
         'page_name' => $page_name,
@@ -2121,7 +2121,7 @@ if ($op == 'default') {
         }
     }
     $e_date->modify('-1 day');
-    $this->showTemplate('web/common/commission_export', [
+    app()->showTemplate('web/common/commission_export', [
             'title' => $title,
             'logs' => $logs,
             'pager' => $pager,

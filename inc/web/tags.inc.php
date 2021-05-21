@@ -82,7 +82,7 @@ if ($op == 'default') {
         $tags['serial'] = request('serial') ?: microtime(true) . '';
         JSON::success($tags);
     } else {
-        $this->showTemplate('web/tags/default', [
+        app()->showTemplate('web/tags/default', [
             'op' => $op,
             'tags' => $tags,
         ]);

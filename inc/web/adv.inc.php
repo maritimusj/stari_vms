@@ -315,7 +315,7 @@ if ($op == 'default') {
     $assigned = $res->settings('assigned', []);
     $assigned = isEmptyArray($assigned) ? [] : $assigned;
 
-    $this->showTemplate('web/adv/assign', [
+    app()->showTemplate('web/adv/assign', [
         'adv' => $adv,
         'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
         'assign_data' => json_encode($assigned),
@@ -557,7 +557,7 @@ if ($op == 'default') {
     $typename = request::trim('typename');
     $res = Util::getWe7Material($typename, request('page'), request('pagesize'));
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/adv/msg',
         [
             'typename' => $typename,
@@ -597,7 +597,7 @@ if ($op == 'default') {
 
     $assigned = Config::aliTicket('assign', []);
 
-    $this->showTemplate('web/adv/assign_ali_ticket', [
+    app()->showTemplate('web/adv/assign_ali_ticket', [
         'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
         'assign_data' => json_encode($assigned),
         'agent_url' => $this->createWebUrl('agent'),
@@ -618,4 +618,4 @@ if ($op == 'default') {
 }
 
 $filename = Advertising::$names[$type];
-$this->showTemplate("web/adv/{$filename}", $tpl_data);
+app()->showTemplate("web/adv/{$filename}", $tpl_data);

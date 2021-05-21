@@ -494,7 +494,7 @@ CODE;
 
     $tpl_data['js']['code'] = $js_code;
 
-    $this->showTemplate(Theme::file('order'), ['tpl' => $tpl_data]);
+    app()->showTemplate(Theme::file('order'), ['tpl' => $tpl_data]);
 
 } elseif ($op == 'feedback') {
 
@@ -559,5 +559,5 @@ CODE;
 
     $tpl_data['js']['code'] = $js_code;
 
-    $this->showTemplate(Theme::file('feedback'), ['tpl' => $tpl_data]);
+    app()->showTemplate(Theme::file('feedback'), ['tpl' => $tpl_data]);
 }

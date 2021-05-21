@@ -52,7 +52,7 @@ if ($op == 'default') {
         }
     }
 
-    $this->showTemplate(Theme::file('payresult'), [
+    app()->showTemplate(Theme::file('payresult'), [
         'tpl' => $tpl,
         'url' => Util::murl('order', ['op' => 'result', 'orderNO' => $order_no]),
         'idcard_url' => Util::murl('idcard', ['orderNO' => $order_no]),

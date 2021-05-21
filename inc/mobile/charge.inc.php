@@ -55,4 +55,4 @@ foreach ($query->findAll() as $i) {
     ];
 }
 
-$this->chargePage($tpl_data);
+app()->chargePage($tpl_data);

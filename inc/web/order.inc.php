@@ -234,7 +234,7 @@ if ($op == 'default') {
             $data['device'] = $device;
         }
 
-        $content = $this->fetchTemplate('web/order/list', $data);
+        $content = app()->fetchTemplate('web/order/list', $data);
 
         JSON::success([
             'title' => '',
@@ -248,7 +248,7 @@ if ($op == 'default') {
     $tpl_data['orders'] = $orders;
     $tpl_data['accounts'] = $accounts;
 
-    $this->showTemplate('web/order/default', $tpl_data);
+    app()->showTemplate('web/order/default', $tpl_data);
 } elseif ($op == 'preRefund') {
 
     $id = request::int('id');
@@ -281,7 +281,7 @@ if ($op == 'default') {
         $tpl['user'] = $user->profile();
     }
 
-    $content = $this->fetchTemplate('web/order/refund', $tpl);
+    $content = app()->fetchTemplate('web/order/refund', $tpl);
 
     JSON::success([
         'title' => '订单退款',
@@ -367,7 +367,7 @@ if ($op == 'default') {
         $list[] = $data;
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/order/pulls',
         [
             'list' => $list,
@@ -383,7 +383,7 @@ if ($op == 'default') {
         JSON::fail($result);
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/order/detail',
         [
             'list' => $result,
@@ -400,7 +400,7 @@ if ($op == 'default') {
     $tpl_data['s_date'] = (new DateTime('first day of this month'))->format('Y-m-d');
     $tpl_data['e_date'] = (new DateTime())->format('Y-m-d');
 
-    $this->showTemplate('web/order/export', $tpl_data);
+    app()->showTemplate('web/order/export', $tpl_data);
 
 } elseif ($op == 'export_do') {
 
@@ -659,7 +659,7 @@ if ($op == 'default') {
     $tpl_data['logs'] = $logs;
     $tpl_data['way'] = 'pay';
 
-    $this->showTemplate('web/order/log', $tpl_data);
+    app()->showTemplate('web/order/log', $tpl_data);
 } elseif ($op == 'stat') {
 
     //统计 订单金额
@@ -711,7 +711,7 @@ if ($op == 'default') {
     $tpl_data['data'] = array_reverse($data);
     $tpl_data['total'] = $total;
 
-    $this->showTemplate('web/order/stat', $tpl_data);
+    app()->showTemplate('web/order/stat', $tpl_data);
 }
 
 /**

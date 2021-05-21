@@ -161,4 +161,4 @@ if ($op == 'default') {
     Util::itoast('失败！', $this->createWebUrl('qrcode'), 'error');
 }
 
-$this->showTemplate('web/qrcode/default', $tpl_data);
+app()->showTemplate('web/qrcode/default', $tpl_data);

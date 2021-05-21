@@ -34,16 +34,16 @@ if ($op == 'default') {
 
     $balance = $user->getCommissionBalance()->total();
 
-    $this->showTemplate('gspor', [
+    app()->showTemplate('gspor', [
         'balance' => $balance,
         'balance_formatted' => number_format($balance / 100, 2),
     ]);
 
 } elseif ($op == 'req') {
 
-    $this->showTemplate('withdraw');
+    app()->showTemplate('withdraw');
 
 } elseif ($op == 'logs') {
 
-    $this->showTemplate('record');
+    app()->showTemplate('record');
 }

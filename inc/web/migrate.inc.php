@@ -19,7 +19,7 @@ if ($op == 'default') {
         exit();
     }
 
-    $this->showTemplate('web/migrate/default', [
+    app()->showTemplate('web/migrate/default', [
         'total' => count($task),
     ]);
 

@@ -35,7 +35,7 @@ if ($op == 'default') {
         $devices[] = $device;
     }
      */
-    $this->showTemplate('app', [
+    app()->showTemplate('app', [
         'js_code' => Util::fetchJSSDK(),
         'op' => $op,
         'appId' => $app_id,

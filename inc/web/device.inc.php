@@ -81,7 +81,7 @@ if ($op == 'list') {
         ];
     }
 
-    $this->showTemplate('web/device/default_new', $tpl_data);
+    app()->showTemplate('web/device/default_new', $tpl_data);
 } elseif ($op == 'search') {
 
     $result = [];
@@ -410,7 +410,7 @@ if ($op == 'list') {
         $tpl_data['moscaleRegionSaved'] = is_array($extra) ? $extra['moscale']['region'] : [];
     }
 
-    $this->showTemplate('web/device/edit_new', $tpl_data);
+    app()->showTemplate('web/device/edit_new', $tpl_data);
 } elseif ($op == 'deviceTestAll') {
 
     $device = Device::get(request('id'));
@@ -418,7 +418,7 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/device/cargo_lanes_test',
         [
             'is_vd' => $device->isVDevice(),
@@ -917,7 +917,7 @@ if ($op == 'list') {
     }
     $tpl_data['accounts'] = $accounts;
 
-    $tpl_data['day_stats'] = $this->fetchTemplate(
+    $tpl_data['day_stats'] = app()->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
@@ -927,7 +927,7 @@ if ($op == 'list') {
         ]
     );
 
-    $tpl_data['month_stats'] = $this->fetchTemplate(
+    $tpl_data['month_stats'] = app()->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
@@ -943,7 +943,7 @@ if ($op == 'list') {
     $tpl_data['mcb_online'] = $device->isMcbOnline();
     $tpl_data['app_online'] = $device->isAppOnline();
 
-    $this->showTemplate('web/device/detail', $tpl_data);
+    app()->showTemplate('web/device/detail', $tpl_data);
 } elseif ($op == 'log') {
 
     $device = Device::get(request('id'));
@@ -1039,7 +1039,7 @@ if ($op == 'list') {
     $tpl_data['logs'] = $logs;
     $tpl_data['device'] = $device;
 
-    $this->showTemplate('web/device/log', $tpl_data);
+    app()->showTemplate('web/device/log', $tpl_data);
 } elseif ($op == 'event') {
 
     $device = Device::get(request('id'));
@@ -1097,7 +1097,7 @@ if ($op == 'list') {
     $tpl_data['events'] = $events;
     $tpl_data['device'] = $device;
 
-    $this->showTemplate('web/device/event', $tpl_data);
+    app()->showTemplate('web/device/event', $tpl_data);
 } elseif ($op == 'daystats') {
 
     $device = Device::get(request('id'));
@@ -1106,7 +1106,7 @@ if ($op == 'list') {
     }
 
     $title = date('n月d日');
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
@@ -1132,7 +1132,7 @@ if ($op == 'list') {
 
     $title = date('Y年n月', $month);
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/device/stats',
         [
             'chartid' => Util::random(10),
@@ -1250,7 +1250,7 @@ if ($op == 'list') {
 
         return [];
     });
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/device/all-stats',
         [
             'device' => $device,
@@ -1287,7 +1287,7 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/device/confirm',
         [
             'device_id' => $device->getId(),
@@ -1452,7 +1452,7 @@ if ($op == 'list') {
     $tpl_data['filter'] = $filter;
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
-    $this->showTemplate('web/device/report_list', $tpl_data);
+    app()->showTemplate('web/device/report_list', $tpl_data);
 } elseif ($op == 'group') {
     $query = Group::query();
 
@@ -1590,13 +1590,13 @@ if ($op == 'list') {
     $tpl_data['agentId'] = isset($agent_id) ? $agent_id : null;
     $tpl_data['navs'] = $navs;
 
-    $this->showTemplate('web/device/new_group', $tpl_data);
+    app()->showTemplate('web/device/new_group', $tpl_data);
 } elseif ($op == 'new_group_add') {
 
     $tpl_data['op'] = $op;
     $tpl_data['clr'] = Util::randColor();
 
-    $this->showTemplate('web/device/new_group', $tpl_data);
+    app()->showTemplate('web/device/new_group', $tpl_data);
 } elseif ($op == 'new_group_edit') {
 
     $id = request::int('id');
@@ -1625,7 +1625,7 @@ if ($op == 'list') {
         ];
     }
 
-    $this->showTemplate('web/device/new_group', $tpl_data);
+    app()->showTemplate('web/device/new_group', $tpl_data);
 } elseif ($op == 'new_group_save') {
 
     $title = request::trim('title');
@@ -1866,7 +1866,7 @@ if ($op == 'list') {
 
         $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
-        $this->showTemplate('web/device/record', $tpl_data);
+        app()->showTemplate('web/device/record', $tpl_data);
     }
 } else if ($op == 'feed_back') {
 
@@ -1954,7 +1954,7 @@ if ($op == 'list') {
     $tpl_data['data'] = $data;
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
     
-    $this->showTemplate('web/device/feedback', $tpl_data);
+    app()->showTemplate('web/device/feedback', $tpl_data);
 } else if ($op == 'deal_fb') {
 
     //处理反馈
@@ -1989,7 +1989,7 @@ if ($op == 'list') {
         JSON::fail('找不到该记录！');
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/device/deal_fb',
         [
             'chartid' => Util::random(10),
@@ -2002,7 +2002,7 @@ if ($op == 'list') {
 } else if ($op == 'import_bluetooth_device_upload') {
 
     $tpl_data = [];
-    $this->showTemplate('web/device/bluetooth_upload', $tpl_data);
+    app()->showTemplate('web/device/bluetooth_upload', $tpl_data);
 } else if ($op == 'create_bluetooth_device') {
 
     $data = [
@@ -2162,7 +2162,7 @@ if ($op == 'list') {
     $tpl_data['events'] = $events;
     $tpl_data['the_first_id'] = $the_first_id;
 
-    $this->showTemplate('web/device/poll_event', $tpl_data);
+    app()->showTemplate('web/device/poll_event', $tpl_data);
 } elseif ($op == 'new_event') {
 
     $device = Device::get(request('id'));

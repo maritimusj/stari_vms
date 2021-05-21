@@ -153,7 +153,7 @@ if ($op == 'default') {
         }
     }
 
-    $this->showTemplate('web/account/default', [
+    app()->showTemplate('web/account/default', [
         'agent' => isset($agent) ? $agent : null,
         'accounts' => $accounts,
         'banned' => $banned,
@@ -466,7 +466,7 @@ if ($op == 'default') {
         $config = $account->get('config');
     }
 
-    $this->showTemplate('web/account/edit', [
+    app()->showTemplate('web/account/edit', [
         'op' => $op,
         'type' => $type,
         'id' => $id,
@@ -481,7 +481,7 @@ if ($op == 'default') {
     ]);
 
 } elseif ($op == 'add') {
-    $this->showTemplate('web/account/edit', [
+    app()->showTemplate('web/account/edit', [
         'clr' => Util::randColor(),
         'op' => $op,
         'type' => request::int('type', Account::NORMAL),
@@ -561,7 +561,7 @@ if ($op == 'default') {
     $assigned = $account->settings('assigned', []);
     $assigned = isEmptyArray($assigned) ? [] : $assigned;
 
-    $this->showTemplate('web/account/assign_v', [
+    app()->showTemplate('web/account/assign_v', [
         'id' => $id,
         'commission_enabled' => $commission_enabled,
         'account' => $data,
@@ -656,7 +656,7 @@ if ($op == 'default') {
     $caption = date('Y年n月', strtotime($time));
     $data = Stats::chartDataOfMonth($acc, $time, "公众号：{$title}({$caption})");
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/account/stats',
         [
             'chartid' => 'chart-' . Util::random(10),
@@ -677,7 +677,7 @@ if ($op == 'default') {
 
     $title = $acc->getTitle();
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/account/stats_history',
         [
             'id' => $id,
@@ -799,7 +799,7 @@ if ($op == 'default') {
     $e_date->modify('-1 day');
     $tpl_data['e_date'] = $e_date->format('Y-m-d');
 
-    $this->showTemplate('web/account/platform_stat', $tpl_data);
+    app()->showTemplate('web/account/platform_stat', $tpl_data);
 
 } elseif ($op == 'accountAuthorize') {
 
@@ -808,7 +808,7 @@ if ($op == 'default') {
         JSON::fail('暂时无法获取授权转跳网址！');
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/account/authorize',
         [
             'url' => $url,

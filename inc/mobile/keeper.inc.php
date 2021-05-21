@@ -64,7 +64,7 @@ if ($op == 'save') {
     }
 }
 
-$this->keeperPage(
+app()->keeperPage(
     [
         'user' =>
             [

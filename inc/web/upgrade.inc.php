@@ -72,7 +72,7 @@ if ($op == 'apk') {
             }
         }
 
-        $content = $this->fetchTemplate(
+        $content = app()->fetchTemplate(
             'web/version/list',
             [
                 'lastUpgradeInfo' => $lastUpgradeInfo,
@@ -84,7 +84,7 @@ if ($op == 'apk') {
         JSON::success(['title' => "请选择要升级的版本(设备：{$device_name})", 'content' => $content]);
     }
 
-    $this->showTemplate('web/version/upgrade', [
+    app()->showTemplate('web/version/upgrade', [
         'deviceid' => $device_id,
         'all' => $all,
     ]);

@@ -50,13 +50,13 @@ if ($op == 'stats') {
         ];
     });
 
-    $content = $this->fetchTemplate('web/home/stats', $data);
+    $content = app()->fetchTemplate('web/home/stats', $data);
 
     JSON::success(['content' => $content]);
 
 } elseif ($op == 'agents_chartdata') {
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/home/chart',
         [
             'chartid' => Util::random(10),
@@ -71,7 +71,7 @@ if ($op == 'stats') {
 
 } elseif ($op == 'devices_chartdata') {
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/home/chart',
         [
             'chartid' => Util::random(10),
@@ -86,7 +86,7 @@ if ($op == 'stats') {
 
 } elseif ($op == 'accounts_chartdata') {
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/home/chart',
         [
             'chartid' => Util::random(10),
@@ -100,6 +100,6 @@ if ($op == 'stats') {
     JSON::success(['content' => $content]);
 }
 
-$this->showTemplate('web/home/default', [
+app()->showTemplate('web/home/default', [
     'url' => Util::url('homepage'),
 ]);

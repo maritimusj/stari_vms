@@ -207,7 +207,7 @@ if ($op == 'default') {
 
     $tpl_data['users'] = $users;
 
-    $this->showTemplate('web//user/default', $tpl_data);
+    app()->showTemplate('web//user/default', $tpl_data);
 
 } elseif ($op == 'user_stats') {
 
@@ -466,7 +466,7 @@ if ($op == 'default') {
         }
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/common/balance-log',
         [
             'log' => $log,
@@ -521,7 +521,7 @@ if ($op == 'default') {
         $list[] = $data;
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/user/keeper_device',
         [
             'devices' => $list,
@@ -585,7 +585,7 @@ if ($op == 'default') {
         }
     }
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/user/keeper_replenish',
         [
             'goods_assoc' => $goods_assoc,
@@ -653,7 +653,7 @@ if ($op == 'default') {
 
     krsort($data);
 
-    $content = $this->fetchTemplate(
+    $content = app()->fetchTemplate(
         'web/user/month_stat',
         [
             'data' => $data,
@@ -684,7 +684,7 @@ if ($op == 'default') {
             JSON::fail('没有找到这个用户！');
         }
 
-        $content = $this->fetchTemplate(
+        $content = app()->fetchTemplate(
             'web/common/balance-edit',
             [
                 'user' => [
@@ -776,7 +776,7 @@ if ($op == 'default') {
                     }
                 }
 
-                $content = $this->fetchTemplate(
+                $content = app()->fetchTemplate(
                     'web/prize/prize-log',
                     [
                         'prizes' => $prizes,

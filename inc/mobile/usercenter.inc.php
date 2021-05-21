@@ -43,5 +43,5 @@ if ($op == 'default') {
         }
     }
 
-    $this->userCenterPage($tpl_data);
+    app()->userCenterPage($tpl_data);
 }

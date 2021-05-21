@@ -8,6 +8,10 @@ use Exception;
 
 class JSON
 {
+    /**
+     * 向请求者返回JSON数据
+     * @param $data
+     */
     public static function result($data)
     {
         if (is_error($data) || $data instanceof Exception) {
@@ -16,6 +20,10 @@ class JSON
         self::success($data);
     }
 
+    /**
+     * 向请求者返回成功的JSON数据
+     * @param array $data
+     */
     public static function success($data = [])
     {
         if (is_string($data)) {
@@ -25,6 +33,10 @@ class JSON
         Util::resultJSON(true, $data);
     }
 
+    /**
+     * 向请求者返回失败的JSON数据，支持直接传入error结构，Exception对象等等
+     * @param array $data
+     */
     public static function fail($data = [])
     {
         if (is_string($data)) {

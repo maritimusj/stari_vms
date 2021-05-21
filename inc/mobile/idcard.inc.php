@@ -27,7 +27,7 @@ if ($op == 'default') {
         $device_id = $data['orderData']['deviceId'];
     }
 
-    $this->idCardPage(
+    app()->idCardPage(
         [
             'deviceid' => $device_id,
             'orderNO' => $order_no,

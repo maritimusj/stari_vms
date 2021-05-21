@@ -15,7 +15,7 @@ $op = request::op('default');
 if ($op == 'default') {
 
     $js_sdk = Util::fetchJSSDK();
-    $this->showTemplate('map', ['jssdk' => $js_sdk]);
+    app()->showTemplate('map', ['jssdk' => $js_sdk]);
 } else if ($op == 'data') {
 
     //请求附近设备数据
@@ -202,5 +202,5 @@ if ($op == 'default') {
         }
     }
 
-    $this->showTemplate('review', $tpl_data);
+    app()->showTemplate('review', $tpl_data);
 }

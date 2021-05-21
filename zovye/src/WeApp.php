@@ -36,7 +36,7 @@ class WeApp extends Settings
 
         extract($tpl_data);
 
-        include WeApp::template($filename);
+        include self::template($filename);
         exit();
     }
 
@@ -61,6 +61,16 @@ class WeApp extends Settings
         }
 
         return $compile;
+    }
+
+    public function createWebUrl($do, $params = []): string
+    {
+        return Util::url($do, $params);
+    }
+
+    public function createMobileUrl($do, $params = []): string
+    {
+        return Util::murl($do, $params);
     }
 
     public function forceUnlock(): bool
@@ -296,7 +306,7 @@ class WeApp extends Settings
     })
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('scan'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('scan'), ['tpl' => $tpl]);
     }
 
     /**
@@ -365,7 +375,7 @@ JSCODE;
         //             }
         //         }
         $tpl['js']['code'] .= "\r\n</script>";
-        WeApp::showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
     }
 
     /**
@@ -569,7 +579,7 @@ JSCODE;
             $tpl['js']['code'] .= "\r\n{$js}\r\n";
         }
 
-        WeApp::showTemplate(Theme::file('device'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('device'), ['tpl' => $tpl]);
     }
 
     /**
@@ -659,7 +669,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('get'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('get'), ['tpl' => $tpl]);
     }
 
     /**
@@ -705,7 +715,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('usercenter'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('usercenter'), ['tpl' => $tpl]);
     }
 
     /**
@@ -734,7 +744,7 @@ JSCODE;
 </script>
 JSCODE;
 
-        WeApp::showTemplate(Theme::file('myprizes'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('myprizes'), ['tpl' => $tpl]);
     }
 
     /**
@@ -812,7 +822,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('charge'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('charge'), ['tpl' => $tpl]);
     }
 
     /**
@@ -894,7 +904,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('mobile'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('mobile'), ['tpl' => $tpl]);
     }
 
     public function keeperPage($params = [])
@@ -946,7 +956,7 @@ JSCODE;
     }
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('keeper'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('keeper'), ['tpl' => $tpl]);
     }
 
     /**
@@ -1016,7 +1026,7 @@ JSCODE;
 </script>
 JSCODE;
 
-        WeApp::showTemplate(Theme::file('location'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('location'), ['tpl' => $tpl]);
     }
 
     /**
@@ -1064,7 +1074,7 @@ JSCODE;
 <script>
 </script>
 JSCODE;
-        WeApp::showTemplate(Theme::file('accounts'), ['tpl' => $tpl, 'url' => $api_url]);
+        self::showTemplate(Theme::file('accounts'), ['tpl' => $tpl, 'url' => $api_url]);
     }
 
     public function idCardPage($params = [])
@@ -1119,7 +1129,7 @@ JSCODE;
 </script>
 JSCODE;
 
-        WeApp::showTemplate(Theme::file('idcard'), ['tpl' => $tpl]);
+        self::showTemplate(Theme::file('idcard'), ['tpl' => $tpl]);
     }
 
     public function aliAuthPage($cb_url)

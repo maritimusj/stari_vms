@@ -344,8 +344,8 @@ class device
         $location = function (deviceModelObj $device) {
             $extra = $device->get('extra', []);
             //位置
-            if ($extra['location']['area']) {
-                return array_values($extra['location']['area']);
+            if ($extra['location']['tencent']['area']) {
+                return array_values($extra['location']['tencent']['area']);
             } else {
                 $agent = $device->getAgent();
                 if ($agent) {

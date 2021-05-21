@@ -95,9 +95,12 @@
         width: 1.5em;
         height: 1.5em;
     }
-    #devicelist sup {
+    #devicelist sup.bluetooth {
         color: #009688;
     }
+    #devicelist sup.vdevice {
+        color: #4caf50;
+    }    
     #devicelist .status .error {
         color: red;
     }
@@ -395,10 +398,10 @@
                             <div class="devicename" :title="o.address">
                                 {{o.name}}
                                 <template v-if="o.isVD">
-                                    <sup title="虚拟设备">[ 虚拟 ]</sup>
+                                    <sup class="vdevice" title="虚拟设备">[ 虚拟 ]</sup>
                                 </template>                            
                                 <template v-if="o.isBluetooth">
-                                    <sup :title="'蓝牙设备 ' + o.BUID">[ 蓝牙 ]
+                                    <sup class="bluetooth" :title="'蓝牙设备 ' + o.BUID">[ 蓝牙 ]
                                 </template>
                                 <template v-if="o.isDown">
                                     <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消">

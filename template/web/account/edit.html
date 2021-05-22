@@ -158,7 +158,7 @@
                 </div> 
             </div>
             {/if}
-            {if !$account->useAccountQRCode()}
+            {if empty($account) || !$account->useAccountQRCode()}
                 <div class="seg">
                     <div class="title">用户限制</div>
                     <div class="form-group">

@@ -212,7 +212,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V2_STARTUP => [
-            'title' => '[v2]主板起动',
+            'title' => '[v2]主板启动',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onMcbStartup',
             'params' => [
                 'log' => [

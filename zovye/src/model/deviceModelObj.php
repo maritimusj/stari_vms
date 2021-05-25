@@ -2482,6 +2482,8 @@ class deviceModelObj extends modelObj
                             'price' => $goods_data['price'],
                             'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2) . '元',
                             'num' => intval($goods_data['num']),
+                            'allowFree' => $goods_data['allowFree'],
+                            'allowPay' => $goods_data['allowPay'],
                         ];
 
                         if (!empty($user)) {

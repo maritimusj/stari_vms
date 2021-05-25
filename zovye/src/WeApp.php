@@ -95,7 +95,7 @@ class WeApp extends Settings
             return Util::lockObject($global, [OBJ_LOCKED_UID => UNLOCKED], true);
         }
 
-        return null;        
+        return null;
     }
 
     public function isLocked(): bool
@@ -129,7 +129,7 @@ class WeApp extends Settings
         global $do;
 
         if ($do != 'migrate') {
-            Util::cachedCall(10, function() {
+            Util::cachedCall(10, function () {
                 Migrate::detect(true);
             });
         }
@@ -408,17 +408,6 @@ JSCODE;
             ]);
         }
 
-        foreach ($tpl['accounts'] as $index => $account) {
-            if (!empty($account['redirect_url'])) {
-                //链接转跳前，先判断设备是否在线
-                if ($device->isMcbOnline()) {
-                    Util::redirect($account['redirect_url']);
-                    exit('正在转跳...');
-                }
-                unset($tpl['accounts'][$index]);
-            }
-        }
-
         //如果设置必须关注公众号以后才能购买商品
         if (Helper::MustFollowAccount($device)) {
             if ($tpl['from'] != 'account') {
@@ -450,11 +439,37 @@ JSCODE;
             $user->remove('last');
         }
 
-        //如果只有一个货道，并且商品数量不足，则无法免费领取
-        if ($device->getCargoLanesNum() == 1) {
+        //如果没有货道，或只有一个货道，并且商品数量不足，或所有商品都没有允许免费领取，则无法免费领取
+        $lanesNum = $device->getCargoLanesNum();
+        if ($lanesNum == 1) {
             $goods = $device->getGoodsByLane(0);
             if (empty($goods) || $goods['num'] < 1) {
                 $tpl['accounts'] = [];
+            }
+        } elseif ($lanesNum > 1) {
+            $anyFreeGoods = false;
+            foreach ($tpl['goods'] as $goods) {
+                if ($goods['allowFree']) {
+                    $anyFreeGoods = true;
+                    break;
+                }
+            }
+            if (!$anyFreeGoods) {
+                $tpl['accounts'] = [];
+            }
+        } else {
+            $tpl['accounts'] = [];
+        }
+
+        //检查直接转跳的吸粉广告或公众号
+        foreach ($tpl['accounts'] as $index => $account) {
+            if (!empty($account['redirect_url'])) {
+                //链接转跳前，先判断设备是否在线
+                if ($device->isMcbOnline()) {
+                    Util::redirect($account['redirect_url']);
+                    exit('正在转跳...');
+                }
+                unset($tpl['accounts'][$index]);
             }
         }
 

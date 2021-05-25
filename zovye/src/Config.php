@@ -40,4 +40,17 @@ class Config
 
         return globalConfig('agent', $key, $v);
     }
+
+    /**
+     * 微信第三方平台相关配置
+     */
+
+    public static function wxplatform($key, $v = null, $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('wxplatform', $key, $v);
+        }
+
+        return globalConfig('wxplatform', $key, $v);
+    }
 }

@@ -7,13 +7,13 @@ defined('IN_IA') or exit('Access Denied');
 $op = request::op('default');
 if ($op == WxPlatform::AUTH_NOTIFY) {
 
-    //微信第三方平台verify ticket推送
+    //微信授权通知
     $result = WxPlatform::handleAuthorizerNotify();
     exit($result);
 
 } elseif ($op == WxPlatform::AUTHORIZER_EVENT) {
 
-    //微信第三方平台消息推送
+    //微信消息推送
     $result = WxPlatform::handleAuthorizerEvent();
     exit($result);
 

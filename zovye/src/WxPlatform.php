@@ -63,12 +63,6 @@ class WxPlatform
                 return $result;
             }
 
-            if ($result['InfoType'] === 'component_verify_ticket') {
-                if (updateSettings('account.wx.platform.ticket', $result)) {
-                    return ['message' => '成功'];
-                }
-            }
-
             if ($fn) {
                 return $fn($result);
             }
@@ -104,7 +98,7 @@ class WxPlatform
 
     public static function getComponentTicket(): string
     {
-        $data = settings('account.wx.platform.ticket', []);
+        $data = Config::wxplatform('ticket', []);
         if ($data && $data['ComponentVerifyTicket']) {
             return $data['ComponentVerifyTicket'];
         }
@@ -114,7 +108,7 @@ class WxPlatform
 
     public static function getComponentAccessToken(): string
     {
-        $tokenData = settings('account.wx.platform.token', []);
+        $tokenData = Config::wxplatform('token', []);
         if ($tokenData && $tokenData['component_access_token']) {
             if (time() - $tokenData['createtime'] < intval($tokenData['expires_in']) - 600) {
                 return $tokenData['component_access_token'];
@@ -133,11 +127,11 @@ class WxPlatform
                 Util::logToFile('wxplatform', [
                     'fn' => 'getComponentAccessToken',
                     'error' => $result,
-                ]);
+               ]);
                 return '';
             }
             $result['createtime'] = time();
-            updateSettings('account.wx.platform.token', $result);
+            Config::wxplatform('token', $result, true);
             return $result['component_access_token'];
         }
 
@@ -275,19 +269,35 @@ class WxPlatform
         return $result;
     }
 
+    /**
+     * 微信授权事件通知处理
+     */
     public static function handleAuthorizerNotify(): string
     {
         //平台授权通知
         $result = WxPlatform::parseEncryptedData(function ($result) {
+            //授权和授权更新
             if ($result['InfoType'] === 'authorized' || $result['InfoType'] === 'updateauthorized') {
+
                 $res = Account::createOrUpdateFromWxPlatform(request::int('agent'), $result['AuthorizerAppid'], $result);
                 if (is_error($res)) {
                     return $res;
                 }
+
                 return ['message' => 'Ok'];
+
             } elseif ($result['InfoType'] === 'unauthorized') {
+                //取消授权
                 return Account::disableWxPlatformAccount($result['AuthorizerAppid']);
+
+            } elseif ($result['InfoType'] === 'component_verify_ticket') {
+
+                //component_verify_ticket推送                
+                if (Config::wxplatform('ticket', $result, true)) {
+                    return ['message' => 'Ok'];
+                }
             }
+
             return [];
         });
 
@@ -301,6 +311,10 @@ class WxPlatform
         return self:: SUCCESS_RESPONSE;
     }
 
+    /**
+     * 微信消息处理
+     * 
+     */
     public static function handleAuthorizerEvent(): string
     {
         $msg = WxPlatform::parseEncryptedMsgData();

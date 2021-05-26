@@ -98,7 +98,7 @@ class WxPlatform
 
     public static function getComponentTicket(): string
     {
-        $data = Config::wxplatform('ticket', []);
+        $data = Config::wxplatform('ticket', settings('account.wx.platform.ticket', []));
         if ($data && $data['ComponentVerifyTicket']) {
             return $data['ComponentVerifyTicket'];
         }
@@ -108,7 +108,7 @@ class WxPlatform
 
     public static function getComponentAccessToken(): string
     {
-        $tokenData = Config::wxplatform('token', []);
+        $tokenData = Config::wxplatform('token', settings('account.wx.platform.token', []));
         if ($tokenData && $tokenData['component_access_token']) {
             if (time() - $tokenData['createtime'] < intval($tokenData['expires_in']) - 600) {
                 return $tokenData['component_access_token'];

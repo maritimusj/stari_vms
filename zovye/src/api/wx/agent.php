@@ -919,7 +919,7 @@ class agent
             /** @var deviceModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
                 $extra = $entry->get('extra', []);
-                $address = $extra['location']['address'] ?: '<地址未登记>';
+                $address = $entry->settings('extra.location.tencent.address') ?: '<地址未登记>';
                 $last_error = $entry->getLastError();
                 $result['list'][] = [
                     'id' => $entry->getImei(),

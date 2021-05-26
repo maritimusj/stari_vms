@@ -244,7 +244,7 @@
                                     <th class="fixed">当前数量</th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}">
+                                    <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
                                         <td>
                                             <div class="lane operate">
                                                 <span :class="{index: isCustomType}">
@@ -703,7 +703,7 @@
                             self.scene.list = data.scenes || [];
                             self.regStatus = data.status;
                             self.regMsg = data.error || '';
-                            if (typeof data.config.deviceType != 'undefined') {
+                            if (data.config && data.config.deviceType != undefined) {
                                 self.join = data.config['join'];
                                 self.deviceType = data.config['deviceType'];
                                 self.setFirstScene(data.config['firstScene']);
@@ -766,7 +766,13 @@
                     this.change();
                 },
                 currentType(e) {
-                    console.log(e)
+                    if (!e || e.id == 0) {
+                        this.addCargoLane();
+                    } else {
+                        if (e && (!e.cargo_lanes || e.cargo_lanes.length == 0)) {
+                            this.addCargoLane();
+                        }
+                    }
                 }                
             },
             computed: {
@@ -775,7 +781,12 @@
                 }
             },
             mounted() {
-                this.deviceId > 0 ? this.change(true) : this.search();
+                if (this.deviceId > 0) {
+                    this.change(true);
+                } else {
+                    this.search();
+                    this.addCargoLane();
+                }
             },
 
             methods: {
@@ -785,10 +796,15 @@
                     $.getJSON(api_url, {keywords: self.keywords, op: 'search'}).then(function (res) {
                         if(res) {
                             if (res.status) {
-                                self.list = res.data.list || [];
-                            } else {
+                                self.list = res.data.list || [];  
+                            } else  {
+                                self.list = [];
                                 self.error = res.data.msg || '&lt;出错了&gt;';
                             }
+                        }
+                        if (self.list.length == 0) {
+                            self.currentType = null;      
+                            self.currentTypeID = 0;
                         }
                         self.searching = false;
                     })
@@ -800,7 +816,9 @@
                         if (res) {
                             if (res.status) {
                                 self.currentType = res.data;
-                                if (first && !self.isCustomType) self.list.push(res.data);
+                                if (first && !self.isCustomType) {
+                                    self.list.push(res.data);
+                                }
                             } else {
                                 self.currentType = null;
                                 self.error = res.data.msg || '&lt;出错了&gt;';
@@ -811,6 +829,11 @@
                 },
                 addCargoLane() {
                     if (this.isCustomType) {
+                        if (!this.currentType) {
+                            this.currentType = {
+                                cargo_lanes:[],
+                            }
+                        }
                         this.currentType.cargo_lanes.push({
                             id: 0,
                             num: 0,

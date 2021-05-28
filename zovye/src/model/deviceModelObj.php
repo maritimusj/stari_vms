@@ -2022,10 +2022,10 @@ class deviceModelObj extends modelObj
 
     /**
      * 设备关联的出货主板是否在线
-     * @param bool $ignore_cache
+     * @param bool $use_cache
      * @return bool
      */
-    public function isMcbOnline($ignore_cache = false): bool
+    public function isMcbOnline($use_cache = true): bool
     {
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return true;
@@ -2035,7 +2035,7 @@ class deviceModelObj extends modelObj
             $res = CtrlServ::v2_query(
                 "device/{$this->imei}/mcb/online",
                 [
-                    'nocache' => $ignore_cache,
+                    'nocache' => $use_cache == false,
                 ]
             );
 

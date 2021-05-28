@@ -478,4 +478,17 @@ if ($op == 'default') {
     $device->save();
 
     JSON::success($detail);
+
+} else if ($op == 'online') {
+
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    JSON::success([
+        'mcb' => [
+            'online' => $device->isMcbOnline(false),
+        ]
+    ]);
 }

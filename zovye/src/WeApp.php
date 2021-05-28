@@ -346,6 +346,13 @@ JSCODE;
                 }
             })
         }
+        zovye_fn.isOnline = function (cb) {
+            $.get("{$device_api_url}", {op: 'online'}).then(function (res) {
+                if (typeof cb === 'function') {
+                    cb(res);
+                }
+            })
+        }
         zovye_fn.redirect = function() {
             window.location.replace("{$device_url}");
         }

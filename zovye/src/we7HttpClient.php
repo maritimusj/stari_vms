@@ -66,7 +66,7 @@ class we7HttpClient implements IHttpClient
                 }
             }
 
-            return true;
+            return error(State::ERROR, '请求失败！');;
         }
 
         return error(State::ERROR, '系统维护中，请稍后再试！');

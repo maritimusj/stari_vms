@@ -517,20 +517,16 @@ class device
                 ];
             }
 
-            $result =  Util::cachedCall(30, function() use($device) {
-                $result = [
-                    'mcb' => [                        
-                        'online' => $device->isMcbOnline(),
-                    ],
+            $result = [
+                'mcb' => [                        
+                    'online' => $device->isMcbOnline(),
+                ],
+            ];
+            if ($device->getAppId()) {
+                $result['app'] =  [
+                    'online' => $device->isAppOnline(),
                 ];
-                if ($device->getAppId()) {
-                    $result['app'] =  [
-                        'online' => $device->isAppOnline(),
-                    ];
-                }                
-                return $result;
-            }, $device->getId());
-
+            }                
             return $result;
         }
 

@@ -437,7 +437,7 @@
                             </label>
                             <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="commission_fee" id="commission_fee" value="{php echo number_format($agent_data['commission']['fee'] /100, 2)}" min="0" step="0.01">
                             <span id="fee_type_title">{if $agent_data['commission']['fee_type']==1}%{else}元{/if}</span>
-                            <span class="help-block">* 用户微信支付购买商品，平台扣除相应费用，0表示不扣手续费</span>
+                            <span class="help-block">* 用户支付购买商品，平台扣除相应费用，0表示不扣手续费</span>
                         </div>
                     </div>
                 </div>

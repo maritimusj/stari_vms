@@ -278,13 +278,13 @@ class Pay
             }
 
             return $pay->getResponse(true);
+
         } catch (Exception $e) {
             Util::logToFile('pay', [
                 'error' => $e->getMessage(),
                 'name' => $name,
                 'input' => $input,
             ]);
-
             return isset($pay) ? $pay->getResponse(false) : $e->getMessage();
         }
     }

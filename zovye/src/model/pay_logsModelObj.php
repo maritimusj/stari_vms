@@ -31,7 +31,6 @@ class pay_logsModelObj extends BaseLogsModelObj
         return strval($this->getData('user'));
     }
 
-
     public function getGoodsId(): int
     {
         return intval($this->getData('goods'));
@@ -41,7 +40,6 @@ class pay_logsModelObj extends BaseLogsModelObj
     {
         return (array)($this->getData('orderData.extra.goods', []));
     }
-
 
     public function getPayName(): string
     {

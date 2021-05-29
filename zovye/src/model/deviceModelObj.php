@@ -438,9 +438,12 @@ class deviceModelObj extends modelObj
 
     public function getAddress($default = ''): string
     {
-        $address = $this->settings('extra.location.baidu.address', '');
+        $address = $this->settings('extra.location.tencent.address', '');
         if (empty($address)) {
-            $address = $this->settings('extra.location.tencent.address', '');
+            $address = $this->settings('extra.location.baidu.address', '');
+            if (empty($address)) {
+                $address = $this->settings('extra.location.address', '');
+            }
         }
         return empty($address) ? $default : $address;
     }
@@ -2167,7 +2170,7 @@ class deviceModelObj extends modelObj
     {
         if (App::isLocationValidateEnabled()) {
             if (empty(settings('user.location.validate.force'))) {
-                $location = $this->settings('extra.location.tencent');
+                $location = $this->settings('extra.location.tencent', $this->settings('extra.location', []));
                 if (empty($location) || empty($location['lng']) || empty($location['lat'])) {
                     return false;
                 }

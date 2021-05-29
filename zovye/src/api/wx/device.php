@@ -61,7 +61,7 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'location' => isEmptyArray($extra['location']['tencent']) ? null : $extra['location']['tencent'],
+                    'location' => isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
                     'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
                 ],
             ];
@@ -86,7 +86,7 @@ class device
             ],
             'extra' => [
                 'iccid' => $device->getIccid(),
-                'location' => isEmptyArray($extra['location']['tencent']) ? null : $extra['location']['tencent'],
+                'location' => isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
                 'volume' => intval($extra['volume']),
                 'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
             ],

@@ -2167,7 +2167,7 @@ class deviceModelObj extends modelObj
     {
         if (App::isLocationValidateEnabled()) {
             if (empty(settings('user.location.validate.force'))) {
-                $location = $this->settings('extra.location');
+                $location = $this->settings('extra.location.tencent');
                 if (empty($location) || empty($location['lng']) || empty($location['lat'])) {
                     return false;
                 }

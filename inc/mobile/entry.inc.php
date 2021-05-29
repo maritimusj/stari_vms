@@ -184,7 +184,7 @@ if (App::isUserVerify18Enabled()) {
 }
 
 if ($from == 'device') {
-    if (time() - $device->settings('last.online', 0) > 60) {
+    if ($device && time() - $device->settings('last.online', 0) > 60) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = Util::getTplData([$device, $user]);
         app()->devicePreparePage($tpl_data);

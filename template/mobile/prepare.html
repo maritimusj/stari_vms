@@ -98,7 +98,7 @@
             });
         }
         $(function () {
-            zovye_fn.getDetail(function (res) {
+            zovye_fn.isOnline(function (res) {
                 if (res && res.data.mcb && res.data.mcb.online) {
                     return setOnline(true);
                 }

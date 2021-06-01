@@ -441,7 +441,7 @@ class WxPlatform
             }
 
             //出货时机是用户点击链连后，直接指定回推送的消息
-            if (!empty($config['timing'])) {
+            if (!empty($acc->settings('config.open.timing'))) {
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 

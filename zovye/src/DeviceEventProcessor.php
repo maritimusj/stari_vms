@@ -16,6 +16,7 @@ class DeviceEventProcessor
     const EVENT_V0_ADV = 'adv';
     const EVENT_V0_QRCODE = 'qrcode';
     const EVENT_V0_CONFIG = 'config';
+    const EVENT_V0_OFFLINE = 'offline';
 
     const EVENT_V1_ONLINE = 'mcb.online';
     const EVENT_V1_OFFLINE = 'mcb.offline';
@@ -238,6 +239,15 @@ class DeviceEventProcessor
                 'log' => [
                     'enable' => true,
                     'id' => 21,
+                ],
+            ],
+        ],
+        self::EVENT_V0_OFFLINE => [
+            'title' => '[v0]App离线',
+            'params' => [
+                'log' => [
+                    'enable' => true,
+                    'id' => 22,
                 ],
             ],
         ],
@@ -487,7 +497,6 @@ class DeviceEventProcessor
         CtrlServ::appNotify($app_id, 'config', $result);
         return false;
     }
-
 
     /**
      * app::init 事件处理

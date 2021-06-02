@@ -50,8 +50,6 @@ class DeviceTypes
                     'cargo_lanes' => [
                         'l0' => [
                             'num' => 0,
-                            'capacity' => 0,
-                            'goods_id' => 0,
                         ],
                     ],
                 ]

@@ -552,11 +552,16 @@ class Device extends State
         $device->setGroupId(0);
         $device->setTagsFromText('');
 
-        $device->updateQrcode(true);
-
         $device->set('refresh', time());
         if ($notify) {
             $device->appNotify('init');
+        } else {
+            $device->updateQrcode(true);
+        }
+
+        $code = $device->getProtocolV1Code();
+        if ($code) {
+            $device->reportMcbStatus($code);
         }
 
         return true;

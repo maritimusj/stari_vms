@@ -48,9 +48,10 @@ class DeviceTypes
                 'title' => '<自定义>',
                 'extra' => [
                     'cargo_lanes' => [
-                        'l0' => [
-                            'num' => 0,
-                        ],
+                       [
+                           'goods' => 0,
+                           'capacity' => 0,
+                       ]
                     ],
                 ]
             ]);

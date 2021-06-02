@@ -564,7 +564,7 @@ class Device extends State
             $device->reportMcbStatus($code);
         }
 
-        return true;
+        return $device->save();
     }
 
     /**

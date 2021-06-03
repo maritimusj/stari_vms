@@ -67,7 +67,7 @@ if ($op == 'default') {
     $user->updateSettings('last.location', $data);
 
     //用户扫描设备后的定位信息
-    $location = $device->settings('extra.location.tencent', $device->settings('extra.location', []));
+    $location = $device->settings('extra.location.tencent', []);
     if ($location && $location['lng'] && $location['lat']) {
 
         $distance = App::userLocationValidateDistance(1);

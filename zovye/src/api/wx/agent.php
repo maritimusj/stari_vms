@@ -481,7 +481,7 @@ class agent
         }
 
         //修改设备名称
-        $name = request('name');
+        $name = request::trim('name');
         if ($name && $name != $device->getName()) {
             $device->setName($name);
         }

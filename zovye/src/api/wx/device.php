@@ -48,6 +48,8 @@ class device
 
         list($v, $way, $is_percent) = $device->getCommissionValue($keeper_id);
 
+        $location = isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'];
+
         if ($simple) {
             $result = [
                 'device' => [
@@ -61,10 +63,12 @@ class device
                     'way' => $way,
                 ],
                 'extra' => [
-                    'location' => isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
                     'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
                 ],
             ];
+            if ($location) {
+                $result['extra']['location'] = $location;
+            }
             if ($is_percent) {
                 $result['keeper']['percent'] = $v;
             } else {
@@ -86,7 +90,6 @@ class device
             ],
             'extra' => [
                 'iccid' => $device->getIccid(),
-                'location' => isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
                 'volume' => intval($extra['volume']),
                 'is_down' => isset($extra['isDown']) && $extra['isDown'] ? 1 : 0,
             ],
@@ -102,6 +105,10 @@ class device
                 'kind' => $device->getKeeperKind($keeper_id),
             ],
         ];
+
+        if ($location) {
+            $result['extra']['location'] = $location;
+        }
 
         $sig = intval($device->getSig());
         if ($sig != -1) {
@@ -173,7 +180,7 @@ class device
         }
 
         //设备默认显示代理商的地区
-        if (isEmptyArray($result['location']['area'])) {            
+        if (isEmptyArray($result['location']['area'])) {
             if ($agent) {
                 $agent_data = $agent->getAgentData();
                 if (!isEmptyArray($agent_data['area'])) {
@@ -208,7 +215,7 @@ class device
             if ($defaultType) {
                 $params['device_type'] = $defaultType->getId();
             }
-            
+
             $device = Util::activeDevice($id, $params);
             if (is_error($device)) {
                 return error(State::ERROR, '找不到这个设备，请重新扫描二维码！');
@@ -512,21 +519,21 @@ class device
 
             if ($device->isVDevice() || $device->isBlueToothDevice()) {
                 return [
-                    'mcb' => [ 'online' => true ],
-                    'app' => [ 'online' => true ],
+                    'mcb' => ['online' => true],
+                    'app' => ['online' => true],
                 ];
             }
 
             $result = [
-                'mcb' => [                        
+                'mcb' => [
                     'online' => $device->isMcbOnline(),
                 ],
             ];
             if ($device->getAppId()) {
-                $result['app'] =  [
+                $result['app'] = [
                     'online' => $device->isAppOnline(),
                 ];
-            }                
+            }
             return $result;
         }
 
@@ -567,7 +574,7 @@ class device
                 $query->whereOr([
                     'name LIKE' => "%{$keyword}%",
                     'imei LIKE' => "%{$keyword}%",
-                ]);                
+                ]);
             }
         }
 
@@ -650,12 +657,12 @@ class device
                     }
                 }
                 if ($date) {
-                    $data['stats']['day'] = Util::cachedCall(10, function() use($device, $date) {
+                    $data['stats']['day'] = Util::cachedCall(10, function () use ($device, $date) {
                         return intval($device->getDTotal(['total'], $date));
                     }, $device->getId(), $date);
                 }
                 if ($month) {
-                    $data['stats']['month'] = Util::cachedCall(10, function() use($device, $month) {
+                    $data['stats']['month'] = Util::cachedCall(10, function () use ($device, $month) {
                         return intval($device->getMTotal(['total'], $month));
                     }, $device->getId(), $month);
                 }

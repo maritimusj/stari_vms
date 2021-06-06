@@ -615,7 +615,7 @@ class Account extends State
         return ['message' => '找不到公众号！'];
     }
 
-    public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
+    public static function getAccountFromThirdPlatform(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         $list = [];
 
@@ -680,8 +680,13 @@ class Account extends State
             }
         }
 
+        return [];
+    }
+
+    public static function getAccountFromLocal(deviceModelObj $device, userModelObj $user, array $params = []): array
+    {
         //获取本地可用公众号列表
-        $accounts = Account::match($device, $user, ['admin', 'max' => settings('misc.maxAccounts', 0)]);
+        $accounts = Account::match($device, $user, array_merge($params, ['admin', 'max' => settings('misc.maxAccounts', 0)]));
         if (!empty($accounts)) {
             foreach ($accounts as $index => &$account) {
                 if (App::useAccountQRCode()) {
@@ -709,8 +714,26 @@ class Account extends State
                 }
             }
         }
-
         return $accounts;
+    }
+
+    public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
+    {
+        if (App::isLocalAccountPreferred()) {
+            $accounts = self::getAccountFromLocal($device, $user, $params);
+            if ($accounts) {
+                return $accounts;
+            }
+
+            return self::getAccountFromThirdPlatform($device, $user, $params);
+        }
+
+        $accounts = self::getAccountFromThirdPlatform($device, $user, $params);
+        if ($accounts) {
+            return $accounts;
+        }
+
+        return self::getAccountFromLocal($device, $user, $params);
     }
 
     /**

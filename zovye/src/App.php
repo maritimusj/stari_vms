@@ -293,6 +293,7 @@ class App
      * 出货策略
      * true 表示库存多的货道优先出货：平衡出货
      * false 表示库存少的货道优先出货：顺序出货
+     * @param deviceModelObj|null $device
      * @return bool
      */
     public static function shipmentBalance(deviceModelObj $device = null): bool
@@ -440,6 +441,10 @@ class App
         return onceCall(function() {
             return boolval(settings('custom.useAccountQRCode.enabled'));
         });
+    }
+
+    public static function isLocalAccountPreferred(): bool {
+        return settings('misc.account.priority') == 'local';
     }
     
 }

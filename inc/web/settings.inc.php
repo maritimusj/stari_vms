@@ -379,6 +379,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
     } elseif ($save_type == 'account') {
 
+        $settings['misc']['account']['priority'] = request::trim('accountPriority');
+
         if (App::isWxPlatformEnabled()) {
             $settings['account']['wx']['platform']['config']['appid'] = request::trim('wxPlatformAppID');
             $settings['account']['wx']['platform']['config']['secret'] = request::trim('wxPlatformAppSecret');

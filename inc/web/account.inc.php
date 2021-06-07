@@ -276,7 +276,7 @@ if ($op == 'default') {
                     'secret' => request::trim('secret'),
                 ]);
             } elseif ($account->isAuth()) {
-                $timing = $account->getServiceType() == 2 ? request::int('OpenTiming') : 1;
+                $timing = request::int('OpenTiming');
                 $config = [
                     'type' => Account::AUTH,
                 ];

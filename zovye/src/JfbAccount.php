@@ -9,8 +9,6 @@ use zovye\model\deviceModelObj;
 
 class JfbAccount
 {
-    const apiURL = 'https://search-api.zhuna888.com/dmp-search-api/v4/ad/noauth';
-
     const CB_RESPONSE = '{"result_code":0,"result_message":"成功"}';
 
     public static function getUid(): string
@@ -23,14 +21,13 @@ class JfbAccount
         $acc = Account::findOne(['state' => Account::JFB]);
         if ($acc) {
             $config = $acc->get('config', []);
-            if (empty($config['appno'])) {
-                return err('没有配置app no');
+            if (empty($config['url'])) {
+                return err('没有配置api url');
             }
 
             $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
             $data = [
-                'appNo' => $config['appno'],
                 'openId' => $fans['openid'],
                 'facilityId' => $device->getImei(),
                 'nickname' => $fans['nickname'],
@@ -47,7 +44,6 @@ class JfbAccount
                 'facilityProvince' => $fans['province'],
                 'facilityCity' => $fans['city'],
                 'facilityDistrict' => '',
-                'scene' => $config['scene'],
                 'redirect' => Util::murl('order', ['op' => 'feedback', 'device_imei' => $device->getImei(), 'device_name' => $device->getName()]),
                 'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
                         'op' => 'feedback',
@@ -56,9 +52,10 @@ class JfbAccount
                     ]) . '">如未出货请点我！</a>',
             ];
 
-            $result = Util::post(self::apiURL, $data);
+            $result = Util::post($config['url'], $data);
 
             Util::logToFile('jfb_query', [
+                'url' => $config['url'],
                 'request' => $data,
                 'result' => $result,
             ]);
@@ -73,11 +70,9 @@ class JfbAccount
 
                 $x = $result['result']['data'][0];
                 if ($x) {
-
                     $data['title'] = $x['nickName'];
                     $data['img'] = $x['headImgUrl'];
                     $data['qrcode'] = $x['qrPicUrl'];
-
                     return [$data];
                 }
             }
@@ -137,6 +132,7 @@ class JfbAccount
             } catch (Exception $e) {
                 Util::logToFile('jfb', [
                     'error' => $e->getMessage(),
+                    'params' => $params,
                 ]);
             }
         }

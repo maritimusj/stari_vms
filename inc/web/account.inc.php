@@ -246,8 +246,7 @@ if ($op == 'default') {
                 $data['img'] = Account::JFB_HEAD_IMG;
                 $account->set('config', [
                     'type' => Account::JFB,
-                    'appno' => request::trim('appno'),
-                    'scene' => request::trim('scene'),
+                    'url' => request::trim('apiURL'),
                 ]);
             } elseif ($account->isMoscale()) {
                 $data['name'] = Account::MOSCALE_NAME;

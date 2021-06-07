@@ -271,17 +271,10 @@
                     {if \zovye\App::isJfbEnabled() && $account && $account->isJFB()}
                     <div class="seg-divider"></div>
                     <div class="form-group">
-                        <label for="appno" class="col-md-2 control-label">准粉吧 appno</label>
+                        <label for="apiURL" class="col-md-2 control-label">API URL</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="appno" id="appno" value="{$config['appno']}">
-                            <span class="help-block"></span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="scene" class="col-md-2 control-label">准粉吧应用场景</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="scene" id="scene" value="{$config['scene']}">
-                            <span class="help-block"></span>
+                            <input type="text" class="form-control" name="apiURL" id="apiURL" value="{$config['url']}">
+                            <span class="help-block">* 准粉吧 API 接口网址</span>
                         </div>
                     </div>
                     {/if}

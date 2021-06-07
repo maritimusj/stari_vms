@@ -2038,7 +2038,7 @@ class deviceModelObj extends modelObj
             $res = CtrlServ::v2_query(
                 "device/{$this->imei}/mcb/online",
                 [
-                    'nocache' => $use_cache == false,
+                    'nocache' => $use_cache == false ? 'true' : 'false',
                 ]
             );
 

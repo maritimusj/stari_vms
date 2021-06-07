@@ -150,7 +150,7 @@ class Account extends State
         $join = function($cond, $getter_fn) use($device, $user, &$list) {
             $acc = Account::findOne($cond);
             if ($acc) {
-                $index = 'o' . $acc->getOrderNo();
+                $index = sprintf("%03d", $acc->getOrderNo());
                 if ($list[$index]) {
                     $index .= $acc->getId();
                 }
@@ -217,7 +217,15 @@ class Account extends State
             return [];
         }
 
-        ksort($list);
+        uksort($list, function($a, $b) {
+            $res = strcmp($a, $b);
+            if ($res < 0) {
+                return 1;
+            }elseif ($res > 0) {
+                return -1;
+            }
+            return 0;
+        });
 
         $result = [];
 

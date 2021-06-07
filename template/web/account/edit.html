@@ -200,7 +200,7 @@
                         <label for="orderno" class="col-md-2 control-label">排序</label>
                         <div class="col-md-10">
                             <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
-                            <span class="help-block">* 可选，默认为0。数字越大，优先级越高。用户于多个特殊吸粉平台的请求顺序</span>
+                            <span class="help-block">* 可选，默认为0。数字越大，优先级越高。</span>
                         </div>
                     </div>
                     {if \zovye\App::isUserCenterEnabled()}

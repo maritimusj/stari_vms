@@ -445,40 +445,24 @@ class WxPlatform
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
-            if ($acc->getServiceType() == 2) {
+            list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
+            if ($prefix != App::uid(6)) {
+                return [];
+            }
 
-                $user = User::get($msg['FromUserName'], true);
-                //找不到用户的话，给用户推送消息
-                if (empty($user)) {
-                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
-                }
+            $device = Device::get($second);
 
-                $last_device_id = $user->getLastActiveData('device');
-                $device = Device::get($last_device_id);
-                if (empty($device)) {
-                    throw new RuntimeException('找不到这个设备！');
-                }
+            if (empty($device)) {
+                throw new RuntimeException('找不到这个设备！');
+            }
 
-            } else {
-                list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
-                if ($prefix != App::uid(6)) {
-                    return [];
-                }
+            if ($first == 'device') {
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+            }
 
-                $device = Device::get($second);
-
-                if (empty($device)) {
-                    throw new RuntimeException('找不到这个设备！');
-                }
-
-                if ($first == 'device') {
-                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
-                }
-
-                $user = User::get($first);
-                if (empty($user)) {
-                    throw new RuntimeException('找不到这个用户！');
-                }
+            $user = User::get($first);
+            if (empty($user)) {
+                throw new RuntimeException('找不到这个用户！');
             }
 
             if ($user->isBanned()) {

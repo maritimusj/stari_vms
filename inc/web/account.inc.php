@@ -247,6 +247,8 @@ if ($op == 'default') {
                 $account->set('config', [
                     'type' => Account::JFB,
                     'url' => request::trim('apiURL'),
+                    'appno' => request::trim('appNO'),
+                    'scene' => request::trim('scene'),
                 ]);
             } elseif ($account->isMoscale()) {
                 $data['name'] = Account::MOSCALE_NAME;

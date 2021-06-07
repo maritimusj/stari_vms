@@ -25,9 +25,15 @@ class JfbAccount
                 return err('没有配置api url');
             }
 
+            if (empty($config['appno'])) {
+                return err('没有配置appno');
+            }
+
             $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
             $data = [
+                'appNo' => strval($config['appno']),
+                'scene' => strval($config['scene']),
                 'openId' => $fans['openid'],
                 'facilityId' => $device->getImei(),
                 'nickname' => $fans['nickname'],
@@ -52,7 +58,7 @@ class JfbAccount
                     ]) . '">如未出货请点我！</a>',
             ];
 
-            $result = Util::post($config['url'], $data);
+            $result = Util::post(strval($config['url']), $data);
 
             Util::logToFile('jfb_query', [
                 'url' => $config['url'],
@@ -65,9 +71,7 @@ class JfbAccount
             }
 
             if ($result['status'] && $result['errorCode'] == '0000') {
-
                 $data = $acc->format();
-
                 $x = $result['result']['data'][0];
                 if ($x) {
                     $data['title'] = $x['nickName'];

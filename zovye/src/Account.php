@@ -137,27 +137,39 @@ class Account extends State
      * @param deviceModelObj $device
      * @param userModelObj $user
      * @param array $params
-     * $params['unfollow'] 忽略用户已关注的公众号（通过订单判断）
-     * $params['max' => 1] 最多返回几个公众号
      * @return array
+     * $params['max' => 1] 最多返回几个公众号
      */
-    public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
-    {
+    public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array {
         $accounts = $device->getAccounts();
         if (empty($accounts)) {
             return $accounts;
         }
 
+        $list = [];
+        $join = function($cond, $getter_fn) use($device, $user, &$list) {
+            $acc = Account::findOne($cond);
+            if ($acc) {
+                $index = 'o' . $acc->getOrderNo();
+                if ($list[$index]) {
+                    $index .= $acc->getId();
+                }
+                $list[$index] = function () use($getter_fn, $acc, $device, $user) {
+                    //检查用户是否允许
+                    $res = Util::isAvailable($user, $acc, $device);
+                    if (is_error($res)) {
+                        return $res;
+                    }
+
+                    return $getter_fn($acc);
+                };
+            }
+        };
+
         $groups = [];
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
-            $account = Account::get($entry['id']);
-            if (empty($account)) {
-                unset($accounts[$uid]);
-                continue;
-            }
-            $res = Util::isAvailable($user, $account, $device, ['unfollow' => in_array('unfollow', $params, true)]);
-            if (is_error($res) || ($group_name && array_key_exists($group_name, $groups))) {
+            if ($group_name && array_key_exists($group_name, $groups)) {
                 unset($accounts[$uid]);
                 continue;
             }
@@ -165,52 +177,84 @@ class Account extends State
             if ($group_name) {
                 $groups[$group_name] = 'exists';
             }
+
+            $join(['id' => $entry['id']], function ($acc) {
+                return [$acc->format()];
+            });
         }
 
-        $sort_then_slice_accounts = function (&$arr, $max) {
-            $total = count($arr);
-            if ($total > 1) {
-                //按order no从大到小,对公众号排序
-                uasort(
-                    $arr,
-                    function ($a, $b) {
-                        return $b['orderno'] - $a['orderno'];
-                    }
-                );
+        $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
 
-                //设置了最大公众号显示个数后，分割数组
-                if ($max && $max < $total) {
-                    $arr = array_slice($arr, 0, $max, true);
-                }
-            }
-        };
+        //准粉吧
+        if (App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude)) {
+            $join(['state' => Account::JFB], function () use ($device, $user) {
+                return JfbAccount::fetch($device, $user);
+            });
+        }
 
-        $shuffle_accounts = function (&$arr) {
-            if (count($arr) > 1) {
-                //如果所有公众号的排序值一样，则打乱排序
-                $first = current($arr);
-                $last = end($arr);
+        //公锤
+        if (App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude)) {
+            $join(['state' => Account::MOSCALE], function () use ($device, $user) {
+                return MoscaleAccount::fetch($device, $user);
+            });
+        }
+
+        //云粉
+        if (App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude)) {
+            $join(['state' => Account::YUNFENBA], function () use ($device, $user) {
+                return YunfenbaAccount::fetch($device, $user);
+            });
+        }
+
+        //阿旗
+        if (App::isAQiinfoEnabled() && !in_array(AQiinfoAccount::getUid(), $exclude)) {
+            $join(['state' => Account::AQIINFO], function () use ($device, $user) {
+                return AQiinfoAccount::fetch($device, $user);
+            });
+        }
+
+        if (empty($list)) {
+            return [];
+        }
+
+        ksort($list);
+
+        $result = [];
+
+        //如果所有公众号的排序值一样，则打乱排序
+        $shuffle_accounts = function ($result) {
+            if (count($result) > 1) {
+                $first = current($result);
+                $last = end($result);
 
                 if ($first['orderno'] == $last['orderno']) {
-
-                    $keys = array_keys($arr);
+                    $keys = array_keys($result);
                     shuffle($keys);
 
-                    $result = [];
+                    $arr = [];
                     foreach ($keys as $key) {
-                        $result[$key] = $arr[$key];
+                        $arr[$key] = $result[$key];
                     }
-
-                    $arr = $result;
+                    return $arr;
                 }
             }
+            return $result;
         };
 
-        $sort_then_slice_accounts($accounts, $params['max']);
+        $max = intval($params['max']);
+        foreach ($list as $getter) {
+            $res = $getter();
+            if (empty($res) || is_error($res)) {
+                continue;
+            }
+            $result = array_merge($result, $res);
+            if ($max > 0 && count($result) >= $max) {
+                $result = array_slice($result, 0, $max, true);
+                return $shuffle_accounts($result);
+            }
+        }
 
-        $shuffle_accounts($accounts);
-
-        return $accounts;
+        return $result;
     }
 
     /**
@@ -615,75 +659,8 @@ class Account extends State
         return ['message' => '找不到公众号！'];
     }
 
-    public static function getAccountFromThirdPlatform(deviceModelObj $device, userModelObj $user, array $params = []): array
-    {
-        $list = [];
 
-        $join = function ($cond, $fn) use (&$list, $device, $user) {
-            $acc = Account::findOne($cond);
-            if ($acc) {
-                $no = 'o' . strval($acc->getOrderNo());
-                if (!empty($list[$no])) {
-                    $no .= $acc->getId();
-                }
-
-                $list[$no] = function () use ($fn, $acc, $device, $user) {
-                    //检查用户是否允许
-                    $res = Util::isAvailable($user, $acc, $device);
-                    if (is_error($res)) {
-                        return $res;
-                    }
-
-                    return $fn();
-                };
-            }
-        };
-
-        $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
-
-        //准粉吧
-        if (App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude)) {
-            $join(['state' => Account::JFB], function () use ($device, $user) {
-                return JfbAccount::fetch($device, $user);
-            });
-        }
-
-        //公锤
-        if (App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude)) {
-            $join(['state' => Account::MOSCALE], function () use ($device, $user) {
-                return MoscaleAccount::fetch($device, $user);
-            });
-        }
-
-        //云粉
-        if (App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude)) {
-            $join(['state' => Account::YUNFENBA], function () use ($device, $user) {
-                return YunfenbaAccount::fetch($device, $user);
-            });
-        }
-
-        //阿旗
-        if (App::isAQiinfoEnabled() && !in_array(AQiinfoAccount::getUid(), $exclude)) {
-            $join(['state' => Account::AQIINFO], function () use ($device, $user) {
-                return AQiinfoAccount::fetch($device, $user);
-            });
-        }
-
-        if ($list) {
-            krsort($list);
-
-            foreach ($list as $fn) {
-                $result = $fn();
-                if ($result && !is_error($result)) {
-                    return $result;
-                }
-            }
-        }
-
-        return [];
-    }
-
-    public static function getAccountFromLocal(deviceModelObj $device, userModelObj $user, array $params = []): array
+    public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         //获取本地可用公众号列表
         $accounts = Account::match($device, $user, array_merge($params, ['admin', 'max' => settings('misc.maxAccounts', 0)]));
@@ -715,25 +692,6 @@ class Account extends State
             }
         }
         return $accounts;
-    }
-
-    public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
-    {
-        if (App::isLocalAccountPreferred()) {
-            $accounts = self::getAccountFromLocal($device, $user, $params);
-            if ($accounts) {
-                return $accounts;
-            }
-
-            return self::getAccountFromThirdPlatform($device, $user, $params);
-        }
-
-        $accounts = self::getAccountFromThirdPlatform($device, $user, $params);
-        if ($accounts) {
-            return $accounts;
-        }
-
-        return self::getAccountFromLocal($device, $user, $params);
     }
 
     /**

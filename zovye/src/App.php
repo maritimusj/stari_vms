@@ -442,9 +442,4 @@ class App
             return boolval(settings('custom.useAccountQRCode.enabled'));
         });
     }
-
-    public static function isLocalAccountPreferred(): bool {
-        return settings('misc.account.priority') == 'local';
-    }
-    
 }

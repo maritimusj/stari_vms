@@ -217,11 +217,11 @@ class Account extends State
             return [];
         }
 
-        uksort($list, function($a, $b) {
+        uksort($list, function ($a, $b) {
             $res = strcmp($a, $b);
             if ($res < 0) {
                 return 1;
-            }elseif ($res > 0) {
+            } elseif ($res > 0) {
                 return -1;
             }
             return 0;

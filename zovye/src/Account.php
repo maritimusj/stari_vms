@@ -147,11 +147,6 @@ class Account extends State
      * $params['max' => 1] 最多返回几个公众号
      */
     public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array {
-        $accounts = $device->getAccounts();
-        if (empty($accounts)) {
-            return $accounts;
-        }
-
         $list = [];
         $join = function($cond, $getter_fn) use($device, $user, &$list) {
             $acc = Account::findOne($cond);
@@ -173,6 +168,8 @@ class Account extends State
         };
 
         $groups = [];
+        
+        $accounts = $device->getAccounts();
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
             if ($group_name && array_key_exists($group_name, $groups)) {

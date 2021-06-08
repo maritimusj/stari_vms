@@ -56,6 +56,7 @@ if ($op === 'create') {
         JSON::fail('对不起，商品数量不足！');
     }
 
+    //获取用户折扣
     $discount = User::getUserDiscount($user, $goods, $total);
     $price = $goods['price'] * $total - $discount;
     if ($price < 1) {

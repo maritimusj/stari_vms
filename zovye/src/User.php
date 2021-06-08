@@ -196,6 +196,7 @@ class User
 
         $discount = 0;
 
+        //首单优惠
         if (empty(Order::getLastOrderOfUser($user))) {
             if (!empty($goods_data['discountPrice'])) {
                 if ($goods_data['price'] > $goods_data['discountPrice']) {

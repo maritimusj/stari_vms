@@ -130,6 +130,7 @@ if ($op == 'default') {
         Account::MOSCALE => App::isMoscaleEnabled(),
         Account::YUNFENBA => App::isYunfenbaEnabled(),
         Account::AQIINFO => App::isAQiinfoEnabled(),
+        Account::ZJBAO => App::isZJBaoEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -275,7 +276,16 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'secret' => request::trim('secret'),
                 ]);
-            } elseif ($account->isAuth()) {
+            } elseif ($account->isZJBao()) {
+                $data['name'] = Account::ZJBAO_NAME;
+                $data['img'] = Account::ZJBAO_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::ZJBAO,
+                    'key' => request::trim('key'),
+                    'secret' => request::trim('secret'),
+                ]);
+            }
+            elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 $config = [
                     'type' => Account::AUTH,

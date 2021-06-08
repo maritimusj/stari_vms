@@ -41,6 +41,9 @@ class Account extends State
     //阿旗数据平台
     const AQIINFO = 102;
 
+    //纸巾宝
+    const ZJBAO = 103;
+
     const JFB_NAME = '准粉吧';
     const JFB_HEAD_IMG = MODULE_URL . 'static/img/jfb_pic.png';
 
@@ -52,6 +55,9 @@ class Account extends State
 
     const AQIINFO_NAME = '阿旗平台';
     const AQIINFO_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
+
+    const ZJBAO_NAME = '纸巾宝';
+    const ZJBAO_HEAD_IMG = MODULE_URL . 'static/img/zjbao_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -210,6 +216,13 @@ class Account extends State
         if (App::isAQiinfoEnabled() && !in_array(AQiinfoAccount::getUid(), $exclude)) {
             $join(['state' => Account::AQIINFO], function () use ($device, $user) {
                 return AQiinfoAccount::fetch($device, $user);
+            });
+        }
+
+        //纸巾宝
+        if (App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude)) {
+            $join(['state' => Account::ZJBAO], function () use ($device, $user) {
+                return ZhiJinBaoAccount::fetch($device, $user);
             });
         }
 
@@ -527,6 +540,12 @@ class Account extends State
     {
         $url = Util::murl('aqiinfo');
         return self::createSpecialAccount(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
+    }
+
+    public static function createZJBaoAccount(): ?accountModelObj
+    {
+        $url = Util::murl('zjbao');
+        return self::createSpecialAccount(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array

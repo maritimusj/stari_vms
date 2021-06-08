@@ -174,6 +174,11 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             Account::createAQiinfoAccount();
         }
 
+        $settings['zjbao']['fan']['enabled'] = request::bool('ZJBaoFAN') ? 1 : 0;
+        if ($settings['zjbao']['fan']['enabled']) {
+            Account::createZJBaoAccount();
+        }
+
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
 

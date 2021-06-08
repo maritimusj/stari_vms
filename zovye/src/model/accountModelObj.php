@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\Account;
+use zovye\App;
 use zovye\base\modelObj;
 
 use zovye\traits\ExtraDataGettersAndSetters;
@@ -203,6 +204,7 @@ class accountModelObj extends modelObj
             Account::MOSCALE,
             Account::YUNFENBA,
             Account::AQIINFO,
+            Account::ZJBAO,
         ]);
     }
 
@@ -237,6 +239,11 @@ class accountModelObj extends modelObj
     public function isAQiinfo(): bool
     {
         return $this->getType() == Account::AQIINFO;
+    }
+
+    public function isZJBao(): bool
+    {
+        return $this->getType() == Account::ZJBAO;
     }
 
     public function isAuth(): bool
@@ -283,7 +290,7 @@ class accountModelObj extends modelObj
         if (isset($enable)) {
             return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
         }
-        return \zovye\App::useAccountQRCode() && boolval($this->settings('misc.useAccountQRCode', 0));
+        return App::useAccountQRCode() && boolval($this->settings('misc.useAccountQRCode', 0));
     }
 
     public function getOpenMsg($from, $to, $redirect_url = ''): string

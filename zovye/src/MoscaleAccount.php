@@ -249,10 +249,10 @@ class MoscaleAccount
     {
         $result = Util::post($url, $data);
 
-        // Util::logToFile('moscale_query', [
-        //     'request' => $data,
-        //     'result' => $result,
-        // ]);
+         Util::logToFile('moscale_query', [
+             'request' => $data,
+             'result' => $result,
+         ]);
 
         return $result;
     }

@@ -336,6 +336,23 @@
                         </div>
                     </div>
                     {/if}
+                    {if \zovye\App::isZJBaoEnabled() && $account && $account->isZJBao()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="key" class="col-md-2 control-label">纸巾宝平台 appkey</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="key" id="key" value="{$config['key']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="secret" class="col-md-2 control-label">纸巾宝平台 appsecret</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="secret" id="secret" value="{$config['secret']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
                 {if \zovye\App::isCommissionEnabled()}
                 <div class="seg">

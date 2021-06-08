@@ -330,6 +330,7 @@ if ($op == 'default') {
                 Account::MOSCALE_NAME,
                 Account::YUNFENBA_NAME,
                 Account::AQIINFO_NAME,
+                Account::ZJBAO_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

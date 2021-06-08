@@ -135,7 +135,7 @@ class ZhiJinBaoAccount
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
         $params = array_merge($params, [
-            'zjbAppId' => '',
+            'zjbAppId' => $this->app_id,
             'openId' => $profile['openid'],
             'nickName' => $profile['nickname'],
             'headUrl' => empty($profile['avatar']) ? $profile['headimgurl'] : $profile['avatar'],

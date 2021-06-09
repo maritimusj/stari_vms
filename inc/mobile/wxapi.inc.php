@@ -35,7 +35,7 @@ router::exec($op, [
     'AgentMsgDetail' => '\zovye\api\wx\agent::msgDetail',
     'AgentMsgRemove' => '\zovye\api\wx\agent::msgRemove',
     'DeviceList' => '\zovye\api\wx\agent::deviceList',
-    'DeviceUpdate' => '\zovye\api\wx\agent::deviceUpdate',
+    'DeviceUpdate' => '@\zovye\api\wx\agent::deviceUpdate',
     'DeviceInfo' => '\zovye\api\wx\agent::deviceInfo',
     'DeviceBind' => '\zovye\api\wx\agent::deviceBind',
     'DeviceOpen' => '\zovye\api\wx\agent::deviceTest',

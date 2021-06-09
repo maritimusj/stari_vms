@@ -3,6 +3,8 @@
 namespace zovye\api;
 
 use zovye\JSON;
+use zovye\Util;
+use zovye\We7;
 use function zovye\is_error;
 
 class router
@@ -10,8 +12,10 @@ class router
     public static function exec($op, $map)
     { 
         $fn = $map[$op];
+        $with_transaction = We7::starts_with($fn, '@');
+        $fn = $with_transaction ? ltrim($fn, '@') : $fn;
         if (is_callable($fn)) {
-            $result = $fn();
+            $result = $with_transaction ? Util::transactionDo($fn) : $fn();
             if (is_error($result)) {
                 JSON::fail($result);
             } else {

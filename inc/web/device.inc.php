@@ -12,6 +12,7 @@ defined('IN_IA') or exit('Access Denied');
 use DateTime;
 
 use Exception;
+use RuntimeException;
 use zovye\model\device_eventsModelObj;
 use zovye\model\device_feedbackModelObj;
 use zovye\model\device_groupsModelObj;
@@ -571,182 +572,182 @@ if ($op == 'list') {
         'cargo_lanes' => [],
     ]);
 } elseif ($op == 'save') {
-
     $id = request::int('id');
 
-    $data = [
-        'agent_id' => 0,
-        'name' => request::trim('name'),
-        'imei' => request::trim('IMEI'),
-        'group_id' => request::int('group'),
-        'capacity' => max(0, request::int('capacity')),
-        'remain' => max(0, request::int('remain')),
-    ];
-
-    $tags = request::trim('tags');
-    $extra = [
-        'pushAccountMsg' => request::trim('pushAccountMsg'),
-        'isDown' => request::bool('isDown') ? 1 : 0,
-        'activeQrcode' => request::bool('activeQrcode') ? 1 : 0,
-        'address' => request::trim('address'),
-        'grantloc' => [
-            'lng' => floatval(request('location')['lng']),
-            'lat' => floatval(request('location')['lat']),
-        ],
-        'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
-    ];
-
-    if (App::isMustFollowAccountEnabled()) {
-        $extra['mfa'] = [
-            'enable' => request::int('mustFollow'),
+    $result = Util::transactionDo(function () use ($id) {
+        $data = [
+            'agent_id' => 0,
+            'name' => request::trim('name'),
+            'imei' => request::trim('IMEI'),
+            'group_id' => request::int('group'),
+            'capacity' => max(0, request::int('capacity')),
+            'remain' => max(0, request::int('remain')),
         ];
-    }
 
-    if (App::isMoscaleEnabled()) {
-        $extra['moscale'] = [
-            'key' => request::trim('moscaleMachineKey'),
-            'label' => array_map(function ($e) {
-                return intval($e);
-            }, explode(',', request::trim('moscaleLabel'))),
-            'region' => [
-                'province' => request::int('province_code'),
-                'city' => request::int('city_code'),
-                'area' => request::int('area_code'),
+        $tags = request::trim('tags');
+        $extra = [
+            'pushAccountMsg' => request::trim('pushAccountMsg'),
+            'isDown' => request::bool('isDown') ? 1 : 0,
+            'activeQrcode' => request::bool('activeQrcode') ? 1 : 0,
+            'address' => request::trim('address'),
+            'grantloc' => [
+                'lng' => floatval(request('location')['lng']),
+                'lat' => floatval(request('location')['lat']),
             ],
+            'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
         ];
-    }
 
-
-    if (empty($data['name']) || empty($data['imei'])) {
-        Util::itoast('设备名称或IMEI不能为空！', We7::referer(), 'error');
-    }
-
-    $type_id = request::int('deviceType');
-    if ($type_id) {
-        $device_type = DeviceTypes::get($type_id);
-        if (empty($device_type)) {
-            Util::itoast('设备类型不正确！', We7::referer(), 'error');
-        }
-    }
-
-    $data['device_type'] = $type_id;
-
-    if (App::isBluetoothDeviceSupported() && request::str('device_model') == Device::BLUETOOTH_DEVICE) {
-        $extra['bluetooth'] = [
-            'protocol' => request::str('blueToothProtocol'),
-            'uid' => request::trim('BUID'),
-            'mac' => request::trim('MAC'),
-            'motor' => request::int('Motor'),
-            'screen' => request::int('blueToothScreen') ? 1 : 0,
-            'power' => request::int('blueToothPowerSupply') ? 1 : 0,
-            'disinfectant' => request::int('blueToothDisinfectant') ? 1 : 0,
-        ];
-    }
-
-    $agent_id = request::int('agent_id');
-    if ($agent_id) {
-        $agent = Agent::get($agent_id);
-        if (empty($agent)) {
-            Util::itoast('找不到这个代理商！', We7::referer(), 'error');
-        }
-
-        $data['agent_id'] = $agent->getId();
-    }
-
-    if ($id) {
-        $device = Device::get($id);
-        if (empty($device)) {
-            Util::itoast('设备不存在！', $this->createWebUrl('device'), 'error');
-        }
-
-        if ($data['shadow_id']) {
-            $device->setShadowId($data['shadow_id']);
-        }
-
-        if ($data['agent_id'] != $device->getAgentId()) {
-            $device->setAgentId($data['agent_id']);
-        }
-
-        if ($data['name'] != $device->getName()) {
-            $device->setName($data['name']);
-        }
-
-        if ($data['device_type'] != $device->getDeviceType()) {
-            $device->setDeviceType($data['device_type']);
-        }
-
-        if ($data['group_id'] != $device->getGroupId()) {
-            $device->setGroupId($data['group_id']);
-        }
-
-        if (request::isset('volume')) {
-            $vol = max(0, min(100, request::int('volume')));
-            if ($vol != $device->settings('extra.volume')) {
-                $extra['volume'] = $vol;
-            }
-        }
-    } else {
-        $device = Device::create($data);
-        if (empty($device)) {
-            Util::itoast('创建失败！', We7::referer(), 'error');
-        }
-
-        $model = request('device_model');
-
-        $device->setDeviceModel($model);
-
-        if ($model == Device::NORMAL_DEVICE) {
-            $activeRes = Util::activeDevice($device->getImei());
-        }
-
-        //绑定appId
-        $device->updateAppId();
-    }
-
-    if (empty($type_id)) {
-        $device->setDeviceType(0);
-        $device_type = DeviceTypes::from($device);
-
-        $cargo_lanes = [];
-        $capacities = request::array('capacities');
-        foreach (request::array('goods') as $index => $goods_id) {
-            $cargo_lanes[] = [
-                'goods' => intval($goods_id),
-                'capacity' => intval($capacities[$index]),
+        if (App::isMustFollowAccountEnabled()) {
+            $extra['mfa'] = [
+                'enable' => request::int('mustFollow'),
             ];
         }
 
-        $device_type->setExtraData('cargo_lanes', $cargo_lanes);
-        $device_type->save();
-    }
-
-    if (empty($device_type)) {
-        Util::itoast('获取型号失败！', We7::referer(), 'error');
-    }
-
-    //货道商品数量和价格
-    $type_data = DeviceTypes::format($device_type);
-    $cargo_lanes = [];
-    foreach ($type_data['cargo_lanes'] as $index => $lane) {
-        $cargo_lanes["l{$index}"] = [
-            'num' => max(0, request::int("lane{$index}_num")),
-        ];
-        if ($device_type->getDeviceId() == $device->getId()) {
-            $cargo_lanes["l{$index}"]['price'] = request::float("price{$index}", 0, 2) * 100;
+        if (App::isMoscaleEnabled()) {
+            $extra['moscale'] = [
+                'key' => request::trim('moscaleMachineKey'),
+                'label' => array_map(function ($e) {
+                    return intval($e);
+                }, explode(',', request::trim('moscaleLabel'))),
+                'region' => [
+                    'province' => request::int('province_code'),
+                    'city' => request::int('city_code'),
+                    'area' => request::int('area_code'),
+                ],
+            ];
         }
-    }
 
-    if (!$device->setCargoLanes($cargo_lanes)) {
-        Util::itoast('保存型号数据失败！', We7::referer(), 'error');
-    }
 
-    $location = request::array('location');
-    $extra['location']['baidu']['lat'] = $location['lat'];
-    $extra['location']['baidu']['lng'] = $location['lng'];
+        if (empty($data['name']) || empty($data['imei'])) {
+            Util::itoast('设备名称或IMEI不能为空！', We7::referer(), 'error');
+        }
 
-    $saved_baidu_loc = $device->settings('extra.location.baidu', []);
-    if (strval($saved_baidu_loc['lng']) != strval($location['lng']) 
-        || strval($saved_baidu_loc['lat']) != strval($location['lat'])) {
+        $type_id = request::int('deviceType');
+        if ($type_id) {
+            $device_type = DeviceTypes::get($type_id);
+            if (empty($device_type)) {
+                throw new RuntimeException('设备类型不正确！');
+            }
+        }
+
+        $data['device_type'] = $type_id;
+
+        if (App::isBluetoothDeviceSupported() && request::str('device_model') == Device::BLUETOOTH_DEVICE) {
+            $extra['bluetooth'] = [
+                'protocol' => request::str('blueToothProtocol'),
+                'uid' => request::trim('BUID'),
+                'mac' => request::trim('MAC'),
+                'motor' => request::int('Motor'),
+                'screen' => request::int('blueToothScreen') ? 1 : 0,
+                'power' => request::int('blueToothPowerSupply') ? 1 : 0,
+                'disinfectant' => request::int('blueToothDisinfectant') ? 1 : 0,
+            ];
+        }
+
+        $agent_id = request::int('agent_id');
+        if ($agent_id) {
+            $agent = Agent::get($agent_id);
+            if (empty($agent)) {
+                throw new RuntimeException('找不到这个代理商！');
+            }
+
+            $data['agent_id'] = $agent->getId();
+        }
+
+        if ($id) {
+            $device = Device::get($id);
+            if (empty($device)) {
+                throw new RuntimeException('设备不存在！');
+            }
+
+            if ($data['shadow_id']) {
+                $device->setShadowId($data['shadow_id']);
+            }
+
+            if ($data['agent_id'] != $device->getAgentId()) {
+                $device->setAgentId($data['agent_id']);
+            }
+
+            if ($data['name'] != $device->getName()) {
+                $device->setName($data['name']);
+            }
+
+            if ($data['device_type'] != $device->getDeviceType()) {
+                $device->setDeviceType($data['device_type']);
+            }
+
+            if ($data['group_id'] != $device->getGroupId()) {
+                $device->setGroupId($data['group_id']);
+            }
+
+            if (request::isset('volume')) {
+                $vol = max(0, min(100, request::int('volume')));
+                if ($vol != $device->settings('extra.volume')) {
+                    $extra['volume'] = $vol;
+                }
+            }
+        } else {
+            $device = Device::create($data);
+            if (empty($device)) {
+                throw new RuntimeException('创建失败！');
+            }
+
+            $model = request('device_model');
+
+            $device->setDeviceModel($model);
+
+            if ($model == Device::NORMAL_DEVICE) {
+                $activeRes = Util::activeDevice($device->getImei());
+            }
+
+            //绑定appId
+            $device->updateAppId();
+        }
+
+        if (empty($type_id)) {
+            $device->setDeviceType(0);
+            $device_type = DeviceTypes::from($device);
+
+            $cargo_lanes = [];
+            $capacities = request::array('capacities');
+            foreach (request::array('goods') as $index => $goods_id) {
+                $cargo_lanes[] = [
+                    'goods' => intval($goods_id),
+                    'capacity' => intval($capacities[$index]),
+                ];
+            }
+
+            $device_type->setExtraData('cargo_lanes', $cargo_lanes);
+            $device_type->save();
+        }
+
+        if (empty($device_type)) {
+            throw new RuntimeException('获取型号失败！');
+        }
+
+        //货道商品数量和价格
+        $type_data = DeviceTypes::format($device_type);
+        $cargo_lanes = [];
+        foreach ($type_data['cargo_lanes'] as $index => $lane) {
+            $cargo_lanes["l{$index}"] = [
+                'num' => max(0, request::int("lane{$index}_num")),
+            ];
+            if ($device_type->getDeviceId() == $device->getId()) {
+                $cargo_lanes["l{$index}"]['price'] = request::float("price{$index}", 0, 2) * 100;
+            }
+        }
+
+        if (!$device->setCargoLanes($cargo_lanes)) {
+            throw new RuntimeException('保存型号数据失败！');
+        }
+
+        $location = request::array('location');
+        $extra['location']['baidu']['lat'] = $location['lat'];
+        $extra['location']['baidu']['lng'] = $location['lng'];
+
+        $saved_baidu_loc = $device->settings('extra.location.baidu', []);
+        if (strval($saved_baidu_loc['lng']) != strval($location['lng'])
+            || strval($saved_baidu_loc['lat']) != strval($location['lat'])) {
             $addr = Util::getLocation($location['lng'], $location['lat']);
             if ($addr) {
                 $extra['location']['baidu']['area'] = [
@@ -759,23 +760,25 @@ if ($op == 'list') {
                 $extra['location']['area'] = [];
                 $extra['location']['address'] = [];
             }
-    } else {
-        $extra['location']['baidu'] = $device->settings('extra.location.baidu');
-    }
+        } else {
+            $extra['location']['baidu'] = $device->settings('extra.location.baidu');
+        }
 
-    $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
+        $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
 
-    //合并extra
-    $extra = array_merge($device->get('extra', []), $extra);
+        //合并extra
+        $extra = array_merge($device->get('extra', []), $extra);
 
-    if (!$device->set('extra', $extra)) {
-        Util::itoast('保存扩展数据失败！', We7::referer(), 'error');
-    }
+        if (!$device->set('extra', $extra)) {
+            throw new RuntimeException('保存扩展数据失败！');
+        }
 
-    $device->setTagsFromText($tags);
-    $device->setDeviceModel(request('device_model'));
+        $device->setTagsFromText($tags);
+        $device->setDeviceModel(request('device_model'));
+        if (!$device->save()) {
+            throw new RuntimeException('保存数据失败！');
+        }
 
-    if ($device->save()) {
         //保存其它广告需要的配置
         if (App::isCustomAliTicketEnabled()) {
             $join = request::bool('JoinAliTicket');
@@ -795,7 +798,7 @@ if ($op == 'list') {
                 AliTicket::registerDevice($device);
             } else {
                 AliTicket::unregisterDevice($device);
-            }            
+            }
         }
 
         //更新公众号缓存
@@ -806,6 +809,7 @@ if ($op == 'list') {
         $device->updateRemain();
 
         $msg = '保存成功';
+        $error = false;
 
         $res = $device->updateQrcode(true);
         if (is_error($res)) {
@@ -820,15 +824,20 @@ if ($op == 'list') {
 
         $msg .= '!';
 
-        Util::itoast($msg, $id ? We7::referer() : $this->createWebUrl('device'), isset($error) ? 'warning' : 'success');
+        return ['error' => $error, 'message' => $msg];
+    });
+
+    if (is_error($result)) {
+        Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), 'error');
     }
 
-    Util::itoast('保存失败！', We7::referer(), 'error');
+    Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), $result['error'] ? 'warning' : 'success');
+
 } elseif ($op == 'online') {
 
     $device = Device::get(request::int('id'));
     if (empty($device)) {
-        JSON::fail('找不到这个设备！');        
+        JSON::fail('找不到这个设备！');
     }
 
     JSON::success($device->getOnlineDetail(false));
@@ -1486,11 +1495,11 @@ if ($op == 'list') {
         $query->where(['title REGEXP' => $keywords]);
     }
 
-    $result     = [
-        'page'      => $page,
-        'total'     => $total,
+    $result = [
+        'page' => $page,
+        'total' => $total,
         'totalpage' => $total_page,
-        'list'      => [],
+        'list' => [],
     ];
 
     foreach ($query->findAll() as $entry) {
@@ -1498,7 +1507,7 @@ if ($op == 'list') {
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
-            'total' => (int) Device::query(['group_id' => $entry->getId()])->count(),
+            'total' => (int)Device::query(['group_id' => $entry->getId()])->count(),
         ];
     }
 
@@ -1897,7 +1906,7 @@ if ($op == 'list') {
     } else {
         $e_date = new DateTime('first day of next month 00:00:00');
     }
-    
+
     $condition = [
         'createtime >=' => $s_date->getTimestamp(),
         'createtime <' => $e_date->getTimestamp(),
@@ -1929,13 +1938,13 @@ if ($op == 'list') {
         if ($pics === false) {
             $pics = [];
         } else {
-            foreach($pics as $index => $pic) {
+            foreach ($pics as $index => $pic) {
                 $pics[$index] = Util::toMedia($pic);
-            }            
+            }
         }
 
         $arr = [
-            'id' => $item->getId(),                  
+            'id' => $item->getId(),
             'text' => $item->getText(),
             'pics' => $pics,
             'remark' => $item->getRemark(),
@@ -1956,7 +1965,7 @@ if ($op == 'list') {
             $agent = $device->getAgent();
             if ($agent) {
                 $arr['agent'] = $agent->profile();
-            }            
+            }
         }
 
         $data[] = $arr;
@@ -1967,7 +1976,7 @@ if ($op == 'list') {
     $tpl_data['device_id'] = $device_id;
     $tpl_data['data'] = $data;
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
-    
+
     app()->showTemplate('web/device/feedback', $tpl_data);
 } else if ($op == 'deal_fb') {
 
@@ -2264,7 +2273,7 @@ if ($op == 'list') {
         if (isset($device) && $result['config']['join']) {
             $status = AliTicket::getDeviceJoinStatus($device);
             $result['status'] = is_error($status) ? 0 : 1;
-            $result['error'] = is_error($status) ? $status['message'] : '';      
+            $result['error'] = is_error($status) ? $status['message'] : '';
         }
     }
 

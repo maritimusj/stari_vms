@@ -614,15 +614,21 @@ class deviceModelObj extends modelObj
     {
         $result = Device::resetPayload($this, $data);
         if ($result) {
-            PayloadLogs::create([
-                'device_id' => $this->id,
-                'goods_id' => $result['goodsId'],
-                'org' => $result['org'],
-                'num' => $result['num'],
-                'extra' => [
-                    'reason' => $reason,
-                ]
-            ]);
+            $now = time();
+            $code = Util::random(6);
+            foreach ($result as $entry) {
+                PayloadLogs::create([
+                    'device_id' => $this->id,
+                    'goods_id' => $entry['goodsId'],
+                    'org' => $entry['org'],
+                    'num' => $entry['num'],
+                    'extra' => [
+                        'reason' => $reason,
+                        'code' => $code,
+                    ],
+                    'createtime' => $now,
+                ]);
+            }
         }
         return $result;
     }

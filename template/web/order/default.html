@@ -242,7 +242,7 @@
                             {if $order['price']>0}
                             (总计：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
                                 {if $order['discount'] > 0}
-                                {php echo number_format($order['goods']['price'] / 100, 2)}
+                                {php echo number_format($order['goods']['price'] * $order['num'] / 100, 2)}
                                 {else}
                                 {$order['price']}
                                 {/if}

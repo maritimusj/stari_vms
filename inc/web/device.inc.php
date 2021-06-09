@@ -724,6 +724,7 @@ if ($op == 'list') {
         Util::itoast('获取型号失败！', We7::referer(), 'error');
     }
 
+    //货道商品数量和价格
     $type_data = DeviceTypes::format($device_type);
     $cargo_lanes = [];
     foreach ($type_data['cargo_lanes'] as $index => $lane) {

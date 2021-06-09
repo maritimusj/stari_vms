@@ -527,18 +527,23 @@ class agent
             $device->setDeviceType($type_id);
         }
 
-        //如果是自定义型号
-        if ($device->getDeviceType() == 0) {
-            $type_data = isset($device_type) ? DeviceTypes::format($device_type) : [];
-            $extra['cargo_lanes'] = [];
-            $prices = request::array('price');
-            $num = request::array('num');
-            foreach ($type_data['cargo_lanes'] as $index => $lane) {
-                $extra['cargo_lanes']["l{$index}"] = [
-                    'price' => intval($prices[$index]),
-                    'num' => max(0, intval($num[$index])),
-                ];
+        //货道商品数量和价格
+        $prices = request::array('price');
+        $num = request::array('num');
+
+        $type_data = DeviceTypes::format($device_type);
+        $cargo_lanes = [];
+        foreach ($type_data['cargo_lanes'] as $index => $lane) {
+            $cargo_lanes["l{$index}"] = [
+                'num' => max(0, intval($num[$index])),
+            ];
+            if ($device_type->getDeviceId() == $device->getId()) {
+                $cargo_lanes["l{$index}"]['price'] =  intval($prices[$index]);
             }
+        }
+    
+        if (!$device->setCargoLanes($cargo_lanes)) {
+            return error(State::ERROR, '保存型号数据失败！');
         }
 
         //修改位置信息

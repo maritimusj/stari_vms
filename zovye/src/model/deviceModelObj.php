@@ -11,6 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\Job;
 
+use zovye\PayloadLogs;
 use zovye\PlaceHolder;
 use zovye\We7;
 use zovye\User;
@@ -604,13 +605,26 @@ class deviceModelObj extends modelObj
 
     /**
      * 重置多货道商品数量，负值表示减少指定数量，正值表示设置为指定数量，0值表示重围到最大数量
-     * 空数组则重围所有货道商品数量到最大值
+     * 空数组则重置所有货道商品数量到最大值
      * @param array $data
+     * @param string $reason
      * @return array
      */
-    public function resetPayload(array $data = []): array
+    public function resetPayload(array $data = [], $reason = ''): array
     {
-        return Device::resetPayload($this, $data);
+        $result = Device::resetPayload($this, $data);
+        if ($result) {
+            PayloadLogs::create([
+                'device_id' => $this->id,
+                'goods_id' => $result['goodsId'],
+                'org' => $result['org'],
+                'num' => $result['num'],
+                'extra' => [
+                    'reason' => $reason,
+                ]
+            ]);
+        }
+        return $result;
     }
 
     public function resetGoodsNum($goods_id, $delta): array

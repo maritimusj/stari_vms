@@ -194,7 +194,7 @@ class orderModelObj extends modelObj
 
     public function getCommissionPrice(): int
     {
-        return $this->getPrice() - $this->getDiscount();
+        return $this->getPrice();
     }
 
     public function getGoodsPrice(): int

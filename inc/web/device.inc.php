@@ -825,13 +825,13 @@ if ($op == 'list') {
     Util::itoast('保存失败！', We7::referer(), 'error');
 } elseif ($op == 'online') {
 
-    $client_id = request::trim('id');
-    if ($client_id) {
-        $res = CtrlServ::v2_query("device/{$client_id}/online");
-        exit($res['status'] === true && $res['data']['mcb'] === true ? 1 : 0);
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');        
     }
 
-    exit(-1);
+    JSON::success($device->getOnlineDetail(false));
+
 } elseif ($op == 'deviceTest') {
 
     $id = request::int('id');

@@ -1560,15 +1560,15 @@ class deviceModelObj extends modelObj
         return $accounts;
     }
 
-    public function getOnlineDetail(): array
+    public function getOnlineDetail($use_cache = true): array
     {
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
-                'mcb' => ['online' => true],
-                'app' => ['online' => true],
+                'mcb' => true,
+                'app' => true,
             ];
         }
-        $res = CtrlServ::v2_query("device/{$this->imei}");
+        $res = CtrlServ::v2_query("device/{$this->imei}/online", ['nocache' => $use_cache ? 'false' : 'true']);
         if ($res['status'] === true) {
             return $res['data'];
         }
@@ -2059,6 +2059,7 @@ class deviceModelObj extends modelObj
                 return true;
             }
         }
+
         return false;
     }
 

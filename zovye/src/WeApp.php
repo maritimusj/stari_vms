@@ -395,19 +395,9 @@ JSCODE;
         if (Helper::MustFollowAccount($device)) {
             if ($tpl['from'] != 'account') {
                 if (empty($tpl['accounts'])) {
-                    $account = Account::getNext($device, $user->settings('accounts.last.uid', ''));
+                    $account = Account::getUserNext($device, $user);
                     if ($account) {
-                        $uid = $account['uid'];
-
-                        Account::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
-                        if ($account) {
-                            $tpl['accounts'][] = $account;
-                        }
-
-                        $user->updateSettings('accounts.last', [
-                            'uid' => $uid,
-                            'time' => time(),
-                        ]);
+                        $tpl['accounts'][] = $account;
                     }
                 }
             } else {
@@ -421,6 +411,8 @@ JSCODE;
         if (empty($tpl['accounts']) && empty($tpl['goods'])) {
             $user->remove('last');
         }
+
+
 
         //如果没有货道，或只有一个货道，并且商品数量不足，或所有商品都没有允许免费领取，则无法免费领取
         $lanesNum = $device->getCargoLanesNum();

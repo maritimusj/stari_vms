@@ -748,6 +748,31 @@ class Account extends State
     /**
      * 根据上次 uid 获取下个公众号
      * @param deviceModelObj $device
+     * @param userModelObj $user
+     * @return array
+     */
+    public static function getUserNext(deviceModelObj $device, userModelObj  $user): array
+    {
+        $account = Account::getNext($device, $user->settings('accounts.last.uid', ''));
+        if ($account) {
+            $uid = $account['uid'];
+
+            Account::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
+            if ($account) {
+                return $account;
+            }
+
+            $user->updateSettings('accounts.last', [
+                'uid' => $uid,
+                'time' => time(),
+            ]);
+        }
+        return [];
+    }
+
+    /**
+     * 根据上次 uid 获取下个公众号
+     * @param deviceModelObj $device
      * @param $last_uid
      * @return array
      */

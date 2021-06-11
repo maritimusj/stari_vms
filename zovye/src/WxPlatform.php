@@ -26,6 +26,7 @@ class WxPlatform
     const AUTHORIZATION_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid={APPID}&redirect_uri={REDIRECT_URI}&response_type=code&scope={SCOPE}&state={STATE}&component_appid={COMPONENT_APPID}#wechat_redirect';
     const ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/sns/oauth2/component/access_token?appid={APPID}&code={CODE}&grant_type=authorization_code&component_appid={COMPONENT_APPID}&component_access_token={COMPONENT_ACCESS_TOKEN}';
     const GET_USER_PROFILE = 'https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN';
+    const GET_USER_PROFILE2 = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN';
 
     const PERM_QRCODE = 'QR_LIMIT_STR_SCENE';
     const TEMP_QRCODE = 'QR_STR_SCENE';
@@ -189,6 +190,22 @@ class WxPlatform
     public static function getUserProfile($access_token, $openid): array
     {
         $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE));
+
+        $result = json_decode($data, true);
+        if (empty($result)) {
+            return err('接口返回数据为空！');
+        }
+
+        if (!empty($result['errcode'])) {
+            return err($result['errmsg']);
+        }
+
+        return $result;
+    }
+
+    public static function getUserProfile2($access_token, $openid): array
+    {
+        $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2));
 
         $result = json_decode($data, true);
         if (empty($result)) {

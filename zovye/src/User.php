@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -19,7 +20,7 @@ class User
     const WxAPP = 1;
     const ALI = 2;
 
-    const API = 10;   
+    const API = 10;
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -141,7 +142,7 @@ class User
             if ($is_openid) {
                 $cond['openid'] = strval($id);
             } else {
-                $cond['id'] = intval($id);                
+                $cond['id'] = intval($id);
             }
             $user = self::findOne($cond);
             if ($user) {
@@ -211,5 +212,21 @@ class User
         }
 
         return $discount;
+    }
+
+    public static function makeUserFootprint($data = [])
+    {
+        if ($data  instanceof userModelObj) {
+            $data = $data->profile();
+        }
+        return sha1(http_build_query(
+            [
+                'nickname' => $data['nickname'],
+                'sex' => $data['sex'],
+                'province' => $data['province'],
+                'city' => $data['city'],
+                'country' => $data['country'],
+            ]
+        ));
     }
 }

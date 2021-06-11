@@ -144,6 +144,10 @@ class Account extends State
             $data['service_type'] = $entry->getServiceType();
             //出货时机
             $data['open_timing'] = $entry->settings('config.open.timing');
+            $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
+            if ($appid) {
+                $data['appid'] = $appid;
+            }            
         }
 
         return $data;

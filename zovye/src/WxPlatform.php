@@ -219,6 +219,14 @@ class WxPlatform
         return $result;
     }
 
+    public static function getAccountAccessToken(accountModelObj $acc)
+    {
+        $data = $acc->settings('authdata.authorization_info', []);
+        if (time() - $data['createtime'] > $data['expires_in'] - 1000) {
+
+        }
+    }
+
     public static function getComponentTicket(): string
     {
         $data = Config::wxplatform('ticket', settings('account.wx.platform.ticket', []));
@@ -567,25 +575,58 @@ class WxPlatform
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
-            list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
-            if ($prefix != App::uid(6)) {
-                return [];
+            if ($acc->isServiceAccount()) {
+                list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
+                if ($prefix != App::uid(6)) {
+                    return [];
+                }
+
+                $device = Device::get($second);
+
+                if (empty($device)) {
+                    throw new RuntimeException('找不到这个设备！');
+                }
+
+                if ($first == 'device') {
+                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                }
+
+                $user = User::get($first);
+                if (empty($user)) {
+                    throw new RuntimeException('找不到这个用户！');
+                }                
+            } else {
+                $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
+
+                $appid = $acc->settings('authdata.authorization_info.authorizer_appid');
+                $obj = ComponentUser::findOne([
+                    'appid' => $appid,
+                    'openid' => User::makeUserFootprint($profile), 
+                ]);
+
+                // Util::logToFile('debug', [
+                //     'msg' => $msg,
+                //     'token' => $acc->settings('authdata.authorization_info.authorizer_access_token'),
+                //     'profile' => $profile,
+                // ]);
+
+                if (empty($obj)) {
+                    throw new RuntimeException('找不到这个用户！?');
+                }
+
+                ComponentUser::removeAll(['appid' => $appid]);
+
+                $device = Device::findOne(['shadow_id' => $obj->getExtraData('device')]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到这个设备！');
+                }
+
+                $user = User::get($obj->getUserId());
             }
 
-            $device = Device::get($second);
-
-            if (empty($device)) {
-                throw new RuntimeException('找不到这个设备！');
-            }
-
-            if ($first == 'device') {
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
-            }
-
-            $user = User::get($first);
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
-            }
+            } 
 
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用！');
@@ -608,7 +649,7 @@ class WxPlatform
                 ]);
             }
 
-            $uid = sha1($msg['Ticket']);
+            $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
             $order_uid = substr("U{$user->getId()}D{$device->getId()}{$uid}", 0, MAX_ORDER_NO_LEN);
 
             Job::createSpecialAccountOrder([
@@ -622,6 +663,9 @@ class WxPlatform
             return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
 
         } catch (ZovyeException $e) {
+            Util::logToFile('debug', [
+                'error' => $e->getMessage()
+            ]);            
             $device = $e->getDevice();
             if ($device) {
                 $device->appShowMessage($e->getMessage(), 'error');
@@ -630,6 +674,9 @@ class WxPlatform
             return err($e->getMessage());
 
         } catch (Exception $e) {
+            Util::logToFile('debug', [
+                'error' => $e->getMessage()
+            ]);
             return err($e->getMessage());
         }
     }

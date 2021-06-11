@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use CompileError;
 use Exception;
 use we7\template;
 use zovye\base\modelObj;
@@ -440,6 +441,8 @@ JSCODE;
             $tpl['accounts'] = [];
         }
 
+        ComponentUser::removeAll(['user_id' => $user->getId()]);
+
         foreach ($tpl['accounts'] as $index => $account) {
             //检查直接转跳的吸粉广告或公众号
             if (!empty($account['redirect_url'])) {
@@ -453,15 +456,24 @@ JSCODE;
 
             //检查需要关注出货的订阅号
             if (isset($account['service_type']) && $account['service_type'] != Account::SERVICE_ACCOUNT && empty($account['open_timing'])) {
-                $obj = Account::get($account['id']);
-                if ($obj) {
-                    $redirect_url = Util::murl('util', ['op' => 'auth', 'device' => $device->getImei(), 'account' => $account['id'], 'user' => $user->getId()]);
-                    $url = WxPlatform::getAuthorizationCodeRedirectUrl($obj, $redirect_url);
-                    if ($url) {
-                        Util::redirect($url);
-                        exit('正在转跳...');
+                $footprint = User::makeUserFootprint($user);
+                if (!ComponentUser::exists(['user_id' => $user->getId(), 'appid' => $account['appid']])) {
+                    ComponentUser::create([
+                        'appid' => $account['appid'],
+                        'user_id' => $user->getId(),
+                        'openid' => $footprint,
+                        'extra' => [
+                            'device' => $device->getShadowId(),
+                            'time' => time(),
+                        ]
+                    ]);    
+                } else {
+                    $obj = ComponentUser::findOne(['user_id' => $user->getId(), 'appid' => $account['appid']]);
+                    if ($obj) {
+                        $obj->setOpenid($footprint);
+                        $obj->save();
                     }
-                }
+                }                
             }
         }
 

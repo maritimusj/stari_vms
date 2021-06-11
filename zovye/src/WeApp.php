@@ -440,7 +440,6 @@ JSCODE;
             $tpl['accounts'] = [];
         }
 
-        $easy_mode = App::isSubscriptionAccountEasyModeEnabled();
         foreach ($tpl['accounts'] as $index => $account) {
             //检查直接转跳的吸粉广告或公众号
             if (!empty($account['redirect_url'])) {
@@ -453,7 +452,7 @@ JSCODE;
             }
 
             //检查需要关注出货的订阅号
-            if (isset($account['service_type']) && $account['service_type'] != Account::SERVICE_ACCOUNT && $easy_mode) {
+            if (isset($account['service_type']) && $account['service_type'] != Account::SERVICE_ACCOUNT && empty($account['open_timing'])) {
                 $obj = Account::get($account['id']);
                 if ($obj) {
                     $redirect_url = Util::murl('util', ['op' => 'auth', 'device' => $device->getImei(), 'account' => $account['id'], 'user' => $user->getId()]);

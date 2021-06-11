@@ -140,7 +140,10 @@ class Account extends State
         }
 
         if ($entry->isAuth()) {
+            //授权公众号类型
             $data['service_type'] = $entry->getServiceType();
+            //出货时机
+            $data['open_timing'] = $entry->settings('config.open.timing');
         }
 
         return $data;

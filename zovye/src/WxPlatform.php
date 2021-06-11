@@ -498,7 +498,6 @@ class WxPlatform
         ]);
     }
 
-
     public static function getEncryptedMsg(string $msg): string
     {
         $platform = self::getPlatform();

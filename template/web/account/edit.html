@@ -218,11 +218,11 @@
                         <label class="col-md-2 control-label">出货时机</label>
                         <div class="col-md-8">
                             <label for="scan" class="radio-inline">
-                                <input name="OpenTiming" id="scan" type="radio" value="0"{if empty($config['open']['timing'])} checked="checked"{/if}{/if}>
+                                <input name="OpenTiming" id="scan" type="radio" value="0"{if empty($config['open']['timing'])} checked="checked"{/if}>
                                 扫码进入公众号
                             </label>
                             <label for="link" class="radio-inline">
-                                <input name="OpenTiming" id="link" type="radio" value="1"  {if $config['open']['timing'] == 1}checked="checked"{/if}>
+                                <input name="OpenTiming" id="link" type="radio" value="1"{if $config['open']['timing'] == 1} checked="checked"{/if}>
                                 打开取货链接
                             </label>
                             <span class="help-block">* 请选择出货时机，用户扫码进入公众号后立即出货或用户打开取货页面后出货</span>
@@ -232,8 +232,8 @@
                         <label for="OpenMsg" class="col-md-2 control-label">消息推送</label>
                         <div class="col-md-10">
                             <select style="width: 100%;" name="openMsgType" id="openMsgType">
-                                <option value="text" {if isset($config['open']['msg'])}selected{/if}>文本消息</option>
-                                <option value="news" {if isset($config['open']['news'])}selected{/if}>图文消息</option>
+                                <option value="text"{if isset($config['open']['msg'])} selected{/if}>文本消息</option>
+                                <option value="news"{if isset($config['open']['news'])} selected{/if}>图文消息</option>
                             </select>
                             <span class="help-block">* 用户扫码进入公众号后，给用户推送消息</span>
                         </div>

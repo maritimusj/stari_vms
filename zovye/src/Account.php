@@ -708,8 +708,8 @@ class Account extends State
                         continue;
                     }
                 }
-                if (isset($account['service_type'])) {
-                    //如果是授权公众号，需要使用场景二维码替换原二维码
+                if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
+                    //如果是授权服务号，需要使用场景二维码替换原二维码
                     self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                     if (isset($account['qrcode'])) {
                         if ($account['qrcode']) {
@@ -745,7 +745,7 @@ class Account extends State
             $result = Account::getAuthorizerQrcodeById($account_data['id'], $str, $temporary);
             if (is_error($result)) {
                 Util::logToFile('wxplatform', [
-                    'fn' => 'devicePage',
+                    'fn' => 'updateAuthAccountQRCode',
                     'error' => $result,
                 ]);
                 return $result;

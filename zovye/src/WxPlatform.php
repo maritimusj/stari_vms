@@ -115,15 +115,14 @@ class WxPlatform
     public static function getAuthorizationCodeRedirectUrl(accountModelObj $account, $redirect_url, $scope = self::SCOPE_SNSAPI_BASE, $state = ''): string
     {
         $component_appid = settings('account.wx.platform.config.appid');
-        $appid = $account->settings('authorization_info.authorizer_appid');
-
+        $appid = $account->settings('authdata.authorization_info.authorizer_appid');
         if (empty($component_appid) || empty($appid)) {
             return '';
         }
 
         return str_replace(['{APPID}', '{REDIRECT_URI}', '{SCOPE}', '{STATE}', '{COMPONENT_APPID}'], [
             $appid,
-            $redirect_url,
+            urlencode($redirect_url),
             $scope,
             $state,
             $component_appid,
@@ -164,12 +163,12 @@ class WxPlatform
             return err('无法获取component access token');
         }
 
-        $data = Util::get(str_replace(self::ACCESS_TOKEN_URL, ['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
+        $data = Util::get(str_replace(['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
             $appid,
             $code,
             $component_appid,
             $component_access_token,
-        ]));
+        ], self::ACCESS_TOKEN_URL));
 
         if (empty($data)) {
             return err('接口请求失败！');
@@ -189,9 +188,7 @@ class WxPlatform
 
     public static function getUserProfile($access_token, $openid): array
     {
-        $data = Util::get(str_replace(self::GET_USER_PROFILE, ['{ACCESS_TOKEN}', '{OPENID}'], [
-            $access_token, $openid,
-        ]));
+        $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE));
 
         $result = json_decode($data, true);
         if (empty($result)) {
@@ -548,7 +545,7 @@ class WxPlatform
                 throw new RuntimeException('找不到指定的公众号：' . $account_name);
             }
 
-            //出货时机是用户点击链连后，直接指定回推送的消息
+            //出货时机是用户点击链连后，直接返回推送的消息
             if (!empty($acc->settings('config.open.timing'))) {
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }

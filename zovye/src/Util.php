@@ -2358,7 +2358,7 @@ HTML_CONTENT;
      * @param int $timeout
      * @return string|null
      */
-    public static function get(string $url, int $timeout = 3): ?string
+    public static function get(string $url, int $timeout = 3, $params = []): ?string
     {
         $ch = curl_init();
 
@@ -2371,6 +2371,14 @@ HTML_CONTENT;
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
+        if (empty($params[CURLOPT_USERAGENT])) {
+            $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
+        }      
+
+        foreach($params as $index => $val) {
+            curl_setopt($ch, $index, $val);
+        }
 
         $response = curl_exec($ch);
 
@@ -2391,7 +2399,7 @@ HTML_CONTENT;
      * @param int $timeout
      * @return array
      */
-    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3): array
+    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, $params = []): array
     {
         $ch = curl_init();
 
@@ -2416,6 +2424,14 @@ HTML_CONTENT;
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
+        if (empty($params[CURLOPT_USERAGENT])) {
+            $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
+        }      
+
+        foreach($params as $index => $val) {
+            curl_setopt($ch, $index, $val);
+        }
 
         $response = curl_exec($ch);
 

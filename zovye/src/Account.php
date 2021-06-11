@@ -753,11 +753,11 @@ class Account extends State
      */
     public static function getUserNext(deviceModelObj $device, userModelObj  $user): array
     {
-        $account = Account::getNext($device, $user->settings('accounts.last.uid', ''));
+        $account = self::getNext($device, $user->settings('accounts.last.uid', ''));
         if ($account) {
             $uid = $account['uid'];
 
-            Account::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
+            self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
             if ($account) {
                 return $account;
             }

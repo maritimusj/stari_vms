@@ -565,7 +565,7 @@ class Account extends State
         return self::getAuthorizerQrcode($account, $sceneStr, $temporary);
     }
 
-    public static function getAuthorizerQrcode(accountModelObj $account, string $sceneStr, $temporary = true): array
+    public static function getAuthorizerAccessToken(accountModelObj $account)
     {
         $auth_data = $account->get('authdata', []);
         if (empty($auth_data)) {
@@ -593,9 +593,17 @@ class Account extends State
             $account->set('authdata', $auth_data);
         }
 
-        $access_token = getArray($auth_data, 'authorization_info.authorizer_access_token', '');
+        return strval(getArray($auth_data, 'authorization_info.authorizer_access_token', ''));
+    }
 
-        return WxPlatform::getAuthQRCode($access_token, $sceneStr, $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE);
+    public static function getAuthorizerQrcode(accountModelObj $account, string $sceneStr, $temporary = true): array
+    {
+        $res = self::getAuthorizerAccessToken($account);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return WxPlatform::getAuthQRCode($res, $sceneStr, $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE);
     }
 
     public static function createOrUpdateFromWxPlatform(int $agent_id, string $app_id, array $auth_result = [])

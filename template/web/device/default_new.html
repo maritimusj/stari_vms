@@ -63,6 +63,7 @@
         display: flex;
     }
     #devicelist .app .devcie-detail {
+        cursor: default;
         position: absolute;
         z-index: 99;
         overflow: hidden;
@@ -522,8 +523,8 @@
                         <td class="status">
                             <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
                             <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
-                            <div @click="refreshStatus(o)" :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">
-                                <div :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
+                            <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">
+                                <div @click.self="refreshStatus(o)" :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
                                     <div class="devcie-detail">
                                         <div class="detail-seg">
                                             <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 

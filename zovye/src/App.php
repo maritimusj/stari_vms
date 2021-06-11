@@ -453,4 +453,10 @@ class App
             return boolval(settings('custom.useAccountQRCode.enabled'));
         });
     }
+
+    public static function isSubscriptionAccountEasyModeEnabled(): bool {
+        return onceCall(function() {
+            return boolval(settings('custom.account.easy_mode.enabled'));
+        });
+    }
 }

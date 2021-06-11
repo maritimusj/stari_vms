@@ -44,6 +44,10 @@ class Account extends State
     //纸巾宝
     const ZJBAO = 103;
 
+
+    const SUBSCRIPTION_ACCOUNT = 0;
+    const SERVICE_ACCOUNT = 2;
+
     const JFB_NAME = '准粉吧';
     const JFB_HEAD_IMG = MODULE_URL . 'static/img/jfb_pic.png';
 
@@ -133,6 +137,10 @@ class Account extends State
             $data['duration'] = $entry->getDuration();
         } else {
             $data['qrcode'] = $entry->getQrcode();
+        }
+
+        if ($entry->isAuth()) {
+            $data['service_type'] = $entry->getServiceType();
         }
 
         return $data;
@@ -697,13 +705,15 @@ class Account extends State
                         continue;
                     }
                 }
-                //如果是授权公众号，需要使用场景二维码替换原二维码
-                self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
-                if (isset($account['qrcode'])) {
-                    if ($account['qrcode']) {
-                        $account['qrcode'] = Util::toMedia($account['qrcode']);
-                    } else {
-                        $account['qrcode'] = './resource/images/nopic.jpg';
+                if (isset($account['service_type'])) {
+                    //如果是授权公众号，需要使用场景二维码替换原二维码
+                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
+                    if (isset($account['qrcode'])) {
+                        if ($account['qrcode']) {
+                            $account['qrcode'] = Util::toMedia($account['qrcode']);
+                        } else {
+                            $account['qrcode'] = './resource/images/nopic.jpg';
+                        }
                     }
                 }
                 if (isset($account['media'])) {

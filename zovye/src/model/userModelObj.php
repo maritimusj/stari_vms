@@ -136,7 +136,7 @@ class userModelObj extends modelObj
         return $this->app == User::API;
     }
 
-    public function profile(): array
+    public function profile($detail = true): array
     {
         $data = [
             'id' => $this->getId(),
@@ -146,23 +146,25 @@ class userModelObj extends modelObj
             'headimgurl' => $this->getAvatar(),
         ];
 
-        $fans_data = $this->get('fansData', []);
+        if ($detail) {
+            $fans_data = $this->get('fansData', []);
 
-        if (is_array($fans_data)) {
-            $data['sex'] = $fans_data['sex'];
-            $data['province'] = $fans_data['province'];
-            $data['city'] = $fans_data['city'];
-            $data['country'] = $fans_data['country'];
+            if (is_array($fans_data)) {
+                $data['sex'] = $fans_data['sex'];
+                $data['province'] = $fans_data['province'];
+                $data['city'] = $fans_data['city'];
+                $data['country'] = $fans_data['country'];
 
-            if (is_array($fans_data['tag'])) {
-                if (empty($data['province'])) {
-                    $data['province'] = $fans_data['tag']['province'];
-                }
-                if (empty($data['city'])) {
-                    $data['city'] = $fans_data['tag']['city'];
-                }
-                if (empty($data['province'])) {
-                    $data['country'] = $fans_data['tag']['country'];
+                if (is_array($fans_data['tag'])) {
+                    if (empty($data['province'])) {
+                        $data['province'] = $fans_data['tag']['province'];
+                    }
+                    if (empty($data['city'])) {
+                        $data['city'] = $fans_data['tag']['city'];
+                    }
+                    if (empty($data['province'])) {
+                        $data['country'] = $fans_data['tag']['country'];
+                    }
                 }
             }
         }

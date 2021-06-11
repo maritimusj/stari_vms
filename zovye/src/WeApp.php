@@ -386,9 +386,15 @@ JSCODE;
                 }
             }
         } else {
-            $tpl['accounts'] = Account::getAvailableList($device, $user, [
-                'exclude' => $params['exclude'],
-            ]);
+            $last_account = $user->getLastActiveData('account');
+            if ($last_account) {
+                $tpl['accounts'] = [$last_account];
+                $user->setLastActiveData();
+            } else {
+                $tpl['accounts'] = Account::getAvailableList($device, $user, [
+                    'exclude' => $params['exclude'],
+                ]);
+            }
         }
 
         //如果设置必须关注公众号以后才能购买商品
@@ -412,8 +418,6 @@ JSCODE;
             $user->remove('last');
         }
 
-
-
         //如果没有货道，或只有一个货道，并且商品数量不足，或所有商品都没有允许免费领取，则无法免费领取
         $lanesNum = $device->getCargoLanesNum();
         if ($lanesNum == 1) {
@@ -436,8 +440,9 @@ JSCODE;
             $tpl['accounts'] = [];
         }
 
-        //检查直接转跳的吸粉广告或公众号
+        $easy_mode = App::isSubscriptionAccountEasyModeEnabled();
         foreach ($tpl['accounts'] as $index => $account) {
+            //检查直接转跳的吸粉广告或公众号
             if (!empty($account['redirect_url'])) {
                 //链接转跳前，先判断设备是否在线
                 if ($device->isMcbOnline()) {
@@ -445,6 +450,19 @@ JSCODE;
                     exit('正在转跳...');
                 }
                 unset($tpl['accounts'][$index]);
+            }
+
+            //检查需要关注出货的订阅号
+            if (isset($account['service_type']) && $account['service_type'] != Account::SERVICE_ACCOUNT && $easy_mode) {
+                $obj = Account::get($account['id']);
+                if ($obj) {
+                    $redirect_url = Util::murl('util', ['op' => 'auth', 'device' => $device->getImei(), 'account' => $account['id'], 'user' => $user->getId()]);
+                    $url = WxPlatform::getAuthorizationCodeRedirectUrl($obj, $redirect_url);
+                    if ($url) {
+                        Util::redirect($url);
+                        exit('正在转跳...');
+                    }
+                }
             }
         }
 

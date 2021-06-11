@@ -7,6 +7,7 @@ namespace zovye;
 use Exception;
 use RuntimeException;
 use wx\Platform;
+use zovye\model\accountModelObj;
 
 class WxPlatform
 {
@@ -16,8 +17,15 @@ class WxPlatform
 
     const SUCCESS_RESPONSE = 'success';
 
+    const SCOPE_SNSAPI_BASE = 'snsapi_base';
+    const SCOPE_SNSAPI_USERINFO = 'snsapi_userinfo';
+
     const CREATE_AUTHORIZER_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={TOKEN}';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={TICKET}';
+
+    const AUTHORIZATION_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid={APPID}&redirect_uri={REDIRECT_URI}&response_type=code&scope={SCOPE}&state={STATE}&component_appid={COMPONENT_APPID}#wechat_redirect';
+    const ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/sns/oauth2/component/access_token?appid={APPID}&code={CODE}&grant_type=authorization_code&component_appid={COMPONENT_APPID}&component_access_token={COMPONENT_ACCESS_TOKEN}';
+    const GET_USER_PROFILE = 'https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN';
 
     const PERM_QRCODE = 'QR_LIMIT_STR_SCENE';
     const TEMP_QRCODE = 'QR_STR_SCENE';
@@ -96,6 +104,107 @@ class WxPlatform
         return err('没有配置！');
     }
 
+    /**
+     * 获取公众号网页授权URL
+     * @param accountModelObj $account
+     * @param $redirect_url
+     * @param string $scope
+     * @param string $state
+     * @return string
+     */
+    public static function getAuthorizationCodeRedirectUrl(accountModelObj $account, $redirect_url, $scope = self::SCOPE_SNSAPI_BASE, $state = ''): string
+    {
+        $component_appid = settings('account.wx.platform.config.appid');
+        $appid = $account->settings('authorization_info.authorizer_appid');
+
+        if (empty($component_appid) || empty($appid)) {
+            return '';
+        }
+
+        return str_replace(['{APPID}', '{REDIRECT_URI}', '{SCOPE}', '{STATE}', '{COMPONENT_APPID}'], [
+            $appid,
+            $redirect_url,
+            $scope,
+            $state,
+            $component_appid,
+        ], self::AUTHORIZATION_CODE_URL);
+    }
+
+    public static function getUserInfo(accountModelObj $account, $code): array
+    {
+        $appid = $account->settings('authorization_info.authorizer_appid');
+        if (empty($appid)) {
+            return err('配置不正确, appid为空！');
+        }
+        $res = self::getAccessToken($appid, $code);
+        if (is_error($res)) {
+            return $res;
+        }
+        $scopes = explode($res['scope'], ',');
+        if (in_array(self::SCOPE_SNSAPI_USERINFO, $scopes)) {
+            $res = self::getUserProfile($res['access_token'], $res['openid']);
+            if (!is_error($res)) {
+                return $res;
+            }
+        }
+        return [
+            'openid' => $res['openid'],
+        ];
+    }
+
+    public static function getAccessToken($appid, $code): array
+    {
+        $component_appid = settings('account.wx.platform.config.appid');
+        if (empty($component_appid)) {
+            return err('配置不正确, component_appid为空！');
+        }
+
+        $component_access_token = self::getComponentAccessToken();
+        if (empty($component_access_token)) {
+            return err('无法获取component access token');
+        }
+
+        $data = Util::get(str_replace(self::ACCESS_TOKEN_URL, ['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
+            $appid,
+            $code,
+            $component_appid,
+            $component_access_token,
+        ]));
+
+        if (empty($data)) {
+            return err('接口请求失败！');
+        }
+
+        $result = json_decode($data, true);
+        if (empty($result)) {
+            return err('接口返回数据为空！');
+        }
+
+        if (!empty($result['errcode'])) {
+            return err($result['errmsg']);
+        }
+
+        return $result;
+    }
+
+    public static function getUserProfile($access_token, $openid): array
+    {
+        $data = Util::get(str_replace(self::GET_USER_PROFILE, ['{ACCESS_TOKEN}', '{OPENID}'], [
+            $access_token, $openid,
+        ]));
+
+        $result = json_decode($data, true);
+        if (empty($result)) {
+            return err('接口返回数据为空！');
+        }
+
+        if (!empty($result['errcode'])) {
+            return err($result['errmsg']);
+        }
+
+        return $result;
+    }
+
     public static function getComponentTicket(): string
     {
         $data = Config::wxplatform('ticket', settings('account.wx.platform.ticket', []));
@@ -127,7 +236,7 @@ class WxPlatform
                 Util::logToFile('wxplatform', [
                     'fn' => 'getComponentAccessToken',
                     'error' => $result,
-               ]);
+                ]);
                 return '';
             }
             $result['createtime'] = time();
@@ -313,7 +422,7 @@ class WxPlatform
 
     /**
      * 微信消息处理
-     * 
+     *
      */
     public static function handleAuthorizerEvent(): string
     {

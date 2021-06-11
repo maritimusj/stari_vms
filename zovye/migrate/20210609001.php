@@ -1,11 +1,9 @@
 <?php
 namespace zovye;
 
-use zovye\We7;
-
 $tb_name = 'zovye_vms';
 
-if (!We7::pdo_tableexists($tb_name . 'zovye_vms')) {
+if (!We7::pdo_tableexists($tb_name . 'payload_logs')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_payload_logs` (
      `id` INT NOT NULL AUTO_INCREMENT , 
@@ -22,4 +20,3 @@ SQL;
     Migrate::execSQL($sql);
     
 }
-    Migrate::execSQL($sql);

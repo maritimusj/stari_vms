@@ -219,14 +219,6 @@ class WxPlatform
         return $result;
     }
 
-    public static function getAccountAccessToken(accountModelObj $acc)
-    {
-        $data = $acc->settings('authdata.authorization_info', []);
-        if (time() - $data['createtime'] > $data['expires_in'] - 1000) {
-
-        }
-    }
-
     public static function getComponentTicket(): string
     {
         $data = Config::wxplatform('ticket', settings('account.wx.platform.ticket', []));

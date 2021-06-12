@@ -473,6 +473,10 @@ class agent
             return $device;
         }
 
+        if (!$device->lockAcquire(3)) {
+            return error(State::ERROR, '无法锁定设备，请稍后再试！');
+        }
+
         if (empty($device->getAgentId())) {
             return error(State::ERROR, '这个设备没有绑定代理商！');
         }
@@ -682,9 +686,14 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
+        /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request::trim('id'), $user);
         if (is_error($device)) {
             return $device;
+        }
+
+        if (!$device->lockAcquire(3)) {
+            return error(State::ERROR, '无法锁定设备，请稍后再试！');
         }
 
         $agent = $user->getPartnerAgent() ?: $user;
@@ -778,8 +787,8 @@ class agent
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->lockAcquire()) {
-            return error(State::ERROR, '无法锁定设备！');
+        if (!$device->lockAcquire(3)) {
+            return error(State::ERROR, '无法锁定设备，请稍后再试！');
         }
 
         if (request::isset('lane')) {

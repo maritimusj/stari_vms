@@ -1940,7 +1940,7 @@ class deviceModelObj extends modelObj
      * @param int $delay_seconds
      * @return bool
      */
-    public function lockAcquire(int $retries = 0, int $delay_seconds = 0): bool
+    public function lockAcquire(int $retries = 0, int $delay_seconds = 1): bool
     {
         $wait_timeout = intval(settings('device.waitTimeout'));
         $lock_timeout = intval(settings('device.lockTimeout'));

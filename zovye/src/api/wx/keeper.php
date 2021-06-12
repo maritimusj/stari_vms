@@ -785,6 +785,7 @@ class keeper
      * 运营人员补货.
      *
      * @return array
+     * @throws Exception
      */
     public static function deviceReset(): array
     {
@@ -803,8 +804,8 @@ class keeper
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->lockAcquire()) {
-            return error(State::ERROR, '无法锁定设备！');
+        if (!$device->lockAcquire(3)) {
+            return error(State::ERROR, '无法锁定设备，请稍后再试！');
         }
 
         //补货佣金计算函数
@@ -868,6 +869,10 @@ class keeper
             ];
         } else {
             $data = [];
+        }
+
+        if (!$device->lockAcquire(3)) {
+            return err('无法锁定设备，请稍后再试！');
         }
 
         $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
@@ -949,7 +954,7 @@ class keeper
         );
 
         if (is_error($res)) {
-            return error(State::FAIL, $res['message']);
+            return $res;
         }
 
         $device->cleanError();

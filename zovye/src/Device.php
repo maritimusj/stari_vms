@@ -169,27 +169,15 @@ class Device extends State
                 foreach ($cargo_lanes as $index => $lane) {
                     $data[$index] = 0;
                 }
+            } elseif (isset($data['all'])) {
+                $v = $data['all'];
+                $data = [];
+                foreach ($cargo_lanes as $index => $lane) {
+                    $data[$index] = $v;
+                }
             }
 
             $lanes_data = $device->getCargoLanes();
-            //处理货道变动的情况
-            foreach ($lanes_data as $index => $lane) {
-                $id = ltrim($index, 'l');
-                if ($cargo_lanes[$id]) {
-                    continue;
-                }
-                if ($lane['num'] > 0) {
-                    $goods = $cargo_lanes[$id]['goods'];
-                    $result[$goods] = [
-                        'goodsId' => $goods,
-                        'org' => intval($lane['num']),
-                        'num' => 0 - intval($lane['num']),
-                        'reason' => '货道删除',
-                    ];
-                }
-                unset($lanes_data[$index]);
-            }
-
             $lowest = null;
 
             foreach ($data as $index => $lane) {

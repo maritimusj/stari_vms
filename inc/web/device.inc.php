@@ -673,6 +673,7 @@ if ($op == 'list') {
             }
 
             if ($data['device_type'] != $device->getDeviceType()) {
+                $device->resetPayload(['all' => '@0'], '型号变动');
                 $device->setDeviceType($data['device_type']);
             }
 
@@ -704,9 +705,12 @@ if ($op == 'list') {
             $device->updateAppId();
         }
 
+        //处理自定义型号
         if (empty($type_id)) {
             $device->setDeviceType(0);
             $device_type = DeviceTypes::from($device);
+
+            $old = $device_type->getExtraData('cargo_lanes', []);
 
             $cargo_lanes = [];
             $capacities = request::array('capacities');
@@ -715,6 +719,15 @@ if ($op == 'list') {
                     'goods' => intval($goods_id),
                     'capacity' => intval($capacities[$index]),
                 ];
+
+                if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
+                    $device->resetPayload([$index => '@0'], '货道商品更改');
+                }
+                unset($old[$index]);
+            }
+
+            foreach ($old as $index => $lane) {
+                $device->resetPayload([$index => '@0'], '货道删除');
             }
 
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);

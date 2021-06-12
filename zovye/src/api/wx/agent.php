@@ -831,24 +831,17 @@ class agent
             }
         }
 
-        $result = Util::transactionDo(function () use ($target, $device_ids, $user) {
-            foreach ($device_ids as $device_id) {
-                $device = \zovye\api\wx\device::getDevice($device_id, $user);
-                if (is_error($device)) {
-                    return $device;
-                }
-
-                if (Device::bind($device, $target) && $device->save()) {
-                    continue;
-                } else {
-                    return error(State::ERROR, '转移设备失败！');
-                }
+        foreach ($device_ids as $device_id) {
+            $device = \zovye\api\wx\device::getDevice($device_id, $user);
+            if (is_error($device)) {
+                return $device;
             }
-            return true;
-        });
 
-        if (is_error($result)) {
-            return $result;
+            if (Device::bind($device, $target) && $device->save()) {
+                continue;
+            } else {
+                return error(State::ERROR, '转移设备失败！');
+            }
         }
 
         return ['msg' => '转移设备成功！'];

@@ -277,7 +277,10 @@ class device
             }
 
             $num = request::int('num');
-            $device->setLane($lane, $num);
+            $res = $device->resetPayload([$lane => '@' . $num], '代理商补货');
+            if (is_error($res)) {
+                return error(State::ERROR, '保存库存失败！');
+            }
 
             return ['msg' => '设置成功！'];
         }

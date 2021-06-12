@@ -462,7 +462,11 @@ if ($op == 'list') {
         ];
     }
 
-    $device->resetPayload($data, '管理员重置商品数量');
+    $res = $device->resetPayload($data, '管理员重置商品数量');
+    if (is_error($res)) {
+        Util::itoast('保存库存失败！', $this->createWebUrl('device'), 'error');
+    }
+
     $device->updateRemain();
     $device->save();
 
@@ -619,7 +623,7 @@ if ($op == 'list') {
 
 
         if (empty($data['name']) || empty($data['imei'])) {
-            Util::itoast('设备名称或IMEI不能为空！', We7::referer(), 'error');
+            throw new RuntimeException('设备名称或IMEI不能为空！');
         }
 
         $type_id = request::int('deviceType');
@@ -673,7 +677,10 @@ if ($op == 'list') {
             }
 
             if ($data['device_type'] != $device->getDeviceType()) {
-                $device->resetPayload(['all' => '@0'], '管理员改变型号');
+                $res = $device->resetPayload(['all' => '@0'], '管理员改变型号');
+                if (is_error($res)) {
+                    throw new RuntimeException('保存库存失败！');
+                }
                 $device->setDeviceType($data['device_type']);
             }
 
@@ -711,7 +718,7 @@ if ($op == 'list') {
 
             $device_type = DeviceTypes::from($device);
             if (empty($device_type)) {
-                return error(State::ERROR, '设备类型不正确！');
+                throw new RuntimeException('设备类型不正确！');
             }
 
             $old = $device_type->getExtraData('cargo_lanes', []);
@@ -751,7 +758,7 @@ if ($op == 'list') {
 
         $res = $device->resetPayload($cargo_lanes, '管理员编辑设备');
         if (is_error($res)) {
-            return err('保存设备库存数据失败！');
+            throw new RuntimeException('保存设备库存数据失败！');
         }
 
         $location = request::array('location');

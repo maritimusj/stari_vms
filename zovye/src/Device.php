@@ -594,7 +594,10 @@ class Device extends State
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
-        $device->resetPayload([], '设备重置');
+        $res = $device->resetPayload([], '设备重置');
+        if (is_error($res)) {
+            return false;
+        }
 
         //设备分组
         $device->setGroupId(0);

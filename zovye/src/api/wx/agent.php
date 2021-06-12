@@ -7,6 +7,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use Exception;
+use zovye\Config;
 use zovye\model\agent_msgModelObj;
 use zovye\model\agentModelObj;
 use zovye\App;
@@ -212,7 +213,7 @@ class agent
             return $result;
         }
 
-        $agreement = \zovye\Config::agent('agreement.agent', []);
+        $agreement = Config::agent('agreement.agent', []);
         if ($agreement['enabled']) {
             $result['agreement'] = $agreement['content'];
         }

@@ -842,26 +842,24 @@ class keeper
                 return err('代理商余额不足！');
             }
 
-            return Util::transactionDo(function () use ($total, $agent, $keeper, $device) {
-                if ($agent->getCommissionBalance()->total() >= $total) {
-                    $r1 = $agent->commission_change(0 - $total, CommissionBalance::RELOAD_OUT, [
-                        'device' => $device->getId(),
-                        'keeper' => $keeper->getId(),
-                    ]);
+            if ($agent->getCommissionBalance()->total() >= $total) {
+                $r1 = $agent->commission_change(0 - $total, CommissionBalance::RELOAD_OUT, [
+                    'device' => $device->getId(),
+                    'keeper' => $keeper->getId(),
+                ]);
 
-                    if ($r1 && $r1->update([], true)) {
-                        $keeperUser = $keeper->getUser();
-                        if (!empty($keeperUser)) {
-                            $r2 = $keeperUser->commission_change($total, CommissionBalance::RELOAD_IN, ['device' => $device->getId()]);
-                            if ($r2 && $r2->update([], true)) {
-                                return true;
-                            }
+                if ($r1 && $r1->update([], true)) {
+                    $keeperUser = $keeper->getUser();
+                    if (!empty($keeperUser)) {
+                        $r2 = $keeperUser->commission_change($total, CommissionBalance::RELOAD_IN, ['device' => $device->getId()]);
+                        if ($r2 && $r2->update([], true)) {
+                            return true;
                         }
                     }
-                    throw new Exception('创建佣金失败！');
                 }
-                return true;
-            });
+                throw new Exception('创建佣金失败！');
+            }
+            return true;
         };
 
         if (request::isset('lane')) {

@@ -19,6 +19,7 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\device_logsModelObj;
 use zovye\model\device_recordModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\payload_logsModelObj;
 use zovye\model\userModelObj;
 use zovye\model\versionModelObj;
 
@@ -669,6 +670,8 @@ if ($op == 'list') {
             $data['agent_id'] = $agent->getId();
         }
 
+        $serial = Util::random(6);
+
         if ($id) {
             $device = Device::get($id);
             if (empty($device)) {
@@ -692,7 +695,7 @@ if ($op == 'list') {
             }
 
             if ($data['device_type'] != $device->getDeviceType()) {
-                $res = $device->resetPayload(['all' => '@0'], '管理员改变型号');
+                $res = $device->resetPayload(['all' => '@0'], '管理员改变型号', $serial);
                 if (is_error($res)) {
                     throw new RuntimeException('保存库存失败！');
                 }
@@ -746,13 +749,13 @@ if ($op == 'list') {
                     'capacity' => intval($capacities[$index]),
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                    $device->resetPayload([$index => '@0'], '管理员更改货道商品');
+                    $device->resetPayload([$index => '@0'], '管理员更改货道商品', $serial);
                 }
                 unset($old[$index]);
             }
 
             foreach($old as $index => $lane) {
-                $device->resetPayload([$index => '@0'], '管理员删除货道');
+                $device->resetPayload([$index => '@0'], '管理员删除货道', $serial);
             }
 
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -775,7 +778,7 @@ if ($op == 'list') {
             }
         }
 
-        $res = $device->resetPayload($cargo_lanes, '管理员编辑设备');
+        $res = $device->resetPayload($cargo_lanes, '管理员编辑设备', $serial);
         if (is_error($res)) {
             throw new RuntimeException('保存设备库存数据失败！');
         }
@@ -1029,7 +1032,7 @@ if ($op == 'list') {
     $logs = [];
     $last_code = '';
     $last_clr = '#ccc';
-    /** @var payload_logModelObj $entry */
+    /** @var payload_logsModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $data = [
             'id' => $entry->getId(),

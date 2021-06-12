@@ -611,14 +611,15 @@ class deviceModelObj extends modelObj
      * 空数组则重置所有货道商品数量到最大值
      * @param array $data
      * @param string $reason
+     * @param string $code
      * @return array
      */
-    public function resetPayload(array $data = [], $reason = ''): array
+    public function resetPayload(array $data = [], $reason = '', $code = ''): array
     {
         $result = Device::resetPayload($this, $data);
         if ($result) {
             $now = time();
-            $code = Util::random(6);
+            $code = empty($code) ? Util::random(6) : $code;
             foreach ($result as $entry) {
                 if (!empty($entry['reason'])) {
                     $reason = $reason . "({entry['reason']})";

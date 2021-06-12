@@ -1997,7 +1997,11 @@ class deviceModelObj extends modelObj
 
         //虚拟设备直接返回成功
         if ($this->isVDevice()) {
-            return ['num' => max(1, $options['num'])];
+            return [
+                'num' => max(1, $options['num']),
+                'errno' => 0,
+                'message' => '虚拟出货成功！',
+            ];
         }
 
         $mcb_channel = isset($options['channel']) ? intval($options['channel']) : Device::CHANNEL_DEFAULT;

@@ -15,6 +15,9 @@
     tr.item {
         border-left: 4px solid #ccc;
     }
+    .index {
+        text-align: center;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {loop $navs $nav_op $nav_title}
@@ -44,7 +47,7 @@
             <tbody>
             {loop $logs $index $item}
             <tr class="item" style="border-left-color: {$item['clr']};">
-                <td>{php echo $index + 1}</td>
+                <td class="index" style="color:{$item['clr']}">{php echo $index + 1}</td>
                 <td>
                     <div class="goods">
                         <img src="{$item['goods']['img']}">

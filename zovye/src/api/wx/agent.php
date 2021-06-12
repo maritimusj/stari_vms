@@ -540,6 +540,10 @@ class agent
                     unset($old[$index]);
                 }
 
+                foreach($old as $index => $lane) {
+                    $device->resetPayload([$index => '@0'], '代理商删除货道');
+                }
+
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
                 $device_type->save();
             }

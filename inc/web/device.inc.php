@@ -751,6 +751,10 @@ if ($op == 'list') {
                 unset($old[$index]);
             }
 
+            foreach($old as $index => $lane) {
+                $device->resetPayload([$index => '@0'], '管理员删除货道');
+            }
+
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
             $device_type->save();
         }

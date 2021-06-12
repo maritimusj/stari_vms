@@ -605,7 +605,7 @@ class WxPlatform
                 // ]);
 
                 if (empty($obj)) {
-                    throw new RuntimeException('找不到这个用户！?');
+                    throw new RuntimeException('请先扫描设备二维码，谢谢！');
                 }
 
                 ComponentUser::removeAll(['appid' => $appid]);

@@ -1400,7 +1400,7 @@ HTML_CONTENT;
 
             //如果是营运人员测试，则不减少库存
             if (empty($params['keeper'])) {
-                $res = $device->resetPayload([$lane => -1], '设备测试');
+                $res = $device->resetPayload([$lane => -1], "设备测试：{$data['userid']}");
                 if (is_error($res)) {
                     return error(State::ERROR, '保存库存失败！');
                 }

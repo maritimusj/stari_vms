@@ -638,6 +638,10 @@ class deviceModelObj extends modelObj
                     return err('保存库存记录失败！');
                 }
             }
+            $this->updateSettings('extra.payload', [
+                'code' => $code,
+                'time' => $now,
+            ]);
         }
         return $result;
     }

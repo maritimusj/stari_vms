@@ -18,6 +18,16 @@
     .index {
         text-align: center;
     }
+    .code {
+        white-space: nowrap;
+        color: #9e9e9e;
+    }
+    .code.success i {
+        color: #4caf50;
+    }
+    .code.error i {
+        color: #ff5722;
+    } 
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {loop $navs $nav_op $nav_title}
@@ -41,6 +51,7 @@
                     <td>变动</td>
                     <td>剩余</td>
                     <td>原因</td>
+                    <td>流水号</td>
                     <td>时间</td>
                 </tr>
             </thead>
@@ -75,7 +86,17 @@
                 </td>
                 <td>
                     {$item['reason']}
-                </td>                
+                </td>
+                <td>
+                    <div class="code{if $verified[$item['code']]} success{else} error{/if}">
+                        {if $verified[$item['code']]}
+                        <i class="fa fa-check-circle-o" title="检验通过"></i> 
+                        {else}
+                        <i class="fa fa-times-circle-o" title="检验失败"></i> 
+                        {/if}
+                        {$item['code']} 
+                    </div>
+                </td>            
                 <td>
                     {$item['createtime_foramtted']}
                 </td>

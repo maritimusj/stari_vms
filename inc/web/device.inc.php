@@ -1031,6 +1031,7 @@ if ($op == 'list') {
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
+    $query->page($page, $page_size);
     $query->orderBy('id desc');
 
     $logs = [];
@@ -1045,6 +1046,7 @@ if ($op == 'list') {
             'new' => $entry->getOrg() + $entry->getNum(),
             'reason' => strval($entry->getExtraData('reason', '')),
             'code' => strval($entry->getExtraData('code', '')),
+            'createtime' => $entry->getCreatetime(),
             'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];
         $goods = Goods::get($entry->getGoodsId());
@@ -1059,7 +1061,24 @@ if ($op == 'list') {
         $logs[] = $data;
     }
 
+    $verified = [];
+    foreach($logs as $index => $log) {
+        $code = $log['code'];        
+        if ($verified[$code]) {
+            continue;
+        }
+        if (isset($logs[$index + 1])) {
+            $verified[$code] = sha1($logs[$index + 1]['code'] . $log['createtime']) == $code;
+        } else {
+            $l = $device->payloadQuery(['id <' => $log['id']])->orderBy('id desc')->findOne();
+            if ($l) {
+                $verified[$code] = sha1($l->getExtraData('code') . $log['createtime']) == $code;
+            }
+        }      
+    }
+
     $tpl_data['logs'] = $logs;
+    $tpl_data['verified'] = $verified;
     $tpl_data['device'] = $device;
 
     app()->showTemplate('web/device/payload', $tpl_data);

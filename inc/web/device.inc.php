@@ -736,8 +736,10 @@ if ($op == 'list') {
                 $cargo_lanes[$index]['price'] = request::float("price{$index}", 0, 2) * 100;
             }
         }
-        if (!$device->resetPayload($cargo_lanes)) {
-            throw new RuntimeException('保存型号数据失败！');
+
+        $res = $device->resetPayload($cargo_lanes, '管理员编辑设备');
+        if (is_error($res)) {
+            return err('保存设备库存数据失败！');
         }
 
         $location = request::array('location');

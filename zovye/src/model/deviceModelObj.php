@@ -28,6 +28,8 @@ use zovye\Keeper;
 use zovye\Locker;
 use zovye\Account;
 use zovye\CtrlServ;
+
+use function zovye\err;
 use function zovye\getArray;
 use function zovye\m;
 use function zovye\tb;
@@ -617,7 +619,7 @@ class deviceModelObj extends modelObj
             $now = time();
             $code = Util::random(6);
             foreach ($result as $entry) {
-                PayloadLogs::create([
+                if (!PayloadLogs::create([
                     'device_id' => $this->id,
                     'goods_id' => $entry['goodsId'],
                     'org' => $entry['org'],
@@ -627,7 +629,9 @@ class deviceModelObj extends modelObj
                         'code' => $code,
                     ],
                     'createtime' => $now,
-                ]);
+                ])) {
+                    return err('保存库存记录失败！');
+                }
             }
         }
         return $result;

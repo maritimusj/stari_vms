@@ -542,9 +542,9 @@ class agent
                 $cargo_lanes[$index]['price'] =  intval($prices[$index]);
             }
         }
-    
-        if (!$device->resetPayload($cargo_lanes)) {
-            return error(State::ERROR, '保存型号数据失败！');
+        $res = $device->resetPayload($cargo_lanes, '代理商编辑设备');
+        if (is_error($res)) {
+            return error(State::ERROR, '保存设备库存数据失败！');
         }
 
         //修改位置信息

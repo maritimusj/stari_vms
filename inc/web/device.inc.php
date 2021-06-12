@@ -724,7 +724,7 @@ if ($op == 'list') {
                     'capacity' => intval($capacities[$index]),
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                    $device->resetPayload([$index => '@0'], '货道商品更改');
+                    $device->resetPayload([$index => '@0'], '管理员更改货道商品');
                 }
                 unset($old[$index]);
             }

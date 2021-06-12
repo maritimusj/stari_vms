@@ -530,7 +530,7 @@ class agent
                         'capacity' => intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $device->resetPayload([$index => '@0'], '货道商品更改');
+                        $device->resetPayload([$index => '@0'], '代理商更改货道商品');
                     }
                     unset($old[$index]);
                 }

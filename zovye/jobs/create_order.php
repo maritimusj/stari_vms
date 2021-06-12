@@ -337,7 +337,10 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         }
     } else {
         if (isset($goods['cargo_lane'])) {
-            $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order_no}");
+            $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order_no}");
+            if (is_error($res)) {
+                return [error(State::ERROR, '保存库存变动失败！')];
+            }
         }
 
         //使用取货码

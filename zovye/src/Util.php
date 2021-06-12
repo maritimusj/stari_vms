@@ -1677,7 +1677,10 @@ HTML_CONTENT;
                 $order->setResultCode(0);
 
                 if (isset($goods['cargo_lane'])) {
-                    $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                    $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                    if (is_error($res)) {
+                        return error(State::ERROR, '保存库存失败！');
+                    }
                 }
 
                 if ($voucher) {

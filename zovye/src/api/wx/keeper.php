@@ -873,40 +873,42 @@ class keeper
         }
 
         $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
-        if ($result) {
-            $total = 0;
-            foreach ($result as $entry) {
-                \zovye\Keeper::createReplenish(
-                    $keeper,
-                    $device,
-                    $entry['goodsId'],
-                    $entry['org'],
-                    $entry['num'],
-                    [
-                        'device' => [
-                            'name' => $device->getName(),
-                        ],
-                    ]
-                );
-
-                //累计佣金
-                $total += $commission_price_calc($entry['num'], $entry['goodsId']);
-            }
-
-            //保存佣金
-            if ($total > 0) {
-                $err = $create_commission_fn($total);
-                if (is_error($err)) {
-                    Util::logToFile('keeper', [
-                        'error' => '创建营运人员补货佣金失败:' . $err['message'],
-                        'total' => $total,
-                    ]);
-                }
-            }
-
-            $device->updateRemain();
-            $device->save();
+        if (is_error($result)) {
+            return err('保存库存失败！');
         }
+
+        $total = 0;
+        foreach ($result as $entry) {
+            \zovye\Keeper::createReplenish(
+                $keeper,
+                $device,
+                $entry['goodsId'],
+                $entry['org'],
+                $entry['num'],
+                [
+                    'device' => [
+                        'name' => $device->getName(),
+                    ],
+                ]
+            );
+
+            //累计佣金
+            $total += $commission_price_calc($entry['num'], $entry['goodsId']);
+        }
+
+        //保存佣金
+        if ($total > 0) {
+            $err = $create_commission_fn($total);
+            if (is_error($err)) {
+                Util::logToFile('keeper', [
+                    'error' => '创建营运人员补货佣金失败:' . $err['message'],
+                    'total' => $total,
+                ]);
+            }
+        }
+
+        $device->updateRemain();
+        $device->save();
 
         return ['msg' => '设置成功！'];
     }

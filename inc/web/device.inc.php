@@ -458,7 +458,7 @@ if ($op == 'list') {
         $data = [];
     } else {
         $data = [
-            request::int('lane') => request::int('num'),
+            request::int('lane') => 0,
         ];
     }
 

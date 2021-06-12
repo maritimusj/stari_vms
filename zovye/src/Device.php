@@ -151,7 +151,7 @@ class Device extends State
 
     /**
      * 重置多货道商品数量
-     * -号开头的负值表示减少指定数量，+开头表示增加指定数量，正值表示设置为指定数量，0值表示重置到最大数量
+     * @开头表示增加指定数量，正值表示增加指定数量，负值表示减少指定数量，0值表示重置到最大数量
      * 空数组则重置所有货道商品数量到最大值
      * 返回商品改变的数量
      * @param deviceModelObj $device
@@ -188,17 +188,13 @@ class Device extends State
                         $num = $entry;
                     }
 
-                    if (We7::starts_with($num, '+')) {
-                        $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
-                    } elseif (We7::starts_with($num, '@')) {
+                    if (We7::starts_with($num, '@')) {
                         $lanes_data[$lane_id]['num'] = max(0, intval(ltrim($num, '@')));
                     } else {
-                        if ($num > 0) {
-                            $lanes_data[$lane_id]['num'] = intval($num);
-                        } elseif ($num == 0) {
+                        if ($num == 0) {
                             $lanes_data[$lane_id]['num'] = intval($cargo_lanes[$lane]['capacity']);
-                        } elseif ($num < 0) {
-                            $lanes_data[$lane_id]['num'] = max(0, $old + $num);
+                        } else {
+                            $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
                         }
                     }
 

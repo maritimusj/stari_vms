@@ -670,13 +670,15 @@ if ($op == 'list') {
             $data['agent_id'] = $agent->getId();
         }
 
-        $serial = Util::random(6);
+        $now = time();
 
         if ($id) {
             $device = Device::get($id);
             if (empty($device)) {
                 throw new RuntimeException('设备不存在！');
             }
+
+            $serial = $device->getPayloadCode($now);
 
             if (!$device->lockAcquire(3)) {
                 throw new RuntimeException('无法锁定设备，请稍后再试！');
@@ -695,7 +697,7 @@ if ($op == 'list') {
             }
 
             if ($data['device_type'] != $device->getDeviceType()) {
-                $res = $device->resetPayload(['*' => '@0'], '管理员改变型号', $serial);
+                $res = $device->resetPayload(['*' => '@0'], '管理员改变型号', $serial, $now);
                 if (is_error($res)) {
                     throw new RuntimeException('保存库存失败！');
                 }
@@ -717,6 +719,8 @@ if ($op == 'list') {
             if (empty($device)) {
                 throw new RuntimeException('创建失败！');
             }
+
+            $serial = $device->getPayloadCode($now);
 
             $model = request('device_model');
 
@@ -749,13 +753,13 @@ if ($op == 'list') {
                     'capacity' => intval($capacities[$index]),
                 ];
                 if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                    $device->resetPayload([$index => '@0'], '管理员更改货道商品', $serial);
+                    $device->resetPayload([$index => '@0'], '管理员更改货道商品', $serial, $now);
                 }
                 unset($old[$index]);
             }
 
             foreach($old as $index => $lane) {
-                $device->resetPayload([$index => '@0'], '管理员删除货道', $serial);
+                $device->resetPayload([$index => '@0'], '管理员删除货道', $serial, $now);
             }
 
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -778,7 +782,7 @@ if ($op == 'list') {
             }
         }
 
-        $res = $device->resetPayload($cargo_lanes, '管理员编辑设备', $serial);
+        $res = $device->resetPayload($cargo_lanes, '管理员编辑设备', $serial, $now);
         if (is_error($res)) {
             throw new RuntimeException('保存设备库存数据失败！');
         }

@@ -504,7 +504,8 @@ class agent
 
         $extra = $device->get('extra', []);
 
-        $serial = Util::random(6);
+        $now = time();
+        $serial = $device->getPayloadCode($now);
 
         if (request::isset('device_type')) {
             $type_id = request::int('device_type');
@@ -515,7 +516,7 @@ class agent
                 }
 
                 if ($type_id != $device->getDeviceType()) {
-                    $device->resetPayload(['*' => '@0'], '代理商改变型号', $serial);
+                    $device->resetPayload(['*' => '@0'], '代理商改变型号', $serial, $now);
                     $device->setDeviceType($type_id);
                 }
 
@@ -537,13 +538,13 @@ class agent
                         'capacity' => intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $device->resetPayload([$index => '@0'], '代理商更改货道商品', $serial);
+                        $device->resetPayload([$index => '@0'], '代理商更改货道商品', $serial, $now);
                     }
                     unset($old[$index]);
                 }
 
                 foreach($old as $index => $lane) {
-                    $device->resetPayload([$index => '@0'], '代理商删除货道', $serial);
+                    $device->resetPayload([$index => '@0'], '代理商删除货道', $serial, $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -569,7 +570,7 @@ class agent
                 $cargo_lanes[$index]['price'] =  intval($prices[$index]);
             }
         }
-        $res = $device->resetPayload($cargo_lanes, '代理商编辑设备', $serial);
+        $res = $device->resetPayload($cargo_lanes, '代理商编辑设备', $serial, $now);
         if (is_error($res)) {
             return error(State::ERROR, '保存设备库存数据失败！');
         }

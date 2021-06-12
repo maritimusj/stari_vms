@@ -606,20 +606,31 @@ class deviceModelObj extends modelObj
         return $this->save();
     }
 
+    public function getPayloadCode($now = 0): string
+    {
+        $now = empty($now) ? time() : $now;
+        $last_code = $this->settings('extra.payload.code');
+        if (empty($last_code)) {
+            $last_code = Util::random(6);
+        }
+        return sha1($last_code . $now);
+    }
+
     /**
      * 重置多货道商品数量，负值表示减少指定数量，正值表示设置为指定数量，0值表示重围到最大数量
      * 空数组则重置所有货道商品数量到最大值
      * @param array $data
      * @param string $reason
      * @param string $code
+     * @param int $now
      * @return array
      */
-    public function resetPayload(array $data = [], $reason = '', $code = ''): array
+    public function resetPayload(array $data = [], $reason = '', $code = '', $now = 0): array
     {
         $result = Device::resetPayload($this, $data);
         if ($result) {
-            $now = time();
-            $code = empty($code) ? Util::random(6) : $code;
+            $now = empty($now) ? time() : $now;
+            $code = empty($code) ? $this->getPayloadCode($now) : $code;
             foreach ($result as $entry) {
                 if (!empty($entry['reason'])) {
                     $reason = $reason . "({entry['reason']})";

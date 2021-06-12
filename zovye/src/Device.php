@@ -178,13 +178,15 @@ class Device extends State
                 if ($cargo_lanes[$id]) {
                     continue;
                 }
-                $goods = $cargo_lanes[$id]['goods'];
-                $result[$goods] = [
-                    'goodsId' => $goods,
-                    'org' => intval($lane['num']),
-                    'num' => 0 - intval($lane['num']),
-                    'reason' => '货道删除',
-                ];
+                if ($lane['num'] > 0) {
+                    $goods = $cargo_lanes[$id]['goods'];
+                    $result[$goods] = [
+                        'goodsId' => $goods,
+                        'org' => intval($lane['num']),
+                        'num' => 0 - intval($lane['num']),
+                        'reason' => '货道删除',
+                    ];
+                }
                 unset($lanes_data[$index]);
             }
 

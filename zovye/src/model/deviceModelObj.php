@@ -74,6 +74,7 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
  * @method setMcbOnline(int $ONLINE)
  *
  * @method getCreatetime()
+ * @method setRank($rank)
  * @method getRank()
  * @method getS1()
  * @method setS1(int $int)

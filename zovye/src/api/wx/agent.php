@@ -466,7 +466,7 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
-        /** @var deviceModelObj $device */
+        /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request('id'));
         if (is_error($device)) {
             return $device;
@@ -503,29 +503,45 @@ class agent
             $type_id = request::int('device_type');
             if ($type_id) {
                 $device_type = DeviceTypes::get($type_id);
+                if (empty($device_type)) {
+                    return error(State::ERROR, '设备类型不正确！');
+                }
+
+                if ($type_id != $device->getDeviceType()) {
+                    $device->resetPayload(['all' => '@0'], '代理商改变型号');
+                    $device->setDeviceType($type_id);
+                }
+
             } else {
                 $device->setDeviceType(0);
 
                 $device_type = DeviceTypes::from($device);
-                $cargo_lanes = [];
+                if (empty($device_type)) {
+                    return error(State::ERROR, '设备类型不正确！');
+                }
 
+                $old = $device_type->getExtraData('cargo_lanes', []);
+
+                $cargo_lanes = [];
                 $capacities = request::array('capacities');
                 foreach (request::array('goods') as $index => $goods_id) {
                     $cargo_lanes[] = [
                         'goods' => intval($goods_id),
                         'capacity' => intval($capacities[$index]),
                     ];
+                    if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
+                        $device->resetPayload([$index => '@0'], '货道商品更改');
+                    }
+                    unset($old[$index]);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
                 $device_type->save();
             }
+        }
 
-            if (empty($device_type)) {
-                return error(State::ERROR, '设备类型不正确！');
-            }
-
-            $device->setDeviceType($type_id);
+        if (empty($device_type)) {
+            return error(State::ERROR, '获取型号失败！');
         }
 
         //货道商品数量和价格

@@ -169,8 +169,8 @@ class Device extends State
                 foreach ($cargo_lanes as $index => $lane) {
                     $data[$index] = 0;
                 }
-            } elseif (isset($data['all'])) {
-                $v = $data['all'];
+            } elseif (isset($data['*'])) {
+                $v = $data['*'];
                 $data = [];
                 foreach ($cargo_lanes as $index => $lane) {
                     $data[$index] = $v;
@@ -585,16 +585,17 @@ class Device extends State
     /**
      * 恢复设备设置到默认状态
      * @param deviceModelObj $device
+     * @param string $reason
      * @return bool
      */
-    public static function reset(deviceModelObj $device): bool
+    public static function reset(deviceModelObj $device, $reason = '设备重置'): bool
     {
         //清空营运人员
         $extra = $device->get('extra', []);
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
-        $res = $device->resetPayload([], '设备重置');
+        $res = $device->resetPayload(['*' => '@0'], $reason);
         if (is_error($res)) {
             return false;
         }
@@ -646,7 +647,7 @@ class Device extends State
             }
         }
 
-        return self::reset($device);
+        return self::reset($device, $agent ? '绑定设备' : '解绑设备');
     }
 
     /**

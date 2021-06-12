@@ -695,7 +695,7 @@ if ($op == 'list') {
             }
 
             if ($data['device_type'] != $device->getDeviceType()) {
-                $res = $device->resetPayload(['all' => '@0'], '管理员改变型号', $serial);
+                $res = $device->resetPayload(['*' => '@0'], '管理员改变型号', $serial);
                 if (is_error($res)) {
                     throw new RuntimeException('保存库存失败！');
                 }

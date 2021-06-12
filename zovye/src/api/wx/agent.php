@@ -515,7 +515,7 @@ class agent
                 }
 
                 if ($type_id != $device->getDeviceType()) {
-                    $device->resetPayload(['all' => '@0'], '代理商改变型号', $serial);
+                    $device->resetPayload(['*' => '@0'], '代理商改变型号', $serial);
                     $device->setDeviceType($type_id);
                 }
 

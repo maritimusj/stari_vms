@@ -463,7 +463,9 @@ class WxPlatform
                     'error' => $result,
                 ]);
 
-                $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
+                if (DEBUG) {
+                    $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
+                }
             }
 
             if (!empty($result)) {

@@ -2445,6 +2445,11 @@ class deviceModelObj extends modelObj
         return $this->save();
     }
 
+    public function payloadQuery($cond = []): modelObjFinder
+    {
+        return PayloadLogs::query(['device_id' => $this->getId()])->where($cond);
+    }
+
     public function logQuery($cond = []): modelObjFinder
     {
         return m('device_logs')->where(We7::uniacid(['title' => $this->getImei()]))->where($cond);

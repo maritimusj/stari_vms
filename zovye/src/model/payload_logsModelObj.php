@@ -34,9 +34,6 @@ class payload_logsModelObj extends modelObj
      /** @var int */
 	protected $num;
 
-     /** @var int */
-	protected $change;
-
 	protected $extra;
 
      /** @var int */

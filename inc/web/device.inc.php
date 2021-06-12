@@ -927,6 +927,7 @@ if ($op == 'list') {
 
     $tpl_data['navs'] = [
         'detail' => $device->getName(),
+        'payload' => '库存',
         'log' => '事件',
         //'poll_event' => '最新',
         'event' => '消息',
@@ -992,6 +993,66 @@ if ($op == 'list') {
     $tpl_data['app_online'] = $device->isAppOnline();
 
     app()->showTemplate('web/device/detail', $tpl_data);
+} elseif ($op == 'payload') {
+
+    $device = Device::get(request('id'));
+    if (empty($device)) {
+        Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    }
+
+    $tpl_data['navs'] = [
+        'detail' => $device->getName(),
+        'payload' => '库存',
+        'log' => '事件',
+        //'poll_event' => '最新',
+        'event' => '消息',
+    ];
+
+    $query = $device->payloadQuery();
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    $total = $query->count();
+    if (ceil($total / $page_size) < $page) {
+        $page = 1;
+    }
+
+    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
+    $query->orderBy('id desc');
+
+    $logs = [];
+    $last_code = '';
+    $last_clr = '#ccc';
+    /** @var payload_logModelObj $entry */
+    foreach ($query->findAll() as $entry) {
+        $data = [
+            'id' => $entry->getId(),
+            'org' => $entry->getOrg(),
+            'num' => $entry->getNum(),
+            'new' => $entry->getOrg() + $entry->getNum(),
+            'reason' => strval($entry->getExtraData('reason', '')),
+            'code' => strval($entry->getExtraData('code', '')),
+            'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+        ];
+        $goods = Goods::get($entry->getGoodsId());
+        if ($goods) {
+            $data['goods'] = Goods::format($goods, false, true);
+        }
+        if (empty($last_code) || $last_code != $data['code']) {
+            $last_code = $data['code'];
+            $last_clr = Util::randColor();
+        }
+        $data['clr'] = $last_clr;
+        $logs[] = $data;
+    }
+
+    $tpl_data['logs'] = $logs;
+    $tpl_data['device'] = $device;
+
+    app()->showTemplate('web/device/payload', $tpl_data);
+    
 } elseif ($op == 'log') {
 
     $device = Device::get(request('id'));
@@ -1001,6 +1062,7 @@ if ($op == 'list') {
 
     $tpl_data['navs'] = [
         'detail' => $device->getName(),
+        'payload' => '库存',
         'log' => '事件',
         //'poll_event' => '最新',
         'event' => '消息',
@@ -1147,6 +1209,7 @@ if ($op == 'list') {
 
     $tpl_data['navs'] = [
         'detail' => $device->getName(),
+        'payload' => '库存',
         'log' => '事件',
         //'poll_event' => '最新',
         'event' => '消息',

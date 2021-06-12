@@ -872,7 +872,7 @@ class keeper
             $data = [];
         }
 
-        $result = $device->resetPayload($data);
+        $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
         if ($result) {
             $total = 0;
             foreach ($result as $entry) {

@@ -403,7 +403,7 @@ class DeviceEventProcessor
         if ($data['IMEI']) {
             $device = Device::get($data['IMEI'], true);
             if ($device) {
-                $device->resetPayload();
+                $device->resetPayload([], 'reset重置');
                 $device->updateRemain();
             }
         }
@@ -697,7 +697,7 @@ class DeviceEventProcessor
         $device = Device::get($data['uid'], true);
         if ($device) {
             $device->setProtocolV1Code($data['code']);
-            $device->resetPayload();
+            $device->resetPayload([], 'reload重置');
             $device->save();
         }
     }

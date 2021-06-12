@@ -466,6 +466,7 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
+        /** @var deviceModelObj $device */
         $device = \zovye\api\wx\device::getDevice(request('id'));
         if (is_error($device)) {
             return $device;
@@ -534,15 +535,15 @@ class agent
         $type_data = DeviceTypes::format($device_type);
         $cargo_lanes = [];
         foreach ($type_data['cargo_lanes'] as $index => $lane) {
-            $cargo_lanes["l{$index}"] = [
-                'num' => max(0, intval($num[$index])),
+            $cargo_lanes[$index] = [
+                'num' => '@' . max(0, intval($num[$index])),
             ];
             if ($device_type->getDeviceId() == $device->getId()) {
-                $cargo_lanes["l{$index}"]['price'] =  intval($prices[$index]);
+                $cargo_lanes[$index]['price'] =  intval($prices[$index]);
             }
         }
     
-        if (!$device->setCargoLanes($cargo_lanes)) {
+        if (!$device->resetPayload($cargo_lanes)) {
             return error(State::ERROR, '保存型号数据失败！');
         }
 

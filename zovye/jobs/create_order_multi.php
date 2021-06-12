@@ -312,7 +312,7 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         $device->setError($result['data']['errno'], $result['data']['message']);
         $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
     } else {
-        $device->resetPayload([$goods['cargo_lane'] => -1]);
+        $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
     }
     $device->save();
 

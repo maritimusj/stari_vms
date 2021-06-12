@@ -462,7 +462,7 @@ if ($op == 'list') {
         ];
     }
 
-    $device->resetPayload($data);
+    $device->resetPayload($data, '管理员重置商品数量');
     $device->updateRemain();
     $device->save();
 
@@ -729,15 +729,14 @@ if ($op == 'list') {
         $type_data = DeviceTypes::format($device_type);
         $cargo_lanes = [];
         foreach ($type_data['cargo_lanes'] as $index => $lane) {
-            $cargo_lanes["l{$index}"] = [
-                'num' => max(0, request::int("lane{$index}_num")),
+            $cargo_lanes[$index] = [
+                'num' => '@' . max(0, request::int("lane{$index}_num")),
             ];
             if ($device_type->getDeviceId() == $device->getId()) {
-                $cargo_lanes["l{$index}"]['price'] = request::float("price{$index}", 0, 2) * 100;
+                $cargo_lanes[$index]['price'] = request::float("price{$index}", 0, 2) * 100;
             }
         }
-
-        if (!$device->setCargoLanes($cargo_lanes)) {
+        if (!$device->resetPayload($cargo_lanes)) {
             throw new RuntimeException('保存型号数据失败！');
         }
 

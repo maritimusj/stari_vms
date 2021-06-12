@@ -173,12 +173,25 @@ class Device extends State
 
             $lanes_data = $device->getCargoLanes();
             $lowest = null;
-            foreach ($data as $lane => $num) {
+
+            foreach ($data as $lane => $entry) {
                 if (isset($cargo_lanes[$lane])) {
                     $lane_id = "l{$lane}";
                     $old = $lanes_data[$lane_id]['num'];
+
+                    if (is_array($entry)) {
+                        $num = $entry['num'];
+                        if (isset($entry['price'])) {
+                            $lanes_data[$lane_id]['price'] = $entry['price'];
+                        }
+                    } else {
+                        $num = $entry;
+                    }
+
                     if (We7::starts_with($num, '+')) {
                         $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
+                    } elseif (We7::starts_with($num, '@')) {
+                        $lanes_data[$lane_id]['num'] = max(0, intval(ltrim($num, '@')));
                     } else {
                         if ($num > 0) {
                             $lanes_data[$lane_id]['num'] = intval($num);
@@ -579,7 +592,7 @@ class Device extends State
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
-        $device->resetPayload();
+        $device->resetPayload([], '设备重置');
 
         //设备分组
         $device->setGroupId(0);

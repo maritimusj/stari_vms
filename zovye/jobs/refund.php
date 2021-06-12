@@ -91,7 +91,7 @@ function resetPayload(orderModelObj $order, int $num = 0)
     if ($device) {
         $goods_id = $order->getGoodsId();
         $total = $num == 0 ? $order->getNum() : $num;
-        $device->resetGoodsNum($goods_id, '+' . $total);
+        $device->resetGoodsNum($goods_id, '+' . $total, "订单退款：{$order->getOrderNO()}");
         $device->save();
     }
 }

@@ -592,7 +592,7 @@ class deviceModelObj extends modelObj
 
         $this->set('extra', []);
 
-        $this->resetPayload();
+        $this->resetPayload([], '设备初始化');
 
         $this->setGroupId(0);
         $this->setAgent();
@@ -633,11 +633,11 @@ class deviceModelObj extends modelObj
         return $result;
     }
 
-    public function resetGoodsNum($goods_id, $delta): array
+    public function resetGoodsNum($goods_id, $delta, $reason = ''): array
     {
         $goods = $this->getGoods($goods_id);
         if ($goods) {
-            return $this->resetPayload([$goods['cargo_lane'] => $delta]);
+            return $this->resetPayload([$goods['cargo_lane'] => $delta], $reason);
         }
 
         return error(State::ERROR, '找不到指定的商品！');

@@ -337,7 +337,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         }
     } else {
         if (isset($goods['cargo_lane'])) {
-            $device->resetPayload([$goods['cargo_lane'] => -1]);
+            $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order_no}");
         }
 
         //使用取货码

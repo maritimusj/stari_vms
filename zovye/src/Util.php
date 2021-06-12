@@ -1400,7 +1400,7 @@ HTML_CONTENT;
 
             //如果是营运人员测试，则不减少库存
             if (empty($params['keeper'])) {
-                $device->resetPayload([$lane => -1]);
+                $device->resetPayload([$lane => -1], '设备测试');
                 $device->updateRemain();
             }
 
@@ -1677,7 +1677,7 @@ HTML_CONTENT;
                 $order->setResultCode(0);
 
                 if (isset($goods['cargo_lane'])) {
-                    $device->resetPayload([$goods['cargo_lane'] => -1]);
+                    $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
                 }
 
                 if ($voucher) {

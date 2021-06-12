@@ -652,9 +652,9 @@ class agent
                         $device->save();
 
                         $result['status']['sig'] = $device->getSig();
-                        $result['status']['online'] = $detail['mcb']['online'];
-                        if (isset($detail['app']['online'])) {
-                            $result['app']['online'] = $detail['app']['online'];
+                        $result['status']['online'] = boolval($detail['mcb']);
+                        if (isset($detail['app'])) {
+                            $result['app']['online'] = boolval($detail['app']);                         
                         }
                     }
                 }

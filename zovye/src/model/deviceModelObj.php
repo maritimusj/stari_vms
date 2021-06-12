@@ -619,6 +619,9 @@ class deviceModelObj extends modelObj
             $now = time();
             $code = Util::random(6);
             foreach ($result as $entry) {
+                if (!empty($entry['reason'])) {
+                    $reason = $reason . "({entry['reason']})";
+                }
                 if (!PayloadLogs::create([
                     'device_id' => $this->id,
                     'goods_id' => $entry['goodsId'],
@@ -2184,7 +2187,7 @@ class deviceModelObj extends modelObj
             $url = settings("misc.redirect.{$when}.url");
         }
 
-        return ['url' => PlaceHolder::url($url, [ $this ]), 'delay' => intval($delay)];
+        return ['url' => PlaceHolder::url($url, [$this]), 'delay' => intval($delay)];
     }
 
     /**

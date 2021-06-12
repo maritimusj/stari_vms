@@ -782,14 +782,19 @@ class agent
         }
 
         if (request::isset('lane')) {
+            $num = request::int('num');
             $data = [
-                request::int('lane') => request::int('num'),
+                request::int('lane') => $num > 0 ? '@' . $num : 0,
             ];
         } else {
             $data = [];
         }
 
-        $device->resetPayload($data);
+        $res = $device->resetPayload($data, '代理商补货');
+        if (is_error($res)) {
+            return error(State::ERROR, '保存库存失败！');
+        }
+
         $device->updateRemain();
         $device->save();
 

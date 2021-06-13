@@ -593,22 +593,25 @@ class WxPlatform
                 $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
 
                 $appid = $acc->settings('authdata.authorization_info.authorizer_appid');
+                $user_uid = User::makeUserFootprint($profile);
                 $obj = ComponentUser::findOne([
                     'appid' => $appid,
-                    'openid' => User::makeUserFootprint($profile), 
+                    'openid' => $user_uid,
                 ]);
 
-                // Util::logToFile('debug', [
-                //     'msg' => $msg,
-                //     'token' => $acc->settings('authdata.authorization_info.authorizer_access_token'),
-                //     'profile' => $profile,
-                // ]);
+//                 Util::logToFile('debug', [
+//                     'appid' => $appid,
+//                     'user_uid' => $user_uid,
+//                     'msg' => $msg,
+//                     'token' => $acc->settings('authdata.authorization_info.authorizer_access_token'),
+//                     'profile' => $profile,
+//                 ]);
 
                 if (empty($obj)) {
                     throw new RuntimeException('请先扫描设备二维码，谢谢！');
                 }
 
-                ComponentUser::removeAll(['appid' => $appid]);
+                ComponentUser::removeAll(['appid' => $appid, 'openid' => $user_uid]);
 
                 $device = Device::findOne(['shadow_id' => $obj->getExtraData('device')]);
                 if (empty($device)) {

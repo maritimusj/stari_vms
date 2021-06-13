@@ -214,7 +214,7 @@ class User
         return $discount;
     }
 
-    public static function makeUserFootprint($data = [])
+    public static function makeUserFootprint($data = []): string
     {
         if ($data  instanceof userModelObj) {
             $data = $data->profile();

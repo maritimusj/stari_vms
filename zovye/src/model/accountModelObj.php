@@ -280,6 +280,15 @@ class accountModelObj extends modelObj
         return $this->settings('profile.authorizer_info.service_type_info.id', 0);
     }
 
+    /**
+     * 授权公众号是否已通过微信认证
+     * @return bool
+     */
+    public function isVerified(): bool
+    {
+        return $this->settings('profile.authorizer_info.verify_type_info.id', -1) != -1;
+    }
+
     public function isServiceAccount(): bool
     {
         return $this->getServiceType() == Account::SERVICE_ACCOUNT;

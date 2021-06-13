@@ -229,9 +229,9 @@
                             {/if}{$a['name']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
                             {if $a['state'] == \zovye\Account::AUTH}
                             {if $a['service'] == 2}
-                            <span class="state auth" title="授权接入的服务号"><i class="fa fa-check-circle"></i></span>
+                            <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
                             {else}
-                            <span class="state auth" title="授权接入的订阅号"><i class="fa fa-check-circle-o"></i></span>
+                            <span class="state auth" title="授权接入的订阅号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle-o"></i></span>
                             {/if}
                             {elseif $a['state'] == \zovye\Account::VIDEO}
                             <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>

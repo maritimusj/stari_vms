@@ -217,8 +217,8 @@
                     <div class="form-group">
                         <label class="col-md-2 control-label">出货时机</label>
                         <div class="col-md-8">
-                            <label for="scan" class="radio-inline">
-                                <input name="OpenTiming" id="scan" type="radio" value="0"{if empty($config['open']['timing'])} checked="checked"{/if}>
+                            <label for="scan" class="radio-inline{if !$account->isVerified()} disabled{/if}">
+                                <input name="OpenTiming" id="scan" type="radio" value="0"{if !$account->isVerified()} disabled {else}{if empty($config['open']['timing'])} checked="checked"{/if}{/if}>
                                 扫码进入公众号
                             </label>
                             <label for="link" class="radio-inline">

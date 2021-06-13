@@ -86,6 +86,7 @@ if ($op == 'default') {
 
             if ($entry->isAuth()) {
                 $data['service'] = $entry->getServiceType();
+                $data['verified'] = $entry->isVerified();
             }
 
             if (App::useAccountQRCode()) {
@@ -286,7 +287,7 @@ if ($op == 'default') {
                 ]);
             }
             elseif ($account->isAuth()) {
-                $timing = request::int('OpenTiming');
+                $timing = $account->isVerified() ? request::int('OpenTiming') : 0;
                 $config = [
                     'type' => Account::AUTH,
                 ];

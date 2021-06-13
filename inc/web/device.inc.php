@@ -1068,6 +1068,8 @@ if ($op == 'list') {
             $l = $device->payloadQuery(['id <' => $log['id']])->orderBy('id desc')->findOne();
             if ($l) {
                 $verified[$code] = sha1($l->getExtraData('code') . $log['createtime']) == $code;
+            } else {
+                $verified[$code] = sha1(App::uid() . $log['createtime']) == $code;
             }
         }      
     }

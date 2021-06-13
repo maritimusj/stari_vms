@@ -611,7 +611,7 @@ class deviceModelObj extends modelObj
         $now = empty($now) ? time() : $now;
         $last_code = $this->settings('extra.payload.code');
         if (empty($last_code)) {
-            $last_code = Util::random(6);
+            $last_code = App::uid();
         }
         return sha1($last_code . $now);
     }

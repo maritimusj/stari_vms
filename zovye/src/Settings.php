@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS {$we7tb_name} (
     `createtime` int(11) DEFAULT NULL,
     `locked_uid` VARCHAR( 64 ) NULL DEFAULT  'n/a',
     PRIMARY KEY (`id`),
-    KEY `name` (`name`(16)),
+    KEY `name` (`name`(16),`uniacid`),
     KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CODE;

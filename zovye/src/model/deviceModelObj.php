@@ -627,6 +627,14 @@ class deviceModelObj extends modelObj
      */
     public function resetPayload(array $data = [], $reason = '', $code = '', $now = 0): array
     {
+        static $cache = [];
+        if ($cache[$code]) {
+            $clr = $cache[$code];
+        } else {
+            $clr = Util::randColor();
+            $cache[$code] = $clr;
+        }
+
         $result = Device::resetPayload($this, $data);
         if ($result) {
             $now = empty($now) ? time() : $now;
@@ -643,6 +651,7 @@ class deviceModelObj extends modelObj
                     'extra' => [
                         'reason' => $reason,
                         'code' => $code,
+                        'clr' => $clr,
                     ],
                     'createtime' => $now,
                 ])) {

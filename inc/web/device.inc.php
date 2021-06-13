@@ -1035,8 +1035,7 @@ if ($op == 'list') {
     $query->orderBy('id desc');
 
     $logs = [];
-    $last_code = '';
-    $last_clr = '#ccc';
+
     /** @var payload_logsModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $data = [
@@ -1046,6 +1045,7 @@ if ($op == 'list') {
             'new' => $entry->getOrg() + $entry->getNum(),
             'reason' => strval($entry->getExtraData('reason', '')),
             'code' => strval($entry->getExtraData('code', '')),
+            'clr' => strval($entry->getExtraData('clr', '#9e9e9e')),
             'createtime' => $entry->getCreatetime(),
             'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];
@@ -1053,11 +1053,6 @@ if ($op == 'list') {
         if ($goods) {
             $data['goods'] = Goods::format($goods, false, true);
         }
-        if (empty($last_code) || $last_code != $data['code']) {
-            $last_code = $data['code'];
-            $last_clr = Util::randColor();
-        }
-        $data['clr'] = $last_clr;
         $logs[] = $data;
     }
 

@@ -287,7 +287,10 @@ if ($op == 'default') {
                 ]);
             }
             elseif ($account->isAuth()) {
-                $timing = $account->isVerified() ? request::int('OpenTiming') : 0;
+                $timing = request::int('OpenTiming');
+                if (!$account->isVerified()) {
+                    $timing = 1;
+                }
                 $config = [
                     'type' => Account::AUTH,
                 ];

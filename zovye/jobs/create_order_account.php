@@ -18,6 +18,7 @@ use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\is_error;
+use function zovye\settings;
 
 $account_id = request::str('account');
 $device_id = request::str('device');
@@ -68,7 +69,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
                     ZovyeException::throwWith('订单已经存在！', -1, $device); 
                 }
 
-                $max_retries = intval(\zovye\settings('order.retry.max', 0));
+                $max_retries = intval(settings('order.retry.max', 0));
                 if (!empty($max_retries)) {
                     $total = intval($order->getExtraData('retry.total', 0));
                     

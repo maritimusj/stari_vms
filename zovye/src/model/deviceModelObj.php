@@ -640,7 +640,7 @@ class deviceModelObj extends modelObj
             $code = empty($code) ? $this->getPayloadCode($now) : $code;
             foreach ($result as $entry) {
                 if (!empty($entry['reason'])) {
-                    $reason = $reason . "({entry['reason']})";
+                    $reason = $reason . "({$entry['reason']})";
                 }
                 if (!PayloadLogs::create([
                     'device_id' => $this->id,

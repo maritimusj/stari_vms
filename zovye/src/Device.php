@@ -277,7 +277,7 @@ class Device extends State
             if ($match_fn($lane)) {
                 $result['num'] = $lane['num'];
                 $result['cargo_lane'] = $index;
-                if ($device->getDeviceType() == 0 && isset($lane['goods_price'])) {
+                if ($device->isCustomType() && isset($lane['goods_price'])) {
                     $result['price'] = $lane['goods_price'];
                     $result['price_formatted'] = '¥' . number_format($result['price'] / 100, 2) . '元';
                 }
@@ -313,7 +313,7 @@ class Device extends State
                 $laneId = "l{$index}";
                 if (!empty($lanes_data[$laneId])) {
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
-                    if ($device->getDeviceType() == 0 && isset($lanes_data[$laneId]['price'])) {
+                    if ($device->isCustomType() && isset($lanes_data[$laneId]['price'])) {
                         $lane['goods_price'] = $lanes_data[$laneId]['price'];
                         $lane['goods_price_formatted'] = '¥' . number_format($lane['goods_price'] / 100, 2) . '元';
                     }

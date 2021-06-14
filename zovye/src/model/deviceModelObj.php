@@ -1704,6 +1704,15 @@ class deviceModelObj extends modelObj
     }
 
     /**
+     * 是否为自定义型号设备
+     * @return bool
+     */
+    public function isCustomType(): bool
+    {
+        return $this->device_type == 0;
+    }
+
+    /**
      * @param bool $detail
      * @return array
      */
@@ -2524,7 +2533,7 @@ class deviceModelObj extends modelObj
                 $goods_data = Goods::data($entry['goods'], ['useImageProxy' => true]);
                 if ($goods_data) {
                     $goods_data['num'] = $entry['num'];
-                    if ($this->getDeviceType() == 0 && isset($entry['goods_price'])) {
+                    if ($this->isCustomType() && isset($entry['goods_price'])) {
                         $goods_data['price'] = $entry['goods_price'];
                     }
                 }

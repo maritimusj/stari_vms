@@ -608,7 +608,9 @@ class WxPlatform
 //                 ]);
 
                 if (empty($obj)) {
-                    throw new RuntimeException('请先扫描设备二维码，谢谢！');
+                    //throw new RuntimeException('请先扫描设备二维码，谢谢！');
+                    //用户匹配失败，直接返回设定的消息，点击接领取
+                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
                 }
 
                 ComponentUser::removeAll(['appid' => $appid, 'openid' => $user_uid]);

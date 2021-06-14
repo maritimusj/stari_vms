@@ -1058,18 +1058,19 @@ if ($op == 'list') {
 
     $verified = [];
     foreach($logs as $index => $log) {
-        $code = $log['code'];        
-        if ($verified[$code]) {
+        $code = $log['code'];
+        if (isset($verified[$code])) {
             continue;
         }
+        $createtime = $log['createtime'];
         if (isset($logs[$index + 1])) {
-            $verified[$code] = sha1($logs[$index + 1]['code'] . $log['createtime']) == $code;
+            $verified[$code] = sha1($logs[$index + 1]['code'] . $createtime) == $code;
         } else {
             $l = $device->payloadQuery(['id <' => $log['id']])->orderBy('id desc')->findOne();
             if ($l) {
-                $verified[$code] = sha1($l->getExtraData('code') . $log['createtime']) == $code;
+                $verified[$code] = sha1($l->getExtraData('code') . $createtime) == $code;
             } else {
-                $verified[$code] = sha1(App::uid() . $log['createtime']) == $code;
+                $verified[$code] = sha1(App::uid() . $createtime) == $code;
             }
         }      
     }

@@ -608,7 +608,6 @@ class deviceModelObj extends modelObj
 
     public function getPayloadCode($now = 0): string
     {
-        $now = empty($now) ? time() : $now;
         $last_code = $this->settings('extra.payload.code');
         if (empty($last_code)) {
             $last_code = App::uid();

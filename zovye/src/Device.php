@@ -313,7 +313,7 @@ class Device extends State
                 $laneId = "l{$index}";
                 if (!empty($lanes_data[$laneId])) {
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
-                    if (isset($lanes_data[$laneId]['price'])) {
+                    if ($device->getDeviceType() == 0 && isset($lanes_data[$laneId]['price'])) {
                         $lane['goods_price'] = $lanes_data[$laneId]['price'];
                         $lane['goods_price_formatted'] = '¥' . number_format($lane['goods_price'] / 100, 2) . '元';
                     }

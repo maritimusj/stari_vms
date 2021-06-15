@@ -608,7 +608,7 @@ class deviceModelObj extends modelObj
 
     public function getPayloadCode($now = 0): string
     {
-        $last_code = $this->settings('extra.payload.code');
+        $last_code = $this->settings('last.code');
         if (empty($last_code)) {
             $last_code = App::uid();
         }
@@ -624,21 +624,23 @@ class deviceModelObj extends modelObj
      * @param int $now
      * @return array
      */
-    public function resetPayload(array $data = [], $reason = '', $code = '', $now = 0): array
-    {
+    public function resetPayload(array $data = [], $reason = '', $now = 0): array
+    {        
         static $cache = [];
-        if ($cache[$code]) {
-            $clr = $cache[$code];
+
+        $now = empty($now) ? time() : $now;
+
+        if ($cache[$now]) {
+            $clr = $cache[$now];
         } else {
             $clr = Util::randColor();
-            $cache[$code] = $clr;
+            $cache[$now] = $clr;
         }
 
         $result = Device::resetPayload($this, $data);
-        if ($result) {
-            $now = empty($now) ? time() : $now;
-            $code = empty($code) ? $this->getPayloadCode($now) : $code;
+        if ($result) {               
             foreach ($result as $entry) {
+                $code =  $this->getPayloadCode($now);
                 if (!empty($entry['reason'])) {
                     $reason = $reason . "({$entry['reason']})";
                 }
@@ -656,11 +658,13 @@ class deviceModelObj extends modelObj
                 ])) {
                     return err('保存库存记录失败！');
                 }
+                if (!$this->updateSettings('last', [
+                    'code' => $code,
+                    'time' => $now,
+                ])) {
+                    return err('保存流水记录失败！');
+                }
             }
-            $this->updateSettings('extra.payload', [
-                'code' => $code,
-                'time' => $now,
-            ]);
         }
         return $result;
     }

@@ -1398,7 +1398,8 @@ if ($op == 'list') {
         }
 
         return [];
-    });
+    }, $device->getId());
+
     $content = app()->fetchTemplate(
         'web/device/all-stats',
         [

@@ -179,6 +179,11 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             Account::createZJBaoAccount();
         }
 
+        $settings['meipa']['fan']['enabled'] = request::bool('MeiPaFAN') ? 1 : 0;
+        if ($settings['meipa']['fan']['enabled']) {
+            Account::createMeiPaAccount();
+        }
+
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
 

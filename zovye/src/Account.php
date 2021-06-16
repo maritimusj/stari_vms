@@ -44,6 +44,8 @@ class Account extends State
     //纸巾宝
     const ZJBAO = 103;
 
+    //美葩
+    const MEIPA = 104;
 
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
@@ -62,6 +64,9 @@ class Account extends State
 
     const ZJBAO_NAME = '纸巾宝';
     const ZJBAO_HEAD_IMG = MODULE_URL . 'static/img/zjbao_pic.png';
+
+    const MEIPA_NAME = '美葩';
+    const MEIPA_HEAD_IMG = MODULE_URL . 'static/img/meipa_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -235,6 +240,13 @@ class Account extends State
         if (App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude)) {
             $join(['state' => Account::ZJBAO], function () use ($device, $user) {
                 return ZhiJinBaoAccount::fetch($device, $user);
+            });
+        }
+
+        //美葩
+        if (App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude)) {
+            $join(['state' => Account::MEIPA], function () use ($device, $user) {
+                return MeiPaAccount::fetch($device, $user);
             });
         }
 
@@ -558,6 +570,12 @@ class Account extends State
     {
         $url = Util::murl('zjbao');
         return self::createSpecialAccount(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
+    }
+
+    public static function createMeiPaAccount(): ?accountModelObj
+    {
+        $url = Util::murl('meipa');
+        return self::createSpecialAccount(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array

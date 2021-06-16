@@ -52,8 +52,8 @@ class MeiPaAccount
             } else {
                 $data = $acc->format();
 
-                $data['name'] = $result['data']['wechat_name'];
-                $data['qrcode'] = $result['data']['qrcode_url'];
+                $data['title'] = $result['data']['wechat_name'];
+                $data['qrcode'] = $result['data']['qrcodeurl'];
 
                 return [$data];
             }
@@ -120,6 +120,7 @@ class MeiPaAccount
 
         } catch (Exception $e) {
             Util::logToFile('meipa', [
+                'data' => $data,
                 'error' => '回调处理发生错误! ',
                 'result' => $e->getMessage(),
             ]);
@@ -143,7 +144,7 @@ class MeiPaAccount
         ]);
 
         $params['sing'] = $this->sign($params);
-        $result = Util::post(self::API_URL, $params);
+        $result = Util::post(self::API_URL, $params, false);
 
         Util::logToFile('meipa_query', [
             'query' => $params,

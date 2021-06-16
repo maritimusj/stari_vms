@@ -205,6 +205,7 @@ class accountModelObj extends modelObj
             Account::YUNFENBA,
             Account::AQIINFO,
             Account::ZJBAO,
+            Account::MEIPA,
         ]);
     }
 

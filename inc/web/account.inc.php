@@ -148,13 +148,16 @@ if ($op == 'default') {
                     'assigned' => !isEmptyArray($t_res->get('assigned')),
                 ];
             } else {
+                unset($one_res[$index]);
                 Util::logToFile('account', "特殊吸粉{$index}已开启，但查找公众号资料失败！");
             }
         }
-        if (!is_array($one_res[$index])) {
-            unset($one_res[$index]);
-        }
     }
+
+    //排序
+    usort($one_res, function ($a, $b) {
+        return $b['orderno'] - $a['orderno'];
+    });
 
     app()->showTemplate('web/account/default', [
         'agent' => isset($agent) ? $agent : null,

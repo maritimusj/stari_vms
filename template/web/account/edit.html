@@ -353,6 +353,23 @@
                         </div>
                     </div>
                     {/if}
+                    {if \zovye\App::isMeiPaEnabled() && $account && $account->isMeiPa()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="apiid" class="col-md-2 control-label">美葩平台 apiid</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="apiid" id="apiid" value="{$config['apiid']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appkey" class="col-md-2 control-label">美葩平台 appkey</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="appkey" id="appkey" value="{$config['appkey']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
                 {if \zovye\App::isCommissionEnabled()}
                 <div class="seg">

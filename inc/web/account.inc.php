@@ -132,6 +132,7 @@ if ($op == 'default') {
         Account::YUNFENBA => App::isYunfenbaEnabled(),
         Account::AQIINFO => App::isAQiinfoEnabled(),
         Account::ZJBAO => App::isZJBaoEnabled(),
+        Account::MEIPA => App::isMeiPaEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -285,7 +286,16 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'secret' => request::trim('secret'),
                 ]);
+            } elseif ($account->isMeiPa()) {
+                $data['name'] = Account::MEIPA_NAME;
+                $data['img'] = Account::MEIPA_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::MEIPA,
+                    'apiid' => request::trim('apiid'),
+                    'appkey' => request::trim('appkey'),
+                ]);
             }
+            
             elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
@@ -335,6 +345,7 @@ if ($op == 'default') {
                 Account::YUNFENBA_NAME,
                 Account::AQIINFO_NAME,
                 Account::ZJBAO_NAME,
+                Account::MEIPA_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

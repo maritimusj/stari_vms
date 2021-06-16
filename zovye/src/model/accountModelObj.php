@@ -245,6 +245,11 @@ class accountModelObj extends modelObj
     {
         return $this->getType() == Account::ZJBAO;
     }
+    
+    public function isMeiPa(): bool
+    {
+        return $this->getType() == Account::MEIPA;
+    }
 
     public function isAuth(): bool
     {

@@ -456,7 +456,7 @@ if ($op == 'list') {
     }
 
     if (!$device->lockAcquire(3)) {
-        Util::itoast('无法锁定设备，请稍后再试！', $this->createWebUrl('device'), 'error');
+        Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
     }
 
     $result = Util::transactionDo(function() use ($device) {
@@ -679,7 +679,7 @@ if ($op == 'list') {
             }
 
             if (!$device->lockAcquire(3)) {
-                throw new RuntimeException('无法锁定设备，请稍后再试！');
+                throw new RuntimeException('设备正忙，请稍后再试！');
             }
 
             if ($data['shadow_id']) {

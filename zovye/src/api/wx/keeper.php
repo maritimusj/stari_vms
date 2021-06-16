@@ -805,7 +805,7 @@ class keeper
         }
 
         if (!$device->lockAcquire(3)) {
-            return error(State::ERROR, '无法锁定设备，请稍后再试！');
+            return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
         //补货佣金计算函数
@@ -872,7 +872,7 @@ class keeper
         }
 
         if (!$device->lockAcquire(3)) {
-            return err('无法锁定设备，请稍后再试！');
+            return err('设备正忙，请稍后再试！');
         }
 
         $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");

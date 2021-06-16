@@ -267,7 +267,7 @@ class device
 
         if ($device) {
             if (!$device->lockAcquire(3)) {
-                return error(State::ERROR, '无法锁定设备，请稍后再试！');
+                return error(State::ERROR, '设备正忙，请稍后再试！');
             }
 
             $lane = request::int('lane');

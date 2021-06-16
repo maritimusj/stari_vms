@@ -77,6 +77,10 @@ if ($op == 'default') {
     }
 
     $ticket_data = $user->settings('last.ticket', []);
+    if (empty($ticket_data)) {
+        Util::resultAlert('请重新扫描设备二维码！', 'error');
+    }
+
     $account = Account::get($ticket_data['accountId']);
     if (empty($account)) {
         Util::resultAlert('找不到指定的视频广告！', 'error');

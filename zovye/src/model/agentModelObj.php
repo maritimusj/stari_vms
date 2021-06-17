@@ -145,7 +145,7 @@ class agentModelObj extends userModelObj
             if (!empty($path)) {
                 $key .= ".{$path}";
             }
-            return $this->settings($key, []);
+            return $this->settings($key);
         }
 
         if ($this->isPartner()) {

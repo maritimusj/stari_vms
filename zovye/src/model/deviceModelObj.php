@@ -25,7 +25,7 @@ use zovye\State;
 use zovye\Topic;
 use zovye\Device;
 use zovye\Keeper;
-use zovye\Locker;
+use zovye\DeviceLocker;
 use zovye\Account;
 use zovye\CtrlServ;
 
@@ -1990,7 +1990,7 @@ class deviceModelObj extends modelObj
         }
 
         for (; ;) {
-            if ((new Locker($this))->isLocked()) {
+            if ((new DeviceLocker($this))->isLocked()) {
                 return true;
             }
 

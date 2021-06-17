@@ -351,15 +351,16 @@ class modelObj implements ISettings
      */
     public function destroy(): bool
     {
-        $res = $this->factory->remove($this);
-        if ($res) {
-            foreach ($this as $key => $val) {
-                $this->$key = null;
+        if ($this->factory()) {
+            $res = $this->factory->remove($this);
+            if ($res) {
+                foreach ($this as $key => $val) {
+                    $this->$key = null;
+                }
+
+                return true;
             }
-
-            return true;
         }
-
         return false;
     }
 

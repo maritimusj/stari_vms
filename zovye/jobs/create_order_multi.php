@@ -313,7 +313,7 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
     } else {
         if (!$device->payloadLockAcquire(3)) {
-            return err('无法保存库存数据！');
+            return err('设备正忙，请重试！');
         }
         $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
         if (is_error($res)) {

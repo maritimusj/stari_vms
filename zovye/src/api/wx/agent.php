@@ -788,7 +788,8 @@ class agent
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->payloadLockAcquire(3)) {
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
@@ -805,6 +806,8 @@ class agent
         if (is_error($res)) {
             return error(State::ERROR, '保存库存失败！');
         }
+
+        $locker->unlocked();
 
         $device->updateRemain();
         $device->save();

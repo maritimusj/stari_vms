@@ -595,7 +595,8 @@ class Device extends State
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
-        if (!$device->payloadLockAcquire(3)) {
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
             return false;
         }
 
@@ -603,6 +604,8 @@ class Device extends State
         if (is_error($res)) {
             return false;
         }
+
+        $locker->unlock();
 
         //设备分组
         $device->setGroupId(0);

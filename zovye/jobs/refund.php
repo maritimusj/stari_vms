@@ -93,12 +93,14 @@ function resetPayload(orderModelObj $order, int $num = 0)
     if ($device) {
         $goods_id = $order->getGoodsId();
         $total = $num == 0 ? $order->getNum() : $num;
-        if ($device->payloadLockAcquire(30)) {
+        
+        $locker = $device->payloadLockAcquire(30);
+        if ($locker) {
             $device->resetGoodsNum($goods_id, '+' . $total, "订单退款：{$order->getOrderNO()}");
         } else {
             $log['payload'] = '锁定设备库存失败!';
         }
-
+        $locker->unlock();
         $device->save();
     }
 }

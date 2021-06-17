@@ -804,7 +804,8 @@ class keeper
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->payloadLockAcquire(3)) {
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
@@ -871,14 +872,12 @@ class keeper
             $data = [];
         }
 
-        if (!$device->payloadLockAcquire(3)) {
-            return err('设备正忙，请稍后再试！');
-        }
-
         $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
         if (is_error($result)) {
             return err('保存库存失败！');
         }
+
+        $locker->unlock();
 
         $total = 0;
         foreach ($result as $entry) {

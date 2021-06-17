@@ -1400,13 +1400,15 @@ HTML_CONTENT;
 
             //如果是营运人员测试，则不减少库存
             if (empty($params['keeper'])) {
-                if (!$device->payloadLockAcquire(3)) {
+                $locker = $device->payloadLockAcquire(3);
+                if (empty($locker)) {
                     return error(State::ERROR, '设备正忙，请重试！');
                 }
                 $res = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
                 if (is_error($res)) {
                     return error(State::ERROR, '保存库存失败！');
                 }
+                $locker->unlock();
                 $device->updateRemain();
             }
 

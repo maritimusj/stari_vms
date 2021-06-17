@@ -69,12 +69,7 @@ class modelFactory
         if ($res) {
             $id = intval(We7::pdo_insertid());
             $obj = new $objClassname($id, $this);
-
-            foreach ($data as $key => $val) {
-                $setter = 'set' . ucfirst(toCamelCase($key));
-                $obj->$setter($val);
-            }
-
+            $obj->__setData($data);
             return $obj;
         }
 

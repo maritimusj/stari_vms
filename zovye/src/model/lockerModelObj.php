@@ -62,4 +62,9 @@ class lockerModelObj extends modelObj
         }
         return false;
     }
+
+    public function unlock(): bool
+    {
+        return $this->destroy();
+    }
 }

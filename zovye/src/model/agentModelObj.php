@@ -160,7 +160,13 @@ class agentModelObj extends userModelObj
 
     public function isPaymentConfigEnabled(): bool
     {
-        return $this->getAgentData('pay.wx.enable') || $this->getAgentData('pay.lcsw.enable');
+        $pay = $this->getAgentData('pay', []);
+        foreach($pay as $config) {
+            if ($config['enable']) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -340,7 +340,7 @@ class modelObj implements ISettings
     public function saveWhen($condition = []): bool
     {
         if ($this->factory) {
-            return $this->factory->__saveToDb($this, null, $condition);
+            return $this->factory->__saveToDb($this, null, $condition) > 0;
         }
 
         return false;

@@ -321,10 +321,8 @@ class modelFactory
 
                 $this->writeCacheData($obj, $cache_data);
             }
-
-            return true;
         }
 
-        return false;
+        return $res;
     }
 }

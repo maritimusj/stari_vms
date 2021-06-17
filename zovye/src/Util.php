@@ -1683,14 +1683,15 @@ HTML_CONTENT;
                 $order->setResultCode(0);
 
                 if (isset($goods['cargo_lane'])) {
-                    $res = $device->payloadLockAcquire(3);
-                    if (is_error($res)) {
-                        return error(State::ERROR, '无法保存库存！');
+                    $locker = $device->payloadLockAcquire(3);
+                    if (empty($locker)) {
+                        return error(State::ERROR, '设备正忙，请重试！');
                     }
                     $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
                     if (is_error($res)) {
                         return error(State::ERROR, '保存库存失败！');
                     }
+                    $locker->unlock();
                 }
 
                 if ($voucher) {

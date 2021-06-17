@@ -2006,9 +2006,9 @@ class deviceModelObj extends modelObj
         return false;
     }
 
-    public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): bool
+    public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {
-        return Locker::try("payload:{$this->getImei()}", $retries, $delay_seconds) != null;
+        return Locker::try("payload:{$this->getImei()}", $retries, $delay_seconds);
     }
 
     /**

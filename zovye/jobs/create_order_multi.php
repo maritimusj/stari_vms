@@ -16,11 +16,13 @@ use zovye\Order;
 use zovye\model\orderModelObj;
 use zovye\Pay;
 use zovye\model\pay_logsModelObj;
+use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\err;
+use function zovye\error;
 use function zovye\getArray;
 use function zovye\is_error;
 use function zovye\settings;
@@ -312,13 +314,15 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         $device->setError($result['data']['errno'], $result['data']['message']);
         $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
     } else {
-        if (!$device->payloadLockAcquire(3)) {
-            return err('设备正忙，请重试！');
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
+            return error(State::ERROR, '设备正忙，请重试！');
         }
         $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
         if (is_error($res)) {
             return err('保存库存失败！');
         }
+        $locker->unlock();
     }
     $device->save();
 

@@ -337,7 +337,8 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         }
     } else {
         if (isset($goods['cargo_lane'])) {
-            if (!$device->payloadLockAcquire(3)) {
+            $locker = $device->payloadLockAcquire(3);
+            if (empty($locker)) {
                 return error(State::ERROR, '设备正忙，请重试！');
             }
             $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order_no}");

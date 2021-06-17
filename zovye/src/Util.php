@@ -1366,7 +1366,7 @@ HTML_CONTENT;
             }
 
             if (!$device->lockAcquire()) {
-                return error(State::ERROR, '设备正忙，请重试！');
+                return error(State::ERROR, '设备锁定失败，请重试！');
             }
 
             $data = array_merge(

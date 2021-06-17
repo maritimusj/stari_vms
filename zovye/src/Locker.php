@@ -45,7 +45,7 @@ class Locker
     {
         if ($locker->getAvailable() <= 0) {
             register_shutdown_function(function () use ($locker) {
-                //$locker->destroy();
+                $locker->destroy();
             });
         }
     }

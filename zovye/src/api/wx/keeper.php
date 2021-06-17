@@ -804,7 +804,7 @@ class keeper
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->lockAcquire(3)) {
+        if (!$device->payloadLockAcquire(3)) {
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 

@@ -694,7 +694,7 @@ class agent
         }
 
         if (!$device->lockAcquire(3)) {
-            return error(State::ERROR, '设备正忙，请稍后再试！');
+            return error(State::ERROR, '锁定设备失败，请稍后再试！');
         }
 
         $agent = $user->getPartnerAgent() ?: $user;
@@ -788,8 +788,8 @@ class agent
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->lockAcquire(3)) {
-            return error(State::ERROR, '无法锁定设备，请稍后再试！');
+        if (!$device->payloadLockAcquire(3)) {
+            return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
         if (request::isset('lane')) {

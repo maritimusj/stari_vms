@@ -161,8 +161,8 @@ class agentModelObj extends userModelObj
     public function isPaymentConfigEnabled(): bool
     {
         $pay = $this->getAgentData('pay', []);
-        foreach($pay as $config) {
-            if ($config['enable']) {
+        foreach((array)$pay as $config) {
+            if (is_array($config) && $config['enable']) {
                 return true;
             }
         }

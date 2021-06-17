@@ -43,7 +43,7 @@ class Locker
 
     protected static function registerLockerDestroy(lockerModelObj $locker)
     {
-        if (empty($locker->getAvailable())) {
+        if ($locker->getAvailable() <= 0) {
             register_shutdown_function(function () use ($locker) {
                 $locker->destroy();
             });
@@ -53,7 +53,7 @@ class Locker
     /**
      * @param string $uid 锁的全局唯一UID
      * @param int $available 可用次数，即可重入的次数
-     * @param int $expire_seconds 几秒后过期，0默为：脚本运行完过期
+     * @param int $expire_seconds 几秒后过期，0为默认：脚本运行完过期
      * @return lockerModelObj|null
      */
     public static function load(string $uid = '', int $available = 0, int $expire_seconds = 0): ?lockerModelObj
@@ -63,12 +63,11 @@ class Locker
         }
 
         $locker = self::get($uid, true);
-
-        if ($locker) {
+        if ($locker) {            
             if ($locker->isExpired()) {
                 $locker->destroy();
-            } else {
-                if ($locker->reenter()) {
+            } else {               
+                if ($locker->reenter()) {                
                     self::registerLockerDestroy($locker);
                     return $locker;
                 }
@@ -79,7 +78,7 @@ class Locker
         $locker = self::create([
             'uid' => $uid,
             'request_id' => $available > 0 ? REQUEST_ID : Util::generateUID(),
-            'available' => max(0, $available),
+            'available' => max(0, $available - 1),
             'expired_at' => $expire_seconds > 0 ? time() + $expire_seconds : 0,
         ]);
 
@@ -90,15 +89,19 @@ class Locker
         return $locker;
     }
 
-    public static function try(string $uid = '', int $tries = 1, $delay = 1, int $available = 1, int $expired_at = 0): ?lockerModelObj
+    public static function try(string $uid = '', int $tries = 0, $delay = 1, int $available = 0, int $expired_at = 60): ?lockerModelObj
     {
-        for ($i = 0; $i < $tries; $i++) {
+        $i = 0;
+        do {
             $locker = self::load($uid, $available, $expired_at);
             if ($locker) {
                 return $locker;
             }
-            sleep($delay);
-        }
+            if ($i++ < $tries) {
+                sleep($delay);
+            }
+        } while ($i < $tries);
+
         return null;
     }
 }

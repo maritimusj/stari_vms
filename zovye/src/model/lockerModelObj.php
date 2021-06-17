@@ -53,11 +53,12 @@ class lockerModelObj extends modelObj
     public function reenter(): bool
     {
         if ($this->request_id === REQUEST_ID && $this->available > 0 && !$this->isExpired()) {
-            $this->setAvailable($this->available - 1);
-            return $this->saveWhen([
+            $condition = [
                 'request_id' => REQUEST_ID,
                 'available' => $this->available,
-            ]);
+            ];
+            $this->setAvailable($this->available - 1);
+            return $this->saveWhen($condition);
         }
         return false;
     }

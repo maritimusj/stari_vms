@@ -1366,7 +1366,7 @@ HTML_CONTENT;
             }
 
             if (!$device->lockAcquire()) {
-                return error(State::ERROR, '设备被占用，请重试！');
+                return error(State::ERROR, '设备正忙，请重试！');
             }
 
             $data = array_merge(
@@ -1400,6 +1400,9 @@ HTML_CONTENT;
 
             //如果是营运人员测试，则不减少库存
             if (empty($params['keeper'])) {
+                if (!$device->payloadLockAcquire(3)) {
+                    return error(State::ERROR, '无法保存库存数据！');
+                }
                 $res = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
                 if (is_error($res)) {
                     return error(State::ERROR, '保存库存失败！');
@@ -1680,6 +1683,10 @@ HTML_CONTENT;
                 $order->setResultCode(0);
 
                 if (isset($goods['cargo_lane'])) {
+                    $res = $device->payloadLockAcquire(3);
+                    if (is_error($res)) {
+                        return error(State::ERROR, '无法保存库存！');
+                    }
                     $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
                     if (is_error($res)) {
                         return error(State::ERROR, '保存库存失败！');

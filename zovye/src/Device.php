@@ -595,6 +595,10 @@ class Device extends State
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
+        if (!$device->payloadLockAcquire(3)) {
+            return false;
+        }
+
         $res = $device->resetPayload(['*' => '@0'], $reason);
         if (is_error($res)) {
             return false;

@@ -871,7 +871,7 @@ class keeper
             $data = [];
         }
 
-        if (!$device->lockAcquire(3)) {
+        if (!$device->payloadLockAcquire(3)) {
             return err('设备正忙，请稍后再试！');
         }
 

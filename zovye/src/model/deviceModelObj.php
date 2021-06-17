@@ -11,6 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\Job;
 
+use zovye\Locker;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
 use zovye\We7;
@@ -620,7 +621,6 @@ class deviceModelObj extends modelObj
      * 空数组则重置所有货道商品数量到最大值
      * @param array $data
      * @param string $reason
-     * @param string $code
      * @param int $now
      * @return array
      */
@@ -2004,6 +2004,11 @@ class deviceModelObj extends modelObj
         }
 
         return false;
+    }
+
+    public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): bool
+    {
+        return Locker::try("payload:{$this->getImei()}", $retries, $delay_seconds) != null;
     }
 
     /**

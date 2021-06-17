@@ -473,7 +473,7 @@ class agent
             return $device;
         }
 
-        if (!$device->lockAcquire(3)) {
+        if (!$device->payloadLockAcquire(3)) {
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 

@@ -455,7 +455,7 @@ if ($op == 'list') {
         Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
     }
 
-    if (!$device->lockAcquire(3)) {
+    if (!$device->payloadLockAcquire(3)) {
         Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
     }
 
@@ -678,7 +678,7 @@ if ($op == 'list') {
                 throw new RuntimeException('设备不存在！');
             }
 
-            if (!$device->lockAcquire(3)) {
+            if (!$device->payloadLockAcquire(3)) {
                 throw new RuntimeException('设备正忙，请稍后再试！');
             }
 

@@ -55,7 +55,7 @@ trait GettersAndSetters
         } elseif (strncasecmp($name, 'is', 2) == 0) {
             $prop = toSnakeCase(ltrim($name, 'is'));
             if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
-                return intval($this->forceReloadPropertyValue($prop, $params));
+                return boolval($this->forceReloadPropertyValue($prop, $params));
             }
             return boolval($this->$prop);
         } elseif (strncasecmp($name, 'has', 3) == 0) {

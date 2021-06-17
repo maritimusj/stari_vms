@@ -9,7 +9,7 @@ namespace zovye;
 //捕获错误和异常
 use Exception;
 
-define('REQUEST_ID', getmypid() . '-' . time() . '-' . Util::random(6, true));
+define('REQUEST_ID', Util::generateUID());
 
 Util::setErrorHandler();
 

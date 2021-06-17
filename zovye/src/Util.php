@@ -2028,6 +2028,11 @@ HTML_CONTENT;
         return $data;
     }
 
+    public static function generateUID(): string
+    {
+        return getmypid() . '-' . time() . '-' . Util::random(6, true);
+    }
+
     /**
      * @param $length
      * @param bool $numeric

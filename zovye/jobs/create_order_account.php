@@ -85,7 +85,15 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             }
         }
 
-        $goods = empty($goods_id) ? $device->getGoodsByLane(0) : $device->getGoods($goods_id);
+        if (empty($goods_id)) {
+            $goods = $device->getGoodsByLane(0);
+            if ($goods && $goods['num'] < 1) {
+                $goods = $device->getGoods($goods['id']);
+            }
+        } else {
+            $goods = $device->getGoods($goods_id);
+        }
+
         if (empty($goods)) {
             ZovyeException::throwWith('找不到商品！', -1, $device);
         }

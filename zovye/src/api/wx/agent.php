@@ -807,7 +807,7 @@ class agent
             return error(State::ERROR, '保存库存失败！');
         }
 
-        $locker->unlocked();
+        $locker->unlock();
 
         $device->updateRemain();
         $device->save();

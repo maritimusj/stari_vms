@@ -70,6 +70,15 @@ if (is_error($res)) {
     JSON::fail($res['message']);
 }
 
+$goods = $device->getGoodsByLane(0);
+if ($goods && $goods['num'] < 1) {
+    $goods = $device->getGoods($goods['id']);
+}
+
+if (empty($goods) || $goods['num'] < 1) {
+    JSON::fail('商品库存不足！');
+}
+
 $no_str = Util::random(32);
 $order_uid = substr("U{$user->getId()}D{$device->getId()}{$no_str }", 0, MAX_ORDER_NO_LEN);
 

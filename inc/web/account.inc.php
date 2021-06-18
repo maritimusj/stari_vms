@@ -151,6 +151,8 @@ if ($op == 'default') {
                 unset($one_res[$index]);
                 Util::logToFile('account', "特殊吸粉{$index}已开启，但查找公众号资料失败！");
             }
+        } else {
+            unset($one_res[$index]);
         }
     }
 

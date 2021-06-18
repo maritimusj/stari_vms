@@ -70,6 +70,7 @@ if (is_error($res)) {
     JSON::fail($res['message']);
 }
 
+//获取第一货道上的商品，如果该商品数量为0，则去获取相同商品的其它货道
 $goods = $device->getGoodsByLane(0);
 if ($goods && $goods['num'] < 1) {
     $goods = $device->getGoods($goods['id']);
@@ -80,7 +81,7 @@ if (empty($goods) || $goods['num'] < 1) {
 }
 
 $no_str = Util::random(32);
-$order_uid = substr("U{$user->getId()}D{$device->getId()}{$no_str }", 0, MAX_ORDER_NO_LEN);
+$order_uid = substr("U{$user->getId()}D{$device->getId()}{$no_str}", 0, MAX_ORDER_NO_LEN);
 
 Job::createSpecialAccountOrder([
     'device' => $device->getId(),

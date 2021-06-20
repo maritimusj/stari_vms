@@ -154,7 +154,6 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
 
-        $accounts_need_refresh = false;
         $specialAccounts = [
             'jfbFAN' => [
                 __NAMESPACE__ . '\Account::createJFBAccount',
@@ -183,20 +182,23 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             ],
         ];
 
+        $accounts_need_refresh = false;
+
         foreach ($specialAccounts as $key => $v) {
             $enabled = request::bool($key) ? 1 : 0;
             if ($enabled) {
                 call_user_func($v[0]);
-            } else {
-                if (getArray($settings, $v[1])) {
-                    $accounts_need_refresh = true;
-                }
             }
+
+            if (getArray($settings, $v[1]) != $enabled) {
+                $accounts_need_refresh = true;
+            }
+
             setArray($settings, $v[1], $enabled);
         }
-
+       
         if ($accounts_need_refresh) {
-            Account::updateAccountData();
+            setArray($settings, 'accounts.lastupdate', '' . microtime(true));
         }
 
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;

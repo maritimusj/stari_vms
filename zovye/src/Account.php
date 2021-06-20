@@ -607,12 +607,20 @@ class Account extends State
                 return $result;
             }
 
-            setArray($auth_data, 'authorization_info.authorizer_access_token', $result['authorizer_access_token']);
-            setArray($auth_data, 'authorization_info.authorizer_refresh_token', $result['authorizer_refresh_token']);
-            setArray($auth_data, 'authorization_info.expires_in', $result['expires_in']);
-            setArray($auth_data, 'createtime', time());
+            if ($result) {
+                if ($result['authorizer_access_token']) {
+                    setArray($auth_data, 'authorization_info.authorizer_access_token', $result['authorizer_access_token']);
+                }
 
-            $account->set('authdata', $auth_data);
+                if ($result['authorizer_refresh_token']) {
+                    setArray($auth_data, 'authorization_info.authorizer_refresh_token', $result['authorizer_refresh_token']);
+                }
+
+                setArray($auth_data, 'authorization_info.expires_in', $result['expires_in']);
+                setArray($auth_data, 'createtime', time());
+
+                $account->set('authdata', $auth_data);
+            }
         }
 
         return strval(getArray($auth_data, 'authorization_info.authorizer_access_token', ''));
@@ -640,10 +648,6 @@ class Account extends State
         //Util::logToFile('wxplatform', $auth_data);
         if (is_error($auth_data)) {
             return $auth_data;
-        }
-
-        if ($auth_data['errcode'] != 0) {
-            return error(intval($auth_data['errcode']), strval($auth_data['errmsg']));
         }
 
         $uid = Account::makeUID($app_id);

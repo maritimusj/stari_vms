@@ -331,7 +331,13 @@ class WxPlatform
         if ($accessToken) {
             $platform = self::getPlatform();
             if ($platform) {
-                return $platform->getAuthData($accessToken, $authCode);
+                $result = $platform->getAuthData($accessToken, $authCode);
+                if (is_error($result)) {
+                    return $result;
+                }
+                if ($result['errcode'] != 0) {
+                    return error(intval($result['errcode']), strval($result['errmsg']));
+                }
             }
         }
         return err('暂时无法请求！');
@@ -343,7 +349,13 @@ class WxPlatform
         if ($accessToken) {
             $platform = self::getPlatform();
             if ($platform) {
-                return $platform->refreshAuthorizerAccessToken($accessToken, $app_id, $refreshAccessToken);
+                $result = $platform->refreshAuthorizerAccessToken($accessToken, $app_id, $refreshAccessToken);
+                if (is_error($result)) {
+                    return $result;
+                }
+                if ($result['errcode'] != 0) {
+                    return error(intval($result['errcode']), strval($result['errmsg']));
+                }
             }
         }
         return err('暂时无法请求！');
@@ -355,7 +367,13 @@ class WxPlatform
         if ($accessToken) {
             $platform = self::getPlatform();
             if ($platform) {
-                return $platform->getAuthProfile($app_id, $accessToken);
+                $result = $platform->getAuthProfile($app_id, $accessToken);
+                if (is_error($result)) {
+                    return $result;
+                }
+                if ($result['errcode'] != 0) {
+                    return error(intval($result['errcode']), strval($result['errmsg']));
+                }
             }
         }
         return err('暂时无法请求！');
@@ -382,8 +400,11 @@ class WxPlatform
 
         //Util::logToFile('wxplatform', $result);
 
-        if ($result && $result['errcode'] > 0) {
-            return err($result['errmsg']);
+        if (is_error($result)) {
+            return $result;
+        }
+        if ($result['errcode'] != 0) {
+            return error(intval($result['errcode']), strval($result['errmsg']));
         }
 
         $result['content'] = $result['url'];

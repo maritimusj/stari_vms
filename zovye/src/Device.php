@@ -569,7 +569,7 @@ class Device extends State
 
         $device->set('refresh', time());
         if ($notify) {
-            $device->appNotify('init');
+            $device->appNotify();
         } else {
             $device->updateQrcode(true);
         }

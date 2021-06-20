@@ -154,34 +154,46 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
 
-        $settings['jfb']['fan']['enabled'] = request::bool('jfbFAN') ? 1 : 0;
-        if ($settings['jfb']['fan']['enabled']) {
-            Account::createJFBAccount();
+        $accounts_need_refresh = false;
+        $specialAccounts = [
+            'jfbFAN' => [
+                __NAMESPACE__ . '\Account::createJFBAccount',
+                'jfb.fan.enabled',
+            ],
+
+            'moscalesFAN' => [
+                __NAMESPACE__ . '\Account::createMoscaleAccount',
+                'moscale.fan.enabled',
+            ],
+            'yunfenbaFAN' => [
+                __NAMESPACE__ . '\Account::createYunFenBaAccount',
+                'yunfenba.fan.enabled',
+            ],
+
+            'AQiinfoFAN' => [
+                __NAMESPACE__ . '\Account::createAQiinfoAccount',
+                'AQiinfo.fan.enabled',
+            ],
+            'MeiPaFAN' => [
+                __NAMESPACE__ . '\Account::createMeiPaAccount',
+                'meipa.fan.enabled',
+            ],
+        ];
+
+        foreach ($specialAccounts as $key => $v) {
+            $enabled = request::bool($key) ? 1 : 0;
+            if ($enabled) {
+                call_user_func($v[0]);
+            } else {
+                if (getArray($settings, $v[1])) {
+                    $accounts_need_refresh = true;
+                }
+            }
+            setArray($settings, $v[1], $enabled);
         }
 
-        $settings['moscale']['fan']['enabled'] = request::bool('moscalesFAN') ? 1 : 0;
-        if ($settings['moscale']['fan']['enabled']) {
-            Account::createMoscaleAccount();
-        }
-
-        $settings['yunfenba']['fan']['enabled'] = request::bool('yunfenbaFAN') ? 1 : 0;
-        if ($settings['yunfenba']['fan']['enabled']) {
-            Account::createYunFenBaAccount();
-        }
-
-        $settings['AQiinfo']['fan']['enabled'] = request::bool('AQiinfoFAN') ? 1 : 0;
-        if ($settings['AQiinfo']['fan']['enabled']) {
-            Account::createAQiinfoAccount();
-        }
-
-        $settings['zjbao']['fan']['enabled'] = request::bool('ZJBaoFAN') ? 1 : 0;
-        if ($settings['zjbao']['fan']['enabled']) {
-            Account::createZJBaoAccount();
-        }
-
-        $settings['meipa']['fan']['enabled'] = request::bool('MeiPaFAN') ? 1 : 0;
-        if ($settings['meipa']['fan']['enabled']) {
-            Account::createMeiPaAccount();
+        if ($accounts_need_refresh) {
+            Account::updateAccountData();
         }
 
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;

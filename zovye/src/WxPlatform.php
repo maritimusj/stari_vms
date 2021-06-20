@@ -233,7 +233,7 @@ class WxPlatform
     {
         $tokenData = Config::wxplatform('token', settings('account.wx.platform.token', []));
         if ($tokenData && $tokenData['component_access_token']) {
-            if (time() - $tokenData['createtime'] < intval($tokenData['expires_in']) - 600) {
+            if (time() - $tokenData['createtime'] < intval($tokenData['expires_in'])) {
                 return $tokenData['component_access_token'];
             }
         }
@@ -246,7 +246,7 @@ class WxPlatform
         $platform = self::getPlatform();
         if ($platform) {
             $result = $platform->getComponentAccessToken($ticket);
-            if ($result['errcode']) {
+            if ($result['errcode'] != 0) {
                 Util::logToFile('wxplatform', [
                     'fn' => 'getComponentAccessToken',
                     'error' => $result,
@@ -271,7 +271,7 @@ class WxPlatform
         $platform = self::getPlatform();
         if ($platform) {
             $result = $platform->getPreAuthCode($accessToken);
-            if ($result['errcode']) {
+            if ($result['errcode'] != 0) {
                 Util::logToFile('wxplatform', [
                     'fn' => 'getPreAuthCode',
                     'error' => $result,
@@ -403,6 +403,7 @@ class WxPlatform
         if (is_error($result)) {
             return $result;
         }
+
         if ($result['errcode'] != 0) {
             return error(intval($result['errcode']), strval($result['errmsg']));
         }

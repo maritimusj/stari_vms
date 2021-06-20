@@ -597,7 +597,7 @@ class Account extends State
         $createtime = getArray($auth_data, 'createtime', 0);
         $expired = getArray($auth_data, 'authorization_info.expires_in', 0);
 
-        if (time() - $createtime > $expired - 600) {
+        if (time() - $createtime > $expired) {
 
             $app_id = getArray($auth_data, 'authorization_info.authorizer_appid', '');
             $refreshToken = getArray($auth_data, 'authorization_info.authorizer_refresh_token', '');

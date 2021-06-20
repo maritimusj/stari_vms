@@ -1599,6 +1599,9 @@ class deviceModelObj extends modelObj
 
         /** @var accountModelObj $entry */
         foreach ($query->findAll() as $entry) {
+            if ($entry->isBanned()) {
+                continue;
+            }
             $assign_data = $entry->settings('assigned');
             if ($this->isMatched($assign_data)) {
                 $accounts[$entry->getUid()] = $entry->format();

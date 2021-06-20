@@ -132,7 +132,25 @@ class accountModelObj extends modelObj
 
     public function isBanned(): bool
     {
-        return $this->state == Account::BANNED;
+        if ($this->state == Account::BANNED) {
+            return true;
+        }
+
+        if ($this->isSpecial()) {
+            $status = [
+                Account::JFB => App::isJfbEnabled(),
+                Account::MOSCALE => App::isMoscaleEnabled(),
+                Account::YUNFENBA => App::isYunfenbaEnabled(),
+                Account::AQIINFO => App::isAQiinfoEnabled(),
+                Account::ZJBAO => App::isZJBaoEnabled(),
+                Account::MEIPA => App::isMeiPaEnabled(),
+            ];
+            $state = $status[$this->getType()];
+            if (isset($state) && !$state) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getDescription(): string

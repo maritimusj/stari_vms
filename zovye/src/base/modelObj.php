@@ -326,7 +326,7 @@ class modelObj implements ISettings
     public function save(): bool
     {
         if ($this->factory) {
-            return $this->factory->__saveToDb($this);
+            return $this->factory->__saveToDb($this) !== false;
         }
 
         return false;

@@ -286,9 +286,9 @@ class modelFactory
      * @param modelObj $obj
      * @param null $seg_arr
      * @param array $condition
-     * @return bool
+     * @return mixed
      */
-    public function __saveToDb(modelObj $obj, $seg_arr = null, $condition = []): bool
+    public function __saveToDb(modelObj $obj, $seg_arr = null, $condition = [])
     {
         $data = $obj->__getData($seg_arr);
         if (empty($data)) {

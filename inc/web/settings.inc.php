@@ -169,7 +169,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createYunFenBaAccount',
                 'yunfenba.fan.enabled',
             ],
-
+            'ZJBaoFAN' => [
+                __NAMESPACE__ . '\Account::createZJBaoAccount',
+                'zjbao.fan.enabled',
+            ],
             'AQiinfoFAN' => [
                 __NAMESPACE__ . '\Account::createAQiinfoAccount',
                 'AQiinfo.fan.enabled',

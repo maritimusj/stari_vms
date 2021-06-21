@@ -346,7 +346,7 @@ class mp
             'title' => request::trim('title'),
             'descr' => request::str('descr'),
             'group_name' => request::str('groupname'),
-            'order_no' => request::int('orderno'),
+            'order_no' => min(999, request::int('orderno', 0)),
             'clr' => request::has('clr') ? request::trim('clr') : 'gray',
             'scname' => request::has('scname') ? request::trim('scname') : Schema::DAY,
             'count' => request::int('count'),

@@ -138,15 +138,17 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>
-                        <div>公众号名称</div>
+                    <th style="text-align: left;">
+                        <div>公众号</div>
                     </th>
                     <th>
-                        <div>所属代理</div>
-                        <div>名称</div>
+                        标题
+                    </th>
+                    <th>
+                        <div>所属代理</div>                        
                     </th>
                     <th>领取周期</th>
-                    <th>详情 <i class="fa fa-share-alt" title="分佣"></i></th>
+                    <th>详情</th>
                     <th>关注二维码</th>
                     <th></th>
                 </tr>
@@ -160,9 +162,12 @@
                 </td>
                 <td>
                     <div class="profile">
-                        <img src="{$res['img']}">
-                        <span>{$res['name']}</span>
-                    </div>
+                        <img src="{$res['img']}">     
+                        <span>{$res['name']}</span>                   
+                    </div>                    
+                </td>
+                <td>
+                    <span>{$res['title']}</span>
                 </td>
                 <td class="desc">
                 </td>
@@ -238,6 +243,11 @@
                             {/if}
                         </div>
                     </td>
+                    <td>
+                        <div>
+                            {$a['title']}
+                        </div>
+                    </td>
                     <td class="desc">
                         <div style="margin-bottom:10px;">
                             {if $a['agent'] && (empty($agent) || $agent->getId() != $a['agent']['id'])}
@@ -253,9 +263,7 @@
                             <span style="color:gray;">&lt;平台&gt;</span>
                             {/if}
                         </div>
-                        <div>
-                            {$a['title']}
-                        </div>
+
                     </td>
                     <td class="desc">
                         <span class="schema schema_{$a['scname']}" style="border-bottom:4px solid #fff;box-shadow: 0px 2px 0px 0px {$a['clr']};" title="{if $a['count']}每人每{php echo zovye\Schema::desc($a['scname'])}可领取{$a['count']}包{/if}{if $a['sccount']}，每{php echo zovye\Schema::desc($a['scname'])}最多送出{$a['sccount']}包{/if}">

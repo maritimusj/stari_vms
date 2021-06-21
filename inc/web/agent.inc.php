@@ -88,6 +88,7 @@ if ($op == 'default') {
         $query->whereOr([
             'nickname LIKE' => "%{$keywords}%",
             'mobile LIKE' => "%{$keywords}%",
+            'name LIKE' => "%{$keywords}%",
         ]);
     }
 

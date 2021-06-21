@@ -41,7 +41,8 @@ if ($op == 'default') {
     if ($keywords) {
         $query->whereOr([
             'name LIKE' => "%{$keywords}%",
-            'title LIEK' => "%{$keywords}%",
+            'title LIKE' => "%{$keywords}%",
+            'descr LIKE' => "%{$keywords}%",
         ]);
     }
 
@@ -143,6 +144,7 @@ if ($op == 'default') {
                     'id' => $t_res->getId(),
                     'orderno' => $t_res->getOrderNo(),
                     'name' => $t_res->getName(),
+                    'title' => $t_res->getTitle(),
                     'url' => $t_res->getUrl(),
                     'img' => $t_res->getImg(),
                     'assigned' => !isEmptyArray($t_res->get('assigned')),

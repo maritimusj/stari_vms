@@ -53,7 +53,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_RESET => [
-            'title' => '[v0]补纸信号',
+            'title' => '[v0]补货信号',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onResetMsg',
             'params' => [
                 'log' => [
@@ -63,7 +63,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_RESULT => [
-            'title' => '出纸结果v0',
+            'title' => '出货结果v0',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onResultMsg',
             'params' => [
                 'log' => [
@@ -183,7 +183,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V1_RECORD => [
-            'title' => '[v1]出纸结果',
+            'title' => '[v1]出货结果',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onMcbRecord',
             'params' => [
                 'log' => [

@@ -179,7 +179,7 @@ class Util
     public static function fansInfo(): array
     {
         if (_W('openid')) {
-            $res = We7::mc_oauth_account_userinfo();
+            $res = We7::mc_oauth_userinfo();
             if (!is_error($res)) {
                 return $res;
             }

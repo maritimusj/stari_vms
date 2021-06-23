@@ -176,7 +176,7 @@ class Util
      *
      * @return array
      */
-    public static function fansInfo($refresh = true): array
+    public static function fansInfo(): array
     {
         if (_W('openid')) {
             $res = We7::mc_oauth_account_userinfo();

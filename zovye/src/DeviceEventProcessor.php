@@ -84,7 +84,7 @@ class DeviceEventProcessor
         ],
         self::EVENT_V0_UPDATE => [
             'title' => '[v0]App更新配置',
-            'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onAppInitMsg',
+            'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onAppConfigMsg',
             'params' => [
                 'log' => [
                     'enable' => true,

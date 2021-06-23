@@ -176,10 +176,10 @@ class Util
      *
      * @return array
      */
-    public static function fansInfo(): array
+    public static function fansInfo($refresh = true): array
     {
         if (_W('openid')) {
-            $res = We7::mc_oauth_userinfo();
+            $res = We7::mc_oauth_account_userinfo();
             if (!is_error($res)) {
                 return $res;
             }

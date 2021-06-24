@@ -7,6 +7,7 @@
 
 namespace zovye\model;
 
+use zovye\Locker;
 use zovye\Pay;
 use zovye\We7;
 use zovye\User;
@@ -600,6 +601,16 @@ class userModelObj extends modelObj
         $res = $query->get('sum(num)');
 
         return intval($res);
+    }
+
+    /**
+     * 新的锁定方法
+     * @param string $name
+     * @return lockerModelObj|null
+     */
+    public function acquireLocker($name = ''): ?lockerModelObj
+    {
+        return Locker::try("user:{$this->getId()}:{$name}", 6);
     }
 
     /**

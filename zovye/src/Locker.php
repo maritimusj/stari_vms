@@ -89,18 +89,18 @@ class Locker
         return $locker;
     }
 
-    public static function try(string $uid = '', int $tries = 0, $delay = 1, int $available = 0, int $expired_at = 60): ?lockerModelObj
+    public static function try(string $uid = '', int $retries = 0, $retry_delay_seconds = 1, int $available = 0, int $expired_after_seconds = 60): ?lockerModelObj
     {
         $i = 0;
         do {
-            $locker = self::load($uid, $available, $expired_at);
+            $locker = self::load($uid, $available, $expired_after_seconds);
             if ($locker) {
                 return $locker;
             }
-            if ($i++ < $tries) {
-                sleep($delay);
+            if ($i++ < $retries) {
+                sleep($retry_delay_seconds);
             }
-        } while ($i < $tries);
+        } while ($i < $retries);
 
         return null;
     }

@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use CompileError;
 use Exception;
 use we7\template;
 use zovye\base\modelObj;

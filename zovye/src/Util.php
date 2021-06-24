@@ -1388,14 +1388,14 @@ HTML_CONTENT;
                 'payload' => $device->getPayload(),
             ];
 
-            $res = $device->pull($data);
+            $pull_result = $device->pull($data);
 
-            $log_data['result'] = $res;
+            $log_data['result'] = $pull_result;
 
             $device->goodsLog(LOG_GOODS_TEST, $log_data);
 
-            if (is_error($res)) {
-                return $res;
+            if (is_error($pull_result)) {
+                return $pull_result;
             }
 
             //如果是营运人员测试，则不减少库存
@@ -1404,8 +1404,8 @@ HTML_CONTENT;
                 if (empty($locker)) {
                     return error(State::ERROR, '设备正忙，请重试！');
                 }
-                $res = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
-                if (is_error($res)) {
+                $payload = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
+                if (is_error($payload)) {
                     return error(State::ERROR, '保存库存失败！');
                 }
                 $locker->unlock();
@@ -1418,7 +1418,7 @@ HTML_CONTENT;
             $result = ['message' => '出货成功！'];
 
             if ($device->isBlueToothDevice()) {
-                $result['data'] = $res;
+                $result['data'] = $pull_result;
             }
 
             return $result;

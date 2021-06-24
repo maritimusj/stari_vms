@@ -529,11 +529,18 @@ class deviceModelObj extends modelObj
 
     public function profile(): array
     {
-        return [
+        $data = [
             'id' => $this->getId(),
             'imei' => $this->getImei(),
             'name' => $this->getName(),
         ];
+        if ($this->isVDevice()) {
+            $data['vDevice'] = true;
+        } elseif ($this->isBlueToothDevice()) {
+            $data['bluetooth'] = true;
+            $data['buid'] = $this->getBUID();
+        }
+        return $data;
     }
 
     public function cleanError()

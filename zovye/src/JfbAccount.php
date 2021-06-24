@@ -50,7 +50,7 @@ class JfbAccount
                 'facilityProvince' => $fans['province'],
                 'facilityCity' => $fans['city'],
                 'facilityDistrict' => '',
-                'showTimes' => 1,
+                'showTimes' => 0,
                 'redirect' => Util::murl('order', ['op' => 'feedback', 'device_imei' => $device->getImei(), 'device_name' => $device->getName()]),
                 'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
                         'op' => 'feedback',

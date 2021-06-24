@@ -108,7 +108,7 @@ function prepare(string $order_no)
         ExceptionNeedsRefund::throwWith($device, '找不到指定的用户！');
     }
 
-    if(!$user->lock()) {
+    if(!$user->acquireLocker('create::order')) {
         throw new Exception('用户无法锁定！');
     }
 

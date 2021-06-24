@@ -341,7 +341,7 @@ ORDER;
 
                 if (isset($id) && $id > $last_id) {
                     $total += $last_total;
-                    $locker = $this->user->lock();
+                    $locker = $this->user->acquireLocker(User::COMMISSION_BALANCE_LOCKER);
                     if ($locker) {
                         $this->user->set('commission_balance', [
                             'id' => $id,

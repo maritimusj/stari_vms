@@ -712,7 +712,7 @@ if ($op == 'default') {
                 JSON::fail('金额不能为零！');
             }
 
-            if ($user->lock()) {
+            if ($user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
                 $memo = strval(request('memo'));
                 $r = $user->commission_change(
                     $total,

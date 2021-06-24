@@ -32,6 +32,11 @@ class User
     const GSPOR = 'gspor';
     const TESTER = 'tester';
 
+    const ORDER_ACCOUNT_LOCKER  = 'account::order';
+    const ORDER_LOCKER = 'order';
+    const COMMISSION_BALANCE_LOCKER = 'commission::balance';
+
+
     const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
 
 

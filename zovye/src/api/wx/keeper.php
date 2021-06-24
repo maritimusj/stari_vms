@@ -836,7 +836,7 @@ class keeper
                 return err('找不到设备代理商！');
             }
 
-            if (!$agent->tryLock()) {
+            if (!$agent->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
                 return err('无法锁定代理商！');
             }
 

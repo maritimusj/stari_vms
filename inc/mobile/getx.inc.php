@@ -15,7 +15,7 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail(['text' => '领取失败', 'msg' => '找不到用户或者用户无法领取']);
 }
 
-if (!$user->lock()) {
+if (!$user->acquireLocker('get::x')) {
     JSON::fail(['text' => '领取失败', 'msg' => '用户锁定失败，请重试']);
 }
 

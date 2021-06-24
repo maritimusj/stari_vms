@@ -86,11 +86,15 @@ class balance
         return $result;
     }
 
-
+    /**
+     * @param $user userModelObj
+     * @param $amount
+     * @return array
+     */
     public static function balanceWithdraw($user, $amount): array
     {
         //先锁定用户，防止恶意重复提交
-        if (!$user->lock()) {
+        if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
             return error(State::ERROR, '锁定用户失败，请重试！');
         }
 

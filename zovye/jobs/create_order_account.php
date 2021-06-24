@@ -52,7 +52,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             ZovyeException::throwWith('找不到指定的用户或者已禁用!', -1, $device);
         }
 
-        if (!$user->lock()) {
+        if (!$user->acquireLocker(User::ORDER_ACCOUNT_LOCKER)) {
             ZovyeException::throwWith('用户锁定失败!', -1, $device);
         }
 

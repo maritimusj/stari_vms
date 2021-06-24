@@ -212,7 +212,7 @@ if ($op === 'create') {
         JSON::fail('找不到用户或者用户已禁用！');
     }
 
-    if (!$user->lock()) {
+    if (!$user->acquireLocker(User::ORDER_ACCOUNT_LOCKER)) {
         JSON::fail('用户锁定失败！');
     }
 

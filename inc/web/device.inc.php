@@ -2401,4 +2401,30 @@ if ($op == 'list') {
     }
 
     JSON::success($result);
+
+} elseif ($op == 'qrcode_download') {
+
+    //简单的二维码导出功能
+    $url_prefix = We7::attachment_set_attach_url();
+    $attach_prefix = ATTACHMENT_ROOT;
+
+    $zip = new \ZipArchive();
+    $file_name = time() . '_' . rand() . '.zip';
+    $file_path = $attach_prefix . $file_name;
+    $zip->open($file_path, \ZipArchive::CREATE);   //打开压缩包
+
+    $ids = request::array('ids', []);
+    $query = Device::query(['id' => $ids]);
+
+    foreach($query->findAll() as $device) {
+        $file_real = str_replace($url_prefix, $attach_prefix, $device->getQrcode());
+        $file_real = preg_replace('/\?.*/', '', $file_real);
+        if (file_exists($file_real)) {
+            $zip->addFile($file_real, basename($file_real));
+        }
+    }
+
+    $zip->close();
+
+    JSON::success(['url' => Util::toMedia($file_name)]);
 }

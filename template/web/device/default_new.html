@@ -387,8 +387,14 @@
             <table class="table" id="devicelist">
                 <thead v-show="device.list !== undefined">
                     <tr>
-                        <th>#</th>
-                        <th></th>
+                        <th>
+                            <input type="checkbox" v-if="showSelectInputCtrl" v-model="selectAll">
+                            <template v-else>#</template>
+                        </th>
+                        <th class="operate">
+                            <i class="fa fa-download" title="下载选中的设备二维码" v-if="showSelectInputCtrl && canDownload" @click="downloadQRCode"></i>
+                            <i class="fa fa-sign-out" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
+                        </th>
                         <th>                    
                             <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>
                         </th>
@@ -421,18 +427,23 @@
                 <tbody>
                     <tr v-for="(o,index) in device.list" :key="o.id" :data-fetchid="o.id" :class="o.model">
                         <td class="operate">
-                            <template v-if="o.lockedtime">
-                                <i class="fa fa-lock" :title="'锁定时间：' + o.lockedtime" data-op="unlock" :data-index="index + 1"></i>
+                            <template v-if="showSelectInputCtrl">
+                                <input type="checkbox" id="downloadQRCode" :value="o.id" v-model="selectedInputCtrl">                                
                             </template>
                             <template v-else>
-                                <template v-if="o.s1">
-                                    <span class="operate">
-                                        <i class="fa fa-map-marker" title="设备位置已变动" data-op="confirmLAC" :data-index="index + 1"></i>
-                                    </span>                                    
+                                <template v-if="o.lockedtime">
+                                    <i class="fa fa-lock" :title="'锁定时间：' + o.lockedtime" data-op="unlock" :data-index="index + 1"></i>
                                 </template>
-                               <template v-else>
-                                {{index + 1}}
-                               </template>
+                                <template v-else>
+                                    <template v-if="o.s1">
+                                        <span class="operate">
+                                            <i class="fa fa-map-marker" title="设备位置已变动" data-op="confirmLAC" :data-index="index + 1"></i>
+                                        </span>                                    
+                                    </template>
+                                    <template v-else>
+                                        {{index + 1}}
+                                    </template>
+                                </template>
                             </template>
                         </td>
                         <td class="device-qrcode">
@@ -669,5 +680,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210609"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625"></script>
 {template 'common/footer'}

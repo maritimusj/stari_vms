@@ -391,8 +391,10 @@
                             <i :class="{'fa': true, 'fa-check-square': isAllSelected, 'fa-square-o': !isAllSelected}" title="全部" v-if="showSelectInputCtrl" @click="selectAll"></i> 
                             <template v-else>#</template>
                         </th>
-                        <th class="operate">
-                            <i class="fa fa-download" title="下载选中的设备二维码" v-if="showSelectInputCtrl && canDownload" @click="downloadQRCode"></i>
+                        <th class="operate" style="position: relative;">
+                            <template v-if="showSelectInputCtrl && canDownload">
+                                <i class="fa fa-download" title="下载选中的设备二维码" @click="downloadQRCode"></i><span class="badge" style="position: absolute;">{{selectedInputCtrl.length}}</span>
+                            </template>
                             <i class="fa fa-sign-out" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
                         </th>
                         <th>                    
@@ -646,6 +648,9 @@
                     </tr>
                 </tbody>
             </table>
+    <div class="pull-left operate" style="padding: 0 15px;">
+        <i class="fa fa-sort-down" title="显示更多" @click="incrPageSize"></i>
+    </div>
     <div class="pull-right" v-if="device.list.length>0">
         <div>
             <ul class="pagination pagination-centered">
@@ -680,5 +685,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625002"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625003"></script>
 {template 'common/footer'}

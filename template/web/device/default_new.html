@@ -387,8 +387,8 @@
             <table class="table" id="devicelist">
                 <thead v-show="device.list !== undefined">
                     <tr>
-                        <th>
-                            <input type="checkbox" v-if="showSelectInputCtrl" v-model="selectAll">
+                        <th class="operate">
+                            <i :class="{'fa': true, 'fa-check-square': isAllSelected, 'fa-square-o': !isAllSelected}" title="选中所有" v-if="showSelectInputCtrl" @click="selectAll"></i> 
                             <template v-else>#</template>
                         </th>
                         <th class="operate">
@@ -680,5 +680,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625002"></script>
 {template 'common/footer'}

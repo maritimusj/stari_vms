@@ -633,8 +633,13 @@ if ($op == 'default') {
                 $data[$month_date]['withdraw'] += $x_val;
             } elseif ($src == CommissionBalance::FEE) {
                 $data[$month_date]['fee'] += $x_val;
+            } else {
+                if ($x_val > 0) {
+                    $data[$month_date]['income'] += $x_val;
+                } else {
+                    $data[$month_date]['fee'] += $x_val;
+                }
             }
-
         }
     }
 

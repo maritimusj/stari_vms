@@ -38,6 +38,7 @@
             <entry title="文档管理" do="article" state="" direct=""/>
             <entry title="型号管理" do="devicetypes" state="" direct=""/>
             <entry title="商品管理" do="goods" state="" direct=""/>
+            <entry title="库存管理" do="storage" state="" direct=""/>
             <entry title="版本管理" do="upgrade" state="" direct=""/>
             <entry title="系统设置" do="settings" state="" direct=""/>
         </menu>

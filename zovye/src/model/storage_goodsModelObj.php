@@ -20,9 +20,6 @@ class storage_goodsModelObj extends modelObj
 	protected $id;
 
 	/** @var int */
-	protected $uniacid;
-
-	/** @var int */
 	protected $storage_id;
 
 	/** @var int */

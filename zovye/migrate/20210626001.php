@@ -22,7 +22,6 @@ CREATE TABLE `ims_zovye_vms_storage` (
 
 CREATE TABLE `ims_zovye_vms_storage_goods` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
-    `uniacid` INT NOT NULL , 
     `storage_id` INT NOT NULL , 
     `goods_id` INT NOT NULL , 
     `num` INT NOT NULL DEFAULT '0' , 

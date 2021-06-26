@@ -83,6 +83,16 @@ class request
         return boolval(_W('isajax'));
     }
 
+    public static function is_post(): bool
+    {
+        return boolval(_W('ispost'));
+    }
+
+    public static function is_get(): bool
+    {
+        return !self::is_post();
+    }
+
     public static function int(string $name, int $default = 0): int
     {
         return intval(request($name, $default));

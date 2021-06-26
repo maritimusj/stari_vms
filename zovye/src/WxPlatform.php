@@ -7,6 +7,7 @@ namespace zovye;
 use Exception;
 use RuntimeException;
 use wx\Platform;
+use zovye\model\accountModelObj;
 
 class WxPlatform
 {
@@ -16,8 +17,16 @@ class WxPlatform
 
     const SUCCESS_RESPONSE = 'success';
 
+    const SCOPE_SNSAPI_BASE = 'snsapi_base';
+    const SCOPE_SNSAPI_USERINFO = 'snsapi_userinfo';
+
     const CREATE_AUTHORIZER_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={TOKEN}';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={TICKET}';
+
+    const AUTHORIZATION_CODE_URL = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid={APPID}&redirect_uri={REDIRECT_URI}&response_type=code&scope={SCOPE}&state={STATE}&component_appid={COMPONENT_APPID}#wechat_redirect';
+    const ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/sns/oauth2/component/access_token?appid={APPID}&code={CODE}&grant_type=authorization_code&component_appid={COMPONENT_APPID}&component_access_token={COMPONENT_ACCESS_TOKEN}';
+    const GET_USER_PROFILE = 'https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN';
+    const GET_USER_PROFILE2 = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN';
 
     const PERM_QRCODE = 'QR_LIMIT_STR_SCENE';
     const TEMP_QRCODE = 'QR_STR_SCENE';
@@ -96,6 +105,120 @@ class WxPlatform
         return err('没有配置！');
     }
 
+    /**
+     * 获取公众号网页授权URL
+     * @param accountModelObj $account
+     * @param $redirect_url
+     * @param string $scope
+     * @param string $state
+     * @return string
+     */
+    public static function getAuthorizationCodeRedirectUrl(accountModelObj $account, $redirect_url, $scope = self::SCOPE_SNSAPI_BASE, $state = ''): string
+    {
+        $component_appid = settings('account.wx.platform.config.appid');
+        $appid = $account->settings('authdata.authorization_info.authorizer_appid');
+        if (empty($component_appid) || empty($appid)) {
+            return '';
+        }
+
+        return str_replace(['{APPID}', '{REDIRECT_URI}', '{SCOPE}', '{STATE}', '{COMPONENT_APPID}'], [
+            $appid,
+            urlencode($redirect_url),
+            $scope,
+            $state,
+            $component_appid,
+        ], self::AUTHORIZATION_CODE_URL);
+    }
+
+    public static function getUserInfo(accountModelObj $account, $code): array
+    {
+        $appid = $account->settings('authorization_info.authorizer_appid');
+        if (empty($appid)) {
+            return err('配置不正确, appid为空！');
+        }
+        $res = self::getAccessToken($appid, $code);
+        if (is_error($res)) {
+            return $res;
+        }
+        $scopes = explode($res['scope'], ',');
+        if (in_array(self::SCOPE_SNSAPI_USERINFO, $scopes)) {
+            $res = self::getUserProfile($res['access_token'], $res['openid']);
+            if (!is_error($res)) {
+                return $res;
+            }
+        }
+        return [
+            'openid' => $res['openid'],
+        ];
+    }
+
+    public static function getAccessToken($appid, $code): array
+    {
+        $component_appid = settings('account.wx.platform.config.appid');
+        if (empty($component_appid)) {
+            return err('配置不正确, component_appid为空！');
+        }
+
+        $component_access_token = self::getComponentAccessToken();
+        if (empty($component_access_token)) {
+            return err('无法获取component access token');
+        }
+
+        $data = Util::get(str_replace(['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
+            $appid,
+            $code,
+            $component_appid,
+            $component_access_token,
+        ], self::ACCESS_TOKEN_URL));
+
+        if (empty($data)) {
+            return err('接口请求失败！');
+        }
+
+        $result = json_decode($data, true);
+        if (empty($result)) {
+            return err('接口返回数据为空！');
+        }
+
+        if (!empty($result['errcode'])) {
+            return err($result['errmsg']);
+        }
+
+        return $result;
+    }
+
+    public static function getUserProfile($access_token, $openid): array
+    {
+        $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE));
+
+        $result = json_decode($data, true);
+        if (empty($result)) {
+            return err('接口返回数据为空！');
+        }
+
+        if (!empty($result['errcode'])) {
+            return err($result['errmsg']);
+        }
+
+        return $result;
+    }
+
+    public static function getUserProfile2($access_token, $openid): array
+    {
+        $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2));
+
+        $result = json_decode($data, true);
+        if (empty($result)) {
+            return err('接口返回数据为空！');
+        }
+
+        if (!empty($result['errcode'])) {
+            return err($result['errmsg']);
+        }
+
+        return $result;
+    }
+
     public static function getComponentTicket(): string
     {
         $data = Config::wxplatform('ticket', settings('account.wx.platform.ticket', []));
@@ -110,7 +233,7 @@ class WxPlatform
     {
         $tokenData = Config::wxplatform('token', settings('account.wx.platform.token', []));
         if ($tokenData && $tokenData['component_access_token']) {
-            if (time() - $tokenData['createtime'] < intval($tokenData['expires_in']) - 600) {
+            if (time() - $tokenData['createtime'] < intval($tokenData['expires_in'])) {
                 return $tokenData['component_access_token'];
             }
         }
@@ -123,11 +246,11 @@ class WxPlatform
         $platform = self::getPlatform();
         if ($platform) {
             $result = $platform->getComponentAccessToken($ticket);
-            if ($result['errcode']) {
+            if ($result['errcode'] != 0) {
                 Util::logToFile('wxplatform', [
                     'fn' => 'getComponentAccessToken',
                     'error' => $result,
-               ]);
+                ]);
                 return '';
             }
             $result['createtime'] = time();
@@ -148,7 +271,7 @@ class WxPlatform
         $platform = self::getPlatform();
         if ($platform) {
             $result = $platform->getPreAuthCode($accessToken);
-            if ($result['errcode']) {
+            if ($result['errcode'] != 0) {
                 Util::logToFile('wxplatform', [
                     'fn' => 'getPreAuthCode',
                     'error' => $result,
@@ -208,7 +331,13 @@ class WxPlatform
         if ($accessToken) {
             $platform = self::getPlatform();
             if ($platform) {
-                return $platform->getAuthData($accessToken, $authCode);
+                $result = $platform->getAuthData($accessToken, $authCode);
+                if (is_error($result)) {
+                    return $result;
+                }
+                if ($result['errcode'] != 0) {
+                    return error(intval($result['errcode']), strval($result['errmsg']));
+                }
             }
         }
         return err('暂时无法请求！');
@@ -220,7 +349,14 @@ class WxPlatform
         if ($accessToken) {
             $platform = self::getPlatform();
             if ($platform) {
-                return $platform->refreshAuthorizerAccessToken($accessToken, $app_id, $refreshAccessToken);
+                $result = $platform->refreshAuthorizerAccessToken($accessToken, $app_id, $refreshAccessToken);
+                if (is_error($result)) {
+                    return $result;
+                }
+                if ($result['errcode'] != 0) {
+                    return error(intval($result['errcode']), strval($result['errmsg']));
+                }
+                return $result;
             }
         }
         return err('暂时无法请求！');
@@ -232,7 +368,13 @@ class WxPlatform
         if ($accessToken) {
             $platform = self::getPlatform();
             if ($platform) {
-                return $platform->getAuthProfile($app_id, $accessToken);
+                $result = $platform->getAuthProfile($app_id, $accessToken);
+                if (is_error($result)) {
+                    return $result;
+                }
+                if ($result['errcode'] != 0) {
+                    return error(intval($result['errcode']), strval($result['errmsg']));
+                }
             }
         }
         return err('暂时无法请求！');
@@ -259,8 +401,12 @@ class WxPlatform
 
         //Util::logToFile('wxplatform', $result);
 
-        if ($result && $result['errcode'] > 0) {
-            return err($result['errmsg']);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        if ($result['errcode'] != 0) {
+            return error(intval($result['errcode']), strval($result['errmsg']));
         }
 
         $result['content'] = $result['url'];
@@ -313,7 +459,7 @@ class WxPlatform
 
     /**
      * 微信消息处理
-     * 
+     *
      */
     public static function handleAuthorizerEvent(): string
     {
@@ -340,7 +486,9 @@ class WxPlatform
                     'error' => $result,
                 ]);
 
-                $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
+                if (DEBUG) {
+                    $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
+                }
             }
 
             if (!empty($result)) {
@@ -388,7 +536,6 @@ class WxPlatform
             ],
         ]);
     }
-
 
     public static function getEncryptedMsg(string $msg): string
     {
@@ -440,30 +587,68 @@ class WxPlatform
                 throw new RuntimeException('找不到指定的公众号：' . $account_name);
             }
 
-            //出货时机是用户点击链连后，直接指定回推送的消息
+            //出货时机是用户点击链连后，直接返回推送的消息
             if (!empty($acc->settings('config.open.timing'))) {
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
-            list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
-            if ($prefix != App::uid(6)) {
-                return [];
+            if ($acc->isServiceAccount()) {
+                list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
+                if ($prefix != App::uid(6)) {
+                    return [];
+                }
+
+                $device = Device::get($second);
+
+                if (empty($device)) {
+                    throw new RuntimeException('找不到这个设备！');
+                }
+
+                if ($first == 'device') {
+                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                }
+
+                $user = User::get($first);
+                if (empty($user)) {
+                    throw new RuntimeException('找不到这个用户！');
+                }                
+            } else {
+                $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
+
+                $appid = $acc->settings('authdata.authorization_info.authorizer_appid');
+                $user_uid = User::makeUserFootprint($profile);
+                $obj = ComponentUser::findOne([
+                    'appid' => $appid,
+                    'openid' => $user_uid,
+                ]);
+
+//                 Util::logToFile('debug', [
+//                     'appid' => $appid,
+//                     'user_uid' => $user_uid,
+//                     'msg' => $msg,
+//                     'token' => $acc->settings('authdata.authorization_info.authorizer_access_token'),
+//                     'profile' => $profile,
+//                 ]);
+
+                if (empty($obj)) {
+                    //throw new RuntimeException('请先扫描设备二维码，谢谢！');
+                    //用户匹配失败，直接返回设定的消息，点击接领取
+                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
+                }
+
+                ComponentUser::removeAll(['appid' => $appid, 'openid' => $user_uid]);
+
+                $device = Device::findOne(['shadow_id' => $obj->getExtraData('device')]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到这个设备！');
+                }
+
+                $user = User::get($obj->getUserId());
             }
 
-            $device = Device::get($second);
-
-            if (empty($device)) {
-                throw new RuntimeException('找不到这个设备！');
-            }
-
-            if ($first == 'device') {
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
-            }
-
-            $user = User::get($first);
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
-            }
+            } 
 
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用！');
@@ -486,7 +671,7 @@ class WxPlatform
                 ]);
             }
 
-            $uid = sha1($msg['Ticket']);
+            $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
             $order_uid = substr("U{$user->getId()}D{$device->getId()}{$uid}", 0, MAX_ORDER_NO_LEN);
 
             Job::createSpecialAccountOrder([
@@ -500,6 +685,9 @@ class WxPlatform
             return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
 
         } catch (ZovyeException $e) {
+            Util::logToFile('debug', [
+                'error' => $e->getMessage()
+            ]);            
             $device = $e->getDevice();
             if ($device) {
                 $device->appShowMessage($e->getMessage(), 'error');
@@ -508,6 +696,9 @@ class WxPlatform
             return err($e->getMessage());
 
         } catch (Exception $e) {
+            Util::logToFile('debug', [
+                'error' => $e->getMessage()
+            ]);
             return err($e->getMessage());
         }
     }

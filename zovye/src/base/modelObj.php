@@ -326,7 +326,7 @@ class modelObj implements ISettings
     public function save(): bool
     {
         if ($this->factory) {
-            return $this->factory->__saveToDb($this);
+            return $this->factory->__saveToDb($this) !== false;
         }
 
         return false;
@@ -339,9 +339,8 @@ class modelObj implements ISettings
 
     public function saveWhen($condition = []): bool
     {
-
         if ($this->factory) {
-            return $this->factory->__saveToDb($this, null, $condition);
+            return $this->factory->__saveToDb($this, null, $condition) > 0;
         }
 
         return false;
@@ -352,15 +351,16 @@ class modelObj implements ISettings
      */
     public function destroy(): bool
     {
-        $res = $this->factory->remove($this);
-        if ($res) {
-            foreach ($this as $key => $val) {
-                $this->$key = null;
+        if ($this->factory()) {
+            $res = $this->factory->remove($this);
+            if ($res) {
+                foreach ($this as $key => $val) {
+                    $this->$key = null;
+                }
+
+                return true;
             }
-
-            return true;
         }
-
         return false;
     }
 

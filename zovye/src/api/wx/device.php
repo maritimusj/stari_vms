@@ -266,8 +266,8 @@ class device
         }
 
         if ($device) {
-            if (!$device->lockAcquire()) {
-                return error(State::ERROR, '无法锁定设备！');
+            if (!$device->payloadLockAcquire(3)) {
+                return error(State::ERROR, '设备正忙，请稍后再试！');
             }
 
             $lane = request::int('lane');
@@ -277,7 +277,10 @@ class device
             }
 
             $num = request::int('num');
-            $device->setLane($lane, $num);
+            $res = $device->resetPayload([$lane => '@' . $num], '代理商补货');
+            if (is_error($res)) {
+                return error(State::ERROR, '保存库存失败！');
+            }
 
             return ['msg' => '设置成功！'];
         }

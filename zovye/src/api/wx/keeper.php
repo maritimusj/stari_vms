@@ -785,6 +785,7 @@ class keeper
      * 运营人员补货.
      *
      * @return array
+     * @throws Exception
      */
     public static function deviceReset(): array
     {
@@ -803,8 +804,9 @@ class keeper
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->lockAcquire()) {
-            return error(State::ERROR, '无法锁定设备！');
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
+            return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
         //补货佣金计算函数
@@ -834,7 +836,7 @@ class keeper
                 return err('找不到设备代理商！');
             }
 
-            if (!$agent->tryLock()) {
+            if (!$agent->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
                 return err('无法锁定代理商！');
             }
 
@@ -842,71 +844,73 @@ class keeper
                 return err('代理商余额不足！');
             }
 
-            return Util::transactionDo(function () use ($total, $agent, $keeper, $device) {
-                if ($agent->getCommissionBalance()->total() >= $total) {
-                    $r1 = $agent->commission_change(0 - $total, CommissionBalance::RELOAD_OUT, [
-                        'device' => $device->getId(),
-                        'keeper' => $keeper->getId(),
-                    ]);
+            if ($agent->getCommissionBalance()->total() >= $total) {
+                $r1 = $agent->commission_change(0 - $total, CommissionBalance::RELOAD_OUT, [
+                    'device' => $device->getId(),
+                    'keeper' => $keeper->getId(),
+                ]);
 
-                    if ($r1 && $r1->update([], true)) {
-                        $keeperUser = $keeper->getUser();
-                        if (!empty($keeperUser)) {
-                            $r2 = $keeperUser->commission_change($total, CommissionBalance::RELOAD_IN, ['device' => $device->getId()]);
-                            if ($r2 && $r2->update([], true)) {
-                                return true;
-                            }
+                if ($r1 && $r1->update([], true)) {
+                    $keeperUser = $keeper->getUser();
+                    if (!empty($keeperUser)) {
+                        $r2 = $keeperUser->commission_change($total, CommissionBalance::RELOAD_IN, ['device' => $device->getId()]);
+                        if ($r2 && $r2->update([], true)) {
+                            return true;
                         }
                     }
-                    throw new Exception('创建佣金失败！');
                 }
-                return true;
-            });
+                throw new Exception('创建佣金失败！');
+            }
+            return true;
         };
 
         if (request::isset('lane')) {
             $data = [
-                request::int('lane') => request::int('num'),
+                request::int('lane') => '@' . request::int('num'),
             ];
         } else {
             $data = [];
         }
 
-        $result = $device->resetPayload($data);
-        if ($result) {
-            $total = 0;
-            foreach ($result as $entry) {
-                \zovye\Keeper::createReplenish(
-                    $keeper,
-                    $device,
-                    $entry['goodsId'],
-                    $entry['org'],
-                    $entry['num'],
-                    [
-                        'device' => [
-                            'name' => $device->getName(),
-                        ],
-                    ]
-                );
-
-                //累计佣金
-                $total += $commission_price_calc($entry['num'], $entry['goodsId']);
-            }
-
-            //保存佣金
-            if ($total > 0) {
-                $err = $create_commission_fn($total);
-                if (is_error($err)) {
-                    Util::logToFile('keeper', [
-                        'error' => '创建营运人员补货佣金失败:' . $err['message'],
-                        'total' => $total,
-                    ]);
-                }
-            }
-
-            $device->updateRemain();
-            $device->save();
+        $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
+        if (is_error($result)) {
+            return err('保存库存失败！');
         }
+
+        $locker->unlock();
+
+        $total = 0;
+        foreach ($result as $entry) {
+            \zovye\Keeper::createReplenish(
+                $keeper,
+                $device,
+                $entry['goodsId'],
+                $entry['org'],
+                $entry['num'],
+                [
+                    'device' => [
+                        'name' => $device->getName(),
+                    ],
+                ]
+            );
+
+            //累计佣金
+            $total += $commission_price_calc($entry['num'], $entry['goodsId']);
+        }
+
+        //保存佣金
+        if ($total > 0) {
+            $err = $create_commission_fn($total);
+            if (is_error($err)) {
+                Util::logToFile('keeper', [
+                    'error' => '创建营运人员补货佣金失败:' . $err['message'],
+                    'total' => $total,
+                ]);
+            }
+        }
+
+        $device->updateRemain();
+        $device->save();
 
         return ['msg' => '设置成功！'];
     }
@@ -949,7 +953,7 @@ class keeper
         );
 
         if (is_error($res)) {
-            return error(State::FAIL, $res['message']);
+            return $res;
         }
 
         $device->cleanError();

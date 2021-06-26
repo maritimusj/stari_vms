@@ -146,6 +146,28 @@ class App
     }
 
     /**
+     * 是否开启 纸巾宝 吸粉
+     *
+     */
+    public static function isZJBaoEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('zjbao.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 美葩 吸粉
+     *
+     */
+    public static function isMeiPaEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('meipa.fan.enabled'));
+        });
+    }
+
+    /**
      * 是否启用用户中心
      * @return bool
      */

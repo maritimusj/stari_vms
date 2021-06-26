@@ -35,7 +35,15 @@ trait GettersAndSetters
 
     public function __call($name, $params)
     {
-        if (strncasecmp($name, 'set', 3) == 0) {
+        if (strncasecmp($name, 'get', 3) == 0) {
+            $prop = toSnakeCase(ltrim($name, 'get'));
+            if (!in_array($prop, $this->__getterFilters) && property_exists($this, $prop)) {
+                if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
+                    return $this->forceReloadPropertyValue($prop, $params);
+                }
+                return $this->$prop;
+            }
+        } elseif (strncasecmp($name, 'set', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'set'));
             if (!in_array($prop, $this->__setterFilters) && property_exists($this, $prop) && $this->$prop !== $params[0]) {
                 $this->$prop = $params[0];
@@ -44,14 +52,12 @@ trait GettersAndSetters
                 }
             }
             return $this;
-        } elseif (strncasecmp($name, 'get', 3) == 0) {
-            $prop = toSnakeCase(ltrim($name, 'get'));
-            if (!in_array($prop, $this->__getterFilters) && property_exists($this, $prop)) {
-                if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
-                    return $this->forceReloadPropertyValue($prop, $params);
-                }
-                return $this->$prop;
+        } elseif (strncasecmp($name, 'is', 2) == 0) {
+            $prop = toSnakeCase(ltrim($name, 'is'));
+            if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
+                return boolval($this->forceReloadPropertyValue($prop, $params));
             }
+            return boolval($this->$prop);
         } elseif (strncasecmp($name, 'has', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'has'));
             return property_exists($this, $prop);

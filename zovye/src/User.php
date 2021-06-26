@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -19,7 +20,7 @@ class User
     const WxAPP = 1;
     const ALI = 2;
 
-    const API = 10;   
+    const API = 10;
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -30,6 +31,11 @@ class User
     const KEEPER = 'keeper';
     const GSPOR = 'gspor';
     const TESTER = 'tester';
+
+    const ORDER_ACCOUNT_LOCKER  = 'account::order';
+    const ORDER_LOCKER = 'order';
+    const COMMISSION_BALANCE_LOCKER = 'commission::balance';
+
 
     const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
 
@@ -141,7 +147,7 @@ class User
             if ($is_openid) {
                 $cond['openid'] = strval($id);
             } else {
-                $cond['id'] = intval($id);                
+                $cond['id'] = intval($id);
             }
             $user = self::findOne($cond);
             if ($user) {
@@ -196,6 +202,7 @@ class User
 
         $discount = 0;
 
+        //首单优惠
         if (empty(Order::getLastOrderOfUser($user))) {
             if (!empty($goods_data['discountPrice'])) {
                 if ($goods_data['price'] > $goods_data['discountPrice']) {
@@ -210,5 +217,21 @@ class User
         }
 
         return $discount;
+    }
+
+    public static function makeUserFootprint($data = []): string
+    {
+        if ($data  instanceof userModelObj) {
+            $data = $data->profile();
+        }
+        return sha1(http_build_query(
+            [
+                'nickname' => $data['nickname'],
+                'sex' => $data['sex'],
+                'province' => $data['province'],
+                'city' => $data['city'],
+                'country' => $data['country'],
+            ]
+        ));
     }
 }

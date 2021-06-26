@@ -18,6 +18,7 @@ use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\is_error;
+use function zovye\settings;
 
 $account_id = request::str('account');
 $device_id = request::str('device');
@@ -51,7 +52,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             ZovyeException::throwWith('找不到指定的用户或者已禁用!', -1, $device);
         }
 
-        if (!$user->lock()) {
+        if (!$user->acquireLocker(User::ORDER_ACCOUNT_LOCKER)) {
             ZovyeException::throwWith('用户锁定失败!', -1, $device);
         }
 
@@ -68,7 +69,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
                     ZovyeException::throwWith('订单已经存在！', -1, $device); 
                 }
 
-                $max_retries = intval(\zovye\settings('order.retry.max', 0));
+                $max_retries = intval(settings('order.retry.max', 0));
                 if (!empty($max_retries)) {
                     $total = intval($order->getExtraData('retry.total', 0));
                     
@@ -84,7 +85,15 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             }
         }
 
-        $goods = empty($goods_id) ? $device->getGoodsByLane(0) : $device->getGoods($goods_id);
+        if (empty($goods_id)) {
+            $goods = $device->getGoodsByLane(0);
+            if ($goods && $goods['num'] < 1) {
+                $goods = $device->getGoods($goods['id']);
+            }
+        } else {
+            $goods = $device->getGoods($goods_id);
+        }
+
         if (empty($goods)) {
             ZovyeException::throwWith('找不到商品！', -1, $device);
         }

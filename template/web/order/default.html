@@ -241,10 +241,14 @@
                         <div class="pay operate">
                             {if $order['price']>0}
                             (总计：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
-                                {$order['price']}                            
+                                {if $order['discount'] > 0}
+                                {php echo number_format($order['goods']['price'] * $order['num'] / 100, 2)}
+                                {else}
+                                {$order['price']}
+                                {/if}
                             </span>
                             {if $order['discount']>0}
-                            <span class="price">{php echo number_format($order['price'] - $order['discount'], 2)}</span>
+                            <span class="price">{php echo number_format($order['price'], 2)}</span>
                             {/if}
                             {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0}
                             <i class="fa fa-info-circle">

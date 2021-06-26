@@ -45,11 +45,12 @@ class JfbAccount
                 'provinceName' => $fans['province'],
                 'cityName' => $fans['city'],
                 'requestType' => 1,
-                'creativityType' => 1,
+                'creativityType' => 0,
                 'facilityCountry' => $fans['country'],
                 'facilityProvince' => $fans['province'],
                 'facilityCity' => $fans['city'],
                 'facilityDistrict' => '',
+                'showTimes' => 0,
                 'redirect' => Util::murl('order', ['op' => 'feedback', 'device_imei' => $device->getImei(), 'device_name' => $device->getName()]),
                 'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
                         'op' => 'feedback',

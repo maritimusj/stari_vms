@@ -157,7 +157,7 @@ function toSnakeCase($str): string
  */
 function ifEmpty($data, $default)
 {
-    if (empty($data) && isset($default)) {
+    if (!isset($data) && isset($default)) {
         if (is_callable($default)) {
             return $default();
         }

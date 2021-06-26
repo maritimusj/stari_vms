@@ -68,14 +68,7 @@ class modelFactory
         $res = We7::pdo_insert($objClassname::getTableName(modelObj::OP_WRITE), $data);
         if ($res) {
             $id = intval(We7::pdo_insertid());
-            $obj = new $objClassname($id, $this);
-
-            foreach ($data as $key => $val) {
-                $setter = 'set' . ucfirst(toCamelCase($key));
-                $obj->$setter($val);
-            }
-
-            return $obj;
+            return $this->load($id);
         }
 
         return null;
@@ -293,9 +286,9 @@ class modelFactory
      * @param modelObj $obj
      * @param null $seg_arr
      * @param array $condition
-     * @return bool
+     * @return mixed
      */
-    public function __saveToDb(modelObj $obj, $seg_arr = null, $condition = []): bool
+    public function __saveToDb(modelObj $obj, $seg_arr = null, $condition = [])
     {
         $data = $obj->__getData($seg_arr);
         if (empty($data)) {
@@ -326,10 +319,8 @@ class modelFactory
 
                 $this->writeCacheData($obj, $cache_data);
             }
-
-            return true;
         }
 
-        return false;
+        return $res;
     }
 }

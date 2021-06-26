@@ -41,6 +41,15 @@ class Account extends State
     //阿旗数据平台
     const AQIINFO = 102;
 
+    //纸巾宝
+    const ZJBAO = 103;
+
+    //美葩
+    const MEIPA = 104;
+
+    const SUBSCRIPTION_ACCOUNT = 0;
+    const SERVICE_ACCOUNT = 2;
+
     const JFB_NAME = '准粉吧';
     const JFB_HEAD_IMG = MODULE_URL . 'static/img/jfb_pic.png';
 
@@ -52,6 +61,12 @@ class Account extends State
 
     const AQIINFO_NAME = '阿旗平台';
     const AQIINFO_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
+
+    const ZJBAO_NAME = '纸巾宝';
+    const ZJBAO_HEAD_IMG = MODULE_URL . 'static/img/zjbao_pic.png';
+
+    const MEIPA_NAME = '美葩';
+    const MEIPA_HEAD_IMG = MODULE_URL . 'static/img/meipa_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -129,6 +144,17 @@ class Account extends State
             $data['qrcode'] = $entry->getQrcode();
         }
 
+        if ($entry->isAuth()) {
+            //授权公众号类型
+            $data['service_type'] = $entry->getServiceType();
+            //出货时机
+            $data['open_timing'] = $entry->settings('config.open.timing');
+            $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
+            if ($appid) {
+                $data['appid'] = $appid;
+            }            
+        }
+
         return $data;
     }
 
@@ -141,16 +167,11 @@ class Account extends State
      * $params['max' => 1] 最多返回几个公众号
      */
     public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array {
-        $accounts = $device->getAccounts();
-        if (empty($accounts)) {
-            return $accounts;
-        }
-
         $list = [];
         $join = function($cond, $getter_fn) use($device, $user, &$list) {
             $acc = Account::findOne($cond);
             if ($acc) {
-                $index = 'o' . $acc->getOrderNo();
+                $index = sprintf("%03d", $acc->getOrderNo());
                 if ($list[$index]) {
                     $index .= $acc->getId();
                 }
@@ -167,6 +188,8 @@ class Account extends State
         };
 
         $groups = [];
+        
+        $accounts = $device->getAccounts();
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
             if ($group_name && array_key_exists($group_name, $groups)) {
@@ -213,11 +236,33 @@ class Account extends State
             });
         }
 
+        //纸巾宝
+        if (App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude)) {
+            $join(['state' => Account::ZJBAO], function () use ($device, $user) {
+                return ZhiJinBaoAccount::fetch($device, $user);
+            });
+        }
+
+        //美葩
+        if (App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude)) {
+            $join(['state' => Account::MEIPA], function () use ($device, $user) {
+                return MeiPaAccount::fetch($device, $user);
+            });
+        }
+
         if (empty($list)) {
             return [];
         }
 
-        ksort($list);
+        uksort($list, function ($a, $b) {
+            $res = strcmp($a, $b);
+            if ($res < 0) {
+                return 1;
+            } elseif ($res > 0) {
+                return -1;
+            }
+            return 0;
+        });
 
         $result = [];
 
@@ -521,6 +566,18 @@ class Account extends State
         return self::createSpecialAccount(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
     }
 
+    public static function createZJBaoAccount(): ?accountModelObj
+    {
+        $url = Util::murl('zjbao');
+        return self::createSpecialAccount(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
+    }
+
+    public static function createMeiPaAccount(): ?accountModelObj
+    {
+        $url = Util::murl('meipa');
+        return self::createSpecialAccount(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
+    }
+
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
     {
         $account = self::get($id);
@@ -530,7 +587,7 @@ class Account extends State
         return self::getAuthorizerQrcode($account, $sceneStr, $temporary);
     }
 
-    public static function getAuthorizerQrcode(accountModelObj $account, string $sceneStr, $temporary = true): array
+    public static function getAuthorizerAccessToken(accountModelObj $account)
     {
         $auth_data = $account->get('authdata', []);
         if (empty($auth_data)) {
@@ -540,7 +597,7 @@ class Account extends State
         $createtime = getArray($auth_data, 'createtime', 0);
         $expired = getArray($auth_data, 'authorization_info.expires_in', 0);
 
-        if (time() - $createtime > $expired - 600) {
+        if (time() - $createtime > $expired) {
 
             $app_id = getArray($auth_data, 'authorization_info.authorizer_appid', '');
             $refreshToken = getArray($auth_data, 'authorization_info.authorizer_refresh_token', '');
@@ -550,17 +607,33 @@ class Account extends State
                 return $result;
             }
 
-            setArray($auth_data, 'authorization_info.authorizer_access_token', $result['authorizer_access_token']);
-            setArray($auth_data, 'authorization_info.authorizer_refresh_token', $result['authorizer_refresh_token']);
-            setArray($auth_data, 'authorization_info.expires_in', $result['expires_in']);
-            setArray($auth_data, 'createtime', time());
+            if ($result) {
+                if ($result['authorizer_access_token']) {
+                    setArray($auth_data, 'authorization_info.authorizer_access_token', $result['authorizer_access_token']);
+                }
 
-            $account->set('authdata', $auth_data);
+                if ($result['authorizer_refresh_token']) {
+                    setArray($auth_data, 'authorization_info.authorizer_refresh_token', $result['authorizer_refresh_token']);
+                }
+
+                setArray($auth_data, 'authorization_info.expires_in', $result['expires_in']);
+                setArray($auth_data, 'createtime', time());
+
+                $account->set('authdata', $auth_data);
+            }
         }
 
-        $access_token = getArray($auth_data, 'authorization_info.authorizer_access_token', '');
+        return strval(getArray($auth_data, 'authorization_info.authorizer_access_token', ''));
+    }
 
-        return WxPlatform::getAuthQRCode($access_token, $sceneStr, $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE);
+    public static function getAuthorizerQrcode(accountModelObj $account, string $sceneStr, $temporary = true): array
+    {
+        $res = self::getAuthorizerAccessToken($account);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return WxPlatform::getAuthQRCode($res, $sceneStr, $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE);
     }
 
     public static function createOrUpdateFromWxPlatform(int $agent_id, string $app_id, array $auth_result = [])
@@ -575,10 +648,6 @@ class Account extends State
         //Util::logToFile('wxplatform', $auth_data);
         if (is_error($auth_data)) {
             return $auth_data;
-        }
-
-        if ($auth_data['errcode'] != 0) {
-            return error(intval($auth_data['errcode']), strval($auth_data['errmsg']));
         }
 
         $uid = Account::makeUID($app_id);
@@ -673,8 +742,11 @@ class Account extends State
                         continue;
                     }
                 }
-                //如果是授权公众号，需要使用场景二维码替换原二维码
-                self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
+                if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
+                    //如果是授权服务号，需要使用场景二维码替换原二维码
+                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);  
+                }
+
                 if (isset($account['qrcode'])) {
                     if ($account['qrcode']) {
                         $account['qrcode'] = Util::toMedia($account['qrcode']);
@@ -708,7 +780,7 @@ class Account extends State
             $result = Account::getAuthorizerQrcodeById($account_data['id'], $str, $temporary);
             if (is_error($result)) {
                 Util::logToFile('wxplatform', [
-                    'fn' => 'devicePage',
+                    'fn' => 'updateAuthAccountQRCode',
                     'error' => $result,
                 ]);
                 return $result;
@@ -719,6 +791,31 @@ class Account extends State
         }
 
         return err('不是授权接入的公众号！');
+    }
+
+    /**
+     * 根据上次 uid 获取下个公众号
+     * @param deviceModelObj $device
+     * @param userModelObj $user
+     * @return array
+     */
+    public static function getUserNext(deviceModelObj $device, userModelObj  $user): array
+    {
+        $account = self::getNext($device, $user->settings('accounts.last.uid', ''));
+        if ($account) {
+            $uid = $account['uid'];
+
+            self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
+            if ($account) {
+                return $account;
+            }
+
+            $user->updateSettings('accounts.last', [
+                'uid' => $uid,
+                'time' => time(),
+            ]);
+        }
+        return [];
     }
 
     /**

@@ -69,8 +69,8 @@ define('UNLOCKED', 'n/a');
 
 define('MAX_ORDER_NO_LEN', 32);
 
-define('DEVICE_FORWARDER_URL', 'http://z.ph6618.cn:6699/?id={imei}');
-define('FLUSH_DEVICE_FORWARDER_URL', 'http://z.ph6618.cn:6699/cache/flush?id={imei}');
+define('DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/?id={imei}');
+define('FLUSH_DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/cache/flush?id={imei}');
 
 define('DEFAULT_LBS_KEY', 'FNBBZ-DK2C4-3LCUM-DXXIO-GVYQ7-OTBEA');
 

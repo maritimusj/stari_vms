@@ -41,7 +41,8 @@ if ($op == 'default') {
     if ($keywords) {
         $query->whereOr([
             'name LIKE' => "%{$keywords}%",
-            'title LIEK' => "%{$keywords}%",
+            'title LIKE' => "%{$keywords}%",
+            'descr LIKE' => "%{$keywords}%",
         ]);
     }
 
@@ -86,6 +87,7 @@ if ($op == 'default') {
 
             if ($entry->isAuth()) {
                 $data['service'] = $entry->getServiceType();
+                $data['verified'] = $entry->isVerified();
             }
 
             if (App::useAccountQRCode()) {
@@ -130,6 +132,8 @@ if ($op == 'default') {
         Account::MOSCALE => App::isMoscaleEnabled(),
         Account::YUNFENBA => App::isYunfenbaEnabled(),
         Account::AQIINFO => App::isAQiinfoEnabled(),
+        Account::ZJBAO => App::isZJBaoEnabled(),
+        Account::MEIPA => App::isMeiPaEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -140,18 +144,24 @@ if ($op == 'default') {
                     'id' => $t_res->getId(),
                     'orderno' => $t_res->getOrderNo(),
                     'name' => $t_res->getName(),
+                    'title' => $t_res->getTitle(),
                     'url' => $t_res->getUrl(),
                     'img' => $t_res->getImg(),
                     'assigned' => !isEmptyArray($t_res->get('assigned')),
                 ];
             } else {
+                unset($one_res[$index]);
                 Util::logToFile('account', "特殊吸粉{$index}已开启，但查找公众号资料失败！");
             }
-        }
-        if (!is_array($one_res[$index])) {
+        } else {
             unset($one_res[$index]);
         }
     }
+
+    //排序
+    usort($one_res, function ($a, $b) {
+        return $b['orderno'] - $a['orderno'];
+    });
 
     app()->showTemplate('web/account/default', [
         'agent' => isset($agent) ? $agent : null,
@@ -208,7 +218,7 @@ if ($op == 'default') {
             'total' => max(0, request::int('total')),
             'balance_deduct_num' => max(0, request::int('balanceDeductNum')),
             'order_limits' => max(0, request::int('orderlimits')),
-            'order_no' => request::int('orderno'),
+            'order_no' => min(999, request::int('orderno')),
             'group_name' => request::str('groupname'),
             'scname' => request::str('scname', Schema::DAY),
             'shared' => request::has('commission_share') ? 1 : 0,
@@ -275,8 +285,29 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'secret' => request::trim('secret'),
                 ]);
-            } elseif ($account->isAuth()) {
-                $timing = $account->getServiceType() == 2 ? request::int('OpenTiming') : 1;
+            } elseif ($account->isZJBao()) {
+                $data['name'] = Account::ZJBAO_NAME;
+                $data['img'] = Account::ZJBAO_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::ZJBAO,
+                    'key' => request::trim('key'),
+                    'secret' => request::trim('secret'),
+                ]);
+            } elseif ($account->isMeiPa()) {
+                $data['name'] = Account::MEIPA_NAME;
+                $data['img'] = Account::MEIPA_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::MEIPA,
+                    'apiid' => request::trim('apiid'),
+                    'appkey' => request::trim('appkey'),
+                ]);
+            }
+            
+            elseif ($account->isAuth()) {
+                $timing = request::int('OpenTiming');
+                if (!$account->isVerified()) {
+                    $timing = 1;
+                }
                 $config = [
                     'type' => Account::AUTH,
                 ];
@@ -320,6 +351,8 @@ if ($op == 'default') {
                 Account::MOSCALE_NAME,
                 Account::YUNFENBA_NAME,
                 Account::AQIINFO_NAME,
+                Account::ZJBAO_NAME,
+                Account::MEIPA_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }
@@ -829,7 +862,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个公众号！');
     }
 
-    if (!$account->isAuth() || $account->getServiceType() !== 2) {
+    if (!$account->isAuth() || !$account->isServiceAccount()) {
         JSON::fail('只能是授权接入的服务号才能设置为屏幕二维码！');
     }
 

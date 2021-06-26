@@ -200,7 +200,7 @@
                         <label for="orderno" class="col-md-2 control-label">排序</label>
                         <div class="col-md-10">
                             <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
-                            <span class="help-block">* 可选，默认为0。数字越大，优先级越高。</span>
+                            <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
                         </div>
                     </div>
                     {if \zovye\App::isUserCenterEnabled()}
@@ -217,12 +217,12 @@
                     <div class="form-group">
                         <label class="col-md-2 control-label">出货时机</label>
                         <div class="col-md-8">
-                            <label for="scan" class="radio-inline{if $account->getServiceType() != 2} disabled{/if}">
-                                <input name="OpenTiming" id="scan" type="radio" value="0" {if $account->getServiceType() != 2} disabled{else}{if empty($config['open']['timing'])}checked="checked"{/if}{/if}>
+                            <label for="scan" class="radio-inline{if !$account->isVerified()} disabled{/if}">
+                                <input name="OpenTiming" id="scan" type="radio" value="0"{if !$account->isVerified()} disabled {else}{if empty($config['open']['timing'])} checked="checked"{/if}{/if}>
                                 扫码进入公众号
                             </label>
                             <label for="link" class="radio-inline">
-                                <input name="OpenTiming" id="link" type="radio" value="1"  {if $config['open']['timing'] == 1}checked="checked"{/if}>
+                                <input name="OpenTiming" id="link" type="radio" value="1"{if $config['open']['timing'] == 1} checked="checked"{/if}>
                                 打开取货链接
                             </label>
                             <span class="help-block">* 请选择出货时机，用户扫码进入公众号后立即出货或用户打开取货页面后出货</span>
@@ -232,8 +232,8 @@
                         <label for="OpenMsg" class="col-md-2 control-label">消息推送</label>
                         <div class="col-md-10">
                             <select style="width: 100%;" name="openMsgType" id="openMsgType">
-                                <option value="text" {if isset($config['open']['msg'])}selected{/if}>文本消息</option>
-                                <option value="news" {if isset($config['open']['news'])}selected{/if}>图文消息</option>
+                                <option value="text"{if isset($config['open']['msg'])} selected{/if}>文本消息</option>
+                                <option value="news"{if isset($config['open']['news'])} selected{/if}>图文消息</option>
                             </select>
                             <span class="help-block">* 用户扫码进入公众号后，给用户推送消息</span>
                         </div>
@@ -336,6 +336,46 @@
                         </div>
                     </div>
                     {/if}
+                    {if \zovye\App::isZJBaoEnabled() && $account && $account->isZJBao()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="key" class="col-md-2 control-label">纸巾宝平台 appkey</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="key" id="key" value="{$config['key']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="secret" class="col-md-2 control-label">纸巾宝平台 appsecret</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="secret" id="secret" value="{$config['secret']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    {/if}
+                    {if \zovye\App::isMeiPaEnabled() && $account && $account->isMeiPa()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="apiid" class="col-md-2 control-label">美葩平台 apiid</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="apiid" id="apiid" value="{$config['apiid']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appkey" class="col-md-2 control-label">美葩平台 appkey</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="appkey" id="appkey" value="{$config['appkey']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">美葩平台 回调网址</label>
+                        <div class="col-md-10">
+                            <span class="form-control operate" style="overflow:hidden;"><i class="fa fa-paste" title="复制网址" data-url="{php echo \zovye\Util::murl('meipai')}"></i> {php echo \zovye\Util::murl('meipai')}</span>
+                        </div>
+                    </div>
+                    {/if}
                 </div>
                 {if \zovye\App::isCommissionEnabled()}
                 <div class="seg">
@@ -421,6 +461,10 @@
 </form>
 
 <script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableInputMask();
+        zovye.enableCopy();
+    })
     $(function(){
         const open_id = 0;
         $('#find_agent').click(function () {

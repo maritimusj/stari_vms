@@ -15,6 +15,10 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail(['text' => '领取失败', 'msg' => '找不到用户或者用户无法领取']);
 }
 
+if (!$user->acquireLocker('get::x')) {
+    JSON::fail(['text' => '领取失败', 'msg' => '用户锁定失败，请重试']);
+}
+
 $ticket = request::str('ticket');
 if (empty($ticket)) {
     JSON::fail(['text' => '领取失败', 'msg' => '请重新扫描设备二维码 [601]']);

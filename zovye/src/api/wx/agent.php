@@ -7,6 +7,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use Exception;
+use zovye\Config;
 use zovye\model\agent_msgModelObj;
 use zovye\model\agentModelObj;
 use zovye\App;
@@ -212,7 +213,7 @@ class agent
             return $result;
         }
 
-        $agreement = \zovye\Config::agent('agreement.agent', []);
+        $agreement = Config::agent('agreement.agent', []);
         if ($agreement['enabled']) {
             $result['agreement'] = $agreement['content'];
         }
@@ -466,9 +467,14 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
+        /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request('id'));
         if (is_error($device)) {
             return $device;
+        }
+
+        if (!$device->payloadLockAcquire(3)) {
+            return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
         if (empty($device->getAgentId())) {
@@ -498,46 +504,68 @@ class agent
 
         $extra = $device->get('extra', []);
 
+        $now = time();
+
         if (request::isset('device_type')) {
             $type_id = request::int('device_type');
-            if ($type_id) {
-                $device_type = DeviceTypes::get($type_id);
-            } else {
-                $device->setDeviceType(0);
 
-                $device_type = DeviceTypes::from($device);
+            if ($type_id != $device->getDeviceType()) {
+                $device->resetPayload(['*' => '@0'], '代理商改变型号', $now);
+                $device->setDeviceType($type_id);
+            }
+
+            $device_type = DeviceTypes::from($device);
+            if (empty($device_type)) {
+                return error(State::ERROR, '设备类型不正确！');
+            }
+
+            if ($device->isCustomType()) {
+                $old = $device_type->getExtraData('cargo_lanes', []);
+
                 $cargo_lanes = [];
-
                 $capacities = request::array('capacities');
                 foreach (request::array('goods') as $index => $goods_id) {
                     $cargo_lanes[] = [
                         'goods' => intval($goods_id),
                         'capacity' => intval($capacities[$index]),
                     ];
+                    if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
+                        $device->resetPayload([$index => '@0'], '代理商更改货道商品', $now);
+                    }
+                    unset($old[$index]);
+                }
+
+                foreach($old as $index => $lane) {
+                    $device->resetPayload([$index => '@0'], '代理商删除货道', $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
                 $device_type->save();
             }
-
-            if (empty($device_type)) {
-                return error(State::ERROR, '设备类型不正确！');
-            }
-
-            $device->setDeviceType($type_id);
         }
 
-        //如果是自定义型号
-        if ($device->getDeviceType() == 0) {
-            $type_data = isset($device_type) ? DeviceTypes::format($device_type) : [];
-            $extra['cargo_lanes'] = [];
+        if (empty($device_type)) {
+            return error(State::ERROR, '获取型号失败！');
+        }
+
+        if (request::isset('price') || request::isset('num')) {
+            //货道商品数量和价格
             $prices = request::array('price');
             $num = request::array('num');
+
+            $type_data = DeviceTypes::format($device_type);
+            $cargo_lanes = [];
             foreach ($type_data['cargo_lanes'] as $index => $lane) {
-                $extra['cargo_lanes']["l{$index}"] = [
-                    'price' => intval($prices[$index]),
-                    'num' => max(0, intval($num[$index])),
+                $cargo_lanes[$index] = [
+                    'num' => '@' . max(0, intval($num[$index])),
                 ];
+                if ($device_type->getDeviceId() == $device->getId()) {
+                    $cargo_lanes[$index]['price'] =  intval($prices[$index]);
+                }
+            }
+            $res = $device->resetPayload($cargo_lanes, '代理商编辑设备', $now);
+            if (is_error($res)) {
+                return error(State::ERROR, '保存设备库存数据失败！');
             }
         }
 
@@ -619,9 +647,9 @@ class agent
                         $device->save();
 
                         $result['status']['sig'] = $device->getSig();
-                        $result['status']['online'] = $detail['mcb']['online'];
-                        if (isset($detail['app']['online'])) {
-                            $result['app']['online'] = $detail['app']['online'];
+                        $result['status']['online'] = boolval($detail['mcb']);
+                        if (isset($detail['app'])) {
+                            $result['app']['online'] = boolval($detail['app']);                         
                         }
                     }
                 }
@@ -659,9 +687,14 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
+        /** @var deviceModelObj|array $device */
         $device = \zovye\api\wx\device::getDevice(request::trim('id'), $user);
         if (is_error($device)) {
             return $device;
+        }
+
+        if (!$device->lockAcquire(3)) {
+            return error(State::ERROR, '锁定设备失败，请稍后再试！');
         }
 
         $agent = $user->getPartnerAgent() ?: $user;
@@ -755,19 +788,27 @@ class agent
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        if (!$device->lockAcquire()) {
-            return error(State::ERROR, '无法锁定设备！');
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
+            return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
         if (request::isset('lane')) {
+            $num = request::int('num');
             $data = [
-                request::int('lane') => request::int('num'),
+                request::int('lane') => $num > 0 ? '@' . $num : 0,
             ];
         } else {
             $data = [];
         }
 
-        $device->resetPayload($data);
+        $res = $device->resetPayload($data, '代理商补货');
+        if (is_error($res)) {
+            return error(State::ERROR, '保存库存失败！');
+        }
+
+        $locker->unlock();
+
         $device->updateRemain();
         $device->save();
 
@@ -809,24 +850,17 @@ class agent
             }
         }
 
-        $result = Util::transactionDo(function () use ($target, $device_ids, $user) {
-            foreach ($device_ids as $device_id) {
-                $device = \zovye\api\wx\device::getDevice($device_id, $user);
-                if (is_error($device)) {
-                    return $device;
-                }
-
-                if (Device::bind($device, $target) && $device->save()) {
-                    continue;
-                } else {
-                    return error(State::ERROR, '转移设备失败！');
-                }
+        foreach ($device_ids as $device_id) {
+            $device = \zovye\api\wx\device::getDevice($device_id, $user);
+            if (is_error($device)) {
+                return $device;
             }
-            return true;
-        });
 
-        if (is_error($result)) {
-            return $result;
+            if (Device::bind($device, $target) && $device->save()) {
+                continue;
+            } else {
+                return error(State::ERROR, '转移设备失败！');
+            }
         }
 
         return ['msg' => '转移设备成功！'];

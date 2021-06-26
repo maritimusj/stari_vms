@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\Account;
+use zovye\App;
 use zovye\base\modelObj;
 
 use zovye\traits\ExtraDataGettersAndSetters;
@@ -131,7 +132,25 @@ class accountModelObj extends modelObj
 
     public function isBanned(): bool
     {
-        return $this->state == Account::BANNED;
+        if ($this->state == Account::BANNED) {
+            return true;
+        }
+
+        if ($this->isSpecial()) {
+            $status = [
+                Account::JFB => App::isJfbEnabled(),
+                Account::MOSCALE => App::isMoscaleEnabled(),
+                Account::YUNFENBA => App::isYunfenbaEnabled(),
+                Account::AQIINFO => App::isAQiinfoEnabled(),
+                Account::ZJBAO => App::isZJBaoEnabled(),
+                Account::MEIPA => App::isMeiPaEnabled(),
+            ];
+            $state = $status[$this->getType()];
+            if (isset($state) && !$state) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getDescription(): string
@@ -203,6 +222,8 @@ class accountModelObj extends modelObj
             Account::MOSCALE,
             Account::YUNFENBA,
             Account::AQIINFO,
+            Account::ZJBAO,
+            Account::MEIPA,
         ]);
     }
 
@@ -237,6 +258,16 @@ class accountModelObj extends modelObj
     public function isAQiinfo(): bool
     {
         return $this->getType() == Account::AQIINFO;
+    }
+
+    public function isZJBao(): bool
+    {
+        return $this->getType() == Account::ZJBAO;
+    }
+    
+    public function isMeiPa(): bool
+    {
+        return $this->getType() == Account::MEIPA;
     }
 
     public function isAuth(): bool
@@ -274,6 +305,20 @@ class accountModelObj extends modelObj
     }
 
     /**
+     * 授权公众号是否已通过微信认证
+     * @return bool
+     */
+    public function isVerified(): bool
+    {
+        return $this->settings('profile.authorizer_info.verify_type_info.id', -1) != -1;
+    }
+
+    public function isServiceAccount(): bool
+    {
+        return $this->getServiceType() == Account::SERVICE_ACCOUNT;
+    }
+
+    /**
      * 使用这个授权服务号的二维码做为设备二维码，推送到APP上显示
      * @param null $enable
      * @return bool
@@ -283,7 +328,7 @@ class accountModelObj extends modelObj
         if (isset($enable)) {
             return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
         }
-        return \zovye\App::useAccountQRCode() && boolval($this->settings('misc.useAccountQRCode', 0));
+        return App::useAccountQRCode() && boolval($this->settings('misc.useAccountQRCode', 0));
     }
 
     public function getOpenMsg($from, $to, $redirect_url = ''): string

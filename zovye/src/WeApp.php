@@ -347,7 +347,7 @@ JSCODE;
             })
         }
         zovye_fn.isOnline = function (cb) {
-            $.get("{$device_api_url}", {op: 'online'}).then(function (res) {
+            $.get("{$device_api_url}", {op: 'online', serial: (new Date()).getTime()}).then(function (res) {
                 if (typeof cb === 'function') {
                     cb(res);
                 }
@@ -357,30 +357,6 @@ JSCODE;
             window.location.replace("{$device_url}");
         }
 JSCODE;
-        //检查用户在该设备上最近失败的免费订单
-        //         $minutes = settings('order.retry.last', 0);
-        //         if ($minutes > 0) {
-        //             $order = Order::findOne([
-        //                 'openid' => $user->getOpenid(),
-        //                 'device_id' => $device->getId(),
-        //                 'result_code <>' => 0,
-        //                 'price' => 0,
-        //                 'balance' => 0,
-        //                 'createtime >' => strtotime("-{$minutes} minute"),
-        //             ]);
-        //             if ($order) {
-        //                 $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
-        //                 $tpl['js']['code'] .= <<<JSCODE
-        //     \r\nzovye_fn.retryOrder = function (cb) {
-        //         $.get("{$order_retry_url}").then(function (res) {
-        //             if (typeof cb === 'function') {
-        //                 cb(res);
-        //             }
-        //         })
-        //     }
-        // JSCODE;
-        //             }
-        //         }
         $tpl['js']['code'] .= "\r\n</script>";
         $this->showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
     }
@@ -410,28 +386,24 @@ JSCODE;
                 }
             }
         } else {
-            $tpl['accounts'] = Account::getAvailableList($device, $user, [
-                'exclude' => $params['exclude'],
-            ]);
+            $last_account = $user->getLastActiveData('account');
+            if ($last_account) {
+                $tpl['accounts'] = [$last_account];
+                $user->setLastActiveData();
+            } else {
+                $tpl['accounts'] = Account::getAvailableList($device, $user, [
+                    'exclude' => $params['exclude'],
+                ]);
+            }
         }
 
         //如果设置必须关注公众号以后才能购买商品
         if (Helper::MustFollowAccount($device)) {
             if ($tpl['from'] != 'account') {
                 if (empty($tpl['accounts'])) {
-                    $account = Account::getNext($device, $user->settings('accounts.last.uid', ''));
+                    $account = Account::getUserNext($device, $user);
                     if ($account) {
-                        $uid = $account['uid'];
-
-                        Account::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
-                        if ($account) {
-                            $tpl['accounts'][] = $account;
-                        }
-
-                        $user->updateSettings('accounts.last', [
-                            'uid' => $uid,
-                            'time' => time(),
-                        ]);
+                        $tpl['accounts'][] = $account;
                     }
                 }
             } else {
@@ -468,8 +440,10 @@ JSCODE;
             $tpl['accounts'] = [];
         }
 
-        //检查直接转跳的吸粉广告或公众号
+        ComponentUser::removeAll(['user_id' => $user->getId()]);
+
         foreach ($tpl['accounts'] as $index => $account) {
+            //检查直接转跳的吸粉广告或公众号
             if (!empty($account['redirect_url'])) {
                 //链接转跳前，先判断设备是否在线
                 if ($device->isMcbOnline()) {
@@ -477,6 +451,28 @@ JSCODE;
                     exit('正在转跳...');
                 }
                 unset($tpl['accounts'][$index]);
+            }
+
+            //检查需要关注出货的订阅号
+            if (isset($account['service_type']) && $account['service_type'] != Account::SERVICE_ACCOUNT && empty($account['open_timing'])) {
+                $footprint = User::makeUserFootprint($user);
+                if (!ComponentUser::exists(['user_id' => $user->getId(), 'appid' => $account['appid']])) {
+                    ComponentUser::create([
+                        'appid' => $account['appid'],
+                        'user_id' => $user->getId(),
+                        'openid' => $footprint,
+                        'extra' => [
+                            'device' => $device->getShadowId(),
+                            'time' => time(),
+                        ]
+                    ]);    
+                } else {
+                    $obj = ComponentUser::findOne(['user_id' => $user->getId(), 'appid' => $account['appid']]);
+                    if ($obj) {
+                        $obj->setOpenid($footprint);
+                        $obj->save();
+                    }
+                }                
             }
         }
 

@@ -53,15 +53,17 @@
         color:green;
     }
     #devicelist td.status {
-        transition: all 1s;
+        transition: all 1s;       
     }
     #devicelist .app {
+        cursor: pointer;
         position: relative;
     }
     #devicelist .status:hover .app .devcie-detail {
         display: flex;
     }
     #devicelist .app .devcie-detail {
+        cursor: default;
         position: absolute;
         z-index: 99;
         overflow: hidden;
@@ -385,8 +387,16 @@
             <table class="table" id="devicelist">
                 <thead v-show="device.list !== undefined">
                     <tr>
-                        <th>#</th>
-                        <th></th>
+                        <th class="operate">
+                            <i :class="{'fa': true, 'fa-check-square': isAllSelected, 'fa-square-o': !isAllSelected}" title="全部" v-if="showSelectInputCtrl" @click="selectAll"></i> 
+                            <template v-else>#</template>
+                        </th>
+                        <th class="operate" style="position: relative;">
+                            <template v-if="showSelectInputCtrl && canDownload">
+                                <i class="fa fa-download" title="下载选中的设备二维码" @click="downloadQRCode"></i><span class="badge" style="position: absolute;">{{selectedInputCtrl.length}}</span>
+                            </template>
+                            <i class="fa fa-sign-out" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
+                        </th>
                         <th>                    
                             <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>
                         </th>
@@ -419,18 +429,23 @@
                 <tbody>
                     <tr v-for="(o,index) in device.list" :key="o.id" :data-fetchid="o.id" :class="o.model">
                         <td class="operate">
-                            <template v-if="o.lockedtime">
-                                <i class="fa fa-lock" :title="'锁定时间：' + o.lockedtime" data-op="unlock" :data-index="index + 1"></i>
+                            <template v-if="showSelectInputCtrl">
+                                <input type="checkbox" id="downloadQRCode" :value="o.id" v-model="selectedInputCtrl">                                
                             </template>
                             <template v-else>
-                                <template v-if="o.s1">
-                                    <span class="operate">
-                                        <i class="fa fa-map-marker" title="设备位置已变动" data-op="confirmLAC" :data-index="index + 1"></i>
-                                    </span>                                    
+                                <template v-if="o.lockedtime">
+                                    <i class="fa fa-lock" :title="'锁定时间：' + o.lockedtime" data-op="unlock" :data-index="index + 1"></i>
                                 </template>
-                               <template v-else>
-                                {{index + 1}}
-                               </template>
+                                <template v-else>
+                                    <template v-if="o.s1">
+                                        <span class="operate">
+                                            <i class="fa fa-map-marker" title="设备位置已变动" data-op="confirmLAC" :data-index="index + 1"></i>
+                                        </span>                                    
+                                    </template>
+                                    <template v-else>
+                                        {{index + 1}}
+                                    </template>
+                                </template>
                             </template>
                         </td>
                         <td class="device-qrcode">
@@ -520,8 +535,9 @@
                         </td>
                         <td class="status">
                             <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
-                            <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status">
-                                <div :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
+                            <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
+                            <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">
+                                <div @click.self="refreshStatus(o)" :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
                                     <div class="devcie-detail">
                                         <div class="detail-seg">
                                             <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 
@@ -632,6 +648,9 @@
                     </tr>
                 </tbody>
             </table>
+    <div class="pull-left operate" style="padding: 0 15px;">
+        <i class="fa fa-sort-down" title="显示更多" @click="incrPageSize"></i>
+    </div>
     <div class="pull-right" v-if="device.list.length>0">
         <div>
             <ul class="pagination pagination-centered">
@@ -666,5 +685,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=202100428"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625004"></script>
 {template 'common/footer'}

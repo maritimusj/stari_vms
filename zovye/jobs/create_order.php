@@ -108,7 +108,7 @@ function prepare(string $order_no)
         ExceptionNeedsRefund::throwWith($device, '找不到指定的用户！');
     }
 
-    if(!$user->lock()) {
+    if(!$user->acquireLocker('create::order')) {
         throw new Exception('用户无法锁定！');
     }
 
@@ -337,7 +337,15 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         }
     } else {
         if (isset($goods['cargo_lane'])) {
-            $device->resetPayload([$goods['cargo_lane'] => -1]);
+            $locker = $device->payloadLockAcquire(3);
+            if (empty($locker)) {
+                return [error(State::ERROR, '设备正忙，请重试！')];
+            }
+            $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order_no}");
+            if (is_error($res)) {
+                return [error(State::ERROR, '保存库存变动失败！')];
+            }
+            $locker->unlock();
         }
 
         //使用取货码

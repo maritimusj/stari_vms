@@ -11,6 +11,8 @@ use Exception;
 use zovye\App;
 use zovye\Job;
 
+use zovye\Locker;
+use zovye\PayloadLogs;
 use zovye\PlaceHolder;
 use zovye\We7;
 use zovye\User;
@@ -24,9 +26,11 @@ use zovye\State;
 use zovye\Topic;
 use zovye\Device;
 use zovye\Keeper;
-use zovye\Locker;
+use zovye\DeviceLocker;
 use zovye\Account;
 use zovye\CtrlServ;
+
+use function zovye\err;
 use function zovye\getArray;
 use function zovye\m;
 use function zovye\tb;
@@ -71,6 +75,7 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
  * @method setMcbOnline(int $ONLINE)
  *
  * @method getCreatetime()
+ * @method setRank($rank)
  * @method getRank()
  * @method getS1()
  * @method setS1(int $int)
@@ -524,11 +529,18 @@ class deviceModelObj extends modelObj
 
     public function profile(): array
     {
-        return [
+        $data = [
             'id' => $this->getId(),
             'imei' => $this->getImei(),
             'name' => $this->getName(),
         ];
+        if ($this->isVDevice()) {
+            $data['vDevice'] = true;
+        } elseif ($this->isBlueToothDevice()) {
+            $data['bluetooth'] = true;
+            $data['buid'] = $this->getBUID();
+        }
+        return $data;
     }
 
     public function cleanError()
@@ -591,7 +603,7 @@ class deviceModelObj extends modelObj
 
         $this->set('extra', []);
 
-        $this->resetPayload();
+        $this->resetPayload([], '设备初始化');
 
         $this->setGroupId(0);
         $this->setAgent();
@@ -602,22 +614,73 @@ class deviceModelObj extends modelObj
         return $this->save();
     }
 
-    /**
-     * 重置多货道商品数量，负值表示减少指定数量，正值表示设置为指定数量，0值表示重围到最大数量
-     * 空数组则重围所有货道商品数量到最大值
-     * @param array $data
-     * @return array
-     */
-    public function resetPayload(array $data = []): array
+    public function getPayloadCode($now = 0): string
     {
-        return Device::resetPayload($this, $data);
+        $last_code = $this->settings('last.code');
+        if (empty($last_code)) {
+            $last_code = App::uid();
+        }
+        return sha1($last_code . $now);
     }
 
-    public function resetGoodsNum($goods_id, $delta): array
+    /**
+     * 重置多货道商品数量，负值表示减少指定数量，正值表示设置为指定数量，0值表示重围到最大数量
+     * 空数组则重置所有货道商品数量到最大值
+     * @param array $data
+     * @param string $reason
+     * @param int $now
+     * @return array
+     */
+    public function resetPayload(array $data = [], $reason = '', $now = 0): array
+    {        
+        static $cache = [];
+
+        $now = empty($now) ? time() : $now;
+
+        if ($cache[$now]) {
+            $clr = $cache[$now];
+        } else {
+            $clr = Util::randColor();
+            $cache[$now] = $clr;
+        }
+
+        $result = Device::resetPayload($this, $data);
+        if ($result) {               
+            foreach ($result as $entry) {
+                $code =  $this->getPayloadCode($now);
+                if (!empty($entry['reason'])) {
+                    $reason = $reason . "({$entry['reason']})";
+                }
+                if (!PayloadLogs::create([
+                    'device_id' => $this->id,
+                    'goods_id' => $entry['goodsId'],
+                    'org' => $entry['org'],
+                    'num' => $entry['num'],
+                    'extra' => [
+                        'reason' => $reason,
+                        'code' => $code,
+                        'clr' => $clr,
+                    ],
+                    'createtime' => $now,
+                ])) {
+                    return err('保存库存记录失败！');
+                }
+                if (!$this->updateSettings('last', [
+                    'code' => $code,
+                    'time' => $now,
+                ])) {
+                    return err('保存流水记录失败！');
+                }
+            }
+        }
+        return $result;
+    }
+
+    public function resetGoodsNum($goods_id, $delta, $reason = ''): array
     {
         $goods = $this->getGoods($goods_id);
         if ($goods) {
-            return $this->resetPayload([$goods['cargo_lane'] => $delta]);
+            return $this->resetPayload([$goods['cargo_lane'] => $delta], $reason);
         }
 
         return error(State::ERROR, '找不到指定的商品！');
@@ -1543,6 +1606,9 @@ class deviceModelObj extends modelObj
 
         /** @var accountModelObj $entry */
         foreach ($query->findAll() as $entry) {
+            if ($entry->isBanned()) {
+                continue;
+            }
             $assign_data = $entry->settings('assigned');
             if ($this->isMatched($assign_data)) {
                 $accounts[$entry->getUid()] = $entry->format();
@@ -1560,15 +1626,15 @@ class deviceModelObj extends modelObj
         return $accounts;
     }
 
-    public function getOnlineDetail(): array
+    public function getOnlineDetail($use_cache = true): array
     {
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
-                'mcb' => ['online' => true],
-                'app' => ['online' => true],
+                'mcb' => true,
+                'app' => true,
             ];
         }
-        $res = CtrlServ::v2_query("device/{$this->imei}");
+        $res = CtrlServ::v2_query("device/{$this->imei}/online", ['nocache' => $use_cache ? 'false' : 'true']);
         if ($res['status'] === true) {
             return $res['data'];
         }
@@ -1649,6 +1715,15 @@ class deviceModelObj extends modelObj
         $res = $this->appNotify('config', $data);
 
         return !is_error($res);
+    }
+
+    /**
+     * 是否为自定义型号设备
+     * @return bool
+     */
+    public function isCustomType(): bool
+    {
+        return $this->device_type == 0;
     }
 
     /**
@@ -1912,7 +1987,7 @@ class deviceModelObj extends modelObj
      * @param int $delay_seconds
      * @return bool
      */
-    public function lockAcquire(int $retries = 0, int $delay_seconds = 0): bool
+    public function lockAcquire(int $retries = 0, int $delay_seconds = 1): bool
     {
         $wait_timeout = intval(settings('device.waitTimeout'));
         $lock_timeout = intval(settings('device.lockTimeout'));
@@ -1925,7 +2000,7 @@ class deviceModelObj extends modelObj
         }
 
         for (; ;) {
-            if ((new Locker($this))->isLocked()) {
+            if ((new DeviceLocker($this))->isLocked()) {
                 return true;
             }
 
@@ -1939,6 +2014,11 @@ class deviceModelObj extends modelObj
         }
 
         return false;
+    }
+
+    public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
+    {
+        return Locker::try("payload:{$this->getImei()}", $retries, $delay_seconds);
     }
 
     /**
@@ -1970,7 +2050,11 @@ class deviceModelObj extends modelObj
 
         //虚拟设备直接返回成功
         if ($this->isVDevice()) {
-            return ['num' => max(1, $options['num'])];
+            return [
+                'num' => max(1, $options['num']),
+                'errno' => 0,
+                'message' => '虚拟出货成功！',
+            ];
         }
 
         $mcb_channel = isset($options['channel']) ? intval($options['channel']) : Device::CHANNEL_DEFAULT;
@@ -2038,7 +2122,7 @@ class deviceModelObj extends modelObj
             $res = CtrlServ::v2_query(
                 "device/{$this->imei}/mcb/online",
                 [
-                    'nocache' => $use_cache == false,
+                    'nocache' => $use_cache == false ? 'true' : 'false',
                 ]
             );
 
@@ -2059,6 +2143,7 @@ class deviceModelObj extends modelObj
                 return true;
             }
         }
+
         return false;
     }
 
@@ -2159,7 +2244,7 @@ class deviceModelObj extends modelObj
             $url = settings("misc.redirect.{$when}.url");
         }
 
-        return ['url' => PlaceHolder::url($url, [ $this ]), 'delay' => intval($delay)];
+        return ['url' => PlaceHolder::url($url, [$this]), 'delay' => intval($delay)];
     }
 
     /**
@@ -2412,6 +2497,11 @@ class deviceModelObj extends modelObj
         return $this->save();
     }
 
+    public function payloadQuery($cond = []): modelObjFinder
+    {
+        return PayloadLogs::query(['device_id' => $this->getId()])->where($cond);
+    }
+
     public function logQuery($cond = []): modelObjFinder
     {
         return m('device_logs')->where(We7::uniacid(['title' => $this->getImei()]))->where($cond);
@@ -2462,7 +2552,7 @@ class deviceModelObj extends modelObj
                 $goods_data = Goods::data($entry['goods'], ['useImageProxy' => true]);
                 if ($goods_data) {
                     $goods_data['num'] = $entry['num'];
-                    if ($this->getDeviceType() == 0 && isset($entry['goods_price'])) {
+                    if ($this->isCustomType() && isset($entry['goods_price'])) {
                         $goods_data['price'] = $entry['goods_price'];
                     }
                 }

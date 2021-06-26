@@ -53,7 +53,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_RESET => [
-            'title' => '[v0]补纸信号',
+            'title' => '[v0]补货信号',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onResetMsg',
             'params' => [
                 'log' => [
@@ -63,7 +63,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_RESULT => [
-            'title' => '出纸结果v0',
+            'title' => '出货结果v0',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onResultMsg',
             'params' => [
                 'log' => [
@@ -83,8 +83,8 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V0_UPDATE => [
-            'title' => '[v0]App初始化',
-            'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onAppInitMsg',
+            'title' => '[v0]App更新配置',
+            'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onAppConfigMsg',
             'params' => [
                 'log' => [
                     'enable' => true,
@@ -183,7 +183,7 @@ class DeviceEventProcessor
             ],
         ],
         self::EVENT_V1_RECORD => [
-            'title' => '[v1]出纸结果',
+            'title' => '[v1]出货结果',
             'handler' => __NAMESPACE__ . '\DeviceEventProcessor::onMcbRecord',
             'params' => [
                 'log' => [
@@ -403,8 +403,10 @@ class DeviceEventProcessor
         if ($data['IMEI']) {
             $device = Device::get($data['IMEI'], true);
             if ($device) {
-                $device->resetPayload();
-                $device->updateRemain();
+                if ($device->payloadLockAcquire(3)) {
+                    $device->resetPayload([], 'reset重置');
+                    $device->updateRemain();
+                }
             }
         }
     }
@@ -697,8 +699,10 @@ class DeviceEventProcessor
         $device = Device::get($data['uid'], true);
         if ($device) {
             $device->setProtocolV1Code($data['code']);
-            $device->resetPayload();
-            $device->save();
+            if ($device->payloadLockAcquire(3)) {
+                $device->resetPayload([], 'reload重置');
+                $device->save();
+            }
         }
     }
 

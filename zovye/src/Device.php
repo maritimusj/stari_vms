@@ -151,7 +151,7 @@ class Device extends State
 
     /**
      * 重置多货道商品数量
-     * 负值表示减少指定数量，正值表示设置为指定数量，0值表示重置到最大数量
+     * @开头表示增加指定数量，正值表示增加指定数量，负值表示减少指定数量，0值表示重置到最大数量
      * 空数组则重置所有货道商品数量到最大值
      * 返回商品改变的数量
      * @param deviceModelObj $device
@@ -169,23 +169,38 @@ class Device extends State
                 foreach ($cargo_lanes as $index => $lane) {
                     $data[$index] = 0;
                 }
+            } elseif (isset($data['*'])) {
+                $v = $data['*'];
+                $data = [];
+                foreach ($cargo_lanes as $index => $lane) {
+                    $data[$index] = $v;
+                }
             }
 
             $lanes_data = $device->getCargoLanes();
             $lowest = null;
-            foreach ($data as $lane => $num) {
-                if (isset($cargo_lanes[$lane])) {
-                    $lane_id = "l{$lane}";
+
+            foreach ($data as $index => $lane) {
+                if (isset($cargo_lanes[$index])) {
+                    $lane_id = "l{$index}";
                     $old = $lanes_data[$lane_id]['num'];
-                    if (We7::starts_with($num, '+')) {
-                        $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
+
+                    if (is_array($lane)) {
+                        $num = $lane['num'];
+                        if (isset($lane['price'])) {
+                            $lanes_data[$lane_id]['price'] = $lane['price'];
+                        }
                     } else {
-                        if ($num > 0) {
-                            $lanes_data[$lane_id]['num'] = intval($num);
-                        } elseif ($num == 0) {
-                            $lanes_data[$lane_id]['num'] = intval($cargo_lanes[$lane]['capacity']);
-                        } elseif ($num < 0) {
-                            $lanes_data[$lane_id]['num'] = max(0, $old + $num);
+                        $num = $lane;
+                    }
+
+                    if (We7::starts_with($num, '@')) {
+                        $lanes_data[$lane_id]['num'] = max(0, intval(ltrim($num, '@')));
+                    } else {
+                        if ($num == 0) {
+                            $lanes_data[$lane_id]['num'] = intval($cargo_lanes[$index]['capacity']);
+                        } else {
+                            $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
                         }
                     }
 
@@ -194,7 +209,7 @@ class Device extends State
                     }
 
                     //统计商品补货数量
-                    $goods = $cargo_lanes[$lane]['goods'];
+                    $goods = $cargo_lanes[$index]['goods'];
                     $changed = $lanes_data[$lane_id]['num'] - $old;
                     if ($changed != 0) {
                         $result[$goods] = [
@@ -256,13 +271,13 @@ class Device extends State
             //统计商品总库存
             if ($lane['goods'] == $goods_id) {
                 $total += $lane['num'];
-            }          
-              
+            }
+
             //根据出货策略匹配货道
             if ($match_fn($lane)) {
                 $result['num'] = $lane['num'];
                 $result['cargo_lane'] = $index;
-                if ($device->getDeviceType() == 0 && isset($lane['goods_price'])) {
+                if ($device->isCustomType() && isset($lane['goods_price'])) {
                     $result['price'] = $lane['goods_price'];
                     $result['price_formatted'] = '¥' . number_format($result['price'] / 100, 2) . '元';
                 }
@@ -298,8 +313,8 @@ class Device extends State
                 $laneId = "l{$index}";
                 if (!empty($lanes_data[$laneId])) {
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
-                    if (isset($lanes_data[$laneId]['price'])) {
-                        $lane['goods_price'] =  $lanes_data[$laneId]['price'];
+                    if ($device->isCustomType() && isset($lanes_data[$laneId]['price'])) {
+                        $lane['goods_price'] = $lanes_data[$laneId]['price'];
                         $lane['goods_price_formatted'] = '¥' . number_format($lane['goods_price'] / 100, 2) . '元';
                     }
                 }
@@ -354,7 +369,7 @@ class Device extends State
                 if ($defaultType) {
                     $data['device_type'] = $defaultType->getId();
                 }
-                    
+
                 $device = Device::create($data);
                 if ($device) {
                     $device->setCapacity(DEFAULT_DEVICE_CAPACITY);
@@ -554,7 +569,7 @@ class Device extends State
 
         $device->set('refresh', time());
         if ($notify) {
-            $device->appNotify('init');
+            $device->appNotify();
         } else {
             $device->updateQrcode(true);
         }
@@ -570,16 +585,27 @@ class Device extends State
     /**
      * 恢复设备设置到默认状态
      * @param deviceModelObj $device
+     * @param string $reason
      * @return bool
      */
-    public static function reset(deviceModelObj $device): bool
+    public static function reset(deviceModelObj $device, $reason = '设备重置'): bool
     {
         //清空营运人员
         $extra = $device->get('extra', []);
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
-        $device->resetPayload();
+        $locker = $device->payloadLockAcquire(3);
+        if (empty($locker)) {
+            return false;
+        }
+
+        $res = $device->resetPayload(['*' => '@0'], $reason);
+        if (is_error($res)) {
+            return false;
+        }
+
+        $locker->unlock();
 
         //设备分组
         $device->setGroupId(0);
@@ -628,7 +654,7 @@ class Device extends State
             }
         }
 
-        return self::reset($device);
+        return self::reset($device, $agent ? '绑定设备' : '解绑设备');
     }
 
     /**
@@ -685,7 +711,8 @@ class Device extends State
         return self::findOne(['shadow_id' => $key]);
     }
 
-    public static function search() {
+    public static function search()
+    {
         try {
             $query = Device::query();
 
@@ -702,7 +729,7 @@ class Device extends State
                     $query->where(['agent_id' => $agent->getId()]);
                 }
             }
-        
+
             //分组
             if (request::isset('group_id')) {
                 $group_id = request::int('group_id');
@@ -712,12 +739,12 @@ class Device extends State
                     $group = Group::get($group_id);
                     if (empty($group)) {
                         throw new Exception('找不到这个分组！');
-                        
+
                     }
                     $query->where(['group_id' => $group_id]);
                 }
             }
-        
+
             //型号
             if (request::isset('device_type')) {
                 $device_type_id = request::int('device_type');
@@ -727,12 +754,12 @@ class Device extends State
                     $device_type = DeviceTypes::get($device_type_id);
                     if (empty($device_type)) {
                         throw new Exception('找不到这个型号！');
-                        
+
                     }
                     $query->where(['device_type' => $device_type->getId()]);
                 }
             }
-        
+
             //标签
             $tag_ids = [];
             if (request::has('tag_ids')) {
@@ -741,7 +768,7 @@ class Device extends State
             if (request::has('tag_id')) {
                 $tag_ids[] = request::int('tag_id');
             }
-        
+
             $tag_ids = array_unique($tag_ids);
             if ($tag_ids) {
                 $tags_query = m('tags')->where(['id' => $tag_ids]);
@@ -749,7 +776,7 @@ class Device extends State
                     $query->where("tags_data REGEXP '<{$tag->getId()}>'");
                 }
             }
-        
+
             //关键字
             $keywords = request::trim('keywords');
             if (!empty($keywords)) {
@@ -760,25 +787,25 @@ class Device extends State
                     'iccid LIKE' => "%{$keywords}%",
                 ]);
             }
-        
+
             //只显示有问题设备
             if (request::bool('error')) {
                 $query->where(['error_code <>' => 0]);
             }
-        
+
             //缺货设备
             if (request::bool('low')) {
                 $remain_warning = intval(settings('device.remainWarning', 1));
                 $query->where(['remain <' => $remain_warning]);
             }
-        
+
             //位置已变化        
             if (request::bool('lac')) {
                 $query->where(['s1' => 1]);
             }
-        
+
             $now = new DateTimeImmutable();
-        
+
             if (request::isset('online')) {
                 $online_time = $now->modify('-15 min');
                 //在线状态
@@ -788,26 +815,26 @@ class Device extends State
                     $query->where(['last_ping <' => $online_time->getTimestamp()]);
                 }
             }
-        
+
             //长时间不在线
             if (request::bool('lost')) {
                 $offset = intval(settings('device.lost', 1));
                 $offset_time = $now->modify("-{$offset} days");
                 $query->where(['last_online <' => $offset_time->getTimestamp()]);
             }
-        
+
             //长时间不出货
             if (request::bool('no_order')) {
                 $offset = intval(settings('device.issuing', 1));
                 $offset_time = $now->modify("-{$offset} days");
                 $query->where(['last_order <' => $offset_time->getTimestamp()]);
             }
-        
+
             //维护状态
             if (request::bool('maintenance')) {
                 $query->where(['status' => Device::STATUS_MAINTENANCE]);
             }
-        
+
             //App未绑定
             if (request::bool('unbind')) {
                 $query->where("(app_id IS NULL OR app_id='')");
@@ -818,26 +845,26 @@ class Device extends State
                 $ids = request::array('ids', []);
                 $query->where(['id' => $ids]);
             }
-            
+
             $page = max(1, request::int('page'));
             $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-        
+
             $total = $query->count();
             $total_page = ceil($total / $page_size);
             if ($page > $total_page) {
                 $page = 1;
             }
-        
+
             $devices = [
                 'total' => $total,
                 'page' => $page,
                 'totalpage' => $total_page,
                 'list' => [],
             ];
-        
+
             $query->page($page, $page_size);
             $query->orderBy('id desc');
-        
+
             /** @var deviceModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $data = [
@@ -852,11 +879,11 @@ class Device extends State
                 if ($res) {
                     $data['agent'] = $res->profile();
                 }
-        
+
                 if (App::isVDeviceSupported()) {
                     $data['isVD'] = $entry->isVDevice();
                 }
-        
+
                 if (App::isBluetoothDeviceSupported()) {
                     if ($entry->isBlueToothDevice()) {
                         $data['isBluetooth'] = true;
@@ -864,9 +891,9 @@ class Device extends State
                 }
                 $devices['list'][] = $data;
             }
-        
+
             return $devices;
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             return err($e->getMessage());
         }
     }

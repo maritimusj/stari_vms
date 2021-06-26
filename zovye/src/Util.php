@@ -1366,7 +1366,7 @@ HTML_CONTENT;
             }
 
             if (!$device->lockAcquire()) {
-                return error(State::ERROR, '设备被占用，请重试！');
+                return error(State::ERROR, '设备锁定失败，请重试！');
             }
 
             $data = array_merge(
@@ -1388,19 +1388,27 @@ HTML_CONTENT;
                 'payload' => $device->getPayload(),
             ];
 
-            $res = $device->pull($data);
+            $pull_result = $device->pull($data);
 
-            $log_data['result'] = $res;
+            $log_data['result'] = $pull_result;
 
             $device->goodsLog(LOG_GOODS_TEST, $log_data);
 
-            if (is_error($res)) {
-                return $res;
+            if (is_error($pull_result)) {
+                return $pull_result;
             }
 
             //如果是营运人员测试，则不减少库存
             if (empty($params['keeper'])) {
-                $device->resetPayload([$lane => -1]);
+                $locker = $device->payloadLockAcquire(3);
+                if (empty($locker)) {
+                    return error(State::ERROR, '设备正忙，请重试！');
+                }
+                $payload = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
+                if (is_error($payload)) {
+                    return error(State::ERROR, '保存库存失败！');
+                }
+                $locker->unlock();
                 $device->updateRemain();
             }
 
@@ -1410,7 +1418,7 @@ HTML_CONTENT;
             $result = ['message' => '出货成功！'];
 
             if ($device->isBlueToothDevice()) {
-                $result['data'] = $res;
+                $result['data'] = $pull_result;
             }
 
             return $result;
@@ -1677,7 +1685,15 @@ HTML_CONTENT;
                 $order->setResultCode(0);
 
                 if (isset($goods['cargo_lane'])) {
-                    $device->resetPayload([$goods['cargo_lane'] => -1]);
+                    $locker = $device->payloadLockAcquire(3);
+                    if (empty($locker)) {
+                        return error(State::ERROR, '设备正忙，请重试！');
+                    }
+                    $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                    if (is_error($res)) {
+                        return error(State::ERROR, '保存库存失败！');
+                    }
+                    $locker->unlock();
                 }
 
                 if ($voucher) {
@@ -2022,6 +2038,11 @@ HTML_CONTENT;
         return $data;
     }
 
+    public static function generateUID(): string
+    {
+        return getmypid() . '-' . time() . '-' . Util::random(6, true);
+    }
+
     /**
      * @param $length
      * @param bool $numeric
@@ -2358,7 +2379,7 @@ HTML_CONTENT;
      * @param int $timeout
      * @return string|null
      */
-    public static function get(string $url, int $timeout = 3): ?string
+    public static function get(string $url, int $timeout = 3, $params = []): ?string
     {
         $ch = curl_init();
 
@@ -2371,6 +2392,14 @@ HTML_CONTENT;
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
+        if (empty($params[CURLOPT_USERAGENT])) {
+            $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
+        }      
+
+        foreach($params as $index => $val) {
+            curl_setopt($ch, $index, $val);
+        }
 
         $response = curl_exec($ch);
 
@@ -2391,7 +2420,7 @@ HTML_CONTENT;
      * @param int $timeout
      * @return array
      */
-    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3): array
+    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, $params = []): array
     {
         $ch = curl_init();
 
@@ -2416,6 +2445,14 @@ HTML_CONTENT;
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
+        if (empty($params[CURLOPT_USERAGENT])) {
+            $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
+        }      
+
+        foreach($params as $index => $val) {
+            curl_setopt($ch, $index, $val);
+        }
 
         $response = curl_exec($ch);
 

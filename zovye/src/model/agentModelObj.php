@@ -34,9 +34,9 @@ class agentModelObj extends userModelObj
         return empty($name) ? parent::getName() : $name;
     }
 
-    public function profile(): array
+    public function profile($detail = true): array
     {
-        $profile = parent::profile();
+        $profile = parent::profile($detail);
 
         $profile['avatar'] = $profile['headimgurl'];
         $profile['mobile'] = $this->getMobile();
@@ -145,7 +145,7 @@ class agentModelObj extends userModelObj
             if (!empty($path)) {
                 $key .= ".{$path}";
             }
-            return $this->settings($key, []);
+            return $this->settings($key);
         }
 
         if ($this->isPartner()) {
@@ -160,7 +160,13 @@ class agentModelObj extends userModelObj
 
     public function isPaymentConfigEnabled(): bool
     {
-        return $this->getAgentData('pay.wx.enable') || $this->getAgentData('pay.lcsw.enable');
+        $pay = $this->getAgentData('pay', []);
+        foreach((array)$pay as $config) {
+            if (is_array($config) && $config['enable']) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -369,6 +369,7 @@
             util.loading();
             $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
                 op: 'search',
+                openid: open_id,
                 keyword: keyword
             }, function (res) {
                 let html = '';

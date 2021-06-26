@@ -1,0 +1,118 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{template 'web/common/header'}
+<style>
+    .goods img {
+        width: 100px;
+        height: 100px;
+    }
+    .inc {
+        color: #4caf50;
+    }
+    .dec {
+        color: #ff5722;
+    }
+    tr.item {
+        border-left: 4px solid #ccc;
+    }
+    .index {
+        text-align: center;
+    }
+    .code {
+        white-space: nowrap;
+        color: #9e9e9e;
+    }
+    .code.success i {
+        color: #4caf50;
+    }
+    .code.error i {
+        color: #ff5722;
+    } 
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    {loop $navs $nav_op $nav_title}
+    {if $op == $nav_op}
+    <li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')));}">{$nav_title}</a></li>
+    {/if}
+    {/loop}
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        {if $logs}
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>#</td>
+                    <td>商品</td>
+                    <td>名称</td>
+                    <td>原库存</td>
+                    <td>变动</td>
+                    <td>剩余</td>
+                    <td>原因</td>
+                    <td>流水号</td>
+                    <td>时间</td>
+                </tr>
+            </thead>
+            <tbody>
+            {loop $logs $index $item}
+            <tr class="item" style="border-left-color: {$item['clr']};">
+                <td class="index" style="color:{$item['clr']}">{php echo $index + 1}</td>
+                <td>
+                    <div class="goods">
+                        <img src="{$item['goods']['img']}">
+                    </div>                    
+                </td>
+                <td>
+                    {$item['goods']['name']}
+                </td>
+                <td>
+                    {$item['org']}
+                </td>
+                <td>
+                    {if $item['num']>0}
+                    <span class="inc">
+                        +{$item['num']}
+                    </span>                    
+                    {else}
+                    <span class="dec">
+                        {$item['num']}
+                    </span>                    
+                    {/if}
+                </td>
+                <td>
+                    {$item['new']}
+                </td>
+                <td>
+                    {$item['reason']}
+                </td>
+                <td>
+                    <div class="code{if $verified[$item['code']]} success{else} error{/if}">
+                        {if $verified[$item['code']]}
+                        <i class="fa fa-check-circle-o"></i> 
+                        {else}
+                        <i class="fa fa-times-circle-o"></i> 
+                        {/if}
+                        {$item['code']} 
+                    </div>
+                </td>            
+                <td>
+                    {$item['createtime_foramtted']}
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            暂时还没有任何记录！
+        </div>
+        {/if}
+    </div>
+</div>
+
+{template 'common/footer'}

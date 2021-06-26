@@ -182,7 +182,7 @@ function getAndCheckWithdraw($id)
         return error(State::ERROR, '找不到这个用户！');
     }
 
-    if (!$user->lock()) {
+    if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
         return error(State::ERROR, '用户无法锁定，请重试！');
     }
 

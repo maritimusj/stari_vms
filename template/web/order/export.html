@@ -98,7 +98,7 @@
 
     let lastid = 0;
     let filenames = [];    
-    const q = [];    
+    let q = [];    
 
     function getList(uid, params, headers) {
         $.getJSON(url, Object.assign({ op: 'export_list', lastid, uid }, params)).then(res => {
@@ -116,9 +116,12 @@
                         filenames.forEach(filename => {
                             window.location.href = filename;
                         })
+                        
                         util.loaded();
-                        filenames = [];
+
                         lastid = 0;
+                        filenames = [];
+                        q = [];                        
                     });
                 }
             }

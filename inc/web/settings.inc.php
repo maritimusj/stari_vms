@@ -203,8 +203,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
-
-        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0; 
+        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;        
+        $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
         if ($settings['app']['first']['enabled']) {

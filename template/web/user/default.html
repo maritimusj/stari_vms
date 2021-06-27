@@ -298,10 +298,12 @@
             <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
             {/if}            
             <li role="separator" class="divider"></li>
+            {if isset($item['inventory'])}
             {if $item['inventory']}
             <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
             {else}
             <li><a href="#" data-op="createInventory"><i class="fa fa-archive fa-fw"></i> 创建仓库</a></li>
+            {/if}
             {/if}
             {if $balance_used}
             <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>

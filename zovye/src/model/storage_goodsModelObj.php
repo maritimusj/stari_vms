@@ -13,7 +13,11 @@ class storage_goodsModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-        return tb('storage_goods');
+		if ($readOrWrite == self::OP_READ) {
+            return tb('storage_goods_vw');
+        }
+
+		return tb('storage_goods');
     }
     
 	/** @var int */

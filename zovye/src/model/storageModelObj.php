@@ -5,15 +5,17 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\User;
 use function zovye\tb;
+use zovye\base\modelObj;
+use zovye\Storage;
+use zovye\traits\ExtraDataGettersAndSetters;
 
 class storageModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-        return tb('storage');
+		return tb('storage');
     }
     
 	/** @var int */
@@ -25,13 +27,10 @@ class storageModelObj extends modelObj
 	/** @var int */
 	protected $parent_id;
 
-	/** @var int */
-	protected $user_id;
-
 	/** @var string */
 	protected $uid;
 
-	/** @var int */
+	/** @var string */
 	protected $title;
 
 	protected $extra;
@@ -40,4 +39,36 @@ class storageModelObj extends modelObj
 	protected $createtime;
 
 	use ExtraDataGettersAndSetters;
+
+	public function format(): array
+	{
+		$data = [
+			'id' => $this->getId(),
+			'title' => $this->getTitle(),
+			'createtime' => $this->getCreatetime(),
+			'createtime_formatted' => date('Y-m-d H:i:s', $this->getCreatetime()),
+		];
+
+		$parent_id = $this->getParentId();
+		if ($parent_id) {
+			$parent = Storage::get($parent_id);
+			if ($parent) {
+				$data['parent'] = [
+					'id' => $parent->getId(),
+					'title' => $this->getTitle(),
+				];
+			}
+		}
+
+		$owner = $this->getExtraData('user', []);
+		if ($owner) {
+			$user = User::get($owner['id']);
+			if ($user) {
+				$data['user'] = $user->profile();
+			} else {
+				$data['user'] = $owner;
+			}
+		}
+		return $data;
+	}
 }

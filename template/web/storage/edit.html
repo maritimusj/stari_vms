@@ -1,0 +1,135 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<div id="app" v-cloak>
+    <form action="{php echo $this->createWebUrl('storage');}" method="post">
+        <div class="panel panel-default panel-first nav-tab-item">
+            <div class="heading">
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">所属用户</label>
+                    <div class="col-md-5">
+                        <select style="width:100%;" name="userId" v-model="filter.user">
+                            <option v-for="u in user.list" :key="u.id" :value="u.id">
+                                {{u.nickname + (u.mobile ? '，手机号码：' + u.mobile : '')}}
+                            </option>                            
+                            <option value="0" :selected="filter.user === 0">&lt;平台&gt;</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="请输入手机号码或者名称查找..." v-model.trim="user.keyword">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" title="搜索用户" @click.prevent="searchUser">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">所属仓库</label>
+                    <div class="col-md-5">
+                        <select style="width:100%;" v-model="filter.storage" name="parentStorageId">
+                            <option v-for="s in storage.list" :key="s.id" :value="s.id" :disabled="storage.id == s.id">
+                                {{s.title}}<span v-if="s.user">（所属用户：{{s.user.name}}）</span>
+                            </option>                            
+                            <option value="0" :selected="filter.storage=== 0">&lt;无&gt;</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="请输名称查找..." v-model.trim="storage.keyword">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-default" type="button" title="搜索仓库" @click.prevent="searchStorage">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">仓库名称</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="title" v-model="storage.title" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-btn">
+            <input type="hidden" name="op" value="save">
+            <input type="hidden" name="id" v-model="storage.id">
+            <button type="submit" class="btn btn-primary">{{storage.id > 0 ? '保存':'创建'}}</button>
+            <button type="button" class="btn btn-default" @click="backToList">返回</button>
+        </div>
+    </form>
+</div>
+<script>
+    const userApiUrl = "{php echo $this->createWebUrl('user')}";
+    const storageApiUrl = "{php echo $this->createWebUrl('storage')}";
+    require(["{php \zovye\url(false, JS_VUE_URL);}"], function(Vue) {
+        new Vue({
+            el: "#app",
+            data: {
+                filter: {
+                    user: 0,
+                    storage: 0,
+                },
+                user: {
+                    list:[],
+                    keyword: '',
+                },
+                storage: {
+                    id: 0,
+                    title: '',
+                    parent: 0,
+                    list: [],
+                    keyword: '',
+                },                
+            },
+            watch: {
+                'filter.user': function (v) {
+                    $.getJSON(storageApiUrl, {op: 'getUserStorage', user_id: v}).then(res => {
+                        if (res && res.status === true) {
+                            this.storage.id = res.data.id;
+                            this.storage.parent = res.data.parent && res.data.parent.id || 0;
+                            this.storage.title = res.data.title;
+                            this.filter.storage = this.storage.parent;                        
+                        } else {
+                            this.storage.id = 0
+                            this.storage.parent = 0;
+                            this.storage.title = '';
+                        }
+                    })                    
+                }
+            },
+            mounted() {
+
+            },
+            methods: {
+                backToList() {
+                    window.location.replace("{php echo $this->createWebUrl('storage');}");
+                },
+                searchUser() {
+                    this.getUserList();
+                },
+                getUserList() {
+                    $.getJSON(userApiUrl, {op: "search", keywords: this.user.keyword}).then(res => {
+                        if (res) {
+                            this.user.list = res.list;
+                        }
+                    })
+                },
+                searchStorage() {
+                    $.getJSON(storageApiUrl, {op: "search", keywords: this.storage.keyword}).then(res => {
+                        if (res && res.status) {
+                            this.storage.list = res.data;
+                        } else {
+                            this.storage.list = [];
+                        }
+                    })
+                },
+
+            },
+            
+        })
+
+    })
+</script>
+{template 'common/footer'}

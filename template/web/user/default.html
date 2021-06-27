@@ -296,8 +296,13 @@
             {if empty($item['isAgent']) && empty($item['isPartner']) && $item['mobile']}
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
-            {/if}
+            {/if}            
             <li role="separator" class="divider"></li>
+            {if $item['storage']}
+            <li><a href="#" data-op="viewStorage"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
+            {else}
+            <li><a href="#" data-op="createStorage"><i class="fa fa-archive fa-fw"></i> 创建仓库</a></li>
+            {/if}
             {if $balance_used}
             <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>
             {/if}
@@ -381,6 +386,9 @@
                 if(res.data && res.data.msg) {
                     util.message(res.data.msg, '', res.status?'success':'error');
                 }
+                if (res.data && res.data.redirect_url) {
+                    window.location.replace(res.data.redirect_url);
+                }
             }
         }).fail(function(){
             loading && util.loaded();
@@ -417,19 +425,29 @@
     api.giftLog = function(userid) {
         api.showResult({op: 'prize', id: userid});
     }
-    api.orderList = function(id) {
-        api.showResult({user_id: id}, api.ordersUrl);
+
+    api.createStorage = function(userid) {
+        api.showResult({op: 'create_storage', id: userid});
     }
-    api.balanceEdit = function(id, event) {
-        api.showResult({userid: id, op: "balance_edit"});
+
+    api.viewStorage = function(userid) {
+        api.showResult({op: 'view_storage', id: userid});
+    }
+
+    api.orderList = function(userid) {
+        api.showResult({id: userid}, api.ordersUrl);
+    }
+
+    api.balanceEdit = function(userid, event) {
+        api.showResult({id: userid, op: "balance_edit"});
         event.stopPropagation();
     }
-    api.saveUserBalanceLog = function(id) {
+    api.saveUserBalanceLog = function(userid) {
         const total = $('input[name=total]').val();
         const memo = $('input[name=memo]').val();
-        api.showResult({userid: id, total: total, memo: memo, op: "balance_edit_save"}, '', false, function(){
+        api.showResult({id: userid, total: total, memo: memo, op: "balance_edit_save"}, '', false, function(){
             $('#modal-message').modal('hide');
-            api.getUserStats([id]);
+            api.getUserStats([userid]);
         })
     }
 

@@ -10,13 +10,12 @@ CREATE TABLE `ims_zovye_vms_storage` (
     `id` INT NOT NULL AUTO_INCREMENT , 
     `uniacid` INT NOT NULL ,
     `parent_id` INT NOT NULL  DEFAULT '0',
-    `user_id` INT NOT NULL  DEFAULT '0',
     `uid` VARCHAR(64) NOT NULL , 
     `title` VARCHAR(128) NOT NULL , 
     `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    UNIQUE KEY `uid` (`uid`, `user_id`),
+    UNIQUE KEY `uid` (`uid`),
     INDEX (`parent_id`)                                     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -42,6 +41,10 @@ CREATE TABLE `ims_zovye_vms_storage_log` (
     INDEX (`storage_id`), 
     INDEX (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE OR REPLACE VIEW `ims_zovye_vms_storage_goods_vw` AS
+SELECT s.*,g.name,g.img,g.price FROM `ims_zovye_vms_storage_goods` s INNER JOIN `ims_zovye_vms_goods` g ON s.goods_id=g.id;
+
 SQL;
     Migrate::execSQL($sql);
 }

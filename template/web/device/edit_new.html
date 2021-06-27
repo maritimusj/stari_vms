@@ -773,7 +773,7 @@
                             this.addCargoLane();
                         }
                     }
-                }                
+                }
             },
             computed: {
                 isCustomType() {
@@ -803,7 +803,7 @@
                             }
                         }
                         if (self.list.length == 0) {
-                            self.currentType = null;      
+                            self.currentType = {};      
                             self.currentTypeID = 0;
                         }
                         self.searching = false;
@@ -820,7 +820,7 @@
                                     self.list.push(res.data);
                                 }
                             } else {
-                                self.currentType = null;
+                                self.currentType = {};
                                 self.error = res.data.msg || '&lt;出错了&gt;';
                             }
                         }
@@ -829,10 +829,8 @@
                 },
                 addCargoLane() {
                     if (this.isCustomType) {
-                        if (!this.currentType) {
-                            this.currentType = {
-                                cargo_lanes:[],
-                            }
+                        if (!this.currentType.cargo_lanes) {
+                            Vue.set(this.currentType, 'cargo_lanes', []);
                         }
                         this.currentType.cargo_lanes.push({
                             id: 0,

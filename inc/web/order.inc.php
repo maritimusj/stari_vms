@@ -631,7 +631,16 @@ if ($op == 'default') {
     $column = array_values(array_intersect_key($all_headers, array_flip($headers)));  
     $filename =  "export/{$uid}.xls";
 
-    Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
+    $locker = Locker::try($uid, 30);
+    if ($locker) {
+        Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
+    } else {
+        Util::logToFile('export', [
+            'error' => 'lock failed',
+            'uid' => $uid,
+        ]);
+    }
+
     JSON::success([
         'filename' => Util::toMedia($filename),
     ]);

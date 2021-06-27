@@ -464,4 +464,10 @@ class App
             return boolval(settings('custom.useAccountQRCode.enabled'));
         });
     }
+
+    public static function isInventoryEnabled(): bool {
+        return onceCall(function() {
+            return boolval(settings('inventory.enabled'));
+        });        
+    }
 }

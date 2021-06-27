@@ -143,8 +143,11 @@ if ($op == 'default') {
             'isTester' => $user->isTester(),
             'verified' => $user->isIDCardVerified(),
             'isLocked' => $user->isLocked(),
-            'inventory' => Inventory::exists($user),
         ];
+
+        if (App::isInventoryEnabled()) {
+            $data['inventory'] = Inventory::exists($user);
+        }
 
         if ($credit_used) {
             $data['credit'] = $user->getWe7credit()->total();

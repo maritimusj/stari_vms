@@ -4,9 +4,9 @@ namespace zovye;
 
 $tb_name = 'zovye_vms';
 
-if (!We7::pdo_tableexists($tb_name . '_storage')) {
+if (!We7::pdo_tableexists($tb_name . '_inventory')) {
     $sql = <<<SQL
-CREATE TABLE `ims_zovye_vms_storage` ( 
+CREATE TABLE `ims_zovye_vms_inventory` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
     `uniacid` INT NOT NULL ,
     `parent_id` INT NOT NULL  DEFAULT '0',
@@ -19,7 +19,7 @@ CREATE TABLE `ims_zovye_vms_storage` (
     INDEX (`parent_id`)                                     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `ims_zovye_vms_storage_goods` ( 
+CREATE TABLE `ims_zovye_vms_inventory_goods` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
     `storage_id` INT NOT NULL , 
     `goods_id` INT NOT NULL , 
@@ -30,7 +30,7 @@ CREATE TABLE `ims_zovye_vms_storage_goods` (
     INDEX (`goods_id`, `storage_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `ims_zovye_vms_storage_log` ( 
+CREATE TABLE `ims_zovye_vms_inventory_log` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
     `storage_id` INT NOT NULL , 
     `goods_id` INT NOT NULL , 
@@ -42,8 +42,8 @@ CREATE TABLE `ims_zovye_vms_storage_log` (
     INDEX (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE OR REPLACE VIEW `ims_zovye_vms_storage_goods_vw` AS
-SELECT s.*,g.name,g.img,g.price FROM `ims_zovye_vms_storage_goods` s INNER JOIN `ims_zovye_vms_goods` g ON s.goods_id=g.id;
+CREATE OR REPLACE VIEW `ims_zovye_vms_inventory_goods_vw` AS
+SELECT s.*,g.name,g.img,g.price FROM `ims_zovye_vms_inventory_goods` s INNER JOIN `ims_zovye_vms_goods` g ON s.goods_id=g.id;
 
 SQL;
     Migrate::execSQL($sql);

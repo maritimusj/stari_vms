@@ -6,8 +6,8 @@
 <div class="panel panel-default panel-first">
     <div class="heading">
         <span class="operate">
-            <i class="fa fa fa-sign-out" title="出库" data-op='chooseGoods'></i>
-            <i class="fa fa fa-sign-in" title="入库"></i>
+            <i class="fa fa fa-sign-out" title="出库" data-op='stockOut'></i>
+            <i class="fa fa fa-sign-in" title="入库" data-op='stockIn'></i>
         </span>
     </div>
     <div class="panel-body">
@@ -52,6 +52,14 @@
         if (api.dlg) {
             api.dlg.modal('hide');
         }
+    }
+
+    api.stockOut = function() {
+        api.showResult({op: 'stockOut', pagesize: 10});
+    }
+
+    api.stockIn = function() {
+        api.showResult({op: 'stockIn', pagesize: 10});
     }
 
     api.chooseGoods = function() {

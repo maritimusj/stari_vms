@@ -9,22 +9,22 @@ use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
-class storage_goodsModelObj extends modelObj
+class inventory_goodsModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
 		if ($readOrWrite == self::OP_READ) {
-            return tb('storage_goods_vw');
+            return tb('inventory_goods_vw');
         }
 
-		return tb('storage_goods');
+		return tb('inventory_goods');
     }
     
 	/** @var int */
 	protected $id;
 
 	/** @var int */
-	protected $storage_id;
+	protected $inventory_id;
 
 	/** @var int */
 	protected $goods_id;

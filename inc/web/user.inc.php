@@ -143,7 +143,7 @@ if ($op == 'default') {
             'isTester' => $user->isTester(),
             'verified' => $user->isIDCardVerified(),
             'isLocked' => $user->isLocked(),
-            'storage' => Storage::exists($user),
+            'inventory' => Inventory::exists($user),
         ];
 
         if ($credit_used) {
@@ -786,39 +786,39 @@ if ($op == 'default') {
 
     JSON::fail('没找到这个用户！');
 
-} elseif ($op == 'create_storage') {
+} elseif ($op == 'create_inventory') {
 
     $user = User::get(request::int('id'));
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
 
-    if (Storage::exists($user)) {
+    if (Inventory::exists($user)) {
         JSON::fail('仓库已经存在！');
     }
 
-    $storage = Storage::create([
-        'uid' => Storage::getUID($user),
+    $inventory = Inventory::create([
+        'uid' => Inventory::getUID($user),
         'title' => "{$user->getName()}的仓库",
     ]);
 
-    if ($storage) {
+    if ($inventory) {
         JSON::success('创建成功！');
     }
 
     JSON::fail('创建失败！');
 
-} elseif ($op == 'view_storage') {
+} elseif ($op == 'view_inventory') {
 
     $user = User::get(request::int('id'));
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
 
-    $storage = Storage::find($user);
-    if (empty($storage)) {
+    $inventory = Inventory::find($user);
+    if (empty($inventory)) {
         JSON::fail('仓库不存在！');
     }
 
-    JSON::success(['redirect_url' => Util::url('storage', ['op' => 'detail', 'id' => $storage->getId()])]);
+    JSON::success(['redirect_url' => Util::url('inventory', ['op' => 'detail', 'id' => $inventory->getId()])]);
 }

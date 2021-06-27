@@ -3,27 +3,26 @@
 
 namespace zovye;
 
-use zovye\base\model;
 use zovye\base\modelObj;
 use zovye\model\userModelObj;
 use zovye\base\modelObjFinder;
 use zovye\model\deviceModelObj;
-use zovye\model\storageModelObj;
+use zovye\model\inventoryModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
-class Storage
+class Inventory
 {
-    public static function create($data = []): ?storageModelObj
+    public static function create($data = []): ?inventoryModelObj
     {
         if (empty($data['uniacid'])) {
             $data['uniacid'] = We7::uniacid();
         }
 
         /** @var ExtraDataGettersAndSetters $classname */
-        $classname = m('storage')->objClassname();
+        $classname = m('inventory')->objClassname();
         $data['extra'] = $classname::serializeExtra($data['extra']);
 
-        return m('storage')->create($data);
+        return m('inventory')->create($data);
     }
 
     /**
@@ -32,19 +31,19 @@ class Storage
      */
     public static function query(array $condition = []): modelObjFinder
     {
-        return m('storage')->where(We7::uniacid([]))->where($condition);
+        return m('inventory')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function get($id): ?storageModelObj
+    public static function get($id): ?inventoryModelObj
     {
         return self::findOne(['id' => $id]);
     }
 
     /**
      * @param $cond
-     * @return storageModelObj|null
+     * @return inventoryModelObj|null
      */
-    public static function findOne($cond): ?storageModelObj
+    public static function findOne($cond): ?inventoryModelObj
     {
         return self::query($cond)->findOne();
     }
@@ -57,11 +56,13 @@ class Storage
             $cond = ['uid' => $v];
         } elseif ($v instanceof modelObj) {
             $cond = ['uid' => self::getUID($v, $name)];
+        } else {
+            return false;
         }
         return self::query()->exists($cond);
     }
 
-    public static function find($obj, $name = 'default'): ?storageModelObj 
+    public static function find($obj, $name = 'default'): ?inventoryModelObj
     {
         $uid = self::getUID($obj, $name);
         return self::findOne(['uid' => $uid]);
@@ -69,6 +70,9 @@ class Storage
 
     /**
      * 获取指定对象指定名称的仓库UID
+     * @param modelObj $obj
+     * @param string $name
+     * @return string
      */
     public static function getUID(modelObj $obj, $name = 'default'): string
     {
@@ -86,7 +90,7 @@ class Storage
     }
 
 
-    public static function for(modelObj $obj, $name = 'default'): ?storageModelObj
+    public static function for(modelObj $obj, $name = 'default'): ?inventoryModelObj
     {
         if (self::exists($obj, $name)) {
             return self::find($obj, $name);

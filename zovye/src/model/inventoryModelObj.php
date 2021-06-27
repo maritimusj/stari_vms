@@ -8,14 +8,14 @@ namespace zovye\model;
 use zovye\User;
 use function zovye\tb;
 use zovye\base\modelObj;
-use zovye\Storage;
+use zovye\Inventory;
 use zovye\traits\ExtraDataGettersAndSetters;
 
-class storageModelObj extends modelObj
+class inventoryModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-		return tb('storage');
+		return tb('inventory');
     }
     
 	/** @var int */
@@ -51,7 +51,7 @@ class storageModelObj extends modelObj
 
 		$parent_id = $this->getParentId();
 		if ($parent_id) {
-			$parent = Storage::get($parent_id);
+			$parent = Inventory::get($parent_id);
 			if ($parent) {
 				$data['parent'] = [
 					'id' => $parent->getId(),

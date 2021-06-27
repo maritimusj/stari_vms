@@ -10,7 +10,7 @@ if ($op == 'default') {
     $page = max(1, request::int('page'));
     $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
 
-    $query = Storage::query();
+    $query = Inventory::query();
 
     //搜索关键字
     $keywords = request::trim('keywords');
@@ -21,7 +21,7 @@ if ($op == 'default') {
     }
 
     $total = $query->count();
-    $storages = [
+    $inventories = [
         'page' => 0,
         'total' => 0,
         'totalpage' => 0,
@@ -34,23 +34,23 @@ if ($op == 'default') {
             $page = 1;
         }
 
-        $storages['total'] = $total;
-        $storages['page'] = $page;
-        $storages['totalpage'] = $total_page;
+        $inventories['total'] = $total;
+        $inventories['page'] = $page;
+        $inventories['totalpage'] = $total_page;
 
         $query->orderBy('id DESC');
         foreach($query->findAll() as $entry) {
-            $storages['list'][] = $entry->format();
+            $inventories['list'][] = $entry->format();
         }
     }
 
-    app()->showTemplate('web/storage/default', [
+    app()->showTemplate('web/inventory/default', [
         'op' => $op,
-        'storages' => $storages,
+        'inventories' => $inventories,
     ]);
 
 } elseif ($op == 'search') {
-    $query = Storage::query();
+    $query = Inventory::query();
     //搜索关键字
     $keywords = request::trim('keywords');
     if ($keywords) {
@@ -74,25 +74,25 @@ if ($op == 'default') {
     ];
 
     if ($op == 'edit') {
-        $storage = Storage::get(request::int('id'));
-        if (empty($storage)) {
+        $inventory = Inventory::get(request::int('id'));
+        if (empty($inventory)) {
             Util::itoast('找不到指定的仓库！', '', 'error');
         }
-        $tpl_data['storage'] = $storage;
+        $tpl_data['inventory'] = $inventory;
     }
 
-    app()->showTemplate('web/storage/edit', $tpl_data);
+    app()->showTemplate('web/inventory/edit', $tpl_data);
 
 } elseif ($op == 'save') {
 
     $id = request::int('id');
     if ($id > 0) {
-        $storage = Storage::get($id);
-        if (empty($storage)) {
+        $inventory = Inventory::get($id);
+        if (empty($inventory)) {
             Util::itoast('找不到指定的仓库！', '', 'error');
         }
-        $storage->setTitle(request::trim('title'));
-        $storage->save();
+        $inventory->setTitle(request::trim('title'));
+        $inventory->save();
         Util::itoast('保存成功！', '', 'success');
     }
 
@@ -105,8 +105,8 @@ if ($op == 'default') {
         if (empty($user)) {
             Util::itoast('找不到这个用户！', '', 'error');
         }
-        $uid = Storage::getUID($user);
-        if (Storage::exists($uid)) {
+        $uid = Inventory::getUID($user);
+        if (Inventory::exists($uid)) {
             Util::itoast('仓库已经存在！', '', 'error');
         }
         $data['uid'] = $uid;
@@ -115,50 +115,50 @@ if ($op == 'default') {
         ];
     }
 
-    $parent_storage_id = request::int('parentStorageId');
-    if ($parent_storage_id > 0) {
-        $parent_storage = Storage::get($parent_storage_id);
-        if (empty($parent_storage)) {
+    $parent_inventory_id = request::int('parentId');
+    if ($parent_inventory_id > 0) {
+        $parent_inventory = Inventory::get($parent_inventory_id);
+        if (empty($parent_inventory)) {
             Util::itoast('找不到指定的仓库！', '', 'error');
         }
-        $data['parent_id'] = $parent_storage->getId();
+        $data['parent_id'] = $parent_inventory->getId();
     }
 
-    $storage = Storage::create($data);
-    if ($storage) {
+    $inventory = Inventory::create($data);
+    if ($inventory) {
         Util::itoast('创建成功！', '', 'success');
     }
 
     Util::itoast('创建失败！', '', 'error');
 
-} elseif ($op == 'getUserStorage') {
+} elseif ($op == 'getUserInventory') {
 
     $user_id = request::int('user_id');
     $user = User::get($user_id);
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
-    $storage = Storage::find($user, request::trim('name'));
-    if (empty($storage)) {
+    $inventory = Inventory::find($user, request::trim('name'));
+    if (empty($inventory)) {
         JSON::fail('找不到指定的仓库！');
     }
     JSON::success([
-        'id' => $storage->getId(),
-        'uid' => $storage->getUid(),
-        'title' => $storage->getTitle(),
-        'createtime' => $storage->getCreatetime(),
-        'createtime_formatted' => date('Y-m-d H:i:s', $storage->getCreatetime()),
+        'id' => $inventory->getId(),
+        'uid' => $inventory->getUid(),
+        'title' => $inventory->getTitle(),
+        'createtime' => $inventory->getCreatetime(),
+        'createtime_formatted' => date('Y-m-d H:i:s', $inventory->getCreatetime()),
     ]);
 
 } elseif ($op == 'detail') {
 
-    $storage = Storage::get(request::int('id'));
-    if (empty($storage)) {
+    $inventory = Inventory::get(request::int('id'));
+    if (empty($inventory)) {
         Util::itoast('找不到这个仓库！', '', 'error');
     }
 
     $tpl_data = [
-        'title' => $storage->getTitle(),
+        'title' => $inventory->getTitle(),
     ];
-    app()->showTemplate('web/storage/detail', $tpl_data);
+    app()->showTemplate('web/inventory/detail', $tpl_data);
 }

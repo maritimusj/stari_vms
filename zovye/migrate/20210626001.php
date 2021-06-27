@@ -21,24 +21,24 @@ CREATE TABLE `ims_zovye_vms_inventory` (
 
 CREATE TABLE `ims_zovye_vms_inventory_goods` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
-    `storage_id` INT NOT NULL , 
+    `inventory_id` INT NOT NULL , 
     `goods_id` INT NOT NULL , 
     `num` INT NOT NULL DEFAULT '0' , 
     `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    INDEX (`goods_id`, `storage_id`)
+    INDEX (`goods_id`, `inventory_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `ims_zovye_vms_inventory_log` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
-    `storage_id` INT NOT NULL , 
+    `inventory_id` INT NOT NULL , 
     `goods_id` INT NOT NULL , 
     `num` INT NOT NULL , 
     `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    INDEX (`storage_id`), 
+    INDEX (`inventory_id`), 
     INDEX (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

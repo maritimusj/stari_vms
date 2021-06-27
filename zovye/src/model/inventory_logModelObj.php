@@ -9,18 +9,18 @@ use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
-class storage_logModelObj extends modelObj
+class inventory_logModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-        return tb('storage_log');
+        return tb('inventory_log');
     }
     
 	/** @var int */
 	protected $id;
 
 	/** @var int */
-	protected $storage_id;
+	protected $inventory_id;
 
 	/** @var int */
 	protected $goods_id;

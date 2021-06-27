@@ -298,10 +298,10 @@
             <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
             {/if}            
             <li role="separator" class="divider"></li>
-            {if $item['storage']}
-            <li><a href="#" data-op="viewStorage"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
+            {if $item['inventory']}
+            <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
             {else}
-            <li><a href="#" data-op="createStorage"><i class="fa fa-archive fa-fw"></i> 创建仓库</a></li>
+            <li><a href="#" data-op="createInventory"><i class="fa fa-archive fa-fw"></i> 创建仓库</a></li>
             {/if}
             {if $balance_used}
             <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>
@@ -426,12 +426,12 @@
         api.showResult({op: 'prize', id: userid});
     }
 
-    api.createStorage = function(userid) {
-        api.showResult({op: 'create_storage', id: userid});
+    api.createInventory = function(userid) {
+        api.showResult({op: 'create_inventory', id: userid});
     }
 
-    api.viewStorage = function(userid) {
-        api.showResult({op: 'view_storage', id: userid});
+    api.viewInventory = function(userid) {
+        api.showResult({op: 'view_inventory', id: userid});
     }
 
     api.orderList = function(userid) {

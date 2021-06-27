@@ -5,18 +5,18 @@ namespace zovye;
 
 
 use zovye\base\modelObjFinder;
-use zovye\model\storageModelObj;
+use zovye\model\inventoryModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
-class StorageLog
+class InventoryGoods
 {
-    public function create($data = []): ?storageModelObj
+    public function create($data = []): ?inventoryModelObj
     {
         /** @var ExtraDataGettersAndSetters $classname */
-        $classname = m('storage_log')->objClassname();
+        $classname = m('inventory_goods')->objClassname();
         $data['extra'] = $classname::serializeExtra($data['extra']);
 
-        return m('storage_log')->create($data);
+        return m('inventory_goods')->create($data);
     }
 
     /**
@@ -25,14 +25,14 @@ class StorageLog
      */
     public static function query(array $condition = []): modelObjFinder
     {
-        return m('storage_log')->where($condition);
+        return m('inventory_goods')->where($condition);
     }
 
     /**
      * @param $cond
-     * @return storageModelObj|null
+     * @return inventoryModelObj|null
      */
-    public static function findOne($cond): ?storageModelObj
+    public static function findOne($cond): ?inventoryModelObj
     {
         return self::query($cond)->findOne();
     }

@@ -169,7 +169,7 @@
                     if (res.data && res.data.length > 0) {
                         lastid = Math.max(...res.data);
                         getList(uid, params, headers);
-                        q.push($.getJSON(url, {op: 'export_update', ids: res.data, uid, headers}).then(res => {
+                        q.push($.post(url, {op: 'export_update', ids: res.data, uid, headers}).then(res => {
                             console.log(res);
                             if (filenames.indexOf(res.data.filename) === -1) {
                                 filenames.push(res.data.filename);

@@ -338,6 +338,7 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+                return $result;
             }
         }
         return err('暂时无法请求！');
@@ -375,6 +376,7 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+                return $result;
             }
         }
         return err('暂时无法请求！');

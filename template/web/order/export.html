@@ -170,7 +170,6 @@
                         lastid = Math.max(...res.data);
                         getList(uid, params, headers);
                         q.push($.post(url, {op: 'export_update', ids: res.data, uid, headers}).then(res => {
-                            console.log(res);
                             if (filenames.indexOf(res.data.filename) === -1) {
                                 filenames.push(res.data.filename);
                             }
@@ -178,7 +177,6 @@
                     } else {
                         $.when(...q).then(function() {
                             lastid = 0;
-                            console.log(uid + ' done');
                             filenames.forEach(filename => {
                                 window.location.href = filename;
                             })

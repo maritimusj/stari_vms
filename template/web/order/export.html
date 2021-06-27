@@ -175,12 +175,13 @@
                             }
                         }));
                     } else {
-                        $.when(...q).then(function() {
-                            lastid = 0;
+                        $.when(...q).then(function() {                            
                             filenames.forEach(filename => {
                                 window.location.href = filename;
                             })
                             util.loaded();
+                            filenames = [];
+                            lastid = 0;
                         });
                     }
                 }

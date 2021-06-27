@@ -463,7 +463,7 @@ if ($op == 'default') {
     }
 
     $query->orderBy('id ASC');
-    $query->limit(1000);
+    $query->limit(500);
 
     $result = $query->findAll([], true);
     $total = $result->count();

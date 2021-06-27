@@ -2189,6 +2189,24 @@ HTML_CONTENT;
         return $device;
     }
 
+    public static function exportExcelFile($filename, array $header = [], array $data = [])
+    {
+        We7::mkdirs(dirname($filename));
+
+        $str_export = '';
+
+        if (!file_exists($filename)) {
+            $tab_header = implode("\t", $header);
+            $str_export = $tab_header . "\r\n";
+        }
+
+        foreach ($data as $row) {
+            $str_export .= implode("\t", $row) . "\r\n";
+        }
+
+        return file_put_contents($filename, $str_export, FILE_APPEND);
+    }
+
     /**
      * 导出excel.
      *

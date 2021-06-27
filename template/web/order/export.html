@@ -87,6 +87,12 @@
     </div>
 </form>
 <script>
+    function uid() {
+        function S4() {
+            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        }
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    }
     $(function(){
         $('#find_agent').click(function(){
             const keyword = $('input[name=keyword_agent]').val();
@@ -153,34 +159,60 @@
             })
         })
 
-        function downloadFile(url, filename) {
-            const form = $("<form></form>").attr("action", url).attr("method", "post");
-            form.append($("<input>").attr("type", "hidden").attr("name", "fileName").attr("value", filename));
-            form.appendTo('body').submit().remove();
+        const url = "{php echo $this->createWebUrl('order');}";
+        let lastid = 0;
+        const q = [];
+        const filenames = [];
+        function getList(uid, params, headers) {
+            $.getJSON(url, Object.assign({op: 'export_list', lastid, uid}, params)).then(res => {
+                if (res && res.status) {
+                    if (res.data && res.data.length > 0) {
+                        lastid = Math.max(...res.data);
+                        getList(uid, params, headers);
+                        q.push($.getJSON(url, {op: 'export_update', ids: res.data, uid, headers}).then(res => {
+                            console.log(res);
+                            if (filenames.indexOf(res.data.filename) === -1) {
+                                filenames.push(res.data.filename);
+                            }
+                        }));
+                    } else {
+                        $.when(...q).then(function() {
+                            lastid = 0;
+                            console.log(uid + ' done');
+                            filenames.forEach(filename => {
+                                window.location.href = filename;
+                            })
+                            util.loaded();
+                        });
+                    }
+                }
+            })
         }
+
 
         $('#export').click(function(){
             const agent_openid = $('select[name=agent_openid]').val();
-            const account_id = $('select[name=account_id]').val();
-            const device_id = $('select[name=device_id]').val();
+            const accountid = $('select[name=account_id]').val();
+            const deviceid = $('select[name=device_id]').val();
 
-            const starttime = $('input[name="datelimit[start]"]').val();
-            const endtime = $('input[name="datelimit[end]"]').val();
+            const start = $('input[name="datelimit[start]"]').val();
+            const end = $('input[name="datelimit[end]"]').val();
 
             let headers = [];
             $('input[name=header]:checked').each(function(){
                 headers.push($(this).val());
             });
 
-            let url = "{php echo $this->createWebUrl('order', array('op' => 'export_do', 'agent_openid' => '__agentid__', 'accountid' => '__accountid__', 'deviceid' => '__deviceid__', 'start' => '__start__', 'end' => '__end__',  'headers'=>'__header__'));}";
-            url = url.replace('__agentid__', agent_openid)
-                .replace('__accountid__', account_id)
-                .replace('__deviceid__', device_id)
-                .replace('__start__', starttime)
-                .replace('__end__', endtime)
-                .replace('__header__', encodeURIComponent(headers.join(',')));
+            const params = {
+                agent_openid,
+                accountid,
+                deviceid,
+                start,
+                end,
+            };
 
-            downloadFile(url, 'order.xls');
+            util.loading();
+            getList(uid(), params, headers);
         })
 
         require(["daterangepicker"], function () {

@@ -394,7 +394,7 @@ if ($op == 'default') {
 } elseif ($op == 'export') {
 
     $all_headers = getHeaders();    
-    unset($all_headers['#'], $all_headers['ID']);
+    unset($all_headers['ID']);
 
     $tpl_data['headers'] = $all_headers;
     $tpl_data['s_date'] = (new DateTime('first day of this month'))->format('Y-m-d');
@@ -483,7 +483,6 @@ if ($op == 'default') {
     } 
 
     array_unshift($headers, 'ID');
-    array_unshift($headers, '#');
 
     $uid = request::trim('uid');
     $ids = request::array('ids');
@@ -504,9 +503,6 @@ if ($op == 'default') {
 
         foreach ($headers as $header) {
             switch ($header) {
-                case '#':
-                    $data[$header] = $index + 1;
-                    break;
                 case 'ID':
                     $data[$header] = $entry->getId();
                     break;
@@ -631,15 +627,7 @@ if ($op == 'default') {
     $column = array_values(array_intersect_key($all_headers, array_flip($headers)));  
     $filename =  "export/{$uid}.xls";
 
-    $locker = Locker::try($uid, 30);
-    if ($locker) {
-        Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
-    } else {
-        Util::logToFile('export', [
-            'error' => 'lock failed',
-            'uid' => $uid,
-        ]);
-    }
+    Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
 
     JSON::success([
         'filename' => Util::toMedia($filename),
@@ -757,7 +745,6 @@ if ($op == 'default') {
 function getHeaders(): array
 {
     return [
-        '#' => '#',
         'ID' => 'ID',
         'order_no' => '订单号',
         'pay_no' => '支付号',

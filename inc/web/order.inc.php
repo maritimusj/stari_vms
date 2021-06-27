@@ -402,6 +402,78 @@ if ($op == 'default') {
 
     app()->showTemplate('web/order/export', $tpl_data);
 
+} elseif ($op == 'export_list') {
+
+    $agent_openid = request::str('agent_openid');
+    $account_id = request::int('accountid');
+    $device_id = request::int('deviceid');
+    $last_id = request::int('lastid');
+
+    $query = Order::query();
+    if ($agent_openid) {
+        $agent = User::get($agent_openid, true);
+        if (empty($agent)) {
+            Util::itoast('找不到指定的代理商！', Util::url('order', ['op' => 'export']), 'error');
+        }
+        $query->where(['agent_id' => $agent->getId()]);
+    }
+
+    if ($account_id) {
+        $account = Account::get($account_id);
+        if (empty($account)) {
+            Util::itoast('找不到指定的公众号！', Util::url('order', ['op' => 'export']), 'error');
+        }
+        $query->where(['account' => $account->getName()]);
+    }
+
+    if ($device_id) {
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            Util::itoast('找不到指定的设备！', Util::url('order', ['op' => 'export']), 'error');
+        }
+        $query->where(['device_id' => $device->getId()]);
+    }
+
+    $date_start = request::str('start');
+    if ($date_start) {
+        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_start . ' 00:00:00');
+    }
+
+    if (empty($s_date)) {
+        $s_date = new DateTime('first day of this month 00:00:00');
+    }
+
+    $date_end = request::str('end');
+    if ($date_end) {
+        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_end . ' 00:00:00');
+    }
+    if (empty($e_date)) {
+        $e_date = new DateTime();
+    }
+
+    $e_date = $e_date->modify('next day 00:00:00');
+
+    $query->where([
+        'createtime >=' => $s_date->getTimestamp(),
+        'createtime <' => $e_date->getTimestamp(),
+    ]);
+
+    if ($last_id > 0) {
+        $query->where(['id >' => $last_id]);
+    }
+
+    $query->orderBy('id DESC');
+    $query->limit(1000);
+
+    $result = $query->findAll([], true);
+    $total = $result->count();
+    $ids = [];
+    for($i = 0; $i < $total; $i ++) {
+        $ids[] = $result[$i]['id'];
+    }
+
+    JSON::success($ids);
+
 } elseif ($op == 'export_do') {
 
     set_time_limit(60);
@@ -448,7 +520,7 @@ if ($op == 'default') {
         $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_start . ' 00:00:00');
     }
 
-    if (!$s_date) {
+    if (empty($s_date)) {
         $s_date = new DateTime('first day of this month 00:00:00');
     }
 
@@ -456,7 +528,7 @@ if ($op == 'default') {
     if ($date_end) {
         $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_end . ' 00:00:00');
     } 
-    if (!$e_date) {
+    if (empty($e_date)) {
         $e_date = new DateTime();
     }
 

@@ -21,7 +21,7 @@ use zovye\model\userModelObj;
  * @method page(int|mixed $page, int $page_size)
  * @method orderBy(string $string)
  * @method groupBy($group_by)
- * @method findAll()
+ * @method findAll($cond = [], $lazy = false)
  * @method findOne($lazy = false)
  * @method exists($condition = [])
  * @method makeSQL($fields, $delete = false)

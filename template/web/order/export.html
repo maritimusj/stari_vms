@@ -89,19 +89,51 @@
 <script>
     function uid() {
         function S4() {
-            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
         }
-        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
-    $(function(){
-        $('#find_agent').click(function(){
+
+    const url = "{php echo $this->createWebUrl('order');}";
+
+    let lastid = 0;
+    let filenames = [];    
+    const q = [];    
+
+    function getList(uid, params, headers) {
+        $.getJSON(url, Object.assign({ op: 'export_list', lastid, uid }, params)).then(res => {
+            if (res && res.status) {
+                if (res.data && res.data.length > 0) {
+                    lastid = Math.max(...res.data);
+                    getList(uid, params, headers);
+                    q.push($.post(url, { op: 'export_update', ids: res.data, uid, headers }).then(res => {
+                        if (filenames.indexOf(res.data.filename) === -1) {
+                            filenames.push(res.data.filename);
+                        }
+                    }));
+                } else {
+                    $.when(...q).then(function () {
+                        filenames.forEach(filename => {
+                            window.location.href = filename;
+                        })
+                        util.loaded();
+                        filenames = [];
+                        lastid = 0;
+                    });
+                }
+            }
+        })
+    }
+
+    $(function () {
+        $('#find_agent').click(function () {
             const keyword = $('input[name=keyword_agent]').val();
             util.loading();
-            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {op:'search', keyword:keyword}, function(res){
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", { op: 'search', keyword: keyword }, function (res) {
                 let html = '';
-                if(res.status) {
+                if (res.status) {
                     const list = res.data || [];
-                    list.forEach(function(e) {
+                    list.forEach(function (e) {
                         html += '<option value="_1*">_2*，手机号码：_3*</option>'
                             .replace('_1*', e.openid)
                             .replace('_2*', e.name)
@@ -111,19 +143,19 @@
                 html += '<option value="0"><不限></option>';
                 $('#select_agent').html(html);
 
-            }, 'json').complete(function(){
+            }, 'json').complete(function () {
                 util.loaded();
             })
         })
 
-        $('#find_account').click(function(){
+        $('#find_account').click(function () {
             const keyword = $('input[name=keyword_account]').val();
             util.loading();
-            $.get("{php echo $this->createWebUrl('account')}", {op:'search', keyword:keyword}, function(res){
+            $.get("{php echo $this->createWebUrl('account')}", { op: 'search', keyword: keyword }, function (res) {
                 let html = '';
-                if(res.status) {
+                if (res.status) {
                     const list = res.data || [];
-                    list.forEach(function(e) {
+                    list.forEach(function (e) {
                         html += '<option value="_1*">公众号：_2*，_3*</option>'
                             .replace('_1*', e.id)
                             .replace('_2*', e.name)
@@ -133,18 +165,19 @@
                 html += '<option value="0"><不限></option>';
                 $('#select_account').html(html);
 
-            }, 'json').complete(function(){
+            }, 'json').complete(function () {
                 util.loaded();
             })
         })
-        $('#find_device').click(function(){
+
+        $('#find_device').click(function () {
             const keyword = $('input[name=keyword_device]').val();
             util.loading();
-            $.get("{php echo $this->createWebUrl('device');}", {op:'search', keyword:keyword}, function(res){
+            $.get("{php echo $this->createWebUrl('device');}", { op: 'search', keyword: keyword }, function (res) {
                 let html = '';
-                if(res.status) {
+                if (res.status) {
                     const list = res.data || [];
-                    list.forEach(function(e) {
+                    list.forEach(function (e) {
                         html += '<option value="_1*">_2*，IMEI：_3*</option>'
                             .replace('_1*', e.id)
                             .replace('_2*', e.name)
@@ -154,42 +187,12 @@
                 html += '<option value="0"><不限></option>';
                 $('#select_device').html(html);
 
-            }, 'json').complete(function(){
+            }, 'json').complete(function () {
                 util.loaded();
             })
         })
 
-        const url = "{php echo $this->createWebUrl('order');}";
-        let lastid = 0;
-        const q = [];
-        const filenames = [];
-        function getList(uid, params, headers) {
-            $.getJSON(url, Object.assign({op: 'export_list', lastid, uid}, params)).then(res => {
-                if (res && res.status) {
-                    if (res.data && res.data.length > 0) {
-                        lastid = Math.max(...res.data);
-                        getList(uid, params, headers);
-                        q.push($.post(url, {op: 'export_update', ids: res.data, uid, headers}).then(res => {
-                            if (filenames.indexOf(res.data.filename) === -1) {
-                                filenames.push(res.data.filename);
-                            }
-                        }));
-                    } else {
-                        $.when(...q).then(function() {                            
-                            filenames.forEach(filename => {
-                                window.location.href = filename;
-                            })
-                            util.loaded();
-                            filenames = [];
-                            lastid = 0;
-                        });
-                    }
-                }
-            })
-        }
-
-
-        $('#export').click(function(){
+        $('#export').click(function () {
             const agent_openid = $('select[name=agent_openid]').val();
             const accountid = $('select[name=account_id]').val();
             const deviceid = $('select[name=device_id]').val();
@@ -198,7 +201,7 @@
             const end = $('input[name="datelimit[end]"]').val();
 
             let headers = [];
-            $('input[name=header]:checked').each(function(){
+            $('input[name=header]:checked').each(function () {
                 headers.push($(this).val());
             });
 

@@ -2196,12 +2196,12 @@ HTML_CONTENT;
         $str_export = '';
 
         if (!file_exists($filename)) {
-            $tab_header = implode("\t", $header);
-            $str_export = $tab_header . "\r\n";
+            $tab_header = implode(",", $header);
+            $str_export = chr(0xEF) . chr(0xBB) . chr(0xBF) . $tab_header . "\r\n";
         }
 
         foreach ($data as $row) {
-            $str_export .= implode("\t", $row) . "\r\n";
+            $str_export .= implode(",", $row) . "\r\n";
         }
 
         return file_put_contents($filename, $str_export, FILE_APPEND);
@@ -2219,10 +2219,10 @@ HTML_CONTENT;
         header('Content-type:application/vnd.ms-excel');
         header('Content-Disposition:filename=' . $filename . '.xls');
 
-        $tab_header = implode("\t", $header);
-        $str_export = $tab_header . "\r\n";
+        $tab_header = implode(",", $header);
+        $str_export = chr(0xEF) . chr(0xBB) . chr(0xBF) . $tab_header . "\r\n";
         foreach ($data as $row) {
-            $str_export .= implode("\t", $row) . "\r\n";
+            $str_export .= implode(",", $row) . "\r\n";
         }
 
         exit($str_export);

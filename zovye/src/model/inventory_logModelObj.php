@@ -20,6 +20,9 @@ class inventory_logModelObj extends modelObj
 	protected $id;
 
 	/** @var int */
+	protected $src_inventory_id;	
+
+	/** @var int */
 	protected $inventory_id;
 
 	/** @var int */

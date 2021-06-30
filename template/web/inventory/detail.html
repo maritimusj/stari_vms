@@ -1,22 +1,66 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+#list img {
+    width: 60px;
+    height: 60px;
+}
+table th,table td {
+        text-align: center;
+}
+</style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">{$title}</a></li>
 </ul>
 <div class="panel panel-default panel-first">
     <div class="heading">
         <span class="operate">
-            <i class="fa fa fa-sign-out" title="出库" data-op='stockOut'></i>
-            <i class="fa fa fa-sign-in" title="入库" data-op='stockIn'></i>
+            <a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}"><i class="fa fa-sign-in" title="入库"></i></a>       
+            <a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockLog', 'user' => $user, 'id' => $id])}"><i class="fa fa-reorder" title="出库入库记录"></i></a>
         </span>
     </div>
     <div class="panel-body">
-
+        {if $list}
+        <table class="table table-bordered" id="list">
+            <thead>
+                <th>#</th>
+                <th>商品图片</th>
+                <th>商品名称</th>
+                <th>当前库存数量</th>
+            </thead>
+            <tbody>
+                {loop $list $index $item}
+                <tr>
+                    <td>
+                        {php echo $index+1}
+                    </td>
+                    <td>
+                        <img src=" {$item['goods']['img']}">
+                    </td>
+                    <td>
+                        {$item['goods']['name']}
+                    </td>
+                    <td>
+                        {$item['num']}
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            暂时还没有任何商品！
+        </div>
+        {/if}
     </div>
 </div>
 <script>
     const api = {
-        url: "{php echo $this->createWebUrl('goods');}",
+        goodsApiUrl: "{php echo $this->createWebUrl('goods');}",
+        url: "{php echo $this->createWebUrl('inventory', ['id' => $id]);}",
         dlg: null,
     }
 
@@ -54,16 +98,8 @@
         }
     }
 
-    api.stockOut = function() {
-        api.showResult({op: 'stockOut', pagesize: 10});
-    }
-
-    api.stockIn = function() {
-        api.showResult({op: 'stockIn', pagesize: 10});
-    }
-
     api.chooseGoods = function() {
-        api.showResult({op: 'goods', pagesize: 10});
+        api.showResult({op: 'goods', pagesize: 10}, goodsApiUrl);
     }
 
     $(function() {
@@ -76,97 +112,5 @@
         })
     })
 </script>
-<script>
-    let backer = "";
-    let agentId = "";
-    $(function(){
-        function reload(url) {
-            api.showResult({}, url);
-        }
-        
-        $('body').on('click', '#search-bar', function () {
-            $(this).hide();
-            $('#search-form').show();
-            $('input[name=s_keywords]').focus();
-        })
 
-        $('body').on('click', '#search-form .btn-close', function (e) {
-            if (backer) {
-                api.chooseGoods();
-            } else {
-                $('#search-form').hide();
-                $('#search-bar').show();
-            }       
-            e.preventDefault();     
-         })
-
-        $('body').on('click', '#search_agent', function () {
-            const keyword = $('#search-form input[name=keyword_agent]').val();console.log(keyword);
-            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
-                op: 'search',
-                keyword: keyword,
-            }, function (res) {
-                let html = '';
-                if (res.status) {
-                    const list = res.data || [];
-                    list.forEach(function (e) {
-                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
-                            .replace('_1*', e.id)
-                            .replace('_2*', e.name)
-                            .replace('_3*', e.mobile)
-                            .replace('_4*', '');
-                    })
-                }
-
-                html += '<option value=""><不限></option><option value="-1"><平台></option>';
-                $('#agent_search_result').html(html);
-
-            }, 'json');
-        })
-
-        function reloadPageWithFilter(fn) {
-            const params = new URLSearchParams();
-
-            const form = $("#search-form form");
-            const s_keywords = $.trim(form.find('input[name=s_keywords]').val());
-            if (s_keywords) {
-                params.append("keywords", s_keywords);
-            }
-            const agentId = $.trim(form.find('select[name=agentId]').val());
-            if (agentId != '') {
-                params.append("agentId", agentId);
-            }
-            if (typeof fn === 'function') {
-                fn(params);
-            }
-
-            params.append("pagesize", 10);
-            
-            reload(form.attr("action") + "&" + encodeURI(params.toString()));
-        }
-
-        $('body').on('submit', "#search-form form", function(e){
-            reloadPageWithFilter();            
-            e.preventDefault();
-        })
-
-        $('body').on('click', 'a[filter]', function (e) {
-            const self = this;
-            reloadPageWithFilter(function (params) {
-                const name = $(self).data('name');
-                const val = $(self).data('val');
-                if (name) {
-                    params.set(name, val);
-                }
-            });
-            e.preventDefault();
-        })
-
-        $('body').on('click', '.pagination li:not(.active) a', function (e) {
-            e.preventDefault();
-            const url = $(this).attr("href");
-            reload(url);
-        })
-    })
-</script>
 {template 'common/footer'}

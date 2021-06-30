@@ -35,7 +35,7 @@
         cursor: pointer;
     }
     #goodslist .goods img {
-        width: 30px;
+        width: 60px;
     }
     #search-form {
         display: none;
@@ -115,7 +115,12 @@
                 </thead>
                 <tbody>
                 {loop $goods_list $index $item}
-                <tr data-goods="{$item['id']}" data-name="{$item['name']}" data-title="{$item['unit_title']}" data-price="{php echo number_format($item['price'] / 100, 2)}">
+                <tr 
+                data-goods="{$item['id']}" 
+                data-name="{$item['name']}" 
+                data-title="{$item['unit_title']}" 
+                data-price="{php echo number_format($item['price'] / 100, 2)}"
+                data-img="{$item['img']}">
                     <td style="width:40px;">
                         <span class="index">
                             {php echo $index + 1}

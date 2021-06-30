@@ -48,23 +48,23 @@ class Inventory
         return self::query($cond)->findOne();
     }
 
-    public static function exists($v, $name = 'default'): bool
+    public static function exists($v): bool
     {
         if (is_array($v)) {
             $cond = $v;
         } elseif (is_string($v)) {
             $cond = ['uid' => $v];
         } elseif ($v instanceof modelObj) {
-            $cond = ['uid' => self::getUID($v, $name)];
+            $cond = ['uid' => self::getUID($v)];
         } else {
             return false;
         }
         return self::query()->exists($cond);
     }
 
-    public static function find($obj, $name = 'default'): ?inventoryModelObj
+    public static function find($obj): ?inventoryModelObj
     {
-        $uid = self::getUID($obj, $name);
+        $uid = self::getUID($obj);
         return self::findOne(['uid' => $uid]);
     }
 
@@ -74,26 +74,32 @@ class Inventory
      * @param string $name
      * @return string
      */
-    public static function getUID(modelObj $obj, $name = 'default'): string
+    public static function getUID(modelObj $obj): string
     {
-        if (empty($name)) {
-            $name = 'default';
-        }
-
         if ($obj instanceof userModelObj) {
-            return "user:{$obj->getId()}:{$name}";
+            return "user:{$obj->getId()}:default";
         }
         if ($obj instanceof deviceModelObj) {
-            return "device:{$obj->getImei()}:{$name}";
+            return "device:{$obj->getImei()}:default";
         }
-        return "obj:{$obj->getId()}:{$name}";
+        return "obj:{$obj->getId()}:default";
     }
 
-
-    public static function for(modelObj $obj, $name = 'default'): ?inventoryModelObj
+    public static function for(modelObj $obj): ?inventoryModelObj
     {
-        if (self::exists($obj, $name)) {
-            return self::find($obj, $name);
+        $inventory = self::find($obj);
+        if ($inventory) {
+            return $inventory;
         }
+        $title = '<未命名>';
+        if ($obj instanceof userModelObj) {
+            $title = "{$obj->getName()}的仓库";
+        } elseif ($obj instanceof deviceModelObj) {
+            $title = "设备:{$obj->getImei()}";
+        }
+        return self::create([
+            'uid' => Inventory::getUID($obj),
+            'title' => $title,
+        ]);
     }
 }

@@ -298,12 +298,8 @@
             <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
             {/if}            
             <li role="separator" class="divider"></li>
-            {if isset($item['inventory'])}
-            {if $item['inventory']}
+            {if \zovye\App::isInventoryEnabled()}
             <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
-            {else}
-            <li><a href="#" data-op="createInventory"><i class="fa fa-archive fa-fw"></i> 创建仓库</a></li>
-            {/if}
             {/if}
             {if $balance_used}
             <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>
@@ -415,11 +411,13 @@
             api.showResult({op: 'reset_mobile', id: userid});
         }
     }
+
     api.resetIDCardVerify = function(userid) {
         if (confirm('确定要清除用户的实名认证信息吗？')) {
             api.showResult({op: 'reset_idcard_verify', id: userid});
         }
     }
+
     api.balanceLog = function(userid) {
         api.showResult({op: 'balance_log', id: userid});
     }
@@ -428,12 +426,8 @@
         api.showResult({op: 'prize', id: userid});
     }
 
-    api.createInventory = function(userid) {
-        api.showResult({op: 'create_inventory', id: userid});
-    }
-
     api.viewInventory = function(userid) {
-        api.showResult({op: 'view_inventory', id: userid});
+        window.location.href = "{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => '__id__']);}".replace('__id__', userid);
     }
 
     api.orderList = function(userid) {
@@ -444,6 +438,7 @@
         api.showResult({id: userid, op: "balance_edit"});
         event.stopPropagation();
     }
+
     api.saveUserBalanceLog = function(userid) {
         const total = $('input[name=total]').val();
         const memo = $('input[name=memo]').val();
@@ -454,7 +449,7 @@
     }
 
     api.getUserStats = function(ids) {
-        $.post(api.url, {op: 'user_stats', ids: ids}).then(function(res){
+        $.post(api.url, {op: 'user_stats', ids}).then(function(res){
             if(res && res.status && $.isArray(res.data)) {
                 $.each(res.data, function(i, stats){
                     const tr = $('tr[data-id=' + stats.id + ']');

@@ -145,10 +145,6 @@ if ($op == 'default') {
             'isLocked' => $user->isLocked(),
         ];
 
-        if (App::isInventoryEnabled()) {
-            $data['inventory'] = Inventory::exists($user);
-        }
-
         if ($credit_used) {
             $data['credit'] = $user->getWe7credit()->total();
         }
@@ -789,39 +785,4 @@ if ($op == 'default') {
 
     JSON::fail('没找到这个用户！');
 
-} elseif ($op == 'create_inventory') {
-
-    $user = User::get(request::int('id'));
-    if (empty($user)) {
-        JSON::fail('找不到这个用户！');
-    }
-
-    if (Inventory::exists($user)) {
-        JSON::fail('仓库已经存在！');
-    }
-
-    $inventory = Inventory::create([
-        'uid' => Inventory::getUID($user),
-        'title' => "{$user->getName()}的仓库",
-    ]);
-
-    if ($inventory) {
-        JSON::success('创建成功！');
-    }
-
-    JSON::fail('创建失败！');
-
-} elseif ($op == 'view_inventory') {
-
-    $user = User::get(request::int('id'));
-    if (empty($user)) {
-        JSON::fail('找不到这个用户！');
-    }
-
-    $inventory = Inventory::find($user);
-    if (empty($inventory)) {
-        JSON::fail('仓库不存在！');
-    }
-
-    JSON::success(['redirect_url' => Util::url('inventory', ['op' => 'detail', 'id' => $inventory->getId()])]);
 }

@@ -1,6 +1,8 @@
 <?php
 namespace zovye;
 
+use RuntimeException;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
@@ -28,15 +30,19 @@ if ($op == 'default') {
         'list' => [],
     ];
 
+    $pager = '';
+
     if ($total > 0) {
         $total_page = ceil($total / $page_size);
         if ($page > $total_page) {
             $page = 1;
         }
 
+        $pager = We7::pagination($total, $page, $page_size);
+
         $inventories['total'] = $total;
         $inventories['page'] = $page;
-        $inventories['totalpage'] = $total_page;
+        $inventories['totalpage'] = $total_page;        
 
         $query->orderBy('id DESC');
         foreach($query->findAll() as $entry) {
@@ -44,8 +50,22 @@ if ($op == 'default') {
         }
     }
 
+    if (request::is_ajax()) {
+        $content = app()->fetchTemplate(
+            'web/inventory/choose',
+            [
+                'pager' => $pager,
+                's_keywords' => $keywords,
+                'list' => $inventories['list'],
+            ]
+        );
+    
+        JSON::success(['title' => "库存列表", 'content' => $content]);
+    }
+
     app()->showTemplate('web/inventory/default', [
         'op' => $op,
+        'pager' => $pager,
         'inventories' => $inventories,
     ]);
 
@@ -138,7 +158,7 @@ if ($op == 'default') {
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
-    $inventory = Inventory::find($user, request::trim('name'));
+    $inventory = Inventory::find($user);
     if (empty($inventory)) {
         JSON::fail('找不到指定的仓库！');
     }
@@ -152,13 +172,169 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $inventory = Inventory::for($user);
+    if (empty($inventory)) {
+        JSON::fail('无法打开该用户的库存数据！');
+    }
+
+    $tpl_data = [
+        'title' => $inventory->getTitle(),
+        'user' => $user->getId(),
+        'id' => $inventory->getId(),
+    ];
+
+    $query = $inventory->query();
+
+    if (request::has('agentId')) {
+        $agent = Agent::get(request::int('agentId'));
+        if (empty($agent)) {
+            JSON::fail('找不到这个代理商！');
+        }
+        $query->where(['agent_id' => $agent->getId()]);
+    }
+
+   //搜索关键字
+   $keywords = request::trim('keywords');
+   if ($keywords) {
+       $query->whereOr([
+           'name LIKE' => "%{$keywords}%",
+       ]);
+   }
+
+   $total = $query->count();
+   $list = [];
+
+   if ($total > 0) {
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+        $total_page = ceil($total / $page_size);
+        if ($page > $total_page) {
+            $page = 1;
+        }
+        
+        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);     
+        
+        $query->page($page, $page_size);
+        $query->orderBy('id ASC');
+
+        foreach($query->findAll() as $entry) {
+            $goods = $entry->getGoods();
+            if ($goods) {
+                    $list[] = [
+                        'goods' => Goods::format($goods, true, true),
+                        'num' => $entry->getNum(),
+                    ];
+            }
+        }        
+   }
+
+   $tpl_data['list'] = $list;
+
+   if (request::is_ajax()) {
+        $content = app()->fetchTemplate('web/inventory/choose', [
+            'list' => $list,
+            'pager' => $tpl_data['pager'],
+            'backer' => $keywords ? true : false,
+        ]);
+
+        JSON::success([
+            'title' => '选择商品',
+            'content' => $content,
+        ]);
+   }
+
+   app()->showTemplate('web/inventory/detail', $tpl_data);
+
+} elseif ($op == 'stockOut') {
+
+    $tpl_data = [];
+    app()->showTemplate('web/inventory/stock_out', $tpl_data);
+
+} elseif ($op == 'stockIn') {
+
+    $id = request::int('id');
+
     $inventory = Inventory::get(request::int('id'));
     if (empty($inventory)) {
         Util::itoast('找不到这个仓库！', '', 'error');
     }
 
     $tpl_data = [
+        'id' => $id,
+        'user' => request::int('user'),
         'title' => $inventory->getTitle(),
     ];
-    app()->showTemplate('web/inventory/detail', $tpl_data);
+    app()->showTemplate('web/inventory/stock_in', $tpl_data);
+
+} elseif ($op == 'saveStockIn') {
+
+    $result = Util::transactionDo(function () {
+        $user = User::get(request::int('userid'));
+        if (empty($user)) {
+            throw new RuntimeException('找不到这个用户！');
+        }
+
+        $inventory = Inventory::for($user);
+        if (empty($inventory)) {
+            throw new RuntimeException('找不到用户的仓库！');
+        }
+
+        $user_ids = request::array('user');
+        $goods_ids = request::array('goods');
+        $num_arr = request::array('num');
+
+        $logs = [];
+
+        foreach ($goods_ids as $index => $goods_id) {
+            if (empty($goods_id)) {
+                continue;
+            }
+            $goods = Goods::get($goods_id);
+            if (empty($goods)) {
+                throw new RuntimeException('找不到这个商品！');
+            }
+            $num = isset($num_arr[$index]) ? intval($num_arr[$index]) : 0;
+            if ($num <= 0) {
+                continue;
+            }
+
+            $src_inventory = null;
+            $user_id = isset($user_ids[$index]) ? intval($user_ids[$index]) : 0;
+            if (!empty($user_id)) {
+                $from = User::get($user_id);
+                if (empty($from)) {
+                    throw new RuntimeException('找不到源用户！');
+                }
+                $src_inventory = Inventory::for($from);
+                if (empty($src_inventory)) {
+                    throw new RuntimeException('找不到源用户仓库！');
+                }
+            }
+            $log = $inventory->stock($src_inventory, $goods, $num, [
+                'memo' => '管理员后台入库',
+                'serial' => REQUEST_ID,
+            ]);
+            if (!$log) {
+                throw new RuntimeException('入库失败！');
+            }
+            $logs[] = $log;
+        }
+
+        return $logs;
+    });
+
+    if (is_error($result)) {
+        JSON::fail($result['message']);
+    }
+
+    if (empty($result)) {
+        JSON::fail('没有指定商品或者商品数量！');
+    }
+    JSON::success('入库成功！');
 }

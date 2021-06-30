@@ -6,9 +6,11 @@
 namespace zovye\model;
 
 use zovye\User;
+use zovye\Inventory;
 use function zovye\tb;
 use zovye\base\modelObj;
-use zovye\Inventory;
+use zovye\InventoryGoods;
+use zovye\InventoryLog;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class inventoryModelObj extends modelObj
@@ -71,4 +73,70 @@ class inventoryModelObj extends modelObj
 		}
 		return $data;
 	}
+
+	public function query($cond = [])
+	{
+		$cond['inventory_id'] = $this->id;
+		return InventoryGoods::query($cond);
+	}
+
+	public function stock($src_inventory, $goods, $num, $extra = null): ?inventory_logModelObj
+	{
+		if ($src_inventory instanceof inventoryModelObj) {
+			$src_inventory_id = $src_inventory->getId();
+		} elseif (is_int($src_inventory)) {
+			$src_inventory_id = $src_inventory;
+		} elseif (empty($src_inventory)) {
+			$src_inventory_id = 0;
+		} else {
+			return null;
+		}
+
+		if ($goods instanceof goodsModelObj) {
+			$goods_id = $goods->getId();
+		} elseif (is_int($goods)) {
+			$goods_id = $goods;
+		} elseif (is_array($goods) && !empty($goods['id'])) {
+			$goods_id = intval($goods['id']);
+		} else {
+			return null;
+		}
+
+		if ($num == 0) {
+			return null;
+		}
+
+		$inventory_goods = InventoryGoods::findOne([
+			'inventory_id' => $this->id,
+			'goods_id' => $goods_id,			
+		]);
+		if ($inventory_goods) {
+			$inventory_goods->setNum($inventory_goods->getNum() + $num);
+			if (!$inventory_goods->save()) {
+				return null;
+			}
+		} else {
+			if (!InventoryGoods::create([
+				'inventory_id' => $this->id,
+				'goods_id' => $goods_id,
+				'num' => $num,
+			])) {
+				return null;
+			}
+		}
+
+		$log_data = [
+			'src_inventory_id' => $src_inventory_id,
+			'inventory_id' => $this->id,
+			'goods_id' => $goods_id,
+			'num' => intval($num),
+		];
+
+		if (isset($extra)) {
+			$log_data['extra'] = $extra;
+		}
+
+		return InventoryLog::create($log_data);
+	}
+
 }

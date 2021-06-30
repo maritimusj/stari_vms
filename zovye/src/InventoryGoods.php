@@ -5,12 +5,13 @@ namespace zovye;
 
 
 use zovye\base\modelObjFinder;
+use zovye\model\inventory_goodsModelObj;
 use zovye\model\inventoryModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class InventoryGoods
 {
-    public function create($data = []): ?inventoryModelObj
+    public static function create($data = []): ?inventory_goodsModelObj
     {
         /** @var ExtraDataGettersAndSetters $classname */
         $classname = m('inventory_goods')->objClassname();
@@ -30,9 +31,9 @@ class InventoryGoods
 
     /**
      * @param $cond
-     * @return inventoryModelObj|null
+     * @return inventory_goodsModelObj|null
      */
-    public static function findOne($cond): ?inventoryModelObj
+    public static function findOne($cond): ?inventory_goodsModelObj
     {
         return self::query($cond)->findOne();
     }

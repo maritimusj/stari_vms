@@ -5,9 +5,11 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
-use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\Goods;
 use function zovye\tb;
+use zovye\base\modelObj;
+use zovye\Inventory;
+use zovye\traits\ExtraDataGettersAndSetters;
 
 class inventory_logModelObj extends modelObj
 {
@@ -37,4 +39,15 @@ class inventory_logModelObj extends modelObj
 	protected $createtime;
 
 	use ExtraDataGettersAndSetters;
+
+	public function getGoods()
+	{
+		return Goods::get($this->goods_id);
+	}
+
+	public function getSrcInventory()
+	{
+		return Inventory::get($this->src_inventory_id);
+	}
+	
 }

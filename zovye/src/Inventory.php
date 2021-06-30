@@ -92,14 +92,20 @@ class Inventory
             return $inventory;
         }
         $title = '<未命名>';
+        $extra = [];
         if ($obj instanceof userModelObj) {
-            $title = "{$obj->getName()}的仓库";
+            $title = "{$obj->getName()}";
+            $extra = ['user' => $obj->profile()];
         } elseif ($obj instanceof deviceModelObj) {
-            $title = "设备:{$obj->getImei()}";
+            $title = "{$obj->getImei()}";
+            $extra = ['device' => $obj->profile()];
+        } else {
+            return null;
         }
         return self::create([
             'uid' => Inventory::getUID($obj),
             'title' => $title,
+            'extra' => $extra,
         ]);
     }
 }

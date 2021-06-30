@@ -1,22 +1,36 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
 <style>
-#list img {
+#list img, .goods img {
     width: 60px;
     height: 60px;
 }
 table th,table td {
-        text-align: center;
+    text-align: center;
+}
+.total {
+    position: relative;
+}
+.change {
+    position: relative;
+    top: -6px;
+}
+.change.in {
+    color: green;
+}
+.change.out {
+    color: red;
 }
 </style>
 <ul class="nav nav-tabs" id="navbar">
-    <li role="presentation" class="active"><a href="#">{$title}</a></li>
+    <li role="presentation" class="active"><a href="#"><b>{$title}</b>的库存</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockLog', 'id' => $user])}">变动记录</a></li>
 </ul>
 <div class="panel panel-default panel-first">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}"><i class="fa fa-sign-in" title="入库"></i></a>       
-            <a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockLog', 'user' => $user, 'id' => $id])}"><i class="fa fa-reorder" title="出库入库记录"></i></a>
+            <a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}"><i class="fa fa-sign-in" title="入库"></i></a>
+            <a href="{php echo $this->createWebUrl('user')}"><i class="fa fa-reply" title="返回"></i></a>
         </span>
     </div>
     <div class="panel-body">
@@ -27,10 +41,11 @@ table th,table td {
                 <th>商品图片</th>
                 <th>商品名称</th>
                 <th>当前库存数量</th>
+                <th>操作</th>
             </thead>
             <tbody>
                 {loop $list $index $item}
-                <tr>
+                <tr data-id="{$item['goods']['id']}">
                     <td>
                         {php echo $index+1}
                     </td>
@@ -40,8 +55,12 @@ table th,table td {
                     <td>
                         {$item['goods']['name']}
                     </td>
-                    <td>
-                        {$item['num']}
+                    <td class="total">
+                        <span class="num">{$item['num']}</span> <span class="change"></span>
+                    </td>
+                    <td class="operate">
+                        <i class="fa fa-edit fa-fw" title="修改库存" data-op="edit"></i>
+                        <i class="fa fa-trash fa-fw" title="删除商品" data-op="remove"></i>
                     </td>
                 </tr>
                 {/loop}
@@ -98,8 +117,30 @@ table th,table td {
         }
     }
 
-    api.chooseGoods = function() {
-        api.showResult({op: 'goods', pagesize: 10}, goodsApiUrl);
+    api.edit = function(goods, self) {
+        api.showResult({op: 'editGoods', goods});
+    }
+
+    api.remove = function(goods, self) {
+        if (confirm("确定要删除这个商品吗？")) {
+            api.showResult({op: 'removeGoods', goods}, '', false, (res) => {
+                if (res && res.status) {
+                    console.log($(self));
+                    self.closest('tr').remove();
+                }
+            });
+        }        
+    }
+
+    api.saveGoodsNum = function(goods, event) {
+        const num = $('input[name=goodsNum]').val();
+        api.showResult({op: 'saveGoodsNum', goods, num}, '', false, (res) => {
+            if (res && res.status) {
+                const tr = $('#list [data-id=' + goods + ']');
+                tr.find('.num').text(num);
+                tr.find('.change').removeClass("in out").addClass(res.data.num > 0 ? 'in' : 'out').text(res.data.num);
+            }
+        });
     }
 
     $(function() {
@@ -107,7 +148,8 @@ table th,table td {
             e.preventDefault();
             const op = $(this).data('op');
             if (op && api[op]) {
-                api[op](e);
+                const goods = $(this).closest('tr').data('id');
+                api[op](goods, $(this));
             }
         })
     })

@@ -27,11 +27,11 @@
         align-content: center;
         align-items: center;
     }
-    .inventory i.fa-trash {
+    .inventory i.fa-trash, .inventory i.fa-ban {
         margin-left: 1em;
         visibility: hidden;
     }
-    .inventory:hover i.fa-trash {
+    .inventory:hover i.fa-trash, .inventory:hover i.fa-ban {
         visibility: visible;
     }
     #list .goods {
@@ -93,7 +93,7 @@
                                             <img :src="e.user.avatar">
                                             <span>{{e.user.nickname}}</span>
                                         </div>
-                                        <i class="fa fa-trash" title="清除" @click="cleanInventory(e)"></i>
+                                        <i class="fa fa-ban" title="清除" @click="cleanInventory(e)"></i>
                                     </template>
                                     <span class="platform gray" @click="chooseInventory(e)" v-else>&lt;平台&gt;</span>
                                 </div>
@@ -132,7 +132,7 @@
                     </button>
                 </div>
                 <div class="pull-right">
-                    <button type="button" class="btn btn-primary" @click="save">
+                    <button type="button" class="btn btn-primary" @click="save" :class ="{'disabled': !isReady}">
                         <i class="fa fa-sign-in"></i> 入库
                     </button>
                 </div>
@@ -155,7 +155,7 @@
             <div>
                 <table class="table table-bordered" id="logs">
                     <tbody>
-                        <tr v-for="(log,index) in logs" :key="log.goods.id">
+                        <tr v-for="(log,index) in logs" :key="log.goods && log.goods.id">
                             <td>
                                 {{index + 1}}
                             </td>
@@ -236,13 +236,13 @@
 
     api.chooseGoods = function(user) {
         if (user) {
-            api.showResult({op: 'detail', id: user.id, pagesize: 2});
+            api.showResult({op: 'detail', id: user.id, pagesize: 10});
         } else {
             api.showResult({op: 'goods', pagesize: 10}, api.goodsApiUrl);
         }        
     }
 
-    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+    require(['jquery', 'util', '{php \zovye\url(false, JS_VUE_URL);}'], function($, util, Vue) {
         const app = new Vue({
             el: "#app",
             data: {
@@ -250,16 +250,23 @@
                 logs: [],
                 current: null,
             },
+            computed: {
+                isReady () {
+                    return this.list.some(e => e.goods && e.goods.id > 0 && e.num > 0);
+                }
+            },
             mounted() {
                 const self = this;
-
                 self.addEntry();
-
                 searchDlg.init('user', function(user, e){
-                    if(user && user.id) {                       
-                        if (e.user == null || e.user.id != user.id) {
-                            Vue.set(e, 'user', user);
-                            Vue.set(e, 'goods', null);                            
+                    if(user && user.id) {
+                        if (user.id !== api.userid) {
+                            if (e.user == null || e.user.id != user.id) {
+                                Vue.set(e, 'user', user);
+                                Vue.set(e, 'goods', null);                            
+                            }
+                        } else {
+                            util.message('来源仓库不能是当前用户！', '', 'error');
                         }
                     }
                 })
@@ -306,14 +313,20 @@
                     const user = [];
                     const goods = [];
                     const num = [];
-                    this.list.forEach(e => {                        
-                        user.push(e.user ? e.user.id : 0);
-                        goods.push(e.goods ? e.goods.id : 0);
-                        num.push(e.num > 0 ? e.num : 0);
+                    this.list.forEach(e => { 
+                        if (e.goods) {
+                            user.push(e.user ? e.user.id : 0);
+                            goods.push(e.goods ? e.goods.id : 0);
+                            num.push(e.num > 0 ? e.num : 0);                            
+                        }
                     })
                     api.showResult({op: 'saveStockIn', userid: api.userid, user, goods, num}, '', false, (res) => {
                         if (res && res.status) {
-                            this.logs.unshift(...this.list);
+                            this.list.forEach(e => {
+                                if (e.goods) {
+                                    this.logs.unshift(e);
+                                }                                
+                            });
                             this.list = [];
                             this.addEntry();
                         }

@@ -1,0 +1,106 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    table thead th,table tr td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .goods img {
+        width: 60px;
+        height: 60px;
+    }
+    .inventory {
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+    }
+    tr.item {
+        border-left: 4px solid #ccc;
+    }
+    .stock.out {
+        color: red;
+    }
+    .stock.in {
+        color: green;
+    }
+    .stock.in:before {
+        content: '+';
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => $user])}"><b>{$title}</b>的库存</a></li>
+    <li role="presentation"class="active"><a href="#">变动记录</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+        <span class="operate">  
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table table-bordered">
+            <thead>
+                <th>#</th>
+                <th>来源</th>
+                <th>商品图片</th>
+                <th>商品名称</th>
+                <th>数量</th>
+                <th>备注</th>
+                <th>时间</th>
+            </thead>
+            <tbody>
+                {loop $list $index $e}
+                <tr class="item" style="border-left-color: {$e['clr']};">
+                    <td>
+                        {php echo $index + 1}
+                    </td>
+                    <td>
+                        <div class="inventory">
+                            {if $e['src']}
+                            <div title="{$e['src']['title']}">
+                                {if $e['src']['user']}
+                                <div class="profile">
+                                    <img src="{$e['src']['user']['headimgurl']}">
+                                    <span>{$e['src']['user']['name']}</span>
+                                </div>
+                                {else}
+                                {$e['src']['title']}
+                                {/if}
+                            </div>
+                            {else}
+                                <span class="text-muted">&lt;平台&gt;</span>
+                            {/if}                            
+                        </div>
+                    </td>
+                    <td class="goods">
+                        <img src="{$e['goods']['img']}">
+                    </td>
+                    <td>
+                        <span>{$e['goods']['name']}</span>
+                    </td>
+                    <td>
+                        <span class="stock {if $e['num'] < 0}out{else}in{/if}">{$e['num']}</span>
+                    </td>
+                    <td>
+                        {$e['memo']}
+                    </td>
+                    <td>
+                        <span>{$e['createtime_formatted']}</span>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            暂时还没有任何库存数据！
+        </div>
+        {/if}
+    </div>
+</div>
+
+{template 'common/footer'}

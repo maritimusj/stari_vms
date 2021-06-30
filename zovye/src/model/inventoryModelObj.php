@@ -6,11 +6,12 @@
 namespace zovye\model;
 
 use zovye\User;
+use zovye\Locker;
 use zovye\Inventory;
 use function zovye\tb;
+use zovye\InventoryLog;
 use zovye\base\modelObj;
 use zovye\InventoryGoods;
-use zovye\InventoryLog;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class inventoryModelObj extends modelObj
@@ -79,6 +80,21 @@ class inventoryModelObj extends modelObj
 		$cond['inventory_id'] = $this->id;
 		return InventoryGoods::query($cond);
 	}
+
+	public function logQuery()
+	{
+		return InventoryLog::query(['inventory_id' => $this->id]);
+	}
+
+    /**
+     * 锁定
+     * @param string $name
+     * @return lockerModelObj|null
+     */
+    public function acquireLocker(): ?lockerModelObj
+    {
+        return Locker::try("inventory:{$this->getId()}:default", 6);
+    }
 
 	public function stock($src_inventory, $goods, $num, $extra = null): ?inventory_logModelObj
 	{

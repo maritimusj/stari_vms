@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\We7;
 
 use function zovye\tb;
 
@@ -38,6 +39,9 @@ class lockerModelObj extends modelObj
     protected $available;
 
     /** @var int */
+    protected $used;
+
+    /** @var int */
     protected $createtime;
 
     public static function getTableName($readOrWrite): string
@@ -50,14 +54,34 @@ class lockerModelObj extends modelObj
         return $this->expired_at > 0 && time() > $this->expired_at;
     }
 
+    public function release(): bool
+    {
+        if ($this->request_id === REQUEST_ID) {
+            if  (--$this->used > 0) {                
+                $tbname = We7::tablename(lockerModelObj::getTableName(true));
+                $res = We7::pdo_query('UPDATE '. $tbname . ' SET used=used-1 WHERE id=:id AND request_id=:request_id', [
+                    ':id' => $this->id,
+                    ':request_id' => REQUEST_ID,
+                ]);
+                if ($res > 0) {                    
+                    return true;
+                }
+            } else {
+                return $this->destroy();
+            }                 
+        }
+
+        return false;
+    }
+
     public function reenter(): bool
     {
-        if ($this->request_id === REQUEST_ID && $this->available > 0 && !$this->isExpired()) {
+        if ($this->request_id === REQUEST_ID && $this->used < $this->available && !$this->isExpired()) {
             $condition = [
                 'request_id' => REQUEST_ID,
-                'available' => $this->available,
+                'used' => $this->used,
             ];
-            $this->setAvailable($this->available - 1);
+            $this->setUsed($this->used + 1);
             return $this->saveWhen($condition);
         }
         return false;
@@ -65,6 +89,6 @@ class lockerModelObj extends modelObj
 
     public function unlock(): bool
     {
-        return $this->destroy();
+        return $this->release();
     }
 }

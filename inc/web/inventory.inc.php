@@ -311,6 +311,7 @@ if ($op == 'default') {
             }
             $data['memo'] = $entry->getExtraData('memo');
             $data['clr'] = $entry->getExtraData('clr');
+            $data['serial'] = $entry->getExtraData('serial');
             $list[] = $data;
         }
     }
@@ -351,7 +352,7 @@ if ($op == 'default') {
         JSON::fail('锁定仓库失败！');
     }
 
-    $result = Util::transactionDo(function () use ($inventory) {
+    $result = Util::transactionDo(function () use ($inventory, $user) {
 
         $user_ids = request::array('user');
         $goods_ids = request::array('goods');
@@ -384,8 +385,17 @@ if ($op == 'default') {
                 if (empty($src_inventory)) {
                     throw new RuntimeException('找不到源用户仓库！');
                 }
-                if (!$src_inventory->acquireLocker()) {
+                $l = $src_inventory->acquireLocker();
+                if (empty($l)) {
                     throw new RuntimeException('锁定源仓库失败！');
+                }
+                $log = $src_inventory->stock($inventory, $goods, -$num, [
+                    'memo' => '管理员后台调货',
+                    'clr' => $clr,
+                    'serial' => REQUEST_ID,
+                ]);
+                if (!$log) {
+                    throw new RuntimeException('调货失败！');
                 }
             }
 

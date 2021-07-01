@@ -43,11 +43,13 @@ class Locker
 
     protected static function registerLockerDestroy(lockerModelObj $locker)
     {
-        if ($locker->getAvailable() <= 0) {
-            register_shutdown_function(function () use ($locker) {
-                $locker->destroy();
-            });
-        }
+        $id = $locker->getId();
+        register_shutdown_function(function () use ($id) {
+            $locker = self::get($id);
+            if ($locker) {
+                $locker->release();
+            }
+        });
     }
 
     /**
@@ -77,11 +79,11 @@ class Locker
 
         $locker = self::create([
             'uid' => $uid,
-            'request_id' => $available > 0 ? REQUEST_ID : Util::generateUID(),
-            'available' => max(0, $available - 1),
+            'request_id' => REQUEST_ID,
+            'available' => max(1, $available),
+            'used' => 1,
             'expired_at' => $expire_seconds > 0 ? time() + $expire_seconds : 0,
         ]);
-
         if ($locker) {
             self::registerLockerDestroy($locker);
         }

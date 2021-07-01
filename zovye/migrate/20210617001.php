@@ -15,7 +15,7 @@ CREATE TABLE `ims_zovye_vms_locker` (
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     UNIQUE (`uid`), 
-    UNIQUE (`request_id`)
+    INDEX (`request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);

@@ -190,10 +190,13 @@ class Util
 
     protected static function getAliUserSex($gender)
     {
-        switch($gender) {
-            case 'm': return 1;
-            case 'f': return 2;
-            default: return 0;
+        switch ($gender) {
+            case 'm':
+                return 1;
+            case 'f':
+                return 2;
+            default:
+                return 0;
         }
     }
 
@@ -256,7 +259,7 @@ class Util
                     $user->set('fromData', $params['from']);
                 }
             }
-            
+
             if ($user) {
                 $user->setNickname($nick_name);
                 $user->setAvatar($avatar);
@@ -265,11 +268,10 @@ class Util
                     'city' => $result->alipay_user_info_share_response->city,
                     'sex' => self::getAliuserSex($result->alipay_user_info_share_response->gender),
                 ]);
-                $user->save();                
+                $user->save();
             }
 
             return $user;
-
         } catch (Exception $e) {
             Util::logToFile('error', [
                 'msg' => '获取阿里用户身份失败！',
@@ -305,23 +307,46 @@ class Util
         return $log_dir . DIRECTORY_SEPARATOR . date('Ymd') . '.log';
     }
 
+    public static function deleteExpiredLogFiles(string $name, $keep_days = 3)
+    {
+        $files = [];
+        $patten = self::logDir($name) . '/*.log';
+        foreach (glob($patten) as $filename) {
+            if (is_file($filename)) {
+                $files[basename($filename, '.log')] = $filename;
+            }
+        }
+        $date = new DateTime();
+        do {
+            unset($files[$date->format('Ymd')]);
+            $date->modify('-1 day');
+        } while (--$keep_days > 0);
+
+        foreach ($files as $filename) {
+            unlink($filename);
+        }
+    }
+
     /**
      * 输出指定变量到文件中
      * @param string $name 日志名称
      * @param mixed $data 数据
      * @return bool
      */
-    
+
     static $log_cache = [];
 
     public static function logToFile(string $name, $data): bool
     {
         if (empty(self::$log_cache)) {
-            register_shutdown_function(function () {
+            register_shutdown_function(function () use ($name) {
                 foreach (self::$log_cache as $filename => $data) {
                     if ($filename && $data) {
                         file_put_contents($filename, $data, FILE_APPEND);
                     }
+                }
+                if (random_int(0, 10) == 10) {
+                    self::deleteExpiredLogFiles($name);
                 }
             });
         }
@@ -334,9 +359,9 @@ class Util
 
         echo PHP_EOL;
 
-        $log_filename = self::logFileName($name);       
-         
-        self::$log_cache[$log_filename][] = ob_get_clean(); 
+        $log_filename = self::logFileName($name);
+
+        self::$log_cache[$log_filename][] = ob_get_clean();
 
         return true;
     }
@@ -889,7 +914,7 @@ include './index.php';
 </script>
 JS1;
         } elseif (Util::isAliAppContainer()) {
-$js =<<<JS2
+            $js = <<<JS2
 <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
 <script>
 const url = "{$redirect}";
@@ -1590,7 +1615,7 @@ HTML_CONTENT;
                 $order_data['order_id'] = $args['orderId'];
             } else {
                 $no_str = Util::random(32);
-                $order_data['order_id'] = substr("U{$user->getId()}D{$device->getId()}{$no_str }", 0, MAX_ORDER_NO_LEN);
+                $order_data['order_id'] = substr("U{$user->getId()}D{$device->getId()}{$no_str}", 0, MAX_ORDER_NO_LEN);
             }
 
             if ($voucher) {
@@ -1680,7 +1705,6 @@ HTML_CONTENT;
                     //退款任务
                     Job::refund($order->getOrderNO(), $res['message']);
                 }
-
             } else {
                 $order->setResultCode(0);
 
@@ -2413,9 +2437,9 @@ HTML_CONTENT;
 
         if (empty($params[CURLOPT_USERAGENT])) {
             $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
-        }      
+        }
 
-        foreach($params as $index => $val) {
+        foreach ($params as $index => $val) {
             curl_setopt($ch, $index, $val);
         }
 
@@ -2466,9 +2490,9 @@ HTML_CONTENT;
 
         if (empty($params[CURLOPT_USERAGENT])) {
             $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
-        }      
+        }
 
-        foreach($params as $index => $val) {
+        foreach ($params as $index => $val) {
             curl_setopt($ch, $index, $val);
         }
 

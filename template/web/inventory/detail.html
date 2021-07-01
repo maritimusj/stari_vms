@@ -133,7 +133,13 @@ table th,table td {
     }
 
     api.saveGoodsNum = function(goods, event) {
-        const num = $('input[name=goodsNum]').val();
+        const inputCtrl = $('input[name=goodsNum]');
+        const num = parseInt(inputCtrl.val());
+        const org = parseInt(inputCtrl.data('num'));
+        if (num === org) {
+            inputCtrl.focus();
+            return;
+        }
         api.showResult({op: 'saveGoodsNum', goods, num}, '', false, (res) => {
             if (res && res.status) {
                 const tr = $('#list [data-id=' + goods + ']');

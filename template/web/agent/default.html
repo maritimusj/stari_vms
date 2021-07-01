@@ -159,7 +159,9 @@
                                 <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
                                 <li role="separator" class="divider"></li>                                
                                 <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-cube fa-fw"></i> 他的设备</a></li>
+                                {if \zovye\App::isInventoryEnabled()}
                                 <li><a href="{php echo $this->createWebUrl('inventory', array('op' => 'detail', 'id'=>$agent['id']));}"> <i class="fa fa-archive fa-fw"></i> 他的库存</a></li>
+                                {/if}
                                 <li><a href="{php echo $this->createWebUrl('order', array('agent_openid'=>$agent['openid']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的订单</a></li>
                                 <li><a href="{php echo $this->createWebUrl('account', array('agentId'=>$agent['id']));}"> <i class="fa fa-weixin fa-fw"></i> 他的吸粉广告</a></li>
                                 <li role="separator" class="divider"></li>

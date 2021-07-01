@@ -73,7 +73,13 @@
                                 {/if}
                             </div>
                             {else}
-                                <span class="text-muted">&lt;平台&gt;</span>
+                                <span class="text-muted">
+                                    {if $e['extra']['device']}
+                                    &lt;设备: {$e['extra']['device']['name']}&gt;
+                                    {else}
+                                    &lt;平台&gt;
+                                    {/if}
+                                </span>
                             {/if}                            
                         </div>
                         {else}
@@ -95,7 +101,13 @@
                                 {/if}
                             </div>
                             {else}
-                                <span class="text-muted">&lt;平台&gt;</span>
+                            <span class="text-muted">
+                                {if $e['extra']['device']}
+                                &lt;设备: {$e['extra']['device']['name']}&gt;
+                                {else}
+                                &lt;平台&gt;
+                                {/if}
+                            </span>
                             {/if}                            
                         </div>
                         {else}

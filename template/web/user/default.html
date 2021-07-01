@@ -292,11 +292,7 @@
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的测试员身份吗？')){return false;}"><i class="wi wi-system-info fa-fw"></i> 取消测试员身份</a></li>
             {else}
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'create', 'id'=>$item['id']));}"><i class="wi wi-system-info fa-fw"></i> 设置测试员</a></li>
-            {/if}
-            {if empty($item['isAgent']) && empty($item['isPartner']) && $item['mobile']}
-            <li role="separator" class="divider"></li>
-            <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
-            {/if}            
+            {/if}          
             <li role="separator" class="divider"></li>
             {if \zovye\App::isInventoryEnabled()}
             <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
@@ -309,10 +305,14 @@
             {if $prize_used}
             <li><a href="#" data-op="giftLog"><i class="fa fa-gift fa-fw"></i> 奖品列表</a></li>
             {/if}
+            {if empty($item['isAgent']) && empty($item['isPartner']) && empty($item['isKeeper']) && $item['mobile']}
+            <li role="separator" class="divider"></li>
+            <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
+            {/if}
             {if $item['verified']}
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetIDCardVerify"><i class="fa fa-bookmark fa-fw"></i> 清除实名认证</a></li>
-            {/if}
+            {/if} 
         </ul>
     </div>
 </td>

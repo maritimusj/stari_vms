@@ -309,9 +309,7 @@ if ($op == 'default') {
             if ($goods) {
                 $data['goods'] = Goods::format($goods, true, true);
             }
-            $data['memo'] = $entry->getExtraData('memo');
-            $data['clr'] = $entry->getExtraData('clr');
-            $data['serial'] = $entry->getExtraData('serial');
+            $data['extra'] = $entry->getExtraData();
             $list[] = $data;
         }
     }

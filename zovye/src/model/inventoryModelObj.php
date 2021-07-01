@@ -96,7 +96,7 @@ class inventoryModelObj extends modelObj
         return Locker::try("inventory:{$this->getId()}:default", 0, 6, 9999);
     }
 
-	public function stock($src_inventory, $goods, $num, $extra = null): ?inventory_logModelObj
+	public function stock($src_inventory, $goods, int $num, array $extra = []): ?inventory_logModelObj
 	{
 		if ($src_inventory instanceof inventoryModelObj) {
 			$src_inventory_id = $src_inventory->getId();
@@ -127,30 +127,32 @@ class inventoryModelObj extends modelObj
 			'goods_id' => $goods_id,			
 		]);
 		if ($inventory_goods) {
+			$extra['before'] = $inventory_goods->getNum();
 			$inventory_goods->setNum($inventory_goods->getNum() + $num);
 			if (!$inventory_goods->save()) {
 				return null;
 			}
 		} else {
-			if (!InventoryGoods::create([
+			$extra['before'] = 0;
+			$inventory_goods = InventoryGoods::create([
 				'inventory_id' => $this->id,
 				'goods_id' => $goods_id,
 				'num' => $num,
-			])) {
+			]);
+			if (empty($inventory_goods)) {
 				return null;
 			}
 		}
+
+		$extra['after'] = $inventory_goods->getNum();
 
 		$log_data = [
 			'src_inventory_id' => $src_inventory_id,
 			'inventory_id' => $this->id,
 			'goods_id' => $goods_id,
 			'num' => intval($num),
+			'extra' => $extra,
 		];
-
-		if (isset($extra)) {
-			$log_data['extra'] = $extra;
-		}
 
 		return InventoryLog::create($log_data);
 	}

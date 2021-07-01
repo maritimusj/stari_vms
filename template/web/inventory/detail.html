@@ -139,6 +139,7 @@ table th,table td {
                 const tr = $('#list [data-id=' + goods + ']');
                 tr.find('.num').text(num);
                 tr.find('.change').removeClass("in out").addClass(res.data.num > 0 ? 'in' : 'out').text(res.data.num);
+                $('#modal-message').modal('hide');
             }
         });
     }

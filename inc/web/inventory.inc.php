@@ -520,7 +520,7 @@ if ($op == 'default') {
     $result = Util::transactionDo(function () use ($inventory, $goods) {
         $clr = Util::randColor();
 
-        if ($goods->getNum() > 0) {
+        if ($goods->getNum() != 0) {
             $log = $inventory->stock(null, $goods->getGoods(), 0 - $goods->getNum(), [
                 'memo' => '管理员删除商品库存',
                 'clr' => $clr,

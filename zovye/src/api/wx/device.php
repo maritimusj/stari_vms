@@ -285,7 +285,7 @@ class device
 
             if (App::isInventoryEnabled()) {
                 $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
-                $v = Inventory::syncDevicePayloadLog($user, $device, $res, '代理商补货');
+                $v = Inventory::syncDevicePayloadLog($user, $device, $res, $user->isKeeper() ? '营运人员补货' : '代理商补货');
                 if (is_error($v)) {
                     return $v;
                 }

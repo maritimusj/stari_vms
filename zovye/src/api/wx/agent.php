@@ -820,6 +820,14 @@ class agent
             return error(State::ERROR, '保存库存失败！');
         }
 
+        if (App::isInventoryEnabled()) {
+            $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
+            $v = Inventory::syncDevicePayloadLog($user, $device, $res, '代理商补货');
+            if (is_error($v)) {
+                return $v;
+            }
+        }
+
         $locker->unlock();
 
         $device->updateRemain();

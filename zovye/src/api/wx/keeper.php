@@ -866,8 +866,9 @@ class keeper
         };
 
         if (request::isset('lane')) {
+            $num = request::int('num');
             $data = [
-                request::int('lane') => '@' . request::int('num'),
+                request::int('lane') => $num != 0 ? '@' . $num :  0,
             ];
         } else {
             $data = [];

@@ -122,7 +122,7 @@ class Inventory
                 if (!$goods_lack) {
                     $goods = $inventory->getGoods($entry['goodsId']);
                     if (empty($goods) || $goods->getNum() < $entry['num']) {
-                        return error(State::ERROR, '仓库商品库存不足！');
+                        return error(State::ERROR, '用户仓库商品库存不足！');
                     }
                 }
             }

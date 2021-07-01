@@ -109,6 +109,10 @@ class inventoryModelObj extends modelObj
 
 	public function stock($src_inventory, $goods, int $num, array $extra = []): ?inventory_logModelObj
 	{
+		if ($num == 0) {
+			return null;
+		}
+
 		if ($src_inventory instanceof inventoryModelObj) {
 			$src_inventory_id = $src_inventory->getId();
 		} elseif (is_int($src_inventory)) {
@@ -129,14 +133,11 @@ class inventoryModelObj extends modelObj
 			return null;
 		}
 
-		if ($num == 0) {
-			return null;
-		}
-
 		$inventory_goods = InventoryGoods::findOne([
 			'inventory_id' => $this->id,
 			'goods_id' => $goods_id,			
 		]);
+		
 		if ($inventory_goods) {
 			$extra['before'] = $inventory_goods->getNum();
 			$inventory_goods->setNum($inventory_goods->getNum() + $num);

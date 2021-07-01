@@ -354,7 +354,7 @@ if ($op == 'default') {
         JSON::fail('锁定仓库失败！');
     }
 
-    $result = Util::transactionDo(function () use ($inventory, $user) {
+    $result = Util::transactionDo(function () use ($inventory) {
 
         $user_ids = request::array('user');
         $goods_ids = request::array('goods');
@@ -372,7 +372,7 @@ if ($op == 'default') {
                 throw new RuntimeException('找不到这个商品！');
             }
             $num = isset($num_arr[$index]) ? intval($num_arr[$index]) : 0;
-            if ($num <= 0) {
+            if ($num == 0) {
                 continue;
             }
 
@@ -406,9 +406,11 @@ if ($op == 'default') {
                 'clr' => $clr,
                 'serial' => REQUEST_ID,
             ]);
+            
             if (!$log) {
                 throw new RuntimeException('入库失败！');
             }
+
             $logs[] = $log;
         }
 

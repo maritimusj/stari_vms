@@ -121,7 +121,7 @@
                                 <span class="gray" v-else></span>                                                            
                             </td>
                             <td>
-                                <input type="number" class="form-control num" v-model="e.num" min="0" :max="e.goods && e.goods.num!==undefined ? e.goods.num : ''">                 
+                                <input type="number" class="form-control num" v-model="e.num" :max="e.goods && e.goods.num!==undefined ? e.goods.num : ''">                 
                             </td>
                         </tr>
                     </tbody>
@@ -252,7 +252,7 @@
             },
             computed: {
                 isReady () {
-                    return this.list.some(e => e.goods && e.goods.id > 0 && e.num > 0);
+                    return this.list.some(e => e.goods && e.goods.id > 0 && e.num != 0);
                 }
             },
             mounted() {
@@ -314,16 +314,16 @@
                     const goods = [];
                     const num = [];
                     this.list.forEach(e => { 
-                        if (e.goods) {
+                        if (e.goods && e.num != 0) {
                             user.push(e.user ? e.user.id : 0);
                             goods.push(e.goods ? e.goods.id : 0);
-                            num.push(e.num > 0 ? e.num : 0);                            
+                            num.push(e.num);                            
                         }
                     })
                     api.showResult({op: 'saveStockIn', userid: api.userid, user, goods, num}, '', false, (res) => {
                         if (res && res.status) {
                             this.list.forEach(e => {
-                                if (e.goods) {
+                                if (e.goods && e.num != 0) {
                                     this.logs.unshift(e);
                                 }                                
                             });

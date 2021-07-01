@@ -157,8 +157,9 @@
                             <span class="fa fa-caret-down"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的设备</a></li>
+                                <li role="separator" class="divider"></li>                                
+                                <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-cube fa-fw"></i> 他的设备</a></li>
+                                <li><a href="{php echo $this->createWebUrl('inventory', array('op' => 'detail', 'id'=>$agent['id']));}"> <i class="fa fa-archive fa-fw"></i> 他的库存</a></li>
                                 <li><a href="{php echo $this->createWebUrl('order', array('agent_openid'=>$agent['openid']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的订单</a></li>
                                 <li><a href="{php echo $this->createWebUrl('account', array('agentId'=>$agent['id']));}"> <i class="fa fa-weixin fa-fw"></i> 他的吸粉广告</a></li>
                                 <li role="separator" class="divider"></li>
@@ -185,14 +186,15 @@
                                 {/if}
                                 <li role="separator" class="divider"></li>
                                 <li>
+                                    <a href="#">
+                                        <i class="fa fa-user"></i> 代理商ID: {$agent['id']}
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                <li>
                                     <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$agent['id'], 'from'=>'agent'));}" onclick="if(!confirm('确定要取消用户的代理身份吗？\r\n\r\n注意：该操作会同时删除代理商相关数据（设备，商品和广告等等）！')){return false;}">
                                         <i class="fa fa-close"></i> 取消代理身份
                                     </a>
-                                </li>
-                                <li>
-                                    <span style="display: block; padding: 3px 20px;">
-                                        <i class="fa fa-user"></i> 代理商ID: {$agent['id']}
-                                    </span>
                                 </li>
                             </ul>
                         </div>

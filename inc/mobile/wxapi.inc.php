@@ -20,7 +20,7 @@ router::exec($op, [
     'DebugMode' => '\zovye\api\wx\debug::mode',
     'DemoLogin' => '\zovye\api\wx\debug::login',
 
-    'DeviceSetNum' => '\zovye\api\wx\device::deviceReset',
+    'DeviceSetNum' => '@\zovye\api\wx\device::deviceReset',
 
     'Reg' => '\zovye\api\wx\agent::reg',
     'PreLogin' => '\zovye\api\wx\agent::preLogin',
@@ -89,7 +89,7 @@ router::exec($op, [
     'KeeperLowDevices' => '\zovye\api\wx\keeper::lowDevices',
     'KeeperErrorDevices' => '\zovye\api\wx\keeper::errorDevices',
     'KeeperDeviceDetail' => '\zovye\api\wx\keeper::deviceDetail',
-    'KeeperDeviceReset' => '\zovye\api\wx\keeper::deviceReset',
+    'KeeperDeviceReset' => '@\zovye\api\wx\keeper::deviceReset',
     'KeeperDeviceTest' => '\zovye\api\wx\keeper::deviceTest',
     'KeeperStats' => '\zovye\api\wx\keeper::stats',
     'ViewKeeperStats' => '\zovye\api\wx\keeper::viewKeeperStats',

@@ -1,7 +1,9 @@
 <?php
+
 namespace zovye;
 
 use RuntimeException;
+use zovye\model\inventoryModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -42,10 +44,10 @@ if ($op == 'default') {
 
         $inventories['total'] = $total;
         $inventories['page'] = $page;
-        $inventories['totalpage'] = $total_page;        
+        $inventories['totalpage'] = $total_page;
 
         $query->orderBy('id DESC');
-        foreach($query->findAll() as $entry) {
+        foreach ($query->findAll() as $entry) {
             $inventories['list'][] = $entry->format();
         }
     }
@@ -59,7 +61,7 @@ if ($op == 'default') {
                 'list' => $inventories['list'],
             ]
         );
-    
+
         JSON::success(['title' => "库存列表", 'content' => $content]);
     }
 
@@ -81,7 +83,7 @@ if ($op == 'default') {
 
     $query->limit(100)->orderBy('id DESC');
     $result = [];
-    foreach($query->findAll() as $entry) {
+    foreach ($query->findAll() as $entry) {
         $result[] = $entry->format();
     }
 
@@ -107,6 +109,7 @@ if ($op == 'default') {
 
     $id = request::int('id');
     if ($id > 0) {
+        /** @var inventoryModelObj $inventory */
         $inventory = Inventory::get($id);
         if (empty($inventory)) {
             Util::itoast('找不到指定的仓库！', '', 'error');
@@ -158,6 +161,7 @@ if ($op == 'default') {
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
+    /** @var inventoryModelObj $inventory */
     $inventory = Inventory::find($user);
     if (empty($inventory)) {
         JSON::fail('找不到指定的仓库！');
@@ -198,18 +202,18 @@ if ($op == 'default') {
         $query->where(['agent_id' => $agent->getId()]);
     }
 
-   //搜索关键字
-   $keywords = request::trim('keywords');
-   if ($keywords) {
-       $query->whereOr([
-           'name LIKE' => "%{$keywords}%",
-       ]);
-   }
+    //搜索关键字
+    $keywords = request::trim('keywords');
+    if ($keywords) {
+        $query->whereOr([
+            'name LIKE' => "%{$keywords}%",
+        ]);
+    }
 
-   $total = $query->count();
-   $list = [];
+    $total = $query->count();
+    $list = [];
 
-   if ($total > 0) {
+    if ($total > 0) {
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
 
@@ -217,26 +221,26 @@ if ($op == 'default') {
         if ($page > $total_page) {
             $page = 1;
         }
-        
-        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);     
-        
+
+        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
         $query->page($page, $page_size);
         $query->orderBy('id ASC');
 
-        foreach($query->findAll() as $entry) {
+        foreach ($query->findAll() as $entry) {
             $goods = $entry->getGoods();
             if ($goods) {
-                    $list[] = [
-                        'goods' => Goods::format($goods, true, true),
-                        'num' => $entry->getNum(),
-                    ];
+                $list[] = [
+                    'goods' => Goods::format($goods, true, true),
+                    'num' => $entry->getNum(),
+                ];
             }
-        }        
-   }
+        }
+    }
 
-   $tpl_data['list'] = $list;
+    $tpl_data['list'] = $list;
 
-   if (request::is_ajax()) {
+    if (request::is_ajax()) {
         $content = app()->fetchTemplate('web/inventory/choose', [
             'list' => $list,
             'pager' => $tpl_data['pager'],
@@ -247,9 +251,9 @@ if ($op == 'default') {
             'title' => '选择商品',
             'content' => $content,
         ]);
-   }
+    }
 
-   app()->showTemplate('web/inventory/detail', $tpl_data);
+    app()->showTemplate('web/inventory/detail', $tpl_data);
 
 } elseif ($op == 'stockLog') {
 
@@ -270,7 +274,7 @@ if ($op == 'default') {
     ];
 
     $query = $inventory->logQuery();
-    
+
     if (request::isset('src')) {
         $query->where(['src_inventory_id' => request::int('src')]);
     }
@@ -290,13 +294,13 @@ if ($op == 'default') {
         if ($page > $total_page) {
             $page = 1;
         }
-        
-        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);     
-        
+
+        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
         $query->page($page, $page_size);
         $query->orderBy('id DESC');
 
-        foreach($query->findAll() as $entry) {
+        foreach ($query->findAll() as $entry) {
             $data = [
                 'num' => $entry->getNum(),
                 'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
@@ -478,12 +482,12 @@ if ($op == 'default') {
             'memo' => '管理员编辑商品库存',
             'clr' => $clr,
             'serial' => REQUEST_ID,
-        ]); 
+        ]);
 
         if (!$log) {
             throw new RuntimeException('入库失败！');
         }
-        return $num;        
+        return $num;
     });
 
     if (is_error($result)) {
@@ -519,16 +523,16 @@ if ($op == 'default') {
                 'memo' => '管理员删除商品库存',
                 'clr' => $clr,
                 'serial' => REQUEST_ID,
-            ]); 
+            ]);
 
             if (!$log) {
                 throw new RuntimeException('保存库存失败！');
-            }            
+            }
         }
 
         $goods->destroy();
 
-        return true;        
+        return true;
     });
 
     if (is_error($result)) {

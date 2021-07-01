@@ -11,6 +11,10 @@ use zovye\base\modelObj;
 use zovye\InventoryGoods;
 use zovye\traits\ExtraDataGettersAndSetters;
 
+/**
+ * @method getNum()
+ * @method setNum(int $param)
+ */
 class inventory_goodsModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

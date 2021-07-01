@@ -5,6 +5,7 @@ namespace zovye\api\wx;
 
 
 use Exception;
+use zovye\Inventory;
 use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\base\modelObjFinder;
@@ -280,6 +281,14 @@ class device
             $res = $device->resetPayload([$lane => '@' . $num], '代理商补货');
             if (is_error($res)) {
                 return error(State::ERROR, '保存库存失败！');
+            }
+
+            if (App::isInventoryEnabled()) {
+                $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
+                $v = Inventory::syncDevicePayloadLog($user, $device, $res, '代理商补货');
+                if (is_error($v)) {
+                    return $v;
+                }
             }
 
             return ['msg' => '设置成功！'];

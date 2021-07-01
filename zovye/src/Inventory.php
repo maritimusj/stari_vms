@@ -71,7 +71,6 @@ class Inventory
     /**
      * 获取指定对象指定名称的仓库UID
      * @param modelObj $obj
-     * @param string $name
      * @return string
      */
     public static function getUID(modelObj $obj): string
@@ -91,8 +90,6 @@ class Inventory
         if ($inventory) {
             return $inventory;
         }
-        $title = '<未命名>';
-        $extra = [];
         if ($obj instanceof userModelObj) {
             $title = "{$obj->getName()}";
             $extra = ['user' => $obj->profile()];
@@ -107,5 +104,38 @@ class Inventory
             'title' => $title,
             'extra' => $extra,
         ]);
+    }
+
+    public static function syncDevicePayloadLog(userModelObj $user, deviceModelObj $device, array $result, $memo = '')
+    {
+        $inventory = self::for($user);
+        if (empty($inventory)) {
+            return error(State::ERROR, '打开用户仓库失败！');
+        }
+        if (!$inventory->acquireLocker()) {
+            return error(State::ERROR, '无法锁定用户仓库！');
+        }
+        $goods_lack = settings('inventory.goods.mode') ? false : true;
+        $clr = Util::randColor();
+        foreach ($result as $entry) {
+            if ($entry['num'] > 0) {
+                if (!$goods_lack) {
+                    $goods = $inventory->getGoods($entry['goodsId']);
+                    if (empty($goods) || $goods->getNum() < $entry['num']) {
+                        return error(State::ERROR, '仓库商品库存不足！');
+                    }
+                }
+            }
+            $log = $inventory->stock(null, $entry['goodsId'], -$entry['num'], [
+                'memo' => $memo,
+                'device' => $device->profile(),
+                'clr' => $clr,
+                'serial' => REQUEST_ID,
+            ]);
+            if (empty($log)) {
+                return error(State::ERROR, '仓库商品操作失败！');
+            }
+        }
+        return true;
     }
 }

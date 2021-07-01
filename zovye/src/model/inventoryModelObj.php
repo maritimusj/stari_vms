@@ -5,6 +5,7 @@
  */
 namespace zovye\model;
 
+use zovye\base\modelObjFinder;
 use zovye\User;
 use zovye\Locker;
 use zovye\Inventory;
@@ -14,6 +15,12 @@ use zovye\base\modelObj;
 use zovye\InventoryGoods;
 use zovye\traits\ExtraDataGettersAndSetters;
 
+/**
+ * @method getTitle()
+ * @method getParentId()
+ * @method getUid()
+ * @method setTitle(string $trim)
+ */
 class inventoryModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
@@ -75,20 +82,24 @@ class inventoryModelObj extends modelObj
 		return $data;
 	}
 
-	public function query($cond = [])
-	{
+	public function query($cond = []): modelObjFinder
+    {
 		$cond['inventory_id'] = $this->id;
 		return InventoryGoods::query($cond);
 	}
 
-	public function logQuery()
-	{
+	public function getGoods($goods_id): ?inventory_goodsModelObj
+    {
+        return InventoryGoods::findOne(['inventory_id' => $this->id, 'goods_id' => $goods_id]);
+    }
+
+	public function logQuery(): modelObjFinder
+    {
 		return InventoryLog::query(['inventory_id' => $this->id]);
 	}
 
     /**
      * 锁定
-     * @param string $name
      * @return lockerModelObj|null
      */
     public function acquireLocker(): ?lockerModelObj

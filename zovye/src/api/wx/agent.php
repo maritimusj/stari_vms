@@ -8,6 +8,7 @@ use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use Exception;
 use zovye\Config;
+use zovye\Inventory;
 use zovye\model\agent_msgModelObj;
 use zovye\model\agentModelObj;
 use zovye\App;
@@ -505,12 +506,13 @@ class agent
         $extra = $device->get('extra', []);
 
         $now = time();
+        $payload = [];
 
         if (request::isset('device_type')) {
             $type_id = request::int('device_type');
 
             if ($type_id != $device->getDeviceType()) {
-                $device->resetPayload(['*' => '@0'], '代理商改变型号', $now);
+                $payload[] = $device->resetPayload(['*' => '@0'], '代理商改变型号', $now);
                 $device->setDeviceType($type_id);
             }
 
@@ -530,13 +532,13 @@ class agent
                         'capacity' => intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $device->resetPayload([$index => '@0'], '代理商更改货道商品', $now);
+                        $payload[] = $device->resetPayload([$index => '@0'], '代理商更改货道商品', $now);
                     }
                     unset($old[$index]);
                 }
 
-                foreach($old as $index => $lane) {
-                    $device->resetPayload([$index => '@0'], '代理商删除货道', $now);
+                foreach ($old as $index => $lane) {
+                    $payload[] = $device->resetPayload([$index => '@0'], '代理商删除货道', $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -560,12 +562,23 @@ class agent
                     'num' => '@' . max(0, intval($num[$index])),
                 ];
                 if ($device_type->getDeviceId() == $device->getId()) {
-                    $cargo_lanes[$index]['price'] =  intval($prices[$index]);
+                    $cargo_lanes[$index]['price'] = intval($prices[$index]);
                 }
             }
             $res = $device->resetPayload($cargo_lanes, '代理商编辑设备', $now);
             if (is_error($res)) {
                 return error(State::ERROR, '保存设备库存数据失败！');
+            }
+            $payload[] = $res;
+        }
+
+        if (App::isInventoryEnabled()) {
+            $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
+            foreach ($payload as $result) {
+                $v = Inventory::syncDevicePayloadLog($user, $device, $result, '代理商编辑设备');
+                if (is_error($v)) {
+                    return $v;
+                }
             }
         }
 
@@ -649,7 +662,7 @@ class agent
                         $result['status']['sig'] = $device->getSig();
                         $result['status']['online'] = boolval($detail['mcb']);
                         if (isset($detail['app'])) {
-                            $result['app']['online'] = boolval($detail['app']);                         
+                            $result['app']['online'] = boolval($detail['app']);
                         }
                     }
                 }
@@ -1951,7 +1964,7 @@ class agent
     public static function repair()
     {
         $user = common::getAgent();
-        $agent = $user->isPartner() ?  $user->getPartnerAgent() : $user;
+        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
         $repairData = $agent->settings('repair', []);
 

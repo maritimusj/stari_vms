@@ -11,6 +11,7 @@ use zovye\App;
 use zovye\CommissionBalance;
 use zovye\Config;
 use zovye\Device;
+use zovye\Inventory;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\request;
@@ -875,6 +876,14 @@ class keeper
         $result = $device->resetPayload($data, "运营人员补货：{$keeper->getMobile()}");
         if (is_error($result)) {
             return err('保存库存失败！');
+        }
+
+        if (App::isInventoryEnabled()) {
+            $user = $keeper->getUser();
+            $v = Inventory::syncDevicePayloadLog($user, $device, $result, '营运人员补货');
+            if (is_error($v)) {
+                return $v;
+            }
         }
 
         $locker->unlock();

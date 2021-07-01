@@ -6,7 +6,6 @@ namespace zovye;
 
 use zovye\base\modelObjFinder;
 use zovye\model\inventory_goodsModelObj;
-use zovye\model\inventoryModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class InventoryGoods

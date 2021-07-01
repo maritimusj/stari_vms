@@ -30,7 +30,7 @@ class InventoryLog
 
     /**
      * @param $cond
-     * @return inventoryModelOinventory_logModelObjbj|null
+     * @return inventory_logModelObj|null
      */
     public static function findOne($cond): ?inventory_logModelObj
     {

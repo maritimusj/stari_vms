@@ -3,7 +3,7 @@
     <application setting="false">
         <name><![CDATA[新零售saas系统]]></name>
         <identifie><![CDATA[zovye_vms]]></identifie>
-        <version><![CDATA[6.0.9]]></version>
+        <version><![CDATA[6.1.1]]></version>
         <type><![CDATA[business]]></type>
         <ability><![CDATA[新零售saas系统]]></ability>
         <description><![CDATA[新零售saas系统]]></description>
@@ -38,7 +38,6 @@
             <entry title="文档管理" do="article" state="" direct=""/>
             <entry title="型号管理" do="devicetypes" state="" direct=""/>
             <entry title="商品管理" do="goods" state="" direct=""/>
-            <entry title="库存管理" do="storage" state="" direct=""/>
             <entry title="版本管理" do="upgrade" state="" direct=""/>
             <entry title="系统设置" do="settings" state="" direct=""/>
         </menu>

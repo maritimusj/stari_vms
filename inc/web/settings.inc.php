@@ -235,6 +235,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['agent']['order']['refund'] = request::bool('allowAgentRefund') ? 1 : 0;
 
+        $settings['inventory']['goods']['mode'] = request::bool('inventoryGoodsLack') ? 1 : 0;      
+
         $settings['agent']['msg_tplid'] = request::trim('agentMsg');
         $settings['agent']['levels'] = [
             'level0' => ['clr' => request::trim('clr0'), 'title' => request::trim('level0')],

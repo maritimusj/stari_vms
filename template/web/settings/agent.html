@@ -48,6 +48,22 @@
                     </div>
                 </div>
             </div>
+            {if \zovye\App::isInventoryEnabled()}
+            <div class="seg">
+                <div class="title">库存管理</div>
+                <div class="form-group">
+                    <label for="inventoryGoodsLack" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="inventoryGoodsLack" id="inventoryGoodsLack" value="1" {if $settings['inventory']['goods']['mode']}checked{/if}>
+                                库存不足时，不允许代理商及营运人员补货
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}
             <div class="seg">
                 <div class="title">消息提醒</div>
                 <div class="form-group">

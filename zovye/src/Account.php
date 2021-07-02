@@ -867,7 +867,7 @@ class Account extends State
         $data = [
             'request_id' => REQUEST_ID,
             'account_id' => $account->getId(),
-            'user_id' => $account->getId(),
+            'user_id' => $user->getId(),
             'device_id' => $device->getId(),
             'request' => json_encode($request),
             'result' => json_encode($result),
@@ -880,7 +880,7 @@ class Account extends State
         return m('account_query')->create($data);
     }
 
-    public static function logQuery(accountModelObj $account, $condition = [])
+    public static function logQuery(accountModelObj $account, $condition = []): modelObjFinder
     {
         return m('account_query')
             ->where(['account_id' => $account->getId()])

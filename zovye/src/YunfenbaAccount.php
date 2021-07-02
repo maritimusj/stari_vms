@@ -244,8 +244,8 @@ class YunfenbaAccount
                 throw new RuntimeException('找不到指定的设备:' . $params['state']);
             }
 
-            $nostr = Util::random(16, true);
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$nostr}", 0, MAX_ORDER_NO_LEN);
+            $str = Util::random(16, true);
+            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$str}", 0, MAX_ORDER_NO_LEN);
 
             $acc = $res['account'];
 

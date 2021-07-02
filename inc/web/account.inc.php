@@ -740,6 +740,58 @@ if ($op == 'default') {
 
     JSON::success('修复失败！');
 
+} elseif ($op == 'viewQueryLog') {
+
+    $id = request::int('id');
+    $acc = Account::get($id);
+
+    if (empty($acc)) {
+        JSON::fail('找不到这个公众号！');
+    }
+  
+    $query = Account::logQuery($acc);
+
+    if (request::has('device')) {
+        $query->where(['device_id' => request::int('device')]);
+    }
+
+    if (request::has('user')) {
+        $query->where(['user_id' => request::int('user')]);
+    }
+
+    $total = $query->count();
+    $list = [];
+
+    if ($total > 0) {
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+        $total_page = ceil($total / $page_size);
+        if ($page > $total_page) {
+            $page = 1;
+        }
+
+        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
+        $query->page($page, $page_size);
+        $query->orderBy('id DESC');
+
+        foreach ($query->findAll() as $entry) {
+            $data = [
+                'id' => $entry->getId(),
+                'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            ];
+            
+            $data['extra'] = $entry->getExtraData();
+            $list[] = $data;
+        }
+    }
+
+    $tpl_data['list'] = $list;
+
+    app()->showTemplate('web/account/log', $tpl_data);
+
+
 } elseif ($op == 'viewFansCount') {
 
     $id = request::int('id');

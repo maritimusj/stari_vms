@@ -111,11 +111,17 @@ class Util
             $user = User::get(App::getUserUID(), true);
         } else {
             if (empty($user)) {
+                $update = empty($params['update']) ? false : true;
+                if ($update) {
+                    //通过删除$_SESSION['userinfo']，让框架刷新用户信息
+                    self::cachedCall(60, function() {
+                        unset($_SESSION['userinfo']);
+                    });
+                }
                 $fans = Util::fansInfo();
                 if ($fans && !empty($fans['openid'])) {
                     $user = User::get($fans['openid'], true);
 
-                    $update = empty($params['update']) ? false : true;
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
                             'app' => User::WX,

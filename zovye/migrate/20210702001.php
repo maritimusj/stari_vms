@@ -16,7 +16,7 @@ CREATE TABLE `ims_zovye_vms_account_query` (
     `extra` TEXT , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`),
-    UNIQUE (`request_id`), 
+    INDEX (`request_id`), 
     INDEX (`account_id`),
     INDEX (`device_id`),
     INDEX (`user_id`)

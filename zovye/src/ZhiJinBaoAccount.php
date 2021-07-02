@@ -36,39 +36,62 @@ class ZhiJinBaoAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::ZJBAO]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['key']) || empty($config['secret'])) {
+                return [];
+            }
             //请求API
             $ZJBao = new ZhiJinBaoAccount($config['key'], $config['secret']);
-            $result = $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('zjbao_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+            $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('zjbao_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
+
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if ($result['code'] != 0) {
+                        throw new RuntimeException('失败，发生错误：' . $result['code']);
+                    }
+
+                    $data = $acc->format();
+
+                    $data['name'] = $result['nickname'];
+                    $data['qrcode'] = $result['qrcodeUrl'];
+
+                    $v[] = $data;
+
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+                } catch (Exception $e) {
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    }
                 }
             });
-            if (is_error($result) || $result['code'] != 0) {
-                Util::logToFile('zjbao', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
-
-                $data['name'] = $result['nickname'];
-                $data['qrcode'] = $result['qrcodeUrl'];
-
-                return [$data];
-            }
         }
 
-        return [];
+        return $v;
     }
 
 

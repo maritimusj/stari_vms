@@ -873,10 +873,7 @@ class Account extends State
             'result' => json_encode($result),
             'createtime' => isset($createtime) ? intval($createtime) : time(),
         ];
-
-        // $classname = m('account_query')->objClassname();
-        // $data['extra'] = $classname::serializeExtra($data['extra']);
-
+       
         return m('account_query')->create($data);
     }
 

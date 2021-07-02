@@ -153,6 +153,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;        
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
+        $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;        
 
         $specialAccounts = [
             'jfbFAN' => [

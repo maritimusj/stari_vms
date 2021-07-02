@@ -470,4 +470,10 @@ class App
             return boolval(settings('inventory.enabled'));
         });        
     }
+
+    public static function isAccountLogEanbled(): bool {
+        return onceCall(function() {
+            return boolval(settings('account.log.enabled'));
+        });        
+    }    
 }

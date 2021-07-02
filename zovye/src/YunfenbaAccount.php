@@ -144,17 +144,6 @@ class YunfenbaAccount
             $cb($data, $result);
         }
 
-        if (is_error($result)) {
-            return $result;
-        }
-
-        if (!empty($result['errcode'])) {
-            if ($result['errcode'] == 203) {
-                return err('暂时没有公众号！');
-            }
-            return err('接口返回错误！');
-        }
-
         return $result['data'];
     }
 
@@ -166,6 +155,8 @@ class YunfenbaAccount
      */
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         $acc = Account::findOne(['state' => Account::YUNFENBA]);
         if ($acc) {
             $config = $acc->settings('config', []);
@@ -175,35 +166,56 @@ class YunfenbaAccount
 
             //请求对方API
             $yunfenba = new YunfenbaAccount($config['vendor']['uid']);
-            $result = $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('yunfenba_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+
+            $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('yunfenba_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
+
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if (!empty($result['errcode'])) {
+                        if ($result['errcode'] == 203) {
+                            throw new RuntimeException('暂时没有公众号！');
+                        }
+                        throw new RuntimeException('失败，错误代码：' . $result['errcode']);
+                    }
+
+                    $data = $acc->format();
+
+                    $data['title'] = $result['wechat_name'];
+                    $data['img'] = $result['headimg_url'];
+                    $data['qrcode'] = $result['qrcode_url'];
+
+                    $v[] = $data;
+
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+                } catch (Exception $e) {
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    }
                 }
             });
-            if (is_error($result)) {
-                Util::logToFile('yunfenba', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->getName(),
-                    'data' => request::raw(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
-
-                $data['title'] = $result['wechat_name'];
-                $data['img'] = $result['headimg_url'];
-                $data['qrcode'] = $result['qrcode_url'];
-
-                return [$data];
-            }
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params): array

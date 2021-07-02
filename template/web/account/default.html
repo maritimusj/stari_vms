@@ -198,6 +198,13 @@
                             </a>
                         </li>
                         <li role="separator" class="divider"></li>
+                        {if \zovye\App::isAccountLogEanbled()}
+                        <li>
+                            <a href="#"  data-op="viewQueryLog">
+                                <i class="fa fa-history fa-fw"></i> 查看请求日志
+                            </a>
+                        </li>
+                        {/if}
                         <li>
                             <a href="#"  data-op="viewFansCount">
                                 <i class="fa fa-users fa-fw"></i> 统计净增粉量
@@ -444,6 +451,13 @@
         api.accountAuthorize = function(id) {
             api.showResult({
                 op: 'accountAuthorize',
+            })
+        }
+
+        api.viewQueryLog = function(id) {
+            api.showResult({
+                op: 'viewQueryLog',
+                id: id,
             })
         }
 

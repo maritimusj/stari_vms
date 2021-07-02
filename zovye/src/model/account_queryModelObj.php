@@ -7,6 +7,9 @@
 
 namespace zovye\model;
 
+use zovye\User;
+use zovye\Device;
+use zovye\Account;
 use function zovye\tb;
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
@@ -45,4 +48,19 @@ class account_queryModelObj extends modelObj
 	protected $createtime;
 
 	use ExtraDataGettersAndSetters;
+
+	public function getAccount()
+	{
+		return Account::get($this->account_id);
+	}
+
+	public function getUser()
+	{
+		return User::get($this->user_id);
+	}
+
+	public function getDevice()
+	{
+		return Device::get($this->device_id);
+	}
 }

@@ -18,6 +18,8 @@ class JfbAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
+        $v = [];
+
         $acc = Account::findOne(['state' => Account::JFB]);
         if ($acc) {
             $config = $acc->get('config', []);
@@ -61,31 +63,54 @@ class JfbAccount
 
             $result = Util::post(strval($config['url']), $data);
 
-            $log = Account::createQueryLog($acc, $user, $device, $data, $result);
-            if (empty($log)) {
-                Util::logToFile('jfb_query', [
-                    'request' => $data,
-                    'result' => $result,
-                ]);
+            if (App::isAccountLogEanbled()) {
+                $log = Account::createQueryLog($acc, $user, $device, $data, $result);
+                if (empty($log)) {
+                    Util::logToFile('jfb_query', [
+                        'request' => $data,
+                        'result' => $result,
+                    ]);
+                }
             }
 
-            if (is_error($result)) {
-                return [];
-            }
+            try {
+                if (empty($result)) {
+                    throw new RuntimeException('返回数据为空！');
+                }
 
-            if ($result['status'] && $result['errorCode'] == '0000') {
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message']);
+                }
+
+                if (!$result['status'] || $result['errorCode'] != '0000') {
+                    throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
+                }
+
                 $data = $acc->format();
                 $x = $result['result']['data'][0];
-                if ($x) {
-                    $data['title'] = $x['nickName'];
-                    $data['img'] = $x['headImgUrl'];
-                    $data['qrcode'] = $x['qrPicUrl'];
-                    return [$data];
+                if (empty($x)) {
+                    throw new RuntimeException('没有数据！');
+                }
+
+                $data['title'] = $x['nickName'];
+                $data['img'] = $x['headImgUrl'];
+                $data['qrcode'] = $x['qrPicUrl'];
+
+                $v[] = $data;
+
+                if (App::isAccountLogEanbled() && $log) {
+                    $log->setExtraData('account', $data);
+                    $log->save();
+                }
+            } catch (Exception $e) {
+                if (App::isAccountLogEanbled() && $log) {
+                    $log->setExtraData('error_msg', $e->getMessage());
+                    $log->save();
                 }
             }
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params = []): array
@@ -129,14 +154,16 @@ class JfbAccount
 
                 $acc = $res['account'];
 
-                $log = Account::getLastQueryLog($acc, $user, $device);
-                if ($log) {
-                    $log->setExtraData('cb', [
-                        'time' => time(),
-                        'order_uid' => $order_uid,
-                        'data' => $params,
-                    ]);
-                    $log->save();
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::getLastQueryLog($acc, $user, $device);
+                    if ($log) {
+                        $log->setExtraData('cb', [
+                            'time' => time(),
+                            'order_uid' => $order_uid,
+                            'data' => $params,
+                        ]);
+                        $log->save();
+                    }
                 }
 
                 Job::createSpecialAccountOrder([

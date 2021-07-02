@@ -35,39 +35,53 @@ class MeiPaAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::MEIPA]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['apiid']) || empty($config['appkey'])) {
+                return [];
+            }
+
             //请求API
             $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
-            $result = $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('meipa_query', [
-                        'query' => $request,
-                        'result' => $result,
+            $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('meipa_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
+
+                if (is_error($result) || $result['status'] != 1) {
+                    Util::logToFile('meipa', [
+                        'user' => $user->profile(),
+                        'acc' => $acc->getName(),
+                        'device' => $device->profile(),
+                        'error' => $result,
                     ]);
+                } else {
+                    $data = $acc->format();
+
+                    $data['title'] = $result['data']['wechat_name'];
+                    $data['qrcode'] = $result['data']['qrcodeurl'];
+
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+
+                    $v[] = $data;
                 }
             });
-
-            if (is_error($result) || $result['status'] != 1) {
-                Util::logToFile('meipa', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
-
-                $data['title'] = $result['data']['wechat_name'];
-                $data['qrcode'] = $result['data']['qrcodeurl'];
-
-                return [$data];
-            }
         }
-        return [];
+        
+        return $v;
     }
 
     public static function verifyData($params): array

@@ -41,7 +41,15 @@ class MoscaleAccount
             $config = $acc->settings('config', []);
             //请求公锤API
             $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
-            $result = $moscale->fetchOne($device, $user);
+            $result = $moscale->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user) {
+                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                if (empty($log)) {
+                    Util::logToFile('moscale_query', [
+                        'query' => $request,
+                        'result' => $result,
+                    ]);
+                }
+            });
             if (is_error($result)) {
                 Util::logToFile('moscale', [
                     'user' => $user->profile(),
@@ -98,7 +106,7 @@ class MoscaleAccount
 
     public static function getLabelList(): array
     {
-        return Util::cachedCall(30, function() {
+        return Util::cachedCall(30, function () {
             $acc = Account::findOne(['state' => Account::MOSCALE]);
             if ($acc) {
                 $config = $acc->settings('config', []);
@@ -109,7 +117,7 @@ class MoscaleAccount
                 }
             }
 
-            return [];           
+            return [];
         });
     }
 
@@ -126,7 +134,7 @@ class MoscaleAccount
                 }
             }
 
-            return [];            
+            return [];
         });
     }
 
@@ -154,6 +162,16 @@ class MoscaleAccount
 
             $acc = $res['account'];
 
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $params,
+                ]);
+                $log->save();
+            }
+
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),
                 'user' => $user->getId(),
@@ -174,7 +192,7 @@ class MoscaleAccount
             'app_id' => $this->app_id,
         ]);
 
-        return $this->post(self::GET_LABEL_API_URL, $data);
+        return Util::post(self::GET_LABEL_API_URL, $data);
     }
 
     public function fetchRegionData(): array
@@ -183,10 +201,10 @@ class MoscaleAccount
             'app_id' => $this->app_id,
         ]);
 
-        return $this->post(self::GET_REGION_API_URL, $data);
+        return Util::post(self::GET_REGION_API_URL, $data);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null): array
     {
         $key = $device->settings('extra.moscale.key', '');
         if (empty($key)) {
@@ -236,25 +254,17 @@ class MoscaleAccount
 
         $data = $this->sign($params);
 
-        $result = $this->post(self::API_URL, $data);
+        $result = Util::post(self::API_URL, $data);
+
+        if ($cb) {
+            $cb($data, $result);
+        }
 
         if ($result['code'] != 200) {
             return error(intval($result['code']), empty($result['msg']) ? '发生错误' : $result['msg']);
         }
 
         return $result['data'];
-    }
-
-    private function post($url, $data): array
-    {
-        $result = Util::post($url, $data);
-
-         Util::logToFile('moscale_query', [
-             'request' => $data,
-             'result' => $result,
-         ]);
-
-        return $result;
     }
 
     private function sign($data)

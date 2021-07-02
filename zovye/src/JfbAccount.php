@@ -53,19 +53,21 @@ class JfbAccount
                 'showTimes' => 0,
                 'redirect' => Util::murl('order', ['op' => 'feedback', 'device_imei' => $device->getImei(), 'device_name' => $device->getName()]),
                 'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
-                        'op' => 'feedback',
-                        'device_imei' => $device->getImei(),
-                        'device_name' => $device->getName(),
-                    ]) . '">如未出货请点我！</a>',
+                    'op' => 'feedback',
+                    'device_imei' => $device->getImei(),
+                    'device_name' => $device->getName(),
+                ]) . '">如未出货请点我！</a>',
             ];
 
             $result = Util::post(strval($config['url']), $data);
 
-            Util::logToFile('jfb_query', [
-                'url' => $config['url'],
-                'request' => $data,
-                'result' => $result,
-            ]);
+            $log = Account::createQueryLog($acc, $user, $device, $data, $result);
+            if (empty($log)) {
+                Util::logToFile('jfb_query', [
+                    'request' => $data,
+                    'result' => $result,
+                ]);
+            }
 
             if (is_error($result)) {
                 return [];
@@ -105,27 +107,37 @@ class JfbAccount
     public static function cb($params)
     {
         if ($params['op_type'] == 1) {
-            try {                
+            try {
                 $res = self::verifyData($params);
                 if (is_error($res)) {
                     throw new RuntimeException('发生错误：' . $res['message']);
                 }
-                
+
                 /** @var userModelObj $user */
                 $user = User::get($params['openid'], true);
                 if (empty($user) || $user->isBanned()) {
                     throw new RuntimeException('用户已被禁用！');
                 }
-        
+
                 /** @var deviceModelObj $device */
                 $device = Device::get($params['device'], true);
                 if (empty($device)) {
                     throw new RuntimeException('找不对这个设备:' . $params['device']);
                 }
-        
+
                 $order_uid = substr("U{$user->getId()}D{$device->getId()}{$params['sign']}" . Util::random(32), 0, MAX_ORDER_NO_LEN);
-        
+
                 $acc = $res['account'];
+
+                $log = Account::getLastQueryLog($acc, $user, $device);
+                if ($log) {
+                    $log->setExtraData('cb', [
+                        'time' => time(),
+                        'order_uid' => $order_uid,
+                        'data' => $params,
+                    ]);
+                    $log->save();
+                }
 
                 Job::createSpecialAccountOrder([
                     'device' => $device->getId(),
@@ -133,7 +145,6 @@ class JfbAccount
                     'account' => $acc->getId(),
                     'orderUID' => $order_uid,
                 ]);
-        
             } catch (Exception $e) {
                 Util::logToFile('jfb', [
                     'error' => $e->getMessage(),

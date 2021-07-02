@@ -41,7 +41,16 @@ class MeiPaAccount
             $config = $acc->settings('config', []);
             //请求API
             $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
-            $result = $MeiPa->fetchOne($device, $user);
+            $result = $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user) {
+                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                if (empty($log)) {
+                    Util::logToFile('meipa_query', [
+                        'query' => $request,
+                        'result' => $result,
+                    ]);
+                }
+            });
+
             if (is_error($result) || $result['status'] != 1) {
                 Util::logToFile('meipa', [
                     'user' => $user->profile(),
@@ -111,13 +120,22 @@ class MeiPaAccount
 
             $acc = $res['account'];
 
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $data,
+                ]);
+                $log->save();
+            }
+
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),
                 'user' => $user->getId(),
                 'account' => $acc->getId(),
                 'orderUID' => $order_uid,
             ]);
-
         } catch (Exception $e) {
             Util::logToFile('meipa', [
                 'data' => $data,
@@ -127,7 +145,7 @@ class MeiPaAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = []): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = [], callable $cb = null): array
     {
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
@@ -145,12 +163,9 @@ class MeiPaAccount
 
         $params['sing'] = $this->sign($params);
         $result = Util::post(self::API_URL, $params, false);
-
-        Util::logToFile('meipa_query', [
-            'query' => $params,
-            'result' => $result,
-        ]);
-
+        if ($cb) {
+            $cb($params, $result);
+        }
         return $result;
     }
 

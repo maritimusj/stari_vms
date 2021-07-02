@@ -109,7 +109,6 @@ class YunfenbaAccount
                 'title' => '大巴',
                 'val' => 'scene_18'
             ],
-
             [
                 'title' => '商务酒店',
                 'val' => 'scene_19'
@@ -117,7 +116,7 @@ class YunfenbaAccount
         ];
     }
 
-    public function getTask(deviceModelObj $device, userModelObj $user): array
+    public function getTask(deviceModelObj $device, userModelObj $user, callable $cb = null): array
     {
         $url = str_replace('{vendor_uid}', $this->vendor_uid, self::GET_TASK_URL);
 
@@ -141,10 +140,9 @@ class YunfenbaAccount
 
         $result = Util::post($url, $data);
 
-        Util::logToFile('yunfenba', [
-            'request' => $data,
-            'result' => $result,
-        ]);
+        if ($cb) {
+            $cb($data, $result);
+        }
 
         if (is_error($result)) {
             return $result;
@@ -177,7 +175,15 @@ class YunfenbaAccount
 
             //请求对方API
             $yunfenba = new YunfenbaAccount($config['vendor']['uid']);
-            $result = $yunfenba->getTask($device, $user);
+            $result = $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user) {
+                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                if (empty($log)) {
+                    Util::logToFile('yunfenba_query', [
+                        'query' => $request,
+                        'result' => $result,
+                    ]);
+                }
+            });
             if (is_error($result)) {
                 Util::logToFile('yunfenba', [
                     'user' => $user->profile(),
@@ -238,14 +244,26 @@ class YunfenbaAccount
                 throw new RuntimeException('找不到指定的设备:' . $params['state']);
             }
 
+            $nostr = Util::random(16, true);
+            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$nostr}", 0, MAX_ORDER_NO_LEN);
+
             $acc = $res['account'];
 
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $params,
+                ]);
+                $log->save();
+            }
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),
                 'user' => $user->getId(),
                 'account' => $acc->getId(),
+                'orderUID' => $order_uid,
             ]);
-            
         } catch (Exception $e) {
             Util::logToFile('yunfenba', [
                 'error' => '发生错误! ',

@@ -152,7 +152,7 @@ class Account extends State
             $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
             if ($appid) {
                 $data['appid'] = $appid;
-            }            
+            }
         }
 
         return $data;
@@ -166,16 +166,17 @@ class Account extends State
      * @return array
      * $params['max' => 1] 最多返回几个公众号
      */
-    public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array {
+    public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array
+    {
         $list = [];
-        $join = function($cond, $getter_fn) use($device, $user, &$list) {
+        $join = function ($cond, $getter_fn) use ($device, $user, &$list) {
             $acc = Account::findOne($cond);
             if ($acc) {
                 $index = sprintf("%03d", $acc->getOrderNo());
                 if ($list[$index]) {
                     $index .= $acc->getId();
                 }
-                $list[$index] = function () use($getter_fn, $acc, $device, $user) {
+                $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                     //检查用户是否允许
                     $res = Util::isAvailable($user, $acc, $device);
                     if (is_error($res)) {
@@ -188,7 +189,7 @@ class Account extends State
         };
 
         $groups = [];
-        
+
         $accounts = $device->getAccounts();
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
@@ -744,7 +745,7 @@ class Account extends State
                 }
                 if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
                     //如果是授权服务号，需要使用场景二维码替换原二维码
-                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);  
+                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                 }
 
                 if (isset($account['qrcode'])) {
@@ -859,5 +860,40 @@ class Account extends State
         }
 
         return $first;
+    }
+
+    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null)
+    {
+        $data = [
+            'request_id' => REQUEST_ID,
+            'account_id' => $account->getId(),
+            'user_id' => $account->getId(),
+            'device_id' => $device->getId(),
+            'request' => json_encode($request),
+            'result' => json_encode($result),
+            'createtime' => isset($createtime) ? intval($createtime) : time(),
+        ];
+
+        // $classname = m('account_query')->objClassname();
+        // $data['extra'] = $classname::serializeExtra($data['extra']);
+
+        return m('account_query')->create($data);
+    }
+
+    public static function logQuery(accountModelObj $account, $condition = [])
+    {
+        return m('account_query')
+            ->where(['account_id' => $account->getId()])
+            ->where($condition);
+    }
+
+    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device)
+    {
+        $query = self::logQuery($account, [
+            'device_id' => $device->getId(),
+            'user_id' => $user->getId()
+        ]);
+        $query->orderBy('id DESC');
+        return $query->findOne();
     }
 }

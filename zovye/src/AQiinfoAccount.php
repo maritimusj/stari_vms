@@ -38,7 +38,15 @@ class AQiinfoAccount
 
             //请求API
             $AQiinfo = new AQiinfoAccount($config['key'], $config['secret']);
-            $result = $AQiinfo->fetchOne($device, $user);
+            $result = $AQiinfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user) {
+                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                if (empty($log)) {
+                    Util::logToFile('AQiinfo_query', [
+                        'query' => $request,
+                        'result' => $result,
+                    ]);
+                }
+            });
 
             if (is_error($result) || empty($result['ticket']) || empty($result['url'])) {
                 Util::logToFile('AQiinfo', [
@@ -129,13 +137,22 @@ class AQiinfoAccount
 
             $acc = $res['account'];
 
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $params,
+                ]);
+                $log->save();
+            }
+
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),
                 'user' => $user->getId(),
                 'account' => $acc->getId(),
                 'orderUID' => $order_uid,
-            ]);  
-
+            ]);
         } catch (Exception $e) {
             Util::logToFile('AQiinfo', [
                 'error' => '发生错误! ',
@@ -144,7 +161,7 @@ class AQiinfoAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array
     {
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
@@ -162,10 +179,9 @@ class AQiinfoAccount
 
         $result = Util::post(self::API_URL, $data, false);
 
-        Util::logToFile('AQiinfo', [
-            'request' => $data,
-            'result' => $result,
-        ]);
+        if ($cb) {
+            $cb($data, $result);
+        }
 
         if ($result['code'] != 200) {
             if ($result['code'] == 450031) {

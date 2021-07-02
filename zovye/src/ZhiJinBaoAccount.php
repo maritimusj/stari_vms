@@ -29,7 +29,6 @@ class ZhiJinBaoAccount
         $this->app_secret = $app_secret;
     }
 
-
     public static function getUid(): string
     {
         return Account::makeSpecialAccountUID(Account::ZJBAO, Account::ZJBAO_NAME);
@@ -43,7 +42,15 @@ class ZhiJinBaoAccount
             $config = $acc->settings('config', []);
             //请求API
             $ZJBao = new ZhiJinBaoAccount($config['key'], $config['secret']);
-            $result = $ZJBao->fetchOne($device, $user);
+            $result = $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user) {
+                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                if (empty($log)) {
+                    Util::logToFile('zjbao_query', [
+                        'query' => $request,
+                        'result' => $result,
+                    ]);
+                }
+            });
             if (is_error($result) || $result['code'] != 0) {
                 Util::logToFile('zjbao', [
                     'user' => $user->profile(),
@@ -115,13 +122,22 @@ class ZhiJinBaoAccount
 
             $acc = $res['account'];
 
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $data,
+                ]);
+                $log->save();
+            }
+
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),
                 'user' => $user->getId(),
                 'account' => $acc->getId(),
                 'orderUID' => $order_uid,
             ]);
-
         } catch (Exception $e) {
             Util::logToFile('zjbao', [
                 'error' => '回调处理发生错误! ',
@@ -130,7 +146,7 @@ class ZhiJinBaoAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = []): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = [], callable $cb = null): array
     {
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
@@ -151,10 +167,9 @@ class ZhiJinBaoAccount
         $params['sign'] = $this->sign($params);
         $result = Util::post(self::API_URL, $params);
 
-        Util::logToFile('zjbao_query', [
-            'query' => $params,
-            'result' => $result,
-        ]);
+        if ($cb) {
+            $cb($params, $result);
+        }
 
         return $result;
     }

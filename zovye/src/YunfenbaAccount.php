@@ -166,6 +166,8 @@ class YunfenbaAccount
      */
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         $acc = Account::findOne(['state' => Account::YUNFENBA]);
         if ($acc) {
             $config = $acc->settings('config', []);
@@ -175,7 +177,8 @@ class YunfenbaAccount
 
             //请求对方API
             $yunfenba = new YunfenbaAccount($config['vendor']['uid']);
-            $result = $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user) {
+
+            $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
                     Util::logToFile('yunfenba_query', [
@@ -183,27 +186,32 @@ class YunfenbaAccount
                         'result' => $result,
                     ]);
                 }
+                if (is_error($result)) {
+                    Util::logToFile('yunfenba', [
+                        'user' => $user->profile(),
+                        'acc' => $acc->getName(),
+                        'device' => $device->getName(),
+                        'data' => request::raw(),
+                        'error' => $result,
+                    ]);
+                } else {
+                    $data = $acc->format();
+
+                    $data['title'] = $result['wechat_name'];
+                    $data['img'] = $result['headimg_url'];
+                    $data['qrcode'] = $result['qrcode_url'];
+
+                    $v[] = $data;
+
+                    if ($log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+                }
             });
-            if (is_error($result)) {
-                Util::logToFile('yunfenba', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->getName(),
-                    'data' => request::raw(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
-
-                $data['title'] = $result['wechat_name'];
-                $data['img'] = $result['headimg_url'];
-                $data['qrcode'] = $result['qrcode_url'];
-
-                return [$data];
-            }
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params): array

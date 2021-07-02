@@ -36,13 +36,18 @@ class ZhiJinBaoAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::ZJBAO]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['key']) || empty($config['secret'])) {
+                return [];
+            }
             //请求API
             $ZJBao = new ZhiJinBaoAccount($config['key'], $config['secret']);
-            $result = $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user) {
+            $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
                     Util::logToFile('zjbao_query', [
@@ -50,25 +55,30 @@ class ZhiJinBaoAccount
                         'result' => $result,
                     ]);
                 }
+                if (is_error($result) || $result['code'] != 0) {
+                    Util::logToFile('zjbao', [
+                        'user' => $user->profile(),
+                        'acc' => $acc->getName(),
+                        'device' => $device->profile(),
+                        'error' => $result,
+                    ]);
+                } else {
+                    $data = $acc->format();
+
+                    $data['name'] = $result['nickname'];
+                    $data['qrcode'] = $result['qrcodeUrl'];
+
+                    if ($log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+
+                    $v[] = $data;
+                }
             });
-            if (is_error($result) || $result['code'] != 0) {
-                Util::logToFile('zjbao', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
-
-                $data['name'] = $result['nickname'];
-                $data['qrcode'] = $result['qrcodeUrl'];
-
-                return [$data];
-            }
         }
 
-        return [];
+        return $v;
     }
 
 

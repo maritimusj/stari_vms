@@ -35,13 +35,18 @@ class MoscaleAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::MOSCALE]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['appid']) || empty($config['appsecret'])) {
+                return [];
+            }
             //请求公锤API
             $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
-            $result = $moscale->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user) {
+            $moscale->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
                     Util::logToFile('moscale_query', [
@@ -49,25 +54,33 @@ class MoscaleAccount
                         'result' => $result,
                     ]);
                 }
+
+                if (is_error($result)) {
+                    Util::logToFile('moscale', [
+                        'user' => $user->profile(),
+                        'acc' => $acc->getName(),
+                        'device' => $device->profile(),
+                        'error' => $result,
+                    ]);
+                } 
+                
+                if ($result['code'] == 200) {
+                    $data = $acc->format();
+
+                    $data['name'] = $result['data']['name'];
+                    $data['qrcode'] = $result['data']['qrcode_url'];
+
+                    if ($log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+
+                    $v[] = $data;
+                }
             });
-            if (is_error($result)) {
-                Util::logToFile('moscale', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
-
-                $data['name'] = $result['name'];
-                $data['qrcode'] = $result['qrcode_url'];
-
-                return [$data];
-            }
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params): array
@@ -258,10 +271,6 @@ class MoscaleAccount
 
         if ($cb) {
             $cb($data, $result);
-        }
-
-        if ($result['code'] != 200) {
-            return error(intval($result['code']), empty($result['msg']) ? '发生错误' : $result['msg']);
         }
 
         return $result['data'];

@@ -31,14 +31,18 @@ class AQiinfoAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::AQIINFO]);
         if ($acc) {
             $config = $acc->settings('config', []);
-
+            if (empty($config['key']) || empty($config['secret'])) {
+                return [];
+            }
             //请求API
             $AQiinfo = new AQiinfoAccount($config['key'], $config['secret']);
-            $result = $AQiinfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user) {
+            $AQiinfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
                     Util::logToFile('AQiinfo_query', [
@@ -46,40 +50,45 @@ class AQiinfoAccount
                         'result' => $result,
                     ]);
                 }
-            });
 
-            if (is_error($result) || empty($result['ticket']) || empty($result['url'])) {
-                Util::logToFile('AQiinfo', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $user->set('AQiinfo', $result);
-
-                $data = $acc->format();
-
-                if ($result['name']) {
-                    $data['name'] = $result['name'];
-                }
-
-                $res = Util::createQrcodeFile("aqiinfo{$result['ticket']}", $result['url']);
-                if (is_error($res)) {
+                if (is_error($result) || empty($result['ticket']) || empty($result['url'])) {
                     Util::logToFile('AQiinfo', [
-                        'error' => 'fail to createQrcode file',
-                        'result' => $res,
+                        'user' => $user->profile(),
+                        'acc' => $acc->getName(),
+                        'device' => $device->profile(),
+                        'error' => $result,
                     ]);
-                    $data['redirect_url'] = $result['url'];
                 } else {
-                    $data['qrcode'] = Util::toMedia($res);
-                }
+                    $user->set('AQiinfo', $result);
 
-                return [$data];
-            }
+                    $data = $acc->format();
+
+                    if ($result['name']) {
+                        $data['name'] = $result['name'];
+                    }
+
+                    $res = Util::createQrcodeFile("aqiinfo{$result['ticket']}", $result['url']);
+                    if (is_error($res)) {
+                        Util::logToFile('AQiinfo', [
+                            'error' => 'fail to createQrcode file',
+                            'result' => $res,
+                        ]);
+                        $data['redirect_url'] = $result['url'];
+                    } else {
+                        $data['qrcode'] = Util::toMedia($res);
+                    }
+
+                    if ($log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+
+                    $v[] = $data;
+                }
+            });
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params): array

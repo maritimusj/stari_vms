@@ -345,7 +345,7 @@ class Util
                         file_put_contents($filename, $data, FILE_APPEND);
                     }
                 }
-                if (random_int(0, 10) == 10) {
+                if (rand(0, 10) == 10) {
                     self::deleteExpiredLogFiles($name);
                 }
             });

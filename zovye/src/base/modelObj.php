@@ -382,6 +382,8 @@ class modelObj implements ISettings
                 return doubleval($val);
             case 'array':
                 return (array)$val;
+            case 'json':
+                return json_decode($val, true);
             default:
                 return $val;
         }

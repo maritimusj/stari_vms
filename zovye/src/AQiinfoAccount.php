@@ -52,40 +52,62 @@ class AQiinfoAccount
                         ]);
                     }
                 }
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+                    
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
 
-                if (is_error($result) || empty($result['ticket']) || empty($result['url'])) {
-                    Util::logToFile('AQiinfo', [
-                        'user' => $user->profile(),
-                        'acc' => $acc->getName(),
-                        'device' => $device->profile(),
-                        'error' => $result,
-                    ]);
-                } else {
-                    $user->set('AQiinfo', $result);
+                    if ($result['code'] != 200) {
+                        if ($result['code'] == 450031) {
+                            throw new RuntimeException('签名错误！');
+                        }
+
+                        if ($result['msg']) {
+                            throw new RuntimeException($result['msg']);
+                        }
+
+                        throw new RuntimeException("接口返回错误：{$result['code']}");
+                    }
+
+                    if (empty($result['data']) || empty($result['data']['ticket']) || empty($result['data']['url'])) {
+                        throw new RuntimeException('返回数据不正确！');
+                    }
+
+                    $user->set('AQiinfo', $result['data']);
 
                     $data = $acc->format();
 
-                    if ($result['name']) {
-                        $data['name'] = $result['name'];
+                    if ($result['data']['name']) {
+                        $data['name'] = $result['data']['name'];
                     }
 
-                    $res = Util::createQrcodeFile("aqiinfo{$result['ticket']}", $result['url']);
+                    $res = Util::createQrcodeFile("aqiinfo{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
                         Util::logToFile('AQiinfo', [
                             'error' => 'fail to createQrcode file',
                             'result' => $res,
                         ]);
-                        $data['redirect_url'] = $result['url'];
+                        $data['redirect_url'] = $result['data']['url'];
                     } else {
                         $data['qrcode'] = Util::toMedia($res);
                     }
+
+                    $v[] = $data;
 
                     if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }
 
-                    $v[] = $data;
+                } catch (Exception $e) {
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    }
                 }
             });
         }
@@ -194,19 +216,7 @@ class AQiinfoAccount
             $cb($data, $result);
         }
 
-        if ($result['code'] != 200) {
-            if ($result['code'] == 450031) {
-                return err('签名错误！');
-            }
-
-            if ($result['msg']) {
-                return err($result['msg']);
-            }
-
-            return err("接口返回错误：{$result['code']}");
-        }
-
-        return $result['data'];
+        return $result;
     }
 
     public static function sign(array $data, string $secret): string

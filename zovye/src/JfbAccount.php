@@ -73,24 +73,39 @@ class JfbAccount
                 }
             }
 
-            if (is_error($result)) {
-                return [];
-            }
+            try {
+                if (empty($result)) {
+                    throw new RuntimeException('返回数据为空！');
+                }
 
-            if ($result['status'] && $result['errorCode'] == '0000') {
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message']);
+                }
+
+                if (!$result['status'] || $result['errorCode'] != '0000') {
+                    throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
+                }
+
                 $data = $acc->format();
                 $x = $result['result']['data'][0];
-                if ($x) {
-                    $data['title'] = $x['nickName'];
-                    $data['img'] = $x['headImgUrl'];
-                    $data['qrcode'] = $x['qrPicUrl'];
+                if (empty($x)) {
+                    throw new RuntimeException('没有数据！');
+                }
 
-                    if (App::isAccountLogEanbled() && $log) {
-                        $log->setExtraData('account', $data);
-                        $log->save();
-                    }
+                $data['title'] = $x['nickName'];
+                $data['img'] = $x['headImgUrl'];
+                $data['qrcode'] = $x['qrPicUrl'];
 
-                    $v[] = $data;
+                $v[] = $data;
+
+                if (App::isAccountLogEanbled() && $log) {
+                    $log->setExtraData('account', $data);
+                    $log->save();
+                }
+            } catch (Exception $e) {
+                if (App::isAccountLogEanbled() && $log) {
+                    $log->setExtraData('error_msg', $e->getMessage());
+                    $log->save();
                 }
             }
         }

@@ -144,17 +144,6 @@ class YunfenbaAccount
             $cb($data, $result);
         }
 
-        if (is_error($result)) {
-            return $result;
-        }
-
-        if (!empty($result['errcode'])) {
-            if ($result['errcode'] == 203) {
-                return err('暂时没有公众号！');
-            }
-            return err('接口返回错误！');
-        }
-
         return $result['data'];
     }
 
@@ -189,15 +178,22 @@ class YunfenbaAccount
                     }
                 }
 
-                if (is_error($result)) {
-                    Util::logToFile('yunfenba', [
-                        'user' => $user->profile(),
-                        'acc' => $acc->getName(),
-                        'device' => $device->getName(),
-                        'data' => request::raw(),
-                        'error' => $result,
-                    ]);
-                } else {
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if (!empty($result['errcode'])) {
+                        if ($result['errcode'] == 203) {
+                            throw new RuntimeException('暂时没有公众号！');
+                        }
+                        throw new RuntimeException('失败，错误代码：' . $result['errcode']);
+                    }
+
                     $data = $acc->format();
 
                     $data['title'] = $result['wechat_name'];
@@ -208,6 +204,11 @@ class YunfenbaAccount
 
                     if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+                } catch (Exception $e) {
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     }
                 }

@@ -58,25 +58,35 @@ class ZhiJinBaoAccount
                     }
                 }
 
-                if (is_error($result) || $result['code'] != 0) {
-                    Util::logToFile('zjbao', [
-                        'user' => $user->profile(),
-                        'acc' => $acc->getName(),
-                        'device' => $device->profile(),
-                        'error' => $result,
-                    ]);
-                } else {
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if ($result['code'] != 0) {
+                        throw new RuntimeException('失败，发生错误：' . $result['code']);
+                    }
+
                     $data = $acc->format();
 
                     $data['name'] = $result['nickname'];
                     $data['qrcode'] = $result['qrcodeUrl'];
 
+                    $v[] = $data;
+
                     if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }
-
-                    $v[] = $data;
+                } catch (Exception $e) {
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    }
                 }
             });
         }

@@ -57,27 +57,35 @@ class MoscaleAccount
                     }
                 }
 
-                if (is_error($result)) {
-                    Util::logToFile('moscale', [
-                        'user' => $user->profile(),
-                        'acc' => $acc->getName(),
-                        'device' => $device->profile(),
-                        'error' => $result,
-                    ]);
-                } 
-                
-                if ($result['code'] == 200) {
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if ($result['code'] != 200) {
+                        throw new RuntimeException('失败，错误代码：' . $result['code']);
+                    }
+
                     $data = $acc->format();
 
                     $data['name'] = $result['data']['name'];
                     $data['qrcode'] = $result['data']['qrcode_url'];
 
+                    $v[] = $data;
+
                     if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }
-
-                    $v[] = $data;
+                } catch (Exception $e) {
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    }
                 }
             });
         }

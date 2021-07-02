@@ -179,13 +179,16 @@ class YunfenbaAccount
             $yunfenba = new YunfenbaAccount($config['vendor']['uid']);
 
             $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('yunfenba_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('yunfenba_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
                 }
+
                 if (is_error($result)) {
                     Util::logToFile('yunfenba', [
                         'user' => $user->profile(),
@@ -203,7 +206,7 @@ class YunfenbaAccount
 
                     $v[] = $data;
 
-                    if ($log) {
+                    if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }

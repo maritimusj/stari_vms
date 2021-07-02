@@ -18,6 +18,8 @@ class JfbAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
+        $v = [];
+
         $acc = Account::findOne(['state' => Account::JFB]);
         if ($acc) {
             $config = $acc->get('config', []);
@@ -61,12 +63,14 @@ class JfbAccount
 
             $result = Util::post(strval($config['url']), $data);
 
-            $log = Account::createQueryLog($acc, $user, $device, $data, $result);
-            if (empty($log)) {
-                Util::logToFile('jfb_query', [
-                    'request' => $data,
-                    'result' => $result,
-                ]);
+            if (App::isAccountLogEanbled()) {
+                $log = Account::createQueryLog($acc, $user, $device, $data, $result);
+                if (empty($log)) {
+                    Util::logToFile('jfb_query', [
+                        'request' => $data,
+                        'result' => $result,
+                    ]);
+                }
             }
 
             if (is_error($result)) {
@@ -80,12 +84,18 @@ class JfbAccount
                     $data['title'] = $x['nickName'];
                     $data['img'] = $x['headImgUrl'];
                     $data['qrcode'] = $x['qrPicUrl'];
-                    return [$data];
+
+                    if (App::isAccountLogEanbled() && $log) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+
+                    $v[] = $data;
                 }
             }
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params = []): array
@@ -129,14 +139,16 @@ class JfbAccount
 
                 $acc = $res['account'];
 
-                $log = Account::getLastQueryLog($acc, $user, $device);
-                if ($log) {
-                    $log->setExtraData('cb', [
-                        'time' => time(),
-                        'order_uid' => $order_uid,
-                        'data' => $params,
-                    ]);
-                    $log->save();
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::getLastQueryLog($acc, $user, $device);
+                    if ($log) {
+                        $log->setExtraData('cb', [
+                            'time' => time(),
+                            'order_uid' => $order_uid,
+                            'data' => $params,
+                        ]);
+                        $log->save();
+                    }
                 }
 
                 Job::createSpecialAccountOrder([

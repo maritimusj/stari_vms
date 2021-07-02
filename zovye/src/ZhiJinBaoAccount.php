@@ -48,13 +48,16 @@ class ZhiJinBaoAccount
             //请求API
             $ZJBao = new ZhiJinBaoAccount($config['key'], $config['secret']);
             $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('zjbao_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('zjbao_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
                 }
+
                 if (is_error($result) || $result['code'] != 0) {
                     Util::logToFile('zjbao', [
                         'user' => $user->profile(),
@@ -68,7 +71,7 @@ class ZhiJinBaoAccount
                     $data['name'] = $result['nickname'];
                     $data['qrcode'] = $result['qrcodeUrl'];
 
-                    if ($log) {
+                    if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }

@@ -48,13 +48,16 @@ class MeiPaAccount
             //请求API
             $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
             $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('meipa_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('meipa_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
                 }
+
                 if (is_error($result) || $result['status'] != 1) {
                     Util::logToFile('meipa', [
                         'user' => $user->profile(),
@@ -68,7 +71,7 @@ class MeiPaAccount
                     $data['title'] = $result['data']['wechat_name'];
                     $data['qrcode'] = $result['data']['qrcodeurl'];
 
-                    if ($log) {
+                    if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }

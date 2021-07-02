@@ -43,12 +43,14 @@ class AQiinfoAccount
             //请求API
             $AQiinfo = new AQiinfoAccount($config['key'], $config['secret']);
             $AQiinfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('AQiinfo_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('AQiinfo_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
                 }
 
                 if (is_error($result) || empty($result['ticket']) || empty($result['url'])) {
@@ -78,7 +80,7 @@ class AQiinfoAccount
                         $data['qrcode'] = Util::toMedia($res);
                     }
 
-                    if ($log) {
+                    if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }

@@ -47,12 +47,14 @@ class MoscaleAccount
             //请求公锤API
             $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
             $moscale->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Util::logToFile('moscale_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+                if (App::isAccountLogEanbled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('moscale_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
                 }
 
                 if (is_error($result)) {
@@ -70,7 +72,7 @@ class MoscaleAccount
                     $data['name'] = $result['data']['name'];
                     $data['qrcode'] = $result['data']['qrcode_url'];
 
-                    if ($log) {
+                    if (App::isAccountLogEanbled() && $log) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }

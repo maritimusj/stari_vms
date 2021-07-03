@@ -893,4 +893,26 @@ class Account extends State
         $query->orderBy('id DESC');
         return $query->findOne();
     }
+
+    public static function createSpecialAccountOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
+    {
+        if (App::isAccountLogEanbled()) {
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $cb_params,
+                ]);
+                $log->save();
+            }
+        }
+
+        Job::createSpecialAccountOrder([
+            'device' => $device->getId(),
+            'user' => $user->getId(),
+            'account' => $acc->getId(),
+            'orderUID' => $order_uid,
+        ]);
+    }
 }

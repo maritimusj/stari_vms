@@ -98,12 +98,12 @@ class JfbAccount
 
                 $v[] = $data;
 
-                if (App::isAccountLogEanbled() && $log) {
+                if (App::isAccountLogEanbled() && isset($log)) {
                     $log->setExtraData('account', $data);
                     $log->save();
                 }
             } catch (Exception $e) {
-                if (App::isAccountLogEanbled() && $log) {
+                if (App::isAccountLogEanbled() && isset($log)) {
                     $log->setExtraData('error_msg', $e->getMessage());
                     $log->save();
                 }
@@ -154,24 +154,8 @@ class JfbAccount
 
                 $acc = $res['account'];
 
-                if (App::isAccountLogEanbled()) {
-                    $log = Account::getLastQueryLog($acc, $user, $device);
-                    if ($log) {
-                        $log->setExtraData('cb', [
-                            'time' => time(),
-                            'order_uid' => $order_uid,
-                            'data' => $params,
-                        ]);
-                        $log->save();
-                    }
-                }
+                Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
 
-                Job::createSpecialAccountOrder([
-                    'device' => $device->getId(),
-                    'user' => $user->getId(),
-                    'account' => $acc->getId(),
-                    'orderUID' => $order_uid,
-                ]);
             } catch (Exception $e) {
                 Util::logToFile('jfb', [
                     'error' => $e->getMessage(),

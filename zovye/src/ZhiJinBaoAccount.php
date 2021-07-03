@@ -78,12 +78,12 @@ class ZhiJinBaoAccount
 
                     $v[] = $data;
 
-                    if (App::isAccountLogEanbled() && $log) {
+                    if (App::isAccountLogEanbled() && isset($log)) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }
                 } catch (Exception $e) {
-                    if (App::isAccountLogEanbled() && $log) {
+                    if (App::isAccountLogEanbled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     }
@@ -145,22 +145,8 @@ class ZhiJinBaoAccount
 
             $acc = $res['account'];
 
-            $log = Account::getLastQueryLog($acc, $user, $device);
-            if ($log) {
-                $log->setExtraData('cb', [
-                    'time' => time(),
-                    'order_uid' => $order_uid,
-                    'data' => $data,
-                ]);
-                $log->save();
-            }
+            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
 
-            Job::createSpecialAccountOrder([
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'account' => $acc->getId(),
-                'orderUID' => $order_uid,
-            ]);
         } catch (Exception $e) {
             Util::logToFile('zjbao', [
                 'error' => '回调处理发生错误! ',

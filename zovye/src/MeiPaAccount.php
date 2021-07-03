@@ -71,7 +71,7 @@ class MeiPaAccount
                     $data['title'] = $result['data']['wechat_name'];
                     $data['qrcode'] = $result['data']['qrcodeurl'];
 
-                    if (App::isAccountLogEanbled() && $log) {
+                    if (App::isAccountLogEanbled() && isset($log)) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }
@@ -134,22 +134,8 @@ class MeiPaAccount
 
             $acc = $res['account'];
 
-            $log = Account::getLastQueryLog($acc, $user, $device);
-            if ($log) {
-                $log->setExtraData('cb', [
-                    'time' => time(),
-                    'order_uid' => $order_uid,
-                    'data' => $data,
-                ]);
-                $log->save();
-            }
+            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
 
-            Job::createSpecialAccountOrder([
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'account' => $acc->getId(),
-                'orderUID' => $order_uid,
-            ]);
         } catch (Exception $e) {
             Util::logToFile('meipa', [
                 'data' => $data,

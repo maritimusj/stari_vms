@@ -1280,6 +1280,6 @@ class common
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        return ['goods' => $device->getGoodsList()];
+        return ['goods' => $device->getGoodsList(null, ['allowPay'])];
     }
 }

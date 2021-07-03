@@ -407,10 +407,10 @@ JSCODE;
                     }
                 }
             } else {
-                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user)]);
+                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
             }
         } else {
-            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user)]);
+            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
         }
 
         //如果无法领取，则清除访问记录
@@ -426,14 +426,8 @@ JSCODE;
                 $tpl['accounts'] = [];
             }
         } elseif ($lanesNum > 1) {
-            $anyFreeGoods = false;
-            foreach ($tpl['goods'] as $goods) {
-                if ($goods['allowFree']) {
-                    $anyFreeGoods = true;
-                    break;
-                }
-            }
-            if (!$anyFreeGoods) {
+            $free_goods_list = $device->getGoodsList($user, ['allowFree']);
+            if (empty($free_goods_list)) {
                 $tpl['accounts'] = [];
             }
         } else {
@@ -465,14 +459,14 @@ JSCODE;
                             'device' => $device->getShadowId(),
                             'time' => time(),
                         ]
-                    ]);    
+                    ]);
                 } else {
                     $obj = ComponentUser::findOne(['user_id' => $user->getId(), 'appid' => $account['appid']]);
                     if ($obj) {
                         $obj->setOpenid($footprint);
                         $obj->save();
                     }
-                }                
+                }
             }
         }
 

@@ -632,7 +632,7 @@ class deviceModelObj extends modelObj
      * @return array
      */
     public function resetPayload(array $data = [], $reason = '', $now = 0): array
-    {        
+    {
         static $cache = [];
 
         $now = empty($now) ? time() : $now;
@@ -645,9 +645,9 @@ class deviceModelObj extends modelObj
         }
 
         $result = Device::resetPayload($this, $data);
-        if ($result) {               
+        if ($result) {
             foreach ($result as $entry) {
-                $code =  $this->getPayloadCode($now);
+                $code = $this->getPayloadCode($now);
                 if (!empty($entry['reason'])) {
                     $reason = $reason . "({$entry['reason']})";
                 }
@@ -2541,7 +2541,7 @@ class deviceModelObj extends modelObj
         return $total;
     }
 
-    public function getGoodsList(userModelObj $user = null): array
+    public function getGoodsList(userModelObj $user = null, $params = []): array
     {
         $result = [];
 
@@ -2550,40 +2550,49 @@ class deviceModelObj extends modelObj
         if ($payload && $payload['cargo_lanes']) {
             foreach ($payload['cargo_lanes'] as $entry) {
                 $goods_data = Goods::data($entry['goods'], ['useImageProxy' => true]);
-                if ($goods_data) {
-                    $goods_data['num'] = $entry['num'];
-                    if ($this->isCustomType() && isset($entry['goods_price'])) {
-                        $goods_data['price'] = $entry['goods_price'];
+                if (empty($goods_data)) {
+                    continue;
+                }
+
+                if ($params) {
+                    if ((!empty($params['allowPay']) || in_array('allowPay', $params)) && empty($goods_data['allowPay'])) {
+                        continue;
+                    }
+                    if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
+                        continue;
                     }
                 }
 
-                if ($goods_data && $goods_data['allowPay']) {
-                    $key = "goods{$goods_data['id']}";
-                    if ($result['goods'][$key]) {
-                        $result['goods'][$key]['num'] += intval($goods_data['num']);
-                        //如果相同商品设置了不同价格，则使用更高的价格
-                        if ($result['goods'][$key]['price'] < $goods_data['price']) {
-                            $result['goods'][$key]['price'] = $goods_data['price'];
-                            $result['goods'][$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
-                        }
-                    } else {
-                        $result['goods'][$key] = [
-                            'id' => $goods_data['id'],
-                            'name' => $goods_data['name'],
-                            'img' => $goods_data['img'],
-                            'detail_img' => $goods_data['detailImg'],
-                            'price' => $goods_data['price'],
-                            'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2) . '元',
-                            'num' => intval($goods_data['num']),
-                            'allowFree' => $goods_data['allowFree'],
-                            'allowPay' => $goods_data['allowPay'],
-                        ];
+                $goods_data['num'] = $entry['num'];
+                if ($this->isCustomType() && isset($entry['goods_price'])) {
+                    $goods_data['price'] = $entry['goods_price'];
+                }
 
-                        if (!empty($user)) {
-                            $discount = User::getUserDiscount($user, $goods_data);
-                            $result['goods'][$key]['discount'] = $discount;
-                            $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
-                        }
+                $key = "goods{$goods_data['id']}";
+                if ($result['goods'][$key]) {
+                    $result['goods'][$key]['num'] += intval($goods_data['num']);
+                    //如果相同商品设置了不同价格，则使用更高的价格
+                    if ($result['goods'][$key]['price'] < $goods_data['price']) {
+                        $result['goods'][$key]['price'] = $goods_data['price'];
+                        $result['goods'][$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
+                    }
+                } else {
+                    $result['goods'][$key] = [
+                        'id' => $goods_data['id'],
+                        'name' => $goods_data['name'],
+                        'img' => $goods_data['img'],
+                        'detail_img' => $goods_data['detailImg'],
+                        'price' => $goods_data['price'],
+                        'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2) . '元',
+                        'num' => intval($goods_data['num']),
+                        'allowFree' => $goods_data['allowFree'],
+                        'allowPay' => $goods_data['allowPay'],
+                    ];
+
+                    if (!empty($user)) {
+                        $discount = User::getUserDiscount($user, $goods_data);
+                        $result['goods'][$key]['discount'] = $discount;
+                        $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
                     }
                 }
             }

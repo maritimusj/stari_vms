@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{php \zovye\url(true, 'static/css/common.css?v=20210703001');}
 <style>
     #devicelist .device-qrcode {
         position: relative;
@@ -136,6 +136,33 @@
     }
     #devicelist .devicename img {
         width: 15px;
+    }
+    #devicelist .tags {
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+    }
+    #devicelist .first-tag {
+        position: relative;
+    }
+    #devicelist .tagslist {
+        position: absolute;
+        display: none;
+        flex-wrap: wrap;
+        border: 1px solid #ccc;
+        width: fit-content;
+        padding: 10px;
+        z-index: 99;
+        background: #fff;
+        justify-content: flex-start;
+        align-content: center;
+        align-items: center;
+        top: 36px;
+        left: 0px;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+    #devicelist .tags-list:hover .tagslist {
+        display: flex;
     }
     .zovye_qrcode:hover {
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -395,7 +422,7 @@
                             <template v-if="showSelectInputCtrl && canDownload">
                                 <i class="fa fa-download" title="下载选中的设备二维码" @click="downloadQRCode"></i><span class="badge" style="position: absolute;">{{selectedInputCtrl.length}}</span>
                             </template>
-                            <i class="fa fa-sign-out" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
+                            <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
                         </th>
                         <th>                    
                             <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>
@@ -414,14 +441,17 @@
                         <th>
                             <div data-orderby="groupId" {if $orderby=='groupId'}class="fa {$order}"{/if}>分组</div>
                         </th>
+                        <th style="width: 60px;">
+                            标签
+                        </th>
                         <th>
                             <div>设备状态</div>
                         </th>
-                       <th>
-                            加入时间
-                        </th>
                         <th style="width: 165px;">
                             出货用时
+                        </th>
+                        <th>
+                            加入时间
                         </th>
                         <th>操作</th>
                     </tr>
@@ -533,6 +563,14 @@
                             </template>
                             <span class="nogroup" v-else>&lt;无分组&gt;</span>
                         </td>
+                        <td class="tags-list">
+                            <div class="tags" v-if="o.tags && o.tags.length>0">
+                                <span class="tag first-tag" @click="tagClicked(o.tags[0])">{{o.tags[0].title}}</span>
+                                <div class="tagslist tags" v-if="o.tags.length > 1">
+                                    <span class="tag" v-for="tag in o.tags"  @click="tagClicked(tag)">{{tag.title}}</span>
+                                </div>
+                            </div>
+                        </td>
                         <td class="status">
                             <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
                             <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
@@ -594,11 +632,11 @@
                             </div>
                         </td>
                         <td>
-                            {{o.createtime}}
-                        </td>
-                        <td>
                             <div :id="'chart_' + o.id" style="width: 160px;height: 60px;">
                             </div>
+                        </td>
+                        <td>
+                            {{o.createtime}}
                         </td>
                         <td class="operate">
                             <div class="btn-group">
@@ -685,5 +723,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625004"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625006"></script>
 {template 'common/footer'}

@@ -24,12 +24,12 @@ table th,table td {
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#"><b>{$title}</b>的库存</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}">商品入库</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockLog', 'id' => $user])}">变动记录</a></li>
 </ul>
 <div class="panel panel-default panel-first">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}"><i class="fa fa-sign-in" title="入库"></i></a>
             <a href="{php echo $this->createWebUrl('user')}"><i class="fa fa-reply" title="返回"></i></a>
         </span>
     </div>

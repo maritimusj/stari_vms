@@ -152,8 +152,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;        
         $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;        
 
-        $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
-        $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;        
+        $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;    
 
         $specialAccounts = [
             'jfbFAN' => [
@@ -419,6 +418,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['account']['wx']['platform']['config']['token'] = request::trim('wxPlatformToken');
             $settings['account']['wx']['platform']['config']['key'] = request::trim('wxPlatformKey');
         }
+
+        $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;    
 
         $settings['misc']['adminAccount'] = request::trim('adminAccount');
         $settings['misc']['pushAccountMsg_type'] = request::trim('pushAccountMsg_type');

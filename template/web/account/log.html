@@ -1,0 +1,122 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    #list .data {
+        position: relative;
+    }
+    #list .data .json {
+        width: 500px;
+        position: absolute;
+        display: none;
+        z-index: 99;
+        left: 40px;
+        text-align: start;
+    }
+    #list .data:hover .json {
+        display: block;        
+    }
+    #list .data i {
+        color: gray;
+    }
+    #list td i.success {
+        color: #4caf50;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"class="active"><a href="#">请求日志</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'clearLog', 'id' => $id));}"><i class="fa fa-times" title="清除日志"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table" id="list">
+            <thead>
+                <th>#</th>
+                <th style="width: 260px;">流水号</th>
+                <th>公众号</th>
+                <th>用户</th>
+                <th>设备</th>
+                <th class="center">请求数据</th>
+                <th class="center">API响应</th>
+                <th class="center">通知</th>
+                <th style="width: 300px;">订单</th>
+                <th style="width: 200px;">时间</th>
+            </thead>
+            <tbody>
+                {loop $list $index $e}
+                <tr>
+                    <td>{php echo $index + 1}</td>
+                    <td>
+                        {$e['request_id']}
+                    </td>
+                    <td>
+                        <div class="profile">
+                            <img src="{$e['account']['img']}">
+                            <span>{$e['account']['name']}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="profile">
+                            <img src="{$e['user']['headimgurl']}">
+                            <span>{$e['user']['name']}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <span>{$e['device']['imei']}</span>
+                        </div>
+                    </td>
+                    <td class="center">
+                        <div class="data">
+                        <i class="fa fa-cloud-upload {if $e['request']}success{else}fail{/if}"></i>
+                        <div class="json">
+                            <pre>
+{php echo json_encode($e['request'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);}
+                            </pre>
+                        </div>                            
+                        </div>
+
+                    </td>
+                    <td class="data center">
+                        <i class="fa fa-cloud-download {if $e['result']}success{else}fail{/if}"></i>
+                        <div class="json">
+                            <pre>
+{php echo json_encode($e['result'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);}
+                            </pre>
+                        </div>
+                    </td>
+                    <td class="data center">
+                        {if $e['cb']}
+                        <i class="fa fa-check-circle-o {if $e['cb']['data']}success{else}fail{/if}"></i> {php echo date('Y-m-d H:i:s', $e['cb']['time'])}
+                        <div class="json">
+                            <pre>
+{php echo json_encode($e['cb']['data'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);}
+                            </pre>
+                        </div>
+                        {/if}
+                    </td>
+                    <td>
+                        <span>{$e['cb']['order_uid']}</span>
+                    </td>
+                    <td>
+                        {php echo date('Y-m-d H:i:s', $e['createtime'])}
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            暂时还没有任何库存数据！
+        </div>
+        {/if}
+    </div>
+</div>
+{template 'common/footer'}

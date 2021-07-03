@@ -779,10 +779,37 @@ if ($op == 'default') {
         foreach ($query->findAll() as $entry) {
             $data = [
                 'id' => $entry->getId(),
+                'request_id' => $entry->getRequestId(),
                 'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];
-            
-            $data['extra'] = $entry->getExtraData();
+
+            $acc = $entry->getAccount();
+            if (!empty($acc)) {
+                $data['account']['id'] = $acc->getId();
+                $data['account']['state'] = $acc->getState();
+                $data['account']['clr'] = $acc->getClr();
+                $data['account']['name'] = $acc->getName();
+                $data['account']['title'] = $acc->getTitle();
+                $data['account']['descr'] = $acc->getDescription();
+                $data['account']['img'] = $acc->getImg();
+                $data['account']['qrcode'] = $acc->getQrcode();
+            }
+
+            $user = $entry->getUser();
+            if ($user) {
+                $data['user'] = $user->profile();
+            }
+
+            $device = $entry->getDevice();
+            if ($device) {
+                $data['device'] = $device->profile();
+            }
+
+            $data['request'] = $entry->getRequest();
+            $data['result'] = $entry->getResult();
+            $data['cb'] = $entry->getExtraData('cb');
+            $data['createtime'] = $entry->getCreatetime();
+
             $list[] = $data;
         }
     }

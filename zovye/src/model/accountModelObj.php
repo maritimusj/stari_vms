@@ -130,6 +130,20 @@ class accountModelObj extends modelObj
         return tb('account');
     }
 
+    public function profile()
+    {
+        return [
+            'id' => $this->getId(),
+            'state' => $this->getState(),
+            'clr' => $this->getClr(),
+            'name' => $this->getName(),
+            'title' => $this->getTitle(),
+            'descr' => $this->getDescription(),
+            'img' => $this->getImg(),
+            'qrcode' => $this->getQrcode(),
+        ];
+    }
+
     public function isBanned(): bool
     {
         if ($this->state == Account::BANNED) {

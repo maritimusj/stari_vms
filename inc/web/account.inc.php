@@ -748,15 +748,31 @@ if ($op == 'default') {
     if (empty($acc)) {
         JSON::fail('找不到这个公众号！');
     }
+
+    $tpl_data = [
+        'account' => $acc->profile(),
+    ];
   
     $query = Account::logQuery($acc);
 
     if (request::has('device')) {
-        $query->where(['device_id' => request::int('device')]);
+        $device_id = request::int('device');
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            Util::itoast('找不到这个设备！', '', 'error');
+        }
+        $tpl_data['device']  = $device->profile();
+        $query->where(['device_id' => $device_id]);
     }
 
     if (request::has('user')) {
-        $query->where(['user_id' => request::int('user')]);
+        $user_id = request::int('user');
+        $user = User::get($user_id);
+        if (empty($user)) {
+            Util::itoast('找不到这个用户！', '', 'error');
+        }
+        $tpl_data['user'] = $user->profile();
+        $query->where(['user_id' => $user_id]);
     }
 
     $total = $query->count();
@@ -785,14 +801,7 @@ if ($op == 'default') {
 
             $acc = $entry->getAccount();
             if (!empty($acc)) {
-                $data['account']['id'] = $acc->getId();
-                $data['account']['state'] = $acc->getState();
-                $data['account']['clr'] = $acc->getClr();
-                $data['account']['name'] = $acc->getName();
-                $data['account']['title'] = $acc->getTitle();
-                $data['account']['descr'] = $acc->getDescription();
-                $data['account']['img'] = $acc->getImg();
-                $data['account']['qrcode'] = $acc->getQrcode();
+                $data['account'] = $acc->profile();
             }
 
             $user = $entry->getUser();

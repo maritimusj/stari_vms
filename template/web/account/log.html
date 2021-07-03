@@ -23,12 +23,37 @@
     }
 </style>
 <ul class="nav nav-tabs" id="navbar">
-    <li role="presentation"class="active"><a href="#">请求日志</a></li>
+    {if empty($user) && empty($device)}
+    <li role="presentation"class="active">
+        <a href="#">
+            <span><b>{$account['name']}</b></span>的请求日志           
+        </a>
+    </li>
+    {else}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id']])}">
+            <span>{$account['name']}的请求日志        
+        </a>
+    </li>
+    {/if}
+    {if $user}
+    <li role="presentation"class="active">
+        <a href="#">
+            <span>{$user['name']}</span>           
+        </a>
+    </li>
+    {/if}
+    {if $device}
+    <li role="presentation"class="active">
+        <a href="#">
+            <span><b>{$device['name']}</b></span>           
+        </a>
+    </li>
+    {/if}
 </ul>
 <div class="panel panel-default panel-first">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('account', array('op'=>'clearLog', 'id' => $id));}"><i class="fa fa-times" title="清除日志"></i></a>
         </span>
     </div>
     <div class="panel-body">
@@ -60,14 +85,18 @@
                         </div>
                     </td>
                     <td>
-                        <div class="profile">
-                            <img src="{$e['user']['headimgurl']}">
-                            <span>{$e['user']['name']}</span>
-                        </div>
+                        <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id'], 'user' => $e['user']['id']]);}">
+                            <div class="profile">
+                                <img src="{$e['user']['headimgurl']}">
+                                <span>{$e['user']['name']}</span>
+                            </div>
+                        </a>
                     </td>
                     <td>
                         <div>
-                            <span>{$e['device']['imei']}</span>
+                            <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id'], 'device' => $e['device']['id']]);}">
+                                <span title="{$e['device']['imei']}">{$e['device']['name']}</span>
+                            </a>
                         </div>
                     </td>
                     <td class="center">

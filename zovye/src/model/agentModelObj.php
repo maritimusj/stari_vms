@@ -7,13 +7,11 @@
 namespace zovye\model;
 
 use zovye\GSP;
-use zovye\State;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
 
-use function zovye\error;
 use function zovye\m;
 use function zovye\settings;
 

@@ -353,30 +353,32 @@ class Util
 
     public static function logToFile(string $name, $data): bool
     {
-        if (empty(self::$log_cache)) {
-            register_shutdown_function(function () use ($name) {
-                foreach (self::$log_cache as $filename => $data) {
-                    if ($filename && $data) {
-                        file_put_contents($filename, $data, FILE_APPEND);
+        if (DEBUG) {
+            if (empty(self::$log_cache)) {
+                register_shutdown_function(function () use ($name) {
+                    foreach (self::$log_cache as $filename => $data) {
+                        if ($filename && $data) {
+                            file_put_contents($filename, $data, FILE_APPEND);
+                        }
                     }
-                }
-                if (rand(0, 10) == 10) {
-                    self::deleteExpiredLogFiles($name);
-                }
-            });
+                    if (rand(0, 10) == 10) {
+                        self::deleteExpiredLogFiles($name);
+                    }
+                });
+            }
+
+            ob_start();
+
+            echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
+
+            print_r($data);
+
+            echo PHP_EOL;
+
+            $log_filename = self::logFileName($name);
+
+            self::$log_cache[$log_filename][] = ob_get_clean();
         }
-
-        ob_start();
-
-        echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
-
-        print_r($data);
-
-        echo PHP_EOL;
-
-        $log_filename = self::logFileName($name);
-
-        self::$log_cache[$log_filename][] = ob_get_clean();
 
         return true;
     }

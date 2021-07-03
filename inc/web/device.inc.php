@@ -13,6 +13,7 @@ use DateTime;
 
 use Exception;
 use RuntimeException;
+use ZipArchive;
 use zovye\model\device_eventsModelObj;
 use zovye\model\device_feedbackModelObj;
 use zovye\model\device_groupsModelObj;
@@ -69,8 +70,8 @@ if ($op == 'list') {
     }
 
     if (request::has('types')) {
-        $typeid = request::int('types');
-        $type = DeviceTypes::get($typeid);
+        $type_id = request::int('types');
+        $type = DeviceTypes::get($type_id);
         if (empty($type)) {
             Util::itoast('找不到这个型号！', $this->createWebUrl('device'), 'error');
         }
@@ -408,11 +409,11 @@ if ($op == 'list') {
     $tpl_data['device_types'] = $device_types;
 
     if (App::isMoscaleEnabled()) {
-        $tpl_data['moscaleMachineKey'] = is_array($extra) ? strval($extra['moscale']['key']) : '';
+        $tpl_data['moscaleMachineKey'] = isset($extra) && is_array($extra) ? strval($extra['moscale']['key']) : '';
         $tpl_data['moscaleLabelList'] = MoscaleAccount::getLabelList();
-        $tpl_data['moscaleAreaListSaved'] = is_array($extra) ? $extra['moscale']['label'] : [];
+        $tpl_data['moscaleAreaListSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['label'] : [];
         $tpl_data['moscaleRegionData'] = MoscaleAccount::getRegionData();
-        $tpl_data['moscaleRegionSaved'] = is_array($extra) ? $extra['moscale']['region'] : [];
+        $tpl_data['moscaleRegionSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['region'] : [];
     }
 
     app()->showTemplate('web/device/edit_new', $tpl_data);
@@ -1043,7 +1044,7 @@ if ($op == 'list') {
             'code' => strval($entry->getExtraData('code', '')),
             'clr' => strval($entry->getExtraData('clr', '#9e9e9e')),
             'createtime' => $entry->getCreatetime(),
-            'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];
         $goods = Goods::get($entry->getGoodsId());
         if ($goods) {
@@ -1749,7 +1750,7 @@ if ($op == 'list') {
     $tpl_data['id'] = $id;
 
     /** @var device_groupsModelObj $one */
-    $one = Group::get($id);;
+    $one = Group::get($id);
     if (empty($one)) {
         Util::itoast('分组不存在！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
     }
@@ -2408,10 +2409,10 @@ if ($op == 'list') {
     $url_prefix = We7::attachment_set_attach_url();
     $attach_prefix = ATTACHMENT_ROOT;
 
-    $zip = new \ZipArchive();
+    $zip = new ZipArchive();
     $file_name = time() . '_' . rand() . '.zip';
     $file_path = $attach_prefix . $file_name;
-    $zip->open($file_path, \ZipArchive::CREATE);   //打开压缩包
+    $zip->open($file_path, ZipArchive::CREATE);   //打开压缩包
 
     $ids = request::array('ids', []);
     $query = Device::query(['id' => $ids]);

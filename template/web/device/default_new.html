@@ -339,7 +339,6 @@
                             :style="{'background-color': tag.selected?'#009688':'#9E9E9E'}"
                             @click.prevent="selectTag(tag)">
                                 <span>{{tag.title}}</span>
-                                <span v-if="tag.count > 0">({{tag.count}})</span>
                             </div>
                             <span class="tag-page-btn" title="下一页"
                             v-if="tags.totalpage > 1"

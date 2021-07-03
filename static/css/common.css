@@ -402,7 +402,6 @@ a .profile {
 #citylist,
 #selected-agentslist,
 #agentslist,
-#tagslist,
 .deviceslist,
 .selectedevicelist,
 #limitslist {
@@ -1237,11 +1236,11 @@ i.wxpay {
     font-size: small;
 }
 
-#tagslist {
+#tagslist,.tags {
     display: flex;
 }
 
-#tagslist .tag {
+#tagslist .tag,.tags .tag {
     cursor: pointer;
     padding: 3px 10px;
     margin: 3px;
@@ -1249,13 +1248,14 @@ i.wxpay {
     color: #fff;
     border-radius: 0 1em 1em 0;
     display: block;
+    white-space: nowrap
 }
 
-#tagslist .tag:active {
+#tagslist .tag:active,.tags .tag:active  {
     transform: translate3d(0, 2px, 0);
 }
 
-#tagslist .tag:hover {
+#tagslist .tag:hover,.tags .tag:hover {
     box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
     background-color: rgba(0, 150, 136, .8);
 }

@@ -1108,7 +1108,7 @@ class deviceModelObj extends modelObj
                     /** @var tagsModelObj $tag */
                     $tag = m('tags')->findOne($condition);
                     if ($tag) {
-                        $titles[] = $tag->getTitle();
+                        $titles[$tag->getId()] = $tag->getTitle();
                     }
                 }
             }

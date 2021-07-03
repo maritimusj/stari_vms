@@ -288,6 +288,14 @@ if ($op == 'list') {
                 }
             }
 
+            $tags = $entry->getTagsAsText(false);
+            foreach($tags as $id => $title) {
+                $data['tags'][] = [
+                    'id' => $id,
+                    'title' => $title,
+                ];
+            }
+            
             $accounts = $entry->getAssignedAccounts();
             if ($accounts) {
                 $data['gettype']['free'] = true;

@@ -112,16 +112,9 @@ class Util
         } else {
             if (empty($user)) {
                 $update = empty($params['update']) ? false : true;
-                if ($update) {
-                    //通过删除$_SESSION['userinfo']，让框架刷新用户信息
-                    self::cachedCall(60, function() {
-                        unset($_SESSION['userinfo']);
-                    });
-                }
-                $fans = Util::fansInfo();
+                $fans = Util::fansInfo($update);
                 if ($fans && !empty($fans['openid'])) {
                     $user = User::get($fans['openid'], true);
-
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
                             'app' => User::WX,
@@ -180,11 +173,27 @@ class Util
     /**
      * 获取fans数据.
      *
+     * @param bool $update
      * @return array
      */
-    public static function fansInfo(): array
+    public static function fansInfo($update = false): array
     {
-        if (_W('openid')) {
+        $openid = _W('openid');
+        if ($openid) {
+            if ($update) {
+                $userinfo = self::cachedCall(6, function() use ($openid) {
+                    $oauth_account = \WeAccount::createByUniacid();
+                    $userinfo = $oauth_account->fansQueryInfo($openid);
+                    $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
+                    $userinfo['avatar'] = $userinfo['headimgurl'];
+                    return $userinfo;
+                }, $openid);
+
+                //接口调用次数上限后，$userinfo中相关字段为空
+                if (!empty($userinfo['nickname']) && !empty($userinfo['avatar'])) {
+                    return $userinfo;
+                }
+            }
             $res = We7::mc_oauth_userinfo();
             if (!is_error($res)) {
                 return $res;
@@ -194,7 +203,7 @@ class Util
         return [];
     }
 
-    protected static function getAliUserSex($gender)
+    protected static function getAliUserSex($gender): int
     {
         switch ($gender) {
             case 'm':

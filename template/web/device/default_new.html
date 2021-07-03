@@ -395,7 +395,7 @@
                             <template v-if="showSelectInputCtrl && canDownload">
                                 <i class="fa fa-download" title="下载选中的设备二维码" @click="downloadQRCode"></i><span class="badge" style="position: absolute;">{{selectedInputCtrl.length}}</span>
                             </template>
-                            <i class="fa fa-sign-out" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
+                            <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
                         </th>
                         <th>                    
                             <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>

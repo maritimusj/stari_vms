@@ -56,7 +56,7 @@ if ($op == 'default') {
         }
     }
 
-    $user_id = request::int('user_id');
+    $user_id = request::int('id');
     if ($user_id) {
         $user = User::get($user_id);
         if ($user) {

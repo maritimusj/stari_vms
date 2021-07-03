@@ -144,7 +144,7 @@ class YunfenbaAccount
             $cb($data, $result);
         }
 
-        return $result['data'];
+        return $result;
     }
 
     /**
@@ -210,6 +210,10 @@ class YunfenbaAccount
                     if (App::isAccountLogEanbled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
+                    } else {
+                        Util::logToFile('yunfenba', [
+                            'error' => $e->getMessage()
+                        ]);
                     }
                 }
             });

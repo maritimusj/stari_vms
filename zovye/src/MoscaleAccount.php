@@ -85,6 +85,10 @@ class MoscaleAccount
                     if (App::isAccountLogEanbled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
+                    } else {
+                        Util::logToFile('moscale', [
+                            'error' => $e->getMessage()
+                        ]);
                     }
                 }
             });
@@ -269,7 +273,7 @@ class MoscaleAccount
             $cb($data, $result);
         }
 
-        return $result['data'];
+        return $result;
     }
 
     private function sign($data)

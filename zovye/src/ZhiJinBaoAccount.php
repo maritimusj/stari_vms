@@ -86,6 +86,10 @@ class ZhiJinBaoAccount
                     if (App::isAccountLogEanbled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
+                    } else {
+                        Util::logToFile('zjbao', [
+                            'error' => $e->getMessage()
+                        ]);
                     }
                 }
             });

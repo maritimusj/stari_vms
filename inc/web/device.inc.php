@@ -1671,7 +1671,7 @@ if ($op == 'list') {
             'id' => intval($entry->getId()),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
-            'create' => date('Y-m-d H:i', $entry->getCreatetime()),
+            'createtime' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
         $agent = $entry->getAgent();
         if ($agent) {
@@ -1723,9 +1723,9 @@ if ($op == 'list') {
         $data = [
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
-            'clr' => $entry->getClr(),
-            'create' => date('Y-m-d H:i', $entry->getCreatetime()),
-            'total' => Device::query(['group_id' => $entry->getId()])->count()
+            'clr' => $entry->getClr(),            
+            'total' => Device::query(['group_id' => $entry->getId()])->count(),
+            'createtime_foramtted' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
         $agent = $entry->getAgent();
         if ($agent) {
@@ -1770,14 +1770,13 @@ if ($op == 'list') {
 
     if ($one) {
         $agent = $one->getAgent();
-        if (empty($agent)) {
-            Util::itoast('找不到这个代理商！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
+        if (!empty($agent)) {
+            $tpl_data['agent'] = [
+                'id' => $agent->getId(),
+                'name' => $agent->getName(),
+                'mobile' => $agent->getMobile(),
+            ];            
         }
-        $tpl_data['agent'] = [
-            'id' => $agent->getId(),
-            'name' => $agent->getName(),
-            'mobile' => $agent->getMobile(),
-        ];
     }
 
     app()->showTemplate('web/device/new_group', $tpl_data);

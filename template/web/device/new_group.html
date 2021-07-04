@@ -5,7 +5,7 @@
 <div class="panel panel-default">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group_add'));}"><i class="fa fa-cubes" title="创建分组"></i></a>
+            <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group_add'));}"><i class="fa fa-pencil" title="创建分组"></i></a>
             <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回设备列表"></i></a>
         </span>
     </div>
@@ -27,11 +27,16 @@
             <th>名称</th>
             <th>代理商</th>
             <th>设备数量</th>
-            <th></th>
+            <th>创建时间</th>
+            <th>操作</th>
             </thead>
             <tbody>
             {loop $groups $index $item}
             <tr data-id="{$index}">
+                <td>
+                    {php echo $index + 1}
+                    <span style="margin-left: 2em;"> 分组ID：{$item['id']}</span>
+                </td>
                 <td class="group">
                     <span class="groupname" {if $item['clr']} style="background-color:{$item['clr']}"{/if}>{$item['title']}</span>
                 </td>
@@ -47,15 +52,17 @@
                     <span style="color:gray;">&lt;平台&gt;</span>
                     {/if}
                 </td>
-                <td>{php echo intval($item['total'])}</td>
+                <td>{php echo intval($item['total'])}</td> 
+                <td>
+                    {$item['createtime_foramtted']}
+                </td>
                 <td class="operate">
                     <a href="{php echo $this->createWebUrl('device',array('id'=>$item['id'],'op'=>'new_group_edit'));}">
                         <i class="fa fa-edit" title="编辑"></i>
                     </a>
                     <a href="{php echo $this->createWebUrl('device',array('id'=>$item['id'],'op'=>'new_group_remove'));}" onclick="if(!confirm('确定要删除这个分组吗？')){return false;}">
                         <i class="fa fa-trash-o" title="删除这个分组？"></i>
-                    </a>
-                    <span style="margin-left: 2em;"> 分组ID：{$item['id']}</span>
+                    </a>                    
                 </td>
             </tr>
             {/loop}
@@ -74,7 +81,7 @@
 {else}
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">
-        <i class="fa fa-cubes"></i> 
+        <i class="fa fa-pencil"></i> 
         {if $op=='new_group_edit'}编辑{else}添加{/if}分组
     </a></li>
 </ul>

@@ -27,7 +27,7 @@ use we7\db;
  * @method static array mc_credit_fetch($uid, $types = array())
  * @method static bool mc_credit_update($uid, $credittype, $creditval = 0, $log = array())
  * @method static referer()
- * @method static attachment_set_attach_url()
+ * @method static string attachment_set_attach_url()
  * @method static material_list(string $string, string $MATERIAL_WEXIN, array $array)
  * @method static material_news_list(string $MATERIAL_WEXIN)
  * @method static refund_create_order($order_no, $APP_NAME)

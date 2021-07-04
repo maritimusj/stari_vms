@@ -67,6 +67,13 @@ if ($op == 'default') {
         }
     }
 
+    if (request::has('accountId')) {
+        $account = Account::get(request::int('accountId'));
+        if ($account) {
+            $query->where(['account' => $account->getName()]);
+        }
+    }
+
     $way = request::str('way');
     if ($way == 'free') {
         $query->where(['price' => 0, 'balance' => 0]);

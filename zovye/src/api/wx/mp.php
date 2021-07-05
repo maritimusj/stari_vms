@@ -450,7 +450,7 @@ class mp
 
         $account->setExtraData('update', [
             'time' => time(),
-            'admin' => $user->profile(),
+            'user' => $user->profile(),
         ]);
 
         if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {

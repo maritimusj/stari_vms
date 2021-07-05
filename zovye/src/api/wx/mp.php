@@ -18,7 +18,6 @@ use zovye\State;
 use zovye\Util;
 use zovye\We7;
 use zovye\WxPlatform;
-use function zovye\_W;
 use function zovye\err;
 use function zovye\error;
 use function zovye\request;

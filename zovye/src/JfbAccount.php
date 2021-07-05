@@ -27,14 +27,10 @@ class JfbAccount
                 return err('没有配置api url');
             }
 
-            if (empty($config['appno'])) {
-                return err('没有配置appno');
-            }
-
             $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
             $data = [
-                'appNo' => strval($config['appno']),
+                'appNo' => '',
                 'scene' => strval($config['scene']),
                 'openId' => $fans['openid'],
                 'facilityId' => $device->getImei(),

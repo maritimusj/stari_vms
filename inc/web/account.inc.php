@@ -379,6 +379,11 @@ if ($op == 'default') {
             }
         }
 
+        $account->setExtraData('update', [
+            'time' => time(),
+            'admin' => _W('username'),
+        ]);
+
         if ($account->save() && Account::updateAccountData()) {
             //处理多个关注二维码
             if ($qr_codes) {

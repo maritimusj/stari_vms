@@ -640,13 +640,11 @@ class Account extends State
     public static function createOrUpdateFromWxPlatform(int $agent_id, string $app_id, array $auth_result = [])
     {
         $profile = WxPlatform::getAuthProfile($app_id);
-        //Util::logToFile('wxplatform', $profile);
         if (is_error($profile)) {
             return $profile;
         }
 
         $auth_data = WxPlatform::getAuthData($auth_result['AuthorizationCode']);
-        //Util::logToFile('wxplatform', $auth_data);
         if (is_error($auth_data)) {
             return $auth_data;
         }

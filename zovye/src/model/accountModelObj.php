@@ -120,6 +120,7 @@ class accountModelObj extends modelObj
     protected $shared;
 
     protected $extra;
+
     /** @var int */
     protected $createtime;
 
@@ -130,7 +131,7 @@ class accountModelObj extends modelObj
         return tb('account');
     }
 
-    public function profile()
+    public function profile(): array
     {
         return [
             'id' => $this->getId(),

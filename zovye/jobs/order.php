@@ -10,6 +10,7 @@ use zovye\Advertising;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Locker;
 use zovye\request;
 use zovye\Job;
 use zovye\model\deviceModelObj;
@@ -102,10 +103,9 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
             }
         }
 
-        $locker = app()->lock();
-        if ($locker && $locker->isLocked()) {
+        $locker = Locker::try("order::statistics", 3);
+        if ($locker) {
             $log['statistics'][$order->getId()] = Util::orderStatistics($order);
-
             //其它未处理订单
             $other_order = Order::query([
                 'updatetime' => 0,
@@ -119,7 +119,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 }
             }
         } else {
-            $log['error'] = 'App()->lock() failed';
+            $log['error'] = 'lock() failed';
         }
     }
 }

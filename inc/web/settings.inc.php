@@ -1329,7 +1329,64 @@ if ($op == 'account') {
             $tpl_data['upgrade']['error'] = '检查更新失败！';
         }
     }
-}
+
+} elseif ($op == 'showTestingQrcode') {
+
+    $url = Util::murl('testing');
+    $result = Util::createQrcodeFile('testing', $url);
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '用微信扫一扫，打开测试页面',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => '测试入口',
+        'content' => $content,
+    ]);
+} elseif ($op == 'showDeviceNearbyQrcode') {
+
+    $url = Util::murl('util');
+    $result = Util::createQrcodeFile('deviceNearby', $url);
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '用微信扫一扫，打开附近设备',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => '附近设备',
+        'content' => $content,
+    ]);
+} elseif ($op == 'showAgentRegQrcode') {
+
+    $url = Util::murl('mobile');
+    $result = Util::createQrcodeFile('agent', $url);
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '用微信扫一扫，打开代理商注册页面',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => '代理商注册页面',
+        'content' => $content,
+    ]);
+} 
+
+
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {
     Util::itoast('找不到这个配置页面！', $this->createWebUrl('settings'), 'error');

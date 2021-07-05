@@ -52,7 +52,9 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">网址链接</label>
                     <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$loc_url}"></i> {$loc_url}</span>
+                        <span class="form-control operate text-url">
+                            <i class="fa fa-qrcode" title="显示二维码" data-op="showDeviceNearbyQrcode"></i> 
+                            <i class="fa fa-paste" title="复制网址" data-url="{$loc_url}"></i> {$loc_url}</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -225,7 +227,9 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">测试网址</label>
                     <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$test_url}"></i> {$test_url}</span>
+                        <span class="form-control operate text-url">
+                            <i class="fa fa-qrcode" title="显示二维码" data-op="showTestingQrcode"></i> 
+                            <i class="fa fa-paste" title="复制网址" data-url="{$test_url}"></i> {$test_url}</span>
                     </div>
                 </div>
             </div>
@@ -306,6 +310,8 @@
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableInputMask();
         zovye.enableCopy();
+        zovye.setApiUrl("{php echo $this->createWebUrl('settings');}")
+        zovye.enableOp();
     })
     $(function(){
         $('#special input[name=userLocationEnabled]').click(function(){

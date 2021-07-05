@@ -646,13 +646,14 @@ class WxPlatform
                 throw new RuntimeException('用户已被禁用！');
             }
 
+            //获取第一货道上的商品，如果该商品数量不足，则去获取相同商品的其它货道
             $goods = $device->getGoodsByLane(0);
-            if (empty($goods)) {
-                ZovyeException::throwWith('道货（1）没有商品，请联系管理员！', -1, $device);
+            if ($goods && $goods['num'] < 1) {
+                $goods = $device->getGoods($goods['id']);
             }
 
-            if ($goods['num'] < 1) {
-                ZovyeException::throwWith('当前商品库存不足！', -1, $device);
+            if (empty($goods) || $goods['num'] < 1) {
+                ZovyeException::throwWith('指定的商品库存不足！', -1, $device);
             }
 
             if (DEBUG) {

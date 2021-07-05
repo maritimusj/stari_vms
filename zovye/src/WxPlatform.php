@@ -611,9 +611,7 @@ class WxPlatform
                 }
 
                 $user = User::get($first);
-                if (empty($user)) {
-                    throw new RuntimeException('找不到这个用户！');
-                }                
+
             } else {
                 $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
 
@@ -623,14 +621,6 @@ class WxPlatform
                     'appid' => $appid,
                     'openid' => $user_uid,
                 ]);
-
-//                 Util::logToFile('debug', [
-//                     'appid' => $appid,
-//                     'user_uid' => $user_uid,
-//                     'msg' => $msg,
-//                     'token' => $acc->settings('authdata.authorization_info.authorizer_access_token'),
-//                     'profile' => $profile,
-//                 ]);
 
                 if (empty($obj)) {
                     //throw new RuntimeException('请先扫描设备二维码，谢谢！');

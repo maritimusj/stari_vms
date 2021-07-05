@@ -80,8 +80,7 @@ if (empty($goods) || $goods['num'] < 1) {
     JSON::fail('商品库存不足！');
 }
 
-$no_str = Util::random(32);
-$order_uid = substr("U{$user->getId()}D{$device->getId()}{$no_str}", 0, MAX_ORDER_NO_LEN);
+$order_uid = Order::makeUID($user, $device);
 
 Job::createSpecialAccountOrder([
     'device' => $device->getId(),

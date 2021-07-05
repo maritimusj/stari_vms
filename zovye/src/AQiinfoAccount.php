@@ -169,10 +169,9 @@ class AQiinfoAccount
                 throw new RuntimeException('找不到指定的设备:' . $shadow_id);
             }
 
-            $trade_no = empty($params['tradeNo']) ? Util::random(32, true) : $params['tradeNo'] . Util::random(32);
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$trade_no}", 0, MAX_ORDER_NO_LEN);
-
             $acc = $res['account'];
+
+            $order_uid = Order::makeUID($user, $device, strval($params['tradeNo']));
 
             Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
 

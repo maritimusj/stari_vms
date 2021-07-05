@@ -145,9 +145,9 @@ class ZhiJinBaoAccount
                 throw new RuntimeException('找不到指定的设备:' . $data['deviceSn']);
             }
 
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$data['sign']}", 0, MAX_ORDER_NO_LEN);
-
             $acc = $res['account'];
+
+            $order_uid = Order::makeUID($user, $device, $data['sign']);
 
             Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
 

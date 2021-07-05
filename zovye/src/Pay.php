@@ -87,7 +87,7 @@ class Pay
             $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));
         }
 
-        $order_no = substr("U{$user->getId()}D{$device->getId()}" . $partial, 0, MAX_ORDER_NO_LEN);
+        $order_no = Order::makeUID($user, $device, $partial);
 
         $pay_data = array_merge_recursive($pay_data, [
             'device' => $device->getId(),

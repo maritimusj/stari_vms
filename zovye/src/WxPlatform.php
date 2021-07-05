@@ -674,7 +674,7 @@ class WxPlatform
             }
 
             $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$uid}", 0, MAX_ORDER_NO_LEN);
+            $order_uid = Order::makeUID($user, $device, $uid);
 
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),

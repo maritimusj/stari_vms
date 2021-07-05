@@ -150,9 +150,9 @@ class JfbAccount
                     throw new RuntimeException('找不对这个设备:' . $params['device']);
                 }
 
-                $order_uid = substr("U{$user->getId()}D{$device->getId()}{$params['ad_code_no']}" . Util::random(32), 0, MAX_ORDER_NO_LEN);
-
                 $acc = $res['account'];
+
+                $order_uid = Order::makeUID($user, $device, $params['ad_code_no']);
 
                 Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
 

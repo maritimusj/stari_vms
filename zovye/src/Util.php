@@ -1631,8 +1631,7 @@ HTML_CONTENT;
             if ($args['orderId']) {
                 $order_data['order_id'] = $args['orderId'];
             } else {
-                $no_str = Util::random(32);
-                $order_data['order_id'] = substr("U{$user->getId()}D{$device->getId()}{$no_str}", 0, MAX_ORDER_NO_LEN);
+                $order_data['order_id'] = Order::makeUID($user, $device);
             }
 
             if ($voucher) {

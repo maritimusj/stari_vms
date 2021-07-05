@@ -91,6 +91,11 @@ class Order extends State
         return m('order')->create($data);
     }
 
+    public static function makeUID(userModelObj $user, deviceModelObj $device, $nonce = ''): string
+    {
+       return substr("U{$user->getId()}D{$device->getId()}{$nonce}" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
+    }
+
     /**
      * @param $order_no
      * @param int $total

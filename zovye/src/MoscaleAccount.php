@@ -185,9 +185,9 @@ class MoscaleAccount
                 throw new RuntimeException('找不到指定的设备:' . $params['state']);
             }
 
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$params['signature']}", 0, MAX_ORDER_NO_LEN);
-
             $acc = $res['account'];
+
+            $order_uid = Order::makeUID($user, $device, $params['signature']);
 
             Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
 

@@ -24,9 +24,10 @@
         </ul>
         <table class="table" id="grouplist">
             <thead>
+            <th>#</th>
             <th>名称</th>
             <th>代理商</th>
-            <th>设备数量</th>
+            <th class="center">设备数量</th>
             <th>创建时间</th>
             <th>操作</th>
             </thead>
@@ -52,7 +53,7 @@
                     <span style="color:gray;">&lt;平台&gt;</span>
                     {/if}
                 </td>
-                <td>{php echo intval($item['total'])}</td> 
+                <td class="center">{php echo intval($item['total'])}</td> 
                 <td>
                     {$item['createtime_foramtted']}
                 </td>

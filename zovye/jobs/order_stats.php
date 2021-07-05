@@ -13,7 +13,6 @@ use zovye\Job;
 use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Util;
-use function zovye\app;
 use function zovye\request;
 
 $op = request::op('default');

@@ -17,7 +17,6 @@ use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Util;
-use function zovye\app;
 use function zovye\request;
 use function zovye\isEmptyArray;
 use function zovye\settings;

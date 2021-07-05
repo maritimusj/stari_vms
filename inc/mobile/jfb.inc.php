@@ -8,7 +8,7 @@ JfbAccount::cb([
     'openid' => request::str('open_id'),
     'device' => request::str('facility_id'),
     'op_type' => request::int('op_type'),
-    'sign' => request::str('sign'),
+    'ad_code_no' => request::str('ad_code_no'),
 ]);
 
 echo JfbAccount::CB_RESPONSE;

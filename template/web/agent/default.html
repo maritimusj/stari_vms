@@ -69,10 +69,10 @@
                 <tr>
                     <th>#</th>
                     <th>昵称</th>
-                    <th style="text-align: center;">账户余额</th>
+                    <th class="center">账户余额</th>
                     <th>手机号码</th>
                     <th class="text-center"><span id="J_money" data-sort="{$s_money}" style="cursor: pointer;">等级</span></th>                    
-                    <th><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
+                    <th class="center"><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
                     <th>
                         <div><span id="J_fee" data-sort="{$s_fee}" style="cursor: pointer;">本月出货</span></div>
                     </th>                    
@@ -117,7 +117,7 @@
                             </span>
                         </div>
                     </td>
-                    <td>
+                    <td class="center">
                         {if $agent['total'] > 0}
                         <a href="{php echo $this->createWebUrl('device', ['agentId' => $agent['id']])}" title="点击查看代理商的设备列表...">{$agent['total']}</a>
                         {else}

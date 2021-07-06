@@ -893,7 +893,7 @@ if ($op == 'list') {
 
     $res = $device->getOnlineDetail(false);
     if (empty($res)) {
-        JSON::fail('请求出错！');
+        JSON::fail('请求出错，请稍后再试！');
     }
     JSON::success($res);
 

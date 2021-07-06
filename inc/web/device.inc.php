@@ -891,7 +891,11 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    JSON::success($device->getOnlineDetail(false));
+    $res = $device->getOnlineDetail(false);
+    if (empty($res)) {
+        JSON::fail('请求出错！');
+    }
+    JSON::success($res);
 
 } elseif ($op == 'deviceTest') {
 

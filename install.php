@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_logs` (
   `data` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `title` (`title`(16),`uniacid`),
+  KEY `title` (`title`(16),`uniacid`, `level`),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -754,7 +754,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_user_logs` (
   `data` text,
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `title` (`title`(16),`uniacid`),
+  KEY `title` (`title`(16),`uniacid`, `level`),
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -209,16 +209,6 @@ class Pay
         return '{"code":200}';
     }
 
-    public static function getResponse(string $name)
-    {
-        //获取一个临时的pay对象
-        $pay = self::makePayObj($name);
-        if (is_error($pay)) {
-            return $pay;
-        }
-        return $pay->getResponse(false);
-    }
-
     /**
      * 处理支付的通知数据
      * @param string $name 支付类型名称

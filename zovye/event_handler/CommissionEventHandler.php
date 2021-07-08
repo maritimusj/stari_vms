@@ -347,7 +347,7 @@ class CommissionEventHandler
 
                 //第2步，计算商品利润（减去成本价）
                 $goods = $order->getGoods();
-                $costPrice = $goods->getCostPrice();
+                $costPrice = empty($goods) ? 0 : $goods->getCostPrice();
 
                 $commission_price -= $costPrice;
 

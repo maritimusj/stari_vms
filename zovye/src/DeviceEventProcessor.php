@@ -690,14 +690,6 @@ class DeviceEventProcessor
      */
     public static function onMcbReload(array $data = [])
     {
-        $device = Device::get($data['uid'], true);
-        if ($device) {
-            $device->setProtocolV1Code($data['code']);
-            if ($device->payloadLockAcquire(3)) {
-                $device->resetPayload([], 'reload重置');
-                $device->save();
-            }
-        }
     }
 
     /**

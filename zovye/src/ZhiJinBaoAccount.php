@@ -48,7 +48,7 @@ class ZhiJinBaoAccount
             //请求API
             $ZJBao = new ZhiJinBaoAccount($config['key'], $config['secret']);
             $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
-                if (App::isAccountLogEanbled()) {
+                if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
                         Util::logToFile('zjbao_query', [
@@ -78,12 +78,12 @@ class ZhiJinBaoAccount
 
                     $v[] = $data;
 
-                    if (App::isAccountLogEanbled() && isset($log)) {
+                    if (App::isAccountLogEnabled() && isset($log)) {
                         $log->setExtraData('account', $data);
                         $log->save();
                     }
                 } catch (Exception $e) {
-                    if (App::isAccountLogEanbled() && isset($log)) {
+                    if (App::isAccountLogEnabled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {

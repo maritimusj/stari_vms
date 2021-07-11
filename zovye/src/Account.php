@@ -894,7 +894,7 @@ class Account extends State
 
     public static function createSpecialAccountOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
     {
-        if (App::isAccountLogEanbled()) {
+        if (App::isAccountLogEnabled()) {
             $log = Account::getLastQueryLog($acc, $user, $device);
             if ($log) {
                 $log->setExtraData('cb', [

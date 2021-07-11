@@ -471,7 +471,7 @@ class App
         });        
     }
 
-    public static function isAccountLogEanbled(): bool {
+    public static function isAccountLogEnabled(): bool {
         return onceCall(function() {
             return boolval(settings('account.log.enabled'));
         });        

@@ -59,7 +59,7 @@ class JfbAccount
 
             $result = Util::post(strval($config['url']), $data);
 
-            if (App::isAccountLogEanbled()) {
+            if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $data, $result);
                 if (empty($log)) {
                     Util::logToFile('jfb_query', [
@@ -94,12 +94,12 @@ class JfbAccount
 
                 $v[] = $data;
 
-                if (App::isAccountLogEanbled() && isset($log)) {
+                if (App::isAccountLogEnabled() && isset($log)) {
                     $log->setExtraData('account', $data);
                     $log->save();
                 }
             } catch (Exception $e) {
-                if (App::isAccountLogEanbled() && isset($log)) {
+                if (App::isAccountLogEnabled() && isset($log)) {
                     $log->setExtraData('error_msg', $e->getMessage());
                     $log->save();
                 } else {

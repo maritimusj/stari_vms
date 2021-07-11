@@ -198,7 +198,7 @@
                             </a>
                         </li>
                         <li role="separator" class="divider"></li>
-                        {if \zovye\App::isAccountLogEanbled()}
+                        {if \zovye\App::isAccountLogEnabled()}
                         <li>
                             <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $res['id']])}">
                                 <i class="fa fa-history fa-fw"></i> 查看请求日志

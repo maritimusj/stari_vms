@@ -96,14 +96,16 @@
                         <span class="help-block">* 商品成本价格(可以不填写)</span>
                     </div>
                 </div>
+                {if \zovye\App::isCommissionEnabled()}
                 <div class="form-group">
                     <label for="goodsCW" class="col-md-2 control-label"></label>
                     <div class="col-md-10">
                         <label class="checkbox-inline">
-                            <input type="checkbox" id="goodsCW" name="goodsCW" value="1" {if $goods && $goods['cw']}checked{/if}> 成本金额不参与分佣（即：佣金 = 商品价格 - 成本价）
+                            <input type="checkbox" id="goodsCW" name="goodsCW" value="1" {if $goods && $goods['cw']}checked{/if}> 成本金额不参与分佣（成本金额不做为佣金分给设备代理商）
                         </label>
                     </div>
                 </div>
+                {/if}
                 <div class="form-group">
                     <label for="discountPrice" class="col-md-2 control-label">新用户首单优惠（元）</label>
                     <div class="col-md-10">

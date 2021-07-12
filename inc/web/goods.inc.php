@@ -74,55 +74,51 @@ if ($op == 'default' || $op == 'goods') {
     $params = [];
 
     if ($op == 'editGoods') {
-        $title = empty(request('type')) ? '编辑商品' : '编辑固定货道商品';
         $goods_id = request::int('id');
-
         $params['goods'] = Goods::data($goods_id, ['detail']);
+        if (empty($params['goods'])) {
+            Util::itoast('找不到这个商品！', '', 'error');
+        }
         if ($params['goods']['name_original']) {
             $params['goods']['name'] = $params['goods']['name_original'];
         }
-    } else {
-        $title = empty(request('type')) ? '添加商品' : '添加固定货道商品';
     }
 
-    if (empty(request('type'))) {
-        $content = app()->fetchTemplate('web/goods/edit', $params);
+    $lottery = request::str('type') == 'lottery';
+    if ($lottery) {
+        app()->showTemplate('web/goods/edit_lottery', $params);
     } else {
-        $content = app()->fetchTemplate('web/goods/edit_lottery', $params);
+        app()->showTemplate('web/goods/edit', $params);
     }
-
-    JSON::success([
-        'title' => $title,
-        'content' => $content,
-    ]);
 
 } elseif ($op == 'saveGoods') {
 
     $params = [];
-    parse_str(request('params'), $params);
+    parse_str(request::raw(), $params);
 
     if (empty($params['goodsName'])) {
-        JSON::fail('商品名称不能为空！');
+        Util::itoast('商品名称不能为空！', '', 'error');
     }
+
     if ($params['agentId']) {
         $agent = Agent::get($params['agentId']);
         if (empty($agent)) {
-            JSON::fail('找不到这个代理商！');
+            Util::itoast('找不到这个代理商！', '', 'error');
         }
     }
 
     if ($params['costPrice'] < 0 || $params['goodsPrice'] < 0 || $params['costPrice'] > $params['goodsPrice']) {
-        JSON::fail('成本价不能低于售价！');
+        Util::itoast('成本价不能高于售价！', '', 'error');
     }
 
     if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || $params['discountPrice'] > $params['goodsPrice']) {
-        JSON::fail('优惠价不能高于售价！');
+        Util::itoast('优惠价不能高于售价！', '', 'error');
     }
 
     if (isset($params['goodsId'])) {
         $goods = Goods::get($params['goodsId']);
         if (empty($goods)) {
-            JSON::fail('找不到这个商品！');
+            Util::itoast('找不到这个商品！', '', 'error');
         }
 
         if (isset($params['goodsLaneID'])) {
@@ -217,10 +213,10 @@ if ($op == 'default' || $op == 'goods') {
         if ($params['syncAll']) {
             Job::goodsClone($goods->getId());
         }
-        JSON::success('商品保存成功！');
+        Util::itoast('商品保存成功！', '', 'success');
     }
 
-    JSON::fail('商品保存失败！');
+    Util::itoast('商品保存失败！', '', 'error');
 
 } elseif ($op == 'editAppendage') {
 

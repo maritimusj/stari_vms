@@ -55,18 +55,22 @@
     <div class="panel panel-default nav-tab-item">
         <div class="heading">
             <span class="operate">
-                <i class="fa fa-gift fa-fw" title="添加商品" data-op="addGoods"></i>
+                <a href="{php echo $this->createWebUrl('goods', ['op' => 'addGoods']);}">
+                    <i class="fa fa-gift fa-fw" title="添加商品"></i>
+                </a>
                 {if \zovye\App::isLotteryGoodsSupported()}
-                <i class="fa fa-ticket fa-fw" title="添加固定货道商品" data-op="addLotteryGoods"></i>
+                <a href="{php echo $this->createWebUrl('goods', ['op' => 'addGoods', 'type' => 'lottery']);}">
+                    <i class="fa fa-ticket fa-fw" title="添加固定货道商品"></i>
+                </a>                
                 {/if}
                 {if \zovye\App::isGoodsVoucherEnabled()}
                 <a href="{php echo $this->createWebUrl('voucher');}">
-                <i class="fa fa-ticket fa-fw" title="提货码管理"></i>
+                    <i class="fa fa-ticket fa-fw" title="提货码管理"></i>
                 </a>
                 {/if}
                 {if $agent}
                 <a href="{php echo $this->createWebUrl('goods');}">
-                <i class="fa fa-reply fa-fw" title="返回全部商品列表"></i>
+                    <i class="fa fa-reply fa-fw" title="返回全部商品列表"></i>
                 </a>
                 {/if}
             </span>
@@ -202,9 +206,9 @@
                     <td class="operate">
                         <div class="btn-group">
                             {if $item['lottery']}
-                            <a class="btn btn-default" href="#" title="编辑" data-op="editLotteryGoods"><i class="fa fa-edit"> </i></a>
+                            <a class="btn btn-default" href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'id' => $item['id'], 'type' => 'lottery'])}" title="编辑"><i class="fa fa-edit"> </i></a>
                             {else}
-                            <a class="btn btn-default" href="#" title="编辑" data-op="editGoods"><i class="fa fa-edit"> </i></a>
+                            <a class="btn btn-default" href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'id' => $item['id']])}" title="编辑"><i class="fa fa-edit"> </i></a>
                             {/if}
                             <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                                 <span class="fa fa-caret-down"></span>
@@ -281,27 +285,6 @@
             api.showResult({op: 'viewGoodsStats', id: id});
         }
     }
-    api.addGoods = function() {
-        api.showResult({op: 'addGoods'});
-    }
-    api.addLotteryGoods = function() {
-        api.showResult({op: 'addGoods', type: 'lottery'});
-    }
-    api.editLotteryGoods = function(target) {
-        const tr = target.closest('tr');
-        const id = tr.data('id');
-        if (id !== undefined) {
-            api.showResult({op: 'editGoods', id: id, type: 'lottery'});
-        }
-    }
-    api.editGoods = function(target) {
-        const tr = target.closest('tr');
-        const id = tr.data('id');
-        if (id !== undefined) {
-            api.showResult({op: 'editGoods', id: id});
-        }
-    }
-
     api.removeGoods = function(target) {
         const tr = target.closest('tr');
         const id = tr.data('id');
@@ -309,24 +292,6 @@
             api.showResult({op: 'removeGoods', id: id}, undefined, false, function(res){
                 if (res && res.status) {
                     tr.remove();
-                }
-            })
-        }
-    }
-    api.saveGoods = function() {
-        let passed = true;
-        $('form#addGoodsForm input[required]').each(function(){
-            if($(this).val().trim() === '') {
-                passed = false;
-                $(this).focus();
-                return false;
-            }
-        })
-        if (passed) {
-            const data = $('form#addGoodsForm').serialize();
-            $.post(api.url, {op: 'saveGoods', params: data}).then(function(res){
-                if (res && res.data.msg) {
-                    util.message(res.data.msg, "{php echo $this->createWebUrl('goods');}", res.status ? 'success':'error');
                 }
             })
         }
@@ -443,39 +408,6 @@
             const op = self.data('op');
             if(api[op]) {
                 api[op](self);
-            }
-        })
-        $('body').on('click', '#find_agent', function() {
-            const ownerId = $('select[name=agentId]').val();
-            const keywords = $('input[name=find_keywords]').val();
-            util.loading();
-            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {op:'search', keyword:keywords}, function(res){
-                let html = '';
-                if(res.status) {
-                    const list = res.data || [];
-                    list.forEach(function(e) {
-                        html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
-                            .replace('_1*', e.id)
-                            .replace('_2*', e.name)
-                            .replace('_3*', e.mobile)
-                            .replace('_**!_', e.id === ownerId ? 'selected' : '');
-                    })
-                }
-                html += '<option value="0"><无></option>';
-                $('#find_agent_select').html(html);
-
-            }, 'json').complete(function(){
-                util.loaded();
-            })
-        })
-        $('body').on('click', '#addGoodsForm input[type=checkbox]', function(){
-            const val = $(this).val();
-            if (val) {
-                if ($(this).is(':checked')) {
-                    $('#' + val).removeAttr('disabled');
-                } else {
-                    $('#' + val).attr('disabled', true);
-                }
             }
         })
     })

@@ -92,6 +92,7 @@ class Goods
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            'cw' => $entry->getExtraData('cw', 0),
         ];
 
         $lottery = $entry->getExtraData('lottery', []);
@@ -102,12 +103,13 @@ class Goods
         $cost_price = $entry->getCostPrice();
 
         if (!empty($cost_price)) {
+            
             $data['costPrice'] = $cost_price;
             $data['costPrice_formatted'] = '￥' . number_format($cost_price / 100, 2) . '元';
         }
 
         $discountPrice = $entry->getExtraData('discountPrice', 0);
-        if (!empty($discountPrice)) {
+        if (!empty($discountPrice)) {           
             $data['discountPrice'] = $discountPrice;
             $data['discountPrice_formatted'] = '￥' . number_format($discountPrice / 100, 2) . '元';
         }

@@ -131,6 +131,8 @@ if ($op == 'default' || $op == 'goods') {
             $goods->setExtraData('costPrice', floatval($params['costPrice'] * 100));
         }
 
+        $goods->setExtraData('cw', empty($params['goodsCW']) ? 0 : 1);
+
         if (isset($params['discountPrice'])) {
             $goods->setExtraData('discountPrice', floatval($params['discountPrice'] * 100));
         }
@@ -201,6 +203,8 @@ if ($op == 'default' || $op == 'goods') {
         if (isset($params['costPrice'])) {
             $data['extra']['costPrice'] = floatval($params['costPrice'] * 100);
         }
+
+        $data['extra']['cw'] = empty($params['goodsCW']) ? 0 : 1;
 
         if (isset($params['discountPrice'])) {
             $data['extra']['discountPrice'] = floatval($params['discountPrice'] * 100);

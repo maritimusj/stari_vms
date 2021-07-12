@@ -374,8 +374,6 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             } else {
                 $settings['commission']['withdraw']['fee']['percent'] = min(100, max(0, round(request::int('withdraw_fee_permille') / 10)));
             }
-
-            $settings['commission']['goods']['cw'] = request::int('goods_cost_price_cw');
         }
 
         $settings['commission']['agreement']['freq'] = request::trim('commission_agreement');

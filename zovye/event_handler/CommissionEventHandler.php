@@ -357,7 +357,10 @@ class CommissionEventHandler
                 }
 
                 //第4步，成本及剩余利润分配给代理商
-                $commission_price += $costPrice;
+                if (empty($goods->getExtraData('cw', 0))) {
+                    //成本参与分佣
+                    $commission_price += $costPrice;
+                }
 
                 if ($commission_price < 1) {
                     return true;

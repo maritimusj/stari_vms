@@ -156,7 +156,6 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>订单号</th>
                     <th>来源</th>                    
                     <th>商品</th>
                     <th>图片</th>
@@ -178,17 +177,17 @@
                 <tr data-id="{$order['id']}" {if $order['result'] && isset($order['result']['errno']) && $order['result']['errno'] != 0}class="failed"{/if}>
                     <td>{php echo $index + 1}</td>
                     <td>
-                        {$order['orderId']}
-                    </td>
-                    <td>
                         {if $order['price']>0}                      
                         <div class="transactionId">
                            <i class="wi wi-money {$order['src']}" title="{$order['pay_name']}"></i> {$order['transaction_id']}
                         </div>
+                        <div class="orderId">
+                            {$order['orderId']}
+                        </div>
                         {else}
                         <div class="color-gray">
                             {if $order['account']}
-                            <div class="account-title" title="{php echo $accounts[$order['account']]['title']}">
+                            <div class="account-title" title="{$order['orderId']}">
                                 {if $accounts[$order['account']]}
                                 <img src="{media $accounts[$order['account']]['img']}" alt=""/>
                                 {/if}

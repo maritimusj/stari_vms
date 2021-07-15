@@ -71,10 +71,14 @@ class ZhiJinBaoAccount
                         throw new RuntimeException('失败，发生错误：' . $result['code']);
                     }
 
+                    if (empty($result['data']) || empty($result['data']['qrcodeUrl'])) {
+                        throw new RuntimeException('返回的数据不正确！');
+                    }
+
                     $data = $acc->format();
 
-                    $data['name'] = $result['nickname'];
-                    $data['qrcode'] = $result['qrcodeUrl'];
+                    $data['name'] = $result['data']['nickname'];
+                    $data['qrcode'] = $result['data']['qrcodeUrl'];
 
                     $v[] = $data;
 
@@ -147,7 +151,7 @@ class ZhiJinBaoAccount
 
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, $data['sign']);
+            $order_uid = Order::makeUID($user, $device, sha1($data['appId']));
 
             Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
 
@@ -189,12 +193,23 @@ class ZhiJinBaoAccount
 
     private function sign($data): string
     {
-        unset($data['sign']);
+        $keys = [
+            'extraParam' => $data['extraParam'],
+            'nonceStr' => $data['nonceStr'],
+            'openId' => $data['openId'],
+            'timeStamp' => $data['timeStamp'],
+            'zjbAppId' => $data['zjbAppId'],
+            'zjbSecret' => $this->app_secret,
+        ];
 
-        $data['zjbSecret'] = $this->app_secret;
-
-        sort($data);
-
-        return strtoupper(md5(http_build_query($data)));
+        $str = [];
+        foreach($keys as $key => $val) {
+            if ($val == '') {
+                continue;
+            }
+            $str[] = "$key={$val}";
+        }
+       
+        return strtoupper(md5(implode('&', $str)));
     }
 }

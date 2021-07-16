@@ -56,7 +56,7 @@ if ($op == 'default') {
         }
     }
 
-    $user_id = request::int('id');
+    $user_id = request::int('user_id');
     if ($user_id) {
         $user = User::get($user_id);
         if ($user) {
@@ -67,8 +67,8 @@ if ($op == 'default') {
         }
     }
 
-    if (request::has('accountId')) {
-        $account = Account::get(request::int('accountId'));
+    if (request::has('account_id')) {
+        $account = Account::get(request::int('account_id'));
         if ($account) {
             $query->where(['account' => $account->getName()]);
         }

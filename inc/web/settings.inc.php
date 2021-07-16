@@ -751,6 +751,9 @@ if ($op == 'account') {
 } elseif ($op == 'reset') {
 
     Migrate::reset();
+    if (Migrate::detect(false)) {
+        JSON::success(['redirect' => Util::url('migrate')]);
+    }
     JSON::success('已重置！');
 
 } elseif ($op == 'device') {
@@ -1295,7 +1298,9 @@ if ($op == 'account') {
                         $data = Util::get(UPGRADE_URL . '/?op=exec');
                         $res = json_decode($data, true);
                         if ($res && $res['status']) {
-                            Util::itoast('更新成功！', $back_url, 'success');
+                            if (!Migrate::detect(true)) {
+                                Util::itoast('更新成功！', $back_url, 'success');
+                            }
                         }
                     }
                 } else {
@@ -1385,8 +1390,6 @@ if ($op == 'account') {
         'content' => $content,
     ]);
 } 
-
-
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {
     Util::itoast('找不到这个配置页面！', $this->createWebUrl('settings'), 'error');

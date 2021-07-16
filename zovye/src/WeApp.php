@@ -126,14 +126,6 @@ class WeApp extends Settings
      */
     public function run(): WeApp
     {
-        global $do;
-
-        if ($do != 'migrate') {
-            Util::cachedCall(10, function () {
-                Migrate::detect(true);
-            });
-        }
-
         class_alias(__NAMESPACE__ . '\Site', lcfirst(APP_NAME) . 'ModuleSite');
         return $this;
     }

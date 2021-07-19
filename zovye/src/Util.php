@@ -2435,6 +2435,7 @@ HTML_CONTENT;
      * 使用GET请求指定API
      * @param string $url
      * @param int $timeout
+     * @param array $params
      * @return string|null
      */
     public static function get(string $url, int $timeout = 3, $params = []): ?string

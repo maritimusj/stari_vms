@@ -47,6 +47,9 @@ class Account extends State
     //美葩
     const MEIPA = 104;
 
+    //金粉吧
+    const KINGFANS = 105;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -67,6 +70,9 @@ class Account extends State
 
     const MEIPA_NAME = '美葩';
     const MEIPA_HEAD_IMG = MODULE_URL . 'static/img/meipa_pic.png';
+
+    const KINGFANS_NAME = '金粉吧';
+    const KINGFANS_HEAD_IMG = MODULE_URL . 'static/img/kingfans_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -248,6 +254,13 @@ class Account extends State
         if (App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude)) {
             $join(['state' => Account::MEIPA], function () use ($device, $user) {
                 return MeiPaAccount::fetch($device, $user);
+            });
+        }
+
+        //金粉吧
+        if (App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude)) {
+            $join(['state' => Account::KINGFANS], function () use ($device, $user) {
+                return KingFansAccount::fetch($device, $user);
             });
         }
 
@@ -577,6 +590,12 @@ class Account extends State
     {
         $url = Util::murl('meipa');
         return self::createSpecialAccount(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
+    }
+
+    public static function createKingFansAccount(): ?accountModelObj
+    {
+        $url = Util::murl('kingfans');
+        return self::createSpecialAccount(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array

@@ -168,6 +168,17 @@ class App
     }
 
     /**
+     * 是否开启 金粉吧 吸粉
+     *
+     */
+    public static function isKingFansEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('king.fan.enabled'));
+        });
+    }
+
+    /**
      * 是否启用用户中心
      * @return bool
      */

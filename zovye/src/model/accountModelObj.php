@@ -159,6 +159,7 @@ class accountModelObj extends modelObj
                 Account::AQIINFO => App::isAQiinfoEnabled(),
                 Account::ZJBAO => App::isZJBaoEnabled(),
                 Account::MEIPA => App::isMeiPaEnabled(),
+                Account::KINGFANS => App::isKingFansEnabled(),
             ];
             $state = $status[$this->getType()];
             if (isset($state) && !$state) {
@@ -239,6 +240,7 @@ class accountModelObj extends modelObj
             Account::AQIINFO,
             Account::ZJBAO,
             Account::MEIPA,
+            Account::KINGFANS,
         ]);
     }
 
@@ -283,6 +285,11 @@ class accountModelObj extends modelObj
     public function isMeiPa(): bool
     {
         return $this->getType() == Account::MEIPA;
+    }
+
+    public function isKingFans(): bool
+    {
+        return $this->getType() == Account::KINGFANS;
     }
 
     public function isAuth(): bool

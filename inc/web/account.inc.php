@@ -82,7 +82,7 @@ if ($op == 'default') {
                 'orderlimits' => $entry->getOrderLimits(),
                 'banned' => $entry->isBanned(),
                 'url' => $entry->getUrl(),
-                'assigned' => !isEmptyArray($entry->get('assigned')),                
+                'assigned' => !isEmptyArray($entry->get('assigned')),
             ];
 
             if ($entry->isAuth()) {
@@ -134,6 +134,7 @@ if ($op == 'default') {
         Account::AQIINFO => App::isAQiinfoEnabled(),
         Account::ZJBAO => App::isZJBaoEnabled(),
         Account::MEIPA => App::isMeiPaEnabled(),
+        Account::KINGFANS => App::isKingFansEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -176,7 +177,7 @@ if ($op == 'default') {
 } elseif ($op == 'search') {
 
     $result = [];
-    
+
     $query = Account::query();
 
     $keyword = trim(urldecode(request::str('keyword')));
@@ -301,9 +302,15 @@ if ($op == 'default') {
                     'apiid' => request::trim('apiid'),
                     'appkey' => request::trim('appkey'),
                 ]);
-            }
-            
-            elseif ($account->isAuth()) {
+            } elseif ($account->isKingFans()) {
+                $data['name'] = Account::KINGFANS_NAME;
+                $data['img'] = Account::KINGFANS_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::KINGFANS,
+                    'bid' => request::trim('bid'),
+                    'key' => request::trim('key'),
+                ]);
+            } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
                     $timing = 1;
@@ -353,6 +360,7 @@ if ($op == 'default') {
                 Account::AQIINFO_NAME,
                 Account::ZJBAO_NAME,
                 Account::MEIPA_NAME,
+                Account::KINGFANS,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }
@@ -757,7 +765,7 @@ if ($op == 'default') {
     $tpl_data = [
         'account' => $acc->profile(),
     ];
-  
+
     $query = Account::logQuery($acc);
 
     if (request::has('device')) {
@@ -766,7 +774,7 @@ if ($op == 'default') {
         if (empty($device)) {
             Util::itoast('找不到这个设备！', '', 'error');
         }
-        $tpl_data['device']  = $device->profile();
+        $tpl_data['device'] = $device->profile();
         $query->where(['device_id' => $device_id]);
     }
 

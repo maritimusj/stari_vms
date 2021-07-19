@@ -180,6 +180,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createMeiPaAccount',
                 'meipa.fan.enabled',
             ],
+            'kingFAN' => [
+                __NAMESPACE__ . '\Account::createKingFansAccount',
+                'king.fan.enabled',
+            ],
         ];
 
         $accounts_need_refresh = false;

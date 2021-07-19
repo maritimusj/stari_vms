@@ -70,7 +70,7 @@ if (is_error($res)) {
     JSON::fail($res['message']);
 }
 
-//获取第一货道上的商品，如果该商品数量为0，则去获取相同商品的其它货道
+//获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
 $goods = $device->getGoodsByLane(0);
 if ($goods && $goods['num'] < 1) {
     $goods = $device->getGoods($goods['id']);

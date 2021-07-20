@@ -549,6 +549,18 @@ JSCODE;
 }
 JSCODE;
         }
+        if (App::isDonatePayEnabled()) {
+            $donate_url = Util::murl('donate', ['device' => $device->getShadowId()]);
+            $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.getDonationInfo = function(cb) {
+    $.get("{$donate_url}").then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+JSCODE;
+        }
         //检查用户在该设备上最近失败的免费订单
         $retry = settings('order.retry', []);
         if ($retry['last'] > 0) {

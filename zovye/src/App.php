@@ -486,5 +486,11 @@ class App
         return onceCall(function() {
             return boolval(settings('account.log.enabled'));
         });        
-    }    
+    }
+
+    public static function isDonatePayEnabled(): bool {
+        return onceCall(function() {
+            return boolval(settings('custom.DonatePay.enabled'));
+        });        
+    } 
 }

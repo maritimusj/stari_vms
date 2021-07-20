@@ -207,6 +207,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
+        $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;        
         $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;        
         $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
 
@@ -531,6 +532,14 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['api'] = [
             'account' => request::trim('account'),
         ];
+
+        if (App::isDonatePayEnabled()) {
+            Config::donatePay('qsc', [
+                'title' => request::trim('donatePayTitle'),
+                'desc' => request::trim('donatePayDesc'),
+                'url' => request::trim('donatePayUrl'),
+            ], true);
+        }
 
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;
@@ -982,7 +991,9 @@ if ($op == 'account') {
     }
     $tpl_data['app_key'] = $app_key;
     $tpl_data['account'] = settings('api.account', '');
-
+    if (App::isDonatePayEnabled()) {
+        $tpl_data['donatePay'] = Config::donatePay('qsc');
+    }
 } elseif ($op == 'accountMsgConfig') {
 
     $media = request('media') ?: [

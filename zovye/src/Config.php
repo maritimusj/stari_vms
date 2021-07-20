@@ -53,4 +53,17 @@ class Config
 
         return globalConfig('wxplatform', $key, $v);
     }
+
+    /**
+     * 轻松筹爱心捐款设置
+     */
+
+    public static function donatePay($key, $v = null, $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('donatePay', $key, $v);
+        }
+
+        return globalConfig('donatePay', $key, $v);
+    }
 }

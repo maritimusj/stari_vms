@@ -91,12 +91,18 @@ const app = new Vue({
     },
     created() {
         if (typeof zovye_fn.getDonationInfo === 'function') {
-            const res = zovye_fn.getDonationInfo()
-            this.donate = {
-                exist: true,
-                show: true,
-                ...res
-            }
+            zovye_fn.getDonationInfo((res) => {
+                if (res && res.status) {
+                    this.donate = {
+                        exist: true,
+                        show: true,
+                        ...res.data
+                    } 
+                } else {
+                    this.donate.exist = false;
+                    this.donate.show = false;
+                }               
+            })
         }
         if (typeof zovye_fn.retryOrder === 'function') {
             zovye_fn.retryOrder((res) => {

@@ -266,6 +266,7 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
     }
 
     $user->remove('last');
+    $user->remove('donate');
 
     return $order;
 }

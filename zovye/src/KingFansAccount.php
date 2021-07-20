@@ -114,10 +114,9 @@ class KingFansAccount
             return err('没有配置！');
         }
 
-        Util::logToFile('kingfans', [
-            'params' => $params,
-            'config' => $config,
-        ]);
+        if (md5($params['oid'] . $params['uid'] . $params['timestamp'] . $config['key']) !== $params['sign']) {
+            return err('签名错误！');
+        }
 
         return ['account' => $acc];
     }
@@ -131,7 +130,7 @@ class KingFansAccount
                 throw new RuntimeException('发生错误：' . $res['message']);
             }
 
-            list($device_shadow_uid, $user_openid) = explode($params['param'], ':');
+            list($device_shadow_uid, $user_openid) = explode(':', $params['param']);
 
             if (empty($device_shadow_uid) || empty($user_openid)) {
                 throw new RuntimeException('发生错误：回传参数为格式不正确！');
@@ -146,12 +145,12 @@ class KingFansAccount
             /** @var deviceModelObj $device */
             $device = Device::findOne(['shadow_id' => $device_shadow_uid]);
             if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['state']);
+                throw new RuntimeException('找不到指定的设备:' . $device_shadow_uid);
             }
 
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device);
+            $order_uid = Order::makeUID($user, $device, sha1($params['oid'] . $user_openid));
 
             Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
 

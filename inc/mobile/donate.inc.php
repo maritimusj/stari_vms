@@ -86,7 +86,7 @@ if ($op == 'default') {
         'type' => 'donate',
         'orderNO' => $order_no,
         'transaction_id' => REQUEST_ID,
-        'total' => $price,
+        'total' => $paylog->getTotal(),
         'paytime' => time(),
         'openid' => $user->getOpenid(),
         'deviceUID' => $device->getImei(),

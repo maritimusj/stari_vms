@@ -65,9 +65,8 @@ class KingFansAccount
                     throw new RuntimeException($result['message']);
                 }
 
-                $result = json_decode($result, true);
-                if (empty($result)) {
-                    throw new RuntimeException('返回数据无法解析！');
+                if ($result['error']) {
+                    throw new RuntimeException("请求失败，错误代码：{$result['error']}");
                 }
 
                 $data = $acc->format();
@@ -182,7 +181,9 @@ class KingFansAccount
         $data['sign'] = md5($this->key . $data['uuid'] . $data['t']);
 
         $result = Util::get(self::API_URL . '?' . http_build_query($data));
-
+        if (!empty($result) && is_string($result)) {
+            $result = json_decode($result, true);
+        }        
         if ($cb) {
             $cb($data, $result);
         }

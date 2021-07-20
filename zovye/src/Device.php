@@ -336,7 +336,9 @@ class Device extends State
         if (!empty($payload['cargo_lanes'][$lane_id])) {
             $goods_id = $payload['cargo_lanes'][$lane_id]['goods'];
             $result = Goods::data($goods_id);
-            $result['num'] = $payload['cargo_lanes'][$lane_id]['num'];
+            if ($result) {
+                $result['num'] = $payload['cargo_lanes'][$lane_id]['num'];
+            }
         }
 
         return $result;

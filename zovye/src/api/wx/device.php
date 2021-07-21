@@ -109,7 +109,7 @@ class device
 
         if ($location) {
             $result['extra']['location'] = $location;
-            if (isset($result['extra']['location']['area'])) {
+            if (!isset($result['extra']['location']['area'])) {
                 $result['extra']['location']['area'] = [];
             }
         }

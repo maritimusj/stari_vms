@@ -1202,8 +1202,8 @@ class deviceModelObj extends modelObj
         //商品库存
         $cfg = array_merge($cfg, Device::getPayload($this));
 
-        //app版本需要大于等于3.1才能处理字幕
-        if ($srt['subs'] && $this->getAppVersion() >= 3.1) {
+        //字幕
+        if ($srt['subs']) {
             $cfg['srt'] = $srt;
         }
 

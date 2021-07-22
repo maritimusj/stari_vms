@@ -14,28 +14,24 @@ class router
     public static function exec($op, $map)
     {
         $fn = $map[$op];
-        try {
-            if (We7::starts_with($fn, '@')) {
-                $fn = ltrim($fn, '@');
-                if (is_callable($fn)) {
-                    $result = Util::transactionDo($fn);
-                }
-            } elseif (We7::starts_with($fn, '#')) {
-                $fn = ltrim($fn, '#');
-                if (is_callable($fn)) {
-                    $result = Util::cachedCall(6, $fn, common::getToken());
-                }
-            } else {
-                if (is_callable($fn)) {
-                    $result = $fn();
-                }
+        if (We7::starts_with($fn, '@')) {
+            $fn = ltrim($fn, '@');
+            if (is_callable($fn)) {
+                $result = Util::transactionDo($fn);
             }
-            if (!isset($result)) {
-                throw new RuntimeException('不正确的调用！');
+        } elseif (We7::starts_with($fn, '*')) {
+            $fn = ltrim($fn, '*');
+            if (is_callable($fn)) {
+                $result = Util::cachedCall(6, $fn, common::getToken());
             }
-            JSON::success($result);
-        } catch (Exception $e) {
-            JSON::fail($e);
+        } else {
+            if (is_callable($fn)) {
+                $result = $fn();
+            }
         }
+        if (!isset($result)) {
+            JSON::fail('不正确的调用！');
+        }
+        JSON::success($result);
     }
 }

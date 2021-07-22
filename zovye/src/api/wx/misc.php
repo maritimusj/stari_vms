@@ -1,8 +1,5 @@
 <?php
-
-
 namespace zovye\api\wx;
-
 
 use zovye\App;
 use zovye\model\userModelObj;
@@ -25,7 +22,9 @@ class misc
         $low_remain_total = self::getLowRemainDeviceTotal($agent);
 
         /** @var userModelObj $sub */
-        foreach (\zovye\Agent::getAllSubordinates($agent) as $sub) {
+        $list = [];
+        \zovye\Agent::getAllSubordinates($agent, $list, true);
+        foreach ($list as $sub) {
             if ($sub->isAgent()) {
                 $sa = $sub->agent();
                 if ($sa) {

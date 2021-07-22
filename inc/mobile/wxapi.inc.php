@@ -153,6 +153,6 @@ router::exec($op, [
     'YZShopStats' => '\zovye\api\wx\yzshop::stats',
     'News' => '\zovye\api\wx\yzshop::news',
 
-    'DeviceStats' => '#\zovye\api\wx\misc::deviceStats',
+    'DeviceStats' => '\zovye\api\wx\misc::deviceStats',
 ]);
 

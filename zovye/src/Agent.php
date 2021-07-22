@@ -167,15 +167,15 @@ class Agent
         return err('失败！');
     }
 
-    public static function getAllSubordinates(userModelObj $user, array &$result = []): array
+    public static function getAllSubordinates(userModelObj $user, array &$result = [], $fetch_obj = false): array
     {
         $query = User::query(['superior_id' => $user->getId()]);
 
         /** @var userModelObj $entry */
         foreach ($query->findAll() as $entry) {
             if (!in_array($entry->getId(), $result)) {
-                $result[] = $entry->getId();
-                self::getAllSubordinates($entry, $result);
+                $result[] = $fetch_obj ? $entry : $entry->getId();
+                self::getAllSubordinates($entry, $result, $fetch_obj);
             }
         }
         return $result;

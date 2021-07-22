@@ -2,30 +2,40 @@
 
 namespace zovye\api;
 
+use Exception;
+use RuntimeException;
+use zovye\api\wx\common;
 use zovye\JSON;
 use zovye\Util;
 use zovye\We7;
-use function zovye\is_error;
 
 class router
 {
     public static function exec($op, $map)
-    { 
+    {
         $fn = $map[$op];
-        $with_transaction = We7::starts_with($fn, '@');
-        $fn = $with_transaction ? ltrim($fn, '@') : $fn;
-        if (is_callable($fn)) {
-            $result = $with_transaction ? Util::transactionDo($fn) : $fn();
-            if (is_error($result)) {
-                JSON::fail($result);
-            } else {
-                if (is_string($result)) {
-                    JSON::success(['msg' => $result]);
+        try {
+            if (We7::starts_with($fn, '@')) {
+                $fn = ltrim($fn, '@');
+                if (is_callable($fn)) {
+                    $result = Util::transactionDo($fn);
                 }
-                JSON::success($result);
+            } elseif (We7::starts_with($fn, '#')) {
+                $fn = ltrim($fn, '#');
+                if (is_callable($fn)) {
+                    $result = Util::cachedCall(6, $fn, common::getToken());
+                }
+            } else {
+                if (is_callable($fn)) {
+                    $result = $fn();
+                }
             }
-        } else {
-            JSON::fail('不正确的调用？' . strval($op));
+            if (!isset($result)) {
+                throw new RuntimeException('不正确的调用！');
+            }
+            JSON::success($result);
+        } catch (Exception $e) {
+            JSON::fail($e);
         }
     }
 }

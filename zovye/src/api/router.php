@@ -2,8 +2,6 @@
 
 namespace zovye\api;
 
-use Exception;
-use RuntimeException;
 use zovye\api\wx\common;
 use zovye\JSON;
 use zovye\Util;
@@ -29,9 +27,11 @@ class router
                 $result = $fn();
             }
         }
-        if (!isset($result)) {
-            JSON::fail('不正确的调用！');
+
+        if (isset($result)) {
+            JSON::success($result);
         }
-        JSON::success($result);
+
+        JSON::fail('不正确的调用！');
     }
 }

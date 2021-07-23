@@ -29,7 +29,7 @@ class router
         }
 
         if (isset($result)) {
-            JSON::success($result);
+            JSON::result($result);
         }
 
         JSON::fail('不正确的调用！');

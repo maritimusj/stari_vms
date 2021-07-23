@@ -71,6 +71,14 @@ class MeiPaAccount
                     $data['title'] = $result['data']['wechat_name'];
                     $data['qrcode'] = $result['data']['qrcodeurl'];
 
+                    if ($result['data']['joburl']) {
+                        $data['redirect_url'] = $result['data']['joburl'];
+                    }
+
+                    if ($result['data']['code_words']) {
+                        $data['descr'] = "回复<b>{$result['data']['code_words']}</b>免费领取！";
+                    }
+
                     if (App::isAccountLogEnabled() && isset($log)) {
                         $log->setExtraData('account', $data);
                         $log->save();

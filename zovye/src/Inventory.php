@@ -126,14 +126,16 @@ class Inventory
                     }
                 }
             }
-            $log = $inventory->stock(null, $entry['goodsId'], -$entry['num'], [
-                'memo' => $memo,
-                'device' => $device->profile(),
-                'clr' => $clr,
-                'serial' => REQUEST_ID,
-            ]);
-            if (empty($log)) {
-                return error(State::ERROR, '仓库商品操作失败！');
+            if ($entry['num'] != 0) {
+                $log = $inventory->stock(null, intval($entry['goodsId']), -$entry['num'], [
+                    'memo' => $memo,
+                    'device' => $device->profile(),
+                    'clr' => $clr,
+                    'serial' => REQUEST_ID,
+                ]);
+                if (empty($log)) {
+                    return error(State::ERROR, '仓库商品操作失败！');
+                }
             }
         }
         return true;

@@ -138,7 +138,17 @@ class Goods
         $query = Goods::query();
 
         if (isset($params['agent_id'])) {
-            if ($params['agent_id'] > 0) {
+            if (We7::starts_with('*', $params['agent_id'])) {
+                $agent_id = ltrim($params['agent_id'], '*');
+
+                $agent = Agent::get($agent_id);
+                if (empty($agent)) {
+                    return error(State::ERROR, '找不到这个代理商！');
+                }
+
+                $query->where("agent_id=0 OR agent_id={$agent->getId()}");
+
+            } elseif ($params['agent_id'] > 0) {
                 $agent = Agent::get($params['agent_id']);
                 if (empty($agent)) {
                     return error(State::ERROR, '找不到这个代理商！');

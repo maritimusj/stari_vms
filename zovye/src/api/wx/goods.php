@@ -27,7 +27,12 @@ class goods
         ];
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-        $params['agent_id'] = $agent->getId();
+
+        if (request::bool('all')) {
+            $params['agent_id'] = "*{$agent->getId()}";
+        } else {
+            $params['agent_id'] = $agent->getId();
+        }
 
         $result = \zovye\Goods::getList($params);
         $result['goods_edit'] = boolval(settings('goods.agent.edit', 0));

@@ -1,8 +1,10 @@
 <?php
+
 namespace zovye\api\wx;
 
 use zovye\App;
 use zovye\model\userModelObj;
+use zovye\request;
 
 class misc
 {
@@ -38,6 +40,26 @@ class misc
             'total' => $total,
             'all' => $all_devices,
             'low_remain' => $low_remain_total,
+        ];
+    }
+
+    public static function orderStats(): array
+    {
+        $user = common::getAgent();
+        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
+
+        $query = \zovye\Order::query(['agent_id' => $agent->getId()]);
+
+        $goods_id = request::int('goods');
+        if ($goods_id > 0) {
+            $query->where(['goods_id' => $goods_id]);
+        }
+
+        list($price, $num) = $query->get(['sum(price)', 'count(num)']);
+
+        return [
+            'price' => $price,
+            'num' => $num,
         ];
     }
 }

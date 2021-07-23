@@ -2,9 +2,12 @@
 
 namespace zovye\api\wx;
 
+use DateTime;
+use Exception;
 use zovye\App;
 use zovye\model\userModelObj;
 use zovye\request;
+use function zovye\err;
 
 class misc
 {
@@ -53,6 +56,21 @@ class misc
         $goods_id = request::int('goods');
         if ($goods_id > 0) {
             $query->where(['goods_id' => $goods_id]);
+        }
+
+        try {
+            $start = new DateTime(request::trim('start'));
+            $query->where(['createtime >=' => $start->getTimestamp()]);
+        } catch (Exception $e) {
+            return err('起始时间不正确！');
+        }
+
+        try {
+            $end = new DateTime(request::trim('end'));
+            $end->modify('next day 00:00');
+            $query->where(['createtime <' => $end->getTimestamp()]);
+        } catch (Exception $e) {
+            return err('结束时间不正确！');
         }
 
         list($price, $num) = $query->get(['sum(price)', 'count(num)']);

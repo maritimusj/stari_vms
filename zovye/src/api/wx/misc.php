@@ -58,26 +58,30 @@ class misc
             $query->where(['goods_id' => $goods_id]);
         }
 
-        try {
-            $start = new DateTime(request::trim('start'));
-            $query->where(['createtime >=' => $start->getTimestamp()]);
-        } catch (Exception $e) {
-            return err('起始时间不正确！');
+        if (request::has('start')) {
+            try {
+                $start = new DateTime(request::trim('start'));
+                $query->where(['createtime >=' => $start->getTimestamp()]);
+            } catch (Exception $e) {
+                return err('起始时间不正确！');
+            }            
         }
 
-        try {
-            $end = new DateTime(request::trim('end'));
-            $end->modify('next day 00:00');
-            $query->where(['createtime <' => $end->getTimestamp()]);
-        } catch (Exception $e) {
-            return err('结束时间不正确！');
+        if (request::has('end')) {
+            try {
+                $end = new DateTime(request::trim('end'));
+                $end->modify('next day 00:00');
+                $query->where(['createtime <' => $end->getTimestamp()]);
+            } catch (Exception $e) {
+                return err('结束时间不正确！');
+            }            
         }
 
         list($price, $num) = $query->get(['sum(price)', 'count(num)']);
 
         return [
-            'price' => $price,
-            'num' => $num,
+            'price' => intval($price),
+            'num' => intval($num),
         ];
     }
 }

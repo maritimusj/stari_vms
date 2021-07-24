@@ -356,19 +356,19 @@ if (!function_exists('array_key_first')) {
 function hashFN(callable $fn, ...$val): string
 {
     try {
-        $reflect = new ReflectionFunction($fn);
+        $ref = new ReflectionFunction($fn);
     }catch (ReflectionException $e) {
         try {
-            $reflect = new ReflectionMethod($fn);
+            $ref = new ReflectionMethod($fn);
         } catch (ReflectionException $e) {
             trigger_error($e->getMessage());
         }
     }
-    if (!empty($reflect)) {
+    if (!empty($ref)) {
         $data = [
-            $reflect->getFileName(),
-            $reflect->getStartLine(),
-            $reflect->getEndLine(),
+            $ref->getFileName(),
+            $ref->getStartLine(),
+            $ref->getEndLine(),
         ];
         foreach ($val as $v) {
             $data[] = strval($v);

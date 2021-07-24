@@ -9,6 +9,7 @@ namespace zovye;
 
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionMethod;
 use zovye\base\model;
 use zovye\base\modelFactory;
 
@@ -356,18 +357,27 @@ function hashFN(callable $fn, ...$val): string
 {
     try {
         $reflect = new ReflectionFunction($fn);
+    }catch (ReflectionException $e) {
+        try {
+            $reflect = new ReflectionMethod($fn);
+        } catch (ReflectionException $e) {
+            trigger_error($e->getMessage());
+        }
+    }
+    if (!empty($reflect)) {
         $data = [
             $reflect->getFileName(),
             $reflect->getStartLine(),
             $reflect->getEndLine(),
         ];
         foreach ($val as $v) {
-            $data[] = $v;
+            $data[] = strval($v);
         }
         return md5(implode('', $data));
-    } catch (ReflectionException $e) {
-        die($e->getMessage());
     }
+
+    trigger_error('无法识别的函数或方法!');
+    return '';
 }
 
 function onceCall(callable $fn, ...$val)

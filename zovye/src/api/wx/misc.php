@@ -52,7 +52,14 @@ class misc
         $user = common::getAgent();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-        $query = \zovye\Order::query(['agent_id' => $agent->getId()]);
+        $query = \zovye\Order::query();
+        if (request::bool('all')) {
+            $ids = \zovye\Agent::getAllSubordinates($agent);
+            $ids[] = $agent->getId();
+            $query->where(['agent_id' => $ids]);
+        } else {
+            $query->where(['agent_id' => $agent->getId()]);
+        }
 
         $goods_id = request::int('goods');
         if ($goods_id > 0) {
@@ -65,7 +72,7 @@ class misc
                 $query->where(['createtime >=' => $start->getTimestamp()]);
             } catch (Exception $e) {
                 return err('起始时间不正确！');
-            }            
+            }
         }
 
         if (request::has('end')) {
@@ -75,14 +82,14 @@ class misc
                 $query->where(['createtime <' => $end->getTimestamp()]);
             } catch (Exception $e) {
                 return err('结束时间不正确！');
-            }            
+            }
         }
 
         list($price, $num) = $query->get(['sum(price)', 'count(num)']);
 
         $list = [];
-        $query->groupBy('goods_id');        
-        foreach($query->getAll(['id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
+        $query->groupBy('goods_id');
+        foreach ($query->getAll(['id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
             $goods = Goods::get($entry['id']);
             if ($goods) {
                 $list[] = [

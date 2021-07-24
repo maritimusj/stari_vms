@@ -28,6 +28,7 @@ use zovye\model\userModelObj;
  * @method delete($condition = [])
  * @method get($m)
  * @method resetAll()
+ * @method getAll(string[] $array)
  */
 class ModelObjFinderProxy
 {

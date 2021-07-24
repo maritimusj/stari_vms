@@ -89,8 +89,8 @@ class misc
 
         $list = [];
         $query->groupBy('goods_id');
-        foreach ($query->getAll(['id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
-            $goods = Goods::get($entry['id']);
+        foreach ($query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
+            $goods = Goods::get($entry['goods_id']);
             if ($goods) {
                 $list[] = [
                     'goods' => Goods::format($goods),

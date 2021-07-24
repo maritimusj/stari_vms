@@ -96,7 +96,7 @@ class misc
                     'goods' => Goods::format($goods),
                     'num' => intval($entry['num']),
                     'price' => intval($entry['price']),
-                    'price_foramtted' => number_format($entry['price'] / 100, 2),
+                    'price_formatted' => number_format($entry['price'] / 100, 2),
                 ];
             }
         }

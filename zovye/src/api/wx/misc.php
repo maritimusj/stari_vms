@@ -5,6 +5,7 @@ namespace zovye\api\wx;
 use DateTime;
 use Exception;
 use zovye\App;
+use zovye\Goods;
 use zovye\model\userModelObj;
 use zovye\request;
 use function zovye\err;
@@ -79,10 +80,25 @@ class misc
 
         list($price, $num) = $query->get(['sum(price)', 'count(num)']);
 
+        $list = [];
+        $query->groupBy('goods_id');        
+        foreach($query->getAll(['id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
+            $goods = Goods::get($entry['id']);
+            if ($goods) {
+                $list[] = [
+                    'goods' => Goods::format($goods),
+                    'num' => intval($entry['num']),
+                    'price' => intval($entry['price']),
+                    'price_foramtted' => number_format($entry['price'] / 100, 2),
+                ];
+            }
+        }
+
         return [
             'price' => intval($price),
             'price_formatted' => number_format($price / 100, 2),
             'num' => intval($num),
+            'goods' => $list,
         ];
     }
 }

@@ -861,6 +861,11 @@ class deviceModelObj extends modelObj
         $id = $this->isActiveQrcodeEnabled() ? $this->shadow_id : $this->imei;
 
         $params = [];
+        $adv = $this->getOneAdv(Advertising::WX_APP_URL_CODE);
+        if ($adv && $adv['extra']['code']) {
+            $params['app'] = strval($adv['extra']['code']);
+        }
+
         if ($this->isBlueToothDevice()) {
             $params['wxapp'] = 'true';
         }

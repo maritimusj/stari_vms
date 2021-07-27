@@ -864,6 +864,8 @@ class deviceModelObj extends modelObj
         $adv = $this->getOneAdv(Advertising::WX_APP_URL_CODE);
         if ($adv && $adv['extra']['code']) {
             $params['app'] = strval($adv['extra']['code']);
+        } else {
+            $params['app'] = 'NULL';
         }
 
         if ($this->isBlueToothDevice()) {

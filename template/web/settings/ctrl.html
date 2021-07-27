@@ -74,12 +74,21 @@
             <div class="seg">
                 <div class="title">本地服务器</div>
                 <div class="form-group">
+                    {if $migrate}
+                    <div class="page_item">
+                        <span>立即升级</span>
+                        <span class="duration operate">
+                            <i class="fa fa-flash" title="点击立即升级" data-op="migrate"></i>
+                        </span>
+                    </div>
+                    {else}
                     <div class="page_item">
                         <span>重置升级</span>
                         <span class="duration operate">
                             <i class="fa fa-reply-all" title="点击重置升级" data-op="reset"></i>
                         </span>
                     </div>
+                    {/if}
                     {if $is_locked}
                     <div class="page_item">
                         <span>锁定状态</span>

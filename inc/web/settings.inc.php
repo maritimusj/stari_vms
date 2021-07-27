@@ -756,10 +756,17 @@ if ($op == 'account') {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
     }
+    $tpl_data['migrate'] = Migrate::detect(false);
 } elseif ($op == 'unlock') {
 
     app()->resetLock();
     JSON::success('成功！');
+
+} elseif ($op == 'migrate') {
+
+    if (Migrate::detect(false)) {
+        JSON::success(['redirect' => Util::url('migrate')]);
+    }
 
 } elseif ($op == 'reset') {
 

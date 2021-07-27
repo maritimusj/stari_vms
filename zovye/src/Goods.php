@@ -44,9 +44,10 @@ class Goods
 
     /**
      * @param mixed $id
+     * @param bool $delete
      * @return goodsModelObj|null
      */
-    public static function get($id): ?goodsModelObj
+    public static function get($id, $deleted = false): ?goodsModelObj
     {
         /** @var goodsModelObj[] $cache */
         static $cache = [];
@@ -56,7 +57,7 @@ class Goods
             if ($cache[$id]) {
                 return $cache[$id];
             }
-            $goods = self::query()->findOne(['id' => $id]);
+            $goods = $deleted ? m('goods')->where(We7::uniacid([]))->findOne(['id' => $id]) : self::query()->findOne(['id' => $id]);
             if ($goods) {
                 $cache[$goods->getId()] = $goods;
                 return $goods;
@@ -95,6 +96,10 @@ class Goods
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'cw' => $entry->getExtraData('cw', 0),
         ];
+
+        if ($entry->isDeleted()) {
+            $data['deleted'] = true;
+        }
 
         $lottery = $entry->getExtraData('lottery', []);
         if (!empty($lottery)) {

@@ -118,6 +118,9 @@ class Inventory
         $goods_lack = settings('inventory.goods.mode') ? false : true;
         $clr = Util::randColor();
         foreach ($result as $entry) {
+            if (empty($entry['goodsId'])) {
+                return error(State::ERROR, '请检查商品设置是否正确！');
+            }
             if ($entry['num'] > 0) {
                 if (!$goods_lack) {
                     $goods = $inventory->getGoods($entry['goodsId']);

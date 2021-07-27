@@ -121,6 +121,9 @@
                     </td>
                     <td>
                         <span>{$e['goods']['name']}</span>
+                        {if $e['goods']['deleted']}
+                        <span class="text-muted">&lt;已删除&gt;</span>
+                        {/if}
                     </td>
                     <td>
                         <span>

@@ -42,7 +42,7 @@ class inventory_logModelObj extends modelObj
 
 	public function getGoods()
 	{
-		return Goods::get($this->goods_id);
+		return Goods::get($this->goods_id, true);
 	}
 
 	public function getSrcInventory()

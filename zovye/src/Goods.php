@@ -70,6 +70,7 @@ class Goods
      * @param goodsModelObj $entry
      * @param bool $detail
      * @param bool $use_image_proxy
+     * @param bool $full_path
      * @return array
      */
     public static function format(goodsModelObj $entry, $detail = false, $use_image_proxy = false, $full_path = true): array
@@ -223,7 +224,7 @@ class Goods
      */
     public static function query(array $condition = []): modelObjFinder
     {
-        return m('goods')->where(We7::uniacid([]))->where($condition);
+        return m('goods')->where(We7::uniacid(['deleted' => 0]))->where($condition);
     }
 
     public static function findOne($cond): ?goodsModelObj

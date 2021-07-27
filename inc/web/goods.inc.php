@@ -268,7 +268,13 @@ if ($op == 'default' || $op == 'goods') {
 } elseif ($op == 'removeGoods') {
 
     $goods = Goods::get(request('id'));
-    if ($goods && $goods->destroy()) {
+    if ($goods) {
+        if (InventoryGoods::exists(['goods_id' => $goods->getId()])) {
+            $goods->delete();
+            $goods->save();
+        } else {
+           $goods->destroy();
+        }
         JSON::success('商品删除成功！');
     }
 

@@ -95,6 +95,10 @@ if ($op == 'default') {
             'type' => Advertising::PASSWD,
             'title' => '口令',
         ],
+        [
+            'type' => Advertising::WX_APP_URL_CODE,
+            'title' => '小程序识别码',
+        ],
     ];
 
     $url_params = [];
@@ -247,6 +251,10 @@ if ($op == 'default') {
 
                 $data['code'] = $entry->getExtraData('code');
                 $data['text'] = $entry->getExtraData('text');
+
+            } elseif ($type == Advertising::WX_APP_URL_CODE) {
+
+                $data['code'] = $entry->getExtraData('code');
             }
 
             $advs[] = $data;
@@ -447,6 +455,9 @@ if ($op == 'default') {
             $tpl_data['code'] = $adv->getExtraData('code');
             $tpl_data['text'] = $adv->getExtraData('text');
 
+        } elseif ($type == Advertising::WX_APP_URL_CODE) {
+
+            $tpl_data['code'] = $adv->getExtraData('code');
         }
     }
 

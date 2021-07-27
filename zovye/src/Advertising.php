@@ -31,6 +31,7 @@ class Advertising extends State
     const GOODS = 10; //商品推荐
     const QRCODE = 11; //推广二维码
     const PASSWD = 12; //用于推广的口令
+    const WX_APP_URL_CODE = 13; //微信小程序URL识别码
 
     public static $names = [
         self::UNKNOWN => 'default',
@@ -45,6 +46,7 @@ class Advertising extends State
         self::GOODS => 'goods',
         self::QRCODE => 'qrcode',
         self::PASSWD => 'passwd',
+        self::WX_APP_URL_CODE => 'wx_app_url_code',
     ];
 
     protected static $title = [
@@ -60,6 +62,7 @@ class Advertising extends State
         self::GOODS => '商品推荐',
         self::QRCODE => '推广二维码',
         self::PASSWD => '口令',
+        self::WX_APP_URL_CODE => '微信小程序识别码'
     ];
 
     /**
@@ -299,6 +302,10 @@ class Advertising extends State
 
             $extra['code'] = trim($params['code']);
             $extra['text'] = trim($params['text']);
+
+        } elseif ($type == Advertising::WX_APP_URL_CODE) {
+
+            $extra['code'] = trim($params['code']);
 
         } else {
             $extra['url'] = trim($params['url']);

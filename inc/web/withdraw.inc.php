@@ -134,7 +134,8 @@ if ($op == 'export') {
                     if ($keeper) {
                         $user_qrcode = $keeper->settings('qrcode', []);
                     }
-                } else {
+                }
+                if (isEmptyArray($user_qrcode)) {
                     $user_qrcode = $user->settings('qrcode', []);
                 }
                 if (isset($user_qrcode['wx'])) {

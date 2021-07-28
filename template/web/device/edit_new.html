@@ -539,9 +539,9 @@
                     <label for="group" class="col-md-2 control-label">购买界面</label>
                     <div class="col-md-10">
                         <select name="goodsList" id="group" style="width:80%;">
-                            <option value="goods">只显示商品，不显示套餐</option>
-                            <option value="package">只显示套餐，不显示商品</option>
-                            <option value="all">商品和套餐都显示</option>
+                            <option value="goods" {if $extra['goodsList'] == 'goods'}selected{/if}>只显示商品，不显示套餐</option>
+                            <option value="package" {if $extra['goodsList'] == 'package'}selected{/if}>只显示套餐，不显示商品</option>
+                            <option value="all" {if $extra['goodsList'] == 'all'}selected{/if}>商品和套餐都显示</option>
                         </select>
                     </div>
                 </div>
@@ -942,8 +942,9 @@
                 },
                 error: '',
                 currentLane: null,
-                loading: false,
+                changing: false,
                 searching: false,
+                creating: false,
                 packages: [],
                 currentPackage: null,
             },
@@ -960,11 +961,6 @@
                         }
                     }
                 },
-                loading(val) {
-                    if (val <= 0) {
-                        this.loading = false;
-                    }
-                }
             },
             computed: {
                 isCustomType() {
@@ -974,22 +970,23 @@
                     return (this.currentType.cargo_lanes || []).filter(lane => {
                         return !!lane.packing;
                     })
+                },
+                loading() {
+                    return this.changing || this.searching || this.creating;
                 }
             },
             mounted() {
-                if (this.deviceId > 0) {
-                    this.loading = 2;
+                if (this.deviceId > 0) {                    
                     this.change(true);
-                    $.getJSON(package_api_url, {op: 'list', device: this.deviceId}).then(res => {
-                        if (res && res.status) {
-                            this.packages = res.data;
-                        }
-                        this.loading --;
-                    })
                 } else {
                     this.search();
                     this.addCargoLane();
                 }
+                $.getJSON(package_api_url, {op: 'list', device: this.deviceId}).then(res => {
+                    if (res && res.status) {
+                        this.packages = res.data;
+                    }
+                })
             },
 
             methods: {
@@ -1014,6 +1011,7 @@
                 },
                 change(first = false) {
                     const self = this;
+                    self.changing = true;
                     $.getJSON(device_api_url, {op: 'get_lane_detail', deviceid: this.deviceId, typeid: this.currentTypeID}).then(res => {
                         if (res) {
                             if (res.status) {
@@ -1026,7 +1024,7 @@
                                 self.error = res.data.msg || '&lt;出错了&gt;';
                             }
                         }
-                        self.loading --;
+                        self.changing = false;
                     })
                 },
                 isPackageGoodsValid(goods)
@@ -1072,7 +1070,7 @@
                         const params = Object.assign({}, this.currentPackage);
                         params.op = "create";
                         params.deviceId = this.deviceId;
-                        this.loading = 1;
+                        this.creating = true;
                         $.post(package_api_url, params).then(res => {
                             if (res && res.status) {
                                 $.getJSON(package_api_url, {op: 'detail', id: res.data.id}).then(res => {
@@ -1080,10 +1078,10 @@
                                         this.packages.push(res.data);
                                         this.currentPackage = null;
                                     }
-                                    this.loading = 0;
+                                    this.creating  = false;
                                 })
                             } else {
-                                this.loading = 0;
+                                this.creating = false;
                             }
                         })
                     }

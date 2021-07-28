@@ -6,13 +6,15 @@ use RuntimeException;
 $op = request::op('default');
 
 if ($op == 'list') {
-
-    $device = Device::get(request::int('device'));
-    if (empty($device)) {
-        JSON::fail('找不到这个设备！');
+    $device_id = request::int('device');
+    if ($device_id) {
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            JSON::fail('找不到这个设备！');
+        }
     }
 
-    $query = Package::query(['device_id' => $device->getId()]);
+    $query = Package::query(['device_id' => $device_id]);
     $query->orderBy('id ASC');
 
     $result = [];
@@ -23,19 +25,22 @@ if ($op == 'list') {
     JSON::success($result);
 
 } elseif ($op == 'create') {
-    $device = Device::get(request::int('deviceId'));
-    if (empty($device)) {
-        JSON::fail('找不到这个设备！');
+    $device_id = request::int('deviceId');
+    if ($device_id) {
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            JSON::fail('找不到这个设备！');
+        }        
     }
 
-    $result = Util::transactionDo(function() use ($device) {
+    $result = Util::transactionDo(function() use ($device_id) {
         $title = request::trim('title');
         $price = request::float('price', 0, 2);
 
         $goods_list = request::array('list');
 
         $package = Package::create([
-            'device_id' => $device->getId(),
+            'device_id' => $device_id,
             'title' => $title,
             'price' => $price * 100,
         ]);

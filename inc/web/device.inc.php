@@ -539,6 +539,11 @@ if ($op == 'list') {
     $device->remove('lastErrorData');
     $device->remove('extra');
 
+    //删除相关套餐
+    foreach(Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
+        $entry->destroy();
+    }
+    
     //通知实体设备
     $device->appNotify();
 
@@ -735,6 +740,12 @@ if ($op == 'list') {
                 $activeRes = Util::activeDevice($device->getImei());
             }
 
+            //绑定套餐
+            foreach(Package::query(['device_id' => 0])->findAll() as $entry) {
+                $entry->setDeviceId($device->getId());
+                $entry->save();
+            }
+
             //绑定appId
             $device->updateAppId();
         }
@@ -816,6 +827,7 @@ if ($op == 'list') {
         }
 
         $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
+        $extra['goodsList'] = request::trim('goodsList');
 
         //合并extra
         $extra = array_merge($device->get('extra', []), $extra);

@@ -5,8 +5,9 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\Goods;
 use function zovye\tb;
+use zovye\base\modelObj;
 
 class package_goodsModelObj extends modelObj
 {
@@ -33,4 +34,8 @@ class package_goodsModelObj extends modelObj
     /** @var int */
 	protected $createtime;
 
+    public function getGoods()
+    {
+        return Goods::get($this->getGoodsId(), true);
+    }
 }

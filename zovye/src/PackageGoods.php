@@ -3,6 +3,7 @@
 namespace zovye;
 
 use zovye\model\package_goodsModelObj;
+use zovye\model\packageModelObj;
 
 class PackageGoods
 {
@@ -22,6 +23,11 @@ class PackageGoods
     public static function query($condition = []): base\modelObjFinder
     {
         return m('package_goods')->query($condition);
+    }
+
+    public static function queryFor(packageModelObj $package)
+    {
+        return self::query(['package_id' => $package->getId()]);
     }
 
     /**

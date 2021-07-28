@@ -98,6 +98,10 @@
         left: 36px;
         border-color: transparent transparent #e9e9e9 transparent;
     }
+    tr.invalid {
+        color: #ccc;
+        text-decoration-line: line-through;
+    }
     .package .close-btn {
         position: absolute;
         right: 6px;
@@ -442,16 +446,16 @@
                                                     <b>商品总价：</b>¥{{p.price}}元
                                                 </div>
                                                 <div class="package-delete operate">
-                                                    <i class="fa fa-ban" title="删除" @click="removePackage(p,index)"></i>
+                                                    <i class="fa fa-ban" :class="{disabled: loading}" title="删除" @click="removePackage(p,index)"></i>
                                                 </div>
                                             </td>
                                         </tr>
-                                        <tr v-for="(goods,index) in p.list">
+                                        <tr v-for="(goods,index) in p.list" :class="{invalid:!isPackageGoodsValid(goods)}">
                                             <td class="index">
                                                 {{index +1}}
                                             </td>
                                             <td>
-                                                {{goods.name}}
+                                                {{goods.name}}<span class="text-muted" v-if="goods.deleted">&lt;已删除&gt;</span>
                                             </td>
                                             <td>
                                                 ¥{{goods.price}}元
@@ -532,7 +536,7 @@
                     </div>
                 -->
                 <div class="form-group">
-                    <label for="group" class="col-md-2 control-label">商品列表</label>
+                    <label for="group" class="col-md-2 control-label">购买界面</label>
                     <div class="col-md-10">
                         <select name="goodsList" id="group" style="width:80%;">
                             <option value="goods">只显示商品，不显示套餐</option>
@@ -924,6 +928,8 @@
 
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         const api_url = "{php echo $this->createWebUrl('devicetypes');}";
+        const device_api_url = "{php echo $this->createWebUrl('device')}";
+        const package_api_url = "{php echo $this->createWebUrl('package')}";
         const app = new Vue({
             el: "#device_types",
             data: {
@@ -954,6 +960,11 @@
                         }
                     }
                 },
+                loading(val) {
+                    if (val <= 0) {
+                        this.loading = false;
+                    }
+                }
             },
             computed: {
                 isCustomType() {
@@ -967,7 +978,14 @@
             },
             mounted() {
                 if (this.deviceId > 0) {
+                    this.loading = 2;
                     this.change(true);
+                    $.getJSON(package_api_url, {op: 'list', device: this.deviceId}).then(res => {
+                        if (res && res.status) {
+                            this.packages = res.data;
+                        }
+                        this.loading --;
+                    })
                 } else {
                     this.search();
                     this.addCargoLane();
@@ -996,8 +1014,7 @@
                 },
                 change(first = false) {
                     const self = this;
-                    self.loading = true;
-                    $.getJSON("{php echo $this->createWebUrl('device')}", {op: 'get_lane_detail', deviceid: this.deviceId, typeid: this.currentTypeID}).then(function(res){
+                    $.getJSON(device_api_url, {op: 'get_lane_detail', deviceid: this.deviceId, typeid: this.currentTypeID}).then(res => {
                         if (res) {
                             if (res.status) {
                                 self.currentType = res.data;
@@ -1009,8 +1026,15 @@
                                 self.error = res.data.msg || '&lt;出错了&gt;';
                             }
                         }
-                        self.loading = false;
+                        self.loading --;
                     })
+                },
+                isPackageGoodsValid(goods)
+                {
+                    if (this.currentType && this.currentType.cargo_lanes) {
+                        return this.currentType.cargo_lanes.findIndex(e => e.goods_id == goods.goods_id) !== -1;
+                    }
+                    return false;
                 },
                 addCargoLane() {
                     if (this.isCustomType) {
@@ -1044,9 +1068,24 @@
                     this.currentPackage = null;
                 },
                 createPackage() {
-                    if (this.currentPackage && this.currentPackage.list.length > 0) {
-                        this.packages.push(this.currentPackage);
-                        this.currentPackage = null;
+                    if (!this.loading && this.currentPackage && this.currentPackage.list.length > 0) {
+                        const params = Object.assign({}, this.currentPackage);
+                        params.op = "create";
+                        params.deviceId = this.deviceId;
+                        this.loading = 1;
+                        $.post(package_api_url, params).then(res => {
+                            if (res && res.status) {
+                                $.getJSON(package_api_url, {op: 'detail', id: res.data.id}).then(res => {
+                                    if (res && res.status) {
+                                        this.packages.push(res.data);
+                                        this.currentPackage = null;
+                                    }
+                                    this.loading = 0;
+                                })
+                            } else {
+                                this.loading = 0;
+                            }
+                        })
                     }
                 },
                 addPackage(lane) {
@@ -1066,7 +1105,13 @@
                 },
                 removePackage(p,index)
                 {
-                    this.packages.splice(index,1);
+                    if (p && p.id && !this.loading && confirm('确定要删除这个套餐吗？')) {
+                        $.getJSON(package_api_url, {op: 'remove', id: p.id}).then(res => {
+                            if (res && res.status) {
+                                this.packages.splice(index,1);
+                            }
+                        })
+                    }                    
                 },
                 removeGoodsFromPackage(index)
                 {

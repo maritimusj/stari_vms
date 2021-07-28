@@ -5,8 +5,10 @@
  */
 namespace zovye\model;
 
-use zovye\base\modelObj;
+use zovye\api\wx\fb;
 use function zovye\tb;
+use zovye\PackageGoods;
+use zovye\base\modelObj;
 
 class packageModelObj extends modelObj
 {
@@ -29,5 +31,39 @@ class packageModelObj extends modelObj
 
     /** @var int */
 	protected $createtime;
+
+    public function format($detail = false)
+    {
+        $result = [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'price' => number_format($this->getPrice() / 100, 2),
+            'createtime' => date('Y-m-d H:i:s', $this->getCreatetime()),
+        ];
+        if ($detail) {
+            $result['list'] = [];
+            foreach(PackageGoods::queryFor($this)->findAll() as $entry)
+            {   
+                $data = [
+                    'id' => $entry->getId(),
+                    'price' => number_format($entry->getPrice() / 100, 2),
+                    'num' => $entry->getNum(),
+                ];
+                $goods = $entry->getGoods();
+                if ($goods) {    
+                    $data['goods_id'] = $goods->getId();
+                    $data['name'] = $goods->getName();
+                    $data['image'] = $goods->getImg();
+                    $data['unit_title'] = $goods->getUnitTitle();
+                    if ($goods->isDeleted()) {
+                        $data['deleted'] = true;
+                    }
+                }
+                $result['list'][] = $data;
+            }
+        }
+
+        return $result;
+    }
 
 }

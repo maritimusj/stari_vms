@@ -38,14 +38,12 @@
         height: 60px;
         border-radius: 50%;
         border: 1px solid gray;
-    }
-    
+    }    
     .accounts .item img.qrcode {
         margin: 10px 0;
         width: 100px;
         height: 100px;
-    }
-    
+    }    
     a:hover {
         color: inherit;
         text-decoration: none;
@@ -61,7 +59,14 @@
     table#cargolanes div.loading i{
         font-size: 1em;
         color: #4CAF50;
-    }  
+    }
+    .package {
+        width: 100%;
+        margin-top: 10px;
+    }
+    .package tr {
+        text-align: center;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
 {loop $navs $nav_op $nav_title}
@@ -200,7 +205,51 @@
                     </table>
                 </div>
             </div>
-        {/if}      
+            {/if}
+            {if $packages}
+            <div class="seg">
+                <div class="title">商品套餐</div>
+                <div>
+                    {loop $packages $index $p}
+                    <div class="package">
+                        <table class="table table-bordered cargolanes">
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" style="text-align: left;">
+                                        <div>
+                                            <b>套餐名称：</b>{$p['title']}
+                                        </div>
+                                        <div>
+                                            <b>商品总价：</b>¥{$p['price']}元
+                                        </div>
+                                    </td>
+                                </tr>
+                                {loop $p['list'] $i $goods}
+                                <tr>
+                                    <td class="index">
+                                        {php echo $i +1}
+                                    </td>
+                                    <td>
+                                        {$goods['name']}{if $goods['deleted']}<span class="text-muted">&lt;已删除&gt;</span>{/if}
+                                    </td>
+                                    <td>
+                                        ¥{$goods['price']}元
+                                    </td>
+                                    <td>
+                                        {$goods['num']}
+                                        {if $goods['unit_title']}
+                                        <span>({$goods['unit_title']})</span>
+                                        {/if}
+                                    </td>
+                                </tr>
+                                {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                    {/loop}
+                </div>
+            </div>
+            {/if}
             {if $last_error_notify}
             <div class="seg">
                 <div class="title">上次故障通知</div>

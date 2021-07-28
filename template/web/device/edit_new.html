@@ -10,17 +10,16 @@
     #device_edit_form table.cargo_lanes td {
         text-align: center;
     }
-    #device_edit_form table.cargo_lanes input.capacity {
+    #device_edit_form table.cargo_lanes input.goods{
         width: 10em;
         border: 0;
         margin: 0 auto;
         text-align: center;
         display: inline;
     }
-    #device_edit_form table.cargo_lanes input:focus.capacity {
+    #device_edit_form table.cargo_lanes input.goods {
         border-color: #66afe9;
     }
-    
     .cargo_lanes div.lane {
         position: relative;
     }
@@ -48,17 +47,11 @@
     #device_types i.fa-edit {
         visibility: hidden;
     }
-    #device_types i.fa-trash {
-        display: none;
-    }
     #device_types tr:hover i.fa-trash {
         display: inline;
     }
     #device_types tr:hover i.fa-edit {
         visibility: visible;
-    }
-    #device_types tr:hover .index {
-        display: none;
     }
     #device_types tr.unknown {
         color: #ccc;
@@ -77,6 +70,53 @@
     }
     #device_types .cargo_lanes th.fixed {
         min-width: 200px;
+    }
+    #device_types .operate i.flash:not(.disabled) {
+        color: #4caf50;
+    }
+    #device_types .package {
+        position: relative;
+        margin-top: 20px;
+        border: 3px solid #e9e9e9;
+        padding: 10px;
+    }
+    #device_types .package::before{
+        position: absolute;
+        content: "";
+        border: 6px solid #e9e9e9;
+        top: -15px;
+        left: 40px;
+        height: 10px;
+    }
+    #device_types .package::after{
+        position: absolute;
+        content: "";
+        width: 0;
+        height: 0;
+        border: 10px solid;
+        top: -32px;
+        left: 36px;
+        border-color: transparent transparent #e9e9e9 transparent;
+    }
+    .package .close-btn {
+        position: absolute;
+        right: 6px;
+        top: 6px;
+    }
+    .editable-price {
+        cursor: pointer;
+    }
+    .index {
+        width: 50px;
+    }
+    .package-list {
+        margin-top: 20px;
+        position: relative;
+    }
+    .package-delete {
+        position: absolute;
+        right: 6px;
+        top: 6px;
     }
     .scene_list {
         display: flex;
@@ -242,16 +282,16 @@
                                     <th class="fixed">价格</th>
                                     <th class="fixed">容量</th>
                                     <th class="fixed">当前数量</th>
+                                    <th>操作</th>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
                                         <td>
-                                            <div class="lane operate">
-                                                <span :class="{index: isCustomType}">
+                                            <div class="lane">
+                                                <span>
                                                     {{i + 1}}
                                                     <sup title="电机货道" v-if="lane.is_motor">[ 电机 ]</sup>   
-                                                </span>  
-                                                <i class="fa fa-trash" title="删除" @click="removeLane(lane)" v-if="isCustomType"></i>
+                                                </span>                                                
                                             </div>
                                         </td>
                                         <td :class="{operate: isCustomType}">
@@ -260,7 +300,7 @@
                                         </td>
                                         <td>
                                             <div v-show="currentLane == lane">
-                                                <input class="form-control capacity" type="number" 
+                                                <input class="form-control goods" type="number" 
                                                 :name="'price' + i" 
                                                 min="0" 
                                                 step="0.01"
@@ -278,7 +318,7 @@
                                         </td>
                                         <td>
                                             <template v-if="isCustomType">
-                                                <input type="number" class="form-control capacity" 
+                                                <input type="number" class="form-control goods" 
                                                 :name="'capacities[' + i + ']'" 
                                                 v-model="lane.capacity" 
                                                 min="0">
@@ -288,14 +328,142 @@
                                                 {{lane.capacity}} 
                                             </template>
                                         <td>
-                                            <input type="number" class="form-control capacity" :name="'lane' + i + '_num'" v-model="lane.num" min="0" :max="lane.capacity">
-                                        </td>  
-                                    </tr>                            
+                                            <input type="number" class="form-control goods" :name="'lane' + i + '_num'" v-model="lane.num" min="0" :max="lane.capacity">
+                                        </td>
+                                        <td class="operate">                                          
+                                            <i class="fa fa-gift" 
+                                            v-if="currentPackage"
+                                            :class="{disabled: lane.goods_id===0,flash:currentPackage}" 
+                                            title="加入套餐" 
+                                            @click="addPackage(lane)"></i>
+                                            <i class="fa fa-trash" title="删除" 
+                                            @click="removeLane(lane)" v-if="isCustomType && !currentPackage"></i>                                            
+                                        </td>
+                                    </tr>
+                                    <tr v-if="isCustomType">
+                                        <td class="operate">
+                                            <i class="fa fa-plus" title="添加货道"  @click.prevent="addCargoLane" :disabled="loading"></i>
+                                        </td>
+                                        <td colspan="5">
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
-                            <div v-if="isCustomType">
-                                <button class="btn btn-success" @click.prevent="addCargoLane" :disabled="loading"><i class="fa fa-plus"></i> 增加货道</button>
-                            </div>  
+                            <div>
+                                <button class="btn btn-success" 
+                                @click.prevent="newPackage" 
+                                :disabled="loading"
+                                v-if="!currentPackage">
+                                    <i class="fa fa-gift"></i> 创建套餐
+                                </button> 
+                                <button class="btn btn-success" 
+                                @click.prevent="createPackage" 
+                                :disabled="loading || currentPackage.list.length === 0"
+                                v-if="currentPackage"
+                                >
+                                    <i class="fa fa-save"></i> 保存套餐
+                                </button>
+
+                            </div>
+                            <div class="package operate" v-if="currentPackage">
+                                <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>                           
+                                <table class="table cargo_lanes">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>商品名称</th>
+                                        <th class="fixed">单价</th>
+                                        <th class="fixed">数量</th>
+                                        <th style="width: 60px;">操作</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(goods,index) in currentPackage.list">
+                                            <td>
+                                                {{index +1}}
+                                            </td>
+                                            <td>
+                                                {{goods.name}}
+                                                <span v-if="goods.unit_title">({{goods.unit_title}})</span>
+                                            </td>
+                                            <td>
+                                                <div v-show="goods.edit">
+                                                    <input type="number" class="form-control goods" 
+                                                    v-model="goods.price"
+                                                    ref="packageGoodsPrice"
+                                                    @blur="editPackageGoodsPriceDone(goods,index)"
+                                                    @keydown.enter.self.prevent="editPackageGoodsPriceDone(goods,index)"
+                                                    step="0.01" 
+                                                    min="0">
+                                                </div>
+                                                <span class="editable-price" @click="editPackageGoodsPrice(goods,index)" v-show="!goods.edit">
+                                                    ¥{{goods.price}}元
+                                                </span>                                                
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control goods" 
+                                                v-model="goods.num"
+                                                @blur="editPackageGoodsNumDone(goods, index)"
+                                                min="1">
+                                            </td>
+                                            <td class="operate">
+                                                <i class="fa fa-trash" title="删除" @click="removeGoodsFromPackage(index)"></i>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="currentPackage.list.length === 0">
+                                            <td colspan="5" class="center text-muted">
+                                                &lt;请从设备商品列表中选择商品&gt;
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" style="text-align: left;">
+                                                <div class="total-price">
+                                                    <div>
+                                                        <b>套餐名称：</b><input type="text" style="text-align: left;" class="form-control goods" v-model="currentPackage.title">
+                                                    </div>
+                                                    <div>
+                                                        <b>商品总价：</b>
+                                                        <span style="padding-left: 12px;">¥{{currentPackage.price}}元</span>
+                                                    </div>                                                    
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div v-for="(p, index) in packages" class="package-list">
+                                <table class="table table-bordered cargo_lanes">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="4" style="text-align: left;">
+                                                <div>
+                                                    <b>套餐名称：</b>{{p.title}}
+                                                </div>
+                                                <div>
+                                                    <b>商品总价：</b>¥{{p.price}}元
+                                                </div>
+                                                <div class="package-delete operate">
+                                                    <i class="fa fa-ban" title="删除" @click="removePackage(p,index)"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr v-for="(goods,index) in p.list">
+                                            <td class="index">
+                                                {{index +1}}
+                                            </td>
+                                            <td>
+                                                {{goods.name}}
+                                            </td>
+                                            <td>
+                                                ¥{{goods.price}}元
+                                            </td>
+                                            <td>
+                                                {{goods.num}}
+                                                <span v-if="goods.unit_title">({{goods.unit_title}})</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>                         
                 </div>
@@ -363,6 +531,16 @@
                         </div>
                     </div>
                 -->
+                <div class="form-group">
+                    <label for="group" class="col-md-2 control-label">商品列表</label>
+                    <div class="col-md-10">
+                        <select name="goodsList" id="group" style="width:80%;">
+                            <option value="goods">只显示商品，不显示套餐</option>
+                            <option value="package">只显示套餐，不显示商品</option>
+                            <option value="all">商品和套餐都显示</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="group" class="col-md-2 control-label">分组</label>
                     <div class="col-md-10">
@@ -760,6 +938,8 @@
                 currentLane: null,
                 loading: false,
                 searching: false,
+                packages: [],
+                currentPackage: null,
             },
             watch: {
                 currentTypeID() {
@@ -773,11 +953,16 @@
                             this.addCargoLane();
                         }
                     }
-                }
+                },
             },
             computed: {
                 isCustomType() {
                     return this.currentTypeID === 0 || this.currentTypeID === '0';
+                },
+                packageGoods() {
+                    return (this.currentType.cargo_lanes || []).filter(lane => {
+                        return !!lane.packing;
+                    })
                 }
             },
             mounted() {
@@ -848,6 +1033,55 @@
                         this.currentType.cargo_lanes.splice(i, 1);
                     }
                 },
+                newPackage() {
+                    Vue.set(this, 'currentPackage', {
+                        list: [],
+                        title: '套餐' + (this.packages.length + 1),
+                        price: 0,
+                    });
+                },
+                closePackage() {
+                    this.currentPackage = null;
+                },
+                createPackage() {
+                    if (this.currentPackage && this.currentPackage.list.length > 0) {
+                        this.packages.push(this.currentPackage);
+                        this.currentPackage = null;
+                    }
+                },
+                addPackage(lane) {
+                    if (!this.currentPackage) {
+                        this.newPackage();
+                    }
+                    if (lane.goods_id > 0) {
+                        this.currentPackage.list.push({
+                            id: lane.goods_id,
+                            name: lane.goods_name,
+                            price: lane.goods_price,
+                            num: 1,
+                            unit_title: lane.goods_unit_title,
+                        })
+                        this.calcPakcageGoodsTotal(this.currentPackage);
+                    }
+                },
+                removePackage(p,index)
+                {
+                    this.packages.splice(index,1);
+                },
+                removeGoodsFromPackage(index)
+                {
+                    if (this.currentPackage) {
+                        this.currentPackage.list.splice(index, 1);
+                        this.calcPakcageGoodsTotal(this.currentPackage);
+                    }
+                },
+                calcPakcageGoodsTotal(p) {
+                    p.price = 0;
+                    p.list.forEach(e => {
+                        p.price += e.price * e.num;
+                    })
+                    p.price = p.price.toFixed(2);
+                },
                 chooseGoods(lane){
                     if (this.isCustomType) {
                         this.currentLane = lane;
@@ -867,7 +1101,7 @@
                 editPrice(lane, index) {
                     if (this.isCustomType) {
                         this.currentLane = lane;
-                        this.$nextTick(function() {
+                        this.$nextTick(() => {
                             this.$refs.price[index].focus();
                         })
                     }                 
@@ -875,7 +1109,24 @@
                 editPriceDone(lane) {
                     this.currentLane = null;
                     lane.goods_price = parseFloat(lane.goods_price).toFixed(2);
-                }
+                },
+                editPackageGoodsPrice(goods,index)
+                {
+                    Vue.set(goods, 'edit', true);
+                    this.$nextTick(() => {
+                        this.$refs.packageGoodsPrice[index].focus();
+                    })
+                },
+                editPackageGoodsPriceDone(goods,index)
+                {
+                    goods.edit = false;
+                    goods.price = parseFloat(goods.price).toFixed(2);
+                    this.calcPakcageGoodsTotal(this.currentPackage);
+                },
+                editPackageGoodsNumDone(goods,index)
+                {
+                    this.calcPakcageGoodsTotal(this.currentPackage);
+                },
             }
         })
 

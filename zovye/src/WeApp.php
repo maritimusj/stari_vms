@@ -399,10 +399,10 @@ JSCODE;
                     }
                 }
             } else {
-                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
+                $tpl = array_merge($tpl, $device->getGoodsAndPackages($user, ['allowPay']));
             }
         } else {
-            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
+            $tpl = array_merge($tpl, $device->getGoodsAndPackages($user, ['allowPay']));
         }
 
         //如果无法领取，则清除访问记录

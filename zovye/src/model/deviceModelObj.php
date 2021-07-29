@@ -12,6 +12,7 @@ use zovye\App;
 use zovye\Job;
 
 use zovye\Locker;
+use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
 use zovye\We7;
@@ -2548,6 +2549,19 @@ class deviceModelObj extends modelObj
         return $total;
     }
 
+    public function getGoodsAndPackages($user, $params = []): array
+    {
+        $result = [];
+        $w = $this->settings('goodsList');
+        if (empty($w) || $w == 'all' || $w == 'goods') {
+            $result['goods'] = $this->getGoodsList($user, $params);
+        }
+        if ($w == 'all' || $w == 'packages') {
+            $result['packages'] = $this->getPackages();
+        }
+        return $result;
+    }
+
     public function getGoodsList(userModelObj $user = null, $params = []): array
     {
         $result = [];
@@ -2605,6 +2619,21 @@ class deviceModelObj extends modelObj
             }
 
             $result = array_values((array)$result['goods']);
+        }
+
+        return $result;
+    }
+
+    public function getPackages(): array
+    {
+        $result = [];
+
+        $query = Package::query(['device_id' => $this->getId()]);
+        $query->orderBy('id ASC');
+
+        /** @var packageModelObj $entry */
+        foreach ($query->findAll() as $entry) {
+            $result[] = $entry->format(true);
         }
 
         return $result;

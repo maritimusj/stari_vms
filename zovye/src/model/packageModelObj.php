@@ -6,6 +6,7 @@
 namespace zovye\model;
 
 use zovye\api\wx\fb;
+use zovye\Util;
 use function zovye\tb;
 use zovye\PackageGoods;
 use zovye\base\modelObj;
@@ -32,7 +33,7 @@ class packageModelObj extends modelObj
     /** @var int */
 	protected $createtime;
 
-    public function format($detail = false)
+    public function format($detail = false): array
     {
         $result = [
             'id' => $this->getId(),
@@ -53,7 +54,7 @@ class packageModelObj extends modelObj
                 if ($goods) {    
                     $data['goods_id'] = $goods->getId();
                     $data['name'] = $goods->getName();
-                    $data['image'] = $goods->getImg();
+                    $data['image'] = Util::toMedia($goods->getImg(), true);
                     $data['unit_title'] = $goods->getUnitTitle();
                     if ($goods->isDeleted()) {
                         $data['deleted'] = true;

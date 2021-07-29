@@ -2632,11 +2632,15 @@ class deviceModelObj extends modelObj
         $query->orderBy('id ASC');
 
         /** @var packageModelObj $entry */
-        foreach ($query->findAll() as $i => &$entry) {
+        foreach ($query->findAll() as $entry) {
             $data = $entry->format(true);
+            $data['isOk'] = true;
             foreach ($data['list'] as $item) {
                 $payload = $this->getGoods(intval($item['goods_id']));
-                $entry['isOk'] = !empty($payload) && !empty($payload['num']) && $payload['num'] >= $item['num'];
+                if (empty($payload) || empty($payload['num']) || $payload['num'] < $item['num']) {
+                    $data['isOk'] = false;
+                    break;
+                }
             }
             $result[] = $data;
         }

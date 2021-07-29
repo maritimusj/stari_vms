@@ -44,7 +44,7 @@ class Goods
 
     /**
      * @param mixed $id
-     * @param bool $delete
+     * @param bool $deleted
      * @return goodsModelObj|null
      */
     public static function get($id, $deleted = false): ?goodsModelObj

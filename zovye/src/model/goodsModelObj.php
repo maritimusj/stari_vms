@@ -26,6 +26,7 @@ use zovye\traits\ExtraDataGettersAndSetters;
  * @method setBalance($goodsBalance)
  * @method getCreatetime()
  * @method setDeleted(int $int)
+ * @method isDeleted()
  */
 class goodsModelObj extends modelObj
 {

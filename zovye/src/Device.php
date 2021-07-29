@@ -264,7 +264,10 @@ class Device extends State
             };
         }
 
-        $payload = self::getPayload($device);
+        static $payload = null;
+        if (is_null($payload)) {
+            $payload = self::getPayload($device);
+        }
 
         $total = 0;
         foreach ($payload['cargo_lanes'] as $index => $lane) {

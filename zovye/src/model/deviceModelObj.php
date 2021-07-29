@@ -2624,6 +2624,28 @@ class deviceModelObj extends modelObj
         return $result;
     }
 
+    protected function isPackageOk(array $data): bool
+    {
+        foreach ($data['list'] as $item) {
+            $payload = $this->getGoods(intval($item['goods_id']));
+            if (empty($payload) || empty($payload['num']) || $payload['num'] < $item['num']) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function getPackage($id): array
+    {
+        $result = [];
+        $package = Package::findOne(['device_id' => $this->getId(), 'id' => $id]);
+        if ($package) {
+            $result = $package->format(true);
+            $result['isOk'] = $this->isPackageOk($result);
+        }
+        return $result;
+    }
+
     public function getPackages(): array
     {
         $result = [];
@@ -2634,14 +2656,7 @@ class deviceModelObj extends modelObj
         /** @var packageModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = $entry->format(true);
-            $data['isOk'] = true;
-            foreach ($data['list'] as $item) {
-                $payload = $this->getGoods(intval($item['goods_id']));
-                if (empty($payload) || empty($payload['num']) || $payload['num'] < $item['num']) {
-                    $data['isOk'] = false;
-                    break;
-                }
-            }
+            $data['isOk'] = $this->isPackageOk($data);
             $result[] = $data;
         }
 

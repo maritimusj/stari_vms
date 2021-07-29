@@ -2552,7 +2552,7 @@ class deviceModelObj extends modelObj
     public function getGoodsAndPackages($user, $params = []): array
     {
         $result = [];
-        $w = $this->settings('goodsList');
+        $w = $this->settings('extra.goodsList');
         if (empty($w) || $w == 'all' || $w == 'goods') {
             $result['goods'] = $this->getGoodsList($user, $params);
         }

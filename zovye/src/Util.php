@@ -181,7 +181,7 @@ class Util
         $openid = _W('openid');
         if ($openid) {
             if ($update) {
-                $userinfo = self::cachedCall(6, function() use ($openid) {
+                $userinfo = self::cachedCall(6, function () use ($openid) {
                     $oauth_account = \WeAccount::createByUniacid();
                     $userinfo = $oauth_account->fansQueryInfo($openid);
                     $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
@@ -1790,6 +1790,18 @@ HTML_CONTENT;
      */
     public static function transactionDo(callable $cb)
     {
+        $key = 'transaction:' . REQUEST_ID;
+
+        if (We7::cache_read($key)) {
+            try {
+                return $cb();
+            } catch (Exception $e) {
+                return err($e->getMessage());
+            }
+        }
+
+        We7::cache_write($key, microtime(true));
+
         We7::pdo_begin();
         try {
             $ret = $cb();
@@ -1802,6 +1814,8 @@ HTML_CONTENT;
         } catch (Exception $e) {
             We7::pdo_rollback();
             return err($e->getMessage());
+        } finally {
+            We7::cache_delete($key);
         }
     }
 

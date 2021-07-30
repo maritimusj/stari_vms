@@ -373,7 +373,7 @@ function hashFN(callable $fn, ...$val): string
         foreach ($val as $v) {
             $data[] = strval($v);
         }
-        return md5(implode('', $data));
+        return md5(implode(':', $data));
     }
 
     trigger_error('无法识别的函数或方法!');

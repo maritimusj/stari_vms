@@ -2048,7 +2048,7 @@ class deviceModelObj extends modelObj
      * @param array $options
      * @return array
      */
-    public function pull(array $options = [])
+    public function pull(array $options = []): ?array
     {
         if ($options['online'] && !$this->isMcbOnline()) {
             return error(State::FAIL, '设备已关机！');
@@ -2640,7 +2640,7 @@ class deviceModelObj extends modelObj
         $result = [];
         $package = Package::findOne(['device_id' => $this->getId(), 'id' => $id]);
         if ($package) {
-            $result = $package->format(true);
+            $result = $package->format(true, false);
             $result['isOk'] = $this->isPackageOk($result);
         }
         return $result;

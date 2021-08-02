@@ -9,6 +9,10 @@ use zovye\Goods;
 use function zovye\tb;
 use zovye\base\modelObj;
 
+/**
+ * @method getPrice()
+ * @method getNum()
+ */
 class package_goodsModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

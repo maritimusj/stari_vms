@@ -197,6 +197,25 @@ class WXPay implements IPay
             alert(e);
         });
     }
+    zovye_fn.package_pay = function(packageID, successFN, failFN) {
+        return new Promise(function(resolve, reject) {
+            $.get("{$order_api_url}", {op: "create", packageID: packageID}).then(function(res) {
+              zovye_fn.pay(res).then(function(orderNO, msg) {
+                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
+                    zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                  }
+                  resolve(orderNO, msg)
+              }).catch(function(msg) {
+                  if (typeof failFN !== 'function' || !failFN(msg)) {                  
+                    zovye_fn.redirectToPayFailedPage(msg);
+                  }
+                  reject(msg);
+              });
+          });
+        }).catch((e)=>{
+            alert(e);
+        });
+    }
 </script>
 JS_CODE;
     }

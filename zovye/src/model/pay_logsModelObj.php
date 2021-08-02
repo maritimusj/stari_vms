@@ -31,6 +31,26 @@ class pay_logsModelObj extends BaseLogsModelObj
         return strval($this->getData('user'));
     }
 
+    public function isPackage(): bool
+    {
+        return $this->getPackageId() > 0;
+    }
+
+    public function isGoods(): bool
+    {
+        return $this->getGoodsId() > 0;
+    }
+
+    public function getPackageId(): int
+    {
+        return intval($this->getData('package'));
+    }
+
+    public function getPackage(): array
+    {
+        return (array)($this->getData('orderData.extra.package', []));
+    }
+
     public function getGoodsId(): int
     {
         return intval($this->getData('goods'));
@@ -39,6 +59,20 @@ class pay_logsModelObj extends BaseLogsModelObj
     public function getGoods(): array
     {
         return (array)($this->getData('orderData.extra.goods', []));
+    }
+
+    public function getGoodsList(): array
+    {
+        $result = [];
+        if ($this->isGoods()) {
+            $result[] = $this->getGoods();
+        } elseif ($this->isPackage()) {
+            $package = $this->getPackage();
+            if ($package && $package['list']) {
+                $result = $package['list'];
+            }
+        }
+        return $result;
     }
 
     public function getPayName(): string

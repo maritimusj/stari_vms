@@ -138,6 +138,17 @@ class SQBPay implements IPay
             console.log(e);
         });
     }
+    zovye_fn.package_pay = function(packageID) {
+        return new Promise(function(resolve, reject) {
+            $.get("{$order_api_url}", {op: "create", packageID: packageID}).then(function(res) {
+              zovye_fn.pay(res).catch(function(msg) {
+                  reject(msg);
+              });
+          });
+        }).catch((e)=>{
+            console.log(e);
+        });
+    }
     </script>
 JS_CODE;
     }

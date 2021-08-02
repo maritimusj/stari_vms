@@ -865,7 +865,15 @@ if ($op == 'default') {
     }
 
     $result = Util::cachedCall(3, function() use ($agent, $date) {
-        return Stats::repairMonthData($agent, $date);
+        $result = Stats::repairMonthData($agent, $date);
+        if (!is_error($result)) {
+            if ($agent->settings('repair.status'))
+            $agent->updateSettings('repair', [
+                'status' => 'finished',
+                'time' => time(),
+            ]);
+        }
+        return $result;
     }, $agent->getId(), $month);
 
     if (is_error($result)) {

@@ -14,9 +14,7 @@ use zovye\CtrlServ;
 use zovye\request;
 use zovye\Order;
 use zovye\model\orderModelObj;
-use zovye\State;
 use zovye\Util;
-use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 
@@ -71,15 +69,28 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
     }
 
     //以下是普通设备退款
-    if ($order->isPullOk()) {
+    if (empty($num) && $order->isPullOk()) {
         $log['result'] = '订单已成功，取消退款！';
         return Util::logToFile('refund', $log);
     }
 
-    //退款
-    $res = Order::refund($order->getOrderNO(), $num, ['message' => $log['message']]);
-    if ($reset_payload && !is_error($res)) {
-        resetPayload($order, $num);
+    if ($num >= 0) {
+        //退款
+        $res = Order::refund($order->getOrderNO(), $num, ['message' => $log['message']]);
+        if ($reset_payload && !is_error($res)) {
+            resetPayload($order, $num);
+        }
+    } else {
+        //找出所有出货失败的商品，并计算退款金额
+        $price = 0;
+
+        if ($price > 0) {
+            //退款
+            $res = Order::refund2($order->getOrderNO(), $price, ['message' => $log['message']]);
+            if ($reset_payload && !is_error($res)) {
+                //恢复指定商品库存
+            }
+        }
     }
 
     $log['result'] = is_error($res) ? $res : '退款成功！';

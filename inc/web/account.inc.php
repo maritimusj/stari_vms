@@ -119,9 +119,6 @@ if ($op == 'default') {
                 $data['commission'] = $entry->get('commission', []);
             }
 
-            //总订单数
-            $data['orders'] = Order::query(['account' => $entry->getName()])->count();
-
             $accounts[] = $data;
         }
     }

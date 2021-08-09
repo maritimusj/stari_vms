@@ -7,7 +7,6 @@ namespace zovye;
 use zovye\model\agent_vwModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
-use zovye\model\device_viewModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeperModelObj;
@@ -76,7 +75,7 @@ class ModelObjFinderProxy
                 trigger_error('property not exists', E_USER_ERROR);
             }            
 
-        } elseif ($condition instanceof deviceModelObj || $condition instanceof device_viewModelObj) {
+        } elseif ($condition instanceof deviceModelObj) {
 
             if ($this->finder->isPropertyExists('device_id')) {
                 $this->finder->where(['device_id' => $condition->getId()]);

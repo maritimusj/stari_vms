@@ -92,11 +92,6 @@ class Device extends State
         return m('device')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function query_view($condition = []): modelObjFinder
-    {
-        return m('device_view')->where(We7::uniacid([]))->where($condition);
-    }
-
     /**
      * 通过http调用，获取指定设备的配置
      * @param deviceModelObj $device

@@ -138,7 +138,7 @@ function process($order_no)
 
         foreach ($goods_list as $goods) {
             for ($i = 0; $i < $goods['num']; $i++) {
-                $result = pullGoods($order, $device, $user, $level, $goods['id']);
+                $result = pullGoods($order, $device, $user, $level, $goods);
                 if (is_error($result) || !$is_pull_result_updated) {
                     $order->setResultCode($result['errno']);
                     $order->setExtraData('pull.result', $result);
@@ -289,12 +289,12 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
  * @param $goods_id
  * @return array
  */
-function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, $level, $goods_id): array
+function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, $level, $data): array
 {
     //todo 处理优惠券
     //$voucher = $pay_log->getVoucher();
 
-    $goods = $device->getGoods($goods_id);
+    $goods = $device->getGoods($data['goods_id']);
     if (empty($goods)) {
         return err('找不到对应的商品！');
     }
@@ -344,6 +344,7 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         'result' => $result,
         'user' => $user->profile(),
         'goods' => $goods,
+        'price' => $data['price'],
         'voucher' => isset($voucher) ? ['id' => $voucher->getId()] : [],
     ];
 

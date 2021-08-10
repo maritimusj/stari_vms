@@ -65,7 +65,9 @@ class pay_logsModelObj extends BaseLogsModelObj
     {
         $result = [];
         if ($this->isGoods()) {
-            $result[] = $this->getGoods();
+            $goods = $this->getGoods();
+            $goods['goods_id'] = $goods['id'];
+            $result[] = $goods;
         } elseif ($this->isPackage()) {
             $package = $this->getPackage();
             if ($package && $package['list']) {

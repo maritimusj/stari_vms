@@ -11,6 +11,7 @@ namespace zovye\job\refund;
 
 use Exception;
 use zovye\CtrlServ;
+use zovye\Helper;
 use zovye\request;
 use zovye\Order;
 use zovye\model\orderModelObj;
@@ -83,6 +84,13 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
     } else {
         //找出所有出货失败的商品，并计算退款金额
         $price = 0;
+
+        $list = Helper::getOrderPullLog($order);
+        foreach($list as $entry) {
+            if (is_error($entry['result'])) {
+                $price += intval($entry['price']);
+            }
+        }
 
         if ($price > 0) {
             //退款

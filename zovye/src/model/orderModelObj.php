@@ -117,6 +117,16 @@ class orderModelObj extends modelObj
         return User::get($this->openid, true);
     }
 
+    public function isPackage(): bool 
+    {
+        return $this->getPackageId() > 0;
+    }
+
+    public function getPackageId(): int
+    {
+        return $this->getExtraData('package.id'); 
+    }
+
     public function getGoods(): ?goodsModelObj
     {
         return Goods::get($this->getGoodsId());

@@ -550,11 +550,26 @@ class Order extends State
             $data['agent'] = [];
             $data['device'] = [];
 
-            $data['goods'] = $order->getExtraData('goods');
-            $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
-            $goods = Goods::get($data['goods']['id']);
-            if ($goods) {
-                $data['goods']['extra'] = $goods->getAppendage();
+            $goods = $order->getExtraData('goods');
+            if (!empty($goods)) {
+                $data['goods'] = $goods;
+                $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
+                $goods = Goods::get($data['goods']['id']);
+                if ($goods) {
+                    $data['goods']['extra'] = $goods->getAppendage();
+                }
+            } else {
+                $package = $order->getExtraData('package');
+                if ($package) {
+                    $data['package'] = $package;
+                    foreach($data['package']['list'] as $index => $goods) {
+                        $data['package']['list'][$index]['image'] = Util::toMedia($goods['image'], true);
+                        $goods = Goods::get($goods['id']);
+                        if ($goods) {
+                            $data['package']['list'][$index]['extra'] = $goods->getAppendage();
+                        }
+                    }
+                }
             }
 
             //用户信息

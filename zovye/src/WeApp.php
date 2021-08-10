@@ -390,6 +390,7 @@ JSCODE;
         }
 
         //如果设置必须关注公众号以后才能购买商品
+        $goods_lis_FN = false;
         if (Helper::MustFollowAccount($device)) {
             if ($tpl['from'] != 'account') {
                 if (empty($tpl['accounts'])) {
@@ -399,10 +400,12 @@ JSCODE;
                     }
                 }
             } else {
-                $tpl = array_merge($tpl, $device->getGoodsAndPackages($user, ['allowPay']));
+                $goods_lis_FN = true;
+                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
             }
         } else {
-            $tpl = array_merge($tpl, $device->getGoodsAndPackages($user, ['allowPay']));
+            $goods_lis_FN = true;
+            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
         }
 
         //如果无法领取，则清除访问记录
@@ -537,6 +540,17 @@ JSCODE;
         })
     }
 JSCODE;
+    if ($goods_lis_FN) {
+    $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.getGoodsList = function(cb) {
+$.get("{$device_api_url}", {op: 'goods'}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+JSCODE;
+    }
         if (!App::isAliUser() && App::isChannelPayEnabled()) {
             $pay_url = Util::murl('channel', ['device' => $device->getShadowId()]);
             $tpl['js']['code'] .= <<<JSCODE
@@ -561,6 +575,7 @@ JSCODE;
 }
 JSCODE;
         }
+
         //检查用户在该设备上最近失败的免费订单
         $retry = settings('order.retry', []);
         if ($retry['last'] > 0) {

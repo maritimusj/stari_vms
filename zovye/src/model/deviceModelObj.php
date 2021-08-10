@@ -691,9 +691,11 @@ class deviceModelObj extends modelObj
      * 重置设备锁
      * @return bool
      */
-    public function resetLock(): bool
+    public function resetLock()
     {
-        return We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId()]);
+        if (We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId()])) {
+            $this->locked_uid = UNLOCKED;
+        }
     }
 
     /**
@@ -967,6 +969,7 @@ class deviceModelObj extends modelObj
      */
     public function isLocked(): bool
     {
+        $this->checkLockerExpired();
         return $this->locked_uid != UNLOCKED;
     }
 
@@ -1989,13 +1992,7 @@ class deviceModelObj extends modelObj
         return 0;
     }
 
-    /**
-     * 尝试锁定设备，超过系统设置的超时时长后，自动解锁
-     * @param int $retries
-     * @param int $delay_seconds
-     * @return bool
-     */
-    public function lockAcquire(int $retries = 0, int $delay_seconds = 1): bool
+    protected function checkLockerExpired()
     {
         $wait_timeout = intval(settings('device.waitTimeout'));
         $lock_timeout = intval(settings('device.lockTimeout'));
@@ -2006,6 +2003,18 @@ class deviceModelObj extends modelObj
                 $this->resetLock();
             }
         }
+        return false;
+    }
+
+    /**
+     * 尝试锁定设备，超过系统设置的超时时长后，自动解锁
+     * @param int $retries
+     * @param int $delay_seconds
+     * @return bool
+     */
+    public function lockAcquire(int $retries = 0, int $delay_seconds = 1): bool
+    {
+        $this->checkLockerExpired();
 
         for (; ;) {
             if ((new DeviceLocker($this))->isLocked()) {

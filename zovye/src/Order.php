@@ -189,7 +189,6 @@ class Order extends State
             return error(State::FAIL, '找不到支付信息!');
         }
 
-        $percent = 1;
         $percent = $total / $pay_log->getPrice();
         $remain = $total;
 

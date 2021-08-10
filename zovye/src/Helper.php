@@ -3,6 +3,7 @@
 
 namespace zovye;
 
+use zovye\model\device_logsModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 
@@ -64,7 +65,7 @@ class Helper
         return boolval($enabled);
     }
 
-    public static function getOrderPullLog(orderModelObj $order)
+    public static function getOrderPullLog(orderModelObj $order): array
     {
         $condition = We7::uniacid([
             'createtime >=' => $order->getCreatetime(),

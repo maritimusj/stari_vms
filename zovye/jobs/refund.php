@@ -15,7 +15,9 @@ use zovye\Helper;
 use zovye\request;
 use zovye\Order;
 use zovye\model\orderModelObj;
+use zovye\State;
 use zovye\Util;
+use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 
@@ -75,6 +77,8 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
         return Util::logToFile('refund', $log);
     }
 
+    $res = [];
+
     if ($num >= 0) {
         //退款
         $res = Order::refund($order->getOrderNO(), $num, ['message' => $log['message']]);
@@ -86,7 +90,7 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
         $price = 0;
 
         $list = Helper::getOrderPullLog($order);
-        foreach($list as $entry) {
+        foreach ($list as $entry) {
             if (is_error($entry['result'])) {
                 $price += intval($entry['price']);
             }
@@ -97,29 +101,60 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
             $res = Order::refund2($order->getOrderNO(), $price, ['message' => $log['message']]);
             if ($reset_payload && !is_error($res)) {
                 //恢复指定商品库存
+                resetPayload2($order);
             }
         }
     }
 
-    $log['result'] = is_error($res) ? $res : '退款成功！';
+    $log['result'] = !is_error($res) ? '退款成功！' : $res;
 }
 
 Util::logToFile('refund', $log);
 
-function resetPayload(orderModelObj $order, int $num = 0)
+function resetPayload(orderModelObj $order, int $num = 0): array
 {
     $device = $order->getDevice();
     if ($device) {
         $goods_id = $order->getGoodsId();
         $total = $num == 0 ? $order->getNum() : $num;
-        
+
         $locker = $device->payloadLockAcquire(30);
         if ($locker) {
             $device->resetGoodsNum($goods_id, '+' . $total, "订单退款：{$order->getOrderNO()}");
         } else {
-            $log['payload'] = '锁定设备库存失败!';
+            return error(State::ERROR, '锁定设备库存失败!');
         }
+
         $locker->unlock();
-        $device->save();
+        if ($device->save()) {
+            return ['msg' => '库存已重置！'];
+        }
     }
+    return ['msg' => '库存重置失败！'];
+}
+
+function resetPayload2(orderModelObj $order): array
+{
+    $device = $order->getDevice();
+    if ($device) {
+        $locker = $device->payloadLockAcquire(30);
+        if (empty($locker)) {
+            return error(State::ERROR, '锁定设备库存失败!');
+        }
+
+        $result = Helper::getOrderPullLog($order);
+        foreach ($result as $entry) {
+            $result = $device->resetGoodsNum($entry['goods']['id'], '+1', "订单退款：{$order->getOrderNO()}");
+            if (is_error($result)) {
+                return $result;
+            }
+        }
+
+        $locker->unlock();
+        if ($device->save()) {
+            return ['msg' => '库存已重置！'];
+        }
+    }
+
+    return ['msg' => '库存重置失败！'];
 }

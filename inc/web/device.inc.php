@@ -1021,10 +1021,13 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
     $tpl_data['payload'] = $device->getPayload(true);
 
+    $packages = [];
     $query = Package::query(['device_id' => $device->getId()]);
-    foreach($query->findAll() as $entry) {
-        $tpl_data['packages'][] = $entry->format(true);
+    foreach($query->findAll() as $i) {
+        $packages[] = $i->format(true);
     }
+
+    $tpl_data['packages'] = $packages;
 
     $tpl_data['mcb_online'] = $device->isMcbOnline();
     $tpl_data['app_online'] = $device->isAppOnline();

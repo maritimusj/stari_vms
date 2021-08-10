@@ -2635,12 +2635,18 @@ class deviceModelObj extends modelObj
 
     protected function isPackageOk(array $data): bool
     {
+        $goods_list = [];
         foreach ($data['list'] as $item) {
-            $payload = $this->getGoods(intval($item['goods_id']));
-            if (empty($payload) || empty($payload['num']) || $payload['num'] < $item['num']) {
+            $goods_list[$item['goods_id']] += $item['num'];
+        }
+
+        foreach ($goods_list as $id => $num) {
+            $payload = $this->getGoods($id);
+            if (empty($payload) || empty($num) || $payload['num'] < $num) {
                 return false;
             }
         }
+        
         return true;
     }
 

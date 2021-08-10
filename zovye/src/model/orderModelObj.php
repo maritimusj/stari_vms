@@ -124,7 +124,7 @@ class orderModelObj extends modelObj
 
     public function getPackageId(): int
     {
-        return $this->getExtraData('package.id'); 
+        return intval($this->getExtraData('package.id')); 
     }
 
     public function getGoods(): ?goodsModelObj

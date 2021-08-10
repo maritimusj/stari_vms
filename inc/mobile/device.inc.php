@@ -491,4 +491,19 @@ if ($op == 'default') {
             'online' => $device->isMcbOnline(false),
         ]
     ]);
+
+} elseif ($op == 'goods') {
+
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户！');
+    }
+
+    $result = $device->getGoodsAndPackages($user, ['allowPay']);
+    JSON::success($result);
 }

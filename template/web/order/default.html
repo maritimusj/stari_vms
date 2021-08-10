@@ -202,18 +202,28 @@
                         {/if}
                     </td>
                     <td>
-                        {if $order['goods']}
                         <div class="name">
-                        {$order['goods']['name']}
-                        <span {if $order['pull_logs']===true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num gray" title="{$order['pull_logs']}"{/if}> x{$order['num']}</span>
+                            {if $order['goods']}                            
+                            {$order['goods']['name']}                            
+                            {else}
+                            {$order['package']['title']}
+                            {/if}
+                            <span {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num gray" title="{$order['pull_logs']}"{/if}> x{$order['num']}</span>
                         </div>
-                        {/if}
                     </td>
                     <td>
                         {if $order['goods']}
                         <div class="goods">
                             <img src="{$order['goods']['img']}"/>
-                        </div>                    
+                        </div>
+                        {elseif $order['package']}
+                        <div class="package">
+                            {loop $order['package']['list'] $i $goods}
+                            <div class="goods">
+                                <img src="{$goods['image']}">
+                            </div>
+                            {/loop}
+                        </div>
                         {/if}
                     </td>
                     <td class="status">
@@ -454,6 +464,22 @@
             const num = parseInt(input.val());
             if (num >= min && num <= max) {
                 api.showResult({ op: 'refund', id: id, num: num }, '', true, function () {
+                    $('#modal-message').modal('hide');
+                });
+            } else {
+                input.focus();
+            }
+        }
+    }
+
+    api.orderRefund2 = function (id) {
+        const input = $('input[name=price]');
+        if (input) {
+            const min = Math.round(parseFloat(input.attr('min')) * 100);
+            const max = Math.round(parseFloat(input.attr('max')) * 100);
+            const price = Math.round((input.val()) * 100);
+            if (price >= min && price <= max) {
+                api.showResult({ op: 'refund', id: id, price: price }, '', true, function () {
                     $('#modal-message').modal('hide');
                 });
             } else {

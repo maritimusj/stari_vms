@@ -203,7 +203,7 @@ class WxPlatform
         return $result;
     }
 
-    public static function getUserProfile2($access_token, $openid): array
+    public static function getUserProfile2($access_token, $openid, $create_user = false)
     {
         $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2));
 
@@ -214,6 +214,22 @@ class WxPlatform
 
         if (!empty($result['errcode'])) {
             return err($result['errmsg']);
+        }
+
+        if ($create_user) {
+            $user = User::get($result['openid'], true);
+            if (empty($user)) {
+                $user = User::create([
+                    'app' => User::WX,
+                    'nickname' => $result['nickname'],
+                    'avatar' => $result['headimgurl'],
+                    'openid' => $result['openid'],
+                ]);
+                if ($user) {
+                    $user->set('fansData', $result);
+                }
+            }
+            return $user;
         }
 
         return $result;
@@ -611,8 +627,12 @@ class WxPlatform
                     return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
                 }
 
-                $user = User::get($first);
-
+                //如果来自公众号屏幕推广二维码
+                if ($first == 'app') {
+                    $user = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName'], true);
+                } else {
+                    $user = User::get($first);
+                }
             } else {
                 $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
 
@@ -641,7 +661,7 @@ class WxPlatform
 
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
-            } 
+            }
 
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用！');
@@ -681,7 +701,7 @@ class WxPlatform
         } catch (ZovyeException $e) {
             Util::logToFile('debug', [
                 'error' => $e->getMessage()
-            ]);            
+            ]);
             $device = $e->getDevice();
             if ($device) {
                 $device->appShowMessage($e->getMessage(), 'error');

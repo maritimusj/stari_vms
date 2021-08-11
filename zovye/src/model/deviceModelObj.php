@@ -857,9 +857,9 @@ class deviceModelObj extends modelObj
 
     /**
      * 获取领货链接
-     * @return string | array
+     * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         $id = $this->isActiveQrcodeEnabled() ? $this->shadow_id : $this->imei;
 
@@ -1128,8 +1128,36 @@ class deviceModelObj extends modelObj
         return $str ? implode(',', $titles) : $titles;
     }
 
+    //公众号推广二维码
+    public function getAccountAppQRCode(): string
+    {
+        if (App::useAccountAppQRCode()) {
+            $accounts = $this->getAccounts(Account::AUTH);
+            foreach ($accounts as $account) {
+                $obj = Account::get($account['id']);
+                if (empty($obj) || !$obj->settings('config.appQRCode')) {
+                    continue;
+                }
+
+                $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'app', $this->getId()], false);
+                if (!is_error($res)) {
+                    return $account['qrcode'];
+                }
+            }
+        }
+
+        return '';
+    }
+
     public function getAccountQRCode(): string
     {
+        //是否分配了屏幕推广的公众号
+        $qrcode = $this->getAccountAppQRCode();
+        if ($qrcode) {
+            return $qrcode;
+        }
+
+        //是否设置了屏幕二维码的公众号
         if (App::useAccountQRCode()) {
             $accounts = $this->getAccounts(Account::AUTH);
             foreach ($accounts as $account) {
@@ -1203,11 +1231,13 @@ class deviceModelObj extends modelObj
             'advs' => $advs,
         ];
 
-        $cfg['qrcode'] = $this->getAccountQRCode();
+        $qrcode = $this->getAccountQRCode();
 
-        if (empty($cfg['qrcode'])) {
-            $cfg['qrcode'] = strval($this->getQrcode());
-            $cfg['qrcode_url'] = strval($this->getUrl());
+        if ($qrcode) {
+            $cfg['qrcode'] = $qrcode;
+        } else {
+            $cfg['qrcode'] = $this->getQrcode();
+            $cfg['qrcode_url'] = $this->getUrl();
         }
 
         //商品库存

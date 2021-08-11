@@ -2450,9 +2450,10 @@ HTML_CONTENT;
      * @param string $url
      * @param int $timeout
      * @param array $params
-     * @return string|null
+     * @param bool $json_result
+     * @return string|null|array
      */
-    public static function get(string $url, int $timeout = 3, $params = []): ?string
+    public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false): ?string
     {
         $ch = curl_init();
 
@@ -2482,7 +2483,7 @@ HTML_CONTENT;
             return null;
         }
 
-        return $response;
+        return $json_result ? json_decode($response, true) : $response;
     }
 
     /**
@@ -2491,9 +2492,10 @@ HTML_CONTENT;
      * @param array $data
      * @param bool $json
      * @param int $timeout
+     * @param array $params
      * @return array
      */
-    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, $params = []): array
+    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, array $params = []): array
     {
         $ch = curl_init();
 

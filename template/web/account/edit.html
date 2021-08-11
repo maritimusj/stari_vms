@@ -189,6 +189,7 @@
                 </div>
                 <div class="seg">
                     <div class="title">其它设置</div>
+                    {if empty($account) || !$account->isSpecial()}
                     <div class="form-group">
                         <label for="groupname" class="col-md-2 control-label">分组名称</label>
                         <div class="col-md-10">
@@ -196,6 +197,7 @@
                             <span class="help-block">* 可选，同一分组的公众号不会同时出现在公众号关注页面中</span>
                         </div>
                     </div>
+                    {/if}
                     <div class="form-group">
                         <label for="orderno" class="col-md-2 control-label">排序</label>
                         <div class="col-md-10">

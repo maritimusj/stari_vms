@@ -200,20 +200,35 @@ class Account extends State
             }
         };
 
+        //处理分组
         $groups = [];
 
         $accounts = $device->getAccounts();
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
-            if ($group_name && array_key_exists($group_name, $groups)) {
-                unset($accounts[$uid]);
+            if (empty($group_name)) {
                 continue;
             }
+            if (!isset($groups[$group_name])) {
+                $groups[$group_name] = [
+                    'uid' => $uid,
+                    'orderno' => $entry['orderno'],
+                ];
+            } elseif ($entry['orderno'] >= $groups[$group_name]['orderno']) {
+                $last_uid = $groups[$group_name]['uid'];
 
-            if ($group_name) {
-                $groups[$group_name] = 'exists';
+                unset($accounts[$last_uid]);
+
+                $groups[$group_name] = [
+                    'uid' => $uid,
+                    'orderno' => $entry['orderno'],
+                ];
+            } else {
+                unset($accounts[$uid]);
             }
+        }
 
+        foreach ($accounts as $entry) {
             $join(['id' => $entry['id']], function ($acc) {
                 return [$acc->format()];
             });

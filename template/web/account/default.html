@@ -281,8 +281,8 @@
                     <td class="detail" style="position:relative;">
                         <div class="limit" style="background-color:{$a['clr']}" >
                             {if $a['groupname']}<div class="group" title="分组名称：{$a['groupname']}" style="color:{$a['clr']}">{$a['groupname']}</div>{/if}
-                            <div class="first"><span class="count">{$a['count']}</span>次/{php echo zovye\schema::desc($a['scname'])}</div>
-                            <div class="more">每人最多<span class="total">{$a['total']}</span>次</div>
+                            <div class="first" title="{if $a['orderlimits']}最大订单数量限制：{$a['orderlimits']}{/if}"><span class="count">{$a['count']}</span>次/{php echo zovye\schema::desc($a['scname'])}</div>
+                            <div class="more" title="{if $a['orderlimits']}最大订单数量限制：{$a['orderlimits']}{/if}">每人最多<span class="total">{$a['total']}</span>次</div>
                             {if $a['commission'] && $a['commission']['money'] > 0}
                                 <span class="more commission" title="每包佣金：{php echo number_format($a['commission']['money']/100, 2)}元"><i class="fa fa-share-alt"></i> 已参加分佣</span>
                             {/if}

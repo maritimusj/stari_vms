@@ -101,6 +101,7 @@ class SNTOAccount
                 $data = $acc->format();
 
                 $data['name'] = $result['data']['app_name'];
+                $data['title'] = $result['data']['app_name'];
                 $data['qrcode'] = $result['data']['qr_code_url'];
 
                 $v[] = $data;

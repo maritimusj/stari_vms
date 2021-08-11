@@ -216,6 +216,16 @@
                     {/if}
                     {if \zovye\App::isWxPlatformEnabled() && $account && $account->isAuth()}
                     <div class="seg-divider"></div>
+                    {if $account->isVerified()}
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕推广</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="useAppQRCode" name="useAppQRCode" value="1" {if $config['appQRCode']}checked{/if}> 在设备屏幕上进行推广
+                            </label>
+                        </div>
+                    </div>
+                    {/if}
                     <div class="form-group">
                         <label class="col-md-2 control-label">出货时机</label>
                         <div class="col-md-8">

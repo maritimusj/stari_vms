@@ -325,6 +325,7 @@ if ($op == 'default') {
                 }
                 $config = [
                     'type' => Account::AUTH,
+                    'appQRCode' => request::bool('useAppQRCode'),
                 ];
                 if (request::str('openMsgType') == 'text') {
                     $config['open'] = [
@@ -369,6 +370,7 @@ if ($op == 'default') {
                 Account::ZJBAO_NAME,
                 Account::MEIPA_NAME,
                 Account::KINGFANS,
+                Account::SNTO,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

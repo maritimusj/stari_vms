@@ -169,9 +169,9 @@ class Job
         return CtrlServ::scheduleJob('create_order_account', $params);
     }
 
-    public static function authAccount($agent_id, $accountUID): bool
+    public static function authAccount($agent_id, $accountUID, $total = 0): bool
     {
-        return CtrlServ::scheduleDelayJob('auth_account', ['agent' => $agent_id, 'account' => $accountUID], 3);
+        return CtrlServ::scheduleDelayJob('auth_account', ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total], 3);
     }
 
     public static function repairAgentMonthStats($agent_id, $month): bool

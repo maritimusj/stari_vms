@@ -57,6 +57,8 @@ class SNTOAccount
                 $config['data'] = $res['data'];
                 $config['data']['last'] = time();
                 $acc->updateSettings('config', $config);
+            } else {
+                Util::logToFile('snto_error', $res);
             }
         }
 
@@ -80,7 +82,7 @@ class SNTOAccount
             }
 
             try {
-                if (empty($result) || empty($result['list'])) {
+                if (empty($result)) {
                     throw new RuntimeException('返回数据为空！');
                 }
 
@@ -88,17 +90,18 @@ class SNTOAccount
                     throw new RuntimeException($result['message']);
                 }
 
-                if ($result['error']) {
-                    throw new RuntimeException("请求失败，错误代码：{$result['error']}");
+                if ($result['code'] !== 200) {
+                    throw new RuntimeException("请求失败，错误：{$result['message']}");
+                }
+
+                if (empty($result['data']) || empty($result['data']['qr_code_url'])) {
+                    throw new RuntimeException("请求失败，返回数据为空！");
                 }
 
                 $data = $acc->format();
 
-                $data['name'] = $result['list']['ghname'];
-                $data['qrcode'] = $result['list']['qrcode_url'];
-                if ($result['list']['head_img']) {
-                    $data['img'] = $result['list']['head_img'];
-                }
+                $data['name'] = $result['data']['app_name'];
+                $data['qrcode'] = $result['data']['qr_code_url'];
 
                 $v[] = $data;
 
@@ -129,18 +132,15 @@ class SNTOAccount
 
     public static function cb($params = [])
     {
-
     }
 
     public function fetchToken()
     {
-        $url = self::API_URL . '/token/scanQr.json';
-        $result = Util::get($url, 3, [
+        $url = self::API_URL . '/token/scanQr.json?' . http_build_query([
             'app_id' => $this->id,
             'app_key' => $this->key,
-        ], true);
-        Util::logToFile('snto', $result);
-        return $result;
+        ]);
+        return Util::getJSON($url);
     }
 
     public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null)
@@ -158,7 +158,7 @@ class SNTOAccount
         ];
 
         $result = Util::post($url, $data, true, 3, [
-            CURLOPT_HTTPHEADER => "Auth: {$this->token}",
+            CURLOPT_HTTPHEADER => ["AUTH: {$this->token}"],
         ]);
 
         if ($cb) {

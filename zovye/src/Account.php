@@ -214,7 +214,7 @@ class Account extends State
                     'uid' => $uid,
                     'orderno' => $entry['orderno'],
                 ];
-            } elseif ($entry['orderno'] >= $groups[$group_name]['orderno']) {
+            } elseif ($entry['orderno'] > $groups[$group_name]['orderno']) {
                 $last_uid = $groups[$group_name]['uid'];
 
                 unset($accounts[$last_uid]);

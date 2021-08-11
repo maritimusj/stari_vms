@@ -78,7 +78,7 @@ class Account extends State
     const KINGFANS_HEAD_IMG = MODULE_URL . 'static/img/kingfans_pic.png';
 
     const SNTO_NAME = '史莱姆';
-    const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_ic.png';
+    const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',

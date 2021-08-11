@@ -313,8 +313,8 @@ if ($op == 'default') {
                 $data['img'] = Account::SNTO_HEAD_IMG;
                 $account->set('config', [
                     'type' => Account::SNTO,
-                    'id' => request::trim('id'),
-                    'key' => request::trim('key'),
+                    'id' => request::trim('app_id'),
+                    'key' => request::trim('app_key'),
                     'channel' => request::trim('channel'),
                     'data' => $account->settings('config.data', []),
                 ]);

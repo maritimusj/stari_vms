@@ -441,7 +441,7 @@ class Account extends State
 
     /**
      * 绑定或者取消绑定多个对象，（必须有一个公众号和一个或多个其它对象：设备，代理商，标签）
-     * @param array<mixed> $objs
+     * @param array $objs
      * @param array $params
      * @return bool
      */

@@ -606,6 +606,7 @@ class WxPlatform
                     throw new RuntimeException('找不到这个设备！');
                 }
 
+                //如果是来自屏幕二维码
                 if ($first == 'device') {
                     return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
                 }

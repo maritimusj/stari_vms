@@ -50,6 +50,9 @@ class Account extends State
     //金粉吧
     const KINGFANS = 105;
 
+    //史莱姆
+    const SNTO = 106;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -73,6 +76,9 @@ class Account extends State
 
     const KINGFANS_NAME = '金粉吧';
     const KINGFANS_HEAD_IMG = MODULE_URL . 'static/img/kingfans_pic.png';
+
+    const SNTO_NAME = '史莱姆';
+    const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_ic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -172,7 +178,7 @@ class Account extends State
      * @return array
      * $params['max' => 1] 最多返回几个公众号
      */
-    public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array
+    public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         $list = [];
         $join = function ($cond, $getter_fn) use ($device, $user, &$list) {
@@ -264,6 +270,13 @@ class Account extends State
             });
         }
 
+        //史莱姆
+        if (App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude)) {
+            $join(['state' => Account::SNTO], function () use ($device, $user) {
+                return SNTOAccount::fetch($device, $user);
+            });
+        }
+
         if (empty($list)) {
             return [];
         }
@@ -343,15 +356,12 @@ class Account extends State
      */
     public static function removeAllAgents(accountModelObj $account): bool
     {
-        if ($account) {
-            $assign_data = $account->settings('assigned', []);
-            $assign_data['agents'] = [];
-            $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
-            if ($account->updateSettings('assigned', $assign_data)) {
-                return self::updateAccountData();
-            }
+        $assign_data = $account->settings('assigned', []);
+        $assign_data['agents'] = [];
+        $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
+        if ($account->updateSettings('assigned', $assign_data)) {
+            return self::updateAccountData();
         }
-
         return false;
     }
 
@@ -598,6 +608,12 @@ class Account extends State
         return self::createSpecialAccount(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
     }
 
+    public static function createSNTOAccount(): ?accountModelObj
+    {
+        $url = Util::murl('snto');
+        return self::createSpecialAccount(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+    }
+
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
     {
         $account = self::get($id);
@@ -817,7 +833,7 @@ class Account extends State
      * @param userModelObj $user
      * @return array
      */
-    public static function getUserNext(deviceModelObj $device, userModelObj  $user): array
+    public static function getUserNext(deviceModelObj $device, userModelObj $user): array
     {
         $account = self::getNext($device, $user->settings('accounts.last.uid', ''));
         if ($account) {
@@ -890,7 +906,7 @@ class Account extends State
             'result' => json_encode($result),
             'createtime' => isset($createtime) ? intval($createtime) : time(),
         ];
-       
+
         return m('account_query')->create($data);
     }
 

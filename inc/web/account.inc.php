@@ -132,6 +132,7 @@ if ($op == 'default') {
         Account::ZJBAO => App::isZJBaoEnabled(),
         Account::MEIPA => App::isMeiPaEnabled(),
         Account::KINGFANS => App::isKingFansEnabled(),
+        Account::SNTO => App::isSNTOEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -306,6 +307,16 @@ if ($op == 'default') {
                     'type' => Account::KINGFANS,
                     'bid' => request::trim('bid'),
                     'key' => request::trim('key'),
+                ]);
+            } elseif ($account->isSNTO()) {
+                $data['name'] = Account::SNTO_NAME;
+                $data['img'] = Account::SNTO_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::SNTO,
+                    'id' => request::trim('id'),
+                    'key' => request::trim('key'),
+                    'channel' => request::trim('channel'),
+                    'data' => $account->settings('config.data', []),
                 ]);
             } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');

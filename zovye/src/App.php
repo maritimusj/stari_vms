@@ -179,6 +179,17 @@ class App
     }
 
     /**
+     * 是否开启 史莱姆 吸粉
+     *
+     */
+    public static function isSNTOEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('snto.fan.enabled'));
+        });
+    }
+
+    /**
      * 是否启用用户中心
      * @return bool
      */

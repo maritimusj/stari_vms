@@ -2646,7 +2646,7 @@ class deviceModelObj extends modelObj
                 return false;
             }
         }
-        
+
         return true;
     }
 

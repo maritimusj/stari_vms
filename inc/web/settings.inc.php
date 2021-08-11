@@ -184,6 +184,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createKingFansAccount',
                 'king.fan.enabled',
             ],
+            'sntoFAN' => [
+                __NAMESPACE__ . '\Account::createSNTOAccount',
+                'snto.fan.enabled',
+            ],
         ];
 
         $accounts_need_refresh = false;
@@ -229,7 +233,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 $content = file_get_contents($file['filename']);
                 if ($content && stripos($content, $module_url) === false) {
                     file_put_contents($file['filename'], $file['content'], $file['append'] ? FILE_APPEND : 0);
-                }    
+                }
             }
         }
     } elseif ($save_type == 'agent') {

@@ -503,5 +503,14 @@ class App
         return onceCall(function() {
             return boolval(settings('custom.DonatePay.enabled'));
         });        
-    } 
+    }
+
+    /**
+     * 使用屏幕推广公众号二维码
+     */
+    public static function useAccountAppQRCode(): bool {
+        return onceCall(function() {
+            return boolval(settings('account.appQRCode.enabled'));
+        });
+    }
 }

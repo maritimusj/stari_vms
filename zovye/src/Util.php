@@ -2451,9 +2451,9 @@ HTML_CONTENT;
      * @param int $timeout
      * @param array $params
      * @param bool $json_result
-     * @return string|null|array
+     * @return mixed
      */
-    public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false): ?string
+    public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false)
     {
         $ch = curl_init();
 
@@ -2486,6 +2486,11 @@ HTML_CONTENT;
         return $json_result ? json_decode($response, true) : $response;
     }
 
+    public static function getJSON(string $url)
+    {
+        return self::get($url, 3, [],true);
+    }
+
     /**
      * 使用POST请求指定URL
      * @param string $url
@@ -2507,13 +2512,14 @@ HTML_CONTENT;
         }
 
         curl_setopt($ch, CURLOPT_POST, true);
+
+        $headers = [];
+
         if ($json) {
             $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($json_str)
-            ]);
+            $headers[] = 'Content-Type: application/json';
+            $headers[] =  'Content-Length: ' . strlen($json_str);
         } else {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
@@ -2526,9 +2532,21 @@ HTML_CONTENT;
         }
 
         foreach ($params as $index => $val) {
+            if ($index == CURLOPT_HTTPHEADER) {
+                if (array($val)) {
+                    $headers = array_merge($headers, $val);
+                } else {
+                    $headers[] = $val;
+                }
+                continue;             
+            }
             curl_setopt($ch, $index, $val);
         }
 
+        if ($headers) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        
         $response = curl_exec($ch);
 
         curl_close($ch);

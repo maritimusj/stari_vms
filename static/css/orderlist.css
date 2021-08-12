@@ -41,7 +41,7 @@
 #orderlist td .name {
     cursor: default;
     font-size: larger;
-    white-space: nowrap;
+    width: 260px;
 }
 
 #orderlist .devicename div {

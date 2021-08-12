@@ -488,11 +488,7 @@ class Stats
             $chart['xAxis']['data'][] = date('m-d', $l);
         }
 
-        $devices = m('device_view')
-        ->where(We7::uniacid(['m_total >' => 0]))
-        ->orderBy('d_total DESC,m_total DESC')
-        ->limit($max)
-        ->findAll();
+        $devices = Device::query()->findAll();
 
         $index = 0;
 
@@ -530,9 +526,9 @@ class Stats
             $index++;
         }
 
-        // usort($chart['series'], function ($a, $b) {
-        //     return $b['total'] - $a['total'];
-        // });
+        usort($chart['series'], function ($a, $b) {
+            return $b['total'] - $a['total'];
+        });
 
         $chart['series'] = array_slice($chart['series'], 0, $max);
         foreach ($chart['series'] as $item) {

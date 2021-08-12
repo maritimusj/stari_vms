@@ -23,6 +23,16 @@ class WeApp extends Settings
         parent::__construct($this, 'weapp', 'config', true);
     }
 
+    public function createWebUrl($do, $params = []): string
+    {
+        return Util::url($do, $params, false);
+    }
+
+    public function createMobileUrl($do, $params = []): string
+    {
+        return Util::murl($do, $params);
+    }
+    
     /**
      * @param $filename
      * @param array $tpl_data

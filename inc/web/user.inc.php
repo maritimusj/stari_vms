@@ -203,8 +203,9 @@ if ($op == 'default') {
     $tpl_data['s_type_wxapp'] = $s_type_wxapp;
     $tpl_data['s_type_ali'] = $s_type_ali;
     $tpl_data['s_type_api'] = $s_type_api;
+    $tpl_data['s_type_third'] = $s_type_third;
     $tpl_data['s_principal'] = $s_principal;
-    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_api;
+    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_api || $s_type_third;
 
     $tpl_data['users'] = $users;
 

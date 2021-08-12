@@ -528,7 +528,7 @@
                 params.append("s_keywords", s_keywords);
             }
 
-            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api'].forEach(stype => {
+            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api', 's_type_third'].forEach(stype => {
                 const s_type = $(form.find('[name=' + stype + ']:checked')).val();
                 if (s_type) {
                     params.append(stype, s_type);

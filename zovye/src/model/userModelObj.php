@@ -137,6 +137,11 @@ class userModelObj extends modelObj
         return $this->app == User::API;
     }
 
+    public function isThirdAccountUser(): bool
+    {
+        return $this->app == User::THIRD_ACCOUNT;
+    }
+
     public function profile($detail = true): array
     {
         $data = [

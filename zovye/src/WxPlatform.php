@@ -220,7 +220,7 @@ class WxPlatform
             $user = User::get($result['openid'], true);
             if (empty($user)) {
                 $user = User::create([
-                    'app' => User::WX,
+                    'app' => User::THIRD_ACCOUNT,
                     'nickname' => $result['nickname'],
                     'avatar' => $result['headimgurl'],
                     'openid' => $result['openid'],

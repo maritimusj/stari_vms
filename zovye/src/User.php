@@ -20,7 +20,10 @@ class User
     const WxAPP = 1;
     const ALI = 2;
 
+    //API用户
     const API = 10;
+    //第三方公众号
+    const THIRD_ACCOUNT = 15;
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -76,15 +79,23 @@ class User
                 'title' => '第三方API用户',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL . "static/img/api.svg",
-            ]
+            ],
+            'third' => [
+                'name' => 'api',
+                'title' => '第三方公众号授权用户',
+                'color' => '#4CAF50',
+                'icon' => MODULE_URL . "static/img/third.svg",
+            ],
         ];
 
         if (self::isAliUser($obj)) {
             return $data['ali'];
         } elseif (self::isWXAppUser($obj)) {
             return $data['wxapp'];
-        } else if (self::isApiUser($obj)) {
+        } elseif (self::isApiUser($obj)) {
             return $data['api'];
+        } elseif (self::isThirdAccountUser($obj)) {
+            return $data['third'];
         }
 
         return $data['wx'];
@@ -125,6 +136,15 @@ class User
         }
         $user = User::get($obj, is_string($obj));
         return $user && $user->isApiUser();
+    }
+
+    public static function isThirdAccountUser($obj): bool
+    {
+        if ($obj instanceof userModelObj) {
+            return $obj->isThirdAccountUser();
+        }
+        $user = User::get($obj, is_string($obj));
+        return $user && $user->isThirdAccountUser();
     }
     /**
      * @param $id

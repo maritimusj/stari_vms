@@ -109,6 +109,11 @@ if ($op == 'default') {
         $types[] = User::API;
     }
 
+    $s_type_third = request::bool('s_type_third');
+    if ($s_type_third) {
+        $types[] = User::THIRD_ACCOUNT;
+    }
+
     //当指定了**部分**用户类型时，加入用户app条件过滤
     if ($types && count($types) < 3) {
         $query->where(['app' => $types]);

@@ -578,8 +578,8 @@
                                 </div>
                             </div>
                         </td>
-                        <td>
-                            <div class="status">
+                        <td class="status">
+                            <div>
                                 <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
                                 <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
                                 <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">

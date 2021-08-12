@@ -343,7 +343,7 @@ class Stats
             $chart['xAxis']['data'][] = date('m-d', $l);
         }
 
-        $agents = m('agent_vw')->where(We7::uniacid([]))->findAll();
+        $agents = Agent::query()->findAll();
         $index = 0;
         foreach ($agents as $agent) {
 

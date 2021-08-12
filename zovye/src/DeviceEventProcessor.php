@@ -277,7 +277,9 @@ class DeviceEventProcessor
     {
         $e = self::$events[$event];
         if (isset($e)) {
-            self::log($e, $data);
+            if (DEBUG) {
+                self::log($e, $data);
+            }
             $fn = $e['handler'];
             if (!empty($fn)) {
                 if (is_callable($fn)) {

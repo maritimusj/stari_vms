@@ -353,6 +353,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            {if $op != 'add_bluetooth_device' && (empty($device) || !$device->isBlueToothDevice())}
                             <div>
                                 <button class="btn btn-success" 
                                 @click.prevent="newPackage" 
@@ -367,8 +368,8 @@
                                 >
                                     <i class="fa fa-save"></i> 保存套餐
                                 </button>
-
                             </div>
+                            {/if}
                             <div class="package operate" v-if="currentPackage">
                                 <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>                           
                                 <table class="table cargo_lanes">
@@ -1082,6 +1083,9 @@
                                 })
                             } else {
                                 this.creating = false;
+                                if (res && res.data && res.data.msg) {
+                                    alert(res.data.msg);
+                                }
                             }
                         })
                     }

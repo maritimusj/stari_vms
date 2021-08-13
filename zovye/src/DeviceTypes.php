@@ -128,7 +128,7 @@ class DeviceTypes
 
             /** @var device_typesModelObj $entry */
             foreach ($query->findAll() as $entry) {
-                $data = self::format($entry, $params['detail']);
+                $data = self::format($entry, boolval($params['detail']));
                 $device_types[] = $data;
             }
         }

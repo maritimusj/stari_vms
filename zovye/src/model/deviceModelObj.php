@@ -690,11 +690,13 @@ class deviceModelObj extends modelObj
     /**
      * 重置设备锁
      */
-    public function resetLock()
+    public function resetLock(): bool
     {
         if (We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId()])) {
             $this->locked_uid = UNLOCKED;
+            return true;
         }
+        return false;
     }
 
     /**

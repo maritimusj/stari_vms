@@ -10,13 +10,13 @@ class Package
      * @param array $data
      * @return packageModelObj|null
      */
-    public static function create($data = []): ?packageModelObj
+    public static function create(array $data = []): ?packageModelObj
     {
         return m('package')->create($data);
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return base\modelObjFinder
      */
     public static function query($condition = []): base\modelObjFinder
@@ -34,7 +34,7 @@ class Package
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return packageModelObj|null
      */
     public static function findOne($condition = []): ?packageModelObj

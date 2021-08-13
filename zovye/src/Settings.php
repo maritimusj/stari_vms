@@ -201,7 +201,7 @@ CODE;
             }
         }
 
-        return is_array($key) ? $ret : (isset($ret[$key]) ? $ret[$key] : $default);
+        return is_array($key) ? $ret : ($ret[$key] ?? $default);
     }
 
     /**

@@ -14,7 +14,7 @@ class App
      * @param int $len
      * @return string
      */
-    public static function uid($len = null): string
+    public static function uid(int $len = 0): string
     {
         return onceCall(function() use ($len) {
             $uid = sha1(_W('config.setting.authkey') . We7::uniacid());

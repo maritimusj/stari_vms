@@ -10,7 +10,7 @@ class Group
      * @param array $data
      * @return mixed
      */
-    public static function create($data = [])
+    public static function create(array $data = [])
     {
         if (empty($data['uniacid'])) {
             $data['uniacid'] = We7::uniacid();
@@ -21,6 +21,10 @@ class Group
         return m('device_groups')->create($data);
     }
 
+    /**
+     * @param mixed $condition
+     * @return base\modelObjFinder
+     */
     public static function query($condition = []): base\modelObjFinder
     {
         return m('device_groups')->where(We7::uniacid([]))->where($condition);

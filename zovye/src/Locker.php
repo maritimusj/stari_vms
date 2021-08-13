@@ -13,26 +13,43 @@ class Locker
      * @param array $data
      * @return ?lockerModelObj
      */
-    public static function create($data = []): ?lockerModelObj
+    public static function create(array $data = []): ?lockerModelObj
     {
         return m('locker')->create($data);
     }
 
+    /**
+     * @param mixed $condition
+     * @return modelObjFinder
+     */
     public static function query($condition = []): modelObjFinder
     {
         return m('locker')->query($condition);
     }
 
+    /**
+     * @param mixed $condition
+     * @return lockerModelObj|null
+     */
     public static function findOne($condition = []): ?lockerModelObj
     {
         return self::query($condition)->findOne();
     }
 
+    /**
+     * @param mixed $condition
+     * @return bool
+     */
     public static function exists($condition = []): bool
     {
         return self::query($condition)->exists();
     }
 
+    /**
+     * @param $id
+     * @param bool $is_uid
+     * @return lockerModelObj|null
+     */
     public static function get($id, bool $is_uid = false): ?lockerModelObj
     {
         if ($is_uid) {

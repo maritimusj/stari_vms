@@ -14,10 +14,8 @@ use zovye\request;
 use zovye\Keeper;
 use zovye\model\keeperModelObj;
 use zovye\Util;
-use zovye\We7;
 use zovye\Wx;
 use function zovye\request;
-use function zovye\m;
 use function zovye\settings;
 
 $op = request::op('default');

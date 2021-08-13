@@ -115,7 +115,7 @@ class Inventory
         if (!$inventory->acquireLocker()) {
             return error(State::ERROR, '无法锁定用户仓库！');
         }
-        $goods_lack = settings('inventory.goods.mode') ? false : true;
+        $goods_lack = !settings('inventory.goods.mode');
         $clr = Util::randColor();
         foreach ($result as $entry) {
             if (empty($entry['goodsId'])) {

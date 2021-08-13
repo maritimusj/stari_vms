@@ -178,7 +178,7 @@ class ZhiJinBaoAccount
             'cityName' => $profile['city'],
             'nonceStr' => Util::random(16, true),
             'timeStamp' => time(),
-            'deviceSn' => $device ? $device->getImei() : '',
+            'deviceSn' => $device->getImei(),
         ]);
 
         $params['sign'] = $this->sign($params);
@@ -207,7 +207,7 @@ class ZhiJinBaoAccount
             if ($val == '') {
                 continue;
             }
-            $str[] = "$key={$val}";
+            $str[] = "$key=$val";
         }
        
         return strtoupper(md5(implode('&', $str)));

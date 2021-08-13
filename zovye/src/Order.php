@@ -50,17 +50,17 @@ class Order extends State
     const VOUCHER = 10;
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return ModelObjFinderProxy
      */
-    public static function query(array $condition = []): ModelObjFinderProxy
+    public static function query($condition = []): ModelObjFinderProxy
     {
         $finder = m('order')->where(We7::uniacid([]))->where($condition);
         return new ModelObjFinderProxy($finder);
     }
 
     /**
-     * @param $cond
+     * @param mixed $cond
      * @return orderModelObj|null
      */
     public static function findOne($cond): ?orderModelObj
@@ -101,7 +101,7 @@ class Order extends State
      * @param int $total
      * @return bool
      */
-    public static function refundBy($order_no, $total = 0): bool
+    public static function refundBy($order_no, int $total = 0): bool
     {
         //退款
         $res = Pay::refund($order_no, $total);
@@ -169,10 +169,6 @@ class Order extends State
 
     public static function refund2($order_no, $total, array $refund_data = [])
     {
-        if (empty($order_no)) {
-            return error(State::ERROR, '订单号不正确!');
-        }
-
         $order = Order::get($order_no, true);
         if (empty($order)) {
             //尝试订单id查找订单
@@ -316,7 +312,7 @@ class Order extends State
      * @param array $refund_data
      * @return bool|array
      */
-    public static function refund($order_no, $goods_num = 0, array $refund_data = [])
+    public static function refund($order_no, int $goods_num = 0, array $refund_data = [])
     {
         return Util::transactionDo(
             function () use ($order_no, $refund_data, $goods_num) {
@@ -477,7 +473,7 @@ class Order extends State
      * @param bool $is_orderNO
      * @return orderModelObj|null
      */
-    public static function get($id, $is_orderNO = false): ?orderModelObj
+    public static function get($id, bool $is_orderNO = false): ?orderModelObj
     {
         /** @var orderModelObj[] $cache */
         static $cache = [];

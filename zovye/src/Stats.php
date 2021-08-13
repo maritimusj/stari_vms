@@ -22,11 +22,11 @@ class Stats
      * 更新统计信息
      * @param orderModelObj $order
      * @param ISettings|ISettings[] $objs
-     * @param callable $fn
+     * @param callable|null $fn
      */
-    public static function update(orderModelObj $order, $objs, $fn = null)
+    public static function update(orderModelObj $order, $objs, callable $fn = null)
     {
-        if ($objs && $order) {
+        if ($objs) {
             $num = intval($order->getNum());
 
             if ($num > 0) {
@@ -76,7 +76,7 @@ class Stats
     /**
      * 获取对象某天的统计数据
      * @param ISettings $obj
-     * @param null|string $day
+     * @param mixed $day
      * @return array
      */
     public static function getDayTotal(ISettings $obj, $day = null): array
@@ -106,7 +106,7 @@ class Stats
     /**
      * 获取对象某月的统计数据
      * @param ISettings $obj
-     * @param null|string $month
+     * @param mixed $month
      * @return array
      */
     public static function getMonthTotal(ISettings $obj, $month = null): array
@@ -155,7 +155,7 @@ class Stats
     /**
      * 按月获取对象的统计数据
      * @param ISettings $obj
-     * @param null|string $year
+     * @param mixed $year
      * @return array
      */
     public static function months(ISettings $obj, $year = null): array
@@ -193,7 +193,7 @@ class Stats
      * @param string $title
      * @return array
      */
-    public static function chartDataOfDay(ISettings $obj, $day, $title = ''): array
+    public static function chartDataOfDay(ISettings $obj, $day, string $title = ''): array
     {
         if (empty($day)) {
             $day = time();
@@ -260,7 +260,7 @@ class Stats
      * @param string $title
      * @return array
      */
-    public static function chartDataOfMonth(ISettings $obj, $day, $title = ''): array
+    public static function chartDataOfMonth(ISettings $obj, $day, string $title = ''): array
     {
         if (empty($day)) {
             $day = time();
@@ -326,7 +326,7 @@ class Stats
      * @param int $max
      * @return array
      */
-    public static function chartDataOfAgents($len = 7, $max = 15): array
+    public static function chartDataOfAgents(int $len = 7, int $max = 15): array
     {
         $chart = [
             'title' => ['text' => "代理商最近{$len}日订单统计"],
@@ -398,7 +398,7 @@ class Stats
      * @param int $max
      * @return array
      */
-    public static function chartDataOfAccounts($len = 7, $max = 15): array
+    public static function chartDataOfAccounts(int $len = 7, int $max = 15): array
     {
         $chart = [
             'title' => ['text' => "公众号最近{$len}日订单统计"],
@@ -471,7 +471,7 @@ class Stats
      * @param int $max
      * @return array
      */
-    public static function chartDataOfDevices($len = 7, $max = 15): array
+    public static function chartDataOfDevices(int $len = 7, int $max = 15): array
     {
         $chart = [
             'title' => ['text' => "设备最近{$len}日订单统计"],
@@ -615,26 +615,26 @@ class Stats
 
         $today = strtotime('today');
         $data['today']['f'] = $query->resetAll()->where(['createtime >=' => $today])->count();
-       
-        $data['yesterday']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function() use ($query, $today) {
+
+        $data['yesterday']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $today) {
             $yesterday = strtotime('yesterday');
             return $query->resetAll()->where([
-                'createtime >=' => $yesterday, 
+                'createtime >=' => $yesterday,
                 'createtime <' => $today,
             ])->count();
         });
 
-        $data['last7days']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function() use($query) {
+        $data['last7days']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query) {
             $last7days = strtotime(date('Y-m-d 00:00:00', strtotime('-7 days')));
             return $query->resetAll()->where(['createtime >=' => $last7days])->count();
         });
 
         $month = strtotime(date('Y-m-01 00:00:00'));
-        $data['month']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function() use ($query, $month) {            
+        $data['month']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $month) {
             return $query->resetAll()->where(['createtime >=' => $month])->count();
         });
 
-        $data['lastmonth']['f'] = Util::cachedCallUtil(new DateTime('first day of next month 00:00:00'), function() use ($query, $month) {
+        $data['lastmonth']['f'] = Util::cachedCallUtil(new DateTime('first day of next month 00:00:00'), function () use ($query, $month) {
             $lastmonth = strtotime(date('Y-m-01 00:00:00', strtotime('-1 month')));
             return $query->resetAll()->where(['createtime >=' => $lastmonth, 'createtime <' => $month])->count();
         });
@@ -774,7 +774,7 @@ class Stats
                 'b' => $b,
                 'f' => $f,
             ];
-            
+
             return $obj->set('statsData', $stats);
 
         } catch (Exception $e) {
@@ -827,7 +827,7 @@ class Stats
 
     /**
      * @param ISettings $obj
-     * @param null $day
+     * @param mixed $day
      * @return array
      */
     public static function daysOfMonth(ISettings $obj, $day = null): array
@@ -872,7 +872,7 @@ class Stats
 
     /**
      * @param ISettings $obj
-     * @param null $day
+     * @param mixed $day
      * @return array
      */
     public static function hoursOfDay(ISettings $obj, $day = null): array

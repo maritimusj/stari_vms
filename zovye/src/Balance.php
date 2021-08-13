@@ -45,8 +45,7 @@ class Balance extends State
 
         if ($this->user) {
             $openid = $this->user->getOpenid();
-            $remain = intval(m('balance')->where(We7::uniacid(['openid' => $openid]))->get('sum(x_val)'));
-
+            $remain = m('balance')->where(We7::uniacid(['openid' => $openid]))->get('sum(x_val)');
             return intval($remain);
         }
 
@@ -78,10 +77,10 @@ class Balance extends State
      * 余额变动操作
      * @param $n
      * @param $src
-     * @param array|null $memo
+     * @param string|null $memo
      * @return balanceModelObj|null
      */
-    public function change($n, $src, $memo = null): ?balanceModelObj
+    public function change($n, $src, string $memo = null): ?balanceModelObj
     {
         if ($this->user && $n != 0) {
             return m('balance')->create(

@@ -97,8 +97,8 @@ class Pay
             ],
             'orderData' => [
                 'orderNO' => $order_no,
-                'num' => isset($pay_data['total']) ? $pay_data['total'] : 1,
-                'price' => isset($pay_data['price']) ? $pay_data['price'] : $goods['price'],
+                'num' => $pay_data['total'] ?? 1,
+                'price' => $pay_data['price'] ?? $goods['price'],
                 'ip' => CLIENT_IP,
                 'extra' => [],
                 'createtime' => time(),
@@ -464,7 +464,7 @@ class Pay
             }
         }
 
-        if (empty($res['enable']) || empty(array_diff_key((array)$res, ['enable' => 1, 'name' => 1]))) {
+        if (empty($res['enable']) || empty(array_diff_key($res, ['enable' => 1, 'name' => 1]))) {
             $res = self::getDefaultPayParams($name);
         }
 

@@ -44,7 +44,7 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
     $agent->updateSettings('repair', [
         'status' => 'finished',
         'time' => time(),
-        'used' => isset($used) ? $used : 0,
+        'used' => $used ?? 0,
     ]);
 
 } else {

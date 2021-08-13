@@ -35,7 +35,7 @@ class ModelObjFinderProxy
 
     /**
      * modelObjFinder constructor.
-     * @param $finder
+     * @param base\modelObjFinder $finder
      */
     public function __construct(base\modelObjFinder $finder)
     {
@@ -53,7 +53,7 @@ class ModelObjFinderProxy
 
             $this->finder->where($condition);
 
-        } elseif ($condition instanceof agentModelObj || $condition instanceof agent_vwModelObj) {
+        } elseif ($condition instanceof agentModelObj) {
 
             if ($this->finder->isPropertyExists('agent_id')) {
                 $this->finder->where(['agent_id' => $condition->getId()]);

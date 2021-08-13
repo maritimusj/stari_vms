@@ -10,7 +10,7 @@ use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
 
-class AQiinfoAccount
+class AQIInfoAccount
 {
     const API_URL = 'https://c.api.aqiinfo.com/ChannelApi/UfansTicket';
     const CB_RESPONSE = '{"code":200}';
@@ -41,12 +41,12 @@ class AQiinfoAccount
                 return [];
             }
             //请求API
-            $AQiinfo = new AQiinfoAccount($config['key'], $config['secret']);
-            $AQiinfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
+            $AQIInfo = new AQIInfoAccount($config['key'], $config['secret']);
+            $AQIInfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('AQiinfo_query', [
+                        Util::logToFile('AQIInfo_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -77,7 +77,7 @@ class AQiinfoAccount
                         throw new RuntimeException('返回数据不正确！');
                     }
 
-                    $user->set('AQiinfo', $result['data']);
+                    $user->set('AQIInfo', $result['data']);
 
                     $data = $acc->format();
 
@@ -87,7 +87,7 @@ class AQiinfoAccount
 
                     $res = Util::createQrcodeFile("aqiinfo{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
-                        Util::logToFile('AQiinfo', [
+                        Util::logToFile('AQIInfo', [
                             'error' => 'fail to createQrcode file',
                             'result' => $res,
                         ]);
@@ -108,7 +108,7 @@ class AQiinfoAccount
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('AQiinfo', [
+                        Util::logToFile('AQIInfo', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -135,7 +135,7 @@ class AQiinfoAccount
             return err('没有配置！');
         }
 
-        Util::logToFile('AQiinfo', [
+        Util::logToFile('AQIInfo', [
             'params' => $params,
             'config' => $config,
         ]);
@@ -176,7 +176,7 @@ class AQiinfoAccount
             Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Util::logToFile('AQiinfo', [
+            Util::logToFile('AQIInfo', [
                 'error' => '发生错误! ',
                 'result' => $e->getMessage(),
             ]);
@@ -217,7 +217,7 @@ class AQiinfoAccount
             if ($key == 'ufsign') {
                 continue;
             }
-            $arr[] = "{$key}={$val}";
+            $arr[] = "$key=$val";
         }
 
         $str = implode('&', $arr);

@@ -470,7 +470,7 @@ class DeviceEventProcessor
      * @param bool $fetch
      * @return array|bool
      */
-    public static function onAppConfigMsg(array $data, $fetch = false)
+    public static function onAppConfigMsg(array $data, bool $fetch = false)
     {
         $result = [];
 

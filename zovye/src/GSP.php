@@ -38,7 +38,7 @@ class GSP
         return m('gsp_user')->create($data);
     }
 
-    public static function update($condition = [], $data = []): ?bool
+    public static function update($condition = [], $data = []): bool
     {
         $one = self::findOne($condition);
         if ($one) {
@@ -48,7 +48,7 @@ class GSP
             }
             return $one->save();
         }
-        return self::create($data) ? true : false;
+        return !empty(self::create($data));
     }
 
     public static function getUser(agentModelObj $agent, gsp_userModelObj $obj): ?userModelObj

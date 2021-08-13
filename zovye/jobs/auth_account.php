@@ -10,8 +10,6 @@ use zovye\Job;
 use zovye\model\agentModelObj;
 use zovye\Util;
 
-use function zovye\request;
-
 $agent_id = request::str('agent');
 $accountUID = request::str('account');
 $total = request::int('total');
@@ -41,7 +39,6 @@ if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
         if ($total < 60) {
             Job::authAccount($agent_id, $accountUID, $total + 1);
         }
-        
     }
 }
 

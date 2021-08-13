@@ -19,7 +19,7 @@ class LoginData
 
     /**
      * @param $token
-     * @param null|array $src
+     * @param mixed $src
      * @return login_dataModelObj|null
      */
     public static function get($token, $src = null): ?login_dataModelObj

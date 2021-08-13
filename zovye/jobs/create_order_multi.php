@@ -286,7 +286,7 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
  * @param deviceModelObj $device
  * @param userModelObj $user
  * @param $level
- * @param $goods_id
+ * @param $data
  * @return array
  */
 function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, $level, $data): array

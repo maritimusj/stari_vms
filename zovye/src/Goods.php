@@ -47,7 +47,7 @@ class Goods
      * @param bool $deleted
      * @return goodsModelObj|null
      */
-    public static function get($id, $deleted = false): ?goodsModelObj
+    public static function get($id, bool $deleted = false): ?goodsModelObj
     {
         /** @var goodsModelObj[] $cache */
         static $cache = [];
@@ -74,22 +74,22 @@ class Goods
      * @param bool $full_path
      * @return array
      */
-    public static function format(goodsModelObj $entry, $detail = false, $use_image_proxy = false, $full_path = true): array
+    public static function format(goodsModelObj $entry, bool $detail = false, bool $use_image_proxy = false, bool $full_path = true): array
     {
-        $imageUrlFN = function ($url) use($use_image_proxy, $full_path) {
+        $imageUrlFN = function ($url) use ($use_image_proxy, $full_path) {
             if ($full_path) {
                 $url = Util::toMedia($url, $use_image_proxy);
             }
             return $url;
         };
         $data = [
-            'id' => intval($entry->getId()),
+            'id' => $entry->getId(),
             'name' => strval($entry->getName()),
             'img' => $imageUrlFN($entry->getImg()),
             'detailImg' => $imageUrlFN($entry->getDetailImg()),
             'sync' => boolval($entry->getSync()),
-            'allowFree' => boolval($entry->allowFree()),
-            'allowPay' => boolval($entry->allowPay()),
+            'allowFree' => $entry->allowFree(),
+            'allowPay' => $entry->allowPay(),
             'price' => intval($entry->getPrice()),
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
@@ -109,13 +109,13 @@ class Goods
         $cost_price = $entry->getCostPrice();
 
         if (!empty($cost_price)) {
-            
+
             $data['costPrice'] = $cost_price;
             $data['costPrice_formatted'] = '￥' . number_format($cost_price / 100, 2) . '元';
         }
 
         $discountPrice = $entry->getExtraData('discountPrice', 0);
-        if (!empty($discountPrice)) {           
+        if (!empty($discountPrice)) {
             $data['discountPrice'] = $discountPrice;
             $data['discountPrice_formatted'] = '￥' . number_format($discountPrice / 100, 2) . '元';
         }
@@ -171,7 +171,7 @@ class Goods
 
         $keywords = trim(urldecode($params['keywords']));
         if ($keywords) {
-            $query->where(['name LIKE' => "%{$keywords}%"]);
+            $query->where(['name LIKE' => "%$keywords%"]);
         }
 
         $total = $query->count();

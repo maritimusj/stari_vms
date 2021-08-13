@@ -32,19 +32,19 @@ class Theme
     public static function file($name): string
     {
         $theme = settings('device.get.theme', 'default');
-        $filename = MODULE_ROOT . "/template/mobile/themes/{$theme}/{$name}.html";
+        $filename = MODULE_ROOT . "/template/mobile/themes/{$theme}/$name.html";
         if (file_exists($filename)) {
-            return "themes/{$theme}/{$name}";
+            return "themes/{$theme}/$name";
         }
 
         if ($theme != 'default') {
-            $filename = MODULE_ROOT . "/template/mobile/themes/default/{$name}.html";
+            $filename = MODULE_ROOT . "/template/mobile/themes/default/$name.html";
             if (file_exists($filename)) {
-                return "themes/default/{$name}";
+                return "themes/default/$name";
             }
         }
 
-        $filename = MODULE_ROOT . "/template/mobile/{$name}.html";
+        $filename = MODULE_ROOT . "/template/mobile/$name.html";
         if (file_exists($filename)) {
             return $name;
         }

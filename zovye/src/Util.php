@@ -111,7 +111,7 @@ class Util
             $user = User::get(App::getUserUID(), true);
         } else {
             if (empty($user)) {
-                $update = empty($params['update']) ? false : true;
+                $update = !empty($params['update']);
                 $fans = Util::fansInfo($update);
                 if ($fans && !empty($fans['openid'])) {
                     $user = User::get($fans['openid'], true);
@@ -176,7 +176,7 @@ class Util
      * @param bool $update
      * @return array
      */
-    public static function fansInfo($update = false): array
+    public static function fansInfo(bool $update = false): array
     {
         $openid = _W('openid');
         if ($openid) {
@@ -579,10 +579,10 @@ include './index.php';
         }
 
         $sc_name = $account->getScname();
-        $total = intval($account->getTotal());
-        $count = intval($account->getCount());
-        $sc_count = intval($account->getSccount());
-        $order_limits = intval($account->getOrderLimits());
+        $total = $account->getTotal();
+        $count = $account->getCount();
+        $sc_count = $account->getSccount();
+        $order_limits = $account->getOrderLimits();
 
         //检查性别，手机限制
         $limits = $account->get('limits');
@@ -837,7 +837,7 @@ include './index.php';
      *
      * @return ?RowLocker
      */
-    public static function lockObject(modelObj $obj, array $cond, $auto_unlock = false): ?RowLocker
+    public static function lockObject(modelObj $obj, array $cond, bool $auto_unlock = false): ?RowLocker
     {
         $seg = key($cond);
         if (is_string($seg)) {
@@ -861,7 +861,7 @@ include './index.php';
      * @param string $redirect
      * @param string $type
      */
-    public static function message($msg, $redirect = '', $type = '')
+    public static function message($msg, string $redirect = '', string $type = '')
     {
         We7::message($msg, $redirect, $type);
     }
@@ -871,7 +871,7 @@ include './index.php';
      * @param string $redirect
      * @param string $type
      */
-    public static function itoast($msg, $redirect = '', $type = '')
+    public static function itoast($msg, string $redirect = '', string $type = '')
     {
         We7::itoast($msg, $redirect, $type);
     }
@@ -1001,7 +1001,7 @@ HTML_CONTENT;
      *
      * @return string
      */
-    public static function fetchJSSDK($debug = false): string
+    public static function fetchJSSDK(bool $debug = false): string
     {
         ob_start();
         We7::register_jssdk($debug);
@@ -1020,7 +1020,7 @@ HTML_CONTENT;
     {
         $result = [];
 
-        if ($agent && $type) {
+        if ($type) {
             $agent_data = $agent->getAgentData();
             if ($agent_data['notice'][$type]) {
                 $result[$agent->getId()] = $agent->getOpenid();
@@ -1225,7 +1225,7 @@ HTML_CONTENT;
      *
      * @return mixed
      */
-    public static function toMedia($src, $use_image_proxy = false, $local_path = false): string
+    public static function toMedia($src, bool $use_image_proxy = false, bool $local_path = false): string
     {
         if (empty(_W('attachurl'))) {
             We7::load()->model('attachment');
@@ -1388,7 +1388,7 @@ HTML_CONTENT;
      *
      * @return array
      */
-    public static function deviceTest($user, $device, $lane = Device::DEFAULT_CARGO_LANE, $params = []): array
+    public static function deviceTest($user, $device, int $lane = Device::DEFAULT_CARGO_LANE, array $params = []): array
     {
         if (is_string($device)) {
             $device = Device::get($device, true);
@@ -1475,7 +1475,7 @@ HTML_CONTENT;
      * @return array
      * @throws Exception
      */
-    public static function openDevice($args = []): array
+    public static function openDevice(array $args = []): array
     {
         ignore_user_abort(true);
         set_time_limit(0);
@@ -1680,7 +1680,7 @@ HTML_CONTENT;
             }
 
             $data = [
-                'online' => $args['online'] === false ? false : true,
+                'online' => !($args['online'] === false),
                 'channel' => $mcb_channel,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 'userid' => $user->getOpenid(),
@@ -1820,9 +1820,9 @@ HTML_CONTENT;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function getClientIp()
+    public static function getClientIp(): string
     {
         return We7::getip();
     }
@@ -2101,9 +2101,9 @@ HTML_CONTENT;
      * @param $length
      * @param bool $numeric
      *
-     * @return mixed
+     * @return string
      */
-    public static function random($length, $numeric = false)
+    public static function random($length, bool $numeric = false): string
     {
         return We7::random($length, $numeric);
     }
@@ -2127,9 +2127,9 @@ HTML_CONTENT;
      * @param string $do
      * @param array $params
      * @param bool $eid
-     * @return mixed
+     * @return string
      */
-    public static function url($do = '', array $params = [], $eid = true)
+    public static function url(string $do = '', array $params = [], bool $eid = true): string
     {
         $params['m'] = APP_NAME;
 
@@ -2146,7 +2146,7 @@ HTML_CONTENT;
      * @param bool $full_url
      * @return string
      */
-    public static function murl($do = '', array $params = [], $full_url = true): string
+    public static function murl(string $do = '', array $params = [], bool $full_url = true): string
     {
         $params['do'] = $do;
         $params['m'] = APP_NAME;
@@ -2268,7 +2268,7 @@ HTML_CONTENT;
      * @param array $header
      * @param array $data
      */
-    public static function exportExcel($filename = '', array $header = [], array $data = [])
+    public static function exportExcel(string $filename = '', array $header = [], array $data = [])
     {
         header('Content-type:application/vnd.ms-excel');
         header('Content-Disposition:filename=' . $filename . '.xls');
@@ -2557,7 +2557,7 @@ HTML_CONTENT;
 
         $result = json_decode($response, JSON_OBJECT_AS_ARRAY);
 
-        return isset($result) ? $result : error(State::ERROR, '无法解析返回的数据！');
+        return $result ?? error(State::ERROR, '无法解析返回的数据！');
     }
 
     /**

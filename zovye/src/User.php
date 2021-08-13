@@ -149,10 +149,10 @@ class User
     /**
      * @param $id
      * @param bool $is_openid
-     * @param int $app
+     * @param int? $app
      * @return userModelObj|null
      */
-    public static function get($id, $is_openid = false, $app = null): ?userModelObj
+    public static function get($id, bool $is_openid = false, $app = null): ?userModelObj
     {
         /** @var userModelObj[] $cache */
         static $cache = [];
@@ -181,7 +181,7 @@ class User
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return userModelObj|null
      */
     public static function findOne($condition = []): ?userModelObj
@@ -190,7 +190,7 @@ class User
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return modelObjFinder
      */
     public static function query($condition = []): modelObjFinder
@@ -202,7 +202,7 @@ class User
      * @param array $data
      * @return userModelObj|null
      */
-    public static function create($data = []): ?userModelObj
+    public static function create(array $data = []): ?userModelObj
     {
         if (empty($data['uniacid'])) {
             $data['uniacid'] = We7::uniacid();

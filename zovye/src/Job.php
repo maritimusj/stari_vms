@@ -20,7 +20,7 @@ class Job
      * @param int $delay 指定时间后才开始检查
      * @return bool
      */
-    public static function refund($order_no, $message, $num = 0, $reset_payload = false, $delay = 0): bool
+    public static function refund($order_no, $message, int $num = 0, bool $reset_payload = false, int $delay = 0): bool
     {
         if ($delay > 0) {
             return CtrlServ::scheduleDelayJob('refund', [
@@ -58,7 +58,7 @@ class Job
 
     public static function orderPayResult($order_no, $start = 0, $timeout = 3): bool
     {
-        return CtrlServ::scheduleDelayJob('order_pay_result', ['orderNO' => $order_no, 'start' => $start ? $start : time()], $timeout);
+        return CtrlServ::scheduleDelayJob('order_pay_result', ['orderNO' => $order_no, 'start' => $start ?: time()], $timeout);
     }
 
     public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT): bool

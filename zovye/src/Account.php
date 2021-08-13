@@ -133,20 +133,20 @@ class Account extends State
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
-            'id' => intval($entry->getId()),
-            'uid' => strval($entry->getUid()),
-            'state' => intval($entry->getState()),
-            'name' => strval($entry->getName()),
-            'title' => strval($entry->getTitle()),
+            'id' => $entry->getId(),
+            'uid' => $entry->getUid(),
+            'state' => $entry->getState(),
+            'name' => $entry->getName(),
+            'title' => $entry->getTitle(),
             'descr' => html_entity_decode($entry->getDescription()),
-            'url' => strval($entry->getUrl()),
-            'clr' => strval($entry->getClr()),
+            'url' => $entry->getUrl(),
+            'clr' => $entry->getClr(),
             'img' => $entry->isSpecial() ? $entry->getImg() : Util::toMedia($entry->getImg()),
-            'scname' => strval($entry->getScname()),
-            'total' => intval($entry->getTotal()),
-            'count' => intval($entry->getCount()),
-            'groupname' => strval($entry->getGroupName()),
-            'orderno' => intval($entry->getOrderNo()),
+            'scname' => $entry->getScname(),
+            'total' => $entry->getTotal(),
+            'count' => $entry->getCount(),
+            'groupname' => $entry->getGroupName(),
+            'orderno' => $entry->getOrderNo(),
         ];
 
         if ($entry->isVideo()) {
@@ -258,9 +258,9 @@ class Account extends State
         }
 
         //阿旗
-        if (App::isAQiinfoEnabled() && !in_array(AQiinfoAccount::getUid(), $exclude)) {
+        if (App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude)) {
             $join(['state' => Account::AQIINFO], function () use ($device, $user) {
-                return AQiinfoAccount::fetch($device, $user);
+                return AQIInfoAccount::fetch($device, $user);
             });
         }
 
@@ -350,7 +350,7 @@ class Account extends State
      */
     public static function findOne($cond): ?accountModelObj
     {
-        $cond = boolval($cond['id']) || boolval($cond['uid']) ? $cond : We7::uniacid($cond);
+        $cond = $cond['id'] || $cond['uid'] ? $cond : We7::uniacid($cond);
         $query = self::query($cond);
         return $query->findOne();
     }
@@ -479,7 +479,7 @@ class Account extends State
             if ($obj instanceof $accounts['classname']) {
                 $accounts['list'][] = $obj;
             } else {
-                foreach ($dst as $index => &$x) {
+                foreach ($dst as &$x) {
                     if ($obj instanceof $x['classname']) {
                         $x['list'][] = intval($obj->getId());
                         break;
@@ -822,7 +822,7 @@ class Account extends State
      * @param bool $temporary
      * @return array|string
      */
-    public static function updateAuthAccountQRCode(array &$account_data, $params, $temporary = true)
+    public static function updateAuthAccountQRCode(array &$account_data, $params, bool $temporary = true)
     {
         if ($account_data['state'] == Account::AUTH) {
             $str = is_array($params) ? implode(':', $params) : strval($params);
@@ -919,7 +919,7 @@ class Account extends State
             'device_id' => $device->getId(),
             'request' => json_encode($request),
             'result' => json_encode($result),
-            'createtime' => isset($createtime) ? intval($createtime) : time(),
+            'createtime' => $createtime ?? time(),
         ];
 
         return m('account_query')->create($data);

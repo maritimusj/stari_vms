@@ -19,8 +19,6 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
 
 class Device extends State
 {
-    const WX_APP_ENTRY_PAGE = 'pages/bigcms/customer/index/index';
-
     const VIRTUAL_DEVICE = 'vd';
     const BLUETOOTH_DEVICE = 'bluetooth';
     const NORMAL_DEVICE = 'normal';
@@ -64,14 +62,14 @@ class Device extends State
      * @param int $kind
      * @return modelObjFinder
      */
-    public static function keeper($keeper, $kind = -1): modelObjFinder
+    public static function keeper($keeper, int $kind = -1): modelObjFinder
     {
         if ($keeper instanceof keeperModelObj) {
             $keeper_id = $keeper->getId();
         } else {
             $keeper_id = intval($keeper);
         }
-        $query = m('device_keeper_vw')->where(We7::uniacid([]))->where(['keeper_id' => intval($keeper_id)]);
+        $query = m('device_keeper_vw')->where(We7::uniacid([]))->where(['keeper_id' => $keeper_id]);
         if ($kind >= 0) {
             $query->where(['kind' => $kind]);
         }
@@ -141,7 +139,7 @@ class Device extends State
     {
         unset($device);
 
-        return intval($lane) + 1;
+        return $lane + 1;
     }
 
     /**
@@ -177,7 +175,7 @@ class Device extends State
 
             foreach ($data as $index => $lane) {
                 if (isset($cargo_lanes[$index])) {
-                    $lane_id = "l{$index}";
+                    $lane_id = "l$index";
                     $old = $lanes_data[$lane_id]['num'];
 
                     if (is_array($lane)) {
@@ -289,7 +287,7 @@ class Device extends State
      * @param bool $detail
      * @return array
      */
-    public static function getPayload(deviceModelObj $device, $detail = false): array
+    public static function getPayload(deviceModelObj $device, bool $detail = false): array
     {
         $data = [];
 
@@ -305,7 +303,7 @@ class Device extends State
             $lanes_data = $device->getCargoLanes();
 
             foreach ($data['cargo_lanes'] as $index => &$lane) {
-                $laneId = "l{$index}";
+                $laneId = "l$index";
                 if (!empty($lanes_data[$laneId])) {
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
                     if ($device->isCustomType() && isset($lanes_data[$laneId]['price'])) {
@@ -346,7 +344,7 @@ class Device extends State
      *
      * @return deviceModelObj|null
      */
-    public static function createNewDevice($params = []): ?deviceModelObj
+    public static function createNewDevice(array $params = []): ?deviceModelObj
     {
         if (App::deviceAutoJoin()) {
             if (isset($params['IMEI'])) {
@@ -415,7 +413,7 @@ class Device extends State
      *
      * @return deviceModelObj|null
      */
-    public static function get($id, $is_imei = false): ?deviceModelObj
+    public static function get($id, bool $is_imei = false): ?deviceModelObj
     {
         if ($id) {
             if (self::cacheExists($id)) {
@@ -585,7 +583,7 @@ class Device extends State
      * @param string $reason
      * @return bool
      */
-    public static function reset(deviceModelObj $device, $reason = '设备重置'): bool
+    public static function reset(deviceModelObj $device, string $reason = '设备重置'): bool
     {
         //清空营运人员
         $extra = $device->get('extra', []);
@@ -621,9 +619,9 @@ class Device extends State
     /**
      * 解除设备与当前代理商的绑定关系
      * @param deviceModelObj $device
-     * @return array|bool
+     * @return bool
      */
-    public static function unbind(deviceModelObj $device)
+    public static function unbind(deviceModelObj $device): bool
     {
         return self::bind($device);
     }
@@ -632,9 +630,9 @@ class Device extends State
      * 绑定、解绑设备
      * @param deviceModelObj $device
      * @param agentModelObj|null $agent
-     * @return array|bool
+     * @return bool
      */
-    public static function bind(deviceModelObj $device, agentModelObj $agent = null)
+    public static function bind(deviceModelObj $device, agentModelObj $agent = null): bool
     {
         if ($agent) {
             $device->setAgent($agent);
@@ -708,7 +706,7 @@ class Device extends State
         return self::findOne(['shadow_id' => $key]);
     }
 
-    public static function search()
+    public static function search(): array
     {
         try {
             $query = Device::query();
@@ -730,16 +728,13 @@ class Device extends State
             //分组
             if (request::isset('group_id')) {
                 $group_id = request::int('group_id');
-                if ($group_id == 0) {
-                    $query->where(['group_id' => $group_id]);
-                } else {
+                if ($group_id != 0) {
                     $group = Group::get($group_id);
                     if (empty($group)) {
                         throw new Exception('找不到这个分组！');
-
                     }
-                    $query->where(['group_id' => $group_id]);
                 }
+                $query->where(['group_id' => $group_id]);
             }
 
             //型号
@@ -778,10 +773,10 @@ class Device extends State
             $keywords = request::trim('keywords');
             if (!empty($keywords)) {
                 $query->whereOr([
-                    'name LIKE' => "%{$keywords}%",
-                    'imei LIKE' => "%{$keywords}%",
-                    'app_id LIKE' => "%{$keywords}%",
-                    'iccid LIKE' => "%{$keywords}%",
+                    'name LIKE' => "%$keywords%",
+                    'imei LIKE' => "%$keywords%",
+                    'app_id LIKE' => "%$keywords%",
+                    'iccid LIKE' => "%$keywords%",
                 ]);
             }
 
@@ -816,14 +811,14 @@ class Device extends State
             //长时间不在线
             if (request::bool('lost')) {
                 $offset = intval(settings('device.lost', 1));
-                $offset_time = $now->modify("-{$offset} days");
+                $offset_time = $now->modify("-$offset days");
                 $query->where(['last_online <' => $offset_time->getTimestamp()]);
             }
 
             //长时间不出货
             if (request::bool('no_order')) {
                 $offset = intval(settings('device.issuing', 1));
-                $offset_time = $now->modify("-{$offset} days");
+                $offset_time = $now->modify("-$offset days");
                 $query->where(['last_order <' => $offset_time->getTimestamp()]);
             }
 

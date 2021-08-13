@@ -54,6 +54,6 @@ Util::logToFile(
     'accountMsg',
     [
         'media' => $media,
-        'result' => isset($res) ? $res : '<null>',
+        'result' => $res ?? '<null>',
     ]
 );

@@ -44,7 +44,7 @@ class GoodsVoucher
      * @param array $assign
      * @return mixed
      */
-    public static function create($agent, $goods, $total = 1, $begin = 0, $end = 0, $limit_goods = [], $assign = [])
+    public static function create($agent, $goods, int $total = 1, int $begin = 0, int $end = 0, array $limit_goods = [], array $assign = [])
     {
         /** @var ExtraDataGettersAndSetters $classname */
         $classname = m('goods_voucher')->objClassname();
@@ -57,7 +57,7 @@ class GoodsVoucher
             'enable' => 1,
             'agent_id' => $agent instanceof agentModelObj ? $agent->getId() : '',
             'goods_id' => $goods instanceof goodsModelObj ? $goods->getId() : -1,
-            'total' => intval($total),
+            'total' => $total,
             'extra' => $classname::serializeExtra([
                 'limitGoods' => $limit_goods,
                 'assign' => $assign,
@@ -77,52 +77,50 @@ class GoodsVoucher
             $agent_levels = settings('agent.levels', []);
         }
 
-        if ($voucher) {
-            $data = [
-                'id' => intval($voucher->getId()),
-                'enabled' => $voucher->getEnable() ? 1 : 0,
-                'agentId' => intval($voucher->getAgentId()),
-                'goodsId' => intval($voucher->getGoodsId()),
-                'total' => intval($voucher->getTotal()),
-                'usedTotal' => intval($voucher->getUsedTotal()),
-                'limitGoods' => $voucher->getExtraData('limitGoods', []),
-                'createtime_formatted' => date('Y-m-d H:i:s', $voucher->getCreatetime()),
-            ];
-            if ($voucher->getBegin() > 0) {
-                $data['begin'] = $voucher->getBegin();
-                $data['begin_formatted'] = date('Y-m-d', $data['begin']);
-            }
-            if ($voucher->getEnd() > 0) {
-                $data['end'] = $voucher->getEnd();
-                $data['end_formatted'] = date('Y-m-d', $voucher->getEnd());
-            }
-            if ($detail) {
-                $data['limitGoods'] = (array)$voucher->getExtraData('limitGoods', []);
-                $data['assigned'] = (array)$voucher->getExtraData('assigned', []);
-            } else {
-                $assign_data = $voucher->getExtraData('assigned', []);
-                $data['limitGoodsNum'] = count($data['limitGoods']);
-                $data['assigned'] = count((array)$assign_data);
-                $data['assignedStatus'] = Util::descAssignedStatus($assign_data);
-            }
-            if ($data['goodsId']) {
-                $goods = Goods::get($data['goodsId']);
-                $data['goods'] = Goods::format($goods, false, true);
-            }
-            if ($data['agentId']) {
-                $agent = Agent::get($data['agentId']);
-                if ($agent) {
-                    $data['agent'] = [
-                        'id' => $agent->getId(),
-                        'level_clr' => $agent_levels[$agent->settings('agentData.level')]['clr'],
-                        'nickname' => $agent->settings('agentData.name') ?: $agent->getNickname(),
-                        'avatar' => $agent->getAvatar(),
-                    ];
-                }
-            }
-            $data['limitGoodsNum'] = count($data['limitGoods']);
+        $data = [
+            'id' => intval($voucher->getId()),
+            'enabled' => $voucher->getEnable() ? 1 : 0,
+            'agentId' => intval($voucher->getAgentId()),
+            'goodsId' => intval($voucher->getGoodsId()),
+            'total' => intval($voucher->getTotal()),
+            'usedTotal' => $voucher->getUsedTotal(),
+            'limitGoods' => $voucher->getExtraData('limitGoods', []),
+            'createtime_formatted' => date('Y-m-d H:i:s', $voucher->getCreatetime()),
+        ];
+        if ($voucher->getBegin() > 0) {
+            $data['begin'] = $voucher->getBegin();
+            $data['begin_formatted'] = date('Y-m-d', $data['begin']);
         }
-        return isset($data) ? $data : [];
+        if ($voucher->getEnd() > 0) {
+            $data['end'] = $voucher->getEnd();
+            $data['end_formatted'] = date('Y-m-d', $voucher->getEnd());
+        }
+        if ($detail) {
+            $data['limitGoods'] = (array)$voucher->getExtraData('limitGoods', []);
+            $data['assigned'] = (array)$voucher->getExtraData('assigned', []);
+        } else {
+            $assign_data = $voucher->getExtraData('assigned', []);
+            $data['limitGoodsNum'] = count($data['limitGoods']);
+            $data['assigned'] = count((array)$assign_data);
+            $data['assignedStatus'] = Util::descAssignedStatus($assign_data);
+        }
+        if ($data['goodsId']) {
+            $goods = Goods::get($data['goodsId']);
+            $data['goods'] = Goods::format($goods, false, true);
+        }
+        if ($data['agentId']) {
+            $agent = Agent::get($data['agentId']);
+            if ($agent) {
+                $data['agent'] = [
+                    'id' => $agent->getId(),
+                    'level_clr' => $agent_levels[$agent->settings('agentData.level')]['clr'],
+                    'nickname' => $agent->settings('agentData.name') ?: $agent->getNickname(),
+                    'avatar' => $agent->getAvatar(),
+                ];
+            }
+        }
+        $data['limitGoodsNum'] = count($data['limitGoods']);
+        return $data ?? [];
     }
 
     public static function logs($cond = []): base\modelObjFinder
@@ -235,11 +233,11 @@ class GoodsVoucher
 
     /**
      * @param userModelObj $user
-     * @param int[] $voucher_ids
+     * @param mixed $voucher_ids
      * @param callable|null $fn 检查提货券是否可用
      * @return array
      */
-    public static function give(userModelObj $user, array $voucher_ids, callable $fn = null): array
+    public static function give(userModelObj $user,  $voucher_ids, callable $fn = null): array
     {
         $result = [];
         $ids = is_array($voucher_ids) ? $voucher_ids : [$voucher_ids];
@@ -263,7 +261,6 @@ class GoodsVoucher
                     continue;
                 }
 
-                $code = '';
                 for (; ;) {
                     $code = Util::random(6, true);
                     if (!m('goods_voucher_logs')->exists(['code' => $code])) {

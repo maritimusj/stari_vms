@@ -16,7 +16,7 @@ class Config
      * @param bool $update
      * @return mixed
      */
-    public static function aliTicket($key, $v = null, $update = false)
+    public static function aliTicket($key, $v = null, bool $update = false)
     {
         if ($update) {
             return updateGlobalConfig('ali_ticket', $key, $v);
@@ -32,7 +32,7 @@ class Config
      * @param bool $update
      * @return mixed
      */
-    public static function agent($key, $v = null, $update = false)
+    public static function agent($key, $v = null, bool $update = false)
     {
         if ($update) {
             return updateGlobalConfig('agent', $key, $v);
@@ -45,7 +45,7 @@ class Config
      * 微信第三方平台相关配置
      */
 
-    public static function wxplatform($key, $v = null, $update = false)
+    public static function wxplatform($key, $v = null, bool $update = false)
     {
         if ($update) {
             return updateGlobalConfig('wxplatform', $key, $v);
@@ -58,7 +58,7 @@ class Config
      * 轻松筹爱心捐款设置
      */
 
-    public static function donatePay($key, $v = null, $update = false)
+    public static function donatePay($key, $v = null, bool $update = false)
     {
         if ($update) {
             return updateGlobalConfig('donatePay', $key, $v);

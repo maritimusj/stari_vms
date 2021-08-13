@@ -689,7 +689,6 @@ class deviceModelObj extends modelObj
 
     /**
      * 重置设备锁
-     * @return bool
      */
     public function resetLock()
     {
@@ -2059,8 +2058,6 @@ class deviceModelObj extends modelObj
 
             sleep($delay_seconds);
         }
-
-        return false;
     }
 
     public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
@@ -2085,9 +2082,9 @@ class deviceModelObj extends modelObj
     /**
      * 出货操作
      * @param array $options
-     * @return array
+     * @return array|string|null
      */
-    public function pull(array $options = []): ?array
+    public function pull(array $options = [])
     {
         if ($options['online'] && !$this->isMcbOnline()) {
             return error(State::FAIL, '设备已关机！');
@@ -2140,6 +2137,7 @@ class deviceModelObj extends modelObj
                 $extra['user-agent'] = $_SERVER['HTTP_USER_AGENT'];
             }
             //打开设备，出货
+            /** @var string|array $result */
             $result = $this->open($mcb_channel, $num, $timeout, $extra);
         }
 
@@ -2159,7 +2157,7 @@ class deviceModelObj extends modelObj
      * @param bool $use_cache
      * @return bool
      */
-    public function isMcbOnline($use_cache = true): bool
+    public function isMcbOnline(bool $use_cache = true): bool
     {
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return true;

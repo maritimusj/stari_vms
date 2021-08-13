@@ -290,9 +290,9 @@ if ($op == 'list') {
             }
 
             $tags = $entry->getTagsAsText(false);
-            foreach($tags as $id => $title) {
+            foreach($tags as $i => $title) {
                 $data['tags'][] = [
-                    'id' => $id,
+                    'id' => $i,
                     'title' => $title,
                 ];
             }
@@ -741,9 +741,11 @@ if ($op == 'list') {
             }
 
             //绑定套餐
-            foreach(Package::query(['device_id' => 0])->findAll() as $entry) {
-                $entry->setDeviceId($device->getId());
-                $entry->save();
+            if (!$device->isBlueToothDevice()) {
+                foreach(Package::query(['device_id' => 0])->findAll() as $entry) {
+                    $entry->setDeviceId($device->getId());
+                    $entry->save();
+                }
             }
 
             //绑定appId
@@ -1494,7 +1496,7 @@ if ($op == 'list') {
         }
     );
 
-    Util::resultJSON(is_error($res) ? false : true, ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
+    Util::resultJSON(!is_error($res), ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
 } elseif ($op == 'unlock') {
 
     $id = request::int('id');

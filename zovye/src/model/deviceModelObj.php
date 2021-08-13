@@ -2081,6 +2081,7 @@ class deviceModelObj extends modelObj
 
     /**
      * 出货操作
+     * 蓝牙设备出货操作可能会返回字符串，普通设备则返回成功或error()
      * @param array $options
      * @return array|string|null
      */

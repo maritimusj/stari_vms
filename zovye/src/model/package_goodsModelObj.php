@@ -12,6 +12,7 @@ use zovye\base\modelObj;
 /**
  * @method getPrice()
  * @method getNum()
+ * @method getGoodsId()
  */
 class package_goodsModelObj extends modelObj
 {
@@ -38,7 +39,7 @@ class package_goodsModelObj extends modelObj
     /** @var int */
 	protected $createtime;
 
-    public function getGoods()
+    public function getGoods(): ?goodsModelObj
     {
         return Goods::get($this->getGoodsId(), true);
     }

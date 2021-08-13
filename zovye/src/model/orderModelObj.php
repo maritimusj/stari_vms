@@ -139,7 +139,7 @@ class orderModelObj extends modelObj
 
     public function getOrderNO(): string
     {
-        return strval($this->order_id);
+        return $this->order_id;
     }
 
     public function getBluetoothDeviceBUID(): string

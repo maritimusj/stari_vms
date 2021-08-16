@@ -678,6 +678,17 @@
                 </div>
             </div>
             {/if}
+            {if \zovye\App::isZJBaoEnabled()}
+            <div class="seg"  id="ZJBao">
+                <div class="title">纸巾宝设置</div>
+                <div class="form-group">
+                    <label for="ZJBao_Scene" class="col-md-2 control-label">场景</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="ZJBao_Scene" id="ZJBao_Scene" value="{php echo strval($zjbao['scene'])}">
+                    </div>
+                </div>
+            </div>
+            {/if}
             {if \zovye\App::isMoscaleEnabled()}
             <div id="moscale">
             </div>

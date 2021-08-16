@@ -290,13 +290,13 @@ if ($op == 'list') {
             }
 
             $tags = $entry->getTagsAsText(false);
-            foreach($tags as $i => $title) {
+            foreach ($tags as $i => $title) {
                 $data['tags'][] = [
                     'id' => $i,
                     'title' => $title,
                 ];
             }
-            
+
             $accounts = $entry->getAssignedAccounts();
             if ($accounts) {
                 $data['gettype']['free'] = true;
@@ -468,7 +468,7 @@ if ($op == 'list') {
         Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
     }
 
-    $result = Util::transactionDo(function() use ($device) {
+    $result = Util::transactionDo(function () use ($device) {
         if (!request::isset('lane') || request::str('lane') == 'all') {
             $data = [];
         } else {
@@ -540,10 +540,10 @@ if ($op == 'list') {
     $device->remove('extra');
 
     //删除相关套餐
-    foreach(Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
+    foreach (Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
         $entry->destroy();
     }
-    
+
     //通知实体设备
     $device->appNotify();
 
@@ -742,7 +742,7 @@ if ($op == 'list') {
 
             //绑定套餐
             if (!$device->isBlueToothDevice()) {
-                foreach(Package::query(['device_id' => 0])->findAll() as $entry) {
+                foreach (Package::query(['device_id' => 0])->findAll() as $entry) {
                     $entry->setDeviceId($device->getId());
                     $entry->save();
                 }
@@ -776,7 +776,7 @@ if ($op == 'list') {
                 unset($old[$index]);
             }
 
-            foreach($old as $index => $lane) {
+            foreach ($old as $index => $lane) {
                 $device->resetPayload([$index => '@0'], '管理员删除货道', $now);
             }
 
@@ -864,6 +864,10 @@ if ($op == 'list') {
             } else {
                 AliTicket::unregisterDevice($device);
             }
+        }
+
+        if (App::isZJBaoEnabled()) {
+            $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
         }
 
         //更新公众号缓存
@@ -1025,7 +1029,7 @@ if ($op == 'list') {
 
     $packages = [];
     $query = Package::query(['device_id' => $device->getId()]);
-    foreach($query->findAll() as $i) {
+    foreach ($query->findAll() as $i) {
         $packages[] = $i->format(true);
     }
 
@@ -1088,7 +1092,7 @@ if ($op == 'list') {
     }
 
     $verified = [];
-    foreach($logs as $index => $log) {
+    foreach ($logs as $index => $log) {
         $code = $log['code'];
         if (isset($verified[$code])) {
             continue;
@@ -1111,7 +1115,7 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
 
     app()->showTemplate('web/device/payload', $tpl_data);
-    
+
 } elseif ($op == 'log') {
 
     $device = Device::get(request('id'));
@@ -1749,7 +1753,7 @@ if ($op == 'list') {
         $data = [
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
-            'clr' => $entry->getClr(),            
+            'clr' => $entry->getClr(),
             'total' => Device::query(['group_id' => $entry->getId()])->count(),
             'createtime_foramtted' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
@@ -1801,7 +1805,7 @@ if ($op == 'list') {
                 'id' => $agent->getId(),
                 'name' => $agent->getName(),
                 'mobile' => $agent->getMobile(),
-            ];            
+            ];
         }
     }
 
@@ -2450,7 +2454,7 @@ if ($op == 'list') {
     $ids = request::array('ids', []);
     $query = Device::query(['id' => $ids]);
 
-    foreach($query->findAll() as $device) {
+    foreach ($query->findAll() as $device) {
         $file_real = str_replace($url_prefix, $attach_prefix, $device->getQrcode());
         $file_real = preg_replace('/\?.*/', '', $file_real);
         if (file_exists($file_real)) {

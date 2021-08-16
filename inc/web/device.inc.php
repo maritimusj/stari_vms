@@ -424,6 +424,12 @@ if ($op == 'list') {
         $tpl_data['moscaleRegionSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['region'] : [];
     }
 
+    if (App::isZJBaoEnabled()) {
+        $tpl_data['zjbao'] = [
+            'scene' => isset($device) ? $device->settings('zjbao.scene', '') : '',
+        ];
+    }
+
     app()->showTemplate('web/device/edit_new', $tpl_data);
 } elseif ($op == 'deviceTestAll') {
 

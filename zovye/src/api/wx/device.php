@@ -470,8 +470,6 @@ class device
             $obj = null;
             if (request::has('guid')) {
                 $obj = $agent;
-            } else {
-                $obj = $agent;
             }
 
             //指定了设备

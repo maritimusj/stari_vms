@@ -45,9 +45,9 @@ class agent
     /**
      * 获取当前登录的代理商身份，如果当前登录用户是合伙人，则返回合伙人对应的代理商身份
      * @param null $token
-     * @return mixed
+     * @return agentModelObj|null
      */
-    public static function getAgent($token = null)
+    public static function getAgent($token = null): ?agentModelObj
     {
         $user = common::getAgent($token);
         if ($user && $user->isAgent()) {

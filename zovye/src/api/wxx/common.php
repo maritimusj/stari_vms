@@ -4,13 +4,13 @@ namespace zovye\api\wxx;
 
 use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
-use bluetooth\wx\protocol;
 use DateTime;
 use Exception;
 use zovye\Account;
 use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;
+use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;
@@ -175,8 +175,8 @@ class common
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
             return [
-                'data' => $cmd->getEncoded(protocol::BASE64),
-                'hex' => $cmd->getEncoded(protocol::HEX),
+                'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
+                'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
             ];
         }
 
@@ -226,8 +226,8 @@ class common
         Device::createBluetoothCmdLog($device, $cmd);
 
         return [
-            'data' => $cmd->getEncoded(protocol::BASE64),
-            'hex' => $cmd->getEncoded(protocol::HEX),
+            'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
+            'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
         ];
     }
 
@@ -321,8 +321,8 @@ class common
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
 
-            $data['data'] = $cmd->getEncoded(protocol::BASE64);
-            $data['hex'] = $cmd->getEncoded(protocol::HEX);
+            $data['data'] = $cmd->getEncoded(IBlueToothProtocol::BASE64);
+            $data['hex'] = $cmd->getEncoded(IBlueToothProtocol::HEX);
         }
 
         return $data;
@@ -759,7 +759,7 @@ class common
                 $time = $entry->getExtraData('refund.createtime');
                 $time_formatted = date('Y-m-d H:i:s', $time);
                 $data['refund'] = [
-                    'title' => "退款时间：{$time_formatted}",
+                    'title' => "退款时间：$time_formatted",
                     'reason' => $entry->getExtraData('refund.message'),
                 ];
                 $data['clr'] = '#ccc';
@@ -771,7 +771,7 @@ class common
             }
 
             $pay_result = $entry->getExtraData('payResult');
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $data['orderId']);
+            $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? $data['orderId']);
 
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
@@ -1196,7 +1196,7 @@ class common
                 'openid' => $openid,
                 'nickname' => $res['nickName'],
                 'avatar' => $res['avatarUrl'],
-                'mobile' => isset($res['phoneNumber']) ? $res['phoneNumber'] : '',
+                'mobile' => $res['phoneNumber'] ?? '',
                 'createtime' => time(),
             ]);
 

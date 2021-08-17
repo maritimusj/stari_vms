@@ -64,6 +64,7 @@ class SNTOAccount
         }
 
         if (empty($config['data']['token'])) {
+            Util::logToFile('snto', '无法获取token！');
             return [];
         }
 

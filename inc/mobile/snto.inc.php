@@ -13,4 +13,4 @@ if (App::isSNTOEnabled()) {
     ]);
 }
 
-exit(SNTOAccount::REPONSE_STR);
+exit(SNTOAccount::RESPONSE_STR);

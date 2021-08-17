@@ -10,7 +10,7 @@ use zovye\model\userModelObj;
 class SNTOAccount
 {
     const API_URL = 'https://xf.snto.com';
-    const REPONSE_STR = 'Ok';
+    const RESPONSE_STR = 'Ok';
 
     private $id;
     private $key;

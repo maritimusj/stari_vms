@@ -10,6 +10,7 @@ use zovye\model\userModelObj;
 class SNTOAccount
 {
     const API_URL = 'https://xf.snto.com';
+    const REPONSE_STR = 'Ok';
 
     private $id;
     private $key;
@@ -126,13 +127,69 @@ class SNTOAccount
     }
 
 
-    public static function verifyData($params): array
+    public static function verifyData($data): array
     {
-        return [];
+        if (!App::isSNTOEnabled()) {
+            return err('没有启用！');
+        }
+
+        $acc = Account::findOne(['state' => Account::SNTO]);
+        if (empty($acc)) {
+            return err('找不到指定的公众号！');
+        }
+
+        $config = $acc->settings('config', []);
+
+        if (empty($config)) {
+            return err('没有配置！');
+        }
+
+        $obj = new SNTOAccount($config['id'], $config['key'], $config['channel']);
+        if ($obj->sign($data) !== $data['sign']) {
+            return err('签名校验失败！');
+        }
+
+        return ['account' => $acc];
     }
 
-    public static function cb($params = [])
+    public static function cb($data = [])
     {
+        Util::logToFile('snto', $data);
+
+        try {
+            $res = self::verifyData($data);
+            if (is_error($res)) {
+                throw new RuntimeException($res['message']);
+            }
+
+            list($app, $device_uid, $openid) = explode(':', $data['mac']);
+            if ($app !== App::uid(6)) {
+                throw new RuntimeException('不正确的调用！');
+            }
+
+            /** @var userModelObj $user */
+            $user = User::get($openid, true);
+            if (empty($user) || $user->isBanned()) {
+                throw new RuntimeException('找不到指定的用户或者已禁用！');
+            }
+
+            /** @var deviceModelObj $device */
+            $device = Device::findOne(['shadow_id' => $device_uid]);
+            if (empty($device)) {
+                throw new RuntimeException('找不到指定的设备:' . $device_uid);
+            }
+
+            $acc = $res['account'];
+
+            $order_uid = Order::makeUID($user, $device, sha1($data['order_id']));
+
+            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+        } catch (Exception $e) {
+            Util::logToFile('snto', [
+                'error' => '回调处理发生错误! ',
+                'result' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function fetchToken()
@@ -165,5 +222,10 @@ class SNTOAccount
         if ($cb) {
             $cb($data, $result);
         }
+    }
+
+    public function sign($data = []): string
+    {
+        return sha1($data['app_id'] . $data['order_id'] . $data['mac'] . $this->key);
     }
 }

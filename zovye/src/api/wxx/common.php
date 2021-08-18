@@ -255,7 +255,7 @@ class common
             return error(State::ERROR, '无法加载蓝牙协议！');
         }
 
-        $result = $proto->parseMessage($device->getImei(), $data);
+        $result = $proto->parseMessage($device->getBUID(), $data);
         if (empty($result)) {
             return error(State::ERROR, '无法解析消息！');
         }
@@ -304,18 +304,18 @@ class common
 
         $battery = $result->getBatteryValue();
 
-        $device->setQoe($battery);
-
-        if ($device->isLowBattery()) {
-            $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
-            $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+        if ($battery != -1) {
+            $device->setQoe($battery);
+            if ($device->isLowBattery()) {
+                $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+            }
+            if ($battery >= 0) {
+                $data['battery'] = $battery;
+            }
         }
 
         $device->save();
-
-        if ($battery >= 0) {
-            $data['battery'] = $battery;
-        }
 
         $cmd = $result->getCmd();
         if ($cmd) {

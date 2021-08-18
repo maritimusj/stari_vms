@@ -129,7 +129,6 @@ class WeApp extends Settings
         return $this;
     }
 
-
     public function saveSettings($settings): bool
     {
         if ($this->set('settings', $settings)) {

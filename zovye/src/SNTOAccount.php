@@ -93,6 +93,9 @@ class SNTOAccount
                 }
 
                 if ($result['code'] !== 200) {
+                    if ($result['code'] == 400003) {
+                        $acc->updateSettings('config.data', []);
+                    }
                     throw new RuntimeException("请求失败，错误：{$result['message']}");
                 }
 
@@ -163,7 +166,7 @@ class SNTOAccount
                 throw new RuntimeException($res['message']);
             }
 
-            list($app, $device_uid, $openid) = explode(':', $data['mac']);
+            list($app, $device_uid, $openid) = explode(':', $data['params']);
             if ($app !== App::uid(6)) {
                 throw new RuntimeException('不正确的调用！');
             }
@@ -210,10 +213,11 @@ class SNTOAccount
         $uid = App::uid(6);
         $data = [
             'channel' => $this->channel,
-            'mac' => "{$uid}:{$device->getShadowId()}:{$user->getOpenid()}",
+            'mac' => $user->getOpenid(),
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'ip' => CLIENT_IP,
+            'params' => "{$uid}:{$device->getShadowId()}:{$user->getOpenid()}",
         ];
 
         $result = Util::post($url, $data, true, 3, [
@@ -227,6 +231,6 @@ class SNTOAccount
 
     public function sign($data = []): string
     {
-        return sha1($data['app_id'] . $data['order_id'] . $data['mac'] . $this->key);
+        return sha1($data['app_id'] . $data['order_id'] . $data['params'] . $this->key);
     }
 }

@@ -536,22 +536,17 @@ class Device extends State
     /**
      * 刷新设备状态
      * @param deviceModelObj $device
-     * @param bool $notify
      * @return bool
      */
-    public static function refresh(deviceModelObj $device, bool $notify = true): bool
+    public static function refresh(deviceModelObj $device): bool
     {
         $device->remove('fakeQrcodeData');
-        $device->remove('advsData');
         $device->remove('accountsData');
         $device->remove('lastErrorData');
         $device->remove('lastErrorNotify');
         $device->remove('lastRemainWarning');
         $device->remove('fakeQrcodeData');
-        $device->remove('assigned');
         $device->remove('advsData');
-        $device->remove('advs');
-        $device->remove('statsData');
 
         //绑定appId
         $device->updateAppId();
@@ -559,15 +554,8 @@ class Device extends State
         $device->resetLock();
         $device->resetShadowId();
 
-        $device->setGroupId(0);
-        $device->setTagsFromText('');
-
         $device->set('refresh', time());
-        if ($notify) {
-            $device->appNotify();
-        } else {
-            $device->updateQrcode(true);
-        }
+        $device->appNotify();
 
         $code = $device->getProtocolV1Code();
         if ($code) {
@@ -605,8 +593,20 @@ class Device extends State
         //设备分组
         $device->setGroupId(0);
 
+        //设备标签
+        $device->setTagsFromText('');
+
+        $device->remove('statsData');
+        $device->remove('assigned');
+
+
         //设备类型
-        $device->setDeviceType(DeviceTypes::UNKNOWN_TYPE);
+        $defaultDeviceType = App::getDefaultDeviceType();
+        if ($defaultDeviceType) {
+            $device->setDeviceType($defaultDeviceType->getId());
+        } else {
+            $device->setDeviceType(DeviceTypes::UNKNOWN_TYPE);
+        }
 
         //删除关联的营运人员
         foreach ($device->getKeepers() as $keeper) {

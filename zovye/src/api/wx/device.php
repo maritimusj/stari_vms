@@ -467,10 +467,7 @@ class device
                 }
             }
 
-            $obj = null;
-            if (request::has('guid')) {
-                $obj = $agent;
-            }
+            $obj = $agent;
 
             //指定了设备
             if (request::has('deviceid')) {

@@ -410,11 +410,18 @@ class mp
             $limits['male'] = 1;
         } elseif (request::str('sex') == 'female') {
             $limits['female'] = 1;
+        } else {
+            $limits['male'] = 1;
+            $limits['female'] = 1;
+            $limits['unknown_sex'] = 1;
         }
 
         if (request::str('os') == 'ios') {
             $limits['ios'] = 1;
         } elseif (request::str('os') == 'android') {
+            $limits['android'] = 1;
+        } else {
+            $limits['ios'] = 1;
             $limits['android'] = 1;
         }
 

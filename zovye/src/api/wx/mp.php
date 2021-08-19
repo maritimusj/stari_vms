@@ -408,8 +408,12 @@ class mp
         $limits = [];
         if (request::str('sex') == 'male') {
             $limits['male'] = 1;
+            $limits['female'] = 0;
+            $limits['unknown_sex'] = 0;
         } elseif (request::str('sex') == 'female') {
+            $limits['male'] = 0;
             $limits['female'] = 1;
+            $limits['unknown_sex'] = 0;
         } else {
             $limits['male'] = 1;
             $limits['female'] = 1;
@@ -418,7 +422,9 @@ class mp
 
         if (request::str('os') == 'ios') {
             $limits['ios'] = 1;
+            $limits['android'] = 0;
         } elseif (request::str('os') == 'android') {
+            $limits['ios'] = 0;
             $limits['android'] = 1;
         } else {
             $limits['ios'] = 1;

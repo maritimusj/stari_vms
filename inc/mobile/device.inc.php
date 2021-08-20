@@ -387,7 +387,7 @@ if ($op == 'default') {
 
         $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
         if ($res['status']) {
-            $device->updateSettings('weigh', $set_data);
+            $device->updateSettings('weight', $set_data);
         }
         echo json_encode($res);
 
@@ -402,7 +402,7 @@ if ($op == 'default') {
 
         $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
         if ($res['status']) {
-            $device->updateSettings('weigh', $set_data);
+            $device->updateSettings('weight', $set_data);
         }
         echo json_encode($res);
 
@@ -454,7 +454,7 @@ if ($op == 'default') {
 
         $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
         if ($res['status']) {
-            $device->updateSettings('weigh', $set_data);
+            $device->updateSettings('weight', $set_data);
         }
 
         $res['price'] = $set_data['price'];

@@ -1095,7 +1095,7 @@ class agent
                 ];
             } else {
                 $data['status'] = [
-                    'title' => '已完成',
+                    'title' => '出货成功',
                     'clr' => '#67C23A',
                 ];
             }

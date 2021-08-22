@@ -726,6 +726,7 @@
         upgradeApiUrl: "{php echo $this->createWebUrl('upgrade');}",
         orderApiUrl: "{php echo $this->createWebUrl('order');}",
         deviceDetailUrl: '{php echo $this->createWebUrl("device", array("op"=>"detail", "id" => "__id__"));}',
+        page: {php echo intval($page);}
     }
     const current = {
         agent: JSON.parse(decodeURIComponent('{php echo urlencode(json_encode($s_agent ?: []))}')),
@@ -734,5 +735,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625007"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625009"></script>
 {template 'common/footer'}

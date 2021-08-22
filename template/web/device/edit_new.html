@@ -162,7 +162,7 @@
     <div class="panel panel-default panel-first">
         <div class="heading">
             <span class="operate">
-                <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回"></i></a>
+                <i class="fa fa-reply" title="返回"  onclick="backtolist();"></i>
             </span>
         </div>
         <div class="panel-body">
@@ -1202,12 +1202,13 @@
         })
     })
 </script>
-<script>    
+<script>
     function backtolist() {
         setTimeout(function(){
             util.loading();
         }, 1000);
-        window.location.href = "{php echo $this->createWebUrl('device');}"
+        const page = localStorage.getItem('device_list.page') || 1;
+        window.location.href = "{php echo $this->createWebUrl('device', ['page' => '__page__']);}".replace('__page__', page);
     }
     function renderTags(tags) {
         const tpl = $('#tag_tpl').clone().removeAttr('id').prop('outerHTML');

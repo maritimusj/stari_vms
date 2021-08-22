@@ -84,6 +84,8 @@ if ($op == 'list') {
         ];
     }
 
+    $tpl_data['page'] = request::int('page', 1);
+
     app()->showTemplate('web/device/default_new', $tpl_data);
 } elseif ($op == 'search') {
 

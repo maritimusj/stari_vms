@@ -160,6 +160,7 @@ if ($op == 'default') {
         JSON::success($agents);
     }
 
+    $tpl_data['page'] = $page;
     $tpl_data['agents'] = $agents['list'];
     $tpl_data['mobile_url'] = Util::murl('mobile');
 

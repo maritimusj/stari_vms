@@ -311,10 +311,11 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                         'b' => request::bool('balanceOrder') ? 1 : 0,
                         'p' => request::bool('payOrder') ? 1 : 0,
                     ];
-                    $settings['agent']['reg']['bonus']['level0'] = round(request::int('rel_bonus_level0') * 100);
-                    $settings['agent']['reg']['bonus']['level1'] = round(request::int('rel_bonus_level1') * 100);
-                    $settings['agent']['reg']['bonus']['level2'] = round(request::int('rel_bonus_level2') * 100);
-                    $settings['agent']['reg']['bonus']['level3'] = round(request::int('rel_bonus_level3') * 100);
+
+                    $settings['agent']['reg']['bonus']['level0'] = request::float('rel_bonus_level0', 0, 2) * 100;
+                    $settings['agent']['reg']['bonus']['level1'] = request::float('rel_bonus_level1', 0, 2) * 100;
+                    $settings['agent']['reg']['bonus']['level2'] = request::float('rel_bonus_level2', 0, 2) * 100;
+                    $settings['agent']['reg']['bonus']['level3'] = request::float('rel_bonus_level3', 0, 2) * 100;
                 }
             }
         }

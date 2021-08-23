@@ -1085,6 +1085,25 @@ class agent
                 $data['name'] = $x->getNickname();
                 $data['avatar'] = $x->getAvatar();
             }
+            
+            
+            $pull_result = $order->getExtraData('pull.result', []);
+            if (is_error($pull_result)) {
+                $data['status'] = [
+                    'title' => $pull_result['message'],
+                    'clr' => '#F56C6C',
+                ];
+            } else {
+                $data['status'] = [
+                    'title' => '出货成功',
+                    'clr' => '#67C23A',
+                ];
+            }
+
+            if ($data['refund']) {
+                $data['status']['title'] .= '（已退款）';
+            }
+            
             $result['list'][] = $data;
         }
 

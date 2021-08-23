@@ -149,10 +149,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['goods']['voucher']['enabled'] = request::bool('goodsVoucher') ? 1 : 0;
 
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
-        $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;        
-        $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;        
+        $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
+        $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;
 
-        $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;    
+        $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
 
         $specialAccounts = [
             'jfbFAN' => [
@@ -204,33 +204,33 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
             setArray($settings, $v[1], $enabled);
         }
-       
+
         if ($accounts_need_refresh) {
             setArray($settings, 'accounts.lastupdate', '' . microtime(true));
         }
 
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
-        $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;        
-        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;        
+        $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;
+        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;
         $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
         $settings['account']['appQRCode']['enabled'] = request::bool('AccountAppQRCode') ? 1 : 0;
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
         if ($settings['app']['first']['enabled']) {
-            $module_url =  str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
+            $module_url = str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
             $files = [
                 [
                     'filename' => IA_ROOT . '/index.php',
-                    'content' =>"<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();"
+                    'content' => "<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();"
                 ],
                 [
                     'filename' => IA_ROOT . '/framework/bootstrap.inc.php',
                     'append' => true,
                     'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '{$module_url}';\r\n}"
                 ],
-            ];            
-            foreach($files as $file) {
+            ];
+            foreach ($files as $file) {
                 $content = file_get_contents($file['filename']);
                 if ($content && stripos($content, $module_url) === false) {
                     file_put_contents($file['filename'], $file['content'], $file['append'] ? FILE_APPEND : 0);
@@ -393,23 +393,23 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['commission']['agreement']['version'] = sha1($settings['commission']['agreement']['content']);
         }
 
-    } elseif ($save_type == 'advs') {      
+    } elseif ($save_type == 'advs') {
 
         if ($settings['custom']['SQMPay']['enabled']) {
             $settings['custom']['SQMPay']['appSecret'] = request::trim('appSecret');
             $settings['custom']['SQMPay']['js'] = request::str('js');
 
-            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);            
+            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);
             if (empty($settings['custom']['SQMPay']['goodsNum'])) {
                 $settings['custom']['SQMPay']['goodsNum'] = 1;
             }
             $settings['custom']['SQMPay']['bonus'] = max(0, request::float('bonus', 0, 2)) * 100;
         }
-        
+
         if ($settings['custom']['aliTicket']['enabled']) {
             $settings['custom']['aliTicket']['key'] = request::trim('aliTicketAppKey');
             $settings['custom']['aliTicket']['secret'] = request::trim('aliTicketAppSecret');
-            $settings['custom']['aliTicket']['goodsNum'] = request::int('aliTicketGoodsNum', 1);            
+            $settings['custom']['aliTicket']['goodsNum'] = request::int('aliTicketGoodsNum', 1);
             if (empty($settings['custom']['aliTicket']['goodsNum'])) {
                 $settings['custom']['aliTicket']['goodsNum'] = 1;
             }
@@ -429,7 +429,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['account']['wx']['platform']['config']['key'] = request::trim('wxPlatformKey');
         }
 
-        $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;    
+        $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
 
         $settings['misc']['adminAccount'] = request::trim('adminAccount');
         $settings['misc']['pushAccountMsg_type'] = request::trim('pushAccountMsg_type');
@@ -444,7 +444,9 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         if (App::isMoscaleEnabled()) {
             $settings['moscale']['fan']['key'] = request::trim('moscaleMachineKey');
-            $settings['moscale']['fan']['label'] = array_map(function($e) { return intval($e);}, explode(',', request::trim('moscaleLabel')));
+            $settings['moscale']['fan']['label'] = array_map(function ($e) {
+                return intval($e);
+            }, explode(',', request::trim('moscaleLabel')));
             $settings['moscale']['fan']['region'] = [
                 'province' => request::int('province_code'),
                 'city' => request::int('city_code'),
@@ -561,12 +563,12 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             ];
 
             if (false === Util::createApiRedirectFile('payment/wx.php', 'payresult', [
-                'headers' => [
-                    'HTTP_USER_AGENT' => 'wx_notify',
-                ],
-                'op' => 'notify',
-                'from' => 'wx',
-            ])) {
+                    'headers' => [
+                        'HTTP_USER_AGENT' => 'wx_notify',
+                    ],
+                    'op' => 'notify',
+                    'from' => 'wx',
+                ])) {
                 Util::itoast('创建微信支付入口文件失败！');
             }
         }
@@ -788,6 +790,10 @@ if ($op == 'account') {
     $tpl_data['test_url'] = Util::murl('testing');
     $tpl_data['get_schema'] = settings('device.get.theme');
     $tpl_data['themes'] = Theme::all();
+    $location_error = Config::device('location.error');
+    if (is_error($location_error)) {
+        $tpl_data['location_error_msg'] = $location_error['message'];
+    }
 
 } elseif ($op == 'agent') {
 
@@ -835,14 +841,14 @@ if ($op == 'account') {
     if ($page > ceil($total / $page_size)) {
         $page = 1;
     }
-    
+
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
     $query->page($page, $page_size);
     $query->orderBy('id desc');
 
     $list = [];
-    foreach($query->findAll() as $wxapp) {
+    foreach ($query->findAll() as $wxapp) {
         $data = [
             'id' => $wxapp->getId(),
             'name' => $wxapp->getName(),
@@ -1416,7 +1422,7 @@ if ($op == 'account') {
         'title' => '代理商注册页面',
         'content' => $content,
     ]);
-} 
+}
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {
     Util::itoast('找不到这个配置页面！', $this->createWebUrl('settings'), 'error');

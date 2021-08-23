@@ -66,4 +66,17 @@ class Config
 
         return globalConfig('donatePay', $key, $v);
     }
+
+    /**
+     * 全局设备设置
+     */
+
+    public static function device($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('device', $key, $v);
+        }
+
+        return globalConfig('device', $key, $v);
+    }
 }

@@ -289,7 +289,7 @@ class Util
             return $user;
         } catch (Exception $e) {
             Util::logToFile('error', [
-                'msg' => '获取阿里用户身份失败！',
+                'msg' => '获取支付宝用户失败！',
                 'error' => $e->getMessage(),
             ]);
         }

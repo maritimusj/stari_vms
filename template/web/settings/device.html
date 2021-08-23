@@ -73,7 +73,7 @@
                     <label for="siteWarning" class="col-md-2 control-label">腾讯LBS key</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control inputMask" name="lbsKey" id="lbsKey" value="{$lbsKey}">
-                        <span class="help-block">* 指定腾讯LBS服务的APP KEY</span>{if !empty($location_error_msg)}<span style="color: red;"> （最近错误：{$location_error_msg}）</span>{/if}
+                        <span class="help-block">* 指定腾讯LBS服务的APP KEY</span>
                     </div>
                 </div>
                 <fieldset {if empty($settings['user']['location']['validate']['enabled'])}disabled{/if}>

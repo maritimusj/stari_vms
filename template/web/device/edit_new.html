@@ -162,7 +162,7 @@
     <div class="panel panel-default panel-first">
         <div class="heading">
             <span class="operate">
-                <i class="fa fa-reply" title="返回"  onclick="backtolist();"></i>
+                <i class="fa fa-reply" title="返回"  onclick="backToList();"></i>
             </span>
         </div>
         <div class="panel-body">
@@ -770,7 +770,7 @@
         {else}
         <button type="submit" class="btn btn-primary">创建</button>
         {/if}
-        <button type="button" class="btn btn-default" onclick="backtolist();">返回</button>
+        <button type="button" class="btn btn-default" onclick="backToList();">返回</button>
     </div>
 </form>
 <script>
@@ -1203,7 +1203,7 @@
     })
 </script>
 <script>
-    function backtolist() {
+    function backToList() {
         setTimeout(function(){
             util.loading();
         }, 1000);

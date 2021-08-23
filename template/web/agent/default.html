@@ -256,6 +256,8 @@
     }
 
     $(function () {
+        localStorage.setItem('agent_list.page', {php echo intval($page)});
+        
         $('#J_total').on('click', function () {
             let s_total = parseInt($(this).data('sort')) || 0;
             s_total++;

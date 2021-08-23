@@ -82,7 +82,6 @@ if ($op == 'default') {
 
         $res = Util::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
         if (is_error($res)) {
-            Config::device('location.error', $res, true);
             Util::logToFile('location', $res);
             JSON::fail('哎呀，出错了');
         }

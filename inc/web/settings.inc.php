@@ -790,10 +790,6 @@ if ($op == 'account') {
     $tpl_data['test_url'] = Util::murl('testing');
     $tpl_data['get_schema'] = settings('device.get.theme');
     $tpl_data['themes'] = Theme::all();
-    $location_error = Config::device('location.error');
-    if (is_error($location_error)) {
-        $tpl_data['location_error_msg'] = $location_error['message'];
-    }
 
 } elseif ($op == 'agent') {
 

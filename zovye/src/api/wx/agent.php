@@ -1075,7 +1075,7 @@ class agent
             ];
 
             $pay_result = $order->getExtraData('payResult');
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : '');
+            $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? '');
 
             $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
 
@@ -1214,7 +1214,7 @@ class agent
             'total' => $total,
             'sup_guid' => "{$superior_guid}",
             'list' => [],
-            'remove' => $user->settings('agentData.misc.power') ? true : false
+            'remove' => (bool)$user->settings('agentData.misc.power')
         ];
 
         if ($total > 0) {
@@ -1225,7 +1225,7 @@ class agent
             foreach ($query->findAll() as $entry) {
                 $agent = $entry->agent();
 
-                if ($agent && $agent instanceof agentModelObj) {
+                if ($agent instanceof agentModelObj) {
                     $agent_data = $agent->getAgentData();
 
                     $data = [
@@ -1245,7 +1245,7 @@ class agent
                             $gsp['rel'][$level] = number_format($val / 100, 2);
                         }
                         $data['gsp_rel'] = $gsp['rel'];
-                        $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
+                        $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
                     }
 
                     $result['list'][] = $data;
@@ -1305,7 +1305,7 @@ class agent
             $_reg = '/.+:(.+):.+/';
             foreach ($s_res as $val) {
                 $s_data = unserialize($val->getData());
-                $s_agent = isset($s_data['agent']) ? $s_data['agent'] : '';
+                $s_agent = $s_data['agent'] ?? '';
                 if ($s_agent == $agent->getId()) {
                     $str = $val->getName();
                     preg_match($_reg, $str, $mat);
@@ -1429,7 +1429,7 @@ class agent
                 $result = [
                     'total' => $total,
                     'list' => [],
-                    'remove' => $agent->settings('agentData.misc.power') ? true : false
+                    'remove' => (bool)$agent->settings('agentData.misc.power')
                 ];
 
                 if ($total > 0) {
@@ -1438,7 +1438,7 @@ class agent
                     foreach ($query->findAll() as $entry) {
                         $agent = $entry->agent();
 
-                        if ($agent && $agent instanceof agentModelObj) {
+                        if ($agent instanceof agentModelObj) {
                             $agent_data = $agent->getAgentData();
                             if ($keyword) {
                                 $h_key = false;
@@ -1472,7 +1472,7 @@ class agent
                                     foreach ((array)$gsp['rel'] as $level => $val) {
                                         $gsp['rel'][$level] = number_format($val / 100, 2);
                                     }
-                                    $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
+                                    $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
                                 }
 
                                 $result['list'][] = $data;
@@ -1572,7 +1572,7 @@ class agent
             return error(State::ERROR, '系统错误！');
         }
 
-        $mobile = isset($res['purePhoneNumber']) ? $res['purePhoneNumber'] : $res['phoneNumber'];
+        $mobile = $res['purePhoneNumber'] ?? $res['phoneNumber'];
         $session_key = $res['session_key'];
 
         if (empty($mobile)) {

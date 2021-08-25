@@ -70,6 +70,12 @@ class Cache
         };
     }
 
+    public static function makeUID(array $v = []): string
+    {
+        $v = We7::uniacid($v);
+        return sha1(http_build_query($v));
+    }
+
     public static function fetch($uid, callable $fn = null, callable ...$args)
     {
         $result = self::get($uid, true);

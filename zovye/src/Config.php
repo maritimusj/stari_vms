@@ -42,6 +42,23 @@ class Config
     }
 
     /**
+     * 用户相关配置
+     * @param $key
+     * @param null $v
+     * @param bool $update
+     * @return mixed
+     */
+    public static function user($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('user', $key, $v);
+        }
+
+        return globalConfig('user', $key, $v);
+    }
+
+
+    /**
      * 微信第三方平台相关配置
      */
 

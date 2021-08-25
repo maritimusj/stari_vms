@@ -131,6 +131,21 @@ class Order extends State
         return $query->orderBy('id desc')->findOne();
     }
 
+    public static function getFirstOrderOfDevice(deviceModelObj $device): ?orderModelObj
+    {
+        $id = Config::device('order.first.id');
+        if ($id) {
+            return Order::get($id);
+        }
+        $query = self::query(['device_id' => $device->getId()]);
+        $order = $query->orderBy('id ASC')->findOne();
+        if ($order) {
+            Config::device('order.first.id', $order->getId());
+            return $order;
+        }
+        return null;
+    }
+
     /**
      * @param userModelObj $user
      * @return orderModelObj
@@ -139,6 +154,21 @@ class Order extends State
     {
         $query = self::query(['openid' => $user->getOpenid()]);
         return $query->orderBy('id desc')->findOne();
+    }
+
+    public static function getFirstOrderOfUser(userModelObj $user): ?orderModelObj
+    {
+        $id = Config::user('order.first.id');
+        if ($id) {
+            return Order::get($id);
+        }
+        $query = self::query(['openid' => $user->getOpenid()]);
+        $order = $query->orderBy('id ASC')->findOne();
+        if ($order) {
+            Config::user('order.first.id', $order->getId());
+            return $order;
+        }
+        return null;
     }
 
     public static function getCommissionDetail($id): array
@@ -557,7 +587,7 @@ class Order extends State
                 $package = $order->getExtraData('package');
                 if ($package) {
                     $data['package'] = $package;
-                    foreach($data['package']['list'] as $index => $goods) {
+                    foreach ($data['package']['list'] as $index => $goods) {
                         $data['package']['list'][$index]['image'] = Util::toMedia($goods['image'], true);
                         $goods = Goods::get($goods['id']);
                         if ($goods) {

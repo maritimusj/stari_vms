@@ -265,7 +265,9 @@ class commission
                 }
             }
         }
+
         ksort($data);
+
         $last_month_balance = 0;
         foreach ($data as $key => $item) {
             $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;

@@ -63,13 +63,6 @@ class Cache
         };
     }
 
-    public static function FetchData(callable $fn): Closure
-    {
-        return function (array &$data) use ($fn) {
-            $data['fn'] = $fn;
-        };
-    }
-
     public static function Data($v): Closure
     {
         return function (array &$data) use ($v) {

@@ -293,27 +293,31 @@ class commission
         $data = [];
 
         for (; $begin <= $end;) {
-            $begin_ts = $begin->getTimestamp();
-            $begin->modify('first day of next month 00:00');
+            $month = $begin->format('Y-m');
+            $ts = $begin->getTimestamp();
 
             $uid = Cache::makeUID([
                 'api' => 'monthStats',
                 'user' => $user->getOpenid(),
-                'month' => $begin->format('Y-m'),
+                'month' => $month,
             ]);
 
             $params = [];
 
-            if ($begin->format('Y-m') == date('Y-m')) {
+            if ($month == date('Y-m')) {
                 $params[] = Cache::ResultExpiredAfter(10);
             }
-            $res = Cache::fetch($uid, function () use ($user, $begin_ts, $begin) {
-                return self::getMonthStatsData($user, $begin_ts, $begin->getTimestamp());
+
+            $begin->modify('first day of next month 00:00');
+
+            $res = Cache::fetch($uid, function () use ($user, $ts, $begin) {
+                return self::getMonthStatsData($user, $ts, $begin->getTimestamp());
             }, ...$params);
 
             if (is_error($res)) {
                 return $res;
             }
+            
             $data = array_merge($data, $res);
         }
 

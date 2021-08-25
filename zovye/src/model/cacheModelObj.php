@@ -36,6 +36,6 @@ class cacheModelObj extends modelObj
 
     public function isExpired(): bool
     {
-        return $this->expiretime && $this->expiretime > time();
+        return $this->expiretime && $this->expiretime < time();
     }
 }

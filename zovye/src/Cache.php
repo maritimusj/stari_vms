@@ -77,7 +77,7 @@ class Cache
         };
     }
 
-    public static function fetch($uid, callable ...$args)
+    public static function fetch($uid, callable $fn = null, callable ...$args)
     {
         $result = self::get($uid, true);
         if ($result) {
@@ -99,9 +99,9 @@ class Cache
 
         $res = null;
 
-        if (isset($conf['fn']) && is_callable($conf['fn'])) {
+        if ($fn) {
             try {
-                $res = $conf['fn']();
+                $res = $fn();
             } catch (Exception $e) {
                 $res = err($e->getMessage());
             }

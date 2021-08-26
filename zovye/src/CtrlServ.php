@@ -365,7 +365,10 @@ class CtrlServ
     public static function scheduleDelayJob($op, array $params = [], int $delay = 0): bool
     {
         $result = self::httpDelayCallback($delay, self::makeJobUrl($op, $params));
-        return !is_error($result) && $result !== false;
+        if (!is_error($result) && $result !== false) {
+            return $result['queued'];
+        }
+        return false;
     }
 
     /**
@@ -397,7 +400,11 @@ class CtrlServ
     public static function scheduleJob($op, array $params = [], string $level = LEVEL_NORMAL): bool
     {
         $result = self::httpQueuedCallback($level, self::makeJobUrl($op, $params));
-        return !is_error($result) && $result !== false;
+
+        if (!is_error($result) && $result !== false) {
+            return $result['queued'];
+        }
+        return false;
     }
 
     /**

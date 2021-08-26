@@ -20,7 +20,7 @@ class we7HttpClient implements IHttpClient
      * @param int $timeout
      * @return mixed
      */
-    public function request(string $url, string $method = 'GET', $headers = '', $data = '', $timeout = 60)
+    public function request(string $url, string $method = 'GET', $headers = '', $data = '', int $timeout = 60)
     {
         $extra = [
             'CURLOPT_CUSTOMREQUEST' => $method,
@@ -66,7 +66,7 @@ class we7HttpClient implements IHttpClient
                 }
             }
 
-            return error(State::ERROR, '请求失败！');;
+            return error(State::ERROR, '请求失败！');
         }
 
         return error(State::ERROR, '系统维护中，请稍后再试！');

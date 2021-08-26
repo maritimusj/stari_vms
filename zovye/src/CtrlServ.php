@@ -362,7 +362,7 @@ class CtrlServ
      * @param int $delay
      * @return bool|mixed
      */
-    public static function scheduleDelayJob($op, array $params = [], int $delay = 0): bool
+    public static function scheduleDelayJob($op, array $params = [], int $delay = 0)
     {
         $result = self::httpDelayCallback($delay, self::makeJobUrl($op, $params));
         if (!is_error($result) && $result !== false) {
@@ -397,7 +397,7 @@ class CtrlServ
      * @param string $level
      * @return mixed
      */
-    public static function scheduleJob($op, array $params = [], string $level = LEVEL_NORMAL): bool
+    public static function scheduleJob($op, array $params = [], string $level = LEVEL_NORMAL)
     {
         $result = self::httpQueuedCallback($level, self::makeJobUrl($op, $params));
 

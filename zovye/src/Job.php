@@ -125,7 +125,7 @@ class Job
         return CtrlServ::scheduleJob('order_stats', ['id' => 0]);
     }
 
-    public static function order($order_id): bool
+    public static function order($order_id)
     {
         return CtrlServ::scheduleJob('order', ['id' => $order_id]);
     }

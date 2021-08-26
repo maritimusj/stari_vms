@@ -111,14 +111,18 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
             'updatetime' => 0,
         ])->limit(100);
 
+        $total = 0;
         /** @var orderModelObj $entry */
         foreach ($other_order->findAll() as $entry) {
             if ($entry) {
                 $log['statistics'][$entry->getId()] = Util::orderStatistics($entry) ?: 'success';
             }
+            $total ++;
         }
 
-        Job::order(0);
+        if ($total > 50) {
+            Job::order(0);
+        }
     }
 }
 Util::logToFile('order', $log);

@@ -125,9 +125,14 @@ class Job
         return CtrlServ::scheduleJob('order_stats', ['id' => 0]);
     }
 
-    public static function order($order_id)
+    public static function order($order_id): bool
     {
-        return CtrlServ::scheduleJob('order', ['id' => $order_id]);
+        if (Config::app('queue.size') < 100) {
+            $queued = CtrlServ::scheduleJob('order', ['id' => $order_id]);
+            Config::app('queue.size', $queued, true);
+            return $queued !== false;
+        }
+        return false;
     }
 
     public static function getResult($order_no, $openid): bool
@@ -176,6 +181,14 @@ class Job
 
     public static function repairAgentMonthStats($agent_id, $month): bool
     {
-        return CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]);
+        $key = "repair.$agent_id.month:$month";
+        if (time() - Config::agent($key) < 300) {
+            return false;
+        }
+        if (CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]) !== false) {
+            Config::agent($key, time(), true);
+            return true;
+        }
+        return false;
     }
 }

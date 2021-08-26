@@ -96,4 +96,18 @@ class Config
 
         return globalConfig('device', $key, $v);
     }
+
+    /**
+     * 全局APP设置
+     */
+
+    public static function app($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('app', $key, $v);
+        }
+
+        return globalConfig('app', $key, $v);
+    }
+
 }

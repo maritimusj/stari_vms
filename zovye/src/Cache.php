@@ -35,31 +35,31 @@ class Cache
         return self::query($condition)->exists();
     }
 
-    public static function ResultExpiredAfter($time): Closure
+    public static function ResultExpiredAfter(int $seconds): Closure
     {
-        return function (array &$data) use ($time) {
-            $data['expire_time'] = time() + $time;
+        return function (array &$data) use ($seconds) {
+            $data['expire_time'] = time() + $seconds;
         };
     }
 
     public static function ResultExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['expire_time'] = $time;
+            $data['expire_time'] = is_int($time) ? $time : strtotime($time);
         };
     }
 
-    public static function ErrorExpiredAfter($time): Closure
+    public static function ErrorExpiredAfter(int $seconds): Closure
     {
-        return function (array &$data) use ($time) {
-            $data['error_expired'] = time() + $time;
+        return function (array &$data) use ($seconds) {
+            $data['error_expired'] = time() + $seconds;
         };
     }
 
     public static function ErrorExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['error_expired'] = $time;
+            $data['error_expired'] = is_int($time) ? $time : strtotime($time);;
         };
     }
 

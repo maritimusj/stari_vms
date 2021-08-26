@@ -6,7 +6,10 @@ namespace zovye\api\wx;
 use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
+use zovye\Cache;
 use zovye\Config;
 use zovye\Inventory;
 use zovye\model\agent_msgModelObj;
@@ -1085,8 +1088,8 @@ class agent
                 $data['name'] = $x->getNickname();
                 $data['avatar'] = $x->getAvatar();
             }
-            
-            
+
+
             $pull_result = $order->getExtraData('pull.result', []);
             if (is_error($pull_result)) {
                 $data['status'] = [
@@ -1103,7 +1106,7 @@ class agent
             if ($data['refund']) {
                 $data['status']['title'] .= '（已退款）';
             }
-            
+
             $result['list'][] = $data;
         }
 
@@ -1907,10 +1910,8 @@ class agent
 
         list($stats, $data) = Util::cachedCall(10, function () use ($user) {
 
-            $agent_id = $user->getAgentId();
-
             $condition = [];
-            $condition['agent_id'] = $agent_id;
+            $condition['agent_id'] = $user->getAgentId();
 
             $device_stat = [
                 'all' => 0,
@@ -1924,65 +1925,83 @@ class agent
             $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
             $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
 
-            $data = [
-                'all' => [
-                    'n' => 0, //全部交易数量
-                ],
-                'today' => [
-                    'n' => 0, //今日交易数量,
-                ],
-                'yesterday' => [
-                    'n' => 0, //昨日交易数量,
-                ],
-                'last7days' => [
-                    'n' => 0, //近7日交易数量
-                ],
-                'month' => [
-                    'n' => 0, //本月交易数量
-                ],
-                'lastmonth' => [
-                    'n' => 0, //上月交易数量,
-                ],
-            ];
-
-            $date = new DateTime();
-            $date->modify('today');
-            $today = $date->format('Y-m-d');
-            $today_timestamp = $date->getTimestamp();
-            $date->modify('yesterday');
-            $yesterday_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('tomorrow');
-            $tomorrow_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('+7 days');
-            $last7days_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('first day of last month');
-            $fl_mon_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('first day of this month');
-            $ft_mon_timestamp = $date->getTimestamp();
-
-            $data['all']['n'] = Order::query($condition)->count();
-            $data['today']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $tomorrow_timestamp)
-                ->count();
-            $data['yesterday']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $yesterday_timestamp . ' and createtime < ' . $today_timestamp)
-                ->count();
-            $data['last7days']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $last7days_timestamp)
-                ->count();
-            $data['month']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $ft_mon_timestamp . ' and createtime < ' . $tomorrow_timestamp)
-                ->count();
-            $data['lastmonth']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $fl_mon_timestamp . ' and createtime < ' . $ft_mon_timestamp)
-                ->count();
-
-            return [$device_stat, $data];
         }, $user->getId());
+
+        $data['all']['n'] = 0;
+        $data['today']['n'] = 0;
+        $data['yesterday']['n'] = 0;
+        $data['month']['n'] = 0;
+
+        $uid_data = [
+            'api' => 'homepage',
+            'name' => 'order_stats',
+            'agent' => $user->getAgentId(),
+        ];
+
+        $countFN = function (DateTimeInterface $begin = null, DateTimeInterface $end = null) use ($user) {
+            $cond = [
+                'agent_id' => $user->getAgentId(),
+            ];
+            if ($begin) {
+                $cond['createtime >='] = $begin->getTimestamp();
+            }
+            if ($end) {
+                $cond['createtime <'] = $end->getTimestamp();
+            }
+            return Order::query($cond)->count();
+        };
+
+        $today = new DateTime('today');
+        $uid_data['day'] = $today->format('Y-m-d');
+        $data['today']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+            return $countFN($today);
+        }, Cache::ResultExpiredAfter(10));
+
+        $yesterday = new DateTime('yesterday');
+        $uid_data['day'] = $yesterday->format('Y-m-d');
+        $data['yesterday']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today, $yesterday) {
+            return $countFN($yesterday, $today);
+        });
+
+        //统计本月订单数量
+        $data['month']['n'] = $data['today']['n'];
+
+        $begin = new DateTimeImmutable('today');
+        $current_month_label = $today->format('Y-m-d');
+
+        for ($i = 0; $i < 31; $i++) {
+
+            $end = $begin->modify('-1 day');
+
+            $label = $end->format('Y-m-d');
+            if ($label != $current_month_label) {
+                break;
+            }
+
+            $uid_data['day'] = $label;
+
+            $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $begin, $end) {
+                return $countFN($end, $begin);
+            });
+            if (is_error($res)) {
+                return $res;
+            }
+
+            $data['month']['n'] += $res;
+        }
+
+        //全部统计
+        $uid_data['day'] = 'all';
+        $data['all']['n'] = $data['today']['n'];
+
+        $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+            return $countFN(null, $today);
+        }, Cache::ResultExpiredAt('tomorrow'));
+
+        if (is_error($res)) {
+            return $res;
+        }
+        $data['all']['n'] += $res;
 
         return ['device_stat' => $stats, 'data' => $data];
     }

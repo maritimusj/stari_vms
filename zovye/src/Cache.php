@@ -78,7 +78,7 @@ class Cache
 
     public static function expire($uid)
     {
-        $obj = self::get($uid);
+        $obj = self::get($uid, true);
         if ($obj) {
             $obj->destroy();
         }

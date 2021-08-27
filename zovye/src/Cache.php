@@ -76,6 +76,14 @@ class Cache
         return sha1(http_build_query($v));
     }
 
+    public static function expire($uid)
+    {
+        $obj = self::get($uid);
+        if ($obj) {
+            $obj->destroy();
+        }
+    }
+
     public static function fetch($uid, callable $fn = null, callable ...$args)
     {
         $result = self::get($uid, true);

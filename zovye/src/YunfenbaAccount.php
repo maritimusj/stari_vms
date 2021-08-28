@@ -15,10 +15,12 @@ class YunfenbaAccount
     //const GET_TASK_URL = 'http://testapi.goluodi.com/{vendor_uid}/gettask';
 
     private $vendor_uid;
+    private $sub_uid;
 
-    public function __construct($vendor_uid)
+    public function __construct($vendor_uid, $sub_uid = '')
     {
         $this->vendor_uid = strval($vendor_uid);
+        $this->sub_uid = $sub_uid;
     }
 
     public static function getUid(): string
@@ -119,6 +121,9 @@ class YunfenbaAccount
     public function getTask(deviceModelObj $device, userModelObj $user, callable $cb = null): array
     {
         $url = str_replace('{vendor_uid}', $this->vendor_uid, self::GET_TASK_URL);
+        if (!empty($this->sub_uid)) {
+            $url .= "/{$this->sub_uid}";
+        }
 
         $scene = $device->settings('extra.yunfenba.scene', '');
 
@@ -165,7 +170,7 @@ class YunfenbaAccount
             }
 
             //请求对方API
-            $yunfenba = new YunfenbaAccount($config['vendor']['uid']);
+            $yunfenba = new YunfenbaAccount($config['vendor']['uid'], $config['vendor']['sid']);
 
             $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {

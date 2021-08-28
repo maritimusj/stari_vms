@@ -323,6 +323,13 @@
                             <span class="help-block"></span>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="vendorUID" class="col-md-2 control-label">云粉渠道二级UID</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="vendorSubUID" id="vendorSubUID" value="{$config['vendor']['sid']}">
+                            <span class="help-block">* 二级UID，由云粉吧提供，没有可以忽略</span>
+                        </div>
+                    </div>
                     {/if}
                     {if \zovye\App::isAQiinfoEnabled() && $account && $account->isAQiinfo()}
                     <div class="seg-divider"></div>

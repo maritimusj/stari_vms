@@ -274,6 +274,7 @@ if ($op == 'default') {
                     'type' => Account::YUNFENBA,
                     'vendor' => [
                         'uid' => request::trim('vendorUID'),
+                        'sid' => request::trim('vendorSubUID'),
                     ]
                 ]);
             } elseif ($account->isAQiinfo()) {

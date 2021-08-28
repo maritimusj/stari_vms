@@ -32,7 +32,7 @@ class WeApp extends Settings
     {
         return Util::murl($do, $params);
     }
-    
+
     /**
      * @param $filename
      * @param array $tpl_data
@@ -280,7 +280,16 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
+        $tpl['text'] = empty($params['text']) ? '设备连接中' : $params['text'];
+        $tpl['err_msg'] = empty($params['err_msg']) ? '设备不在线，请稍后再试！' : $params['err_msg'];
 
+        $tpl['icon'] = [
+            'loading' => empty($params['icon']['loading']) ? MODULE_URL . 'static/img/loading-puff.svg' : $params['icon']['loading'],
+            'success' => empty($params['icon']['success']) ? MODULE_URL . 'static/img/smile.svg' : $params['icon']['success'],
+            'error' => empty($params['icon']['error']) ? MODULE_URL . 'static/img/offline.svg' : $params['icon']['error'],
+        ];
+
+        $scene = empty($params['scene']) ? 'online' : $params['scene'];
         $tpl['js']['code'] .= <<<JSCODE
         <script src="$jquery_url"></script>
         $js_sdk
@@ -298,8 +307,8 @@ JSCODE;
                 }
             })
         }
-        zovye_fn.isOnline = function (cb) {
-            $.get("$device_api_url", {op: 'online', serial: (new Date()).getTime()}).then(function (res) {
+        zovye_fn.isReady = function (cb) {
+            $.get("$device_api_url", {op: 'is_ready', scene: '$scene', serial: (new Date()).getTime()}).then(function (res) {
                 if (typeof cb === 'function') {
                     cb(res);
                 }
@@ -500,8 +509,8 @@ JSCODE;
         })
     }
 JSCODE;
-    if ($goods_lis_FN) {
-    $tpl['js']['code'] .= <<<JSCODE
+        if ($goods_lis_FN) {
+            $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.getGoodsList = function(cb) {
 $.get("$device_api_url", {op: 'goods'}).then(function(res) {
         if (typeof cb === 'function') {
@@ -510,7 +519,7 @@ $.get("$device_api_url", {op: 'goods'}).then(function(res) {
     });
 }
 JSCODE;
-    }
+        }
         if (!App::isAliUser() && App::isChannelPayEnabled()) {
             $pay_url = Util::murl('channel', ['device' => $device->getShadowId()]);
             $tpl['js']['code'] .= <<<JSCODE

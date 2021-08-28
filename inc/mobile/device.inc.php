@@ -491,6 +491,12 @@ if ($op == 'default') {
     $scene = request::str('scene');
     if ($scene == 'online') {
         $is_ready = $device->isMcbOnline(false);
+    } elseif ($scene == 'lock') {
+        if (!$device->isLocked()) {
+            if (Locker::try("device:is_ready:{$device->getId()}")) {
+                $is_ready = true;
+            }
+        }
     }
 
     JSON::success([

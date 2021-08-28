@@ -280,6 +280,7 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
+        $tpl['max'] = is_numeric($params['max']) ? $params['max'] : 3;
         $tpl['text'] = empty($params['text']) ? '设备连接中' : $params['text'];
         $tpl['err_msg'] = empty($params['err_msg']) ? '设备不在线，请稍后再试！' : $params['err_msg'];
 

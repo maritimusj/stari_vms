@@ -113,7 +113,7 @@
         return new Promise((resolve) => setTimeout(resolve, time));
     }
 
-    const max_tries = 3;
+    const max_tries = {$tpl['max']};
     let tries = 0;
 
     function isReady() {

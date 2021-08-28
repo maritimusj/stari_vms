@@ -73,7 +73,7 @@
         <div class="icon">
             <img src="{$tpl['icon']['loading']}">
         </div>
-        <span class="text">{$text} <span class="num"></span> ...</span>
+        <span class="text">{$tpl['text']} <span class="num"></span> ...</span>
         <div class="copyrights">
             <span>{$tpl['site']['copyrights']}</span>
         </div>
@@ -98,7 +98,7 @@
         c.addClass('offline');
 
         c.find('.icon img').attr('src', err_icon);
-        c.find('.text').text('{$err_msg}');
+        c.find('.text').text('{$tpl["err_msg"]}');
         c.click(function () {
             c.find('.icon img').attr('src', success_icon);
             c.find('.text').text('请稍等...');

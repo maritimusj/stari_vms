@@ -14,7 +14,7 @@
         }
 
         .loading,
-        .offline {
+        .success {
             width: 100vw;
             height: 150vh;
             background-color: #efefef;
@@ -32,12 +32,12 @@
             z-index: 101;
             margin-bottom: 0;
             color: #666;
-            bottom: 0;
+            bottom: 20px;
             position: absolute;
         }
 
         .loading .icon img,
-        .offline .icon img {
+        .success .icon img {
             margin: 6vw;
         }
 
@@ -87,7 +87,7 @@
     const err_icon = '{$tpl["icon"]["error"]}';
     const success_icon = '{$tpl["icon"]["success"]}';
 
-    function setOnline(online) {
+    function setOk(online) {
         const c = $('#container');
         if (online) {
             c.find('.text').text('转跳中...');
@@ -95,10 +95,11 @@
         }
 
         c.removeClass('loading');
-        c.addClass('offline');
+        c.addClass('success');
 
         c.find('.icon img').attr('src', err_icon);
         c.find('.text').text('{$tpl["err_msg"]}');
+
         c.click(function () {
             c.find('.icon img').attr('src', success_icon);
             c.find('.text').text('请稍等...');
@@ -119,15 +120,15 @@
         tries++;
         $('span.num').text(tries);
         zovye_fn.isReady(function (res) {
-            if (res && res.data.mcb && res.data.mcb.online) {
-                return setOnline(true);
+            if (res && res.data.is_ready) {
+                return setOk(true);
             }
             if (tries < max_tries) {
                 sleep(2500).then(() => {
                     isReady();
                 })
             } else {
-                setOnline(false);
+                setOk(false);
             }
         })
     }

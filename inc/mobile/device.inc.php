@@ -479,17 +479,22 @@ if ($op == 'default') {
 
     JSON::success($detail);
 
-} else if ($op == 'online') {
+} else if ($op == 'is_ready') {
 
     $device = Device::get(request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
+    $is_ready = false;
+
+    $scene = request::str('scene');
+    if ($scene == 'online') {
+        $is_ready = $device->isMcbOnline(false);
+    }
+
     JSON::success([
-        'mcb' => [
-            'online' => $device->isMcbOnline(false),
-        ]
+        'is_ready' => $is_ready,
     ]);
 
 } elseif ($op == 'goods') {

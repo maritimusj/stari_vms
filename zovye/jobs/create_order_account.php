@@ -61,25 +61,24 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             ZovyeException::throwWith('找不到指定公众号！', -1, $device);
         }
 
-
         if (!empty($order_uid)) {
             $order = Order::get($order_uid, true);
             if ($order) {
                 if ($order->getResultCode() == 0) {
-                    ZovyeException::throwWith('订单已经存在！', -1, $device); 
+                    ZovyeException::throwWith('订单已经存在！', -1, $device);
                 }
 
                 $max_retries = intval(settings('order.retry.max', 0));
                 if (!empty($max_retries)) {
                     $total = intval($order->getExtraData('retry.total', 0));
-                    
+
                     if ($total >= $max_retries) {
-                        ZovyeException::throwWith('已超过最大重试次数！', -1, $device); 
+                        ZovyeException::throwWith('已超过最大重试次数！', -1, $device);
                     }
 
                     $order->setExtraData('retry.total', $total + 1);
                     if (!$order->save()) {
-                        ZovyeException::throwWith('订单数据无法保存！', -1, $device); 
+                        ZovyeException::throwWith('订单数据无法保存！', -1, $device);
                     }
                 }
             }

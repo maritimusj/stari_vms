@@ -182,7 +182,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return bool
      */
-    public function goodsLog($level, $data = array()): bool
+    public function goodsLog($level, array $data = []): bool
     {
         return $this->log($level, $this->getImei(), $data);
     }

@@ -77,8 +77,6 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['user']['location']['appkey'] = request::trim('lbsKey', DEFAULT_LBS_KEY);
 
-        $settings['device']['v1']['activecode']['enabled'] = request::bool('v1ActiveCodeEnabled') ? 1 : 0;
-
         $settings['device']['shipment']['balanced'] = request::bool('shipmentBalance') ? 1 : 0;
 
         $settings['goods']['agent']['edit'] = request::bool('allowAgentEditGoods') ? 1 : 0;

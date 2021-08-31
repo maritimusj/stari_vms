@@ -33,18 +33,18 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
             $reload_tp_lid = settings('notice.reload_smstplid');
             $warningRemain = settings('device.remainWarning', 1);
 
-            if ($reload_tp_lid && $extra['keepers']) {
-                /** @var keeperModelObj $keeper */
-                $keeper = Keeper::query()->findOne(['id' => intval($extra['keepers'])]);
-                if ($keeper && $keeper->getMobile()) {
-                    Util::sendSMS(
-                        $keeper->getMobile(),
-                        $reload_tp_lid,
-                        [
-                            'name' => $device->getName(),
-                            'num' => "{$warningRemain}，剩余{$device->getRemainNum()}",
-                        ]
-                    );
+            if ($reload_tp_lid) {
+                foreach ($device->getKeepers() as $keeper) {
+                    if ($keeper && $keeper->getMobile()) {
+                        $log['sms'][$keeper->getName()] = Util::sendSMS(
+                            $keeper->getMobile(),
+                            $reload_tp_lid,
+                            [
+                                'name' => $device->getName(),
+                                'num' => "{$warningRemain}，剩余{$device->getRemainNum()}",
+                            ]
+                        );
+                    }
                 }
             }
 

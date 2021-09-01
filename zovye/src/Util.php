@@ -724,8 +724,7 @@ include './index.php';
 
             $agent = $device->getAgent();
             if ($agent) {
-                $agent_data = $agent->getAgentData();
-                $max_free = intval($agent_data['misc']['maxFree']);
+                $max_free = $agent->getAgentData('misc.maxFree', 0);
             }
 
             $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxFree', 0);

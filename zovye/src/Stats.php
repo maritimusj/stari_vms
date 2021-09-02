@@ -415,7 +415,7 @@ class Stats
             $chart['xAxis']['data'][] = date('m-d', $l);
         }
 
-        $accounts = Account::query(['state' => 1])->findAll();
+        $accounts = Account::query(['state <>' => 0])->findAll();
 
         $index = 0;
         foreach ($accounts as $acc) {

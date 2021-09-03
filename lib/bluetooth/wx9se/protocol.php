@@ -43,6 +43,11 @@ class protocol implements IBlueToothProtocol
     const KEY_TIME = 0x13;
     const KEY_LIGHTS_SCHEDULE = 0x14;
 
+    const LOW = 0;
+    const HIGH = 1;
+
+    const CONNECTED = 'connected';
+
 
     function transUID($uid)
     {
@@ -54,26 +59,41 @@ class protocol implements IBlueToothProtocol
      */
     function onConnected($device_id, $data = ''): ?ICmd
     {
-        $data = [];
-        for ($i = 0; $i < 16; $i++) {
-            $data[] = rand(0, 127);
-        }
-
-        //保存握手随机数值
         $device = Device::get($device_id, true);
-        if ($device) {
-            $device->updateSettings('wx9se.code', $data);
+        if (empty($device)) {
+            return null;
         }
 
+        $data = [];
+
+        //16位非零随机数
+        for ($i = 0; $i < 16; $i++) {
+            $data[] = rand(1, 127);
+        }
+        //保存握手随机数值
+        $device->updateSettings('wx9se.random.data', $data);
+        $device->updateSettings('wx9se.state', self::CONNECTED);
+
         $data[] = 0;
         $data[] = 0;
 
-        return new cmd($device_id, self::CMD_SHAKE_HAND, self::KEY_SHAKE, $data);
+        //蓝牙连接成功，返回握手请求命令
+        return new ShakeHandCMD($device_id, $data);
     }
 
     function initialize($device_id)
     {
+        $device = Device::get($device_id, true);
+        if (empty($device)) {
+            return null;
+        }
 
+        $state = $device->settings('wx9se.state');
+        switch ($state) {
+            case self::CONNECTED:
+                $data = $device->settings('wx9se.random.data', []);
+                return new AppVerifyCMD($data);
+        }
     }
 
     /**
@@ -85,10 +105,47 @@ class protocol implements IBlueToothProtocol
         return null;
     }
 
+
+    function getCrc16Data($mac, array $code, $lowOrHigh): array
+    {
+        $crc16 = new CRC16XModem();
+
+        $mask = $lowOrHigh == self::LOW ? 0xFF00 : 0x00FF;
+
+        $result = [];
+        foreach ($code as $c) {
+
+            $crc16->update($c);
+            $crc16->update($mac);
+            $v = $crc16->finish();
+
+            $result[] = $v & $mask;
+
+            $crc16->reset();
+        }
+
+        return $result;
+    }
+
+    function verifyCRC16Data($mac, array $code, array $crc16): bool
+    {
+        $data = $this->getCrc16Data($mac, $code, self::LOW);
+        if (count($data) != count($crc16)) {
+            return false;
+        }
+        foreach ($data as $index => $v) {
+            if ($v != $crc16[$index]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     /**
      * @inheritDoc
      */
-    function parseMessage($device_id, $data): ?IResult
+    function parseMessage($device_id, $data):?IResult
     {
         $device = Device::get($device_id, true);
         if (empty($device)) {
@@ -96,17 +153,31 @@ class protocol implements IBlueToothProtocol
         }
 
         $result = new result($device_id, $data);
+        if (!$result->isValid()) {
+            return null;
+        }
 
-        $cmd = $result->getCmd();
+        $code = $result->getCode();
         $key = $result->getKey();
 
-        switch ($cmd) {
+        switch ($code) {
             case self::CMD_SHAKE_HAND:
                 if ($key == self::KEY_SHAKE) {
-                    $code = $device->settings('wx9se.code', []);
-
+                    $mac = $device->getMAC();
+                    $randomData = $device->settings('wx9se.random.data', []);
+                    $data = $result->getPayloadData();
+                    if (!$this->verifyCRC16Data($mac, $randomData, $data)) {
+                        return null;
+                    }
+                    //握手通过，返回APP检验请求
+                    $crc  = $this->getCrc16Data($mac, $randomData, self::HIGH);
+                    $result->setCmd(new AppVerifyCMD($crc));
                 } elseif ($key == self::KEY_VERIFY) {
-
+                    if (!$result->getPayloadData(0, 1)) {
+                        return null;
+                    }
+                    //APP检验通过，返回获取设备基本信息请求
+                    $result->setCmd(new BaseInfoCMD());
                 }
                 break;
             case self::CMD_CONFIG:
@@ -115,6 +186,8 @@ class protocol implements IBlueToothProtocol
                 if ($key == self::KEY_INFO) {
                     $version = $result->getVersion();
                     $device->updateSettings('wx9se.ver', $version);
+                    //返回设备电量信息的请求
+                    $result->setCmd(new BatteryCMD());
                 } elseif ($key == self::KEY_BATTERY) {
                     $v = $result->getBatteryValue();
                     $device->setQoe($v);

@@ -317,7 +317,7 @@ class common
 
         $device->save();
 
-        $cmd = $result->getCmd();
+        $cmd = $result->getCode();
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
 

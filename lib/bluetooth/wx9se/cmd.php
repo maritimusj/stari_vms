@@ -6,18 +6,18 @@ use zovye\Contract\bluetooth\ICmd;
 
 class cmd implements ICmd
 {
-    private $device_id;
-    private $id;
-    private $key;
-    private $data;
+    protected $device_id;
+    protected $id;
+    protected $key;
+    protected $data;
 
     /**
      * @param $device_id
      * @param $id
      * @param $key
-     * @param $data
+     * @param mixed $data
      */
-    public function __construct($device_id, $id, $key, $data)
+    public function __construct($device_id, $id, $key, $data = '')
     {
         $this->device_id = $device_id;
         $this->id = $id;

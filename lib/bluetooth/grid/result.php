@@ -137,7 +137,7 @@ class result implements IResult
         return null;
     }
 
-    function getCmd()
+    function getCode()
     {
         if ($this->isResponse()) {
             return $this->getAuthCmd();

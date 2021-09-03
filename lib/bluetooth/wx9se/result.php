@@ -2,12 +2,14 @@
 
 namespace bluetooth\wx9se;
 
+use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResult;
 
 class result implements IResult
 {
     private $device_id;
     private $data;
+    private $cmd;
 
     /**
      * @param $device_id
@@ -19,6 +21,11 @@ class result implements IResult
         $this->data = base64_decode($data);
     }
 
+    function setCmd(ICmd $cmd = null)
+    {
+        $this->cmd = $cmd;
+    }
+
     function isValid(): bool
     {
         return strlen($this->data) === protocol::MSG_LEN;
@@ -26,7 +33,7 @@ class result implements IResult
 
     function isOpenResultOk(): bool
     {
-        if ($this->getCmd() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
+        if ($this->getCode() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
             return $this->getPayloadData(0, 1) == protocol::RESULT_LOCKER_SUCCESS;
         }
         return false;
@@ -34,7 +41,7 @@ class result implements IResult
 
     function isOpenResultFail(): bool
     {
-        if ($this->getCmd() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
+        if ($this->getCode() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
             return $this->getPayloadData(0, 1) != protocol::RESULT_LOCKER_SUCCESS;
         }
         return false;
@@ -47,7 +54,7 @@ class result implements IResult
 
     function getBatteryValue(): int
     {
-        if ($this->getCmd() == protocol::CMD_QUERY && $this->getKey() == protocol::KEY_BATTERY) {
+        if ($this->getCode() == protocol::CMD_QUERY && $this->getKey() == protocol::KEY_BATTERY) {
             return $this->getPayloadData(6, 1);
         }
         return -1;
@@ -55,12 +62,13 @@ class result implements IResult
 
     function getCode()
     {
-        return $this->getCmd();
+        $v = unpack('C', $this->data);
+        return $v ? $v[1] : 0;
     }
 
     function getMessage(): string
     {
-        $cmd = $this->getCmd();
+        $cmd = $this->getCode();
         $key = $this->getKey();
 
         if ($cmd == protocol::CMD_SHAKE_HAND) {
@@ -134,8 +142,7 @@ class result implements IResult
 
     function getCmd()
     {
-        $v = unpack('C', $this->data);
-        return $v ? $v[1] : 0;
+        return $this->cmd;
     }
 
     function getKey()

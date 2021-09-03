@@ -47,7 +47,7 @@ class cmd implements ICmd
 
     function encode()
     {
-        return pack('c*', $this->id, $this->key, $this->data);
+        return pack('c*', $this->id, $this->key, ...$this->data);
     }
 
     function getMessage(): string

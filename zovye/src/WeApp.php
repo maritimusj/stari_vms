@@ -275,7 +275,7 @@ JSCODE;
         /** @var userModelObj $user */
         //$user = $tpl['user']['_obj'];
 
-        $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getImei()]) : strval($params['redirect']);
+        $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getShadowId()]) : strval($params['redirect']);
         $device_api_url = Util::murl('device', ['id' => $device->getId()]);
         $jquery_url = JS_JQUERY_URL;
 

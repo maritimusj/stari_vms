@@ -25,4 +25,6 @@ interface IResult
     function getRawData();
 
     function getCmd();
+    
+    function getPayloadData();
 }

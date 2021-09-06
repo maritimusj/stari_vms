@@ -47,12 +47,12 @@ class cmd implements ICmd
 
     function encode()
     {
-        return pack('c*', $this->id, $this->key, ...$this->data);
+        return pack('C*', $this->id, $this->key, ...$this->data);
     }
 
     function getMessage(): string
     {
-        return protocol::$strMsg[$this->id] ?? '<未知>';
+        return protocol::$strMsg[$this->id][$this->key] ?? '<未知>';
     }
 
     function getEncoded($fn = null)

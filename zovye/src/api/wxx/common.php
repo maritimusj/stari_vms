@@ -271,8 +271,7 @@ class common
                 if ($result->isOpenResultOk()) {
                     $order->setBluetoothResultOk();
                 } elseif ($result->isOpenResultFail()) {
-                    $order->setBluetoothResultFail();
-
+                    $order->setBluetoothResultFail($result->getMessage());
                     if (Helper::NeedAutoRefund($device)) {
                         //启动退款
                         Job::refund($order->getOrderNO(), $result->getMessage());
@@ -522,7 +521,10 @@ class common
             $result = 2;
         }
 
-        $result = ['result' => $result];
+        $result = [
+            'uid' => $order->getOrderNO(),
+            'result' => $result,
+        ];
 
         $vouchers = $order->getExtraData('extra.voucher.recv', 0);
         if ($vouchers > 0) {

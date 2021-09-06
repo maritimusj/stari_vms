@@ -42,7 +42,8 @@ class result implements IResult
     function isOpenResultFail(): bool
     {
         if ($this->getCode() == protocol::CMD_CONFIG && $this->getKey() == protocol::KEY_LOCKER) {
-            return $this->getPayloadData(2, 1) != protocol::RESULT_LOCKER_SUCCESS;
+            $v = $this->getPayloadData(2, 1);
+            return $v != protocol::RESULT_LOCKER_SUCCESS && $v != protocol::RESULT_LOCKER_WAIT;
         }
         return false;
     }

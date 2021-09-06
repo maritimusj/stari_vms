@@ -218,7 +218,8 @@ if ($op == 'default') {
         }
 
         if ($entry->getBluetoothDeviceBUID()) {
-            $data['result'] = $entry->isBluetoothResultFail() ? ['errno' => 1] : [];
+            $msg = $entry->getExtraData('bluetooth.error.msg', '');
+            $data['result'] = $entry->isBluetoothResultFail() ? err($msg) : [];
         } else {
             $data['result'] = $entry->getExtraData('pull.result', []);
         }

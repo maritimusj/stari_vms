@@ -5,7 +5,6 @@ namespace bluetooth\grid;
 use zovye\Contract\bluetooth\IResult;
 use zovye\Device;
 use zovye\We7;
-use zovye\Util;
 
 class result implements IResult
 {
@@ -83,7 +82,7 @@ class result implements IResult
         $err = $this->getCode();
         if ($err > 0) {
             $msg = self::$err_msg[$err];
-            return isset($msg) ? $msg : '未知错误';
+            return $msg ?? '未知错误';
         }
         return '';
     }
@@ -137,15 +136,6 @@ class result implements IResult
         return null;
     }
 
-    function getCode()
-    {
-        if ($this->isResponse()) {
-            return $this->getAuthCmd();
-        }
-
-        return null;
-    }
-
     function isReady()
     {
         return $this->isAuthSuccess();
@@ -154,5 +144,18 @@ class result implements IResult
     public function getBatteryValue()
     {
         return -1;
+    }
+
+    function getCmd()
+    {
+        if ($this->isResponse()) {
+            return $this->getAuthCmd();
+        }
+
+        return null;
+    }
+
+    function getPayloadData()
+    {
     }
 }

@@ -113,8 +113,13 @@ class result implements IResult
         return bin2hex($this->data);
     }
 
-    public function getCode()
+    function getCmd()
     {
         return null;
+    }
+
+    function getPayloadData()
+    {
+
     }
 }

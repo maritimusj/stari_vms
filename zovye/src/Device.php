@@ -520,9 +520,13 @@ class Device extends State
                     'raw' => base64_encode($result->getRawData()),
                     'code' => $result->getCode(),
                     'message' => $result->getMessage(),
-                    'serial' => $result->getSerial(),
                 ]),
             ]);
+
+            $serial = $result->getSerial();
+            if ($serial) {
+                $data['extra']['serial'] = $serial;
+            }
 
             if (!m('device_events')->create($data)) {
                 Util::logToFile('events', [

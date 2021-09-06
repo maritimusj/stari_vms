@@ -49,7 +49,7 @@ class result implements IResult
 
     function isReady()
     {
-        // TODO: Implement isReady() method.
+        return $this->getBatteryValue() > 0;
     }
 
     function getBatteryValue(): int
@@ -68,10 +68,10 @@ class result implements IResult
 
     function getMessage(): string
     {
-        $cmd_code = $this->getCode();
+        $cmd = $this->getCode();
         $key = $this->getKey();
 
-        if ($cmd_code == protocol::CMD_SHAKE_HAND) {
+        if ($cmd == protocol::CMD_SHAKE_HAND) {
             if ($key == protocol::KEY_SHAKE) {
                 return '<= APP握手结果';
             } elseif ($key == protocol::KEY_VERIFY) {
@@ -79,20 +79,20 @@ class result implements IResult
                 return $result ? '<= APP检验成功' : '<= APP检验失败';
             }
             return '<= 未知握手数据';
-        } elseif ($cmd_code == protocol::CMD_CONFIG) {
+        } elseif ($cmd == protocol::CMD_CONFIG) {
             $result = $this->getPayloadData(2, 1);
             if ($key == protocol::KEY_LOCKER) {
                 $prefix = '<= 开锁结果：';
                 switch ($result) {
-                    case 0:
+                    case protocol::RESULT_LOCKER_FAIL:
                         return $prefix . '失败';
-                    case 1:
+                    case protocol::RESULT_LOCKER_WAIT:
                         return $prefix . '成功，等待开锁';
-                    case 2:
+                    case protocol::RESULT_LOCKER_SUCCESS:
                         return $prefix . '成功';
-                    case 3:
+                    case protocol::RESULT_LOCKER_FAIL_TIMEOUT:
                         return $prefix . '失败，超时';
-                    case 4:
+                    case protocol::RESULT_LOCKER_FAIL_LOW_BATTERY:
                         return $prefix . '失败，电量低';
                     default:
                         return $prefix . '未知';
@@ -104,7 +104,7 @@ class result implements IResult
             }
             return '<= 未知设置结果';
 
-        } elseif ($cmd_code == protocol::CMD_QUERY || $cmd_code == protocol::CMD_NOTIFY) {
+        } elseif ($cmd == protocol::CMD_QUERY || $cmd == protocol::CMD_NOTIFY) {
             if ($key == protocol::KEY_INFO) {
                 return '<= 设备基本信息';
             } elseif ($key == protocol::KEY_BATTERY) {
@@ -117,7 +117,7 @@ class result implements IResult
             }
             return '<= 未知请求结果';
 
-        } elseif ($cmd_code = protocol::CMD_TEST) {
+        } elseif ($cmd = protocol::CMD_TEST) {
 
         }
         return '<= 未知数据';

@@ -52,7 +52,11 @@ class protocol implements IBlueToothProtocol
     const KEY_TIMER = 0x13;
     const KEY_LIGHTS = 0x14;
 
+    const RESULT_LOCKER_FAIL = 0;
+    const RESULT_LOCKER_WAIT = 1;
     const RESULT_LOCKER_SUCCESS = 2;
+    const RESULT_LOCKER_FAIL_TIMEOUT = 3;
+    const RESULT_LOCKER_FAIL_LOW_BATTERY = 4;
 
     //CMD_QUERY 相关KEY
     const KEY_INFO = 0x01;
@@ -204,8 +208,6 @@ class protocol implements IBlueToothProtocol
                     }
                 }
                 break;
-            case self::CMD_CONFIG:
-                break;
             case self::CMD_QUERY:
                 if ($key == self::KEY_INFO) {
                     $version = $result->getVersion();
@@ -217,8 +219,12 @@ class protocol implements IBlueToothProtocol
                     $device->setQoe($v);
                 }
                 break;
+            case self::CMD_CONFIG:
             case self::CMD_NOTIFY:
                 if ($key == self::KEY_BATTERY) {
+                    $v = $result->getBatteryValue();
+                    $device->setQoe($v);
+                } elseif ($key == self::KEY_LOCKER) {
 
                 }
                 break;

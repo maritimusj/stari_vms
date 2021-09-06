@@ -88,10 +88,6 @@ class protocol implements IBlueToothProtocol
         //保存握手随机数值
         $device->updateSettings('wx9se.random.data', $data);
 
-        //$data = $device->settings('wx9se.random.data');
-        $data[] = 0;
-        $data[] = 0;
-
         //蓝牙连接成功，返回握手请求命令
         $cmd = new ShakeHandCMD($device_id, $data);
 
@@ -202,7 +198,7 @@ class protocol implements IBlueToothProtocol
                         $result->setCmd(new AppVerifyCMD($crc));
                     }
                 } elseif ($key == self::KEY_VERIFY) {
-                    if ($result->getPayloadData(0, 1)) {
+                    if ($result->getPayloadData(2, 1)) {
                         //APP检验通过，返回获取设备基本信息请求
                         //$result->setCmd(new BaseInfoCMD());
                     }

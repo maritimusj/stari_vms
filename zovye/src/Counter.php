@@ -8,10 +8,7 @@ class Counter
 {
     public static function create(array $data = [])
     {
-        var_dump($data);
-        $result = m('counter')->create($data);
-        var_dump($result);
-        return $result;
+        return m('counter')->create($data);
     }
 
     public static function query($condition = []): base\modelObjFinder

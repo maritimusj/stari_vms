@@ -16,6 +16,7 @@ class counterModelObj extends modelObj
     }
     /** @var int */
     protected $id;
+    
     /** @var string */
     protected $uid;
 

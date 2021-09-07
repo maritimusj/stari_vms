@@ -8,7 +8,10 @@ class Counter
 {
     public static function create(array $data = [])
     {
-        return m('counter')->create($data);
+        var_dump($data);
+        $result = m('counter')->create($data);
+        var_dump($result);
+        return $result;
     }
 
     public static function query($condition = []): base\modelObjFinder
@@ -29,19 +32,19 @@ class Counter
         return self::query(['uid' => $uid])->exists();
     }
 
-    public static function increment(string $uid, int $delta = 1): bool
+    public static function increment($uid, int $delta = 1): bool
     {
         if ($delta == 0) {
             return true;
         }
 
         return Util::transactionDo(function () use ($uid, $delta) {
-            $uid_arr = is_array($uid) ? $uid : [$uid];
             $tb = We7::tablename(counterModelObj::getTableName(true));
             $op = $delta > 0 ? '+' : '';
+            $sql = "UPDATE $tb SET num=num$op$delta,updatetime=:updatetime WHERE uid=:uid";
 
+            $uid_arr = is_array($uid) ? $uid : [$uid];
             foreach ($uid_arr as $uid) {
-                $sql = "UPDATE $tb SET num=num$op$delta,updatetime=:updatetime WHERE uid=:uid";
                 $params = [
                     ':uid' => $uid,
                     ':updatetime' => time(),
@@ -56,12 +59,12 @@ class Counter
                     ])) {
                         $res = We7::pdo_query($sql, $params);
                         if ($res < 1) {
-                            return false;
+                            return err('failed');
                         } else {
                             continue;
                         }
                     }
-                    return false;
+                    return err('failed');
                 }
             }
             return true;

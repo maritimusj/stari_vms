@@ -29,13 +29,13 @@ class Counter
         return self::query(['uid' => $uid])->exists();
     }
 
-    public static function increment($uid, int $delta = 1): bool
+    public static function increment($uid, int $delta = 1, callable $initFN = null): bool
     {
         if ($delta == 0) {
             return true;
         }
 
-        $result = Util::transactionDo(function () use ($uid, $delta) {
+        $result = Util::transactionDo(function () use ($uid, $delta, $initFN) {
             $tb = We7::tablename(counterModelObj::getTableName(true));
             $op = $delta > 0 ? '+' : '';
             $sql = "UPDATE $tb SET num=num$op$delta,updatetime=:updatetime WHERE uid=:uid";
@@ -48,17 +48,19 @@ class Counter
                 ];
                 $res = We7::pdo_query($sql, $params);
                 if ($res < 1) {
-                    if (self::create([
-                        'uid' => $uid,
-                        'num' => 0,
-                        'createtime' => time(),
-                        'updatetime' => 0,
-                    ])) {
-                        $res = We7::pdo_query($sql, $params);
-                        if ($res < 1) {
-                            return err('failed');
-                        } else {
-                            continue;
+                    if (Locker::try("counter:init:$uid")) {
+                        if (self::create([
+                            'uid' => $uid,
+                            'num' => $initFN == null ? 0 : $initFN(),
+                            'createtime' => time(),
+                            'updatetime' => 0,
+                        ])) {
+                            $res = We7::pdo_query($sql, $params);
+                            if ($res < 1) {
+                                return err('failed');
+                            } else {
+                                continue;
+                            }
                         }
                     }
                     return err('failed');

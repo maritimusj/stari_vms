@@ -35,7 +35,7 @@ class Counter
             return true;
         }
 
-        return Util::transactionDo(function () use ($uid, $delta) {
+        $result = Util::transactionDo(function () use ($uid, $delta) {
             $tb = We7::tablename(counterModelObj::getTableName(true));
             $op = $delta > 0 ? '+' : '';
             $sql = "UPDATE $tb SET num=num$op$delta,updatetime=:updatetime WHERE uid=:uid";
@@ -66,6 +66,7 @@ class Counter
             }
             return true;
         });
+        return !is_error($result);
     }
 
     public static function decrement($uid, $delta = 1): bool

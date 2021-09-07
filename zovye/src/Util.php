@@ -11,6 +11,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use ali\aop\request\AlipayUserInfoShareRequest;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use QRcode;
@@ -759,46 +760,113 @@ include './index.php';
 
     public static function updateOrderCounters(orderModelObj $order)
     {
-       if ($order->getUpdatetime() > 0) {
-           return true;
-       }
+        if ($order->getUpdatetime() > 0) {
+            return true;
+        }
 
-       if (!Locker::try("order:counter:{$order->getId()}")) {
-           return false;
-       }
+        if (!Locker::try("order:counter:{$order->getId()}")) {
+            return false;
+        }
 
-       $uid = App::uid();
-       $counters = [
-           "$uid:order:all",
-       ];
-       
-       $createtime = $order->getCreatetime();
-       $counters[] = $uid . ':order:month:' .  date('Y-m', $createtime);
-       $counters[] = $uid . ':order:day:' .  date('Y-m-d', $createtime);
+        $uid = App::uid(6);
+        $counters = [
+            "$uid:order:all" => function () {
+                return Order::query()->count();
+            }
+        ];
 
-       $device = $order->getDevice();
-       if ($device) {
-            $counters[] = "device:{$device->getId()}:order:all:" .  date('Y', $createtime);
-            $counters[] = "device:{$device->getId()}:order:month:" .  date('Y-m', $createtime);
-            $counters[] = "device:{$device->getId()}:order:day:" .  date('Y-m-d', $createtime);
-       }
+        $createtime = $order->getCreatetime();
+        $counters[$uid . ':order:month:' . date('Y-m', $createtime)] = function () use ($createtime) {
+            $start = new DateTime("@$createtime");
+            $start->modify('first day of this month 00:00');
+            $end = new DateTime("@$createtime");
+            $end->modify('first day of next month 00:00');
+            return Order::query([
+                'createtime >=' => $start->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->count();
+        };
+        $counters[$uid . ':order:day:' . date('Y-m-d', $createtime)] = function () use ($createtime) {
+            $start = new DateTime("@$createtime");
+            $start->modify('00:00');
+            $end = new DateTime("@$createtime");
+            $end->modify('next day 00:00');
+            return Order::query([
+                'createtime >=' => $start->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->count();
+        };
 
-       $agent = $order->getAgent();
-       if ($agent) {
-            $counters[] = "agent:{$agent->getId()}:order:all:" .  date('Y', $createtime);
-            $counters[] = "agent:{$agent->getId()}:order:month:" .  date('Y-m', $createtime);
-            $counters[] = "agent:{$agent->getId()}:order:day:" .  date('Y-m-d', $createtime);
-       }
+        $device = $order->getDevice();
+        if ($device) {
+            $counters["device:{$device->getId()}:order:all:" . date('Y', $createtime)] = function () use ($device) {
+                return Order::query([
+                    'device_id' => $device->getId(),
+                ])->count();
+            };
+            $counters["device:{$device->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($device, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('first day of this month 00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('first day of next month 00:00');
+                return Order::query([
+                    'device_id' => $device->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+            $counters["device:{$device->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($device, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('next day 00:00');
+                return Order::query([
+                    'device_id' => $device->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+        }
 
-       return Util::transactionDo(function() use($order, $counters) {
-            if (Counter::increment($counters)) {
-                $order->setUpdatetime(time());
-                if ($order->save()) {
-                    return true;
+        $agent = $order->getAgent();
+        if ($agent) {
+            $counters["agent:{$agent->getId()}:order:all:" . date('Y', $createtime)] = function () use ($agent) {
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                ])->count();
+            };
+            $counters["agent:{$agent->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($agent, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('first day of this month 00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('first day of next month 00:00');
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+            $counters["agent:{$agent->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($agent, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('next day 00:00');
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+        }
+
+        return Util::transactionDo(function () use ($order, $counters) {
+            foreach ($counters as $uid => $initFN) {
+                if (!Counter::increment($uid, 1, $initFN)) {
+                    return err('fail');
                 }
             }
-            return err('fail');
-       });
+            return true;
+        });
     }
 
     /**
@@ -863,6 +931,9 @@ include './index.php';
                     );
                 }
             }
+
+            $result['counter'] = self::updateOrderCounters($order);
+
         } else {
             $result[] = $order->getId() . ' lock failed!';
         }
@@ -2531,7 +2602,7 @@ HTML_CONTENT;
 
     public static function getJSON(string $url)
     {
-        return self::get($url, 3, [],true);
+        return self::get($url, 3, [], true);
     }
 
     /**
@@ -2562,7 +2633,7 @@ HTML_CONTENT;
             $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
             $headers[] = 'Content-Type: application/json';
-            $headers[] =  'Content-Length: ' . strlen($json_str);
+            $headers[] = 'Content-Length: ' . strlen($json_str);
         } else {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
@@ -2581,7 +2652,7 @@ HTML_CONTENT;
                 } else {
                     $headers[] = $val;
                 }
-                continue;             
+                continue;
             }
             curl_setopt($ch, $index, $val);
         }
@@ -2589,7 +2660,7 @@ HTML_CONTENT;
         if ($headers) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
-        
+
         $response = curl_exec($ch);
 
         curl_close($ch);

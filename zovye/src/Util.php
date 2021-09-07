@@ -799,7 +799,7 @@ include './index.php';
 
         $device = $order->getDevice();
         if ($device) {
-            $counters["device:{$device->getId()}:order:all:" . date('Y', $createtime)] = function () use ($device) {
+            $counters["device:{$device->getId()}:order:all"] = function () use ($device) {
                 return Order::query([
                     'device_id' => $device->getId(),
                 ])->count();
@@ -830,7 +830,7 @@ include './index.php';
 
         $agent = $order->getAgent();
         if ($agent) {
-            $counters["agent:{$agent->getId()}:order:all:" . date('Y', $createtime)] = function () use ($agent) {
+            $counters["agent:{$agent->getId()}:order:all"] = function () use ($agent) {
                 return Order::query([
                     'agent_id' => $agent->getId(),
                 ])->count();

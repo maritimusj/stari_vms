@@ -51,16 +51,11 @@ class Counter
                     if (Locker::try("counter:init:$uid")) {
                         if (self::create([
                             'uid' => $uid,
-                            'num' => $initFN == null ? 0 : $initFN(),
+                            'num' => $initFN == null ? $delta : $initFN(),
                             'createtime' => time(),
                             'updatetime' => 0,
                         ])) {
-                            $res = We7::pdo_query($sql, $params);
-                            if ($res < 1) {
-                                return err('failed');
-                            } else {
-                                continue;
-                            }
+                            continue;
                         }
                     }
                     return err('failed');

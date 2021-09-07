@@ -757,6 +757,50 @@ include './index.php';
         return 'unknown';
     }
 
+    public static function updateOrderCounters(orderModelObj $order)
+    {
+       if ($order->getUpdatetime() > 0) {
+           return true;
+       }
+
+       if (!Locker::try("order:counter:{$order->getId()}")) {
+           return false;
+       }
+
+       $uid = App::uid();
+       $counters = [
+           "$uid:order:all",
+       ];
+       
+       $createtime = $order->getCreatetime();
+       $counters[] = $uid . ':order:month:' .  date('Y-m', $createtime);
+       $counters[] = $uid . ':order:day:' .  date('Y-m-d', $createtime);
+
+       $device = $order->getDevice();
+       if ($device) {
+            $counters[] = "device:{$device->getId()}:order:all:" .  date('Y', $createtime);
+            $counters[] = "device:{$device->getId()}:order:month:" .  date('Y-m', $createtime);
+            $counters[] = "device:{$device->getId()}:order:day:" .  date('Y-m-d', $createtime);
+       }
+
+       $agent = $order->getAgent();
+       if ($agent) {
+            $counters[] = "agent:{$agent->getId()}:order:all:" .  date('Y', $createtime);
+            $counters[] = "agent:{$agent->getId()}:order:month:" .  date('Y-m', $createtime);
+            $counters[] = "agent:{$agent->getId()}:order:day:" .  date('Y-m-d', $createtime);
+       }
+
+       return Util::transactionDo(function() use($order, $counters) {
+            if (Counter::increment($counters)) {
+                $order->setUpdatetime(time());
+                if ($order->save()) {
+                    return true;
+                }
+            }
+            return err('fail');
+       });
+    }
+
     /**
      * 订单统计
      *

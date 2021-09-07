@@ -69,20 +69,20 @@ class result implements IResult
 
     function getMessage(): string
     {
-        $cmd = $this->getCode();
-        $key = $this->getKey();
+        $cmd_code = $this->getCode();
+        $cmd_key = $this->getKey();
 
-        if ($cmd == protocol::CMD_SHAKE_HAND) {
-            if ($key == protocol::KEY_SHAKE) {
+        if ($cmd_code == protocol::CMD_SHAKE_HAND) {
+            if ($cmd_key == protocol::KEY_SHAKE) {
                 return '<= APP握手结果';
-            } elseif ($key == protocol::KEY_VERIFY) {
+            } elseif ($cmd_key == protocol::KEY_VERIFY) {
                 $result = $this->getPayloadData(2, 1);
                 return $result ? '<= APP检验成功' : '<= APP检验失败';
             }
             return '<= 未知握手数据';
-        } elseif ($cmd == protocol::CMD_CONFIG) {
+        } elseif ($cmd_code == protocol::CMD_CONFIG) {
             $result = $this->getPayloadData(2, 1);
-            if ($key == protocol::KEY_LOCKER) {
+            if ($cmd_key == protocol::KEY_LOCKER) {
                 $prefix = '<= 开锁结果：';
                 switch ($result) {
                     case protocol::RESULT_LOCKER_FAIL:
@@ -98,28 +98,28 @@ class result implements IResult
                     default:
                         return $prefix . '未知';
                 }
-            } elseif ($key == protocol::KEY_TIMER) {
+            } elseif ($cmd_key == protocol::KEY_TIMER) {
                 return $result ? '<= 设置时间：成功' : '<= 设置时间：失败';
-            } elseif ($key == protocol::KEY_LIGHTS) {
+            } elseif ($cmd_key == protocol::KEY_LIGHTS) {
                 return $result ? '<= 设置开关灯时间：成功' : '<= 设置时间：失败';
             }
             return '<= 未知设置结果';
 
-        } elseif ($cmd == protocol::CMD_QUERY || $cmd == protocol::CMD_NOTIFY) {
-            if ($key == protocol::KEY_INFO) {
+        } elseif ($cmd_code == protocol::CMD_QUERY || $cmd_code == protocol::CMD_NOTIFY) {
+            if ($cmd_key == protocol::KEY_INFO) {
                 return '<= 设备基本信息';
-            } elseif ($key == protocol::KEY_BATTERY) {
+            } elseif ($cmd_key == protocol::KEY_BATTERY) {
                 $v = $this->getBatteryValue();
                 return '<= 设备电量：' . ($v != -1 ? $v . '%' : '<未知>');
-            } elseif ($key == protocol::KEY_TIME) {
-
-            } elseif ($key == protocol::KEY_LIGHTS_SCHEDULE) {
-
+            } elseif ($cmd_key == protocol::KEY_TIME) {
+                //todo
+            } elseif ($cmd_key == protocol::KEY_LIGHTS_SCHEDULE) {
+                //todo
             }
             return '<= 未知请求结果';
 
-        } elseif ($cmd = protocol::CMD_TEST) {
-
+        } elseif ($cmd_code = protocol::CMD_TEST) {
+            //todo
         }
         return '<= 未知数据';
     }

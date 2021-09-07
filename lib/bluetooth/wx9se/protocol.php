@@ -168,10 +168,10 @@ class protocol implements IBlueToothProtocol
      */
     function parseMessage($device_id, $data):?IResult
     {
-        Util::logToFile($device_id, [
-            'data' => $data,
-            'hex' => bin2hex(base64_decode($data)),
-        ]);
+//        Util::logToFile($device_id, [
+//            'data' => $data,
+//            'hex' => bin2hex(base64_decode($data)),
+//        ]);
 
         $device = Device::get($device_id, true);
         if (empty($device)) {
@@ -188,11 +188,11 @@ class protocol implements IBlueToothProtocol
             return null;
         }
 
-        $code = $result->getCode();
-        $key = $result->getKey();
-        switch ($code) {
+        $cmd_code = $result->getCode();
+        $cmd_key = $result->getKey();
+        switch ($cmd_code) {
             case self::CMD_SHAKE_HAND:
-                if ($key == self::KEY_SHAKE) {
+                if ($cmd_key == self::KEY_SHAKE) {
                     $mac = $device->getMAC();
                     $randomData = $device->settings('wx9se.random.data', []);
                     $data = $result->getPayloadData(2, 16);
@@ -201,7 +201,7 @@ class protocol implements IBlueToothProtocol
                         $crc  = $this->getCrc16Data($mac, $randomData, self::HIGH);
                         $result->setCmd(new AppVerifyCMD($crc));
                     }
-                } elseif ($key == self::KEY_VERIFY) {
+                } elseif ($cmd_key == self::KEY_VERIFY) {
                     if ($result->getPayloadData(2, 1)) {
                         //APP检验通过，返回获取设备基本信息请求
                         //$result->setCmd(new BaseInfoCMD());
@@ -209,23 +209,23 @@ class protocol implements IBlueToothProtocol
                 }
                 break;
             case self::CMD_QUERY:
-                if ($key == self::KEY_INFO) {
+                if ($cmd_key == self::KEY_INFO) {
                     $version = $result->getVersion();
                     $device->updateSettings('wx9se.ver', $version);
                     //返回设备电量信息的请求
                     $result->setCmd(new BatteryCMD());
-                } elseif ($key == self::KEY_BATTERY) {
+                } elseif ($cmd_key == self::KEY_BATTERY) {
                     $v = $result->getBatteryValue();
                     $device->setQoe($v);
                 }
                 break;
             case self::CMD_CONFIG:
             case self::CMD_NOTIFY:
-                if ($key == self::KEY_BATTERY) {
+                if ($cmd_key == self::KEY_BATTERY) {
                     $v = $result->getBatteryValue();
                     $device->setQoe($v);
-                } elseif ($key == self::KEY_LOCKER) {
-
+                } elseif ($cmd_key == self::KEY_LOCKER) {
+                    //todo
                 }
                 break;
             default:

@@ -41,10 +41,26 @@ class Counter
             $op = $delta > 0 ? '+' : '';
 
             foreach ($uid_arr as $uid) {
-                $res = We7::pdo_query("UPDATE $tb SET num=num$op$delta WHERE uid=:uid", [
+                $sql = "UPDATE $tb SET num=num$op$delta,updatetime=:updatetime WHERE uid=:uid";
+                $params = [
                     ':uid' => $uid,
-                ]);
+                    ':updatetime' => time(),
+                ];
+                $res = We7::pdo_query($sql, $params);
                 if ($res < 1) {
+                    if (self::create([
+                        'uid' => $uid,
+                        'num' => 0,
+                        'createtime' => time(),
+                        'updatetime' => 0,
+                    ])) {
+                        $res = We7::pdo_query($sql, $params);
+                        if ($res < 1) {
+                            return false;
+                        } else {
+                            continue;
+                        }
+                    }
                     return false;
                 }
             }

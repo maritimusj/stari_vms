@@ -1,0 +1,20 @@
+<?php
+
+namespace zovye;
+
+$tb_name = 'zovye_vms';
+
+if (!We7::pdo_tableexists($tb_name . '_counter')) {
+    $sql = <<<SQL
+CREATE TABLE `ims_zovye_counter` ( 
+    `id` INT NOT NULL AUTO_INCREMENT , 
+    `uid` INT NOT NULL , 
+    `num` INT NOT NULL DEFAULT '0' , 
+    `createtime` INT NOT NULL , 
+    `updatetime` INT NOT NULL , 
+    PRIMARY KEY (`id`), 
+    UNIQUE (`uid`)
+) ENGINE = InnoDB;
+SQL;
+    Migrate::execSQL($sql);
+}

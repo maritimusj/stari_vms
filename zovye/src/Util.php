@@ -1783,7 +1783,7 @@ HTML_CONTENT;
     /**
      * 在事务中执行指定函数.
      *
-     * @param callable $cb 要执行的函数
+     * @param callable $cb 要执行的函数, return error(..)或者抛出异常会回退事务
      *
      * @return mixed
      */

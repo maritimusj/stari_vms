@@ -265,7 +265,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['agent']['reg']['superior'] = request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
             $settings['agent']['reg']['level'] = request::str('agentRegLevel');
             $settings['agent']['reg']['commission_fee'] = round(request::int('agentCommissionFee') * 100);
-            $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 0 : 1;
+            $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 1 : 0;
 
             $settings['agent']['reg']['funcs'] = Util::parseAgentFNsFromGPC();
 

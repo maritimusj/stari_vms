@@ -212,41 +212,41 @@
                 </div>
                 <fieldset {if  empty($settings['agent']['reg']['mode']) || empty($settings['agent']['reg']['rel_gsp']['enabled'])}disabled{/if} id="agent_rel_gsp_enabled">
                 <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">数值类型</label>
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">计算方式</label>
                     <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                         <div class="radio">
                             <label>
-                                <input type="radio" name="gsp_mode_type" value="percent" {if $settings['agent']['reg']['gsp_mode_type'] == 'percent'}checked{/if}>
+                                <input type="radio" name="gsp_mode_type" value="percent" {if $settings['agent']['reg']['gsp_mode_type'] == 'percent'}checked{/if} onclick="changeModeTypeTitle('%')">
                                 百分比(%)
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" name="gsp_mode_type" value="amount"  {if $settings['agent']['reg']['gsp_mode_type'] == 'amount'}checked{/if}>
-                                数值(元)
+                                <input type="radio" name="gsp_mode_type" value="amount"  {if $settings['agent']['reg']['gsp_mode_type'] == 'amount'}checked{/if} onclick="changeModeTypeTitle('元')">
+                                固定金额(元)
                             </label>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="rel_gsp_level1" class="col-md-2 control-label"><b>直接上级</b></label>
+                    <label for="rel_gsp_level1" class="col-md-2 control-label"><b>直接上级</b>（<span class="modeTitle">{if $settings['agent']['reg']['gsp_mode_type']=='percent'}%{else}元{/if}</span>）</label>
                     <div class="col-md-10">
                         <input type="float" class="form-control" name="rel_gsp_level1" id="rel_gsp_level1" value="{$settings['agent']['reg']['rel_gsp']['level1']}" min="0" max="100">
-                        <span class="help-block">* 直接上级代理商会获得的佣金百分比</span>
+                        <span class="help-block">* 直接上级代理商会获得的佣金</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="rel_gsp_level2" class="col-md-2 control-label"><b>上上级</b></label>
+                    <label for="rel_gsp_level2" class="col-md-2 control-label"><b>上上级</b>（<span class="modeTitle">{if $settings['agent']['reg']['gsp_mode_type']=='percent'}%{else}元{/if}</span>）</label>
                     <div class="col-md-10">
                         <input type="float" class="form-control" name="rel_gsp_level2" id="rel_gsp_level2" value="{$settings['agent']['reg']['rel_gsp']['level2']}" min="0" max="100">
-                        <span class="help-block">* 上级的上一级代理会获得的佣金百分比</span>
+                        <span class="help-block">* 上级的上一级代理会获得的佣金</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="rel_gsp_level3" class="col-md-2 control-label"><b>上上上级</b></label>
+                    <label for="rel_gsp_level3" class="col-md-2 control-label"><b>上上上级</b>（<span class="modeTitle">{if $settings['agent']['reg']['gsp_mode_type']=='percent'}%{else}元{/if}</span>）</label>
                     <div class="col-md-10">
                         <input type="float" class="form-control" name="rel_gsp_level3" id="rel_gsp_level3" value="{$settings['agent']['reg']['rel_gsp']['level3']}" min="0" max="100">
-                        <span class="help-block">* 上级的上一级的上级代理会获得的佣金百分比</span>
+                        <span class="help-block">* 上级的上一级的上级代理会获得的佣金</span>
                     </div>
                 </div>
                 </fieldset>
@@ -505,6 +505,9 @@
 
     function chfeeTypeTitle(title) {
         $("#fee_type_title").html(title);
+    }
+    function changeModeTypeTitle(title) {
+        $(".modeTitle").html(title);
     }
     
     $(function(){

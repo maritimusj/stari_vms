@@ -1238,6 +1238,7 @@ i.wxpay {
 
 #tagslist,.tags {
     display: flex;
+    z-index: 99;
 }
 
 #tagslist .tag,.tags .tag {

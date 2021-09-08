@@ -187,7 +187,6 @@ if ($op == 'list') {
 
             if ($entry->isVDevice() || $entry->isBlueToothDevice()) {
                 $data['status']['mcb'] = true;
-                $data['status']['app'] = true;
             } else {
                 $status = $devices_status[$entry->getImei()];
                 if (isset($status['mcb']['online'])) {

@@ -75,7 +75,7 @@ class Locker
      * @param int $expire_seconds 几秒后过期，0为默认：脚本运行完过期
      * @return lockerModelObj|null
      */
-    public static function load(string $uid = '', int $available = 0, int $expire_seconds = 0): ?lockerModelObj
+    public static function load(string $uid = '', int $available = 0, int $expire_seconds = 0, bool $auto_unlock = true): ?lockerModelObj
     {
         if (empty($uid)) {
             $uid = Util::generateUID();
@@ -86,8 +86,10 @@ class Locker
             if ($locker->isExpired()) {
                 $locker->destroy();
             } else {               
-                if ($locker->reenter()) {                
-                    self::registerLockerDestroy($locker);
+                if ($locker->reenter()) {        
+                    if ($auto_unlock) {
+                        self::registerLockerDestroy($locker);
+                    }
                     return $locker;
                 }
                 return null;
@@ -101,18 +103,18 @@ class Locker
             'used' => 1,
             'expired_at' => $expire_seconds > 0 ? time() + $expire_seconds : 0,
         ]);
-        if ($locker) {
+        if ($locker && $auto_unlock) {
             self::registerLockerDestroy($locker);
         }
 
         return $locker;
     }
 
-    public static function try(string $uid = '', int $retries = 0, $retry_delay_seconds = 1, int $available = 0, int $expired_after_seconds = 60): ?lockerModelObj
+    public static function try(string $uid = '', int $retries = 0, $retry_delay_seconds = 1, int $available = 0, int $expired_after_seconds = 60, bool $auto_unlock = true): ?lockerModelObj
     {
         $i = 0;
         do {
-            $locker = self::load($uid, $available, $expired_after_seconds);
+            $locker = self::load($uid, $available, $expired_after_seconds, $auto_unlock);
             if ($locker) {
                 return $locker;
             }

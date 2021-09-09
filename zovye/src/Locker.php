@@ -75,7 +75,7 @@ class Locker
      * @param int $expire_seconds 几秒后过期，0为默认：脚本运行完过期
      * @return lockerModelObj|null
      */
-    public static function load(string $uid = '', int $available = 0, int $expire_seconds = 0, bool $auto_unlock = true): ?lockerModelObj
+    public static function load(string $uid = '', string $requestID = REQUEST_ID, int $available = 0, int $expired_at = 0, $auto_release = true): ?lockerModelObj
     {
         if (empty($uid)) {
             $uid = Util::generateUID();
@@ -86,8 +86,8 @@ class Locker
             if ($locker->isExpired()) {
                 $locker->destroy();
             } else {               
-                if ($locker->reenter()) {        
-                    if ($auto_unlock) {
+                if ($locker->reenter($requestID)) {    
+                    if ($auto_release) {
                         self::registerLockerDestroy($locker);
                     }
                     return $locker;
@@ -98,31 +98,46 @@ class Locker
 
         $locker = self::create([
             'uid' => $uid,
-            'request_id' => REQUEST_ID,
+            'request_id' => $requestID,
             'available' => max(1, $available),
             'used' => 1,
-            'expired_at' => $expire_seconds > 0 ? time() + $expire_seconds : 0,
+            'expired_at' => $expired_at > 0 ? $expired_at : 0,
         ]);
-        if ($locker && $auto_unlock) {
+        if ($locker && $auto_release) {
             self::registerLockerDestroy($locker);
         }
 
         return $locker;
     }
 
-    public static function try(string $uid = '', int $retries = 0, $retry_delay_seconds = 1, int $available = 0, int $expired_after_seconds = 60, bool $auto_unlock = true): ?lockerModelObj
+    public static function try(string $uid = '', $requestID = REQUEST_ID,  int $retries = 0, $retry_delay_seconds = 1, int $available = 0, int $expired_after_seconds = 60, bool $auto_release = true): ?lockerModelObj
     {
         $i = 0;
+        $expired_at = time() + $expired_after_seconds;
         do {
-            $locker = self::load($uid, $available, $expired_after_seconds, $auto_unlock);
+            $locker = self::load($uid, $requestID, $available, $expired_at, $auto_release);
             if ($locker) {
                 return $locker;
             }
             if ($i++ < $retries) {
                 sleep($retry_delay_seconds);
             }
-        } while ($i < $retries);
+        } while ($i < $retries && time() < $expired_at);
 
+        return null;
+    }
+
+    public static function enter(string $requestID, $auto_release = true)
+    {
+        $locker = self::findOne([
+            'request_id' => $requestID,
+        ]);
+        if ($locker && $locker->reenter($requestID)) {
+            if ($auto_release) {
+                self::registerLockerDestroy($locker);
+            }
+            return $locker;
+        }
         return null;
     }
 }

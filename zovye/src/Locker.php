@@ -71,11 +71,14 @@ class Locker
 
     /**
      * @param string $uid 锁的全局唯一UID
+     * @param string $requestID
      * @param int $available 可用次数，即可重入的次数
-     * @param int $expire_seconds 几秒后过期，0为默认：脚本运行完过期
+     * @param int $expired_at
+     * @param bool $auto_release
      * @return lockerModelObj|null
      */
-    public static function load(string $uid = '', string $requestID = REQUEST_ID, int $available = 0, int $expired_at = 0, $auto_release = true): ?lockerModelObj
+    public static function load(string $uid = '', string $requestID = REQUEST_ID, int $available = 0,
+                                int $expired_at = 0, bool $auto_release = true): ?lockerModelObj
     {
         if (empty($uid)) {
             $uid = Util::generateUID();
@@ -110,7 +113,8 @@ class Locker
         return $locker;
     }
 
-    public static function try(string $uid = '', $requestID = REQUEST_ID,  int $retries = 0, $retry_delay_seconds = 1, int $available = 0, int $expired_after_seconds = 60, bool $auto_release = true): ?lockerModelObj
+    public static function try(string $uid = '', $requestID = REQUEST_ID,  int $retries = 0, $retry_delay_seconds = 1,
+                               int $available = 0, int $expired_after_seconds = 60, bool $auto_release = true): ?lockerModelObj
     {
         $i = 0;
         $expired_at = time() + $expired_after_seconds;
@@ -127,7 +131,7 @@ class Locker
         return null;
     }
 
-    public static function enter(string $requestID, $auto_release = true)
+    public static function enter(string $requestID, $auto_release = true): ?lockerModelObj
     {
         $locker = self::findOne([
             'request_id' => $requestID,

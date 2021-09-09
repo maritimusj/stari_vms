@@ -265,43 +265,54 @@ const app = new Vue({
             }
         },
         playClick(item) {
-        	const that = this;
-			that.video.data = item;
-			that.video.countdown = item.duration;
-            const options = {
-        		autoplay: true,
-        		sources: [{ 
-        			type: "video/mp4",
-        			src: that.video.data.media
-        		}]
-        	};
-            that.video.player = videojs('player', options, function onPlayerReady() {
-                this.play();
-                that.video.visible = true;
-    			that.playVideo();
-            });
+            const that = this;
+            if (!that.video.player) {
+                that.video.data = item;
+                that.video.countdown = item.duration;
+                const options = {
+                    autoplay: true,
+                    sources: [{
+                        type: "video/mp4",
+                        src: that.video.data.media
+                    }]
+                };
+            
+                that.video.player = videojs('player', options, function onPlayerReady() {
+                    this.play();
+                    that.video.visible = true;
+                    that.playVideo();
+                });
+            }
 		},
 		playVideo() {
+            this.playRequest();
 			this.video.interval = setInterval(() => {
 				this.video.countdown--;
 				if (this.video.countdown === 0) {
 					clearInterval(this.video.interval);
 				}
 			}, 1000);
-			this.playRequest();
 		},
 		playRequest() {
 		    zovye_fn.play(this.video.data.uid, this.video.data.duration - this.video.countdown, (res) => {
-			    if(res.redirect) {
-			        window.location.replace(res.redirect)
-			    } else {
-			        setTimeout(() => {
-			            if(this.isHidden !== true) {
-			                this.playRequest();
-			            }
-    			    }, 1000)
-			    }
-			});
+                if (res) {
+                    if (!res.status) {
+                        this.video.player.pause();
+                        clearInterval(this.video.interval);
+                        this.video.visible = false;
+                        this.isHidden = true;
+                        alert(res.data.msg || '播放出错！'); 
+                    }
+                    if (res.data && res.data.redirect) {
+                        window.location.replace(res.data.redirect)
+                    } else if (res.status) {
+                        setTimeout(() => {
+                            if (this.isHidden !== true) {
+                                this.playRequest();
+                            }
+                        }, 1000)
+                    }
+                }
 		},
         alertConfirmClick() {
             zovye_fn.closeWindow && zovye_fn.closeWindow();

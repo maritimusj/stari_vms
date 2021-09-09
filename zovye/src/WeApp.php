@@ -457,6 +457,9 @@ JSCODE;
         if (is_error($pay_js)) {
             Util::resultAlert($pay_js['message'], 'error');
         }
+
+        $requestID = REQUEST_ID;
+
         $tpl['js']['code'] = $pay_js;
         $tpl['js']['code'] .= <<<JSCODE
 <script>
@@ -486,14 +489,8 @@ JSCODE;
         })           
     }
     zovye_fn.play = function(uid, seconds, cb) {
-        $.get("$account_url", {op:'play', uid, seconds, device:'$device_imei'}).then(function(res){
-            if (res && res.status) {
-                if (typeof cb === 'function') {
-                    cb(res.data);
-                } else {
-                    console.log(res.data);
-                }
-            }
+        $.get("$account_url", {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
+            if (cb) cb(res);
         })    
     }
     zovye_fn.redirectToOrder = function() {

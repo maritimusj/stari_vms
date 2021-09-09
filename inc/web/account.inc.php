@@ -446,6 +446,7 @@ if ($op == 'default') {
                     'type' => Account::VIDEO,
                     'video' => [
                         'duration' => request::int('duration', 1),
+                        'exclusive' => request::int('exclusive', 0),
                     ]
                 ]);
             }

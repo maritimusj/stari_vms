@@ -80,7 +80,17 @@
                         <input type="number" class="form-control" name="duration" id="duration" value="{php echo $account?$account->getDuration():'1'}">
                         <span class="help-block">* 用户等待视频播放指定时长后，才能成功领取奖励</span>
                     </div>
-                </div>         
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <label>
+                            <input type="checkbox" name="exclusive" id="exclusive" value="1" {if $account && $account->settings('config.video.exclusive')}checked{/if}>
+                            同一时间只允许一个用户观看视频
+                        </label>
+                        <span class="help-block">* 用户必须等待其他用户观看完成后，才能点击观看视频</span>
+                    </div>
+                </div>
                 {else}
                     {if $account && $account->isAuth()}
                     <input name="qrcode" type="hidden" value="{php echo $account->getQrcode()}">

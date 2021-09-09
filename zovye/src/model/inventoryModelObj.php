@@ -104,7 +104,7 @@ class inventoryModelObj extends modelObj
      */
     public function acquireLocker(): ?lockerModelObj
     {
-        return Locker::try("inventory:{$this->getId()}:default", 0, 6, 9999);
+        return Locker::try("inventory:{$this->getId()}:default", REQUEST_ID, 0, 6, 9999);
     }
 
 	public function stock($src_inventory, $goods, int $num, array $extra = []): ?inventory_logModelObj

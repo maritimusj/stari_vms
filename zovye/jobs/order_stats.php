@@ -31,7 +31,7 @@ if ($op == 'order_stats' && CtrlServ::checkJobSign(['id' => request('id')])) {
         }
 
     } else {
-        $locker = Locker::try("order::statistics", 3);
+        $locker = Locker::try("order::statistics", REQUEST_ID, 3);
         if ($locker) {
             //未处理订单
             $other_order = Order::query(

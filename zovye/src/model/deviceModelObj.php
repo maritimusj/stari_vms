@@ -2063,7 +2063,7 @@ class deviceModelObj extends modelObj
 
     public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {
-        return Locker::try("payload:{$this->getImei()}", $retries, $delay_seconds);
+        return Locker::try("payload:{$this->getImei()}", REQUEST_ID, $retries, $delay_seconds);
     }
 
     /**

@@ -7,12 +7,12 @@
 namespace zovye\job\orderStats;
 
 use zovye\CtrlServ;
+use zovye\Locker;
 use zovye\request;
 use zovye\Job;
 use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Util;
-use function zovye\app;
 use function zovye\request;
 
 $op = request::op('default');
@@ -31,8 +31,8 @@ if ($op == 'order_stats' && CtrlServ::checkJobSign(['id' => request('id')])) {
         }
 
     } else {
-        $locker = app()->lock();
-        if ($locker && $locker->isLocked()) {
+        $locker = Locker::try("order::statistics", REQUEST_ID, 3);
+        if ($locker) {
             //未处理订单
             $other_order = Order::query(
                 [
@@ -48,7 +48,7 @@ if ($op == 'order_stats' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 }
             }
         } else {
-            $log['error'] = 'App()->lock() failed';
+            $log['error'] = 'lock() failed';
         }
     }
 

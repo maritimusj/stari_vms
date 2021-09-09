@@ -7,7 +7,6 @@ namespace zovye;
 use zovye\model\agent_vwModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\device_groupsModelObj;
-use zovye\model\device_viewModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeperModelObj;
@@ -21,13 +20,14 @@ use zovye\model\userModelObj;
  * @method page(int|mixed $page, int $page_size)
  * @method orderBy(string $string)
  * @method groupBy($group_by)
- * @method findAll()
+ * @method findAll($cond = [], $lazy = false)
  * @method findOne($lazy = false)
  * @method exists($condition = [])
  * @method makeSQL($fields, $delete = false)
  * @method delete($condition = [])
  * @method get($m)
  * @method resetAll()
+ * @method getAll(string[] $array)
  */
 class ModelObjFinderProxy
 {
@@ -35,7 +35,7 @@ class ModelObjFinderProxy
 
     /**
      * modelObjFinder constructor.
-     * @param $finder
+     * @param base\modelObjFinder $finder
      */
     public function __construct(base\modelObjFinder $finder)
     {
@@ -53,7 +53,7 @@ class ModelObjFinderProxy
 
             $this->finder->where($condition);
 
-        } elseif ($condition instanceof agentModelObj || $condition instanceof agent_vwModelObj) {
+        } elseif ($condition instanceof agentModelObj) {
 
             if ($this->finder->isPropertyExists('agent_id')) {
                 $this->finder->where(['agent_id' => $condition->getId()]);
@@ -75,7 +75,7 @@ class ModelObjFinderProxy
                 trigger_error('property not exists', E_USER_ERROR);
             }            
 
-        } elseif ($condition instanceof deviceModelObj || $condition instanceof device_viewModelObj) {
+        } elseif ($condition instanceof deviceModelObj) {
 
             if ($this->finder->isPropertyExists('device_id')) {
                 $this->finder->where(['device_id' => $condition->getId()]);

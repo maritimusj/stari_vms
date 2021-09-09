@@ -48,7 +48,7 @@ if ($op == 'new_agent' && CtrlServ::checkJobSign(['id' => request('id')])) {
                     'keyword1' => ['value' => $agent_data['license'] ?: '<无>'],
                     'keyword2' => ['value' => $agent_data['name'] ?: '<未填写>'],
                     'keyword3' => ['value' => $agent->getMobile()],
-                    'keyword4' => ['value' => isset($text) ? $text : '<无>'],
+                    'keyword4' => ['value' => $text ?? '<无>'],
                 ];
 
                 $res = Wx::sendTplNotice(

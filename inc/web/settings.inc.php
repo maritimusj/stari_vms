@@ -77,8 +77,6 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['user']['location']['appkey'] = request::trim('lbsKey', DEFAULT_LBS_KEY);
 
-        $settings['device']['v1']['activecode']['enabled'] = request::bool('v1ActiveCodeEnabled') ? 1 : 0;
-
         $settings['device']['shipment']['balanced'] = request::bool('shipmentBalance') ? 1 : 0;
 
         $settings['goods']['agent']['edit'] = request::bool('allowAgentEditGoods') ? 1 : 0;
@@ -149,8 +147,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['goods']['voucher']['enabled'] = request::bool('goodsVoucher') ? 1 : 0;
 
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
-        $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;        
-        $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;        
+        $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
+        $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
 
@@ -180,6 +178,14 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createMeiPaAccount',
                 'meipa.fan.enabled',
             ],
+            'kingFAN' => [
+                __NAMESPACE__ . '\Account::createKingFansAccount',
+                'king.fan.enabled',
+            ],
+            'sntoFAN' => [
+                __NAMESPACE__ . '\Account::createSNTOAccount',
+                'snto.fan.enabled',
+            ],
         ];
 
         $accounts_need_refresh = false;
@@ -196,35 +202,37 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
             setArray($settings, $v[1], $enabled);
         }
-       
+
         if ($accounts_need_refresh) {
             setArray($settings, 'accounts.lastupdate', '' . microtime(true));
         }
 
         $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
         $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
-
-        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0; 
+        $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;
+        $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;
+        $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
+        $settings['account']['appQRCode']['enabled'] = request::bool('AccountAppQRCode') ? 1 : 0;
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
         if ($settings['app']['first']['enabled']) {
-            $module_url =  str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
+            $module_url = str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
             $files = [
                 [
                     'filename' => IA_ROOT . '/index.php',
-                    'content' =>"<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();"
+                    'content' => "<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();"
                 ],
                 [
                     'filename' => IA_ROOT . '/framework/bootstrap.inc.php',
                     'append' => true,
                     'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '{$module_url}';\r\n}"
                 ],
-            ];            
-            foreach($files as $file) {
+            ];
+            foreach ($files as $file) {
                 $content = file_get_contents($file['filename']);
                 if ($content && stripos($content, $module_url) === false) {
                     file_put_contents($file['filename'], $file['content'], $file['append'] ? FILE_APPEND : 0);
-                }    
+                }
             }
         }
     } elseif ($save_type == 'agent') {
@@ -234,6 +242,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         ];
 
         $settings['agent']['order']['refund'] = request::bool('allowAgentRefund') ? 1 : 0;
+
+        if ($settings['inventory']['enabled']) {
+            $settings['inventory']['goods']['mode'] = request::bool('inventoryGoodsLack') ? 1 : 0;
+        }
 
         $settings['agent']['msg_tplid'] = request::trim('agentMsg');
         $settings['agent']['levels'] = [
@@ -253,7 +265,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['agent']['reg']['superior'] = request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
             $settings['agent']['reg']['level'] = request::str('agentRegLevel');
             $settings['agent']['reg']['commission_fee'] = round(request::int('agentCommissionFee') * 100);
-            $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 0 : 1;
+            $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 1 : 0;
 
             $settings['agent']['reg']['funcs'] = Util::parseAgentFNsFromGPC();
 
@@ -297,10 +309,11 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                         'b' => request::bool('balanceOrder') ? 1 : 0,
                         'p' => request::bool('payOrder') ? 1 : 0,
                     ];
-                    $settings['agent']['reg']['bonus']['level0'] = round(request::int('rel_bonus_level0') * 100);
-                    $settings['agent']['reg']['bonus']['level1'] = round(request::int('rel_bonus_level1') * 100);
-                    $settings['agent']['reg']['bonus']['level2'] = round(request::int('rel_bonus_level2') * 100);
-                    $settings['agent']['reg']['bonus']['level3'] = round(request::int('rel_bonus_level3') * 100);
+
+                    $settings['agent']['reg']['bonus']['level0'] = request::float('rel_bonus_level0', 0, 2) * 100;
+                    $settings['agent']['reg']['bonus']['level1'] = request::float('rel_bonus_level1', 0, 2) * 100;
+                    $settings['agent']['reg']['bonus']['level2'] = request::float('rel_bonus_level2', 0, 2) * 100;
+                    $settings['agent']['reg']['bonus']['level3'] = request::float('rel_bonus_level3', 0, 2) * 100;
                 }
             }
         }
@@ -379,23 +392,23 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['commission']['agreement']['version'] = sha1($settings['commission']['agreement']['content']);
         }
 
-    } elseif ($save_type == 'advs') {      
+    } elseif ($save_type == 'advs') {
 
         if ($settings['custom']['SQMPay']['enabled']) {
             $settings['custom']['SQMPay']['appSecret'] = request::trim('appSecret');
             $settings['custom']['SQMPay']['js'] = request::str('js');
 
-            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);            
+            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);
             if (empty($settings['custom']['SQMPay']['goodsNum'])) {
                 $settings['custom']['SQMPay']['goodsNum'] = 1;
             }
             $settings['custom']['SQMPay']['bonus'] = max(0, request::float('bonus', 0, 2)) * 100;
         }
-        
+
         if ($settings['custom']['aliTicket']['enabled']) {
             $settings['custom']['aliTicket']['key'] = request::trim('aliTicketAppKey');
             $settings['custom']['aliTicket']['secret'] = request::trim('aliTicketAppSecret');
-            $settings['custom']['aliTicket']['goodsNum'] = request::int('aliTicketGoodsNum', 1);            
+            $settings['custom']['aliTicket']['goodsNum'] = request::int('aliTicketGoodsNum', 1);
             if (empty($settings['custom']['aliTicket']['goodsNum'])) {
                 $settings['custom']['aliTicket']['goodsNum'] = 1;
             }
@@ -415,6 +428,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['account']['wx']['platform']['config']['key'] = request::trim('wxPlatformKey');
         }
 
+        $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
+
         $settings['misc']['adminAccount'] = request::trim('adminAccount');
         $settings['misc']['pushAccountMsg_type'] = request::trim('pushAccountMsg_type');
         $settings['misc']['pushAccountMsg_val'] = request::trim('pushAccountMsg_val');
@@ -428,7 +443,9 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         if (App::isMoscaleEnabled()) {
             $settings['moscale']['fan']['key'] = request::trim('moscaleMachineKey');
-            $settings['moscale']['fan']['label'] = array_map(function($e) { return intval($e);}, explode(',', request::trim('moscaleLabel')));
+            $settings['moscale']['fan']['label'] = array_map(function ($e) {
+                return intval($e);
+            }, explode(',', request::trim('moscaleLabel')));
             $settings['moscale']['fan']['region'] = [
                 'province' => request::int('province_code'),
                 'city' => request::int('city_code'),
@@ -522,6 +539,14 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             'account' => request::trim('account'),
         ];
 
+        if (App::isDonatePayEnabled()) {
+            Config::donatePay('qsc', [
+                'title' => request::trim('donatePayTitle'),
+                'desc' => request::trim('donatePayDesc'),
+                'url' => request::trim('donatePayUrl'),
+            ], true);
+        }
+
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;
         $settings['pay']['wx']['enable'] = $wx_enabled;
@@ -537,12 +562,12 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             ];
 
             if (false === Util::createApiRedirectFile('payment/wx.php', 'payresult', [
-                'headers' => [
-                    'HTTP_USER_AGENT' => 'wx_notify',
-                ],
-                'op' => 'notify',
-                'from' => 'wx',
-            ])) {
+                    'headers' => [
+                        'HTTP_USER_AGENT' => 'wx_notify',
+                    ],
+                    'op' => 'notify',
+                    'from' => 'wx',
+                ])) {
                 Util::itoast('创建微信支付入口文件失败！');
             }
         }
@@ -737,14 +762,24 @@ if ($op == 'account') {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
     }
+    $tpl_data['migrate'] = Migrate::detect(false);
 } elseif ($op == 'unlock') {
 
     app()->resetLock();
     JSON::success('成功！');
 
+} elseif ($op == 'migrate') {
+
+    if (Migrate::detect(false)) {
+        JSON::success(['redirect' => Util::url('migrate')]);
+    }
+
 } elseif ($op == 'reset') {
 
     Migrate::reset();
+    if (Migrate::detect(false)) {
+        JSON::success(['redirect' => Util::url('migrate')]);
+    }
     JSON::success('已重置！');
 
 } elseif ($op == 'device') {
@@ -801,14 +836,14 @@ if ($op == 'account') {
     if ($page > ceil($total / $page_size)) {
         $page = 1;
     }
-    
+
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
     $query->page($page, $page_size);
     $query->orderBy('id desc');
 
     $list = [];
-    foreach($query->findAll() as $wxapp) {
+    foreach ($query->findAll() as $wxapp) {
         $data = [
             'id' => $wxapp->getId(),
             'name' => $wxapp->getName(),
@@ -969,7 +1004,9 @@ if ($op == 'account') {
     }
     $tpl_data['app_key'] = $app_key;
     $tpl_data['account'] = settings('api.account', '');
-
+    if (App::isDonatePayEnabled()) {
+        $tpl_data['donatePay'] = Config::donatePay('qsc');
+    }
 } elseif ($op == 'accountMsgConfig') {
 
     $media = request('media') ?: [
@@ -1289,7 +1326,9 @@ if ($op == 'account') {
                         $data = Util::get(UPGRADE_URL . '/?op=exec');
                         $res = json_decode($data, true);
                         if ($res && $res['status']) {
-                            Util::itoast('更新成功！', $back_url, 'success');
+                            if (!Migrate::detect(true)) {
+                                Util::itoast('更新成功！', $back_url, 'success');
+                            }
                         }
                     }
                 } else {
@@ -1323,6 +1362,61 @@ if ($op == 'account') {
             $tpl_data['upgrade']['error'] = '检查更新失败！';
         }
     }
+
+} elseif ($op == 'showTestingQrcode') {
+
+    $url = Util::murl('testing');
+    $result = Util::createQrcodeFile('testing', $url);
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '用微信扫一扫，打开测试页面',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => '测试入口',
+        'content' => $content,
+    ]);
+} elseif ($op == 'showDeviceNearbyQrcode') {
+
+    $url = Util::murl('util');
+    $result = Util::createQrcodeFile('deviceNearby', $url);
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '用微信扫一扫，打开附近设备',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => '附近设备',
+        'content' => $content,
+    ]);
+} elseif ($op == 'showAgentRegQrcode') {
+
+    $url = Util::murl('mobile');
+    $result = Util::createQrcodeFile('agent', $url);
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '用微信扫一扫，打开代理商注册页面',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => '代理商注册页面',
+        'content' => $content,
+    ]);
 }
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {

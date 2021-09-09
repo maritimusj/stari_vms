@@ -12,10 +12,12 @@ use zovye\Util;
 
 $agent_id = request::str('agent');
 $accountUID = request::str('account');
+$total = request::int('total');
 
 $params = [
     'agent' => $agent_id,
     'account' => $accountUID,
+    'total' => $total,
 ];
 
 $op = request::op('default');
@@ -34,7 +36,9 @@ if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
         }
     } else {
         $params['error'] = '找不到这个公众号或者公众号还没有创建！';
-        Job::authAccount($agent_id, $accountUID);
+        if ($total < 60) {
+            Job::authAccount($agent_id, $accountUID, $total + 1);
+        }
     }
 }
 

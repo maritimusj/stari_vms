@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{php \zovye\url(true, 'static/css/common.css?v=20210703002');}
 <style>
     #devicelist .device-qrcode {
         position: relative;
@@ -53,9 +53,10 @@
         color:green;
     }
     #devicelist td.status {
-        transition: all 1s;       
+        transition: all 1s;
     }
     #devicelist .app {
+        width: 2em;
         cursor: pointer;
         position: relative;
     }
@@ -131,11 +132,48 @@
         width: 15em;
         font-size: 1em;
     }
+    #devicelist .status {
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        width: 45px;
+        height: 45px;
+        margin: 0 auto;
+    }
     #devicelist .devicename {
         cursor: default
     }
     #devicelist .devicename img {
         width: 15px;
+    }
+    #devicelist .tags {
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+    }
+    #devicelist .first-tag {
+        position: relative;
+    }
+    #devicelist .tagslist {
+        position: absolute;
+        display: none;
+        flex-wrap: wrap;
+        border: 1px solid #ccc;
+        width: max-content;
+        max-width: 300px;
+        padding: 10px;
+        z-index: 99;
+        background: #fff;
+        justify-content: flex-start;
+        align-content: center;
+        align-items: center;
+        top: 36px;
+        left: 0px;
+        box-shadow: 1px 1px 3px 3px rgba(0, 0, 0, 0.1);
+    }
+    #devicelist .tags-list:hover .tagslist {
+        display: flex;
     }
     .zovye_qrcode:hover {
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -224,7 +262,7 @@
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'add'));}"><i class="fa fa-cube fa-fw" title="添加新设备"></i></a>
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group'));}"><i class="fa fa-cubes fa-fw" title="分组管理"></i></a>
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'report_list'));}"><i class="fa fa-exclamation fa-fw" title="故障报告列表"></i></a>
-                <i class="fa fa-exchange fa-fw" title="通知所有设备刷新配置？" onclick="api.refresAll();"></i>
+                <i class="fa fa-exchange fa-fw" title="通知所有设备刷新配置？" onclick="api.refreshAll();"></i>
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'clean_error'));}"><i class="fa fa-undo fa-fw" title="清除所有设备错误代码"></i></a>
             </span>
         </div>
@@ -312,7 +350,6 @@
                             :style="{'background-color': tag.selected?'#009688':'#9E9E9E'}"
                             @click.prevent="selectTag(tag)">
                                 <span>{{tag.title}}</span>
-                                <span v-if="tag.count > 0">({{tag.count}})</span>
                             </div>
                             <span class="tag-page-btn" title="下一页"
                             v-if="tags.totalpage > 1"
@@ -395,13 +432,13 @@
                             <template v-if="showSelectInputCtrl && canDownload">
                                 <i class="fa fa-download" title="下载选中的设备二维码" @click="downloadQRCode"></i><span class="badge" style="position: absolute;">{{selectedInputCtrl.length}}</span>
                             </template>
-                            <i class="fa fa-sign-out" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
+                            <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
                         </th>
                         <th>                    
                             <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>
                         </th>
                         <th>
-                            <div data-orderby="agentId" {if $orderby=='agentId'}class="fa {$order}"{/if}>直属代理商</div>
+                            <div data-orderby="agentId" {if $orderby=='agentId'}class="fa {$order}"{/if}>所属代理商</div>
                         </th>
                         <th style="min-width:3em;">
                         </th>
@@ -414,14 +451,17 @@
                         <th>
                             <div data-orderby="groupId" {if $orderby=='groupId'}class="fa {$order}"{/if}>分组</div>
                         </th>
-                        <th>
-                            <div>设备状态</div>
+                        <th style="width: 60px;">
+                            标签
                         </th>
-                       <th>
-                            加入时间
+                        <th class="center">
+                            设备状态
                         </th>
                         <th style="width: 165px;">
                             出货用时
+                        </th>
+                        <th>
+                            加入时间
                         </th>
                         <th>操作</th>
                     </tr>
@@ -533,60 +573,70 @@
                             </template>
                             <span class="nogroup" v-else>&lt;无分组&gt;</span>
                         </td>
-                        <td class="status">
-                            <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
-                            <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
-                            <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">
-                                <div @click.self="refreshStatus(o)" :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
-                                    <div class="devcie-detail">
-                                        <div class="detail-seg">
-                                            <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 
-                                            <div><span class="title">ICCID：</span><span>{{o.ICCID ? o.ICCID : 'n/a'}}</span></div>
+                        <td class="tags-list">
+                            <div class="tags" v-if="o.tags && o.tags.length>0">
+                                <span class="tag first-tag" @click="tagClicked(o.tags[0])">{{o.tags[0].title}}</span>
+                                <div class="tagslist tags" v-if="o.tags.length > 1">
+                                    <span class="tag" v-for="tag in o.tags"  @click="tagClicked(tag)">{{tag.title}}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status">
+                                <i class="fa fa-clock-o loading" title="加载中..." style="color:#ddd;" v-if="!o.status"></i>
+                                <i class="fa fa-spinner fa-pulse" title="加载中..." style="color:#9e9e9e;" v-if="o.loading"></i>
+                                <div :class="{'app': true, 'loading': !o.status, 'none': o.status.app === null, 'online': o.status && o.status.app === true, 'offline': o.status && o.status.app === false, 'down': o.isDown}" v-if="o.status && !o.loading">
+                                    <div @click.self="refreshStatus(o)" :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
+                                        <div class="devcie-detail">
+                                            <div class="detail-seg">
+                                                <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 
+                                                <div><span class="title">ICCID：</span><span>{{o.ICCID ? o.ICCID : 'n/a'}}</span></div>
 
-                                            <template v-if="o.appId">
-                                                <div><span class="title">AppID：</span><span>{{o.appId}}</span></div>
-                                                <div><span class="title">AppVersion：</span><span>{{o.appVersion ? o.appVersion : 'n/a'}}</span></div>
-                                            </template>
+                                                <template v-if="o.appId">
+                                                    <div><span class="title">AppID：</span><span>{{o.appId}}</span></div>
+                                                    <div><span class="title">AppVersion：</span><span>{{o.appVersion ? o.appVersion : 'n/a'}}</span></div>
+                                                </template>
 
-                                            <template v-if="o.sig !== undefined && o.sig != -1">
-                                                <div>
-                                                    <span class="title">信号强度：</span>
-                                                    <div class="bar sig">
-                                                        <div :style="{minWidth:'2em', width: o.sig + '%'}">{{o.sig + '%'}}</div>
+                                                <template v-if="o.sig !== undefined && o.sig != -1">
+                                                    <div>
+                                                        <span class="title">信号强度：</span>
+                                                        <div class="bar sig">
+                                                            <div :style="{minWidth:'2em', width: o.sig + '%'}">{{o.sig + '%'}}</div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </template>
-                                            <template v-if="o.qoe != undefined && o.qoe != -1">
-                                                <div>
-                                                    <span class="title">电池电量：</span>
-                                                    <div class="bar qoe">
-                                                        <div :style="{minWidth:'2em',width: o.qoe + '%'}">{{o.qoe + '%'}}</div>
+                                                </template>
+                                                <template v-if="o.qoe != undefined && o.qoe != -1">
+                                                    <div>
+                                                        <span class="title">电池电量：</span>
+                                                        <div class="bar qoe">
+                                                            <div :style="{minWidth:'2em',width: o.qoe + '%'}">{{o.qoe + '%'}}</div>
+                                                        </div>
                                                     </div>
+                                                </template>
+                                            </div>
+                                            <div class="detail-seg" v-if="o.cargo_lanes && o.cargo_lanes.length > 0">
+                                                <div v-for="(lane,index) in o.cargo_lanes">
+                                                    <span class="title">{{index + 1}}，<span :class="{'text-gray': lane.goods_id === 0}">{{lane.goods_name}}</span>：</span>
+                                                    <span>{{lane.num}} / {{lane.capacity}} {{lane.goods_unit_title}}</span>
                                                 </div>
-                                            </template>
-                                        </div>
-                                        <div class="detail-seg" v-if="o.cargo_lanes && o.cargo_lanes.length > 0">
-                                            <div v-for="(lane,index) in o.cargo_lanes">
-                                                <span class="title">{{index + 1}}，<span :class="{'text-gray': lane.goods_id === 0}">{{lane.goods_name}}</span>：</span>
-                                                <span>{{lane.num}} / {{lane.capacity}} {{lane.goods_unit_title}}</span>
                                             </div>
-                                        </div>
-                                        <div class="detail-seg" v-if="(o.lastError && o.lastError.errno) || o.firstMsgTotal || o.lastPing || o.lastOnline">
-                                            <div v-if="o.lastError && o.lastError.errno">
-                                                <span class="title">最近错误：</span>
-                                                <span class="error">{{o.lastError.message}}</span>
-                                            </div>
-                                            <div v-if="o.firstMsgTotal">
-                                                <span class="title">今日重启：</span>
-                                                <span>{{o.firstMsgTotal}}次</span>
-                                            </div>
-                                            <div v-if="o.lastPing">
-                                                <span class="title">最近心跳：</span>
-                                                <span>{{o.lastPing}}</span>
-                                            </div>
-                                            <div v-if="o.lastOnline">
-                                                <span class="title">最后上线：</span>
-                                                <span>{{o.lastOnline}}</span>
+                                            <div class="detail-seg" v-if="(o.lastError && o.lastError.errno) || o.firstMsgTotal || o.lastPing || o.lastOnline">
+                                                <div v-if="o.lastError && o.lastError.errno">
+                                                    <span class="title">最近错误：</span>
+                                                    <span class="error">{{o.lastError.message}}</span>
+                                                </div>
+                                                <div v-if="o.firstMsgTotal">
+                                                    <span class="title">今日重启：</span>
+                                                    <span>{{o.firstMsgTotal}}次</span>
+                                                </div>
+                                                <div v-if="o.lastPing">
+                                                    <span class="title">最近心跳：</span>
+                                                    <span>{{o.lastPing}}</span>
+                                                </div>
+                                                <div v-if="o.lastOnline">
+                                                    <span class="title">最后上线：</span>
+                                                    <span>{{o.lastOnline}}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -594,11 +644,11 @@
                             </div>
                         </td>
                         <td>
-                            {{o.createtime}}
-                        </td>
-                        <td>
                             <div :id="'chart_' + o.id" style="width: 160px;height: 60px;">
                             </div>
+                        </td>
+                        <td>
+                            {{o.createtime}}
                         </td>
                         <td class="operate">
                             <div class="btn-group">
@@ -623,7 +673,7 @@
                                     </template>                                    
                                     <template>
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量?</a></li>
+                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量</a></li>
                                         <li role="separator" class="divider"></li>
                                         
                                         <li v-for="(lane, index) in o.cargo_lanes">
@@ -635,13 +685,13 @@
                                     <li role="separator" class="divider"></li>
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li v-if="o.appId"><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新!?</a></li>
-                                    <li class="disabled" v-else><a href="#"><i class="fa fa-cloud-download fa-fw disabled"></i> 推送版本更新!?</a></li>
+                                    <li v-if="o.appId"><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>
+                                    <li class="disabled" v-else><a href="#"><i class="fa fa-cloud-download fa-fw disabled"></i> 推送版本更新</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已注册的AppId?</a></li>
-                                    <li><a href="#" data-op="deviceRemove"><i class="fa fa-trash fa-fw"></i> 删除?</a></li>
+                                    <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已绑定的AppID</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#" data-op="deviceRevertPrompt"><i class="fa fa-plug fa-fw"></i> 重置设备!?</a></li>
+                                    <li><a href="#" data-op="deviceRevertPrompt"><i class="fa fa-plug fa-fw"></i> 重置设备</a></li>
+                                    <li><a href="#" data-op="deviceRemove"><i class="fa fa-trash fa-fw"></i> 删除</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -677,6 +727,7 @@
         upgradeApiUrl: "{php echo $this->createWebUrl('upgrade');}",
         orderApiUrl: "{php echo $this->createWebUrl('order');}",
         deviceDetailUrl: '{php echo $this->createWebUrl("device", array("op"=>"detail", "id" => "__id__"));}',
+        page: {php echo intval($page);}
     }
     const current = {
         agent: JSON.parse(decodeURIComponent('{php echo urlencode(json_encode($s_agent ?: []))}')),
@@ -685,5 +736,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625004"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625009"></script>
 {template 'common/footer'}

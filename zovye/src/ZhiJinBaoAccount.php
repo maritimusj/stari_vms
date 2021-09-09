@@ -29,7 +29,6 @@ class ZhiJinBaoAccount
         $this->app_secret = $app_secret;
     }
 
-
     public static function getUid(): string
     {
         return Account::makeSpecialAccountUID(Account::ZJBAO, Account::ZJBAO_NAME);
@@ -37,31 +36,70 @@ class ZhiJinBaoAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::ZJBAO]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['key']) || empty($config['secret'])) {
+                return [];
+            }
             //请求API
             $ZJBao = new ZhiJinBaoAccount($config['key'], $config['secret']);
-            $result = $ZJBao->fetchOne($device, $user);
-            if (is_error($result) || $result['code'] != 0) {
-                Util::logToFile('zjbao', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
+            $ZJBao->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEnabled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('zjbao_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
 
-                $data['name'] = $result['nickname'];
-                $data['qrcode'] = $result['qrcodeUrl'];
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
 
-                return [$data];
-            }
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if ($result['code'] != 0) {
+                        throw new RuntimeException('失败，发生错误：' . $result['code']);
+                    }
+
+                    if (empty($result['data']) || empty($result['data']['qrcodeUrl'])) {
+                        throw new RuntimeException('返回的数据不正确！');
+                    }
+
+                    $data = $acc->format();
+
+                    $data['name'] = $result['data']['nickname'];
+                    $data['qrcode'] = $result['data']['qrcodeUrl'];
+
+                    $v[] = $data;
+
+                    if (App::isAccountLogEnabled() && isset($log)) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+                } catch (Exception $e) {
+                    if (App::isAccountLogEnabled() && isset($log)) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    } else {
+                        Util::logToFile('zjbao', [
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+            });
         }
 
-        return [];
+        return $v;
     }
 
 
@@ -111,16 +149,11 @@ class ZhiJinBaoAccount
                 throw new RuntimeException('找不到指定的设备:' . $data['deviceSn']);
             }
 
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$data['sign']}", 0, MAX_ORDER_NO_LEN);
-
             $acc = $res['account'];
 
-            Job::createSpecialAccountOrder([
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'account' => $acc->getId(),
-                'orderUID' => $order_uid,
-            ]);
+            $order_uid = Order::makeUID($user, $device, sha1($data['appId']));
+
+            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
             Util::logToFile('zjbao', [
@@ -130,7 +163,7 @@ class ZhiJinBaoAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = []): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = [], callable $cb = null): array
     {
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
@@ -145,28 +178,52 @@ class ZhiJinBaoAccount
             'cityName' => $profile['city'],
             'nonceStr' => Util::random(16, true),
             'timeStamp' => time(),
-            'deviceSn' => $device ? $device->getImei() : '',
+            'deviceSn' => $device->getImei(),
+            'ipAddress' => $user->getLastActiveData('ip', CLIENT_IP),
+            'userAgent' => $user->settings('from.user-agent', $_SERVER['HTTP_USER_AGENT']),
         ]);
+
+        $params['scene'] = $device->settings('zjbao.scene', '');
+
+        $area = $device->settings('extra.location.tencent.area', []);
+        if (isEmptyArray($area)) {
+            $area = $device->settings('extra.location.baidu.area', []);
+        }
+
+        $params['deviceCountry'] = '中国';
+        $params['deviceProvince'] = strval($area[0]);
+        $params['deviceCity'] = strval($area[1]);
+        $params['deviceDistrict'] = strval($area[2]);
 
         $params['sign'] = $this->sign($params);
         $result = Util::post(self::API_URL, $params);
 
-        Util::logToFile('zjbao_query', [
-            'query' => $params,
-            'result' => $result,
-        ]);
+        if ($cb) {
+            $cb($params, $result);
+        }
 
         return $result;
     }
 
     private function sign($data): string
     {
-        unset($data['sign']);
+        $keys = [
+            'extraParam' => $data['extraParam'],
+            'nonceStr' => $data['nonceStr'],
+            'openId' => $data['openId'],
+            'timeStamp' => $data['timeStamp'],
+            'zjbAppId' => $data['zjbAppId'],
+            'zjbSecret' => $this->app_secret,
+        ];
 
-        $data['zjbSecret'] = $this->app_secret;
+        $str = [];
+        foreach ($keys as $key => $val) {
+            if ($val == '') {
+                continue;
+            }
+            $str[] = "$key=$val";
+        }
 
-        sort($data);
-
-        return strtoupper(md5(http_build_query($data)));
+        return strtoupper(md5(implode('&', $str)));
     }
 }

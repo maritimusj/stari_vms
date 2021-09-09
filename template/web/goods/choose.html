@@ -35,7 +35,7 @@
         cursor: pointer;
     }
     #goodslist .goods img {
-        width: 30px;
+        width: 60px;
     }
     #search-form {
         display: none;
@@ -111,12 +111,16 @@
                     <th>领取方式</th>
                     <th>单价</th>
                     <th>所属代理商</th>
-                    <th style="text-align:center;">创建时间</th>
                 </tr>
                 </thead>
                 <tbody>
                 {loop $goods_list $index $item}
-                <tr data-goods="{$item['id']}" data-name="{$item['name']}" data-title="{$item['unit_title']}" data-price="{php echo number_format($item['price'] / 100, 2)}">
+                <tr 
+                data-goods="{$item['id']}" 
+                data-name="{$item['name']}" 
+                data-title="{$item['unit_title']}" 
+                data-price="{php echo number_format($item['price'] / 100, 2)}"
+                data-img="{$item['img']}">
                     <td style="width:40px;">
                         <span class="index">
                             {php echo $index + 1}
@@ -178,9 +182,6 @@
                             {/if}                        
                         {/if}
                     </td>
-                    <td style="text-align:center;">
-                        {$item['createtime_formatted']}
-                    </td>
                 </tr>
                 {/loop}
                 </tbody>
@@ -190,7 +191,7 @@
             </div>
             {else}
             <div class="text-center text-muted">
-                暂时还没有任何商品！
+                <i class="fa fa-question-circle"></i> 暂时还没有任何商品！
             </div>
             {/if}
         </div>

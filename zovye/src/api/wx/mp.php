@@ -316,17 +316,21 @@ class mp
         common::checkCurrentUserPrivileges('F_xf');
 
         $uid = request::trim('uid');
-        if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
-            if ($account && $account->getAgentId() == $user->getAgentId()) {
-                $account->destroy();
-                if (Account::updateAccountData()) {
-                    return ['msg' => '删除成功！'];
-                }
-            }
+        $account = Account::findOne(['uid' => $uid]);
+        if (empty($account)) {
+            return error(State::ERROR, '找不到指定的公众号！');
         }
 
-        return error(State::ERROR, '没有权限操作这个公众号！');
+        if ($account->getAgentId() != $user->getAgentId()) {
+            return error(State::ERROR, '没有权限操作这个公众号！');
+        }
+
+        $account->destroy();
+        if (Account::updateAccountData()) {
+            return ['msg' => '删除成功！'];
+        }
+
+        return ['msg' => '删除失败！'];
     }
 
     /**
@@ -377,13 +381,12 @@ class mp
             return error(State::ERROR, '领取频率只是每天/每周/每月！');
         }
 
-        
         if (request::has('qrcode')) {
             $type = Account::NORMAL;
             list($sha1val, $url) = explode('@', request::str('qrcode'), 2);
             if (empty($sha1val) || empty($url) || sha1(App::uid() . CLIENT_IP . $url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的二维码文件！');
-            }            
+            }
         } elseif (request::has('media')) {
             $type = Account::VIDEO;
             list($sha1val, $url) = explode('@', request::str('media'), 2);
@@ -405,13 +408,26 @@ class mp
         $limits = [];
         if (request::str('sex') == 'male') {
             $limits['male'] = 1;
+            $limits['female'] = 0;
+            $limits['unknown_sex'] = 0;
         } elseif (request::str('sex') == 'female') {
+            $limits['male'] = 0;
             $limits['female'] = 1;
+            $limits['unknown_sex'] = 0;
+        } else {
+            $limits['male'] = 1;
+            $limits['female'] = 1;
+            $limits['unknown_sex'] = 1;
         }
 
         if (request::str('os') == 'ios') {
             $limits['ios'] = 1;
+            $limits['android'] = 0;
         } elseif (request::str('os') == 'android') {
+            $limits['ios'] = 0;
+            $limits['android'] = 1;
+        } else {
+            $limits['ios'] = 1;
             $limits['android'] = 1;
         }
 
@@ -441,7 +457,16 @@ class mp
             $account = Account::create($data);
         }
 
-        if ($account && $account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
+        if (empty($account)) {
+            return error(State::ERROR, '操作失败！');
+        }
+
+        $account->setExtraData('update', [
+            'time' => time(),
+            'user' => $user->profile(),
+        ]);
+
+        if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
             if ($account->isVideo()) {
                 $account->set('config', [
                     'type' => Account::VIDEO,
@@ -453,7 +478,7 @@ class mp
             return ['msg' => '保存成功！'];
         }
 
-        return error(State::ERROR, '操作失败！');
+        return error(State::ERROR, '保存数据失败！');
     }
 
     public static function groupAssign(): array

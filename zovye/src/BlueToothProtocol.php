@@ -28,7 +28,7 @@ class BlueToothProtocol
 
     public static function get($protocol): ?IBlueToothProtocol
     {
-        $classname = "\bluetooth\\{$protocol}\\protocol";
+        $classname = "\bluetooth\\$protocol\\protocol";
         if (class_exists($classname)) {
             return new $classname();
         }

@@ -30,13 +30,13 @@ class model
         if (!is_file($mod_filename)) {
             //加载已生成的modelObj文件
             $mod_filename = MOD_CACHE_DIR . "{$name}_auto_.mod.php";
-            if (!DEBUG && is_file($mod_filename)) {
-                require_once $mod_filename;
-            } else {
+            if (DEBUG || !is_file($mod_filename)) {
                 We7::mkDirs(MOD_CACHE_DIR);
                 if ($this->createClassFile($name, $classname, $mod_filename)) {
                     require_once $mod_filename;
-                }
+                }                
+            } else {
+                require_once $mod_filename;
             }
         }
 
@@ -95,8 +95,7 @@ DEBUG_MODE;
 namespace zovye\model;
 
 use zovye\base\modelObj;
-use zovye\\traits\ExtraDataGettersAndSetters;
-use function zovye\\tb;
+use function zovye\tb;
 
 class {$classname} extends modelObj
 {

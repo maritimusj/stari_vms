@@ -20,9 +20,16 @@ class tagsModelObj extends modelObj
 {
     /** @var int */
     protected $id;
+
+     /** @var int */
     protected $uniacid;
+
+     /** @var string */
     protected $title;
+
+     /** @var int */
     protected $count;
+    
     /** @var int */
     protected $createtime;
 

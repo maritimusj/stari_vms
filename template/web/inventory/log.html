@@ -1,0 +1,160 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    table thead th,table tr td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .goods img {
+        width: 60px;
+        height: 60px;
+    }
+    .inventory {
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+    }
+    tr.item {
+        border-left: 4px solid #ccc;
+    }
+    .stock.out {
+        color: red;
+    }
+    .stock.in {
+        color: green;
+    }
+    .stock.in:before {
+        content: '+';
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => $user])}"><b>{$title}</b>的库存</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}">商品入库</a></li>
+    <li role="presentation"class="active"><a href="#">变动记录</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('user')}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table table-bordered">
+            <thead>
+                <th>#</th>
+                <th>来源仓库</th>
+                <th>目的仓库</th>
+                <th>商品图片</th>
+                <th>商品名称</th>
+                <th>库存</th>
+                <th>数量</th>                
+                <th>备注</th>
+                <th>流水号</th>
+                <th>时间</th>
+            </thead>
+            <tbody>
+                {loop $list $index $e}
+                <tr class="item" style="border-left-color: {$e['extra']['clr']};">
+                    <td>
+                        {php echo $index + 1}
+                    </td>
+                    <td>
+                        {if $e['num'] > 0}
+                        <div class="inventory">
+                            {if $e['src']}
+                            <div title="{$e['src']['title']}">
+                                {if $e['src']['user']}
+                                <div class="profile">
+                                    <img src="{$e['src']['user']['headimgurl']}">
+                                    <span>{$e['src']['user']['name']}</span>
+                                </div>
+                                {else}
+                                {$e['src']['title']}
+                                {/if}
+                            </div>
+                            {else}
+                                <span class="text-muted">
+                                    {if $e['extra']['device']}
+                                    &lt;设备: {$e['extra']['device']['name']}&gt;
+                                    {else}
+                                    &lt;平台&gt;
+                                    {/if}
+                                </span>
+                            {/if}                            
+                        </div>
+                        {else}
+                        <span class="text-muted">&lt;{$title}的库存&gt;</span>
+                        {/if}
+                    </td>
+                    <td>
+                        {if $e['num'] < 0}
+                        <div class="inventory">
+                            {if $e['src']}
+                            <div title="{$e['src']['title']}">
+                                {if $e['src']['user']}
+                                <div class="profile">
+                                    <img src="{$e['src']['user']['headimgurl']}">
+                                    <span>{$e['src']['user']['name']}</span>
+                                </div>
+                                {else}
+                                {$e['src']['title']}
+                                {/if}
+                            </div>
+                            {else}
+                            <span class="text-muted">
+                                {if $e['extra']['device']}
+                                &lt;设备: {$e['extra']['device']['name']}&gt;
+                                {else}
+                                &lt;平台&gt;
+                                {/if}
+                            </span>
+                            {/if}                            
+                        </div>
+                        {else}
+                        <span class="text-muted">&lt;{$title}的库存&gt;</span>
+                        {/if}
+                    </td>
+                    <td class="goods">
+                        <img src="{$e['goods']['img']}">
+                    </td>
+                    <td>
+                        <span>{$e['goods']['name']}</span>
+                        {if $e['goods']['deleted']}
+                        <span class="text-muted">&lt;已删除&gt;</span>
+                        {/if}
+                    </td>
+                    <td>
+                        <span>
+                            {$e['extra']['before']}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="stock {if $e['num'] < 0}out{else}in{/if}">{$e['num']}</span>
+                    </td>
+                    <td>
+                        {$e['extra']['memo']}
+                    </td>
+                    <td>
+                        <span>{$e['extra']['serial']}</span>
+                    </td>
+                    <td>
+                        <span>{$e['createtime_formatted']}</span>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何变动记录！
+        </div>
+        {/if}
+    </div>
+</div>
+
+{template 'common/footer'}

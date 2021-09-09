@@ -10,6 +10,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        white-space: nowrap;
     }
     .referral {
         border: 1px solid #4CAF50;
@@ -68,10 +69,10 @@
                 <tr>
                     <th>#</th>
                     <th>昵称</th>
-                    <th style="text-align: center;">账户余额</th>
+                    <th class="center">账户余额</th>
                     <th>手机号码</th>
                     <th class="text-center"><span id="J_money" data-sort="{$s_money}" style="cursor: pointer;">等级</span></th>                    
-                    <th><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
+                    <th class="center"><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
                     <th>
                         <div><span id="J_fee" data-sort="{$s_fee}" style="cursor: pointer;">本月出货</span></div>
                     </th>                    
@@ -116,7 +117,7 @@
                             </span>
                         </div>
                     </td>
-                    <td>
+                    <td class="center">
                         {if $agent['total'] > 0}
                         <a href="{php echo $this->createWebUrl('device', ['agentId' => $agent['id']])}" title="点击查看代理商的设备列表...">{$agent['total']}</a>
                         {else}
@@ -156,8 +157,11 @@
                             <span class="fa fa-caret-down"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的设备</a></li>
+                                <li role="separator" class="divider"></li>                                
+                                <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-cube fa-fw"></i> 他的设备</a></li>
+                                {if \zovye\App::isInventoryEnabled()}
+                                <li><a href="{php echo $this->createWebUrl('inventory', array('op' => 'detail', 'id'=>$agent['id']));}"> <i class="fa fa-archive fa-fw"></i> 他的库存</a></li>
+                                {/if}
                                 <li><a href="{php echo $this->createWebUrl('order', array('agent_openid'=>$agent['openid']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的订单</a></li>
                                 <li><a href="{php echo $this->createWebUrl('account', array('agentId'=>$agent['id']));}"> <i class="fa fa-weixin fa-fw"></i> 他的吸粉广告</a></li>
                                 <li role="separator" class="divider"></li>
@@ -184,14 +188,15 @@
                                 {/if}
                                 <li role="separator" class="divider"></li>
                                 <li>
+                                    <a href="#">
+                                        <i class="fa fa-user"></i> 代理商ID: {$agent['id']}
+                                    </a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                <li>
                                     <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$agent['id'], 'from'=>'agent'));}" onclick="if(!confirm('确定要取消用户的代理身份吗？\r\n\r\n注意：该操作会同时删除代理商相关数据（设备，商品和广告等等）！')){return false;}">
                                         <i class="fa fa-close"></i> 取消代理身份
                                     </a>
-                                </li>
-                                <li>
-                                    <span style="display: block; padding: 3px 20px;">
-                                        <i class="fa fa-user"></i> 代理商ID: {$agent['id']}
-                                    </span>
                                 </li>
                             </ul>
                         </div>
@@ -235,7 +240,7 @@
         </script>
         {else}
         <div class="text-center text-muted">
-            暂时还没有任何代理商！
+            <i class="fa fa-question-circle"></i> 暂时还没有任何代理商！
         </div>
         {/if}
     </div>
@@ -251,6 +256,8 @@
     }
 
     $(function () {
+        localStorage.setItem('agent_list.page', {php echo intval($page)});
+        
         $('#J_total').on('click', function () {
             let s_total = parseInt($(this).data('sort')) || 0;
             s_total++;
@@ -340,18 +347,18 @@
         })
     }
     api.balanceEdit = function (id, event) {
-        api.showResult({ userid: id, op: "balance_edit" }, api.user_url);
+        api.showResult({ id, op: "balance_edit" }, api.user_url);
     }
     api.saveUserBalanceLog = function (id) {
         $('#modal-message').modal('hide');
         const total = $('input[name=total]').val();
         const memo = $('input[name=memo]').val();
-        api.showResult({ userid: id, total: total, memo: memo, op: "balance_edit_save" }, api.user_url, false, function () {
+        api.showResult({ id, total: total, memo: memo, op: "balance_edit_save" }, api.user_url, false, function () {
             api.getUserStats([id]);
         })
     }
     api.getUserStats = function (ids) {
-        $.post(api.user_url, { op: 'user_stats', ids: ids }).then(function (res) {
+        $.post(api.user_url, { op: 'user_stats', ids }).then(function (res) {
             if (res && res.status && $.isArray(res.data)) {
                 $.each(res.data, function (i, stats) {
                     const tr = $('tr[data-id=' + stats.id + ']');
@@ -363,19 +370,19 @@
         })
     }
     api.viewMsg = function (id) {
-        api.showResult({ op: 'viewmsg', id: id });
+        api.showResult({ op: 'viewmsg', id });
     }
     api.viewStatsChart = function (id) {
-        api.showResult({ op: 'viewStatsChart', id: id });
+        api.showResult({ op: 'viewStatsChart', id });
     }
     api.viewStats = function (id) {
-        api.showResult({ op: 'viewstats', id: id });
+        api.showResult({ op: 'viewstats', id });
     }
     api.createAgent = function () {
         api.showResult({ op: 'create' });
     }
     api.showMsgDetail = function (id) {
-        $.getJSON(api.url, { op: 'msglist_detail', id: id }).then(function (res) {
+        $.getJSON(api.url, { op: 'msglist_detail', id }).then(function (res) {
             if (res) {
                 if (res.status) {
                     const dlg = util.dialog(res.data.title || '', res.data.content);
@@ -389,10 +396,10 @@
         })
     }
     api.viewCommissionLog = function (id) {
-        api.showResult({ op: 'commission_log', id: id });
+        api.showResult({ op: 'commission_log', id });
     }
     api.viewKeepers = function (id) {
-        api.showResult({ op: 'keepers', id: id });
+        api.showResult({ op: 'keepers', id });
     }
     api.repair = function(data, e) {
         const self = $(e.target);

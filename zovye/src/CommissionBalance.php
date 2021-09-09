@@ -237,7 +237,7 @@ REALOD_IN;
      * @param string $addition_spec
      * @return string
      */
-    protected static function format_order_memo($id, $addition_spec = ''): string
+    protected static function format_order_memo($id, string $addition_spec = ''): string
     {
         if ($addition_spec) {
             $addition_spec = "<dt>其它</dt><dd class=\"additional\">{$addition_spec}</dd>";
@@ -383,7 +383,7 @@ ORDER;
      * @param array $extra
      * @return commission_balanceModelObj
      */
-    public function change($n, $src, $extra = []): ?commission_balanceModelObj
+    public function change($n, $src, array $extra = []): ?commission_balanceModelObj
     {
         $n = intval($n);
         if ($this->user && $n != 0) {

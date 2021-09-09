@@ -47,6 +47,12 @@ class Account extends State
     //美葩
     const MEIPA = 104;
 
+    //金粉吧
+    const KINGFANS = 105;
+
+    //史莱姆
+    const SNTO = 106;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -67,6 +73,12 @@ class Account extends State
 
     const MEIPA_NAME = '美葩';
     const MEIPA_HEAD_IMG = MODULE_URL . 'static/img/meipa_pic.png';
+
+    const KINGFANS_NAME = '金粉吧';
+    const KINGFANS_HEAD_IMG = MODULE_URL . 'static/img/kingfans_pic.png';
+
+    const SNTO_NAME = '史莱姆';
+    const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -121,20 +133,20 @@ class Account extends State
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
-            'id' => intval($entry->getId()),
-            'uid' => strval($entry->getUid()),
-            'state' => intval($entry->getState()),
-            'name' => strval($entry->getName()),
-            'title' => strval($entry->getTitle()),
+            'id' => $entry->getId(),
+            'uid' => $entry->getUid(),
+            'state' => $entry->getState(),
+            'name' => $entry->getName(),
+            'title' => $entry->getTitle(),
             'descr' => html_entity_decode($entry->getDescription()),
-            'url' => strval($entry->getUrl()),
-            'clr' => strval($entry->getClr()),
+            'url' => $entry->getUrl(),
+            'clr' => $entry->getClr(),
             'img' => $entry->isSpecial() ? $entry->getImg() : Util::toMedia($entry->getImg()),
-            'scname' => strval($entry->getScname()),
-            'total' => intval($entry->getTotal()),
-            'count' => intval($entry->getCount()),
-            'groupname' => strval($entry->getGroupName()),
-            'orderno' => intval($entry->getOrderNo()),
+            'scname' => $entry->getScname(),
+            'total' => $entry->getTotal(),
+            'count' => $entry->getCount(),
+            'groupname' => $entry->getGroupName(),
+            'orderno' => $entry->getOrderNo(),
         ];
 
         if ($entry->isVideo()) {
@@ -152,7 +164,7 @@ class Account extends State
             $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
             if ($appid) {
                 $data['appid'] = $appid;
-            }            
+            }
         }
 
         return $data;
@@ -166,16 +178,17 @@ class Account extends State
      * @return array
      * $params['max' => 1] 最多返回几个公众号
      */
-    public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array {
+    public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
+    {
         $list = [];
-        $join = function($cond, $getter_fn) use($device, $user, &$list) {
+        $join = function ($cond, $getter_fn) use ($device, $user, &$list) {
             $acc = Account::findOne($cond);
             if ($acc) {
                 $index = sprintf("%03d", $acc->getOrderNo());
                 if ($list[$index]) {
                     $index .= $acc->getId();
                 }
-                $list[$index] = function () use($getter_fn, $acc, $device, $user) {
+                $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                     //检查用户是否允许
                     $res = Util::isAvailable($user, $acc, $device);
                     if (is_error($res)) {
@@ -187,20 +200,35 @@ class Account extends State
             }
         };
 
+        //处理分组
         $groups = [];
-        
+
         $accounts = $device->getAccounts();
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
-            if ($group_name && array_key_exists($group_name, $groups)) {
-                unset($accounts[$uid]);
+            if (empty($group_name)) {
                 continue;
             }
+            if (!isset($groups[$group_name])) {
+                $groups[$group_name] = [
+                    'uid' => $uid,
+                    'orderno' => $entry['orderno'],
+                ];
+            } elseif ($entry['orderno'] > $groups[$group_name]['orderno']) {
+                $last_uid = $groups[$group_name]['uid'];
 
-            if ($group_name) {
-                $groups[$group_name] = 'exists';
+                unset($accounts[$last_uid]);
+
+                $groups[$group_name] = [
+                    'uid' => $uid,
+                    'orderno' => $entry['orderno'],
+                ];
+            } else {
+                unset($accounts[$uid]);
             }
+        }
 
+        foreach ($accounts as $entry) {
             $join(['id' => $entry['id']], function ($acc) {
                 return [$acc->format()];
             });
@@ -230,9 +258,9 @@ class Account extends State
         }
 
         //阿旗
-        if (App::isAQiinfoEnabled() && !in_array(AQiinfoAccount::getUid(), $exclude)) {
+        if (App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude)) {
             $join(['state' => Account::AQIINFO], function () use ($device, $user) {
-                return AQiinfoAccount::fetch($device, $user);
+                return AQIInfoAccount::fetch($device, $user);
             });
         }
 
@@ -247,6 +275,20 @@ class Account extends State
         if (App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude)) {
             $join(['state' => Account::MEIPA], function () use ($device, $user) {
                 return MeiPaAccount::fetch($device, $user);
+            });
+        }
+
+        //金粉吧
+        if (App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude)) {
+            $join(['state' => Account::KINGFANS], function () use ($device, $user) {
+                return KingFansAccount::fetch($device, $user);
+            });
+        }
+
+        //史莱姆
+        if (App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude)) {
+            $join(['state' => Account::SNTO], function () use ($device, $user) {
+                return SNTOAccount::fetch($device, $user);
             });
         }
 
@@ -308,7 +350,7 @@ class Account extends State
      */
     public static function findOne($cond): ?accountModelObj
     {
-        $cond = boolval($cond['id']) || boolval($cond['uid']) ? $cond : We7::uniacid($cond);
+        $cond = $cond['id'] || $cond['uid'] ? $cond : We7::uniacid($cond);
         $query = self::query($cond);
         return $query->findOne();
     }
@@ -329,15 +371,12 @@ class Account extends State
      */
     public static function removeAllAgents(accountModelObj $account): bool
     {
-        if ($account) {
-            $assign_data = $account->settings('assigned', []);
-            $assign_data['agents'] = [];
-            $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
-            if ($account->updateSettings('assigned', $assign_data)) {
-                return self::updateAccountData();
-            }
+        $assign_data = $account->settings('assigned', []);
+        $assign_data['agents'] = [];
+        $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
+        if ($account->updateSettings('assigned', $assign_data)) {
+            return self::updateAccountData();
         }
-
         return false;
     }
 
@@ -402,7 +441,7 @@ class Account extends State
 
     /**
      * 绑定或者取消绑定多个对象，（必须有一个公众号和一个或多个其它对象：设备，代理商，标签）
-     * @param array<mixed> $objs
+     * @param array $objs
      * @param array $params
      * @return bool
      */
@@ -440,7 +479,7 @@ class Account extends State
             if ($obj instanceof $accounts['classname']) {
                 $accounts['list'][] = $obj;
             } else {
-                foreach ($dst as $index => &$x) {
+                foreach ($dst as &$x) {
                     if ($obj instanceof $x['classname']) {
                         $x['list'][] = intval($obj->getId());
                         break;
@@ -578,6 +617,18 @@ class Account extends State
         return self::createSpecialAccount(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
     }
 
+    public static function createKingFansAccount(): ?accountModelObj
+    {
+        $url = Util::murl('kingfans');
+        return self::createSpecialAccount(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
+    }
+
+    public static function createSNTOAccount(): ?accountModelObj
+    {
+        $url = Util::murl('snto');
+        return self::createSpecialAccount(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+    }
+
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
     {
         $account = self::get($id);
@@ -639,13 +690,11 @@ class Account extends State
     public static function createOrUpdateFromWxPlatform(int $agent_id, string $app_id, array $auth_result = [])
     {
         $profile = WxPlatform::getAuthProfile($app_id);
-        //Util::logToFile('wxplatform', $profile);
         if (is_error($profile)) {
             return $profile;
         }
 
         $auth_data = WxPlatform::getAuthData($auth_result['AuthorizationCode']);
-        //Util::logToFile('wxplatform', $auth_data);
         if (is_error($auth_data)) {
             return $auth_data;
         }
@@ -744,7 +793,7 @@ class Account extends State
                 }
                 if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
                     //如果是授权服务号，需要使用场景二维码替换原二维码
-                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);  
+                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                 }
 
                 if (isset($account['qrcode'])) {
@@ -773,7 +822,7 @@ class Account extends State
      * @param bool $temporary
      * @return array|string
      */
-    public static function updateAuthAccountQRCode(array &$account_data, $params, $temporary = true)
+    public static function updateAuthAccountQRCode(array &$account_data, $params, bool $temporary = true)
     {
         if ($account_data['state'] == Account::AUTH) {
             $str = is_array($params) ? implode(':', $params) : strval($params);
@@ -799,7 +848,7 @@ class Account extends State
      * @param userModelObj $user
      * @return array
      */
-    public static function getUserNext(deviceModelObj $device, userModelObj  $user): array
+    public static function getUserNext(deviceModelObj $device, userModelObj $user): array
     {
         $account = self::getNext($device, $user->settings('accounts.last.uid', ''));
         if ($account) {
@@ -859,5 +908,59 @@ class Account extends State
         }
 
         return $first;
+    }
+
+    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null)
+    {
+        $data = [
+            'request_id' => REQUEST_ID,
+            'account_id' => $account->getId(),
+            'user_id' => $user->getId(),
+            'device_id' => $device->getId(),
+            'request' => json_encode($request),
+            'result' => json_encode($result),
+            'createtime' => $createtime ?? time(),
+        ];
+
+        return m('account_query')->create($data);
+    }
+
+    public static function logQuery(accountModelObj $account, $condition = []): modelObjFinder
+    {
+        return m('account_query')
+            ->where(['account_id' => $account->getId()])
+            ->where($condition);
+    }
+
+    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device)
+    {
+        $query = self::logQuery($account, [
+            'device_id' => $device->getId(),
+            'user_id' => $user->getId()
+        ]);
+        $query->orderBy('id DESC');
+        return $query->findOne();
+    }
+
+    public static function createSpecialAccountOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
+    {
+        if (App::isAccountLogEnabled()) {
+            $log = Account::getLastQueryLog($acc, $user, $device);
+            if ($log) {
+                $log->setExtraData('cb', [
+                    'time' => time(),
+                    'order_uid' => $order_uid,
+                    'data' => $cb_params,
+                ]);
+                $log->save();
+            }
+        }
+
+        Job::createSpecialAccountOrder([
+            'device' => $device->getId(),
+            'user' => $user->getId(),
+            'account' => $acc->getId(),
+            'orderUID' => $order_uid,
+        ]);
     }
 }

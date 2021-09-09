@@ -156,6 +156,18 @@ class modelObjFinder extends SqlParser
         return null;
     }
 
+    public function getAll($m)
+    {
+        if ($m) {
+            $res = We7::pdo_fetchAll($this->makeSQL($m), $this->params);
+            if ($res) {
+                return $res;
+            }
+        }
+
+        return null;
+    }
+
     public function delete($condition = []): bool
     {
         $this->where($condition);

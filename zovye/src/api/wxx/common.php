@@ -4,13 +4,13 @@ namespace zovye\api\wxx;
 
 use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
-use bluetooth\wx\protocol;
 use DateTime;
 use Exception;
 use zovye\Account;
 use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;
+use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;
@@ -175,8 +175,8 @@ class common
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
             return [
-                'data' => $cmd->getEncoded(protocol::BASE64),
-                'hex' => $cmd->getEncoded(protocol::HEX),
+                'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
+                'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
             ];
         }
 
@@ -226,8 +226,8 @@ class common
         Device::createBluetoothCmdLog($device, $cmd);
 
         return [
-            'data' => $cmd->getEncoded(protocol::BASE64),
-            'hex' => $cmd->getEncoded(protocol::HEX),
+            'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
+            'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
         ];
     }
 
@@ -255,7 +255,7 @@ class common
             return error(State::ERROR, '无法加载蓝牙协议！');
         }
 
-        $result = $proto->parseMessage($device->getImei(), $data);
+        $result = $proto->parseMessage($device->getBUID(), $data);
         if (empty($result)) {
             return error(State::ERROR, '无法解析消息！');
         }
@@ -271,8 +271,7 @@ class common
                 if ($result->isOpenResultOk()) {
                     $order->setBluetoothResultOk();
                 } elseif ($result->isOpenResultFail()) {
-                    $order->setBluetoothResultFail();
-
+                    $order->setBluetoothResultFail($result->getMessage());
                     if (Helper::NeedAutoRefund($device)) {
                         //启动退款
                         Job::refund($order->getOrderNO(), $result->getMessage());
@@ -304,25 +303,25 @@ class common
 
         $battery = $result->getBatteryValue();
 
-        $device->setQoe($battery);
-
-        if ($device->isLowBattery()) {
-            $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
-            $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+        if ($battery != -1) {
+            $device->setQoe($battery);
+            if ($device->isLowBattery()) {
+                $device->setError(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+                $device->scheduleErrorNotifyJob(Device::ERROR_LOW_BATTERY, Device::desc(Device::ERROR_LOW_BATTERY));
+            }
+            if ($battery >= 0) {
+                $data['battery'] = $battery;
+            }
         }
 
         $device->save();
-
-        if ($battery >= 0) {
-            $data['battery'] = $battery;
-        }
 
         $cmd = $result->getCmd();
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
 
-            $data['data'] = $cmd->getEncoded(protocol::BASE64);
-            $data['hex'] = $cmd->getEncoded(protocol::HEX);
+            $data['data'] = $cmd->getEncoded(IBlueToothProtocol::BASE64);
+            $data['hex'] = $cmd->getEncoded(IBlueToothProtocol::HEX);
         }
 
         return $data;
@@ -522,7 +521,10 @@ class common
             $result = 2;
         }
 
-        $result = ['result' => $result];
+        $result = [
+            'uid' => $order->getOrderNO(),
+            'result' => $result,
+        ];
 
         $vouchers = $order->getExtraData('extra.voucher.recv', 0);
         if ($vouchers > 0) {
@@ -759,7 +761,7 @@ class common
                 $time = $entry->getExtraData('refund.createtime');
                 $time_formatted = date('Y-m-d H:i:s', $time);
                 $data['refund'] = [
-                    'title' => "退款时间：{$time_formatted}",
+                    'title' => "退款时间：$time_formatted",
                     'reason' => $entry->getExtraData('refund.message'),
                 ];
                 $data['clr'] = '#ccc';
@@ -771,7 +773,7 @@ class common
             }
 
             $pay_result = $entry->getExtraData('payResult');
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $data['orderId']);
+            $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? $data['orderId']);
 
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
@@ -1196,7 +1198,7 @@ class common
                 'openid' => $openid,
                 'nickname' => $res['nickName'],
                 'avatar' => $res['avatarUrl'],
-                'mobile' => isset($res['phoneNumber']) ? $res['phoneNumber'] : '',
+                'mobile' => $res['phoneNumber'] ?? '',
                 'createtime' => time(),
             ]);
 
@@ -1280,6 +1282,6 @@ class common
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        return ['goods' => $device->getGoodsList()];
+        return ['goods' => $device->getGoodsList(null, ['allowPay'])];
     }
 }

@@ -31,6 +31,7 @@ class Advertising extends State
     const GOODS = 10; //商品推荐
     const QRCODE = 11; //推广二维码
     const PASSWD = 12; //用于推广的口令
+    const WX_APP_URL_CODE = 13; //微信小程序URL识别码
 
     public static $names = [
         self::UNKNOWN => 'default',
@@ -45,6 +46,7 @@ class Advertising extends State
         self::GOODS => 'goods',
         self::QRCODE => 'qrcode',
         self::PASSWD => 'passwd',
+        self::WX_APP_URL_CODE => 'wx_app_url_code',
     ];
 
     protected static $title = [
@@ -60,6 +62,7 @@ class Advertising extends State
         self::GOODS => '商品推荐',
         self::QRCODE => '推广二维码',
         self::PASSWD => '口令',
+        self::WX_APP_URL_CODE => '微信小程序识别码'
     ];
 
     /**
@@ -76,7 +79,7 @@ class Advertising extends State
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return modelObjFinder
      */
     public static function query($condition = []): modelObjFinder
@@ -100,7 +103,7 @@ class Advertising extends State
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @param null $type
      * @return advertisingModelObj|null
      */
@@ -150,7 +153,7 @@ class Advertising extends State
 
     public static function setAdvsLastUpdate($type, $ts = null): bool
     {
-        $ts = isset($ts) ? $ts : time();
+        $ts = $ts ?? time();
         return updateSettings("advs.version.type{$type}", $ts);
     }
 
@@ -173,7 +176,7 @@ class Advertising extends State
     public static function format(advertisingModelObj $adv): array
     {
         return [
-            'id' => intval($adv->getId()),
+            'id' => $adv->getId(),
             'title' => strval($adv->getTitle()),
             'type' => intval($adv->getType()),
             'state' => intval($adv->getState()),
@@ -299,6 +302,10 @@ class Advertising extends State
 
             $extra['code'] = trim($params['code']);
             $extra['text'] = trim($params['text']);
+
+        } elseif ($type == Advertising::WX_APP_URL_CODE) {
+
+            $extra['code'] = trim($params['code']);
 
         } else {
             $extra['url'] = trim($params['url']);

@@ -5,6 +5,7 @@ namespace zovye;
 
 use zovye\base\modelObj;
 use zovye\model\component_userModelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 
 class ComponentUser
 {

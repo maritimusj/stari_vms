@@ -387,7 +387,7 @@ if ($op == 'default') {
 
         $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
         if ($res['status']) {
-            $device->updateSettings('weigh', $set_data);
+            $device->updateSettings('weight', $set_data);
         }
         echo json_encode($res);
 
@@ -402,7 +402,7 @@ if ($op == 'default') {
 
         $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
         if ($res['status']) {
-            $device->updateSettings('weigh', $set_data);
+            $device->updateSettings('weight', $set_data);
         }
         echo json_encode($res);
 
@@ -454,7 +454,7 @@ if ($op == 'default') {
 
         $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
         if ($res['status']) {
-            $device->updateSettings('weigh', $set_data);
+            $device->updateSettings('weight', $set_data);
         }
 
         $res['price'] = $set_data['price'];
@@ -479,16 +479,42 @@ if ($op == 'default') {
 
     JSON::success($detail);
 
-} else if ($op == 'online') {
+} else if ($op == 'is_ready') {
 
     $device = Device::get(request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
+    $is_ready = false;
+
+    $scene = request::str('scene');
+    if ($scene == 'online') {
+        $is_ready = $device->isMcbOnline(false);
+    } elseif ($scene == 'lock') {
+        if (!$device->isLocked()) {
+            if (Locker::try("device:is_ready:{$device->getId()}")) {
+                $is_ready = true;
+            }
+        }
+    }
+
     JSON::success([
-        'mcb' => [
-            'online' => $device->isMcbOnline(false),
-        ]
+        'is_ready' => $is_ready,
     ]);
+
+} elseif ($op == 'goods') {
+
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户！');
+    }
+
+    $result = $device->getGoodsAndPackages($user, ['allowPay']);
+    JSON::success($result);
 }

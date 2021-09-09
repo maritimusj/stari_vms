@@ -44,7 +44,7 @@ class SQM
         }
 
         $app_secret = settings('custom.SQMPay.appSecret', '');
-        return strtoupper(md5(implode('&', $arr) . "&appsecret={$app_secret}")) === $data['sign'];
+        return strtoupper(md5(implode('&', $arr) . "&appsecret=$app_secret")) === $data['sign'];
     }
 
     public static function createOrder(deviceModelObj $device, userModelObj $user, $goodsData, $num, $params = []): bool

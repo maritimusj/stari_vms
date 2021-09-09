@@ -257,8 +257,8 @@
     color: #607D8B;
 }    
 #orderlist .orderId{
-    font-size: small;
     color: #9E9E9E;
+    white-space: nowrap;
 }
 #orderlist .account-title img {
     width: 30px;
@@ -304,3 +304,24 @@
     display: block;
 }
 
+#search-form {
+    display: none;
+}
+#orderlist i.query {
+    color:#ffc107;
+}
+#orderlist i.cb {
+    color:#4caf50;
+}
+#orderlist i.wi-money:not(.cb,.query) {
+    color:gray;
+}
+#orderlist .transactionId {
+    white-space: nowrap;
+}
+#orderlist .num.gray {
+    color: #9E9E9E;
+}
+#orderlist .order-uid {
+    color: #4caf50;
+}

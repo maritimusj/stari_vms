@@ -35,30 +35,61 @@ class MeiPaAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::MEIPA]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['apiid']) || empty($config['appkey'])) {
+                return [];
+            }
+
             //请求API
             $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
-            $result = $MeiPa->fetchOne($device, $user);
-            if (is_error($result) || $result['status'] != 1) {
-                Util::logToFile('meipa', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
+            $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEnabled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('meipa_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
 
-                $data['title'] = $result['data']['wechat_name'];
-                $data['qrcode'] = $result['data']['qrcodeurl'];
+                if (is_error($result) || $result['status'] != 1) {
+                    Util::logToFile('meipa', [
+                        'user' => $user->profile(),
+                        'acc' => $acc->getName(),
+                        'device' => $device->profile(),
+                        'error' => $result,
+                    ]);
+                } else {
+                    $data = $acc->format();
 
-                return [$data];
-            }
+                    $data['title'] = $result['data']['wechat_name'];
+                    $data['qrcode'] = $result['data']['qrcodeurl'];
+
+                    if ($result['data']['joburl']) {
+                        $data['redirect_url'] = $result['data']['joburl'];
+                    }
+
+                    if ($result['data']['code_words']) {
+                        $data['descr'] = "回复<b>{$result['data']['code_words']}</b>免费领取！";
+                    }
+
+                    if (App::isAccountLogEnabled() && isset($log)) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+
+                    $v[] = $data;
+                }
+            });
         }
-        return [];
+        
+        return $v;
     }
 
     public static function verifyData($params): array
@@ -107,16 +138,11 @@ class MeiPaAccount
                 throw new RuntimeException('找不到指定的设备！');
             }
 
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$data['order_sn']}", 0, MAX_ORDER_NO_LEN);
-
             $acc = $res['account'];
 
-            Job::createSpecialAccountOrder([
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'account' => $acc->getId(),
-                'orderUID' => $order_uid,
-            ]);
+            $order_uid = Order::makeUID($user, $device, $data['order_sn']);
+
+            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
             Util::logToFile('meipa', [
@@ -127,7 +153,7 @@ class MeiPaAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = []): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = [], callable $cb = null): array
     {
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
@@ -138,6 +164,7 @@ class MeiPaAccount
             'nickname' => $profile['nickname'],
             'headimgurl' => empty($profile['avatar']) ? $profile['headimgurl'] : $profile['avatar'],
             'sex' => $profile['sex'],
+            'country' => $profile['country'],
             'province' => $profile['province'],
             'city' => $profile['city'],
             'carry_data' => $device->getShadowId(),
@@ -145,12 +172,9 @@ class MeiPaAccount
 
         $params['sing'] = $this->sign($params);
         $result = Util::post(self::API_URL, $params, false);
-
-        Util::logToFile('meipa_query', [
-            'query' => $params,
-            'result' => $result,
-        ]);
-
+        if ($cb) {
+            $cb($params, $result);
+        }
         return $result;
     }
 

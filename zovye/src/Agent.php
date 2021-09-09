@@ -2,9 +2,6 @@
 
 namespace zovye;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use Exception;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
@@ -21,7 +18,7 @@ class Agent
      * @param bool $is_openid
      * @return agentModelObj|null
      */
-    public static function get($id, $is_openid = false): ?agentModelObj
+    public static function get($id, bool $is_openid = false): ?agentModelObj
     {
         static $cache = [];
         if ($id) {
@@ -46,7 +43,7 @@ class Agent
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return modelObjFinder
      */
     public static function query($condition = []): modelObjFinder
@@ -80,7 +77,7 @@ class Agent
      * @param string $name
      * @return array
      */
-    public static function getPayParams(agentModelObj $agent, $name = ''): array
+    public static function getPayParams(agentModelObj $agent, string $name = ''): array
     {
         $params = $agent->settings('agentData.pay', []);
         return Pay::selectPayParams($params, $name);
@@ -167,15 +164,15 @@ class Agent
         return err('失败！');
     }
 
-    public static function getAllSubordinates(userModelObj $user, array &$result = []): array
+    public static function getAllSubordinates(userModelObj $user, array &$result = [], $fetch_obj = false): array
     {
         $query = User::query(['superior_id' => $user->getId()]);
 
         /** @var userModelObj $entry */
         foreach ($query->findAll() as $entry) {
             if (!in_array($entry->getId(), $result)) {
-                $result[] = $entry->getId();
-                self::getAllSubordinates($entry, $result);
+                $result[] = $fetch_obj ? $entry : $entry->getId();
+                self::getAllSubordinates($entry, $result, $fetch_obj);
             }
         }
         return $result;

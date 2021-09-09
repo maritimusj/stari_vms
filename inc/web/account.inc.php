@@ -82,7 +82,7 @@ if ($op == 'default') {
                 'orderlimits' => $entry->getOrderLimits(),
                 'banned' => $entry->isBanned(),
                 'url' => $entry->getUrl(),
-                'assigned' => !isEmptyArray($entry->get('assigned')),                
+                'assigned' => !isEmptyArray($entry->get('assigned')),
             ];
 
             if ($entry->isAuth()) {
@@ -119,9 +119,6 @@ if ($op == 'default') {
                 $data['commission'] = $entry->get('commission', []);
             }
 
-            //总订单数
-            $data['orders'] = Order::query(['account' => $entry->getName()])->count();
-
             $accounts[] = $data;
         }
     }
@@ -134,6 +131,8 @@ if ($op == 'default') {
         Account::AQIINFO => App::isAQiinfoEnabled(),
         Account::ZJBAO => App::isZJBaoEnabled(),
         Account::MEIPA => App::isMeiPaEnabled(),
+        Account::KINGFANS => App::isKingFansEnabled(),
+        Account::SNTO => App::isSNTOEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -176,7 +175,7 @@ if ($op == 'default') {
 } elseif ($op == 'search') {
 
     $result = [];
-    
+
     $query = Account::query();
 
     $keyword = trim(urldecode(request::str('keyword')));
@@ -275,6 +274,7 @@ if ($op == 'default') {
                     'type' => Account::YUNFENBA,
                     'vendor' => [
                         'uid' => request::trim('vendorUID'),
+                        'sid' => request::trim('vendorSubUID'),
                     ]
                 ]);
             } elseif ($account->isAQiinfo()) {
@@ -301,15 +301,32 @@ if ($op == 'default') {
                     'apiid' => request::trim('apiid'),
                     'appkey' => request::trim('appkey'),
                 ]);
-            }
-            
-            elseif ($account->isAuth()) {
+            } elseif ($account->isKingFans()) {
+                $data['name'] = Account::KINGFANS_NAME;
+                $data['img'] = Account::KINGFANS_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::KINGFANS,
+                    'bid' => request::trim('bid'),
+                    'key' => request::trim('key'),
+                ]);
+            } elseif ($account->isSNTO()) {
+                $data['name'] = Account::SNTO_NAME;
+                $data['img'] = Account::SNTO_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::SNTO,
+                    'id' => request::trim('app_id'),
+                    'key' => request::trim('app_key'),
+                    'channel' => request::trim('channel'),
+                    'data' => $account->settings('config.data', []),
+                ]);
+            } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
                     $timing = 1;
                 }
                 $config = [
                     'type' => Account::AUTH,
+                    'appQRCode' => request::bool('useAppQRCode'),
                 ];
                 if (request::str('openMsgType') == 'text') {
                     $config['open'] = [
@@ -353,6 +370,8 @@ if ($op == 'default') {
                 Account::AQIINFO_NAME,
                 Account::ZJBAO_NAME,
                 Account::MEIPA_NAME,
+                Account::KINGFANS,
+                Account::SNTO,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }
@@ -378,6 +397,11 @@ if ($op == 'default') {
                 return err('创建公众号失败！');
             }
         }
+
+        $account->setExtraData('update', [
+            'time' => time(),
+            'admin' => _W('username'),
+        ]);
 
         if ($account->save() && Account::updateAccountData()) {
             //处理多个关注二维码
@@ -422,6 +446,7 @@ if ($op == 'default') {
                     'type' => Account::VIDEO,
                     'video' => [
                         'duration' => request::int('duration', 1),
+                        'exclusive' => request::int('exclusive', 0),
                     ]
                 ]);
             }
@@ -739,6 +764,94 @@ if ($op == 'default') {
     }
 
     JSON::success('修复失败！');
+
+} elseif ($op == 'viewQueryLog') {
+
+    $id = request::int('id');
+    $acc = Account::get($id);
+
+    if (empty($acc)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    $tpl_data = [
+        'account' => $acc->profile(),
+    ];
+
+    $query = Account::logQuery($acc);
+
+    if (request::has('device')) {
+        $device_id = request::int('device');
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            Util::itoast('找不到这个设备！', '', 'error');
+        }
+        $tpl_data['device'] = $device->profile();
+        $query->where(['device_id' => $device_id]);
+    }
+
+    if (request::has('user')) {
+        $user_id = request::int('user');
+        $user = User::get($user_id);
+        if (empty($user)) {
+            Util::itoast('找不到这个用户！', '', 'error');
+        }
+        $tpl_data['user'] = $user->profile();
+        $query->where(['user_id' => $user_id]);
+    }
+
+    $total = $query->count();
+    $list = [];
+
+    if ($total > 0) {
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+        $total_page = ceil($total / $page_size);
+        if ($page > $total_page) {
+            $page = 1;
+        }
+
+        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
+        $query->page($page, $page_size);
+        $query->orderBy('id DESC');
+
+        foreach ($query->findAll() as $entry) {
+            $data = [
+                'id' => $entry->getId(),
+                'request_id' => $entry->getRequestId(),
+                'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            ];
+
+            $acc = $entry->getAccount();
+            if (!empty($acc)) {
+                $data['account'] = $acc->profile();
+            }
+
+            $user = $entry->getUser();
+            if ($user) {
+                $data['user'] = $user->profile();
+            }
+
+            $device = $entry->getDevice();
+            if ($device) {
+                $data['device'] = $device->profile();
+            }
+
+            $data['request'] = $entry->getRequest();
+            $data['result'] = $entry->getResult();
+            $data['cb'] = $entry->getExtraData('cb');
+            $data['createtime'] = $entry->getCreatetime();
+
+            $list[] = $data;
+        }
+    }
+
+    $tpl_data['list'] = $list;
+
+    app()->showTemplate('web/account/log', $tpl_data);
+
 
 } elseif ($op == 'viewFansCount') {
 

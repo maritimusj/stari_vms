@@ -122,8 +122,6 @@ if ($device_id) {
     ];
 }
 
-$user = null;
-
 //创建支付宝用户
 if (Util::isAliAppContainer()) {
     if (request::op() == 'auth_alipay') {

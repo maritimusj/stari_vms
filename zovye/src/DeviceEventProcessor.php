@@ -275,25 +275,24 @@ class DeviceEventProcessor
      */
     public static function handle(string $event, array $data)
     {
-        $ok = false;
-
         $e = self::$events[$event];
         if (isset($e)) {
-            self::log($e, $data);
-            $fn = $e['handler'];
-            if (is_callable($fn)) {
-                call_user_func($fn, $data);
-                $ok = true;
-            } else {
-                Util::logToFile('events', [
-                    'event' => $event,
-                    'data' => $data,
-                    'error' => 'handler is not function!',
-                ]);
+            if (DEBUG) {
+                self::log($e, $data);
             }
-        }
-
-        if (!$ok) {
+            $fn = $e['handler'];
+            if (!empty($fn)) {
+                if (is_callable($fn)) {
+                    call_user_func($fn, $data);
+                } else {
+                    Util::logToFile('events', [
+                        'event' => $event,
+                        'data' => $data,
+                        'error' => 'handler is not function!',
+                    ]);
+                }
+            }
+        } else {
             Util::logToFile('events', [
                 'event' => $event,
                 'data' => $data,
@@ -342,7 +341,6 @@ class DeviceEventProcessor
                     'data' => $data,
                 ]);
             }
-
         }
     }
 
@@ -426,7 +424,6 @@ class DeviceEventProcessor
      */
     public static function onAppAdvMsg(array $data)
     {
-
     }
 
     /**
@@ -473,7 +470,7 @@ class DeviceEventProcessor
      * @param bool $fetch
      * @return array|bool
      */
-    public static function onAppConfigMsg(array $data, $fetch = false)
+    public static function onAppConfigMsg(array $data, bool $fetch = false)
     {
         $result = [];
 
@@ -530,7 +527,6 @@ class DeviceEventProcessor
             $result['mcbUID'] = strval($device->getImei());
 
             $device->appNotify('config', $result);
-
         } else {
             $result = [
                 'volume' => 10, //音量百分比 0 - 100
@@ -661,7 +657,7 @@ class DeviceEventProcessor
                 $device->setSig($data['extra']['RSSI']);
             }
 
-            if (isset($data['extra']['LAC'])) {                
+            if (isset($data['extra']['LAC'])) {
                 if (settings('device.lac.enabled')) {
                     $lastLAC = $device->settings('extra.v1.lac.v', '');
                     if (!empty($lastLAC) && $lastLAC != $data['extra']['LAC'] && empty($device->getS1())) {
@@ -669,7 +665,7 @@ class DeviceEventProcessor
                         $device->UpdateSettings('extra.v1.lac.time', time());
                     }
                 }
-                
+
                 $device->updateSettings('extra.v1.lac.v', strval($data['extra']['LAC']));
             }
 
@@ -696,14 +692,6 @@ class DeviceEventProcessor
      */
     public static function onMcbReload(array $data = [])
     {
-        $device = Device::get($data['uid'], true);
-        if ($device) {
-            $device->setProtocolV1Code($data['code']);
-            if ($device->payloadLockAcquire(3)) {
-                $device->resetPayload([], 'reload重置');
-                $device->save();
-            }
-        }
     }
 
     /**
@@ -722,7 +710,6 @@ class DeviceEventProcessor
      */
     public static function onMcbReset(array $data = [])
     {
-
     }
 
 

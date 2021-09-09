@@ -38,7 +38,7 @@ if (request::str('appResult') == 'nomore') {
     }
 
     $tpl_data = Util::getTplData([$user, $device]);
-    $tpl_data['exclude'][] = AQiinfoAccount::getUid();
+    $tpl_data['exclude'][] = AQIInfoAccount::getUid();
 
     //设备首页
     app()->devicePage($tpl_data);
@@ -57,7 +57,7 @@ Util::logToFile('aqiinfo', [
 ]);
 
 if (App::isAQiinfoEnabled()) {
-    AQiinfoAccount::cb($data);
+    AQIInfoAccount::cb($data);
 } else {
     Util::logToFile('aqiinfo', [
         'error' => '阿旗数据平台没有启用！',
@@ -65,4 +65,4 @@ if (App::isAQiinfoEnabled()) {
 }
 
 
-exit(AQiinfoAccount::CB_RESPONSE);
+exit(AQIInfoAccount::CB_RESPONSE);

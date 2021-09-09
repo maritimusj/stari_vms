@@ -34,21 +34,18 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
         $agent->updateSettings('repair', [
             'error' => $result,
         ]);
-
         $log['error'] = $result;
     } else {
         $used = microtime(true) - $start;
-
         $log['used'] = $used;
-
-        $agent->updateSettings('repair', [
-            'status' => 'finished',
-            'time' => time(),
-            'used' => $used,
-        ]);
-
         $log['save result'] = $agent->save();
     }
+
+    $agent->updateSettings('repair', [
+        'status' => 'finished',
+        'time' => time(),
+        'used' => $used ?? 0,
+    ]);
 
 } else {
     $log['error'] = '参数或签名错误！';

@@ -203,7 +203,7 @@ class WxPlatform
         return $result;
     }
 
-    public static function getUserProfile2($access_token, $openid): array
+    public static function getUserProfile2($access_token, $openid, $create_user = false)
     {
         $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2));
 
@@ -214,6 +214,22 @@ class WxPlatform
 
         if (!empty($result['errcode'])) {
             return err($result['errmsg']);
+        }
+
+        if ($create_user) {
+            $user = User::get($result['openid'], true);
+            if (empty($user)) {
+                $user = User::create([
+                    'app' => User::THIRD_ACCOUNT,
+                    'nickname' => $result['nickname'],
+                    'avatar' => $result['headimgurl'],
+                    'openid' => $result['openid'],
+                ]);
+                if ($user) {
+                    $user->set('fansData', $result);
+                }
+            }
+            return $user;
         }
 
         return $result;
@@ -338,6 +354,7 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+                return $result;
             }
         }
         return err('暂时无法请求！');
@@ -375,6 +392,7 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+                return $result;
             }
         }
         return err('暂时无法请求！');
@@ -604,14 +622,17 @@ class WxPlatform
                     throw new RuntimeException('找不到这个设备！');
                 }
 
+                //如果是来自屏幕二维码
                 if ($first == 'device') {
                     return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
                 }
 
-                $user = User::get($first);
-                if (empty($user)) {
-                    throw new RuntimeException('找不到这个用户！');
-                }                
+                //如果来自公众号屏幕推广二维码
+                if ($first == 'app') {
+                    $user = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName'], true);
+                } else {
+                    $user = User::get($first);
+                }
             } else {
                 $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
 
@@ -621,14 +642,6 @@ class WxPlatform
                     'appid' => $appid,
                     'openid' => $user_uid,
                 ]);
-
-//                 Util::logToFile('debug', [
-//                     'appid' => $appid,
-//                     'user_uid' => $user_uid,
-//                     'msg' => $msg,
-//                     'token' => $acc->settings('authdata.authorization_info.authorizer_access_token'),
-//                     'profile' => $profile,
-//                 ]);
 
                 if (empty($obj)) {
                     //throw new RuntimeException('请先扫描设备二维码，谢谢！');
@@ -648,19 +661,20 @@ class WxPlatform
 
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
-            } 
+            }
 
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用！');
             }
 
+            //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
             $goods = $device->getGoodsByLane(0);
-            if (empty($goods)) {
-                ZovyeException::throwWith('道货（1）没有商品，请联系管理员！', -1, $device);
+            if ($goods && $goods['num'] < 1) {
+                $goods = $device->getGoods($goods['id']);
             }
 
-            if ($goods['num'] < 1) {
-                ZovyeException::throwWith('当前商品库存不足！', -1, $device);
+            if (empty($goods) || $goods['num'] < 1) {
+                ZovyeException::throwWith('指定的商品库存不足！', -1, $device);
             }
 
             if (DEBUG) {
@@ -672,7 +686,7 @@ class WxPlatform
             }
 
             $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$uid}", 0, MAX_ORDER_NO_LEN);
+            $order_uid = Order::makeUID($user, $device, $uid);
 
             Job::createSpecialAccountOrder([
                 'device' => $device->getId(),
@@ -687,7 +701,7 @@ class WxPlatform
         } catch (ZovyeException $e) {
             Util::logToFile('debug', [
                 'error' => $e->getMessage()
-            ]);            
+            ]);
             $device = $e->getDevice();
             if ($device) {
                 $device->appShowMessage($e->getMessage(), 'error');

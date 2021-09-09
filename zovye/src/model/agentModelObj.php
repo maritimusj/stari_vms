@@ -7,13 +7,11 @@
 namespace zovye\model;
 
 use zovye\GSP;
-use zovye\State;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
 
-use function zovye\error;
 use function zovye\m;
 use function zovye\settings;
 
@@ -136,22 +134,23 @@ class agentModelObj extends userModelObj
 
     /**
      * @param string $path
+     * @param null $default
      * @return mixed
      */
-    public function getAgentData($path = '')
+    public function getAgentData(string $path = '', $default = null)
     {
         if ($this->isAgent()) {
             $key = 'agentData';
             if (!empty($path)) {
-                $key .= ".{$path}";
+                $key .= ".$path";
             }
-            return $this->settings($key);
+            return $this->settings($key, $default);
         }
 
         if ($this->isPartner()) {
             $agent = $this->getPartnerAgent();
             if ($agent) {
-                return $agent->getAgentData($path);
+                return $agent->getAgentData($path, $default);
             }
         }
 

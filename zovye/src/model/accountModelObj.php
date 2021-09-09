@@ -120,6 +120,7 @@ class accountModelObj extends modelObj
     protected $shared;
 
     protected $extra;
+
     /** @var int */
     protected $createtime;
 
@@ -128,6 +129,20 @@ class accountModelObj extends modelObj
     public static function getTableName($readOrWrite): string
     {
         return tb('account');
+    }
+
+    public function profile(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'state' => $this->getState(),
+            'clr' => $this->getClr(),
+            'name' => $this->getName(),
+            'title' => $this->getTitle(),
+            'descr' => $this->getDescription(),
+            'img' => $this->getImg(),
+            'qrcode' => $this->getQrcode(),
+        ];
     }
 
     public function isBanned(): bool
@@ -144,6 +159,8 @@ class accountModelObj extends modelObj
                 Account::AQIINFO => App::isAQiinfoEnabled(),
                 Account::ZJBAO => App::isZJBaoEnabled(),
                 Account::MEIPA => App::isMeiPaEnabled(),
+                Account::KINGFANS => App::isKingFansEnabled(),
+                Account::SNTO => App::isSNTOEnabled(),
             ];
             $state = $status[$this->getType()];
             if (isset($state) && !$state) {
@@ -224,6 +241,8 @@ class accountModelObj extends modelObj
             Account::AQIINFO,
             Account::ZJBAO,
             Account::MEIPA,
+            Account::KINGFANS,
+            Account::SNTO,
         ]);
     }
 
@@ -268,6 +287,16 @@ class accountModelObj extends modelObj
     public function isMeiPa(): bool
     {
         return $this->getType() == Account::MEIPA;
+    }
+
+    public function isKingFans(): bool
+    {
+        return $this->getType() == Account::KINGFANS;
+    }
+
+    public function isSNTO(): bool
+    {
+        return $this->getType() == Account::SNTO;
     }
 
     public function isAuth(): bool

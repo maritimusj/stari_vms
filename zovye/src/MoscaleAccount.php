@@ -35,31 +35,66 @@ class MoscaleAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
+        $v = [];
+
         /** @var accountModelObj $acc */
         $acc = Account::findOne(['state' => Account::MOSCALE]);
         if ($acc) {
             $config = $acc->settings('config', []);
+            if (empty($config['appid']) || empty($config['appsecret'])) {
+                return [];
+            }
             //请求公锤API
             $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
-            $result = $moscale->fetchOne($device, $user);
-            if (is_error($result)) {
-                Util::logToFile('moscale', [
-                    'user' => $user->profile(),
-                    'acc' => $acc->getName(),
-                    'device' => $device->profile(),
-                    'error' => $result,
-                ]);
-            } else {
-                $data = $acc->format();
+            $moscale->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEnabled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Util::logToFile('moscale_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
 
-                $data['name'] = $result['name'];
-                $data['qrcode'] = $result['qrcode_url'];
+                try {
+                    if (empty($result)) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
 
-                return [$data];
-            }
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if ($result['code'] != 200) {
+                        throw new RuntimeException('失败，错误代码：' . $result['code']);
+                    }
+
+                    $data = $acc->format();
+
+                    $data['name'] = $result['data']['name'];
+                    $data['qrcode'] = $result['data']['qrcode_url'];
+
+                    $v[] = $data;
+
+                    if (App::isAccountLogEnabled() && isset($log)) {
+                        $log->setExtraData('account', $data);
+                        $log->save();
+                    }
+                } catch (Exception $e) {
+                    if (App::isAccountLogEnabled() && isset($log)) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    } else {
+                        Util::logToFile('moscale', [
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+            });
         }
 
-        return [];
+        return $v;
     }
 
     public static function verifyData($params): array
@@ -98,7 +133,7 @@ class MoscaleAccount
 
     public static function getLabelList(): array
     {
-        return Util::cachedCall(30, function() {
+        return Util::cachedCall(30, function () {
             $acc = Account::findOne(['state' => Account::MOSCALE]);
             if ($acc) {
                 $config = $acc->settings('config', []);
@@ -109,7 +144,7 @@ class MoscaleAccount
                 }
             }
 
-            return [];           
+            return [];
         });
     }
 
@@ -126,7 +161,7 @@ class MoscaleAccount
                 }
             }
 
-            return [];            
+            return [];
         });
     }
 
@@ -150,16 +185,12 @@ class MoscaleAccount
                 throw new RuntimeException('找不到指定的设备:' . $params['state']);
             }
 
-            $order_uid = substr("U{$user->getId()}D{$device->getId()}{$params['signature']}", 0, MAX_ORDER_NO_LEN);
-
             $acc = $res['account'];
 
-            Job::createSpecialAccountOrder([
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'account' => $acc->getId(),
-                'orderUID' => $order_uid,
-            ]);
+            $order_uid = Order::makeUID($user, $device, $params['signature']);
+
+            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+
         } catch (Exception $e) {
             Util::logToFile('moscale', [
                 'error' => '回调处理发生错误! ',
@@ -174,7 +205,7 @@ class MoscaleAccount
             'app_id' => $this->app_id,
         ]);
 
-        return $this->post(self::GET_LABEL_API_URL, $data);
+        return Util::post(self::GET_LABEL_API_URL, $data);
     }
 
     public function fetchRegionData(): array
@@ -183,10 +214,10 @@ class MoscaleAccount
             'app_id' => $this->app_id,
         ]);
 
-        return $this->post(self::GET_REGION_API_URL, $data);
+        return Util::post(self::GET_REGION_API_URL, $data);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null): array
+    public function fetchOne(deviceModelObj $device, userModelObj $user = null, callable $cb = null): array
     {
         $key = $device->settings('extra.moscale.key', '');
         if (empty($key)) {
@@ -236,23 +267,11 @@ class MoscaleAccount
 
         $data = $this->sign($params);
 
-        $result = $this->post(self::API_URL, $data);
+        $result = Util::post(self::API_URL, $data);
 
-        if ($result['code'] != 200) {
-            return error(intval($result['code']), empty($result['msg']) ? '发生错误' : $result['msg']);
+        if ($cb) {
+            $cb($data, $result);
         }
-
-        return $result['data'];
-    }
-
-    private function post($url, $data): array
-    {
-        $result = Util::post($url, $data);
-
-         Util::logToFile('moscale_query', [
-             'request' => $data,
-             'result' => $result,
-         ]);
 
         return $result;
     }

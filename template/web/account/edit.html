@@ -80,7 +80,17 @@
                         <input type="number" class="form-control" name="duration" id="duration" value="{php echo $account?$account->getDuration():'1'}">
                         <span class="help-block">* 用户等待视频播放指定时长后，才能成功领取奖励</span>
                     </div>
-                </div>         
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <label>
+                            <input type="checkbox" name="exclusive" id="exclusive" value="1" {if $account && $account->settings('config.video.exclusive')}checked{/if}>
+                            同一时间只允许一个用户观看视频
+                        </label>
+                        <span class="help-block">* 用户必须等待其他用户观看完成后，才能点击观看视频</span>
+                    </div>
+                </div>
                 {else}
                     {if $account && $account->isAuth()}
                     <input name="qrcode" type="hidden" value="{php echo $account->getQrcode()}">
@@ -189,13 +199,15 @@
                 </div>
                 <div class="seg">
                     <div class="title">其它设置</div>
+                    {if empty($account) || !$account->isSpecial()}
                     <div class="form-group">
                         <label for="groupname" class="col-md-2 control-label">分组名称</label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="groupname" id="groupname" value="{php echo $account?$account->getGroupName():''}">
-                            <span class="help-block">* 可选，同一分组的公众号不会同时出现在公众号关注页面中</span>
+                            <span class="help-block">* 可选，同一分组的公众号只有排序值最大的才会显示在公众号关注页面中</span>
                         </div>
                     </div>
+                    {/if}
                     <div class="form-group">
                         <label for="orderno" class="col-md-2 control-label">排序</label>
                         <div class="col-md-10">
@@ -214,6 +226,16 @@
                     {/if}
                     {if \zovye\App::isWxPlatformEnabled() && $account && $account->isAuth()}
                     <div class="seg-divider"></div>
+                    {if $account->isVerified()}
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕推广</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="useAppQRCode" name="useAppQRCode" value="1" {if $config['appQRCode']}checked{/if}> 在设备屏幕上进行推广
+                            </label>
+                        </div>
+                    </div>
+                    {/if}
                     <div class="form-group">
                         <label class="col-md-2 control-label">出货时机</label>
                         <div class="col-md-8">
@@ -229,7 +251,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="OpenMsg" class="col-md-2 control-label">消息推送</label>
+                        <label for="openMsgType" class="col-md-2 control-label">消息推送</label>
                         <div class="col-md-10">
                             <select style="width: 100%;" name="openMsgType" id="openMsgType">
                                 <option value="text"{if isset($config['open']['msg'])} selected{/if}>文本消息</option>
@@ -271,13 +293,6 @@
                     {if \zovye\App::isJfbEnabled() && $account && $account->isJFB()}
                     <div class="seg-divider"></div>
                     <div class="form-group">
-                        <label for="appNO" class="col-md-2 control-label">APP NO</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="appNO" id="appNO" value="{$config['appno']}">
-                            <span class="help-block">* 准粉吧 APP NO</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label for="scene" class="col-md-2 control-label">场景</label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="scene" id="scene" value="{$config['scene']}">
@@ -304,7 +319,7 @@
                     <div class="form-group">
                         <label for="appsecret" class="col-md-2 control-label">公锤 app secret</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="appsecret" id="appsecret" value="{$config['appsecret']}">
+                            <input type="text" class="form-control inputMask" name="appsecret" id="appsecret" value="{$config['appsecret']}">
                             <span class="help-block"></span>
                         </div>
                     </div>
@@ -316,6 +331,13 @@
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="vendorUID" id="vendorUID" value="{$config['vendor']['uid']}">
                             <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorUID" class="col-md-2 control-label">云粉渠道二级UID</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="vendorSubUID" id="vendorSubUID" value="{$config['vendor']['sid']}">
+                            <span class="help-block">* 二级UID，由云粉吧提供，没有可以忽略</span>
                         </div>
                     </div>
                     {/if}
@@ -331,7 +353,7 @@
                     <div class="form-group">
                         <label for="secret" class="col-md-2 control-label">阿旗数据平台 appsecret</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="secret" id="secret" value="{$config['secret']}">
+                            <input type="text" class="form-control inputMask" name="secret" id="secret" value="{$config['secret']}">
                             <span class="help-block"></span>
                         </div>
                     </div>
@@ -348,7 +370,7 @@
                     <div class="form-group">
                         <label for="secret" class="col-md-2 control-label">纸巾宝平台 appsecret</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="secret" id="secret" value="{$config['secret']}">
+                            <input type="text" class="form-control inputMask" name="secret" id="secret" value="{$config['secret']}">
                             <span class="help-block"></span>
                         </div>
                     </div>
@@ -365,7 +387,7 @@
                     <div class="form-group">
                         <label for="appkey" class="col-md-2 control-label">美葩平台 appkey</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="appkey" id="appkey" value="{$config['appkey']}">
+                            <input type="text" class="form-control inputMask" name="appkey" id="appkey" value="{$config['appkey']}">
                             <span class="help-block"></span>
                         </div>
                     </div>
@@ -373,6 +395,53 @@
                         <label class="col-md-2 control-label">美葩平台 回调网址</label>
                         <div class="col-md-10">
                             <span class="form-control operate" style="overflow:hidden;"><i class="fa fa-paste" title="复制网址" data-url="{php echo \zovye\Util::murl('meipai')}"></i> {php echo \zovye\Util::murl('meipai')}</span>
+                        </div>
+                    </div>
+                    {/if}
+                    {if \zovye\App::isKingFansEnabled() && $account && $account->isKingFans()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="apiid" class="col-md-2 control-label">金粉吧渠道ID</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="bid" id="bid" value="{$config['bid']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appkey" class="col-md-2 control-label">金粉吧渠道key</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control inputMask" name="key" id="key" value="{$config['key']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">金粉吧平台 回调网址</label>
+                        <div class="col-md-10">
+                            <span class="form-control operate" style="overflow:hidden;"><i class="fa fa-paste" title="复制网址" data-url="{php echo \zovye\Util::murl('kingfans')}"></i> {php echo \zovye\Util::murl('kingfans')}</span>
+                        </div>
+                    </div>
+                    {/if}
+                    {if \zovye\App::isSNTOEnabled() && $account && $account->isSNTO()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="channel" class="col-md-2 control-label">史莱姆 channel id</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="channel" id="channel" value="{$config['channel']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="app_id" class="col-md-2 control-label">史莱姆 app_id</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="app_id" id="app_id" value="{$config['id']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="app_key" class="col-md-2 control-label">史莱姆 app_key</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control inputMask" name="app_key" id="app_key" value="{$config['key']}">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                     {/if}

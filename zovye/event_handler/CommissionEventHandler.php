@@ -347,7 +347,8 @@ class CommissionEventHandler
 
                 //第2步，计算商品利润（减去成本价）
                 $goods = $order->getGoods();
-                $costPrice = $goods->getCostPrice();
+
+                $costPrice = empty($goods) ? 0 : $goods->getCostPrice();
 
                 $commission_price -= $costPrice;
 
@@ -357,7 +358,10 @@ class CommissionEventHandler
                 }
 
                 //第4步，成本及剩余利润分配给代理商
-                $commission_price += $costPrice;
+                if ($goods && empty($goods->getExtraData('cw', 0))) {
+                    //成本参与分佣
+                    $commission_price += $costPrice;
+                }
 
                 if ($commission_price < 1) {
                     return true;

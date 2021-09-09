@@ -56,8 +56,7 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">回调网址</label>
                     <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址"
-                                data-url="{$cb_url}"></i> {$cb_url}</span>
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$cb_url}"></i> {$cb_url}</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -74,12 +73,21 @@
             <div class="seg">
                 <div class="title">本地服务器</div>
                 <div class="form-group">
+                    {if $migrate}
+                    <div class="page_item">
+                        <span>立即升级</span>
+                        <span class="duration operate">
+                            <i class="fa fa-flash" title="点击立即升级" data-op="migrate"></i>
+                        </span>
+                    </div>
+                    {else}
                     <div class="page_item">
                         <span>重置升级</span>
                         <span class="duration operate">
                             <i class="fa fa-reply-all" title="点击重置升级" data-op="reset"></i>
                         </span>
                     </div>
+                    {/if}
                     {if $is_locked}
                     <div class="page_item">
                         <span>锁定状态</span>
@@ -154,6 +162,22 @@
                             </label>
                         </div>
                     </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="Inventory" id="Inventory" value="1" {if $settings['inventory']['enabled']}checked{/if}>
+                                开启库存管理功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="AccountAppQRCode" id="AccountAppQRCode" value="1" {if $settings['account']['appQRCode']['enabled']}checked{/if}>
+                                开启公众号屏幕推广功能
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="seg">
@@ -215,6 +239,22 @@
                             </label>
                         </div>
                     </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="kingFAN" id="kingFAN" value="1" {if $settings['king']['fan']['enabled']}checked{/if}>
+                                开启金粉吧吸粉功能
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="sntoFAN" id="sntoFAN" value="1" {if $settings['snto']['fan']['enabled']}checked{/if}>
+                                开启史莱姆吸粉功能
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="seg">
@@ -260,6 +300,14 @@
                             </label>
                         </div>
                     </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="DonatePay" id="DonatePay" value="1" {if $settings['custom']['DonatePay']['enabled']}checked{/if}>
+                                启用轻松筹爱心捐款功能
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -271,7 +319,7 @@
     </div>
 </form>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210716')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('settings');}");
         zovye.op('reset', function(self, next) {

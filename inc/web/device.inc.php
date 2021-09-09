@@ -13,6 +13,7 @@ use DateTime;
 
 use Exception;
 use RuntimeException;
+use ZipArchive;
 use zovye\model\device_eventsModelObj;
 use zovye\model\device_feedbackModelObj;
 use zovye\model\device_groupsModelObj;
@@ -69,8 +70,8 @@ if ($op == 'list') {
     }
 
     if (request::has('types')) {
-        $typeid = request::int('types');
-        $type = DeviceTypes::get($typeid);
+        $type_id = request::int('types');
+        $type = DeviceTypes::get($type_id);
         if (empty($type)) {
             Util::itoast('找不到这个型号！', $this->createWebUrl('device'), 'error');
         }
@@ -82,6 +83,8 @@ if ($op == 'list') {
             ]
         ];
     }
+
+    $tpl_data['page'] = request::int('page', 1);
 
     app()->showTemplate('web/device/default_new', $tpl_data);
 } elseif ($op == 'search') {
@@ -184,7 +187,6 @@ if ($op == 'list') {
 
             if ($entry->isVDevice() || $entry->isBlueToothDevice()) {
                 $data['status']['mcb'] = true;
-                $data['status']['app'] = true;
             } else {
                 $status = $devices_status[$entry->getImei()];
                 if (isset($status['mcb']['online'])) {
@@ -286,6 +288,14 @@ if ($op == 'list') {
                 if ($group) {
                     $data['group'] = $group->format();
                 }
+            }
+
+            $tags = $entry->getTagsAsText(false);
+            foreach ($tags as $i => $title) {
+                $data['tags'][] = [
+                    'id' => $i,
+                    'title' => $title,
+                ];
             }
 
             $accounts = $entry->getAssignedAccounts();
@@ -408,11 +418,17 @@ if ($op == 'list') {
     $tpl_data['device_types'] = $device_types;
 
     if (App::isMoscaleEnabled()) {
-        $tpl_data['moscaleMachineKey'] = is_array($extra) ? strval($extra['moscale']['key']) : '';
+        $tpl_data['moscaleMachineKey'] = isset($extra) && is_array($extra) ? strval($extra['moscale']['key']) : '';
         $tpl_data['moscaleLabelList'] = MoscaleAccount::getLabelList();
-        $tpl_data['moscaleAreaListSaved'] = is_array($extra) ? $extra['moscale']['label'] : [];
+        $tpl_data['moscaleAreaListSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['label'] : [];
         $tpl_data['moscaleRegionData'] = MoscaleAccount::getRegionData();
-        $tpl_data['moscaleRegionSaved'] = is_array($extra) ? $extra['moscale']['region'] : [];
+        $tpl_data['moscaleRegionSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['region'] : [];
+    }
+
+    if (App::isZJBaoEnabled()) {
+        $tpl_data['zjbao'] = [
+            'scene' => isset($device) ? $device->settings('zjbao.scene', '') : '',
+        ];
     }
 
     app()->showTemplate('web/device/edit_new', $tpl_data);
@@ -459,7 +475,7 @@ if ($op == 'list') {
         Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
     }
 
-    $result = Util::transactionDo(function() use ($device) {
+    $result = Util::transactionDo(function () use ($device) {
         if (!request::isset('lane') || request::str('lane') == 'all') {
             $data = [];
         } else {
@@ -529,6 +545,11 @@ if ($op == 'list') {
     $device->remove('statsData');
     $device->remove('lastErrorData');
     $device->remove('extra');
+
+    //删除相关套餐
+    foreach (Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
+        $entry->destroy();
+    }
 
     //通知实体设备
     $device->appNotify();
@@ -726,6 +747,14 @@ if ($op == 'list') {
                 $activeRes = Util::activeDevice($device->getImei());
             }
 
+            //绑定套餐
+            if (!$device->isBlueToothDevice()) {
+                foreach (Package::query(['device_id' => 0])->findAll() as $entry) {
+                    $entry->setDeviceId($device->getId());
+                    $entry->save();
+                }
+            }
+
             //绑定appId
             $device->updateAppId();
         }
@@ -754,7 +783,7 @@ if ($op == 'list') {
                 unset($old[$index]);
             }
 
-            foreach($old as $index => $lane) {
+            foreach ($old as $index => $lane) {
                 $device->resetPayload([$index => '@0'], '管理员删除货道', $now);
             }
 
@@ -807,6 +836,7 @@ if ($op == 'list') {
         }
 
         $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
+        $extra['goodsList'] = request::trim('goodsList');
 
         //合并extra
         $extra = array_merge($device->get('extra', []), $extra);
@@ -841,6 +871,10 @@ if ($op == 'list') {
             } else {
                 AliTicket::unregisterDevice($device);
             }
+        }
+
+        if (App::isZJBaoEnabled()) {
+            $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
         }
 
         //更新公众号缓存
@@ -882,7 +916,11 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    JSON::success($device->getOnlineDetail(false));
+    $res = $device->getOnlineDetail(false);
+    if (empty($res)) {
+        JSON::fail('请求出错，请稍后再试！');
+    }
+    JSON::success($res);
 
 } elseif ($op == 'deviceTest') {
 
@@ -996,6 +1034,14 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
     $tpl_data['payload'] = $device->getPayload(true);
 
+    $packages = [];
+    $query = Package::query(['device_id' => $device->getId()]);
+    foreach ($query->findAll() as $i) {
+        $packages[] = $i->format(true);
+    }
+
+    $tpl_data['packages'] = $packages;
+
     $tpl_data['mcb_online'] = $device->isMcbOnline();
     $tpl_data['app_online'] = $device->isAppOnline();
 
@@ -1043,7 +1089,7 @@ if ($op == 'list') {
             'code' => strval($entry->getExtraData('code', '')),
             'clr' => strval($entry->getExtraData('clr', '#9e9e9e')),
             'createtime' => $entry->getCreatetime(),
-            'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];
         $goods = Goods::get($entry->getGoodsId());
         if ($goods) {
@@ -1053,7 +1099,7 @@ if ($op == 'list') {
     }
 
     $verified = [];
-    foreach($logs as $index => $log) {
+    foreach ($logs as $index => $log) {
         $code = $log['code'];
         if (isset($verified[$code])) {
             continue;
@@ -1076,7 +1122,7 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
 
     app()->showTemplate('web/device/payload', $tpl_data);
-    
+
 } elseif ($op == 'log') {
 
     $device = Device::get(request('id'));
@@ -1461,7 +1507,7 @@ if ($op == 'list') {
         }
     );
 
-    Util::resultJSON(is_error($res) ? false : true, ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
+    Util::resultJSON(!is_error($res), ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
 } elseif ($op == 'unlock') {
 
     $id = request::int('id');
@@ -1662,7 +1708,7 @@ if ($op == 'list') {
             'id' => intval($entry->getId()),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
-            'create' => date('Y-m-d H:i', $entry->getCreatetime()),
+            'createtime' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
         $agent = $entry->getAgent();
         if ($agent) {
@@ -1715,8 +1761,8 @@ if ($op == 'list') {
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
-            'create' => date('Y-m-d H:i', $entry->getCreatetime()),
-            'total' => Device::query(['group_id' => $entry->getId()])->count()
+            'total' => Device::query(['group_id' => $entry->getId()])->count(),
+            'createtime_foramtted' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
         $agent = $entry->getAgent();
         if ($agent) {
@@ -1749,7 +1795,7 @@ if ($op == 'list') {
     $tpl_data['id'] = $id;
 
     /** @var device_groupsModelObj $one */
-    $one = Group::get($id);;
+    $one = Group::get($id);
     if (empty($one)) {
         Util::itoast('分组不存在！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
     }
@@ -1761,14 +1807,13 @@ if ($op == 'list') {
 
     if ($one) {
         $agent = $one->getAgent();
-        if (empty($agent)) {
-            Util::itoast('找不到这个代理商！', $this->createWebUrl('device', ['op' => 'new_group']), 'error');
+        if (!empty($agent)) {
+            $tpl_data['agent'] = [
+                'id' => $agent->getId(),
+                'name' => $agent->getName(),
+                'mobile' => $agent->getMobile(),
+            ];
         }
-        $tpl_data['agent'] = [
-            'id' => $agent->getId(),
-            'name' => $agent->getName(),
-            'mobile' => $agent->getMobile(),
-        ];
     }
 
     app()->showTemplate('web/device/new_group', $tpl_data);
@@ -2408,15 +2453,15 @@ if ($op == 'list') {
     $url_prefix = We7::attachment_set_attach_url();
     $attach_prefix = ATTACHMENT_ROOT;
 
-    $zip = new \ZipArchive();
+    $zip = new ZipArchive();
     $file_name = time() . '_' . rand() . '.zip';
     $file_path = $attach_prefix . $file_name;
-    $zip->open($file_path, \ZipArchive::CREATE);   //打开压缩包
+    $zip->open($file_path, ZipArchive::CREATE);   //打开压缩包
 
     $ids = request::array('ids', []);
     $query = Device::query(['id' => $ids]);
 
-    foreach($query->findAll() as $device) {
+    foreach ($query->findAll() as $device) {
         $file_real = str_replace($url_prefix, $attach_prefix, $device->getQrcode());
         $file_real = preg_replace('/\?.*/', '', $file_real);
         if (file_exists($file_real)) {

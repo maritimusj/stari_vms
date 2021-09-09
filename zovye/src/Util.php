@@ -11,6 +11,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use ali\aop\request\AlipayUserInfoShareRequest;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use QRcode;
@@ -111,11 +112,10 @@ class Util
             $user = User::get(App::getUserUID(), true);
         } else {
             if (empty($user)) {
-                $fans = Util::fansInfo();
+                $update = !empty($params['update']);
+                $fans = Util::fansInfo($update);
                 if ($fans && !empty($fans['openid'])) {
                     $user = User::get($fans['openid'], true);
-
-                    $update = empty($params['update']) ? false : true;
                     if (empty($user) && !empty($params['create'])) {
                         $data = [
                             'app' => User::WX,
@@ -174,11 +174,27 @@ class Util
     /**
      * 获取fans数据.
      *
+     * @param bool $update
      * @return array
      */
-    public static function fansInfo(): array
+    public static function fansInfo(bool $update = false): array
     {
-        if (_W('openid')) {
+        $openid = _W('openid');
+        if ($openid) {
+            if ($update) {
+                $userinfo = self::cachedCall(6, function () use ($openid) {
+                    $oauth_account = \WeAccount::createByUniacid();
+                    $userinfo = $oauth_account->fansQueryInfo($openid);
+                    $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
+                    $userinfo['avatar'] = $userinfo['headimgurl'];
+                    return $userinfo;
+                }, $openid);
+
+                //接口调用次数上限后，$userinfo中相关字段为空
+                if (!empty($userinfo['nickname']) && !empty($userinfo['avatar'])) {
+                    return $userinfo;
+                }
+            }
             $res = We7::mc_oauth_userinfo();
             if (!is_error($res)) {
                 return $res;
@@ -188,12 +204,15 @@ class Util
         return [];
     }
 
-    protected static function getAliUserSex($gender)
+    protected static function getAliUserSex($gender): int
     {
-        switch($gender) {
-            case 'm': return 1;
-            case 'f': return 2;
-            default: return 0;
+        switch ($gender) {
+            case 'm':
+                return 1;
+            case 'f':
+                return 2;
+            default:
+                return 0;
         }
     }
 
@@ -256,7 +275,7 @@ class Util
                     $user->set('fromData', $params['from']);
                 }
             }
-            
+
             if ($user) {
                 $user->setNickname($nick_name);
                 $user->setAvatar($avatar);
@@ -265,14 +284,13 @@ class Util
                     'city' => $result->alipay_user_info_share_response->city,
                     'sex' => self::getAliuserSex($result->alipay_user_info_share_response->gender),
                 ]);
-                $user->save();                
+                $user->save();
             }
 
             return $user;
-
         } catch (Exception $e) {
             Util::logToFile('error', [
-                'msg' => '获取阿里用户身份失败！',
+                'msg' => '获取支付宝用户失败！',
                 'error' => $e->getMessage(),
             ]);
         }
@@ -305,38 +323,63 @@ class Util
         return $log_dir . DIRECTORY_SEPARATOR . date('Ymd') . '.log';
     }
 
+    public static function deleteExpiredLogFiles(string $name, $keep_days = 3)
+    {
+        $files = [];
+        $patten = self::logDir($name) . '/*.log';
+        foreach (glob($patten) as $filename) {
+            if (is_file($filename)) {
+                $files[basename($filename, '.log')] = $filename;
+            }
+        }
+        $date = new DateTime();
+        do {
+            unset($files[$date->format('Ymd')]);
+            $date->modify('-1 day');
+        } while (--$keep_days > 0);
+
+        foreach ($files as $filename) {
+            unlink($filename);
+        }
+    }
+
     /**
      * 输出指定变量到文件中
      * @param string $name 日志名称
      * @param mixed $data 数据
      * @return bool
      */
-    
+
     static $log_cache = [];
 
     public static function logToFile(string $name, $data): bool
     {
-        if (empty(self::$log_cache)) {
-            register_shutdown_function(function () {
-                foreach (self::$log_cache as $filename => $data) {
-                    if ($filename && $data) {
-                        file_put_contents($filename, $data, FILE_APPEND);
+        if (DEBUG) {
+            if (empty(self::$log_cache)) {
+                register_shutdown_function(function () use ($name) {
+                    foreach (self::$log_cache as $filename => $data) {
+                        if ($filename && $data) {
+                            file_put_contents($filename, $data, FILE_APPEND);
+                        }
                     }
-                }
-            });
+                    if (rand(0, 10) == 10) {
+                        self::deleteExpiredLogFiles($name);
+                    }
+                });
+            }
+
+            ob_start();
+
+            echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
+
+            print_r($data);
+
+            echo PHP_EOL;
+
+            $log_filename = self::logFileName($name);
+
+            self::$log_cache[$log_filename][] = ob_get_clean();
         }
-
-        ob_start();
-
-        echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
-
-        print_r($data);
-
-        echo PHP_EOL;
-
-        $log_filename = self::logFileName($name);       
-         
-        self::$log_cache[$log_filename][] = ob_get_clean(); 
 
         return true;
     }
@@ -537,10 +580,10 @@ include './index.php';
         }
 
         $sc_name = $account->getScname();
-        $total = intval($account->getTotal());
-        $count = intval($account->getCount());
-        $sc_count = intval($account->getSccount());
-        $order_limits = intval($account->getOrderLimits());
+        $total = $account->getTotal();
+        $count = $account->getCount();
+        $sc_count = $account->getSccount();
+        $order_limits = $account->getOrderLimits();
 
         //检查性别，手机限制
         $limits = $account->get('limits');
@@ -682,8 +725,7 @@ include './index.php';
 
             $agent = $device->getAgent();
             if ($agent) {
-                $agent_data = $agent->getAgentData();
-                $max_free = intval($agent_data['misc']['maxFree']);
+                $max_free = $agent->getAgentData('misc.maxFree', 0);
             }
 
             $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxFree', 0);
@@ -714,6 +756,117 @@ include './index.php';
         }
 
         return 'unknown';
+    }
+
+    public static function updateOrderCounters(orderModelObj $order)
+    {
+        if ($order->getUpdatetime() > 0) {
+            return true;
+        }
+
+        if (!Locker::try("order:counter:{$order->getId()}")) {
+            return false;
+        }
+
+        $uid = App::uid(6);
+        $counters = [
+            "$uid:order:all" => function () {
+                return Order::query()->count();
+            }
+        ];
+
+        $createtime = $order->getCreatetime();
+        $counters[$uid . ':order:month:' . date('Y-m', $createtime)] = function () use ($createtime) {
+            $start = new DateTime("@$createtime");
+            $start->modify('first day of this month 00:00');
+            $end = new DateTime("@$createtime");
+            $end->modify('first day of next month 00:00');
+            return Order::query([
+                'createtime >=' => $start->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->count();
+        };
+        $counters[$uid . ':order:day:' . date('Y-m-d', $createtime)] = function () use ($createtime) {
+            $start = new DateTime("@$createtime");
+            $start->modify('00:00');
+            $end = new DateTime("@$createtime");
+            $end->modify('next day 00:00');
+            return Order::query([
+                'createtime >=' => $start->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->count();
+        };
+
+        $device = $order->getDevice();
+        if ($device) {
+            $counters["device:{$device->getId()}:order:all"] = function () use ($device) {
+                return Order::query([
+                    'device_id' => $device->getId(),
+                ])->count();
+            };
+            $counters["device:{$device->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($device, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('first day of this month 00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('first day of next month 00:00');
+                return Order::query([
+                    'device_id' => $device->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+            $counters["device:{$device->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($device, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('next day 00:00');
+                return Order::query([
+                    'device_id' => $device->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+        }
+
+        $agent = $order->getAgent();
+        if ($agent) {
+            $counters["agent:{$agent->getId()}:order:all"] = function () use ($agent) {
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                ])->count();
+            };
+            $counters["agent:{$agent->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($agent, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('first day of this month 00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('first day of next month 00:00');
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+            $counters["agent:{$agent->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($agent, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('next day 00:00');
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+        }
+
+        return Util::transactionDo(function () use ($order, $counters) {
+            foreach ($counters as $uid => $initFN) {
+                if (!Counter::increment($uid, 1, $initFN)) {
+                    return err('fail');
+                }
+            }
+            return true;
+        });
     }
 
     /**
@@ -778,6 +931,9 @@ include './index.php';
                     );
                 }
             }
+
+            $result['counter'] = self::updateOrderCounters($order);
+
         } else {
             $result[] = $order->getId() . ' lock failed!';
         }
@@ -795,7 +951,7 @@ include './index.php';
      *
      * @return ?RowLocker
      */
-    public static function lockObject(modelObj $obj, array $cond, $auto_unlock = false): ?RowLocker
+    public static function lockObject(modelObj $obj, array $cond, bool $auto_unlock = false): ?RowLocker
     {
         $seg = key($cond);
         if (is_string($seg)) {
@@ -819,7 +975,7 @@ include './index.php';
      * @param string $redirect
      * @param string $type
      */
-    public static function message($msg, $redirect = '', $type = '')
+    public static function message($msg, string $redirect = '', string $type = '')
     {
         We7::message($msg, $redirect, $type);
     }
@@ -829,7 +985,7 @@ include './index.php';
      * @param string $redirect
      * @param string $type
      */
-    public static function itoast($msg, $redirect = '', $type = '')
+    public static function itoast($msg, string $redirect = '', string $type = '')
     {
         We7::itoast($msg, $redirect, $type);
     }
@@ -889,7 +1045,7 @@ include './index.php';
 </script>
 JS1;
         } elseif (Util::isAliAppContainer()) {
-$js =<<<JS2
+            $js = <<<JS2
 <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
 <script>
 const url = "{$redirect}";
@@ -959,7 +1115,7 @@ HTML_CONTENT;
      *
      * @return string
      */
-    public static function fetchJSSDK($debug = false): string
+    public static function fetchJSSDK(bool $debug = false): string
     {
         ob_start();
         We7::register_jssdk($debug);
@@ -978,7 +1134,7 @@ HTML_CONTENT;
     {
         $result = [];
 
-        if ($agent && $type) {
+        if ($type) {
             $agent_data = $agent->getAgentData();
             if ($agent_data['notice'][$type]) {
                 $result[$agent->getId()] = $agent->getOpenid();
@@ -1183,7 +1339,7 @@ HTML_CONTENT;
      *
      * @return mixed
      */
-    public static function toMedia($src, $use_image_proxy = false, $local_path = false): string
+    public static function toMedia($src, bool $use_image_proxy = false, bool $local_path = false): string
     {
         if (empty(_W('attachurl'))) {
             We7::load()->model('attachment');
@@ -1346,7 +1502,7 @@ HTML_CONTENT;
      *
      * @return array
      */
-    public static function deviceTest($user, $device, $lane = Device::DEFAULT_CARGO_LANE, $params = []): array
+    public static function deviceTest($user, $device, int $lane = Device::DEFAULT_CARGO_LANE, array $params = []): array
     {
         if (is_string($device)) {
             $device = Device::get($device, true);
@@ -1433,7 +1589,7 @@ HTML_CONTENT;
      * @return array
      * @throws Exception
      */
-    public static function openDevice($args = []): array
+    public static function openDevice(array $args = []): array
     {
         ignore_user_abort(true);
         set_time_limit(0);
@@ -1589,8 +1745,7 @@ HTML_CONTENT;
             if ($args['orderId']) {
                 $order_data['order_id'] = $args['orderId'];
             } else {
-                $no_str = Util::random(32);
-                $order_data['order_id'] = substr("U{$user->getId()}D{$device->getId()}{$no_str }", 0, MAX_ORDER_NO_LEN);
+                $order_data['order_id'] = Order::makeUID($user, $device);
             }
 
             if ($voucher) {
@@ -1639,7 +1794,7 @@ HTML_CONTENT;
             }
 
             $data = [
-                'online' => $args['online'] === false ? false : true,
+                'online' => !($args['online'] === false),
                 'channel' => $mcb_channel,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 'userid' => $user->getOpenid(),
@@ -1680,7 +1835,6 @@ HTML_CONTENT;
                     //退款任务
                     Job::refund($order->getOrderNO(), $res['message']);
                 }
-
             } else {
                 $order->setResultCode(0);
 
@@ -1744,12 +1898,24 @@ HTML_CONTENT;
     /**
      * 在事务中执行指定函数.
      *
-     * @param callable $cb 要执行的函数
+     * @param callable $cb 要执行的函数, return error(..)或者抛出异常会回退事务
      *
      * @return mixed
      */
     public static function transactionDo(callable $cb)
     {
+        $key = 'transaction:' . REQUEST_ID;
+
+        if (We7::cache_read($key)) {
+            try {
+                return $cb();
+            } catch (Exception $e) {
+                return err($e->getMessage());
+            }
+        }
+
+        We7::cache_write($key, microtime(true));
+
         We7::pdo_begin();
         try {
             $ret = $cb();
@@ -1762,13 +1928,15 @@ HTML_CONTENT;
         } catch (Exception $e) {
             We7::pdo_rollback();
             return err($e->getMessage());
+        } finally {
+            We7::cache_delete($key);
         }
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function getClientIp()
+    public static function getClientIp(): string
     {
         return We7::getip();
     }
@@ -2047,9 +2215,9 @@ HTML_CONTENT;
      * @param $length
      * @param bool $numeric
      *
-     * @return mixed
+     * @return string
      */
-    public static function random($length, $numeric = false)
+    public static function random($length, bool $numeric = false): string
     {
         return We7::random($length, $numeric);
     }
@@ -2073,9 +2241,9 @@ HTML_CONTENT;
      * @param string $do
      * @param array $params
      * @param bool $eid
-     * @return mixed
+     * @return string
      */
-    public static function url($do = '', array $params = [], $eid = true)
+    public static function url(string $do = '', array $params = [], bool $eid = true): string
     {
         $params['m'] = APP_NAME;
 
@@ -2092,7 +2260,7 @@ HTML_CONTENT;
      * @param bool $full_url
      * @return string
      */
-    public static function murl($do = '', array $params = [], $full_url = true): string
+    public static function murl(string $do = '', array $params = [], bool $full_url = true): string
     {
         $params['do'] = $do;
         $params['m'] = APP_NAME;
@@ -2189,6 +2357,24 @@ HTML_CONTENT;
         return $device;
     }
 
+    public static function exportExcelFile($filename, array $header = [], array $data = [])
+    {
+        We7::mkdirs(dirname($filename));
+
+        $str_export = '';
+
+        if (!file_exists($filename)) {
+            $tab_header = implode(",", $header);
+            $str_export = chr(0xEF) . chr(0xBB) . chr(0xBF) . $tab_header . "\r\n";
+        }
+
+        foreach ($data as $row) {
+            $str_export .= implode(",", $row) . "\r\n";
+        }
+
+        return file_put_contents($filename, $str_export, FILE_APPEND);
+    }
+
     /**
      * 导出excel.
      *
@@ -2196,15 +2382,15 @@ HTML_CONTENT;
      * @param array $header
      * @param array $data
      */
-    public static function exportExcel($filename = '', array $header = [], array $data = [])
+    public static function exportExcel(string $filename = '', array $header = [], array $data = [])
     {
         header('Content-type:application/vnd.ms-excel');
         header('Content-Disposition:filename=' . $filename . '.xls');
 
-        $tab_header = implode("\t", $header);
-        $str_export = $tab_header . "\r\n";
+        $tab_header = implode(",", $header);
+        $str_export = chr(0xEF) . chr(0xBB) . chr(0xBF) . $tab_header . "\r\n";
         foreach ($data as $row) {
-            $str_export .= implode("\t", $row) . "\r\n";
+            $str_export .= implode(",", $row) . "\r\n";
         }
 
         exit($str_export);
@@ -2377,9 +2563,11 @@ HTML_CONTENT;
      * 使用GET请求指定API
      * @param string $url
      * @param int $timeout
-     * @return string|null
+     * @param array $params
+     * @param bool $json_result
+     * @return mixed
      */
-    public static function get(string $url, int $timeout = 3, $params = []): ?string
+    public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false)
     {
         $ch = curl_init();
 
@@ -2395,9 +2583,9 @@ HTML_CONTENT;
 
         if (empty($params[CURLOPT_USERAGENT])) {
             $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
-        }      
+        }
 
-        foreach($params as $index => $val) {
+        foreach ($params as $index => $val) {
             curl_setopt($ch, $index, $val);
         }
 
@@ -2409,7 +2597,12 @@ HTML_CONTENT;
             return null;
         }
 
-        return $response;
+        return $json_result ? json_decode($response, true) : $response;
+    }
+
+    public static function getJSON(string $url)
+    {
+        return self::get($url, 3, [], true);
     }
 
     /**
@@ -2418,9 +2611,10 @@ HTML_CONTENT;
      * @param array $data
      * @param bool $json
      * @param int $timeout
+     * @param array $params
      * @return array
      */
-    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, $params = []): array
+    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, array $params = []): array
     {
         $ch = curl_init();
 
@@ -2432,13 +2626,14 @@ HTML_CONTENT;
         }
 
         curl_setopt($ch, CURLOPT_POST, true);
+
+        $headers = [];
+
         if ($json) {
             $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($json_str)
-            ]);
+            $headers[] = 'Content-Type: application/json';
+            $headers[] = 'Content-Length: ' . strlen($json_str);
         } else {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
@@ -2448,10 +2643,22 @@ HTML_CONTENT;
 
         if (empty($params[CURLOPT_USERAGENT])) {
             $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
-        }      
+        }
 
-        foreach($params as $index => $val) {
+        foreach ($params as $index => $val) {
+            if ($index == CURLOPT_HTTPHEADER) {
+                if (array($val)) {
+                    $headers = array_merge($headers, $val);
+                } else {
+                    $headers[] = $val;
+                }
+                continue;
+            }
             curl_setopt($ch, $index, $val);
+        }
+
+        if ($headers) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
         $response = curl_exec($ch);
@@ -2464,7 +2671,7 @@ HTML_CONTENT;
 
         $result = json_decode($response, JSON_OBJECT_AS_ARRAY);
 
-        return isset($result) ? $result : error(State::ERROR, '无法解析返回的数据！');
+        return $result ?? error(State::ERROR, '无法解析返回的数据！');
     }
 
     /**

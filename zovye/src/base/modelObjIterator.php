@@ -6,6 +6,7 @@
 
 namespace zovye\base;
 
+use ArrayAccess;
 use Countable;
 use Iterator;
 
@@ -13,7 +14,7 @@ use Iterator;
  * Class modelObjIterator
  * @property modelFactory $factory
  */
-class modelObjIterator implements Iterator, Countable
+class modelObjIterator implements Iterator, Countable, ArrayAccess
 {
     private $factory;
     private $container;
@@ -67,5 +68,25 @@ class modelObjIterator implements Iterator, Countable
     public function valid(): bool
     {
         return isset($this->container[$this->pos]);
+    }
+
+    public function offsetExists($offset): bool
+    {
+        return isset($this->container[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->container[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->container[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->container[$offset]);
     }
 }

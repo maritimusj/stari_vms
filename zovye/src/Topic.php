@@ -13,7 +13,7 @@ class Topic
      * @param string $name
      * @return string
      */
-    public static function encrypt($name = 'all'): string
+    public static function encrypt(string $name = 'all'): string
     {
         static $app_key = null;
         if (is_null($app_key)) {

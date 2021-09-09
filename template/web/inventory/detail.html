@@ -1,0 +1,165 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+#list img, .goods img {
+    width: 60px;
+    height: 60px;
+}
+table th,table td {
+    text-align: center;
+}
+.total {
+    position: relative;
+}
+.change {
+    position: relative;
+    top: -6px;
+}
+.change.in {
+    color: green;
+}
+.change.out {
+    color: red;
+}
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#"><b>{$title}</b>的库存</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockIn', 'user' => $user, 'id' => $id])}">商品入库</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('inventory', ['op' => 'stockLog', 'id' => $user])}">变动记录</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('user')}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table table-bordered" id="list">
+            <thead>
+                <th>#</th>
+                <th>商品图片</th>
+                <th>商品名称</th>
+                <th>当前库存数量</th>
+                <th>操作</th>
+            </thead>
+            <tbody>
+                {loop $list $index $item}
+                <tr data-id="{$item['goods']['id']}">
+                    <td>
+                        {php echo $index+1}
+                    </td>
+                    <td>
+                        <img src=" {$item['goods']['img']}">
+                    </td>
+                    <td>
+                        {$item['goods']['name']}
+                    </td>
+                    <td class="total">
+                        <span class="num">{$item['num']}</span> <span class="change"></span>
+                    </td>
+                    <td class="operate">
+                        <i class="fa fa-edit fa-fw" title="修改库存" data-op="edit"></i>
+                        <i class="fa fa-trash fa-fw" title="删除商品" data-op="remove"></i>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何库存商品！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    const api = {
+        goodsApiUrl: "{php echo $this->createWebUrl('goods');}",
+        url: "{php echo $this->createWebUrl('inventory', ['id' => $id]);}",
+        dlg: null,
+    }
+
+    api.showResult = function(params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function(res){
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if(cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        api.dlg = util.dialog(res.data.title || '', res.data.content);
+                        api.dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function(){
+            loading && util.loaded();
+        })
+    }
+    
+    api.hide = function () {
+        if (api.dlg) {
+            api.dlg.modal('hide');
+        }
+    }
+
+    api.edit = function(goods, self) {
+        api.showResult({op: 'editGoods', goods});
+    }
+
+    api.remove = function(goods, self) {
+        if (confirm("确定要删除这个商品吗？")) {
+            api.showResult({op: 'removeGoods', goods}, '', false, (res) => {
+                if (res && res.status) {
+                    console.log($(self));
+                    self.closest('tr').remove();
+                }
+            });
+        }        
+    }
+
+    api.saveGoodsNum = function(goods, event) {
+        const inputCtrl = $('input[name=goodsNum]');
+        const num = parseInt(inputCtrl.val());
+        const org = parseInt(inputCtrl.data('num'));
+        if (num === org) {
+            inputCtrl.focus();
+            return;
+        }
+        api.showResult({op: 'saveGoodsNum', goods, num}, '', false, (res) => {
+            if (res && res.status) {
+                const tr = $('#list [data-id=' + goods + ']');
+                tr.find('.num').text(num);
+                tr.find('.change').removeClass("in out").addClass(res.data.num > 0 ? 'in' : 'out').text(res.data.num);
+                $('#modal-message').modal('hide');
+            }
+        });
+    }
+
+    $(function() {
+        $("body").on("click", "[data-op]", function (e) {
+            e.preventDefault();
+            const op = $(this).data('op');
+            if (op && api[op]) {
+                const goods = $(this).closest('tr').data('id');
+                api[op](goods, $(this));
+            }
+        })
+    })
+</script>
+
+{template 'common/footer'}

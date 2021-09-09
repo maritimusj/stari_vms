@@ -25,6 +25,8 @@ use zovye\traits\ExtraDataGettersAndSetters;
  * @method getBalance()
  * @method setBalance($goodsBalance)
  * @method getCreatetime()
+ * @method setDeleted(int $int)
+ * @method isDeleted()
  */
 class goodsModelObj extends modelObj
 {
@@ -41,6 +43,9 @@ class goodsModelObj extends modelObj
     protected $price;
     /** @var bool */
     protected $sync;
+    /** @var bool */
+    protected $deleted;
+
     protected $extra;
     /** @var int */
     protected $createtime;
@@ -50,6 +55,11 @@ class goodsModelObj extends modelObj
     public static function getTableName($readOrWrite): string
     {
         return tb('goods');
+    }
+
+    public function delete()
+    {
+        $this->setDeleted(1);
     }
 
     public function allowFree(): bool

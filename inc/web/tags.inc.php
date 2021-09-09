@@ -13,7 +13,6 @@ defined('IN_IA') or exit('Access Denied');
 $op = request::op('default');
 
 if ($op == 'default') {
-
     //分配设备控件查询标签详情
     if (request::is_ajax() && request::has('id')) {
         /** @var tagsModelObj $res */
@@ -65,14 +64,14 @@ if ($op == 'default') {
         $tags['page'] = $page;
         $tags['totalpage'] = $total_page;
 
-        $query->page($page, $page_size)->orderBy('count DESC');
+        $query->page($page, $page_size)->orderBy('id ASC');
 
         /** @var  tagsModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $tag = [
-                'id' => intval($entry->getId()),
-                'title' => strval($entry->getTitle()),
-                'count' => intval($entry->getCount()),
+                'id' => $entry->getId(),
+                'title' => $entry->getTitle(),
+                'count' => $entry->getCount(),
             ];
             $tags['list'][] = $tag;
         }

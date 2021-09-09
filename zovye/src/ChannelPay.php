@@ -106,7 +106,7 @@ class ChannelPay
         $result = (new ChannelPay($settings['key'], $settings['secret']))->create($data);
 
         Util::logToFile('channel', [
-            'requeset' => $data,
+            'request' => $data,
             'response' => $result,
         ]);
 

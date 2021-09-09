@@ -109,6 +109,11 @@ if ($op == 'default') {
         $types[] = User::API;
     }
 
+    $s_type_third = request::bool('s_type_third');
+    if ($s_type_third) {
+        $types[] = User::THIRD_ACCOUNT;
+    }
+
     //当指定了**部分**用户类型时，加入用户app条件过滤
     if ($types && count($types) < 3) {
         $query->where(['app' => $types]);
@@ -142,7 +147,7 @@ if ($op == 'default') {
             'isKeeper' => $user->isKeeper(),
             'isTester' => $user->isTester(),
             'verified' => $user->isIDCardVerified(),
-            'isLocked' => $user->isLocked()
+            'isLocked' => $user->isLocked(),
         ];
 
         if ($credit_used) {
@@ -198,8 +203,9 @@ if ($op == 'default') {
     $tpl_data['s_type_wxapp'] = $s_type_wxapp;
     $tpl_data['s_type_ali'] = $s_type_ali;
     $tpl_data['s_type_api'] = $s_type_api;
+    $tpl_data['s_type_third'] = $s_type_third;
     $tpl_data['s_principal'] = $s_principal;
-    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_api;
+    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_api || $s_type_third;
 
     $tpl_data['users'] = $users;
 
@@ -676,119 +682,113 @@ if ($op == 'default') {
 
     JSON::success('成功！');
 
-} else {
+} elseif ($op == 'balance_edit') {
 
-    if ($op == 'balance_edit') {
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('没有找到这个用户！');
+    }
 
-        $user = User::get(request::int('userid'));
-        if (empty($user)) {
-            JSON::fail('没有找到这个用户！');
+    $content = app()->fetchTemplate(
+        'web/common/balance-edit',
+        [
+            'user' => [
+                'id' => $user->getId(),
+                'openid' => $user->getOpenid(),
+                'nickname' => $user->getNickname(),
+                'avatar' => $user->getAvatar(),
+                'isAgent' => $user->isAgent(),
+                'isPartner' => $user->isPartner(),
+                'isKeeper' => $user->isKeeper(),
+                'verified' => $user->isIDCardVerified(),
+            ],
+        ]
+    );
+
+    JSON::success(['title' => '调整用户余额', 'content' => $content]);
+
+} elseif ($op == 'balance_edit_save') {
+
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('没有找到这个用户！');
+    }
+
+    $total = request::float('total', 0, 2) * 100;
+    if ($total == 0) {
+        JSON::fail('金额不能为零！');
+    }
+
+    if ($user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
+        $memo = strval(request('memo'));
+        $r = $user->commission_change(
+            $total,
+            CommissionBalance::ADJUST,
+            [
+                'admin' => _W('username'),
+                'ip' => CLIENT_IP,
+                'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                'memo' => $memo,
+            ]
+        );
+        if ($r && $r->update([], true)) {
+            JSON::success('操作成功 ！');
+        }
+    }
+
+    JSON::fail('保存数据失败！');
+
+} elseif ($op == 'prize') {
+
+    $user = User::get(request::int('id'));
+    if ($user) {
+        $title = "<b>{$user->getName()}</b>的奖品记录";
+
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+        $pager = '';
+
+        $prizes = [];
+
+        $query = m('prize')->query();
+        $query->where(We7::uniacid(['openid' => $user->getOpenid()]));
+
+        $total = $query->count();
+        if ($total > 0) {
+
+            if ($page > ceil($total / $page_size)) {
+                $page = 1;
+            }
+
+            $pager = We7::pagination($total, $page, $page_size);
+
+            $query->orderBy('createtime DESC');
+            $query->page($page, $page_size);
+
+            /** @var prizeModelObj $entry */
+            foreach ($query->findAll() as $entry) {
+                $prizes[] = [
+                    'id' => $entry->getId(),
+                    'title' => $entry->getTitle(),
+                    'link' => $entry->getLink(),
+                    'desc' => $entry->getDesc(),
+                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                ];
+            }
         }
 
         $content = app()->fetchTemplate(
-            'web/common/balance-edit',
+            'web/prize/prize-log',
             [
-                'user' => [
-                    'id' => $user->getId(),
-                    'openid' => $user->getOpenid(),
-                    'nickname' => $user->getNickname(),
-                    'avatar' => $user->getAvatar(),
-                    'isAgent' => $user->isAgent(),
-                    'isPartner' => $user->isPartner(),
-                    'isKeeper' => $user->isKeeper(),
-                    'verified' => $user->isIDCardVerified(),
-                ],
+                'prizes' => $prizes,
+                'pager' => $pager,
             ]
         );
 
-        JSON::success(['title' => '调整用户余额', 'content' => $content]);
-
-    } else {
-
-        if ($op == 'balance_edit_save') {
-
-            $user = User::get(request::int('userid'));
-            if (empty($user)) {
-                JSON::fail('没有找到这个用户！');
-            }
-
-            $total = request::float('total', 0, 2) * 100;
-            if ($total == 0) {
-                JSON::fail('金额不能为零！');
-            }
-
-            if ($user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-                $memo = strval(request('memo'));
-                $r = $user->commission_change(
-                    $total,
-                    CommissionBalance::ADJUST,
-                    [
-                        'admin' => _W('username'),
-                        'ip' => CLIENT_IP,
-                        'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-                        'memo' => $memo,
-                    ]
-                );
-                if ($r && $r->update([], true)) {
-                    JSON::success('操作成功 ！');
-                }
-            }
-
-            JSON::fail('保存数据失败！');
-
-        } elseif ($op == 'prize') {
-
-            $user = User::get(intval($_GET['id']));
-            if ($user) {
-
-                $title = "<b>{$user->getName()}</b>的奖品记录";
-
-                $page = max(1, request::int('page'));
-                $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-
-                $pager = '';
-
-                $prizes = [];
-
-                $query = m('prize')->query();
-                $query->where(We7::uniacid(['openid' => $user->getOpenid()]));
-
-                $total = $query->count();
-                if ($total > 0) {
-
-                    if ($page > ceil($total / $page_size)) {
-                        $page = 1;
-                    }
-
-                    $pager = We7::pagination($total, $page, $page_size);
-
-                    $query->orderBy('createtime DESC');
-                    $query->page($page, $page_size);
-
-                    /** @var prizeModelObj $entry */
-                    foreach ($query->findAll() as $entry) {
-                        $prizes[] = [
-                            'id' => $entry->getId(),
-                            'title' => $entry->getTitle(),
-                            'link' => $entry->getLink(),
-                            'desc' => $entry->getDesc(),
-                            'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                        ];
-                    }
-                }
-
-                $content = app()->fetchTemplate(
-                    'web/prize/prize-log',
-                    [
-                        'prizes' => $prizes,
-                        'pager' => $pager,
-                    ]
-                );
-
-                JSON::success(['title' => $title, 'content' => $content]);
-            }
-
-            JSON::fail('没找到这个用户！');
-        }
+        JSON::success(['title' => $title, 'content' => $content]);
     }
+
+    JSON::fail('没找到这个用户！');
+
 }

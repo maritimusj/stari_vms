@@ -15,12 +15,12 @@ class Job
      * 启动一个退款任务，如果订单符合退款条件，就会发起退款操作
      * @param $order_no
      * @param $message
-     * @param int $num 退货数量，0表示全部
+     * @param int $num 退货数量，0表示全部， -1表示退出错商品
      * @param false $reset_payload
      * @param int $delay 指定时间后才开始检查
      * @return bool
      */
-    public static function refund($order_no, $message, $num = 0, $reset_payload = false, $delay = 0): bool
+    public static function refund($order_no, $message, int $num = 0, bool $reset_payload = false, int $delay = 0): bool
     {
         if ($delay > 0) {
             return CtrlServ::scheduleDelayJob('refund', [
@@ -58,7 +58,7 @@ class Job
 
     public static function orderPayResult($order_no, $start = 0, $timeout = 3): bool
     {
-        return CtrlServ::scheduleDelayJob('order_pay_result', ['orderNO' => $order_no, 'start' => $start ? $start : time()], $timeout);
+        return CtrlServ::scheduleDelayJob('order_pay_result', ['orderNO' => $order_no, 'start' => $start ?: time()], $timeout);
     }
 
     public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT): bool
@@ -127,7 +127,12 @@ class Job
 
     public static function order($order_id): bool
     {
-        return CtrlServ::scheduleJob('order', ['id' => $order_id]);
+        if (Config::app('queue.size') < 100) {
+            $queued = CtrlServ::scheduleJob('order', ['id' => $order_id]);
+            Config::app('queue.size', $queued, true);
+            return $queued !== false;
+        }
+        return false;
     }
 
     public static function getResult($order_no, $openid): bool
@@ -169,13 +174,21 @@ class Job
         return CtrlServ::scheduleJob('create_order_account', $params);
     }
 
-    public static function authAccount($agent_id, $accountUID): bool
+    public static function authAccount($agent_id, $accountUID, $total = 0): bool
     {
-        return CtrlServ::scheduleDelayJob('auth_account', ['agent' => $agent_id, 'account' => $accountUID], 3);
+        return CtrlServ::scheduleDelayJob('auth_account', ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total], 3);
     }
 
     public static function repairAgentMonthStats($agent_id, $month): bool
     {
-        return CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]);
+        $key = "repair.$agent_id.month:$month";
+        if (time() - Config::agent($key) < 300) {
+            return false;
+        }
+        if (CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]) !== false) {
+            Config::agent($key, time(), true);
+            return true;
+        }
+        return false;
     }
 }

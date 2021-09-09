@@ -5,6 +5,7 @@ namespace zovye\api\wx;
 
 
 use Exception;
+use zovye\Inventory;
 use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\base\modelObjFinder;
@@ -108,6 +109,9 @@ class device
 
         if ($location) {
             $result['extra']['location'] = $location;
+            if (!isset($result['extra']['location']['area'])) {
+                $result['extra']['location']['area'] = [];
+            }
         }
 
         $sig = intval($device->getSig());
@@ -280,6 +284,14 @@ class device
             $res = $device->resetPayload([$lane => '@' . $num], '代理商补货');
             if (is_error($res)) {
                 return error(State::ERROR, '保存库存失败！');
+            }
+
+            if (App::isInventoryEnabled()) {
+                $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
+                $v = Inventory::syncDevicePayloadLog($user, $device, $res, $user->isKeeper() ? '营运人员补货' : '代理商补货');
+                if (is_error($v)) {
+                    return $v;
+                }
             }
 
             return ['msg' => '设置成功！'];
@@ -455,12 +467,7 @@ class device
                 }
             }
 
-            $obj = null;
-            if (request::has('guid')) {
-                $obj = $agent;
-            } else {
-                $obj = $agent;
-            }
+            $obj = $agent;
 
             //指定了设备
             if (request::has('deviceid')) {

@@ -44,9 +44,10 @@ class Goods
 
     /**
      * @param mixed $id
+     * @param bool $deleted
      * @return goodsModelObj|null
      */
-    public static function get($id): ?goodsModelObj
+    public static function get($id, bool $deleted = false): ?goodsModelObj
     {
         /** @var goodsModelObj[] $cache */
         static $cache = [];
@@ -56,7 +57,7 @@ class Goods
             if ($cache[$id]) {
                 return $cache[$id];
             }
-            $goods = self::query()->findOne(['id' => $id]);
+            $goods = $deleted ? m('goods')->where(We7::uniacid([]))->findOne(['id' => $id]) : self::query()->findOne(['id' => $id]);
             if ($goods) {
                 $cache[$goods->getId()] = $goods;
                 return $goods;
@@ -70,29 +71,35 @@ class Goods
      * @param goodsModelObj $entry
      * @param bool $detail
      * @param bool $use_image_proxy
+     * @param bool $full_path
      * @return array
      */
-    public static function format(goodsModelObj $entry, $detail = false, $use_image_proxy = false, $full_path = true): array
+    public static function format(goodsModelObj $entry, bool $detail = false, bool $use_image_proxy = false, bool $full_path = true): array
     {
-        $imageUrlFN = function ($url) use($use_image_proxy, $full_path) {
+        $imageUrlFN = function ($url) use ($use_image_proxy, $full_path) {
             if ($full_path) {
                 $url = Util::toMedia($url, $use_image_proxy);
             }
             return $url;
         };
         $data = [
-            'id' => intval($entry->getId()),
+            'id' => $entry->getId(),
             'name' => strval($entry->getName()),
             'img' => $imageUrlFN($entry->getImg()),
             'detailImg' => $imageUrlFN($entry->getDetailImg()),
             'sync' => boolval($entry->getSync()),
-            'allowFree' => boolval($entry->allowFree()),
-            'allowPay' => boolval($entry->allowPay()),
+            'allowFree' => $entry->allowFree(),
+            'allowPay' => $entry->allowPay(),
             'price' => intval($entry->getPrice()),
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            'cw' => $entry->getExtraData('cw', 0),
         ];
+
+        if ($entry->isDeleted()) {
+            $data['deleted'] = true;
+        }
 
         $lottery = $entry->getExtraData('lottery', []);
         if (!empty($lottery)) {
@@ -102,6 +109,7 @@ class Goods
         $cost_price = $entry->getCostPrice();
 
         if (!empty($cost_price)) {
+
             $data['costPrice'] = $cost_price;
             $data['costPrice_formatted'] = '￥' . number_format($cost_price / 100, 2) . '元';
         }
@@ -136,7 +144,17 @@ class Goods
         $query = Goods::query();
 
         if (isset($params['agent_id'])) {
-            if ($params['agent_id'] > 0) {
+            if (We7::starts_with('*', $params['agent_id'])) {
+                $agent_id = ltrim($params['agent_id'], '*');
+
+                $agent = Agent::get($agent_id);
+                if (empty($agent)) {
+                    return error(State::ERROR, '找不到这个代理商！');
+                }
+
+                $query->where("agent_id=0 OR agent_id={$agent->getId()}");
+
+            } elseif ($params['agent_id'] > 0) {
                 $agent = Agent::get($params['agent_id']);
                 if (empty($agent)) {
                     return error(State::ERROR, '找不到这个代理商！');
@@ -153,7 +171,7 @@ class Goods
 
         $keywords = trim(urldecode($params['keywords']));
         if ($keywords) {
-            $query->where(['name LIKE' => "%{$keywords}%"]);
+            $query->where(['name LIKE' => "%$keywords%"]);
         }
 
         $total = $query->count();
@@ -211,7 +229,7 @@ class Goods
      */
     public static function query(array $condition = []): modelObjFinder
     {
-        return m('goods')->where(We7::uniacid([]))->where($condition);
+        return m('goods')->where(We7::uniacid(['deleted' => 0]))->where($condition);
     }
 
     public static function findOne($cond): ?goodsModelObj

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>{$tpl['site']['title']}</title>
     <meta name="viewport"
-        content="width=device-width,initial-scale=0,minimum-scale=0,maximum-scale=0,user-scalable=no" />
+          content="width=device-width,initial-scale=0,minimum-scale=0,maximum-scale=0,user-scalable=no"/>
     <style>
         body {
             background-color: #f2f2f2;
@@ -14,7 +14,7 @@
         }
 
         .loading,
-        .offline {
+        .success {
             width: 100vw;
             height: 150vh;
             background-color: #efefef;
@@ -32,12 +32,12 @@
             z-index: 101;
             margin-bottom: 0;
             color: #666;
-            bottom: 0;
+            bottom: 20px;
             position: absolute;
         }
 
         .loading .icon img,
-        .offline .icon img {
+        .success .icon img {
             margin: 6vw;
         }
 
@@ -56,9 +56,11 @@
             width: 100vw;
             margin: 0;
         }
+
         span.text {
             font-style: italic;
         }
+
         span.num {
             color: goldenrod;
             font-style: italic;
@@ -66,70 +68,74 @@
     </style>
 </head>
 <body>
-    <div>
-        <div class="loading" id="container">
-            <div class="icon">
-                <img src="{MODULE_URL}static/img/loading-puff.svg">
-            </div>
-            <span class="text">设备连接中 <span class="num"></span> ...</span>
-            <div class="copyrights">
-                <span>{$tpl['site']['copyrights']}</span>
-            </div>
-            <div class="wave">
-                <img src="{MODULE_URL}static/img/wave.svg">
-            </div>
+<div>
+    <div class="loading" id="container">
+        <div class="icon">
+            <img src="{$tpl['icon']['loading']}">
+        </div>
+        <span class="text">{$tpl['text']} <span class="num"></span> ...</span>
+        <div class="copyrights">
+            <span>{$tpl['site']['copyrights']}</span>
+        </div>
+        <div class="wave">
+            <img src="{MODULE_URL}static/img/wave.svg">
         </div>
     </div>
-    {$tpl['js']['code']}
-    <script>
-        const offlineIcon = '{MODULE_URL}static/img/offline.svg';
-        const smileIcon = '{MODULE_URL}static/img/smile.svg';
-        function setOnline(online) {
-            const c = $('#container');
-            if (online) {
-                c.find('.text').text('转跳中...');
-                return zovye_fn.redirect();
+</div>
+{$tpl['js']['code']}
+<script>
+    const err_icon = '{$tpl["icon"]["error"]}';
+    const success_icon = '{$tpl["icon"]["success"]}';
+
+    function setOk(online) {
+        const c = $('#container');
+        if (online) {
+            c.find('.text').text('转跳中...');
+            return zovye_fn.redirect();
+        }
+
+        c.removeClass('loading');
+        c.addClass('success');
+
+        c.find('.icon img').attr('src', err_icon);
+        c.find('.text').text('{$tpl["err_msg"]}');
+
+        c.click(function () {
+            c.find('.icon img').attr('src', success_icon);
+            c.find('.text').text('请稍等...');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+    }
+
+    function sleep(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    const max_tries = {$tpl['max']};
+    let tries = 0;
+
+    function isReady() {
+        tries++;
+        $('span.num').text(tries);
+        zovye_fn.isReady(function (res) {
+            if (res && res.data.is_ready) {
+                return setOk(true);
             }
-
-            c.removeClass('loading');
-            c.addClass('offline');
-
-            c.find('.icon img').attr('src', offlineIcon);
-            c.find('.text').text('设备不在线，请稍后再试！');
-            c.click(function () {
-                c.find('.icon img').attr('src', smileIcon);
-                c.find('.text').text('请稍等...');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            });
-        }
-
-        function sleep (time) {
-            return new Promise((resolve) => setTimeout(resolve, time));
-        }
-
-        const max_tries = 3;
-        let tries = 0;
-        function onlineTest() {
-            tries ++;
-            $('span.num').text(tries);
-            zovye_fn.isOnline(function (res) {
-                if (res && res.data.mcb && res.data.mcb.online) {
-                    return setOnline(true);
-                }
-                if (tries < max_tries) {
-                    sleep(2500).then(() => {
-                        onlineTest();
-                    })
-                } else {
-                    setOnline(false);
-                }
-            })
-        }
-        $(function () {
-            onlineTest();
+            if (tries < max_tries) {
+                sleep(2500).then(() => {
+                    isReady();
+                })
+            } else {
+                setOk(false);
+            }
         })
-    </script>
+    }
+
+    $(function () {
+        isReady();
+    })
+</script>
 </body>
 </html>

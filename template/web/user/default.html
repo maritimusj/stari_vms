@@ -112,7 +112,11 @@
                         <label>
                             <input type="checkbox" name="s_type_api" value="1" {if $s_type_api} checked{/if}>
                             第三方API用户
-                        </label>                        
+                        </label>
+                        <label>
+                            <input type="checkbox" name="s_type_third" value="1" {if $s_type_third} checked{/if}>
+                            第三方公众号授权用户
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -292,12 +296,12 @@
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的测试员身份吗？')){return false;}"><i class="wi wi-system-info fa-fw"></i> 取消测试员身份</a></li>
             {else}
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'create', 'id'=>$item['id']));}"><i class="wi wi-system-info fa-fw"></i> 设置测试员</a></li>
-            {/if}
-            {if empty($item['isAgent']) && empty($item['isPartner']) && $item['mobile']}
+            {/if}          
             <li role="separator" class="divider"></li>
-            <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
-            {/if}
+            {if \zovye\App::isInventoryEnabled()}
+            <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
             <li role="separator" class="divider"></li>
+            {/if}
             {if $balance_used}
             <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>
             {/if}
@@ -305,10 +309,14 @@
             {if $prize_used}
             <li><a href="#" data-op="giftLog"><i class="fa fa-gift fa-fw"></i> 奖品列表</a></li>
             {/if}
+            {if empty($item['isAgent']) && empty($item['isPartner']) && empty($item['isKeeper']) && $item['mobile']}
+            <li role="separator" class="divider"></li>
+            <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
+            {/if}
             {if $item['verified']}
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetIDCardVerify"><i class="fa fa-bookmark fa-fw"></i> 清除实名认证</a></li>
-            {/if}
+            {/if} 
         </ul>
     </div>
 </td>
@@ -326,7 +334,7 @@
 </script>
 {else}
 <div class="text-center text-muted">
-    暂时还没有任何用户！
+    <i class="fa fa-question-circle"></i> 暂时还没有任何用户！
 </div>
 {/if}
 </div>
@@ -381,6 +389,9 @@
                 if(res.data && res.data.msg) {
                     util.message(res.data.msg, '', res.status?'success':'error');
                 }
+                if (res.data && res.data.redirect_url) {
+                    window.location.replace(res.data.redirect_url);
+                }
             }
         }).fail(function(){
             loading && util.loaded();
@@ -405,11 +416,13 @@
             api.showResult({op: 'reset_mobile', id: userid});
         }
     }
+
     api.resetIDCardVerify = function(userid) {
         if (confirm('确定要清除用户的实名认证信息吗？')) {
             api.showResult({op: 'reset_idcard_verify', id: userid});
         }
     }
+
     api.balanceLog = function(userid) {
         api.showResult({op: 'balance_log', id: userid});
     }
@@ -417,24 +430,31 @@
     api.giftLog = function(userid) {
         api.showResult({op: 'prize', id: userid});
     }
-    api.orderList = function(id) {
-        api.showResult({user_id: id}, api.ordersUrl);
+
+    api.viewInventory = function(userid) {
+        window.location.href = "{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => '__id__']);}".replace('__id__', userid);
     }
-    api.balanceEdit = function(id, event) {
-        api.showResult({userid: id, op: "balance_edit"});
+
+    api.orderList = function(userid) {
+        api.showResult({user_id: userid}, api.ordersUrl);
+    }
+
+    api.balanceEdit = function(userid, event) {
+        api.showResult({id: userid, op: "balance_edit"});
         event.stopPropagation();
     }
-    api.saveUserBalanceLog = function(id) {
+
+    api.saveUserBalanceLog = function(userid) {
         const total = $('input[name=total]').val();
         const memo = $('input[name=memo]').val();
-        api.showResult({userid: id, total: total, memo: memo, op: "balance_edit_save"}, '', false, function(){
+        api.showResult({id: userid, total: total, memo: memo, op: "balance_edit_save"}, '', false, function(){
             $('#modal-message').modal('hide');
-            api.getUserStats([id]);
+            api.getUserStats([userid]);
         })
     }
 
     api.getUserStats = function(ids) {
-        $.post(api.url, {op: 'user_stats', ids: ids}).then(function(res){
+        $.post(api.url, {op: 'user_stats', ids}).then(function(res){
             if(res && res.status && $.isArray(res.data)) {
                 $.each(res.data, function(i, stats){
                     const tr = $('tr[data-id=' + stats.id + ']');
@@ -508,7 +528,7 @@
                 params.append("s_keywords", s_keywords);
             }
 
-            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api'].forEach(stype => {
+            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api', 's_type_third'].forEach(stype => {
                 const s_type = $(form.find('[name=' + stype + ']:checked')).val();
                 if (s_type) {
                     params.append(stype, s_type);

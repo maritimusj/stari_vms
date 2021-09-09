@@ -14,7 +14,7 @@ class App
      * @param int $len
      * @return string
      */
-    public static function uid($len = null): string
+    public static function uid(int $len = 0): string
     {
         return onceCall(function() use ($len) {
             $uid = sha1(_W('config.setting.authkey') . We7::uniacid());
@@ -164,6 +164,28 @@ class App
     {
         return onceCall(function() {
             return !empty(settings('meipa.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 金粉吧 吸粉
+     *
+     */
+    public static function isKingFansEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('king.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 史莱姆 吸粉
+     *
+     */
+    public static function isSNTOEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('snto.fan.enabled'));
         });
     }
 
@@ -462,6 +484,33 @@ class App
     {
         return onceCall(function() {
             return boolval(settings('custom.useAccountQRCode.enabled'));
+        });
+    }
+
+    public static function isInventoryEnabled(): bool {
+        return onceCall(function() {
+            return boolval(settings('inventory.enabled'));
+        });        
+    }
+
+    public static function isAccountLogEnabled(): bool {
+        return onceCall(function() {
+            return boolval(settings('account.log.enabled'));
+        });        
+    }
+
+    public static function isDonatePayEnabled(): bool {
+        return onceCall(function() {
+            return boolval(settings('custom.DonatePay.enabled'));
+        });        
+    }
+
+    /**
+     * 使用屏幕推广公众号二维码
+     */
+    public static function useAccountAppQRCode(): bool {
+        return onceCall(function() {
+            return boolval(settings('account.appQRCode.enabled'));
         });
     }
 }

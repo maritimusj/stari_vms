@@ -18,6 +18,17 @@
         </span>        
     </div>
     <div class="panel-body">
+{if DEBUG}
+<div class="alert alert-warning alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <strong>警告，</strong> 模块当前处于调试模式！如果需要关闭事件记录，请到zovye/include/constants.php中修改DEBUG常量值为FALSE！
+</div>
+{else}
+<div class="alert alert-success alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>注意，</strong> 当前DEBUG模式已关闭。如果需要开启设备事件记录，请到zovye/include/constants.php中修改DEBUG常量值为TRUE!
+  </div>
+{/if}
         {if $events}
         <table class="table">
             <thead>
@@ -53,7 +64,7 @@
         </div>
         {else}
         <div class="text-center text-muted">
-            暂时还没有任何日志！
+            <i class="fa fa-question-circle"></i> 暂时还没有任何日志！
         </div>
         {/if}
     </div>

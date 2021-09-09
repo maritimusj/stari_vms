@@ -6,10 +6,11 @@
 
 namespace zovye\base;
 
+use ArrayAccess;
 use Countable;
 use Iterator;
 
-class modelObjIteratorLazy implements Iterator, Countable
+class modelObjIteratorLazy implements Iterator, Countable, ArrayAccess
 {
     /** @var modelFactory */
     private $factory;
@@ -59,5 +60,25 @@ class modelObjIteratorLazy implements Iterator, Countable
         }
 
         return null;
+    }
+
+    public function offsetExists($offset): bool
+    {
+       return isset($this->container[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->container[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->container[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->container[$offset]);
     }
 }

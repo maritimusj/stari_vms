@@ -127,10 +127,12 @@ class Job
 
     public static function order($order_id): bool
     {
-        if (Config::app('queue.size') < Config::app('queue.max_size', 100)) {
-            $queued = CtrlServ::scheduleJob('order', ['id' => $order_id]);
-            Config::app('queue.size', $queued, true);
-            return $queued !== false;
+        $queue = Config::app('queue', []);
+        if (empty($queue['max_size']) || $queue['size'] < $queue['max_size']) {
+            $queue['size'] = CtrlServ::scheduleJob('order', ['id' => $order_id]);
+            $queue['updatetime'] = time();
+            Config::app('queue', $queue, true);
+            return $queue['size'] !== false;
         }
         return false;
     }

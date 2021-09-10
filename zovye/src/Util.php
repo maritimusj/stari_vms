@@ -760,10 +760,6 @@ include './index.php';
 
     public static function updateOrderCounters(orderModelObj $order)
     {
-        if ($order->getUpdatetime() > 0) {
-            return true;
-        }
-
         if (!Locker::try("order:counter:{$order->getId()}")) {
             return false;
         }

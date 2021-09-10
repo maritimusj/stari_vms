@@ -28,6 +28,10 @@
                         <span class="duration">{php echo $formatted_duration ?: 'n/a'}</span>
                     </div>
                     {/if}
+                    <div class="page_item">
+                        <span>任务队列</span>
+                        <span class="duration">{php echo $queue['size']} {php echo empty($queue['max_size']) ? '' : '/' . $queue['max_size']}（最后更新： {php echo date('Y-m-d H:i:s', $queue['updatetime'])}）</span>
+                    </div>
                 </div>
                 <div class="seg-divider"></div>
                 <div class="form-group">

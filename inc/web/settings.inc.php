@@ -761,6 +761,7 @@ if ($op == 'account') {
         if ($data['now']) {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
+        $tpl_data['queue'] = Config::app('queue', []);
     }
     $tpl_data['migrate'] = Migrate::detect(false);
 } elseif ($op == 'unlock') {

@@ -6,6 +6,23 @@
 <!--</div>-->
 {/if}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .fa-info-circle {
+        position: relative;
+    }
+    .limits {
+        position: absolute;
+        z-index: 99;
+        background-color: #ffffff;
+        border: 1px solid #9e9e9e;
+        padding: 6px 10px;
+        white-space: nowrap;
+        display: none;
+    }
+    .fa-info-circle:hover .limits {
+        display: block;
+    }
+</style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default panel-first nav-tab-item">
@@ -70,7 +87,23 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="siteWarning" class="col-md-2 control-label">腾讯LBS key</label>
+                    <label for="siteWarning" class="col-md-2 control-label">
+                        <div>
+                            腾讯LBS key 
+                            {if $lbs_limits}
+                            <i class="fa fa-info-circle" style="color:gray;">
+                                <div class="limits">
+                                    <div>
+                                         <span>当前并发量（次/秒）</span> : <span>{$lbs_limits['current_qps']} / {$lbs_limits['limit_qps']}</span>
+                                    </div>
+                                   <div>
+                                       <span>剩余调用量（次/日）</span> : <span>{$lbs_limits['current_pv']} / {$lbs_limits['limit_pv']}</span>
+                                   </div>
+                                </div>
+                            </i>
+                            {/if}                
+                        </div>
+                    </label>
                     <div class="col-md-10">
                         <input type="text" class="form-control inputMask" name="lbsKey" id="lbsKey" value="{$lbsKey}">
                         <span class="help-block">* 指定腾讯LBS服务的APP KEY</span>

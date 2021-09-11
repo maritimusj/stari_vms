@@ -790,6 +790,7 @@ if ($op == 'account') {
     $tpl_data['test_url'] = Util::murl('testing');
     $tpl_data['get_schema'] = settings('device.get.theme');
     $tpl_data['themes'] = Theme::all();
+    $tpl_data['lbs_limits'] = Config::app('location.tencent.lbs.limits', []);
 
 } elseif ($op == 'agent') {
 

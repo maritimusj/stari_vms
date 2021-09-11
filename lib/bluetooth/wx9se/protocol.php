@@ -31,8 +31,8 @@ class protocol implements IBlueToothProtocol
             self::KEY_LIGHTS_SCHEDULE => '=> 获取灯光计划',
         ],
         self::CMD_CONFIG => [
-            self::KEY_LOCKER => '=>　开锁',
-            self::KEY_TIMER => '=>　时间',
+            self::KEY_LOCKER => '=> 开锁',
+            self::KEY_TIMER => '=> 时间',
             self::KEY_LIGHTS => '=> 灯光',
         ],
         self::CMD_NOTIFY => [

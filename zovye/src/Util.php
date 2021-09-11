@@ -2017,6 +2017,12 @@ HTML_CONTENT;
             return $resp;
         }
 
+        parse_str(str_replace('; ', '&', getArray($resp, 'headers.X-LIMIT', '')), $limit);
+
+        if (isset($limit)) {
+            Config::app('location.tencent.lbs.limit', $limit, true);
+        }
+
         $res = json_decode($resp['content'], true);
         if (empty($res)) {
             return err('请求失败，返回数据为空！');

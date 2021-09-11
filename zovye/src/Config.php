@@ -110,4 +110,16 @@ class Config
         return globalConfig('app', $key, $v);
     }
 
+    /**
+     * LBS设置
+     */
+
+    public static function location($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('location', $key, $v);
+        }
+
+        return globalConfig('location', $key, $v);
+    }
 }

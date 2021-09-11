@@ -2017,10 +2017,10 @@ HTML_CONTENT;
             return $resp;
         }
 
-        parse_str(str_replace('; ', '&', getArray($resp, 'headers.X-LIMIT', '')), $limit);
+        parse_str(str_replace('; ', '&', getArray($resp, 'headers.X-LIMIT', '')), $limits);
 
-        if (isset($limit)) {
-            Config::app('location.tencent.lbs.limit', $limit, true);
+        if (isset($limits)) {
+            Config::location('tencent.lbs.limits', $limits, true);
         }
 
         $res = json_decode($resp['content'], true);

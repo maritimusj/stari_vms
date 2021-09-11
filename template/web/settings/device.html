@@ -97,7 +97,7 @@
                                          <span>当前并发量（次/秒）</span> : <span>{$lbs_limits['current_qps']} / {$lbs_limits['limit_qps']}</span>
                                     </div>
                                    <div>
-                                       <span>剩余调用量（次/日）</span> : <span>{$lbs_limits['current_pv']} / {$lbs_limits['limit_pv']}</span>
+                                       <span>剩余调用量（次/日）</span> : <span>{php echo $lbs_limits['limit_pv'] - $lbs_limits['current_pv']}</span>
                                    </div>
                                 </div>
                             </i>

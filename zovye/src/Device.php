@@ -525,7 +525,7 @@ class Device extends State
 
             $serial = $result->getSerial();
             if ($serial) {
-                $data['extra']['serial'] = $serial;
+                $data['extra'] = ['serial' => $serial];
             }
 
             if (!m('device_events')->create($data)) {

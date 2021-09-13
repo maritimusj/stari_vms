@@ -149,6 +149,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
         $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;
+        $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
 
@@ -547,6 +548,9 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             ], true);
         }
 
+        if (App::isZeroBonusEnabled()) {
+            $settings['custom']['bonus']['zero']['v'] = request::float('zeroBonus', 0, 2);
+        }
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;
         $settings['pay']['wx']['enable'] = $wx_enabled;

@@ -513,4 +513,9 @@ class App
             return boolval(settings('account.appQRCode.enabled'));
         });
     }
+
+    public static function isZeroBonusEnabled(): bool {
+        return settings('custom.bonus.zero.enabled', false);
+    }
+
 }

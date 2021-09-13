@@ -593,6 +593,10 @@ if ($op == 'default') {
                     'enable' => request::int('mustFollow'),
                 ]);
             }
+
+            if (App::isZeroBonusEnabled()) {
+                $user->updateSettings('agentData.custom.bonus.zero.v', request::float('zeroBonus', -1, 2));
+            }
         }
     } elseif (request::bool('agent_payment')) {
         if ($user->isAgent()) {

@@ -655,6 +655,10 @@ if ($op == 'list') {
             ];
         }
 
+        if (App::isZeroBonusEnabled()) {
+            setArray($extra, 'custom.bonus.zero.v', request::float('zeroBonus', -1, 2));
+        }
+
         if (empty($data['name']) || empty($data['imei'])) {
             throw new RuntimeException('设备名称或IMEI不能为空！');
         }

@@ -76,6 +76,10 @@ class CommissionEventHandler
             }
         }
 
+        if (Helper::isZeroBonus($device)) {
+            return true;
+        }
+
         $total_commission_price = $account->commission_price();
 
         if ($total_commission_price <= 0) {

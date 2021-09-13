@@ -125,4 +125,23 @@ class Helper
 
         return $list;
     }
+
+    public static function isZeroBonus(deviceModelObj $device)
+    {
+        if (App::isZeroBonusEnabled()) {
+            $v = $device->settings('extra.custom.bonus.zero.v', -1.0);
+            if ($v < 0) {
+                $agent = $device->getAgent();
+                if ($agent) {
+                    $v = $agent->settings('agentData.custom.bonus.zero.v', -1.0);
+                }
+                if ($v < 0) {
+                    $v = settings('custom.bonus.zero.v', -1.0);
+                }
+            }
+            return $v > 0 && mt_rand(1, 10000) <= intval($v * 100);
+        }
+
+        return false;
+    }
 }

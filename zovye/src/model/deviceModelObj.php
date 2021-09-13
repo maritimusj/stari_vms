@@ -1672,7 +1672,6 @@ class deviceModelObj extends modelObj
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
                 'mcb' => true,
-                'app' => true,
             ];
         }
         $res = CtrlServ::v2_query("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);

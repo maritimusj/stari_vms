@@ -77,7 +77,7 @@ class CommissionEventHandler
         }
 
         if (App::isZeroBonusEnabled()) {
-            if ($order->settings('extra.custom.zero_bonus', false)) {
+            if ($order->getExtraData('custom.zero_bonus', false)) {
                 return true;
             }
         }

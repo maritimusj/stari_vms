@@ -595,7 +595,7 @@ if ($op == 'default') {
             }
 
             if (App::isZeroBonusEnabled()) {
-                $user->updateSettings('agentData.custom.bonus.zero.v', request::float('zeroBonus', -1, 2));
+                $user->updateSettings('agentData.custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
             }
         }
     } elseif (request::bool('agent_payment')) {

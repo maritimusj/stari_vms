@@ -656,7 +656,7 @@ if ($op == 'list') {
         }
 
         if (App::isZeroBonusEnabled()) {
-            setArray($extra, 'custom.bonus.zero.v', request::float('zeroBonus', -1, 2));
+            setArray($extra, 'custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
         }
 
         if (empty($data['name']) || empty($data['imei'])) {

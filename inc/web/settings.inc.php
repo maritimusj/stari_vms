@@ -549,7 +549,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         }
 
         if (App::isZeroBonusEnabled()) {
-            $settings['custom']['bonus']['zero']['v'] = request::float('zeroBonus', 0, 2);
+            $settings['custom']['bonus']['zero']['v'] = min(100, request::float('zeroBonus', 0, 2));
         }
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;

@@ -1716,10 +1716,13 @@ HTML_CONTENT;
             /** @var goods_voucher_logsModelObj $voucher */
             $voucher = $params['voucher'];
 
+            //定制功能：零佣金
+            $zero_bonus = Helper::isZeroBonus($device);
+
             $order_data = [
                 'openid' => $user->getOpenid(),
-                'agent_id' => $device->getAgentId(),
-                'device_id' => $device->getId(),
+                'agent_id' => $zero_bonus ? 0 : $device->getAgentId(),
+                'device_id' => $zero_bonus ? 0 : $device->getId(),
                 'src' => Order::ACCOUNT,
                 'name' => $goods['name'],
                 'goods_id' => $goods['id'],
@@ -1735,6 +1738,9 @@ HTML_CONTENT;
                         'name' => $device->getName(),
                     ],
                     'user' => $user->profile(),
+                    'custom' => [
+                        'zero_bonus' => $zero_bonus,
+                    ]
                 ],
             ];
 
@@ -1834,24 +1840,26 @@ HTML_CONTENT;
             } else {
                 $order->setResultCode(0);
 
-                if (isset($goods['cargo_lane'])) {
-                    $locker = $device->payloadLockAcquire(3);
-                    if (empty($locker)) {
-                        return error(State::ERROR, '设备正忙，请重试！');
+                if (!$zero_bonus) {
+                    if (isset($goods['cargo_lane'])) {
+                        $locker = $device->payloadLockAcquire(3);
+                        if (empty($locker)) {
+                            return error(State::ERROR, '设备正忙，请重试！');
+                        }
+                        $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                        if (is_error($res)) {
+                            return error(State::ERROR, '保存库存失败！');
+                        }
+                        $locker->unlock();
                     }
-                    $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
-                    if (is_error($res)) {
-                        return error(State::ERROR, '保存库存失败！');
-                    }
-                    $locker->unlock();
-                }
 
-                if ($voucher) {
-                    $voucher->setUsedUserId($user->getId());
-                    $voucher->setUsedtime(time());
-                    if (!$voucher->save()) {
-                        return error(State::ERROR, '出货失败：使用取货码失败！');
-                    }
+                    if ($voucher) {
+                        $voucher->setUsedUserId($user->getId());
+                        $voucher->setUsedtime(time());
+                        if (!$voucher->save()) {
+                            return error(State::ERROR, '出货失败：使用取货码失败！');
+                        }
+                    }                    
                 }
             }
 

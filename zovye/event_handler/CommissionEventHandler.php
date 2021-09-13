@@ -76,8 +76,10 @@ class CommissionEventHandler
             }
         }
 
-        if (Helper::isZeroBonus($device)) {
-            return true;
+        if (App::isZeroBonusEnabled()) {
+            if ($order->settings('extra.custom.zero_bonus', false)) {
+                return true;
+            }
         }
 
         $total_commission_price = $account->commission_price();

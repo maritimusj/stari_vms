@@ -276,6 +276,17 @@ class keeper
 
         $keepers = [];
         $query = \zovye\Keeper::query(['agent_id' => $agent->getAgentId()]);
+
+        if (request::has('keyword')) {
+            $keyword = request::trim('keyword');
+            if ($keyword) {
+                $query->whereOr([
+                    'name LIKE' => "%$keyword%",
+                    'mobile LIKE' => "%$keyword%",
+                ]);                
+            }
+        }
+
         $query->orderBy('id desc');
 
         /** @var keeperModelObj $keeper */

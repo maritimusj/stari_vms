@@ -438,6 +438,17 @@ class agent
         }
 
         $query = Device::keeper($keeper);
+        
+        if (request::has('keyword')) {
+            $keyword = request::trim('keyword');
+            if ($keyword) {
+                $query->whereOr([
+                    'name LIKE' => "%{$keyword}%",
+                    'imei LIKE' => "%{$keyword}%",
+                ]);
+            }
+        }
+
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
 

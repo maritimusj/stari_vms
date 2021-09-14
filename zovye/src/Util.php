@@ -1717,12 +1717,12 @@ HTML_CONTENT;
             $voucher = $params['voucher'];
 
             //定制功能：零佣金
-            $zero_bonus = Helper::isZeroBonus($device);
+            $is_zero_bonus = Helper::isZeroBonus($device);
 
             $order_data = [
                 'openid' => $user->getOpenid(),
-                'agent_id' => $zero_bonus ? 0 : $device->getAgentId(),
-                'device_id' => $zero_bonus ? 0 : $device->getId(),
+                'agent_id' => $is_zero_bonus ? 0 : $device->getAgentId(),
+                'device_id' => $is_zero_bonus ? 0 : $device->getId(),
                 'src' => Order::ACCOUNT,
                 'name' => $goods['name'],
                 'goods_id' => $goods['id'],
@@ -1739,7 +1739,7 @@ HTML_CONTENT;
                     ],
                     'user' => $user->profile(),
                     'custom' => [
-                        'zero_bonus' => $zero_bonus,
+                        'zero_bonus' => $is_zero_bonus,
                     ]
                 ],
             ];
@@ -1840,7 +1840,7 @@ HTML_CONTENT;
             } else {
                 $order->setResultCode(0);
 
-                if (!$zero_bonus) {
+                if (!$is_zero_bonus) {
                     if (isset($goods['cargo_lane'])) {
                         $locker = $device->payloadLockAcquire(3);
                         if (empty($locker)) {

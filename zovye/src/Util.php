@@ -2027,7 +2027,8 @@ HTML_CONTENT;
 
         parse_str(str_replace('; ', '&', getArray($resp, 'headers.X-LIMIT', '')), $limits);
 
-        if (isset($limits)) {
+        if (is_array($limits)) {
+            $limits['updatetime'] = time();
             Config::location('tencent.lbs.limits', $limits, true);
         }
 

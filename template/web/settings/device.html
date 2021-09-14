@@ -99,6 +99,11 @@
                                    <div>
                                        <span>剩余调用量（次/日）</span> : <span>{php echo $lbs_limits['limit_pv'] - $lbs_limits['current_pv']}</span>
                                    </div>
+                                   {if !empty($lbs_limits['updatetime'])}
+                                    <div>
+                                        <span>更新时间</span> : <span>{php echo date('Y-m-d H:i:s', $lbs_limits['updatetime'])}</span>
+                                    </div>
+                                   {/if}
                                 </div>
                             </i>
                             {/if}                

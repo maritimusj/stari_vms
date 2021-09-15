@@ -2037,6 +2037,13 @@ if ($op == 'default') {
                 }
             } elseif ($entry->getSrc() == CommissionBalance::ORDER_REFUND) {
                 $data['event'] = '订单退款，返还佣金';
+                $order_id = $entry->getExtraData('orderid');
+                $order = Order::get($order_id);
+                if ($order) {
+                    $data['event'] .= "，订单号：{$order->getOrderNO()}";
+                } else {
+                    $data['event'] .= "，订单ID：$order_id";
+                }
             } elseif ($entry->getSrc() == CommissionBalance::GSP) {
                 $order_id = $entry->getExtraData('orderid');
                 $order = Order::get($order_id);

@@ -148,11 +148,19 @@ REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::ORDER_REFUND) {
 
             $name = $entry->getExtraData('admin');
+            $order_id = $entry->getExtraData('orderid');
+            $order = Order::get($order_id);
+            $order_info = "订单ID：$order_id";
+            if ($order) {
+                $order_info = $order->getOrderNO();
+            }
             $admin_info = empty($name) ? '' : "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
             $data['memo'] = <<<ORDER_REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">订单退款，返还佣金</dd>
+<dt>订单</dt>
+<dd class="event">$order_info</dd>
 {$admin_info}
 </dl>
 ORDER_REFUND;

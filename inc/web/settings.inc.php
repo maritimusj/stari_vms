@@ -265,7 +265,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
             $settings['agent']['reg']['superior'] = request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
             $settings['agent']['reg']['level'] = request::str('agentRegLevel');
-            $settings['agent']['reg']['commission_fee'] = round(request::int('agentCommissionFee') * 100);
+            $settings['agent']['reg']['commission_fee'] = round(request::float('agentCommissionFee', 0, 2) * 100);
             $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 1 : 0;
 
             $settings['agent']['reg']['funcs'] = Util::parseAgentFNsFromGPC();
@@ -277,10 +277,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
                 if ($settings['agent']['reg']['rel_gsp']['enabled']) {
 
-                    $rel_0 = request::float('rel_gsp_level0', 0, 2);
-                    $rel_1 = request::float('rel_gsp_level1', 0, 2);
-                    $rel_2 = request::float('rel_gsp_level2', 0, 2);
-                    $rel_3 = request::float('rel_gsp_level3', 0, 2);
+                    $rel_0 = request::float('rel_gsp_level0', 0, 2) * 100;
+                    $rel_1 = request::float('rel_gsp_level1', 0, 2) * 100;
+                    $rel_2 = request::float('rel_gsp_level2', 0, 2) * 100;
+                    $rel_3 = request::float('rel_gsp_level3', 0, 2) * 100;
 
                     if ($settings['agent']['reg']['gsp_mode_type'] == 'amount') {
                         $rel_0 = intval(round($rel_0));
@@ -289,18 +289,24 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                         $rel_3 = intval(round($rel_3));
                     } else {
                         $total = $rel_0 + $rel_1 + $rel_2 + $rel_3;
-                        if ($total > 100) {
-                            $rel_3 = round($rel_3 / $total * 100, 2);
-                            $rel_2 = round($rel_2 / $total * 100, 2);
-                            $rel_1 = round($rel_1 / $total * 100, 2);
+                        if ($total > 10000) {
+                            $rel_3 = round($rel_3 / $total * 10000, 2);
+                            $rel_2 = round($rel_2 / $total * 10000, 2);
+                            $rel_1 = round($rel_1 / $total * 10000, 2);
                         }
-                        $rel_0 = 100.00 - $rel_1 - $rel_2 - $rel_3;
+                        $rel_0 = 10000 - $rel_1 - $rel_2 - $rel_3;
                     }
 
                     $settings['agent']['reg']['rel_gsp']['level0'] = $rel_0;
                     $settings['agent']['reg']['rel_gsp']['level1'] = $rel_1;
                     $settings['agent']['reg']['rel_gsp']['level2'] = $rel_2;
                     $settings['agent']['reg']['rel_gsp']['level3'] = $rel_3;
+
+                    $settings['agent']['reg']['rel_gsp']['order'] = [
+                        'f' => request::bool('freeOrderGSP') ? 1 : 0,
+                        'b' => request::bool('balanceOrderGSP') ? 1 : 0,
+                        'p' => request::bool('payOrderGSP') ? 1 : 0,
+                    ];
                 }
                 //佣金奖励
                 $settings['agent']['reg']['bonus']['enabled'] = request::bool('agentBonusEnabled') ? 1 : 0;

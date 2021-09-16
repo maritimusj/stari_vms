@@ -621,6 +621,15 @@ if ($op == 'default') {
                 $data['lcsw']['merchant_no'] = request::trim('merchant_no');
                 $data['lcsw']['terminal_id'] = request::trim('terminal_id');
                 $data['lcsw']['access_token'] = request::trim('access_token');
+                
+                //创建扫呗接口文件
+                Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
+                    'headers' => [
+                        'HTTP_USER_AGENT' => 'lcsw_notify',
+                    ],
+                    'op' => 'notify',
+                    'from' => 'lcsw',
+                ]);
             }
 
             $user->updateSettings('agentData.pay', $data);

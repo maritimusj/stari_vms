@@ -42,6 +42,8 @@
     cursor: default;
     font-size: larger;
     white-space: nowrap;
+    max-width: 200px;
+    overflow: auto;
 }
 
 #orderlist .devicename div {

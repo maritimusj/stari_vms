@@ -262,7 +262,7 @@ class YunfenbaAccount
             /** @var deviceModelObj $device */
             $device = Device::findOne(['shadow_id' => $params['device']]);
             if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['state']);
+                throw new RuntimeException('找不到指定的设备:' . $params['device']);
             }
 
             $acc = $res['account'];

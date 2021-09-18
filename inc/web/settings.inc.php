@@ -187,6 +187,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createSNTOAccount',
                 'snto.fan.enabled',
             ],
+            'yfbFAN' => [
+                __NAMESPACE__ . '\Account::createYFBAccount',
+                'yfb.fan.enabled',
+            ],
         ];
 
         $accounts_need_refresh = false;

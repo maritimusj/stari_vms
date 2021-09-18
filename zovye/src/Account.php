@@ -53,6 +53,9 @@ class Account extends State
     //史莱姆
     const SNTO = 106;
 
+    //研粉宝
+    const YFB = 107;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -79,6 +82,9 @@ class Account extends State
 
     const SNTO_NAME = '史莱姆';
     const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
+
+    const YFB_NAME = '研粉宝';
+    const YFB_HEAD_IMG = MODULE_URL . 'static/img/yfb_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -289,6 +295,13 @@ class Account extends State
         if (App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude)) {
             $join(['state' => Account::SNTO], function () use ($device, $user) {
                 return SNTOAccount::fetch($device, $user);
+            });
+        }
+
+        //研粉宝
+        if (App::isYFBEnabled() && !in_array(YfbAccount::getUid(), $exclude)) {
+            $join(['state' => Account::YFB], function () use ($device, $user) {
+                return YfbAccount::fetch($device, $user);
             });
         }
 
@@ -627,6 +640,12 @@ class Account extends State
     {
         $url = Util::murl('snto');
         return self::createSpecialAccount(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+    }
+
+    public static function createYFBAccount(): ?accountModelObj
+    {
+        $url = Util::murl('yfb');
+        return self::createSpecialAccount(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array

@@ -133,6 +133,7 @@ if ($op == 'default') {
         Account::MEIPA => App::isMeiPaEnabled(),
         Account::KINGFANS => App::isKingFansEnabled(),
         Account::SNTO => App::isSNTOEnabled(),
+        Account::YFB => App::isSNTOEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -319,6 +320,15 @@ if ($op == 'default') {
                     'channel' => request::trim('channel'),
                     'data' => $account->settings('config.data', []),
                 ]);
+            } elseif ($account->isYFB()) {
+                $data['name'] = Account::YFB_NAME;
+                $data['img'] = Account::YFB_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::YFB,
+                    'id' => request::trim('app_id'),
+                    'secret' => request::trim('app_secret'),
+                    'scene' => request::trim('scene'),
+                ]);
             } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
@@ -372,6 +382,7 @@ if ($op == 'default') {
                 Account::MEIPA_NAME,
                 Account::KINGFANS,
                 Account::SNTO,
+                Account::YFB,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

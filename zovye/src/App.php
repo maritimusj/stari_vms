@@ -190,6 +190,17 @@ class App
     }
 
     /**
+     * 是否开启 研粉宝 吸粉
+     *
+     */
+    public static function isYFBEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('yfb.fan.enabled'));
+        });
+    }
+
+    /**
      * 是否启用用户中心
      * @return bool
      */

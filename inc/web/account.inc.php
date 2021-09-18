@@ -327,6 +327,7 @@ if ($op == 'default') {
                     'type' => Account::YFB,
                     'id' => request::trim('app_id'),
                     'secret' => request::trim('app_secret'),
+                    'key' => request::trim('key'),
                     'scene' => request::trim('scene'),
                 ]);
             } elseif ($account->isAuth()) {

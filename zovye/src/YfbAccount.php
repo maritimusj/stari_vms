@@ -10,21 +10,24 @@ use zovye\model\userModelObj;
 
 class YfbAccount
 {
-    const API_URL = 'http://yb001.ybaokj.cn/mache/getQrCode';
+    //const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCode';
+    const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCodes';
 
     private $app_id;
     private $app_secret;
     private $scene;
+    private $key;
 
     /**
      * @param $app_id
      * @param $app_secret
      * @param $scene
      */
-    public function __construct($app_id, $app_secret, $scene)
+    public function __construct($app_id, $app_secret, $key, $scene)
     {
         $this->app_id = $app_id;
         $this->app_secret = $app_secret;
+        $this->key = $key;
         $this->scene = $scene;
     }
 
@@ -35,27 +38,30 @@ class YfbAccount
 
     public function getQRCode(deviceModelObj $device, userModelObj $user, callable $cb = null): array
     {
+        $key = $device->settings('extra.yfb.key', '');
+        if (empty($key)) {
+            $key = $this->key;
+        }
+
         $scene = $device->settings('extra.yfb.scene', '');
         if (empty($scene)) {
             $scene = $this->scene;
         }
 
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $fans = $user->profile();
 
         $data = [
             'appId' => $this->app_id,
             'gender' => empty($fans['sex']) ? 0 : $fans['sex'],
             'openid' => $user->getOpenid(),
             'ip' => $user->getLastActiveData('ip', CLIENT_IP),
-            'macheNumber' => $device->getShadowId(),
+            'macheNumber' => $key,
             'scene' => $scene,
+            'params' => $device->getShadowId(),
             'timeStamp' => time(),
         ];
-        $data['sign'] = $this->sign($data);
 
-        if (!empty($scene)) {
-            $data['scene'] = $scene;
-        }
+        $data['sign'] = $this->sign($data);
 
         $result = Util::post(self::API_URL, $data);
 
@@ -76,7 +82,12 @@ class YfbAccount
             $arr[$name] = "$name=$val";
         }
         ksort($arr);
-        return md5(implode('&', array_values($arr)) . $this->app_secret);
+        $str = implode('&', array_values($arr)) . $this->app_secret;
+        Util::logToFile('yfb', [
+            'str' => $str,
+            'arr' => array_values($arr),
+        ]);
+        return md5($str);
     }
 
     private static function getYFB(accountModelObj $acc)
@@ -84,12 +95,12 @@ class YfbAccount
         static $obj = null;
         if (empty($obj)) {
             $config = $acc->settings('config', []);
-            if (empty($config) || empty($config['id'] || empty($config['secret']))) {
+            if (isEmptyArray($config)) {
                 return err('没有配置！');
             }
 
             //请求对方API
-            $obj = new YfbAccount($config['id'], $config['secret'], $config['scene']);
+            $obj = new YfbAccount($config['id'], $config['secret'], $config['key'], $config['scene']);
         }
 
         return $obj;
@@ -114,7 +125,7 @@ class YfbAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('yfb_query', [
+                        Util::logToFile('yfb', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -137,9 +148,14 @@ class YfbAccount
                         throw new RuntimeException('失败，错误代码：' . $result['code']);
                     }
 
-                    $data = $acc->format();
+                    $qrcode = json_decode($result['data'], true);
+                    if (empty($qrcode) || empty($qrcode['qrCode'])) {
+                        throw new RuntimeException('返回的二维码数据为空！');
+                    }
 
-                    $data['qrcode'] = $result['data']['qrCode'];
+                    $data = $acc->format();
+                    $data['qrcode'] = $qrcode['qrCode'];
+                    Util::logToFile('yfb', $data);
 
                     $v[] = $data;
 
@@ -203,9 +219,9 @@ class YfbAccount
             }
 
             /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $params['macheNumber']]);
+            $device = Device::findOne(['shadow_id' => $params['params']]);
             if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['macheNumber']);
+                throw new RuntimeException('找不到指定的设备:' . $params['params']);
             }
 
             $acc = $res['account'];

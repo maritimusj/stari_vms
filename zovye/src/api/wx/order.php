@@ -350,9 +350,9 @@ class order
                     $str_export .= "\t";
                 }
 
-                $str_export .= ($item['agent']['name'] ?: '') . "\t";
-                $str_export .= ($item['device']['name'] ?: '') . "\t";
-                $str_export .= ($item['result']['deviceGUID'] ?: '') . "\t";
+                $str_export .= ($item['agent']['name'] ?? '') . "\t";
+                $str_export .= ($item['device']['name'] ?? '') . "\t";
+                $str_export .= ($item['result']['deviceGUID'] ?? '') . "\t";
                 $str_export .= $item['ip'] . "\t";
                 $str_export .= $item['createtime'] . "\t";
 

@@ -109,10 +109,12 @@
                             <input type="checkbox" name="s_type_ali" value="1" {if $s_type_ali} checked{/if}>
                             支付宝
                         </label>
+                        {if \zovye\App::isDouyinEnabled()}
                         <label>
                             <input type="checkbox" name="s_type_douyin" value="1" {if $s_type_douyin} checked{/if}>
                             抖音
                         </label>
+                        {/if}
                         <label>
                             <input type="checkbox" name="s_type_api" value="1" {if $s_type_api} checked{/if}>
                             第三方API用户

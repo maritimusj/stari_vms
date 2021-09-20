@@ -300,7 +300,7 @@ class Util
         return null;
     }
 
-    public static function getDouYinUser($code, $device)
+    public static function getDouYinUser($code, $device = null)
     {
         $douyin = DouYin::getInstance();
 

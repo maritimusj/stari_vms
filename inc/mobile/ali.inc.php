@@ -30,7 +30,7 @@ if (request::op() == 'auth') {
     if (empty($code)) {
         Util::resultAlert('获取用户auth_code失败！', 'error');
     }
-    if (!Util::getAliUser($code, $device)) {
+    if (!Util::getAliUser($code)) {
         Util::resultAlert('获取用户信息失败[02]', 'error');
     }
 }

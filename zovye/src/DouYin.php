@@ -17,7 +17,7 @@ class DouYin
         $this->client_secret = $secret;
     }
 
-    public function getAuthorizeRedirectUrl($url, array $scopes = [])
+    public function getAuthorizeRedirectUrl($url, array $scopes = []): string
     {
         $path = '/platform/oauth/connect/?';
         $data = [
@@ -30,7 +30,7 @@ class DouYin
         return self::API_URL . $path . http_build_query($data);
     }
 
-    public function getSilenceAuthorizeRedirectUrl($url)
+    public function getSilenceAuthorizeRedirectUrl($url): string
     {
         $path = '/oauth/authorize/v2/?';
         $data = [
@@ -146,7 +146,7 @@ class DouYin
         return $data;
     }
 
-    public static function getInstance()
+    public static function getInstance(): DouYin
     {
         static $instance = null;
         if (is_null($instance)) {
@@ -167,7 +167,7 @@ class DouYin
         exit();  
     }
 
-    public static function isTokenExpired(userModelObj $user)
+    public static function isTokenExpired(userModelObj $user): bool
     {
         $token = $user->get('douyin_token', []);
         return empty($token) || time() - $token['updatetime'] > $token['expires_in'] - 1000;

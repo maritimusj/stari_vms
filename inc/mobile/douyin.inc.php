@@ -9,7 +9,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         Util::resultAlert('获取用户授权code失败！', 'error');
     }
 
-    $user = Util::getDouYinUser($code, $device);
+    $user = Util::getDouYinUser($code);
     if (empty($user)) {
         Util::resultAlert('获取用户信息失败[02]', 'error');
     }

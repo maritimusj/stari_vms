@@ -108,7 +108,7 @@ class Util
     public static function getCurrentUser(array $params = []): ?userModelObj
     {
         $user = null;
-        if (App::isAliUser()) {
+        if (App::isAliUser() || App::isDouYinUser()) {
             $user = User::get(App::getUserUID(), true);
         } else {
             if (empty($user)) {
@@ -162,6 +162,7 @@ class Util
 
                             $user->set('fansData', $fans);
                             $user->save();
+                            App::setContainer($user);
                         }
                     }
                 }
@@ -285,6 +286,7 @@ class Util
                     'sex' => self::getAliuserSex($result->alipay_user_info_share_response->gender),
                 ]);
                 $user->save();
+                App::setContainer($user);
             }
 
             return $user;
@@ -296,6 +298,64 @@ class Util
         }
 
         return null;
+    }
+
+    public static function getDouYinUser($code, $device)
+    {
+        $douyin = DouYin::getInstance();
+
+        $result = $douyin->getAccessToken($code);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        $info = $douyin->getUserInfo($result['access_token'], $result['open_id']);
+        if (is_error($info)) {
+            return $info;
+        }
+
+        $user = User::get($info['open_id'], true, User::DouYin);
+        if (empty($user)) {
+            $data = [
+                'app' => User::DouYin,
+                'nickname' => $info['nickname'],
+                'avatar' => $info['avatar'],
+                'openid' => $info['open_id'],
+            ];
+
+            $user = User::create($data);
+            if (!empty($device)) {
+                $params['from'] = [
+                    'src' => 'device',
+                    'device' => [
+                        'name' => $device->getName(),
+                        'imei' => $device->getImei(),
+                    ],
+                    'ip' => CLIENT_IP,
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+                ];
+
+                $user->set('fromData', $params['from']);
+            }
+        }
+
+        if ($user) {
+            $user->setNickname($info['nickname']);
+            $user->setAvatar($info['avatar']);
+
+            $result['updatetime'] = time();
+            $user->set('douyin_token', $result);
+
+            $user->set('fansData', [
+                'province' => $info['province'],
+                'city' => $info['city'],
+                'sex' => $info['gender'],
+            ]);
+            $user->save();
+            App::setContainer($user);
+        }
+
+        return $user;
     }
 
     /**
@@ -2056,6 +2116,9 @@ HTML_CONTENT;
      */
     public static function mustValidateLocation(userModelObj $user, deviceModelObj $device): bool
     {
+        if (!$user->isWxUser()) {
+            return false;
+        }
         if (!$device->needValidateLocation()) {
             return false;
         }
@@ -2568,6 +2631,21 @@ HTML_CONTENT;
             }
         }
         return false;
+    }
+
+    public static function isDouYinAppContainer(): bool
+    {
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
+        if (empty($user_agent)) {
+            return false;
+        }
+        $douyin = ['bytedancewebview'];
+        foreach ($douyin as $val) {
+            if (strpos($user_agent, $val) !== false) {
+                return true;
+            }
+        }
+        return false;        
     }
 
     /**

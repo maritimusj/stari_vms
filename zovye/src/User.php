@@ -19,6 +19,7 @@ class User
     const WX = 0;
     const WxAPP = 1;
     const ALI = 2;
+    const DouYin = 3;
 
     //API用户
     const API = 10;
@@ -80,12 +81,18 @@ class User
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL . "static/img/api.svg",
             ],
-            'third' => [
+           'third' => [
                 'name' => 'api',
                 'title' => '第三方公众号授权用户',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL . "static/img/third.svg",
             ],
+            'douyin' => [
+                'name' => 'douyin',
+                'title' => '抖音用户',
+                'color' => '#4CAF50',
+                'icon' => MODULE_URL . "static/img/douyin.svg",
+            ]
         ];
 
         if (self::isAliUser($obj)) {
@@ -96,6 +103,8 @@ class User
             return $data['api'];
         } elseif (self::isThirdAccountUser($obj)) {
             return $data['third'];
+        } elseif (self::isDouYinUser($obj)) {
+            return $data['douyin'];
         }
 
         return $data['wx'];
@@ -146,6 +155,16 @@ class User
         $user = User::get($obj, is_string($obj));
         return $user && $user->isThirdAccountUser();
     }
+
+    public static function isDouYinUser($obj): bool
+    {
+        if ($obj instanceof userModelObj) {
+            return $obj->isDouYinUser();
+        }
+        $user = User::get($obj, is_string($obj));
+        return $user && $user->isDouYinUser();
+    }
+
     /**
      * @param $id
      * @param bool $is_openid

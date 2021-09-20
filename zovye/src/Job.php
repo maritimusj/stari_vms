@@ -3,11 +3,15 @@
 namespace zovye;
 
 use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 
 class Job
 {
-    public static function exit()
+    public static function exit(callable $fn = null)
     {
+        if ($fn != null) {
+            $fn();
+        }
         exit(CtrlServ::HANDLE_OK);
     }
 
@@ -192,5 +196,15 @@ class Job
             return true;
         }
         return false;
+    }
+
+    public static function douyinOrder(userModelObj $user, deviceModelObj $device, $account_uid, $time = null)
+    {
+        return CtrlServ::scheduleJob('douyin', [
+            'id' => $user->getId(),
+            'device' => $device->getId(), 
+            'uid' => $account_uid, 
+            'time' => $time ?? time(),
+        ]);
     }
 }

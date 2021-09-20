@@ -256,11 +256,24 @@ class accountModelObj extends modelObj
         return intval($this->settings('config.type'));
     }
 
+    public function getConfig($path = '', $default = null)
+    {
+        if (empty($path)) {
+            return $this->get('config', $default);
+        }
+        return $this->settings('config.' . $path, $default);
+    }
+
     public function isVideo(): bool
     {
         return $this->getType() == Account::VIDEO;
     }
 
+    public function isDouyin(): bool
+    {
+        return $this->getType() == Account::DOUYIN;
+    }
+   
     public function isJFB(): bool
     {
         return $this->getType() == Account::JFB;

@@ -16,6 +16,21 @@ $device_id = request::str('device');
 $account_id = request::str('account');
 $xid = request::str('xid');
 
+if (Util::isAliAppContainer()) {
+    $ali_entry_url = Util::murl('ali', [ 
+        'from' => $from,
+        'device' => $device_id,
+    ]);
+    Util::redirect($ali_entry_url);
+} elseif (Util::isDouYinAppContainer()) {
+    $douyin_entry_url = Util::murl('douyin', [
+        'from' => $from,
+        'device' => $device_id,
+        'account' => $account_id,
+    ]);
+    Util::redirect($douyin_entry_url);
+}
+
 $params = [
     'create' => true,
     'update' => true,
@@ -122,51 +137,10 @@ if ($device_id) {
     ];
 }
 
-//创建支付宝用户
-if (Util::isAliAppContainer()) {
-    if (request::op() == 'auth_alipay') {
-        $code = request::str('auth_code');
-        if (empty($code)) {
-            Util::resultAlert('获取用户auth_code失败！', 'error');
-        }
-
-        $user = Util::getAliUser($code, $device);
-
-        if ($user) {
-            App::setContainer($user);
-        } else {
-            Util::resultAlert('获取用户信息失败！', 'error');
-        }
-
-        $redirect = Util::murl('entry', [
-            'from' => $from,
-            'device' => $device_id,
-            'account' => $account_id,
-            'xid' => $xid,
-        ]);
-
-        Util::redirect($redirect);
-        exit();
-    }
-
-    if (!App::isAliUser()) {
-        $cb_url = Util::murl('entry', [
-            'op' => 'auth_alipay',
-            'from' => $from,
-            'device' => $device_id,
-            'account' => $account_id,
-            'xid' => $xid,
-        ]);
-        app()->aliAuthPage($cb_url);
-    }
-}
-
 $user = Util::getCurrentUser($params);
 if (empty($user)) {
     Util::resultAlert('请用微信或者支付宝扫描二维码，谢谢！', 'error');
 }
-
-App::setContainer($user);
 
 if ($user->isBanned()) {
     Util::resultAlert('用户帐户暂时无法使用该功能，请联系管理员！', 'error');
@@ -176,7 +150,7 @@ if (App::isUserVerify18Enabled()) {
     if(!$user->isIDCardVerified()) {
         app()->showTemplate(Theme::file('verify_18'), [
             'verify18' => settings('user.verify_18', []),
-            'entry_url' => $this->createMobileUrl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
+            'entry_url' => Util::murl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
         ]);
     }
 }
@@ -207,7 +181,7 @@ if (empty($device)) {
 }
 
 //检查用户定位
-if (Util::mustValidateLocation($user, $device)) {
+if (App::isWxUser() && Util::mustValidateLocation($user, $device)) {
     
     $user->updateSettings('last.deviceId', '');
 

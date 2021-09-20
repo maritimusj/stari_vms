@@ -177,6 +177,8 @@ if ($op == 'default') {
                 ];
                 if ($account->isVideo()) {
                     $profile['media'] = $account->getMedia();
+                } elseif ($account->isDouyin()) {
+                    $profile['douyin'] = true;
                 } else {
                     $profile['qrcode'] = $account->getQrcode();
                 }
@@ -188,6 +190,8 @@ if ($op == 'default') {
         if ($accounts[$data['account']]) {
             if (isset($accounts[$data['account']]['media'])) {
                 $data['account_title'] = '视频 ' . $data['account'];
+            } elseif ($accounts[$data['account']]['douyin']) {
+                $data['account_title'] = '抖音 ' . $data['account'];
             } else {
                 $data['account_title'] = '公众号 ' . $data['account'];
             }

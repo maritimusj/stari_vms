@@ -6,15 +6,12 @@ defined('IN_IA') or exit('Access Denied');
 
 Util::logToFile('yfb', [
     'raw' => request::raw(),
-    'user' => request::str('user'),
-    'device' => request::str('device'),
+    'user' => request::str('openid'),
+    'device' => request::str('macheNumber'),
 ]);
 
 if (App::isYFBEnabled()) {
-    YfbAccount::cb([
-        'user' => request::str('user'),
-        'device' => request::str('device'),
-    ]);
+    YfbAccount::cb(request::json());
 } else {
     Util::logToFile('yfb', [
         'error' => '研粉宝没有启用！',

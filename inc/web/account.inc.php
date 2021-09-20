@@ -25,8 +25,12 @@ if ($op == 'default') {
     if ($banned) {
         $query->where(['state' => Account::BANNED]);
     } else {
+        $states =  [Account::NORMAL, Account::VIDEO, Account::AUTH];
+        if (App::isDouyinEnabled()) {
+            $states[] = Account::DOUYIN;
+        }
         $query->where([
-            'state' => [Account::NORMAL, Account::VIDEO, Account::AUTH],
+            'state' => $states,
         ]);
     }
 
@@ -88,6 +92,8 @@ if ($op == 'default') {
             if ($entry->isAuth()) {
                 $data['service'] = $entry->getServiceType();
                 $data['verified'] = $entry->isVerified();
+            } elseif ($entry->isDouyin()) {
+                $data['openid'] = $entry->settings('config.openid', '');
             }
 
             if (App::useAccountQRCode()) {
@@ -460,6 +466,12 @@ if ($op == 'default') {
                         'duration' => request::int('duration', 1),
                         'exclusive' => request::int('exclusive', 0),
                     ]
+                ]);
+            } elseif ($account->isDouyin()) {
+                $account->set('config', [
+                    'type' => Account::DOUYIN,
+                    'url' => request::trim('url'),
+                    'openid' => request::trim('openid'),
                 ]);
             }
 
@@ -879,6 +891,38 @@ if ($op == 'default') {
     $num = (int)$query->get('count(DISTINCT `openid`)');
 
     JSON::success("{$acc->getTitle()}，净增粉丝总数：{$num}人");
+
+} elseif ($op == 'douyinAuthorize') {
+
+    $id = request::int('id');
+
+    $acc = Account::get($id);
+    if (empty($acc)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    $title = $acc->getTitle();
+
+    $url = Util::murl('douyin', [
+        'op' => 'get_openid',
+        'account' => $acc->getId(),
+    ]);
+ 
+    $result = Util::createQrcodeFile("douyin_{$acc->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '请用抖音扫描二维码完成授权！',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => "$title",
+        'content' => $content,
+    ]);
 
 } elseif ($op == 'platform_stat') {
 

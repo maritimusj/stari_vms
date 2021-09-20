@@ -188,6 +188,10 @@ class YfbAccount
         if (!App::isYFBEnabled()) {
             return err('没有启用！');
         }
+        
+        if (isEmptyArray($params)) {
+            return err('请求数据为空！');
+        }
 
         $acc = Account::findOne(['state' => Account::YFB]);
         if (empty($acc)) {

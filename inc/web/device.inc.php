@@ -1011,6 +1011,9 @@ if ($op == 'list') {
     if ($accounts) {
         foreach ($accounts as &$entry) {
             $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);
+            if (empty($entry['qrcode'])) {
+                $entry['qrcode'] = MODULE_URL . 'static/img/qrcode.svg';
+            }
         }
     }
     $tpl_data['accounts'] = $accounts;

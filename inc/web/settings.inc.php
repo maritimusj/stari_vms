@@ -152,6 +152,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
+        $settings['account']['douyin']['enabled'] = request::bool('douyin') ? 1 : 0;
 
         $specialAccounts = [
             'jfbFAN' => [
@@ -437,6 +438,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['account']['wx']['platform']['config']['secret'] = request::trim('wxPlatformAppSecret');
             $settings['account']['wx']['platform']['config']['token'] = request::trim('wxPlatformToken');
             $settings['account']['wx']['platform']['config']['key'] = request::trim('wxPlatformKey');
+        }
+
+        if (App::isDouyinEnabled()) {
+            Config::douyin('client', [
+                'key' => request::trim('douyinClientKey', ''),
+                'secret' => request::trim('douyinClientSecret', ''),
+            ], true);
         }
 
         $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
@@ -739,6 +747,10 @@ if ($op == 'account') {
 
         $tpl_data['moscaleRegionData'] = MoscaleAccount::getRegionData();
         $tpl_data['moscaleRegionSaved'] = is_array($settings['moscale']['fan']['region']) ? $settings['moscale']['fan']['region'] : [];
+    }
+
+    if (App::isDouyinEnabled()) {
+        $tpl_data['douyin'] = Config::douyin('client', []);
     }
 
 } elseif ($op == 'refreshWxPlatformToken') {

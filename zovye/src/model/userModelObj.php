@@ -142,6 +142,11 @@ class userModelObj extends modelObj
         return $this->app == User::THIRD_ACCOUNT;
     }
 
+    public function isDouYinUser(): bool
+    {
+        return $this->app == User::DouYin;
+    }    
+
     public function profile($detail = true): array
     {
         $data = [

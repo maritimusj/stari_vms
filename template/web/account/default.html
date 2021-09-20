@@ -56,6 +56,10 @@
         color: #4CAF50;
         margin-left: 6px;
     }
+    #accountlist .state.auth img {
+        width: 16px;
+        height: 16px;
+    }
     #accountlist .state.video {
         color: #cf1010;
         margin-left: 6px;
@@ -127,6 +131,9 @@
         <span class="operate">
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
+            {if \zovye\App::isDouyinEnabled()}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}"><i class="fa fa-fw fa-thumbs-up" title="添加抖音广告"></i></a>
+            {/if}
             {if \zovye\App::isWxPlatformEnabled()}
             <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
             {/if}
@@ -247,6 +254,12 @@
                             {/if}
                             {elseif $a['state'] == \zovye\Account::VIDEO}
                             <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
+                            {elseif $a['state'] == \zovye\Account::DOUYIN}
+                            {if $a['openid']}
+                            <span class="state auth" title="抖音用户已授权">
+                                <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
+                            </span>
+                            {/if}
                             {/if}
                         </div>
                     </td>
@@ -289,6 +302,11 @@
                         </div>
                     </td>
                     <td style="position:relative;">
+                        {if $a['state'] == zovye\Account::DOUYIN}
+                        <div class="operate">
+                            <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
+                        </div>
+                        {else}
                         <div class="ercode loading">
                             {if $a['useAccountQRCode']}
                             <i class="fa fa-desktop"></i>
@@ -297,6 +315,7 @@
                             {/if}                            
                             <div class="zovye_qrcode"  data-src="{media $a['qrcode']}"></div>
                         </div>
+                        {/if}
                     </td>
                     {else}
                     <td>
@@ -507,6 +526,13 @@
                     const newText = textCtrl.text() == '取消设备二维码' ? '设为设备二维码' : '取消设备二维码';
                     textCtrl.text(newText);
                 }
+            })
+        }
+
+        api.douyinAuth = function(id, self) {
+            api.showResult({
+                id: id,
+                op: 'douyinAuthorize',
             })
         }
         

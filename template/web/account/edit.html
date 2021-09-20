@@ -58,12 +58,18 @@
                     <label class="col-md-2 control-label">
                         {if $type == \zovye\Account::VIDEO}
                         头像
+                        {elseif $type == \zovye\Account::DOUYIN}
+                        账号头像
                         {else}
                         公众号头像
                         {/if}
                     </label>
                     <div class="col-md-10">
+                        {if $type == \zovye\Account::DOUYIN}
+                        {php echo tpl_form_field_image('img', $account?$account->getImg(): MODULE_URL . 'static/img/douyin_icon.svg');}
+                        {else}
                         {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
+                        {/if}
                     </div>
                 </div>
                 {/if}
@@ -91,6 +97,7 @@
                         <span class="help-block">* 用户必须等待其他用户观看完成后，才能点击观看视频</span>
                     </div>
                 </div>
+                {elseif  $type == \zovye\Account::DOUYIN}
                 {else}
                     {if $account && $account->isAuth()}
                     <input name="qrcode" type="hidden" value="{php echo $account->getQrcode()}">
@@ -111,6 +118,22 @@
                     </div>
                     {/if}
                 {/if}
+                {if $type == \zovye\Account::DOUYIN}
+                <div class="form-group">
+                    <label for="openid" class="col-md-2 control-label">授权用户openid</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="openid" id="openid" value="{php echo $account?$account->getConfig('openid'):''}">
+                        <span class="help-block">* 需要吸粉的抖音授权账号openid，可以从用户列表找到该用户，点击抖音图标复制</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="url" class="col-md-2 control-label">抖音账号主页</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="url" id="url" value="{php echo $account?$account->getConfig('url'):''}">
+                        <span class="help-block">* 需要吸粉的抖音账号主页网址，进入用户主页后，点击分享并复制链接</span>
+                    </div>
+                </div>
+                {else}
                 <div class="form-group">
                     <label for="descr" class="col-md-2 control-label">引导关注文字</label>
                     <div class="col-md-10">
@@ -123,6 +146,7 @@
                         {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
                     </div>
                 </div>
+                {/if}
             </div>
             {if $account && !$account->isSpecial() && !$account->useAccountQRCode()}
             <div class="seg">

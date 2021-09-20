@@ -110,6 +110,10 @@
                             支付宝
                         </label>
                         <label>
+                            <input type="checkbox" name="s_type_douyin" value="1" {if $s_type_douyin} checked{/if}>
+                            抖音
+                        </label>
+                        <label>
                             <input type="checkbox" name="s_type_api" value="1" {if $s_type_api} checked{/if}>
                             第三方API用户
                         </label>
@@ -528,7 +532,7 @@
                 params.append("s_keywords", s_keywords);
             }
 
-            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api', 's_type_third'].forEach(stype => {
+            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_douyin', 's_type_api', 's_type_third'].forEach(stype => {
                 const s_type = $(form.find('[name=' + stype + ']:checked')).val();
                 if (s_type) {
                     params.append(stype, s_type);

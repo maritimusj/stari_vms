@@ -122,4 +122,17 @@ class Config
 
         return globalConfig('location', $key, $v);
     }
+
+      /**
+     *  抖音设置
+     */
+
+    public static function douyin($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('douyin', $key, $v);
+        }
+
+        return globalConfig('douyin', $key, $v);
+    }  
 }

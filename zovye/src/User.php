@@ -89,7 +89,7 @@ class User
             ],
             'douyin' => [
                 'name' => 'douyin',
-                'title' => '抖音用户',
+                'title' => '抖音',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL . "static/img/douyin.svg",
             ]

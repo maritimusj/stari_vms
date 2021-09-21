@@ -79,7 +79,7 @@
                 padding: 0 15px;
             }
 
-            .name {
+            .title {
                 font-size: 15px;
                 font-weight: 500;
             }
@@ -132,7 +132,7 @@
                 <div class="account" v-for="item in accounts">
                     <img class="avatar" :src="item.img">
                     <div class="content-view">
-                        <span class="name" v-html="item.name"></span>
+                        <span class="title" v-html="item.title"></span>
                         <span class="descr" v-html="item.descr"></span>
                     </div>
                     <div class="btn" @click="followClick(item.uid)">关注</div>

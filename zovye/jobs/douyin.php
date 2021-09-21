@@ -10,16 +10,16 @@ namespace zovye\job\douyin;
 use zovye\Job;
 use zovye\User;
 use zovye\Util;
+use zovye\Order;
+use zovye\Device;
 use zovye\DouYin;
 use zovye\Locker;
+
 use zovye\Account;
 use zovye\request;
 
 use zovye\CtrlServ;
-use zovye\Device;
-
 use function zovye\is_error;
-use function zovye\request;
 
 $op = request::op('default');
 $data = [
@@ -85,11 +85,11 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
                     'device' => $device->getId(),
                     'user' => $user->getId(),
                     'account' => $account->getId(),
+                    'orderUID' => Order::makeUID($user, $device, sha1("douyin:" . $account->getUid())),
                 ]);
                 Job::exit($writeLog);
             }
         }
-
         if (time() - $data['time'] > 60) {
             $log['error'] = '用户操作时间已超过60秒！';
             Job::exit($writeLog);

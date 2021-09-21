@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>{$tpl['site']['title']}</title>
+        {php \zovye\url(true, CSS_SWIPER_URL);}
+		<style type="text/css">
+			html,
+            body {
+                position: relative;
+                width: 100%;
+            }
+
+            body {
+                background-color: #f2f2f2;
+                font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+                font-size: 14px !important;
+                color: #101010;
+                margin: 0;
+                padding: 0 0 20px;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            }
+
+            #app {
+				width: 100vw;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+
+            .list {
+                width: calc(100vw - 30px);
+                background-color: white;
+                margin: 15px 0;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .header {
+                width: 100%;
+                height: 50px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+            .account {
+                width: calc(100% - 30px);
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                padding: 20px 0;
+            }
+
+            .account:not(:last-child) {
+                border-bottom: 1px solid #eee;
+            }
+
+            .avatar {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+            }
+
+            .content-view {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                padding: 0 15px;
+            }
+
+            .name {
+                font-size: 15px;
+                font-weight: 500;
+            }
+
+            .descr {
+                margin-top: 5px;
+                color: #9d9d9d;
+                font-size: 12px;
+            }
+
+            .btn {
+                width: 60px;
+                height: 26px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                border-radius: 13px;
+                background-image: linear-gradient(to right, #FE5048 , #FE7042);
+                color: white;
+                font-size: 12px;
+                box-shadow: 0 0 5px #FE7042;
+            }
+
+            .btn:active {
+                opacity: 0.7;
+            }
+
+            .nodata-view {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 20vh;
+            }
+
+            .nodata-icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            .nodata-desc {
+                margin-top: 5px;
+            }
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app">
+			<div class="list" v-if="accounts && accounts.length > 0">
+                <div class="header">关注抖音账号，免费领取商品！</div>
+                <div class="account" v-for="item in accounts">
+                    <img class="avatar" :src="item.img">
+                    <div class="content-view">
+                        <span class="name" v-html="item.name"></span>
+                        <span class="descr" v-html="item.descr"></span>
+                    </div>
+                    <div class="btn" @click="followClick(item.uid)">关注</div>
+                </div>
+            </div>
+            <div class="nodata-view" v-if="accounts && accounts.length === 0">
+                <img class="nodata-icon" src="{MODULE_URL}static/m/spa/img/douyin.png">
+                <span class="nodata-desc">暂无可关注的抖音账号...</span>
+            </div>
+		</div>
+        {$tpl['js']['code']}
+        {php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+			new Vue({
+				el: '#app',
+				data: {
+                    accounts: null
+                },
+                created() {
+                    this.getAccounts();
+                },
+                methods: {
+                    getAccounts() {
+                        zovye_fn.getAccounts().then(res => {
+                            if (res && res.status) {
+                                this.accounts = res.data || []
+                            } else {
+                                alert(res.data.msg || '请求失败')
+                            }
+                        })
+                    },
+                    followClick(uid) {
+                        zovye_fn.redirect(uid).then(res => {
+                            if (res && res.status && res.data && res.data.redirect) {
+                                window.location.replace(res.data.redirect)
+                            } else {
+                                alert(res.data.msg || '请求失败')
+                            }
+                        })
+                    }
+                }
+            })
+		</script>
+	</body>
+</html>

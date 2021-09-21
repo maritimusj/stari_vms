@@ -421,6 +421,11 @@ if ($op == 'default') {
             'admin' => _W('username'),
         ]);
 
+        //抖音吸粉总数永远为１
+        if ($account->isDouyin()) {
+            $account->setTotal(1);
+        }
+
         if ($account->save() && Account::updateAccountData()) {
             //处理多个关注二维码
             if ($qr_codes) {
@@ -507,7 +512,7 @@ if ($op == 'default') {
             Util::itoast($res['message'], $back_url, 'success');
         }
     }
-
+    
 } elseif ($op == 'edit') {
 
     $id = request::int('id');

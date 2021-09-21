@@ -22,6 +22,70 @@ if ($op == 'auth' || $op == 'get_openid') {
         $account->updateSettings('config.openid', $user->getOpenid());
         Util::resultAlert('授权接入成功！');
     }
+} elseif ($op == 'account') {
+    $device = Device::findOne(['shadow_id' => request::str('device')]);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+    $user = User::get(request::trim('user'), true);
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $res = Account::match($device, $user, ['state' => Account::DOUYIN]);
+    $data = [];
+    foreach($res as $entry) {
+        if ($entry['url'] && $entry['openid']) {
+            $data[] = [
+                'uid' => $entry['uid'],
+                'name' => $entry['name'],
+                'title' => $entry['title'],
+                'descr' => $entry['descr'],
+                'clr' => $entry['clr'],
+                'img' => $entry['img'],
+            ];
+        }
+    }
+
+    JSON::success($data);
+
+} elseif ($op == 'detail') {
+    $user = User::get(request::trim('user'), true);
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $device = Device::findOne(['shadow_id' => request::str('device')]);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $account = Account::findOne(['uid' => request::trim('uid')]);
+    if (empty($account)) {
+        JSON::fail('找不到这个抖音号[01]！');
+    }
+    if (!$account->isDouyin()) {
+        JSON::fail('找不到这个抖音号[02]！');
+    }
+
+    $url = $account->getConfig('url', '');
+    if (empty($url)) {
+        JSON::fail('抖音号没有正确配置[03]！');
+    }
+
+    if (!Locker::try("douyin:{$user->getId()}:{$account->getUid()}")) {
+        JSON::fail('操作过于频繁，请稍后再试！');
+    }
+
+    if (!Util::isAvailable($user, $account, $device)) {
+        JSON::fail('暂时无法免费领取，请重试！');
+    }
+
+    Job::douyinOrder($user, $device, $account->getUid());
+
+    JSON::success([
+        'redirect' => $url,
+    ]);
 }
 
 $from = request::str('from');
@@ -95,14 +159,4 @@ if ($from == 'device') {
     $user->remove('last');
 }
 
-$res = Account::match($device, $user, ['state' => Account::DOUYIN]);
-
-foreach($res as $entry) {
-    if ($entry['url']) {
-        Job::douyinOrder($user, $device, $entry['uid']);
-        Util::redirect($entry['url']);
-        exit();
-    }
-}
-
-Util::resultAlert('暂时无法领取，请使用微信或者支付宝扫描二维码！', 'error');
+app()->douyinPage($device, $user);

@@ -33,17 +33,11 @@ $log = [
     'data' => $data,
 ];
 
-
 $writeLog = function () use (&$log) {
     Util::logToFile('douyin_order', $log);
 };
 
 if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
-
-    if (time() - $data['time'] > 60) {
-        $log['error'] = '用户操作时间已超过60秒！';
-        Job::exit($writeLog);
-    }
 
     if (!Locker::try("douyin:{$data['id']}:{$data['uid']}")) {
         $log['error'] = '锁定用户失败！';
@@ -74,6 +68,9 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
     }
 
     for($i = 0; $i < 10; $i ++ ) {
+        //延时一定时间后读取用户关注列表
+        sleep(2 + log($i + 1, 2));
+
         $result = DouYin::getUserFollowList($user);
         if (is_error($result)) {
             $log['error'] = $result;
@@ -92,7 +89,11 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
                 Job::exit($writeLog);
             }
         }
-        sleep(2);
+
+        if (time() - $data['time'] > 60) {
+            $log['error'] = '用户操作时间已超过60秒！';
+            Job::exit($writeLog);
+        }
     }
     $log['restart'] = Job::douyinOrder($user, $device, $data['uid'], $data['time']);
 } else {

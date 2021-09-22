@@ -14,7 +14,7 @@ if (App::isYFBEnabled()) {
     YfbAccount::cb(request::json());
 } else {
     Util::logToFile('yfb', [
-        'error' => '研粉宝没有启用！',
+        'error' => '粉丝宝没有启用！',
     ]);
 }
 

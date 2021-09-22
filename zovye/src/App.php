@@ -190,7 +190,7 @@ class App
     }
 
     /**
-     * 是否开启 研粉宝 吸粉
+     * 是否开启 粉丝宝 吸粉
      *
      */
     public static function isYFBEnabled(): bool

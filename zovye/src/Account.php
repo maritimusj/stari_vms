@@ -56,7 +56,7 @@ class Account extends State
     //史莱姆
     const SNTO = 106;
 
-    //研粉宝
+    //粉丝宝
     const YFB = 107;
 
     const SUBSCRIPTION_ACCOUNT = 0;
@@ -86,7 +86,7 @@ class Account extends State
     const SNTO_NAME = '史莱姆';
     const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
 
-    const YFB_NAME = '研粉宝';
+    const YFB_NAME = '粉丝宝';
     const YFB_HEAD_IMG = MODULE_URL . 'static/img/yfb_pic.png';
 
     protected static $title = [
@@ -366,7 +366,7 @@ class Account extends State
                 },
             ],
 
-            //研粉宝
+            //粉丝宝
             Account::YFB => [
                 function () use ($include, $exclude) {
                     if ($include && !in_array(Account::YFB, $include)) {

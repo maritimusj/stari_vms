@@ -64,7 +64,7 @@
 				<div v-for="item in accounts" class="swiper-slide card" :style="{'border':'1px solid' + item.clr,'box-shadow':'0px 0px 5px' + item.clr}">
 					<div class="top-view" :style="{'background-color':item.clr}">
 						<img class="avatar" :src="item.img" />
-						<span class="name">{{item.title}}</span>
+						<span class="name" v-html="item.title"></span>
 					</div>
 					<img class="account-qrcode" :src="item.qrcode" v-if="item.qrcode" />
 					<div class="account-video" v-else-if="item.media">
@@ -74,7 +74,7 @@
 						</div>
 					</div>
 					<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
-					<span class="desc">{{item.desc}}</span>
+					<span class="desc" v-html="item.desc"></span>
 				</div>
 			</div>
 		</div>
@@ -201,12 +201,12 @@
 			imei: "{$tpl['device']['imei']}",
 			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}'),
 			accounts: [
-				{loop $tpl['accounts'] $index $item}
+			{loop $tpl['accounts'] $index $item}
 				{
 					uid: "{$item['uid']}",
 					img: "{$item['img']}",
-					title: "{$item['title']}",
-					desc:"{$item['descr']}",
+					title: `{$item['title']}`,
+					desc:`{$item['descr']}`,
 					clr:"{$item['clr']}",
 					{if $item['qrcode']}
 					qrcode:"{$item['qrcode']}"
@@ -215,7 +215,7 @@
 					duration:{php echo intval($item['duration'])}
 					{/if}
 				},
-				{/loop}
+			{/loop}
 			]
 		};
 </script>

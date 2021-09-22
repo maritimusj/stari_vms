@@ -28,7 +28,7 @@ if ($op == 'auth' || $op == 'get_openid') {
             Util::resultAlert('找不到指定的吸粉广告！', 'error');
         }
         $account->updateSettings('config.openid', $user->getOpenid());
-        JSON::success('授权接入成功！');
+        Util::resultAlert('授权接入成功！');
     }
 
 } elseif ($op == 'account') {

@@ -5,24 +5,26 @@ namespace zovye\api\wx;
 
 
 use Exception;
-use zovye\Account;
-use zovye\model\agentModelObj;
-use zovye\model\accountModelObj;
 use zovye\App;
-use zovye\Device;
-use zovye\Media;
-use zovye\model\device_groupsModelObj;
-use zovye\request;
-use zovye\Schema;
-use zovye\State;
-use zovye\Util;
 use zovye\We7;
+use zovye\Util;
+use zovye\Media;
+use zovye\State;
+use zovye\Config;
+use zovye\Device;
+use zovye\DouYin;
+use zovye\Schema;
+use zovye\Account;
+use zovye\request;
 use zovye\WxPlatform;
 use function zovye\err;
 use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
+use zovye\model\agentModelObj;
 use function zovye\toCamelCase;
+use zovye\model\accountModelObj;
+use zovye\model\device_groupsModelObj;
 
 class mp
 {
@@ -74,6 +76,10 @@ class mp
         if ($account->isVideo()) {
             $data['media'] = Util::toMedia($account->getMedia());
             $data['duration'] = intval($account->getDuration());
+        } elseif ($account->isDouyin()) {
+            $config = $account->get('config', []);
+            $data['url'] = $config['url'];
+            $data['openid'] = $config['openid'];
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }
@@ -393,6 +399,8 @@ class mp
             if (empty($sha1val) || empty($url) || sha1(App::uid() . CLIENT_IP . $url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的视频文件！');
             }
+        } elseif (request::has('douyinUrl')) {
+            $type = Account::DOUYIN;
         } else {
             return error(State::ERROR, '请指定正确的文件网址！');
         }
@@ -429,6 +437,10 @@ class mp
         } else {
             $limits['ios'] = 1;
             $limits['android'] = 1;
+        }
+
+        if ($type == Account::DOUYIN) {
+            $data['total'] = 1;
         }
 
         $data['order_limits'] = request::int('orderlimits');
@@ -473,6 +485,13 @@ class mp
                     'video' => [
                         'duration' => request::int('duration', 1),
                     ]
+                ]);
+            } elseif ($account->isDouyin()) {
+                $openid = $account->settings('config.openid', '');
+                $account->set('config', [
+                    'type' => Account::DOUYIN,
+                    'url' => request::trim('douyinUrl'),
+                    'openid' => $openid,
                 ]);
             }
             return ['msg' => '保存成功！'];
@@ -548,5 +567,25 @@ class mp
         }
 
         return ['url' => $url];
+    }
+
+    public static function getDouyinAuthQRCode(): array
+    {
+        $serial = request::trim('serial');
+        $url = Util::murl('douyin', [
+            'op' => 'get_openid',
+            'serial' => $serial,
+        ]);
+     
+        $result = Util::createQrcodeFile("douyin_$serial", DouYin::redirectToAuthorizeUrl($url, true));
+    
+        if (is_error($result)) {
+            return err('创建二维码文件失败！');
+        }
+    
+        return [
+            'serial' => $serial,
+            'qrcode_url' => Util::toMedia($result),
+        ];
     }
 }

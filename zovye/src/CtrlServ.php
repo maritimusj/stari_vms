@@ -213,17 +213,18 @@ class CtrlServ
     public static function appNotify($app_id, string $op = 'update', array $payload = []): bool
     {
         if ($app_id) {
-
             $topic = ["app/$app_id"];
-            $data = json_encode(
-                [
-                    'op' => $op,
-                    'data' => $payload,
-                    'serial' => microtime(true) . '',
-                ]
-            );
+            
+            $data = [
+                'op' => $op,
+                'serial' => microtime(true) . '',
+            ];
 
-            $body = json_encode(['topics' => $topic, 'data' => $data]);
+            if ($payload) {
+                $data['data'] = $payload;
+            }
+
+            $body = json_encode(['topics' => $topic, 'data' => json_encode($data)]);
 
             $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
 

@@ -60,6 +60,10 @@
         width: 16px;
         height: 16px;
     }
+    #accountlist .state.auth.disabled img {
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }    
     #accountlist .state.video {
         color: #cf1010;
         margin-left: 6px;
@@ -255,11 +259,9 @@
                             {elseif $a['state'] == \zovye\Account::VIDEO}
                             <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
                             {elseif $a['state'] == \zovye\Account::DOUYIN}
-                            {if $a['openid']}
-                            <span class="state auth" title="抖音用户已授权">
+                            <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音">
                                 <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
                             </span>
-                            {/if}
                             {/if}
                         </div>
                     </td>

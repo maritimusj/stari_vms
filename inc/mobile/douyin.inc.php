@@ -21,7 +21,16 @@ if ($op == 'auth' || $op == 'get_openid') {
         }
         $account->updateSettings('config.openid', $user->getOpenid());
         Util::resultAlert('授权接入成功！');
+
+    } elseif (request::has('accountUID')) {
+        $account = Account::findOne(['uid' => request::trim('accountUID')]);
+        if (empty($account)) {
+            Util::resultAlert('找不到指定的吸粉广告！', 'error');
+        }
+        $account->updateSettings('config.openid', $user->getOpenid());
+        JSON::success('授权接入成功！');
     }
+
 } elseif ($op == 'account') {
     $device = Device::findOne(['shadow_id' => request::str('device')]);
     if (empty($device)) {
@@ -62,29 +71,27 @@ if ($op == 'auth' || $op == 'get_openid') {
 
     $account = Account::findOne(['uid' => request::trim('uid')]);
     if (empty($account)) {
-        JSON::fail('找不到这个抖音号[01]！');
+        JSON::fail('找不到这个抖音号[01]');
     }
     if (!$account->isDouyin()) {
-        JSON::fail('找不到这个抖音号[02]！');
+        JSON::fail('找不到这个抖音号[02]');
     }
 
     $url = $account->getConfig('url', '');
     if (empty($url)) {
-        JSON::fail('抖音号没有正确配置[03]！');
-    }
-
-    if (!Locker::try("douyin:{$user->getId()}:{$account->getUid()}")) {
-        JSON::fail('操作过于频繁，请稍后再试！');
+        JSON::fail('抖音号没有正确配置[03]');
     }
 
     if (!Util::isAvailable($user, $account, $device)) {
-        JSON::fail('暂时无法免费领取，请重试！');
+        JSON::fail('暂时无法免费领取，请重试[01]');
     }
 
-    Job::douyinOrder($user, $device, $account->getUid());
+    if (!Job::douyinOrder($user, $device, $account->getUid())) {
+        JSON::fail('暂时无法免费领取，请重试[02]');
+    }
 
     JSON::success([
-        'redirect' => $url,
+        'redirect' => DouYin::makeHomePageUrl($url),
     ]);
 }
 

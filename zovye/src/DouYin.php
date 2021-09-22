@@ -180,4 +180,18 @@ class DouYin
         return $o->getFollowingList($access_token, $user->getOpenid(), $cursor, $count);
     }
     
+    public static function makeHomePageUrl($url)
+    {
+        $result = [];
+        if (preg_match('/https:\/\/.*\/video\/(\d*)/', $url, $result)) {
+            return "snssdk1128://video/profile/{$result[1]}"; 
+        }
+        if (preg_match('/author_id=(\d*)/', $url, $result)) {
+            return "snssdk1128://user/profile/{$result[1]}"; 
+        }        
+        if (is_numeric($url)) {
+            return "snssdk1128://user/profile/$url";
+        }
+        return $url;
+    }
 }

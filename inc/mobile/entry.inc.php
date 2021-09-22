@@ -228,6 +228,7 @@ if (empty($account)) {
     $tpl_data = Util::getTplData([$user, $device]);
     $tpl_data['from'] = $from;
     //设备首页
+    //app()->devicePage($tpl_data);
     app()->douyinPage($device, $user);
 }
 

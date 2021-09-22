@@ -162,7 +162,7 @@ class Account extends State
             $data['media'] = $entry->getQrcode();
             $data['duration'] = $entry->getDuration();
         } elseif ($entry->isDouyin()) {
-            $data['url'] = $entry->getConfig('url');
+            $data['url'] = DouYin::makeHomePageUrl($entry->getConfig('url'));
             $data['openid'] = $entry->getConfig('openid');
         } else {
             $data['qrcode'] = $entry->getQrcode();

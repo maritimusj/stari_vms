@@ -38,7 +38,7 @@ $writeLog = function () use (&$log) {
 };
 
 if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
-
+    
     if (!Locker::try("douyin:{$data['id']}:{$data['uid']}")) {
         $log['error'] = '锁定用户失败！';
         Job::exit($writeLog);

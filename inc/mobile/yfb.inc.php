@@ -6,8 +6,8 @@ defined('IN_IA') or exit('Access Denied');
 
 Util::logToFile('yfb', [
     'raw' => request::raw(),
-    'user' => request::str('openid'),
-    'device' => request::str('macheNumber'),
+    'user' => request::json('openId'),
+    'device' => request::json('params'),
 ]);
 
 if (App::isYFBEnabled()) {

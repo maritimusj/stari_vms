@@ -193,18 +193,18 @@ class YfbAccount
             return err('请求数据为空！');
         }
 
-        $acc = Account::findOne(['state' => Account::YFB]);
-        if (empty($acc)) {
+        $account = Account::findOne(['state' => Account::YFB]);
+        if (empty($account)) {
             return err('找不到指定公众号！');
         }
 
-        $yfb = self::getYFB($acc);
+        $yfb = self::getYFB($account);
 
         if ($yfb->sign($params) !== $params['sign']) {
             return err('签名检验失败！');
         }
 
-        return ['account' => $acc];
+        return ['account' => $account];
     }
 
     public static function cb($params = [])

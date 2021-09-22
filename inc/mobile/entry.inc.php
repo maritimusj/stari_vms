@@ -228,8 +228,9 @@ if (empty($account)) {
     $tpl_data = Util::getTplData([$user, $device]);
     $tpl_data['from'] = $from;
     //设备首页
-    //app()->devicePage($tpl_data);
-    app()->douyinPage($device, $user);
+    app()->devicePage($tpl_data);
+    //调试使用
+    //app()->douyinPage($device, $user);
 }
 
 //处理多个关注二维码

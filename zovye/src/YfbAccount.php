@@ -10,8 +10,8 @@ use zovye\model\userModelObj;
 
 class YfbAccount
 {
-    //const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCode';
-    const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCodes';
+    const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCode';
+    //const API_URL = 'http://plwxmp.ybaokj.cn/mache/getQrCodes';
 
     private $app_id;
     private $app_secret;

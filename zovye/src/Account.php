@@ -214,22 +214,27 @@ class Account extends State
 
         //处理分组
         $groups = [];
+
         $include = $params['state'] ?? [
-            Account::NORMAL, 
-            Account::VIDEO, 
-            Account::AUTH,
-            Account::JFB,
-            Account::MOSCALE,
-            Account::YUNFENBA,
-            Account::AQIINFO,
-            Account::ZJBAO,
-            Account::MEIPA,
-            Account::KINGFANS,
-            Account::SNTO,
-            Account::YFB,
-        ];
-        
+                Account::NORMAL,
+                Account::VIDEO,
+                Account::AUTH,
+            ];
+
+        $specials_includes = $params['state'] ?? [
+                Account::JFB,
+                Account::MOSCALE,
+                Account::YUNFENBA,
+                Account::AQIINFO,
+                Account::ZJBAO,
+                Account::MEIPA,
+                Account::KINGFANS,
+                Account::SNTO,
+                Account::YFB,
+            ];
+
         $include = is_array($include) ? $include : [$include];
+        $specials_includes = is_array($specials_includes) ? $specials_includes : [$specials_includes];
 
         $accounts = $device->getAccounts($include);
         foreach ($accounts as $uid => $entry) {
@@ -266,8 +271,8 @@ class Account extends State
         $specials = [
             //准粉吧
             Account::JFB => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::JFB, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::JFB, $specials_includes)) {
                         return false;
                     }
                     return App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude);
@@ -278,8 +283,8 @@ class Account extends State
             ],
             //公锤
             Account::MOSCALE => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::MOSCALE, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::MOSCALE, $specials_includes)) {
                         return false;
                     }
                     return App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude);
@@ -290,8 +295,8 @@ class Account extends State
             ],
             //云粉
             Account::YUNFENBA => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::YUNFENBA, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::YUNFENBA, $specials_includes)) {
                         return false;
                     }
                     return App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude);
@@ -301,9 +306,9 @@ class Account extends State
                 },
             ],
             //阿旗
-            Account::AQIINFO   => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::AQIINFO, $include)) {
+            Account::AQIINFO => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::AQIINFO, $specials_includes)) {
                         return false;
                     }
                     return App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude);
@@ -315,8 +320,8 @@ class Account extends State
 
             //纸巾宝
             Account::ZJBAO => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::ZJBAO, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::ZJBAO, $specials_includes)) {
                         return false;
                     }
                     return App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
@@ -328,8 +333,8 @@ class Account extends State
 
             //美葩
             Account::MEIPA => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::MEIPA, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::MEIPA, $specials_includes)) {
                         return false;
                     }
                     return App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude);
@@ -339,11 +344,10 @@ class Account extends State
                 },
             ],
 
-
             //金粉吧
             Account::KINGFANS => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::KINGFANS, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::KINGFANS, $specials_includes)) {
                         return false;
                     }
                     return App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude);
@@ -355,8 +359,8 @@ class Account extends State
 
             //史莱姆
             Account::SNTO => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::SNTO, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::SNTO, $specials_includes)) {
                         return false;
                     }
                     return App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude);
@@ -368,8 +372,8 @@ class Account extends State
 
             //粉丝宝
             Account::YFB => [
-                function () use ($include, $exclude) {
-                    if ($include && !in_array(Account::YFB, $include)) {
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::YFB, $specials_includes)) {
                         return false;
                     }
                     return App::isYFBEnabled() && !in_array(YfbAccount::getUid(), $exclude);
@@ -380,7 +384,7 @@ class Account extends State
             ],
         ];
 
-        foreach($specials as $uid => $entry) {
+        foreach ($specials as $uid => $entry) {
             if ($entry[0]()) {
                 $join(['state' => $uid], $entry[1]);
             }

@@ -142,17 +142,17 @@
 <div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
+            {if \zovye\App::isWxPlatformEnabled()}
+            <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
+            {/if}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
             {if \zovye\App::isDouyinEnabled()}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
                 <span class="state auth" title="抖音">
                     <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}" title="添加抖音号">
                 </span>
             </a>
-            {/if}
-            {if \zovye\App::isWxPlatformEnabled()}
-            <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
             {/if}
         </span>       
     </div>

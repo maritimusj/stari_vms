@@ -81,20 +81,24 @@ class YfbAccount
             }
             $arr[$name] = "$name=$val";
         }
+
         ksort($arr);
+
         $str = implode('&', array_values($arr)) . $this->app_secret;
+
         Util::logToFile('yfb', [
             'str' => $str,
             'arr' => array_values($arr),
         ]);
+        
         return md5($str);
     }
 
-    private static function getYFB(accountModelObj $acc)
+    private static function getYFB(accountModelObj $account)
     {
         static $obj = null;
         if (empty($obj)) {
-            $config = $acc->settings('config', []);
+            $config = $account->settings('config', []);
             if (isEmptyArray($config)) {
                 return err('没有配置！');
             }
@@ -116,14 +120,14 @@ class YfbAccount
     {
         $v = [];
 
-        $acc = Account::findOne(['state' => Account::YFB]);
-        if ($acc) {
+        $account = Account::findOne(['state' => Account::YFB]);
+        if ($account) {
             //请求对方API
-            $yfb = self::getYFB($acc);
+            $yfb = self::getYFB($account);
 
-            $yfb->getQRCode($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
+            $yfb->getQRCode($device, $user, function ($request, $result) use ($account, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
-                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    $log = Account::createQueryLog($account, $user, $device, $request, $result);
                     if (empty($log)) {
                         Util::logToFile('yfb', [
                             'query' => $request,
@@ -153,7 +157,7 @@ class YfbAccount
                         throw new RuntimeException('返回的二维码数据为空！');
                     }
 
-                    $data = $acc->format();
+                    $data = $account->format();
                     $data['qrcode'] = $qrcode['qrCode'];
                     Util::logToFile('yfb', $data);
 
@@ -228,11 +232,11 @@ class YfbAccount
                 throw new RuntimeException('找不到指定的设备:' . $params['params']);
             }
 
-            $acc = $res['account'];
+            $account = $res['account'];
 
             $order_uid = Order::makeUID($user, $device);
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createSpecialAccountOrder($account, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('yfb', [

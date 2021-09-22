@@ -305,7 +305,15 @@
                             {php echo zovye\Schema::desc($a['scname'])}
                         </span>
                     </td>
-                    {if $a['src'] == 0}
+                    {if $a['state'] == \zovye\Account::DOUYIN}
+                    <td>
+                    </td>
+                    <td>
+                        <div class="operate">
+                            <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
+                        </div>
+                    </td>
+                    {elseif $a['src'] == 0}
                     <td class="detail" style="position:relative;">
                         <div class="limit" style="background-color:{$a['clr']}" >
                             {if $a['groupname']}<div class="group" title="分组名称：{$a['groupname']}" style="color:{$a['clr']}">{$a['groupname']}</div>{/if}
@@ -317,11 +325,6 @@
                         </div>
                     </td>
                     <td style="position:relative;">
-                        {if $a['state'] == zovye\Account::DOUYIN}
-                        <div class="operate">
-                            <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
-                        </div>
-                        {else}
                         <div class="ercode loading">
                             {if $a['useAccountQRCode']}
                             <i class="fa fa-desktop"></i>
@@ -330,7 +333,6 @@
                             {/if}                            
                             <div class="zovye_qrcode"  data-src="{media $a['qrcode']}"></div>
                         </div>
-                        {/if}
                     </td>
                     {else}
                     <td>

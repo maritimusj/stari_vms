@@ -570,20 +570,20 @@ class mp
 
     public static function getDouyinAuthQRCode(): array
     {
-        $serial = request::trim('serial');
+        $account_uid = request::trim('uid');
         $url = Util::murl('douyin', [
             'op' => 'get_openid',
-            'serial' => $serial,
+            'uid' => $account_uid,
         ]);
      
-        $result = Util::createQrcodeFile("douyin_$serial", DouYin::redirectToAuthorizeUrl($url, true));
+        $result = Util::createQrcodeFile("douyin_$account_uid", DouYin::redirectToAuthorizeUrl($url, true));
     
         if (is_error($result)) {
             return err('创建二维码文件失败！');
         }
     
         return [
-            'serial' => $serial,
+            'uid' => $account_uid,
             'qrcode_url' => Util::toMedia($result),
         ];
     }

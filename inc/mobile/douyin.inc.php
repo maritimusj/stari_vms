@@ -14,16 +14,16 @@ if ($op == 'auth' || $op == 'get_openid') {
         Util::resultAlert('获取用户信息失败[02]', 'error');
     }
 
-    if (request::has('account')) {
-        $account = Account::get(request::int('account'));
+    if (request::has('id')) {
+        $account = Account::get(request::int('id'));
         if (empty($account)) {
             Util::resultAlert('找不到指定的吸粉广告！', 'error');
         }
         $account->updateSettings('config.openid', $user->getOpenid());
         Util::resultAlert('授权接入成功！');
 
-    } elseif (request::has('accountUID')) {
-        $account = Account::findOne(['uid' => request::trim('accountUID')]);
+    } elseif (request::has('uid')) {
+        $account = Account::findOne(['uid' => request::trim('uid')]);
         if (empty($account)) {
             Util::resultAlert('找不到指定的吸粉广告！', 'error');
         }

@@ -901,19 +901,19 @@ if ($op == 'default') {
 
     $id = request::int('id');
 
-    $acc = Account::get($id);
-    if (empty($acc)) {
+    $account = Account::get($id);
+    if (empty($account)) {
         JSON::fail('找不到这个公众号！');
     }
 
-    $title = $acc->getTitle();
+    $title = $account->getTitle();
 
     $url = Util::murl('douyin', [
         'op' => 'get_openid',
-        'account' => $acc->getId(),
+        'id' => $account->getId(),
     ]);
  
-    $result = Util::createQrcodeFile("douyin_{$acc->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
+    $result = Util::createQrcodeFile("douyin_{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
 
     if (is_error($result)) {
         JSON::fail('创建二维码文件失败！');

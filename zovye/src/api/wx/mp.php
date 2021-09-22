@@ -10,7 +10,6 @@ use zovye\We7;
 use zovye\Util;
 use zovye\Media;
 use zovye\State;
-use zovye\Config;
 use zovye\Device;
 use zovye\DouYin;
 use zovye\Schema;
@@ -58,24 +57,24 @@ class mp
     {
         $data = [
             'uid' => $account->getUid(),
-            'state' => $account->isAuth() || $account->isSpecial() ? intval($account->getState()) : $account->getState() != Account::BANNED,
+            'state' => $account->isAuth() || $account->isSpecial() ? $account->getState() : $account->getState() != Account::BANNED,
             'name' => $account->getName(),
             'title' => $account->getTitle(),
             'descr' => $account->getDescription(),
             'groupname' => $account->getGroupName(),
             'clr' => $account->getClr(),
             'scname' => $account->getScname(),
-            'count' => intval($account->getCount()),
-            'total' => intval($account->getTotal()),
+            'count' => $account->getCount(),
+            'total' => $account->getTotal(),
             'img' => Util::toMedia($account->getImg()),
             'url' => $account->getUrl(),
-            'orderno' => intval($account->getOrderNo()),
-            'orderlimits' => intval($account->getOrderLimits()),
+            'orderno' => $account->getOrderNo(),
+            'orderlimits' => $account->getOrderLimits(),
         ];
 
         if ($account->isVideo()) {
             $data['media'] = Util::toMedia($account->getMedia());
-            $data['duration'] = intval($account->getDuration());
+            $data['duration'] = $account->getDuration();
         } elseif ($account->isDouyin()) {
             $config = $account->get('config', []);
             $data['url'] = $config['url'];
@@ -187,7 +186,7 @@ class mp
             return error(State::ERROR, '没有权限上传文件，请联系管理员！');
         }
 
-        $media = isset($_FILES['pic']) ? $_FILES['pic'] : $_FILES['video'];
+        $media = $_FILES['pic'] ?? $_FILES['video'];
         $type = isset($_FILES['pic']) ? Media::IMAGE : Media::VIDEO;
 
         if ($media) {
@@ -559,7 +558,7 @@ class mp
         common::checkCurrentUserPrivileges('F_xf');
 
         $url = WxPlatform::getPreAuthUrl([
-            'agent' => intval($user->getId()),
+            'agent' => $user->getId(),
         ]);
 
         if (empty($url)) {

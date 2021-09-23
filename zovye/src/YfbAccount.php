@@ -129,7 +129,7 @@ class YfbAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($account, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('yfb', [
+                        Util::logToFile('yfb_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -159,7 +159,6 @@ class YfbAccount
 
                     $data = $account->format();
                     $data['qrcode'] = $qrcode['qrCode'];
-                    Util::logToFile('yfb', $data);
 
                     $v[] = $data;
 

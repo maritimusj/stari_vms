@@ -233,7 +233,7 @@ class YfbAccount
 
             $account = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device);
+            $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId']??''));
 
             Account::createSpecialAccountOrder($account, $user, $device, $order_uid, $params);
 

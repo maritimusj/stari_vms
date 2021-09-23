@@ -24,6 +24,7 @@ router::exec($op, [
 
     'Reg' => '\zovye\api\wx\agent::reg',
     'PreLogin' => '\zovye\api\wx\agent::preLogin',
+    'Plugins' => '\zovye\api\wx\agent::pluginsList',
     'Login' => '\zovye\api\wx\agent::login',
     'LoginQR' => '\zovye\api\wx\agent::loginQR',
     'LoginScan' => '\zovye\api\wx\agent::loginScan',

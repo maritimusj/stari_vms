@@ -200,6 +200,14 @@ class agent
         return $result;
     }
 
+    public static function pluginsList(): array
+    {
+        return [
+            'wxplatform' => App::isWxPlatformEnabled(),
+            'douyin' => App::isDouyinEnabled(),
+        ];
+    }
+
     /**
      * 用户登录，小程序必须提交code,encryptedData和iv值
      *

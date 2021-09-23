@@ -438,7 +438,7 @@ class agent
         }
 
         $query = Device::keeper($keeper);
-        
+
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
             if ($keyword) {
@@ -1919,7 +1919,7 @@ class agent
     {
         $user = common::getAgent();
 
-        list($stats, $data) = Util::cachedCall(10, function () use ($user) {
+        return Util::cachedCall(10, function () use ($user) {
 
             $condition = [];
             $condition['agent_id'] = $user->getAgentId();
@@ -1936,85 +1936,85 @@ class agent
             $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
             $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
 
-        }, $user->getId());
 
-        $data['all']['n'] = 0;
-        $data['today']['n'] = 0;
-        $data['yesterday']['n'] = 0;
-        $data['month']['n'] = 0;
+            $data['all']['n'] = 0;
+            $data['today']['n'] = 0;
+            $data['yesterday']['n'] = 0;
+            $data['month']['n'] = 0;
 
-        $uid_data = [
-            'api' => 'homepage',
-            'name' => 'order_stats',
-            'agent' => $user->getAgentId(),
-        ];
-
-        $countFN = function (DateTimeInterface $begin = null, DateTimeInterface $end = null) use ($user) {
-            $cond = [
-                'agent_id' => $user->getAgentId(),
+            $uid_data = [
+                'api' => 'homepage',
+                'name' => 'order_stats',
+                'agent' => $user->getAgentId(),
             ];
-            if ($begin) {
-                $cond['createtime >='] = $begin->getTimestamp();
-            }
-            if ($end) {
-                $cond['createtime <'] = $end->getTimestamp();
-            }
-            return Order::query($cond)->count();
-        };
 
-        $today = new DateTime('today');
-        $uid_data['day'] = $today->format('Y-m-d');
-        $data['today']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
-            return $countFN($today);
-        }, Cache::ResultExpiredAfter(10));
+            $countFN = function (DateTimeInterface $begin = null, DateTimeInterface $end = null) use ($user) {
+                $cond = [
+                    'agent_id' => $user->getAgentId(),
+                ];
+                if ($begin) {
+                    $cond['createtime >='] = $begin->getTimestamp();
+                }
+                if ($end) {
+                    $cond['createtime <'] = $end->getTimestamp();
+                }
+                return Order::query($cond)->count();
+            };
 
-        $yesterday = new DateTime('yesterday');
-        $uid_data['day'] = $yesterday->format('Y-m-d');
-        $data['yesterday']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today, $yesterday) {
-            return $countFN($yesterday, $today);
-        });
+            $today = new DateTime('today');
+            $uid_data['day'] = $today->format('Y-m-d');
+            $data['today']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+                return $countFN($today);
+            }, Cache::ResultExpiredAfter(10));
 
-        //统计本月订单数量
-        $data['month']['n'] = $data['today']['n'];
-
-        $begin = new DateTimeImmutable('today');
-        $current_month_label = $today->format('Y-m-d');
-
-        for ($i = 0; $i < 31; $i++) {
-
-            $end = $begin->modify('-1 day');
-
-            $label = $end->format('Y-m-d');
-            if ($label != $current_month_label) {
-                break;
-            }
-
-            $uid_data['day'] = $label;
-
-            $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $begin, $end) {
-                return $countFN($end, $begin);
+            $yesterday = new DateTime('yesterday');
+            $uid_data['day'] = $yesterday->format('Y-m-d');
+            $data['yesterday']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today, $yesterday) {
+                return $countFN($yesterday, $today);
             });
+
+            //统计本月订单数量
+            $data['month']['n'] = $data['today']['n'];
+
+            $begin = new DateTimeImmutable('today');
+            $current_month_label = $today->format('Y-m-d');
+
+            for ($i = 0; $i < 31; $i++) {
+
+                $end = $begin->modify('-1 day');
+
+                $label = $end->format('Y-m-d');
+                if ($label != $current_month_label) {
+                    break;
+                }
+
+                $uid_data['day'] = $label;
+
+                $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $begin, $end) {
+                    return $countFN($end, $begin);
+                });
+                if (is_error($res)) {
+                    return $res;
+                }
+
+                $data['month']['n'] += $res;
+            }
+
+            //全部统计
+            $uid_data['day'] = 'all';
+            $data['all']['n'] = $data['today']['n'];
+
+            $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+                return $countFN(null, $today);
+            }, Cache::ResultExpiredAt('tomorrow'));
+
             if (is_error($res)) {
                 return $res;
             }
+            $data['all']['n'] += $res;
 
-            $data['month']['n'] += $res;
-        }
-
-        //全部统计
-        $uid_data['day'] = 'all';
-        $data['all']['n'] = $data['today']['n'];
-
-        $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
-            return $countFN(null, $today);
-        }, Cache::ResultExpiredAt('tomorrow'));
-
-        if (is_error($res)) {
-            return $res;
-        }
-        $data['all']['n'] += $res;
-
-        return ['device_stat' => $stats, 'data' => $data];
+            return ['device_stat' => $device_stat, 'data' => $data];
+        }, $user->getId());
     }
 
 

@@ -291,7 +291,7 @@ class mp
                         return ['msg' => '特殊吸粉或者授权接入的公众号无法禁用！'];
                     }
                     if ($account->isBanned()) {
-                        if ($account->isSpecial() || $account->isAuth() || $account->isVideo()) {
+                        if ($account->isSpecial() || $account->isAuth() || $account->isVideo() || $account->isDouyin()) {
                             $account->setState($account->getType());
                         } else {
                             $account->setState(Account::NORMAL);

@@ -596,7 +596,7 @@ if ($op == 'default') {
         $account = Account::get($id);
         if ($account) {
             if ($account->isBanned()) {
-                if ($account->isSpecial() || $account->isAuth() || $account->isVideo()) {
+                if ($account->isSpecial() || $account->isAuth() || $account->isVideo() || $account->isDouyin()) {
                     $account->setState($account->getType());
                 } else {
                     $account->setState(Account::NORMAL);

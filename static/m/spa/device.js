@@ -14,7 +14,6 @@ const app = new Vue({
         }],
         categoryIndex: 0,
         accounts: initData.accounts,
-        goods: initData.goods,
         sales: [],
         toast: {
             title: "",

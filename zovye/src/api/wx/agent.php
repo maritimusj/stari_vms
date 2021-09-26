@@ -1772,7 +1772,7 @@ class agent
 
     public static function aliAuthCode()
     {
-        $auth_code = request('authcode');
+        $auth_code = request::str('authcode');
 
         $aop = new AopClient();
         $aop->appId = settings('ali.appid');

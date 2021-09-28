@@ -123,7 +123,6 @@ class protocol implements IBlueToothProtocol
         return null;
     }
 
-
     function getCrc16Data($mac, array $code, $lowOrHigh): array
     {
         $mac = hex2bin(implode('', array_reverse(explode(':', $mac))));

@@ -114,7 +114,7 @@ class device
             }
         }
 
-        $sig = intval($device->getSig());
+        $sig = $device->getSig();
         if ($sig != -1) {
             $result['status']['sig'] = $sig;
         }
@@ -136,6 +136,7 @@ class device
         if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
             $result['device']['buid'] = $device->getBUID();
             $result['device']['mac'] = $device->getMAC();
+            $result['device']['protocol'] = $device->getBlueToothProtocolName();
         }
 
         $payload = $device->getPayload(true);
@@ -660,9 +661,9 @@ class device
                     } else if (App::isVDeviceSupported() && $device->isVDevice()) {
                         $data['status']['online'] = true;
                     } else {
-                        $data['status']['online'] = $online_status[$device->getImei()] ? true : false;
+                        $data['status']['online'] = (bool)$online_status[$device->getImei()];
                         if ($device->getAppId()) {
-                            $data['app']['online'] = $online_status[$device->getAppId()] ? true : false;
+                            $data['app']['online'] = (bool)$online_status[$device->getAppId()];
                         }
                     }
                 }
@@ -921,9 +922,9 @@ class device
                     $data['status']['online'] = true;
                 } else {
                     if (!$simple) {
-                        $data['status']['online'] = $online_status[$device->getImei()] ? true : false;
+                        $data['status']['online'] = (bool)$online_status[$device->getImei()];
                         if ($device->getAppId()) {
-                            $data['app']['online'] = $online_status[$device->getAppId()] ? true : false;
+                            $data['app']['online'] = (bool)$online_status[$device->getAppId()];
                         }
                     }
                 }

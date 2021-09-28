@@ -1573,9 +1573,6 @@ HTML_CONTENT;
             } else {
                 $mcb_channel = Device::cargoLane2Channel($device, $lane);
             }
-            if ($mcb_channel == Device::CHANNEL_INVALID) {
-                return error(State::ERROR, '不正确的货道！');
-            }
 
             if (!$device->lockAcquire()) {
                 return error(State::ERROR, '设备锁定失败，请重试！');

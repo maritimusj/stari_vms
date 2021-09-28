@@ -50,9 +50,27 @@ class cmd implements ICmd
         return pack('C*', $this->id, $this->key, ...$this->data);
     }
 
+    public function getPayloadData($pos = 0, $len = 0)
+    {
+        $data = array_values(unpack('C*', $this->data));
+
+        if ($pos == 0 && $len == 0) {
+            return $data;
+        }
+        if ($len == 1) {
+            return $data[$pos] ?? 0;
+        }
+        return array_slice($data, $pos, $len);
+    }
+
     function getMessage(): string
     {
-        return protocol::$strMsg[$this->id][$this->key] ?? '<未知>';
+        $msg = protocol::$strMsg[$this->id][$this->key] ?? '<未知>';
+        if ($this->id == protocol::CMD_CONFIG && $this->key == protocol::KEY_LOCKER) {
+            $lock_id = $this->getPayloadData(2, 1);
+            $msg .= ($lock_id > 0 ? "($lock_id)" : '(复位)');
+        }
+        return $msg;
     }
 
     function getEncoded($fn = null)

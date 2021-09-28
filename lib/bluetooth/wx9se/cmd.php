@@ -52,22 +52,20 @@ class cmd implements ICmd
 
     public function getPayloadData($pos = 0, $len = 0)
     {
-        $data = array_values(unpack('C*', $this->data));
-
         if ($pos == 0 && $len == 0) {
-            return $data;
+            return $this->data;
         }
         if ($len == 1) {
-            return $data[$pos] ?? 0;
+            return $this->data[$pos] ?? 0;
         }
-        return array_slice($data, $pos, $len);
+        return array_slice($this->data, $pos, $len);
     }
 
     function getMessage(): string
     {
         $msg = protocol::$strMsg[$this->id][$this->key] ?? '<未知>';
         if ($this->id == protocol::CMD_CONFIG && $this->key == protocol::KEY_LOCKER) {
-            $lock_id = $this->getPayloadData(2, 1);
+            $lock_id = $this->getPayloadData(0, 1);
             $msg .= ($lock_id > 0 ? "($lock_id)" : '(复位)');
         }
         return $msg;

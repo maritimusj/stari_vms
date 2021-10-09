@@ -74,10 +74,10 @@ class CommissionBalance extends State
             $trade_no = "r{$r->getId()}d{$r->getCreatetime()}";
             //先写数据再执行操作
             if ($r->update([
-                    'state' => 'mchpay',
-                    'trade_no' => $trade_no,
-                    'admin' => _W('username'),
-                ],true)) {
+                'state' => 'mchpay',
+                'trade_no' => $trade_no,
+                'admin' => _W('username'),
+            ], true)) {
 
                 $res = $user->MCHPay($n, $trade_no, '佣金提现');
                 if (is_error($res)) {
@@ -418,5 +418,23 @@ ORDER;
     public static function findOne($condition = []): ?commission_balanceModelObj
     {
         return self::query($condition)->findOne();
+    }
+
+    public static function getFirstCommissionBalance(userModelObj $user): ?commission_balanceModelObj
+    {
+        $id = $user->settings('extra.first.commission.id');
+        if ($id) {
+            return self::findOne(['id' => $id]);
+        }
+        $query = self::query(['openid' => $user->getOpenid()]);
+        /** @var commission_balanceModelObj $log */
+        $log = $query->orderBy('id ASC')->findOne();
+        if ($log) {
+            $user->updateSettings('extra.first.commission', [
+                'id' => $log->getId(),
+            ]);
+            return $log;
+        }
+        return null;
     }
 }

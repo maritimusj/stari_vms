@@ -158,14 +158,16 @@ class Order extends State
 
     public static function getFirstOrderOfUser(userModelObj $user): ?orderModelObj
     {
-        $id = Config::user('order.first.id');
+        $id = $user->settings('extra.first.order.id');
         if ($id) {
             return Order::get($id);
         }
         $query = self::query(['openid' => $user->getOpenid()]);
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
-            Config::user('order.first.id', $order->getId());
+            $user->updateSettings('extra.first.order', [
+                'id' => $order->getId(),
+            ]);
             return $order;
         }
         return null;

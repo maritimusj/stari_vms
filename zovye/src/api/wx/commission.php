@@ -281,13 +281,13 @@ class commission
             $user = $user->getPartnerAgent();
         }
 
-        $firstOrder = \zovye\Order::getFirstOrderOfUser($user);
-        if (empty($firstOrder)) {
+        $firstCommissionBalance = CommissionBalance::getFirstCommissionBalance($user);
+        if (empty($firstCommissionBalance)) {
             $data['data'] = [];
             return $data;
         }
 
-        $begin = new DateTime("@{$firstOrder->getCreatetime()}");
+        $begin = new DateTime("@{$firstCommissionBalance->getCreatetime()}");
         $end = new DateTime();
 
         $data = [];

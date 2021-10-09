@@ -112,7 +112,8 @@ class misc
         if (request::bool('detail')) {
             $list = [];
             $query->groupBy('goods_id');
-            foreach ($query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
+            $res = $query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price']);
+            foreach ((array)$res as $entry) {
                 $goods = Goods::get($entry['goods_id']);
                 if ($goods) {
                     $list[] = [

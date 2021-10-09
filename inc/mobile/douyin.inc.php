@@ -51,7 +51,7 @@ if ($op == 'auth' || $op == 'get_openid') {
                 'title' => $entry['title'],
                 'descr' => $entry['descr'],
                 'clr' => $entry['clr'],
-                'img' => $entry['img'],
+                'img' => Util::toMedia($entry['img'], true),
             ];
         }
     }

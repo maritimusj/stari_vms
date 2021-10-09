@@ -66,7 +66,7 @@
                     </label>
                     <div class="col-md-10">
                         {if $type == \zovye\Account::DOUYIN}
-                        {php echo tpl_form_field_image('img', $account?$account->getImg(): MODULE_URL . 'static/img/douyin_icon.svg');}
+                        {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
                         {else}
                         {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
                         {/if}

@@ -12,6 +12,7 @@ use zovye\CommissionBalance;
 use zovye\Config;
 use zovye\Device;
 use zovye\Inventory;
+use zovye\Locker;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\request;
@@ -803,6 +804,10 @@ class keeper
     {
         $keeper = keeper::getKeeper();
 
+        if (!Locker::try("keeper:{$keeper->getId()}")) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
         $device = Device::find(request('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
             return error(State::ERROR, '找不到这个设备！');
@@ -816,7 +821,7 @@ class keeper
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        $locker = $device->payloadLockAcquire(3);
+        $locker = $device->payloadLockAcquire();
         if (empty($locker)) {
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }

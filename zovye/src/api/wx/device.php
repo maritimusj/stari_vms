@@ -622,7 +622,7 @@ class device
                 $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(request::str('order')) : 'ASC';
                 $query->orderBy("{$order_by} {$order}");
             } else {
-                $query->orderBy('rank DESC');
+                $query->orderBy('rank DESC, id DESC');
             }
 
             $query->page($page, $page_size);

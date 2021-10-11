@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace bluetooth\wx9se;
 

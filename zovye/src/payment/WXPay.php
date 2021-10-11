@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\payment;
-
 
 use wx\pay;
 use zovye\Contract\IPay;

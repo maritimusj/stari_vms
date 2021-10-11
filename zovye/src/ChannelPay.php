@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
-
 
 use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;

@@ -26,7 +26,7 @@ if ($op == 'default') {
 
     /** @var deviceModelObj $entry */
     foreach ($query->findAll() as $entry) {
-        $location = $entry->settings('extra.location');
+        $location = $entry->settings('extra.location.tencent', $entry->settings('extra.location'));
         if ($location && $location['lat'] && $location['lng']) {
             unset($location['area'], $location['address']);
             $result[] = [

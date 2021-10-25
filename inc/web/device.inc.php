@@ -2467,6 +2467,7 @@ if ($op == 'list') {
     $ids = request::array('ids', []);
     $query = Device::query(['id' => $ids]);
 
+    /** @var deviceModelObj $device */
     foreach ($query->findAll() as $device) {
         $file_real = str_replace($url_prefix, $attach_prefix, $device->getQrcode());
         $file_real = preg_replace('/\?.*/', '', $file_real);

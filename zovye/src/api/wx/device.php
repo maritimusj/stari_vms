@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\Inventory;
+use zovye\Locker;
 use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\base\modelObjFinder;
@@ -22,6 +23,7 @@ use zovye\Stats;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
+use function zovye\err;
 use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
@@ -247,6 +249,10 @@ class device
 
         $user = common::getUser();
 
+        if (!Locker::try("user:{$user->getId()}")) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
         if ($user->isAgent() || $user->isPartner()) {
             common::checkCurrentUserPrivileges('F_sb');
             $device = self::getDevice(request('id'), $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent());
@@ -273,7 +279,7 @@ class device
         }
 
         if ($device) {
-            if (!$device->payloadLockAcquire(3)) {
+            if (!$device->payloadLockAcquire()) {
                 return error(State::ERROR, '设备正忙，请稍后再试！');
             }
 

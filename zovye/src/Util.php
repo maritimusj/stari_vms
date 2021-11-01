@@ -1713,7 +1713,7 @@ HTML_CONTENT;
         $delay = intval(settings('device.lockRetryDelay', 1));
 
         if (!$device->lockAcquire($retries, $delay)) {
-            return error(State::FAIL, '设备被占用，请重新扫描设备二维码');
+            return error(State::ERROR_LOCK_FAILED, '设备被占用，请重新扫描设备二维码');
         }
 
         //事件：设备已锁定
@@ -1725,7 +1725,7 @@ HTML_CONTENT;
         }
 
         if ($goods['num'] < 1) {
-            return error(State::FAIL, '对不起，已经被领完了');
+            return error(State::ERROR, '对不起，已经被领完了');
         }
 
         if ($goods['lottery']) {
@@ -1735,7 +1735,7 @@ HTML_CONTENT;
         }
 
         if ($mcb_channel == Device::CHANNEL_INVALID) {
-            return error(State::FAIL, '商品货道配置不正确');
+            return error(State::ERROR, '商品货道配置不正确');
         }
 
         $log_data = [
@@ -1825,12 +1825,12 @@ HTML_CONTENT;
                     $order->{$setter}($val);
                 }
                 if (!$order->save()) {
-                    return error(State::FAIL, '领取失败，保存订单失败');
+                    return error(State::ERROR, '领取失败，保存订单失败');
                 }
             } else {
                 $order = Order::create($order_data);
                 if (empty($order)) {
-                    return error(State::FAIL, '领取失败，创建订单失败');
+                    return error(State::ERROR, '领取失败，创建订单失败');
                 }
 
                 $params['order'] = $order;
@@ -1839,7 +1839,7 @@ HTML_CONTENT;
                     //事件：订单已经创建
                     EventBus::on('device.orderCreated', $params);
                 } catch (Exception $e) {
-                    return error($e->getCode() ?: State::ERROR, $e->getMessage());
+                    return error(State::ERROR, $e->getMessage());
                 }
             }
 
@@ -1847,7 +1847,7 @@ HTML_CONTENT;
 
             foreach ($params as $entry) {
                 if ($entry && !$entry->save()) {
-                    return error(State::FAIL, '无法保存数据，请重试');
+                    return error(State::ERROR, '无法保存数据，请重试');
                 }
             }
 
@@ -1923,7 +1923,7 @@ HTML_CONTENT;
             $order->setExtraData('pull.result', $res);
 
             if (!$order->save()) {
-                return error(State::FAIL, '无法保存订单数据！');
+                return error(State::ERROR, '无法保存订单数据！');
             }
 
             $device->save();

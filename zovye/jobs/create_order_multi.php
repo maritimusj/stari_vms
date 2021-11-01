@@ -98,6 +98,12 @@ function process($order_no)
     $delay = intval(settings('device.lockRetryDelay', 1));
 
     if (!$device->lockAcquire($retries, $delay)) {
+        if (settings('order.waitQueue.enabled', false)) {
+            if (!Job::createOrder($order_no, $device)) {
+                throw new Exception('启动排队任务失败！');
+            }
+            return true;
+        }
         ExceptionNeedsRefund::throwWith($device, '设备被占用！');
     }
 

@@ -78,6 +78,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['device']['shipment']['balanced'] = request::bool('shipmentBalance') ? 1 : 0;
 
+        $settings['order']['waitQueue']['enabled'] = request::bool('waitQueueEnabled') ? 1 : 0;
+        
         $settings['goods']['agent']['edit'] = request::bool('allowAgentEditGoods') ? 1 : 0;
 
         $settings['goods']['image']['proxy'] = [

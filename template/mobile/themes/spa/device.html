@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 	<title>{$tpl['site']['title']}</title>
 	{php \zovye\url(true, CSS_SWIPER_URL);}
-	{php \zovye\url(true, 'static/m/spa/device.css?v=202108102001');}
+	{php \zovye\url(true, 'static/m/spa/device.css?v=202111020929');}
 	<link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
 </head>
 <body ontouchstart>
@@ -193,6 +193,22 @@
 	        <div class="confirm" @click="alertConfirmClick">确定</div>
 	    </div>
 	</div>
+	<div class="mask" v-if="saveUserProfile">
+		<div class="sex-view">
+			<span style="font-size: 18px;">完善信息获取更多服务</span>
+			<span style="margin-top: 10px;color: orchid;">您的性别</span>
+			<div style="width: 100%;display: flex;margin-top: 20px;">
+				<div class="sex-item" @click="sexClick(1)">
+					<img src="{MODULE_URL}static/m/spa/img/male_avatar.png">
+					<span style="color: lightblue;">男</span>
+				</div>
+				<div class="sex-item" @click="sexClick(2)">
+					<img src="{MODULE_URL}static/m/spa/img/female_avatar.png">
+					<span style="color: pink;">女</span>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {$tpl['js']['code']}
 {php \zovye\url(true, JS_VUE_URL, JS_SWIPER_URL);}
@@ -219,7 +235,7 @@
 			]
 		};
 </script>
-{php \zovye\url(true, 'static/m/spa/device.js?v=202108102002');}
+{php \zovye\url(true, 'static/m/spa/device.js?v=202111020929');}
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 {if !empty($tpl['site']['warning'])}

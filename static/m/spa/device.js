@@ -44,7 +44,8 @@ const app = new Vue({
             data: null
         },
         goods: [],
-        packages: []
+        packages: [],
+        saveUserProfile: false
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -90,6 +91,9 @@ const app = new Vue({
                     this.retryMsg = res.data.message;
                 }
             })
+        }
+        if (typeof zovye_fn.saveUserProfile === 'function') {
+            this.saveUserProfile = true;
         }
         this.visibilitychange();
         this.imei = this.imei.substring(this.imei.length - 6);
@@ -311,6 +315,10 @@ const app = new Vue({
         },
         buyPackageClick(package) {
             zovye_fn.package_pay(package.id);
+        },
+        sexClick(val) {
+            zovye_fn.saveUserProfile({sex : val});
+            this.saveUserProfile = false;
         }
     }
 });

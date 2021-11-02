@@ -64,7 +64,7 @@ function tb(string $name): string
  */
 class __ZOVYE_SETTINGS__
 {
-    static $cache = [];
+    static array $cache = [];
 }
 
 function settings(string $key = '', $default = null)
@@ -91,7 +91,7 @@ function updateSettings(string $key, $val): bool
  */
 class __ZOVYE_CONFIG__
 {
-    static $cache = [];
+    static array $cache = [];
 }
 
 function globalConfig(string $name, $path = '', $default = null)
@@ -226,7 +226,7 @@ function setArray(array &$array, $key, $val = null): array
 /**
  * 获取数组指定路径的值
  * @param mixed $array
- * @param string $key
+ * @param string|array $key
  * @param mixed $default
  * @return mixed
  */

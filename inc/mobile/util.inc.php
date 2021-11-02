@@ -263,4 +263,11 @@ if ($op == 'default') {
 
         Util::resultAlert($e->getMessage(), 'error');
     }
+} elseif ($op == 'profile') {
+    $user = Util::getCurrentUser();
+    if ($user) {
+        if (request::has('sex')) {
+            $user->updateSettings('fansData.sex', request::int('sex'));
+        }
+    }
 }

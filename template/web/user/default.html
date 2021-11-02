@@ -8,6 +8,10 @@
         flex-direction: column;
         align-items: center;
     }
+    .profile-sex {
+        width: 20px;
+        height: 20px;
+    }
     {loop $agent_levels $index $data}
     .profile.agent.{$index} {
     border-top-color: {$data['clr']};
@@ -146,6 +150,7 @@
             <tr>
                 <th>#</th>
                 <th>昵称</th>
+                <th></th>
                 {if $commission_enabled}
                 <th style="width: 200px;">账户余额</th>
                 {/if}
@@ -226,6 +231,15 @@
                         {/if}
                     </div>
                 </div>
+            </div>
+        </td>
+        <td>
+            <div class="profile-sex">
+                {if $item['sex'] === 1}
+                <img src="{MODULE_URL}static/img/man.svg" title="男">
+                {elseif $item['sex'] == 2}
+                <img src="{MODULE_URL}static/img/woman.svg" title="女">
+                {/if}                
             </div>
         </td>
 {if $commission_enabled}

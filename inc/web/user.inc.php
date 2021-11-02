@@ -142,6 +142,7 @@ if ($op == 'default') {
             'id' => $user->getId(),
             'openid' => $user->getOpenid(),
             'nickname' => $user->getNickname(),
+            'sex' => $user->settings('fansData.sex'),
             'avatar' => $user->getAvatar(),
             'createtime' => date('Y-m-d H:i:s', $user->getCreatetime()),
             'mobile' => $user->getMobile(),

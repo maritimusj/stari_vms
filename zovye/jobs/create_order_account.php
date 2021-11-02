@@ -127,6 +127,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
 
             if (is_error($result)) {
                 if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
+                    unset($params['result']);
                     if (!Job::createAccountOrder($params)) {
                         throw new Exception('启动排队任务失败！');
                     }

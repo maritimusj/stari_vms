@@ -61,9 +61,10 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
 
 /**
  * @param $order_no
+ * @return bool
  * @throws Exception
  */
-function process($order_no)
+function process($order_no): bool
 {
     /** @var pay_logsModelObj $pay_log */
     $pay_log = Pay::getPayLog($order_no);
@@ -183,6 +184,8 @@ function process($order_no)
 
         $device->appShowMessage('出货完成，欢迎下次使用！');
     }
+
+    return true;
 }
 
 /**

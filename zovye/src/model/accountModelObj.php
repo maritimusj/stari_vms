@@ -160,6 +160,8 @@ class accountModelObj extends modelObj
                 Account::ZJBAO => App::isZJBaoEnabled(),
                 Account::MEIPA => App::isMeiPaEnabled(),
                 Account::KINGFANS => App::isKingFansEnabled(),
+                Account::SNTO => App::isSNTOEnabled(),
+                Account::YFB => App::isYFBEnabled(),
             ];
             $state = $status[$this->getType()];
             if (isset($state) && !$state) {
@@ -241,6 +243,8 @@ class accountModelObj extends modelObj
             Account::ZJBAO,
             Account::MEIPA,
             Account::KINGFANS,
+            Account::SNTO,
+            Account::YFB,
         ]);
     }
 
@@ -252,11 +256,24 @@ class accountModelObj extends modelObj
         return intval($this->settings('config.type'));
     }
 
+    public function getConfig($path = '', $default = null)
+    {
+        if (empty($path)) {
+            return $this->get('config', $default);
+        }
+        return $this->settings('config.' . $path, $default);
+    }
+
     public function isVideo(): bool
     {
         return $this->getType() == Account::VIDEO;
     }
 
+    public function isDouyin(): bool
+    {
+        return $this->getType() == Account::DOUYIN;
+    }
+   
     public function isJFB(): bool
     {
         return $this->getType() == Account::JFB;
@@ -290,6 +307,16 @@ class accountModelObj extends modelObj
     public function isKingFans(): bool
     {
         return $this->getType() == Account::KINGFANS;
+    }
+
+    public function isSNTO(): bool
+    {
+        return $this->getType() == Account::SNTO;
+    }
+
+    public function isYFB(): bool
+    {
+        return $this->getType() == Account::YFB;
     }
 
     public function isAuth(): bool

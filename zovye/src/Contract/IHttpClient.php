@@ -16,5 +16,5 @@ interface IHttpClient
      * @param int $timeout
      * @return mixed
      */
-    public function request(string $url, string $method = 'GET', $headers = '', $data = '', $timeout = 60);
+    public function request(string $url, string $method = 'GET', $headers = '', $data = '', int $timeout = 60);
 }

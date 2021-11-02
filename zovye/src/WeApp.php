@@ -17,12 +17,20 @@ class WeApp extends Settings
 {
     private static $app_settings = null;
     private $logger;
-    private $web = [];
-    private $mobile = [];
 
     public function __construct()
     {
         parent::__construct($this, 'weapp', 'config', true);
+    }
+
+    public function createWebUrl($do, $params = []): string
+    {
+        return Util::url($do, $params, false);
+    }
+
+    public function createMobileUrl($do, $params = []): string
+    {
+        return Util::murl($do, $params);
     }
 
     /**
@@ -44,15 +52,15 @@ class WeApp extends Settings
     {
         global $_W;
         if (defined('IN_SYS')) {
-            $source = ZOVYE_ROOT . "template/{$filename}.html";
-            $compile = ZOVYE_ROOT . "data/tpl/{$filename}.tpl.php";
+            $source = ZOVYE_ROOT . "template/$filename.html";
+            $compile = ZOVYE_ROOT . "data/tpl/$filename.tpl.php";
         } else {
-            $source = ZOVYE_ROOT . "template/mobile/{$filename}.html";
-            $compile = ZOVYE_ROOT . "data/tpl/mobile/{$filename}.tpl.php";
+            $source = ZOVYE_ROOT . "template/mobile/$filename.html";
+            $compile = ZOVYE_ROOT . "data/tpl/mobile/$filename.tpl.php";
         }
 
         if (!is_file($source)) {
-            exit("Error: template source '{$filename}' is not exist!");
+            exit("Error: template source '$filename' is not exist!");
         }
         $paths = pathinfo($compile);
         $compile = str_replace($paths['filename'], $_W['uniacid'] . '_' . $paths['filename'], $compile);
@@ -63,15 +71,6 @@ class WeApp extends Settings
         return $compile;
     }
 
-    public function createWebUrl($do, $params = []): string
-    {
-        return Util::url($do, $params, false);
-    }
-
-    public function createMobileUrl($do, $params = []): string
-    {
-        return Util::murl($do, $params);
-    }
 
     public function forceUnlock(): bool
     {
@@ -130,21 +129,6 @@ class WeApp extends Settings
         return $this;
     }
 
-
-    public function web($do, $act)
-    {
-        if ($do && $act) {
-            $this->web[strtolower($do)] = $act;
-        }
-    }
-
-    public function mobile($do, $act)
-    {
-        if ($do && $act) {
-            $this->mobile[strtolower($do)] = $act;
-        }
-    }
-
     public function saveSettings($settings): bool
     {
         if ($this->set('settings', $settings)) {
@@ -182,30 +166,6 @@ class WeApp extends Settings
         return getArray(self::$app_settings, $key, $default);
     }
 
-    public function op($op, $cb)
-    {
-    }
-
-    public function doWeb($do)
-    {
-        if (isset($this->web[$do])) {
-            $act = $this->web[$do];
-            if (is_callable($act)) {
-                $act();
-            }
-        }
-
-        if (DEBUG) {
-            trigger_error("[{$do}] not implemented!");
-        }
-    }
-
-    public function doMobile($do)
-    {
-        if (DEBUG) {
-            trigger_error("[{$do}] not implemented!");
-        }
-    }
 
     public function log($level = null, $title = null, $data = null)
     {
@@ -244,7 +204,7 @@ class WeApp extends Settings
      *
      * @param array $params
      */
-    public function scanPage($params = [])
+    public function scanPage(array $params = [])
     {
         //以下为页面数据
         $tpl = is_array($params) ? $params : [];
@@ -254,8 +214,8 @@ class WeApp extends Settings
         $js_sdk = Util::fetchJSSDK();
         $jquery_url = JS_JQUERY_URL;
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
     const zovye_fn = {};
     zovye_fn.scan = function(){
@@ -271,7 +231,7 @@ class WeApp extends Settings
                     if(result) {
                         const id = result[1];
                         if(id) {
-                            window.location.replace("{$redirect_url}".replace("{$token}", id));                            
+                            window.location.replace("$redirect_url".replace("$token", id));                            
                         }
                     }
                 }
@@ -313,17 +273,27 @@ JSCODE;
         $device = $tpl['device']['_obj'];
 
         /** @var userModelObj $user */
-        $user = $tpl['user']['_obj'];
+        //$user = $tpl['user']['_obj'];
 
-        $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getImei()]) : strval($params['redirect']);
+        $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getShadowId()]) : strval($params['redirect']);
         $device_api_url = Util::murl('device', ['id' => $device->getId()]);
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
+        $tpl['max'] = is_numeric($params['max']) ? $params['max'] : 3;
+        $tpl['text'] = empty($params['text']) ? '设备连接中' : $params['text'];
+        $tpl['err_msg'] = empty($params['err_msg']) ? '设备不在线，请稍后再试！' : $params['err_msg'];
 
+        $tpl['icon'] = [
+            'loading' => empty($params['icon']['loading']) ? MODULE_URL . 'static/img/loading-puff.svg' : $params['icon']['loading'],
+            'success' => empty($params['icon']['success']) ? MODULE_URL . 'static/img/smile.svg' : $params['icon']['success'],
+            'error' => empty($params['icon']['error']) ? MODULE_URL . 'static/img/offline.svg' : $params['icon']['error'],
+        ];
+
+        $scene = empty($params['scene']) ? 'online' : $params['scene'];
         $tpl['js']['code'] .= <<<JSCODE
-        <script src="{$jquery_url}"></script>
-        {$js_sdk}
+        <script src="$jquery_url"></script>
+        $js_sdk
         <script>
         wx.ready(function(){
             wx.hideAllNonBaseMenuItem();
@@ -332,21 +302,21 @@ JSCODE;
             zovye_fn = {};
         }
         zovye_fn.getDetail = function (cb) {
-            $.get("{$device_api_url}", {op: 'detail'}).then(function (res) {
+            $.get("$device_api_url", {op: 'detail'}).then(function (res) {
                 if (typeof cb === 'function') {
                     cb(res);
                 }
             })
         }
-        zovye_fn.isOnline = function (cb) {
-            $.get("{$device_api_url}", {op: 'online', serial: (new Date()).getTime()}).then(function (res) {
+        zovye_fn.isReady = function (cb) {
+            $.get("$device_api_url", {op: 'is_ready', scene: '$scene', serial: (new Date()).getTime()}).then(function (res) {
                 if (typeof cb === 'function') {
                     cb(res);
                 }
             })
         }
         zovye_fn.redirect = function() {
-            window.location.replace("{$device_url}");
+            window.location.replace("$device_url");
         }
 JSCODE;
         $tpl['js']['code'] .= "\r\n</script>";
@@ -357,7 +327,7 @@ JSCODE;
      * 设备页面，通常展示了可用的关注二维码列表和支付信息.
      * @param array $params
      */
-    public function devicePage($params = [])
+    public function devicePage(array $params = [])
     {
         $tpl = is_array($params) ? $params : [];
         $tpl['slides'] = [];
@@ -390,6 +360,7 @@ JSCODE;
         }
 
         //如果设置必须关注公众号以后才能购买商品
+        $goods_lis_FN = false;
         if (Helper::MustFollowAccount($device)) {
             if ($tpl['from'] != 'account') {
                 if (empty($tpl['accounts'])) {
@@ -399,10 +370,12 @@ JSCODE;
                     }
                 }
             } else {
-                $tpl = array_merge($tpl, $device->getGoodsAndPackages($user, ['allowPay']));
+                $goods_lis_FN = true;
+                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
             }
         } else {
-            $tpl = array_merge($tpl, $device->getGoodsAndPackages($user, ['allowPay']));
+            $goods_lis_FN = true;
+            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
         }
 
         //如果无法领取，则清除访问记录
@@ -484,6 +457,9 @@ JSCODE;
         if (is_error($pay_js)) {
             Util::resultAlert($pay_js['message'], 'error');
         }
+
+        $requestID = REQUEST_ID;
+
         $tpl['js']['code'] = $pay_js;
         $tpl['js']['code'] .= <<<JSCODE
 <script>
@@ -502,7 +478,7 @@ JSCODE;
         } else {
             params['type'] = typeid;
         }
-        $.get("{$adv_api_url}", params).then(function(res){
+        $.get("$adv_api_url", params).then(function(res){
             if (res && res.status) {
                 if (typeof cb === 'function') {
                     cb(res.data);
@@ -513,35 +489,40 @@ JSCODE;
         })           
     }
     zovye_fn.play = function(uid, seconds, cb) {
-        $.get("{$account_url}", {op:'play', uid, seconds, device:'{$device_imei}'}).then(function(res){
-            if (res && res.status) {
-                if (typeof cb === 'function') {
-                    cb(res.data);
-                } else {
-                    console.log(res.data);
-                }
-            }
+        $.get("$account_url", {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
+            if (cb) cb(res);
         })    
     }
     zovye_fn.redirectToOrder = function() {
-        window.location.href= "{$order_jump_url}";
+        window.location.href= "$order_jump_url";
     }
     zovye_fn.redirectToFeedBack = function() {
-        window.location.href= "{$feedback_url}&mobile={$mobile}&device_name={$device_name}&device_imei={$device_imei}";
+        window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
     }
     zovye_fn.getDetail = function (cb) {
-        $.get("{$device_api_url}", {op: 'detail'}).then(function (res) {
+        $.get("$device_api_url", {op: 'detail'}).then(function (res) {
             if (typeof cb === 'function') {
                 cb(res);
             }
         })
     }
 JSCODE;
+        if ($goods_lis_FN) {
+            $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.getGoodsList = function(cb) {
+$.get("$device_api_url", {op: 'goods'}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+JSCODE;
+        }
         if (!App::isAliUser() && App::isChannelPayEnabled()) {
             $pay_url = Util::murl('channel', ['device' => $device->getShadowId()]);
             $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.channelPay = function(goods, num, cb) {
-    $.get("{$pay_url}", {goods, num}).then(function(res){
+    $.get("$pay_url", {goods, num}).then(function(res){
         if (typeof cb === 'function') {
             cb(res);
         }
@@ -553,7 +534,7 @@ JSCODE;
             $donate_url = Util::murl('donate', ['device' => $device->getShadowId()]);
             $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.getDonationInfo = function(cb) {
-    $.get("{$donate_url}").then(function(res) {
+    $.get("$donate_url").then(function(res) {
         if (typeof cb === 'function') {
             cb(res);
         }
@@ -561,6 +542,16 @@ JSCODE;
 }
 JSCODE;
         }
+
+        if (empty($user->settings('fansData.sex'))) {
+            $profile_url = Util::murl('util', ['op' => 'profile']);
+            $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.saveUserProfile = function(data) {
+    $.post("$profile_url", data);
+}
+JSCODE;
+        }
+
         //检查用户在该设备上最近失败的免费订单
         $retry = settings('order.retry', []);
         if ($retry['last'] > 0) {
@@ -577,7 +568,7 @@ JSCODE;
                     $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
                     $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.retryOrder = function (cb) {
-    $.get("{$order_retry_url}").then(function (res) {
+    $.get("$order_retry_url").then(function (res) {
         if (typeof cb === 'function') {
             cb(res);
         }
@@ -592,7 +583,7 @@ JSCODE;
 
         if (App::isSQMPayEnabled()) {
             $js = htmlspecialchars_decode(SQM::getJs(), ENT_QUOTES);
-            $tpl['js']['code'] .= "\r\n{$js}\r\n";
+            $tpl['js']['code'] .= "\r\n$js\r\n";
         }
 
         $this->showTemplate(Theme::file('device'), ['tpl' => $tpl]);
@@ -611,7 +602,7 @@ JSCODE;
         $device = $tpl['device']['_obj'];
 
         /** @var userModelObj $user */
-        $user = $tpl['user']['_obj'];
+        //$user = $tpl['user']['_obj'];
 
         if ($device) {
             //格式化广告
@@ -650,18 +641,18 @@ JSCODE;
 
         $tpl['timeout'] = App::deviceWaitTimeout();
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
     })
     const zovye_fn = {};
     zovye_fn.usercenter = function() {
-        window.location.replace("{$user_center_url}");
+        window.location.replace("$user_center_url");
     }
     zovye_fn.getx = function(fn) {
-        $.getJSON("{$get_x_url}").then(function(res){
+        $.getJSON("$get_x_url").then(function(res){
             if (res && res.status && res.data.msg) {
                 if (typeof fn === 'function') {
                     fn(res);
@@ -670,14 +661,14 @@ JSCODE;
         })
     }
     zovye_fn.getGoods = function(id, fn) {
-        $.getJSON("{$get_x_url}", {goodsid: id}).then(function(res){
+        $.getJSON("$get_x_url", {goodsid: id}).then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }
         })
     }
     zovye_fn.getGoodsList = function(fn) {
-        $.getJSON("{$get_goods_list_url}").then(function(res){
+        $.getJSON("$get_goods_list_url").then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }
@@ -706,8 +697,8 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
@@ -717,17 +708,17 @@ JSCODE;
         wx && wx.scanQRCode();
     }
     zovye_fn.getPrize = function(fn){
-        $.getJSON("{$get_prize_url}").then(function(res){
+        $.getJSON("$get_prize_url").then(function(res){
             if(res && res.data){
                 typeof fn == 'function' ? fn(res) : alert(res.data.msg);
             }
         })
     }
     zovye_fn.charge = function() {
-        window.location.href = "{$charge_url}";
+        window.location.href = "$charge_url";
     }
     zovye_fn.myPrizes = function() {
-        window.location.href = "{$my_prizes_url}";
+        window.location.href = "$my_prizes_url";
     }
 </script>
 JSCODE;
@@ -739,7 +730,7 @@ JSCODE;
      *
      * @param array $params
      */
-    public function myPrizesPage($params = [])
+    public function myPrizesPage(array $params = [])
     {
         $tpl = is_array($params) ? $params : [];
 
@@ -748,8 +739,8 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
@@ -782,10 +773,10 @@ JSCODE;
         $mui_url = JS_MUI_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$we7_util_url}"></script>
-<script src="{$jquery_url}"></script>
-<script src="{$mui_url}"></script>
-{$js_sdk}
+<script src="$we7_util_url"></script>
+<script src="$jquery_url"></script>
+<script src="$mui_url"></script>
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
@@ -793,7 +784,7 @@ JSCODE;
 
     const zovye_fn = {};
     zovye_fn.charge = function(amount, coupon, success_cb, fail_cb) {
-        $.getJSON("{$get_order_url}", {op: 'create', balance: amount, coupon: coupon}).then(function(res){
+        $.getJSON("$get_order_url", {op: 'create', balance: amount, coupon: coupon}).then(function(res){
             if(res && res.status) {
                 const data = res.data;
                 if(data) {
@@ -808,12 +799,12 @@ JSCODE;
     					        success_cb(result);
     					    }else{
         					    alert('支付成功！');
-        						window.location.replace("{$user_center_url}");
+        						window.location.replace("$user_center_url");
     					    }
 
     					},
                         fail: function(result) {
-                            $.get("{$get_order_url}", {op: 'cancel', tid: data.tid}, function(){
+                            $.get("$get_order_url", {op: 'cancel', tid: data.tid}, function(){
                             });
                             if(typeof fail_cb == 'function') {
                                 fail_cb();
@@ -858,9 +849,9 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$we7_util_url}"></script>
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$we7_util_url"></script>
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
@@ -868,7 +859,7 @@ JSCODE;
 
     const zovye_fn = {};
     zovye_fn.save = function(mobile, code, success, fail) {
-        $.getJSON("{$mobile_url}", {op: 'save', mobile: mobile, code: code}, function(res){
+        $.getJSON("$mobile_url", {op: 'save', mobile: mobile, code: code}, function(res){
             if (res) {
                 if (res.status) {
                     if (typeof success === 'function') {
@@ -892,7 +883,7 @@ JSCODE;
     }
     
     zovye_fn.checkReferral = function(code, success, fail) {
-        $.getJSON("{$mobile_url}", {op: 'check', code: code}, function(res){
+        $.getJSON("$mobile_url", {op: 'check', code: code}, function(res){
             if (res) {
                 if (res.status) {
                     if (typeof success === 'function') {
@@ -934,9 +925,9 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$we7_util_url}"></script>
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$we7_util_url"></script>
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
@@ -944,7 +935,7 @@ JSCODE;
 
     const zovye_fn = {};
     zovye_fn.save = function(mobile, success, fail) {
-        $.getJSON("{$mobile_url}", {mobile: mobile}, function(res){
+        $.getJSON("$mobile_url", {mobile: mobile}, function(res){
             if (res) {
                 if (res.status) {
                     if (typeof success == 'function') {
@@ -993,18 +984,18 @@ JSCODE;
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$we7_util_url}"></script>
-<script src="{$jquery_url}"></script>
+<script src="$we7_util_url"></script>
+<script src="$jquery_url"></script>
 <script src="https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"></script>
-{$js_sdk}
+$js_sdk
 <script>
     const zovye_fn = {
         cb: null,
-        api_url: "{$api_url}",
+        api_url: "$api_url",
         redirect_url: "{$tpl['redirect']}",
     }
     zovye_fn.check = function(cb) {
-		const geolocation = new qq.maps.Geolocation("{$lbs_key}", "myapp");
+		const geolocation = new qq.maps.Geolocation("$lbs_key", "myapp");
 		const options = {
 			timeout: 8000,
 		}
@@ -1050,7 +1041,7 @@ JSCODE;
      *
      * @param array $params
      */
-    public function moreAccountsPage($params = [])
+    public function moreAccountsPage(array $params = [])
     {
         $tpl = is_array($params) ? $params : [];
 
@@ -1084,9 +1075,9 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$we7_util_url}"></script>
-<script src="{$jquery_url}"></script>
-{$js_sdk}
+<script src="$we7_util_url"></script>
+<script src="$jquery_url"></script>
+$js_sdk
 <script>
 </script>
 JSCODE;
@@ -1106,18 +1097,18 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $tpl['js']['code'] = <<<JSCODE
-<script src="{$we7_util_url}"></script>
-<script src="{$jquery_url}"></script>>
-{$js_sdk}
+<script src="$we7_util_url"></script>
+<script src="$jquery_url"></script>>
+$js_sdk
 <script>
     const zovye_fn = {
-        api_url: "{$api_url}",
+        api_url: "$api_url",
     }
     zovye_fn.verify = function(name, num) {
         $.getJSON(zovye_fn.api_url, {op: 'verify', name: name, num: num}).then(function(res){
             if (res.status) {
                 alert(res.data.msg);
-                window.location.replace("{$redirect_url}");
+                window.location.replace("$redirect_url");
             } else {
                 alert(res.data.msg)
             }
@@ -1168,11 +1159,11 @@ function ready(callback) {
 }
 ready(function(){
     ap.getAuthCode({
-    appId: "{$app_id}",
+    appId: "$app_id",
     scopes: ['auth_user'],
   }, function(res){
         if (res['authCode']) {
-            location.href = "{$cb_url}&auth_code="+res['authCode'];            
+            location.href = "$cb_url&auth_code="+res['authCode'];            
         }
     })
 })
@@ -1183,5 +1174,27 @@ HTML;
         exit();
     }
 
+    public function douyinPage(deviceModelObj $device, userModelObj $user)
+    {
+        $api_url = Util::murl('douyin');
+        $jquery_url = JS_JQUERY_URL;
 
+        $tpl_data = Util::getTplData([$device, $user]);
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+    zovye_fn.getAccounts = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'account', 'device': '{$device->getShadowId()}', 'user': '{$user->getOpenid()}'});
+    }
+    zovye_fn.redirect = function(uid) {
+        return $.getJSON(zovye_fn.api_url, {op: 'detail', 'uid': uid, 'device': '{$device->getShadowId()}', 'user': '{$user->getOpenid()}'});
+    }
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('douyin'), ['tpl' => $tpl_data]);
+    }
 }

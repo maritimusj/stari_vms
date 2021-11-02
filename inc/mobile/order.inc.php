@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -40,25 +39,57 @@ if ($op === 'create') {
         JSON::fail('设备正忙，请稍后再试！');
     }
 
-    $goods_id = request::int('goodsID');
-    if (empty($goods_id)) {
-        JSON::fail('参数错误，没有指定商品！');
+    $price = 0;
+    $total = 0;
+    $discount = 0;
+    $goods = [];
+
+    if (request::has('goodsID')) {
+        $goods_id = request::int('goodsID');
+        if (empty($goods_id)) {
+            JSON::fail('参数错误，没有指定商品！');
+        }
+
+        $goods = $device->getGoods($goods_id);
+        if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
+            JSON::fail('无法购买这个商品，请联系管理员！');
+        }
+
+        $total = min(App::orderMaxGoodsNum(), max(request::int('total'), 1));
+
+        if ($goods['num'] < $total) {
+            JSON::fail('对不起，商品数量不足！');
+        }
+
+        //获取用户折扣
+        $discount = User::getUserDiscount($user, $goods, $total);
+        $price = $goods['price'] * $total - $discount;
+
+    } elseif (request::has('packageID')) {
+
+        $package_id = request::int('packageID');
+        if (empty($package_id)) {
+            JSON::fail('对不起，商品套餐不正确！');
+        }
+
+        $package = $device->getPackage($package_id);
+        if (empty($package)) {
+            JSON::fail('找不到这个商品套餐！');
+        }
+
+        if (empty($package['isOk'])) {
+            JSON::fail('暂时无法购买这个商品套餐！');
+        }
+
+        $total = 1;
+        $price = $package['price'];
+
+        $goods = $package;
+
+    } else {
+        JSON::fail('对不起，请求参数不正确！');
     }
 
-    $goods = $device->getGoods($goods_id);
-    if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
-        JSON::fail('无法购买这个商品，请联系管理员！');
-    }
-
-    $total = min(App::orderMaxGoodsNum(), max(request::int('total'), 1));
-
-    if ($goods['num'] < $total) {
-        JSON::fail('对不起，商品数量不足！');
-    }
-
-    //获取用户折扣
-    $discount = User::getUserDiscount($user, $goods, $total);
-    $price = $goods['price'] * $total - $discount;
     if ($price < 1) {
         JSON::fail('支付金额不能为零！');
     }
@@ -247,7 +278,7 @@ if ($op === 'create') {
     if (empty($account)) {
         JSON::fail('找不到这个公众号！');
     }
-    
+
     $res = Job::createAccountOrder([
         'device' => $device->getId(),
         'user' => $user->getId(),

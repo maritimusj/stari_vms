@@ -34,7 +34,9 @@ class Settings implements ISettings
         $this->title = $title ?: 'settings';
         $this->tb_name = strtolower("{$app_name}_{$classname}_{$this->title}");
 
-        self::createTable($this->getTableName());
+        if (DEBUG) {
+            self::createTable($this->getTableName());
+        }
     }
 
     protected static function createTable($tb_name): bool
@@ -199,7 +201,7 @@ CODE;
             }
         }
 
-        return is_array($key) ? $ret : (isset($ret[$key]) ? $ret[$key] : $default);
+        return is_array($key) ? $ret : ($ret[$key] ?? $default);
     }
 
     /**

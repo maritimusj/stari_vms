@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -15,10 +17,12 @@ class YunfenbaAccount
     //const GET_TASK_URL = 'http://testapi.goluodi.com/{vendor_uid}/gettask';
 
     private $vendor_uid;
+    private $sub_uid;
 
-    public function __construct($vendor_uid)
+    public function __construct($vendor_uid, $sub_uid = '')
     {
         $this->vendor_uid = strval($vendor_uid);
+        $this->sub_uid = $sub_uid;
     }
 
     public static function getUid(): string
@@ -119,6 +123,9 @@ class YunfenbaAccount
     public function getTask(deviceModelObj $device, userModelObj $user, callable $cb = null): array
     {
         $url = str_replace('{vendor_uid}', $this->vendor_uid, self::GET_TASK_URL);
+        if (!empty($this->sub_uid)) {
+            $url .= "/{$this->sub_uid}";
+        }
 
         $scene = $device->settings('extra.yunfenba.scene', '');
 
@@ -165,7 +172,7 @@ class YunfenbaAccount
             }
 
             //请求对方API
-            $yunfenba = new YunfenbaAccount($config['vendor']['uid']);
+            $yunfenba = new YunfenbaAccount($config['vendor']['uid'], $config['vendor']['sid']);
 
             $yunfenba->getTask($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
@@ -196,9 +203,9 @@ class YunfenbaAccount
 
                     $data = $acc->format();
 
-                    $data['title'] = $result['wechat_name'];
-                    $data['img'] = $result['headimg_url'];
-                    $data['qrcode'] = $result['qrcode_url'];
+                    $data['title'] = $result['data']['wechat_name'];
+                    $data['img'] = $result['data']['headimg_url'];
+                    $data['qrcode'] = $result['data']['qrcode_url'];
 
                     $v[] = $data;
 
@@ -257,7 +264,7 @@ class YunfenbaAccount
             /** @var deviceModelObj $device */
             $device = Device::findOne(['shadow_id' => $params['device']]);
             if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['state']);
+                throw new RuntimeException('找不到指定的设备:' . $params['device']);
             }
 
             $acc = $res['account'];

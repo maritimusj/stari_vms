@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -14,7 +18,7 @@ class App
      * @param int $len
      * @return string
      */
-    public static function uid($len = null): string
+    public static function uid(int $len = 0): string
     {
         return onceCall(function() use ($len) {
             $uid = sha1(_W('config.setting.authkey') . We7::uniacid());
@@ -175,6 +179,28 @@ class App
     {
         return onceCall(function() {
             return !empty(settings('king.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 史莱姆 吸粉
+     *
+     */
+    public static function isSNTOEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('snto.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 粉丝宝 吸粉
+     *
+     */
+    public static function isYFBEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('yfb.fan.enabled'));
         });
     }
 
@@ -410,6 +436,8 @@ class App
             $_SESSION['ali_user_id'] = $user->getOpenid();
         } elseif ($user->isWxUser()) {
             $_SESSION['wx_user_id'] = $user->getOpenid();
+        } elseif ($user->isDouYinUser()) {
+            $_SESSION['douyin_user_id'] = $user->getOpenid();
         }
     }
 
@@ -420,6 +448,9 @@ class App
         }
         if (self::isWxUser()) {
             return strval($_SESSION['wx_user_id']);
+        }
+        if (self::isDouYinUser()) {
+            return strval($_SESSION['douyin_user_id']);
         }
         return '';
     }
@@ -433,6 +464,11 @@ class App
     {
         return !empty($_SESSION['wx_user_id']);
     }
+
+     public static function isDouYinUser(): bool
+    {
+        return !empty($_SESSION['douyin_user_id']);
+    }   
 
     public static function isChannelPayEnabled(): bool
     {
@@ -492,5 +528,22 @@ class App
         return onceCall(function() {
             return boolval(settings('custom.DonatePay.enabled'));
         });        
-    } 
+    }
+
+    /**
+     * 使用屏幕推广公众号二维码
+     */
+    public static function useAccountAppQRCode(): bool {
+        return onceCall(function() {
+            return boolval(settings('account.appQRCode.enabled'));
+        });
+    }
+
+    public static function isZeroBonusEnabled(): bool {
+        return settings('custom.bonus.zero.enabled', false);
+    }
+
+    public static function isDouyinEnabled(): bool {
+        return settings('account.douyin.enabled', false);
+    }
 }

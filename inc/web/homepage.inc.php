@@ -91,7 +91,7 @@ if ($op == 'stats') {
         [
             'chartid' => Util::random(10),
             'data' => Util::cachedCall(30, function() {
-                $n = request('n', 10);
+                $n = request::int('n', 10);
                 return Stats::chartDataOfAccounts($n);
             }),
         ]

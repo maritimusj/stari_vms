@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -190,7 +194,9 @@ if ($op == 'default' || $op == 'device_types') {
         function () use ($device_type) {
             $type_id = $device_type->getId();
             if ($device_type->destroy()) {
-                return Device::removeDeviceType($type_id);
+                if(Device::removeDeviceType($type_id)) {
+                    return true;
+                }
             }
             return error(State::ERROR, '失败');
         }

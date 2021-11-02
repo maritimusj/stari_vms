@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\Contract\bluetooth;
 
@@ -25,4 +29,6 @@ interface IResult
     function getRawData();
 
     function getCmd();
+    
+    function getPayloadData();
 }

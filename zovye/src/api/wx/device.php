@@ -1,11 +1,14 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\api\wx;
 
-
 use Exception;
 use zovye\Inventory;
+use zovye\Locker;
 use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\base\modelObjFinder;
@@ -20,6 +23,7 @@ use zovye\Stats;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
+use function zovye\err;
 use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
@@ -114,7 +118,7 @@ class device
             }
         }
 
-        $sig = intval($device->getSig());
+        $sig = $device->getSig();
         if ($sig != -1) {
             $result['status']['sig'] = $sig;
         }
@@ -136,6 +140,7 @@ class device
         if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
             $result['device']['buid'] = $device->getBUID();
             $result['device']['mac'] = $device->getMAC();
+            $result['device']['protocol'] = $device->getBlueToothProtocolName();
         }
 
         $payload = $device->getPayload(true);
@@ -244,6 +249,10 @@ class device
 
         $user = common::getUser();
 
+        if (!Locker::try("user:{$user->getId()}")) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
         if ($user->isAgent() || $user->isPartner()) {
             common::checkCurrentUserPrivileges('F_sb');
             $device = self::getDevice(request('id'), $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent());
@@ -270,7 +279,7 @@ class device
         }
 
         if ($device) {
-            if (!$device->payloadLockAcquire(3)) {
+            if (!$device->payloadLockAcquire()) {
                 return error(State::ERROR, '设备正忙，请稍后再试！');
             }
 
@@ -467,12 +476,7 @@ class device
                 }
             }
 
-            $obj = null;
-            if (request::has('guid')) {
-                $obj = $agent;
-            } else {
-                $obj = $agent;
-            }
+            $obj = $agent;
 
             //指定了设备
             if (request::has('deviceid')) {
@@ -626,7 +630,7 @@ class device
                 $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(request::str('order')) : 'ASC';
                 $query->orderBy("{$order_by} {$order}");
             } else {
-                $query->orderBy('rank DESC');
+                $query->orderBy('rank DESC, id DESC');
             }
 
             $query->page($page, $page_size);
@@ -665,9 +669,9 @@ class device
                     } else if (App::isVDeviceSupported() && $device->isVDevice()) {
                         $data['status']['online'] = true;
                     } else {
-                        $data['status']['online'] = $online_status[$device->getImei()] ? true : false;
+                        $data['status']['online'] = (bool)$online_status[$device->getImei()];
                         if ($device->getAppId()) {
-                            $data['app']['online'] = $online_status[$device->getAppId()] ? true : false;
+                            $data['app']['online'] = (bool)$online_status[$device->getAppId()];
                         }
                     }
                 }
@@ -926,9 +930,9 @@ class device
                     $data['status']['online'] = true;
                 } else {
                     if (!$simple) {
-                        $data['status']['online'] = $online_status[$device->getImei()] ? true : false;
+                        $data['status']['online'] = (bool)$online_status[$device->getImei()];
                         if ($device->getAppId()) {
-                            $data['app']['online'] = $online_status[$device->getAppId()] ? true : false;
+                            $data['app']['online'] = (bool)$online_status[$device->getAppId()];
                         }
                     }
                 }

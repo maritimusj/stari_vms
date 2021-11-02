@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
-
 
 use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
@@ -106,7 +108,7 @@ class ChannelPay
         $result = (new ChannelPay($settings['key'], $settings['secret']))->create($data);
 
         Util::logToFile('channel', [
-            'requeset' => $data,
+            'request' => $data,
             'response' => $result,
         ]);
 

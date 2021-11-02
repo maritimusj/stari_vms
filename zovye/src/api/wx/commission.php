@@ -1,19 +1,28 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 
 namespace zovye\api\wx;
 
+use DateTime;
 use zovye\Account;
+use zovye\Cache;
 use zovye\model\accountModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\CommissionBalance;
+use zovye\model\userModelObj;
 use zovye\request;
 use zovye\Schema;
 use zovye\State;
 use zovye\User;
 use zovye\Util;
 use zovye\We7;
+use function zovye\err;
 use function zovye\error;
+use function zovye\is_error;
 use function zovye\m;
 use function zovye\settings;
 
@@ -192,7 +201,7 @@ class commission
         common::checkCurrentUserPrivileges('F_cm');
 
         $guid = request::trim('guid');
-        $val =  min(10000, max(0, request::float('val', 0, 2) * 100));
+        $val = min(10000, max(0, request::float('val', 0, 2) * 100));
         $level = min(3, max(0, request::int('level')));
 
         $agent = agent::getUserByGUID($guid);
@@ -216,61 +225,114 @@ class commission
         return error(State::ERROR, '未启用，请与管理员联系！[103]');
     }
 
+    protected static function getMonthStatsData(userModelObj $user, $begin, $end): array
+    {
+
+        $res = CommissionBalance::query([
+            'openid' => $user->getOpenid(),
+            'createtime >=' => $begin,
+            'createtime <' => $end,
+        ])->findAll();
+
+        $c_arr = [
+            CommissionBalance::ORDER_FREE,
+            CommissionBalance::ORDER_BALANCE,
+            CommissionBalance::ORDER_WX_PAY,
+            //CommissionBalance::REFUND,
+            CommissionBalance::ORDER_REFUND,
+            CommissionBalance::GSP,
+            CommissionBalance::BONUS,
+        ];
+
+        $data = [];
+        /** @var commission_balanceModelObj $item */
+        foreach ($res as $item) {
+            $month_date = date('Y-m', $item->getCreatetime());
+            if (!isset($data[$month_date])) {
+                $data[$month_date]['income'] = 0;
+                $data[$month_date]['withdraw'] = 0;
+                $data[$month_date]['fee'] = 0;
+            }
+
+            $src = $item->getSrc();
+            $x_val = $item->getXVal();
+
+            if (in_array($src, $c_arr)) {
+                $data[$month_date]['income'] += $x_val;
+            } elseif ($src == CommissionBalance::ADJUST) {
+                if ($x_val > 0) {
+                    $data[$month_date]['income'] += $x_val;
+                } else {
+                    $data[$month_date]['withdraw'] += $x_val;
+                }
+            } elseif ($src == CommissionBalance::WITHDRAW) {
+                $data[$month_date]['withdraw'] += $x_val;
+            } elseif ($src == CommissionBalance::FEE) {
+                $data[$month_date]['fee'] += $x_val;
+            }
+        }
+        return $data;
+    }
+
     public static function monthStat(): array
     {
         $user = User::get(request::int('id'));
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        if ($user->isPartner()) {
+            $user = $user->getPartnerAgent();
+        }
+
+        $firstCommissionBalance = CommissionBalance::getFirstCommissionBalance($user);
+        if (empty($firstCommissionBalance)) {
+            $data['data'] = [];
+            return $data;
+        }
+
+        $begin = new DateTime("@{$firstCommissionBalance->getCreatetime()}");
+        $end = new DateTime();
 
         $data = [];
-        if ($user) {
-            //partner
-            if ($user->isPartner()) {
-                $user = $user->getPartnerAgent();
+
+        for (; $begin <= $end;) {
+            $month = $begin->format('Y-m');
+            $ts = $begin->getTimestamp();
+
+            $uid = Cache::makeUID([
+                'api' => 'monthStats',
+                'user' => $user->getOpenid(),
+                'month' => $month,
+            ]);
+
+            $params = [];
+
+            if ($month == date('Y-m')) {
+                $params[] = Cache::ResultExpiredAfter(10);
             }
-            $openid = $user->getOpenid();
 
-            $res = CommissionBalance::query(['openid' => $openid])->findAll();
-            $c_arr = [
-                CommissionBalance::ORDER_FREE,
-                CommissionBalance::ORDER_BALANCE,
-                CommissionBalance::ORDER_WX_PAY,
-                //CommissionBalance::REFUND,
-                CommissionBalance::ORDER_REFUND,
-                CommissionBalance::GSP,
-                CommissionBalance::BONUS,
-            ];
-            /** @var commission_balanceModelObj $item */
-            foreach ($res as $item) {
-                $month_date = date('Y-m', $item->getCreatetime());
-                if (!isset($data[$month_date])) {
-                    $data[$month_date]['income'] = 0;
-                    $data[$month_date]['withdraw'] = 0;
-                    $data[$month_date]['fee'] = 0;
-                }
+            $begin->modify('first day of next month 00:00');
 
-                $src = $item->getSrc();
-                $x_val = $item->getXVal();
+            $res = Cache::fetch($uid, function () use ($user, $ts, $begin) {
+                return self::getMonthStatsData($user, $ts, $begin->getTimestamp());
+            }, ...$params);
 
-                if (in_array($src, $c_arr)) {
-                    $data[$month_date]['income'] += $x_val;
-                } elseif ($src == CommissionBalance::ADJUST) {
-                    if ($x_val > 0) {
-                        $data[$month_date]['income'] += $x_val;
-                    } else {
-                        $data[$month_date]['withdraw'] += $x_val;
-                    }
-                } elseif ($src == CommissionBalance::WITHDRAW) {
-                    $data[$month_date]['withdraw'] += $x_val;
-                } elseif ($src == CommissionBalance::FEE) {
-                    $data[$month_date]['fee'] += $x_val;
-                }
+            if (is_error($res)) {
+                return $res;
             }
+            
+            $data = array_merge($data, $res);
         }
+
         ksort($data);
+
         $last_month_balance = 0;
         foreach ($data as $key => $item) {
             $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
             $last_month_balance = $data[$key]['balance'];
         }
+
         krsort($data);
 
         return ['data' => $data];

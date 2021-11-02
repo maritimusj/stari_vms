@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -177,6 +176,8 @@ if ($op == 'default') {
                 ];
                 if ($account->isVideo()) {
                     $profile['media'] = $account->getMedia();
+                } elseif ($account->isDouyin()) {
+                    $profile['douyin'] = true;
                 } else {
                     $profile['qrcode'] = $account->getQrcode();
                 }
@@ -188,6 +189,8 @@ if ($op == 'default') {
         if ($accounts[$data['account']]) {
             if (isset($accounts[$data['account']]['media'])) {
                 $data['account_title'] = '视频 ' . $data['account'];
+            } elseif ($accounts[$data['account']]['douyin']) {
+                $data['account_title'] = '抖音 ' . $data['account'];
             } else {
                 $data['account_title'] = '公众号 ' . $data['account'];
             }
@@ -218,13 +221,14 @@ if ($op == 'default') {
         }
 
         if ($entry->getBluetoothDeviceBUID()) {
-            $data['result'] = $entry->isBluetoothResultFail() ? ['errno' => 1] : [];
+            $msg = $entry->getExtraData('bluetooth.error.msg', '');
+            $data['result'] = $entry->isBluetoothResultFail() ? err($msg) : [];
         } else {
             $data['result'] = $entry->getExtraData('pull.result', []);
         }
         $device = $entry->getDevice();
         if ($device) {
-            $data['pull_logs'] = !$device->isVDevice() && !$device->isBlueToothDevice() ? true : '没有出货记录';
+            $data['pull_logs'] = !$device->isBlueToothDevice() ? true : '没有出货记录';
         }
         $orders[] = $data;
     }
@@ -272,9 +276,10 @@ if ($op == 'default') {
         'orderId' => $order->getOrderId(),
         'createtime' => date('Y-m-d H:i:s', $order->getCreatetime()),
     ];
-
-    $data['goods'] = $order->getExtraData('goods');
-    $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
+    
+    if ($order->isPackage()) {
+        $data['package'] = $order->getPackageId();
+    }
 
     $pay_result = $order->getExtraData('payResult');
     $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $data['orderId']);
@@ -297,13 +302,25 @@ if ($op == 'default') {
 } elseif ($op == 'refund') {
 
     $id = request::int('id');
-    $num = request::int('num');
+    if (request::has('num')) {
+        $num = request::int('num');
 
-    $res = Order::refund($id, $num, [
-        'admin' => _W('username'),
-        'ip' => CLIENT_IP,
-        'message' => '管理员退款',
-    ]);
+        $res = Order::refund($id, $num, [
+            'admin' => _W('username'),
+            'ip' => CLIENT_IP,
+            'message' => '管理员退款',
+        ]);        
+    } elseif (request::has('price')) {
+        $price = request::int('price');
+
+        $res = Order::refund2($id, $price, [
+            'admin' => _W('username'),
+            'ip' => CLIENT_IP,
+            'message' => '管理员退款',
+        ]);
+    } else {
+        JSON::fail('参数不正确！');
+    }
 
     if (is_error($res)) {
         JSON::fail($res);
@@ -319,60 +336,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个订单！');
     }
 
-    $condition = We7::uniacid([
-        'createtime >=' => $order->getCreatetime(),
-        'createtime <' => $order->getCreatetime() + 3600,
-        'data REGEXP' => "s:5:\"order\";i:{$order->getId()};",
-    ]);
-
-    $device = $order->getDevice();
-    if ($device) {
-        $condition['title'] = $device->getImei();
-    }
-
-    $query = m('device_logs')->where($condition);
-
-    $list = [];
-    /** @var device_logsModelObj $entry */
-    foreach ($query->findAll() as $entry) {
-        $data = [
-            'id' => $entry->getId(),
-            'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-            'imei' => $entry->getTitle(),
-            'title' => Device::formatPullTitle($entry->getLevel()),
-            'goods' => $entry->getData('goods'),
-            'user' => $entry->getData('user'),
-        ];
-
-        $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
-
-        $result = $entry->getData('result');
-        if (is_array($result)) {
-            if (isset($result['errno'])) {
-                $data['result'] = [
-                    'errno' => intval($result['errno']),
-                    'message' => $result['message'],
-                ];
-            } elseif (isset($result['data']['errno'])) {
-                $data['result'] = [
-                    'errno' => intval($result['data']['errno']),
-                    'message' => $result['data']['message'],
-                ];
-            } else {
-                $data['result'] = [
-                    'errno' => -1,
-                    'message' => '<未知>',
-                ];
-            }
-        } else {
-            $data['result'] = [
-                'errno' => empty($result),
-                'message' => empty($result) ? '失败' : '成功',
-            ];
-        }
-
-        $list[] = $data;
-    }
+    $list = Helper::getOrderPullLog($order);
 
     $content = app()->fetchTemplate(
         'web/order/pulls',

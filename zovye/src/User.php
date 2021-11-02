@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -19,8 +18,12 @@ class User
     const WX = 0;
     const WxAPP = 1;
     const ALI = 2;
+    const DouYin = 3;
 
+    //API用户
     const API = 10;
+    //第三方公众号
+    const THIRD_ACCOUNT = 15;
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -76,6 +79,18 @@ class User
                 'title' => '第三方API用户',
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL . "static/img/api.svg",
+            ],
+           'third' => [
+                'name' => 'api',
+                'title' => '第三方公众号授权用户',
+                'color' => '#4CAF50',
+                'icon' => MODULE_URL . "static/img/third.svg",
+            ],
+            'douyin' => [
+                'name' => 'douyin',
+                'title' => '抖音',
+                'color' => '#4CAF50',
+                'icon' => MODULE_URL . "static/img/douyin.svg",
             ]
         ];
 
@@ -83,8 +98,12 @@ class User
             return $data['ali'];
         } elseif (self::isWXAppUser($obj)) {
             return $data['wxapp'];
-        } else if (self::isApiUser($obj)) {
+        } elseif (self::isApiUser($obj)) {
             return $data['api'];
+        } elseif (self::isThirdAccountUser($obj)) {
+            return $data['third'];
+        } elseif (self::isDouYinUser($obj)) {
+            return $data['douyin'];
         }
 
         return $data['wx'];
@@ -126,13 +145,32 @@ class User
         $user = User::get($obj, is_string($obj));
         return $user && $user->isApiUser();
     }
+
+    public static function isThirdAccountUser($obj): bool
+    {
+        if ($obj instanceof userModelObj) {
+            return $obj->isThirdAccountUser();
+        }
+        $user = User::get($obj, is_string($obj));
+        return $user && $user->isThirdAccountUser();
+    }
+
+    public static function isDouYinUser($obj): bool
+    {
+        if ($obj instanceof userModelObj) {
+            return $obj->isDouYinUser();
+        }
+        $user = User::get($obj, is_string($obj));
+        return $user && $user->isDouYinUser();
+    }
+
     /**
      * @param $id
      * @param bool $is_openid
-     * @param int $app
+     * @param int? $app
      * @return userModelObj|null
      */
-    public static function get($id, $is_openid = false, $app = null): ?userModelObj
+    public static function get($id, bool $is_openid = false, $app = null): ?userModelObj
     {
         /** @var userModelObj[] $cache */
         static $cache = [];
@@ -161,7 +199,7 @@ class User
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return userModelObj|null
      */
     public static function findOne($condition = []): ?userModelObj
@@ -170,7 +208,7 @@ class User
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return modelObjFinder
      */
     public static function query($condition = []): modelObjFinder
@@ -182,7 +220,7 @@ class User
      * @param array $data
      * @return userModelObj|null
      */
-    public static function create($data = []): ?userModelObj
+    public static function create(array $data = []): ?userModelObj
     {
         if (empty($data['uniacid'])) {
             $data['uniacid'] = We7::uniacid();

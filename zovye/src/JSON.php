@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -22,7 +25,7 @@ class JSON
 
     /**
      * 向请求者返回成功的JSON数据
-     * @param array $data
+     * @param mixed $data
      */
     public static function success($data = [])
     {
@@ -35,7 +38,7 @@ class JSON
 
     /**
      * 向请求者返回失败的JSON数据，支持直接传入error结构，Exception对象等等
-     * @param array $data
+     * @param mixed $data
      */
     public static function fail($data = [])
     {

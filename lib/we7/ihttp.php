@@ -1,7 +1,9 @@
 <?php
 /**
- * Http协议.
+ * @author jjs@zovye.com
+ * @url www.zovye.com
  */
+
 namespace we7;
 
 use CURLFile;

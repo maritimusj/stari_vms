@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -26,6 +25,9 @@ class Account extends State
     //视频
     const VIDEO = 10;
 
+    //抖音
+    const DOUYIN = 20;
+
     //授权接入公众号
     const AUTH = 98;
 
@@ -50,6 +52,12 @@ class Account extends State
     //金粉吧
     const KINGFANS = 105;
 
+    //史莱姆
+    const SNTO = 106;
+
+    //粉丝宝
+    const YFB = 107;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -73,6 +81,12 @@ class Account extends State
 
     const KINGFANS_NAME = '金粉吧';
     const KINGFANS_HEAD_IMG = MODULE_URL . 'static/img/kingfans_pic.png';
+
+    const SNTO_NAME = '史莱姆';
+    const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
+
+    const YFB_NAME = '粉丝宝';
+    const YFB_HEAD_IMG = MODULE_URL . 'static/img/yfb_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -127,25 +141,28 @@ class Account extends State
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
-            'id' => intval($entry->getId()),
-            'uid' => strval($entry->getUid()),
-            'state' => intval($entry->getState()),
-            'name' => strval($entry->getName()),
-            'title' => strval($entry->getTitle()),
+            'id' => $entry->getId(),
+            'uid' => $entry->getUid(),
+            'state' => $entry->getState(),
+            'name' => $entry->getName(),
+            'title' => $entry->getTitle(),
             'descr' => html_entity_decode($entry->getDescription()),
-            'url' => strval($entry->getUrl()),
-            'clr' => strval($entry->getClr()),
-            'img' => $entry->isSpecial() ? $entry->getImg() : Util::toMedia($entry->getImg()),
-            'scname' => strval($entry->getScname()),
-            'total' => intval($entry->getTotal()),
-            'count' => intval($entry->getCount()),
-            'groupname' => strval($entry->getGroupName()),
-            'orderno' => intval($entry->getOrderNo()),
+            'url' => $entry->getUrl(),
+            'clr' => $entry->getClr(),
+            'img' => $entry->isSpecial() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia($entry->getImg()),
+            'scname' => $entry->getScname(),
+            'total' => $entry->getTotal(),
+            'count' => $entry->getCount(),
+            'groupname' => $entry->getGroupName(),
+            'orderno' => $entry->getOrderNo(),
         ];
 
         if ($entry->isVideo()) {
             $data['media'] = $entry->getQrcode();
             $data['duration'] = $entry->getDuration();
+        } elseif ($entry->isDouyin()) {
+            $data['url'] = DouYin::makeHomePageUrl($entry->getConfig('url'));
+            $data['openid'] = $entry->getConfig('openid');
         } else {
             $data['qrcode'] = $entry->getQrcode();
         }
@@ -172,7 +189,7 @@ class Account extends State
      * @return array
      * $params['max' => 1] 最多返回几个公众号
      */
-    public static function match(deviceModelObj $device, userModelObj  $user, array $params = []): array
+    public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         $list = [];
         $join = function ($cond, $getter_fn) use ($device, $user, &$list) {
@@ -194,74 +211,182 @@ class Account extends State
             }
         };
 
+        //处理分组
         $groups = [];
 
-        $accounts = $device->getAccounts();
+        $include = $params['state'] ?? [
+                Account::NORMAL,
+                Account::VIDEO,
+                Account::AUTH,
+            ];
+
+        $specials_includes = $params['state'] ?? [
+                Account::JFB,
+                Account::MOSCALE,
+                Account::YUNFENBA,
+                Account::AQIINFO,
+                Account::ZJBAO,
+                Account::MEIPA,
+                Account::KINGFANS,
+                Account::SNTO,
+                Account::YFB,
+            ];
+
+        $include = is_array($include) ? $include : [$include];
+        $specials_includes = is_array($specials_includes) ? $specials_includes : [$specials_includes];
+
+        $accounts = $device->getAccounts($include);
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
-            if ($group_name && array_key_exists($group_name, $groups)) {
-                unset($accounts[$uid]);
+            if (empty($group_name)) {
                 continue;
             }
+            if (!isset($groups[$group_name])) {
+                $groups[$group_name] = [
+                    'uid' => $uid,
+                    'orderno' => $entry['orderno'],
+                ];
+            } elseif ($entry['orderno'] > $groups[$group_name]['orderno']) {
+                $last_uid = $groups[$group_name]['uid'];
 
-            if ($group_name) {
-                $groups[$group_name] = 'exists';
+                unset($accounts[$last_uid]);
+
+                $groups[$group_name] = [
+                    'uid' => $uid,
+                    'orderno' => $entry['orderno'],
+                ];
+            } else {
+                unset($accounts[$uid]);
             }
+        }
 
+        foreach ($accounts as $entry) {
             $join(['id' => $entry['id']], function ($acc) {
                 return [$acc->format()];
             });
         }
 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
+        $specials = [
+            //准粉吧
+            Account::JFB => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::JFB, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return JfbAccount::fetch($device, $user);
+                },
+            ],
+            //公锤
+            Account::MOSCALE => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::MOSCALE, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return MoscaleAccount::fetch($device, $user);
+                },
+            ],
+            //云粉
+            Account::YUNFENBA => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::YUNFENBA, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return YunfenbaAccount::fetch($device, $user);
+                },
+            ],
+            //阿旗
+            Account::AQIINFO => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::AQIINFO, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return AQIInfoAccount::fetch($device, $user);
+                },
+            ],
 
-        //准粉吧
-        if (App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude)) {
-            $join(['state' => Account::JFB], function () use ($device, $user) {
-                return JfbAccount::fetch($device, $user);
-            });
-        }
+            //纸巾宝
+            Account::ZJBAO => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::ZJBAO, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return ZhiJinBaoAccount::fetch($device, $user);
+                },
+            ],
 
-        //公锤
-        if (App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude)) {
-            $join(['state' => Account::MOSCALE], function () use ($device, $user) {
-                return MoscaleAccount::fetch($device, $user);
-            });
-        }
+            //美葩
+            Account::MEIPA => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::MEIPA, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return MeiPaAccount::fetch($device, $user);
+                },
+            ],
 
-        //云粉
-        if (App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude)) {
-            $join(['state' => Account::YUNFENBA], function () use ($device, $user) {
-                return YunfenbaAccount::fetch($device, $user);
-            });
-        }
+            //金粉吧
+            Account::KINGFANS => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::KINGFANS, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return KingFansAccount::fetch($device, $user);
+                },
+            ],
 
-        //阿旗
-        if (App::isAQiinfoEnabled() && !in_array(AQiinfoAccount::getUid(), $exclude)) {
-            $join(['state' => Account::AQIINFO], function () use ($device, $user) {
-                return AQiinfoAccount::fetch($device, $user);
-            });
-        }
+            //史莱姆
+            Account::SNTO => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::SNTO, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return SNTOAccount::fetch($device, $user);
+                },
+            ],
 
-        //纸巾宝
-        if (App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude)) {
-            $join(['state' => Account::ZJBAO], function () use ($device, $user) {
-                return ZhiJinBaoAccount::fetch($device, $user);
-            });
-        }
+            //粉丝宝
+            Account::YFB => [
+                function () use ($specials_includes, $exclude) {
+                    if ($specials_includes && !in_array(Account::YFB, $specials_includes)) {
+                        return false;
+                    }
+                    return App::isYFBEnabled() && !in_array(YfbAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return YfbAccount::fetch($device, $user);
+                },
+            ],
+        ];
 
-        //美葩
-        if (App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude)) {
-            $join(['state' => Account::MEIPA], function () use ($device, $user) {
-                return MeiPaAccount::fetch($device, $user);
-            });
-        }
-
-        //金粉吧
-        if (App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude)) {
-            $join(['state' => Account::KINGFANS], function () use ($device, $user) {
-                return KingFansAccount::fetch($device, $user);
-            });
+        foreach ($specials as $uid => $entry) {
+            if ($entry[0]()) {
+                $join(['state' => $uid], $entry[1]);
+            }
         }
 
         if (empty($list)) {
@@ -322,7 +447,7 @@ class Account extends State
      */
     public static function findOne($cond): ?accountModelObj
     {
-        $cond = boolval($cond['id']) || boolval($cond['uid']) ? $cond : We7::uniacid($cond);
+        $cond = $cond['id'] || $cond['uid'] ? $cond : We7::uniacid($cond);
         $query = self::query($cond);
         return $query->findOne();
     }
@@ -343,15 +468,12 @@ class Account extends State
      */
     public static function removeAllAgents(accountModelObj $account): bool
     {
-        if ($account) {
-            $assign_data = $account->settings('assigned', []);
-            $assign_data['agents'] = [];
-            $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
-            if ($account->updateSettings('assigned', $assign_data)) {
-                return self::updateAccountData();
-            }
+        $assign_data = $account->settings('assigned', []);
+        $assign_data['agents'] = [];
+        $assign_data = isEmptyArray($assign_data) ? [] : $assign_data;
+        if ($account->updateSettings('assigned', $assign_data)) {
+            return self::updateAccountData();
         }
-
         return false;
     }
 
@@ -416,7 +538,7 @@ class Account extends State
 
     /**
      * 绑定或者取消绑定多个对象，（必须有一个公众号和一个或多个其它对象：设备，代理商，标签）
-     * @param array<mixed> $objs
+     * @param array $objs
      * @param array $params
      * @return bool
      */
@@ -454,7 +576,7 @@ class Account extends State
             if ($obj instanceof $accounts['classname']) {
                 $accounts['list'][] = $obj;
             } else {
-                foreach ($dst as $index => &$x) {
+                foreach ($dst as &$x) {
                     if ($obj instanceof $x['classname']) {
                         $x['list'][] = intval($obj->getId());
                         break;
@@ -596,6 +718,18 @@ class Account extends State
     {
         $url = Util::murl('kingfans');
         return self::createSpecialAccount(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
+    }
+
+    public static function createSNTOAccount(): ?accountModelObj
+    {
+        $url = Util::murl('snto');
+        return self::createSpecialAccount(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+    }
+
+    public static function createYFBAccount(): ?accountModelObj
+    {
+        $url = Util::murl('yfb');
+        return self::createSpecialAccount(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -791,7 +925,7 @@ class Account extends State
      * @param bool $temporary
      * @return array|string
      */
-    public static function updateAuthAccountQRCode(array &$account_data, $params, $temporary = true)
+    public static function updateAuthAccountQRCode(array &$account_data, $params, bool $temporary = true)
     {
         if ($account_data['state'] == Account::AUTH) {
             $str = is_array($params) ? implode(':', $params) : strval($params);
@@ -817,7 +951,7 @@ class Account extends State
      * @param userModelObj $user
      * @return array
      */
-    public static function getUserNext(deviceModelObj $device, userModelObj  $user): array
+    public static function getUserNext(deviceModelObj $device, userModelObj $user): array
     {
         $account = self::getNext($device, $user->settings('accounts.last.uid', ''));
         if ($account) {
@@ -888,9 +1022,9 @@ class Account extends State
             'device_id' => $device->getId(),
             'request' => json_encode($request),
             'result' => json_encode($result),
-            'createtime' => isset($createtime) ? intval($createtime) : time(),
+            'createtime' => $createtime ?? time(),
         ];
-       
+
         return m('account_query')->create($data);
     }
 

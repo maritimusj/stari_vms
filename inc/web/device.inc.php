@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -83,6 +82,8 @@ if ($op == 'list') {
             ]
         ];
     }
+
+    $tpl_data['page'] = request::int('page', 1);
 
     app()->showTemplate('web/device/default_new', $tpl_data);
 } elseif ($op == 'search') {
@@ -185,7 +186,6 @@ if ($op == 'list') {
 
             if ($entry->isVDevice() || $entry->isBlueToothDevice()) {
                 $data['status']['mcb'] = true;
-                $data['status']['app'] = true;
             } else {
                 $status = $devices_status[$entry->getImei()];
                 if (isset($status['mcb']['online'])) {
@@ -290,13 +290,13 @@ if ($op == 'list') {
             }
 
             $tags = $entry->getTagsAsText(false);
-            foreach($tags as $id => $title) {
+            foreach ($tags as $i => $title) {
                 $data['tags'][] = [
-                    'id' => $id,
+                    'id' => $i,
                     'title' => $title,
                 ];
             }
-            
+
             $accounts = $entry->getAssignedAccounts();
             if ($accounts) {
                 $data['gettype']['free'] = true;
@@ -424,6 +424,12 @@ if ($op == 'list') {
         $tpl_data['moscaleRegionSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['region'] : [];
     }
 
+    if (App::isZJBaoEnabled()) {
+        $tpl_data['zjbao'] = [
+            'scene' => isset($device) ? $device->settings('zjbao.scene', '') : '',
+        ];
+    }
+
     app()->showTemplate('web/device/edit_new', $tpl_data);
 } elseif ($op == 'deviceTestAll') {
 
@@ -468,7 +474,7 @@ if ($op == 'list') {
         Util::itoast('设备正忙，请稍后再试！', $this->createWebUrl('device'), 'error');
     }
 
-    $result = Util::transactionDo(function() use ($device) {
+    $result = Util::transactionDo(function () use ($device) {
         if (!request::isset('lane') || request::str('lane') == 'all') {
             $data = [];
         } else {
@@ -540,10 +546,10 @@ if ($op == 'list') {
     $device->remove('extra');
 
     //删除相关套餐
-    foreach(Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
+    foreach (Package::query(['device_id' => $device->getId()])->findAll() as $entry) {
         $entry->destroy();
     }
-    
+
     //通知实体设备
     $device->appNotify();
 
@@ -648,6 +654,10 @@ if ($op == 'list') {
             ];
         }
 
+        if (App::isZeroBonusEnabled()) {
+            setArray($extra, 'custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
+        }
+
         if (empty($data['name']) || empty($data['imei'])) {
             throw new RuntimeException('设备名称或IMEI不能为空！');
         }
@@ -741,9 +751,11 @@ if ($op == 'list') {
             }
 
             //绑定套餐
-            foreach(Package::query(['device_id' => 0])->findAll() as $entry) {
-                $entry->setDeviceId($device->getId());
-                $entry->save();
+            if (!$device->isBlueToothDevice()) {
+                foreach (Package::query(['device_id' => 0])->findAll() as $entry) {
+                    $entry->setDeviceId($device->getId());
+                    $entry->save();
+                }
             }
 
             //绑定appId
@@ -774,7 +786,7 @@ if ($op == 'list') {
                 unset($old[$index]);
             }
 
-            foreach($old as $index => $lane) {
+            foreach ($old as $index => $lane) {
                 $device->resetPayload([$index => '@0'], '管理员删除货道', $now);
             }
 
@@ -862,6 +874,10 @@ if ($op == 'list') {
             } else {
                 AliTicket::unregisterDevice($device);
             }
+        }
+
+        if (App::isZJBaoEnabled()) {
+            $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
         }
 
         //更新公众号缓存
@@ -994,6 +1010,9 @@ if ($op == 'list') {
     if ($accounts) {
         foreach ($accounts as &$entry) {
             $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);
+            if (empty($entry['qrcode'])) {
+                $entry['qrcode'] = MODULE_URL . 'static/img/qrcode.svg';
+            }
         }
     }
     $tpl_data['accounts'] = $accounts;
@@ -1021,10 +1040,13 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
     $tpl_data['payload'] = $device->getPayload(true);
 
+    $packages = [];
     $query = Package::query(['device_id' => $device->getId()]);
-    foreach($query->findAll() as $entry) {
-        $tpl_data['packages'][] = $entry->format(true);
+    foreach ($query->findAll() as $i) {
+        $packages[] = $i->format(true);
     }
+
+    $tpl_data['packages'] = $packages;
 
     $tpl_data['mcb_online'] = $device->isMcbOnline();
     $tpl_data['app_online'] = $device->isAppOnline();
@@ -1083,7 +1105,7 @@ if ($op == 'list') {
     }
 
     $verified = [];
-    foreach($logs as $index => $log) {
+    foreach ($logs as $index => $log) {
         $code = $log['code'];
         if (isset($verified[$code])) {
             continue;
@@ -1106,7 +1128,7 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
 
     app()->showTemplate('web/device/payload', $tpl_data);
-    
+
 } elseif ($op == 'log') {
 
     $device = Device::get(request('id'));
@@ -1491,7 +1513,7 @@ if ($op == 'list') {
         }
     );
 
-    Util::resultJSON(is_error($res) ? false : true, ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
+    Util::resultJSON(!is_error($res), ['msg' => is_error($res) ? $res['message'] : '重置成功！']);
 } elseif ($op == 'unlock') {
 
     $id = request::int('id');
@@ -1744,7 +1766,7 @@ if ($op == 'list') {
         $data = [
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
-            'clr' => $entry->getClr(),            
+            'clr' => $entry->getClr(),
             'total' => Device::query(['group_id' => $entry->getId()])->count(),
             'createtime_foramtted' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
@@ -1796,7 +1818,7 @@ if ($op == 'list') {
                 'id' => $agent->getId(),
                 'name' => $agent->getName(),
                 'mobile' => $agent->getMobile(),
-            ];            
+            ];
         }
     }
 
@@ -2445,7 +2467,8 @@ if ($op == 'list') {
     $ids = request::array('ids', []);
     $query = Device::query(['id' => $ids]);
 
-    foreach($query->findAll() as $device) {
+    /** @var deviceModelObj $device */
+    foreach ($query->findAll() as $device) {
         $file_real = str_replace($url_prefix, $attach_prefix, $device->getQrcode());
         $file_real = preg_replace('/\?.*/', '', $file_real);
         if (file_exists($file_real)) {

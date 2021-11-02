@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -102,14 +106,14 @@ class DeviceTypes
                 }
 
             } else {
-                $query->where("(agent_id={$agent_id} OR agent_id=0 OR agent_id IS NULL)");
+                $query->where("(agent_id=$agent_id OR agent_id=0 OR agent_id IS NULL)");
             }
         }
 
         $keywords = $params['keywords'];
         if ($keywords) {
             $query->where([
-                'title LIKE' => "%{$keywords}%",
+                'title LIKE' => "%$keywords%",
             ]);
         }
 
@@ -128,7 +132,7 @@ class DeviceTypes
 
             /** @var device_typesModelObj $entry */
             foreach ($query->findAll() as $entry) {
-                $data = self::format($entry, $params['detail']);
+                $data = self::format($entry, boolval($params['detail']));
                 $device_types[] = $data;
             }
         }
@@ -143,10 +147,10 @@ class DeviceTypes
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return modelObjFinder
      */
-    public static function query(array $condition = []): modelObjFinder
+    public static function query($condition = []): modelObjFinder
     {
         return m('device_types')->where(We7::uniacid([]))->where($condition);
     }
@@ -156,7 +160,7 @@ class DeviceTypes
      * @param bool $detail
      * @return array
      */
-    public static function format(device_typesModelObj $entry, $detail = false): array
+    public static function format(device_typesModelObj $entry, bool $detail = false): array
     {
         $data = [
             'id' => $entry->getId(),
@@ -186,7 +190,7 @@ class DeviceTypes
      * @param bool $detail
      * @return array
      */
-    public static function getCargoLanes(device_typesModelObj $entry, $detail = false): array
+    public static function getCargoLanes(device_typesModelObj $entry, bool $detail = false): array
     {
         $cargo_lanes = $entry->getExtraData('cargo_lanes', []);
         if ($detail) {

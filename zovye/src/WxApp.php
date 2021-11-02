@@ -1,10 +1,14 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
 class WxApp
 {
-    public static function query($condition = [])
+    public static function query($condition = []): base\modelObjFinder
     {
         return m('wx_app')->where(We7::uniacid([]))->where($condition);
     }
@@ -37,7 +41,7 @@ class WxApp
         return self::query($condition)->findOne();
     }
 
-    public static function create($data)
+    public static function create($data = [])
     {
         if (empty($data['uniacid'])) {
             $data['uniacid'] = We7::uniacid();

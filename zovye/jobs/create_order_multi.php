@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\job\createOrderMulti;
 
@@ -36,7 +40,7 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
     } catch (ExceptionNeedsRefund $e) {
         $device = $e->getDevice();
         if ($device) {
-            refund($order_no, $e->getNum(), $device, $e->getMessage());
+            refund($order_no, $device, $e->getMessage());
         }
     } catch (ZovyeException $e) {
         $device = $e->getDevice();
@@ -85,7 +89,7 @@ function process($order_no)
         ExceptionNeedsRefund::throwWith($device, '找不到指定的用户！');
     }
 
-    if(!$user->acquireLocker(User::ORDER_LOCKER)) {
+    if (!$user->acquireLocker(User::ORDER_LOCKER)) {
         throw new Exception('用户无法锁定！');
     }
 
@@ -94,6 +98,12 @@ function process($order_no)
     $delay = intval(settings('device.lockRetryDelay', 1));
 
     if (!$device->lockAcquire($retries, $delay)) {
+        if (settings('order.waitQueue.enabled', false)) {
+            if (!Job::createOrder($order_no, $device)) {
+                throw new Exception('启动排队任务失败！');
+            }
+            return true;
+        }
         ExceptionNeedsRefund::throwWith($device, '设备被占用！');
     }
 
@@ -112,15 +122,12 @@ function process($order_no)
     });
 
     if (is_error($orderResult)) {
-
         Util::logToFile('order_create_multi', [
             'msg' => '创建订单失败！',
             'orderNO' => $order_no,
             'error' => $orderResult,
         ]);
-
         ExceptionNeedsRefund::throwWith($device, $orderResult['message']);
-
     } else {
         /** @var orderModelObj $order */
         $order = $orderResult;
@@ -132,43 +139,43 @@ function process($order_no)
             'order' => $order,
         ]);
 
-        $total = $pay_log->getTotal();
+        $fail = 0;
         $success = 0;
+        $is_pull_result_updated = false;
 
-        for ($i = 0; $i < $total; $i++) {
+        $level = $pay_log->getData('level');
+        $goods_list = $pay_log->getGoodsList();
 
-            $result = pullGoods($order, $device, $user, $pay_log);
-
-            if (is_error($result)) {
-                $order->setResultCode($result['errno']);
-            } else {
-                $order->setResultCode(0);
-            }
-
-            $order->setExtraData('pull.result', $result);
-            $order->save();
-
-            if (is_error($result)) {
-                Util::logToFile('order_create_multi', [
-                    'orderNO' => $order_no,
-                    'error' => $result,
-                ]);
-            } else {
-                $success++;
+        foreach ($goods_list as $goods) {
+            for ($i = 0; $i < $goods['num']; $i++) {
+                $result = pullGoods($order, $device, $user, $level, $goods);
+                if (is_error($result) || !$is_pull_result_updated) {
+                    $order->setResultCode($result['errno']);
+                    $order->setExtraData('pull.result', $result);
+                    if ($order->save()) {
+                        $is_pull_result_updated = true;
+                    }
+                }
+                if (is_error($result)) {
+                    Util::logToFile('order_create_multi', [
+                        'orderNO' => $order_no,
+                        'error' => $result,
+                    ]);
+                    $fail++;
+                } else {
+                    $success++;
+                }
             }
         }
 
         if (empty($success)) {
-
             ExceptionNeedsRefund::throwWith($device, '出货失败！');
-
-        } else if ($success < $total) {
-
+        } elseif ($fail > 0) {
             $order->setExtraData('pull.result', err('部分商品出货失败！'));
             $order->save();
 
-            ExceptionNeedsRefund::throwWithN($device, $total - $success, '部分商品出货失败！');
-
+            //-1 表示失败的商品退款
+            ExceptionNeedsRefund::throwWithN($device, -1,'部分商品出货失败！');
         }
 
         $order->setExtraData('pull.result', ['message' => '出货完成！']);
@@ -188,22 +195,17 @@ function process($order_no)
  */
 function createOrder(string $order_no, deviceModelObj $device, userModelObj $user, pay_logsModelObj $pay_log): orderModelObj
 {
-    $goods_data = $pay_log->getGoods();
-
     $order_data = [
         'src' => intval($pay_log->getData('src', Order::PAY)),
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
         'agent_id' => $device->getAgentId(),
         'device_id' => $device->getId(),
-        'name' => $goods_data['name'],
-        'goods_id' => $goods_data['id'],
         'num' => $pay_log->getTotal(),
         'price' => $pay_log->getPrice(),
         'balance' => 0,
         'ip' => $pay_log->getData('orderData.ip'),
         'extra' => [
-            'goods' => $goods_data,
             'discount' => [
                 'total' => $pay_log->getDiscount(),
             ],
@@ -214,7 +216,26 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
             ],
             'user' => $user->profile(),
         ],
+        'result_code' => 0,
     ];
+
+    if ($pay_log->isGoods()) {
+
+        $goods_data = $pay_log->getGoods();
+        $order_data['name'] = $goods_data['name'];
+        $order_data['goods_id'] = $goods_data['id'];
+        $order_data['extra']['goods'] = $goods_data;
+
+    } elseif ($pay_log->isPackage()) {
+
+        $package_data = $pay_log->getPackage();
+        $order_data['name'] = $package_data['name'];
+        $order_data['goods_id'] = 0; //使用 goods_id=0 表示该订单的商品是商品套餐
+        $order_data['extra']['package'] = $package_data;
+
+    } else {
+        throw new Exception('找不到商品或者套餐信息！');
+    }
 
     $query_result = $pay_log->getQueryResult();
     if (empty($query_result)) {
@@ -257,7 +278,6 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
         'device' => $device,
         'user' => $user,
         'order' => $order,
-
     ]);
 
     //保存在事件处理中存入订单的数据
@@ -275,16 +295,16 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
  * @param orderModelObj $order
  * @param deviceModelObj $device
  * @param userModelObj $user
- * @param pay_logsModelObj $pay_log
+ * @param $level
+ * @param $data
  * @return array
- * @throws Exception
  */
-function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, pay_logsModelObj $pay_log): array
+function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, $level, $data): array
 {
     //todo 处理优惠券
     //$voucher = $pay_log->getVoucher();
 
-    $goods = $device->getGoods($pay_log->getGoodsId());
+    $goods = $device->getGoods($data['goods_id']);
     if (empty($goods)) {
         return err('找不到对应的商品！');
     }
@@ -307,6 +327,7 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
     $pull_data['channel'] = $mcb_channel;
 
     $result = $device->pull($pull_data);
+
     //v1版本新版本返回数据包含在json的data下
     if (is_error($result)) {
         $device->setError($result['errno'], $result['message']);
@@ -325,6 +346,7 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         }
         $locker->unlock();
     }
+
     $device->save();
 
     $log_data = [
@@ -332,22 +354,25 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         'result' => $result,
         'user' => $user->profile(),
         'goods' => $goods,
+        'price' => $data['price'],
         'voucher' => isset($voucher) ? ['id' => $voucher->getId()] : [],
     ];
 
-    $device->goodsLog($pay_log->getData('level'), $log_data);
+    $device->goodsLog($level, $log_data);
 
-    $device->updateRemain();
+    if (!is_error($result)) {
+        $device->updateRemain();
+    }
 
     return $result;
 }
 
 
-function refund(string $order_no, int $num, deviceModelObj $device, string $reason)
+function refund(string $order_no, deviceModelObj $device, string $reason)
 {
     $need = Helper::NeedAutoRefund($device);
     if ($need) {
-        $result = Job::refund($order_no, $reason, $num);
+        $result = Job::refund($order_no, $reason, -1);
         if (empty($result) || is_error($result)) {
             Util::logToFile('order_create_multi', [
                 'orderNO' => $order_no,

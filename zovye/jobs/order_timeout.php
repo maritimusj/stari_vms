@@ -9,7 +9,6 @@ namespace zovye\job\orderTimeout;
 //订单支付超时处理
 
 use zovye\CtrlServ;
-use zovye\Device;
 use zovye\request;
 use zovye\Job;
 use zovye\model\pay_logsModelObj;

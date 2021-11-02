@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace bluetooth\wx;
 
@@ -113,8 +117,13 @@ class result implements IResult
         return bin2hex($this->data);
     }
 
-    public function getCmd()
+    function getCmd()
     {
         return null;
+    }
+
+    function getPayloadData()
+    {
+
     }
 }

@@ -58,7 +58,7 @@ class RowLocker
     public function unlock($new_val = null): bool
     {
         if ($this->locked) {
-            $val = isset($new_val) ? $new_val : $this->condition[$this->seg];
+            $val = $new_val ?? $this->condition[$this->seg];
 
             $condition = $this->condition;
             $condition[$this->seg] = $this->lock_guid;

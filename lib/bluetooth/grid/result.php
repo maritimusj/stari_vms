@@ -1,11 +1,14 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace bluetooth\grid;
 
 use zovye\Contract\bluetooth\IResult;
 use zovye\Device;
 use zovye\We7;
-use zovye\Util;
 
 class result implements IResult
 {
@@ -83,7 +86,7 @@ class result implements IResult
         $err = $this->getCode();
         if ($err > 0) {
             $msg = self::$err_msg[$err];
-            return isset($msg) ? $msg : '未知错误';
+            return $msg ?? '未知错误';
         }
         return '';
     }
@@ -137,6 +140,16 @@ class result implements IResult
         return null;
     }
 
+    function isReady()
+    {
+        return $this->isAuthSuccess();
+    }
+
+    public function getBatteryValue()
+    {
+        return -1;
+    }
+
     function getCmd()
     {
         if ($this->isResponse()) {
@@ -146,13 +159,7 @@ class result implements IResult
         return null;
     }
 
-    function isReady()
+    function getPayloadData()
     {
-        return $this->isAuthSuccess();
-    }
-
-    public function getBatteryValue()
-    {
-        return -1;
     }
 }

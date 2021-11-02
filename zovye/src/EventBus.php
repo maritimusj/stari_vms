@@ -12,9 +12,7 @@ use ReflectionMethod;
 
 class EventBus
 {
-    static $events_data = [
-
-    ];
+    static $events_data = [];
 
     /**
      * 初始化事件处理器
@@ -81,7 +79,7 @@ class EventBus
 
         if ($type && $event) {
             $method_name = 'on' . ucfirst($type) . ucfirst($event);
-            $handlers = getArray(self::$events_data, "{$type}.{$method_name}");
+            $handlers = getArray(self::$events_data, "$type.$method_name");
             if ($handlers && is_array($handlers)) {
                 foreach ($handlers as $clazz) {
                     self::handle($clazz, $method_name, $params);
@@ -121,10 +119,6 @@ class EventBus
      */
     protected static function match(array $params, ReflectionClass $class)
     {
-        if ($class == null) {
-            return null;
-        }
-        
         foreach ($params as $entry) {
             if (is_object($entry) && $class->name == get_class($entry)) {
                 return $entry;
@@ -138,7 +132,7 @@ class EventBus
         }
 
         foreach ($params as $entry) {
-            if (is_object($entry) && $class->isInterface() && ($entry instanceof $class->name)) {
+            if ($class->isInterface() && ($entry instanceof $class->name)) {
                 return $entry;
             }
         }

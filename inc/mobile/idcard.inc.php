@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -178,5 +182,4 @@ if ($op == 'default') {
     $user->setIDCardVerified($hash);
 
     JSON::success('认证成功！');
-
 }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
+
 namespace zovye;
 
 use RuntimeException;
@@ -30,7 +35,10 @@ if ($op == 'list') {
         $device = Device::get($device_id);
         if (empty($device)) {
             JSON::fail('找不到这个设备！');
-        }        
+        }
+        if ($device->isBlueToothDevice()) {
+            JSON::fail('暂时不支持蓝牙设备创建套餐！');
+        }
     }
 
     $result = Util::transactionDo(function() use ($device_id) {

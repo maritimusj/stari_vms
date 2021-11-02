@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -164,6 +166,7 @@ class MeiPaAccount
             'nickname' => $profile['nickname'],
             'headimgurl' => empty($profile['avatar']) ? $profile['headimgurl'] : $profile['avatar'],
             'sex' => $profile['sex'],
+            'country' => $profile['country'],
             'province' => $profile['province'],
             'city' => $profile['city'],
             'carry_data' => $device->getShadowId(),

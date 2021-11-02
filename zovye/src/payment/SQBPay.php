@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\payment;
 
@@ -130,6 +134,17 @@ class SQBPay implements IPay
             const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
             const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
             $.get("{$order_api_url}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
+              zovye_fn.pay(res).catch(function(msg) {
+                  reject(msg);
+              });
+          });
+        }).catch((e)=>{
+            console.log(e);
+        });
+    }
+    zovye_fn.package_pay = function(packageID) {
+        return new Promise(function(resolve, reject) {
+            $.get("{$order_api_url}", {op: "create", packageID: packageID}).then(function(res) {
               zovye_fn.pay(res).catch(function(msg) {
                   reject(msg);
               });

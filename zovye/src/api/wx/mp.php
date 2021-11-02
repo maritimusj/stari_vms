@@ -1,28 +1,31 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\api\wx;
 
-
 use Exception;
-use zovye\Account;
-use zovye\model\agentModelObj;
-use zovye\model\accountModelObj;
 use zovye\App;
-use zovye\Device;
-use zovye\Media;
-use zovye\model\device_groupsModelObj;
-use zovye\request;
-use zovye\Schema;
-use zovye\State;
-use zovye\Util;
 use zovye\We7;
+use zovye\Util;
+use zovye\Media;
+use zovye\State;
+use zovye\Device;
+use zovye\DouYin;
+use zovye\Schema;
+use zovye\Account;
+use zovye\request;
 use zovye\WxPlatform;
 use function zovye\err;
 use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
+use zovye\model\agentModelObj;
 use function zovye\toCamelCase;
+use zovye\model\accountModelObj;
+use zovye\model\device_groupsModelObj;
 
 class mp
 {
@@ -56,24 +59,28 @@ class mp
     {
         $data = [
             'uid' => $account->getUid(),
-            'state' => $account->isAuth() || $account->isSpecial() ? intval($account->getState()) : $account->getState() != Account::BANNED,
+            'state' => $account->isAuth() || $account->isSpecial() ? $account->getState() : $account->getState() != Account::BANNED,
             'name' => $account->getName(),
             'title' => $account->getTitle(),
             'descr' => $account->getDescription(),
             'groupname' => $account->getGroupName(),
             'clr' => $account->getClr(),
             'scname' => $account->getScname(),
-            'count' => intval($account->getCount()),
-            'total' => intval($account->getTotal()),
+            'count' => $account->getCount(),
+            'total' => $account->getTotal(),
             'img' => Util::toMedia($account->getImg()),
             'url' => $account->getUrl(),
-            'orderno' => intval($account->getOrderNo()),
-            'orderlimits' => intval($account->getOrderLimits()),
+            'orderno' => $account->getOrderNo(),
+            'orderlimits' => $account->getOrderLimits(),
         ];
 
         if ($account->isVideo()) {
             $data['media'] = Util::toMedia($account->getMedia());
-            $data['duration'] = intval($account->getDuration());
+            $data['duration'] = $account->getDuration();
+        } elseif ($account->isDouyin()) {
+            $config = $account->get('config', []);
+            $data['url'] = $config['url'];
+            $data['openid'] = $config['openid'];
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }
@@ -181,7 +188,7 @@ class mp
             return error(State::ERROR, '没有权限上传文件，请联系管理员！');
         }
 
-        $media = isset($_FILES['pic']) ? $_FILES['pic'] : $_FILES['video'];
+        $media = $_FILES['pic'] ?? $_FILES['video'];
         $type = isset($_FILES['pic']) ? Media::IMAGE : Media::VIDEO;
 
         if ($media) {
@@ -286,7 +293,7 @@ class mp
                         return ['msg' => '特殊吸粉或者授权接入的公众号无法禁用！'];
                     }
                     if ($account->isBanned()) {
-                        if ($account->isSpecial() || $account->isAuth() || $account->isVideo()) {
+                        if ($account->isSpecial() || $account->isAuth() || $account->isVideo() || $account->isDouyin()) {
                             $account->setState($account->getType());
                         } else {
                             $account->setState(Account::NORMAL);
@@ -393,6 +400,8 @@ class mp
             if (empty($sha1val) || empty($url) || sha1(App::uid() . CLIENT_IP . $url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的视频文件！');
             }
+        } elseif (request::has('douyinUrl')) {
+            $type = Account::DOUYIN;
         } else {
             return error(State::ERROR, '请指定正确的文件网址！');
         }
@@ -408,14 +417,31 @@ class mp
         $limits = [];
         if (request::str('sex') == 'male') {
             $limits['male'] = 1;
+            $limits['female'] = 0;
+            $limits['unknown_sex'] = 0;
         } elseif (request::str('sex') == 'female') {
+            $limits['male'] = 0;
             $limits['female'] = 1;
+            $limits['unknown_sex'] = 0;
+        } else {
+            $limits['male'] = 1;
+            $limits['female'] = 1;
+            $limits['unknown_sex'] = 1;
         }
 
         if (request::str('os') == 'ios') {
             $limits['ios'] = 1;
+            $limits['android'] = 0;
         } elseif (request::str('os') == 'android') {
+            $limits['ios'] = 0;
             $limits['android'] = 1;
+        } else {
+            $limits['ios'] = 1;
+            $limits['android'] = 1;
+        }
+
+        if ($type == Account::DOUYIN) {
+            $data['total'] = 1;
         }
 
         $data['order_limits'] = request::int('orderlimits');
@@ -460,6 +486,13 @@ class mp
                     'video' => [
                         'duration' => request::int('duration', 1),
                     ]
+                ]);
+            } elseif ($account->isDouyin()) {
+                $openid = $account->settings('config.openid', '');
+                $account->set('config', [
+                    'type' => Account::DOUYIN,
+                    'url' => request::trim('douyinUrl'),
+                    'openid' => $openid,
                 ]);
             }
             return ['msg' => '保存成功！'];
@@ -527,7 +560,7 @@ class mp
         common::checkCurrentUserPrivileges('F_xf');
 
         $url = WxPlatform::getPreAuthUrl([
-            'agent' => intval($user->getId()),
+            'agent' => $user->getId(),
         ]);
 
         if (empty($url)) {
@@ -535,5 +568,25 @@ class mp
         }
 
         return ['url' => $url];
+    }
+
+    public static function getDouyinAuthQRCode(): array
+    {
+        $account_uid = request::trim('uid');
+        $url = Util::murl('douyin', [
+            'op' => 'get_openid',
+            'uid' => $account_uid,
+        ]);
+     
+        $result = Util::createQrcodeFile("douyin_$account_uid", DouYin::redirectToAuthorizeUrl($url, true));
+    
+        if (is_error($result)) {
+            return err('创建二维码文件失败！');
+        }
+    
+        return [
+            'uid' => $account_uid,
+            'qrcode_url' => Util::toMedia($result),
+        ];
     }
 }

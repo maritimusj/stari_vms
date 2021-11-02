@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\payment;
 
@@ -187,12 +191,28 @@ class LCSWPay implements IPay
             });
         });
     }
-
     zovye_fn.goods_wxpay = function(params, successFN, failFN) {
       return new Promise(function(resolve, reject) {
         const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
         const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
           $.get("{$params['orderAPIURL']}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
+              zovye_fn.pay(res).then(function(orderNO, msg) {
+                  if (typeof successFN !== 'function' || !successFN(orderNO)) {
+                    zovye_fn.redirectToGetPayResultPage(orderNO, msg);
+                  }
+                  resolve(orderNO, msg);
+              }).catch(function(msg) {
+                  if (typeof failFN !== 'function' || !failFN(msg)) {
+                    zovye_fn.redirectToPayFailedPage(msg);
+                  }
+                  reject(msg);
+              });
+          });  
+      });
+    }
+    zovye_fn.package_pay = function(packageID, successFN, failFN) {
+      return new Promise(function(resolve, reject) {
+          $.get("{$params['orderAPIURL']}", {op: "create", packageID: packageID}).then(function(res) {
               zovye_fn.pay(res).then(function(orderNO, msg) {
                   if (typeof successFN !== 'function' || !successFN(orderNO)) {
                     zovye_fn.redirectToGetPayResultPage(orderNO, msg);

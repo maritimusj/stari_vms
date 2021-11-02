@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20210703001');}
+{php \zovye\url(true, 'static/css/common.css?v=20210703002');}
 <style>
     #devicelist .device-qrcode {
         position: relative;
@@ -53,7 +53,7 @@
         color:green;
     }
     #devicelist td.status {
-        transition: all 1s;       
+        transition: all 1s;
     }
     #devicelist .app {
         width: 2em;
@@ -137,6 +137,9 @@
         align-content: center;
         justify-content: center;
         align-items: center;
+        width: 45px;
+        height: 45px;
+        margin: 0 auto;
     }
     #devicelist .devicename {
         cursor: default
@@ -151,6 +154,12 @@
     }
     #devicelist .first-tag {
         position: relative;
+    }
+    #tagslist {
+        display: flex;
+        z-index: 99;
+        justify-content: flex-start;
+        flex-wrap: wrap;
     }
     #devicelist .tagslist {
         position: absolute;
@@ -670,7 +679,7 @@
                                     </template>                                    
                                     <template>
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量?</a></li>
+                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量</a></li>
                                         <li role="separator" class="divider"></li>
                                         
                                         <li v-for="(lane, index) in o.cargo_lanes">
@@ -682,13 +691,13 @@
                                     <li role="separator" class="divider"></li>
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li v-if="o.appId"><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新!?</a></li>
-                                    <li class="disabled" v-else><a href="#"><i class="fa fa-cloud-download fa-fw disabled"></i> 推送版本更新!?</a></li>
+                                    <li v-if="o.appId"><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>
+                                    <li class="disabled" v-else><a href="#"><i class="fa fa-cloud-download fa-fw disabled"></i> 推送版本更新</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已注册的AppId?</a></li>
-                                    <li><a href="#" data-op="deviceRemove"><i class="fa fa-trash fa-fw"></i> 删除?</a></li>
+                                    <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已绑定的AppID</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="#" data-op="deviceRevertPrompt"><i class="fa fa-plug fa-fw"></i> 重置设备!?</a></li>
+                                    <li><a href="#" data-op="deviceRevertPrompt"><i class="fa fa-plug fa-fw"></i> 重置设备</a></li>
+                                    <li><a href="#" data-op="deviceRemove"><i class="fa fa-trash fa-fw"></i> 删除</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -724,6 +733,7 @@
         upgradeApiUrl: "{php echo $this->createWebUrl('upgrade');}",
         orderApiUrl: "{php echo $this->createWebUrl('order');}",
         deviceDetailUrl: '{php echo $this->createWebUrl("device", array("op"=>"detail", "id" => "__id__"));}',
+        page: {php echo intval($page);}
     }
     const current = {
         agent: JSON.parse(decodeURIComponent('{php echo urlencode(json_encode($s_agent ?: []))}')),
@@ -732,5 +742,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625007"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625009"></script>
 {template 'common/footer'}

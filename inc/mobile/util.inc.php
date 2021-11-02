@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -27,7 +26,7 @@ if ($op == 'default') {
 
     /** @var deviceModelObj $entry */
     foreach ($query->findAll() as $entry) {
-        $location = $entry->settings('extra.location');
+        $location = $entry->settings('extra.location.tencent', $entry->settings('extra.location'));
         if ($location && $location['lat'] && $location['lng']) {
             unset($location['area'], $location['address']);
             $result[] = [
@@ -263,5 +262,12 @@ if ($op == 'default') {
         ]);
 
         Util::resultAlert($e->getMessage(), 'error');
+    }
+} elseif ($op == 'profile') {
+    $user = Util::getCurrentUser();
+    if ($user) {
+        if (request::has('sex')) {
+            $user->updateSettings('fansData.sex', request::int('sex'));
+        }
     }
 }

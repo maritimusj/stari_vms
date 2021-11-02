@@ -79,7 +79,7 @@ class Advertising extends State
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return modelObjFinder
      */
     public static function query($condition = []): modelObjFinder
@@ -103,7 +103,7 @@ class Advertising extends State
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @param null $type
      * @return advertisingModelObj|null
      */
@@ -153,7 +153,7 @@ class Advertising extends State
 
     public static function setAdvsLastUpdate($type, $ts = null): bool
     {
-        $ts = isset($ts) ? $ts : time();
+        $ts = $ts ?? time();
         return updateSettings("advs.version.type{$type}", $ts);
     }
 
@@ -176,7 +176,7 @@ class Advertising extends State
     public static function format(advertisingModelObj $adv): array
     {
         return [
-            'id' => intval($adv->getId()),
+            'id' => $adv->getId(),
             'title' => strval($adv->getTitle()),
             'type' => intval($adv->getType()),
             'state' => intval($adv->getState()),

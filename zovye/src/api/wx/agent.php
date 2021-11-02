@@ -1,12 +1,18 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\api\wx;
 
 use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
+use zovye\Cache;
 use zovye\Config;
 use zovye\Inventory;
 use zovye\model\agent_msgModelObj;
@@ -45,9 +51,9 @@ class agent
     /**
      * 获取当前登录的代理商身份，如果当前登录用户是合伙人，则返回合伙人对应的代理商身份
      * @param null $token
-     * @return mixed
+     * @return agentModelObj|null
      */
-    public static function getAgent($token = null)
+    public static function getAgent($token = null): ?agentModelObj
     {
         $user = common::getAgent($token);
         if ($user && $user->isAgent()) {
@@ -195,6 +201,14 @@ class agent
         }
 
         return $result;
+    }
+
+    public static function pluginsList(): array
+    {
+        return [
+            'wxplatform' => App::isWxPlatformEnabled(),
+            'douyin' => App::isDouyinEnabled(),
+        ];
     }
 
     /**
@@ -435,6 +449,17 @@ class agent
         }
 
         $query = Device::keeper($keeper);
+
+        if (request::has('keyword')) {
+            $keyword = request::trim('keyword');
+            if ($keyword) {
+                $query->whereOr([
+                    'name LIKE' => "%{$keyword}%",
+                    'imei LIKE' => "%{$keyword}%",
+                ]);
+            }
+        }
+
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
 
@@ -924,7 +949,7 @@ class agent
         if ($total > 0) {
             /** @var deviceModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
-                $address = $entry->settings('extra.location.tencent.address', $entry->settings('extra.location')) ?: '<地址未登记>';
+                $address = $entry->settings('extra.location.tencent.address', $entry->settings('extra.location.address')) ?: '<地址未登记>';
                 $result['list'][] = [
                     'id' => $entry->getImei(),
                     'name' => $entry->getName(),
@@ -1075,7 +1100,7 @@ class agent
             ];
 
             $pay_result = $order->getExtraData('payResult');
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : '');
+            $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? '');
 
             $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
 
@@ -1085,6 +1110,25 @@ class agent
                 $data['name'] = $x->getNickname();
                 $data['avatar'] = $x->getAvatar();
             }
+
+
+            $pull_result = $order->getExtraData('pull.result', []);
+            if (is_error($pull_result)) {
+                $data['status'] = [
+                    'title' => $pull_result['message'],
+                    'clr' => '#F56C6C',
+                ];
+            } else {
+                $data['status'] = [
+                    'title' => '出货成功',
+                    'clr' => '#67C23A',
+                ];
+            }
+
+            if ($data['refund']) {
+                $data['status']['title'] .= '（已退款）';
+            }
+
             $result['list'][] = $data;
         }
 
@@ -1195,7 +1239,7 @@ class agent
             'total' => $total,
             'sup_guid' => "{$superior_guid}",
             'list' => [],
-            'remove' => $user->settings('agentData.misc.power') ? true : false
+            'remove' => (bool)$user->settings('agentData.misc.power')
         ];
 
         if ($total > 0) {
@@ -1206,7 +1250,7 @@ class agent
             foreach ($query->findAll() as $entry) {
                 $agent = $entry->agent();
 
-                if ($agent && $agent instanceof agentModelObj) {
+                if ($agent instanceof agentModelObj) {
                     $agent_data = $agent->getAgentData();
 
                     $data = [
@@ -1226,7 +1270,7 @@ class agent
                             $gsp['rel'][$level] = number_format($val / 100, 2);
                         }
                         $data['gsp_rel'] = $gsp['rel'];
-                        $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
+                        $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
                     }
 
                     $result['list'][] = $data;
@@ -1286,7 +1330,7 @@ class agent
             $_reg = '/.+:(.+):.+/';
             foreach ($s_res as $val) {
                 $s_data = unserialize($val->getData());
-                $s_agent = isset($s_data['agent']) ? $s_data['agent'] : '';
+                $s_agent = $s_data['agent'] ?? '';
                 if ($s_agent == $agent->getId()) {
                     $str = $val->getName();
                     preg_match($_reg, $str, $mat);
@@ -1410,7 +1454,7 @@ class agent
                 $result = [
                     'total' => $total,
                     'list' => [],
-                    'remove' => $agent->settings('agentData.misc.power') ? true : false
+                    'remove' => (bool)$agent->settings('agentData.misc.power')
                 ];
 
                 if ($total > 0) {
@@ -1419,7 +1463,7 @@ class agent
                     foreach ($query->findAll() as $entry) {
                         $agent = $entry->agent();
 
-                        if ($agent && $agent instanceof agentModelObj) {
+                        if ($agent instanceof agentModelObj) {
                             $agent_data = $agent->getAgentData();
                             if ($keyword) {
                                 $h_key = false;
@@ -1453,7 +1497,7 @@ class agent
                                     foreach ((array)$gsp['rel'] as $level => $val) {
                                         $gsp['rel'][$level] = number_format($val / 100, 2);
                                     }
-                                    $data['gsp_rel_mode_type'] = isset($gsp['mode_type']) ? $gsp['mode_type'] : 'percent';
+                                    $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
                                 }
 
                                 $result['list'][] = $data;
@@ -1553,7 +1597,7 @@ class agent
             return error(State::ERROR, '系统错误！');
         }
 
-        $mobile = isset($res['purePhoneNumber']) ? $res['purePhoneNumber'] : $res['phoneNumber'];
+        $mobile = $res['purePhoneNumber'] ?? $res['phoneNumber'];
         $session_key = $res['session_key'];
 
         if (empty($mobile)) {
@@ -1731,7 +1775,7 @@ class agent
 
     public static function aliAuthCode()
     {
-        $auth_code = request('authcode');
+        $auth_code = request::str('authcode');
 
         $aop = new AopClient();
         $aop->appId = settings('ali.appid');
@@ -1886,12 +1930,10 @@ class agent
     {
         $user = common::getAgent();
 
-        list($stats, $data) = Util::cachedCall(10, function () use ($user) {
-
-            $agent_id = $user->getAgentId();
+        return Util::cachedCall(10, function () use ($user) {
 
             $condition = [];
-            $condition['agent_id'] = $agent_id;
+            $condition['agent_id'] = $user->getAgentId();
 
             $device_stat = [
                 'all' => 0,
@@ -1905,67 +1947,85 @@ class agent
             $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
             $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
 
-            $data = [
-                'all' => [
-                    'n' => 0, //全部交易数量
-                ],
-                'today' => [
-                    'n' => 0, //今日交易数量,
-                ],
-                'yesterday' => [
-                    'n' => 0, //昨日交易数量,
-                ],
-                'last7days' => [
-                    'n' => 0, //近7日交易数量
-                ],
-                'month' => [
-                    'n' => 0, //本月交易数量
-                ],
-                'lastmonth' => [
-                    'n' => 0, //上月交易数量,
-                ],
+
+            $data['all']['n'] = 0;
+            $data['today']['n'] = 0;
+            $data['yesterday']['n'] = 0;
+            $data['month']['n'] = 0;
+
+            $uid_data = [
+                'api' => 'homepage',
+                'name' => 'order_stats',
+                'agent' => $user->getAgentId(),
             ];
 
-            $date = new DateTime();
-            $date->modify('today');
-            $today = $date->format('Y-m-d');
-            $today_timestamp = $date->getTimestamp();
-            $date->modify('yesterday');
-            $yesterday_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('tomorrow');
-            $tomorrow_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('+7 days');
-            $last7days_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('first day of last month');
-            $fl_mon_timestamp = $date->getTimestamp();
-            $date->modify($today);
-            $date->modify('first day of this month');
-            $ft_mon_timestamp = $date->getTimestamp();
+            $countFN = function (DateTimeInterface $begin = null, DateTimeInterface $end = null) use ($user) {
+                $cond = [
+                    'agent_id' => $user->getAgentId(),
+                ];
+                if ($begin) {
+                    $cond['createtime >='] = $begin->getTimestamp();
+                }
+                if ($end) {
+                    $cond['createtime <'] = $end->getTimestamp();
+                }
+                return Order::query($cond)->count();
+            };
 
-            $data['all']['n'] = Order::query($condition)->count();
-            $data['today']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $tomorrow_timestamp)
-                ->count();
-            $data['yesterday']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $yesterday_timestamp . ' and createtime < ' . $today_timestamp)
-                ->count();
-            $data['last7days']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $today_timestamp . ' and createtime < ' . $last7days_timestamp)
-                ->count();
-            $data['month']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $ft_mon_timestamp . ' and createtime < ' . $tomorrow_timestamp)
-                ->count();
-            $data['lastmonth']['n'] = Order::query($condition)
-                ->where('createtime >= ' . $fl_mon_timestamp . ' and createtime < ' . $ft_mon_timestamp)
-                ->count();
+            $today = new DateTime('today');
+            $uid_data['day'] = $today->format('Y-m-d');
+            $data['today']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+                return $countFN($today);
+            }, Cache::ResultExpiredAfter(10));
 
-            return [$device_stat, $data];
+            $yesterday = new DateTime('yesterday');
+            $uid_data['day'] = $yesterday->format('Y-m-d');
+            $data['yesterday']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today, $yesterday) {
+                return $countFN($yesterday, $today);
+            });
+
+            //统计本月订单数量
+            $data['month']['n'] = $data['today']['n'];
+
+            $begin = new DateTimeImmutable('today');
+            $current_month_label = $today->format('Y-m-d');
+
+            for ($i = 0; $i < 31; $i++) {
+
+                $end = $begin->modify('-1 day');
+
+                $label = $end->format('Y-m-d');
+                if ($label != $current_month_label) {
+                    break;
+                }
+
+                $uid_data['day'] = $label;
+
+                $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $begin, $end) {
+                    return $countFN($end, $begin);
+                });
+                if (is_error($res)) {
+                    return $res;
+                }
+
+                $data['month']['n'] += $res;
+            }
+
+            //全部统计
+            $uid_data['day'] = 'all';
+            $data['all']['n'] = $data['today']['n'];
+
+            $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+                return $countFN(null, $today);
+            }, Cache::ResultExpiredAt('tomorrow'));
+
+            if (is_error($res)) {
+                return $res;
+            }
+            $data['all']['n'] += $res;
+
+            return ['device_stat' => $device_stat, 'data' => $data];
         }, $user->getId());
-
-        return ['device_stat' => $stats, 'data' => $data];
     }
 
 

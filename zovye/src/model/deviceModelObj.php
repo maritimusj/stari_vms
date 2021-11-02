@@ -39,7 +39,6 @@ use zovye\Advertising;
 use zovye\DeviceTypes;
 use zovye\base\modelObj;
 use function zovye\error;
-use bluetooth\wx\protocol;
 use DateTime;
 use DateTimeImmutable;
 
@@ -183,7 +182,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return bool
      */
-    public function goodsLog($level, $data = array()): bool
+    public function goodsLog($level, array $data = []): bool
     {
         return $this->log($level, $this->getImei(), $data);
     }
@@ -222,7 +221,7 @@ class deviceModelObj extends modelObj
      */
     public function isVDevice(): bool
     {
-        return App::isVDeviceSupported() && (boolval($this->settings('device.is_vd')) || $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
+        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
     }
 
     /**
@@ -361,7 +360,7 @@ class deviceModelObj extends modelObj
 
         $this->setCapacity($this->capacity);
 
-        return intval($this->capacity);
+        return $this->capacity;
     }
 
     public function setCapacity($capacity): bool
@@ -374,7 +373,7 @@ class deviceModelObj extends modelObj
      * @param bool $raw
      * @return int
      */
-    public function getSig($raw = false): int
+    public function getSig(bool $raw = false): int
     {
         $sig = $this->settings('extra.v0.status.sig');
         if (!isset($sig)) {
@@ -478,7 +477,7 @@ class deviceModelObj extends modelObj
      * @param null $default
      * @return mixed
      */
-    private function getMigratedLanesData($path = '', $default = null)
+    private function getMigratedLanesData(string $path = '', $default = null)
     {
         $data = $this->get('cargo_lanes');
         if (is_array($data)) {
@@ -495,17 +494,17 @@ class deviceModelObj extends modelObj
     {
         $prefix = $this->migrateLanesData();
         if (is_array($num)) {
-            return $this->updateSettings("{$prefix}cargo_lanes.l{$lane}", $num);
+            return $this->updateSettings("{$prefix}cargo_lanes.l$lane", $num);
         }
 
         if (is_numeric($num)) {
-            if (!$this->updateSettings("{$prefix}cargo_lanes.l{$lane}.num", intval($num))) {
+            if (!$this->updateSettings("{$prefix}cargo_lanes.l$lane.num", intval($num))) {
                 return false;
             }
         }
 
         if (is_numeric($price)) {
-            if (!$this->updateSettings("{$prefix}cargo_lanes.l{$lane}.price", intval($price))) {
+            if (!$this->updateSettings("{$prefix}cargo_lanes.l$lane.price", intval($price))) {
                 return false;
             }
         }
@@ -514,7 +513,7 @@ class deviceModelObj extends modelObj
 
     public function getLane($lane): array
     {
-        return (array)$this->getMigratedLanesData("l{$lane}", []);
+        return (array)$this->getMigratedLanesData("l$lane", []);
     }
 
     public function getCargoLanes(): array
@@ -632,7 +631,7 @@ class deviceModelObj extends modelObj
      * @param int $now
      * @return array
      */
-    public function resetPayload(array $data = [], $reason = '', $now = 0): array
+    public function resetPayload(array $data = [], string $reason = '', int $now = 0): array
     {
         static $cache = [];
 
@@ -689,11 +688,14 @@ class deviceModelObj extends modelObj
 
     /**
      * 重置设备锁
-     * @return bool
      */
     public function resetLock(): bool
     {
-        return We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId()]);
+        if (We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId()])) {
+            $this->locked_uid = UNLOCKED;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -717,8 +719,8 @@ class deviceModelObj extends modelObj
                         $condition['count'] = 1;
                         $tag = m('tags')->create($condition);
                     } else {
-                        $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->where("id<>{$this->id}")->count();
-                        $tag->setCount(intval($count) + 1);
+                        $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->where("id<>$this->id")->count();
+                        $tag->setCount($count + 1);
                         $tag->save();
                     }
 
@@ -734,13 +736,13 @@ class deviceModelObj extends modelObj
             $tag = m('tags')->findOne(We7::uniacid(['id' => $id]));
             if ($tag) {
                 $count = Device::query("tags_data REGEXP '<{$tag->getId()}>'")->count();
-                $tag->setCount(intval($count) - 1);
+                $tag->setCount($count - 1);
                 $tag->save();
             }
         }
 
         $data = implode('><', $ids);
-        $this->setTagsData($data ? "<{$data}>" : '');
+        $this->setTagsData($data ? "<$data>" : '');
     }
 
     /**
@@ -748,7 +750,7 @@ class deviceModelObj extends modelObj
      * @param bool $force
      * @return bool
      */
-    public function updateQrcode($force = false): bool
+    public function updateQrcode(bool $force = false): bool
     {
         $need_notify = false;
         if ($this->isBlueToothDevice()) {
@@ -764,7 +766,7 @@ class deviceModelObj extends modelObj
             }
         }
 
-        return $need_notify ? $this->updateAppQrcode() : false;
+        return $need_notify && $this->updateAppQrcode();
     }
 
     /**
@@ -837,7 +839,7 @@ class deviceModelObj extends modelObj
     {
         $url = $this->getUrl();
 
-        $qrcode_file = Util::createQrcodeFile("device.{$this->imei}", $url, function ($filename) {
+        $qrcode_file = Util::createQrcodeFile("device.$this->imei", $url, function ($filename) {
             $this->renderTxt($filename, $this->imei);
         });
 
@@ -855,9 +857,9 @@ class deviceModelObj extends modelObj
 
     /**
      * 获取领货链接
-     * @return string | array
+     * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         $id = $this->isActiveQrcodeEnabled() ? $this->shadow_id : $this->imei;
 
@@ -911,7 +913,7 @@ class deviceModelObj extends modelObj
         $f = stripos($url, '?') !== false ? '&' : '?';
         $ts = microtime(true);
 
-        return $url . "{$f}v={$ts}";
+        return $url . "{$f}v=$ts";
     }
 
     public function getGroup(): ?device_groupsModelObj
@@ -925,7 +927,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return bool
      */
-    public function appNotify($op = 'update', $data = []): bool
+    public function appNotify(string $op = 'update', array $data = []): bool
     {
         if ($this->app_id) {
             return CtrlServ::appNotify($this->app_id, $op, $data);
@@ -957,7 +959,7 @@ class deviceModelObj extends modelObj
         return $this->appNotify('message', [
             'content' => $msg,
             'type' => $type,
-            'style' => isset($style) ? $style : $styles[$type],
+            'style' => $style ?? $styles[$type],
         ]);
     }
 
@@ -967,6 +969,7 @@ class deviceModelObj extends modelObj
      */
     public function isLocked(): bool
     {
+        $this->checkLockerExpired();
         return $this->locked_uid != UNLOCKED;
     }
 
@@ -978,7 +981,7 @@ class deviceModelObj extends modelObj
     public function lock($uid = null): string
     {
         $uid = strval($uid) ?: Util::random(6);
-        $uid = "{$uid}:" . time();
+        $uid = "$uid:" . time();
         $res = We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => $uid], ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]);
         if ($res) {
             $this->locked_uid = $uid;
@@ -1104,7 +1107,7 @@ class deviceModelObj extends modelObj
      * @param bool $str
      * @return string|array
      */
-    public function getTagsAsText($str = true)
+    public function getTagsAsText(bool $str = true)
     {
         $titles = [];
 
@@ -1125,8 +1128,36 @@ class deviceModelObj extends modelObj
         return $str ? implode(',', $titles) : $titles;
     }
 
+    //公众号推广二维码
+    public function getAccountAppQRCode(): string
+    {
+        if (App::useAccountAppQRCode()) {
+            $accounts = $this->getAccounts(Account::AUTH);
+            foreach ($accounts as $account) {
+                $obj = Account::get($account['id']);
+                if (empty($obj) || !$obj->settings('config.appQRCode')) {
+                    continue;
+                }
+
+                $res = Account::updateAuthAccountQRCode($account, [App::uid(6), 'app', $this->getId()], false);
+                if (!is_error($res)) {
+                    return $account['qrcode'];
+                }
+            }
+        }
+
+        return '';
+    }
+
     public function getAccountQRCode(): string
     {
+        //是否分配了屏幕推广的公众号
+        $qrcode = $this->getAccountAppQRCode();
+        if ($qrcode) {
+            return $qrcode;
+        }
+
+        //是否设置了屏幕二维码的公众号
         if (App::useAccountQRCode()) {
             $accounts = $this->getAccounts(Account::AUTH);
             foreach ($accounts as $account) {
@@ -1200,11 +1231,13 @@ class deviceModelObj extends modelObj
             'advs' => $advs,
         ];
 
-        $cfg['qrcode'] = $this->getAccountQRCode();
+        $qrcode = $this->getAccountQRCode();
 
-        if (empty($cfg['qrcode'])) {
-            $cfg['qrcode'] = strval($this->getQrcode());
-            $cfg['qrcode_url'] = strval($this->getUrl());
+        if ($qrcode) {
+            $cfg['qrcode'] = $qrcode;
+        } else {
+            $cfg['qrcode'] = $this->getQrcode();
+            $cfg['qrcode_url'] = $this->getUrl();
         }
 
         //商品库存
@@ -1224,7 +1257,7 @@ class deviceModelObj extends modelObj
      * @param bool $random
      * @return array|null
      */
-    public function getOneAdv($type, $random = false): ?array
+    public function getOneAdv($type, bool $random = false): ?array
     {
         $advs = $this->getAdvs($type);
         if (!isEmptyArray($advs)) {
@@ -1243,13 +1276,13 @@ class deviceModelObj extends modelObj
      * @param bool $ignore_cache
      * @return array
      */
-    public function getAdvs($type, $ignore_cache = false): array
+    public function getAdvs($type, bool $ignore_cache = false): array
     {
         $advs = null;
 
         if ($ignore_cache == false) {
-            if ($this->settings("advsData.type{$type}.version") == Advertising::version($type)) {
-                $advs = $this->settings("advsData.type{$type}.data");
+            if ($this->settings("advsData.type$type.version") == Advertising::version($type)) {
+                $advs = $this->settings("advsData.type$type.data");
             }
         }
 
@@ -1275,7 +1308,7 @@ class deviceModelObj extends modelObj
             }
 
             $this->updateSettings(
-                "advsData.type{$type}",
+                "advsData.type$type",
                 [
                     'version' => Advertising::version($type),
                     'data' => $advs,
@@ -1370,7 +1403,7 @@ class deviceModelObj extends modelObj
      * 设置设备代理商
      * @param agentModelObj|null $agent
      */
-    public function setAgent($agent = null)
+    public function setAgent(agentModelObj $agent = null)
     {
         $agent_id = is_object($agent) ? $agent->getAgentId() : intval($agent);
         $this->setAgentId($agent_id);
@@ -1382,7 +1415,7 @@ class deviceModelObj extends modelObj
      * @param string $day
      * @return int|array
      */
-    public function getDTotal($way = [], $day = 'today')
+    public function getDTotal(array $way = [], string $day = 'today')
     {
         try {
             $v = new DateTime($day);
@@ -1539,11 +1572,11 @@ class deviceModelObj extends modelObj
      */
     public function isAdvsUpdated($type): bool
     {
-        if ($this->settings("advsData.type{$type}.version") != Advertising::version($type)) {
+        if ($this->settings("advsData.type$type.version") != Advertising::version($type)) {
             return true;
         }
 
-        $cachedData = $this->settings("advsData.type{$type}.data", []);
+        $cachedData = $this->settings("advsData.type$type.data", []);
         $advs = $this->getAdvs($type, true);
 
         if (empty($cachedData) && empty($advs)) {
@@ -1598,7 +1631,7 @@ class deviceModelObj extends modelObj
      * @param bool $ignore_cache
      * @return array
      */
-    public function getAssignedAccounts($ignore_cache = false): array
+    public function getAssignedAccounts(bool $ignore_cache = false): array
     {
         $accounts = [];
 
@@ -1639,10 +1672,9 @@ class deviceModelObj extends modelObj
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
                 'mcb' => true,
-                'app' => true,
             ];
         }
-        $res = CtrlServ::v2_query("device/{$this->imei}/online", ['nocache' => $use_cache ? 'false' : 'true']);
+        $res = CtrlServ::v2_query("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
         if ($res['status'] === true) {
             return $res['data'];
         }
@@ -1658,7 +1690,7 @@ class deviceModelObj extends modelObj
     {
         if ($this->app_id) {
             if ($this->imei) {
-                $res = CtrlServ::v2_query("device/{$this->imei}/app/online", ['nocache' => false]);
+                $res = CtrlServ::v2_query("device/$this->imei/app/online", ['nocache' => false]);
                 return $res['status'] === true && $res['data']['app'] === true;
             }
         }
@@ -1738,7 +1770,7 @@ class deviceModelObj extends modelObj
      * @param bool $detail
      * @return array
      */
-    public function getPayload($detail = false): array
+    public function getPayload(bool $detail = false): array
     {
         return Device::getPayload($this, $detail);
     }
@@ -1788,7 +1820,7 @@ class deviceModelObj extends modelObj
         $this->resetShadowId();
         $data = [
             'qr' => str_replace('{imei}', $this->getImei(), DEVICE_FORWARDER_URL),
-            'num' => intval($this->getRemainNum()),
+            'num' => $this->getRemainNum(),
         ];
 
         $txt = $this->settings('extra.txt', []);
@@ -1830,7 +1862,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return bool
      */
-    public function mcbNotify($op = 'params', $code = '', $data = []): bool
+    public function mcbNotify(string $op = 'params', string $code = '', array $data = []): bool
     {
         if ($this->imei) {
             return CtrlServ::mcbNotify($this->imei, $code, $op, $data);
@@ -1844,7 +1876,7 @@ class deviceModelObj extends modelObj
      * @param bool $enable
      * @return bool
      */
-    public function enableActiveQrcode($enable = true): bool
+    public function enableActiveQrcode(bool $enable = true): bool
     {
         return $this->updateSettings('extra.activeQrcode', $enable ? 1 : 0);
     }
@@ -1855,7 +1887,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return void
      */
-    public function updateMcbConfig($code, $data = [])
+    public function updateMcbConfig($code, array $data = [])
     {
         $this->mcbNotify('config', $code, $data);
     }
@@ -1881,7 +1913,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return void
      */
-    public function updateMcbStatus($data = [])
+    public function updateMcbStatus(array $data = [])
     {
         $data['updatetime'] = time();
         $this->updateSettings('extra.v1.status', $data);
@@ -1947,7 +1979,7 @@ class deviceModelObj extends modelObj
      * @param string $month
      * @return int|array
      */
-    public function getMTotal($way = [], $month = 'this month')
+    public function getMTotal(array $way = [], string $month = 'this month')
     {
         $ts = strtotime($month);
         if ($ts <= time()) {
@@ -1958,7 +1990,7 @@ class deviceModelObj extends modelObj
             if ($cache && $cache[$m_label]) {
                 $result = $cache[$m_label];
             } else {
-                $begin = new DateTimeImmutable("first day of {$month}");
+                $begin = new DateTimeImmutable("first day of $month");
                 $end = $begin->modify('+1 month');
 
                 if ($m_label != date('Ym')) {
@@ -1989,6 +2021,20 @@ class deviceModelObj extends modelObj
         return 0;
     }
 
+    protected function checkLockerExpired(): bool
+    {
+        $wait_timeout = intval(settings('device.waitTimeout'));
+        $lock_timeout = intval(settings('device.lockTimeout'));
+
+        if ($lock_timeout > 0) {
+            $locked_time = $this->getLockedTime();
+            if ($locked_time > 0 && time() - $this->getLockedTime() > $wait_timeout + $lock_timeout) {
+                return $this->resetLock();
+            }
+        }
+        return false;
+    }
+
     /**
      * 尝试锁定设备，超过系统设置的超时时长后，自动解锁
      * @param int $retries
@@ -1997,15 +2043,7 @@ class deviceModelObj extends modelObj
      */
     public function lockAcquire(int $retries = 0, int $delay_seconds = 1): bool
     {
-        $wait_timeout = intval(settings('device.waitTimeout'));
-        $lock_timeout = intval(settings('device.lockTimeout'));
-
-        if ($lock_timeout > 0) {
-            $locked_time = $this->getLockedTime();
-            if ($locked_time > 0 && time() - $this->getLockedTime() > $wait_timeout + $lock_timeout) {
-                $this->resetLock();
-            }
-        }
+        $this->checkLockerExpired();
 
         for (; ;) {
             if ((new DeviceLocker($this))->isLocked()) {
@@ -2020,13 +2058,11 @@ class deviceModelObj extends modelObj
 
             sleep($delay_seconds);
         }
-
-        return false;
     }
 
     public function payloadLockAcquire(int $retries = 0, int $delay_seconds = 1): ?lockerModelObj
     {
-        return Locker::try("payload:{$this->getImei()}", $retries, $delay_seconds);
+        return Locker::try("payload:{$this->getImei()}", REQUEST_ID, $retries, $delay_seconds);
     }
 
     /**
@@ -2045,8 +2081,9 @@ class deviceModelObj extends modelObj
 
     /**
      * 出货操作
+     * 蓝牙设备出货操作可能会返回字符串，普通设备则返回成功或error()
      * @param array $options
-     * @return array
+     * @return array|string|null
      */
     public function pull(array $options = [])
     {
@@ -2081,7 +2118,7 @@ class deviceModelObj extends modelObj
             $msg = $protocol->Open($this->getBUID(), $option);
             if ($msg) {
                 Device::createBluetoothCmdLog($this, $msg);
-                $result = $msg->getEncoded(protocol::BASE64);
+                $result = $msg->getEncoded(IBlueToothProtocol::BASE64);
             }
         } else {
             //zovye接口出货
@@ -2101,6 +2138,7 @@ class deviceModelObj extends modelObj
                 $extra['user-agent'] = $_SERVER['HTTP_USER_AGENT'];
             }
             //打开设备，出货
+            /** @var string|array $result */
             $result = $this->open($mcb_channel, $num, $timeout, $extra);
         }
 
@@ -2120,7 +2158,7 @@ class deviceModelObj extends modelObj
      * @param bool $use_cache
      * @return bool
      */
-    public function isMcbOnline($use_cache = true): bool
+    public function isMcbOnline(bool $use_cache = true): bool
     {
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return true;
@@ -2128,7 +2166,7 @@ class deviceModelObj extends modelObj
 
         if ($this->imei) {
             $res = CtrlServ::v2_query(
-                "device/{$this->imei}/mcb/online",
+                "device/$this->imei/mcb/online",
                 [
                     'nocache' => $use_cache == false ? 'true' : 'false',
                 ]
@@ -2163,10 +2201,10 @@ class deviceModelObj extends modelObj
      * @param int $timeout
      * @return array
      */
-    public function open($channel = Device::CHANNEL_DEFAULT, $num = 1, $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT, array $extra = []): array
+    public function open(int $channel = Device::CHANNEL_DEFAULT, int $num = 1, int $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT, array $extra = []): array
     {
         $no_str = Util::random(16, true);
-        $order_no = 'P' . We7::uniacid() . "NO{$no_str}";
+        $order_no = 'P' . We7::uniacid() . "NO$no_str";
 
         $content = http_build_query(
             [
@@ -2178,7 +2216,7 @@ class deviceModelObj extends modelObj
             ]
         );
 
-        return CtrlServ::query("order/{$order_no}", ["nostr" => microtime(true)], $content);
+        return CtrlServ::query("order/$order_no", ["nostr" => microtime(true)], $content);
     }
 
     /**
@@ -2213,7 +2251,7 @@ class deviceModelObj extends modelObj
         if (empty($this->getAppId())) {
             $imei = $this->getImei();
             if ($imei) {
-                $res = CtrlServ::query("device/{$imei}", []);
+                $res = CtrlServ::query("device/$imei", []);
                 if (!is_error($res) && $res['appUID']) {
                     $this->setAppId($res['appUID']);
                     return $this->save();
@@ -2229,7 +2267,7 @@ class deviceModelObj extends modelObj
      * @param string $when
      * @return array
      */
-    public function getRedirectUrl($when = 'success'): array
+    public function getRedirectUrl(string $when = 'success'): array
     {
         $delay = 0;
 
@@ -2249,7 +2287,7 @@ class deviceModelObj extends modelObj
         }
 
         if (empty($url)) {
-            $url = settings("misc.redirect.{$when}.url");
+            $url = settings("misc.redirect.$when.url");
         }
 
         return ['url' => PlaceHolder::url($url, [$this]), 'delay' => intval($delay)];
@@ -2312,7 +2350,7 @@ class deviceModelObj extends modelObj
      * @param bool $detail
      * @return array
      */
-    public function getTypeData($detail = false): array
+    public function getTypeData(bool $detail = false): array
     {
         $type = DeviceTypes::from($this);
         if ($type) {
@@ -2479,7 +2517,7 @@ class deviceModelObj extends modelObj
     protected function getSettingsKey($key): string
     {
         $classname = str_replace('zovye\model', 'lltjs', deviceModelObj::class);
-        return "{$classname}:{$this->getId()}:{$key}";
+        return "$classname:{$this->getId()}:$key";
     }
 
     protected function getSettingsBindClassName(): string
@@ -2522,11 +2560,8 @@ class deviceModelObj extends modelObj
 
     public function isOwnerOrSuperior(userModelObj $user): bool
     {
-        if ($user) {
-            $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-            return Device::isOwner($this, $agent);
-        }
-        return false;
+        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
+        return Device::isOwner($this, $agent);
     }
 
     public function getGoodsByLane($lane): array
@@ -2626,12 +2661,18 @@ class deviceModelObj extends modelObj
 
     protected function isPackageOk(array $data): bool
     {
+        $goods_list = [];
         foreach ($data['list'] as $item) {
-            $payload = $this->getGoods(intval($item['goods_id']));
-            if (empty($payload) || empty($payload['num']) || $payload['num'] < $item['num']) {
+            $goods_list[$item['goods_id']] += $item['num'];
+        }
+
+        foreach ($goods_list as $id => $num) {
+            $payload = $this->getGoods($id);
+            if (empty($payload) || empty($num) || $payload['num'] < $num) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -2640,7 +2681,7 @@ class deviceModelObj extends modelObj
         $result = [];
         $package = Package::findOne(['device_id' => $this->getId(), 'id' => $id]);
         if ($package) {
-            $result = $package->format(true);
+            $result = $package->format(true, false);
             $result['isOk'] = $this->isPackageOk($result);
         }
         return $result;
@@ -2684,7 +2725,7 @@ class deviceModelObj extends modelObj
         foreach ($all as $entry) {
             $result = $entry->getData('result');
             if ($result) {
-                $result_data = isset($result['data']) ? $result['data'] : $result;
+                $result_data = $result['data'] ?? $result;
                 $time_used = intval($result_data['timeUsed']);
                 if ($time_used > 0) {
                     $stats[] = round($time_used / 1000, 2);

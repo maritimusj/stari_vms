@@ -137,6 +137,16 @@ class userModelObj extends modelObj
         return $this->app == User::API;
     }
 
+    public function isThirdAccountUser(): bool
+    {
+        return $this->app == User::THIRD_ACCOUNT;
+    }
+
+    public function isDouYinUser(): bool
+    {
+        return $this->app == User::DouYin;
+    }    
+
     public function profile($detail = true): array
     {
         $data = [
@@ -610,7 +620,7 @@ class userModelObj extends modelObj
      */
     public function acquireLocker($name = ''): ?lockerModelObj
     {
-        return Locker::try("user:{$this->getId()}:{$name}", 6);
+        return Locker::try("user:{$this->getId()}:{$name}", REQUEST_ID, 6);
     }
 
     /**

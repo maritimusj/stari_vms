@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -28,7 +32,7 @@ class BlueToothProtocol
 
     public static function get($protocol): ?IBlueToothProtocol
     {
-        $classname = "\bluetooth\\{$protocol}\\protocol";
+        $classname = "\bluetooth\\$protocol\\protocol";
         if (class_exists($classname)) {
             return new $classname();
         }

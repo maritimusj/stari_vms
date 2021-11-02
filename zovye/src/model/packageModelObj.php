@@ -11,6 +11,10 @@ use function zovye\tb;
 use zovye\PackageGoods;
 use zovye\base\modelObj;
 
+/**
+ * @method getTitle()
+ * @method getPrice()
+ */
 class packageModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
@@ -33,21 +37,22 @@ class packageModelObj extends modelObj
     /** @var int */
 	protected $createtime;
 
-    public function format($detail = false): array
+    public function format($detail = false, $format_price = true): array
     {
         $result = [
             'id' => $this->getId(),
             'title' => $this->getTitle(),
-            'price' => number_format($this->getPrice() / 100, 2),
+            'price' => $format_price ? number_format($this->getPrice() / 100, 2) : $this->getPrice(),
+            'is_package' => true,
             'createtime' => date('Y-m-d H:i:s', $this->getCreatetime()),
         ];
         if ($detail) {
             $result['list'] = [];
-            foreach(PackageGoods::queryFor($this)->findAll() as $entry)
-            {   
+            /** @var package_goodsModelObj $entry */
+            foreach(PackageGoods::queryFor($this)->findAll() as $entry) {
                 $data = [
                     'id' => $entry->getId(),
-                    'price' => number_format($entry->getPrice() / 100, 2),
+                    'price' => $format_price ? number_format($entry->getPrice() / 100, 2) : $entry->getPrice(),
                     'num' => $entry->getNum(),
                 ];
                 $goods = $entry->getGoods();

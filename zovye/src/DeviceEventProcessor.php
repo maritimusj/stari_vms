@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
-
 
 class DeviceEventProcessor
 {
@@ -275,28 +277,32 @@ class DeviceEventProcessor
      */
     public static function handle(string $event, array $data)
     {
-        $e = self::$events[$event];
-        if (isset($e)) {
-            self::log($e, $data);
-            $fn = $e['handler'];
-            if (!empty($fn)) {
-                if (is_callable($fn)) {
-                    call_user_func($fn, $data);
-                } else {
-                    Util::logToFile('events', [
-                        'event' => $event,
-                        'data' => $data,
-                        'error' => 'handler is not function!',
-                    ]);
+        Util::transactionDo(function () use ($event, $data) {
+            $e = self::$events[$event];
+            if (isset($e)) {
+                if (DEBUG) {
+                    self::log($e, $data);
                 }
+                $fn = $e['handler'];
+                if (!empty($fn)) {
+                    if (is_callable($fn)) {
+                        call_user_func($fn, $data);
+                    } else {
+                        Util::logToFile('events', [
+                            'event' => $event,
+                            'data' => $data,
+                            'error' => 'handler is not function!',
+                        ]);
+                    }
+                }
+            } else {
+                Util::logToFile('events', [
+                    'event' => $event,
+                    'data' => $data,
+                    'error' => 'unhandled event!',
+                ]);
             }
-        } else {
-            Util::logToFile('events', [
-                'event' => $event,
-                'data' => $data,
-                'error' => 'unhandled event!',
-            ]);
-        }
+        });
 
         exit(CtrlServ::HANDLE_OK);
     }
@@ -468,7 +474,7 @@ class DeviceEventProcessor
      * @param bool $fetch
      * @return array|bool
      */
-    public static function onAppConfigMsg(array $data, $fetch = false)
+    public static function onAppConfigMsg(array $data, bool $fetch = false)
     {
         $result = [];
 

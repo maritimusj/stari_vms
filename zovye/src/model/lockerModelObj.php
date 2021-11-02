@@ -56,29 +56,25 @@ class lockerModelObj extends modelObj
 
     public function release(): bool
     {
-        if ($this->request_id === REQUEST_ID) {
-            if  (--$this->used > 0) {                
-                $tbname = We7::tablename(lockerModelObj::getTableName(true));
-                $res = We7::pdo_query('UPDATE '. $tbname . ' SET used=used-1 WHERE id=:id AND request_id=:request_id', [
-                    ':id' => $this->id,
-                    ':request_id' => REQUEST_ID,
-                ]);
-                if ($res > 0) {                    
-                    return true;
-                }
-            } else {
-                return $this->destroy();
-            }                 
+        if  (--$this->used > 0) {                
+            $tbname = We7::tablename(lockerModelObj::getTableName(true));
+            $res = We7::pdo_query('UPDATE '. $tbname . ' SET used=used-1 WHERE id=:id', [
+                ':id' => $this->id,
+            ]);
+            if ($res > 0) {                    
+                return true;
+            }
+        } else {
+            return $this->destroy();
         }
-
         return false;
     }
 
-    public function reenter(): bool
+    public function reenter(string $request_id): bool
     {
-        if ($this->request_id === REQUEST_ID && $this->used < $this->available && !$this->isExpired()) {
+        if ($this->request_id === $request_id && $this->used < $this->available && !$this->isExpired()) {
             $condition = [
-                'request_id' => REQUEST_ID,
+                'request_id' => $request_id,
                 'used' => $this->used,
             ];
             $this->setUsed($this->used + 1);

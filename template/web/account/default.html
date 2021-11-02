@@ -56,6 +56,14 @@
         color: #4CAF50;
         margin-left: 6px;
     }
+    #accountlist .state.auth img {
+        width: 16px;
+        height: 16px;
+    }
+    #accountlist .state.auth.disabled img {
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }    
     #accountlist .state.video {
         color: #cf1010;
         margin-left: 6px;
@@ -72,6 +80,15 @@
     }
     #accountlist .orderno:hover {
         color: #666;
+    }
+    #accountlist .operate .state.auth {
+        margin-left: 0px;
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }
+    #accountlist .operate .state.auth:hover {
+        filter: grayscale(0);
+        opacity: 1;
     }
     .operate:hover .auth-weixin:hover {
         color: #4CAF50;
@@ -125,10 +142,17 @@
 <div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
             {if \zovye\App::isWxPlatformEnabled()}
             <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
+            {/if}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
+            {if \zovye\App::isDouyinEnabled()}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
+                <span class="state auth" title="抖音">
+                    <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}" title="添加抖音号">
+                </span>
+            </a>
             {/if}
         </span>       
     </div>
@@ -247,6 +271,10 @@
                             {/if}
                             {elseif $a['state'] == \zovye\Account::VIDEO}
                             <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
+                            {elseif $a['state'] == \zovye\Account::DOUYIN}
+                            <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音号">
+                                <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
+                            </span>
                             {/if}
                         </div>
                     </td>
@@ -274,15 +302,27 @@
                     </td>
                     <td class="desc">
                         <span class="schema schema_{$a['scname']}" style="border-bottom:4px solid #fff;box-shadow: 0px 2px 0px 0px {$a['clr']};" title="{if $a['count']}每人每{php echo zovye\Schema::desc($a['scname'])}可领取{$a['count']}包{/if}{if $a['sccount']}，每{php echo zovye\Schema::desc($a['scname'])}最多送出{$a['sccount']}包{/if}">
+                            {if $a['state'] == \zovye\Account::DOUYIN}
+                            单
+                            {else}
                             {php echo zovye\Schema::desc($a['scname'])}
+                            {/if}
                         </span>
                     </td>
-                    {if $a['src'] == 0}
+                    {if $a['state'] == \zovye\Account::DOUYIN}
+                    <td>
+                    </td>
+                    <td>
+                        <div class="operate">
+                            <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
+                        </div>
+                    </td>
+                    {elseif $a['src'] == 0}
                     <td class="detail" style="position:relative;">
                         <div class="limit" style="background-color:{$a['clr']}" >
                             {if $a['groupname']}<div class="group" title="分组名称：{$a['groupname']}" style="color:{$a['clr']}">{$a['groupname']}</div>{/if}
-                            <div class="first" title="总计订单：{$a['orders']}{if $a['orderlimits']} ，最大订单数量限制：{$a['orderlimits']}{/if}"><span class="count">{$a['count']}</span>次/{php echo zovye\schema::desc($a['scname'])}</div>
-                            <div class="more" title="总计订单：{$a['orders']}{if $a['orderlimits']} ，最大订单数量限制：{$a['orderlimits']}{/if}">每人最多<span class="total">{$a['total']}</span>次</div>
+                            <div class="first" title="{if $a['orderlimits']}最大订单数量限制：{$a['orderlimits']}{/if}"><span class="count">{$a['count']}</span>次/{php echo zovye\schema::desc($a['scname'])}</div>
+                            <div class="more" title="{if $a['orderlimits']}最大订单数量限制：{$a['orderlimits']}{/if}">每人最多<span class="total">{$a['total']}</span>次</div>
                             {if $a['commission'] && $a['commission']['money'] > 0}
                                 <span class="more commission" title="每包佣金：{php echo number_format($a['commission']['money']/100, 2)}元"><i class="fa fa-share-alt"></i> 已参加分佣</span>
                             {/if}
@@ -507,6 +547,13 @@
                     const newText = textCtrl.text() == '取消设备二维码' ? '设为设备二维码' : '取消设备二维码';
                     textCtrl.text(newText);
                 }
+            })
+        }
+
+        api.douyinAuth = function(id, self) {
+            api.showResult({
+                id: id,
+                op: 'douyinAuthorize',
             })
         }
         

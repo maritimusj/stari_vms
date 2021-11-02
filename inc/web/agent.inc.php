@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -160,6 +159,7 @@ if ($op == 'default') {
         JSON::success($agents);
     }
 
+    $tpl_data['page'] = $page;
     $tpl_data['agents'] = $agents['list'];
     $tpl_data['mobile_url'] = Util::murl('mobile');
 
@@ -592,6 +592,10 @@ if ($op == 'default') {
                     'enable' => request::int('mustFollow'),
                 ]);
             }
+
+            if (App::isZeroBonusEnabled()) {
+                $user->updateSettings('agentData.custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
+            }
         }
     } elseif (request::bool('agent_payment')) {
         if ($user->isAgent()) {
@@ -616,6 +620,15 @@ if ($op == 'default') {
                 $data['lcsw']['merchant_no'] = request::trim('merchant_no');
                 $data['lcsw']['terminal_id'] = request::trim('terminal_id');
                 $data['lcsw']['access_token'] = request::trim('access_token');
+                
+                //创建扫呗接口文件
+                Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
+                    'headers' => [
+                        'HTTP_USER_AGENT' => 'lcsw_notify',
+                    ],
+                    'op' => 'notify',
+                    'from' => 'lcsw',
+                ]);
             }
 
             $user->updateSettings('agentData.pay', $data);
@@ -865,7 +878,15 @@ if ($op == 'default') {
     }
 
     $result = Util::cachedCall(3, function() use ($agent, $date) {
-        return Stats::repairMonthData($agent, $date);
+        $result = Stats::repairMonthData($agent, $date);
+        if (!is_error($result)) {
+            if ($agent->settings('repair.status'))
+            $agent->updateSettings('repair', [
+                'status' => 'finished',
+                'time' => time(),
+            ]);
+        }
+        return $result;
     }, $agent->getId(), $month);
 
     if (is_error($result)) {
@@ -2024,6 +2045,13 @@ if ($op == 'default') {
                 }
             } elseif ($entry->getSrc() == CommissionBalance::ORDER_REFUND) {
                 $data['event'] = '订单退款，返还佣金';
+                $order_id = $entry->getExtraData('orderid');
+                $order = Order::get($order_id);
+                if ($order) {
+                    $data['event'] .= "，订单号：{$order->getOrderNO()}";
+                } else {
+                    $data['event'] .= "，订单ID：$order_id";
+                }
             } elseif ($entry->getSrc() == CommissionBalance::GSP) {
                 $order_id = $entry->getExtraData('orderid');
                 $order = Order::get($order_id);

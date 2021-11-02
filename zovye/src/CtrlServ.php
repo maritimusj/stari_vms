@@ -35,7 +35,7 @@ class CtrlServ
      */
     public static function makeNotifierSign($app_key, $app_secret, $nostr, $payload): string
     {
-        return hash_hmac("sha256", "{$app_key}{$nostr}{$payload}", $app_secret);
+        return hash_hmac("sha256", "$app_key$nostr$payload", $app_secret);
     }
 
     /**
@@ -46,11 +46,11 @@ class CtrlServ
      * @param array $payloadData
      * @return bool
      */
-    public static function mcbNotify($mcbUID, $code, $op = 'params', $payloadData = []): bool
+    public static function mcbNotify($mcbUID, $code, string $op = 'params', array $payloadData = []): bool
     {
         if ($mcbUID) {
 
-            $topic = ["v1/device/mcb/{$mcbUID}/{$code}"];
+            $topic = ["v1/device/mcb/$mcbUID/$code"];
             $data = json_encode(
                 [
                     'op' => $op,
@@ -71,14 +71,14 @@ class CtrlServ
 
     /**
      * 与控制中心交互 api版本v1
-     * @param $path
+     * @param string $path
      * @param array $params
-     * @param string $body
+     * @param mixed $body
      * @param string $contentType
      * @param string $method
      * @return mixed
      */
-    public static function query($path = '', array $params = [], $body = '', $contentType = '', $method = '')
+    public static function query(string $path = '', array $params = [], $body = '', string $contentType = '', string $method = '')
     {
         return self::queryData('v1', $path, $params, $body, $contentType, $method);
     }
@@ -88,12 +88,12 @@ class CtrlServ
      * @param $version
      * @param $path
      * @param array $params
-     * @param string $body
+     * @param mixed $body
      * @param string $contentType
      * @param string $method
      * @return mixed
      */
-    public static function queryData($version, $path, array $params = [], $body = '', $contentType = '', $method = '')
+    public static function queryData($version, $path, array $params = [], $body = '', string $contentType = '', string $method = '')
     {
         if (self::$http_client) {
             $ctrlServerUrl = settings('ctrl.url');
@@ -108,7 +108,7 @@ class CtrlServ
             }
 
             $ctrlServerUrl .= $version;
-            $ctrlServerUrl .= "/{$path}";
+            $ctrlServerUrl .= "/$path";
 
             $params['nostr'] = TIMESTAMP;
             $ctrlServerUrl .= '?' . http_build_query($params);
@@ -181,24 +181,24 @@ class CtrlServ
      * 生成控制中心通信签名
      * @param $app_key
      * @param $app_secret
-     * @param $nostr
+     * @param string $nostr
      * @return string
      */
-    public static function makeCtrlServerSign($app_key, $app_secret, $nostr = TIMESTAMP): string
+    public static function makeCtrlServerSign($app_key, $app_secret, string $nostr = TIMESTAMP): string
     {
-        return hash_hmac("sha256", "{$app_key}{$nostr}", $app_secret);
+        return hash_hmac("sha256", "$app_key$nostr", $app_secret);
     }
 
     /**
      * 与控制中心交互 api版本v2
-     * @param $path
+     * @param string $path
      * @param array $params
-     * @param string $body
+     * @param mixed $body
      * @param string $contentType
      * @param string $method
      * @return mixed
      */
-    public static function v2_query($path, array $params = [], $body = '', $contentType = '', $method = '')
+    public static function v2_query(string $path, array $params = [], $body = '', string $contentType = '', string $method = '')
     {
         return self::queryData('v2', $path, $params, $body, $contentType, $method);
     }
@@ -210,20 +210,21 @@ class CtrlServ
      * @param array $payload
      * @return bool
      */
-    public static function appNotify($app_id, $op = 'update', $payload = []): bool
+    public static function appNotify($app_id, string $op = 'update', array $payload = []): bool
     {
         if ($app_id) {
+            $topic = ["app/$app_id"];
+            
+            $data = [
+                'op' => $op,
+                'serial' => microtime(true) . '',
+            ];
 
-            $topic = ["app/{$app_id}"];
-            $data = json_encode(
-                [
-                    'op' => $op,
-                    'data' => $payload,
-                    'serial' => microtime(true) . '',
-                ]
-            );
+            if ($payload) {
+                $data['data'] = $payload;
+            }
 
-            $body = json_encode(['topics' => $topic, 'data' => $data]);
+            $body = json_encode(['topics' => $topic, 'data' => json_encode($data)]);
 
             $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
 
@@ -241,7 +242,7 @@ class CtrlServ
      * @param array $payload 数据
      * @return bool
      */
-    public static function appNotifyAll(array $original, array $data = [], $op = 'update', $payload = []): bool
+    public static function appNotifyAll(array $original, array $data = [], string $op = 'update', array $payload = []): bool
     {
         $topics = [];
 
@@ -253,7 +254,7 @@ class CtrlServ
             if ($original['all']) {
                 $topics[] = 'tag/' . Topic::encrypt();
             } else {
-                if (isset($data['all']) && $data['all'] == false) {
+                if (isset($data['all']) && $data['all'] === false) {
                     $all = $original;
                 } else {
                     $all = $data;
@@ -267,22 +268,22 @@ class CtrlServ
 
                 if ($all['agents']) {
                     foreach ($all['agents'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("agent{$id}");
+                        $topics[] = 'tag/' . Topic::encrypt("agent$id");
                     }
                 }
                 if ($all['groups']) {
                     foreach ($all['groups'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("group{$id}");
+                        $topics[] = 'tag/' . Topic::encrypt("group$id");
                     }
                 }
                 if ($all['tags']) {
                     foreach ($all['tags'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("tag{$id}");
+                        $topics[] = 'tag/' . Topic::encrypt("tag$id");
                     }
                 }
                 if ($all['devices']) {
                     foreach ($all['devices'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("device{$id}");
+                        $topics[] = 'tag/' . Topic::encrypt("device$id");
                     }
                 }
             }
@@ -362,10 +363,13 @@ class CtrlServ
      * @param int $delay
      * @return bool|mixed
      */
-    public static function scheduleDelayJob($op, array $params = [], $delay = 0): bool
+    public static function scheduleDelayJob($op, array $params = [], int $delay = 0)
     {
         $result = self::httpDelayCallback($delay, self::makeJobUrl($op, $params));
-        return !is_error($result) && $result !== false;
+        if (!is_error($result) && $result !== false) {
+            return $result['queued'] ?? true;
+        }
+        return false;
     }
 
     /**
@@ -375,7 +379,7 @@ class CtrlServ
      * @param string $data
      * @return mixed
      */
-    public static function httpDelayCallback($delay, $url, $data = '')
+    public static function httpDelayCallback($delay, $url, string $data = '')
     {
         $uid = Util::random(16);
         $query = [
@@ -384,7 +388,7 @@ class CtrlServ
             'data' => $data,
         ];
 
-        return self::query("job/delay/{$uid}", [], http_build_query($query));
+        return self::query("job/delay/$uid", [], http_build_query($query));
     }
 
     /**
@@ -394,10 +398,14 @@ class CtrlServ
      * @param string $level
      * @return mixed
      */
-    public static function scheduleJob($op, array $params = [], $level = LEVEL_NORMAL): bool
+    public static function scheduleJob($op, array $params = [], string $level = LEVEL_NORMAL)
     {
         $result = self::httpQueuedCallback($level, self::makeJobUrl($op, $params));
-        return !is_error($result) && $result !== false;
+
+        if (!is_error($result) && $result !== false) {
+            return $result['queued'];
+        }
+        return false;
     }
 
     /**
@@ -407,7 +415,7 @@ class CtrlServ
      * @param string $data
      * @return mixed
      */
-    public static function httpQueuedCallback($level, $url, $data = '')
+    public static function httpQueuedCallback($level, $url, string $data = '')
     {
         $query = [
             'type' => $level,
@@ -417,6 +425,6 @@ class CtrlServ
 
         $uid = Util::random(16, true);
 
-        return self::query("job/queue/{$uid}", [], http_build_query($query));
+        return self::query("job/queue/$uid", [], http_build_query($query));
     }
 }

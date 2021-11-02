@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -33,15 +32,10 @@ class Site extends WeModuleSite
             $file = $dir . $fun . '.inc.php';
             if (file_exists($file)) {
                 require $file;
-                exit();
-            }
-
-            if ($isWeb) {
-                app()->doWeb($fun);
-            }
-
-            if ($isMobile) {
-                app()->doMobile($fun);
+            } else {
+                if (DEBUG) {
+                    die($file . ' not exists!');
+                }
             }
         }
     }

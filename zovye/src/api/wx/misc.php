@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye\api\wx;
 
@@ -66,6 +70,22 @@ class misc
             $query->where(['goods_id' => $goods_id]);
         }
 
+        if (request::has('group')) {
+            $group = \zovye\Group::get(request::int('group'));
+            if (empty($group) || $group->getAgentId() != $agent->getId()) {
+                return err('分组不存在！');
+            }
+            $device_ids = [];
+            $device_query = \zovye\Device::query(['group_id' => $group->getId()]);
+            $result = $device_query->findAll([], true);
+            for ($i = 0; $i < count($result); $i++) {
+                $device_ids[] = $result[$i]['id'];
+            }
+            $query->where([
+                'device_id' => $device_ids,
+            ]);
+        }
+
         if (request::has('start')) {
             try {
                 $start = new DateTime(request::trim('start'));
@@ -96,7 +116,8 @@ class misc
         if (request::bool('detail')) {
             $list = [];
             $query->groupBy('goods_id');
-            foreach ($query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price']) as $entry) {
+            $res = $query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price']);
+            foreach ((array)$res as $entry) {
                 $goods = Goods::get($entry['goods_id']);
                 if ($goods) {
                     $list[] = [

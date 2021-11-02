@@ -109,10 +109,20 @@
                             <input type="checkbox" name="s_type_ali" value="1" {if $s_type_ali} checked{/if}>
                             支付宝
                         </label>
+                        {if \zovye\App::isDouyinEnabled()}
+                        <label>
+                            <input type="checkbox" name="s_type_douyin" value="1" {if $s_type_douyin} checked{/if}>
+                            抖音
+                        </label>
+                        {/if}
                         <label>
                             <input type="checkbox" name="s_type_api" value="1" {if $s_type_api} checked{/if}>
                             第三方API用户
-                        </label>                        
+                        </label>
+                        <label>
+                            <input type="checkbox" name="s_type_third" value="1" {if $s_type_third} checked{/if}>
+                            第三方公众号授权用户
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -524,7 +534,7 @@
                 params.append("s_keywords", s_keywords);
             }
 
-            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_api'].forEach(stype => {
+            ['s_type_wx', 's_type_wxapp', 's_type_ali', 's_type_douyin', 's_type_api', 's_type_third'].forEach(stype => {
                 const s_type = $(form.find('[name=' + stype + ']:checked')).val();
                 if (s_type) {
                     params.append(stype, s_type);

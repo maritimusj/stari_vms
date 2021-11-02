@@ -1,8 +1,11 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -178,8 +181,22 @@ class ZhiJinBaoAccount
             'cityName' => $profile['city'],
             'nonceStr' => Util::random(16, true),
             'timeStamp' => time(),
-            'deviceSn' => $device ? $device->getImei() : '',
+            'deviceSn' => $device->getImei(),
+            'ipAddress' => $user->getLastActiveData('ip', CLIENT_IP),
+            'userAgent' => $user->settings('from.user-agent', $_SERVER['HTTP_USER_AGENT']),
         ]);
+
+        $params['scene'] = $device->settings('zjbao.scene', '');
+
+        $area = $device->settings('extra.location.tencent.area', []);
+        if (isEmptyArray($area)) {
+            $area = $device->settings('extra.location.baidu.area', []);
+        }
+
+        $params['deviceCountry'] = '中国';
+        $params['deviceProvince'] = strval($area[0]);
+        $params['deviceCity'] = strval($area[1]);
+        $params['deviceDistrict'] = strval($area[2]);
 
         $params['sign'] = $this->sign($params);
         $result = Util::post(self::API_URL, $params);
@@ -203,13 +220,13 @@ class ZhiJinBaoAccount
         ];
 
         $str = [];
-        foreach($keys as $key => $val) {
+        foreach ($keys as $key => $val) {
             if ($val == '') {
                 continue;
             }
-            $str[] = "$key={$val}";
+            $str[] = "$key=$val";
         }
-       
+
         return strtoupper(md5(implode('&', $str)));
     }
 }

@@ -24,6 +24,7 @@ router::exec($op, [
 
     'Reg' => '\zovye\api\wx\agent::reg',
     'PreLogin' => '\zovye\api\wx\agent::preLogin',
+    'Plugins' => '\zovye\api\wx\agent::pluginsList',
     'Login' => '\zovye\api\wx\agent::login',
     'LoginQR' => '\zovye\api\wx\agent::loginQR',
     'LoginScan' => '\zovye\api\wx\agent::loginScan',
@@ -103,6 +104,8 @@ router::exec($op, [
     'Mpsave' => '\zovye\api\wx\mp::save',
     'MpGroupAssign' => '\zovye\api\wx\mp::groupAssign',
     'MpAuthUrl' => '\zovye\api\wx\mp::mpAuthUrl',
+    "MpDouyinAuthQRCode" => '\zovye\api\wx\mp::getDouyinAuthQRCode',
+    "MpDouyinAuthResult" => '\zovye\api\wx\mp::getDouyinAuthResult',
 
     'AdvAssign' => '\zovye\api\wx\adv::assign',
     'Advs' => '\zovye\api\wx\adv::list',

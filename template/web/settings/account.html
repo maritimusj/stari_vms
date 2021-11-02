@@ -89,6 +89,25 @@
                 </div>
             </div>
             {/if}
+            {if \zovye\App::isDouyinEnabled()}
+            <div class="seg">
+                <div class="title">抖音</div>
+                <div class="form-group">
+                    <label for="douyinClientKey" class="col-md-2 control-label">client key</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="douyinClientKey" id="douyinClientKey" value="{$douyin['key']}">
+                        <span class="help-block">* 抖音开放平台 应用的Client Key</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="douyinClientSecret" class="col-md-2 control-label">client secret</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="douyinClientSecret" id="douyinClientSecret" value="{$douyin['secret']}">
+                        <span class="help-block">* 抖音开放平台 应用的Client Secret</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
             {if \zovye\App::isMoscaleEnabled()}
             <div id="moscale">
             </div>

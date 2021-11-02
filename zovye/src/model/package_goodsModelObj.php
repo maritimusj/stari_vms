@@ -9,6 +9,11 @@ use zovye\Goods;
 use function zovye\tb;
 use zovye\base\modelObj;
 
+/**
+ * @method getPrice()
+ * @method getNum()
+ * @method getGoodsId()
+ */
 class package_goodsModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
@@ -34,7 +39,7 @@ class package_goodsModelObj extends modelObj
     /** @var int */
 	protected $createtime;
 
-    public function getGoods()
+    public function getGoods(): ?goodsModelObj
     {
         return Goods::get($this->getGoodsId(), true);
     }

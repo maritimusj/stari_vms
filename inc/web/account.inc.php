@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -25,8 +24,12 @@ if ($op == 'default') {
     if ($banned) {
         $query->where(['state' => Account::BANNED]);
     } else {
+        $states =  [Account::NORMAL, Account::VIDEO, Account::AUTH];
+        if (App::isDouyinEnabled()) {
+            $states[] = Account::DOUYIN;
+        }
         $query->where([
-            'state' => [Account::NORMAL, Account::VIDEO, Account::AUTH],
+            'state' => $states,
         ]);
     }
 
@@ -88,6 +91,8 @@ if ($op == 'default') {
             if ($entry->isAuth()) {
                 $data['service'] = $entry->getServiceType();
                 $data['verified'] = $entry->isVerified();
+            } elseif ($entry->isDouyin()) {
+                $data['openid'] = $entry->settings('config.openid', '');
             }
 
             if (App::useAccountQRCode()) {
@@ -119,9 +124,6 @@ if ($op == 'default') {
                 $data['commission'] = $entry->get('commission', []);
             }
 
-            //总订单数
-            $data['orders'] = Order::query(['account' => $entry->getName()])->count();
-
             $accounts[] = $data;
         }
     }
@@ -135,6 +137,8 @@ if ($op == 'default') {
         Account::ZJBAO => App::isZJBaoEnabled(),
         Account::MEIPA => App::isMeiPaEnabled(),
         Account::KINGFANS => App::isKingFansEnabled(),
+        Account::SNTO => App::isSNTOEnabled(),
+        Account::YFB => App::isSNTOEnabled(),
     ];
 
     foreach ($one_res as $index => $enabled) {
@@ -276,6 +280,7 @@ if ($op == 'default') {
                     'type' => Account::YUNFENBA,
                     'vendor' => [
                         'uid' => request::trim('vendorUID'),
+                        'sid' => request::trim('vendorSubUID'),
                     ]
                 ]);
             } elseif ($account->isAQiinfo()) {
@@ -310,6 +315,26 @@ if ($op == 'default') {
                     'bid' => request::trim('bid'),
                     'key' => request::trim('key'),
                 ]);
+            } elseif ($account->isSNTO()) {
+                $data['name'] = Account::SNTO_NAME;
+                $data['img'] = Account::SNTO_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::SNTO,
+                    'id' => request::trim('app_id'),
+                    'key' => request::trim('app_key'),
+                    'channel' => request::trim('channel'),
+                    'data' => $account->settings('config.data', []),
+                ]);
+            } elseif ($account->isYFB()) {
+                $data['name'] = Account::YFB_NAME;
+                $data['img'] = Account::YFB_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::YFB,
+                    'id' => request::trim('app_id'),
+                    'secret' => request::trim('app_secret'),
+                    'key' => request::trim('key'),
+                    'scene' => request::trim('scene'),
+                ]);
             } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
@@ -317,6 +342,7 @@ if ($op == 'default') {
                 }
                 $config = [
                     'type' => Account::AUTH,
+                    'appQRCode' => request::bool('useAppQRCode'),
                 ];
                 if (request::str('openMsgType') == 'text') {
                     $config['open'] = [
@@ -361,6 +387,8 @@ if ($op == 'default') {
                 Account::ZJBAO_NAME,
                 Account::MEIPA_NAME,
                 Account::KINGFANS,
+                Account::SNTO,
+                Account::YFB,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }
@@ -391,6 +419,11 @@ if ($op == 'default') {
             'time' => time(),
             'admin' => _W('username'),
         ]);
+
+        //抖音吸粉总数永远为１
+        if ($account->isDouyin()) {
+            $account->setTotal(1);
+        }
 
         if ($account->save() && Account::updateAccountData()) {
             //处理多个关注二维码
@@ -435,7 +468,14 @@ if ($op == 'default') {
                     'type' => Account::VIDEO,
                     'video' => [
                         'duration' => request::int('duration', 1),
+                        'exclusive' => request::int('exclusive', 0),
                     ]
+                ]);
+            } elseif ($account->isDouyin()) {
+                $account->set('config', [
+                    'type' => Account::DOUYIN,
+                    'url' => request::trim('url'),
+                    'openid' => request::trim('openid'),
                 ]);
             }
 
@@ -471,7 +511,7 @@ if ($op == 'default') {
             Util::itoast($res['message'], $back_url, 'success');
         }
     }
-
+    
 } elseif ($op == 'edit') {
 
     $id = request::int('id');
@@ -555,7 +595,7 @@ if ($op == 'default') {
         $account = Account::get($id);
         if ($account) {
             if ($account->isBanned()) {
-                if ($account->isSpecial() || $account->isAuth() || $account->isVideo()) {
+                if ($account->isSpecial() || $account->isAuth() || $account->isVideo() || $account->isDouyin()) {
                     $account->setState($account->getType());
                 } else {
                     $account->setState(Account::NORMAL);
@@ -855,6 +895,38 @@ if ($op == 'default') {
     $num = (int)$query->get('count(DISTINCT `openid`)');
 
     JSON::success("{$acc->getTitle()}，净增粉丝总数：{$num}人");
+
+} elseif ($op == 'douyinAuthorize') {
+
+    $id = request::int('id');
+
+    $account = Account::get($id);
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    $title = $account->getTitle();
+
+    $url = Util::murl('douyin', [
+        'op' => 'get_openid',
+        'id' => $account->getId(),
+    ]);
+ 
+    $result = Util::createQrcodeFile("douyin_{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '请用抖音扫描二维码完成授权！',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => "$title",
+        'content' => $content,
+    ]);
 
 } elseif ($op == 'platform_stat') {
 

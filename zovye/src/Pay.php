@@ -1,10 +1,7 @@
 <?php
-
 /**
- * www.zovye.com
- * Author: jjs
- * Date: 2019/12/10
- * Time: 19:42.
+ * @author jjs@zovye.com
+ * @url www.zovye.com
  */
 
 namespace zovye;
@@ -89,24 +86,31 @@ class Pay
 
         $order_no = Order::makeUID($user, $device, $partial);
 
-        $pay_data = array_merge_recursive($pay_data, [
+        $more = [
             'device' => $device->getId(),
             'user' => $user->getOpenid(),
-            'goods' => $goods['id'],
             'pay' => [
                 'name' => $pay_name,
             ],
             'orderData' => [
                 'orderNO' => $order_no,
-                'num' => isset($pay_data['total']) ? $pay_data['total'] : 1,
-                'price' => isset($pay_data['price']) ? $pay_data['price'] : $goods['price'],
+                'num' => $pay_data['total'] ?? 1,
+                'price' => $pay_data['price'] ?? $goods['price'],
                 'ip' => CLIENT_IP,
-                'extra' => [
-                    'goods' => $goods,
-                ],
+                'extra' => [],
                 'createtime' => time(),
             ],
-        ]);
+        ];
+
+        if (!empty($goods['is_package'])) {
+            $more['package'] = $goods['id'];
+            $more['orderData']['extra']['package'] = $goods;
+        } else {
+            $more['goods'] = $goods['id'];
+            $more['orderData']['extra']['goods'] = $goods;
+        }
+
+        $pay_data = array_merge_recursive($pay_data, $more);
 
         $pay_log = self::createPayLog($user, $order_no, $pay_data);
         if (empty($pay_log)) {
@@ -126,7 +130,13 @@ class Pay
         /** @var IPay $pay */
         list($pay, $order_no) = $result;
 
-        $title = "{$goods['name']}x{$pay_data['total']}{$goods['unit_title']}";
+        $goods_name = !empty($goods['name']) ? $goods['name'] : (!empty($goods['title']) ? $goods['title'] : '未命名');
+        if (!empty($pay_data['total'])) {
+            $title = "{$goods_name}x{$pay_data['total']}{$goods['unit_title']}";
+        } else {
+            $title = $goods_name;
+        }
+
         $price = empty($pay_data['price']) ? $goods['price'] : $pay_data['price'];
 
         if (is_callable([$pay, $fn])) {
@@ -451,7 +461,7 @@ class Pay
             }
         }
 
-        if (empty($res['enable']) || empty(array_diff_key((array)$res, ['enable' => 1, 'name' => 1]))) {
+        if (empty($res['enable']) || empty(array_diff_key($res, ['enable' => 1, 'name' => 1]))) {
             $res = self::getDefaultPayParams($name);
         }
 

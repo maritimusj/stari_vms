@@ -76,6 +76,12 @@ class CommissionEventHandler
             }
         }
 
+        if (App::isZeroBonusEnabled()) {
+            if ($order->getExtraData('custom.zero_bonus', false)) {
+                return true;
+            }
+        }
+
         $total_commission_price = $account->commission_price();
 
         if ($total_commission_price <= 0) {
@@ -347,7 +353,8 @@ class CommissionEventHandler
 
                 //第2步，计算商品利润（减去成本价）
                 $goods = $order->getGoods();
-                $costPrice = empty($goods) ? 0 : $goods->getCostPrice();
+
+                $costPrice = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
 
                 $commission_price -= $costPrice;
 
@@ -357,7 +364,7 @@ class CommissionEventHandler
                 }
 
                 //第4步，成本及剩余利润分配给代理商
-                if (empty($goods->getExtraData('cw', 0))) {
+                if ($goods && empty($goods->getExtraData('cw', 0))) {
                     //成本参与分佣
                     $commission_price += $costPrice;
                 }

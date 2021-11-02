@@ -74,10 +74,10 @@ class CommissionBalance extends State
             $trade_no = "r{$r->getId()}d{$r->getCreatetime()}";
             //先写数据再执行操作
             if ($r->update([
-                    'state' => 'mchpay',
-                    'trade_no' => $trade_no,
-                    'admin' => _W('username'),
-                ],true)) {
+                'state' => 'mchpay',
+                'trade_no' => $trade_no,
+                'admin' => _W('username'),
+            ], true)) {
 
                 $res = $user->MCHPay($n, $trade_no, '佣金提现');
                 if (is_error($res)) {
@@ -148,11 +148,19 @@ REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::ORDER_REFUND) {
 
             $name = $entry->getExtraData('admin');
+            $order_id = $entry->getExtraData('orderid');
+            $order = Order::get($order_id);
+            $order_info = "订单ID：$order_id";
+            if ($order) {
+                $order_info = $order->getOrderNO();
+            }
             $admin_info = empty($name) ? '' : "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
             $data['memo'] = <<<ORDER_REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">订单退款，返还佣金</dd>
+<dt>订单</dt>
+<dd class="event">$order_info</dd>
 {$admin_info}
 </dl>
 ORDER_REFUND;
@@ -237,7 +245,7 @@ REALOD_IN;
      * @param string $addition_spec
      * @return string
      */
-    protected static function format_order_memo($id, $addition_spec = ''): string
+    protected static function format_order_memo($id, string $addition_spec = ''): string
     {
         if ($addition_spec) {
             $addition_spec = "<dt>其它</dt><dd class=\"additional\">{$addition_spec}</dd>";
@@ -383,7 +391,7 @@ ORDER;
      * @param array $extra
      * @return commission_balanceModelObj
      */
-    public function change($n, $src, $extra = []): ?commission_balanceModelObj
+    public function change($n, $src, array $extra = []): ?commission_balanceModelObj
     {
         $n = intval($n);
         if ($this->user && $n != 0) {
@@ -410,5 +418,23 @@ ORDER;
     public static function findOne($condition = []): ?commission_balanceModelObj
     {
         return self::query($condition)->findOne();
+    }
+
+    public static function getFirstCommissionBalance(userModelObj $user): ?commission_balanceModelObj
+    {
+        $id = $user->settings('extra.first.commission.id');
+        if ($id) {
+            return self::findOne(['id' => $id]);
+        }
+        $query = self::query(['openid' => $user->getOpenid()]);
+        /** @var commission_balanceModelObj $log */
+        $log = $query->orderBy('id ASC')->findOne();
+        if ($log) {
+            $user->updateSettings('extra.first.commission', [
+                'id' => $log->getId(),
+            ]);
+            return $log;
+        }
+        return null;
     }
 }

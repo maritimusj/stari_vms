@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -182,7 +186,7 @@ class AliTicket
     }
 
 
-    public static function sign($data, $secret)
+    public static function sign($data, $secret): string
     {
         ksort($data);
 
@@ -191,7 +195,7 @@ class AliTicket
             if ($key == 'ufsign') {
                 continue;
             }
-            $arr[] = "{$key}={$val}";
+            $arr[] = "$key=$val";
         }
 
         $str = implode('&', $arr);
@@ -232,7 +236,7 @@ class AliTicket
         return (new AliTicket($config['key'], $config['secret']))->CancelVm($device->getImei());
     }
 
-    public static function getCallbackUrl()
+    public static function getCallbackUrl(): string
     {
         return Util::murl('ali', ['op' => 'ticket']);
     }
@@ -366,7 +370,7 @@ class AliTicket
         return true;
     }
 
-    public static function getSceneList()
+    public static function getSceneList(): array
     {
         return [
             '政府机构' => ['政府机构'],
@@ -502,7 +506,7 @@ class AliTicket
         ];
     }
 
-    public static function getDeviceTypes()
+    public static function getDeviceTypes(): array
     {
         return [
             '售货机',

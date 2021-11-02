@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jjs@zovye.com
+ * @url www.zovye.com
+ */
 
 namespace zovye;
 
@@ -247,8 +251,10 @@ if ($op == 'default') {
     $voucher = GoodsVoucher::get($id);
     if ($voucher) {
         $res = Util::transactionDo(function () use ($voucher) {
-            $voucher->destroy();
-            return true;
+            if($voucher->destroy()) {
+                 return true;
+            }
+           return error(State::ERROR, 'fail');
         });
         if (!is_error($res)) {
             JSON::success('操作成功 ！');

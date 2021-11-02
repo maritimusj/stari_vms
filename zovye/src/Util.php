@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -11,6 +10,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use ali\aop\request\AlipayUserInfoShareRequest;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use QRcode;
@@ -107,11 +107,11 @@ class Util
     public static function getCurrentUser(array $params = []): ?userModelObj
     {
         $user = null;
-        if (App::isAliUser()) {
+        if (App::isAliUser() || App::isDouYinUser()) {
             $user = User::get(App::getUserUID(), true);
         } else {
             if (empty($user)) {
-                $update = empty($params['update']) ? false : true;
+                $update = !empty($params['update']);
                 $fans = Util::fansInfo($update);
                 if ($fans && !empty($fans['openid'])) {
                     $user = User::get($fans['openid'], true);
@@ -161,6 +161,7 @@ class Util
 
                             $user->set('fansData', $fans);
                             $user->save();
+                            App::setContainer($user);
                         }
                     }
                 }
@@ -176,7 +177,7 @@ class Util
      * @param bool $update
      * @return array
      */
-    public static function fansInfo($update = false): array
+    public static function fansInfo(bool $update = false): array
     {
         $openid = _W('openid');
         if ($openid) {
@@ -284,17 +285,76 @@ class Util
                     'sex' => self::getAliuserSex($result->alipay_user_info_share_response->gender),
                 ]);
                 $user->save();
+                App::setContainer($user);
             }
 
             return $user;
         } catch (Exception $e) {
             Util::logToFile('error', [
-                'msg' => '获取阿里用户身份失败！',
+                'msg' => '获取支付宝用户失败！',
                 'error' => $e->getMessage(),
             ]);
         }
 
         return null;
+    }
+
+    public static function getDouYinUser($code, $device = null)
+    {
+        $douyin = DouYin::getInstance();
+
+        $result = $douyin->getAccessToken($code);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        $info = $douyin->getUserInfo($result['access_token'], $result['open_id']);
+        if (is_error($info)) {
+            return $info;
+        }
+
+        $user = User::get($info['open_id'], true, User::DouYin);
+        if (empty($user)) {
+            $data = [
+                'app' => User::DouYin,
+                'nickname' => $info['nickname'],
+                'avatar' => $info['avatar'],
+                'openid' => $info['open_id'],
+            ];
+
+            $user = User::create($data);
+            if (!empty($device)) {
+                $params['from'] = [
+                    'src' => 'device',
+                    'device' => [
+                        'name' => $device->getName(),
+                        'imei' => $device->getImei(),
+                    ],
+                    'ip' => CLIENT_IP,
+                    'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+                ];
+
+                $user->set('fromData', $params['from']);
+            }
+        }
+
+        if ($user) {
+            $user->setNickname($info['nickname']);
+            $user->setAvatar($info['avatar']);
+
+            $result['updatetime'] = time();
+            $user->set('douyin_token', $result);
+
+            $user->set('fansData', [
+                'province' => $info['province'],
+                'city' => $info['city'],
+                'sex' => $info['gender'],
+            ]);
+            $user->save();
+            App::setContainer($user);
+        }
+
+        return $user;
     }
 
     /**
@@ -579,10 +639,10 @@ include './index.php';
         }
 
         $sc_name = $account->getScname();
-        $total = intval($account->getTotal());
-        $count = intval($account->getCount());
-        $sc_count = intval($account->getSccount());
-        $order_limits = intval($account->getOrderLimits());
+        $total = $account->getTotal();
+        $count = $account->getCount();
+        $sc_count = $account->getSccount();
+        $order_limits = $account->getOrderLimits();
 
         //检查性别，手机限制
         $limits = $account->get('limits');
@@ -724,8 +784,7 @@ include './index.php';
 
             $agent = $device->getAgent();
             if ($agent) {
-                $agent_data = $agent->getAgentData();
-                $max_free = intval($agent_data['misc']['maxFree']);
+                $max_free = $agent->getAgentData('misc.maxFree', 0);
             }
 
             $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxFree', 0);
@@ -756,6 +815,113 @@ include './index.php';
         }
 
         return 'unknown';
+    }
+
+    public static function updateOrderCounters(orderModelObj $order)
+    {
+        if (!Locker::try("order:counter:{$order->getId()}")) {
+            return false;
+        }
+
+        $uid = App::uid(6);
+        $counters = [
+            "$uid:order:all" => function () {
+                return Order::query()->count();
+            }
+        ];
+
+        $createtime = $order->getCreatetime();
+        $counters[$uid . ':order:month:' . date('Y-m', $createtime)] = function () use ($createtime) {
+            $start = new DateTime("@$createtime");
+            $start->modify('first day of this month 00:00');
+            $end = new DateTime("@$createtime");
+            $end->modify('first day of next month 00:00');
+            return Order::query([
+                'createtime >=' => $start->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->count();
+        };
+        $counters[$uid . ':order:day:' . date('Y-m-d', $createtime)] = function () use ($createtime) {
+            $start = new DateTime("@$createtime");
+            $start->modify('00:00');
+            $end = new DateTime("@$createtime");
+            $end->modify('next day 00:00');
+            return Order::query([
+                'createtime >=' => $start->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->count();
+        };
+
+        $device = $order->getDevice();
+        if ($device) {
+            $counters["device:{$device->getId()}:order:all"] = function () use ($device) {
+                return Order::query([
+                    'device_id' => $device->getId(),
+                ])->count();
+            };
+            $counters["device:{$device->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($device, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('first day of this month 00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('first day of next month 00:00');
+                return Order::query([
+                    'device_id' => $device->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+            $counters["device:{$device->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($device, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('next day 00:00');
+                return Order::query([
+                    'device_id' => $device->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+        }
+
+        $agent = $order->getAgent();
+        if ($agent) {
+            $counters["agent:{$agent->getId()}:order:all"] = function () use ($agent) {
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                ])->count();
+            };
+            $counters["agent:{$agent->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($agent, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('first day of this month 00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('first day of next month 00:00');
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+            $counters["agent:{$agent->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($agent, $createtime) {
+                $start = new DateTime("@$createtime");
+                $start->modify('00:00');
+                $end = new DateTime("@$createtime");
+                $end->modify('next day 00:00');
+                return Order::query([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $start->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->count();
+            };
+        }
+
+        return Util::transactionDo(function () use ($order, $counters) {
+            foreach ($counters as $uid => $initFN) {
+                if (!Counter::increment($uid, 1, $initFN)) {
+                    return err('fail');
+                }
+            }
+            return true;
+        });
     }
 
     /**
@@ -820,6 +986,9 @@ include './index.php';
                     );
                 }
             }
+
+            $result['counter'] = self::updateOrderCounters($order);
+
         } else {
             $result[] = $order->getId() . ' lock failed!';
         }
@@ -837,7 +1006,7 @@ include './index.php';
      *
      * @return ?RowLocker
      */
-    public static function lockObject(modelObj $obj, array $cond, $auto_unlock = false): ?RowLocker
+    public static function lockObject(modelObj $obj, array $cond, bool $auto_unlock = false): ?RowLocker
     {
         $seg = key($cond);
         if (is_string($seg)) {
@@ -861,7 +1030,7 @@ include './index.php';
      * @param string $redirect
      * @param string $type
      */
-    public static function message($msg, $redirect = '', $type = '')
+    public static function message($msg, string $redirect = '', string $type = '')
     {
         We7::message($msg, $redirect, $type);
     }
@@ -871,7 +1040,7 @@ include './index.php';
      * @param string $redirect
      * @param string $type
      */
-    public static function itoast($msg, $redirect = '', $type = '')
+    public static function itoast($msg, string $redirect = '', string $type = '')
     {
         We7::itoast($msg, $redirect, $type);
     }
@@ -1001,7 +1170,7 @@ HTML_CONTENT;
      *
      * @return string
      */
-    public static function fetchJSSDK($debug = false): string
+    public static function fetchJSSDK(bool $debug = false): string
     {
         ob_start();
         We7::register_jssdk($debug);
@@ -1020,7 +1189,7 @@ HTML_CONTENT;
     {
         $result = [];
 
-        if ($agent && $type) {
+        if ($type) {
             $agent_data = $agent->getAgentData();
             if ($agent_data['notice'][$type]) {
                 $result[$agent->getId()] = $agent->getOpenid();
@@ -1225,7 +1394,7 @@ HTML_CONTENT;
      *
      * @return mixed
      */
-    public static function toMedia($src, $use_image_proxy = false, $local_path = false): string
+    public static function toMedia($src, bool $use_image_proxy = false, bool $local_path = false): string
     {
         if (empty(_W('attachurl'))) {
             We7::load()->model('attachment');
@@ -1388,7 +1557,7 @@ HTML_CONTENT;
      *
      * @return array
      */
-    public static function deviceTest($user, $device, $lane = Device::DEFAULT_CARGO_LANE, $params = []): array
+    public static function deviceTest($user, $device, int $lane = Device::DEFAULT_CARGO_LANE, array $params = []): array
     {
         if (is_string($device)) {
             $device = Device::get($device, true);
@@ -1402,9 +1571,6 @@ HTML_CONTENT;
                 $mcb_channel = $goods['lottery']['size'];
             } else {
                 $mcb_channel = Device::cargoLane2Channel($device, $lane);
-            }
-            if ($mcb_channel == Device::CHANNEL_INVALID) {
-                return error(State::ERROR, '不正确的货道！');
             }
 
             if (!$device->lockAcquire()) {
@@ -1475,7 +1641,7 @@ HTML_CONTENT;
      * @return array
      * @throws Exception
      */
-    public static function openDevice($args = []): array
+    public static function openDevice(array $args = []): array
     {
         ignore_user_abort(true);
         set_time_limit(0);
@@ -1547,7 +1713,7 @@ HTML_CONTENT;
         $delay = intval(settings('device.lockRetryDelay', 1));
 
         if (!$device->lockAcquire($retries, $delay)) {
-            return error(State::FAIL, '设备被占用，请重新扫描设备二维码');
+            return error(State::ERROR_LOCK_FAILED, '设备被占用，请重新扫描设备二维码');
         }
 
         //事件：设备已锁定
@@ -1559,7 +1725,7 @@ HTML_CONTENT;
         }
 
         if ($goods['num'] < 1) {
-            return error(State::FAIL, '对不起，已经被领完了');
+            return error(State::ERROR, '对不起，已经被领完了');
         }
 
         if ($goods['lottery']) {
@@ -1569,7 +1735,7 @@ HTML_CONTENT;
         }
 
         if ($mcb_channel == Device::CHANNEL_INVALID) {
-            return error(State::FAIL, '商品货道配置不正确');
+            return error(State::ERROR, '商品货道配置不正确');
         }
 
         $log_data = [
@@ -1606,10 +1772,13 @@ HTML_CONTENT;
             /** @var goods_voucher_logsModelObj $voucher */
             $voucher = $params['voucher'];
 
+            //定制功能：零佣金
+            $is_zero_bonus = Helper::isZeroBonus($device);
+
             $order_data = [
                 'openid' => $user->getOpenid(),
-                'agent_id' => $device->getAgentId(),
-                'device_id' => $device->getId(),
+                'agent_id' => $is_zero_bonus ? 0 : $device->getAgentId(),
+                'device_id' => $is_zero_bonus ? 0 : $device->getId(),
                 'src' => Order::ACCOUNT,
                 'name' => $goods['name'],
                 'goods_id' => $goods['id'],
@@ -1625,6 +1794,9 @@ HTML_CONTENT;
                         'name' => $device->getName(),
                     ],
                     'user' => $user->profile(),
+                    'custom' => [
+                        'zero_bonus' => $is_zero_bonus,
+                    ]
                 ],
             ];
 
@@ -1653,12 +1825,12 @@ HTML_CONTENT;
                     $order->{$setter}($val);
                 }
                 if (!$order->save()) {
-                    return error(State::FAIL, '领取失败，保存订单失败');
+                    return error(State::ERROR, '领取失败，保存订单失败');
                 }
             } else {
                 $order = Order::create($order_data);
                 if (empty($order)) {
-                    return error(State::FAIL, '领取失败，创建订单失败');
+                    return error(State::ERROR, '领取失败，创建订单失败');
                 }
 
                 $params['order'] = $order;
@@ -1667,7 +1839,7 @@ HTML_CONTENT;
                     //事件：订单已经创建
                     EventBus::on('device.orderCreated', $params);
                 } catch (Exception $e) {
-                    return error($e->getCode() ?: State::ERROR, $e->getMessage());
+                    return error(State::ERROR, $e->getMessage());
                 }
             }
 
@@ -1675,12 +1847,12 @@ HTML_CONTENT;
 
             foreach ($params as $entry) {
                 if ($entry && !$entry->save()) {
-                    return error(State::FAIL, '无法保存数据，请重试');
+                    return error(State::ERROR, '无法保存数据，请重试');
                 }
             }
 
             $data = [
-                'online' => $args['online'] === false ? false : true,
+                'online' => !($args['online'] === false),
                 'channel' => $mcb_channel,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 'userid' => $user->getOpenid(),
@@ -1724,24 +1896,26 @@ HTML_CONTENT;
             } else {
                 $order->setResultCode(0);
 
-                if (isset($goods['cargo_lane'])) {
-                    $locker = $device->payloadLockAcquire(3);
-                    if (empty($locker)) {
-                        return error(State::ERROR, '设备正忙，请重试！');
+                if (!$is_zero_bonus) {
+                    if (isset($goods['cargo_lane'])) {
+                        $locker = $device->payloadLockAcquire(3);
+                        if (empty($locker)) {
+                            return error(State::ERROR, '设备正忙，请重试！');
+                        }
+                        $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                        if (is_error($res)) {
+                            return error(State::ERROR, '保存库存失败！');
+                        }
+                        $locker->unlock();
                     }
-                    $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
-                    if (is_error($res)) {
-                        return error(State::ERROR, '保存库存失败！');
-                    }
-                    $locker->unlock();
-                }
 
-                if ($voucher) {
-                    $voucher->setUsedUserId($user->getId());
-                    $voucher->setUsedtime(time());
-                    if (!$voucher->save()) {
-                        return error(State::ERROR, '出货失败：使用取货码失败！');
-                    }
+                    if ($voucher) {
+                        $voucher->setUsedUserId($user->getId());
+                        $voucher->setUsedtime(time());
+                        if (!$voucher->save()) {
+                            return error(State::ERROR, '出货失败：使用取货码失败！');
+                        }
+                    }                    
                 }
             }
 
@@ -1749,7 +1923,7 @@ HTML_CONTENT;
             $order->setExtraData('pull.result', $res);
 
             if (!$order->save()) {
-                return error(State::FAIL, '无法保存订单数据！');
+                return error(State::ERROR, '无法保存订单数据！');
             }
 
             $device->save();
@@ -1784,7 +1958,7 @@ HTML_CONTENT;
     /**
      * 在事务中执行指定函数.
      *
-     * @param callable $cb 要执行的函数
+     * @param callable $cb 要执行的函数, return error(..)或者抛出异常会回退事务
      *
      * @return mixed
      */
@@ -1820,9 +1994,9 @@ HTML_CONTENT;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function getClientIp()
+    public static function getClientIp(): string
     {
         return We7::getip();
     }
@@ -1907,6 +2081,13 @@ HTML_CONTENT;
             return $resp;
         }
 
+        parse_str(str_replace('; ', '&', getArray($resp, 'headers.X-LIMIT', '')), $limits);
+
+        if (is_array($limits)) {
+            $limits['updatetime'] = time();
+            Config::location('tencent.lbs.limits', $limits, true);
+        }
+
         $res = json_decode($resp['content'], true);
         if (empty($res)) {
             return err('请求失败，返回数据为空！');
@@ -1931,6 +2112,9 @@ HTML_CONTENT;
      */
     public static function mustValidateLocation(userModelObj $user, deviceModelObj $device): bool
     {
+        if (!$user->isWxUser()) {
+            return false;
+        }
         if (!$device->needValidateLocation()) {
             return false;
         }
@@ -2101,9 +2285,9 @@ HTML_CONTENT;
      * @param $length
      * @param bool $numeric
      *
-     * @return mixed
+     * @return string
      */
-    public static function random($length, $numeric = false)
+    public static function random($length, bool $numeric = false): string
     {
         return We7::random($length, $numeric);
     }
@@ -2127,9 +2311,9 @@ HTML_CONTENT;
      * @param string $do
      * @param array $params
      * @param bool $eid
-     * @return mixed
+     * @return string
      */
-    public static function url($do = '', array $params = [], $eid = true)
+    public static function url(string $do = '', array $params = [], bool $eid = true): string
     {
         $params['m'] = APP_NAME;
 
@@ -2146,7 +2330,7 @@ HTML_CONTENT;
      * @param bool $full_url
      * @return string
      */
-    public static function murl($do = '', array $params = [], $full_url = true): string
+    public static function murl(string $do = '', array $params = [], bool $full_url = true): string
     {
         $params['do'] = $do;
         $params['m'] = APP_NAME;
@@ -2268,7 +2452,7 @@ HTML_CONTENT;
      * @param array $header
      * @param array $data
      */
-    public static function exportExcel($filename = '', array $header = [], array $data = [])
+    public static function exportExcel(string $filename = '', array $header = [], array $data = [])
     {
         header('Content-type:application/vnd.ms-excel');
         header('Content-Disposition:filename=' . $filename . '.xls');
@@ -2445,14 +2629,30 @@ HTML_CONTENT;
         return false;
     }
 
+    public static function isDouYinAppContainer(): bool
+    {
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '';
+        if (empty($user_agent)) {
+            return false;
+        }
+        $douyin = ['bytedancewebview'];
+        foreach ($douyin as $val) {
+            if (strpos($user_agent, $val) !== false) {
+                return true;
+            }
+        }
+        return false;        
+    }
+
     /**
      * 使用GET请求指定API
      * @param string $url
      * @param int $timeout
      * @param array $params
-     * @return string|null
+     * @param bool $json_result
+     * @return mixed
      */
-    public static function get(string $url, int $timeout = 3, $params = []): ?string
+    public static function get(string $url, int $timeout = 3, array $params = [], bool $json_result = false)
     {
         $ch = curl_init();
 
@@ -2482,7 +2682,12 @@ HTML_CONTENT;
             return null;
         }
 
-        return $response;
+        return $json_result ? json_decode($response, true) : $response;
+    }
+
+    public static function getJSON(string $url)
+    {
+        return self::get($url, 3, [], true);
     }
 
     /**
@@ -2491,9 +2696,10 @@ HTML_CONTENT;
      * @param array $data
      * @param bool $json
      * @param int $timeout
+     * @param array $params
      * @return array
      */
-    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, $params = []): array
+    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, array $params = []): array
     {
         $ch = curl_init();
 
@@ -2505,13 +2711,14 @@ HTML_CONTENT;
         }
 
         curl_setopt($ch, CURLOPT_POST, true);
+
+        $headers = [];
+
         if ($json) {
             $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($json_str)
-            ]);
+            $headers[] = 'Content-Type: application/json';
+            $headers[] = 'Content-Length: ' . strlen($json_str);
         } else {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
@@ -2524,7 +2731,19 @@ HTML_CONTENT;
         }
 
         foreach ($params as $index => $val) {
+            if ($index == CURLOPT_HTTPHEADER) {
+                if (array($val)) {
+                    $headers = array_merge($headers, $val);
+                } else {
+                    $headers[] = $val;
+                }
+                continue;
+            }
             curl_setopt($ch, $index, $val);
+        }
+
+        if ($headers) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
         $response = curl_exec($ch);
@@ -2537,7 +2756,7 @@ HTML_CONTENT;
 
         $result = json_decode($response, JSON_OBJECT_AS_ARRAY);
 
-        return isset($result) ? $result : error(State::ERROR, '无法解析返回的数据！');
+        return $result ?? error(State::ERROR, '无法解析返回的数据！');
     }
 
     /**

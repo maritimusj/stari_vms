@@ -1670,6 +1670,12 @@ if ($op == 'list') {
         $query->where(['title REGEXP' => $keywords]);
     }
 
+    //分配assign.js通过ids获取对应分组数据
+    $ids = Util::parseIdsFromGPC();
+    if (!empty($ids)) {
+        $query->where(['id' => $ids]);
+    }
+
     $result = [
         'page' => $page,
         'total' => $total,

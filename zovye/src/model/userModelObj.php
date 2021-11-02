@@ -159,7 +159,6 @@ class userModelObj extends modelObj
 
         if ($detail) {
             $fans_data = $this->get('fansData', []);
-
             if (is_array($fans_data)) {
                 $data['sex'] = $fans_data['sex'];
                 $data['province'] = $fans_data['province'];

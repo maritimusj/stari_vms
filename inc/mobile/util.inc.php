@@ -267,7 +267,7 @@ if ($op == 'default') {
     $user = Util::getCurrentUser();
     if ($user) {
         if (request::has('sex')) {
-            $user->updateSettings('fansData.sex', request::int('sex'));
+            $user->updateSettings('customData.sex', request::int('sex'));
         }
     }
 }

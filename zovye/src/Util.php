@@ -158,8 +158,8 @@ class Util
                             if ($user->getAvatar() != $fans['headimgurl']) {
                                 $user->setAvatar($fans['headimgurl']);
                             }
-
-                            $user->set('fansData', $fans);
+                            $customData = $user->get('customData', []);
+                            $user->set('fansData', array_merge($fans, $customData));
                             $user->save();
                             App::setContainer($user);
                         }

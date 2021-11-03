@@ -1,0 +1,481 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #month_stats_chart,#year_stats_chart {
+        width: 100%;
+        height: 450px;
+    }
+    .gray {
+        color: lightgray;
+        cursor: default;
+    }
+    .month_label {
+        margin-right: 6px;
+        cursor: pointer;
+        padding: 0 3px 0 3px;
+    }
+    .month_label:not(.current):hover {
+        background-color: coral;
+        color: white;
+    }
+    .month_label.current {
+        cursor: default;
+        background-color: coral;
+        color: white;
+    }
+    .year_label {
+        margin-right: 6px;
+        cursor: pointer;
+        padding: 0 3px 0 3px;
+    }
+    .year_label:not(.current):hover {
+        background-color: coral;
+        color: white;
+    }
+    .year_label.current {
+        cursor: default;
+        background-color: coral;
+        color: white;
+    }
+    .arrow-pre,.arrow-next {
+        cursor: pointer;
+    }
+    .arrow-pre:active,.arrow-next:active {
+        color: gray;
+    }
+    .arrow-pre:hover,.arrow-next:hover {
+        font-weight: bold;
+    }
+</style>
+<div style="margin-bottom: 1em;display: block;">
+    <div style="position:absolute;float:right;right:2em;top:1em;z-index:999;">
+        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative" title="微信昵称：{php echo $agent->getNickname();}，手机号码：{php echo $agent->getMobile()}">
+            <img src="{php echo $agent->getAvatar();}">
+            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            {if $agent->isAgent()}
+            <span class="agent-user">[ 代理商 ]</span>
+            {/if}
+        </div>        
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">佣金统计</a>
+    </li>
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('agent', array('op'=>'device_stats_view', 'id' => $agent->getId()));}">设备统计</a>
+    </li>
+</ul>
+<div id="app" v-cloak>
+    <div class="panel panel-default nav-tab-item panel-first">
+        <div class="heading">
+            <span class="operate">
+                <div  class="pull-right">
+                    <span class="arrow-pre" @click="preYear">&lt;&lt;</span>
+                    <span v-text="year_title"></span>
+                    <span  class="arrow-next" @click="nextYear" v-if="isNextYearButtonEnabled">&gt;&gt;</span>
+                    <span class="gray" v-else>&gt;&gt;</span>
+                    <template v-for="y in year_list" v-if="year_list.length > 1">
+                        <span v-text="y + '年'" class="year_label" :class="{'current': year == y}" @click="year=y"></span>
+                    </template>
+                    <i :class="{'fa': true,'fa-list': year_view == 'chart', 'fa-area-chart': year_view == 'form'}" @click="toggleChartView('year')" :title="year_view=='chart'?'切换到表格':'切换到图表'"></i>
+                </div>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div id="year_stats_chart" v-show="year_view=='chart'"></div>
+            <div style="margin-top: 2em;">
+                <table class="table"  v-show="year_view=='form'">
+                    <thead>
+                        <th>#</th>
+                        <th>免费订单</th>
+                        <th>支付订单</th>
+                        <th>收益</th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(e, i) in year_data['list']">
+                            <td v-text="i"></td>
+                            <td v-text="e.order.free"></td>
+                            <td v-text="e.order.fee"></td>
+                            <td v-text="e.commission.total"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> 
+    <div class="panel panel-default">
+        <div class="heading">
+            <span class="operate">
+                <div  class="pull-right">
+                    <span  class="arrow-pre" @click="preMonth">&lt;&lt;</span>
+                    <span v-text="month_title"></span>
+                    <span  class="arrow-next" @click="nextMonth" v-if="isNextMonthButtonEnabled">&gt;&gt;</span>
+                    <span class="gray" v-else>&gt;&gt;</span>
+                    <template v-for="m in month_list" v-if="month_list.length > 1">
+                        <span v-text="m + '月'" class="month_label" :class="{'current': month == m}" @click="month=m"></span>
+                    </template>
+                    <i :class="{'fa': true,'fa-list': month_view == 'chart', 'fa-area-chart': month_view == 'form'}" @click="toggleChartView('month')" :title="month_view=='chart'?'切换到表格':'切换到图表'"></i>
+                </div>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div id="month_stats_chart" v-show="month_view=='chart'"></div>
+            <div style="margin-top: 2em;">
+                <table class="table"  v-show="month_view=='form'">
+                    <thead>
+                        <th>#</th>
+                        <th>免费订单</th>
+                        <th>支付订单</th>
+                        <th>收益（元）</th>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(e, i) in month_data['list']">
+                            <td v-text="i"></td>
+                            <td v-text="e.order.free"></td>
+                            <td v-text="e.order.fee"></td>
+                            <td v-text="'￥' + e.commission.total"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<script>
+        const api_url = "{php echo $this->createWebUrl('agent', ['id' => $agent->getId()])}";
+        require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_ECHARTS_URL);}"], function (Vue, EChart) {
+            const colors = ['#5470C6', '#91CC75', '#EE6666'];
+            const year_option = {
+                color: colors,
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                grid: {
+
+                },
+                legend: {
+                    data: ['免费订单', '支付订单', '收益']
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    data: []
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '订单数量',
+                        min: 0,
+                        position: 'left',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[1]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '收益（元）',
+                        min: 0,
+                        position: 'right',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[2]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: []
+            };
+
+            const month_option = {
+                color: colors,
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                grid: {
+
+                },
+                legend: {
+                    data: ['免费订单', '支付订单', '收益']
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    data: []
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '订单数量',
+                        min: 0,
+                        position: 'left',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[1]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '收益（元）',
+                        min: 0,
+                        position: 'right',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[2]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: []
+            };
+
+            new Vue({
+                el: '#app',
+                data: {
+                    month_view: localStorage.getItem('stari_month_chart_view') || 'chart',
+                    month_chart: null,
+                    month_title: '',
+                    month_data: [],
+                    year_view: localStorage.getItem('stari_year_chart_view') || 'chart',
+                    year_chart: null,
+                    year_title: '',
+                    year_data: [],
+                    year_list: [],
+                    month: (new Date()).getMonth() + 1,
+                    year: (new Date()).getFullYear(),
+                },
+                mounted() {
+                    this.getMonthData();
+                    this.getYearData();
+                    this.month_chart = EChart.init(document.getElementById("month_stats_chart"));
+                    this.month_chart.setOption(month_option);
+                    this.year_chart = EChart.init(document.getElementById("year_stats_chart"));
+                    this.year_chart.setOption(year_option);
+                    window.addEventListener('resize', () => {
+                        this.month_chart.resize();
+                        this.year_chart.resize();
+                    })
+                },
+                computed: {
+                    isNextMonthButtonEnabled() {
+                        return this.isValidateMonth(this.month);
+                    },
+                    isNextYearButtonEnabled() {
+                        const year = (new Date()).getFullYear();
+                        return this.year < year;
+                    },
+                    month_list() {
+                        const months = [];
+                        for (i = 0; i < 12; i++) {
+                            if (this.isValidateMonth(i)) months.push(i + 1);
+                        }
+                        return months;
+                    }
+                },
+                watch: {
+                    month() {
+                        this.getMonthData(this.year + "-" + this.month)
+                    },
+                    year() {
+                        if (!this.isValidateMonth(this.month)) {
+                            this.month = 1;
+                        }
+                        this.getYearData(this.year);
+                        this.getMonthData(this.year + "-" + this.month)
+                    }
+                },
+                methods: {
+                    toggleChartView($w) {
+                        if ($w == 'month') {
+                            this.month_view = (this.month_view == 'chart' ? 'form' : 'chart');
+                            localStorage.setItem('stari_month_chart_view', this.month_view);
+                            Vue.nextTick(() => {
+                                this.month_chart && this.month_chart.resize();
+                            })
+                        } else if ($w == 'year') {
+                            this.year_view = (this.year_view == 'chart' ? 'form' : 'chart');
+                            localStorage.setItem('stari_year_chart_view', this.year_view);
+                            Vue.nextTick(() => {
+                                this.year_chart && this.year_chart.resize();
+                            })
+                        }
+                    },
+                    isValidateMonth(m) {
+                        const year = (new Date()).getFullYear();
+                        const month = (new Date()).getMonth() + 1;
+                        return this.year < year || (this.year == year && m < month);
+                    },
+                    preMonth() {
+                        if (--this.month < 1) {
+                            this.month = 12;
+                            this.year--;
+                        }
+                    },
+                    nextMonth() {
+                        if (this.isValidateMonth(this.month)) {
+                            if (++this.month > 12) {
+                                this.month = 1;
+                                this.year++;
+                            }
+                        }
+                    },
+                    getYearData(year = '') {
+                        $.get(api_url, { op: 'year_commission_statistics', year }).then(res => {
+                            if (res.status) {
+                                return res.data;
+                            }
+                        }).then(data => {
+                            this.initYearChart(data);
+                        });
+                    },
+                    getMonthData(month = '') {
+                        $.get(api_url, { op: 'month_commission_statistics', month }).then(res => {
+                            if (res.status) {
+                                return res.data;
+                            }
+                        }).then(data => {
+                            this.initMonthChart(data);
+                        });
+
+                    },
+                    preYear() {
+                        this.month = 12;
+                        this.year--;
+                    },
+                    nextYear() {
+                        this.month = 1;
+                        const year = (new Date()).getFullYear();
+                        if (this.year < year) this.year++;
+                    },
+                    initYearChart(data) {
+                        this.year_data = data;
+                        this.year_title = data['title'] || '';
+                        this.year_list = data['year'] || [];
+                        const xaxis_data = [];
+                        const series_data_free = [];
+                        const series_data_fee = [];
+                        const series_data_total = [];
+                        for (const key in (data['list'] || {})) {
+                            xaxis_data.push(key);
+                            series_data_free.push(data['list'][key]['order']['free']);
+                            series_data_fee.push(data['list'][key]['order']['fee']);
+                            series_data_total.push(data['list'][key]['commission']['total']);
+                        }
+                        year_option.xAxis.data = xaxis_data;
+                        year_option.series = [
+                            {
+                                name: '免费订单',
+                                type: 'bar',
+                                emphasis: {
+                                    focus: 'series'
+                                },
+                                yAxisIndex: 0,
+                                data: series_data_free,
+                            },
+                            {
+                                name: '支付订单',
+                                type: 'bar',
+                                emphasis: {
+                                    focus: 'series'
+                                },
+                                yAxisIndex: 0,
+                                data: series_data_fee,
+                            },
+                            {
+                                name: '收益',
+                                type: 'line',
+                                emphasis: {
+                                    focus: 'series'
+                                },
+                                yAxisIndex: 1,
+                                data: series_data_total,
+                            }
+                        ]
+
+                        this.year_chart.setOption(year_option, true);
+                    },
+                    initMonthChart(data) {
+                        this.month_data = data;
+                        this.month_title = data['title'] || '';
+                        const xaxis_data = [];
+                        const series_data_free = [];
+                        const series_data_fee = [];
+                        const series_data_total = [];
+                        for (const key in (data['list'] || {})) {
+                            xaxis_data.push(key);
+                            series_data_free.push(data['list'][key]['order']['free']);
+                            series_data_fee.push(data['list'][key]['order']['fee']);
+                            series_data_total.push(data['list'][key]['commission']['total']);
+                        }
+                        month_option.xAxis.data = xaxis_data;
+                        month_option.series = [
+                            {
+                                name: '免费订单',
+                                type: 'bar',
+                                emphasis: {
+                                    focus: 'series'
+                                },
+                                yAxisIndex: 0,
+                                data: series_data_free,
+                            },
+                            {
+                                name: '支付订单',
+                                type: 'bar',
+                                emphasis: {
+                                    focus: 'series'
+                                },
+                                yAxisIndex: 0,
+                                data: series_data_fee,
+                            },
+                            {
+                                name: '收益',
+                                type: 'line',
+                                emphasis: {
+                                    focus: 'series'
+                                },
+                                yAxisIndex: 1,
+                                data: series_data_total,
+                            }
+                        ]
+
+                        this.month_chart.setOption(month_option, true);
+                    }
+                }
+            })
+        })
+
+</script>
+{template 'common/footer'}

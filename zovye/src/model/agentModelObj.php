@@ -465,4 +465,16 @@ class agentModelObj extends userModelObj
         }
         return $locked;
     }
+
+    public function getFirstOrderData()
+    {
+        return $this->settings('agentData.stats.first_order');
+    }
+    public function setFirstOrderData(orderModelObj $order)
+    {
+        return $this->updateSettings('agentData.stats.first_order', [
+            'id' => $order->getId(),
+            'createtime' => $order->getCreatetime(),
+        ]);
+    }
 }

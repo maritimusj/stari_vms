@@ -82,6 +82,43 @@ class Statistics
         }, $device->getId(), $begin->format('Y-m'));
     }
 
+    public static function userYear(userModelObj $user, $year = '')
+    {
+        $date = self::parseMonth($year);
+        if (!$date) {
+            return [];
+        }
+
+        $date->modify('first day of January 00:00');
+        $end = DateTimeImmutable::createFromMutable($date)->modify('first day of January next year 00:00');
+
+        $result = [
+            'summary' => [
+                'order' => [
+                    'free' => 0,
+                    'fee' => 0,
+                ],
+                'commission' => [
+                    'total' => 0,
+                ],
+            ],
+            'list' => []
+        ];
+        while ($date < $end) {
+            if ($date->getTimestamp() > time()) {
+                break;
+            }
+            $start = DateTimeImmutable::createFromMutable($date);
+            $date->modify('next month 00:00');
+            $data = self::userMonth($user, $start, true);
+            $result['summary']['order']['free'] += $data['summary']['order']['free'];
+            $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
+            $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
+            $result['list'][$start->format('m月')] = $data['summary'];
+        }
+        return $result;
+    }
+
     public static function userMonth(userModelObj $user, $month = '', $detail = false)
     {
         $fn = function (DateTimeInterface $begin, DateTimeInterface $end) use ($user) {
@@ -95,7 +132,8 @@ class Statistics
                 ]
             ];
 
-            $result['order']['free'] = (int)Order::query()->where([
+            $result['order']['free'] = //random_int(0, 1000);
+            (int)Order::query()->where([
                 'agent_id' => $user->getId(),
                 'price' => 0,
                 'balance' => 0,
@@ -103,14 +141,16 @@ class Statistics
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
 
-            $result['order']['fee'] = (int)Order::query()->where([
+            $result['order']['fee'] = //random_int(0, 1000);
+            (int)Order::query()->where([
                 'agent_id' => $user->getId(),
                 'price >' => 0,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp(),
             ])->get('sum(num)');
 
-            $result['commission']['total'] = (int)CommissionBalance::query()->where([
+            $result['commission']['total'] = //random_int(0, 10000) / 100;
+             (int)CommissionBalance::query()->where([
                 'openid' => $user->getOpenid(),
                 'src' => [
                     CommissionBalance::ORDER_FREE,
@@ -143,11 +183,11 @@ class Statistics
                 while ($begin < $end) {
                     $start = DateTimeImmutable::createFromMutable($begin);
                     $begin->modify('next day 00:00');
-                    $result['list'][$start->format('Y-m-d')] = $fn($start, $begin);
+                    $result['list'][$start->format('m月d日')] = $fn($start, $begin);
                 }
             }
 
             return $result;
-        }, $user->getId(), $begin->format('Y-m'));
+        }, $user->getId(), $begin->format('Y-m'), $detail);
     }
 }

@@ -179,8 +179,7 @@
                                     </a>
                                 </li>                                
                                 <li role="separator" class="divider"></li>
-                                <li><a href="#" data-op="viewStatsChart"> <i class="fa fa-line-chart fa-fw"></i> 本月统计图</a></li>
-                                <li><a href="#" data-op="viewStats"> <i class="fa fa-list-alt fa-fw"></i> 全部统计数据</a></li>
+                                <li><a href="{php echo $this->createWebUrl('agent', ['op' => 'commission_stats_view', 'id' => $agent['id']]);}"> <i class="fa fa-area-chart fa-fw"></i> 统计数据</a></li>
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 佣金明细</a></li>

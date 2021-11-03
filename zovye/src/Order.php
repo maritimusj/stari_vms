@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\model\orderModelObj;
@@ -133,17 +134,41 @@ class Order extends State
 
     public static function getFirstOrderOfDevice(deviceModelObj $device): ?orderModelObj
     {
-        $id = Config::device('order.first.id');
+        $id = $device->settings('stats.first_order.id');
         if ($id) {
             return Order::get($id);
         }
         $query = self::query(['device_id' => $device->getId()]);
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
-            Config::device('order.first.id', $order->getId());
+            $device->updateSettings('stats.first_order', [
+                'id' => $order->getId(),
+                'createtime' => $order->getCreatetime(),
+            ]);
             return $order;
         }
         return null;
+    }
+
+    public static function getFirstOrderOfAgent(agentModelObj $agent): ?orderModelObj
+    {
+        $data = $agent->getFirstOrderData();
+        if ($data && $data['id']) {
+            return Order::get($data['id']);
+        }
+        $query = self::query(['agent_id' => $agent->getId()]);
+        $order = $query->orderBy('id ASC')->findOne();
+        if ($order) {
+            $agent->setFirstOrderData($order);
+            return $order;
+        }
+        return null;
+    }
+
+    public static function getLastOrderOfAgent(agentModelObj $agent): ?orderModelObj
+    {
+        $query = self::query(['agent_id' => $agent->getId()]);
+        return $query->orderBy('id desc')->findOne();
     }
 
     /**

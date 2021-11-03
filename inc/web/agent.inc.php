@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -437,7 +438,6 @@ if ($op == 'default') {
             $user->updateSettings('agentData.level', $level);
             $user->updateSettings('agentData.area', $area);
             $user->updateSettings('agentData.superior', $superior_data);
-
         } else {
 
             $agent_data = [
@@ -471,11 +471,12 @@ if ($op == 'default') {
 
         $user->setAgent($level);
         $user->setMobile($mobile);
-
     } elseif (request::has('agent_notice')) {
 
         if ($user->isAgent()) {
-            $user->updateSettings('agentData.notice', [
+            $user->updateSettings(
+                'agentData.notice',
+                [
                     'agentApp' => request::bool('agentApp') ? 1 : 0,
                     'remainWarning' => request::bool('remainWarning') ? 1 : 0,
                     'deviceError' => request::bool('deviceError') ? 1 : 0,
@@ -485,20 +486,18 @@ if ($op == 'default') {
                 ]
             );
         }
-
     } elseif (request::has('agent_funcs')) {
 
         if ($user->isAgent()) {
             $data = Util::parseAgentFNsFromGPC();
             $user->updateSettings('agentData.funcs', $data);
-            
+
             if (App::isCustomWxAppEnabled()) {
                 $user->updateSettings('agentData.wx.app', [
                     'key' => request::trim('WxAppKey'),
                 ]);
             }
         }
-
     } elseif (request::has('agent_commission')) {
 
         if ($user->isAgent()) {
@@ -531,7 +530,9 @@ if ($op == 'default') {
                     $rel_2 = min(10000, max(0, request::float('rel_level2', 0, 2) * 100));
                     $rel_3 = min(10000, max(0, request::float('rel_level3', 0, 2) * 100));
 
-                    $user->updateSettings('agentData.gsp.rel', [
+                    $user->updateSettings(
+                        'agentData.gsp.rel',
+                        [
                             'level1' => $rel_1,
                             'level2' => $rel_2,
                             'level3' => $rel_3,
@@ -544,7 +545,9 @@ if ($op == 'default') {
             $bonus_enabled = request::bool('agentBonusEnabled');
             $user->updateSettings('agentData.bonus.enabled', $bonus_enabled);
             if ($bonus_enabled) {
-                $user->updateSettings('agentData.bonus', [
+                $user->updateSettings(
+                    'agentData.bonus',
+                    [
                         'enabled' => true,
                         'order' => [
                             'f' => request::bool('freeOrder') ? 1 : 0,
@@ -562,7 +565,9 @@ if ($op == 'default') {
     } elseif (request::bool('agent_misc')) {
 
         if ($user->isAgent()) {
-            $user->updateSettings('agentData.misc', [
+            $user->updateSettings(
+                'agentData.misc',
+                [
                     'maxFree' => request::int('maxFree'),
                     'maxAccounts' => request::int('maxAccounts'),
                     'pushAccountMsg' => request::trim('pushAccountMsg'),
@@ -573,7 +578,9 @@ if ($op == 'default') {
                 ]
             );
 
-            $user->updateSettings('agentData.device', [
+            $user->updateSettings(
+                'agentData.device',
+                [
                     'remainWarning' => request::int('remainWarning'),
                     'shipment' => [
                         'balanced' => request::bool('shipmentBalance') ? 1 : 0,
@@ -620,7 +627,7 @@ if ($op == 'default') {
                 $data['lcsw']['merchant_no'] = request::trim('merchant_no');
                 $data['lcsw']['terminal_id'] = request::trim('terminal_id');
                 $data['lcsw']['access_token'] = request::trim('access_token');
-                
+
                 //创建扫呗接口文件
                 Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
                     'headers' => [
@@ -778,7 +785,6 @@ if ($op == 'default') {
     }
 
     JSON::success($result);
-
 } elseif ($op == 'viewStatsChart') {
 
     $agent = Agent::get(request::int('id'));
@@ -797,7 +803,7 @@ if ($op == 'default') {
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => Util::cachedCall(30, function() use($agent, $datetime, $title) {
+            'chart' => Util::cachedCall(30, function () use ($agent, $datetime, $title) {
                 return Stats::chartDataOfMonth($agent, $datetime, "代理商：{$agent->getName()}({$title})");
             }, $agent->getId(), $title),
         ]
@@ -811,38 +817,20 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $result = Util::cachedCall(30, function() use($agent) {
-        $first_order_datetime = $agent->settings('agentData.stats.first_order');
-        if (empty($first_order_datetime)) {
-    
-            /** @var orderModelObj $first_order */
-            $first_order = Order::query(['agent_id' => $agent->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
-            if ($first_order) {
-                $first_order_datetime = (int)$first_order->getCreatetime();
-                $agent->updateSettings('agentData.stats.first_order', $first_order_datetime);
-            }
-        }
-    
-        if (empty($first_order_datetime)) {
+    $result = Util::cachedCall(30, function () use ($agent) {
+        $first_order = Order::getFirstOrderOfAgent($agent);
+        if (empty($first_order)) {
             return error(State::ERROR, '代理商暂时没有任何订单！');
         }
-    
-        $last_order_datetime = $agent->settings('agentData.stats.last_order');
-        if (empty($last_order_datetime)) {
-    
-            /** @var orderModelObj $last_order */
-            $last_order = Order::query(['agent_id' => $agent->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
-            if ($last_order) {
-                $last_order_datetime = (int)$last_order->getCreatetime();
-            }
-        }
-    
+
+        $last_order = Order::getLastOrderOfAgent($agent);
+
         $months = [];
-    
+
         try {
-            $begin = new DateTime('@' . $first_order_datetime);
-            $end = new DateTime('@' . $last_order_datetime);
-    
+            $begin = new DateTime('@' . $first_order->getCreatetime());
+            $end = new DateTime('@' . $last_order->getCreatetime());
+
             $end = $end->modify('first day of next month');
             $end->modify('-1 day');
             do {
@@ -877,14 +865,14 @@ if ($op == 'default') {
         JSON::fail('时间格式不正确！');
     }
 
-    $result = Util::cachedCall(3, function() use ($agent, $date) {
+    $result = Util::cachedCall(3, function () use ($agent, $date) {
         $result = Stats::repairMonthData($agent, $date);
         if (!is_error($result)) {
             if ($agent->settings('repair.status'))
-            $agent->updateSettings('repair', [
-                'status' => 'finished',
-                'time' => time(),
-            ]);
+                $agent->updateSettings('repair', [
+                    'status' => 'finished',
+                    'time' => time(),
+                ]);
         }
         return $result;
     }, $agent->getId(), $month);
@@ -1902,7 +1890,7 @@ if ($op == 'default') {
         ],
     ];
 
-    $id = request::int('agentid');
+    $id = request::int('id');
     $agent = Agent::get($id);
     if (empty($agent)) {
         Util::itoast('找不到这个代理商！', 'error');
@@ -1911,6 +1899,7 @@ if ($op == 'default') {
     $page_name = request::trim('page_name', 'default');
 
     app()->showTemplate("web/agent/detail/{$page_name}", [
+        'agent' => $agent,
         'pages' => $pages,
         'id' => $id,
         'page_name' => $page_name,
@@ -1925,7 +1914,7 @@ if ($op == 'default') {
         $query = $query->whereOr([
             'name REGEXP' => $s_keyword,
             'nickname REGEXP' => $s_keyword,
-            'mobile REGEXP' => $s_keyword,            
+            'mobile REGEXP' => $s_keyword,
         ]);
     }
 
@@ -1940,7 +1929,7 @@ if ($op == 'default') {
         'start' => request::str('start'),
         'end' => request::str('end'),
     ];
-    
+
     if ($date_limit['start']) {
         $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
     } else {
@@ -2011,7 +2000,9 @@ if ($op == 'default') {
                 $data['event'] = '佣金提现' . $status;
             } elseif ($entry->getSrc() == CommissionBalance::REFUND) {
                 $data['event'] = '退款';
-            } elseif (in_array($entry->getSrc(), [
+            } elseif (in_array(
+                $entry->getSrc(),
+                [
                     CommissionBalance::ORDER_FREE,
                     CommissionBalance::ORDER_BALANCE,
                     CommissionBalance::ORDER_WX_PAY,
@@ -2150,7 +2141,9 @@ if ($op == 'default') {
         }
     }
     $e_date->modify('-1 day');
-    app()->showTemplate('web/common/commission_export', [
+    app()->showTemplate(
+        'web/common/commission_export',
+        [
             'title' => $title,
             'logs' => $logs,
             'pager' => $pager,
@@ -2161,4 +2154,108 @@ if ($op == 'default') {
             's_user_list' => $s_user_list,
         ]
     );
+} elseif ($op == 'device_stats_view') {
+    $agent_id = request::int('id');
+    $agent = Agent::get($agent_id);
+
+    if (empty($agent)) {
+        Util::itoast('找不到这个代理商！', '', 'error');
+    }
+    app()->showTemplate('web/agent/device_stats_view', [
+        'agent' => $agent,
+    ]);
+} elseif ($op == 'commission_stats_view') {
+    $agent_id = request::int('id');
+    $agent = Agent::get($agent_id);
+
+    if (empty($agent)) {
+        Util::itoast('找不到这个代理商！', '', 'error');
+    }
+    app()->showTemplate('web/agent/commission_stats_view', [
+        'agent' => $agent,
+    ]);
+} elseif ($op == 'device_order_statistics') {
+    $agent_id = request::int('id');
+    $agent = Agent::get($agent_id);
+
+    if (empty($agent)) {
+        JSON::fail('找不到这个代理商！');
+    }
+
+    $month_str = request::str('month');
+    try {
+        $month = new DateTimeImmutable($month_str);
+    } catch (Exception $e) {
+        JSON::fail('时间格式不正确！');
+    }
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+    $query = Device::query(['agent_id' => $agent->getId()]);
+    $query->page($page, $page_size);
+
+    $result = [];
+    foreach ($query->findAll() as $device) {
+        $result[] = [
+            'id' => $device->getId(),
+            'uid' => $device->getUID(),
+            'name' => $device->getName(),
+            'stats' => Statistics::deviceOrderMonth($device, $month),
+        ];
+    }
+
+    JSON::success($result);
+} elseif ($op == 'year_commission_statistics') {
+    $agent_id = request::int('id');
+    $agent = Agent::get($agent_id);
+
+    if (empty($agent)) {
+        JSON::fail('找不到这个代理商！');
+    }
+
+    $year_str = request::str('year');
+
+    try {
+        $year = new DateTimeImmutable($year_str . '-01-01');
+    } catch (Exception $e) {
+        JSON::fail('时间格式不正确！');
+    }
+
+    $year_list = [];
+    $first_order = Order::getFirstOrderOfAgent($agent);
+    if ($first_order) {
+        $begin = new DateTime('@' . $first_order->getCreatetime());
+        $nextYear = new DateTime('first day of jan next year 00:00');
+        while ($begin < $nextYear) {
+            $year_list[] = $begin->format('Y');
+            $begin->modify('next year');
+        }
+    } else {
+        $year_list[] = (new DateTime())->format('Y');
+    }
+
+    $result = Statistics::userYear($agent, $year);
+    $result['title'] = $year->format('Y年');
+    $result['year'] = $year_list;
+    JSON::success($result);
+} elseif ($op == 'month_commission_statistics') {
+    $agent_id = request::int('id');
+    $agent = Agent::get($agent_id);
+
+    if (empty($agent)) {
+        JSON::fail('找不到这个代理商！');
+    }
+
+    $month_str = request::str('month');
+    try {
+        $month = new DateTimeImmutable($month_str);
+    } catch (Exception $e) {
+        JSON::fail('时间格式不正确！');
+    }
+
+    $result = Statistics::userMonth($agent, $month, true);
+    $result['title'] = $month->format('Y年m月');
+
+    JSON::success($result);
 }

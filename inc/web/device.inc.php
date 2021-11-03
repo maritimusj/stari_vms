@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author jjs@zovye.com
  * @url www.zovye.com
@@ -32,7 +33,6 @@ $tpl_data = [
 if ($op == 'list') {
 
     JSON::result(Device::search());
-
 } else if ($op == 'default') {
 
     if (request::is_ajax()) {
@@ -820,8 +820,10 @@ if ($op == 'list') {
         $extra['location']['baidu']['lng'] = $location['lng'];
 
         $saved_baidu_loc = $device->settings('extra.location.baidu', []);
-        if (strval($saved_baidu_loc['lng']) != strval($location['lng'])
-            || strval($saved_baidu_loc['lat']) != strval($location['lat'])) {
+        if (
+            strval($saved_baidu_loc['lng']) != strval($location['lng'])
+            || strval($saved_baidu_loc['lat']) != strval($location['lat'])
+        ) {
             $addr = Util::getLocation($location['lng'], $location['lat']);
             if ($addr) {
                 $extra['location']['baidu']['area'] = [
@@ -911,7 +913,6 @@ if ($op == 'list') {
     }
 
     Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), $result['error'] ? 'warning' : 'success');
-
 } elseif ($op == 'online') {
 
     $device = Device::get(request::int('id'));
@@ -924,7 +925,6 @@ if ($op == 'list') {
         JSON::fail('请求出错，请稍后再试！');
     }
     JSON::success($res);
-
 } elseif ($op == 'deviceTest') {
 
     $id = request::int('id');
@@ -1128,7 +1128,6 @@ if ($op == 'list') {
     $tpl_data['device'] = $device;
 
     app()->showTemplate('web/device/payload', $tpl_data);
-
 } elseif ($op == 'log') {
 
     $device = Device::get(request('id'));
@@ -1367,8 +1366,8 @@ if ($op == 'list') {
 
     list($m, $total) = Util::cachedCall(30, function () use ($device) {
         //开始 结束
-        $first_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id ASC')->findAll()->current();
-        $last_order = Order::query(['device_id' => $device->getId()])->limit(1)->orderBy('id DESC')->findAll()->current();
+        $first_order = Order::getFirstOrderOfDevice($device);
+        $last_order = Order::getLastOrderOfDevice($device);
         if ($first_order) {
             $first_order_datetime = intval($first_order->getCreatetime());
         } else {
@@ -2458,7 +2457,6 @@ if ($op == 'list') {
     }
 
     JSON::success($result);
-
 } elseif ($op == 'qrcode_download') {
 
     //简单的二维码导出功能

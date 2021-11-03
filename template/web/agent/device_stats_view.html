@@ -1,0 +1,27 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<div style="margin-bottom: 1em;display: block;">
+    <div style="position:absolute;float:right;right:2em;top:1em;z-index:999;">
+        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative" title="微信昵称：{php echo $agent->getNickname();}，手机号码：{php echo $agent->getMobile()}">
+            <img src="{php echo $agent->getAvatar();}">
+            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            {if $agent->isAgent()}
+            <span class="agent-user">[ 代理商 ]</span>
+            {/if}
+        </div>        
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_stats_view', 'id' => $agent->getId()));}">佣金统计</a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="#">设备统计</a>
+    </li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+    </div>
+</div>
+
+{template 'common/footer'}

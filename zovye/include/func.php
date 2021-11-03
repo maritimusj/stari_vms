@@ -368,6 +368,7 @@ function hashFN(callable $fn, ...$val): string
             $ref->getFileName(),
             $ref->getStartLine(),
             $ref->getEndLine(),
+            $ref->getName(),
         ];
         foreach ($val as $v) {
             $data[] = strval($v);

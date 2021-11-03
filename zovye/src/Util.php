@@ -546,14 +546,18 @@ include './index.php';
             return $last['v'];
         }
 
-        $result = $fn();
+        try {
+            $result = $fn();
 
-        We7::cache_write($key, [
-            'time' => time(),
-            'v' => $result,
-        ]);
+            We7::cache_write($key, [
+                'time' => time(),
+                'v' => $result,
+            ]);
 
-        return $result;
+            return $result;
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 
     public static function cachedCallUtil($expired, callable $fn, ...$params)
@@ -565,14 +569,18 @@ include './index.php';
             return $data['v'];
         }
 
-        $result = $fn();
+        try {
+            $result = $fn();
 
-        We7::cache_write($key, [
-            'time' => $expired instanceof DateTimeInterface ? $expired->getTimestamp() : intval($expired),
-            'v' => $result,
-        ]);
+            We7::cache_write($key, [
+                'time' => $expired instanceof DateTimeInterface ? $expired->getTimestamp() : intval($expired),
+                'v' => $result,
+            ]);
 
-        return $result;
+            return $result;
+        } catch (Exception $e) {
+            return err($e->getMessage());
+        }
     }
 
     public static function isAssigned($data, deviceModelObj $device): bool

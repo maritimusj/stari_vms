@@ -83,7 +83,7 @@ class Statistics
         }, $device->getId(), $begin->format('Y-m'));
     }
 
-    public static function userOrderMonth(userModelObj $user, $month = '', $detail = false)
+    public static function userMonth(userModelObj $user, $month = '', $detail = false)
     {
         $fn = function (DateTimeInterface $begin, DateTimeInterface $end) use ($user) {
             $result = [
@@ -137,7 +137,7 @@ class Statistics
         return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $begin, $detail) {
             $end = DateTimeImmutable::createFromMutable($begin)->modify('first day of next month 00:00');
             $result = [
-                'brief' => $fn($begin, $end),
+                'summary' => $fn($begin, $end),
             ];
 
             if ($detail) {
@@ -150,6 +150,6 @@ class Statistics
             }
 
             return $result;
-        });
+        }, $user->getId(), $begin->format('Y-m'));
     }
 }

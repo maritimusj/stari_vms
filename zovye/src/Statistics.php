@@ -2,6 +2,7 @@
 
 namespace zovye;
 
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
@@ -11,20 +12,23 @@ class Statistics
 {
     public static function deviceOrderMonth(deviceModelObj $device, $month = '')
     {
-        $begin = null;
+        $date = null;
         try {
             if (is_int($month)) {
-                $begin = new DateTimeImmutable('@' . $month);
+                $date = new DateTime('@' . $month);
             } elseif (is_string($month)) {
-                $begin = new DateTimeImmutable($month);
+                $date = new DateTime($month);
             } elseif ($month instanceof DateTimeInterface) {
-                $begin = DateTimeImmutable::createFromFormat($month->format('Y-m-d'), 'Y-m-d');
+                $date = DateTime::createFromFormat('Y-m-d', $month->format('Y-m-d'));
             }
         } catch (Exception $e) {
             return [];
         }
+        
+        $date->modify('first day of this month 00:00');
+        $begin = DateTimeImmutable::createFromMutable($date);
 
-        return Util::cachedCall($begin->format('Y-m') == date('Y-md') ? 10 : 0, function () use ($begin, $device) {
+        return Util::cachedCall($begin->format('Y-m') == date('Y-m') ? 10 : 0, function () use ($begin, $device) {
             $end = $begin->modify('+1 month');
 
             $result = [

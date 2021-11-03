@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -124,7 +123,6 @@ class Statistics
                 'createtime <=' => $begin->getTimestamp(),
                 'createtime >' => $end->getTimestamp(),
             ])->get('sum(x_val)');
-
 
             return $result;
         };

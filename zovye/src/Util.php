@@ -542,7 +542,7 @@ include './index.php';
         $key = App::uid(6) . 'delay' . hashFN($fn, ...$params);
 
         $last = We7::cache_read($key);
-        if ($last && is_array($last) && time() - intval($last['time']) < $interval_seconds) {
+        if ($last && is_array($last) && ($interval_seconds === 0 || time() - intval($last['time']) < $interval_seconds)) {
             return $last['v'];
         }
 

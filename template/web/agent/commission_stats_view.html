@@ -422,22 +422,26 @@
                         this.getMonthData(this.year + "-" + this.month)
                     },
                     year_loading(v) {
-                        // if (this.year_chart) {
-                        //     if (v) {
-                        //         this.year_chart.showLoading();
-                        //     } else {
-                        //         this.year_chart.hideLoading();
-                        //     }
-                        // }
+                        if (this.year_chart) {
+                            setTimeout(() => {
+                                if (this.year_loading && new Date() - this.year_loading > 2000) {
+                                    this.year_chart.showLoading();
+                                } else {
+                                    this.year_chart.hideLoading();
+                                }
+                            }, 2000);
+                        }
                     },
                     month_loading(v) {
-                        // if (this.month_chart) {
-                        //     if (v) {
-                        //         this.month_chart.showLoading();
-                        //     } else {
-                        //         this.month_chart.hideLoading();
-                        //     }
-                        // }
+                        if (this.month_chart) {
+                            setTimeout(() => {
+                                if (this.month_loading && new Date() - this.month_loading > 2000) {
+                                    this.month_chart.showLoading();
+                                } else {
+                                    this.month_chart.hideLoading();
+                                }
+                            }, 2000);
+                        }
                     }
                 },
                 methods: {
@@ -513,6 +517,7 @@
                     },
                     getMonthOfYear(year, month = 1) {
                         $.get(api_url, { op: 'year_commission_statistics', year, month }).then(res => {
+                            this.year_loading = new Date();
                             if (res.status) {
                                 return res.data || [];
                             } else {
@@ -530,13 +535,14 @@
                     },
                     getYearData(year = '') {
                         if (!this.year_loading) {
-                            this.year_loading = true;
+                            this.year_loading = new Date();
                             this.resetYearChart();
                             this.getMonthOfYear(year);
                         }
                     },
                     getDayOfMonth(month, day = 1) {
                         $.get(api_url, { op: 'month_commission_statistics', month, day }).then(res => {
+                            this.month_loading = new Date();
                             if (res.status) {
                                 return res.data || [];
                             } else {
@@ -554,7 +560,7 @@
                     },
                     getMonthData(month = '') {
                         if (!this.month_loading) {
-                            this.month_loading = true;
+                            this.month_loading = new Date();
                             this.resetMonthChart();
                             this.getDayOfMonth(month);
                         }

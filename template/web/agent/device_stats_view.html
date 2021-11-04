@@ -110,7 +110,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="operate text-center">
+            <div class="operate text-center" v-if="data.length > 0">
                 <i class="fa fa-sort-down" title="加载更多" @click="moreData"></i>
             </div>
             <div class="pull-right pager" v-if="totalpage > 0">

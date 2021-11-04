@@ -854,7 +854,7 @@ if ($op == 'default') {
     JSON::success(['title' => "<b>{$agent->getName()}</b>的出货统计", 'content' => $content]);
 } elseif ($op == 'repair') {
 
-    $agent = Agent::get(request::int('agent'));
+    $agent = Agent::get(request::int('id'));
     if (empty($agent)) {
         JSON::fail('找不到这个代理商！');
     }

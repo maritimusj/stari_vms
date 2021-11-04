@@ -2238,9 +2238,9 @@ if ($op == 'default') {
     }
 
     $year_str = request::str('year');
-
+    $year = null;
     try {
-        $year = new DateTimeImmutable($year_str . '-01-01');
+         $year = new DateTimeImmutable($year_str . '-01-01');
     } catch (Exception $e) {
         JSON::fail('时间格式不正确！');
     }
@@ -2248,7 +2248,11 @@ if ($op == 'default') {
     $year_list = [];
     $first_order = Order::getFirstOrderOfAgent($agent);
     if ($first_order) {
-        $begin = new DateTime('@' . $first_order->getCreatetime());
+        try {
+            $begin = new DateTime('@' . $first_order->getCreatetime());
+        } catch (Exception $e) {
+            $begin = new DateTime();
+        }
         $nextYear = new DateTime('first day of jan next year 00:00');
         while ($begin < $nextYear) {
             $year_list[] = $begin->format('Y');
@@ -2272,6 +2276,7 @@ if ($op == 'default') {
     }
 
     $month_str = request::str('month');
+    $month = null;
     try {
         $month = new DateTimeImmutable($month_str);
     } catch (Exception $e) {

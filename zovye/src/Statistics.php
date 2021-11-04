@@ -31,8 +31,16 @@ class Statistics
 
     public static function deviceOrder(deviceModelObj $device, $start = '', $end = '')
     {
-        $begin = new DateTime($start);
-        $end = new DateTime($end);
+        try {
+            $begin = new DateTime($start);
+        } catch (Exception $e) {
+            return [];
+        }
+        try {
+            $end = new DateTime($end);
+        } catch (Exception $e) {
+            return [];
+        }
         if (empty($start)) {
             $begin->modify('first day of January this year 00:00');
         } else {

@@ -64,7 +64,7 @@ function tb(string $name): string
  */
 class __ZOVYE_SETTINGS__
 {
-    static array $cache = [];
+    static $cache = [];
 }
 
 function settings(string $key = '', $default = null)
@@ -91,7 +91,7 @@ function updateSettings(string $key, $val): bool
  */
 class __ZOVYE_CONFIG__
 {
-    static array $cache = [];
+    static $cache = [];
 }
 
 function globalConfig(string $name, $path = '', $default = null)

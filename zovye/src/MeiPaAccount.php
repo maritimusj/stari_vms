@@ -73,7 +73,7 @@ class MeiPaAccount
                     $data['title'] = $result['data']['wechat_name'];
                     $data['qrcode'] = $result['data']['qrcodeurl'];
 
-                    if ($result['data']['joburl']) {
+                    if ($result['data']['joburl'] && We7::starts_with($result['data']['joburl'], 'http')) {
                         $data['redirect_url'] = $result['data']['joburl'];
                     }
 

@@ -8,9 +8,13 @@
         width: 100%;
         height: 450px;
     }
+    .year_title,.month_title {
+        font-weight: bolder;
+    }
     .gray {
         color: lightgray;
         cursor: default;
+        user-select: none;
     }
     .month_label {
         margin-right: 6px;
@@ -42,6 +46,7 @@
     }
     .arrow-pre,.arrow-next {
         cursor: pointer;
+        user-select: none;
     }
     .arrow-pre:active,.arrow-next:active {
         color: gray;
@@ -74,8 +79,9 @@
         <div class="heading">
             <span class="operate">
                 <div  class="pull-right">
-                    <span class="arrow-pre" @click="preYear">&lt;&lt;</span>
-                    <span v-text="year_title"></span>
+                    <span class="arrow-pre" @click="preYear" v-if="isPreYearButtonEnabled">&lt;&lt;</span>
+                    <span class="gray" v-else>&lt;&lt;</span>
+                    <span class="year_title" v-text="year_title"></span>
                     <span  class="arrow-next" @click="nextYear" v-if="isNextYearButtonEnabled">&gt;&gt;</span>
                     <span class="gray" v-else>&gt;&gt;</span>
                     <template v-for="y in year_list" v-if="year_list.length > 1">
@@ -112,7 +118,7 @@
             <span class="operate">
                 <div  class="pull-right">
                     <span  class="arrow-pre" @click="preMonth">&lt;&lt;</span>
-                    <span v-text="month_title"></span>
+                    <span class="month_title" v-text="month_title"></span>
                     <span  class="arrow-next" @click="nextMonth" v-if="isNextMonthButtonEnabled">&gt;&gt;</span>
                     <span class="gray" v-else>&gt;&gt;</span>
                     <template v-for="m in month_list" v-if="month_list.length > 1">
@@ -293,6 +299,9 @@
                     isNextMonthButtonEnabled() {
                         return this.isValidateMonth(this.month);
                     },
+                    isPreYearButtonEnabled() {
+                        return this.isValidateYear(this.year -1);
+                    },
                     isNextYearButtonEnabled() {
                         const year = (new Date()).getFullYear();
                         return this.year < year;
@@ -338,6 +347,10 @@
                         const month = (new Date()).getMonth() + 1;
                         return this.year < year || (this.year == year && m < month);
                     },
+                    isValidateYear(y) {
+                        y += '';
+                        return (this.year_list || []).indexOf(y) !== -1;
+                    },
                     preMonth() {
                         if (--this.month < 1) {
                             this.month = 12;
@@ -372,8 +385,10 @@
 
                     },
                     preYear() {
-                        this.month = 12;
-                        this.year--;
+                        if (this.isValidateYear(this.year-1)) {
+                            this.month = 12;
+                            this.year--;                            
+                        }
                     },
                     nextYear() {
                         this.month = 1;

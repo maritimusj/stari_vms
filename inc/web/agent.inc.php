@@ -2206,6 +2206,7 @@ if ($op == 'default') {
     }
 
     JSON::success($result);
+
 } elseif ($op == 'year_commission_statistics') {
     $agent_id = request::int('id');
     $agent = Agent::get($agent_id);
@@ -2238,7 +2239,9 @@ if ($op == 'default') {
     $result = Statistics::userYear($agent, $year);
     $result['title'] = $year->format('Y年');
     $result['year'] = $year_list;
+
     JSON::success($result);
+
 } elseif ($op == 'month_commission_statistics') {
     $agent_id = request::int('id');
     $agent = Agent::get($agent_id);

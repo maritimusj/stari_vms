@@ -108,24 +108,24 @@ class Statistics
                 'total' => 0,
             ];
 
-            $free = random_int(1, 1000);
-            // (int)Order::query()->where([
-            //     'device_id' => $device->getId(),
-            //     'price' => 0,
-            //     'balance' => 0,
-            //     'createtime >=' => $begin->getTimestamp(),
-            //     'createtime <' => $end->getTimestamp()
-            // ])->get('sum(num)');
+            $free =// random_int(1, 1000);
+            (int)Order::query()->where([
+                'device_id' => $device->getId(),
+                'price' => 0,
+                'balance' => 0,
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp()
+            ])->get('sum(num)');
 
             $result['free'] = intval($free);
 
-            $fee = random_int(1, 1000);
-            // (int)Order::query()->where([
-            //     'device_id' => $device->getId(),
-            //     'price >' => 0,
-            //     'createtime >=' => $begin->getTimestamp(),
-            //     'createtime <' => $end->getTimestamp(),
-            // ])->get('sum(num)');
+            $fee =// random_int(1, 1000);
+            (int)Order::query()->where([
+                'device_id' => $device->getId(),
+                'price >' => 0,
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->get('sum(num)');
 
             $result['fee'] = intval($fee);
 
@@ -174,6 +174,7 @@ class Statistics
             $start = DateTimeImmutable::createFromMutable($date);
             $date->modify('next month 00:00');
             $data = self::userMonth($user, $start, true);
+            $data['summary']['m'] = $start->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
             $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
             $result['summary']['commission']['total'] += $data['summary']['commission']['total'];

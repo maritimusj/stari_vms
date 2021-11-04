@@ -794,6 +794,7 @@ class Stats
             try {
                 $date = new DateTimeImmutable($datetime);
             } catch (Exception $e) {
+                return false;
             }
         } elseif ($datetime instanceof DateTimeInterface) {
             $date = $datetime;

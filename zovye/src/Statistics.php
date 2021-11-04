@@ -232,8 +232,8 @@ class Statistics
                     CommissionBalance::GSP,
                     CommissionBalance::BONUS,
                 ],
-                'createtime <=' => $begin->getTimestamp(),
-                'createtime >' => $end->getTimestamp(),
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
             ])->get('sum(x_val)');
 
             return $result;

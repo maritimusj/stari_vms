@@ -85,7 +85,7 @@
                     <span  class="arrow-next" @click="nextYear" v-if="isNextYearButtonEnabled">&gt;&gt;</span>
                     <span class="gray" v-else>&gt;&gt;</span>
                     <template v-for="y in year_list" v-if="year_list.length > 1">
-                        <span v-text="y + '年'" class="year_label" :class="{'current': year == y}" @click="year=y"></span>
+                        <span v-text="y + '年'" class="year_label" :class="{'current': year == y}" @click="changeYear(y)"></span>
                     </template>
                     <i :class="{'fa': true,'fa-list': year_view == 'chart', 'fa-area-chart': year_view == 'form'}" @click="toggleChartView('year')" :title="year_view=='chart'?'切换到表格':'切换到图表'"></i>
                     <i class="fa fa-reply" title="返回" @click="back()"></i>
@@ -143,7 +143,7 @@
                     <span  class="arrow-next" @click="nextMonth" v-if="isNextMonthButtonEnabled">&gt;&gt;</span>
                     <span class="gray" v-else>&gt;&gt;</span>
                     <template v-for="m in month_list" v-if="month_list.length > 1">
-                        <span v-text="m + '月'" class="month_label" :class="{'current': month == m}" @click="month = m"></span>
+                        <span v-text="m + '月'" class="month_label" :class="{'current': month == m}" @click="changeMonth(m)"></span>
                     </template>
                     <i :class="{'fa': true,'fa-list': month_view == 'chart', 'fa-area-chart': month_view == 'form'}" @click="toggleChartView('month')" :title="month_view=='chart'?'切换到表格':'切换到图表'"></i>
                 </div>
@@ -476,6 +476,16 @@
                             })
                         }
                     },
+                    changeMonth(m) {
+                        if (!this.month_loading) {
+                            this.month = m;
+                        }
+                    },
+                    changeYear(y) {
+                        if (!this.year_loading) {
+                            this.year = y;
+                        }
+                    },
                     isValidateMonth(m) {
                         const year = (new Date()).getFullYear();
                         const month = (new Date()).getMonth() + 1;
@@ -519,9 +529,11 @@
                         });
                     },
                     getYearData(year = '') {
-                        this.year_loading = true;
-                        this.resetYearChart();
-                        this.getMonthOfYear(year);
+                        if (!this.year_loading) {
+                            this.year_loading = true;
+                            this.resetYearChart();
+                            this.getMonthOfYear(year);
+                        }
                     },
                     getDayOfMonth(month, day = 1) {
                         $.get(api_url, { op: 'month_commission_statistics', month, day }).then(res => {
@@ -541,9 +553,11 @@
                         });
                     },
                     getMonthData(month = '') {
-                        this.month_loading = true;
-                        this.resetMonthChart();
-                        this.getDayOfMonth(month);
+                        if (!this.month_loading) {
+                            this.month_loading = true;
+                            this.resetMonthChart();
+                            this.getDayOfMonth(month);
+                        }
                     },
                     preYear() {
                         if (this.isValidateYear(this.year - 1)) {

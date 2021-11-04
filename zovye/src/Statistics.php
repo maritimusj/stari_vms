@@ -222,7 +222,7 @@ class Statistics
             ])->get('sum(num)');
 
             $result['commission']['total'] = //random_int(0, 10000) / 100;
-             (int)CommissionBalance::query()->where([
+             number_format(CommissionBalance::query()->where([
                 'openid' => $user->getOpenid(),
                 'src' => [
                     CommissionBalance::ORDER_FREE,
@@ -234,7 +234,7 @@ class Statistics
                 ],
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp(),
-            ])->get('sum(x_val)');
+            ])->get('sum(x_val)') / 100, 2, '.', '');
 
             return $result;
         };

@@ -2238,11 +2238,17 @@ if ($op == 'default') {
     }
 
     $year_str = request::str('year');
+    $month = request::int('month');
+
     $year = null;
     try {
-         $year = new DateTimeImmutable($year_str . '-01-01');
+        $year = new DateTimeImmutable(sprintf("%s-%02d-01", (new Datetime($year_str))->format('Y'), $month));
     } catch (Exception $e) {
         JSON::fail('时间格式不正确！');
+    }
+
+    if ($year->getTimestamp() > time()) {
+        JSON::fail('时间不超过当前时间！');
     }
 
     $year_list = [];
@@ -2262,7 +2268,7 @@ if ($op == 'default') {
         $year_list[] = (new DateTime())->format('Y');
     }
 
-    $result = Statistics::userYear($agent, $year);
+    $result = Statistics::userYear($agent, $year, $month);
     $result['title'] = $year->format('Y年');
     $result['year'] = $year_list;
 
@@ -2283,7 +2289,7 @@ if ($op == 'default') {
         JSON::fail('时间格式不正确！');
     }
 
-    $result = Statistics::userMonth($agent, $month, true);
+    $result = Statistics::userMonth($agent, $month, request::int('day'));
     $result['title'] = $month->format('Y年m月');
 
     JSON::success($result);

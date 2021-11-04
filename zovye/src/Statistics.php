@@ -153,15 +153,13 @@ class Statistics
         }, $device->getId(), $begin->format('Y-m'));
     }
 
-    public static function userYear(userModelObj $user, $year = '')
+    public static function userYear(userModelObj $user, $year = '', $month = 0)
     {
         $date = self::parseMonth($year);
         if (!$date) {
             return [];
         }
 
-        $date->modify('first day of January 00:00');
-        $end = DateTimeImmutable::createFromMutable($date)->modify('first day of January next year 00:00');
 
         $result = [
             'summary' => [
@@ -175,23 +173,37 @@ class Statistics
             ],
             'list' => []
         ];
-        while ($date < $end) {
-            if ($date->getTimestamp() > time()) {
-                break;
-            }
-            $start = DateTimeImmutable::createFromMutable($date);
-            $date->modify('next month 00:00');
-            $data = self::userMonth($user, $start);
-            $data['summary']['m'] = $start->format('Y年m月');
+        if ($month == 0) {
+            $date->modify('first day of January 00:00');
+            $end = DateTimeImmutable::createFromMutable($date)->modify('first day of January next year 00:00');
+    
+            while ($date < $end) {
+                if ($date->getTimestamp() > time()) {
+                    break;
+                }
+                $start = DateTimeImmutable::createFromMutable($date);
+                $date->modify('next month 00:00');
+                $data = self::userMonth($user, $start);
+                $data['summary']['m'] = $start->format('Y年m月');
+                $result['summary']['order']['free'] += $data['summary']['order']['free'];
+                $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
+                $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
+                $result['list'][$start->format('m月')] = $data['summary'];
+            }            
+        } else {
+            $date->modify('first day of this month 00:00');
+            $data = self::userMonth($user, $date);
+            $data['summary']['m'] = $date->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
             $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
             $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
-            $result['list'][$start->format('m月')] = $data['summary'];
+            $result['list'][$date->format('m月')] = $data['summary'];
         }
+
         return $result;
     }
 
-    public static function userMonth(userModelObj $user, $month = '', $detail = false)
+    public static function userMonth(userModelObj $user, $month = '', $day = 0)
     {
         $fn = function (DateTimeInterface $begin, DateTimeInterface $end) use ($user) {
             $result = [
@@ -251,22 +263,30 @@ class Statistics
             return [];
         }
 
-        return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $begin, $detail) {
+        return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $day, $begin) {
             $end = DateTimeImmutable::createFromMutable($begin)->modify('first day of next month 00:00');
             $result = [
                 'summary' => $fn($begin, $end),
             ];
 
-            if ($detail) {
+            if ($day === true) {
                 $result['list'] = [];
                 while ($begin < $end) {
                     $start = DateTimeImmutable::createFromMutable($begin);
                     $begin->modify('next day 00:00');
                     $result['list'][$start->format('m月d日')] = $fn($start, $begin);
                 }
+            } elseif ($day > 0) {
+                $result['list'] = [];
+                $start = new DateTimeImmutable($begin->format("Y-m-$day 00:00:00"));
+                if ($start->format('Y-m') != $begin->format('Y-m')) {
+                    return [];
+                }
+                $end = $start->modify('next day 00:00');
+                $result['list'][$start->format('m月d日')] = $fn($start, $end);
             }
 
             return $result;
-        }, $user->getId(), $begin->format('Y-m'), $detail);
+        }, $user->getId(), $begin->format('Y-m'), $day);
     }
 }

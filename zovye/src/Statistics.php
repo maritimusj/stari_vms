@@ -125,7 +125,7 @@ class Statistics
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
 
-            $result['free'] = intval($free);
+            $result['free'] = $free;
 
             $fee =// random_int(1, 1000);
             (int)Order::query()->where([
@@ -135,7 +135,7 @@ class Statistics
                 'createtime <' => $end->getTimestamp(),
             ])->get('sum(num)');
 
-            $result['fee'] = intval($fee);
+            $result['fee'] = $fee;
 
             $balance = //random_int(1, 1000);
             (int)Order::query()->where([
@@ -145,7 +145,7 @@ class Statistics
                 'createtime <' => $end->getTimestamp(),
             ])->get('sum(num)');
 
-            $result['balance'] = intval($balance);
+            $result['balance'] = $balance;
 
             $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
 
@@ -181,7 +181,7 @@ class Statistics
             }
             $start = DateTimeImmutable::createFromMutable($date);
             $date->modify('next month 00:00');
-            $data = self::userMonth($user, $start, true);
+            $data = self::userMonth($user, $start);
             $data['summary']['m'] = $start->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
             $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
@@ -205,36 +205,43 @@ class Statistics
             ];
 
             $result['order']['free'] = //random_int(0, 1000);
-            (int)Order::query()->where([
-                'agent_id' => $user->getId(),
-                'price' => 0,
-                'balance' => 0,
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp()
-            ])->get('sum(num)');
+                (int) Util::cachedCall(0, function() use($user, $begin, $end) {
+                    return Order::query()->where([
+                        'agent_id' => $user->getId(),
+                        'price' => 0,
+                        'balance' => 0,
+                        'createtime >=' => $begin->getTimestamp(),
+                        'createtime <' => $end->getTimestamp()
+                    ])->get('sum(num)');
+                }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp());
 
             $result['order']['fee'] = //random_int(0, 1000);
-            (int)Order::query()->where([
-                'agent_id' => $user->getId(),
-                'price >' => 0,
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->get('sum(num)');
+                (int)Util::cachedCall(0, function () use($user, $begin, $end) {
+                    return Order::query()->where([
+                        'agent_id' => $user->getId(),
+                        'price >' => 0,
+                        'createtime >=' => $begin->getTimestamp(),
+                        'createtime <' => $end->getTimestamp(),
+                    ])->get('sum(num)');
+                }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp());
+
 
             $result['commission']['total'] = //random_int(0, 10000) / 100;
-             number_format(CommissionBalance::query()->where([
-                'openid' => $user->getOpenid(),
-                'src' => [
-                    CommissionBalance::ORDER_FREE,
-                    CommissionBalance::ORDER_BALANCE,
-                    CommissionBalance::ORDER_WX_PAY,
-                    CommissionBalance::ORDER_REFUND,
-                    CommissionBalance::GSP,
-                    CommissionBalance::BONUS,
-                ],
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->get('sum(x_val)') / 100, 2, '.', '');
+            number_format((int)Util::cachedCall(0, function() use($user, $begin, $end) {
+                     return CommissionBalance::query()->where([
+                         'openid' => $user->getOpenid(),
+                         'src' => [
+                             CommissionBalance::ORDER_FREE,
+                             CommissionBalance::ORDER_BALANCE,
+                             CommissionBalance::ORDER_WX_PAY,
+                             CommissionBalance::ORDER_REFUND,
+                             CommissionBalance::GSP,
+                             CommissionBalance::BONUS,
+                         ],
+                         'createtime >=' => $begin->getTimestamp(),
+                         'createtime <' => $end->getTimestamp(),
+                     ])->get('sum(x_val)');
+                 }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp()) / 100, 2, '.', '');
 
             return $result;
         };

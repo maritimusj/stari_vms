@@ -2182,7 +2182,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $fn = null;
+    $month = '';
     if (request::has('month')) {
         $month_str = request::str('month');
         try {

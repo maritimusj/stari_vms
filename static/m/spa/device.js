@@ -92,7 +92,7 @@ const app = new Vue({
                 }
             })
         }
-        if (typeof zovye_fn.saveUserProfile === 'function') {
+        if (typeof zovye_fn.saveUserProfile === 'function' && this.accounts.length > 0) {
             this.saveUserProfile = true;
         }
         this.visibilitychange();

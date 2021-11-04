@@ -565,8 +565,12 @@
                         this.year_chart && this.year_chart.setOption(year_option, true);
                     },
                     initYearChart(data) {
-                        this.year_title = data['title'] || '';
-                        this.year_list = data['year'] || [];
+                        if (data['title']) {
+                            this.year_title = data['title'];
+                        }
+                        if (data['year']) {
+                            this.year_list = data['year'];
+                        }
                         for (const key in (data['list'] || {})) {
                             this.year_data.push(data['list'][key]);
                             year_option.xAxis.data.push(key);
@@ -585,7 +589,9 @@
                         this.month_chart && this.month_chart.setOption(month_option, true);
                     },
                     initMonthChart(data) {
-                        this.month_title = data['title'] || '';
+                        if (data['title']) {
+                            this.month_title = data['title'];
+                        }
                         for (const key in (data['list'] || {})) {
                             this.month_data.push(data['list'][key]);
                             month_option.xAxis.data.push(key);

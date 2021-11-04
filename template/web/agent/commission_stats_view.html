@@ -117,7 +117,8 @@
         <div class="heading">
             <span class="operate">
                 <div  class="pull-right">
-                    <span  class="arrow-pre" @click="preMonth">&lt;&lt;</span>
+                    <span  class="arrow-pre" @click="preMonth" v-if="isPreMonthButtonEnabled">&lt;&lt;</span>
+                    <span class="gray" v-else>&lt;&lt;</span>
                     <span class="month_title" v-text="month_title"></span>
                     <span  class="arrow-next" @click="nextMonth" v-if="isNextMonthButtonEnabled">&gt;&gt;</span>
                     <span class="gray" v-else>&gt;&gt;</span>
@@ -296,6 +297,12 @@
                     })
                 },
                 computed: {
+                    isPreMonthButtonEnabled() {
+                        if (this.month == 1 && !this.isValidateYear(this.year -1)) {
+                            return false;
+                        }
+                        return true;
+                    },
                     isNextMonthButtonEnabled() {
                         return this.isValidateMonth(this.month);
                     },
@@ -352,10 +359,13 @@
                         return (this.year_list || []).indexOf(y) !== -1;
                     },
                     preMonth() {
-                        if (--this.month < 1) {
-                            this.month = 12;
-                            this.year--;
+                        if (this.month > 1 || this.isValidateYear(this.year -1)) {
+                            if (--this.month < 1) {
+                                this.month = 12;
+                                this.year--;
+                            }
                         }
+
                     },
                     nextMonth() {
                         if (this.isValidateMonth(this.month)) {

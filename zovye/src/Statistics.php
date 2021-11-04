@@ -29,6 +29,66 @@ class Statistics
         return $date;
     }
 
+    public static function deviceOrder(deviceModelObj $device, $start = '', $end = '')
+    {
+        $begin = new DateTime($start);
+        $end = new DateTime($end);
+        if (empty($start)) {
+            $begin->modify('first day of January this year 00:00');
+        } else {
+            $begin->modify('today 00:00');
+        }
+        if (empty($end)) {
+            $end = $begin->modify('first day of January next year 00:00');
+        } else {
+            $end->modify('next day 00:00');
+        }
+        
+        return Util::cachedCall($end->getTimestamp() > time() ? 10 : 0, function() use($device, $begin, $end) {
+            $result = [
+                'free' => 0,
+                'fee' => 0,
+                'balance' => 0,
+                'total' => 0,
+            ];
+
+            $free = //random_int(1, 1000);
+            (int)Order::query()->where([
+                'device_id' => $device->getId(),
+                'price' => 0,
+                'balance' => 0,
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp()
+            ])->get('sum(num)');
+
+            $result['free'] = intval($free);
+
+            $fee = //random_int(1, 1000);
+            (int)Order::query()->where([
+                'device_id' => $device->getId(),
+                'price >' => 0,
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->get('sum(num)');
+
+            $result['fee'] = intval($fee);
+
+            $balance = //random_int(1, 1000);
+            (int)Order::query()->where([
+                'device_id' => $device->getId(),
+                'balance >' => 0,
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->get('sum(num)');
+
+            $result['balance'] = intval($balance);
+
+            $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+
+            return $result;            
+        }, $device->getId(), $begin->getTimestamp(), $end->getTimestamp());
+    }
+
     public static function deviceOrderMonth(deviceModelObj $device, $month = '')
     {
         $date = self::parseMonth($month);
@@ -48,26 +108,29 @@ class Statistics
                 'total' => 0,
             ];
 
-            $free = Order::query()->where([
-                'device_id' => $device->getId(),
-                'price' => 0,
-                'balance' => 0,
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp()
-            ])->get('sum(num)');
+            $free = random_int(1, 1000);
+            // (int)Order::query()->where([
+            //     'device_id' => $device->getId(),
+            //     'price' => 0,
+            //     'balance' => 0,
+            //     'createtime >=' => $begin->getTimestamp(),
+            //     'createtime <' => $end->getTimestamp()
+            // ])->get('sum(num)');
 
             $result['free'] = intval($free);
 
-            $fee = Order::query()->where([
-                'device_id' => $device->getId(),
-                'price >' => 0,
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->get('sum(num)');
+            $fee = random_int(1, 1000);
+            // (int)Order::query()->where([
+            //     'device_id' => $device->getId(),
+            //     'price >' => 0,
+            //     'createtime >=' => $begin->getTimestamp(),
+            //     'createtime <' => $end->getTimestamp(),
+            // ])->get('sum(num)');
 
             $result['fee'] = intval($fee);
 
-            $balance = Order::query()->where([
+            $balance = //random_int(1, 1000);
+            (int)Order::query()->where([
                 'device_id' => $device->getId(),
                 'balance >' => 0,
                 'createtime >=' => $begin->getTimestamp(),

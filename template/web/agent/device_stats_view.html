@@ -113,7 +113,7 @@
             <div class="operate text-center" v-if="data.length > 0">
                 <i class="fa fa-sort-down" title="加载更多" @click="moreData"></i>
             </div>
-            <div class="pull-right pager" v-if="totalpage > 0">
+            <div class="pull-right pager" v-if="totalpage > 1 ">
                 <span class="preBtn" @click="changePage(1)" :class="{active: page != 1}" v-if="togglePager">
                     首页
                 </span>

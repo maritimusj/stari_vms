@@ -58,80 +58,82 @@
         <a href="#">设备</a>
     </li>
 </ul>
-<div class="panel panel-default nav-tab-item"  id="app" v-cloak>
-    <div class="heading">
-        <span class="operate">
-            <div class="pull-right">
-                <input name="datelimit[start]" type="hidden" value="{php echo $s_start_date}"/>
-                <input name="datelimit[end]" type="hidden" value="{php echo $s_end_date}"/>
-                <button class="btn btn-default daterange daterange-date" type="button">
-                <span class="date-title">
-                    {if empty($s_start_date) && empty($s_end_date)}
-                    {else}
-                    {$s_start_date} 至 {$s_end_date}
-                    {/if}
-                </span> <i class="fa fa-calendar"></i>
-                </button>
-                <button class="btn btn-default">
-                    <i :class="{'fa': true,'fa-list': view == 'chart', 'fa-area-chart': view == 'form'}" @click="toggleChartView('month')" :title="view=='chart'?'切换到表格':'切换到图表'"></i>
-                </button>
-                <button class="btn btn-default">
-                    <i class="fa fa-reply" title="返回" @click="back()"></i>
-                </button>
-            </div>
-        </span>
-    </div>
-    <div class="panel-body">
-        <div v-show="!loading && data.length == 0 && view == 'form'" class="text-center">
-            <i class="fa fa-question-circle text-muted"></i> 暂时没有任何数据
+<div class="panel panel-default nav-tab-item">
+    <div id="app" v-cloak>
+        <div class="heading">
+            <span class="operate">
+                <div class="pull-right">
+                    <input name="datelimit[start]" type="hidden" value="{php echo $s_start_date}"/>
+                    <input name="datelimit[end]" type="hidden" value="{php echo $s_end_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                    <span class="date-title">
+                        {if empty($s_start_date) && empty($s_end_date)}
+                        {else}
+                        {$s_start_date} 至 {$s_end_date}
+                        {/if}
+                    </span> <i class="fa fa-calendar"></i>
+                    </button>
+                    <button class="btn btn-default">
+                        <i :class="{'fa': true,'fa-list': view == 'chart', 'fa-area-chart': view == 'form'}" @click="toggleChartView('month')" :title="view=='chart'?'切换到表格':'切换到图表'"></i>
+                    </button>
+                    <button class="btn btn-default">
+                        <i class="fa fa-reply" title="返回" @click="back()"></i>
+                    </button>
+                </div>
+            </span>
         </div>
-        <template v-show="loading || data.length > 0">
-            <div id="stats_chart" v-show="view == 'chart'" :style="{height: chartHeight}"></div>
-            <div v-show="loading && view == 'form'" class="text-center">
-                <i class="fa fa-spinner fa-spin"></i> 正在加载中...
+        <div class="panel-body">
+            <div v-show="!loading && data.length == 0 && view == 'form'" class="text-center">
+                <i class="fa fa-question-circle text-muted"></i> 暂时没有任何数据
             </div>
-            <div style="margin-top: 2em;" v-show="view=='form' && (data.length > 0)">
-                <table class="table">
-                    <thead>
-                        <th>#</th>
-                        <th>设备</th>
-                        <th>免费订单</th>
-                        <th>支付订单</th>
-                        <th>合计</th>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(e, i) in data">
-                            <td v-text="i + 1"></td>
-                            <td v-text="e.name"></td>
-                            <td v-text="e.stats.free"></td>
-                            <td v-text="e.stats.fee"></td>
-                            <td v-text="e.stats.total"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="operate text-center" v-if="data.length > 0">
-                <i class="fa fa-sort-down" title="加载更多" @click="moreData"></i>
-            </div>
-            <div class="pull-right pager" v-if="totalpage > 1 ">
-                <span class="preBtn" @click="changePage(1)" :class="{active: page != 1}" v-if="togglePager">
-                    首页
-                </span>
-                <span @click="prePage" class="preBtn" :class="{active: page > 1}">
-                    &lt;&lt;
-                </span>
-                <template v-for="i in leftPartPager">
-                    <span :class="{current: i == page}" @click="changePage(i)">[ {{ i }} ]</span>
-                </template>
-                <span v-if="togglePager">
-                    ...
-                </span>
-                <span v-if="togglePager" @click="changePage(totalpage)">[ {{ totalpage }} ]</span>
-                <span @click="nextPage" class="nextBtn" :class="{active: page < totalpage}">
-                    &gt;&gt;
-                </span>
-            </div>
-        </template>
+            <template v-show="loading || data.length > 0">
+                <div id="stats_chart" v-show="view == 'chart'" :style="{height: chartHeight}"></div>
+                <div v-show="loading && view == 'form'" class="text-center">
+                    <i class="fa fa-spinner fa-spin"></i> 正在加载中...
+                </div>
+                <div style="margin-top: 2em;" v-show="view=='form' && (data.length > 0)">
+                    <table class="table">
+                        <thead>
+                            <th>#</th>
+                            <th>设备</th>
+                            <th>免费订单</th>
+                            <th>支付订单</th>
+                            <th>合计</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(e, i) in data">
+                                <td v-text="i + 1"></td>
+                                <td v-text="e.name"></td>
+                                <td v-text="e.stats.free"></td>
+                                <td v-text="e.stats.fee"></td>
+                                <td v-text="e.stats.total"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="operate text-center" v-if="data.length > 0">
+                    <i class="fa fa-sort-down" title="加载更多" @click="moreData"></i>
+                </div>
+                <div class="pull-right pager" v-if="totalpage > 1 ">
+                    <span class="preBtn" @click="changePage(1)" :class="{active: page != 1}" v-if="togglePager">
+                        首页
+                    </span>
+                    <span @click="prePage" class="preBtn" :class="{active: page > 1}">
+                        &lt;&lt;
+                    </span>
+                    <template v-for="i in leftPartPager">
+                        <span :class="{current: i == page}" @click="changePage(i)">[ {{ i }} ]</span>
+                    </template>
+                    <span v-if="togglePager">
+                        ...
+                    </span>
+                    <span v-if="togglePager" @click="changePage(totalpage)">[ {{ totalpage }} ]</span>
+                    <span @click="nextPage" class="nextBtn" :class="{active: page < totalpage}">
+                        &gt;&gt;
+                    </span>
+                </div>
+            </template>
+        </div>        
     </div>
 </div>
 <script>

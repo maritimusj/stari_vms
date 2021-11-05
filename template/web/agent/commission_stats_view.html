@@ -386,10 +386,7 @@
                 },
                 computed: {
                     isPreMonthButtonEnabled() {
-                        if (this.month == 1 && !this.isValidateYear(this.year - 1)) {
-                            return false;
-                        }
-                        return true;
+                        return !(this.month === 1 && !this.isValidateYear(this.year - 1));
                     },
                     isNextMonthButtonEnabled() {
                         return this.isValidateMonth(this.month);
@@ -466,14 +463,14 @@
                         }
                     },
                     toggleChartView($w) {
-                        if ($w == 'month') {
-                            this.month_view = (this.month_view == 'chart' ? 'form' : 'chart');
+                        if ($w === 'month') {
+                            this.month_view = (this.month_view === 'chart' ? 'form' : 'chart');
                             localStorage.setItem('stari_month_chart_view', this.month_view);
                             Vue.nextTick(() => {
                                 this.month_chart && this.month_chart.resize();
                             })
-                        } else if ($w == 'year') {
-                            this.year_view = (this.year_view == 'chart' ? 'form' : 'chart');
+                        } else if ($w === 'year') {
+                            this.year_view = (this.year_view === 'chart' ? 'form' : 'chart');
                             localStorage.setItem('stari_year_chart_view', this.year_view);
                             Vue.nextTick(() => {
                                 this.year_chart && this.year_chart.resize();
@@ -493,7 +490,7 @@
                     isValidateMonth(m) {
                         const year = (new Date()).getFullYear();
                         const month = (new Date()).getMonth() + 1;
-                        return this.year < year || (this.year == year && m < month);
+                        return this.year < year || (this.year === year && m < month);
                     },
                     isValidateYear(y) {
                         y += '';

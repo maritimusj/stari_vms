@@ -138,8 +138,7 @@
     const api_url = "{php echo $this->createWebUrl('agent', ['id' => $agent->getId()])}";
     const back_url = "{php echo $this->createWebUrl('agent');}";
     require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_ECHARTS_URL);}", "daterangepicker"], function (Vue, EChart) {
-
-        option = {
+        const option = {
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -281,7 +280,7 @@
                         }, function (start, end) {
                             start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
                             end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
-                            var html = (start == "" ? "" : start) + (start == "" && end === "" ? "" : (" 至 " + end))
+                            const html = (start === "" ? "" : start) + (start === "" && end === "" ? "" : (" 至 " + end))
                             $(elm).find(".date-title").html(html);
                             $(elm).prev().prev().val(start);
                             $(elm).prev().val(end);
@@ -292,7 +291,7 @@
                     })
                 },
                 toggleChartView() {
-                    this.view = (this.view == 'chart' ? 'form' : 'chart');
+                    this.view = (this.view === 'chart' ? 'form' : 'chart');
                     localStorage.setItem('stari_device_chart_view', this.view);
                     Vue.nextTick(() => {
                         this.chart && this.chart.resize();

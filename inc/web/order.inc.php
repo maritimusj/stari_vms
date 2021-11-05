@@ -130,34 +130,22 @@ if ($op == 'default') {
     $page = max(1, request::int('page'));
     $page_size = $is_ajax ? 10 : request::int('pagesize', DEFAULT_PAGESIZE);
 
-    $total = $query->count();
+    $total = Config::app('order.total');
+    if ($total < 100000) {
+        $total = $query->count();
+        if ($total > 100000) {
+            Config::app('order.total', $total, true);
+        }
+    } else {
+        $total = $page * $page_size * 100;
+    }
+
     if (ceil($total / $page_size) < $page) {
         $page = 1;
     }
 
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
-
-    $pager = We7::pagination($total, $page, $page_size);
-    if (stripos($pager, '&filter=1') === false) {
-        $filter = [
-            'agent_openid' => $agent_openid,
-            'user_id' => $user_id,
-            'device_id' => $device_id,
-            'order' => $order_no,
-            'datelimit[start]' => $start ? $start->format('Y-m-d') : '',
-            'datelimit[end]' => $end ? $end->format('Y-m-d') : '',
-            'filter' => 1,
-        ];
-
-        foreach ($filter as $index => $entry) {
-            if (empty($entry)) {
-                unset($filter[$index]);
-            }
-        }
-        $params_str = http_build_query($filter);
-        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
-    }
 
     $accounts = [];
     $orders = [];
@@ -215,7 +203,7 @@ if ($op == 'default') {
 
         $pay_result = $entry->getExtraData('payResult');
         if ($pay_result) {
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $data['orderId']);
+            $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? $data['orderId']);
             $data['src'] = strval($pay_result['from']);
             $data['pay_name'] = strval($pay_result['type']);
         }
@@ -231,6 +219,31 @@ if ($op == 'default') {
             $data['pull_logs'] = !$device->isBlueToothDevice() ? true : '没有出货记录';
         }
         $orders[] = $data;
+    }
+
+    if (count($orders) < $page_size) {
+        $total = count($orders);
+    }
+
+    $pager = We7::pagination($total, $page, $page_size);
+    if (stripos($pager, '&filter=1') === false) {
+        $filter = [
+            'agent_openid' => $agent_openid,
+            'user_id' => $user_id,
+            'device_id' => $device_id,
+            'order' => $order_no,
+            'datelimit[start]' => isset($start) ? $start->format('Y-m-d') : '',
+            'datelimit[end]' => isset($end) ? $end->format('Y-m-d') : '',
+            'filter' => 1,
+        ];
+
+        foreach ($filter as $index => $entry) {
+            if (empty($entry)) {
+                unset($filter[$index]);
+            }
+        }
+        $params_str = http_build_query($filter);
+        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
     }
 
     if ($is_ajax) {

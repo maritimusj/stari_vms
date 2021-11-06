@@ -54,10 +54,10 @@ class balance
                 //余额
                 $result['balance']['total'] = number_format($agent->getCommissionBalance()->total() / 100, 2, '.', '');
                 $condition = [
-                        'openid' => $agent->getOpenid(),
-                        'x_val >' => 0,
-                        'src <>' => CommissionBalance::REFUND, //退款不计算在收益中
-                    ];
+                    'openid' => $agent->getOpenid(),
+                    'x_val >' => 0,
+                    'src <>' => CommissionBalance::REFUND, //退款不计算在收益中
+                ];
 
                 //总收益
                 $result['balance']['all'] = number_format(
@@ -197,6 +197,7 @@ class balance
                         'openid' => $user->getOpenid(),
                         'ip' => CLIENT_IP,
                         'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                        'remain' => $balance_total - $amount - $fee,
                     ]
                 );
 
@@ -207,7 +208,7 @@ class balance
                 if ($fee_rec) {
                     if (!$r->update(
                         [
-                            'gcr' => [(int)$fee_rec->getId()],
+                            'gcr' => [$fee_rec->getId()],
                         ]
                     )) {
                         return error(State::ERROR, '更新提现手续费数据失败！');

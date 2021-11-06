@@ -192,7 +192,7 @@ class Statistics
             }            
         } else {
             $date->modify('first day of this month 00:00');
-            $data = self::userMonth($user, $date);
+            $data = self::userMonth($user, $date, 1);
             $data['summary']['m'] = $date->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
             $result['summary']['order']['fee'] += $data['summary']['order']['fee'];

@@ -179,9 +179,7 @@
                                     <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_sub','id'=>$agent['id']));}">
                                         <i class="fa fa-users"></i> 他的下级代理商
                                     </a>
-                                </li>                                
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{php echo $this->createWebUrl('agent', ['op' => 'commission_stats_view', 'id' => $agent['id']]);}"> <i class="fa fa-area-chart fa-fw"></i> 统计数据</a></li>
+                                </li>
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 佣金明细</a></li>

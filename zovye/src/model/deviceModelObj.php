@@ -2206,15 +2206,19 @@ class deviceModelObj extends modelObj
         $no_str = Util::random(16, true);
         $order_no = 'P' . We7::uniacid() . "NO$no_str";
 
-        $content = http_build_query(
-            [
-                'deviceGUID' => $this->imei,
-                'src' => json_encode($extra),
-                'channel' => $channel,
-                'timeout' => $timeout,
-                'num' => $num,
-            ]
-        );
+        $params =  [
+            'deviceGUID' => $this->imei,
+            'src' => json_encode($extra),
+            'channel' => $channel,
+            'timeout' => $timeout,
+            'num' => $num,
+        ];
+
+        if ($extra['index']) {
+            $params['index'] = $extra['index'];
+        }
+
+        $content = http_build_query($params);
 
         return CtrlServ::query("order/$order_no", ["nostr" => microtime(true)], $content);
     }

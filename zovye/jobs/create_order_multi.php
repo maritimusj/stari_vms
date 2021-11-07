@@ -316,8 +316,13 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         return err('对不起，商品库存不足！');
     }
 
+    $pull_data = preparePullData($order, $device, $user);
+
     if ($goods['lottery']) {
         $mcb_channel = intval($goods['lottery']['size']);
+        if ($goods['lottery']['index']) {
+            $pull_data['index'] = intval($goods['lottery']['index']);
+        }
     } else {
         $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
     }
@@ -326,7 +331,7 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         return err('商品货道配置不正确！');
     }
 
-    $pull_data = preparePullData($order, $device, $user);
+    
     $pull_data['channel'] = $mcb_channel;
 
     $result = $device->pull($pull_data);

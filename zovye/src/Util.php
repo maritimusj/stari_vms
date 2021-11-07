@@ -1574,28 +1574,30 @@ HTML_CONTENT;
         }
 
         if ($device instanceof deviceModelObj) {
-            $goods = Device::getGoodsByLane($device, $lane);
-            if ($goods['lottery']) {
-                $mcb_channel = $goods['lottery']['size'];
-            } else {
-                $mcb_channel = Device::cargoLane2Channel($device, $lane);
-            }
-
-            if (!$device->lockAcquire()) {
-                return error(State::ERROR, '设备锁定失败，请重试！');
-            }
-
             $data = array_merge(
                 [
                     'online' => true,
                     'userid' => isset($user) ? $user->getName() : _W('username'),
-                    'channel' => $mcb_channel,
                     'num' => 1,
                     'from' => 'web.admin',
                     'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 ],
                 $params
             );
+
+            $goods = Device::getGoodsByLane($device, $lane);
+            if ($goods['lottery']) {
+                $data['channel'] = $goods['lottery']['size'];
+                if ($goods['lottery']['index']) {
+                    $data['index'] = intval($goods['lottery']['index']);
+                }
+            } else {
+                $data['channel'] = Device::cargoLane2Channel($device, $lane);
+            }
+
+            if (!$device->lockAcquire()) {
+                return error(State::ERROR, '设备锁定失败，请重试！');
+            }
 
             $log_data = [
                 'goods' => Device::getGoodsByLane($device, $lane),
@@ -1736,8 +1738,13 @@ HTML_CONTENT;
             return error(State::ERROR, '对不起，已经被领完了');
         }
 
+        $mcb_index = '';
         if ($goods['lottery']) {
             $mcb_channel = intval($goods['lottery']['size']);
+            if ($goods['lottery']['index']) {
+                $mcb_channel = intval($goods['lottery']['index']);
+                $mcb_index = intval($goods['lottery']['size']);
+            }
         } else {
             $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
         }
@@ -1764,7 +1771,7 @@ HTML_CONTENT;
         }
 
         //开启事务
-        $result = Util::transactionDo(function () use (&$params, $goods, $mcb_channel, &$log_data, $args) {
+        $result = Util::transactionDo(function () use (&$params, $goods, $mcb_index, $mcb_channel, &$log_data, $args) {
             /** @var deviceModelObj $device */
             $device = $params['device'];
 
@@ -1861,6 +1868,7 @@ HTML_CONTENT;
 
             $data = [
                 'online' => !($args['online'] === false),
+                'index' =>  $mcb_index,
                 'channel' => $mcb_channel,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 'userid' => $user->getOpenid(),

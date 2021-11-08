@@ -47,7 +47,7 @@ class Settings implements ISettings
             $we7tb_name = We7::tablename($tb_name);
 
             $sql = <<<CODE
-CREATE TABLE IF NOT EXISTS {$we7tb_name} (
+CREATE TABLE IF NOT EXISTS $we7tb_name (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `uniacid` int(11) DEFAULT NULL,
     `name` varchar(128) NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS {$we7tb_name} (
     `createtime` int(11) DEFAULT NULL,
     `locked_uid` VARCHAR( 64 ) NULL DEFAULT  'n/a',
     PRIMARY KEY (`id`),
-    KEY `name` (`name`(16),`uniacid`),
+    KEY `name` (`name`(32),`uniacid`),
     KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CODE;

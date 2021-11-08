@@ -11,19 +11,16 @@ use function unserialize;
 
 class Settings implements ISettings
 {
-    private $app;
     private $use_cache;
     private $tb_name;
     private $title;
 
-    public function __construct(weApp $app, $classname = null, $title = null, $use_cache = false)
+    public function __construct($classname = null, $title = null, $use_cache = false)
     {
         $this->use_cache = (bool)$use_cache;
         if ($this->use_cache) {
             We7::load()->func('cache');
         }
-
-        $this->app = $app;
 
         $app_name = APP_NAME;
 

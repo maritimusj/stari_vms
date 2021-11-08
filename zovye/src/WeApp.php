@@ -20,7 +20,7 @@ class WeApp extends Settings
 
     public function __construct()
     {
-        parent::__construct($this, 'weapp', 'config', true);
+        parent::__construct('weapp', 'config', true);
     }
 
     public function createWebUrl($do, $params = []): string

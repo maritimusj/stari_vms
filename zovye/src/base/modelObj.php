@@ -213,7 +213,7 @@ class modelObj implements ISettings
     public function createSettings(): Settings
     {
         if (!isset($this->settingsObj)) {
-            $this->settingsObj = new Settings(app(), 'settings', $this->getSettingsBindClassName() ?: $this->factory->shortName(), $this->settingsUseCache);
+            $this->settingsObj = new Settings('settings', $this->getSettingsBindClassName() ?: $this->factory->shortName(), $this->settingsUseCache);
         }
 
         return $this->settingsObj;

@@ -204,9 +204,10 @@ if ($op == 'default' || $op == 'goods') {
                 'balance' => $params['allowFree'] ? intval($params['goodsBalance']) : 0,
             ],
         ];
-        if (isset($params['goodsLaneID'])) {
+        if (isset($params['goodsSize'])) {
             $data['extra']['lottery'] = [
-                'size' => intval($params['goodsLaneID']),
+                'size' => intval($params['goodsSize']),
+                'index' => intval($params['goodsMcbIndex']),
             ];
         }
 

@@ -243,7 +243,7 @@ if ($op == 'default') {
                 if (empty($agent)) {
                     return err('找不到这个代理商！');
                 }
-                $data['agent_id'] = intval($agent->getId());
+                $data['agent_id'] = $agent->getId();
             }
         }
 
@@ -363,6 +363,9 @@ if ($op == 'default') {
             } else {
                 $data['img'] = request::trim('img');
             }
+
+            //如果网站更换域名后，需要更新url
+            $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);
 
             foreach ($data as $key => $val) {
                 $key_name = 'get' . ucfirst(toCamelCase($key));
@@ -543,7 +546,7 @@ if ($op == 'default') {
         $qr_codes = [];
         $qrcode_data = $account->get('qrcodesData', []);
         if ($qrcode_data && is_array($qrcode_data)) {
-            foreach ($qrcode_data as $xid => $entry) {
+            foreach ($qrcode_data as $entry) {
                 $qr_codes[] = $entry['img'];
             }
         }
@@ -557,10 +560,10 @@ if ($op == 'default') {
         'op' => $op,
         'type' => $type,
         'id' => $id,
-        'account' => isset($account) ? $account : null,
-        'qrcodes' => isset($qr_codes) ? $qr_codes : null,
-        'limits' => isset($limits) ? $limits : null,
-        'commission' => isset($commission) ? $commission : null,
+        'account' => $account ?? null,
+        'qrcodes' => $qr_codes ?? null,
+        'limits' => $limits ?? null,
+        'commission' => $commission ?? null,
         'agent_name' => $agent_name,
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,

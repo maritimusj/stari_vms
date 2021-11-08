@@ -115,7 +115,7 @@ class modelObj implements ISettings
             }
         }
         $classname = get_called_class();
-        throw new RuntimeException("加载{$classname}::{$name}失败！");
+        throw new RuntimeException("加载$classname::{$name}失败！");
     }
 
     public function factory(): ?modelFactory
@@ -179,7 +179,7 @@ class modelObj implements ISettings
                 if (!is_null($data)) {
                     $this->set($new_key, $data);
                 }
-
+                //删除原值
                 //$this->createSettings()->remove($indexed_key);
             }
 
@@ -196,18 +196,18 @@ class modelObj implements ISettings
      * @param string $classname
      * @return string
      */
-    protected function getSettingsKeyNew($key, $classname = ''): string
+    protected function getSettingsKeyNew($key, string $classname = ''): string
     {
         if (empty($classname)) {
             $classname = get_called_class();
         }
-        return sha1("{$classname}:{$this->id}:{$key}");
+        return sha1("$classname:$this->id:$key");
     }
 
     protected function getSettingsKey($key): string
     {
         $classname = str_replace('zovye\model', 'lltjs', get_called_class());
-        return "{$classname}:{$this->id}:{$key}";
+        return "$classname:$this->id:$key";
     }
 
     public function createSettings(): Settings
@@ -317,11 +317,6 @@ class modelObj implements ISettings
         return null;
     }
 
-    public function setSettingsUseCache($bUse = true)
-    {
-        $this->settingsUseCache = $bUse;
-    }
-
     public function save(): bool
     {
         if ($this->factory) {
@@ -331,7 +326,7 @@ class modelObj implements ISettings
         return false;
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -412,7 +407,7 @@ class modelObj implements ISettings
      * @param bool $doc
      * @return mixed
      */
-    public static function getProps($doc = false)
+    public static function getProps(bool $doc = false)
     {
         static $props_cache = [];
 
@@ -423,8 +418,8 @@ class modelObj implements ISettings
                 $ref = new ReflectionClass($classname);
                 foreach ($ref->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED) as $prop) {
                     $props_cache[$classname][$prop->getName()] = self::parseType($prop->getDocComment());
-                }                
-            }catch(Exception $e) {
+                }
+            } catch (Exception $e) {
             }
 
         }

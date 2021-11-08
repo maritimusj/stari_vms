@@ -9,7 +9,6 @@ namespace zovye\base;
 use zovye\Util;
 use zovye\We7;
 use function zovye\is_error;
-use function zovye\toCamelCase;
 
 class modelFactory
 {
@@ -56,9 +55,9 @@ class modelFactory
 
     /**
      * @param array $data
-     * @return mixed
+     * @return modelObj|null
      */
-    public function create(array $data = [])
+    public function create(array $data = []): ?modelObj
     {
         /** @var modelObj $objClassname */
         $objClassname = $this->objClassname;
@@ -76,9 +75,9 @@ class modelFactory
 
     /**
      * @param int $id
-     * @return mixed
+     * @return modelObj|null
      */
-    public function load(int $id)
+    public function load(int $id): ?modelObj
     {
         if ($id > 0) {
             /** @var modelObj $obj */
@@ -94,11 +93,11 @@ class modelFactory
 
     /**
      * @param mixed $obj
-     * @param array $seg_arr
+     * @param array|mixed $seg_arr
      * @param bool $ignoreCache
-     * @return array
+     * @return array|false
      */
-    public function __loadFromDb($obj, $seg_arr = [], $ignoreCache = false): array
+    public function __loadFromDb($obj, $seg_arr = [], bool $ignoreCache = false)
     {
         $seg_arr = is_array($seg_arr) ? $seg_arr : [$seg_arr];
         /** @var modelObj $objClassname */
@@ -133,7 +132,7 @@ class modelFactory
             $seg_from_db = array_merge($seg_from_db, $cache_missed);
         }
 
-        if ($seg_from_db) {            
+        if ($seg_from_db) {
             $db_res = We7::pdo_get(
                 $objClassname::getTableName(modelObj::OP_READ),
                 ['id' => $obj->getId()],
@@ -142,7 +141,7 @@ class modelFactory
 
             if ($db_res) {
                 //处理对象缓存
-                $cache_data = isset($cache_data) ? $cache_data : $this->getCacheData($obj);
+                $cache_data = $cache_data ?? $this->getCacheData($obj);
                 foreach ($cache_missed as $seg) {
                     $cache_data[$seg] = $db_res[$seg];
                 }
@@ -177,8 +176,7 @@ class modelFactory
     protected function getCacheKey($obj): string
     {
         $id = is_object($obj) ? $obj->getId() : $obj;
-
-        return APP_NAME . ":{$this->shortName}:{$id}";
+        return APP_NAME . ":$this->shortName:$id";
     }
 
     /**
@@ -225,7 +223,7 @@ class modelFactory
     }
 
     /**
-     * @param array $condition
+     * @param array|mixed $condition
      * @return int
      */
     public function count($condition = []): int
@@ -245,27 +243,27 @@ class modelFactory
     }
 
     /**
-     * @param array $condition
+     * @param array|mixed $condition
      * @param bool $lazy
      * @return modelObjIterator|modelObjIteratorLazy
      */
-    public function findAll($condition = [], $lazy = false)
+    public function findAll($condition = [], bool $lazy = false)
     {
         return (new modelObjFinder($this))->findAll($condition, $lazy);
     }
 
     /**
-     * @param array $condition
+     * @param array|mixed $condition
      * @param bool $lazy
      * @return mixed
      */
-    public function findOne($condition = [], $lazy = false)
+    public function findOne($condition = [], bool $lazy = false)
     {
         return (new modelObjFinder($this))->limit(1)->findAll($condition, $lazy)->current();
     }
 
     /**
-     * @param array $condition
+     * @param array|mixed $condition
      * @return modelObjFinder
      */
     public function query($condition = []): modelObjFinder
@@ -274,7 +272,7 @@ class modelFactory
     }
 
     /**
-     * @param array $condition
+     * @param array|mixed $condition
      * @return modelObjFinder
      */
     public function where($condition = []): modelObjFinder
@@ -285,7 +283,7 @@ class modelFactory
     /**
      * @param modelObj $obj
      * @param null $seg_arr
-     * @param array $condition
+     * @param array|mixed $condition
      * @return mixed
      */
     public function __saveToDb(modelObj $obj, $seg_arr = null, $condition = [])

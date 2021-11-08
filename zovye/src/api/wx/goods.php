@@ -112,6 +112,12 @@ class goods
                 }
             }
 
+            if (request::isset('goodsMcbIndex')) {
+                if (request::int('goodsMcbIndex') != $goods->getExtraData('lottery.index')) {
+                    $goods->setExtraData('lottery.index', request::int('goodsMcbIndex'));
+                }
+            }
+
             if (request::isset('costPrice')) {
                 $goods->setExtraData('costPrice', request::float('costPrice', 0, 2) * 100);
             }
@@ -176,11 +182,11 @@ class goods
 
             //固定货道商品商品指定货道
             if (request::is_string('goodsLaneID')) {
-                $goods_data['extra']['lottery'] = [
-                    'size' => request::int('goodsLaneID'),
-                ];
+                $goods_data['extra']['lottery']['size'] =  request::int('goodsLaneID');
             }
-
+            if (request::has('goodsMcbIndex')) {
+                $goods_data['extra']['lottery']['index'] =  request::int('goodsMcbIndex');
+            }
             if (request::isset('costPrice')) {
                 $goods_data['extra']['costPrice'] = request::float('costPrice', 0, 2) * 100;
             }

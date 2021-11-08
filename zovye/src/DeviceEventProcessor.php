@@ -280,7 +280,7 @@ class DeviceEventProcessor
         Util::transactionDo(function () use ($event, $data) {
             $e = self::$events[$event];
             if (isset($e)) {
-                if (DEBUG) {
+                if (settings('device.event.enabled')) {
                     self::log($e, $data);
                 }
                 $fn = $e['handler'];

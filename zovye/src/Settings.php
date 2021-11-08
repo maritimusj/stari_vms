@@ -29,7 +29,7 @@ class Settings implements ISettings
         }
 
         $this->title = $title ?: 'settings';
-        $this->tb_name = strtolower("{$app_name}_{$classname}_{$this->title}");
+        $this->tb_name = strtolower("{$app_name}_{$classname}_$this->title");
 
         if (DEBUG) {
             self::createTable($this->getTableName());
@@ -69,40 +69,12 @@ CODE;
 
     public function cleanCache()
     {
-        We7::cache_clean($this->cacheKey('')); //?
+        We7::cache_clean($this->cacheKey(''));
     }
 
     protected function cacheKey($name): string
     {
-        return APP_NAME . ":settings:" . We7::uniacid() . ":{$this->title}:{$name}";
-    }
-
-    /**
-     * 是否使用缓存
-     * @return bool
-     */
-    public function useCache(): bool
-    {
-        return $this->use_cache;
-    }
-
-    /**
-     * 同步数据库数据到cache
-     * @param string|array $key
-     */
-    public function sync($key)
-    {
-        if ($key && $this->use_cache) {
-            $keys = is_array($key) ? $key : [$key];
-            foreach ($keys as $name) {
-                $res = We7::pdo_get($this->getTableName(), ['uniacid' => We7::uniacid(), 'name' => $name]);
-
-                if ($res) {
-                    $data = unserialize($res['data']);
-                    We7::cache_write($this->cacheKey($name), $data);
-                }
-            }
-        }
+        return APP_NAME . ":settings:" . We7::uniacid() . ":$this->title:$name";
     }
 
     /**

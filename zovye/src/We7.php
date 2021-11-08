@@ -18,7 +18,6 @@ use we7\db;
  * @method static mixed mc_oauth_userinfo($acid = 0)
  * @method static void message($msg, $redirect = '', $type = '', $tips = false, $extend = array())
  * @method static void itoast($message, $redirect = '', $type = '', $extend = array())
- * @method static void register_jssdk($debug = false)
  * @method static array file_upload($file, $type = 'image', $name = '', $compress = false)
  * @method static bool file_remote_delete(string $file)
  * @method static bool|array file_remote_upload($filename, $auto_delete_local = true)
@@ -67,6 +66,93 @@ class We7
 
             return false;
         }
+    }
+
+    public static function register_jssdk($debug)
+    {
+        global $_W;
+
+        if (defined('HEADER')) {
+            echo '';
+            return;
+        }
+
+        $sysinfo = array(
+            'uniacid' 	=> $_W['uniacid'],
+            'acid' 		=> $_W['acid'],
+            'siteroot' 	=> $_W['siteroot'],
+            'siteurl' 	=> $_W['siteurl'],
+            'attachurl' => $_W['attachurl'],
+            'cookie' 	=> array('pre'=>$_W['config']['cookie']['pre'])
+        );
+        if (!empty($_W['acid'])) {
+            $sysinfo['acid'] = $_W['acid'];
+        }
+        if (!empty($_W['openid'])) {
+            $sysinfo['openid'] = $_W['openid'];
+        }
+        if (defined('MODULE_URL')) {
+            $sysinfo['MODULE_URL'] = MODULE_URL;
+        }
+        $sysinfo = json_encode($sysinfo);
+        $jssdkconfig = json_encode($_W['account']['jssdkconfig']);
+        $debug = $debug ? 'true' : 'false';
+
+        $script = <<<EOF
+<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+<script type="text/javascript">
+	window.sysinfo = window.sysinfo || $sysinfo || {};
+	
+	// jssdk config 对象
+	jssdkconfig = $jssdkconfig || {};
+	
+	// 是否启用调试
+	jssdkconfig.debug = $debug;
+	jssdkconfig.openTagList = [
+        'wx-open-launch-weapp',
+    ];
+	jssdkconfig.jsApiList = [
+		'checkJsApi',
+		'onMenuShareTimeline',
+		'onMenuShareAppMessage',
+		'onMenuShareQQ',
+		'onMenuShareWeibo',
+		'hideMenuItems',
+		'showMenuItems',
+		'hideAllNonBaseMenuItem',
+		'showAllNonBaseMenuItem',
+		'translateVoice',
+		'startRecord',
+		'stopRecord',
+		'onRecordEnd',
+		'playVoice',
+		'pauseVoice',
+		'stopVoice',
+		'uploadVoice',
+		'downloadVoice',
+		'chooseImage',
+		'previewImage',
+		'uploadImage',
+		'downloadImage',
+		'getNetworkType',
+		'openLocation',
+		'getLocation',
+		'hideOptionMenu',
+		'showOptionMenu',
+		'closeWindow',
+		'scanQRCode',
+		'chooseWXPay',
+		'openProductSpecificView',
+		'addCard',
+		'chooseCard',
+		'openCard'
+	];
+	
+	wx.config(jssdkconfig);
+	
+</script>
+EOF;
+        echo $script;
     }
 
     /**

@@ -476,7 +476,7 @@ if ($op == 'default') {
     }
 
     $content = app()->fetchTemplate(
-        'web/common/balance-log',
+        'web/common/balance_log',
         [
             'log' => $log,
             'pager' => $pager,
@@ -697,7 +697,7 @@ if ($op == 'default') {
     }
 
     $content = app()->fetchTemplate(
-        'web/common/balance-edit',
+        'web/common/balance_edit',
         [
             'user' => [
                 'id' => $user->getId(),
@@ -786,7 +786,7 @@ if ($op == 'default') {
         }
 
         $content = app()->fetchTemplate(
-            'web/prize/prize-log',
+            'web/prize/prize_log',
             [
                 'prizes' => $prizes,
                 'pager' => $pager,

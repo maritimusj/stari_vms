@@ -1451,7 +1451,7 @@ if ($op == 'default') {
         }
 
         $content = app()->fetchTemplate(
-            'web/common/commission-log',
+            'web/common/commission_log',
             [
                 'user' => $user,
                 'logs' => $logs,

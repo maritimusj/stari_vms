@@ -52,7 +52,7 @@
         {/if}
     </div>
 </div>
-{template 'web/common/search-user'}
+{template 'web/common/search_user'}
 <script>
     function showMsgDetail(id) {
         $.getJSON("{php echo $this->createWebUrl('agent')}", {op:'msg_detail', id: id}).then(function(res){

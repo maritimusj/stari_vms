@@ -1448,7 +1448,7 @@ if ($op == 'list') {
     }, $device->getId());
 
     $content = app()->fetchTemplate(
-        'web/device/all-stats',
+        'web/device/all_stats',
         [
             'device' => $device,
             'm_all' => $m,

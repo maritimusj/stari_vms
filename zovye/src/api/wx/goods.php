@@ -59,7 +59,7 @@ class goods
             return error(State::ERROR, '找不到这个商品！');
         }
 
-        return \zovye\Goods::data($goods_id);
+        return \zovye\Goods::data($goods_id, ['fullPath']);
     }
 
     public static function delete(): array

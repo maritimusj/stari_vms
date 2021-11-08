@@ -214,8 +214,8 @@
                     <span class="agent-user">[ {php echo $item['agent']['title']} ]</span>
                     {/if}
                     {if $item['isPartner']}
-                    <a href="{php echo $this->createWebUrl('agent', array('op'=>'partner', 'id'=>$item['partnerAgent']['id']));}">
-                        <span class="partner-user" title="{$item['partnerAgent']['level']['title']}合伙人" style="color:{$item['co_agent']['level']['clr']}">
+                    <a href="{php echo $this->createWebUrl('agent', array('op'=>'partner', 'id'=>$item['co_agent']['id']));}">
+                        <span class="partner-user" title="{$item['co_agent']['level']['title']}合伙人" style="color:{$item['co_agent']['level']['clr']}">
                             <i class="fa fa-users"></i>
                         </span>
                     </a>

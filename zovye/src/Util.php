@@ -946,6 +946,7 @@ include './index.php';
         $locker = Util::lockObject($order, ['updatetime' => 0]);
 
         if ($locker && $locker->isLocked()) {
+
             //更新统计
             $stats_objs = [app()];
 
@@ -1931,7 +1932,7 @@ HTML_CONTENT;
                         if (!$voucher->save()) {
                             return error(State::ERROR, '出货失败：使用取货码失败！');
                         }
-                    }                    
+                    }
                 }
             }
 
@@ -2657,7 +2658,7 @@ HTML_CONTENT;
                 return true;
             }
         }
-        return false;        
+        return false;
     }
 
     /**

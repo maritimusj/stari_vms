@@ -470,7 +470,7 @@ class agentModelObj extends userModelObj
     {
         return $this->settings('agentData.stats.first_order');
     }
-    public function setFirstOrderData(orderModelObj $order)
+    public function setFirstOrderData(orderModelObj $order): bool
     {
         return $this->updateSettings('agentData.stats.first_order', [
             'id' => $order->getId(),

@@ -99,10 +99,6 @@ if ($op == 'default') {
             'type' => Advertising::WX_APP_URL_CODE,
             'title' => '小程序识别码',
         ],
-        [
-            'type' => Advertising::WX_APP_LAUNCHER,
-            'title' => '小程序推广',
-        ],
     ];
 
     $url_params = [];
@@ -260,10 +256,6 @@ if ($op == 'default') {
 
                 $data['code'] = $entry->getExtraData('code');
 
-            } elseif ($type == Advertising::WX_APP_LAUNCHER) {
-
-                $data['username'] = $entry->getExtraData('username');
-                $data['path'] = $entry->getExtraData('path');
             }
 
             $advs[] = $data;
@@ -468,10 +460,6 @@ if ($op == 'default') {
 
             $tpl_data['code'] = $adv->getExtraData('code');
 
-        } elseif ($type == Advertising::WX_APP_LAUNCHER) {
-
-            $tpl_data['username'] = $adv->getExtraData('username');
-            $tpl_data['path'] = $adv->getExtraData('path');
         }
     }
 

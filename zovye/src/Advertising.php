@@ -32,6 +32,7 @@ class Advertising extends State
     const QRCODE = 11; //推广二维码
     const PASSWD = 12; //用于推广的口令
     const WX_APP_URL_CODE = 13; //微信小程序URL识别码
+    const WX_APP_LAUNCHER = 14; //微信小程序标签广告
 
     public static $names = [
         self::UNKNOWN => 'default',

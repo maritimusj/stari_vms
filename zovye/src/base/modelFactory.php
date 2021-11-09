@@ -55,9 +55,9 @@ class modelFactory
 
     /**
      * @param array $data
-     * @return modelObj|null
+     * @return modelObj|mixed
      */
-    public function create(array $data = []): ?modelObj
+    public function create(array $data = [])
     {
         /** @var modelObj $objClassname */
         $objClassname = $this->objClassname;
@@ -75,12 +75,11 @@ class modelFactory
 
     /**
      * @param int $id
-     * @return modelObj|null
+     * @return modelObj|mixed
      */
-    public function load(int $id): ?modelObj
+    public function load(int $id)
     {
         if ($id > 0) {
-            /** @var modelObj $obj */
             $obj = new $this->objClassname($id, $this);
             $data = $this->__loadFromDb($obj);
             if ($data) {

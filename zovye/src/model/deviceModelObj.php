@@ -1618,7 +1618,7 @@ class deviceModelObj extends modelObj
 
         $accounts = $this->getAssignedAccounts();
         foreach ($accounts as $index => $account) {
-            if (in_array($account['state'], $state_filter)) {
+            if (in_array($account['type'], $state_filter)) {
                 $result[$index] = $account;
             }
         }

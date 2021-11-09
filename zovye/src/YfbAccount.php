@@ -124,7 +124,7 @@ class YfbAccount
     {
         $v = [];
 
-        $account = Account::findOne(['state' => Account::YFB]);
+        $account = Account::findOneFromType(Account::YFB);
         if ($account) {
             //请求对方API
             $yfb = self::getYFB($account);
@@ -200,7 +200,7 @@ class YfbAccount
             return err('请求数据为空！');
         }
 
-        $account = Account::findOne(['state' => Account::YFB]);
+        $account = Account::findOneFromType(Account::YFB);
         if (empty($account)) {
             return err('找不到指定公众号！');
         }

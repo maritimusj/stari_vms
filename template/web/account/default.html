@@ -154,6 +154,11 @@
                 </span>
             </a>
             {/if}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
+                <span class="state auth" title="小程序">
+                    <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}" title="添加小程序">
+                </span>
+            </a>
         </span>       
     </div>
     <div class="panel-body">
@@ -263,15 +268,15 @@
                             <span>{if $a['commission'] && $a['commission']['money'] > 0}
                                 <span class="commission" title="佣金：{php echo number_format($a['commission']['money']/100, 2)}元">*</span>
                             {/if}{$a['name']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
-                            {if $a['state'] == \zovye\Account::AUTH}
+                            {if $a['type'] == \zovye\Account::AUTH}
                             {if $a['service'] == 2}
                             <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
                             {else}
                             <span class="state auth" title="授权接入的订阅号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle-o"></i></span>
                             {/if}
-                            {elseif $a['state'] == \zovye\Account::VIDEO}
+                            {elseif $a['type'] == \zovye\Account::VIDEO}
                             <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
-                            {elseif $a['state'] == \zovye\Account::DOUYIN}
+                            {elseif $a['type'] == \zovye\Account::DOUYIN}
                             <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音号">
                                 <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
                             </span>
@@ -302,14 +307,14 @@
                     </td>
                     <td class="desc">
                         <span class="schema schema_{$a['scname']}" style="border-bottom:4px solid #fff;box-shadow: 0px 2px 0px 0px {$a['clr']};" title="{if $a['count']}每人每{php echo zovye\Schema::desc($a['scname'])}可领取{$a['count']}包{/if}{if $a['sccount']}，每{php echo zovye\Schema::desc($a['scname'])}最多送出{$a['sccount']}包{/if}">
-                            {if $a['state'] == \zovye\Account::DOUYIN}
+                            {if $a['type'] == \zovye\Account::DOUYIN}
                             单
                             {else}
                             {php echo zovye\Schema::desc($a['scname'])}
                             {/if}
                         </span>
                     </td>
-                    {if $a['state'] == \zovye\Account::DOUYIN}
+                    {if $a['type'] == \zovye\Account::DOUYIN}
                     <td>
                     </td>
                     <td>
@@ -365,7 +370,7 @@
                             <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
-                            {if \zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2}
+                            {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
                             <li>
                                 <a href="#" data-op="useAccountQRCode" onclick="return false;">
                                     <i class="fa fa-desktop fa-fw"></i>

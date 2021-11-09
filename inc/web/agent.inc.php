@@ -17,9 +17,10 @@ use zovye\model\agent_msgModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\agent_vwModelObj;
 use zovye\model\commission_balanceModelObj;
+use zovye\model\deviceModelObj;
+use zovye\model\gsp_userModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\msgModelObj;
-use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 
 $agent_levels = settings('agent.levels');
@@ -35,7 +36,7 @@ if ($op == 'default') {
         $agent = Agent::get(request::int('id'));
         if ($agent) {
             $data = [
-                'id' => intval($agent->getId()),
+                'id' => $agent->getId(),
                 'nickname' => strval($agent->getNickname()),
                 'avatar' => strval($agent->getAvatar()),
                 'mobile' => strval($agent->getMobile()),
@@ -327,6 +328,7 @@ if ($op == 'default') {
 
         $mixed_gsp_users = [];
         $query = GSP::query(['agent_id' => $agent->getId()]);
+        /** @var gsp_userModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $user = GSP::getUser($agent, $entry);
             if ($user) {
@@ -375,8 +377,8 @@ if ($op == 'default') {
         'agent_data' => $agent_data,
         'superior' => $superior,
         'superior_data' => $superior_data,
-        'free_gsp_users' => isset($free_gsp_users) ? $free_gsp_users : null,
-        'mixed_gsp_users' => isset($mixed_gsp_users) ? $mixed_gsp_users : null,
+        'free_gsp_users' => $free_gsp_users ?? null,
+        'mixed_gsp_users' => $mixed_gsp_users ?? null,
     ]);
 } elseif ($op == 'save') {
 
@@ -2219,6 +2221,7 @@ if ($op == 'default') {
         'totalpage' => $total_page,
         'list' => [],
     ];
+    /** @var deviceModelObj $device */
     foreach ($query->findAll() as $device) {
         $result['list'][] = [
             'id' => $device->getId(),

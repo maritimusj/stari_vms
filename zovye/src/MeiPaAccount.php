@@ -40,7 +40,7 @@ class MeiPaAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::MEIPA]);
+        $acc = Account::findOneFromType(Account::MEIPA);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['apiid']) || empty($config['appkey'])) {
@@ -99,7 +99,7 @@ class MeiPaAccount
         if (!App::isMeiPaEnabled()) {
             return err('没有启用！');
         }
-        $acc = Account::findOne(['state' => Account::MEIPA]);
+        $acc = Account::findOneFromType(Account::MEIPA);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }

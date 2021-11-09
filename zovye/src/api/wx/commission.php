@@ -125,7 +125,7 @@ class commission
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
 
             if (!$account->getShared()) {
                 return error(State::ERROR, '公众号没有加入推广！');

@@ -89,7 +89,7 @@ if ($device_id) {
 
 } elseif ($account_id) {
 
-    $account = Account::findOne(['uid' => $account_id]);
+    $account = Account::findOneFromUID($account_id);
     if (empty($account) || $account->isBanned()) {
         Util::resultAlert('公众号没有开通免费领取！', 'error');
     }

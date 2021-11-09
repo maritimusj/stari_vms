@@ -154,7 +154,7 @@ if ($op == 'default') {
     foreach ($query->findAll() as $entry) {
         //公众号信息
         if (empty($accounts[$entry->getAccount()])) {
-            $account = Account::findOne(['name' => $entry->getAccount()]);
+            $account = Account::findOneFromName($entry->getAccount());
             if ($account) {
                 $profile = [
                     'name' => $account->getName(),
@@ -582,7 +582,7 @@ if ($op == 'default') {
                     }
                     break;
                 case 'account_title':
-                    $account = Account::findOne(['name' => $entry->getAccount()]);
+                    $account = Account::findOneFromName($entry->getAccount());
                     $title = $account ? $account->getTitle() : $entry->getAccount();
                     $data[$header] = str_replace('"', '', $title);
                     break;

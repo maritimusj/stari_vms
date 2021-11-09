@@ -94,7 +94,7 @@ class orderModelObj extends modelObj
     public function getAccount($obj = false)
     {
         if ($obj) {
-            return Account::findOne(['name' => $this->account]);
+            return Account::findOneFromName($this->account);
         }
         return $this->account;
     }

@@ -969,7 +969,7 @@ include './index.php';
 
             $name = $order->getAccount();
             if ($name) {
-                $account = Account::findOne(['name' => $name]);
+                $account = Account::findOneFromName($name);
                 if ($account) {
                     $order_limits = $account->getOrderLimits();
 

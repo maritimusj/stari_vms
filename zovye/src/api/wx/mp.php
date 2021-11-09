@@ -42,7 +42,7 @@ class mp
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
@@ -59,8 +59,8 @@ class mp
     {
         $data = [
             'uid' => $account->getUid(),
-            'banned' => $account->getState() != Account::BANNED,
             'type' => $account->getType(),
+            'banned' => $account->isBanned(),
             'name' => $account->getName(),
             'title' => $account->getTitle(),
             'descr' => $account->getDescription(),
@@ -150,7 +150,7 @@ class mp
         $devices = request::is_array('devices') ? request::array('devices') : [];
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
@@ -287,7 +287,7 @@ class mp
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             if ($account) {
                 if ($account->getAgentId() == $user->getAgentId()) {
                     if ($account->isSpecial() || $account->isAuth()) {
@@ -320,7 +320,7 @@ class mp
         common::checkCurrentUserPrivileges('F_xf');
 
         $uid = request::trim('uid');
-        $account = Account::findOne(['uid' => $uid]);
+        $account = Account::findOneFromUID($uid);
         if (empty($account)) {
             return error(State::ERROR, '找不到指定的公众号！');
         }
@@ -364,7 +364,7 @@ class mp
         if (empty($data['name'])) {
             return error(State::ERROR, '帐号不能为空！');
         } else {
-            $account = Account::findOne(['name' => $data['name']]);
+            $account = Account::findOneFromName($data['name']);
             if ($account) {
                 if ($account->getAgentId() != $user->getAgentId()) {
                     return error(State::ERROR, '公众号帐号不能重复！');
@@ -373,7 +373,7 @@ class mp
         }
 
         if (request::has('uid')) {
-            $account = Account::findOne(['uid' => request::str('uid')]);
+            $account = Account::findOneFromUID(request::str('uid'));
             if ($account) {
                 if ($account->getAgentId() != $user->getAgentId()) {
                     return error(State::ERROR, '公众号帐号不能重复！');
@@ -462,7 +462,7 @@ class mp
             }
         } else {
             $data['uid'] = Account::makeUID(request::trim('name'));
-            $data['state'] = $type;
+            $data['type'] = $type;
             $data['url'] = Account::createUrl($data['uid'], ['from' => 'account']);
             $account = Account::create($data);
         }
@@ -506,7 +506,7 @@ class mp
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {

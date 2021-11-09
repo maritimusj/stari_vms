@@ -42,7 +42,7 @@ class MoscaleAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::MOSCALE]);
+        $acc = Account::findOneFromType(Account::MOSCALE);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['appid']) || empty($config['appsecret'])) {
@@ -107,7 +107,7 @@ class MoscaleAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::MOSCALE]);
+        $acc = Account::findOneFromType(Account::MOSCALE);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }
@@ -138,7 +138,7 @@ class MoscaleAccount
     public static function getLabelList(): array
     {
         return Util::cachedCall(30, function () {
-            $acc = Account::findOne(['state' => Account::MOSCALE]);
+            $acc = Account::findOneFromType(Account::MOSCALE);
             if ($acc) {
                 $config = $acc->settings('config', []);
                 $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);
@@ -155,7 +155,7 @@ class MoscaleAccount
     public static function getRegionData(): array
     {
         return Util::cachedCall(30, function () {
-            $acc = Account::findOne(['state' => Account::MOSCALE]);
+            $acc = Account::findOneFromType(Account::MOSCALE);
             if ($acc) {
                 $config = $acc->settings('config', []);
                 $moscale = new MoscaleAccount($config['appid'], $config['appsecret']);

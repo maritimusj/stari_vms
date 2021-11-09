@@ -27,7 +27,7 @@ $params = [
 $op = request::op('default');
 if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
 
-    $acc = Account::findOne(['uid' => $accountUID]);
+    $acc = Account::findOneFromUID($accountUID);
     if ($acc) {
         /** @var agentModelObj $agent_id */
         $agent = Agent::get($agent_id);

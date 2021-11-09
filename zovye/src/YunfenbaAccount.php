@@ -164,7 +164,7 @@ class YunfenbaAccount
     {
         $v = [];
 
-        $acc = Account::findOne(['state' => Account::YUNFENBA]);
+        $acc = Account::findOneFromType(Account::YUNFENBA);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config) || empty($config['vendor']['uid'])) {
@@ -237,7 +237,7 @@ class YunfenbaAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::YUNFENBA]);
+        $acc = Account::findOneFromType(Account::YUNFENBA);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }

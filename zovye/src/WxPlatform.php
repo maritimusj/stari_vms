@@ -602,7 +602,7 @@ class WxPlatform
             }
 
             $account_name = $msg['ToUserName'];
-            $acc = Account::findOne(['name' => $account_name]);
+            $acc = Account::findOneFromName($account_name);
             if (empty($acc)) {
                 throw new RuntimeException('找不到指定的公众号：' . $account_name);
             }

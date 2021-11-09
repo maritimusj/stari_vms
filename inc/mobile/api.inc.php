@@ -19,7 +19,7 @@ if (empty($account_name)) {
     JSON::fail('没有指定公众号！');
 }
 
-$account = Account::findOne(['name' => $account_name]);
+$account = Account::findOneFromName($account_name);
 if (empty($account)) {
     JSON::fail('找不到指定的公众号！');
 }

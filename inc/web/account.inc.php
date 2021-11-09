@@ -18,19 +18,17 @@ $op = request::op('default');
 if ($op == 'default') {
     $page = max(1, request::int('page'));
     $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-    $banned = request::bool('banned');
+
 
     $query = Account::query();
+
+    $banned = request::bool('banned');
     if ($banned) {
         $query->where(['state' => Account::BANNED]);
-    } else {
-        $states =  [Account::NORMAL, Account::VIDEO, Account::AUTH];
-        if (App::isDouyinEnabled()) {
-            $states[] = Account::DOUYIN;
-        }
-        $query->where([
-            'state' => $states,
-        ]);
+    }
+
+    if (request::has('type')) {
+        $query->where(['type' => request::int('type')]);
     }
 
     if (request::has('agentId')) {
@@ -67,7 +65,8 @@ if ($op == 'default') {
         foreach ($query->findAll() as $entry) {
             $data = [
                 'id' => $entry->getId(),
-                'state' => $entry->getState(),
+                'type' => $entry->getType(),
+                'banned' => $entry->isBanned(),
                 'agentId' => $entry->getAgentId(),
                 'uid' => $entry->getUid(),
                 'clr' => $entry->getClr(),
@@ -83,7 +82,6 @@ if ($op == 'default') {
                 'sccount' => $entry->getSccount(),
                 'total' => $entry->getTotal(),
                 'orderlimits' => $entry->getOrderLimits(),
-                'banned' => $entry->isBanned(),
                 'url' => $entry->getUrl(),
                 'assigned' => !isEmptyArray($entry->get('assigned')),
             ];
@@ -141,11 +139,11 @@ if ($op == 'default') {
         Account::YFB => App::isSNTOEnabled(),
     ];
 
-    foreach ($one_res as $index => $enabled) {
+    foreach ($one_res as $type => $enabled) {
         if ($enabled) {
-            $t_res = Account::query(['state' => $index])->findOne();
+            $t_res = Account::findOneFromType($type);
             if ($t_res) {
-                $one_res[$index] = [
+                $one_res[$type] = [
                     'id' => $t_res->getId(),
                     'orderno' => $t_res->getOrderNo(),
                     'name' => $t_res->getName(),
@@ -155,11 +153,11 @@ if ($op == 'default') {
                     'assigned' => !isEmptyArray($t_res->get('assigned')),
                 ];
             } else {
-                unset($one_res[$index]);
-                Util::logToFile('account', "特殊吸粉{$index}已开启，但查找公众号资料失败！");
+                unset($one_res[$type]);
+                Util::logToFile('account', "特殊吸粉{$type}已开启，但查找公众号资料失败！");
             }
         } else {
-            unset($one_res[$index]);
+            unset($one_res[$type]);
         }
     }
 
@@ -169,7 +167,7 @@ if ($op == 'default') {
     });
 
     app()->showTemplate('web/account/default', [
-        'agent' => isset($agent) ? $agent : null,
+        'agent' => $agent ?? null,
         'accounts' => $accounts,
         'banned' => $banned,
         'pager' => $pager,
@@ -396,18 +394,18 @@ if ($op == 'default') {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }
 
-            if (Account::findOne(['name' => $name])) {
+            if (Account::findOneFromName($name)) {
                 return err('公众号帐号已经存在！');
             }
 
             $uid = Account::makeUID($name);
-            if (Account::findOne(['uid' => $uid])) {
+            if (Account::findOneFromUID($uid)) {
                 return err('公众号UID已经存在！');
             }
 
             $data['uid'] = $uid;
             $data['name'] = $name;
-            $data['state'] = request::int('type');
+            $data['type'] = request::int('type');
             $data['title'] = request::str('title');
             $data['img'] = request::trim('img');
             $data['url'] = Account::createUrl($uid, ['from' => 'account']);
@@ -532,7 +530,7 @@ if ($op == 'default') {
             Util::itoast('公众号不存在！', $this->createWebUrl('account'), 'error');
         }
 
-        $type = $account->getState();
+        $type = $account->getType();
 
         if ($account->getAgentId()) {
             $agent = Agent::get($account->getAgentId());
@@ -571,11 +569,13 @@ if ($op == 'default') {
     ]);
 
 } elseif ($op == 'add') {
+
     app()->showTemplate('web/account/edit', [
         'clr' => Util::randColor(),
         'op' => $op,
         'type' => request::int('type', Account::NORMAL),
     ]);
+
 } elseif ($op == 'remove') {
 
     $id = request::int('id');
@@ -598,11 +598,7 @@ if ($op == 'default') {
         $account = Account::get($id);
         if ($account) {
             if ($account->isBanned()) {
-                if ($account->isSpecial() || $account->isAuth() || $account->isVideo() || $account->isDouyin()) {
-                    $account->setState($account->getType());
-                } else {
-                    $account->setState(Account::NORMAL);
-                }
+                $account->setState(Account::NORMAL);
             } else {
                 $account->setState(Account::BANNED);
             }

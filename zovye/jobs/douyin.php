@@ -55,7 +55,7 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
         Job::exit($writeLog);
     }
 
-    $account = Account::findOne(['uid' => $data['uid']]);
+    $account = Account::findOneFromUID($data['uid']);
     if (empty($account)) {
         $log['error'] = '找不到这个公众号！';
         Job::exit($writeLog);

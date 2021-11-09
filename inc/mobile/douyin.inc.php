@@ -28,7 +28,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         Util::resultAlert('授权接入成功！');
 
     } elseif (request::has('uid')) {
-        $account = Account::findOne(['uid' => request::trim('uid')]);
+        $account = Account::findOneFromUID(request::trim('uid'));
         if (empty($account)) {
             Util::resultAlert('找不到指定的吸粉广告！', 'error');
         }
@@ -46,7 +46,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         JSON::fail('找不到这个用户！');
     }
 
-    $res = Account::match($device, $user, ['state' => Account::DOUYIN]);
+    $res = Account::match($device, $user, ['type' => Account::DOUYIN]);
     $data = [];
     foreach($res as $entry) {
         if ($entry['url'] && $entry['openid']) {
@@ -74,7 +74,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         JSON::fail('找不到这个设备！');
     }
 
-    $account = Account::findOne(['uid' => request::trim('uid')]);
+    $account = Account::findOneFromUID(request::trim('uid'));
     if (empty($account)) {
         JSON::fail('找不到这个抖音号[01]');
     }

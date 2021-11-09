@@ -42,7 +42,7 @@ class ZhiJinBaoAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::ZJBAO]);
+        $acc = Account::findOneFromType(Account::ZJBAO);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['key']) || empty($config['secret'])) {
@@ -112,7 +112,7 @@ class ZhiJinBaoAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::ZJBAO]);
+        $acc = Account::findOneFromType(Account::ZJBAO);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }

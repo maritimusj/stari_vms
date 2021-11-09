@@ -234,7 +234,7 @@ class order
 
             //公众号信息
             if (empty($accounts[$entry->getAccount()])) {
-                $account = Account::findOne(['name' => $entry->getAccount()]);
+                $account = Account::findOneFromName($entry->getAccount());
                 if ($account) {
                     $accounts[$entry->getAccount()] = [
                         'name' => $account->getName(),

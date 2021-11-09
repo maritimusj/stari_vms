@@ -43,7 +43,7 @@ class SNTOAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $acc = Account::findOne(['state' => Account::SNTO]);
+        $acc = Account::findOneFromType(Account::SNTO);
         if (empty($acc)) {
             return [];
         }
@@ -141,7 +141,7 @@ class SNTOAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::SNTO]);
+        $acc = Account::findOneFromType(Account::SNTO);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }

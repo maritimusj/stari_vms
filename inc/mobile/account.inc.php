@@ -22,7 +22,7 @@ if ($op == 'default') {
         Util::resultAlert('没有指定公众号！', 'error');
     }
 
-    $account = Account::findOne(['uid' => $tid]);
+    $account = Account::findOneFromUID($tid);
     if (empty($account) || $account->isBanned()) {
         Util::resultAlert('公众号没有开通免费领取！', 'error');
     }
@@ -36,7 +36,7 @@ if ($op == 'default') {
     }
 
     $uid = request::trim('uid');
-    $account = Account::findOne(['uid' => $uid]);
+    $account = Account::findOneFromUID($uid);
     if (empty($account)) {
         JSON::fail(['msg' => '找不到这个广告！']);
     }

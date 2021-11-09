@@ -24,7 +24,7 @@ class JfbAccount
     {
         $v = [];
 
-        $acc = Account::findOne(['state' => Account::JFB]);
+        $acc = Account::findOneFromType(Account::JFB);
         if ($acc) {
             $config = $acc->get('config', []);
             if (empty($config['url'])) {
@@ -125,7 +125,7 @@ class JfbAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::JFB]);
+        $acc = Account::findOneFromType(Account::JFB);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }

@@ -36,7 +36,7 @@ class AQIInfoAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::AQIINFO]);
+        $acc = Account::findOneFromType(Account::AQIINFO);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['key']) || empty($config['secret'])) {
@@ -127,7 +127,7 @@ class AQIInfoAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::AQIINFO]);
+        $acc = Account::findOneFromType(Account::AQIINFO);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }

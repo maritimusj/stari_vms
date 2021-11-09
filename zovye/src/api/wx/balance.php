@@ -361,7 +361,7 @@ class balance
 
                             $account_name = $order->getAccount();
                             if ($account_name) {
-                                $account = Account::findOne(['name' => $account_name]);
+                                $account = Account::findOneFromName($account_name);
                                 if ($account) {
                                     $account_info = "通过公众号“{$account->getTitle()}”，";
                                 } else {

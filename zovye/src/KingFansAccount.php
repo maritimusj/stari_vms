@@ -36,7 +36,7 @@ class KingFansAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $acc = Account::findOne(['state' => Account::KINGFANS]);
+        $acc = Account::findOneFromType(Account::KINGFANS);
         if (empty($acc)) {
             return [];
         }
@@ -107,7 +107,7 @@ class KingFansAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::KINGFANS]);
+        $acc = Account::findOneFromType(Account::KINGFANS);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }

@@ -723,7 +723,7 @@ class common
 
             //公众号信息
             if (empty($accounts[$entry->getAccount()])) {
-                $account = Account::findOne(['name' => $entry->getAccount()]);
+                $account = Account::findOneFromName($entry->getAccount());
                 if ($account) {
                     $accounts[$entry->getAccount()] = [
                         'name' => $account->getName(),
@@ -1096,7 +1096,7 @@ class common
         foreach ($query->page($page, $page_size)->orderBy('id DESC')->findAll() as $entry) {
             //公众号信息
             if (empty($accounts[$entry->getAccount()])) {
-                $account = Account::findOne(['name' => $entry->getAccount()]);
+                $account = Account::findOneFromName($entry->getAccount());
                 if ($account) {
                     $accounts[$entry->getAccount()] = [
                         'name' => $account->getName(),

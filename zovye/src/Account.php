@@ -18,9 +18,9 @@ use zovye\model\userModelObj;
  */
 class Account extends State
 {
-    const BANNED = 0;
+    const NORMAL = 0;
 
-    const NORMAL = 1;
+    const BANNED = 1;
 
     //视频
     const VIDEO = 10;
@@ -137,13 +137,29 @@ class Account extends State
         return m('account')->where(We7::uniacid([]))->where($condition);
     }
 
+    public static function findOneFromType($type): ?accountModelObj
+    {
+        return self::findOne(['type' => $type]);
+    }
+
+    public static function findOneFromName($name): ?accountModelObj
+    {
+        return self::findOne(['name' => $name]);
+    }
+
+    public static function findOneFromUID($uid): ?accountModelObj
+    {
+        return self::findOne(['uid' => $uid]);
+    }
+
     public static function format(accountModelObj $entry): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
             'id' => $entry->getId(),
             'uid' => $entry->getUid(),
-            'state' => $entry->getState(),
+            'type' => $entry->getType(),
+            'banned' => $entry->isBanned(),
             'name' => $entry->getName(),
             'title' => $entry->getTitle(),
             'descr' => html_entity_decode($entry->getDescription()),
@@ -214,13 +230,13 @@ class Account extends State
         //处理分组
         $groups = [];
 
-        $include = $params['state'] ?? [
+        $include = $params['type'] ?? [
                 Account::NORMAL,
                 Account::VIDEO,
                 Account::AUTH,
             ];
 
-        $specials_includes = $params['state'] ?? [
+        $specials_includes = $params['type'] ?? [
                 Account::JFB,
                 Account::MOSCALE,
                 Account::YUNFENBA,
@@ -385,7 +401,7 @@ class Account extends State
 
         foreach ($specials as $uid => $entry) {
             if ($entry[0]()) {
-                $join(['state' => $uid], $entry[1]);
+                $join(['type' => $uid], $entry[1]);
             }
         }
 
@@ -642,7 +658,7 @@ class Account extends State
         $uid = self::makeSpecialAccountUID($aid, $name);
         $account = self::findOne(['uid' => $uid]);
         if ($account) {
-            if ($account->getState() != $aid) {
+            if ($account->getType() != $aid) {
                 return null;
             }
 
@@ -658,7 +674,7 @@ class Account extends State
 
         $result = self::create([
             'uid' => $uid,
-            'state' => $aid,
+            'type' => $aid,
             'scname' => Schema::DAY,
             'name' => $name,
             'url' => $url,
@@ -805,7 +821,7 @@ class Account extends State
         $uid = Account::makeUID($app_id);
         $name = getArray($profile, 'authorizer_info.user_name');
 
-        $account = Account::findOne(['uid' => $uid]);
+        $account = Account::findOneFromUID($uid);
 
         if (empty($account)) {
             $qrcode_url = getArray($profile, 'authorizer_info.qrcode_url', '');
@@ -814,7 +830,7 @@ class Account extends State
             }
             $data = [
                 'agent_id' => $agent_id,
-                'state' => Account::AUTH,
+                'type' => Account::AUTH,
                 'uid' => $uid,
                 'name' => $name,
                 'title' => getArray($profile, 'authorizer_info.nick_name', '未知'),
@@ -851,7 +867,7 @@ class Account extends State
             }
 
             $account->setName($name);
-            $account->setState(Account::AUTH);
+            $account->setType(Account::AUTH);
 
             $account->save();
         }
@@ -867,7 +883,7 @@ class Account extends State
     public static function disableWxPlatformAccount(string $app_id): array
     {
         $uid = Account::makeUID($app_id);
-        $account = Account::findOne(['uid' => $uid]);
+        $account = Account::findOneFromUID($uid);
         if ($account) {
             $account->setState(Account::BANNED);
             if ($account->save()) {
@@ -927,7 +943,7 @@ class Account extends State
      */
     public static function updateAuthAccountQRCode(array &$account_data, $params, bool $temporary = true)
     {
-        if ($account_data['state'] == Account::AUTH) {
+        if ($account_data['type'] == Account::AUTH) {
             $str = is_array($params) ? implode(':', $params) : strval($params);
             $result = Account::getAuthorizerQrcodeById($account_data['id'], $str, $temporary);
             if (is_error($result)) {

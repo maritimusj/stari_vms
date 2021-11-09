@@ -45,10 +45,9 @@ use function zovye\tb;
  * @method int getOrderNo()
  * @method setOrderNo($no)
  * @method int getType()
- * @method setType($typr)
+ * @method setType($type)
  * @method string getGroupName()
  * @method setGroupName($group)
- * @method int getState()
  * @method void setState(int $state)
  * @method string getUrl()
  * @method setUrl($url)
@@ -207,7 +206,7 @@ class accountModelObj extends modelObj
 
     public function balance(): int
     {
-        return intval($this->getBalanceDeductNum());
+        return $this->getBalanceDeductNum();
     }
 
     public function getTitle(): string
@@ -217,7 +216,7 @@ class accountModelObj extends modelObj
 
     public function title(): string
     {
-        return strval($this->getTitle());
+        return $this->getTitle();
     }
 
     public function name(): string

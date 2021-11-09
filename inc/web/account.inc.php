@@ -25,6 +25,8 @@ if ($op == 'default') {
     $banned = request::bool('banned');
     if ($banned) {
         $query->where(['state' => Account::BANNED]);
+    } else {
+        $query->where(['state' => Account::NORMAL]);
     }
 
     if (request::has('type')) {

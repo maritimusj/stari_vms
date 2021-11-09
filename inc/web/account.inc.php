@@ -31,6 +31,13 @@ if ($op == 'default') {
 
     if (request::has('type')) {
         $query->where(['type' => request::int('type')]);
+    } else {
+        $query->where(['type' => [
+            Account::NORMAL,
+            Account::VIDEO,
+            Account::DOUYIN,
+            Account::AUTH,
+        ]]);
     }
 
     if (request::has('agentId')) {

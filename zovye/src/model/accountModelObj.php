@@ -44,6 +44,8 @@ use function zovye\tb;
  * @method setOrderLimits($limits)
  * @method int getOrderNo()
  * @method setOrderNo($no)
+ * @method int getType()
+ * @method setType($typr)
  * @method string getGroupName()
  * @method setGroupName($group)
  * @method int getState()
@@ -111,6 +113,9 @@ class accountModelObj extends modelObj
     protected $group_name;
 
     /** @var int */
+    protected $type;
+
+    /** @var int */
     protected $state;
 
     /** @var string */
@@ -135,7 +140,8 @@ class accountModelObj extends modelObj
     {
         return [
             'id' => $this->getId(),
-            'state' => $this->getState(),
+            'type' => $this->getType(),
+            'banned' => $this->isBanned(),
             'clr' => $this->getClr(),
             'name' => $this->getName(),
             'title' => $this->getTitle(),
@@ -162,6 +168,7 @@ class accountModelObj extends modelObj
                 Account::KINGFANS => App::isKingFansEnabled(),
                 Account::SNTO => App::isSNTOEnabled(),
                 Account::YFB => App::isYFBEnabled(),
+                Account::DOUYIN => App::isDouyinEnabled(),
             ];
             $state = $status[$this->getType()];
             if (isset($state) && !$state) {
@@ -246,14 +253,6 @@ class accountModelObj extends modelObj
             Account::SNTO,
             Account::YFB,
         ]);
-    }
-
-    public function getType(): int
-    {
-        if ($this->state != Account::BANNED) {
-            return $this->state;
-        }
-        return intval($this->settings('config.type'));
     }
 
     public function getConfig($path = '', $default = null)

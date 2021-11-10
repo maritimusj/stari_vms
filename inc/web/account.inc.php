@@ -144,7 +144,7 @@ if ($op == 'default') {
     app()->showTemplate('web/account/default', [
         'agent' => $agent ?? null,
         'accounts' => $accounts,
-        'type' => $type,
+        'type' => $type ?? null,
         'banned' => $banned,
         'pager' => $pager,
         'keywords' => $keywords,
@@ -487,7 +487,7 @@ if ($op == 'default') {
             Util::itoast($res['message'], $back_url, 'success');
         }
     }
-    
+
 } elseif ($op == 'edit') {
 
     $id = request::int('id');
@@ -888,7 +888,7 @@ if ($op == 'default') {
         'op' => 'get_openid',
         'id' => $account->getId(),
     ]);
- 
+
     $result = Util::createQrcodeFile("douyin_{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
 
     if (is_error($result)) {

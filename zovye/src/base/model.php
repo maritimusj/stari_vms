@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\base;
@@ -89,8 +89,8 @@ DEBUG_MODE;
                 <<<CLASS_FILE
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 namespace zovye\model;
 

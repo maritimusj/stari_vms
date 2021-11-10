@@ -17,7 +17,7 @@ define('PEM_DIR', DATA_DIR . 'pem' . DIRECTORY_SEPARATOR); //微信支付企业�
 define('LIB_DIR', ZOVYE_ROOT . 'lib' . DIRECTORY_SEPARATOR);
 
 define('APP_NAME', basename(ZOVYE_ROOT));
-define('DEBUG', false);
+define('DEBUG', true);
 
 define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'] . $_SERVER['HTTP_HOST'] . '/addons/' . APP_NAME . '/');
 

@@ -31,18 +31,18 @@ if ($op == 'default') {
 
     if (request::isset('type')) {
         $type = request::int('type');
-        if ($type) {
-            $query->where(['type' => request::int('type')]);
-        } else {
+        if ($type == -1) {
             $query->where(['type' => Account::getAllSpecialAccount()]);
+        } else {
+            if (empty($type)) {
+                $query->where(['type' => [
+                    Account::NORMAL,
+                    Account::AUTH,
+                ]]);
+            } else {
+                $query->where(['type' => request::int('type')]);
+            }
         }
-    } else {
-        $query->where(['type' => [
-            Account::NORMAL,
-            Account::VIDEO,
-            Account::DOUYIN,
-            Account::AUTH,
-        ]]);
     }
 
     if (request::has('agentId')) {
@@ -98,6 +98,7 @@ if ($op == 'default') {
                 'orderlimits' => $entry->getOrderLimits(),
                 'url' => $entry->getUrl(),
                 'assigned' => !isEmptyArray($entry->get('assigned')),
+                'is_special' => $entry->isSpecial(),
             ];
 
             if ($entry->isAuth()) {
@@ -140,46 +141,6 @@ if ($op == 'default') {
         }
     }
 
-//    //特殊吸粉
-//    $one_res = [
-//        Account::JFB => App::isJfbEnabled(),
-//        Account::MOSCALE => App::isMoscaleEnabled(),
-//        Account::YUNFENBA => App::isYunfenbaEnabled(),
-//        Account::AQIINFO => App::isAQiinfoEnabled(),
-//        Account::ZJBAO => App::isZJBaoEnabled(),
-//        Account::MEIPA => App::isMeiPaEnabled(),
-//        Account::KINGFANS => App::isKingFansEnabled(),
-//        Account::SNTO => App::isSNTOEnabled(),
-//        Account::YFB => App::isSNTOEnabled(),
-//    ];
-//
-//    foreach ($one_res as $type => $enabled) {
-//        if ($enabled) {
-//            $t_res = Account::findOneFromType($type);
-//            if ($t_res) {
-//                $one_res[$type] = [
-//                    'id' => $t_res->getId(),
-//                    'orderno' => $t_res->getOrderNo(),
-//                    'name' => $t_res->getName(),
-//                    'title' => $t_res->getTitle(),
-//                    'url' => $t_res->getUrl(),
-//                    'img' => $t_res->getImg(),
-//                    'assigned' => !isEmptyArray($t_res->get('assigned')),
-//                ];
-//            } else {
-//                unset($one_res[$type]);
-//                Util::logToFile('account', "特殊吸粉{$type}已开启，但查找公众号资料失败！");
-//            }
-//        } else {
-//            unset($one_res[$type]);
-//        }
-//    }
-
-    //排序
-//    usort($one_res, function ($a, $b) {
-//        return $b['orderno'] - $a['orderno'];
-//    });
-
     app()->showTemplate('web/account/default', [
         'agent' => $agent ?? null,
         'accounts' => $accounts,
@@ -188,7 +149,6 @@ if ($op == 'default') {
         'pager' => $pager,
         'keywords' => $keywords,
         'search_url' => $this->createWebUrl('account', ['banned' => $banned]),
-        //'one_res' => $one_res
     ]);
 
 } elseif ($op == 'search') {
@@ -597,6 +557,9 @@ if ($op == 'default') {
     if ($id) {
         $account = Account::get($id);
         if ($account) {
+            if ($account->isSpecial()) {
+                Util::itoast('删除失败！', $this->createWebUrl('account'), 'error');
+            }
             $title = $account->getTitle();
             $account->destroy();
             Account::updateAccountData();

@@ -90,6 +90,9 @@
         filter: grayscale(0);
         opacity: 1;
     }
+    #accountlist .qrcode-x {
+        width: 22px;
+    }
     .operate:hover .auth-weixin:hover {
         color: #4CAF50;
         text-shadow: 1px 1px 1px #CDDC39;
@@ -259,7 +262,13 @@
                             <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
                         </div>
                     </td>
-                    {elseif $a['src'] == 0}
+                    {elseif $a['is_special']}
+                    <td>
+                    </td>
+                    <td>
+                        <img src="{MODULE_URL}static/img/qrcode.svg" class="qrcode-x"  title="动态二维码">
+                    </td>
+                    {else}
                     <td class="detail" style="position:relative;">
                         <div class="limit" style="background-color:{$a['clr']}" >
                             {if $a['groupname']}<div class="group" title="分组名称：{$a['groupname']}" style="color:{$a['clr']}">{$a['groupname']}</div>{/if}
@@ -279,18 +288,6 @@
                             {/if}                            
                             <div class="zovye_qrcode"  data-src="{media $a['qrcode']}"></div>
                         </div>
-                    </td>
-                    {else}
-                    <td>
-                        <div>
-                            <div style="padding: 1.5em;">
-                                <span>由广告联盟平台决定</span>
-                            </div>
-                        </div>
-
-                    </td>
-                    <td>
-                        <i class="fa fa-qrcode" title="动态二维码"></i>
                     </td>
                     {/if}
 

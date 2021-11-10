@@ -29,8 +29,13 @@ if ($op == 'default') {
         $query->where(['state' => Account::NORMAL]);
     }
 
-    if (request::has('type')) {
-        $query->where(['type' => request::int('type')]);
+    if (request::isset('type')) {
+        $type = request::int('type');
+        if ($type) {
+            $query->where(['type' => request::int('type')]);
+        } else {
+            $query->where(['type' => Account::getAllSpecialAccount()]);
+        }
     } else {
         $query->where(['type' => [
             Account::NORMAL,
@@ -135,40 +140,40 @@ if ($op == 'default') {
         }
     }
 
-    //特殊吸粉
-    $one_res = [
-        Account::JFB => App::isJfbEnabled(),
-        Account::MOSCALE => App::isMoscaleEnabled(),
-        Account::YUNFENBA => App::isYunfenbaEnabled(),
-        Account::AQIINFO => App::isAQiinfoEnabled(),
-        Account::ZJBAO => App::isZJBaoEnabled(),
-        Account::MEIPA => App::isMeiPaEnabled(),
-        Account::KINGFANS => App::isKingFansEnabled(),
-        Account::SNTO => App::isSNTOEnabled(),
-        Account::YFB => App::isSNTOEnabled(),
-    ];
-
-    foreach ($one_res as $type => $enabled) {
-        if ($enabled) {
-            $t_res = Account::findOneFromType($type);
-            if ($t_res) {
-                $one_res[$type] = [
-                    'id' => $t_res->getId(),
-                    'orderno' => $t_res->getOrderNo(),
-                    'name' => $t_res->getName(),
-                    'title' => $t_res->getTitle(),
-                    'url' => $t_res->getUrl(),
-                    'img' => $t_res->getImg(),
-                    'assigned' => !isEmptyArray($t_res->get('assigned')),
-                ];
-            } else {
-                unset($one_res[$type]);
-                Util::logToFile('account', "特殊吸粉{$type}已开启，但查找公众号资料失败！");
-            }
-        } else {
-            unset($one_res[$type]);
-        }
-    }
+//    //特殊吸粉
+//    $one_res = [
+//        Account::JFB => App::isJfbEnabled(),
+//        Account::MOSCALE => App::isMoscaleEnabled(),
+//        Account::YUNFENBA => App::isYunfenbaEnabled(),
+//        Account::AQIINFO => App::isAQiinfoEnabled(),
+//        Account::ZJBAO => App::isZJBaoEnabled(),
+//        Account::MEIPA => App::isMeiPaEnabled(),
+//        Account::KINGFANS => App::isKingFansEnabled(),
+//        Account::SNTO => App::isSNTOEnabled(),
+//        Account::YFB => App::isSNTOEnabled(),
+//    ];
+//
+//    foreach ($one_res as $type => $enabled) {
+//        if ($enabled) {
+//            $t_res = Account::findOneFromType($type);
+//            if ($t_res) {
+//                $one_res[$type] = [
+//                    'id' => $t_res->getId(),
+//                    'orderno' => $t_res->getOrderNo(),
+//                    'name' => $t_res->getName(),
+//                    'title' => $t_res->getTitle(),
+//                    'url' => $t_res->getUrl(),
+//                    'img' => $t_res->getImg(),
+//                    'assigned' => !isEmptyArray($t_res->get('assigned')),
+//                ];
+//            } else {
+//                unset($one_res[$type]);
+//                Util::logToFile('account', "特殊吸粉{$type}已开启，但查找公众号资料失败！");
+//            }
+//        } else {
+//            unset($one_res[$type]);
+//        }
+//    }
 
     //排序
     usort($one_res, function ($a, $b) {
@@ -178,6 +183,7 @@ if ($op == 'default') {
     app()->showTemplate('web/account/default', [
         'agent' => $agent ?? null,
         'accounts' => $accounts,
+        'type' => $type,
         'banned' => $banned,
         'pager' => $pager,
         'keywords' => $keywords,

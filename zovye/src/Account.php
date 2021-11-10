@@ -29,6 +29,9 @@ class Account extends State
     //抖音
     const DOUYIN = 20;
 
+    //小程序
+    const WXAPP = 30;
+
     //授权接入公众号
     const AUTH = 98;
 
@@ -196,6 +199,28 @@ class Account extends State
         }
 
         return $data;
+    }
+
+    public static function getAllSpecialAccount(): array
+    {
+        $arr = [
+            Account::JFB => App::isJfbEnabled(),
+            Account::MOSCALE => App::isMoscaleEnabled(),
+            Account::YUNFENBA => App::isYunfenbaEnabled(),
+            Account::AQIINFO => App::isAQiinfoEnabled(),
+            Account::ZJBAO => App::isZJBaoEnabled(),
+            Account::MEIPA => App::isMeiPaEnabled(),
+            Account::KINGFANS => App::isKingFansEnabled(),
+            Account::SNTO => App::isSNTOEnabled(),
+            Account::YFB => App::isSNTOEnabled(),
+        ];
+        $result = [];
+        foreach ($arr as $name => $enabled) {
+            if ($enabled) {
+                $result[] = $name;
+            }
+        }
+        return $result;
     }
 
     /**

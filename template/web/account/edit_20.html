@@ -7,9 +7,20 @@
     #text-config,#news-config {
         display: none;
     }
+    #navbar img {
+        width: 16px;
+    }
 </style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
+            抖音号
+        </a>
+    </li>
+</ul>
 <form action="{php echo $this->createWebUrl('account');}" method="post">
-    <div class="panel panel-default">
+    <div class="panel panel-default panel-first">
         <div class="heading">
             <span class="operate">
                 <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>

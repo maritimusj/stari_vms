@@ -7,15 +7,15 @@
     #text-config,#news-config {
         display: none;
     }
-    #navbar i.fa-weixin {
-        color: #4caf50;
+    #navbar img {
+        width: 16px;
     }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active">
         <a href="#">
-            <i class="fa fa-fw fa-weixin"></i>
-            公众号
+            <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
+            小程序
         </a>
     </li>
 </ul>
@@ -66,23 +66,24 @@
 
                 <div class="form-group">
                     <label class="col-md-2 control-label">
-                        公众号头像
+                        头像
                     </label>
                     <div class="col-md-10">
                         {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">二维码</label>
+                    <label for="openid" class="col-md-2 control-label">小程序原始ID</label>
                     <div class="col-md-10">
-                        {php echo tpl_form_field_image('qrcode', $account?$account->getQrcode():'');}
+                        <input type="text" class="form-control" name="openid" id="openid" value="{php echo $account?$account->getConfig('openid'):''}">
+                        <span class="help-block">* </span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">更多二维码（可选）</label>
+                    <label for="url" class="col-md-2 control-label">转跳页面路径</label>
                     <div class="col-md-10">
-                        {php echo tpl_form_field_multi_image('qrcodes', $qrcodes);}
-                        <span class="help-block">* 用户需要关注以上列表中所有公众号才能领取商品</span>
+                        <input type="text" class="form-control" name="url" id="url" value="{php echo $account?$account->getConfig('url'):''}">
+                        <span class="help-block">* </span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -99,80 +100,80 @@
                 </div>
             </div>
             <!-- 基本信息 结束 -->
-            <!-- 高级设置 开始 -->
-            <div class="seg">
-                <div class="title">高级设置</div>
-                <div class="form-group">
-                    <label for="scname" class="col-md-2 control-label">领取周期</label>
-                    <div class="col-md-10">
-                        <select  class="form-control" name="scname" id="scname">
-                            <option value="{php echo zovye\Schema::DAY}" {if $account && $account->getScname() == zovye\Schema::DAY}selected{/if}>每天</option>
-                            <option value="{php echo zovye\Schema::WEEK}" {if $account && $account->getScname() == zovye\Schema::WEEK}selected{/if}>每周</option>
-                            <option value="{php echo zovye\Schema::MONTH}" {if $account && $account->getScname() == zovye\Schema::MONTH}selected{/if}>每月</option>
-                        </select>
-                        <span class="help-block">* 每天/每周/每月可领取一件商品</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="count" class="col-md-2 control-label">一个周期内<br/><b>单个用户</b>可领取数量</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="count" id="count" value="{php echo $account?$account->getCount():'1'}">
-                        <span class="help-block">* 每个用户在关注该公众号以后<b>每个周期</b>最大可领取的商品数量，0表示不限制数量</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="sccount" class="col-md-2 control-label">一个周期内<br/><b>全部用户</b>可领取总数</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="sccount" id="sccount" value="{php echo $account?$account->getSccount():'0'}">
-                        <span class="help-block">* 全部用户在一个周期内领取总数量的最大值，0表示不限制数量</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="total" class="col-md-2 control-label"><b>单个用户</b><br/>累计最多领取数量</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="total" id="total" value="{php echo $account?$account->getTotal():'0'}">
-                        <span class="help-block">* 每个用户在关注该公众号以后累计最多可领取的商品数量，0表示不限制数量</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多领取总数</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="orderlimits" id="orderlimits" value="{php echo $account?$account->getOrderLimits():'0'}">
-                        <span class="help-block">* 所有用户在这个公众号领取的商品总数量，0表示不限制数量，<b>超过后，系统会自动禁用该公众号！</b></span>
-                    </div>
-                </div> 
-            </div>
-            <!-- 高级设置 结束 -->
-            <!-- 用户限制 开始 -->
-            <div class="seg">
-                <div class="title">用户限制</div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="sexCheckbox1" name="limits[]" value="male" {if $limits && $limits['male'] or empty($limits)}checked{/if}> 男
-                        </label>
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="sexCheckbox2" name="limits[]" value="female" {if $limits && $limits['female'] or empty($limits)}checked{/if}> 女
-                        </label>
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="sexCheckbox0" name="limits[]" value="unknown_sex" {if $limits && $limits['unknown_sex'] or empty($limits)}checked{/if}> 未知
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">手机系统</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="phoneCheckbox1" name="limits[]" value="ios" {if $limits && $limits['ios'] or empty($limits)}checked{/if}> iPhone手机
-                        </label>
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
-                        </label>
-                    </div>
+           <!-- 高级设置 开始 -->
+           <div class="seg">
+            <div class="title">高级设置</div>
+            <div class="form-group">
+                <label for="scname" class="col-md-2 control-label">领取周期</label>
+                <div class="col-md-10">
+                    <select  class="form-control" name="scname" id="scname">
+                        <option value="{php echo zovye\Schema::DAY}" {if $account && $account->getScname() == zovye\Schema::DAY}selected{/if}>每天</option>
+                        <option value="{php echo zovye\Schema::WEEK}" {if $account && $account->getScname() == zovye\Schema::WEEK}selected{/if}>每周</option>
+                        <option value="{php echo zovye\Schema::MONTH}" {if $account && $account->getScname() == zovye\Schema::MONTH}selected{/if}>每月</option>
+                    </select>
+                    <span class="help-block">* 每天/每周/每月可领取一件商品</span>
                 </div>
             </div>
-            <!-- 用户限制 结束 -->
+            <div class="form-group">
+                <label for="count" class="col-md-2 control-label">一个周期内<br/><b>单个用户</b>可领取数量</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="count" id="count" value="{php echo $account?$account->getCount():'1'}">
+                    <span class="help-block">* 每个用户在关注该公众号以后<b>每个周期</b>最大可领取的商品数量，0表示不限制数量</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="sccount" class="col-md-2 control-label">一个周期内<br/><b>全部用户</b>可领取总数</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="sccount" id="sccount" value="{php echo $account?$account->getSccount():'0'}">
+                    <span class="help-block">* 全部用户在一个周期内领取总数量的最大值，0表示不限制数量</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="total" class="col-md-2 control-label"><b>单个用户</b><br/>累计最多领取数量</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="total" id="total" value="{php echo $account?$account->getTotal():'0'}">
+                    <span class="help-block">* 每个用户在关注该公众号以后累计最多可领取的商品数量，0表示不限制数量</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多领取总数</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="orderlimits" id="orderlimits" value="{php echo $account?$account->getOrderLimits():'0'}">
+                    <span class="help-block">* 所有用户在这个公众号领取的商品总数量，0表示不限制数量，<b>超过后，系统会自动禁用该公众号！</b></span>
+                </div>
+            </div> 
+        </div>
+        <!-- 高级设置 结束 -->
+        <!-- 用户限制 开始 -->
+        <div class="seg">
+            <div class="title">用户限制</div>
+            <div class="form-group">
+                <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
+                <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                    <label class="checkbox-inline">
+                    <input type="checkbox" id="sexCheckbox1" name="limits[]" value="male" {if $limits && $limits['male'] or empty($limits)}checked{/if}> 男
+                    </label>
+                    <label class="checkbox-inline">
+                    <input type="checkbox" id="sexCheckbox2" name="limits[]" value="female" {if $limits && $limits['female'] or empty($limits)}checked{/if}> 女
+                    </label>
+                    <label class="checkbox-inline">
+                    <input type="checkbox" id="sexCheckbox0" name="limits[]" value="unknown_sex" {if $limits && $limits['unknown_sex'] or empty($limits)}checked{/if}> 未知
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-md-2 col-md-2 control-label">手机系统</label>
+                <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                    <label class="checkbox-inline">
+                    <input type="checkbox" id="phoneCheckbox1" name="limits[]" value="ios" {if $limits && $limits['ios'] or empty($limits)}checked{/if}> iPhone手机
+                    </label>
+                    <label class="checkbox-inline">
+                    <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
+                    </label>
+                </div>
+            </div>
+        </div>
+        <!-- 用户限制 结束 -->
             <!-- 其它设置 开始 -->
             <div class="seg">
                 <div class="title">其它设置</div>

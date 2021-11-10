@@ -7,9 +7,22 @@
     #text-config,#news-config {
         display: none;
     }
+    #navbar img {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+    }
 </style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            <img src="{php echo \zovye\Account::SNTO_HEAD_IMG;}">
+            史莱姆
+        </a>
+    </li>
+</ul>
 <form action="{php echo $this->createWebUrl('account');}" method="post">
-    <div class="panel panel-default">
+    <div class="panel panel-default panel-first">
         <div class="heading">
             <span class="operate">
                 <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>

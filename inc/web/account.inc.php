@@ -541,7 +541,7 @@ if ($op == 'default') {
         $config = $account->get('config');
     }
 
-    app()->showTemplate('web/account/edit', [
+    app()->showTemplate('web/account/edit_' . $type, [
         'op' => $op,
         'type' => $type,
         'id' => $id,
@@ -557,10 +557,11 @@ if ($op == 'default') {
 
 } elseif ($op == 'add') {
 
-    app()->showTemplate('web/account/edit', [
+    $type = request::int('type', Account::NORMAL);
+    app()->showTemplate('web/account/edit_' . $type, [
         'clr' => Util::randColor(),
         'op' => $op,
-        'type' => request::int('type', Account::NORMAL),
+        'type' => $type,
     ]);
 
 } elseif ($op == 'remove') {

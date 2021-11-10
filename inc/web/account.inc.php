@@ -176,9 +176,9 @@ if ($op == 'default') {
 //    }
 
     //排序
-    usort($one_res, function ($a, $b) {
-        return $b['orderno'] - $a['orderno'];
-    });
+//    usort($one_res, function ($a, $b) {
+//        return $b['orderno'] - $a['orderno'];
+//    });
 
     app()->showTemplate('web/account/default', [
         'agent' => $agent ?? null,
@@ -188,7 +188,7 @@ if ($op == 'default') {
         'pager' => $pager,
         'keywords' => $keywords,
         'search_url' => $this->createWebUrl('account', ['banned' => $banned]),
-        'one_res' => $one_res
+        //'one_res' => $one_res
     ]);
 
 } elseif ($op == 'search') {

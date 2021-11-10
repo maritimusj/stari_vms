@@ -8,6 +8,7 @@ namespace zovye;
 
 //公众号状态
 use zovye\base\modelObjFinder;
+use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -1029,7 +1030,16 @@ class Account extends State
         return $first;
     }
 
-    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null)
+    /**
+     * @param accountModelObj $account
+     * @param userModelObj $user
+     * @param deviceModelObj $device
+     * @param $request
+     * @param $result
+     * @param null $createtime
+     * @return account_queryModelObj|null
+     */
+    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null): ?account_queryModelObj
     {
         $data = [
             'request_id' => REQUEST_ID,

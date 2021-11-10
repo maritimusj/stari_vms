@@ -18,7 +18,7 @@
         <div class="panel-body">
             <div class="seg">
                 <div class="title">基本信息</div>
-                {if $account && !$account->isSpecial()}
+                {if $account && !$account->isThirdPartyPlatform()}
                 <div class="form-group">
                     <label for="select_agent" class="col-md-2 control-label">代理商</label>
                     <div class="col-md-5">
@@ -53,7 +53,7 @@
                         <input type="title" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
                     </div>
                 </div>  
-                {if empty($account)  || !$account->isSpecial()}
+                {if empty($account)  || !$account->isThirdPartyPlatform()}
                 <div class="form-group">
                     <label class="col-md-2 control-label">
                         {if $type == \zovye\Account::VIDEO}
@@ -102,7 +102,7 @@
                     {if $account && $account->isAuth()}
                     <input name="qrcode" type="hidden" value="{php echo $account->getQrcode()}">
                     {/if}
-                    {if empty($account) || (!$account->isSpecial() && !$account->isAuth())}
+                    {if empty($account) || (!$account->isThirdPartyPlatform() && !$account->isAuth())}
                     <div class="form-group">
                         <label class="col-md-2 control-label">二维码</label>
                         <div class="col-md-10">
@@ -165,7 +165,7 @@
                     </div>
                 </div>
             </div>
-            {elseif $account && !$account->isSpecial() && !$account->useAccountQRCode()}
+            {elseif $account && !$account->isThirdPartyPlatform() && !$account->useAccountQRCode()}
             <div class="seg">
                 <div class="title">高级设置</div>
                 <div class="form-group">
@@ -240,7 +240,7 @@
                 </div>
                 <div class="seg">
                     <div class="title">其它设置</div>
-                    {if empty($account) || !$account->isSpecial()}
+                    {if empty($account) || !$account->isThirdPartyPlatform()}
                     <div class="form-group">
                         <label for="groupname" class="col-md-2 control-label">分组名称</label>
                         <div class="col-md-10">

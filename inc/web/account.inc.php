@@ -32,7 +32,7 @@ if ($op == 'default') {
     if (request::isset('type')) {
         $type = request::int('type');
         if ($type == -1) {
-            $query->where(['type' => Account::getAllSpecialAccount()]);
+            $query->where(['type' => Account::getAllEnabledThirdPartyPlatform()]);
         } else {
             if (empty($type)) {
                 $query->where(['type' => [
@@ -98,7 +98,7 @@ if ($op == 'default') {
                 'orderlimits' => $entry->getOrderLimits(),
                 'url' => $entry->getUrl(),
                 'assigned' => !isEmptyArray($entry->get('assigned')),
-                'is_special' => $entry->isSpecial(),
+                'is_third_party_platform' => $entry->isThirdPartyPlatform(),
             ];
 
             if ($entry->isAuth()) {
@@ -557,7 +557,7 @@ if ($op == 'default') {
     if ($id) {
         $account = Account::get($id);
         if ($account) {
-            if ($account->isSpecial()) {
+            if ($account->isThirdPartyPlatform()) {
                 Util::itoast('删除失败！', $this->createWebUrl('account'), 'error');
             }
             $title = $account->getTitle();

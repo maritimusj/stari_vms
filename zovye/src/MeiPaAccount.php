@@ -32,7 +32,7 @@ class MeiPaAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::MEIPA, Account::MEIPA_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::MEIPA, Account::MEIPA_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -144,7 +144,7 @@ class MeiPaAccount
 
             $order_uid = Order::makeUID($user, $device, $data['order_sn']);
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
             Util::logToFile('meipa', [

@@ -27,7 +27,7 @@ class YunfenbaAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::YUNFENBA, Account::YUNFENBA_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::YUNFENBA, Account::YUNFENBA_NAME);
     }
 
     /**
@@ -271,7 +271,7 @@ class YunfenbaAccount
 
             $order_uid = Order::makeUID($user, $device);
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('yunfenba', [

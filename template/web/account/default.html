@@ -262,7 +262,7 @@
                             <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
                         </div>
                     </td>
-                    {elseif $a['is_special']}
+                    {elseif $a['is_third_party_platform']}
                     <td>
                     </td>
                     <td>
@@ -331,7 +331,7 @@
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewStats"><i class="fa fa-area-chart fa-fw"></i> 查看本月统计</a></li>
                             <li><a href="#" data-op="viewHistoryStats"><i class="fa fa-line-chart fa-fw"></i> 查看历史数据</a></li>
-                            {if !$a['is_special']}
+                            {if !$a['is_third_party_platform']}
                             <li role="separator" class="divider"></li>
                             <li>
                                 {if $banned}

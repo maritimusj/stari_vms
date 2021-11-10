@@ -290,8 +290,8 @@ class mp
             $account = Account::findOneFromUID($uid);
             if ($account) {
                 if ($account->getAgentId() == $user->getAgentId()) {
-                    if ($account->isSpecial() || $account->isAuth()) {
-                        return ['msg' => '特殊吸粉或者授权接入的公众号无法禁用！'];
+                    if ($account->isThirdPartyPlatform() || $account->isAuth()) {
+                        return ['msg' => '第三方平台或者授权接入的公众号无法禁用！'];
                     }
                     if ($account->isBanned()) {
                         $account->setState(Account::NORMAL);

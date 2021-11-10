@@ -34,7 +34,7 @@ class MoscaleAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::MOSCALE, Account::MOSCALE_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::MOSCALE, Account::MOSCALE_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -193,7 +193,7 @@ class MoscaleAccount
 
             $order_uid = Order::makeUID($user, $device, $params['signature']);
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('moscale', [

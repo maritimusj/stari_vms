@@ -37,7 +37,7 @@ class YfbAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::YFB, Account::YFB_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::YFB, Account::YFB_NAME);
     }
 
     public function getQRCode(deviceModelObj $device, userModelObj $user, callable $cb = null): array
@@ -239,7 +239,7 @@ class YfbAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId']??''));
 
-            Account::createSpecialAccountOrder($account, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($account, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('yfb', [

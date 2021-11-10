@@ -169,7 +169,7 @@ class Account extends State
             'descr' => html_entity_decode($entry->getDescription()),
             'url' => $entry->getUrl(),
             'clr' => $entry->getClr(),
-            'img' => $entry->isSpecial() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia($entry->getImg()),
+            'img' => $entry->isThirdPartyPlatform() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia($entry->getImg()),
             'scname' => $entry->getScname(),
             'total' => $entry->getTotal(),
             'count' => $entry->getCount(),
@@ -201,7 +201,7 @@ class Account extends State
         return $data;
     }
 
-    public static function getAllSpecialAccount(): array
+    public static function getAllEnabledThirdPartyPlatform(): array
     {
         $arr = [
             Account::JFB => App::isJfbEnabled(),
@@ -309,7 +309,7 @@ class Account extends State
         }
 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
-        $specials = [
+        $third_party_platform = [
             //准粉吧
             Account::JFB => [
                 function () use ($specials_includes, $exclude) {
@@ -425,7 +425,7 @@ class Account extends State
             ],
         ];
 
-        foreach ($specials as $uid => $entry) {
+        foreach ($third_party_platform as $uid => $entry) {
             if ($entry[0]()) {
                 $join(['type' => $uid], $entry[1]);
             }
@@ -679,9 +679,9 @@ class Account extends State
         return Util::shortMobileUrl('entry', array_merge(['account' => $uid], $params));
     }
 
-    public static function createSpecialAccount(int $aid, string $name, string $img, string $url): ?accountModelObj
+    public static function createThirdPartyPlatform(int $aid, string $name, string $img, string $url): ?accountModelObj
     {
-        $uid = self::makeSpecialAccountUID($aid, $name);
+        $uid = self::makeThirdPartyPlatformUID($aid, $name);
         $account = self::findOne(['uid' => $uid]);
         if ($account) {
             if ($account->getType() != $aid) {
@@ -715,63 +715,63 @@ class Account extends State
         return $result;
     }
 
-    public static function makeSpecialAccountUID($aid, $name): string
+    public static function makeThirdPartyPlatformUID($aid, $name): string
     {
-        return self::makeUID("{$aid}:{$name}");
+        return self::makeUID("$aid:$name");
     }
 
     public static function createJFBAccount(): ?accountModelObj
     {
         $url = Util::murl('jfb');
-        return self::createSpecialAccount(Account::JFB, Account::JFB_NAME, Account::JFB_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::JFB, Account::JFB_NAME, Account::JFB_HEAD_IMG, $url);
     }
 
     public static function createMoscaleAccount(): ?accountModelObj
     {
         $url = Util::murl('moscale');
-        return self::createSpecialAccount(Account::MOSCALE, Account::MOSCALE_NAME, Account::MOSCALE_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::MOSCALE, Account::MOSCALE_NAME, Account::MOSCALE_HEAD_IMG, $url);
     }
 
     public static function createYunFenBaAccount(): ?accountModelObj
     {
         $url = Util::murl('yunfenba');
-        return self::createSpecialAccount(Account::YUNFENBA, Account::YUNFENBA_NAME, Account::YUNFENBA_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::YUNFENBA, Account::YUNFENBA_NAME, Account::YUNFENBA_HEAD_IMG, $url);
     }
 
     public static function createAQiinfoAccount(): ?accountModelObj
     {
         $url = Util::murl('aqiinfo');
-        return self::createSpecialAccount(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
     }
 
     public static function createZJBaoAccount(): ?accountModelObj
     {
         $url = Util::murl('zjbao');
-        return self::createSpecialAccount(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
     }
 
     public static function createMeiPaAccount(): ?accountModelObj
     {
         $url = Util::murl('meipa');
-        return self::createSpecialAccount(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
     }
 
     public static function createKingFansAccount(): ?accountModelObj
     {
         $url = Util::murl('kingfans');
-        return self::createSpecialAccount(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
     }
 
     public static function createSNTOAccount(): ?accountModelObj
     {
         $url = Util::murl('snto');
-        return self::createSpecialAccount(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
     }
 
     public static function createYFBAccount(): ?accountModelObj
     {
         $url = Util::murl('yfb');
-        return self::createSpecialAccount(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -1096,7 +1096,7 @@ class Account extends State
         return $query->findOne();
     }
 
-    public static function createSpecialAccountOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
+    public static function createThirdPartyPlatformOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
     {
         if (App::isAccountLogEnabled()) {
             $log = Account::getLastQueryLog($acc, $user, $device);
@@ -1110,7 +1110,7 @@ class Account extends State
             }
         }
 
-        Job::createSpecialAccountOrder([
+        Job::createThirdPartyPlatformOrder([
             'device' => $device->getId(),
             'user' => $user->getId(),
             'account' => $acc->getId(),

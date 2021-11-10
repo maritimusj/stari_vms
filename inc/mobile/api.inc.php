@@ -82,7 +82,7 @@ if (empty($goods) || $goods['num'] < 1) {
 
 $order_uid = Order::makeUID($user, $device);
 
-Job::createSpecialAccountOrder([
+Job::createThirdPartyPlatformOrder([
     'device' => $device->getId(),
     'user' => $user->getId(),
     'account' => $account->getId(),

@@ -165,7 +165,7 @@ class Job
         return CtrlServ::scheduleJob('withdraw', ['id' => $user_id, 'amount' => $amount]);
     }
 
-    public static function createSpecialAccountOrder($params = []): bool
+    public static function createThirdPartyPlatformOrder($params = []): bool
     {
         return self::createAccountOrder($params);
     }

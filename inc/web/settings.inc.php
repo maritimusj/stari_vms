@@ -156,7 +156,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
         $settings['account']['douyin']['enabled'] = request::bool('douyin') ? 1 : 0;
 
-        $specialAccounts = [
+        $third_party_platform = [
             'jfbFAN' => [
                 __NAMESPACE__ . '\Account::createJFBAccount',
                 'jfb.fan.enabled',
@@ -198,7 +198,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $accounts_need_refresh = false;
 
-        foreach ($specialAccounts as $key => $v) {
+        foreach ($third_party_platform as $key => $v) {
             $enabled = request::bool($key) ? 1 : 0;
             if ($enabled) {
                 call_user_func($v[0]);

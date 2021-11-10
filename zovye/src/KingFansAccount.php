@@ -31,7 +31,7 @@ class KingFansAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::KINGFANS, Account::KINGFANS_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::KINGFANS, Account::KINGFANS_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -155,7 +155,7 @@ class KingFansAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($params['oid'] . $user_openid));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('kingfans', [

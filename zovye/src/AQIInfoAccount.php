@@ -28,7 +28,7 @@ class AQIInfoAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::AQIINFO, Account::AQIINFO_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::AQIINFO, Account::AQIINFO_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -175,7 +175,7 @@ class AQIInfoAccount
 
             $order_uid = Order::makeUID($user, $device, strval($params['tradeNo']));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('AQIInfo', [

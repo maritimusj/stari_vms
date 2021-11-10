@@ -34,7 +34,7 @@ class ZhiJinBaoAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::ZJBAO, Account::ZJBAO_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::ZJBAO, Account::ZJBAO_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -156,7 +156,7 @@ class ZhiJinBaoAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($data['appId']));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
             Util::logToFile('zjbao', [

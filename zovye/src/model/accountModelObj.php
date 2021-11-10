@@ -156,7 +156,7 @@ class accountModelObj extends modelObj
             return true;
         }
 
-        if ($this->isSpecial()) {
+        if ($this->isThirdPartyPlatform()) {
             $status = [
                 Account::JFB => App::isJfbEnabled(),
                 Account::MOSCALE => App::isMoscaleEnabled(),
@@ -239,7 +239,7 @@ class accountModelObj extends modelObj
         return Account::format($this);
     }
 
-    public function isSpecial(): bool
+    public function isThirdPartyPlatform(): bool
     {
         return in_array($this->getType(), [
             Account::JFB,

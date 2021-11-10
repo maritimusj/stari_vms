@@ -38,7 +38,7 @@ class SNTOAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::SNTO, Account::SNTO_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::SNTO, Account::SNTO_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -191,7 +191,7 @@ class SNTOAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($data['order_id']));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
         } catch (Exception $e) {
             Util::logToFile('snto', [
                 'error' => '回调处理发生错误! ',

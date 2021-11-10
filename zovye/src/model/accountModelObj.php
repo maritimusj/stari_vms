@@ -271,6 +271,11 @@ class accountModelObj extends modelObj
     {
         return $this->getType() == Account::DOUYIN;
     }
+
+    public function isWxApp(): bool
+    {
+        return $this->getType() == Account::WXAPP;
+    }
    
     public function isJFB(): bool
     {

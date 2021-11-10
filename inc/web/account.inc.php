@@ -308,6 +308,12 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'scene' => request::trim('scene'),
                 ]);
+            } elseif ($account->isWxApp()) {
+                $account->set('config', [
+                    'type' => Account::WXAPP,
+                    'username' => request::trim('username'),
+                    'path' => request::trim('path'),
+                ]);
             } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
@@ -452,6 +458,12 @@ if ($op == 'default') {
                     'type' => Account::DOUYIN,
                     'url' => request::trim('url'),
                     'openid' => request::trim('openid'),
+                ]);
+            } elseif ($account->isWxApp()) {
+                $account->set('config', [
+                    'type' => Account::WXAPP,
+                    'username' => request::trim('username'),
+                    'path' => request::trim('path'),
                 ]);
             }
 

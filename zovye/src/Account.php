@@ -263,6 +263,7 @@ class Account extends State
                 Account::NORMAL,
                 Account::VIDEO,
                 Account::AUTH,
+                Account::WXAPP,
             ];
 
         $third_party_platform_includes = $params['type'] ?? [

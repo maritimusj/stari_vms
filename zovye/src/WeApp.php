@@ -355,6 +355,12 @@ JSCODE;
             } else {
                 $tpl['accounts'] = Account::getAvailableList($device, $user, [
                     'exclude' => $params['exclude'],
+                    //type 不包含 Account::WXAPP，兼容以前不支持该类型的皮肤，新皮肤使用js api接口获取
+                    'type' => [
+                        Account::NORMAL,
+                        Account::VIDEO,
+                        Account::AUTH,
+                    ],
                 ]);
             }
         }

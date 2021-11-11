@@ -155,7 +155,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个用户！');
     }
 
-    if ($user->acquireLocker('Account::wxapp')) {
+    if (!$user->acquireLocker('Account::wxapp')) {
         JSON::fail('正忙，请稍后再试！');
     }
 

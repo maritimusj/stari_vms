@@ -104,12 +104,26 @@ class orderModelObj extends modelObj
      */
     public function getDevice(): ?deviceModelObj
     {
-        return Device::get($this->device_id);
+        if ($this->device_id) {
+            return Device::get($this->device_id);
+        }
+        $device_id = $this->getExtraData('custom.device', 0);
+        if ($device_id) {
+            return Device::get($device_id);
+        }
+        return null;
     }
 
     public function getAgent(): ?agentModelObj
     {
-        return Agent::get($this->agent_id);
+        if ($this->agent_id) {
+            return Agent::get($this->agent_id);
+        }
+        $agent_id = $this->getExtraData('custom.agent', 0);
+        if ($agent_id) {
+            return Agent::get($agent_id);
+        }
+        return null;
     }
 
     public function getUser(): ?userModelObj

@@ -390,6 +390,9 @@
                 <td  class="devicename agentId{$order['agentId']}">
                     {if $order['device']['name']}
                     <div>
+                        {if $order['is_zero_bonus']}
+                        <i class="fa fa-question-circle disabled"></i>
+                        {/if}
                         {if $device && $device->getId() == $order['device']['id']}
                         {$order['device']['name']}
                         {else}

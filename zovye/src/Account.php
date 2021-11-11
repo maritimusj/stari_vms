@@ -933,18 +933,23 @@ class Account extends State
         $accounts = Account::match($device, $user, array_merge($params, ['admin', 'max' => settings('misc.maxAccounts', 0)]));
         if (!empty($accounts)) {
             foreach ($accounts as $index => &$account) {
-                if (App::useAccountQRCode()) {
-                    $obj = Account::get($account['id']);
-                    if (empty($obj) || $obj->useAccountQRCode()) {
-                        unset($accounts[$index]);
-                        continue;
+                if ($account['type'] == Account::WXAPP && empty($account['username'])) {
+                    unset($accounts[$index]);
+                    continue;
+                }
+                if ($account['type'] == Account::AUTH) {
+                    if (App::useAccountQRCode()) {
+                        $obj = Account::get($account['id']);
+                        if (empty($obj) || $obj->useAccountQRCode()) {
+                            unset($accounts[$index]);
+                            continue;
+                        }
+                    }
+                    if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
+                        //如果是授权服务号，需要使用场景二维码替换原二维码
+                        self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                     }
                 }
-                if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
-                    //如果是授权服务号，需要使用场景二维码替换原二维码
-                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
-                }
-
                 if (isset($account['qrcode'])) {
                     if ($account['qrcode']) {
                         $account['qrcode'] = Util::toMedia($account['qrcode']);

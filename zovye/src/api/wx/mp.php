@@ -405,6 +405,8 @@ class mp
             }
         } elseif (request::has('douyinUrl')) {
             $type = Account::DOUYIN;
+        } elseif (request::has('username')) {
+            $type = Account::WXAPP;
         } else {
             return error(State::ERROR, '请指定正确的文件网址！');
         }
@@ -496,6 +498,12 @@ class mp
                     'type' => Account::DOUYIN,
                     'url' => request::trim('douyinUrl'),
                     'openid' => $openid,
+                ]);
+            } elseif ($account->isWxApp()) {
+                $account->set('config', [
+                    'type' => Account::WXAPP,
+                    'username' => request::trim('username'),
+                    'path' => request::trim('path'),
                 ]);
             }
             return ['msg' => '保存成功！'];

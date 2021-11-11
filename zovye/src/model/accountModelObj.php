@@ -157,18 +157,22 @@ class accountModelObj extends modelObj
         }
 
         if ($this->isThirdPartyPlatform()) {
-            $status = [
-                Account::JFB => App::isJfbEnabled(),
-                Account::MOSCALE => App::isMoscaleEnabled(),
-                Account::YUNFENBA => App::isYunfenbaEnabled(),
-                Account::AQIINFO => App::isAQiinfoEnabled(),
-                Account::ZJBAO => App::isZJBaoEnabled(),
-                Account::MEIPA => App::isMeiPaEnabled(),
-                Account::KINGFANS => App::isKingFansEnabled(),
-                Account::SNTO => App::isSNTOEnabled(),
-                Account::YFB => App::isYFBEnabled(),
-                Account::DOUYIN => App::isDouyinEnabled(),
-            ];
+            static $status = null;
+            if (is_null($status)) {
+                $status = [
+                    Account::JFB => App::isJfbEnabled(),
+                    Account::MOSCALE => App::isMoscaleEnabled(),
+                    Account::YUNFENBA => App::isYunfenbaEnabled(),
+                    Account::AQIINFO => App::isAQiinfoEnabled(),
+                    Account::ZJBAO => App::isZJBaoEnabled(),
+                    Account::MEIPA => App::isMeiPaEnabled(),
+                    Account::KINGFANS => App::isKingFansEnabled(),
+                    Account::SNTO => App::isSNTOEnabled(),
+                    Account::YFB => App::isYFBEnabled(),
+                    Account::DOUYIN => App::isDouyinEnabled(),
+                ];
+            }
+
             $state = $status[$this->getType()];
             if (isset($state) && !$state) {
                 return true;

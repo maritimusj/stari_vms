@@ -1816,6 +1816,16 @@ HTML_CONTENT;
                 ],
             ];
 
+            if ($acc) {
+                $order_data['extra']['account'] = [
+                    'name' => $acc->getName(),
+                    'type' => $acc->getType(),
+                    'clr' => $acc->getClr(),
+                    'title' => $acc->getTitle(),
+                    'img' => $acc->getImg(),
+                ];
+            }
+
             if ($args['orderId']) {
                 $order_data['order_id'] = $args['orderId'];
             } else {

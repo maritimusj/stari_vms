@@ -166,6 +166,8 @@ if ($op == 'default') {
                     $profile['media'] = $account->getMedia();
                 } elseif ($account->isDouyin()) {
                     $profile['douyin'] = true;
+                } elseif ($account->isWxApp()) {
+                    $profile['wxapp'] = true;
                 } else {
                     $profile['qrcode'] = $account->getQrcode();
                 }
@@ -176,11 +178,13 @@ if ($op == 'default') {
         $data = Order::format($entry, true);
         if ($accounts[$data['account']]) {
             if (isset($accounts[$data['account']]['media'])) {
-                $data['account_title'] = '视频 ' . $data['account'];
+                $data['account_title'] = '视频 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['douyin']) {
-                $data['account_title'] = '抖音 ' . $data['account'];
+                $data['account_title'] = '抖音 ' . $accounts[$data['account']]['title'];
+            } elseif ($accounts[$data['account']]['wxapp']) {
+                $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
             } else {
-                $data['account_title'] = '公众号 ' . $data['account'];
+                $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'];
             }
 
             $data['clr'] = $accounts[$data['account']]['clr'];

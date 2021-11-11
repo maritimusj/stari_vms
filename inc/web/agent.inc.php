@@ -1818,14 +1818,14 @@ if ($op == 'default') {
         ];
     }
 
-    $content = app()->fetchTemplate(
+    app()->showTemplate(
         'web/agent/keepers',
         [
+            'agent' => $agent->profile(),
             'list' => $result,
+            'back_url' => Util::url('agent', []),
         ]
     );
-
-    JSON::success(['title' => '营运人员列表', 'content' => $content]);
 } elseif ($op == 'refresh_rel') {
 
     if (!YZShop::isInstalled()) {

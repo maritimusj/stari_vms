@@ -401,7 +401,7 @@
         api.showResult({ op: 'commission_log', id });
     }
     api.viewKeepers = function (id) {
-        api.showResult({ op: 'keepers', id });
+        window.location.href = "{php echo $this->createWebUrl('agent', ['op' => 'keepers', 'id' => '__id__']);}".replace('__id__', id);
     }
     api.repair = function(data, e) {
         const self = $(e.target);

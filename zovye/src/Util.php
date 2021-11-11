@@ -1812,6 +1812,8 @@ HTML_CONTENT;
                     'user' => $user->profile(),
                     'custom' => [
                         'zero_bonus' => $is_zero_bonus,
+                        'device' => $device->getId(),
+                        'agent' => $device->getAgentId(),
                     ]
                 ],
             ];

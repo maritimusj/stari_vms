@@ -11,7 +11,6 @@ use zovye\model\orderModelObj;
 
 class AgentBonusEventHandler
 {
-
     /**
      * 事件：device.orderCreated
      * @param deviceModelObj $device

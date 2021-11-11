@@ -13,7 +13,6 @@ use zovye\model\accountModelObj;
 
 class LocationEventHandler
 {
-
     /**
      * 事件：device.locked
      * @param deviceModelObj $device

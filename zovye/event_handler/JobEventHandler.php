@@ -10,7 +10,6 @@ use zovye\model\orderModelObj;
 
 class JobEventHandler
 {
-
     /**
      * 事件：device.openSuccess 处理程序
      * @param orderModelObj|null $order

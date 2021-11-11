@@ -13,7 +13,6 @@ use zovye\model\accountModelObj;
 
 class BalanceEventHandler
 {
-
     /**
      * 事件：device.orderCreated
      * @param userModelObj $user

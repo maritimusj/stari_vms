@@ -19,7 +19,7 @@ class AccountEventHandler
      * @param deviceModelObj $device
      * @param userModelObj $user
      * @param accountModelObj|null $account
-     * @throws Exception
+     * @param orderModelObj|null $order
      */
     public static function onDeviceBeforeLock(deviceModelObj $device, userModelObj $user, accountModelObj $account = null, orderModelObj $order = null)
     {

@@ -163,6 +163,14 @@ if ($op == 'default') {
         JSON::fail('找不到这个用户！');
     }
 
+    if ($user->isBanned()) {
+        JSON::fail('用户暂时无法使用！');
+    }
+
+    if (!$user->isWxUser()) {
+        JSON::fail('请用微信中打开！');
+    }
+
     if (!$user->acquireLocker('Account::wxapp')) {
         JSON::fail('正忙，请稍后再试！');
     }

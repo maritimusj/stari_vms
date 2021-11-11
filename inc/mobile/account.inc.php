@@ -144,7 +144,7 @@ if ($op == 'default') {
     }
 
     $types = request::array('types');
-    $result = Account::getAvailableList($device, $user, ['type' => $types]);
+    $result = Account::getAvailableList($device, $user, ['type' => $types ? $types : null]);
 
     JSON::success($result);
 }

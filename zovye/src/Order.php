@@ -647,12 +647,15 @@ class Order extends State
                     'address' => $device_obj->getAddress(),
                 ];
             }
+
             //代理商信息
             $agent_obj = $order->getAgent();
             if ($agent_obj) {
                 $data['agentId'] = $agent_obj->getId();
                 $data['agent'] = $agent_obj->profile();
             }
+
+            $data['is_zero_bonus'] = $order->isZeroBonus();
 
             //ip地址信息
             $ip_info = $order->getIpAddress();

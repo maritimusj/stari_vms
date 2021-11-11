@@ -230,4 +230,9 @@ class orderModelObj extends modelObj
 
         return empty($info) ? [] : json_decode($info, true);
     }
+
+    public function isZeroBonus()
+    {
+        return $this->getExtraData('custom.zero_bonus', false);
+    }
 }

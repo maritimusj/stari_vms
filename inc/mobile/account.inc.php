@@ -76,7 +76,7 @@ if ($op == 'default') {
             if ($locker) {
                 $locker->destroy();
             }
-        }        
+        }
     } else {
         if ($seconds < $duration) {
             JSON::success(['msg' => '请继续观看']);
@@ -90,10 +90,10 @@ if ($op == 'default') {
         'shadowId' => $device->getShadowId(),
         'accountId' => $account->getId(),
     ];
-    
+
     //准备领取商品的ticket
     $user->updateSettings('last.ticket', $ticket_data);
-    
+
     JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 
 } elseif ($op == 'get') {
@@ -116,7 +116,7 @@ if ($op == 'default') {
     if (empty($device)) {
         Util::resultAlert('找不到指定的设备！', 'error');
     }
-    
+
     $tpl_data = Util::getTplData(
         [
             $user,
@@ -131,4 +131,20 @@ if ($op == 'default') {
 
     //领取页面
     app()->getPage($tpl_data);
+
+} elseif ($op == 'get_list') {
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $device = Device::get(request::str('device'), true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $types = request::array('types');
+    $result = Account::getAvailableList($device, $user, ['type' => $types]);
+
+    JSON::success($result);
 }

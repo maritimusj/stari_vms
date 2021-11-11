@@ -182,7 +182,10 @@ class Account extends State
             $data['duration'] = $entry->getDuration();
         } elseif ($entry->isDouyin()) {
             $data['url'] = DouYin::makeHomePageUrl($entry->getConfig('url'));
-            $data['openid'] = $entry->getConfig('openid');
+            $data['openid'] = $entry->getConfig('openid', '');
+        } elseif ($entry->isWxApp()) {
+            $data['username'] = $entry->getConfig('username', '');
+            $data['path'] = $entry->getConfig('path', '');
         } else {
             $data['qrcode'] = $entry->getQrcode();
         }
@@ -199,23 +202,6 @@ class Account extends State
         }
 
         return $data;
-    }
-
-    public static function isTypeValid($type): bool
-    {
-        return in_array($type, [
-            self::NORMAL,
-            self::AUTH,
-            self::JFB,
-            self::MOSCALE,
-            self::YUNFENBA,
-            self::AQIINFO,
-            self::ZJBAO,
-            self::MEIPA,
-            self::KINGFANS,
-            self::SNTO,
-            self::YFB,
-        ]);
     }
 
     public static function getAllEnabledThirdPartyPlatform(): array
@@ -279,7 +265,7 @@ class Account extends State
                 Account::AUTH,
             ];
 
-        $specials_includes = $params['type'] ?? [
+        $third_party_platform_includes = $params['type'] ?? [
                 Account::JFB,
                 Account::MOSCALE,
                 Account::YUNFENBA,
@@ -292,7 +278,7 @@ class Account extends State
             ];
 
         $include = is_array($include) ? $include : [$include];
-        $specials_includes = is_array($specials_includes) ? $specials_includes : [$specials_includes];
+        $third_party_platform_includes = is_array($third_party_platform_includes) ? $third_party_platform_includes : [$third_party_platform_includes];
 
         $accounts = $device->getAccounts($include);
         foreach ($accounts as $uid => $entry) {
@@ -329,8 +315,8 @@ class Account extends State
         $third_party_platform = [
             //准粉吧
             Account::JFB => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::JFB, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::JFB, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude);
@@ -341,8 +327,8 @@ class Account extends State
             ],
             //公锤
             Account::MOSCALE => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::MOSCALE, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::MOSCALE, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude);
@@ -353,8 +339,8 @@ class Account extends State
             ],
             //云粉
             Account::YUNFENBA => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::YUNFENBA, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::YUNFENBA, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude);
@@ -365,8 +351,8 @@ class Account extends State
             ],
             //阿旗
             Account::AQIINFO => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::AQIINFO, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::AQIINFO, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude);
@@ -378,8 +364,8 @@ class Account extends State
 
             //纸巾宝
             Account::ZJBAO => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::ZJBAO, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::ZJBAO, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
@@ -391,8 +377,8 @@ class Account extends State
 
             //美葩
             Account::MEIPA => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::MEIPA, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::MEIPA, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude);
@@ -404,8 +390,8 @@ class Account extends State
 
             //金粉吧
             Account::KINGFANS => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::KINGFANS, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::KINGFANS, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude);
@@ -417,8 +403,8 @@ class Account extends State
 
             //史莱姆
             Account::SNTO => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::SNTO, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::SNTO, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude);
@@ -430,8 +416,8 @@ class Account extends State
 
             //粉丝宝
             Account::YFB => [
-                function () use ($specials_includes, $exclude) {
-                    if ($specials_includes && !in_array(Account::YFB, $specials_includes)) {
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::YFB, $third_party_platform_includes)) {
                         return false;
                     }
                     return App::isYFBEnabled() && !in_array(YfbAccount::getUid(), $exclude);

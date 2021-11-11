@@ -221,7 +221,7 @@ class accountModelObj extends modelObj
 
     public function name(): string
     {
-        return strval($this->getName());
+        return $this->getName();
     }
 
     public function commission_price(): int

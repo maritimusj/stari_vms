@@ -353,7 +353,6 @@ class mp
 
         $data = [
             'agent_id' => $user->getAgentId(),
-            'name' => request::trim('name'),
             'title' => request::trim('title'),
             'descr' => request::str('descr'),
             'group_name' => request::str('groupname'),
@@ -363,20 +362,6 @@ class mp
             'count' => request::int('count'),
             'total' => request::int('total'),
         ];
-
-        if (empty($data['name'])) {
-            //不再要求用户填写唯一的name
-            do {
-                $name = Util::random(16, true);
-            } while(Account::findOneFromName($name));
-        } else {
-            $account = Account::findOneFromName($data['name']);
-            if ($account) {
-                if ($account->getAgentId() != $user->getAgentId()) {
-                    return error(State::ERROR, '公众号帐号不能重复！');
-                }
-            }
-        }
 
         if (request::has('uid')) {
             $account = Account::findOneFromUID(request::str('uid'));
@@ -469,7 +454,21 @@ class mp
                 ]);
             }
         } else {
-            $data['uid'] = Account::makeUID(request::trim('name'));
+            if (empty($data['name'])) {
+                //不再要求用户填写唯一的name
+                do {
+                    $name = Util::random(16, true);
+                } while(Account::findOneFromName($name));
+                $data['name'] = $name;
+            } else {
+                $account = Account::findOneFromName($data['name']);
+                if ($account) {
+                    if ($account->getAgentId() != $user->getAgentId()) {
+                        return error(State::ERROR, '公众号帐号不能重复！');
+                    }
+                }
+            }
+            $data['uid'] = Account::makeUID($data['name']);
             $data['type'] = $type;
             $data['url'] = Account::createUrl($data['uid'], ['from' => 'account']);
             $account = Account::create($data);

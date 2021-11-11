@@ -143,6 +143,7 @@ class accountModelObj extends modelObj
             'banned' => $this->isBanned(),
             'clr' => $this->getClr(),
             'name' => $this->getName(),
+            'uid' => $this->getUid(),
             'title' => $this->getTitle(),
             'descr' => $this->getDescription(),
             'img' => $this->getImg(),

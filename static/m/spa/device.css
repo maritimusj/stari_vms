@@ -489,7 +489,7 @@ body {
 }
 
 .account-video {
-	width: calc(100% - 40px);
+	width: 50%;
 	margin-top: 15px;
 	position: relative;
 	display: flex;
@@ -535,6 +535,7 @@ body {
     padding: 0 20px 20px;
     text-align: center;
     font-weight: 400;
+    margin-top: 5px;
 }
 
 .back-circle {

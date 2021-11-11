@@ -45,7 +45,9 @@ const app = new Vue({
         },
         goods: [],
         packages: [],
-        saveUserProfile: false
+        saveUserProfile: false,
+        accounts: [],
+        loading: false
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -70,19 +72,44 @@ const app = new Vue({
                 });
             })
         });
-        new Swiper('#account-swiper-container', {
-            effect: 'coverflow',
-            grabCursor: true,
-            centeredSlides: true,
-            slidesPerView: 'auto',
-            coverflowEffect: {
-                rotate: 0,
-                stretch: 10,
-                depth: 250,
-                modifier: 1,
-                slideShadows: false
-            }
-        });
+
+        this.loading = true
+        zovye_fn.getAccounts([], res => {
+            this.accounts = res.data
+            Vue.nextTick(() => {
+                new Swiper('#account-swiper-container', {
+                    effect: 'coverflow',
+                    grabCursor: true,
+                    centeredSlides: true,
+                    slidesPerView: 'auto',
+                    coverflowEffect: {
+                        rotate: 0,
+                        stretch: 10,
+                        depth: 250,
+                        modifier: 1,
+                        slideShadows: false
+                    }
+                });
+            })
+            this.getGoodsList()
+            this.accounts.forEach(account => {
+                if(account.username) {
+                    Vue.nextTick(() => {
+                        var btn = document.getElementById(account.uid);
+                        btn.addEventListener('launch', (e) => {
+                            setTimeout(() => {
+                                if(document.hidden) {
+                                    zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(account.uid)
+                                }
+                            }, 1500);
+                        });
+                        btn.addEventListener('error', function (e) {
+                            console.log('fail', e.detail);
+                        });
+                    })
+                }
+            });
+        })
     },
     created() {
         if (typeof zovye_fn.retryOrder === 'function') {
@@ -126,25 +153,28 @@ const app = new Vue({
                 };                
             }
         })
-        zovye_fn.getGoodsList((res) => {
-            if(res.status) {
-                const data = res.data;
-                if(data.goods) {
-                    this.goods = data.goods.map(e => {
-                        e.count = 1;
-                        return e;
-                    });
-                }
-                this.packages = data.packages || [];
-            }
-            if (this.accounts.length) {
-                this.categoryIndex = 0;
-            } else if (this.goods.length || this.packages.length) {
-                this.categoryIndex = 1;
-            }
-        })
     },
     methods: {
+        getGoodsList() {
+            zovye_fn.getGoodsList((res) => {
+                this.loading = false
+                if(res.status) {
+                    const data = res.data;
+                    if(data.goods) {
+                        this.goods = data.goods.map(e => {
+                            e.count = 1;
+                            return e;
+                        });
+                    }
+                    this.packages = data.packages || [];
+                }
+                if (this.accounts.length) {
+                    this.categoryIndex = 0;
+                } else if (this.goods.length || this.packages.length) {
+                    this.categoryIndex = 1;
+                }
+            })
+        },
         visibilitychange() {
             document.addEventListener('visibilitychange', () => {
                 this.isHidden = document.hidden;

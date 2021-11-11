@@ -138,6 +138,14 @@ if ($op == 'default') {
         JSON::fail('找不到这个用户！');
     }
 
+    if ($user->isBanned()) {
+        JSON::fail('用户暂时无法使用！');
+    }
+
+    if (!$user->isWxUser()) {
+        JSON::success([]);
+    }
+
     $device = Device::get(request::str('device'), true);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');

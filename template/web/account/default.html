@@ -128,7 +128,9 @@
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
+            {if \zovye\App::isDouyinEnabled()}
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::DOUYIN]);}">抖音</a></li>
+            {/if}
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::WXAPP]);}">小程序</a></li>
 
             <li role="presentation" class="active"><a href="#">已隐藏的吸粉号</a></li>
@@ -137,7 +139,9 @@
             <li role="presentation"{if $type == -1} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
             <li role="presentation"{if $type === \zovye\Account::NORMAL} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
             <li role="presentation"{if $type == \zovye\Account::VIDEO} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
+            {if \zovye\App::isDouyinEnabled()}
             <li role="presentation"{if $type == \zovye\Account::DOUYIN} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::DOUYIN]);}">抖音</a></li>
+            {/if}
             <li role="presentation"{if $type == \zovye\Account::WXAPP} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::WXAPP]);}">小程序</a></li>
             <li role="presentation"{if $banned} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['banned' => 1]);}">已隐藏的吸粉号</a></li>
         {/if}

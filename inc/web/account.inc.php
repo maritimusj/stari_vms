@@ -43,6 +43,10 @@ if ($op == 'default') {
                 $query->where(['type' => request::int('type')]);
             }
         }
+    } else {
+        if (!App::isDouyinEnabled()) {
+            $query->where(['type <>' => Account::DOUYIN]);
+        }
     }
 
     if (request::has('agentId')) {

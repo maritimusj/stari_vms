@@ -368,9 +368,9 @@ if ($op == 'default') {
                 Account::AQIINFO_NAME,
                 Account::ZJBAO_NAME,
                 Account::MEIPA_NAME,
-                Account::KINGFANS,
-                Account::SNTO,
-                Account::YFB,
+                Account::KINGFANS_NAME,
+                Account::SNTO_NAME,
+                Account::YFB_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

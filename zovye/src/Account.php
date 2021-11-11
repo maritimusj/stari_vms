@@ -201,6 +201,23 @@ class Account extends State
         return $data;
     }
 
+    public static function isTypeValid($type): bool
+    {
+        return in_array($type, [
+            self::NORMAL,
+            self::AUTH,
+            self::JFB,
+            self::MOSCALE,
+            self::YUNFENBA,
+            self::AQIINFO,
+            self::ZJBAO,
+            self::MEIPA,
+            self::KINGFANS,
+            self::SNTO,
+            self::YFB,
+        ]);
+    }
+
     public static function getAllEnabledThirdPartyPlatform(): array
     {
         $arr = [

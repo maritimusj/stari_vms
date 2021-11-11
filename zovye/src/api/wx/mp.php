@@ -82,6 +82,9 @@ class mp
             $config = $account->get('config', []);
             $data['url'] = $config['url'];
             $data['openid'] = $config['openid'];
+        } elseif ($account->isWxApp()) {
+            $data['username'] = $account->getConfig('username', '');
+            $data['path'] = $account->getConfig('path', '');
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }
@@ -362,7 +365,10 @@ class mp
         ];
 
         if (empty($data['name'])) {
-            return error(State::ERROR, '帐号不能为空！');
+            //不再要求用户填写唯一的name
+            do {
+                $name = Util::random(16, true);
+            } while(Account::findOneFromName($name));
         } else {
             $account = Account::findOneFromName($data['name']);
             if ($account) {

@@ -147,4 +147,43 @@ if ($op == 'default') {
     $result = Account::getAvailableList($device, $user, ['type' => $types ? $types : null]);
 
     JSON::success($result);
+
+} elseif ($op == 'get_url') {
+
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    if ($user->acquireLocker('Account::wxapp')) {
+        JSON::fail('正忙，请稍后再试！');
+    }
+
+    $device = Device::get(request::str('device'), true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $account = Account::findOneFromUID(request::str('uid'));
+    if (empty($account)) {
+        JSON::fail('找不到这个小程序！');
+    }
+
+    $res = Util::isAvailable($user, $account, $device);
+    if (is_error($res)) {
+        JSON::fail($res);
+    }
+    
+    $ticket_data = [
+        'id' => Util::random(16),
+        'time' => time(),
+        'deviceId' => $device->getId(),
+        'shadowId' => $device->getShadowId(),
+        'accountId' => $account->getId(),
+    ];
+
+    //准备领取商品的ticket
+    $user->updateSettings('last.ticket', $ticket_data);
+
+    JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 }

@@ -469,6 +469,10 @@ JSCODE;
         $tpl['js']['code'] = $pay_js;
         $tpl['js']['code'] .= <<<JSCODE
 <script>
+    const adv_api_url = "$adv_api_url";
+    const account_api_url = "$account_url";
+    const device_api_url = "$device_api_url";
+
     if (typeof zovye_fn === 'undefined') {
         zovye_fn = {};
     }
@@ -484,7 +488,7 @@ JSCODE;
         } else {
             params['type'] = typeid;
         }
-        $.get("$adv_api_url", params).then(function(res){
+        $.get(adv_api_url, params).then(function(res){
             if (res && res.status) {
                 if (typeof cb === 'function') {
                     cb(res.data);
@@ -495,7 +499,7 @@ JSCODE;
         })           
     }
     zovye_fn.play = function(uid, seconds, cb) {
-        $.get("$account_url", {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
+        $.get(account_api_url, {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
             if (cb) cb(res);
         })    
     }
@@ -506,15 +510,30 @@ JSCODE;
         window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
     }
     zovye_fn.getDetail = function (cb) {
-        $.get("$device_api_url", {op: 'detail'}).then(function (res) {
+        $.get(device_api_url, {op: 'detail'}).then(function (res) {
             if (typeof cb === 'function') {
                 cb(res);
             }
         })
     }
     zovye_fn.getAccounts = function(types, cb) {
-        $.get("$account_url", {op:'get_list', device:'$device_imei', types: types}).then(function(res){
+        $.get(account_api_url, {op:'get_list', device:'$device_imei', types: types}).then(function(res){
             if (cb) cb(res);
+        })
+    }
+    zovye_fn.redirectToAccountGetPage = function(uid) {
+        $.get(account_api_url, {op:'get_url', uid, device:'$device_imei'}).then(function(res){
+           if (res) {
+               if (res.status && res.data.redirect) {
+                   window.location.href = res.data.redirect;
+               } else {
+                   if (res.data && res.data.message) {
+                       alert(res.data.message);
+                   }
+               }
+           } else {
+               alert('请求转跳网址失败！');
+           }
         })
     }
 JSCODE;

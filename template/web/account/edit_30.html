@@ -50,14 +50,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="name" class="col-md-2 control-label">帐号</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="name" id="name" value="{php echo $account?$account->getName():''}" {if $op=='edit'}readonly{/if}>
-                        {if $op!='edit'}<span class="help-block">* 用来识别一个公众号，以后不可以修改</span>{/if}
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="title" class="col-md-2 control-label">名称</label>
                     <div class="col-md-10">
                         <input type="title" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
@@ -73,17 +65,17 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="openid" class="col-md-2 control-label">小程序原始ID</label>
+                    <label for="username" class="col-md-2 control-label">小程序原始ID</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="openid" id="openid" value="{php echo $account?$account->getConfig('openid'):''}">
-                        <span class="help-block">* </span>
+                        <input type="text" class="form-control" name="username" id="username" value="{php echo $account?$account->getConfig('username'):''}">
+                        <span class="help-block">* 请提供小程序原始ID</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="url" class="col-md-2 control-label">转跳页面路径</label>
+                    <label for="path" class="col-md-2 control-label">转跳页面路径</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="url" id="url" value="{php echo $account?$account->getConfig('url'):''}">
-                        <span class="help-block">* </span>
+                        <input type="text" class="form-control" name="path" id="path" value="{php echo $account?$account->getConfig('path'):''}">
+                        <span class="help-block">* 请设置转跳小程序的页面路径</span>
                     </div>
                 </div>
                 <div class="form-group">

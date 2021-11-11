@@ -106,6 +106,8 @@ if ($op == 'default') {
                 $data['verified'] = $entry->isVerified();
             } elseif ($entry->isDouyin()) {
                 $data['openid'] = $entry->settings('config.openid', '');
+            } elseif ($entry->isWxApp()) {
+                $data['username'] = $entry->settings('config.username', '');
             }
 
             if (App::useAccountQRCode()) {
@@ -360,7 +362,11 @@ if ($op == 'default') {
 
         } else {
             if (empty($name)) {
-                return err('帐号不能为空！');
+                //不再要求用户填写唯一的name
+                do {
+                    $name = Util::random(16, true);
+                } while(Account::findOneFromName($name));
+                
             } elseif (in_array($name, [
                 Account::JFB_NAME,
                 Account::MOSCALE_NAME,

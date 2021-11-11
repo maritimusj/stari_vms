@@ -185,9 +185,6 @@
                         <div>公众号</div>
                     </th>
                     <th>
-                        标题
-                    </th>
-                    <th>
                         <div>所属代理</div>                        
                     </th>
                     <th>领取周期</th>
@@ -204,10 +201,10 @@
                     </td>
                     <td>
                         <div class="profile">
-                            <img src="{media $a['img']}">
+                            <img src="{media $a['img']}" title="{$a['uid']}">
                             <span>{if $a['commission'] && $a['commission']['money'] > 0}
                                 <span class="commission" title="佣金：{php echo number_format($a['commission']['money']/100, 2)}元">*</span>
-                            {/if}{$a['name']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
+                            {/if}{$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
                             {if $a['type'] == \zovye\Account::AUTH}
                             {if $a['service'] == 2}
                             <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
@@ -220,12 +217,11 @@
                             <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音号">
                                 <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
                             </span>
+                            {elseif $a['type'] == \zovye\Account::WXAPP}
+                            <span class="state auth{if empty($a['username'])} disabled{/if}" title="抖音号">
+                                <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
+                            </span>
                             {/if}
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            {$a['title']}
                         </div>
                     </td>
                     <td class="desc">
@@ -503,7 +499,7 @@
             if(src) {
                 co.html('<img src="'+ src + '">');
             }else{
-                $(this).attr("title", "没有指定二维码！");
+                $(this).attr("title", "");
                 co.remove();
             }
         })

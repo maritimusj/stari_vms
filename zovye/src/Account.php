@@ -967,7 +967,8 @@ class Account extends State
                 }
             }
         }
-        return $accounts;
+        //防止json_encode成对象造成前端代码出错
+        return array_values($accounts);
     }
 
     /**

@@ -75,17 +75,17 @@ class Cache
         };
     }
 
-    public static function makeUID(array $v = []): string
+    public static function makeUID($v): string
     {
-        $arr = [
-            We7::uniacid(),
-        ];
-        foreach ($v as $item) {
+        $arr = We7::uniacid([]);
+
+        $v = is_array($v) ? $v : [$v];
+        foreach ($v as $index => $item) {
             if ($item instanceof modelObj) {
-                $arr[] = get_class($item);
-                $arr[] = $item->getId();
+                $arr[$index] = get_class($item);
+                $arr[get_class($item)] = $item->getId();
             } else {
-                $arr[] = strval($item);
+                $arr[$index] = strval($item);
             }
         }
         return sha1(http_build_query($arr));
@@ -107,7 +107,7 @@ class Cache
      */
     public static function fetch($obj, callable $fn = null, callable ...$args)
     {
-        $uid = self::makeUID(is_array($obj) ? $obj : [$obj]);
+        $uid = self::makeUID($obj);
 
         $result = self::get($uid, true);
         if ($result) {

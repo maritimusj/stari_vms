@@ -81,6 +81,10 @@ if ($op == 'default') {
 
         /** @var accountModelObj $entry */
         foreach ($query->findAll() as $entry) {
+            //过滤掉未启用的吸粉平台
+            if ($entry->isThirdPartyPlatform() && $entry->isBanned()) {
+                continue;
+            }
             $data = [
                 'id' => $entry->getId(),
                 'type' => $entry->getType(),

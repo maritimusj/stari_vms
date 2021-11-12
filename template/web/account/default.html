@@ -326,6 +326,13 @@
                             {/if}
                             {/loop}
                             {/if}
+                            {if $a['is_third_party_platform']}
+                            <li>
+                                <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $a['id']])}">
+                                    <i class="fa fa-history fa-fw"></i> 查看请求日志
+                                </a>
+                            </li>
+                            {/if}
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewFansCount"><i class="fa fa-users fa-fw"></i> 统计净增粉量</a></li>
                             <li role="separator" class="divider"></li>

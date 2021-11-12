@@ -21,18 +21,25 @@
     #list td i.success {
         color: #4caf50;
     }
+    #navbar img {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($user) && empty($device)}
     <li role="presentation"class="active">
         <a href="#">
+            <img src="{$account['img']}">
             <span><b>{$account['name']}</b></span>的请求日志           
         </a>
     </li>
     {else}
     <li role="presentation">
         <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id']])}">
-            <span>{$account['name']}的请求日志        
+            <img src="{$account['img']}">
+            <span>{$account['name']}</span>的请求日志
         </a>
     </li>
     {/if}
@@ -62,7 +69,7 @@
             <thead>
                 <th>#</th>
                 <th style="width: 260px;">流水号</th>
-                <th>公众号</th>
+                <!-- <th>公众号</th> -->
                 <th>用户</th>
                 <th>设备</th>
                 <th class="center">请求数据</th>
@@ -78,12 +85,12 @@
                     <td>
                         {$e['request_id']}
                     </td>
-                    <td>
+                    <!-- <td>
                         <div class="profile">
                             <img src="{$e['account']['img']}">
                             <span>{$e['account']['name']}</span>
                         </div>
-                    </td>
+                    </td> -->
                     <td>
                         <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id'], 'user' => $e['user']['id']]);}">
                             <div class="profile">

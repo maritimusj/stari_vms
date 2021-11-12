@@ -8,6 +8,7 @@ namespace zovye;
 
 use Closure;
 use Exception;
+use zovye\base\modelObj;
 use zovye\model\cacheModelObj;
 
 class Cache
@@ -76,8 +77,18 @@ class Cache
 
     public static function makeUID(array $v = []): string
     {
-        $v = We7::uniacid($v);
-        return sha1(http_build_query($v));
+        $arr = [
+            We7::uniacid(),
+        ];
+        foreach ($v as $item) {
+            if ($item instanceof modelObj) {
+                $arr[] = get_class($item);
+                $arr[] = $item->getId();
+            } else {
+                $arr[] = strval($item);
+            }
+        }
+        return sha1(http_build_query($arr));
     }
 
     public static function expire($uid)
@@ -88,8 +99,24 @@ class Cache
         }
     }
 
-    public static function fetch($uid, callable $fn = null, callable ...$args)
+    /**
+     * @param $obj
+     * @param callable|null $fn 初始化方法
+     * @param callable ...$args 附加参数
+     * @return array|mixed|cacheModelObj|null
+     */
+    public static function fetch($obj, callable $fn = null, callable ...$args)
     {
+        if (is_scalar($obj)) {
+            $uid = strval($obj);
+        } elseif (is_array($obj)) {
+            $uid = self::makeUID($obj);
+        } elseif ($obj instanceof modelObj) {
+            $uid = self::makeUID([$obj]);
+        } else {
+            return err('无法生成uid！');
+        }
+
         $result = self::get($uid, true);
         if ($result) {
             if ($result->isExpired()) {
@@ -105,7 +132,7 @@ class Cache
         }
 
         $data = [
-            'uid' => $uid,
+            'uid' => $obj,
         ];
 
         $res = null;

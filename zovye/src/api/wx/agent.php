@@ -1974,13 +1974,13 @@ class agent
 
             $today = new DateTime('today');
             $uid_data['day'] = $today->format('Y-m-d');
-            $data['today']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+            $data['today']['n'] = Cache::fetch($uid_data, function () use ($countFN, $today) {
                 return $countFN($today);
             }, Cache::ResultExpiredAfter(10));
 
             $yesterday = new DateTime('yesterday');
             $uid_data['day'] = $yesterday->format('Y-m-d');
-            $data['yesterday']['n'] = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today, $yesterday) {
+            $data['yesterday']['n'] = Cache::fetch($uid_data, function () use ($countFN, $today, $yesterday) {
                 return $countFN($yesterday, $today);
             });
 
@@ -2001,7 +2001,7 @@ class agent
 
                 $uid_data['day'] = $label;
 
-                $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $begin, $end) {
+                $res = Cache::fetch($uid_data, function () use ($countFN, $begin, $end) {
                     return $countFN($end, $begin);
                 });
                 if (is_error($res)) {
@@ -2015,7 +2015,7 @@ class agent
             $uid_data['day'] = 'all';
             $data['all']['n'] = $data['today']['n'];
 
-            $res = Cache::fetch(Cache::makeUID($uid_data), function () use ($countFN, $today) {
+            $res = Cache::fetch($uid_data, function () use ($countFN, $today) {
                 return $countFN(null, $today);
             }, Cache::ResultExpiredAt('tomorrow'));
 

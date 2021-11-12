@@ -29,13 +29,13 @@ class cacheModelObj extends modelObj
     protected $createtime;
 
     /** @var int */
-    protected $expiretime;
+    protected $expiration;
 
     /** @var int */
     protected $updatetime;
 
     public function isExpired(): bool
     {
-        return $this->expiretime && $this->expiretime < time();
+        return $this->expiration && $this->expiration < time();
     }
 }

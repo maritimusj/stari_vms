@@ -42,28 +42,28 @@ class Cache
     public static function ResultExpiredAfter(int $seconds): Closure
     {
         return function (array &$data) use ($seconds) {
-            $data['expire_time'] = time() + $seconds;
+            $data['expiration_time'] = time() + $seconds;
         };
     }
 
     public static function ResultExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['expire_time'] = is_int($time) ? $time : strtotime($time);
+            $data['expiration_time'] = is_int($time) ? $time : strtotime($time);
         };
     }
 
     public static function ErrorExpiredAfter(int $seconds): Closure
     {
         return function (array &$data) use ($seconds) {
-            $data['error_expired'] = time() + $seconds;
+            $data['error_expiration'] = time() + $seconds;
         };
     }
 
     public static function ErrorExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['error_expired'] = is_int($time) ? $time : strtotime($time);;
+            $data['error_expiration'] = is_int($time) ? $time : strtotime($time);;
         };
     }
 
@@ -118,8 +118,8 @@ class Cache
             }
 
             if (is_error($res)) {
-                if (isset($conf['error_expired'])) {
-                    $data['expiretime'] = $conf['error_expired'];
+                if (isset($conf['error_expiration'])) {
+                    $data['expiration'] = $conf['error_expiration'];
                 } else {
                     return $result;
                 }
@@ -134,8 +134,8 @@ class Cache
         $now = time();
         $data['createtime'] = $now;
         $data['updatetime'] = $now;
-        if (!isset($data['expiretime'])) {
-            $data['expiretime'] = intval($conf['expire_time']);
+        if (!isset($data['expiration'])) {
+            $data['expiration'] = intval($conf['expiration_time']);
         }
 
         if (self::create($data)) {

@@ -128,6 +128,9 @@ class YfbAccount
         if ($account) {
             //请求对方API
             $yfb = self::getYFB($account);
+            if (is_error($yfb)) {
+                throw new RuntimeException($yfb['message']);
+            }
 
             $yfb->getQRCode($device, $user, function ($request, $result) use ($account, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
@@ -206,6 +209,9 @@ class YfbAccount
         }
 
         $yfb = self::getYFB($account);
+        if (is_error($yfb)) {
+            return $yfb;
+        }
 
         if ($yfb->sign($params) !== $params['sign']) {
             return err('签名检验失败！');

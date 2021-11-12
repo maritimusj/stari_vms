@@ -13,7 +13,6 @@ const app = new Vue({
             se: false
         }],
         categoryIndex: 0,
-        accounts: initData.accounts,
         sales: [],
         toast: {
             title: "",
@@ -47,7 +46,8 @@ const app = new Vue({
         packages: [],
         saveUserProfile: false,
         accounts: [],
-        loading: false
+        loading: false,
+        timeout: null
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -97,11 +97,15 @@ const app = new Vue({
                     Vue.nextTick(() => {
                         var btn = document.getElementById(account.uid);
                         btn.addEventListener('launch', (e) => {
-                            setTimeout(() => {
+                            if(this.timeout) {
+                                clearTimeout(this.timeout)
+                                this.timeout = null
+                            }
+                            this.timeout = setTimeout(() => {
                                 if(document.hidden) {
                                     zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(account.uid)
                                 }
-                            }, 1500);
+                            }, account.delay * 1000);
                         });
                         btn.addEventListener('error', function (e) {
                             console.log('fail', e.detail);

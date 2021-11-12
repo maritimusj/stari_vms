@@ -47,7 +47,8 @@ const app = new Vue({
         saveUserProfile: false,
         accounts: [],
         loading: false,
-        timeout: null
+        timeout: null,
+        wechatState: null
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -76,6 +77,9 @@ const app = new Vue({
         this.loading = true
         zovye_fn.getAccounts([], res => {
             this.accounts = res.data
+            if (this.wechatState === false && this.accounts.findIndex(e => e.username) !== -1) {
+                alert('当前微信版本过低，建议升级微信后再试！')
+            }
             Vue.nextTick(() => {
                 new Swiper('#account-swiper-container', {
                     effect: 'coverflow',
@@ -92,7 +96,7 @@ const app = new Vue({
                 });
             })
             this.getGoodsList()
-            this.accounts.forEach(account => {
+            this.wechatState && this.accounts.forEach(account => {
                 if(account.username) {
                     Vue.nextTick(() => {
                         var btn = document.getElementById(account.uid);
@@ -116,6 +120,7 @@ const app = new Vue({
         })
     },
     created() {
+        this.judgeWechat()
         if (typeof zovye_fn.retryOrder === 'function') {
             zovye_fn.retryOrder((res) => {
                 if (res.status) {
@@ -159,6 +164,15 @@ const app = new Vue({
         })
     },
     methods: {
+        judgeWechat(){
+            let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i)
+            let judgewechat = wechat[1].split('.')
+            if(judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
+                this.wechatState = true
+            } else {
+                this.wechatState = false
+            }
+        },
         getGoodsList() {
             zovye_fn.getGoodsList((res) => {
                 this.loading = false

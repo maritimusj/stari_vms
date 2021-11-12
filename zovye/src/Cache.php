@@ -13,12 +13,12 @@ use zovye\model\cacheModelObj;
 
 class Cache
 {
-    public static function create($data = []): ?cacheModelObj
+    protected static function create($data = []): ?cacheModelObj
     {
         return m('cache')->create($data);
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    protected static function query($condition = []): base\modelObjFinder
     {
         return m('cache')->query($condition);
     }
@@ -26,7 +26,7 @@ class Cache
     /**
      * @return cacheModelObj
      */
-    public static function get($id, $is_uid = false): ?cacheModelObj
+    protected static function get($id, $is_uid = false): ?cacheModelObj
     {
         if ($is_uid) {
             return self::query(['uid' => $id])->findOne();
@@ -35,7 +35,7 @@ class Cache
         return self::query(['id' => $id])->findOne();
     }
 
-    public static function exists($condition = []): bool
+    protected static function exists($condition = []): bool
     {
         return self::query($condition)->exists();
     }
@@ -93,7 +93,7 @@ class Cache
 
     public static function expire($uid)
     {
-        $obj = self::get($uid, true);
+        $obj = self::get(self::makeUID($uid), true);
         if ($obj) {
             $obj->destroy();
         }

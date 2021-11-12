@@ -74,8 +74,9 @@ class mp
             'orderno' => $account->getOrderNo(),
             'orderlimits' => $account->getOrderLimits(),
         ];
-
-        if ($account->isVideo()) {
+        if ($account->isAuth()) {
+            $data['config'] = $account->get('config', []);
+        } elseif ($account->isVideo()) {
             $data['media'] = Util::toMedia($account->getMedia());
             $data['duration'] = $account->getDuration();
         } elseif ($account->isDouyin()) {
@@ -85,6 +86,7 @@ class mp
         } elseif ($account->isWxApp()) {
             $data['username'] = $account->getConfig('username', '');
             $data['path'] = $account->getConfig('path', '');
+            $data['delay'] = $account->getConfig('delay', 1);
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }
@@ -260,11 +262,7 @@ class mp
         if ($total > 0) {
             $query->page($page, $page_size)->orderBy('order_no desc');
             foreach ($query->findAll() as $account) {
-                $data = mp::formatAccountInfo($account, true);
-                if ($account->isAuth()) {
-                    $data['config'] = $account->get('config', []);
-                }
-                $result['list'][] = $data;
+                $result['list'][] = mp::formatAccountInfo($account, true);
             }
         }
 
@@ -444,15 +442,6 @@ class mp
                     $account->$set_name($val);
                 }
             }
-            if ($account->isAuth()) {
-                $account->set('config', [
-                    'type' => Account::AUTH,
-                    'open' => [
-                        'timing' => request::int('OpenTiming'),
-                        'msg' => request::str('OpenMsg'),
-                    ]
-                ]);
-            }
         } else {
             if (empty($data['name'])) {
                 //不再要求用户填写唯一的name
@@ -484,7 +473,12 @@ class mp
         ]);
 
         if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
-            if ($account->isVideo()) {
+            if ($account->isAuth()) {
+                $account->updateSettings('config.open', [
+                        'timing' => request::int('OpenTiming'),
+                        'msg' => request::str('OpenMsg'),                    
+                ]);
+            } elseif ($account->isVideo()) {
                 $account->set('config', [
                     'type' => Account::VIDEO,
                     'video' => [
@@ -503,6 +497,7 @@ class mp
                     'type' => Account::WXAPP,
                     'username' => request::trim('username'),
                     'path' => request::trim('path'),
+                    'delay' => request::int('delay', 1),
                 ]);
             }
             return ['msg' => '保存成功！'];

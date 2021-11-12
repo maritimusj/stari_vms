@@ -323,6 +323,7 @@ if ($op == 'default') {
                     'type' => Account::WXAPP,
                     'username' => request::trim('username'),
                     'path' => request::trim('path'),
+                    'delay' => request::int('delay', 1),
                 ]);
             } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
@@ -478,6 +479,7 @@ if ($op == 'default') {
                     'type' => Account::WXAPP,
                     'username' => request::trim('username'),
                     'path' => request::trim('path'),
+                    'delay' => request::int('delay'),
                 ]);
             }
 

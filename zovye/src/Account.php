@@ -186,6 +186,7 @@ class Account extends State
         } elseif ($entry->isWxApp()) {
             $data['username'] = $entry->getConfig('username', '');
             $data['path'] = $entry->getConfig('path', '');
+            $data['delay'] = $entry->getConfig('delay', 1);
         } else {
             $data['qrcode'] = $entry->getQrcode();
         }

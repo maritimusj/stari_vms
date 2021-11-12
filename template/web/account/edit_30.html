@@ -79,6 +79,13 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="delay" class="col-md-2 control-label">停留时间（秒）</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="delay" id="delay" value="{php echo $account?$account->getConfig('delay'):''}">
+                        <span class="help-block">* 用户在小程序停留指定时间后出货</span>
+                    </div>
+                </div>                
+                <div class="form-group">
                     <label for="descr" class="col-md-2 control-label">引导关注文字</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">

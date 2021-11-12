@@ -107,15 +107,7 @@ class Cache
      */
     public static function fetch($obj, callable $fn = null, callable ...$args)
     {
-        if (is_scalar($obj)) {
-            $uid = strval($obj);
-        } elseif (is_array($obj)) {
-            $uid = self::makeUID($obj);
-        } elseif ($obj instanceof modelObj) {
-            $uid = self::makeUID([$obj]);
-        } else {
-            return err('无法生成uid！');
-        }
+        $uid = self::makeUID(is_array($obj) ? $obj : [$obj]);
 
         $result = self::get($uid, true);
         if ($result) {

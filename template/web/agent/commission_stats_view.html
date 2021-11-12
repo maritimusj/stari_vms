@@ -168,7 +168,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="(e, i) in month_data">
-                                <td v-text="i + 1"></td>
+                                <td v-text="e.title"></td>
                                 <td v-text="e.order.free"></td>
                                 <td v-text="e.order.fee"></td>
                                 <td v-text="'￥' + e.commission.total"></td>
@@ -609,7 +609,7 @@
                             this.month_title = data['title'];
                         }
                         for (const key in (data['list'] || {})) {
-                            this.month_data.push(data['list'][key]);
+                            this.month_data.push(Object.assign({}, {'title': key}, data['list'][key]));
                             month_option.xAxis.data.push(key);
                             month_option.series[0].data.push(data['list'][key]['order']['free']);
                             month_option.series[1].data.push(data['list'][key]['order']['fee']);

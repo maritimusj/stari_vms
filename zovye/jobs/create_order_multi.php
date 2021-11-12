@@ -331,7 +331,6 @@ function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $u
         return err('商品货道配置不正确！');
     }
 
-    
     $pull_data['channel'] = $mcb_channel;
 
     $result = $device->pull($pull_data);

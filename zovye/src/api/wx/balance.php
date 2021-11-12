@@ -283,7 +283,7 @@ class balance
 
     /**
      * @param userModelObj $user
-     * @param $type
+     * @param string $type
      * @param int $page
      * @param int $page_size
      *

@@ -343,7 +343,7 @@ class device
         /** @var goods_stats_vwModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $result[] = [
-                'id' => intval($entry->getId()),
+                'id' => $entry->getId(),
                 'name' => strval($entry->getName()),
                 'total' => intval($entry->getTotal()),
             ];
@@ -531,7 +531,7 @@ class device
     {
         if (request::has('id')) {
             /** @var deviceModelObj|array $device */
-            $device = $device = \zovye\Device::find(request::str('id'), ['imei', 'shadow_id']);
+            $device = \zovye\Device::find(request::str('id'), ['imei', 'shadow_id']);
             if (is_error($device)) {
                 return $device;
             }

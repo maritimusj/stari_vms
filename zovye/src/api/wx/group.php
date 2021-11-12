@@ -64,7 +64,7 @@ class group
             /** @var device_groupsModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $data = [
-                    'id' => intval($entry->getId()),
+                    'id' => $entry->getId(),
                     'title' => $entry->getTitle(),
                     'clr' => $entry->getClr(),
                     'agentId' => $entry->getAgentId(),
@@ -76,7 +76,7 @@ class group
                     $cond['agent_id'] = $user->getAgentId();
                 }
 
-                $data['count'] = intval(Device::query($cond)->count());
+                $data['count'] = Device::query($cond)->count();
 
                 $result['list'][] = $data;
             }
@@ -207,7 +207,6 @@ class group
         }
 
         if ($one->destroy()) {
-            //do some thing
             return ['msg' => "删除成功！"];
         }
 
@@ -231,6 +230,6 @@ class group
             }
         }
 
-        return isset($cache[$id]) ? $cache[$id] : ['id' => $id, 'title' => '', 'clr' => ''];
+        return $cache[$id] ?? ['id' => $id, 'title' => '', 'clr' => ''];
     }
 }

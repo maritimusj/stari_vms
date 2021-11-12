@@ -98,7 +98,7 @@ class keeper
                         continue;
                     }
                     $keeper_data[] = [
-                        'id' => intval($keeper->getId()),
+                        'id' => $keeper->getId(),
                         'user_id' => $user->getId(),
                         'name' => $keeper->getName(),
                         'agent' => [
@@ -1003,13 +1003,13 @@ class keeper
     /**
      * 运营人员统计
      *
-     * @param $keeper keeperModelObj
+     * @param $keeper keeperModelObj|null
      *
      * @return array
      *
      * @throws
      */
-    public static function stats($keeper = null): array
+    public static function stats(keeperModelObj $keeper = null): array
     {
         if (is_null($keeper)) {
             $keeper = keeper::getKeeper();

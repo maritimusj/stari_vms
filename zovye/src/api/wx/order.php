@@ -73,15 +73,14 @@ class order
         $condition = [];
 
         $guid = request::str('guid');
-        if (empty($guid)) {
-            $condition['agent_id'] = $user->getAgentId();
-        } else {
+        if (!empty($guid)) {
             $user = \zovye\api\wx\agent::getUserByGUID($guid);
             if (empty($user)) {
                 return err('找不到这个用户！');
             }
-            $condition['agent_id'] = $user->getAgentId();
         }
+
+        $condition['agent_id'] = $user->getAgentId();
 
         $query = \zovye\Order::query();
 
@@ -290,7 +289,7 @@ class order
             }
 
             $pay_result = $entry->getExtraData('payResult');
-            $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : '');
+            $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? '');
 
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
@@ -376,7 +375,7 @@ class order
                 'devices' => $devices,
                 'page' => $page,
                 'pagesize' => $page_size,
-                'total' => $total
+                'total' => $total ?? 0
             ];
         }
     }

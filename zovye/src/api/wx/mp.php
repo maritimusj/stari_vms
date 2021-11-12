@@ -399,7 +399,7 @@ class mp
             return error(State::ERROR, '请上传正确的头像文件！');
         }
 
-        $data['qrcode'] = $url;
+        $data['qrcode'] = $url ?? '';
         $data['img'] = $img_url;
 
         $limits = [];
@@ -434,7 +434,7 @@ class mp
 
         $data['order_limits'] = request::int('orderlimits');
 
-        if ($account) {
+        if (isset($account)) {
             foreach ($data as $key => $val) {
                 $key_name = 'get' . ucfirst(toCamelCase($key));
                 if ($val != $account->$key_name()) {

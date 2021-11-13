@@ -29,6 +29,10 @@
         width: 32px;
         max-height: 32px;
     }
+    #list .name img {
+        width: 32px;
+        max-height: 32px;
+    }
 </style>
 <div id="list">
     <table class="table">
@@ -36,10 +40,10 @@
         <tr>
             <th>#</th>
             <th>用户</th>
+            <th>商品</th>
             <th>
                 数量(价格/余额)
             </th>
-
             <th style="text-align:center;">
                 <div>
                     来源
@@ -68,10 +72,20 @@
                 </div>
             </td>
             <td>
+                <div class="name">
+                    {if $order['goods']}
+                    <img src="{$order['goods']['img']}">
+                    {$order['goods']['name']}                            
+                    {else}
+                    {$order['package']['title']}（套餐）
+                    {/if}
+                </div>
+            </td>
+            <td>
                 <div class="pay">
                     <span class="num">{$order['num']}</span>
                     {if $order['price']>0}
-                    (价格：<span class="price {if $order['price']==0}zeroprice{/if}">{$order['price']}</span>)
+                    (价格：<span class="price {if $order['price']==0}zeroprice{/if}">￥{$order['price']}</span>)
                     {elseif $order['balance']>0}
                     (余额：<span class="balance">{$order['balance']} <i class="fa fa-tint"></i></span>)
                     {else}
@@ -79,7 +93,6 @@
                     {/if}
                 </div>
             </td>
-
             <td>
                 <aside class="order-from" style="color:{$order['clr']};text-align:center;">
                     {if $order['price'] > 0}

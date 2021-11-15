@@ -124,7 +124,7 @@ class Cache
         }
 
         $data = [
-            'uid' => $obj,
+            'uid' => $uid,
         ];
 
         $res = null;

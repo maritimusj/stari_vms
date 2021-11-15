@@ -202,10 +202,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $accounts_updated = false;
 
-        foreach ($third_party_platform as $key => $v) {
+        foreach ($third_party_platform as $key => $v) 
             $enabled = request::bool($key) ? 1 : 0;
-            if ($enabled) {
-                call_user_func($v[0]);
+            
+            $acc = call_user_func($v[0]);
+            if ($acc) {
+                $acc->setState($enabled? Account::NORMAL : Account::BANNED);
+                $acc->save();
             }
 
             if (getArray($settings, $v[1]) != $enabled) {

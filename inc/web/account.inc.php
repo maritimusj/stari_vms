@@ -324,7 +324,7 @@ if ($op == 'default') {
                 $account->set('config', [
                     'type' => Account::WxWORK,
                     'key' => request::trim('key'),
-                    'secret' => request::trim('app_secret'),
+                    'secret' => request::trim('secret'),
                 ]);
             } elseif ($account->isWxApp()) {
                 $account->set('config', [

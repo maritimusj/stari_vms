@@ -731,6 +731,7 @@ class Account extends State
             'type' => $aid,
             'scname' => Schema::DAY,
             'name' => $name,
+            'title' => $name,
             'url' => $url,
             'img' => $img,
             'clr' => Util::randColor(),

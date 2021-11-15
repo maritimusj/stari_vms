@@ -1,9 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
 <style>
-    .disabled {
-        color: #ccc;
-    }
     #text-config,#news-config {
         display: none;
     }
@@ -52,7 +49,7 @@
                 <div class="form-group">
                     <label for="title" class="col-md-2 control-label">名称</label>
                     <div class="col-md-10">
-                        <input type="title" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
+                        <input type="text" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
                     </div>
                 </div>
 

@@ -319,7 +319,7 @@ if ($op == 'default') {
                     'scene' => request::trim('scene'),
                 ]);
             } elseif ($account->isWxWork()) {
-                $data['name'] = Account::WxWORK;
+                $data['name'] = Account::WxWORK_NAME;
                 $data['img'] = Account::WxWORK_HEAD_IMG;
                 $account->set('config', [
                     'type' => Account::WxWORK,

@@ -39,8 +39,6 @@ use we7\db;
  * @method static cutstr($name, int $int, bool $true)
  * @method static mc_credit_types()
  * @method static isimplexml_load_string($result, string $string, int $LIBXML_NOCDATA)
- * @method static pdo_fieldexists(string $string, string $string1)
- * @method static indexexists(string $string, string $string1)
  *
 
  */
@@ -78,12 +76,12 @@ class We7
         }
 
         $sysinfo = array(
-            'uniacid' 	=> $_W['uniacid'],
-            'acid' 		=> $_W['acid'],
-            'siteroot' 	=> $_W['siteroot'],
-            'siteurl' 	=> $_W['siteurl'],
+            'uniacid' => $_W['uniacid'],
+            'acid' => $_W['acid'],
+            'siteroot' => $_W['siteroot'],
+            'siteurl' => $_W['siteurl'],
             'attachurl' => $_W['attachurl'],
-            'cookie' 	=> array('pre'=>$_W['config']['cookie']['pre'])
+            'cookie' => array('pre' => $_W['config']['cookie']['pre'])
         );
         if (!empty($_W['acid'])) {
             $sysinfo['acid'] = $_W['acid'];
@@ -469,10 +467,10 @@ EOF;
         if (!isset($db)) {
             $config = Util::config('db');
             if (empty($config['master']['host']) && empty($config['master']['username'])) {
-               $db = call_user_func('pdo');
+                $db = call_user_func('pdo');
             } else {
                 $db = new db($config);
-            }           
+            }
         }
         return $db;
     }
@@ -555,5 +553,15 @@ EOF;
     public static function pdo_getcolumn($tbname, array $array, $string)
     {
         return self::pdo()->getcolumn($tbname, $array, $string);
+    }
+
+    public static function pdo_fieldexists($tbname, $field)
+    {
+        return self::pdo()->fieldexists($tbname, $field);
+    }
+
+    public static function indexexists($tbname, $indexname)
+    {
+        return self::pdo()->indexexists($tbname, $indexname);
     }
 }

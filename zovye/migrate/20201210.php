@@ -7,14 +7,13 @@ if (!We7::pdo_fieldexists($tb_name . '_keeper_devices', 'commission_fixed')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_keeper_devices` ADD `commission_fixed` int(11) NOT NULL DEFAULT -1 AFTER `keeper_id`;
 SQL;
-    Migrate::execSQL($sql);
 } else {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_keeper_devices` MODIFY COLUMN `commission_fixed` int(11) NOT NULL DEFAULT -1;
 ALTER TABLE `ims_zovye_vms_keeper_devices` MODIFY COLUMN `commission_percent` tinyint(4) NOT NULL DEFAULT -1;
 SQL;
-    Migrate::execSQL($sql);
 }
+Migrate::execSQL($sql);
 
 if (!We7::pdo_fieldexists($tb_name . '_keepers', 'extra')) {
     $sql = <<<SQL

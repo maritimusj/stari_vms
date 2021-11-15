@@ -25,6 +25,7 @@ class YfbAccount
     /**
      * @param $app_id
      * @param $app_secret
+     * @param $key
      * @param $scene
      */
     public function __construct($app_id, $app_secret, $key, $scene)
@@ -94,7 +95,7 @@ class YfbAccount
             'str' => $str,
             'arr' => array_values($arr),
         ]);
-        
+
         return md5($str);
     }
 
@@ -198,7 +199,7 @@ class YfbAccount
         if (!App::isYFBEnabled()) {
             return err('没有启用！');
         }
-        
+
         if (isEmptyArray($params)) {
             return err('请求数据为空！');
         }
@@ -243,7 +244,7 @@ class YfbAccount
 
             $account = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId']??''));
+            $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId'] ?? ''));
 
             Account::createThirdPartyPlatformOrder($account, $user, $device, $order_uid, $params);
 

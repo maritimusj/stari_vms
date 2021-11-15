@@ -157,6 +157,10 @@ class accountModelObj extends modelObj
             return true;
         }
 
+        if ($this->isDouyin()) {
+            return App::isDouyinEnabled();
+        }
+
         if ($this->isThirdPartyPlatform()) {
             static $status = null;
             if (is_null($status)) {
@@ -170,7 +174,7 @@ class accountModelObj extends modelObj
                     Account::KINGFANS => App::isKingFansEnabled(),
                     Account::SNTO => App::isSNTOEnabled(),
                     Account::YFB => App::isYFBEnabled(),
-                    Account::DOUYIN => App::isDouyinEnabled(),
+                    Account::WxWORK => App::isWxWorkEnabled(),
                 ];
             }
 
@@ -256,6 +260,7 @@ class accountModelObj extends modelObj
             Account::KINGFANS,
             Account::SNTO,
             Account::YFB,
+            Account::WxWORK,
         ]);
     }
 
@@ -325,6 +330,11 @@ class accountModelObj extends modelObj
     public function isYFB(): bool
     {
         return $this->getType() == Account::YFB;
+    }
+
+    public function isWxWork(): bool
+    {
+        return $this->getType() == Account::WxWORK;
     }
 
     public function isAuth(): bool

@@ -194,9 +194,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createYFBAccount',
                 'yfb.fan.enabled',
             ],
+            'wxWorkFAN' => [
+                __NAMESPACE__ . '\Account::createWxWorkAccount',
+                'wxWork.fan.enabled',
+            ],
         ];
 
-        $accounts_need_refresh = false;
+        $accounts_updated = false;
 
         foreach ($third_party_platform as $key => $v) {
             $enabled = request::bool($key) ? 1 : 0;
@@ -205,13 +209,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             }
 
             if (getArray($settings, $v[1]) != $enabled) {
-                $accounts_need_refresh = true;
+                $accounts_updated = true;
             }
 
             setArray($settings, $v[1], $enabled);
         }
 
-        if ($accounts_need_refresh) {
+        if ($accounts_updated) {
             setArray($settings, 'accounts.lastupdate', '' . microtime(true));
         }
 

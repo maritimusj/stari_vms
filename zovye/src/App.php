@@ -205,6 +205,17 @@ class App
     }
 
     /**
+     * 是否开启 企业微信接新（阿旗） 吸粉
+     *
+     */
+    public static function isWxWorkEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('wxWork.fan.enabled'));
+        });
+    }
+
+    /**
      * 是否启用用户中心
      * @return bool
      */

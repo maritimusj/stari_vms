@@ -62,6 +62,10 @@ class Account extends State
     //粉丝宝
     const YFB = 107;
 
+    //企业微信拉新
+    //refer: https://www.yuque.com/docs/share/cee4fad0-c591-4086-8fd1-79470ffb6b2b
+    const WxWORK = 108;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -91,6 +95,9 @@ class Account extends State
 
     const YFB_NAME = '粉丝宝';
     const YFB_HEAD_IMG = MODULE_URL . 'static/img/yfb_pic.png';
+
+    const WxWORK_NAME = '企业微信拉新（阿旗）';
+    const WxWORK_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -217,6 +224,8 @@ class Account extends State
             Account::KINGFANS => App::isKingFansEnabled(),
             Account::SNTO => App::isSNTOEnabled(),
             Account::YFB => App::isSNTOEnabled(),
+            Account::WxWORK => App::isWxWorkEnabled(),
+
         ];
         $result = [];
         foreach ($arr as $name => $enabled) {
@@ -277,6 +286,7 @@ class Account extends State
                 Account::KINGFANS,
                 Account::SNTO,
                 Account::YFB,
+                Account::WxWORK,
             ];
 
         $include = is_array($include) ? $include : [$include];
@@ -428,6 +438,19 @@ class Account extends State
                     return YfbAccount::fetch($device, $user);
                 },
             ],
+
+            //企业微信拉新（阿旗）
+            Account::WxWORK => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::WxWORK, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isWxWorkEnabled() && !in_array(WxWorkAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return WxWorkAccount::fetch($device, $user);
+                },
+            ]
         ];
 
         foreach ($third_party_platform as $uid => $entry) {
@@ -777,6 +800,12 @@ class Account extends State
     {
         $url = Util::murl('yfb');
         return self::createThirdPartyPlatform(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
+    }
+
+    public static function createWxWorkAccount(): ?accountModelObj
+    {
+        $url = Util::murl('wxwork');
+        return self::createThirdPartyPlatform(Account::WxWORK, Account::WxWORK_NAME, Account::WxWORK_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array

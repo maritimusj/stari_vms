@@ -9,12 +9,12 @@ namespace zovye;
 use Exception;
 use RuntimeException;
 use zovye\model\accountModelObj;
-use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 
-class AQIInfoAccount extends AQIInfo
+class WxWorkAccount extends AQIInfo
 {
-    const API_URL = 'https://c.api.aqiinfo.com/ChannelApi/UfansTicket';
+    const API_URL = 'https://c.api.aqiinfo.com/ChannelApi/WxworkTicket';
     const CB_RESPONSE = '{"code":200}';
 
     private $app_key;
@@ -25,10 +25,39 @@ class AQIInfoAccount extends AQIInfo
         $this->app_key = $app_key;
         $this->app_secret = $app_secret;
 
-        parent::$type = Account::AQIINFO;
-        parent::$name = Account::AQIINFO_NAME;
+        parent::$type = Account::WxWORK;
+        parent::$name = Account::WxWORK_NAME;
     }
 
+    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array
+    {
+        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+
+        $data = [
+            'appKey' => $this->app_key,
+            'exUid' => $fans['openid'],
+            'vmid' => $device->getImei(),
+            'time' => time(),
+            'extra' => "{$device->getShadowId()}:{$fans['openid']}",
+        ];
+
+        $data['ufsign'] = self::sign($data, $this->app_secret);
+
+        $result = Util::post(self::API_URL, $data, false);
+
+        if ($cb) {
+            $cb($data, $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 请求一个公众号
+     * @param deviceModelObj $device
+     * @param userModelObj $user
+     * @return array
+     */
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $v = [];
@@ -41,12 +70,12 @@ class AQIInfoAccount extends AQIInfo
                 return [];
             }
             //请求API
-            $AQIInfo = new AQIInfoAccount($config['key'], $config['secret']);
-            $AQIInfo->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
+            $wxWork = new WxWorkAccount($config['key'], $config['secret']);
+            $wxWork->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('AQIInfo_query', [
+                        Util::logToFile('WxWork_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -56,7 +85,7 @@ class AQIInfoAccount extends AQIInfo
                     if (empty($result)) {
                         throw new RuntimeException('返回数据为空！');
                     }
-                    
+
                     if (is_error($result)) {
                         throw new RuntimeException($result['message']);
                     }
@@ -77,17 +106,15 @@ class AQIInfoAccount extends AQIInfo
                         throw new RuntimeException('返回数据不正确！');
                     }
 
-                    $user->set('AQIInfo', $result['data']);
-
                     $data = $acc->format();
 
                     if ($result['data']['name']) {
                         $data['name'] = $result['data']['name'];
                     }
 
-                    $res = Util::createQrcodeFile("aqiinfo{$result['data']['ticket']}", $result['data']['url']);
+                    $res = Util::createQrcodeFile("wxWork{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
-                        Util::logToFile('AQIInfo', [
+                        Util::logToFile('wxWork', [
                             'error' => 'fail to createQrcode file',
                             'result' => $res,
                         ]);
@@ -108,7 +135,7 @@ class AQIInfoAccount extends AQIInfo
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('AQIInfo', [
+                        Util::logToFile('wxWork', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -117,31 +144,5 @@ class AQIInfoAccount extends AQIInfo
         }
 
         return $v;
-    }
-
-
-    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array
-    {
-        $fans = empty($user) ? Util::fansInfo() : $user->profile();
-
-        $data = [
-            'appKey' => $this->app_key,
-            'exUid' => $fans['openid'],
-            'city' => str_replace('市', '', $fans['city']),
-            'vmid' => $device->getImei(),
-            'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
-            'extra' => "{$device->getShadowId()}:{$fans['openid']}",
-            'time' => time(),
-        ];
-
-        $data['ufsign'] = self::sign($data, $this->app_secret);
-
-        $result = Util::post(self::API_URL, $data, false);
-
-        if ($cb) {
-            $cb($data, $result);
-        }
-
-        return $result;
     }
 }

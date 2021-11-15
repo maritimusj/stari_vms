@@ -318,6 +318,14 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'scene' => request::trim('scene'),
                 ]);
+            } elseif ($account->isWxWork()) {
+                $data['name'] = Account::WxWORK;
+                $data['img'] = Account::WxWORK_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::WxWORK,
+                    'key' => request::trim('key'),
+                    'secret' => request::trim('app_secret'),
+                ]);
             } elseif ($account->isWxApp()) {
                 $account->set('config', [
                     'type' => Account::WXAPP,
@@ -374,8 +382,8 @@ if ($op == 'default') {
                 //不再要求用户填写唯一的name
                 do {
                     $name = Util::random(16, true);
-                } while(Account::findOneFromName($name));
-                
+                } while (Account::findOneFromName($name));
+
             } elseif (in_array($name, [
                 Account::JFB_NAME,
                 Account::MOSCALE_NAME,

@@ -63,7 +63,7 @@ class WxWorkAccount extends AQIInfo
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOneFromType(Account::AQIINFO);
+        $acc = Account::findOneFromType(Account::WxWORK);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['key']) || empty($config['secret'])) {
@@ -75,7 +75,7 @@ class WxWorkAccount extends AQIInfo
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('WxWork_query', [
+                        Util::logToFile('wxWork_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);

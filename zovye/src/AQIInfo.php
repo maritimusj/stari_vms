@@ -33,10 +33,10 @@ class AQIInfo
             'params' => $params,
             'config' => $config,
         ]);
-
-        if ($config['key'] !== $params['appKey'] || self::sign($params, $config['secret']) !== $params['ufsign']) {
-            return err('签名校验失败！');
-        }
+        //暂时无法确定验签算法
+        // if ($config['key'] !== $params['appKey'] || self::sign($params, $config['secret']) !== $params['ufsign']) {
+        //     return err('签名校验失败！');
+        // }
 
         return ['account' => $acc];
     }

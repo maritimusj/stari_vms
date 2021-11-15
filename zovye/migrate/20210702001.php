@@ -2,7 +2,8 @@
 
 namespace zovye;
 
-$tb_name = 'zovye_vms';
+$tb_name = APP_NAME;
+
 if (!We7::pdo_tableexists($tb_name . '_account_query')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_account_query` ( 

@@ -2,7 +2,8 @@
 
 namespace zovye;
 
-$tb_name = 'zovye_vms';
+$tb_name = APP_NAME;
+
 if (!We7::pdo_fieldexists($tb_name . '_inventory', 'src_inventory_id')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_inventory_log` ADD `src_inventory_id` INT NOT NULL DEFAULT '0' AFTER `id`;
@@ -10,7 +11,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-$tb_name = 'zovye_vms';
+
 if (!We7::pdo_fieldexists($tb_name . '_locker', 'used')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_locker` ADD `used` INT NOT NULL DEFAULT '0' AFTER `available`;

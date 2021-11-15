@@ -2,9 +2,9 @@
 
 namespace zovye;
 
-$tb_name = 'zovye_vms';
+$tb_name = APP_NAME;
 
-if (!We7::pdo_fieldexists($tb_name . '_account')) {
+if (!We7::pdo_fieldexists($tb_name . '_account', 'type')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_account` ADD `type` INT NOT NULL DEFAULT '0' AFTER `order_no`, ADD INDEX (`type`);
 SQL;

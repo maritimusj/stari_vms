@@ -1,7 +1,7 @@
 <?php
 namespace zovye;
 
-$tb_name = 'zovye_vms';
+$tb_name = APP_NAME;
 
 if (!We7::pdo_fieldexists($tb_name . '_user', 'app')) {
     $sql = <<<SQL

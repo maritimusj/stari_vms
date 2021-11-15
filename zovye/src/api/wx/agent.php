@@ -1547,7 +1547,7 @@ class agent
 
     public static function getAgentStat($agent, $s_ts, $e_ts): array
     {
-        return Util::cachedCall(10, function () use ($agent, $s_ts, $e_ts) {
+        return Util::cachedCall(30, function () use ($agent, $s_ts, $e_ts) {
             $query = Order::query([
                 'agent_id' => $agent->getId(),
                 'createtime >=' => $s_ts,
@@ -1797,21 +1797,23 @@ class agent
     public static function homepageOrderStat(): array
     {
         $user = common::getAgent();
+        $agent_id = $user->getAgentId();
+        if (request::has('start')) {
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
+        } else {
+            $s_date = new DateTime('first day of this month 00:00:00');
+        }
 
-        return Util::cachedCall(10, function () use ($user) {
-            $agent_id = $user->getAgentId();
-            if (request::has('start')) {
-                $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
-            } else {
-                $s_date = new DateTime('first day of this month 00:00:00');
-            }
+        if (request::has('end')) {
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
+            $e_date->modify('next day');
+        } else {
+            $e_date = new DateTime('first day of next month 00:00:00');
+        }
 
-            if (request::has('end')) {
-                $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
-                $e_date->modify('next day');
-            } else {
-                $e_date = new DateTime('first day of next month 00:00:00');
-            }
+        $device_id = request::int('deviceid');
+
+        return Util::cachedCall(30, function () use ($agent_id, $s_date, $e_date, $device_id) {
 
             $condition = [
                 'agent_id' => $agent_id,
@@ -1832,8 +1834,7 @@ class agent
                 ];
                 $device_keys[] = $item->getId();
             }
-
-            $device_id = request::int('deviceid');
+            
             if ($device_id != 0) {
                 $d_id = request::int('deviceid');
                 if (in_array($d_id, $device_keys)) {
@@ -1923,14 +1924,14 @@ class agent
                 'e_date' => $e_date,
                 'deviceid' => $device_id,
             ];
-        }, $user->getId());
+        }, $agent_id, $s_date->getTimestamp(), $e_date->getTimestamp(), $device_id);
     }
 
     public static function homepageDefault(): array
     {
         $user = common::getAgent();
 
-        return Util::cachedCall(10, function () use ($user) {
+        return Util::cachedCall(30, function () use ($user) {
 
             $condition = [];
             $condition['agent_id'] = $user->getAgentId();

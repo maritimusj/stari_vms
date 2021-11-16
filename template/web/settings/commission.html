@@ -48,11 +48,11 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">手续费</label>
+                    <label class="col-md-2 control-label">手续费（‰）</label>
                     <div class="col-md-10">
                         <div class="col-md-4" style="padding-left:0;">
                             <input type="number" class="form-control" name="withdraw_fee_permille" id="withdraw_fee_permille" value="{php echo intval($settings['commission']['withdraw']['fee']['permille'])}" min="0" max="1000">
-                            <span class="help-block">* 手续费<b>千分比‰</b></span>
+                            <span class="help-block">* 手续费<b>千分比</b></span>
                         </div>
                         <div class="col-md-4">
                             <input type="number" class="form-control" name="withdraw_fee_min" id="withdraw_fee_min" value="{php echo number_format($settings['commission']['withdraw']['fee']['min'] / 100, 2)}" min="0" step="0.01">

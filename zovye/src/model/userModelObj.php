@@ -544,10 +544,6 @@ class userModelObj extends modelObj
         $query = Order::query(['openid' => $this->openid]);
         $query->where(['price' => 0]);
 
-        if (settings('user.balance.type') != 'free') {
-            $query->where(['balance' => 0]);
-        }
-
         $res = $query->get('sum(num)');
 
         return intval($res);
@@ -561,16 +557,7 @@ class userModelObj extends modelObj
     public function getFeeTotal(): int
     {
         $query = Order::query(['openid' => $this->openid]);
-        if (settings('user.balance.type') == 'pay') {
-            $query->whereOr(
-                [
-                    'balance >' => 0,
-                    'price >' => 0,
-                ]
-            );
-        } else {
-            $query->where(['price >' => 0]);
-        }
+        $query->where(['price >' => 0]);
 
         $res = $query->get('sum(num)');
 

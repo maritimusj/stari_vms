@@ -1462,10 +1462,6 @@ class deviceModelObj extends modelObj
 
             $query->where(['price' => 0]);
 
-            if (settings('user.balance.type') != 'free') {
-                $query->where(['balance' => 0]);
-            }
-
             $total['free'] = (int)$query->get('sum(num)');
         }
 
@@ -1480,29 +1476,9 @@ class deviceModelObj extends modelObj
                 ]
             );
 
-            if (settings('user.balance.type') != 'free') {
-                $query->where('(price > 0 OR balance > 0)');
-            } else {
-                $query->where(['price >' => 0]);
-            }
+            $query->where(['price >' => 0]);
 
             $total['pay'] = (int)$query->get('sum(num)');
-        }
-
-        if (empty($way) || in_array('balance', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $query->where(['balance >' => 0]);
-
-            $total['balance'] = (int)$query->get('sum(num)');
         }
 
         if (empty($way) || in_array('total', $way)) {

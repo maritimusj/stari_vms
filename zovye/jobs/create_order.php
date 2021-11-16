@@ -233,7 +233,6 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         'goods_id' => $goods['id'],
         'num' => 1,
         'price' => $goods['price'],
-        'balance' => 0,
         'account' => empty($acc) ? '' : $acc->name(),
         'ip' => $params['ip'],
         'extra' => [

@@ -902,7 +902,6 @@ class Account extends State
                 'scname' => Schema::DAY,
                 'count' => 1,
                 'total' => 1,
-                'balance_deduct_num' => 0,
                 'group_name' => '',
                 'url' => Account::createUrl($uid, ['from' => 'account']),
             ];

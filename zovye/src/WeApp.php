@@ -590,7 +590,6 @@ JSCODE;
                 'device_id' => $device->getId(),
                 'result_code <>' => 0,
                 'price' => 0,
-                'balance' => 0,
                 'createtime >' => strtotime("-{$retry['last']} minute"),
             ])->orderBy('id desc')->findOne();
             if ($order) {

@@ -86,8 +86,6 @@
                     <span class="num">{$order['num']}</span>
                     {if $order['price']>0}
                     (价格：<span class="price {if $order['price']==0}zeroprice{/if}">￥{$order['price']}</span>)
-                    {elseif $order['balance']>0}
-                    (余额：<span class="balance">{$order['balance']} <i class="fa fa-tint"></i></span>)
                     {else}
                     (<span class="zeroprice">免费领取</span>)
                     {/if}

@@ -56,7 +56,6 @@ class Statistics
             $result = [
                 'free' => 0,
                 'fee' => 0,
-                'balance' => 0,
                 'total' => 0,
             ];
 
@@ -64,7 +63,6 @@ class Statistics
             (int)Order::query()->where([
                 'device_id' => $device->getId(),
                 'price' => 0,
-                'balance' => 0,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
@@ -102,7 +100,6 @@ class Statistics
             $result = [
                 'free' => 0,
                 'fee' => 0,
-                'balance' => 0,
                 'total' => 0,
             ];
 
@@ -110,7 +107,6 @@ class Statistics
             (int)Order::query()->where([
                 'device_id' => $device->getId(),
                 'price' => 0,
-                'balance' => 0,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
@@ -201,7 +197,6 @@ class Statistics
                     return Order::query()->where([
                         'agent_id' => $user->getId(),
                         'price' => 0,
-                        'balance' => 0,
                         'createtime >=' => $begin->getTimestamp(),
                         'createtime <' => $end->getTimestamp()
                     ])->get('sum(num)');

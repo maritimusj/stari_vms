@@ -21,7 +21,6 @@ use zovye\User;
 use zovye\Util;
 use function zovye\err;
 use function zovye\error;
-use function zovye\settings;
 
 class order
 {
@@ -51,11 +50,7 @@ class order
         }
         if ($order->getPrice() > 0) {
             $m = number_format($order->getPrice() / 100, 2);
-            $result['spec'] = "微信支付￥{$m}元购买";
-        } elseif ($order->getBalance() > 0) {
-            $balance_title = settings('user.balance.title', DEFAULT_BALANCE_TITLE);
-            $unit_title = settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME);
-            $result['spec'] = "使用{$order->getBalance()}{$unit_title}{$balance_title}领取";
+            $result['spec'] = "支付￥{$m}元购买";
         } else {
             $result['spec'] = '免费领取';
         }
@@ -138,11 +133,8 @@ class order
         $way = request::trim('way');
         if ($way == 'free') {
             $condition['price'] = 0;
-            $condition['balance'] = 0;
         } elseif ($way == 'fee') {
             $condition['price >'] = 0;
-        } elseif ($way == 'balance') {
-            $condition['balance >'] = 0;
         } elseif ($way == 'refund') {
             $condition['extra LIKE'] = '%refund%';
         }
@@ -168,7 +160,6 @@ class order
                 'id' => $entry->getId(),
                 'num' => $entry->getNum(),
                 'price' => number_format($entry->getPrice() / 100, 2),
-                'balance' => $entry->getBalance(),
                 'ip' => $entry->getIp(),
                 'account' => $entry->getAccount(),
                 'orderId' => $entry->getOrderId(),
@@ -261,8 +252,6 @@ class order
 
             if ($data['price'] > 0) {
                 $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-            } elseif ($data['balance'] > 0) {
-                $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
             } else {
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }
@@ -307,7 +296,7 @@ class order
                 '商品名称', //goods -> name
                 '商品数量', //num
                 '商品价格', //goods -> price_formatted
-                '购买方式', // price  现金  balance 余额  .. 免费
+                '购买方式', // price  现金  .. 免费
                 '是否退款', // refund exist
                 '退款时间', // refund -> title
                 '公众号', //
@@ -332,9 +321,7 @@ class order
                 $str_export .= $item['num'] . "\t";
                 $str_export .= ($item['goods']['price_formatted'] ?: '') . "\t";
                 if ($item['price'] > 0) {
-                    $str_export .= "现金\t";
-                } else if ($item['balance'] > 0) {
-                    $str_export .= "余额\t";
+                    $str_export .= "支付\t";
                 } else {
                     $str_export .= "免费\t";
                 }

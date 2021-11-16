@@ -677,8 +677,6 @@ class Order extends State
 
             if ($data['price'] > 0) {
                 $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-            } elseif ($data['balance'] > 0) {
-                $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
             } else {
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }

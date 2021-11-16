@@ -287,7 +287,6 @@ class agentModelObj extends userModelObj
             'total' => 0,
             'free' => 0,
             'fee' => 0,
-            'balance' => 0,
         ];
 
         if (!($this->isAgent() || $this->isPartner())) {
@@ -318,7 +317,7 @@ class agentModelObj extends userModelObj
         $agent_id = $this->getAgentId();
         if ($agent_id) {
             $result['free'] = (int)m('order')
-                ->where(We7::uniacid(['agent_id' => $agent_id, 'price' => 0, 'balance' => 0]))
+                ->where(We7::uniacid(['agent_id' => $agent_id, 'price' => 0]))
                 ->where(['createtime >=' => $begin, 'createtime <' => $end])
                 ->get('sum(num)');
 
@@ -327,12 +326,7 @@ class agentModelObj extends userModelObj
                 ->where(['createtime >=' => $begin, 'createtime <' => $end])
                 ->get('sum(num)');
 
-            $result['balance'] = (int)m('order')
-                ->where(We7::uniacid(['agent_id' => $agent_id, 'balance >' => 0]))
-                ->where(['createtime >=' => $begin, 'createtime <' => $end])
-                ->get('sum(num)');
-
-            $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+            $result['total'] = $result['fee'] + $result['free'];
 
             if ($m_label != date('Ym')) {
                 $M_total[$m_label] = $result;

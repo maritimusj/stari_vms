@@ -467,7 +467,7 @@ class device
                         $result['devices'][$x['id']] = [
                             'name' => $x['name'],
                             'all' => [
-                                'free' => $data['free'] + $data['balance'],
+                                'free' => $data['free'],
                                 'fee' => $data['fee'],
                             ],
                             'area' => $location($item),
@@ -519,7 +519,7 @@ class device
             $data = Stats::getDayTotal($agent);
             $result['all'] = [
                 'name' => $agent->getName(),
-                'free' => $data['free'] + $data['balance'],
+                'free' => $data['free'],
                 'fee' => $data['fee'],
             ];
         }

@@ -351,10 +351,6 @@ class balance
                                 $type = User::getUserCharacter($user)['title'];
                                 $m = number_format($order->getPrice() / 100, 2);
                                 $spec = "{$type}付款￥{$m}元购买";
-                            } elseif ($order->getBalance() > 0) {
-                                $balance_title = settings('user.balance.title', DEFAULT_BALANCE_TITLE);
-                                $unit_title = settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME);
-                                $spec = "使用{$order->getBalance()}{$unit_title}{$balance_title}领取";
                             } else {
                                 $spec = '免费领取';
                             }

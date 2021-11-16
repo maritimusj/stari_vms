@@ -632,11 +632,8 @@ class common
         $way = request::trim('way');
         if ($way == 'free') {
             $condition['price'] = 0;
-            $condition['balance'] = 0;
         } elseif ($way == 'fee') {
             $condition['price >'] = 0;
-        } elseif ($way == 'balance') {
-            $condition['balance >'] = 0;
         } elseif ($way == 'refund') {
             $condition['extra LIKE'] = '%refund%';
         }
@@ -659,7 +656,6 @@ class common
                 'id' => $entry->getId(),
                 'num' => $entry->getNum(),
                 'price' => number_format($entry->getPrice() / 100, 2),
-                'balance' => $entry->getBalance(),
                 'ip' => $entry->getIp(),
                 'account' => $entry->getAccount(),
                 'orderId' => $entry->getOrderId(),
@@ -749,8 +745,6 @@ class common
 
             if ($data['price'] > 0) {
                 $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-            } elseif ($data['balance'] > 0) {
-                $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
             } else {
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }
@@ -1072,11 +1066,8 @@ class common
         $way = request::trim('way');
         if ($way == 'free') {
             $condition['price'] = 0;
-            $condition['balance'] = 0;
         } elseif ($way == 'fee') {
             $condition['price >'] = 0;
-        } elseif ($way == 'balance') {
-            $condition['balance >'] = 0;
         } elseif ($way == 'refund') {
             $condition['extra LIKE'] = '%refund%';
         }

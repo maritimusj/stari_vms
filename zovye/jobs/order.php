@@ -57,7 +57,6 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 'goodsName' => $order->getExtraData('goods.name'),
                 'num' => $order->getNum(),
                 'price' => $order->getPrice(),
-                'balance' => $order->getBalance(),
                 'account' => $order->getAccount(),
                 'ip' => $order->getIp(),
             ];

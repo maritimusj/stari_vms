@@ -335,11 +335,8 @@ if ($op === 'create') {
     $way = request::str('way');
     if ($way == 'free') {
         $condition['price'] = 0;
-        //$condition['balance'] = 0;
     } elseif ($way == 'fee') {
         $condition['price >'] = 0;
-    } elseif ($way == 'balance') {
-        $condition['balance >'] = 0;
     } elseif (isset($device) || isset($user)) {
         $way = 'spec';
     }
@@ -362,7 +359,6 @@ if ($op === 'create') {
             'id' => $entry->getId(),
             'num' => $entry->getNum(),
             'price' => number_format($entry->getPrice() / 100, 2),
-            'balance' => $entry->getBalance(),
             'ip' => $entry->getIp(),
             'account' => $entry->getAccount(),
             'orderId' => $entry->getOrderId(),
@@ -387,8 +383,6 @@ if ($op === 'create') {
 
         if ($data['price'] > 0) {
             $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-        } elseif ($data['balance'] > 0) {
-            $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
         } else {
             $data['tips'] = ['text' => '免费', 'class' => 'free'];
         }
@@ -419,8 +413,6 @@ if ($op === 'create') {
                     $data['status'] = '成功';
                 }
             }
-        } elseif ($entry->getBalance()) {
-            $data['type'] = '余额订单';
         } else {
             $data['type'] = '免费订单';
         }

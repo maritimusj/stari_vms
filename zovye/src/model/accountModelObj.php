@@ -97,9 +97,6 @@ class accountModelObj extends modelObj
     protected $scname;
 
     /** @var int */
-    protected $balance_deduct_num;
-
-    /** @var int */
     protected $total;
 
     /** @var int */
@@ -211,11 +208,6 @@ class accountModelObj extends modelObj
     public function setDuration($duration)
     {
         return $this->settings('config.video.duration', intval($duration));
-    }
-
-    public function balance(): int
-    {
-        return $this->getBalanceDeductNum();
     }
 
     public function getTitle(): string

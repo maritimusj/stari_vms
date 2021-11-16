@@ -102,12 +102,6 @@ try {
         'msg' => $result['msg'],
     ];
 
-    //返回用户当前余额
-    if ($result['change']) {
-        $response['balance'] = $user->getBalance()->total();
-        $response['change'] = $result['change'];
-    }
-
     //成功转跳
     $url = $device->getRedirectUrl()['url'];
     if (!empty($url)) {

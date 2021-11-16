@@ -209,7 +209,6 @@ if ($op == 'default') {
             'count' => max(0, request::int('count')),
             'sccount' => max(0, request::int('sccount')),
             'total' => max(0, request::int('total')),
-            'balance_deduct_num' => max(0, request::int('balanceDeductNum')),
             'order_limits' => max(0, request::int('orderlimits')),
             'order_no' => min(999, request::int('orderno')),
             'group_name' => request::str('groupname'),

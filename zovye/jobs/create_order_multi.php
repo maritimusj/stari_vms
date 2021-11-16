@@ -206,7 +206,6 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
         'device_id' => $device->getId(),
         'num' => $pay_log->getTotal(),
         'price' => $pay_log->getPrice(),
-        'balance' => 0,
         'ip' => $pay_log->getData('orderData.ip'),
         'extra' => [
             'discount' => [

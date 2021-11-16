@@ -1800,7 +1800,6 @@ HTML_CONTENT;
                 'goods_id' => $goods['id'],
                 'num' => 1,
                 'price' => 0,
-                'balance' => 0,
                 'account' => $acc ? $acc->name() : '',
                 'ip' => empty($args['ip']) ? CLIENT_IP : $args['ip'],
                 'extra' => [

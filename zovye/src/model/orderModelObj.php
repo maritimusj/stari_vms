@@ -32,7 +32,6 @@ use function zovye\is_error;
  * @method getGoodsId()
  * @method getIp()
  * @method setIp($ip)
- * @method setBalance($balance_deduct_num)
  * @method setOrderId(string $string)
  * @method getDeviceType()
  * @method getUpdatetime()

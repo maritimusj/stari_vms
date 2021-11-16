@@ -147,10 +147,6 @@ class goods
                 $goods->setPrice($price);
             }
 
-            if (request::str('goodsBalance') != $goods->getBalance()) {
-                $goods->setBalance(request::str('goodsBalance'));
-            }
-
             if (request::bool('allowFree') != $goods->allowFree()) {
                 $goods->setAllowFree(request::bool('allowFree'));
             }
@@ -174,7 +170,6 @@ class goods
                     'unitTitle' => request::trim('goodsUnitTitle'),
                     'allowFree' => request::bool('allowFree') ? 1 : 0,
                     'allowPay' => request::bool('allowPay') ? 1 : 0,
-                    'balance' => request::bool('allowFree') ? request::int('goodsBalance') : 0,
                 ],
             ];
 

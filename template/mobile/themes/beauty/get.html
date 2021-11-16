@@ -272,16 +272,7 @@
 		<div class="main-view">
 			<img class="avatar" src="{$tpl['user']['avatar']}" />
 			<span class="nickname">{$tpl['user']['nickname']}</span>
-			{if $tpl['balance']}
-			<span class="coin">{$tpl['balance']['title']}：<span v-text="balance"></span>{$tpl['balance']['unit']}</span>
-				<button :class="{'get-btn': true, 'disabled': loading, 'blue': !get_result, 'green': get_result}" @click="showGoodsDlg(true)" v-text="btnTitle"></button>
-    			{if $tpl['account']['balanceDeductNum'] > 0}
-    			<span class="tips">领取消耗：{$tpl['account']['balanceDeductNum']}{$tpl['balance']['unit']}{$tpl['balance']['title']}</span>
-    			{/if}
-			<a class="vip-view" onclick="zovye_fn.usercenter()">会员中心有惊喜 &gt;&gt;</a>
-			{else}
-			    <button :class="{'get-btn': true, 'disabled': loading, 'blue': !get_result, 'green': get_result}" @click="showGoodsDlg(true)" v-text="btnTitle"></button>
-			{/if}
+			<button :class="{'get-btn': true, 'disabled': loading, 'blue': !get_result, 'green': get_result}" @click="showGoodsDlg(true)" v-text="btnTitle"></button>
 		</div>
 		{if $tpl['slides']}
 		<div class=" swiper-container" style="box-shadow: -1px -1px 6px #000;" v-once>

@@ -161,27 +161,13 @@
                 {if $credit_used}
                 <th>积分</th>
                 {/if}
-                {if $balance_used}
-                <th>
-                    <span data-orderby="balance" {if $orderby=='balance'}class="fa {$order}"{/if}>余额({$balance['title']})</span>
-                </th>
-                {if $prize_used}
-                <th>
-                    <span data-orderby="prize_total" {if $orderby=='prize_total'}class="fa {$order}"{/if}>奖品</span>
-                </th>
-                {/if}
-                {/if}
                 <th>
                     <div>订单数量</div>
                     <div><span data-orderby="free_total" {if $orderby=='free_total'}class="fa {$order}"{/if}>免费</span>
                         /
                         <span data-orderby="fee_total" {if $orderby=='fee_total'}class="fa {$order}"{/if}>支付</span>
                         /
-                        {if $balance_used}
-                        <span data-orderby="balance_total" {if $orderby=='balance_total'}class="fa {$order}"{/if}>余额</span></div>
-                    {else}
                     其它
-                    {/if}
     </div>
     </th>
     <th><span data-orderby="createtime" {if $orderby=='createtime'}class="fa {$order}"{/if}>加入时间</span></th>
@@ -268,16 +254,7 @@
     {$item['credit']}
 </td>
 {/if}
-{if $balance_used}
-<td class="operate">
-    <span>{$item['balance']} <i class="fa fa-tint balance_log" title="点击查看余额变动记录..." data-op="balanceLog"></i></span>
-</td>
-{if $prize_used}
-<td class="operate">
-    <span>{$item['prizeNum']} <i class="fa fa-gift" title="点击查看奖品记录..." data-op="giftLog"></i></span>
-</td>
-{/if}
-{/if}
+
 <td class="operate">
     <div class="stats">
         <div>
@@ -322,13 +299,7 @@
             <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
             <li role="separator" class="divider"></li>
             {/if}
-            {if $balance_used}
-            <li><a href="#" data-op="balanceLog"><i class="fa fa-tint fa-fw"></i> 余额变动</a></li>
-            {/if}
             <li><a href="#" data-op="orderList"><i class="fa fa-list fa-fw"></i> 领取记录</a></li>
-            {if $prize_used}
-            <li><a href="#" data-op="giftLog"><i class="fa fa-gift fa-fw"></i> 奖品列表</a></li>
-            {/if}
             {if empty($item['isAgent']) && empty($item['isPartner']) && empty($item['isKeeper']) && $item['mobile']}
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
@@ -443,14 +414,6 @@
         }
     }
 
-    api.balanceLog = function(userid) {
-        api.showResult({op: 'balance_log', id: userid});
-    }
-
-    api.giftLog = function(userid) {
-        api.showResult({op: 'prize', id: userid});
-    }
-
     api.viewInventory = function(userid) {
         window.location.href = "{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => '__id__']);}".replace('__id__', userid);
     }
@@ -459,15 +422,15 @@
         api.showResult({user_id: userid}, api.ordersUrl);
     }
 
-    api.balanceEdit = function(userid, event) {
-        api.showResult({id: userid, op: "balance_edit"});
+    api.CommissionBalanceEdit = function(userid, event) {
+        api.showResult({id: userid, op: "commission_balance_edit"});
         event.stopPropagation();
     }
 
-    api.saveUserBalanceLog = function(userid) {
+    api.saveCommissionBalance = function(userid) {
         const total = $('input[name=total]').val();
         const memo = $('input[name=memo]').val();
-        api.showResult({id: userid, total: total, memo: memo, op: "balance_edit_save"}, '', false, function(){
+        api.showResult({id: userid, total: total, memo: memo, op: "commission_balance_save"}, '', false, function(){
             $('#modal-message').modal('hide');
             api.getUserStats([userid]);
         })
@@ -483,7 +446,7 @@
                     tr.find('.stats .balance').text(stats.balance || 0);
                     if (stats.commission_balance !== undefined) {
                         tr.find('.commission_log').html(
-                            "<span class=\"price operate\">￥<b>" + stats.commission_balance_formatted + "</b> <i class=\"fa fa-list\"  data-op=\"viewCommissionLog\" title=\"点击查看详情...\"></i><i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='balanceEdit'></i></span>"
+                            "<span class=\"price operate\">￥<b>" + stats.commission_balance_formatted + "</b> <i class=\"fa fa-list\"  data-op=\"viewCommissionLog\" title=\"点击查看详情...\"></i><i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='CommissionBalanceEdit'></i></span>"
                         ).show();
                     }
                 })

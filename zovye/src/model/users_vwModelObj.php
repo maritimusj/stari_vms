@@ -6,15 +6,12 @@
 
 namespace zovye\model;
 
-use zovye\Balance;
 use function zovye\tb;
 
 /**
  * Class users_vwModelObj
  * @method getFree_total()
  * @method getFee_total()
- * @method getBalanceTotal()
- * @method Balance getBalance()
  */
 class users_vwModelObj extends userModelObj
 {
@@ -22,10 +19,6 @@ class users_vwModelObj extends userModelObj
     protected $free_total;
     /** @var int */
     protected $fee_total;
-    /** @var int */
-    protected $balance_total;
-    /** @var int */
-    protected $balance;
 
     public static function getTableName($readOrWrite): string
     {

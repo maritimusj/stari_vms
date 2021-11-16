@@ -127,9 +127,6 @@
                     <td class="operate">
                         <div class="m_free"><span>免费 {$agent['m']['free']}</span></div>
                         <div class="m_pay"><span>支付 {$agent['m']['fee']}</span></div>
-                        {if \zovye\App::isUserCenterEnabled() || $agent['m']['balance'] > 0}
-                        <div class="m_balance"><span>{php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'} {$agent['m']['balance']}</span></div>
-                        {/if}
                     </td>
                     <td class="partners operate">
                         <span {if empty($agent['partners'])}class="nopartners"{/if}>

@@ -237,13 +237,6 @@
                             <label class="checkbox-inline">
                                 <input type="checkbox" name="freeOrderGSP" value="1" {if $settings['agent']['reg']['rel_gsp']['order']['f']}checked{/if}> 免费订单
                             </label>
-                            {if \zovye\App::isUserCenterEnabled()}
-                            <label class="checkbox-inline">
-                                <input type="checkbox" name="balanceOrderGSP" value="1" {if $settings['agent']['reg']['rel_gsp']['order']['b']}checked{/if}> 余额订单
-                            </label>
-                            {else}
-                            <input type="hidden" name="balanceOrderGSP" value="{$settings['agent']['reg']['rel_gsp']['order']['b']}">
-                            {/if}
                             <label class="checkbox-inline">
                                 <input type="checkbox" name="payOrderGSP" value="1" {if $settings['agent']['reg']['rel_gsp']['order']['p']}checked{/if}> 支付订单
                             </label>
@@ -308,13 +301,6 @@
                         <label class="checkbox-inline">
                             <input type="checkbox" name="freeOrder" value="1" {if $settings['agent']['reg']['bonus']['order']['f']}checked{/if}> 免费订单
                         </label>
-                        {if $settings['user']['center']['enabled']}
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="balanceOrder" value="1" {if $settings['agent']['reg']['bonus']['order']['b']}checked{/if}> 余额订单
-                        </label>
-                        {else}
-                        <input type="hidden" name="balanceOrder" value="{$settings['agent']['reg']['bonus']['order']['b']}">
-                        {/if}
                         <label class="checkbox-inline">
                             <input type="checkbox" name="payOrder" value="1" {if $settings['agent']['reg']['bonus']['order']['p']}checked{/if}> 支付订单
                         </label>

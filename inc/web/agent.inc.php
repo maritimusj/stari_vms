@@ -347,9 +347,6 @@ if ($op == 'default') {
                     if ($entry->isFreeOrderIncluded()) {
                         $data['f'] = $g;
                     }
-                    if ($entry->isBalanceOrderIncluded()) {
-                        $data['b'] = $g;
-                    }
                     if ($entry->isPayOrderIncluded()) {
                         $data['p'] = $g;
                     }
@@ -357,9 +354,6 @@ if ($op == 'default') {
                 } else {
                     if ($entry->isFreeOrderIncluded()) {
                         $mixed_gsp_users[$uid]['f'] = $g;
-                    }
-                    if ($entry->isBalanceOrderIncluded()) {
-                        $mixed_gsp_users[$uid]['b'] = $g;
                     }
                     if ($entry->isPayOrderIncluded()) {
                         $mixed_gsp_users[$uid]['p'] = $g;
@@ -1706,15 +1700,6 @@ if ($op == 'default') {
                 'val' => number_format($f->getVal() / 100, 2),
             ];
         }
-        if (App::isUserCenterEnabled()) {
-            $b = GSP::findOne(['agent_id' => $agent->getId(), 'uid' => $level, 'order_types' => 'b']);
-            if ($b) {
-                $result['b'] = [
-                    'val_type' => $b->getValType(),
-                    'val' => number_format($b->getVal() / 100, 2),
-                ];
-            }
-        }
         $p = GSP::findOne(['agent_id' => $agent->getId(), 'uid' => $level, 'order_types' => 'p']);
         if ($p) {
             $result['p'] = [
@@ -1775,15 +1760,6 @@ if ($op == 'default') {
                 'val_type' => $f->getValType(),
                 'val' => number_format($f->getVal() / 100, 2),
             ];
-        }
-        if (App::isUserCenterEnabled()) {
-            $b = GSP::findOne(['agent_id' => $agent->getId(), 'uid' => $user->getOpenid(), 'order_types' => 'b']);
-            if ($b) {
-                $result['b'] = [
-                    'val_type' => $b->getValType(),
-                    'val' => number_format($b->getVal() / 100, 2),
-                ];
-            }
         }
         $p = GSP::findOne(['agent_id' => $agent->getId(), 'uid' => $user->getOpenid(), 'order_types' => 'p']);
         if ($p) {

@@ -58,9 +58,4 @@ class gsp_userModelObj extends modelObj
     {
         return stristr($this->order_types, 'p') !== false;
     }
-
-    public function isBalanceOrderIncluded(): bool
-    {
-        return stristr($this->order_types, 'b') !== false;
-    }
 }

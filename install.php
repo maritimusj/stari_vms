@@ -61,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_account` (
   `sccount` int(11) DEFAULT '0',
   `scname` varchar(5) NOT NULL,
   `total` int(11) DEFAULT '0',
-  `balance_deduct_num` int(11) NOT NULL DEFAULT '0',
   `order_limits` int(11) DEFAULT '0',
   `order_no` int(11) DEFAULT '0',
   `state` smallint(6) DEFAULT '0',
@@ -150,19 +149,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_article` (
   `createtime` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_balance` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) DEFAULT NULL,
-  `openid` varchar(128) NOT NULL,
-  `x_val` int(11) NOT NULL DEFAULT '0',
-  `src` smallint(6) NOT NULL DEFAULT '0',
-  `memo` varchar(1024) DEFAULT NULL,
-  `createtime` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `openid` (`openid`,`uniacid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 CREATE TABLE IF NOT EXISTS `ims_zy_saas_commission_balance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -492,7 +478,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_order` (
   `name` varchar(128) DEFAULT NULL,
   `num` smallint(6) NOT NULL DEFAULT '0',
   `price` int(11) DEFAULT '0',
-  `balance` int(11) DEFAULT '0',
   `account` varchar(128) DEFAULT NULL,
   `order_id` varchar(32) NOT NULL,
   `agent_id` int(11) DEFAULT NULL,
@@ -539,35 +524,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_principal` (
   PRIMARY KEY (`id`),
   KEY `index` (`user_id`,`principal_id`,`enable`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_prize` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) DEFAULT NULL,
-  `openid` varchar(64) NOT NULL,
-  `title` varchar(128) DEFAULT NULL,
-  `link` varchar(512) DEFAULT NULL,
-  `img` varchar(1024) DEFAULT NULL,
-  `desc` text,
-  `createtime` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_prizelist` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) DEFAULT NULL,
-  `enabled` tinyint(4) DEFAULT '1',
-  `title` varchar(255) DEFAULT NULL,
-  `name` varchar(64) NOT NULL,
-  `percent` tinyint(4) NOT NULL DEFAULT '0',
-  `total` int(11) DEFAULT '0',
-  `max_count` int(11) DEFAULT '0',
-  `begin_time` int(11) DEFAULT '0',
-  `end_time` int(11) DEFAULT '0',
-  `extra` text,
-  `createtime` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 CREATE TABLE IF NOT EXISTS `ims_zy_saas_referral` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -785,7 +741,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_voucher` (
   UNIQUE KEY `uid` (`uid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
 CREATE TABLE IF NOT EXISTS `ims_zy_saas_weapp_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
@@ -823,11 +778,8 @@ FROM `ims_zy_saas_device` d;
 
 CREATE OR REPLACE VIEW `ims_zy_saas_users_vw` AS
 SELECT *,
-(SELECT SUM(x_val) FROM `ims_zy_saas_balance` b WHERE b.openid=u.openid AND b.uniacid=u.uniacid) AS balance,
-(SELECT COUNT(*) FROM `ims_zy_saas_prize` p WHERE p.openid=u.openid AND p.uniacid=u.uniacid) AS prize_total,
-(SELECT COUNT(id) FROM `ims_zy_saas_order` o WHERE o.openid=u.openid AND o.price=0 AND o.balance=0) AS free_total,
+(SELECT COUNT(id) FROM `ims_zy_saas_order` o WHERE o.openid=u.openid AND o.price=0) AS free_total,
 (SELECT COUNT(id) FROM `ims_zy_saas_order` o WHERE o.openid=u.openid AND o.price>0) AS fee_total,
-(SELECT COUNT(id) FROM `ims_zy_saas_order` o WHERE o.openid=u.openid AND o.balance>0) AS balance_total
 FROM `ims_zy_saas_user` u;
 
 CREATE OR REPLACE VIEW `ims_zy_saas_agent_vw` AS

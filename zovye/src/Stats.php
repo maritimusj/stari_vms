@@ -32,7 +32,7 @@ class Stats
             if ($num > 0) {
                 $objs = is_array($objs) ? $objs : [$objs];
 
-                $way = $order->getPrice() > 0 ? 'p' : ($order->getBalance() > 0 ? 'b' : 'f');
+                $way = $order->getPrice() > 0 ? 'p' : 'f';
                 $createtime = $order->getCreatetime();
 
                 $y = date('Y', $createtime); //年
@@ -95,10 +95,9 @@ class Stats
         $result = [
             'fee' => intval($stats['p']),
             'free' => intval($stats['f']),
-            'balance' => intval($stats['b']),
         ];
 
-        $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+        $result['total'] = $result['fee'] + $result['free'];
 
         return $result;
     }
@@ -124,10 +123,9 @@ class Stats
         $result = [
             'fee' => intval($stats['p']),
             'free' => intval($stats['f']),
-            'balance' => intval($stats['b']),
         ];
 
-        $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+        $result['total'] = $result['fee'] + $result['free'];
 
         return $result;
     }
@@ -145,9 +143,8 @@ class Stats
             'end' => $stats['end'],
             'free' => intval($stats['total']['f']),
             'fee' => intval($stats['total']['p']),
-            'balance' => intval($stats['total']['b']),
         ];
-        $result['total'] = $result['free'] + $result['fee'] + $result['balance'];
+        $result['total'] = $result['free'] + $result['fee'];
 
         return $result;
     }
@@ -173,7 +170,7 @@ class Stats
         $data = $stats['data'][$y]['total'] ?: [];
 
         if ($data) {
-            unset($data['f'], $data['b'], $data['p']);
+            unset($data['f'], $data['p']);
 
             uksort(
                 $data,
@@ -246,7 +243,6 @@ class Stats
                 $chart['xAxis']['data'][] = "{$i}:00";
                 $chart['series'][0]['data'][] = intval($stats[$i]['f']);
                 $chart['series'][1]['data'][] = intval($stats[$i]['p']);
-                $chart['series'][2]['data'][] = intval($stats[$i]['b']);
             }
         }
 
@@ -313,7 +309,6 @@ class Stats
             for (; $i <= $end; $i++) {
                 $chart['series'][0]['data'][] = intval($stats[$i]['f']);
                 $chart['series'][1]['data'][] = intval($stats[$i]['p']);
-                $chart['series'][2]['data'][] = intval($stats[$i]['b']);
                 $chart['xAxis']['data'][] = "{$month}{$i}日";
             }
         }
@@ -370,7 +365,7 @@ class Stats
                 $j = date('j', $l);
 
                 $data = $stats['data'][$y]['days'][$n][$j];
-                $total = $data['p'] + $data['b'] + $data['f'];
+                $total = $data['p'] + $data['f'];
                 $chart['series'][$index]['total'] += $total;
                 $chart['series'][$index]['data'][] = $total;
             }
@@ -443,7 +438,7 @@ class Stats
                 $j = date('j', $l);
 
                 $data = $stats['data'][$y]['days'][$n][$j];
-                $total = $data['p'] + $data['b'] + $data['f'];
+                $total = $data['p'] + $data['f'];
                 $chart['series'][$index]['total'] += $total;
                 $chart['series'][$index]['data'][] = $total;
             }
@@ -518,7 +513,7 @@ class Stats
                 $j = date('j', $l);
 
                 $data = $stats['data'][$y]['days'][$n][$j];
-                $total = $data['p'] + $data['b'] + $data['f'];
+                $total = $data['p'] + $data['f'];
                 $chart['series'][$index]['total'] += $total;
                 $chart['series'][$index]['data'][] = $total;
             }
@@ -578,12 +573,12 @@ class Stats
             //$z = date('z'); //一年中的第几天
             $j = date('j'); //月份中的第几天
 
-            $data['all']['n'] = $stats['total']['p'] + $stats['total']['b'] + $stats['total']['f'];
+            $data['all']['n'] = $stats['total']['p'] + $stats['total']['f'];
             $today_total = $stats['data'][$y]['days'][$n][$j];
-            $data['today']['n'] = $today_total['p'] + $today_total['b'] + $today_total['f'];
+            $data['today']['n'] = $today_total['p'] + $today_total['f'];
 
             $month_total = $stats['data'][$y]['total'][$n];
-            $data['month']['n'] = $month_total['p'] + $month_total['b'] + $month_total['f'];
+            $data['month']['n'] = $month_total['p'] + $month_total['f'];
 
             for ($index = 0; $index < 7; $index++) {
 
@@ -594,9 +589,9 @@ class Stats
                 $j1 = date('j', $l);
 
                 $total = $stats['data'][$y1]['days'][$n1][$j1];
-                $data['last7days']['n'] += ($total['p'] + $total['b'] + $total['f']);
+                $data['last7days']['n'] += ($total['p'] + $total['f']);
                 if ($index == 1) {
-                    $data['yesterday']['n'] = ($total['p'] + $total['b'] + $total['f']);
+                    $data['yesterday']['n'] = ($total['p'] + $total['f']);
                 }
             }
 
@@ -605,7 +600,7 @@ class Stats
             $n2 = date('n', $l);
 
             $total = $stats['data'][$y2]['total'][$n2];
-            $data['lastmonth']['n'] = $total['p'] + $total['b'] + $total['f'];
+            $data['lastmonth']['n'] = $total['p'] + $total['f'];
         }
 
         $query = User::query();
@@ -722,7 +717,6 @@ class Stats
             }
 
             unset($stats['data'][$y]['total'][$n]['p']);
-            unset($stats['data'][$y]['total'][$n]['b']);
             unset($stats['data'][$y]['total'][$n]['f']);
 
             $p = 0;
@@ -731,47 +725,38 @@ class Stats
 
             foreach ((array)$stats['data'][$y]['days'][$n] as $key => $val) {
                 $p += intval($val['p']);
-                $b += intval($val['b']);
                 $f += intval($val['f']);
             }
 
             $stats['data'][$y]['total'][$n]['p'] = $p;
-            $stats['data'][$y]['total'][$n]['b'] = $b;
             $stats['data'][$y]['total'][$n]['f'] = $f;
 
             unset($stats['data'][$y]['total']['p']);
-            unset($stats['data'][$y]['total']['b']);
             unset($stats['data'][$y]['total']['f']);
 
             $p = 0;
-            $b = 0;
             $f = 0;
 
             foreach ((array)$stats['data'][$y]['total'] as $key => $val) {
                 $p += intval($val['p']);
-                $b += intval($val['b']);
                 $f += intval($val['f']);
             }
 
             $stats['data'][$y]['total']['p'] = $p;
-            $stats['data'][$y]['total']['b'] = $b;
             $stats['data'][$y]['total']['f'] = $f;
 
             unset($stats['total']);
 
             $p = 0;
-            $b = 0;
             $f = 0;
 
             foreach ((array)$stats['data'] as $key => $val) {
                 $p += intval($val['total']['p']);
-                $b += intval($val['total']['b']);
                 $f += intval($val['total']['f']);
             }
 
             $stats['total'] = [
                 'p' => $p,
-                'b' => $b,
                 'f' => $f,
             ];
 
@@ -852,7 +837,6 @@ class Stats
                     $time = strtotime("{$y}-{$n}-{$index}");
                     $result[date('m-d', $time)] = [
                         'free' => intval($entry['f']),
-                        'balance' => intval($entry['b']),
                         'fee' => intval($entry['p']),
                         '_day' => $index,
                     ];
@@ -897,8 +881,7 @@ class Stats
             if ($data) {
                 foreach ($data as $index => $entry) {
                     $result["{$index}"] = [
-                        'free' => intval($entry['f'] + $entry['b']),
-                        'balance' => intval($entry['b']),
+                        'free' => intval($entry['f']),
                         'fee' => intval($entry['p']),
                     ];
                 }

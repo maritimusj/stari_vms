@@ -8,12 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\model\balanceModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeper_devicesModelObj;
 use zovye\model\keeperModelObj;
-use zovye\model\prizeModelObj;
 use zovye\model\replenishModelObj;
 use zovye\model\userModelObj;
 use zovye\model\users_vwModelObj;
@@ -33,12 +31,6 @@ if ($op == 'default') {
     $tpl_data['agent_levels'] = settings('agent.levels');
 
     $tpl_data['commission_enabled'] = App::isCommissionEnabled();
-
-    $balance_used = App::isUserCenterEnabled();
-    if ($balance_used) {
-        $tpl_data['balance'] = settings('user.balance');
-        $prize_used = App::isUserPrizeEnabled();
-    }
 
     $credit_used = settings('we7credit.enabled');
 
@@ -158,10 +150,6 @@ if ($op == 'default') {
 
         if ($credit_used) {
             $data['credit'] = $user->getWe7credit()->total();
-        }
-
-        if (!empty($prize_used)) {
-            $data['prizeNum'] = m('prize')->where(We7::uniacid(['openid' => $user->getOpenid()]))->count();
         }
 
         if ($user->isAgent()) {
@@ -397,94 +385,6 @@ if ($op == 'default') {
 
     exit(json_encode($result));
 
-} elseif ($op == 'balance_log') {
-
-    $title = '余额变动记录';
-    $log = [];
-    $pager = '';
-
-    $user = User::get(request::int('id'));
-    if ($user) {
-        $title = "<b>{$user->getName()}</b>的{$title}";
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-
-        $balance = $user->getBalance();
-        $logQuery = $balance->log();
-        if ($logQuery) {
-            $total = $logQuery->count();
-
-            if ($total > 0) {
-                if ($page > ceil($total / $page_size)) {
-                    $page = 1;
-                }
-
-                $pager = We7::pagination($total, $page, $page_size);
-                $logQuery->orderBy('createtime desc');
-                $logQuery->page($page, $page_size);
-
-                /** @var balanceModelObj $entry */
-                foreach ($logQuery->findAll() as $entry) {
-                    $data = [
-                        'id' => $entry->getId(),
-                        'xval' => $entry->getXVal() > 0 ? '+' . $entry->getXVal() : $entry->getXVal(),
-                        'src' => Balance::desc($entry->getSrc()),
-                        'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                    ];
-
-                    if ($entry->getSrc() == Balance::SYS) {
-
-                        $data['memo'] = '系统每月免费额度赠送';
-
-                    } elseif ($entry->getSrc() == Balance::ORDER) {
-
-                        if (stripos($entry->getMemo(), 'orderid:') !== false) {
-                            $order_id = intval(ltrim($entry->getMemo(), 'orderid:'));
-                            if ($order_id) {
-                                $order = Order::get($order_id);
-                                if ($order) {
-                                    $data['memo'] = "公众号：{$order->getAccount()}";
-                                    $device = Device::get($order->getDeviceId());
-                                    if ($device) {
-                                        $data['memo'] .= "，设备：{$device->getName()}";
-                                    }
-                                }
-                            }
-                        }
-
-                    } elseif ($entry->getSrc() == Balance::CHARGE) {
-                        if (stripos($entry->getMemo(), 'wxorder:') !== false) {
-                            $wx_order = ltrim($entry->getMemo(), 'wxorder:');
-                            if ($wx_order) {
-                                $pay_log = $user->getPayLog($wx_order);
-                                if ($pay_log) {
-                                    $log_data = $pay_log->getData();
-                                    $data['memo'] = "订单号：{$log_data['payResult']['tid']}，金额：{$log_data['payResult']['fee']}元";
-                                }
-                            }
-                        }
-                    }
-
-                    if (empty($data['memo'])) {
-                        $data['memo'] = $entry->getMemo();
-                    }
-
-                    $log[] = $data;
-                }
-            }
-        }
-    }
-
-    $content = app()->fetchTemplate(
-        'web/common/balance_log',
-        [
-            'log' => $log,
-            'pager' => $pager,
-        ]
-    );
-
-    JSON::success(['title' => $title, 'content' => $content]);
-
 } elseif ($op == 'keeper_device') {
 
     $user = User::get(request::int('id'));
@@ -689,7 +589,7 @@ if ($op == 'default') {
 
     JSON::success('成功！');
 
-} elseif ($op == 'balance_edit') {
+} elseif ($op == 'commission_balance_edit') {
 
     $user = User::get(request::int('id'));
     if (empty($user)) {
@@ -697,7 +597,7 @@ if ($op == 'default') {
     }
 
     $content = app()->fetchTemplate(
-        'web/common/balance_edit',
+        'web/common/commission_balance_edit',
         [
             'user' => [
                 'id' => $user->getId(),
@@ -714,7 +614,7 @@ if ($op == 'default') {
 
     JSON::success(['title' => '调整用户余额', 'content' => $content]);
 
-} elseif ($op == 'balance_edit_save') {
+} elseif ($op == 'commission_balance_save') {
 
     $user = User::get(request::int('id'));
     if (empty($user)) {
@@ -744,58 +644,5 @@ if ($op == 'default') {
     }
 
     JSON::fail('保存数据失败！');
-
-} elseif ($op == 'prize') {
-
-    $user = User::get(request::int('id'));
-    if ($user) {
-        $title = "<b>{$user->getName()}</b>的奖品记录";
-
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-
-        $pager = '';
-
-        $prizes = [];
-
-        $query = m('prize')->query();
-        $query->where(We7::uniacid(['openid' => $user->getOpenid()]));
-
-        $total = $query->count();
-        if ($total > 0) {
-
-            if ($page > ceil($total / $page_size)) {
-                $page = 1;
-            }
-
-            $pager = We7::pagination($total, $page, $page_size);
-
-            $query->orderBy('createtime DESC');
-            $query->page($page, $page_size);
-
-            /** @var prizeModelObj $entry */
-            foreach ($query->findAll() as $entry) {
-                $prizes[] = [
-                    'id' => $entry->getId(),
-                    'title' => $entry->getTitle(),
-                    'link' => $entry->getLink(),
-                    'desc' => $entry->getDesc(),
-                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                ];
-            }
-        }
-
-        $content = app()->fetchTemplate(
-            'web/prize/prize_log',
-            [
-                'prizes' => $prizes,
-                'pager' => $pager,
-            ]
-        );
-
-        JSON::success(['title' => $title, 'content' => $content]);
-    }
-
-    JSON::fail('没找到这个用户！');
 
 }

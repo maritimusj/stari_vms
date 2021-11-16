@@ -235,8 +235,7 @@ class CommissionEventHandler
             $gsp_users = $agent->getGspUsers();
             foreach ($gsp_users as &$entry) {
                 if (($order->getPrice() > 0 && $entry['order']['p']) ||
-                    ($order->getBalance() > 0 && $entry['order']['b']) ||
-                    ($order->getPrice() == 0 && $order->getBalance() == 0 && $entry['order']['f'])) {
+                    ($order->getPrice() == 0 && $entry['order']['f'])) {
                     /** @var userModelObj $user */
                     $user = $entry['__obj'];
                     $percent = $entry['percent'];
@@ -265,9 +264,6 @@ class CommissionEventHandler
                     continue;
                 }
                 if ($order->getPrice() > 0 && !$entry->isPayOrderIncluded()) {
-                    continue;
-                }
-                if ($order->getBalance() > 0 && !$entry->isBalanceOrderIncluded()) {
                     continue;
                 }
                 if ($order->getPrice() == 0 && $order->getBalance() == 0 && !$entry->isFreeOrderIncluded()) {

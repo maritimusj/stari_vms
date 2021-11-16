@@ -64,7 +64,7 @@ class goodsModelObj extends modelObj
 
     public function allowFree(): bool
     {
-        return $this->getExtraData('allowFree') ? true : false;
+        return (bool)$this->getExtraData('allowFree');
     }
 
     public function setAllowFree($allowed = true)
@@ -89,7 +89,7 @@ class goodsModelObj extends modelObj
 
     public function allowPay(): bool
     {
-        return $this->getExtraData('allowPay') ? true : false;
+        return (bool)$this->getExtraData('allowPay');
     }
 
     public function getDetailImg()

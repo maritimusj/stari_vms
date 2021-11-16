@@ -215,31 +215,6 @@ class App
         });
     }
 
-    /**
-     * 是否启用用户中心
-     * @return bool
-     */
-    public static function isUserCenterEnabled(): bool
-    {
-        return onceCall(function() {
-            return !empty(settings('user.center.enabled'));
-        });
-    }
-
-    public static function isUserPrizeEnabled(): bool
-    {
-        return onceCall(function() {
-            return !empty(settings('user.prize.enabled'));            
-        });
-    }
-
-    public static function maxUserPrizeTimes(): int
-    {
-        return onceCall(function() {
-            return settings('user.prize.max_times', 10);            
-        });
-    }
-
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function() {

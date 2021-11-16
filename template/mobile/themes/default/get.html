@@ -29,25 +29,8 @@
 						</div>
 					{/if}
 				</div>
-				{if $tpl['balance']}
-				<div style="display:flex;flex-direction:column;align-items:flex-end;">
-    				<div class="vip-view" onclick="zovye_fn.usercenter()">
-    					<img class="vip-icon" src="{MODULE_URL}static/img/vip_icon.png" />
-    					<div class="vip-text">会员中心</div>
-    					<img class="right-arrow" src="{MODULE_URL}static/img/right_arrow.png" />
-    				</div>
-				</div>
-				{else}
-				<div class="vip-view">
-					<img class="vip-icon" src="{MODULE_URL}static/img/vip_icon.png" />
-					<div class="vip-text" style="padding-right:10px;">{$tpl['site']['title']}</div>
-				</div>				
-				{/if}
 			</div>
 			<button class="button05" id="btn">{if $tpl['balance']}点击{else}免费{/if}领取</button>
-			{if $tpl['balance'] && $tpl['account']['balanceDeductNum'] > 0}
-			<div class="postscript">领取需要：{$tpl['account']['balanceDeductNum']}{$tpl['balance']['unit']}{$tpl['balance']['title']}</div>
-			{/if}
 		</div>
 		{/if}
 		{if $tpl['slides']}
@@ -90,7 +73,6 @@
 				</div>
 				<div class="card-content"></div>
 				<div class="card-bottom">
-					<span onclick="zovye_fn.usercenter()">点击进入会员中心 >></span>
 				</div>
 			</div>
 			<div class="close-btn orange" onclick="maskClose()">关闭</div>

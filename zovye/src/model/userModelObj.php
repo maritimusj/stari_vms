@@ -15,7 +15,6 @@ use zovye\Util;
 use zovye\Agent;
 use zovye\Order;
 use zovye\State;
-use zovye\Balance;
 use zovye\WxMCHPay;
 use zovye\LoginData;
 use zovye\RowLocker;
@@ -517,16 +516,6 @@ class userModelObj extends modelObj
     }
 
     /**
-     * 获取用户余额.
-     *
-     * @return Balance
-     */
-    public function getBalance(): Balance
-    {
-        return new Balance($this);
-    }
-
-    /**
      * 用户今日免费领取数.
      *
      * @return int
@@ -539,31 +528,7 @@ class userModelObj extends modelObj
             'createtime >=' => strtotime('today'),
         ];
 
-        if (settings('user.balance.type') != 'free') {
-            $condition['balance'] = 0;
-        }
-
         $query = Order::query($condition);
-        $res = $query->get('sum(num)');
-
-        return intval($res);
-    }
-
-    /**
-     * 统计用户余额领取的数量.
-     *
-     * @return int
-     */
-    public function getBalanceTotal(): int
-    {
-        $query = Order::query(['openid' => $this->openid]);
-        $query->where(
-            [
-                'price' => 0,
-                'balance >' => 0,
-            ]
-        );
-
         $res = $query->get('sum(num)');
 
         return intval($res);

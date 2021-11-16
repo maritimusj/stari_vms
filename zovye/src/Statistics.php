@@ -79,19 +79,9 @@ class Statistics
                 'createtime <' => $end->getTimestamp(),
             ])->get('sum(num)');
 
-            $result['fee'] = intval($fee);
+            $result['fee'] = $fee;
 
-            $balance = //random_int(1, 1000);
-            (int)Order::query()->where([
-                'device_id' => $device->getId(),
-                'balance >' => 0,
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->get('sum(num)');
-
-            $result['balance'] = intval($balance);
-
-            $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+            $result['total'] = $result['fee'] + $result['free'];
 
             return $result;            
         }, $device->getId(), $begin->getTimestamp(), $end->getTimestamp());
@@ -137,17 +127,7 @@ class Statistics
 
             $result['fee'] = $fee;
 
-            $balance = //random_int(1, 1000);
-            (int)Order::query()->where([
-                'device_id' => $device->getId(),
-                'balance >' => 0,
-                'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
-            ])->get('sum(num)');
-
-            $result['balance'] = $balance;
-
-            $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+            $result['total'] = $result['fee'] + $result['free'];
 
             return $result;
         }, $device->getId(), $begin->format('Y-m'));

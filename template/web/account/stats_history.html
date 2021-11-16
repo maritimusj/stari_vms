@@ -5,16 +5,13 @@
     <th style="text-align:center;">月份</th>
     <th style="text-align:center;">免费</th>
     <th style="text-align:center;">支付</th>
-    <th style="text-align:center;">
-        {php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'}
-    </th>
     <th style="text-align:center;">小计</th>
     <th class="text-center">操作</th>
 </tr>                           
 </thead>
 {loop $m_all $i $item}
 {if is_numeric($i) }
-{php $total = $item['f'] + $item['p'] + $item['b']}
+{php $total = $item['f'] + $item['p']}
 {php $total_x = $total_x + $total;}
 <tr  data-id="{$id}" data-month="{$i}">
    <td class="operate">
@@ -22,7 +19,6 @@
     </td>
     <td>{$item['f']}</td>
     <td>{$item['p']}</td>
-    <td>{$item['b']}</td>
     <td>{$total}</td>
     <td class="operate">
         <i class="fa fa-wrench fa-fw" data-op="repairMonthStats"  title="修复{$i}的统计"></i>

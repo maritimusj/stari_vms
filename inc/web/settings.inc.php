@@ -7,7 +7,6 @@
 namespace zovye;
 
 use DateTime;
-use zovye\model\prizelistModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -95,25 +94,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['device']['event']['enabled'] = request::bool('eventLog') ? 1 : 0;
 
     } elseif ($save_type == 'user') {
-        $settings['user']['center'] = [
-            'enabled' => request::bool('usercenter') ? 1 : 0,
-        ];
 
-        if ($settings['user']['center']['enabled']) {
-            $settings['user']['balance'] = [
-                'title' => request::trim('balance_title') ?: DEFAULT_BALANCE_TITLE,
-                'unit' => request::trim('balance_unit') ?: DEFAULT_BALANCE_UNIT_NAME,
-                'price' => round(request('balance_price') * 100),
-                'free' => request::int('balance_free'),
-            ];
-        }
-
-        $settings['user']['prize']['enabled'] = $settings['user']['center']['enabled'] && request::bool('userprize') ? 1 : 0;
-        if ($settings['user']['prize']['enabled']) {
-            $settings['user']['prize']['maxtimes'] = max(1, request::int('maxTimes'));
-        }
-
-        $settings['user']['balance']['type'] = request::str('balance_type') == 'free' ? 'free' : 'pay';
         $settings['user']['verify']['enabled'] = request::bool('userVerify') ? 1 : 0;
         $settings['user']['verify']['maxtimes'] = max(1, request::int('maxtimes'));
 
@@ -897,72 +878,7 @@ if ($op == 'account') {
 
 } elseif ($op == 'user') {
 
-    $settings['user']['balance']['price'] = number_format($settings['user']['balance']['price'] / 100, 2);
-
-    $tpl_data['usercenter_url'] = Util::murl('usercenter');
-    $tpl_data['prizes'] = Prize::all();
-
-    $prizeEntries = [];
-    $query = m('prizelist')->where(We7::uniacid([]));
-
     $tpl_data['total'] = intval($query->get('sum(percent)'));
-    $max = 0;
-
-    /** @var prizelistModelObj $entry */
-    foreach ($query->findAll() as $entry) {
-        $data = [
-            'id' => $entry->getId(),
-            'enabled' => $entry->getEnabled(),
-            'extra' => unserialize($entry->getExtra()) ?: [],
-            'name' => $entry->getName(),
-            'title' => $entry->getTitle(),
-            'percent' => $entry->getPercent(),
-            'total' => $entry->getTotal(),
-            'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-        ];
-
-        if ($data['enabled']) {
-
-            $remain = $data['extra']['maxcount'] == 0 || $data['total'] < $data['extra']['maxcount'];
-            $begin = empty($data['extra']['begin']) || time() >= strtotime($data['extra']['begin']);
-            $end = empty($data['extra']['end']) || time() < strtotime($data['extra']['end']) + 24 * 60 * 60;
-
-            if ($remain && $begin && $end) {
-                $max += $data['percent'];
-            }
-        }
-
-        $prizeEntries[] = $data;
-    }
-
-    $tpl_data['prizeEntries'] = $prizeEntries;
-
-    $max = min(100, $max);
-    foreach ($prizeEntries as &$entry) {
-
-        if ($entry['enabled']) {
-            $remain = $entry['extra']['maxcount'] == 0 || ($entry['extra']['maxcount'] > 0 && $entry['total'] < $entry['extra']['maxcount']);
-            $begin = empty($entry['extra']['begin']) || time() >= strtotime($entry['extra']['begin']);
-            $end = empty($entry['extra']['end']) || time() < strtotime($entry['extra']['end']) + 24 * 60 * 60;
-
-            if ($remain && $begin && $end) {
-                $entry['pv'] = round($entry['percent'] / $max * 100, 2);
-            } else {
-                $entry['pv'] = 0;
-            }
-
-            if (!$remain) {
-                $entry['invalid'] = '数量已满';
-            }
-
-            if (!($begin && $end)) {
-                $entry['invalid'] = '不在有效期';
-            }
-        } else {
-            $entry['pv'] = 0;
-            $entry['invalid'] = '已禁用';
-        }
-    }
 
     $res = CtrlServ::v2_query('idcard/balance');
     $tpl_data['idcard_balance'] = 0;
@@ -1070,187 +986,6 @@ if ($op == 'account') {
         'title' => $res['title'],
         'content' => $content,
     ]);
-
-} elseif ($op == 'prizes') {
-
-    $content = app()->fetchTemplate(
-        'web/prize/list',
-        [
-            'entries' => Prize::all(),
-        ]
-    );
-
-    JSON::success([
-        'title' => '请选择',
-        'content' => $content,
-    ]);
-
-} elseif ($op == 'banPrize') {
-
-    $id = request::int('id');
-    if ($id) {
-        /** @var prizelistModelObj $prize */
-        $prize = m('prizelist')->findOne(We7::uniacid(['id' => $id]));
-        if ($prize) {
-            $state = $prize->getEnabled();
-            $prize->setEnabled($state ? 0 : 1);
-            if ($prize->save()) {
-                if ($prize->getEnabled()) {
-                    $msg = '已启用！';
-                    $tips = '';
-                    $extra = unserialize($prize->getExtra());
-                    if ($extra['maxcount'] > 0 && $prize->getTotal() >= $extra['maxcount']) {
-                        $tips = '(已失效，数量已满)';
-                    } elseif (!empty($extra['begin']) && time() >= strtotime($extra['begin'])) {
-                        $tips = '(已失效，不在有效期)';
-                    } elseif (!empty($extra['end']) && time() < strtotime($extra['end']) + 24 * 60 * 60) {
-                        $tips = '(已失效，不在有效期)';
-                    }
-                } else {
-                    $msg = '已禁用！';
-                    $tips = '(已失效，已禁用)';
-                }
-
-                JSON::success(['msg' => $msg, 'tips' => $tips, 'enabled' => $prize->getEnabled()]);
-            }
-        }
-    }
-
-    JSON::fail('失败!');
-
-} elseif ($op == 'savePrize') {
-
-    $typename = request::trim('type');
-    $params = [];
-    parse_str(request('params'), $params);
-
-    $percent = min(100, max(1, intval($params['percent'])));
-    $title = trim($params['title']);
-
-    $begin = 0;
-    $end = 0;
-
-    if ($params['validate']) {
-        $begin = strtotime($params['begin']);
-        $end = strtotime($params['end']) + (24 * 60 * 60 - 1);
-    } else {
-        $params['begin'] = 0;
-        $params['end'] = 0;
-    }
-
-    $params['maxcount'] = intval($params['maxcount']);
-
-    if (empty($title)) {
-        JSON::fail('请指定奖品名称！');
-    }
-
-    $entries = Prize::all();
-
-    if (isset($entries[$typename])) {
-        $res = $entries[$typename]->isValid($params);
-        if (is_error($res)) {
-            JSON::fail($res);
-        }
-
-        $id = intval($params['id']);
-        if ($id) {
-            /** @var prizelistModelObj $p */
-            $p = m('prizelist')->findOne(We7::uniacid(['id' => $id]));
-            if ($p) {
-                $p->setTitle($title);
-                $p->setMaxCount($params['maxcount']);
-                $p->setBeginTime($begin);
-                $p->setEndTime($end);
-                $p->setPercent($percent);
-                $p->setExtra(serialize($params));
-                if (!$p->save()) {
-                    JSON::fail('保存失败！');
-                }
-            } else {
-                JSON::fail('找不到这个奖品！');
-            }
-        } else {
-            $p = m('prizelist')->create(
-                We7::uniacid(
-                    [
-                        'name' => $typename,
-                        'title' => $title,
-                        'enabled' => 1,
-                        'max_count' => $params['maxcount'],
-                        'begin_time' => $begin,
-                        'end_time' => $end,
-                        'percent' => $percent,
-                        'extra' => serialize($params),
-                    ]
-                )
-            );
-
-            if (empty($p)) {
-                JSON::fail('创建奖品失败！');
-            }
-        }
-
-        updateSettings('user.prize.enabled', 1);
-
-        Util::resultJSON($p ? true : false, ['msg' => $p ? "{$p->getTitle()}保存成功！" : '保存失败！']);
-    }
-
-    JSON::fail("无法创建{$title}");
-
-} elseif ($op == 'removePrize') {
-
-    $id = request::int('id');
-    $prize = m('prizelist')->findOne(We7::uniacid(['id' => $id]));
-    if ($prize) {
-        $prize->destroy();
-
-        updateSettings('user.prize.enabled', 1);
-
-        JSON::success();
-    }
-
-    JSON::fail();
-
-} elseif ($op == 'addPrize') {
-
-    $type = request::trim('type');
-    $id = request::int('id');
-
-    $prize_data = [];
-    if ($id) {
-        /** @var prizelistModelObj $prize */
-        $prize = m('prizelist')->findOne(We7::uniacid(['id' => $id]));
-        if ($prize) {
-            $prize_data = unserialize($prize->getExtra()) ?: [];
-            $prize_data['id'] = $prize->getId();
-            $prize_data['maxcount'] = $prize->getMaxCount();
-            $prize_data['begin'] = $prize->getBeginTime();
-            $prize_data['end'] = $prize->getEndTime();
-        }
-    }
-
-    $types = [
-        'voucher' => ['title' => $settings['user']['balance']['title'] ?: '点券'],
-        'coupon' => ['title' => '代金券'],
-        'other' => ['title' => '其它奖励'],
-    ];
-
-    if (array_key_exists($type, $types)) {
-        $content = app()->fetchTemplate(
-            "web/prize/prize-{$type}",
-            [
-                'id' => $id,
-                'prizeData' => $prize_data,
-            ]
-        );
-
-        JSON::success([
-            'title' => $types[$type]['title'],
-            'content' => $content,
-        ]);
-    }
-
-    JSON::fail('找不到这个类型的奖品！');
 
 } elseif ($op == 'enableSQB') {
 

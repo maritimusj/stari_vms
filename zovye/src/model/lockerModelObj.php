@@ -12,7 +12,7 @@ use zovye\We7;
 use function zovye\tb;
 
 /**
- * Class prizeModelObj
+ * Class lockerModelObj
  * @package zovye
  * @method getCreatetime()
  * @method getRemaining()

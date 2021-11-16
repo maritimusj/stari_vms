@@ -980,7 +980,7 @@ include './index.php';
                         function ($entry, $stats) use ($order_limits, $account, &$result) {
                             unset($entry);
                             if ($order_limits > 0) {
-                                $total = $stats['total']['p'] + $stats['total']['b'] + $stats['total']['f'];
+                                $total = $stats['total']['p'] + $stats['total']['f'];
                                 if ($total >= $order_limits) {
                                     $account->setState(Account::BANNED);
                                     Account::updateAccountData();
@@ -2252,15 +2252,6 @@ HTML_CONTENT;
                     'avatar' => $entry->getAvatar(),
                     '_obj' => $entry,
                 ];
-
-                if (App::isUserCenterEnabled()) {
-                    $data['user']['balance'] = $entry->getBalance()->total();
-                    $data['balance'] = [
-                        'title' => settings('user.balance.title', DEFAULT_BALANCE_TITLE),
-                        'unit' => settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME),
-                        'price' => settings('user.balance.price', 0),
-                    ];
-                }
             } elseif ($entry instanceof deviceModelObj) {
                 $data['device'] = [
                     'id' => $entry->getId(),
@@ -2292,9 +2283,6 @@ HTML_CONTENT;
                     'clr' => $entry->getClr(),
                     '_obj' => $entry,
                 ];
-                if (App::isUserCenterEnabled()) {
-                    $data['account']['balanceDeductNum'] = $entry->getBalanceDeductNum();
-                }
             } elseif (is_array($entry)) {
                 foreach ($entry as $key => $val) {
                     setArray($data, $key, $val);

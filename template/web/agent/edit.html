@@ -495,13 +495,6 @@
                         <label class="checkbox-inline">
                             <input type="checkbox" name="freeOrderGSP" value="1" {if $agent_data['gsp']['order']['f']}checked{/if}> 免费订单
                         </label>
-                        {if \zovye\App::isUserCenterEnabled()}
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="balanceOrderGSP" value="1" {if $agent_data['gsp']['order']['b']}checked{/if}> 余额订单
-                        </label>
-                        {else}
-                        <input type="hidden" name="balanceOrderGSP" value="{$agent_data['gsp']['order']['b']}">
-                        {/if}
                         <label class="checkbox-inline">
                             <input type="checkbox" name="payOrderGSP" value="1" {if $agent_data['gsp']['order']['p']}checked{/if}> 支付订单
                         </label>
@@ -575,13 +568,9 @@
                                 </td>
                                 <td>
                                     {loop $item['order_type'] $index $o}
-                                    {if \zovye\App::isUserCenterEnabled()} 
-                                    <span class="order_type {if $o}{$index}{/if}" title="{if $index == 'f'}免费订单{elseif $index == 'b'}余额订单{elseif $index == 'p'}支付订单{/if}">{if $index == 'f'}免费{/if}{if $index == 'b'}余额{/if}{if $index == 'p'}支付{/if}</span>
-                                    {else}
                                     {if $index != 'b'}
                                     <span class="order_type {if $o}{$index}{/if}" title="{if $index == 'f'}免费订单{elseif $index == 'p'}支付订单{/if}">{if $index == 'f'}免费{/if}{if $index == 'p'}支付{/if}</span>
                                     {/if}
-                                    {/if}                                    
                                     {/loop}
                                 </td>
                                 <td>
@@ -660,11 +649,6 @@
                                             <span class="name">免费</span><span class="{$item['f']['val_type']}">{$item['f']['val']}</span>
                                         </div>                                        
                                         {/if}
-                                        {if \zovye\App::isUserCenterEnabled() && $item['b']}
-                                        <div class="mixed_order_type b{if $item['b']['val'] == 0} none{/if}">
-                                            <span class="name">余额</span><span class="{$item['b']['val_type']}">{$item['b']['val']}</span>
-                                        </div>                                        
-                                        {/if}
                                         {if $item['p']}
                                         <div class="mixed_order_type p{if $item['p']['val'] == 0} none{/if}">
                                             <span class="name">支付</span><span class="{$item['p']['val_type']}">{$item['p']['val']}</span>
@@ -724,13 +708,6 @@
                         <label class="checkbox-inline">
                             <input type="checkbox" name="freeOrder" value="1" {if $agent_data['bonus']['order']['f']}checked{/if}> 免费订单
                         </label>
-                        {if \zovye\App::isUserCenterEnabled()}
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="balanceOrder" value="1" {if $agent_data['bonus']['order']['b']}checked{/if}> 余额订单
-                        </label>
-                        {else}
-                        <input type="hidden" name="balanceOrder" value="{$agent_data['bonus']['order']['b']}">
-                        {/if}
                         <label class="checkbox-inline">
                             <input type="checkbox" name="payOrder" value="1" {if $agent_data['bonus']['order']['p']}checked{/if}> 支付订单
                         </label>
@@ -895,19 +872,6 @@
             $('#addRoleForm input#freeOrder1').prop('checked', false);
             $('#addRoleForm input#freeOrder0').prop('checked', false);
             $("#addRoleForm input[name=freeOrderVal]").val('0');
-        }
-        if (val['b']) {
-            if (val['b']['val_type'] == 'percent') {
-                $('#addRoleForm input#balanceOrder1').prop('checked', true);
-            } else {
-                $('#addRoleForm input#balanceOrder0').prop('checked', true);
-            }
-            $("#addRoleForm input[name=balanceOrderVal]").val(val['b']['val']);
-
-        } else {
-            $('#addRoleForm input#balanceOrder1').prop('checked', false);
-            $('#addRoleForm input#balanceOrder0').prop('checked', false);
-            $("#addRoleForm input[name=balanceOrderVal]").val('0');
         }
         if (val['p']) {
             if (val['p']['val_type'] == 'percent') {

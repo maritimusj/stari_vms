@@ -177,15 +177,6 @@
                         <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
                     </div>
                 </div>
-                {if \zovye\App::isUserCenterEnabled()}
-                <div class="form-group">
-                    <label for="balanceDeductNum" class="col-md-2 control-label">领取成功扣除余额</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="balanceDeductNum" id="balanceDeductNum" value="{php echo $account?$account->getBalanceDeductNum():''}" min="0">
-                        <span class="help-block">* 用户需要花费相应的余额才能领取成功</span>
-                    </div>
-                </div>
-                {/if}
             </div>
             <!-- 其它设置 结束 -->
             <!-- 佣金设置 开始 -->

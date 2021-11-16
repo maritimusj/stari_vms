@@ -48,27 +48,6 @@
                     </div>
                 </div>
             </div>
-            {if \zovye\App::isUserCenterEnabled()} 
-            <div class="form-group">
-                <label class="col-md-2 control-label">余额订单<br/>佣金
-                </label>
-                <div class="col-md-10">
-                    <div class="control-label checkbox-inline text-left">
-                        <label for="balanceOrder1" class="radio-inline">
-                            <input name="balanceOrderType" id="balanceOrder1" type="radio" value="1" data-type="%">
-                            百分比&nbsp;
-                        </label>
-                        <label for="balanceOrder0" class="radio-inline">
-                            <input name="balanceOrderType" id="balanceOrder0" type="radio" value="0" data-type="元">
-                            固定金额 &nbsp;
-                        </label>
-                        <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="balanceOrderVal" min="0" step="0.01">
-                        <label class="type-text text-inline"></label>
-                        <span class="help-block">* 用户使用余额购买商品时，所产生订单的佣金比例或者金额</span>
-                    </div>
-                </div>
-            </div>
-            {/if}
             <div class="form-group">
                 <label class="col-md-2 control-label">支付订单<br/>佣金
                 </label>
@@ -123,19 +102,6 @@
             $('#addRoleForm input#freeOrder0').prop('checked', false);
             $("#addRoleForm input[name=freeOrderVal]").val('0');
         }
-        if (val['b']) {
-            if (val['b']['val_type'] == 'percent') {
-                $('#addRoleForm input#balanceOrder1').prop('checked', true);
-            } else {
-                $('#addRoleForm input#balanceOrder0').prop('checked', true);
-            }
-            $("#addRoleForm input[name=balanceOrderVal]").val(val['b']['val']);
-
-        } else {
-            $('#addRoleForm input#balanceOrder1').prop('checked', false);
-            $('#addRoleForm input#balanceOrder0').prop('checked', false);
-            $("#addRoleForm input[name=balanceOrderVal]").val('0');
-        }
         if (val['p']) {
             if (val['p']['val_type'] == 'percent') {
                 $('#addRoleForm input#payOrder1').prop('checked', true);
@@ -150,7 +116,6 @@
             $("#addRoleForm input[name=payOrderVal]").val('0');
         }
         changeType($("input[name=freeOrderType]"));
-        changeType($("input[name=balanceOrderType]"));
         changeType($("input[name=payOrderType]"));
     }
     function enableRoleForm(enabled) {

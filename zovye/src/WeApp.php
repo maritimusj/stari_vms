@@ -665,7 +665,6 @@ JSCODE;
 
         $get_x_url = Util::murl('getx', ['ticket' => $params['user']['ticket']]);
         $get_goods_list_url = Util::murl('goodslist', ['free' => true, 'ticket' => $params['user']['ticket']]);
-        $user_center_url = Util::murl('usercenter');
 
         $jquery_url = JS_JQUERY_URL;
 
@@ -678,9 +677,6 @@ $js_sdk
         wx.hideAllNonBaseMenuItem();
     })
     const zovye_fn = {};
-    zovye_fn.usercenter = function() {
-        window.location.replace("$user_center_url");
-    }
     zovye_fn.getx = function(fn) {
         $.getJSON("$get_x_url").then(function(res){
             if (res && res.status && res.data.msg) {
@@ -709,158 +705,6 @@ JSCODE;
         $this->showTemplate(Theme::file('get'), ['tpl' => $tpl]);
     }
 
-    /**
-     * 用户中心页面.
-     *
-     * @param array $params
-     */
-    public function userCenterPage($params = [])
-    {
-        $tpl = is_array($params) ? $params : [];
-
-        $js_sdk = Util::fetchJSSDK();
-
-        $get_prize_url = Util::murl('prize');
-        $my_prizes_url = Util::murl('myprizes');
-        $charge_url = Util::murl('charge');
-
-        $jquery_url = JS_JQUERY_URL;
-
-        $tpl['js']['code'] = <<<JSCODE
-<script src="$jquery_url"></script>
-$js_sdk
-<script>
-    wx.ready(function(){
-        wx.hideAllNonBaseMenuItem();
-    })
-    const zovye_fn = {};
-    zovye_fn.scan = function(){
-        wx && wx.scanQRCode();
-    }
-    zovye_fn.getPrize = function(fn){
-        $.getJSON("$get_prize_url").then(function(res){
-            if(res && res.data){
-                typeof fn == 'function' ? fn(res) : alert(res.data.msg);
-            }
-        })
-    }
-    zovye_fn.charge = function() {
-        window.location.href = "$charge_url";
-    }
-    zovye_fn.myPrizes = function() {
-        window.location.href = "$my_prizes_url";
-    }
-</script>
-JSCODE;
-        $this->showTemplate(Theme::file('usercenter'), ['tpl' => $tpl]);
-    }
-
-    /**
-     * 我的奖品页面.
-     *
-     * @param array $params
-     */
-    public function myPrizesPage(array $params = [])
-    {
-        $tpl = is_array($params) ? $params : [];
-
-        $js_sdk = Util::fetchJSSDK();
-
-        $jquery_url = JS_JQUERY_URL;
-
-        $tpl['js']['code'] = <<<JSCODE
-<script src="$jquery_url"></script>
-$js_sdk
-<script>
-    wx.ready(function(){
-        wx.hideAllNonBaseMenuItem();
-    })
-
-    const zovye_fn = {};
-
-</script>
-JSCODE;
-
-        $this->showTemplate(Theme::file('myprizes'), ['tpl' => $tpl]);
-    }
-
-    /**
-     * 用户充值页面.
-     *
-     * @param array $params
-     */
-    public function chargePage($params = [])
-    {
-        $tpl = is_array($params) ? $params : [];
-
-        $js_sdk = Util::fetchJSSDK();
-
-        $get_order_url = Util::murl('order');
-        $user_center_url = Util::murl('usercenter');
-
-        $we7_util_url = JS_WE7UTIL_URL;
-        $jquery_url = JS_JQUERY_URL;
-        $mui_url = JS_MUI_URL;
-
-        $tpl['js']['code'] = <<<JSCODE
-<script src="$we7_util_url"></script>
-<script src="$jquery_url"></script>
-<script src="$mui_url"></script>
-$js_sdk
-<script>
-    wx.ready(function(){
-        wx.hideAllNonBaseMenuItem();
-    })
-
-    const zovye_fn = {};
-    zovye_fn.charge = function(amount, coupon, success_cb, fail_cb) {
-        $.getJSON("$get_order_url", {op: 'create', balance: amount, coupon: coupon}).then(function(res){
-            if(res && res.status) {
-                const data = res.data;
-                if(data) {
-    				util.pay({
-    					orderFee: data.fee,
-    					payMethod: "wechat",
-    					orderTitle: data.title,
-    					orderTid: data.orderNO,
-    					module:  "{$tpl['module']}",
-    					success: function(result) {
-    					    if(typeof success_cb == 'function') {
-    					        success_cb(result);
-    					    }else{
-        					    alert('支付成功！');
-        						window.location.replace("$user_center_url");
-    					    }
-
-    					},
-                        fail: function(result) {
-                            $.get("$get_order_url", {op: 'cancel', tid: data.tid}, function(){
-                            });
-                            if(typeof fail_cb == 'function') {
-                                fail_cb();
-                            }else{
-                                mui.toast('支付失败 : ' + (result.message || '未知'));
-                            }
-                        },
-    					complete: function(result) {
-    						//window.location.reload();
-    					}
-    				})
-                }
-            }
-            if(res && res.data.msg) {
-                if(typeof fail_cb == 'function') {
-                    fail_cb();
-                }else{
-                    alert(res.data.msg);
-                }
-            }
-        })
-    }
-</script>
-JSCODE;
-        $this->showTemplate(Theme::file('charge'), ['tpl' => $tpl]);
-    }
 
     /**
      * 代理商登记手机页面.

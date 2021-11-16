@@ -26,7 +26,6 @@ class EventBus
                 'device' =>
                     [
                         'AccountEventHandler', //公众号检查
-                        'BalanceEventHandler', //余额处理
                         'CommissionEventHandler', //处理佣金
                         'AgentBonusEventHandler', //佣金奖励
                         'LocationEventHandler', //定位检查

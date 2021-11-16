@@ -4,10 +4,7 @@
     <tr class="active">
         <th class="text-center">月份</th>
         <th class="text-center">免费</th>
-        <th class="text-center">收费</th>
-        <th class="text-center">
-            {php echo \zovye\App::isUserCenterEnabled()?'余额':'其它'}
-        </th>
+        <th class="text-center">支付</th>
         <th class="text-center">小计</th>
         <th class="text-center">操作</th>
     </tr>
@@ -17,7 +14,6 @@
         <td>{$i}</td>
         <td>{$item['free']}</td>
         <td>{$item['fee']}</td>
-        <td>{$item['balance']}</td>
         <td>{$item['total']}</td>
         <td class="operate">
             <i class="fa fa-wrench fa-fw" data-op="repairMonthStats"  title="修复{$i}的出货统计"></i>

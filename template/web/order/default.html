@@ -36,14 +36,6 @@
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'sqm'));}">省钱码</a></li>
     {/if}
     {/if}
-
-    {if \zovye\App::isUserCenterEnabled()}
-        {if $s_way=='balance'}
-        <li role="presentation" class="active"><a href="#">余额</a></li>
-        {else}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">余额</a></li>
-        {/if}
-    {/if}
     {if $s_way=='refund'}
     <li role="presentation" class="active"><a href="#">退款订单</a></li>
     {else}

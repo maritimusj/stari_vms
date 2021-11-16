@@ -35,13 +35,6 @@
                     <label class="checkbox-inline">
                         <input type="checkbox" name="freeOrder" value="1" {if $order_type['f']}checked{/if}> 免费订单
                     </label>
-                    {if \zovye\App::isUserCenterEnabled()}
-                    <label class="checkbox-inline">
-                        <input type="checkbox" name="balanceOrder" value="1" {if $order_type['b']}checked{/if}> 余额订单
-                    </label>
-                    {else}
-                    <input type="hidden" name="balanceOrder" value="{$order_type['b']}">
-                    {/if}
                     <label class="checkbox-inline">
                         <input type="checkbox" name="payOrder" value="1" {if $order_type['p']}checked{/if}> 支付订单
                     </label>

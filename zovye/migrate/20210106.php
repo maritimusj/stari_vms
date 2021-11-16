@@ -21,13 +21,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name . '_account', 'balance_deduct_num')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_account` CHANGE `balanceDeductNum` `balance_deduct_num` INT(11) NOT NULL DEFAULT '0';
-SQL;
-    Migrate::execSQL($sql);
-}
-
 if (!We7::pdo_fieldexists($tb_name . '_advertising', 'agent_id')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_advertising` CHANGE `agentId` `agent_id` INT(11) NULL DEFAULT '0';
@@ -48,13 +41,6 @@ if (!We7::pdo_fieldexists($tb_name . '_agent_msg', 'agent_id')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_agent_msg` CHANGE `agentId` `agent_id` INT(11) NULL DEFAULT NULL;
 ALTER TABLE `ims_zovye_vms_agent_msg` CHANGE `msgId` `msg_id` INT(11) NULL DEFAULT NULL;
-SQL;
-    Migrate::execSQL($sql);
-}
-
-if (!We7::pdo_fieldexists($tb_name . '_balance', 'x_val')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_balance` CHANGE `xval` `x_val` INT(11) NOT NULL DEFAULT '0';
 SQL;
     Migrate::execSQL($sql);
 }
@@ -214,14 +200,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name . '_prizelist', 'max_count')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_prizelist` CHANGE `maxcount` `max_count` INT(11) NULL DEFAULT '0';
-ALTER TABLE `ims_zovye_vms_prizelist` CHANGE `begintime` `begin_time` INT(11) NULL DEFAULT '0';
-ALTER TABLE `ims_zovye_vms_prizelist` CHANGE `endtime` `end_time` INT(11) NULL DEFAULT '0';
-SQL;
-    Migrate::execSQL($sql);
-}
 
 if (!We7::pdo_fieldexists($tb_name . '_replenish', 'device_uid')) {
     $sql = <<<SQL
@@ -256,11 +234,8 @@ FROM `ims_zovye_vms_device` d;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_users_vw` AS
 SELECT *,
-(SELECT SUM(x_val) FROM `ims_zovye_vms_balance` b WHERE b.openid=u.openid AND b.uniacid=u.uniacid) AS balance,
-(SELECT COUNT(*) FROM `ims_zovye_vms_prize` p WHERE p.openid=u.openid AND p.uniacid=u.uniacid) AS prize_total,
-(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.price=0 AND o.balance=0) AS free_total,
+(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.price=0) AS free_total,
 (SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.price>0) AS fee_total,
-(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.balance>0) AS balance_total
 FROM `ims_zovye_vms_user` u;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_agent_vw` AS

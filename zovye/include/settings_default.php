@@ -29,19 +29,6 @@ return [
     ],
     //会员设置
     'user' => [
-        'center' => [
-            'enabled' => 0,
-        ],
-        'balance' => [
-            'title' => DEFAULT_BALANCE_TITLE,
-            'unit' => DEFAULT_BALANCE_UNIT_NAME,
-            'price' => 0,
-            'free' => 0,
-        ],
-        'prize' => [
-            'enabled' => 0,
-            'maxtimes' => 0,
-        ],
         'location' => [
             'validate' => [
                 'enabled' => 0,

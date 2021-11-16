@@ -32,7 +32,12 @@ if ($op == 'default') {
     if (request::isset('type')) {
         $type = request::int('type');
         if ($type == -1) {
-            $query->where(['type' => Account::getAllEnabledThirdPartyPlatform()]);
+            $all = Account::getAllEnabledThirdPartyPlatform();
+            if ($all) {
+                $query->where(['type' => $all]);
+            } else {
+                $query->where(['type' => -1]);
+            }
         } else {
             if (empty($type)) {
                 $query->where(['type' => [

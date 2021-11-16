@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\model;
@@ -1618,7 +1618,7 @@ class deviceModelObj extends modelObj
 
         $accounts = $this->getAssignedAccounts();
         foreach ($accounts as $index => $account) {
-            if (in_array($account['state'], $state_filter)) {
+            if (in_array($account['type'], $state_filter)) {
                 $result[$index] = $account;
             }
         }
@@ -1672,7 +1672,6 @@ class deviceModelObj extends modelObj
         if ($this->isVDevice() || $this->isBlueToothDevice()) {
             return [
                 'mcb' => true,
-                'app' => true,
             ];
         }
         $res = CtrlServ::v2_query("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
@@ -2207,15 +2206,19 @@ class deviceModelObj extends modelObj
         $no_str = Util::random(16, true);
         $order_no = 'P' . We7::uniacid() . "NO$no_str";
 
-        $content = http_build_query(
-            [
-                'deviceGUID' => $this->imei,
-                'src' => json_encode($extra),
-                'channel' => $channel,
-                'timeout' => $timeout,
-                'num' => $num,
-            ]
-        );
+        $params =  [
+            'deviceGUID' => $this->imei,
+            'src' => json_encode($extra),
+            'channel' => $channel,
+            'timeout' => $timeout,
+            'num' => $num,
+        ];
+
+        if ($extra['index']) {
+            $params['index'] = $extra['index'];
+        }
+
+        $content = http_build_query($params);
 
         return CtrlServ::query("order/$order_no", ["nostr" => microtime(true)], $content);
     }

@@ -21,7 +21,7 @@
         <div class="panel-body">
             {if !isset($goods) || $goods['id'] > 0}
             <div class="form-group">
-                <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                <label for="find_agent_select" class="col-md-2 control-label">所属代理商</label>
                 <div class="col-md-5">
                     <select name="agentId" id="find_agent_select" style="width:100%;">
                         {if $goods && $goods['agent']}
@@ -66,10 +66,17 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="goodsUnitTitle" class="col-md-2 control-label">商品长度</label>
+                <label for="goodsSize" class="col-md-2 control-label">商品长度</label>
                 <div class="col-md-10">
-                    <input type="number" class="form-control" id="goodsLaneID" name="goodsLaneID" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['size'] : ''}" min="1" required>
-                    <span class="help-block">* 单位:毫米，请输入单个商品长度，用于设备切割商品！</span>
+                    <input type="number" class="form-control" id="goodsSize" name="goodsSize" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['size'] : ''}" min="1" required>
+                    <span class="help-block">* 单位: 根据具体设备而定，请输入单个商品长度，用于设备切割商品！</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="goodsMcbIndex" class="col-md-2 control-label">出货口</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" id="goodsMcbIndex" name="goodsMcbIndex" value="{php echo !empty($goods)&&isset($goods['lottery'])?$goods['lottery']['index'] : ''}" min="0">
+                    <span class="help-block">* 设备拥有多个出票窗口时，请指定编号</span>
                 </div>
             </div>
             <div class="form-group">

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -24,7 +28,7 @@ class request
         static $data = null;
         if (!isset($data)) {
             $res = json_decode(self::raw(), true);
-            $data = $res ? $res : [];
+            $data = $res ?: [];
         }
         return getArray($data, $key, $default);
     }
@@ -109,18 +113,18 @@ class request
         return boolval(request($name, $default));
     }
 
-    public static function str(string $name, string $default = '', $urldecode = false): string
+    public static function str(string $name, string $default = '', $url_decode = false): string
     {
         $str = strval(request($name, $default));
-        if ($urldecode) {
+        if ($url_decode) {
             $str = urldecode($str);
         }
         return $str;
     }
 
-    public static function trim(string $name, string $default = '', $urldecode = false): string
+    public static function trim(string $name, string $default = '', $url_decode = false): string
     {
-        return trim(request::str($name, $default, $urldecode)) ?: $default;
+        return trim(request::str($name, $default, $url_decode)) ?: $default;
     }
 
     public static function array(string $name, array $default = []): array

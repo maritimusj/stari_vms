@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\job\createOrderAccount;
@@ -10,11 +10,13 @@ use Exception;
 use zovye\Account;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Job;
 use zovye\model\deviceModelObj;
 use zovye\request;
 use zovye\Order;
 use zovye\User;
 use zovye\model\userModelObj;
+use zovye\State;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\is_error;
@@ -124,6 +126,13 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             $params['result'] = $result;
 
             if (is_error($result)) {
+                if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
+                    unset($params['result']);
+                    if (!Job::createAccountOrder($params)) {
+                        throw new Exception('启动排队任务失败！');
+                    }
+                    return true;
+                }
                 throw new Exception($result['message']);
             }
         } catch (Exception $e) {

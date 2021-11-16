@@ -1,8 +1,11 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -31,7 +34,7 @@ class ZhiJinBaoAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::ZJBAO, Account::ZJBAO_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::ZJBAO, Account::ZJBAO_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -39,7 +42,7 @@ class ZhiJinBaoAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::ZJBAO]);
+        $acc = Account::findOneFromType(Account::ZJBAO);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['key']) || empty($config['secret'])) {
@@ -109,7 +112,7 @@ class ZhiJinBaoAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::ZJBAO]);
+        $acc = Account::findOneFromType(Account::ZJBAO);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }
@@ -153,7 +156,7 @@ class ZhiJinBaoAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($data['appId']));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
             Util::logToFile('zjbao', [

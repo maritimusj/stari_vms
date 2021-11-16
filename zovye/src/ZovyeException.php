@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;

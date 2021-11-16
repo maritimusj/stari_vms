@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -20,7 +20,7 @@ class WeApp extends Settings
 
     public function __construct()
     {
-        parent::__construct($this, 'weapp', 'config', true);
+        parent::__construct('weapp', 'config', true);
     }
 
     public function createWebUrl($do, $params = []): string
@@ -355,6 +355,12 @@ JSCODE;
             } else {
                 $tpl['accounts'] = Account::getAvailableList($device, $user, [
                     'exclude' => $params['exclude'],
+                    //type 不包含 Account::WXAPP，兼容以前不支持该类型的皮肤，新皮肤使用js api接口获取
+                    'type' => [
+                        Account::NORMAL,
+                        Account::VIDEO,
+                        Account::AUTH,
+                    ],
                 ]);
             }
         }
@@ -463,6 +469,10 @@ JSCODE;
         $tpl['js']['code'] = $pay_js;
         $tpl['js']['code'] .= <<<JSCODE
 <script>
+    const adv_api_url = "$adv_api_url";
+    const account_api_url = "$account_url";
+    const device_api_url = "$device_api_url";
+
     if (typeof zovye_fn === 'undefined') {
         zovye_fn = {};
     }
@@ -478,7 +488,7 @@ JSCODE;
         } else {
             params['type'] = typeid;
         }
-        $.get("$adv_api_url", params).then(function(res){
+        $.get(adv_api_url, params).then(function(res){
             if (res && res.status) {
                 if (typeof cb === 'function') {
                     cb(res.data);
@@ -489,7 +499,7 @@ JSCODE;
         })           
     }
     zovye_fn.play = function(uid, seconds, cb) {
-        $.get("$account_url", {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
+        $.get(account_api_url, {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
             if (cb) cb(res);
         })    
     }
@@ -500,10 +510,30 @@ JSCODE;
         window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
     }
     zovye_fn.getDetail = function (cb) {
-        $.get("$device_api_url", {op: 'detail'}).then(function (res) {
+        $.get(device_api_url, {op: 'detail'}).then(function (res) {
             if (typeof cb === 'function') {
                 cb(res);
             }
+        })
+    }
+    zovye_fn.getAccounts = function(types, cb) {
+        $.get(account_api_url, {op:'get_list', device:'$device_imei', types: types}).then(function(res){
+            if (cb) cb(res);
+        })
+    }
+    zovye_fn.redirectToAccountGetPage = function(uid) {
+        $.get(account_api_url, {op:'get_url', uid, device:'$device_imei'}).then(function(res){
+           if (res) {
+               if (res.status && res.data.redirect) {
+                   window.location.href = res.data.redirect;
+               } else {
+                   if (res.data && res.data.message) {
+                       alert(res.data.message);
+                   }
+               }
+           } else {
+               alert('请求转跳网址失败！');
+           }
         })
     }
 JSCODE;
@@ -539,6 +569,15 @@ JSCODE;
             cb(res);
         }
     });
+}
+JSCODE;
+        }
+
+        if (empty($user->settings('fansData.sex'))) {
+            $profile_url = Util::murl('util', ['op' => 'profile']);
+            $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.saveUserProfile = function(data) {
+    $.post("$profile_url", data);
 }
 JSCODE;
         }
@@ -1163,5 +1202,29 @@ HTML;
 
         echo($html);
         exit();
+    }
+
+    public function douyinPage(deviceModelObj $device, userModelObj $user)
+    {
+        $api_url = Util::murl('douyin');
+        $jquery_url = JS_JQUERY_URL;
+
+        $tpl_data = Util::getTplData([$device, $user]);
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+    zovye_fn.getAccounts = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'account', 'device': '{$device->getShadowId()}', 'user': '{$user->getOpenid()}'});
+    }
+    zovye_fn.redirect = function(uid) {
+        return $.getJSON(zovye_fn.api_url, {op: 'detail', 'uid': uid, 'device': '{$device->getShadowId()}', 'user': '{$user->getOpenid()}'});
+    }
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('douyin'), ['tpl' => $tpl_data]);
     }
 }

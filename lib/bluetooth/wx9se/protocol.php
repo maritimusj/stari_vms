@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace bluetooth\wx9se;
 
@@ -31,8 +35,8 @@ class protocol implements IBlueToothProtocol
             self::KEY_LIGHTS_SCHEDULE => '=> 获取灯光计划',
         ],
         self::CMD_CONFIG => [
-            self::KEY_LOCKER => '=>　开锁',
-            self::KEY_TIMER => '=>　时间',
+            self::KEY_LOCKER => '=> 开锁',
+            self::KEY_TIMER => '=> 时间',
             self::KEY_LIGHTS => '=> 灯光',
         ],
         self::CMD_NOTIFY => [
@@ -122,7 +126,6 @@ class protocol implements IBlueToothProtocol
         
         return null;
     }
-
 
     function getCrc16Data($mac, array $code, $lowOrHigh): array
     {

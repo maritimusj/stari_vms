@@ -155,6 +155,12 @@
     #devicelist .first-tag {
         position: relative;
     }
+    #tagslist {
+        display: flex;
+        z-index: 99;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
     #devicelist .tagslist {
         position: absolute;
         display: none;
@@ -711,7 +717,7 @@
         </div>
     </div>
     <div class="text-center text-muted" v-if="device.list.length == 0">
-        没有任何设备！
+        <i class="fa fa-question-circle"></i> 暂时没有任何设备！
     </div>
     </div>
     </div>

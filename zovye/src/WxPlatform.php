@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -600,7 +602,7 @@ class WxPlatform
             }
 
             $account_name = $msg['ToUserName'];
-            $acc = Account::findOne(['name' => $account_name]);
+            $acc = Account::findOneFromName($account_name);
             if (empty($acc)) {
                 throw new RuntimeException('找不到指定的公众号：' . $account_name);
             }
@@ -688,7 +690,7 @@ class WxPlatform
             $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
             $order_uid = Order::makeUID($user, $device, $uid);
 
-            Job::createSpecialAccountOrder([
+            Job::createThirdPartyPlatformOrder([
                 'device' => $device->getId(),
                 'user' => $user->getId(),
                 'account' => $acc->getId(),

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -121,9 +125,15 @@ if ($op == 'default' || $op == 'goods') {
             Util::itoast('找不到这个商品！', '', 'error');
         }
 
-        if (isset($params['goodsLaneID'])) {
-            if ($params['goodsLaneID'] != $goods->getExtraData('lottery.size')) {
-                $goods->setExtraData('lottery.size', intval($params['goodsLaneID']));
+        if (isset($params['goodsSize'])) {
+            if ($params['goodsSize'] != $goods->getExtraData('lottery.size')) {
+                $goods->setExtraData('lottery.size', intval($params['goodsSize']));
+            }
+        }
+
+        if (isset($params['goodsMcbIndex'])) {
+            if ($params['goodsMcbIndex'] != $goods->getExtraData('lottery.index')) {
+                $goods->setExtraData('lottery.index', intval($params['goodsMcbIndex']));
             }
         }
 
@@ -194,9 +204,10 @@ if ($op == 'default' || $op == 'goods') {
                 'balance' => $params['allowFree'] ? intval($params['goodsBalance']) : 0,
             ],
         ];
-        if (isset($params['goodsLaneID'])) {
+        if (isset($params['goodsSize'])) {
             $data['extra']['lottery'] = [
-                'size' => intval($params['goodsLaneID']),
+                'size' => intval($params['goodsSize']),
+                'index' => intval($params['goodsMcbIndex']),
             ];
         }
 

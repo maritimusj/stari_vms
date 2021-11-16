@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -104,6 +104,11 @@ if ($op == 'default') {
         $types[] = User::ALI;
     }
 
+    $s_type_douyin = request::bool('s_type_douyin');
+    if ($s_type_douyin) {
+        $types[] = User::DouYin;
+    }
+
     $s_type_api = request::bool('s_type_api');
     if ($s_type_api) {
         $types[] = User::API;
@@ -137,6 +142,7 @@ if ($op == 'default') {
             'id' => $user->getId(),
             'openid' => $user->getOpenid(),
             'nickname' => $user->getNickname(),
+            'sex' => $user->settings('fansData.sex'),
             'avatar' => $user->getAvatar(),
             'createtime' => date('Y-m-d H:i:s', $user->getCreatetime()),
             'mobile' => $user->getMobile(),
@@ -202,10 +208,11 @@ if ($op == 'default') {
     $tpl_data['s_type_wx'] = $s_type_wx;
     $tpl_data['s_type_wxapp'] = $s_type_wxapp;
     $tpl_data['s_type_ali'] = $s_type_ali;
+    $tpl_data['s_type_douyin'] = $s_type_douyin;    
     $tpl_data['s_type_api'] = $s_type_api;
     $tpl_data['s_type_third'] = $s_type_third;
     $tpl_data['s_principal'] = $s_principal;
-    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_api || $s_type_third;
+    $tpl_data['backer'] = $s_keywords || $s_type_wx || $s_type_wxapp || $s_type_ali || $s_type_douyin || $s_type_api || $s_type_third;
 
     $tpl_data['users'] = $users;
 
@@ -469,7 +476,7 @@ if ($op == 'default') {
     }
 
     $content = app()->fetchTemplate(
-        'web/common/balance-log',
+        'web/common/balance_log',
         [
             'log' => $log,
             'pager' => $pager,
@@ -690,7 +697,7 @@ if ($op == 'default') {
     }
 
     $content = app()->fetchTemplate(
-        'web/common/balance-edit',
+        'web/common/balance_edit',
         [
             'user' => [
                 'id' => $user->getId(),
@@ -779,7 +786,7 @@ if ($op == 'default') {
         }
 
         $content = app()->fetchTemplate(
-            'web/prize/prize-log',
+            'web/prize/prize_log',
             [
                 'prizes' => $prizes,
                 'pager' => $pager,

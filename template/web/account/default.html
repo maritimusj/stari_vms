@@ -56,6 +56,14 @@
         color: #4CAF50;
         margin-left: 6px;
     }
+    #accountlist .state.auth img {
+        width: 16px;
+        height: 16px;
+    }
+    #accountlist .state.auth.disabled img {
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }    
     #accountlist .state.video {
         color: #cf1010;
         margin-left: 6px;
@@ -72,6 +80,18 @@
     }
     #accountlist .orderno:hover {
         color: #666;
+    }
+    #accountlist .operate .state.auth {
+        margin-left: 0px;
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }
+    #accountlist .operate .state.auth:hover {
+        filter: grayscale(0);
+        opacity: 1;
+    }
+    #accountlist .qrcode-x {
+        width: 22px;
     }
     .operate:hover .auth-weixin:hover {
         color: #4CAF50;
@@ -104,32 +124,59 @@
 <ul class="nav nav-tabs" id="navbar">
     {if empty($agent)}
         {if $banned}
-            <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">正常</a></li>
-            <li role="presentation" class="active"><a href="#">已隐藏的公众号</a></li>
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">全部</a></li>
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
+            {if \zovye\App::isDouyinEnabled()}
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::DOUYIN]);}">抖音</a></li>
+            {/if}
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::WXAPP]);}">小程序</a></li>
+
+            <li role="presentation" class="active"><a href="#">已隐藏的吸粉号</a></li>
         {else}
-            <li role="presentation" class="active"><a href="#">正常</a></li>
-            <li role="presentation"><a href="{php echo $this->createWebUrl('account', array('banned'=>1));}">已隐藏的公众号</a></li>
+            <li role="presentation"{if !isset($type)} class="active"{/if}><a href="{php echo $this->createWebUrl('account');}">全部</a></li>
+            <li role="presentation"{if $type == -1} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
+            <li role="presentation"{if $type === \zovye\Account::NORMAL} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
+            <li role="presentation"{if $type == \zovye\Account::VIDEO} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
+            {if \zovye\App::isDouyinEnabled()}
+            <li role="presentation"{if $type == \zovye\Account::DOUYIN} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::DOUYIN]);}">抖音</a></li>
+            {/if}
+            <li role="presentation"{if $type == \zovye\Account::WXAPP} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::WXAPP]);}">小程序</a></li>
+            <li role="presentation"{if $banned} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['banned' => 1]);}">已隐藏的吸粉号</a></li>
         {/if}
     {else}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">正常</a></li>
-        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['banned'=>1]);}">已隐藏的公众号</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">全部</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['banned'=>1]);}">已隐藏的吸粉号</a></li>
         {if $banned}
         <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['agentId'=>$agent->getId()]);}">{php echo $agent->getName()}</a></li>
-        <li role="presentation" class="active"><a href="#"><b>{php echo $agent->getName()}</b>已隐藏的公众号</a></li>
+        <li role="presentation" class="active"><a href="#"><b>{php echo $agent->getName()}</b>已隐藏的吸粉号</a></li>
         {else}
         <li role="presentation" class="active"><a href="#">{php echo $agent->getName()}</a></li>
-        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['agentId'=>$agent->getId(), 'banned'=>1]);}"><b>{php echo $agent->getName()}</b>已隐藏的公众号</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['agentId'=>$agent->getId(), 'banned'=>1]);}"><b>{php echo $agent->getName()}</b>已隐藏的吸粉号</a></li>
         {/if}
     {/if}
 </ul>
 <div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
             {if \zovye\App::isWxPlatformEnabled()}
             <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
             {/if}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
+            {if \zovye\App::isDouyinEnabled()}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
+                <span class="state auth" title="抖音">
+                    <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}" title="添加抖音号">
+                </span>
+            </a>
+            {/if}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::WXAPP));}">
+                <span class="state auth" title="小程序">
+                    <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}" title="添加小程序">
+                </span>
+            </a>
         </span>       
     </div>
     <div class="panel-body">
@@ -142,9 +189,6 @@
                         <div>公众号</div>
                     </th>
                     <th>
-                        标题
-                    </th>
-                    <th>
                         <div>所属代理</div>                        
                     </th>
                     <th>领取周期</th>
@@ -154,80 +198,6 @@
                 </tr>
             </thead>
             <tbody>
-            {if !$banned}
-            {loop $one_res $index $res}
-                <tr data-id="{$res['id']}">
-                <td>
-                    <span class="orderno spec"  title="排序值">{if $res['orderno']}{$res['orderno']}{else}#{/if}</span>
-                </td>
-                <td>
-                    <div class="profile">
-                        <img src="{$res['img']}">     
-                        <span>{$res['name']}</span>                   
-                    </div>                    
-                </td>
-                <td>
-                    <span>{$res['title']}</span>
-                </td>
-                <td class="desc">
-                </td>
-                <td class="desc">
-                </td>
-                <td>
-                </td>
-                <td>
-                </td>
-                <td class="operate">
-                    <div class="btn-group">
-                        <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$res['id']))}" title="分配设备">
-                            <i class="fa fa-wrench{if empty($res['assigned'])} active{/if}"></i>
-                        </a>
-                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                            <span class="fa fa-caret-down"></span>
-                        </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$res['id']));}">
-                                <i class="fa fa-edit fa-fw"></i> 编辑
-                            </a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li>
-                            <a href="#" data-url="{$res['url']}" onclick="return false;">
-                                <i class="fa fa-arrow-circle-right fa-fw"></i> 通知回调链接
-                            </a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        {if \zovye\App::isAccountLogEnabled()}
-                        <li>
-                            <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $res['id']])}">
-                                <i class="fa fa-history fa-fw"></i> 查看请求日志
-                            </a>
-                        </li>
-                        {/if}
-                        <li>
-                            <a href="#"  data-op="viewFansCount">
-                                <i class="fa fa-users fa-fw"></i> 统计净增粉量
-                            </a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li>
-                            <a href="#"  data-op="viewStats">
-                                <i class="fa fa-area-chart fa-fw"></i> 查看本月统计
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-op="viewHistoryStats">
-                                <i class="fa fa-line-chart fa-fw"></i> 查看历史数据
-                            </a>
-                        </li>
-                    </ul>
-                    </div>
-                </td>
-
-                </tr>
-                {/loop}
-                {/if}
                 {loop $accounts $index $a}
                 <tr {if $a['banned']}class="banned"{/if} data-id="{$a['id']}">
                     <td>
@@ -235,24 +205,27 @@
                     </td>
                     <td>
                         <div class="profile">
-                            <img src="{media $a['img']}">
+                            <img src="{media $a['img']}" title="{$a['uid']}">
                             <span>{if $a['commission'] && $a['commission']['money'] > 0}
                                 <span class="commission" title="佣金：{php echo number_format($a['commission']['money']/100, 2)}元">*</span>
-                            {/if}{$a['name']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
-                            {if $a['state'] == \zovye\Account::AUTH}
+                            {/if}{$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
+                            {if $a['type'] == \zovye\Account::AUTH}
                             {if $a['service'] == 2}
                             <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
                             {else}
                             <span class="state auth" title="授权接入的订阅号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle-o"></i></span>
                             {/if}
-                            {elseif $a['state'] == \zovye\Account::VIDEO}
+                            {elseif $a['type'] == \zovye\Account::VIDEO}
                             <span class="state video" title="视频"><i class="fa fa-youtube-play"></i></span>
+                            {elseif $a['type'] == \zovye\Account::DOUYIN}
+                            <span class="state auth{if empty($a['openid'])} disabled{/if}" title="抖音号">
+                                <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
+                            </span>
+                            {elseif $a['type'] == \zovye\Account::WXAPP}
+                            <span class="state auth{if empty($a['username'])} disabled{/if}" title="小程序">
+                                <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
+                            </span>
                             {/if}
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            {$a['title']}
                         </div>
                     </td>
                     <td class="desc">
@@ -274,10 +247,28 @@
                     </td>
                     <td class="desc">
                         <span class="schema schema_{$a['scname']}" style="border-bottom:4px solid #fff;box-shadow: 0px 2px 0px 0px {$a['clr']};" title="{if $a['count']}每人每{php echo zovye\Schema::desc($a['scname'])}可领取{$a['count']}包{/if}{if $a['sccount']}，每{php echo zovye\Schema::desc($a['scname'])}最多送出{$a['sccount']}包{/if}">
+                            {if $a['type'] == \zovye\Account::DOUYIN}
+                            单
+                            {else}
                             {php echo zovye\Schema::desc($a['scname'])}
+                            {/if}
                         </span>
                     </td>
-                    {if $a['src'] == 0}
+                    {if $a['type'] == \zovye\Account::DOUYIN}
+                    <td>
+                    </td>
+                    <td>
+                        <div class="operate">
+                            <i class="fa fa-magic" title="抖音用户授权" data-op="douyinAuth"></i>
+                        </div>
+                    </td>
+                    {elseif $a['is_third_party_platform']}
+                    <td>
+                    </td>
+                    <td>
+                        <img src="{MODULE_URL}static/img/qrcode.svg" class="qrcode-x"  title="动态二维码">
+                    </td>
+                    {else}
                     <td class="detail" style="position:relative;">
                         <div class="limit" style="background-color:{$a['clr']}" >
                             {if $a['groupname']}<div class="group" title="分组名称：{$a['groupname']}" style="color:{$a['clr']}">{$a['groupname']}</div>{/if}
@@ -298,18 +289,6 @@
                             <div class="zovye_qrcode"  data-src="{media $a['qrcode']}"></div>
                         </div>
                     </td>
-                    {else}
-                    <td>
-                        <div>
-                            <div style="padding: 1.5em;">
-                                <span>由广告联盟平台决定</span>
-                            </div>
-                        </div>
-
-                    </td>
-                    <td>
-                        <i class="fa fa-qrcode" title="动态二维码"></i>
-                    </td>
                     {/if}
 
                     <td class="operate">
@@ -325,7 +304,7 @@
                             <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
-                            {if \zovye\App::useAccountQRCode() && $a['state'] == \zovye\Account::AUTH && $a['service'] == 2}
+                            {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
                             <li>
                                 <a href="#" data-op="useAccountQRCode" onclick="return false;">
                                     <i class="fa fa-desktop fa-fw"></i>
@@ -347,11 +326,19 @@
                             {/if}
                             {/loop}
                             {/if}
+                            {if $a['is_third_party_platform']}
+                            <li>
+                                <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $a['id']])}">
+                                    <i class="fa fa-history fa-fw"></i> 查看请求日志
+                                </a>
+                            </li>
+                            {/if}
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewFansCount"><i class="fa fa-users fa-fw"></i> 统计净增粉量</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewStats"><i class="fa fa-area-chart fa-fw"></i> 查看本月统计</a></li>
                             <li><a href="#" data-op="viewHistoryStats"><i class="fa fa-line-chart fa-fw"></i> 查看历史数据</a></li>
+                            {if !$a['is_third_party_platform']}
                             <li role="separator" class="divider"></li>
                             <li>
                                 {if $banned}
@@ -360,7 +347,6 @@
                                     <i class="fa fa-wrench fa-fw"></i> 分配设备
                                     </a>
                                 </li>
-                                <li role="separator" class="divider"></li>
                                 {else}
                                 <a href="{php echo $this->createWebUrl('account', array('op'=>'ban','id'=>$a['id']))}">
                                 {if $a['banned']}<i class="fa fa-eye fa-fw"></i> 启用{else}<i class="fa fa-eye-slash fa-fw"></i> 隐藏{/if}
@@ -372,6 +358,7 @@
                                     <i class="fa fa-trash fa-fw"></i> 删除?
                                 </a>
                             </li>
+                            {/if}
                           </ul>
                         </div>
                     </td>
@@ -389,7 +376,7 @@
         </script>
         {else}
         <div class="text-center text-muted">
-            <i class="fa fa-question-circle"></i> 暂时还没有任何公众号！
+            <i class="fa fa-question-circle"></i> 暂时还没有任何数据！
         </div>
         {/if}
     </div>
@@ -509,6 +496,13 @@
                 }
             })
         }
+
+        api.douyinAuth = function(id, self) {
+            api.showResult({
+                id: id,
+                op: 'douyinAuthorize',
+            })
+        }
         
         $("#accountlist").on('mouseover', '.ercode.loading', function(){
             const co = $(this).removeClass('loading').find('.zovye_qrcode');
@@ -516,7 +510,7 @@
             if(src) {
                 co.html('<img src="'+ src + '">');
             }else{
-                $(this).attr("title", "没有指定二维码！");
+                $(this).attr("title", "");
                 co.remove();
             }
         })

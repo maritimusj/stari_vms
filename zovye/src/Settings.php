@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -11,19 +11,16 @@ use function unserialize;
 
 class Settings implements ISettings
 {
-    private $app;
     private $use_cache;
     private $tb_name;
     private $title;
 
-    public function __construct(weApp $app, $classname = null, $title = null, $use_cache = false)
+    public function __construct($classname = null, $title = null, $use_cache = false)
     {
         $this->use_cache = (bool)$use_cache;
         if ($this->use_cache) {
             We7::load()->func('cache');
         }
-
-        $this->app = $app;
 
         $app_name = APP_NAME;
 
@@ -32,7 +29,7 @@ class Settings implements ISettings
         }
 
         $this->title = $title ?: 'settings';
-        $this->tb_name = strtolower("{$app_name}_{$classname}_{$this->title}");
+        $this->tb_name = strtolower("{$app_name}_{$classname}_$this->title");
 
         if (DEBUG) {
             self::createTable($this->getTableName());
@@ -47,7 +44,7 @@ class Settings implements ISettings
             $we7tb_name = We7::tablename($tb_name);
 
             $sql = <<<CODE
-CREATE TABLE IF NOT EXISTS {$we7tb_name} (
+CREATE TABLE IF NOT EXISTS $we7tb_name (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `uniacid` int(11) DEFAULT NULL,
     `name` varchar(128) NOT NULL,
@@ -55,7 +52,7 @@ CREATE TABLE IF NOT EXISTS {$we7tb_name} (
     `createtime` int(11) DEFAULT NULL,
     `locked_uid` VARCHAR( 64 ) NULL DEFAULT  'n/a',
     PRIMARY KEY (`id`),
-    KEY `name` (`name`(16),`uniacid`),
+    KEY `name` (`name`(32),`uniacid`),
     KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CODE;
@@ -72,40 +69,12 @@ CODE;
 
     public function cleanCache()
     {
-        We7::cache_clean($this->cacheKey('')); //?
+        We7::cache_clean($this->cacheKey(''));
     }
 
     protected function cacheKey($name): string
     {
-        return APP_NAME . ":settings:" . We7::uniacid() . ":{$this->title}:{$name}";
-    }
-
-    /**
-     * 是否使用缓存
-     * @return bool
-     */
-    public function useCache(): bool
-    {
-        return $this->use_cache;
-    }
-
-    /**
-     * 同步数据库数据到cache
-     * @param string|array $key
-     */
-    public function sync($key)
-    {
-        if ($key && $this->use_cache) {
-            $keys = is_array($key) ? $key : [$key];
-            foreach ($keys as $name) {
-                $res = We7::pdo_get($this->getTableName(), ['uniacid' => We7::uniacid(), 'name' => $name]);
-
-                if ($res) {
-                    $data = unserialize($res['data']);
-                    We7::cache_write($this->cacheKey($name), $data);
-                }
-            }
-        }
+        return APP_NAME . ":settings:" . We7::uniacid() . ":$this->title:$name";
     }
 
     /**

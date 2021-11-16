@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\model;
@@ -94,7 +94,7 @@ class orderModelObj extends modelObj
     public function getAccount($obj = false)
     {
         if ($obj) {
-            return Account::findOne(['name' => $this->account]);
+            return Account::findOneFromName($this->account);
         }
         return $this->account;
     }
@@ -104,12 +104,26 @@ class orderModelObj extends modelObj
      */
     public function getDevice(): ?deviceModelObj
     {
-        return Device::get($this->device_id);
+        if ($this->device_id) {
+            return Device::get($this->device_id);
+        }
+        $device_id = $this->getExtraData('custom.device', 0);
+        if ($device_id) {
+            return Device::get($device_id);
+        }
+        return null;
     }
 
     public function getAgent(): ?agentModelObj
     {
-        return Agent::get($this->agent_id);
+        if ($this->agent_id) {
+            return Agent::get($this->agent_id);
+        }
+        $agent_id = $this->getExtraData('custom.agent', 0);
+        if ($agent_id) {
+            return Agent::get($agent_id);
+        }
+        return null;
     }
 
     public function getUser(): ?userModelObj
@@ -229,5 +243,10 @@ class orderModelObj extends modelObj
         }
 
         return empty($info) ? [] : json_decode($info, true);
+    }
+
+    public function isZeroBonus()
+    {
+        return $this->getExtraData('custom.zero_bonus', false);
     }
 }

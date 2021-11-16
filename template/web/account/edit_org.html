@@ -18,7 +18,7 @@
         <div class="panel-body">
             <div class="seg">
                 <div class="title">基本信息</div>
-                {if $account && !$account->isSpecial()}
+                {if $account && !$account->isThirdPartyPlatform()}
                 <div class="form-group">
                     <label for="select_agent" class="col-md-2 control-label">代理商</label>
                     <div class="col-md-5">
@@ -53,17 +53,23 @@
                         <input type="title" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
                     </div>
                 </div>  
-                {if empty($account)  || !$account->isSpecial()}
+                {if empty($account)  || !$account->isThirdPartyPlatform()}
                 <div class="form-group">
                     <label class="col-md-2 control-label">
                         {if $type == \zovye\Account::VIDEO}
                         头像
+                        {elseif $type == \zovye\Account::DOUYIN}
+                        账号头像
                         {else}
                         公众号头像
                         {/if}
                     </label>
                     <div class="col-md-10">
+                        {if $type == \zovye\Account::DOUYIN}
                         {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
+                        {else}
+                        {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
+                        {/if}
                     </div>
                 </div>
                 {/if}
@@ -91,11 +97,12 @@
                         <span class="help-block">* 用户必须等待其他用户观看完成后，才能点击观看视频</span>
                     </div>
                 </div>
+                {elseif  $type == \zovye\Account::DOUYIN}
                 {else}
                     {if $account && $account->isAuth()}
                     <input name="qrcode" type="hidden" value="{php echo $account->getQrcode()}">
                     {/if}
-                    {if empty($account) || (!$account->isSpecial() && !$account->isAuth())}
+                    {if empty($account) || (!$account->isThirdPartyPlatform() && !$account->isAuth())}
                     <div class="form-group">
                         <label class="col-md-2 control-label">二维码</label>
                         <div class="col-md-10">
@@ -111,6 +118,49 @@
                     </div>
                     {/if}
                 {/if}
+                {if $type == \zovye\Account::DOUYIN}
+                <div class="form-group">
+                    <label for="openid" class="col-md-2 control-label">授权用户openid</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="openid" id="openid" value="{php echo $account?$account->getConfig('openid'):''}">
+                        <span class="help-block">* 需要吸粉的抖音授权账号openid，可以从用户列表找到该用户，点击抖音图标复制</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="url" class="col-md-2 control-label">抖音链接</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="url" id="url" value="{php echo $account?$account->getConfig('url'):''}">
+                        <span class="help-block">* 支持抖音主页分享链接、视频地址或用户数字ID三种转跳链接</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="descr" class="col-md-2 control-label">引导关注文字</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">
+                    </div>
+                </div>
+                {elseif $type == \zovye\Account::WXAPP}
+                <div class="form-group">
+                    <label for="openid" class="col-md-2 control-label">小程序原始ID</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="openid" id="openid" value="{php echo $account?$account->getConfig('openid'):''}">
+                        <span class="help-block">* </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="openid" class="col-md-2 control-label">小程序转跳页面</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="openid" id="openid" value="{php echo $account?$account->getConfig('openid'):''}">
+                        <span class="help-block">* </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="descr" class="col-md-2 control-label">引导关注文字</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">
+                    </div>
+                </div>
+                {else}
                 <div class="form-group">
                     <label for="descr" class="col-md-2 control-label">引导关注文字</label>
                     <div class="col-md-10">
@@ -123,8 +173,20 @@
                         {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
                     </div>
                 </div>
+                {/if}
             </div>
-            {if $account && !$account->isSpecial() && !$account->useAccountQRCode()}
+            {if $account && $account->isDouyin()}
+            <div class="seg">
+                <div class="title">高级设置</div>
+                <div class="form-group">
+                    <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多领取总数</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="orderlimits" id="orderlimits" value="{php echo $account?$account->getOrderLimits():'0'}">
+                        <span class="help-block">* 所有用户在这个公众号领取的商品总数量，0表示不限制数量，<b>超过后，系统会自动禁用该公众号！</b></span>
+                    </div>
+                </div>
+            </div>
+            {elseif $account && !$account->isThirdPartyPlatform() && !$account->useAccountQRCode()}
             <div class="seg">
                 <div class="title">高级设置</div>
                 <div class="form-group">
@@ -199,7 +261,7 @@
                 </div>
                 <div class="seg">
                     <div class="title">其它设置</div>
-                    {if empty($account) || !$account->isSpecial()}
+                    {if empty($account) || !$account->isThirdPartyPlatform()}
                     <div class="form-group">
                         <label for="groupname" class="col-md-2 control-label">分组名称</label>
                         <div class="col-md-10">
@@ -394,7 +456,7 @@
                     <div class="form-group">
                         <label class="col-md-2 control-label">美葩平台 回调网址</label>
                         <div class="col-md-10">
-                            <span class="form-control operate" style="overflow:hidden;"><i class="fa fa-paste" title="复制网址" data-url="{php echo \zovye\Util::murl('meipai')}"></i> {php echo \zovye\Util::murl('meipai')}</span>
+                            <span class="form-control operate" style="overflow:hidden;"><i class="fa fa-paste" title="复制网址" data-url="{php echo \zovye\Util::murl('meipa')}"></i> {php echo \zovye\Util::murl('meipa')}</span>
                         </div>
                     </div>
                     {/if}
@@ -441,6 +503,37 @@
                         <label for="app_key" class="col-md-2 control-label">史莱姆 app_key</label>
                         <div class="col-md-10">
                             <input type="text" class="form-control inputMask" name="app_key" id="app_key" value="{$config['key']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    {/if}
+                    {if \zovye\App::isYFBEnabled() && $account && $account->isYFB()}
+                    <div class="seg-divider"></div>
+                    <div class="form-group">
+                        <label for="app_id" class="col-md-2 control-label">粉丝宝 app id</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="app_id" id="app_id" value="{$config['id']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="app_secret" class="col-md-2 control-label">粉丝宝 app secret</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control inputMask" name="app_secret" id="app_secret" value="{$config['secret']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="key" class="col-md-2 control-label">粉丝宝 设备Key</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="key" id="key" value="{$config['key']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="scene" class="col-md-2 control-label">粉丝宝 设备场景</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="scene" id="scene" value="{$config['scene']}">
                             <span class="help-block"></span>
                         </div>
                     </div>

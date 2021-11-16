@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 use zovye\base\modelObjFinder;
 use zovye\model\inventory_goodsModelObj;

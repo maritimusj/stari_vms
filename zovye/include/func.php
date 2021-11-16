@@ -1,8 +1,7 @@
 <?php
-
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -227,7 +226,7 @@ function setArray(array &$array, $key, $val = null): array
 /**
  * 获取数组指定路径的值
  * @param mixed $array
- * @param string $key
+ * @param string|array $key
  * @param mixed $default
  * @return mixed
  */
@@ -369,6 +368,7 @@ function hashFN(callable $fn, ...$val): string
             $ref->getFileName(),
             $ref->getStartLine(),
             $ref->getEndLine(),
+            $ref->getName(),
         ];
         foreach ($val as $v) {
             $data[] = strval($v);

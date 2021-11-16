@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -255,6 +255,7 @@ if ($op == 'default') {
             } elseif ($type == Advertising::WX_APP_URL_CODE) {
 
                 $data['code'] = $entry->getExtraData('code');
+
             }
 
             $advs[] = $data;
@@ -458,6 +459,7 @@ if ($op == 'default') {
         } elseif ($type == Advertising::WX_APP_URL_CODE) {
 
             $tpl_data['code'] = $adv->getExtraData('code');
+
         }
     }
 

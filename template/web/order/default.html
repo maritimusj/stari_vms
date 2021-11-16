@@ -1,6 +1,11 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20201231');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20201234');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20201235');}
+<style>
+    .fa-question-circle.disabled {
+        color: coral;
+    }
+</style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -374,14 +379,20 @@
                     </a>
                     {else}
                     <div class="agent" style="background-color:#9E9E9E;">
+                        {if $order['is_zero_bonus']}
+                        {else}
                         <img src="{php echo MODULE_URL.'static/img/warning_icon.jpg'}" alt="">
                         <span>&lt;未绑定&gt;</span>
+                        {/if}
                     </div>
                     {/if}
                 </td>
                 <td  class="devicename agentId{$order['agentId']}">
                     {if $order['device']['name']}
                     <div>
+                        {if $order['is_zero_bonus']}
+                        <i class="fa fa-question-circle disabled"></i>
+                        {/if}
                         {if $device && $device->getId() == $order['device']['id']}
                         {$order['device']['name']}
                         {else}
@@ -392,7 +403,11 @@
                         </div>
                     </div>
                     {else}
-                    &lt;未知设备&gt;
+                        {if $order['is_zero_bonus']}
+                        <i class="fa fa-question-circle disabled"></i>
+                        {else}
+                        &lt;未知设备&gt;
+                        {/if}
                     {/if}
                 </td>
                 <td>

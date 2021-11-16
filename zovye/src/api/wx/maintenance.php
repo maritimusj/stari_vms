@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye\api\wx;
-
 
 use DateTime;
 use zovye\Device;
@@ -23,7 +25,7 @@ class maintenance
     public static function createMaintainRecord($user, $user_id = 0): array
     {
         $device_id = request::int('device_id');
-        $user_id = $user_id ? $user_id : $user->getId();
+        $user_id = $user_id ?: $user->getId();
         $cate = request::str('cate');
 
         $agent_id = $user->getAgentId();
@@ -162,7 +164,7 @@ class maintenance
             $_reg = '/.+:(.+):.+/';
             foreach ($s_res as $val) {
                 $s_data = unserialize($val->getData());
-                $s_agent = isset($s_data['agent']) ? $s_data['agent'] : '';
+                $s_agent = $s_data['agent'] ?? '';
                 if ($s_agent == $agent->getId()) {
                     $str = $val->getName();
                     preg_match($_reg, $str, $mat);

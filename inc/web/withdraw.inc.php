@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -65,7 +65,7 @@ if ($op == 'export') {
 
 } elseif ($op == 'default') {
 
-    $tpl_data['mch_pay_enabled'] = empty(settings('pay.wx.pem')) ? false : true;
+    $tpl_data['mch_pay_enabled'] = !empty(settings('pay.wx.pem'));
 
     $page = max(1, request::int('page'));
     $page_size = request::int('pagesize', DEFAULT_PAGESIZE);

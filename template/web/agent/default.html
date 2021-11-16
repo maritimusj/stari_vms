@@ -152,10 +152,12 @@
                     </td>
                     <td class="operate"  style="width: 6em;">
                         <div class="btn-group">
-                            <a class="btn btn-default" href="{php echo $this->createWebUrl('agent', array('op'=>'edit','id'=>$agent['id']));}" title="设置"><i class="fa fa-gear"> </i></a>
+                            <a class="btn btn-default" href="{php echo $this->createWebUrl('agent', ['op' => 'commission_stats_view', 'id' => $agent['id']]);}" title="统计数据"><i class="fa fa-area-chart"> </i></a>
                             <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                             <span class="fa fa-caret-down"></span></a>
                             <ul class="dropdown-menu">
+                                <li><a href="#" data-op="config"> <i class="fa fa-gear"></i> 设置</a></li>
+                                <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
                                 <li role="separator" class="divider"></li>                                
                                 <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-cube fa-fw"></i> 他的设备</a></li>
@@ -177,10 +179,7 @@
                                     <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_sub','id'=>$agent['id']));}">
                                         <i class="fa fa-users"></i> 他的下级代理商
                                     </a>
-                                </li>                                
-                                <li role="separator" class="divider"></li>
-                                <li><a href="#" data-op="viewStatsChart"> <i class="fa fa-line-chart fa-fw"></i> 本月统计图</a></li>
-                                <li><a href="#" data-op="viewStats"> <i class="fa fa-list-alt fa-fw"></i> 全部统计数据</a></li>
+                                </li>
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 佣金明细</a></li>
@@ -246,7 +245,7 @@
     </div>
 </div>
 
-{template 'web/common/search-user'}
+{template 'web/common/search_user'}
 
 <script>
     function getUrlParam(name) {
@@ -346,6 +345,9 @@
             loading && util.loaded();
         })
     }
+    api.config = function(id) {
+        window.location.href = "{php echo $this->createWebUrl('agent', array('op'=>'edit','id'=>'__id__'));}".replace('__id__', id);
+    }
     api.balanceEdit = function (id, event) {
         api.showResult({ id, op: "balance_edit" }, api.user_url);
     }
@@ -399,7 +401,7 @@
         api.showResult({ op: 'commission_log', id });
     }
     api.viewKeepers = function (id) {
-        api.showResult({ op: 'keepers', id });
+        window.location.href = "{php echo $this->createWebUrl('agent', ['op' => 'keepers', 'id' => '__id__']);}".replace('__id__', id);
     }
     api.repair = function(data, e) {
         const self = $(e.target);

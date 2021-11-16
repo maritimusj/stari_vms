@@ -1,9 +1,9 @@
 <?php
 /**
- *
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
+
 
 namespace zovye;
 
@@ -808,17 +808,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_wx_app` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`,`uniacid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_aaf_balance` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uniacid` int(11) NOT NULL DEFAULT '0',
-  `uid` varchar(128) NOT NULL,
-  `x_val` int(11) NOT NULL,
-  `extra` text,
-  `createtime` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `uid` (`uid`,`uniacid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ;
 
 CREATE OR REPLACE VIEW `ims_zy_saas_device_view` AS
 SELECT *,

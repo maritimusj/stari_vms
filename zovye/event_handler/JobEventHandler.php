@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -10,7 +10,6 @@ use zovye\model\orderModelObj;
 
 class JobEventHandler
 {
-
     /**
      * 事件：device.openSuccess 处理程序
      * @param orderModelObj|null $order

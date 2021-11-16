@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -19,7 +19,7 @@ if (empty($account_name)) {
     JSON::fail('没有指定公众号！');
 }
 
-$account = Account::findOne(['name' => $account_name]);
+$account = Account::findOneFromName($account_name);
 if (empty($account)) {
     JSON::fail('找不到指定的公众号！');
 }
@@ -82,7 +82,7 @@ if (empty($goods) || $goods['num'] < 1) {
 
 $order_uid = Order::makeUID($user, $device);
 
-Job::createSpecialAccountOrder([
+Job::createThirdPartyPlatformOrder([
     'device' => $device->getId(),
     'user' => $user->getId(),
     'account' => $account->getId(),

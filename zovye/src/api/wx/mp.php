@@ -1,28 +1,31 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye\api\wx;
 
-
 use Exception;
-use zovye\Account;
-use zovye\model\agentModelObj;
-use zovye\model\accountModelObj;
 use zovye\App;
-use zovye\Device;
-use zovye\Media;
-use zovye\model\device_groupsModelObj;
-use zovye\request;
-use zovye\Schema;
-use zovye\State;
-use zovye\Util;
 use zovye\We7;
+use zovye\Util;
+use zovye\Media;
+use zovye\State;
+use zovye\Device;
+use zovye\DouYin;
+use zovye\Schema;
+use zovye\Account;
+use zovye\request;
 use zovye\WxPlatform;
 use function zovye\err;
 use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
+use zovye\model\agentModelObj;
 use function zovye\toCamelCase;
+use zovye\model\accountModelObj;
+use zovye\model\device_groupsModelObj;
 
 class mp
 {
@@ -39,7 +42,7 @@ class mp
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
@@ -56,24 +59,34 @@ class mp
     {
         $data = [
             'uid' => $account->getUid(),
-            'state' => $account->isAuth() || $account->isSpecial() ? intval($account->getState()) : $account->getState() != Account::BANNED,
+            'type' => $account->getType(),
+            'banned' => $account->isBanned(),
             'name' => $account->getName(),
             'title' => $account->getTitle(),
             'descr' => $account->getDescription(),
             'groupname' => $account->getGroupName(),
             'clr' => $account->getClr(),
             'scname' => $account->getScname(),
-            'count' => intval($account->getCount()),
-            'total' => intval($account->getTotal()),
+            'count' => $account->getCount(),
+            'total' => $account->getTotal(),
             'img' => Util::toMedia($account->getImg()),
             'url' => $account->getUrl(),
-            'orderno' => intval($account->getOrderNo()),
-            'orderlimits' => intval($account->getOrderLimits()),
+            'orderno' => $account->getOrderNo(),
+            'orderlimits' => $account->getOrderLimits(),
         ];
-
-        if ($account->isVideo()) {
+        if ($account->isAuth()) {
+            $data['config'] = $account->get('config', []);
+        } elseif ($account->isVideo()) {
             $data['media'] = Util::toMedia($account->getMedia());
-            $data['duration'] = intval($account->getDuration());
+            $data['duration'] = $account->getDuration();
+        } elseif ($account->isDouyin()) {
+            $config = $account->get('config', []);
+            $data['url'] = $config['url'];
+            $data['openid'] = $config['openid'];
+        } elseif ($account->isWxApp()) {
+            $data['username'] = $account->getConfig('username', '');
+            $data['path'] = $account->getConfig('path', '');
+            $data['delay'] = $account->getConfig('delay', 1);
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }
@@ -142,7 +155,7 @@ class mp
         $devices = request::is_array('devices') ? request::array('devices') : [];
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
@@ -181,7 +194,7 @@ class mp
             return error(State::ERROR, '没有权限上传文件，请联系管理员！');
         }
 
-        $media = isset($_FILES['pic']) ? $_FILES['pic'] : $_FILES['video'];
+        $media = $_FILES['pic'] ?? $_FILES['video'];
         $type = isset($_FILES['pic']) ? Media::IMAGE : Media::VIDEO;
 
         if ($media) {
@@ -249,11 +262,7 @@ class mp
         if ($total > 0) {
             $query->page($page, $page_size)->orderBy('order_no desc');
             foreach ($query->findAll() as $account) {
-                $data = mp::formatAccountInfo($account, true);
-                if ($account->isAuth()) {
-                    $data['config'] = $account->get('config', []);
-                }
-                $result['list'][] = $data;
+                $result['list'][] = mp::formatAccountInfo($account, true);
             }
         }
 
@@ -279,18 +288,14 @@ class mp
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             if ($account) {
                 if ($account->getAgentId() == $user->getAgentId()) {
-                    if ($account->isSpecial() || $account->isAuth()) {
-                        return ['msg' => '特殊吸粉或者授权接入的公众号无法禁用！'];
+                    if ($account->isThirdPartyPlatform() || $account->isAuth()) {
+                        return ['msg' => '第三方平台或者授权接入的公众号无法禁用！'];
                     }
                     if ($account->isBanned()) {
-                        if ($account->isSpecial() || $account->isAuth() || $account->isVideo()) {
-                            $account->setState($account->getType());
-                        } else {
-                            $account->setState(Account::NORMAL);
-                        }
+                        $account->setState(Account::NORMAL);
                     } else {
                         $account->setState(Account::BANNED);
                     }
@@ -316,7 +321,7 @@ class mp
         common::checkCurrentUserPrivileges('F_xf');
 
         $uid = request::trim('uid');
-        $account = Account::findOne(['uid' => $uid]);
+        $account = Account::findOneFromUID($uid);
         if (empty($account)) {
             return error(State::ERROR, '找不到指定的公众号！');
         }
@@ -346,7 +351,6 @@ class mp
 
         $data = [
             'agent_id' => $user->getAgentId(),
-            'name' => request::trim('name'),
             'title' => request::trim('title'),
             'descr' => request::str('descr'),
             'group_name' => request::str('groupname'),
@@ -357,19 +361,8 @@ class mp
             'total' => request::int('total'),
         ];
 
-        if (empty($data['name'])) {
-            return error(State::ERROR, '帐号不能为空！');
-        } else {
-            $account = Account::findOne(['name' => $data['name']]);
-            if ($account) {
-                if ($account->getAgentId() != $user->getAgentId()) {
-                    return error(State::ERROR, '公众号帐号不能重复！');
-                }
-            }
-        }
-
         if (request::has('uid')) {
-            $account = Account::findOne(['uid' => request::str('uid')]);
+            $account = Account::findOneFromUID(request::str('uid'));
             if ($account) {
                 if ($account->getAgentId() != $user->getAgentId()) {
                     return error(State::ERROR, '公众号帐号不能重复！');
@@ -393,6 +386,10 @@ class mp
             if (empty($sha1val) || empty($url) || sha1(App::uid() . CLIENT_IP . $url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的视频文件！');
             }
+        } elseif (request::has('douyinUrl')) {
+            $type = Account::DOUYIN;
+        } elseif (request::has('username')) {
+            $type = Account::WXAPP;
         } else {
             return error(State::ERROR, '请指定正确的文件网址！');
         }
@@ -402,7 +399,7 @@ class mp
             return error(State::ERROR, '请上传正确的头像文件！');
         }
 
-        $data['qrcode'] = $url;
+        $data['qrcode'] = $url ?? '';
         $data['img'] = $img_url;
 
         $limits = [];
@@ -431,9 +428,13 @@ class mp
             $limits['android'] = 1;
         }
 
+        if ($type == Account::DOUYIN) {
+            $data['total'] = 1;
+        }
+
         $data['order_limits'] = request::int('orderlimits');
 
-        if ($account) {
+        if (isset($account)) {
             foreach ($data as $key => $val) {
                 $key_name = 'get' . ucfirst(toCamelCase($key));
                 if ($val != $account->$key_name()) {
@@ -441,18 +442,23 @@ class mp
                     $account->$set_name($val);
                 }
             }
-            if ($account->isAuth()) {
-                $account->set('config', [
-                    'type' => Account::AUTH,
-                    'open' => [
-                        'timing' => request::int('OpenTiming'),
-                        'msg' => request::str('OpenMsg'),
-                    ]
-                ]);
-            }
         } else {
-            $data['uid'] = Account::makeUID(request::trim('name'));
-            $data['state'] = $type;
+            if (empty($data['name'])) {
+                //不再要求用户填写唯一的name
+                do {
+                    $name = Util::random(16, true);
+                } while(Account::findOneFromName($name));
+                $data['name'] = $name;
+            } else {
+                $account = Account::findOneFromName($data['name']);
+                if ($account) {
+                    if ($account->getAgentId() != $user->getAgentId()) {
+                        return error(State::ERROR, '公众号帐号不能重复！');
+                    }
+                }
+            }
+            $data['uid'] = Account::makeUID($data['name']);
+            $data['type'] = $type;
             $data['url'] = Account::createUrl($data['uid'], ['from' => 'account']);
             $account = Account::create($data);
         }
@@ -467,12 +473,31 @@ class mp
         ]);
 
         if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
-            if ($account->isVideo()) {
+            if ($account->isAuth()) {
+                $account->updateSettings('config.open', [
+                        'timing' => request::int('OpenTiming'),
+                        'msg' => request::str('OpenMsg'),                    
+                ]);
+            } elseif ($account->isVideo()) {
                 $account->set('config', [
                     'type' => Account::VIDEO,
                     'video' => [
                         'duration' => request::int('duration', 1),
                     ]
+                ]);
+            } elseif ($account->isDouyin()) {
+                $openid = $account->settings('config.openid', '');
+                $account->set('config', [
+                    'type' => Account::DOUYIN,
+                    'url' => request::trim('douyinUrl'),
+                    'openid' => $openid,
+                ]);
+            } elseif ($account->isWxApp()) {
+                $account->set('config', [
+                    'type' => Account::WXAPP,
+                    'username' => request::trim('username'),
+                    'path' => request::trim('path'),
+                    'delay' => request::int('delay', 1),
                 ]);
             }
             return ['msg' => '保存成功！'];
@@ -489,7 +514,7 @@ class mp
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
@@ -540,7 +565,7 @@ class mp
         common::checkCurrentUserPrivileges('F_xf');
 
         $url = WxPlatform::getPreAuthUrl([
-            'agent' => intval($user->getId()),
+            'agent' => $user->getId(),
         ]);
 
         if (empty($url)) {
@@ -548,5 +573,25 @@ class mp
         }
 
         return ['url' => $url];
+    }
+
+    public static function getDouyinAuthQRCode(): array
+    {
+        $account_uid = request::trim('uid');
+        $url = Util::murl('douyin', [
+            'op' => 'get_openid',
+            'uid' => $account_uid,
+        ]);
+     
+        $result = Util::createQrcodeFile("douyin_$account_uid", DouYin::redirectToAuthorizeUrl($url, true));
+    
+        if (is_error($result)) {
+            return err('创建二维码文件失败！');
+        }
+    
+        return [
+            'uid' => $account_uid,
+            'qrcode_url' => Util::toMedia($result),
+        ];
     }
 }

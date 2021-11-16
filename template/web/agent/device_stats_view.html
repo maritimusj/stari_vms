@@ -1,0 +1,345 @@
+{template 'common/header'}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #stats_chart {
+        width: 100%;
+        height: 350px;
+    }
+    .panel-default .heading .operate button {
+        margin: 0;
+    }
+    .panel-default .heading .operate button:focus {
+        outline:none;
+    }
+    .operate .btn {
+        padding: 0;
+        border: 0;
+    }
+    .pager span {
+        cursor: pointer;
+        margin-right: 6px;
+    }
+    .pager span.current {
+        background-color: coral;
+        color: white;
+        cursor: default;
+    }
+    .pager span.preBtn, .pager span.nextBtn {
+        color: lightgray;
+        cursor: default;
+    }
+    .pager span.preBtn.active, .pager span.nextBtn.active {
+        color: #333;
+        cursor: pointer;
+    }
+    .fa-spin {
+        color: lightgray;
+    }
+</style>
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<div style="margin-bottom: 1em;display: block;">
+    <div style="position:absolute;float:right;right:2em;top:1em;z-index:999;">
+        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative" title="微信昵称：{php echo $agent->getNickname();}，手机号码：{php echo $agent->getMobile()}">
+            <img src="{php echo $agent->getAvatar();}">
+            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            {if $agent->isAgent()}
+            <span class="agent-user">[ 代理商 ]</span>
+            {/if}
+        </div>        
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('agent', array('op'=>'commission_stats_view', 'id' => $agent->getId()));}">全部</a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="#">设备</a>
+    </li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div id="app" v-cloak>
+        <div class="heading">
+            <span class="operate">
+                <div class="pull-right">
+                    <input name="datelimit[start]" type="hidden" value="{php echo $s_start_date}"/>
+                    <input name="datelimit[end]" type="hidden" value="{php echo $s_end_date}"/>
+                    <button class="btn btn-default daterange daterange-date" type="button">
+                    <span class="date-title">
+                        {if empty($s_start_date) && empty($s_end_date)}
+                        {else}
+                        {$s_start_date} 至 {$s_end_date}
+                        {/if}
+                    </span> <i class="fa fa-calendar"></i>
+                    </button>
+                    <button class="btn btn-default">
+                        <i :class="{'fa': true,'fa-list': view == 'chart', 'fa-area-chart': view == 'form'}" @click="toggleChartView('month')" :title="view=='chart'?'切换到表格':'切换到图表'"></i>
+                    </button>
+                    <button class="btn btn-default">
+                        <i class="fa fa-reply" title="返回" @click="back()"></i>
+                    </button>
+                </div>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div v-show="!loading && data.length == 0 && view == 'form'" class="text-center">
+                <i class="fa fa-question-circle text-muted"></i> 暂时没有任何数据
+            </div>
+            <template v-show="loading || data.length > 0">
+                <div id="stats_chart" v-show="view == 'chart'" :style="{height: chartHeight}"></div>
+                <div v-show="loading && view == 'form'" class="text-center">
+                    <i class="fa fa-spinner fa-spin"></i> 正在加载中...
+                </div>
+                <div style="margin-top: 2em;" v-show="view=='form' && (data.length > 0)">
+                    <table class="table">
+                        <thead>
+                            <th>#</th>
+                            <th>设备</th>
+                            <th>免费订单</th>
+                            <th>支付订单</th>
+                            <th>合计</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(e, i) in data">
+                                <td v-text="i + 1"></td>
+                                <td v-text="e.name"></td>
+                                <td v-text="e.stats.free"></td>
+                                <td v-text="e.stats.fee"></td>
+                                <td v-text="e.stats.total"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="operate text-center" v-if="data.length > 0">
+                    <i class="fa fa-sort-down" title="加载更多" @click="moreData"></i>
+                </div>
+                <div class="pull-right pager" v-if="totalpage > 1 ">
+                    <span class="preBtn" @click="changePage(1)" :class="{active: page != 1}" v-if="togglePager">
+                        首页
+                    </span>
+                    <span @click="prePage" class="preBtn" :class="{active: page > 1}">
+                        &lt;&lt;
+                    </span>
+                    <template v-for="i in leftPartPager">
+                        <span :class="{current: i == page}" @click="changePage(i)">[ {{ i }} ]</span>
+                    </template>
+                    <span v-if="togglePager">
+                        ...
+                    </span>
+                    <span v-if="togglePager" @click="changePage(totalpage)">[ {{ totalpage }} ]</span>
+                    <span @click="nextPage" class="nextBtn" :class="{active: page < totalpage}">
+                        &gt;&gt;
+                    </span>
+                </div>
+            </template>
+        </div>        
+    </div>
+</div>
+<script>
+    const api_url = "{php echo $this->createWebUrl('agent', ['id' => $agent->getId()])}";
+    const back_url = "{php echo $this->createWebUrl('agent');}";
+    require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_ECHARTS_URL);}", "daterangepicker"], function (Vue, EChart) {
+        const option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    // Use axis to trigger tooltip
+                    type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                }
+            },
+            legend: {},
+            grid: {
+            },
+            xAxis: {
+                type: 'value'
+            },
+            yAxis: {
+                type: 'category',
+                data: []
+            },
+            series: [
+                {
+                    name: '免费',
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: []
+                },
+                {
+                    name: '支付',
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                        show: true
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: []
+                },
+            ]
+        };
+        new Vue({
+            el: '#app',
+            data: {
+                chart: null,
+                view: localStorage.getItem('stari_device_chart_view') || 'chart',
+                page: 1,
+                pagesize: 20,
+                totalpage: 0,
+                start: '',
+                end: '',
+                data: [],
+                loading: false,
+            },
+            mounted() {
+                this.initDateCtrl();
+                this.chart = EChart.init(document.getElementById("stats_chart"));
+                window.addEventListener('resize', () => {
+                    this.chart.resize();
+                })
+                this.getData();
+            },
+            watch: {
+                page(v) {
+                    if (v > 0) {
+                        this.getData();
+                    }
+                },
+                pagesize() {
+                    this.getData();
+                },
+                loading(v) {
+                    if (this.chart) {
+                        if (v) {
+                            this.chart.showLoading();
+                        } else {
+                            this.chart.hideLoading();
+                        }
+                    }
+                }
+            },
+            computed: {
+                chartHeight() {
+                    Vue.nextTick(() => {
+                        this.chart && this.chart.resize();
+                    })
+                    return (150 + this.data.length * 40) + 'px';
+                },
+                leftPartPager() {
+                    const arr = [];
+                    if (this.togglePager) {
+                        for (i = 0; i < 5; i++) {
+                            if (this.page + i > this.totalpage) {
+                                break;
+                            }
+                            arr.push(this.page + i);
+                        }
+                    } else {
+                        for (i = 0; i < this.totalpage; i++) {
+                            arr.push(i + 1);
+                        }
+                    }
+
+                    return arr;
+                },
+                togglePager() {
+                    return this.totalpage > 10;
+                },
+            },
+            methods: {
+                back() {
+                    window.location.href = back_url;
+                },
+                moreData() {
+                    this.pagesize += 20;
+                },
+                prePage() {
+                    if (this.page > 1) {
+                        this.page--;
+                    }
+                },
+                nextPage() {
+                    if (this.page < this.totalpage) {
+                        this.page++;
+                    }
+                },
+                initDateCtrl() {
+                    const self = this;
+                    $(".daterange.daterange-date").each(function () {
+                        const elm = this;
+                        $(this).daterangepicker({
+                            startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                            endDate: $(elm).prev().val() || moment("不限", "Y"),
+                            format: "YYYY-MM-DD",
+                            clear: 1
+                        }, function (start, end) {
+                            start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                            end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                            const html = (start === "" ? "" : start) + (start === "" && end === "" ? "" : (" 至 " + end))
+                            $(elm).find(".date-title").html(html);
+                            $(elm).prev().prev().val(start);
+                            $(elm).prev().val(end);
+                            self.start = start;
+                            self.end = end;
+                            self.getData();
+                        })
+                    })
+                },
+                toggleChartView() {
+                    this.view = (this.view === 'chart' ? 'form' : 'chart');
+                    localStorage.setItem('stari_device_chart_view', this.view);
+                    Vue.nextTick(() => {
+                        this.chart && this.chart.resize();
+                    })
+                },
+                getData() {
+                    this.loading = true;
+                    $.get(api_url, {
+                        op: 'device_order_statistics',
+                        page: this.page,
+                        pagesize: this.pagesize,
+                        start: this.start,
+                        end: this.end,
+                    }).then(res => {
+                        if (res.status) {
+                            return res.data;
+                        }
+                    }).then(data => {
+                        this.totalpage = data['totalpage'] || 0;
+                        this.data = data['list'] || [];
+                        this.initChartData(data['list'] || []);
+                        this.loading = false;
+                    })
+                },
+                initChartData(data) {
+                    if (data.length > 0) {
+                        option.yAxis.data = [];
+                        option.series[0].data = [];
+                        option.series[1].data = [];
+                        data.forEach(e => {
+                            option.yAxis.data.push(e.name);
+                            option.series[0].data.push(e.stats.free);
+                            option.series[1].data.push(e.stats.fee);
+                        });
+
+                        this.chart.setOption(option);                        
+                    } else {
+                        this.chart.clear();
+                    }
+
+                },
+                changePage(i) {
+                    this.page = i;
+                }
+            }
+        })
+    })
+</script>
+{template 'common/footer'}

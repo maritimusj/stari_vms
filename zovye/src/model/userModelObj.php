@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\model;
@@ -142,6 +142,11 @@ class userModelObj extends modelObj
         return $this->app == User::THIRD_ACCOUNT;
     }
 
+    public function isDouYinUser(): bool
+    {
+        return $this->app == User::DouYin;
+    }    
+
     public function profile($detail = true): array
     {
         $data = [
@@ -154,7 +159,6 @@ class userModelObj extends modelObj
 
         if ($detail) {
             $fans_data = $this->get('fansData', []);
-
             if (is_array($fans_data)) {
                 $data['sex'] = $fans_data['sex'];
                 $data['province'] = $fans_data['province'];

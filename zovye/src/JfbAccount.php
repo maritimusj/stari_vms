@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -13,14 +17,14 @@ class JfbAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::JFB, Account::JFB_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::JFB, Account::JFB_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
         $v = [];
 
-        $acc = Account::findOne(['state' => Account::JFB]);
+        $acc = Account::findOneFromType(Account::JFB);
         if ($acc) {
             $config = $acc->get('config', []);
             if (empty($config['url'])) {
@@ -121,7 +125,7 @@ class JfbAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::JFB]);
+        $acc = Account::findOneFromType(Account::JFB);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }
@@ -154,7 +158,7 @@ class JfbAccount
 
                 $order_uid = Order::makeUID($user, $device, $params['ad_code_no']);
 
-                Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
             } catch (Exception $e) {
                 Util::logToFile('jfb', [

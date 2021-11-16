@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\job\refund;
@@ -11,8 +11,6 @@ namespace zovye\job\refund;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\request;
-use zovye\Keeper;
-use zovye\model\keeperModelObj;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\request;

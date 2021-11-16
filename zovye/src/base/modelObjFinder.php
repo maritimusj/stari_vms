@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\base;
@@ -131,7 +131,7 @@ class modelObjFinder extends SqlParser
     }
 
     /**
-     * @param string $field
+     * @param mixed $field
      * @return int
      */
     public function count($field = '*'): int
@@ -179,7 +179,7 @@ class modelObjFinder extends SqlParser
      * @param bool $delete
      * @return string
      */
-    private function makeSQL($fields, $delete = false): string
+    private function makeSQL($fields, bool $delete = false): string
     {
         /** @var modelObj $objClassname */
         $objClassname = $this->factory->objClassname();

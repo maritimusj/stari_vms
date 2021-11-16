@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye\api\wx;
 
@@ -164,11 +168,11 @@ class common
     /**
      * 生成用户的GUID.
      *
-     * @param userModelObj $target
+     * @param userModelObj|null $target
      *
      * @return string
      */
-    public static function getGUID(userModelObj $target): string
+    public static function getGUID(userModelObj $target = null): string
     {
         $id = $target ? $target->getId() : false;
 
@@ -193,7 +197,7 @@ class common
      *
      * @return bool
      */
-    public static function checkFuncs($assign_data, $fn, $cb = null): bool
+    public static function checkFuncs($assign_data, $fn, callable $cb = null): bool
     {
         //空$assign_data认为是拥有全部权限
         if (isset($assign_data)) {
@@ -227,7 +231,7 @@ class common
      *
      * @return bool
      */
-    public static function checkCurrentUserPrivileges($fn, $get_result = false): bool
+    public static function checkCurrentUserPrivileges($fn, bool $get_result = false): bool
     {
         $user = common::getAgent();
 

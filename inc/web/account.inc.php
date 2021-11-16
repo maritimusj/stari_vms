@@ -1,8 +1,7 @@
 <?php
-
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -19,15 +18,40 @@ $op = request::op('default');
 if ($op == 'default') {
     $page = max(1, request::int('page'));
     $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-    $banned = request::bool('banned');
+
 
     $query = Account::query();
+
+    $banned = request::bool('banned');
     if ($banned) {
         $query->where(['state' => Account::BANNED]);
     } else {
-        $query->where([
-            'state' => [Account::NORMAL, Account::VIDEO, Account::AUTH],
-        ]);
+        $query->where(['state' => Account::NORMAL]);
+    }
+
+    if (request::isset('type')) {
+        $type = request::int('type');
+        if ($type == -1) {
+            $all = Account::getAllEnabledThirdPartyPlatform();
+            if ($all) {
+                $query->where(['type' => $all]);
+            } else {
+                $query->where(['type' => -1]);
+            }
+        } else {
+            if (empty($type)) {
+                $query->where(['type' => [
+                    Account::NORMAL,
+                    Account::AUTH,
+                ]]);
+            } else {
+                $query->where(['type' => request::int('type')]);
+            }
+        }
+    } else {
+        if (!App::isDouyinEnabled()) {
+            $query->where(['type <>' => Account::DOUYIN]);
+        }
     }
 
     if (request::has('agentId')) {
@@ -62,9 +86,14 @@ if ($op == 'default') {
 
         /** @var accountModelObj $entry */
         foreach ($query->findAll() as $entry) {
+            //过滤掉未启用的吸粉平台
+            if ($entry->isThirdPartyPlatform() && $entry->isBanned()) {
+                continue;
+            }
             $data = [
                 'id' => $entry->getId(),
-                'state' => $entry->getState(),
+                'type' => $entry->getType(),
+                'banned' => $entry->isBanned(),
                 'agentId' => $entry->getAgentId(),
                 'uid' => $entry->getUid(),
                 'clr' => $entry->getClr(),
@@ -80,14 +109,18 @@ if ($op == 'default') {
                 'sccount' => $entry->getSccount(),
                 'total' => $entry->getTotal(),
                 'orderlimits' => $entry->getOrderLimits(),
-                'banned' => $entry->isBanned(),
                 'url' => $entry->getUrl(),
                 'assigned' => !isEmptyArray($entry->get('assigned')),
+                'is_third_party_platform' => $entry->isThirdPartyPlatform(),
             ];
 
             if ($entry->isAuth()) {
                 $data['service'] = $entry->getServiceType();
                 $data['verified'] = $entry->isVerified();
+            } elseif ($entry->isDouyin()) {
+                $data['openid'] = $entry->settings('config.openid', '');
+            } elseif ($entry->isWxApp()) {
+                $data['username'] = $entry->settings('config.username', '');
             }
 
             if (App::useAccountQRCode()) {
@@ -123,53 +156,14 @@ if ($op == 'default') {
         }
     }
 
-    //特殊吸粉
-    $one_res = [
-        Account::JFB => App::isJfbEnabled(),
-        Account::MOSCALE => App::isMoscaleEnabled(),
-        Account::YUNFENBA => App::isYunfenbaEnabled(),
-        Account::AQIINFO => App::isAQiinfoEnabled(),
-        Account::ZJBAO => App::isZJBaoEnabled(),
-        Account::MEIPA => App::isMeiPaEnabled(),
-        Account::KINGFANS => App::isKingFansEnabled(),
-        Account::SNTO => App::isSNTOEnabled(),
-    ];
-
-    foreach ($one_res as $index => $enabled) {
-        if ($enabled) {
-            $t_res = Account::query(['state' => $index])->findOne();
-            if ($t_res) {
-                $one_res[$index] = [
-                    'id' => $t_res->getId(),
-                    'orderno' => $t_res->getOrderNo(),
-                    'name' => $t_res->getName(),
-                    'title' => $t_res->getTitle(),
-                    'url' => $t_res->getUrl(),
-                    'img' => $t_res->getImg(),
-                    'assigned' => !isEmptyArray($t_res->get('assigned')),
-                ];
-            } else {
-                unset($one_res[$index]);
-                Util::logToFile('account', "特殊吸粉{$index}已开启，但查找公众号资料失败！");
-            }
-        } else {
-            unset($one_res[$index]);
-        }
-    }
-
-    //排序
-    usort($one_res, function ($a, $b) {
-        return $b['orderno'] - $a['orderno'];
-    });
-
     app()->showTemplate('web/account/default', [
-        'agent' => isset($agent) ? $agent : null,
+        'agent' => $agent ?? null,
         'accounts' => $accounts,
+        'type' => $type ?? null,
         'banned' => $banned,
         'pager' => $pager,
         'keywords' => $keywords,
         'search_url' => $this->createWebUrl('account', ['banned' => $banned]),
-        'one_res' => $one_res
     ]);
 
 } elseif ($op == 'search') {
@@ -237,7 +231,7 @@ if ($op == 'default') {
                 if (empty($agent)) {
                     return err('找不到这个代理商！');
                 }
-                $data['agent_id'] = intval($agent->getId());
+                $data['agent_id'] = $agent->getId();
             }
         }
 
@@ -319,6 +313,31 @@ if ($op == 'default') {
                     'channel' => request::trim('channel'),
                     'data' => $account->settings('config.data', []),
                 ]);
+            } elseif ($account->isYFB()) {
+                $data['name'] = Account::YFB_NAME;
+                $data['img'] = Account::YFB_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::YFB,
+                    'id' => request::trim('app_id'),
+                    'secret' => request::trim('app_secret'),
+                    'key' => request::trim('key'),
+                    'scene' => request::trim('scene'),
+                ]);
+            } elseif ($account->isWxWork()) {
+                $data['name'] = Account::WxWORK_NAME;
+                $data['img'] = Account::WxWORK_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::WxWORK,
+                    'key' => request::trim('key'),
+                    'secret' => request::trim('secret'),
+                ]);
+            } elseif ($account->isWxApp()) {
+                $account->set('config', [
+                    'type' => Account::WXAPP,
+                    'username' => request::trim('username'),
+                    'path' => request::trim('path'),
+                    'delay' => request::int('delay', 1),
+                ]);
             } elseif ($account->isAuth()) {
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
@@ -348,6 +367,9 @@ if ($op == 'default') {
                 $data['img'] = request::trim('img');
             }
 
+            //如果网站更换域名后，需要更新url
+            $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);
+
             foreach ($data as $key => $val) {
                 $key_name = 'get' . ucfirst(toCamelCase($key));
                 if ($val != $account->$key_name()) {
@@ -362,7 +384,11 @@ if ($op == 'default') {
 
         } else {
             if (empty($name)) {
-                return err('帐号不能为空！');
+                //不再要求用户填写唯一的name
+                do {
+                    $name = Util::random(16, true);
+                } while (Account::findOneFromName($name));
+
             } elseif (in_array($name, [
                 Account::JFB_NAME,
                 Account::MOSCALE_NAME,
@@ -370,24 +396,25 @@ if ($op == 'default') {
                 Account::AQIINFO_NAME,
                 Account::ZJBAO_NAME,
                 Account::MEIPA_NAME,
-                Account::KINGFANS,
-                Account::SNTO,
+                Account::KINGFANS_NAME,
+                Account::SNTO_NAME,
+                Account::YFB_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }
 
-            if (Account::findOne(['name' => $name])) {
+            if (Account::findOneFromName($name)) {
                 return err('公众号帐号已经存在！');
             }
 
             $uid = Account::makeUID($name);
-            if (Account::findOne(['uid' => $uid])) {
+            if (Account::findOneFromUID($uid)) {
                 return err('公众号UID已经存在！');
             }
 
             $data['uid'] = $uid;
             $data['name'] = $name;
-            $data['state'] = request::int('type');
+            $data['type'] = request::int('type');
             $data['title'] = request::str('title');
             $data['img'] = request::trim('img');
             $data['url'] = Account::createUrl($uid, ['from' => 'account']);
@@ -402,6 +429,11 @@ if ($op == 'default') {
             'time' => time(),
             'admin' => _W('username'),
         ]);
+
+        //抖音吸粉总数永远为１
+        if ($account->isDouyin()) {
+            $account->setTotal(1);
+        }
 
         if ($account->save() && Account::updateAccountData()) {
             //处理多个关注二维码
@@ -448,6 +480,19 @@ if ($op == 'default') {
                         'duration' => request::int('duration', 1),
                         'exclusive' => request::int('exclusive', 0),
                     ]
+                ]);
+            } elseif ($account->isDouyin()) {
+                $account->set('config', [
+                    'type' => Account::DOUYIN,
+                    'url' => request::trim('url'),
+                    'openid' => request::trim('openid'),
+                ]);
+            } elseif ($account->isWxApp()) {
+                $account->set('config', [
+                    'type' => Account::WXAPP,
+                    'username' => request::trim('username'),
+                    'path' => request::trim('path'),
+                    'delay' => request::int('delay'),
                 ]);
             }
 
@@ -501,7 +546,7 @@ if ($op == 'default') {
             Util::itoast('公众号不存在！', $this->createWebUrl('account'), 'error');
         }
 
-        $type = $account->getState();
+        $type = $account->getType();
 
         if ($account->getAgentId()) {
             $agent = Agent::get($account->getAgentId());
@@ -515,7 +560,7 @@ if ($op == 'default') {
         $qr_codes = [];
         $qrcode_data = $account->get('qrcodesData', []);
         if ($qrcode_data && is_array($qrcode_data)) {
-            foreach ($qrcode_data as $xid => $entry) {
+            foreach ($qrcode_data as $entry) {
                 $qr_codes[] = $entry['img'];
             }
         }
@@ -525,14 +570,14 @@ if ($op == 'default') {
         $config = $account->get('config');
     }
 
-    app()->showTemplate('web/account/edit', [
+    app()->showTemplate('web/account/edit_' . $type, [
         'op' => $op,
         'type' => $type,
         'id' => $id,
-        'account' => isset($account) ? $account : null,
-        'qrcodes' => isset($qr_codes) ? $qr_codes : null,
-        'limits' => isset($limits) ? $limits : null,
-        'commission' => isset($commission) ? $commission : null,
+        'account' => $account ?? null,
+        'qrcodes' => $qr_codes ?? null,
+        'limits' => $limits ?? null,
+        'commission' => $commission ?? null,
         'agent_name' => $agent_name,
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,
@@ -540,17 +585,23 @@ if ($op == 'default') {
     ]);
 
 } elseif ($op == 'add') {
-    app()->showTemplate('web/account/edit', [
+
+    $type = request::int('type', Account::NORMAL);
+    app()->showTemplate('web/account/edit_' . $type, [
         'clr' => Util::randColor(),
         'op' => $op,
-        'type' => request::int('type', Account::NORMAL),
+        'type' => $type,
     ]);
+
 } elseif ($op == 'remove') {
 
     $id = request::int('id');
     if ($id) {
         $account = Account::get($id);
         if ($account) {
+            if ($account->isThirdPartyPlatform()) {
+                Util::itoast('删除失败！', $this->createWebUrl('account'), 'error');
+            }
             $title = $account->getTitle();
             $account->destroy();
             Account::updateAccountData();
@@ -567,11 +618,7 @@ if ($op == 'default') {
         $account = Account::get($id);
         if ($account) {
             if ($account->isBanned()) {
-                if ($account->isSpecial() || $account->isAuth() || $account->isVideo()) {
-                    $account->setState($account->getType());
-                } else {
-                    $account->setState(Account::NORMAL);
-                }
+                $account->setState(Account::NORMAL);
             } else {
                 $account->setState(Account::BANNED);
             }
@@ -867,6 +914,38 @@ if ($op == 'default') {
     $num = (int)$query->get('count(DISTINCT `openid`)');
 
     JSON::success("{$acc->getTitle()}，净增粉丝总数：{$num}人");
+
+} elseif ($op == 'douyinAuthorize') {
+
+    $id = request::int('id');
+
+    $account = Account::get($id);
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    $title = $account->getTitle();
+
+    $url = Util::murl('douyin', [
+        'op' => 'get_openid',
+        'id' => $account->getId(),
+    ]);
+
+    $result = Util::createQrcodeFile("douyin_{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
+
+    if (is_error($result)) {
+        JSON::fail('创建二维码文件失败！');
+    }
+
+    $content = app()->fetchTemplate('web/common/qrcode', [
+        'title' => '请用抖音扫描二维码完成授权！',
+        'url' => Util::toMedia($result),
+    ]);
+
+    JSON::success([
+        'title' => "$title",
+        'content' => $content,
+    ]);
 
 } elseif ($op == 'platform_stat') {
 

@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -62,7 +62,7 @@ class Advertising extends State
         self::GOODS => '商品推荐',
         self::QRCODE => '推广二维码',
         self::PASSWD => '口令',
-        self::WX_APP_URL_CODE => '微信小程序识别码'
+        self::WX_APP_URL_CODE => '微信小程序识别码',
     ];
 
     /**

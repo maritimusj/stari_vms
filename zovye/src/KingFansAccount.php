@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -28,12 +31,12 @@ class KingFansAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::KINGFANS, Account::KINGFANS_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::KINGFANS, Account::KINGFANS_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $acc = Account::findOne(['state' => Account::KINGFANS]);
+        $acc = Account::findOneFromType(Account::KINGFANS);
         if (empty($acc)) {
             return [];
         }
@@ -104,7 +107,7 @@ class KingFansAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::KINGFANS]);
+        $acc = Account::findOneFromType(Account::KINGFANS);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }
@@ -152,7 +155,7 @@ class KingFansAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($params['oid'] . $user_openid));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('kingfans', [

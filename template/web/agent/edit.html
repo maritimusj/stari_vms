@@ -784,7 +784,7 @@
         <a role="button" class="btn btn-default" href="{php echo $this->createWebUrl('agent');}">返回</a>
     </div>
 </form>
-{template 'web/common/search-user'}
+{template 'web/common/search_user'}
 <script>
     function chfeeTypeTitle(title) {
         $("#fee_type_title").html(title);
@@ -1162,6 +1162,18 @@
                 </div>
                 {/if}
             </div>
+            {if \zovye\App::isZeroBonusEnabled()}
+            <div class="seg">
+                <div class="title">佣金</div>
+                <div class="form-group">
+                    <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
+                    <div class="col-md-10">
+                        <input type="number" step="0.01" class="form-control" name="zeroBonus" id="zeroBonus" value="{php echo $agent_data['custom']['bonus']['zero']['v'] ?? -1}">
+                        <span class="help-block">* -1 默认， 0 表示概率０</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
     <div class="form-btn">

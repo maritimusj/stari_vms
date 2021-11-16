@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -22,7 +22,7 @@ if ($op == 'default') {
         Util::resultAlert('没有指定公众号！', 'error');
     }
 
-    $account = Account::findOne(['uid' => $tid]);
+    $account = Account::findOneFromUID($tid);
     if (empty($account) || $account->isBanned()) {
         Util::resultAlert('公众号没有开通免费领取！', 'error');
     }
@@ -36,7 +36,7 @@ if ($op == 'default') {
     }
 
     $uid = request::trim('uid');
-    $account = Account::findOne(['uid' => $uid]);
+    $account = Account::findOneFromUID($uid);
     if (empty($account)) {
         JSON::fail(['msg' => '找不到这个广告！']);
     }
@@ -76,7 +76,7 @@ if ($op == 'default') {
             if ($locker) {
                 $locker->destroy();
             }
-        }        
+        }
     } else {
         if ($seconds < $duration) {
             JSON::success(['msg' => '请继续观看']);
@@ -90,10 +90,10 @@ if ($op == 'default') {
         'shadowId' => $device->getShadowId(),
         'accountId' => $account->getId(),
     ];
-    
+
     //准备领取商品的ticket
     $user->updateSettings('last.ticket', $ticket_data);
-    
+
     JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 
 } elseif ($op == 'get') {
@@ -116,7 +116,7 @@ if ($op == 'default') {
     if (empty($device)) {
         Util::resultAlert('找不到指定的设备！', 'error');
     }
-    
+
     $tpl_data = Util::getTplData(
         [
             $user,
@@ -131,4 +131,75 @@ if ($op == 'default') {
 
     //领取页面
     app()->getPage($tpl_data);
+
+} elseif ($op == 'get_list') {
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    if ($user->isBanned()) {
+        JSON::fail('用户暂时无法使用！');
+    }
+
+    if (!$user->isWxUser()) {
+        JSON::success([]);
+    }
+
+    $device = Device::get(request::str('device'), true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $types = request::array('types');
+    $result = Account::getAvailableList($device, $user, ['type' => $types ? $types : null]);
+
+    JSON::success($result);
+
+} elseif ($op == 'get_url') {
+
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    if ($user->isBanned()) {
+        JSON::fail('用户暂时无法使用！');
+    }
+
+    if (!$user->isWxUser()) {
+        JSON::fail('请用微信中打开！');
+    }
+
+    if (!$user->acquireLocker('Account::wxapp')) {
+        JSON::fail('正忙，请稍后再试！');
+    }
+
+    $device = Device::get(request::str('device'), true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $account = Account::findOneFromUID(request::str('uid'));
+    if (empty($account)) {
+        JSON::fail('找不到这个小程序！');
+    }
+
+    $res = Util::isAvailable($user, $account, $device);
+    if (is_error($res)) {
+        JSON::fail($res);
+    }
+    
+    $ticket_data = [
+        'id' => Util::random(16),
+        'time' => time(),
+        'deviceId' => $device->getId(),
+        'shadowId' => $device->getShadowId(),
+        'accountId' => $account->getId(),
+    ];
+
+    //准备领取商品的ticket
+    $user->updateSettings('last.ticket', $ticket_data);
+
+    JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 }

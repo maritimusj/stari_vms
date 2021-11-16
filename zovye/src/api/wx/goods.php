@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye\api\wx;
-
 
 use zovye\App;
 use zovye\request;
@@ -57,7 +59,7 @@ class goods
             return error(State::ERROR, '找不到这个商品！');
         }
 
-        return \zovye\Goods::data($goods_id);
+        return \zovye\Goods::data($goods_id, ['fullPath']);
     }
 
     public static function delete(): array
@@ -107,6 +109,12 @@ class goods
             if (request::isset('goodsLaneID')) {
                 if (request::int('goodsLaneID') != $goods->getExtraData('lottery.size')) {
                     $goods->setExtraData('lottery.size', request::int('goodsLaneID'));
+                }
+            }
+
+            if (request::isset('goodsMcbIndex')) {
+                if (request::int('goodsMcbIndex') != $goods->getExtraData('lottery.index')) {
+                    $goods->setExtraData('lottery.index', request::int('goodsMcbIndex'));
                 }
             }
 
@@ -174,11 +182,11 @@ class goods
 
             //固定货道商品商品指定货道
             if (request::is_string('goodsLaneID')) {
-                $goods_data['extra']['lottery'] = [
-                    'size' => request::int('goodsLaneID'),
-                ];
+                $goods_data['extra']['lottery']['size'] =  request::int('goodsLaneID');
             }
-
+            if (request::has('goodsMcbIndex')) {
+                $goods_data['extra']['lottery']['index'] =  request::int('goodsMcbIndex');
+            }
             if (request::isset('costPrice')) {
                 $goods_data['extra']['costPrice'] = request::float('costPrice', 0, 2) * 100;
             }

@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -64,20 +64,34 @@ try {
     //出货流程，EventBus会抛出异常
     $result = Util::openDevice(['level' => LOG_GOODS_GETX, $device, $user, $account, 'goodsId' => $goods_id, 'online' => false]);
     if (is_error($result)) {
-        $response = [
-            'text' => $result['errno'] > 0 ? '请重试' : '领取失败',
-            'msg' => $result['message'],
-        ];
+        if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
+            $params = [
+                'account' => $account->getId(),
+                'device' => $device->getId(),
+                'user' => $user->getId(),
+                'goods' => $goods_id,
+                'ip' => $user->getLastActiveData('ip', CLIENT_IP),
+            ];
+            if (!Job::createAccountOrder($params)) {
+                throw new Exception('启动排队任务失败！');
+            }
+            $device->appShowMessage('正在排除出货，请稍等！', 'success');
+        } else {
+            $response = [
+                'text' => $result['errno'] > 0 ? '请重试' : '领取失败',
+                'msg' => $result['message'],
+            ];
 
-        $device->appShowMessage('出货失败，请稍后再试！', 'error');
+            $device->appShowMessage('出货失败，请稍后再试！', 'error');
 
-        //失败转跳
-        $url = $device->getRedirectUrl('fail')['url'];
-        if (!empty($url)) {
-            $response['url'] = $url;
+            //失败转跳
+            $url = $device->getRedirectUrl('fail')['url'];
+            if (!empty($url)) {
+                $response['url'] = $url;
+            }
+
+            JSON::fail($response);            
         }
-
-        JSON::fail($response);
     }
 
     $device->appShowMessage('领取成功，欢迎下次使用！');

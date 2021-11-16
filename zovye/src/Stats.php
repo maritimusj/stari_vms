@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -794,6 +794,7 @@ class Stats
             try {
                 $date = new DateTimeImmutable($datetime);
             } catch (Exception $e) {
+                return false;
             }
         } elseif ($datetime instanceof DateTimeInterface) {
             $date = $datetime;

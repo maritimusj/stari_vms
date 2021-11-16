@@ -1,0 +1,624 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    [v-cloak] {
+        display: none;
+    }
+    #month_stats_chart,#year_stats_chart {
+        width: 100%;
+        height: 450px;
+    }
+    .year_title,.month_title {
+        font-weight: bolder;
+    }
+    .gray {
+        color: lightgray;
+        cursor: default;
+        user-select: none;
+    }
+    .month_label {
+        margin-right: 6px;
+        cursor: pointer;
+        padding: 0 3px 0 3px;
+    }
+    .month_label:not(.current):hover {
+        background-color: coral;
+        color: white;
+    }
+    .month_label.current {
+        cursor: default;
+        background-color: coral;
+        color: white;
+    }
+    .year_label {
+        margin-right: 6px;
+        cursor: pointer;
+        padding: 0 3px 0 3px;
+    }
+    .year_label:not(.current):hover {
+        background-color: coral;
+        color: white;
+    }
+    .year_label.current {
+        cursor: default;
+        background-color: coral;
+        color: white;
+    }
+    .arrow-pre,.arrow-next {
+        cursor: pointer;
+        user-select: none;
+    }
+    .arrow-pre:active,.arrow-next:active {
+        color: gray;
+    }
+    .arrow-pre:hover,.arrow-next:hover {
+        font-weight: bold;
+    }
+</style>
+<div style="margin-bottom: 1em;display: block;">
+    <div style="position:absolute;float:right;right:2em;top:1em;z-index:999;">
+        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative" title="微信昵称：{php echo $agent->getNickname();}，手机号码：{php echo $agent->getMobile()}">
+            <img src="{php echo $agent->getAvatar();}">
+            <span>{php echo $agent->getName() ?: '<未知>'}</span>
+            {if $agent->isAgent()}
+            <span class="agent-user">[ 代理商 ]</span>
+            {/if}
+        </div>        
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">全部</a>
+    </li>
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('agent', array('op'=>'device_stats_view', 'id' => $agent->getId()));}">设备</a>
+    </li>
+</ul>
+<div id="app" v-cloak>
+    <div class="panel panel-default nav-tab-item panel-first">
+        <div class="heading">
+            <span class="operate">
+                <div  class="pull-right">
+                    <span class="arrow-pre" @click="preYear" v-if="isPreYearButtonEnabled">&lt;&lt;</span>
+                    <span class="gray" v-else>&lt;&lt;</span>
+                    <span class="year_title" v-text="year_title"></span>
+                    <span  class="arrow-next" @click="nextYear" v-if="isNextYearButtonEnabled">&gt;&gt;</span>
+                    <span class="gray" v-else>&gt;&gt;</span>
+                    <template v-for="y in year_list" v-if="year_list.length > 1">
+                        <span v-text="y + '年'" class="year_label" :class="{'current': year == y}" @click="changeYear(y)"></span>
+                    </template>
+                    <i :class="{'fa': true,'fa-list': year_view == 'chart', 'fa-area-chart': year_view == 'form'}" @click="toggleChartView('year')" :title="year_view=='chart'?'切换到表格':'切换到图表'"></i>
+                    <i class="fa fa-reply" title="返回" @click="back()"></i>
+                </div>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div v-show="!year_loading && (!year_data || year_data.length === 0)" class="text-center">
+                <i class="fa fa-question-circle text-muted"></i> 暂时没有任何数据
+            </div>
+            <template v-show="year_data && year_data.length > 0">
+                <div id="year_stats_chart" v-show="year_view=='chart'"></div>
+                <div v-if="year_loading && year_view == 'form'" class="text-center">
+                    <i class="fa fa-spinner fa-spin"></i> 正在加载中...
+                </div>
+                <div style="margin-top: 2em;" v-else>
+                    <table class="table"  v-show="year_view=='form'">
+                        <thead>
+                            <th>#</th>
+                            <th>免费订单</th>
+                            <th>支付订单</th>
+                            <th>收益</th>
+                            <th>操作</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(e, i) in year_data">
+                                <td v-text="e.m"></td>
+                                <td v-text="e.order.free"></td>
+                                <td v-text="e.order.fee"></td>
+                                <td v-text="e.commission.total"></td>
+                                <td :class="{operate: !repairing, 'text-muted': repairing}">
+                                    <template v-if="repairing && repairing === e.m">
+                                        <i class="fa fa-spin fa-spinner"></i>
+                                    </template>
+                                    <template v-else>
+                                        <i class="fa fa-wrench fa-fw"  title="修复出货统计" 
+                                        :class="{disabled: repairing}"
+                                        @click="repair(e.m)"></i>
+                                    </template>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+    </div> 
+    <div class="panel panel-default">
+        <div class="heading">
+            <span class="operate">
+                <div class="pull-right">
+                    <span  class="arrow-pre" @click="preMonth" v-if="isPreMonthButtonEnabled">&lt;&lt;</span>
+                    <span class="gray" v-else>&lt;&lt;</span>
+                    <span class="month_title" v-text="month_title"></span>
+                    <span  class="arrow-next" @click="nextMonth" v-if="isNextMonthButtonEnabled">&gt;&gt;</span>
+                    <span class="gray" v-else>&gt;&gt;</span>
+                    <template v-for="m in month_list" v-if="month_list.length > 1">
+                        <span v-text="m + '月'" class="month_label" :class="{'current': month == m}" @click="changeMonth(m)"></span>
+                    </template>
+                    <i :class="{'fa': true,'fa-list': month_view == 'chart', 'fa-area-chart': month_view == 'form'}" @click="toggleChartView('month')" :title="month_view=='chart'?'切换到表格':'切换到图表'"></i>
+                </div>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div v-show="(!month_data || month_data.length == 0) && !month_loading" class="center">
+                <i class="fa fa-question-circle text-muted"></i> 暂时没有任何数据
+            </div>
+            <template v-show="month_data && month_data.length > 0">
+                <div id="month_stats_chart" v-show="month_view=='chart'"></div>
+                <div v-if="month_loading && month_view == 'form'" class="center">
+                    <i class="fa fa-spinner fa-spin"></i> 正在加载中...
+                </div>
+                <div style="margin-top: 2em;" v-else>
+                    <table class="table"  v-show="month_view=='form'">
+                        <thead>
+                            <th>#</th>
+                            <th>免费订单</th>
+                            <th>支付订单</th>
+                            <th>收益（元）</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(e, i) in month_data">
+                                <td v-text="e.title"></td>
+                                <td v-text="e.order.free"></td>
+                                <td v-text="e.order.fee"></td>
+                                <td v-text="'￥' + e.commission.total"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </div>
+    </div>    
+</div>
+
+<script>
+        const api_url = "{php echo $this->createWebUrl('agent', ['id' => $agent->getId()])}";
+        const back_url = "{php echo $this->createWebUrl('agent');}";
+        require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_ECHARTS_URL);}"], function (Vue, EChart) {
+            const colors = ['#5470C6', '#91CC75', '#EE6666'];
+            const year_option = {
+                color: colors,
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                grid: {
+
+                },
+                legend: {
+                    data: ['免费订单', '支付订单', '收益']
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    data: []
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '订单数量',
+                        min: 0,
+                        position: 'left',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[1]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '收益（元）',
+                        min: 0,
+                        position: 'right',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[2]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '免费订单',
+                        type: 'bar',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        yAxisIndex: 0,
+                        data: [],
+                    },
+                    {
+                        name: '支付订单',
+                        type: 'bar',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        yAxisIndex: 0,
+                        data: [],
+                    },
+                    {
+                        name: '收益',
+                        type: 'line',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        yAxisIndex: 1,
+                        data: [],
+                    }
+                ]
+            };
+
+            const month_option = {
+                color: colors,
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                grid: {
+
+                },
+                legend: {
+                    data: ['免费订单', '支付订单', '收益']
+                },
+                xAxis: {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    data: []
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '订单数量',
+                        min: 0,
+                        position: 'left',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[1]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '收益（元）',
+                        min: 0,
+                        position: 'right',
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: colors[2]
+                            }
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '免费订单',
+                        type: 'bar',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        yAxisIndex: 0,
+                        data: [],
+                    },
+                    {
+                        name: '支付订单',
+                        type: 'bar',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        yAxisIndex: 0,
+                        data: [],
+                    },
+                    {
+                        name: '收益',
+                        type: 'line',
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        yAxisIndex: 1,
+                        data: [],
+                    }
+                ]
+            };
+
+            new Vue({
+                el: '#app',
+                data: {
+                    month_view: localStorage.getItem('stari_month_chart_view') || 'chart',
+                    month_chart: null,
+                    month_title: '',
+                    month_data: [],
+                    month_loading: false,
+                    year_view: localStorage.getItem('stari_year_chart_view') || 'chart',
+                    year_chart: null,
+                    year_title: '',
+                    year_data: [],
+                    year_list: [],
+                    year_loading: false,
+                    month: (new Date()).getMonth() + 1,
+                    year: (new Date()).getFullYear(),
+                    repairing: false,
+                },
+                mounted() {
+                    this.getMonthData();
+                    this.getYearData();
+                    this.month_chart = EChart.init(document.getElementById("month_stats_chart"));
+                    this.month_chart.setOption(month_option);
+                    this.year_chart = EChart.init(document.getElementById("year_stats_chart"));
+                    this.year_chart.setOption(year_option);
+                    window.addEventListener('resize', () => {
+                        this.month_chart.resize();
+                        this.year_chart.resize();
+                    })
+                },
+                computed: {
+                    isPreMonthButtonEnabled() {
+                        return !(this.month === 1 && !this.isValidateYear(this.year - 1));
+                    },
+                    isNextMonthButtonEnabled() {
+                        return this.isValidateMonth(this.month);
+                    },
+                    isPreYearButtonEnabled() {
+                        return this.isValidateYear(this.year - 1);
+                    },
+                    isNextYearButtonEnabled() {
+                        const year = (new Date()).getFullYear();
+                        return this.year < year;
+                    },
+                    month_list() {
+                        const months = [];
+                        for (i = 0; i < 12; i++) {
+                            if (this.isValidateMonth(i)) months.push(i + 1);
+                        }
+                        return months;
+                    }
+                },
+                watch: {
+                    month(v) {
+                        this.getMonthData(this.year + "-" + this.month)
+                    },
+                    year() {
+                        if (!this.isValidateMonth(this.month)) {
+                            this.month = 1;
+                        }
+                        this.getYearData(this.year);
+                        this.getMonthData(this.year + "-" + this.month)
+                    },
+                    year_loading(v) {
+                        if (this.year_chart) {
+                            setTimeout(() => {
+                                if (this.year_loading && new Date() - this.year_loading > 2000) {
+                                    this.year_chart.showLoading();
+                                } else {
+                                    this.year_chart.hideLoading();
+                                }
+                            }, 2000);
+                        }
+                    },
+                    month_loading(v) {
+                        if (this.month_chart) {
+                            setTimeout(() => {
+                                if (this.month_loading && new Date() - this.month_loading > 2000) {
+                                    this.month_chart.showLoading();
+                                } else {
+                                    this.month_chart.hideLoading();
+                                }
+                            }, 2000);
+                        }
+                    }
+                },
+                methods: {
+                    back() {
+                        window.location.href = back_url;
+                    },
+                    repair(m) {
+                        if (!this.repairing) {
+                            this.repairing = m;
+                            $.get(api_url, { op: 'repair', month: m }).then(res => {
+                                this.repairing = false;
+                                if (res.status) {
+                                    return res.data;
+                                } else {
+                                    if (res.data.message) {
+                                        alert(res.data.message);
+                                    }
+                                }
+                            }).then(data => {
+                                console.log(data);
+                            })
+                        }
+                    },
+                    toggleChartView($w) {
+                        if ($w === 'month') {
+                            this.month_view = (this.month_view === 'chart' ? 'form' : 'chart');
+                            localStorage.setItem('stari_month_chart_view', this.month_view);
+                            Vue.nextTick(() => {
+                                this.month_chart && this.month_chart.resize();
+                            })
+                        } else if ($w === 'year') {
+                            this.year_view = (this.year_view === 'chart' ? 'form' : 'chart');
+                            localStorage.setItem('stari_year_chart_view', this.year_view);
+                            Vue.nextTick(() => {
+                                this.year_chart && this.year_chart.resize();
+                            })
+                        }
+                    },
+                    changeMonth(m) {
+                        if (!this.month_loading) {
+                            this.month = m;
+                        }
+                    },
+                    changeYear(y) {
+                        if (!this.year_loading) {
+                            this.year = y;
+                        }
+                    },
+                    isValidateMonth(m) {
+                        const year = (new Date()).getFullYear();
+                        const month = (new Date()).getMonth() + 1;
+                        return this.year < year || (this.year === year && m < month);
+                    },
+                    isValidateYear(y) {
+                        y += '';
+                        return (this.year_list || []).indexOf(y) !== -1;
+                    },
+                    preMonth() {
+                        if (this.month > 1 || this.isValidateYear(this.year - 1)) {
+                            if (--this.month < 1) {
+                                this.month = 12;
+                                this.year--;
+                            }
+                        }
+                    },
+                    nextMonth() {
+                        if (this.isValidateMonth(this.month)) {
+                            if (++this.month > 12) {
+                                this.month = 1;
+                                this.year++;
+                            }
+                        }
+                    },
+                    getMonthOfYear(year, month = 1) {
+                        $.get(api_url, { op: 'year_commission_statistics', year, month }).then(res => {
+                            this.year_loading = new Date();
+                            if (res.status) {
+                                return res.data || [];
+                            } else {
+                                this.year_loading = false;
+                                return [];
+                            }
+                        }).then(data => {
+                            this.initYearChart(data);
+                            if (month++ < 12) {
+                                this.getMonthOfYear(year, month);
+                            } else {
+                                this.year_loading = false;
+                            }
+                        });
+                    },
+                    getYearData(year = '') {
+                        if (!this.year_loading) {
+                            this.year_loading = new Date();
+                            this.resetYearChart();
+                            this.getMonthOfYear(year);
+                        }
+                    },
+                    getDayOfMonth(month, day = 1) {
+                        $.get(api_url, { op: 'month_commission_statistics', month, day }).then(res => {
+                            this.month_loading = new Date();
+                            if (res.status) {
+                                return res.data || [];
+                            } else {
+                                this.month_loading = false;
+                                return [];
+                            }
+                        }).then(data => {
+                            this.initMonthChart(data);
+                            if (day++ < 31) {
+                                this.getDayOfMonth(month, day);
+                            } else {
+                                this.month_loading = false;
+                            }
+                        });
+                    },
+                    getMonthData(month = '') {
+                        if (!this.month_loading) {
+                            this.month_loading = new Date();
+                            this.resetMonthChart();
+                            this.getDayOfMonth(month);
+                        }
+                    },
+                    preYear() {
+                        if (this.isValidateYear(this.year - 1)) {
+                            this.month = 12;
+                            this.year--;
+                        }
+                    },
+                    nextYear() {
+                        this.month = 1;
+                        const year = (new Date()).getFullYear();
+                        if (this.year < year) this.year++;
+                    },
+                    resetYearChart() {
+                        this.year_data = [];
+                        year_option.xAxis.data = [];
+                        year_option.series[0].data = [];
+                        year_option.series[1].data = [];
+                        year_option.series[2].data = [];
+                        this.year_chart && this.year_chart.setOption(year_option, true);
+                    },
+                    initYearChart(data) {
+                        if (data['title']) {
+                            this.year_title = data['title'];
+                        }
+                        if (data['year']) {
+                            this.year_list = data['year'];
+                        }
+                        for (const key in (data['list'] || {})) {
+                            this.year_data.push(data['list'][key]);
+                            year_option.xAxis.data.push(key);
+                            year_option.series[0].data.push(data['list'][key]['order']['free']);
+                            year_option.series[1].data.push(data['list'][key]['order']['fee']);
+                            year_option.series[2].data.push(data['list'][key]['commission']['total']);
+                        }
+                        this.year_chart.setOption(year_option, true);
+                    },
+                    resetMonthChart() {
+                        this.month_data = [];
+                        month_option.xAxis.data = [];
+                        month_option.series[0].data = [];
+                        month_option.series[1].data = [];
+                        month_option.series[2].data = [];
+                        this.month_chart && this.month_chart.setOption(month_option, true);
+                    },
+                    initMonthChart(data) {
+                        if (data['title']) {
+                            this.month_title = data['title'];
+                        }
+                        for (const key in (data['list'] || {})) {
+                            this.month_data.push(Object.assign({}, {'title': key}, data['list'][key]));
+                            month_option.xAxis.data.push(key);
+                            month_option.series[0].data.push(data['list'][key]['order']['free']);
+                            month_option.series[1].data.push(data['list'][key]['order']['fee']);
+                            month_option.series[2].data.push(data['list'][key]['commission']['total']);
+                        }
+                        this.month_chart.setOption(month_option, true);
+                    }
+                }
+            })
+        })
+    </script>
+{template 'common/footer'}

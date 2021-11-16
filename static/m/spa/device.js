@@ -13,8 +13,6 @@ const app = new Vue({
             se: false
         }],
         categoryIndex: 0,
-        accounts: initData.accounts,
-        goods: initData.goods,
         sales: [],
         toast: {
             title: "",
@@ -45,7 +43,12 @@ const app = new Vue({
             data: null
         },
         goods: [],
-        packages: []
+        packages: [],
+        saveUserProfile: false,
+        accounts: [],
+        loading: false,
+        timeout: null,
+        wechatState: null
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -70,27 +73,63 @@ const app = new Vue({
                 });
             })
         });
-        new Swiper('#account-swiper-container', {
-            effect: 'coverflow',
-            grabCursor: true,
-            centeredSlides: true,
-            slidesPerView: 'auto',
-            coverflowEffect: {
-                rotate: 0,
-                stretch: 10,
-                depth: 250,
-                modifier: 1,
-                slideShadows: false
+
+        this.loading = true
+        zovye_fn.getAccounts([], res => {
+            this.accounts = res.data
+            if (this.wechatState === false && this.accounts.findIndex(e => e.username) !== -1) {
+                alert('当前微信版本过低，建议升级微信后再试！')
             }
-        });
+            Vue.nextTick(() => {
+                new Swiper('#account-swiper-container', {
+                    effect: 'coverflow',
+                    grabCursor: true,
+                    centeredSlides: true,
+                    slidesPerView: 'auto',
+                    coverflowEffect: {
+                        rotate: 0,
+                        stretch: 10,
+                        depth: 250,
+                        modifier: 1,
+                        slideShadows: false
+                    }
+                });
+            })
+            this.getGoodsList()
+            this.wechatState && this.accounts.forEach(account => {
+                if(account.username) {
+                    Vue.nextTick(() => {
+                        var btn = document.getElementById(account.uid);
+                        btn.addEventListener('launch', (e) => {
+                            if(this.timeout) {
+                                clearTimeout(this.timeout)
+                                this.timeout = null
+                            }
+                            this.timeout = setTimeout(() => {
+                                if(document.hidden) {
+                                    zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(account.uid)
+                                }
+                            }, account.delay * 1000);
+                        });
+                        btn.addEventListener('error', function (e) {
+                            console.log('fail', e.detail);
+                        });
+                    })
+                }
+            });
+        })
     },
     created() {
+        this.judgeWechat()
         if (typeof zovye_fn.retryOrder === 'function') {
             zovye_fn.retryOrder((res) => {
                 if (res.status) {
                     this.retryMsg = res.data.message;
                 }
             })
+        }
+        if (typeof zovye_fn.saveUserProfile === 'function' && this.accounts.length > 0) {
+            this.saveUserProfile = true;
         }
         this.visibilitychange();
         this.imei = this.imei.substring(this.imei.length - 6);
@@ -123,25 +162,37 @@ const app = new Vue({
                 };                
             }
         })
-        zovye_fn.getGoodsList((res) => {
-            if(res.status) {
-                const data = res.data;
-                if(data.goods) {
-                    this.goods = data.goods.map(e => {
-                        e.count = 1;
-                        return e;
-                    });
-                }
-                this.packages = data.packages || [];
-            }
-            if (this.accounts.length) {
-                this.categoryIndex = 0;
-            } else if (this.goods.length || this.packages.length) {
-                this.categoryIndex = 1;
-            }
-        })
     },
     methods: {
+        judgeWechat(){
+            let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i)
+            let judgewechat = wechat[1].split('.')
+            if(judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
+                this.wechatState = true
+            } else {
+                this.wechatState = false
+            }
+        },
+        getGoodsList() {
+            zovye_fn.getGoodsList((res) => {
+                this.loading = false
+                if(res.status) {
+                    const data = res.data;
+                    if(data.goods) {
+                        this.goods = data.goods.map(e => {
+                            e.count = 1;
+                            return e;
+                        });
+                    }
+                    this.packages = data.packages || [];
+                }
+                if (this.accounts.length) {
+                    this.categoryIndex = 0;
+                } else if (this.goods.length || this.packages.length) {
+                    this.categoryIndex = 1;
+                }
+            })
+        },
         visibilitychange() {
             document.addEventListener('visibilitychange', () => {
                 this.isHidden = document.hidden;
@@ -312,6 +363,10 @@ const app = new Vue({
         },
         buyPackageClick(package) {
             zovye_fn.package_pay(package.id);
+        },
+        sexClick(val) {
+            zovye_fn.saveUserProfile({sex : val});
+            this.saveUserProfile = false;
         }
     }
 });

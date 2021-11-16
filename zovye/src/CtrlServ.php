@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -213,17 +213,18 @@ class CtrlServ
     public static function appNotify($app_id, string $op = 'update', array $payload = []): bool
     {
         if ($app_id) {
-
             $topic = ["app/$app_id"];
-            $data = json_encode(
-                [
-                    'op' => $op,
-                    'data' => $payload,
-                    'serial' => microtime(true) . '',
-                ]
-            );
+            
+            $data = [
+                'op' => $op,
+                'serial' => microtime(true) . '',
+            ];
 
-            $body = json_encode(['topics' => $topic, 'data' => $data]);
+            if ($payload) {
+                $data['data'] = $payload;
+            }
+
+            $body = json_encode(['topics' => $topic, 'data' => json_encode($data)]);
 
             $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
 
@@ -366,7 +367,7 @@ class CtrlServ
     {
         $result = self::httpDelayCallback($delay, self::makeJobUrl($op, $params));
         if (!is_error($result) && $result !== false) {
-            return $result['queued'];
+            return $result['queued'] ?? true;
         }
         return false;
     }

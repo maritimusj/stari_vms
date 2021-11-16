@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -13,7 +13,6 @@ use zovye\model\accountModelObj;
 
 class LocationEventHandler
 {
-
     /**
      * 事件：device.locked
      * @param deviceModelObj $device

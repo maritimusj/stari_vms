@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -73,6 +73,12 @@ class CommissionEventHandler
                 if ($stats && $stats['total'] >= YZShop::getRestrictGoodsTotal($agent)) {
                     return true;
                 }
+            }
+        }
+
+        if (App::isZeroBonusEnabled()) {
+            if ($order->getExtraData('custom.zero_bonus', false)) {
+                return true;
             }
         }
 
@@ -348,7 +354,7 @@ class CommissionEventHandler
                 //第2步，计算商品利润（减去成本价）
                 $goods = $order->getGoods();
 
-                $costPrice = empty($goods) ? 0 : $goods->getCostPrice();
+                $costPrice = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
 
                 $commission_price -= $costPrice;
 

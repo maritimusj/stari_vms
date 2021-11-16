@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\job\order;
@@ -40,7 +40,10 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
             if ($agent_id) {
                 $agent = Agent::get($agent_id);
                 if ($agent) {
-                    $agent->updateSettings('agentData.stats.last_order', $order->getCreatetime());
+                    $agent->updateSettings('agentData.stats.last_order', [
+                        'id' => $order->getId(),
+                        'createtime' => $order->getCreatetime(),
+                    ]);
                 }
             }
 
@@ -103,7 +106,9 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 }
             }
 
-            $log['statistics'][$order->getId()] = Util::orderStatistics($order);
+            $log['statistics'][$order->getId()] = Util::transactionDo(function () use ($order) {
+                return Util::orderStatistics($order);
+            });
         }
 
         //其它未处理订单
@@ -114,10 +119,13 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
         $total = 0;
         /** @var orderModelObj $entry */
         foreach ($other_order->findAll() as $entry) {
-            if ($entry) {
-                $log['statistics'][$entry->getId()] = Util::orderStatistics($entry) ?: 'success';
+            if ($entry && $entry->getCreatetime() === 0) {
+                $result = Util::transactionDo(function () use ($entry) {
+                    return Util::orderStatistics($entry);
+                });
+                $log['statistics'][$entry->getId()] = $result ?: 'success';
             }
-            $total ++;
+            $total++;
         }
 
         if ($total > 50) {

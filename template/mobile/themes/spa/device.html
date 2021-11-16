@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 	<title>{$tpl['site']['title']}</title>
 	{php \zovye\url(true, CSS_SWIPER_URL);}
-	{php \zovye\url(true, 'static/m/spa/device.css?v=202108102001');}
+	{php \zovye\url(true, 'static/m/spa/device.css?v=202111121314');}
 	<link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
 </head>
 <body ontouchstart>
@@ -55,16 +55,20 @@
 		<div class="category-view" v-if="accounts.length > 0 && (goods.length > 0 || packages.length > 0)">
 			<div :class="{'category-item':true,'category-se':item.se}" v-for="(item,index) in categories" @click="categoryClick(index)">{{item.title}}</div>
 		</div>
+		<div class="loading-view" style="margin: 30px auto 10px;" v-if="loading">
+			<img class="loading-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABAEAYAAAD6+a2dAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAABBNJREFUeNrtnE9IFFEcx99bLTExzYMdPKSHMAIlUZCkgkCyk3lKEUE0T10S74LgsUMQQQhFXYrAU9ihg4YHq4MH8ypidtCTqB38k7Tv1+HrLG65ObO742939vu5fNmd2Znv7/d783bmzZsxhhBCCCGFiNU2cFqIiIiUlRkxYmRgwFhjjW1rS15rbg76+rW11lq7u6vtm2QICl9XJ06cuOVl8cXSEta/dEnbP0kTFNJaFHJ+3l/hj+DEifv61duOdjwkIChcW1vgwh/bEFpbteMJi5i2gXC5ciXjTVhjjb16VTuSsIh4A/j5Mzvb2drSjoQEBP13VRV0by+9/n93F1pZqR1P3oP/0osXkdDbt6HNzdCiotD2KyIiIyPpNYBHj7TzlrcggWVl0FevoPH48YleXUUDuXMnND9OnLihIexvff14H2tr0AcPtPOX9yCRU1PBjriDA+j166H5cuLEFRdjP/X1CT38XjtveQ8SeetWel2uHF52zcxox1EoZP8qwBpr7M2bmf4erSEW8auUk8EB0dCAfLx/n+0eMkcTLKLtILe4exfa2Qnt6tJ2lBK02Bs3MvsLmJ7WjiNXQFJKS6Hd3cjP+fPavnwa97osv/z6FfWh14IBBT13DvriBfT37+MLv7KCwre3a/suNE7tLhcKXF2dPLbuDdUuLuL+u3PaCSGEEEIIIYQQQoh3HV9ejoGb8XHo7Cx0agrL+/q0fZIskzyTZ2XF35DumzfavkmWQEHfvUvvzk5Pj7b/QgH5rq2FPnwIranJcINFRYmbNGkxOamdmELhnx7aiRO3sHDS71LPBxAjJjFZ88yZ9GyVlmonJuqg2t6TSyUliQXWWGOPfE5BygZgYzZmYwcH+PTlS3BnRozMzmonKOrgJpoI8t3RAR0dhd67l/EO0MKuXYPu7/vr+hcX0QWd3AJJnoCCNjaiwJ8+JZ8bbG1Bnz/HehUV2n4JIYQQQgghhBBCCCGEeIT+ZBCGiL0ngfr7odXV0L/fzBmPayeEZAncE+joQAM46SVNHz9C+T6AyICCfv8ebAJJb6+2b508VVXhgHn5Ep/n5qCDg9r+ggeUNIcwKE+favvXyZdX+L9xDtrcHNb+Q+pyNzeh+/vBfre+HlagOYs11tjLl1MsPDxHS7U8h0HLffLE35HvzSfIYBJjnoK4+/uTj3iPHz+gFy5o+wwe2OGMIOjjxwhkexsajyfe4u3EiWtp0farDfLS1AS9fz9vC///AK2FcrIoUQINsKcH+vkz9Ns36NgYeqSzZ7V9kiyDAnd1+TsnefZM2y/JMijshw/+GsDOTqG8OrbARt78FtQbkYz+yGTkA0wgRoy8fetv5cnJ5AdjSGRAFz88DPWGqjc2oBMT3mPw2j4JIYQQQsLkDxGHUgxHohgaAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIwLTEwLTI1VDE0OjU4OjUyKzA4OjAw4mNAkQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMC0xMC0yNVQxNDo1ODo1MiswODowMJM++C0AAABRdEVYdHN2ZzpiYXNlLXVyaQBmaWxlOi8vL2hvbWUvYWRtaW4vaWNvbi1mb250L3RtcC9pY29uX3IydDd6N3MzY3llL2xvYWRpbmctZG90dGVkLnN2Z2puT08AAAAASUVORK5CYII=" >
+			<span style="margin-top: 10px;font-size: 12px;">正在加载中...</span>
+		</div>
 		<div class="none-desc" v-else-if="accounts.length == 0 && goods.length == 0 && packages.length == 0">
 			<img src="data:image/png;base64,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" >
 			<span>暂无免费次数可用，或商品已售罄！</span>
 		</div>
 		<div id="account-swiper-container" class="swiper-container" v-show="categoryIndex == 0">
 			<div class="swiper-wrapper">
-				<div v-for="item in accounts" class="swiper-slide card" :style="{'border':'1px solid' + item.clr,'box-shadow':'0px 0px 5px' + item.clr}">
+				<div v-if="item.username && wechatState === true || item.qrcode || item.media" v-for="item in accounts" class="swiper-slide card" :style="{'border':'1px solid' + item.clr,'box-shadow':'0px 0px 5px' + item.clr}">
 					<div class="top-view" :style="{'background-color':item.clr}">
 						<img class="avatar" :src="item.img" />
-						<span class="name">{{item.title}}</span>
+						<span class="name" v-html="item.title"></span>
 					</div>
 					<img class="account-qrcode" :src="item.qrcode" v-if="item.qrcode" />
 					<div class="account-video" v-else-if="item.media">
@@ -73,8 +77,21 @@
 						    <img class="play-icon" src="{MODULE_URL}static/m/spa/img/play_icon.png">
 						</div>
 					</div>
-					<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
-					<span class="desc">{{item.desc}}</span>
+					<div class="account-video" v-else-if="item.username">
+						<img class="video-cover" :src="item.img"></img>
+						<div class="play-icon-mask">
+							<wx-open-launch-weapp :id="item.uid" :username="item.username" :path="item.path">
+								<script type="text/wxtag-template">
+									<style>.play-icon { width: 40px }</style>
+									<img class="play-icon" src="{MODULE_URL}static/m/spa/img/click.svg">
+								</script>
+							</wx-open-launch-weapp>
+						</div>
+					</div>
+					<span class="desc" v-html="item.descr" v-if="item.descr"></span>
+					<span v-else-if="item.qrcode">长按识别二维码</span>
+					<span v-else-if="item.media" style="margin-top: 3px;">点击观看</span>
+					<span v-else-if="item.username" style="margin-top: 3px;">点击打开小程序</span>
 				</div>
 			</div>
 		</div>
@@ -193,33 +210,32 @@
 	        <div class="confirm" @click="alertConfirmClick">确定</div>
 	    </div>
 	</div>
+	<div class="mask" v-if="saveUserProfile">
+		<div class="sex-view">
+			<span style="font-size: 18px;">完善信息获取更多服务</span>
+			<span style="margin-top: 10px;color: orchid;">您的性别</span>
+			<div style="width: 100%;display: flex;margin-top: 20px;">
+				<div class="sex-item" @click="sexClick(1)">
+					<img src="{MODULE_URL}static/m/spa/img/male_avatar.png">
+					<span style="color: lightblue;">男</span>
+				</div>
+				<div class="sex-item" @click="sexClick(2)">
+					<img src="{MODULE_URL}static/m/spa/img/female_avatar.png">
+					<span style="color: pink;">女</span>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {$tpl['js']['code']}
 {php \zovye\url(true, JS_VUE_URL, JS_SWIPER_URL);}
 <script type="text/javascript">
 		const initData = {
 			imei: "{$tpl['device']['imei']}",
-			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}'),
-			accounts: [
-				{loop $tpl['accounts'] $index $item}
-				{
-					uid: "{$item['uid']}",
-					img: "{$item['img']}",
-					title: "{$item['title']}",
-					desc:"{$item['descr']}",
-					clr:"{$item['clr']}",
-					{if $item['qrcode']}
-					qrcode:"{$item['qrcode']}"
-					{else}
-					media:"{$item['media']}",
-					duration:{php echo intval($item['duration'])}
-					{/if}
-				},
-				{/loop}
-			]
+			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
 		};
 </script>
-{php \zovye\url(true, 'static/m/spa/device.js?v=202108102002');}
+{php \zovye\url(true, 'static/m/spa/device.js?v=202111121314');}
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 {if !empty($tpl['site']['warning'])}

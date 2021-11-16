@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\model;
@@ -44,9 +44,10 @@ use function zovye\tb;
  * @method setOrderLimits($limits)
  * @method int getOrderNo()
  * @method setOrderNo($no)
+ * @method int getType()
+ * @method setType($type)
  * @method string getGroupName()
  * @method setGroupName($group)
- * @method int getState()
  * @method void setState(int $state)
  * @method string getUrl()
  * @method setUrl($url)
@@ -111,6 +112,9 @@ class accountModelObj extends modelObj
     protected $group_name;
 
     /** @var int */
+    protected $type;
+
+    /** @var int */
     protected $state;
 
     /** @var string */
@@ -135,9 +139,11 @@ class accountModelObj extends modelObj
     {
         return [
             'id' => $this->getId(),
-            'state' => $this->getState(),
+            'type' => $this->getType(),
+            'banned' => $this->isBanned(),
             'clr' => $this->getClr(),
             'name' => $this->getName(),
+            'uid' => $this->getUid(),
             'title' => $this->getTitle(),
             'descr' => $this->getDescription(),
             'img' => $this->getImg(),
@@ -151,17 +157,27 @@ class accountModelObj extends modelObj
             return true;
         }
 
-        if ($this->isSpecial()) {
-            $status = [
-                Account::JFB => App::isJfbEnabled(),
-                Account::MOSCALE => App::isMoscaleEnabled(),
-                Account::YUNFENBA => App::isYunfenbaEnabled(),
-                Account::AQIINFO => App::isAQiinfoEnabled(),
-                Account::ZJBAO => App::isZJBaoEnabled(),
-                Account::MEIPA => App::isMeiPaEnabled(),
-                Account::KINGFANS => App::isKingFansEnabled(),
-                Account::SNTO => App::isSNTOEnabled(),
-            ];
+        if ($this->isDouyin()) {
+            return App::isDouyinEnabled();
+        }
+
+        if ($this->isThirdPartyPlatform()) {
+            static $status = null;
+            if (is_null($status)) {
+                $status = [
+                    Account::JFB => App::isJfbEnabled(),
+                    Account::MOSCALE => App::isMoscaleEnabled(),
+                    Account::YUNFENBA => App::isYunfenbaEnabled(),
+                    Account::AQIINFO => App::isAQiinfoEnabled(),
+                    Account::ZJBAO => App::isZJBaoEnabled(),
+                    Account::MEIPA => App::isMeiPaEnabled(),
+                    Account::KINGFANS => App::isKingFansEnabled(),
+                    Account::SNTO => App::isSNTOEnabled(),
+                    Account::YFB => App::isYFBEnabled(),
+                    Account::WxWORK => App::isWxWorkEnabled(),
+                ];
+            }
+
             $state = $status[$this->getType()];
             if (isset($state) && !$state) {
                 return true;
@@ -199,7 +215,7 @@ class accountModelObj extends modelObj
 
     public function balance(): int
     {
-        return intval($this->getBalanceDeductNum());
+        return $this->getBalanceDeductNum();
     }
 
     public function getTitle(): string
@@ -209,12 +225,12 @@ class accountModelObj extends modelObj
 
     public function title(): string
     {
-        return strval($this->getTitle());
+        return $this->getTitle();
     }
 
     public function name(): string
     {
-        return strval($this->getName());
+        return $this->getName();
     }
 
     public function commission_price(): int
@@ -232,7 +248,7 @@ class accountModelObj extends modelObj
         return Account::format($this);
     }
 
-    public function isSpecial(): bool
+    public function isThirdPartyPlatform(): bool
     {
         return in_array($this->getType(), [
             Account::JFB,
@@ -243,15 +259,17 @@ class accountModelObj extends modelObj
             Account::MEIPA,
             Account::KINGFANS,
             Account::SNTO,
+            Account::YFB,
+            Account::WxWORK,
         ]);
     }
 
-    public function getType(): int
+    public function getConfig($path = '', $default = null)
     {
-        if ($this->state != Account::BANNED) {
-            return $this->state;
+        if (empty($path)) {
+            return $this->get('config', $default);
         }
-        return intval($this->settings('config.type'));
+        return $this->settings('config.' . $path, $default);
     }
 
     public function isVideo(): bool
@@ -259,6 +277,16 @@ class accountModelObj extends modelObj
         return $this->getType() == Account::VIDEO;
     }
 
+    public function isDouyin(): bool
+    {
+        return $this->getType() == Account::DOUYIN;
+    }
+
+    public function isWxApp(): bool
+    {
+        return $this->getType() == Account::WXAPP;
+    }
+   
     public function isJFB(): bool
     {
         return $this->getType() == Account::JFB;
@@ -297,6 +325,16 @@ class accountModelObj extends modelObj
     public function isSNTO(): bool
     {
         return $this->getType() == Account::SNTO;
+    }
+
+    public function isYFB(): bool
+    {
+        return $this->getType() == Account::YFB;
+    }
+
+    public function isWxWork(): bool
+    {
+        return $this->getType() == Account::WxWORK;
     }
 
     public function isAuth(): bool

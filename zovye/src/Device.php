@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -525,7 +525,7 @@ class Device extends State
 
             $serial = $result->getSerial();
             if ($serial) {
-                $data['extra']['serial'] = $serial;
+                $data['extra'] = json_encode(['serial' => $serial]);
             }
 
             if (!m('device_events')->create($data)) {
@@ -645,15 +645,20 @@ class Device extends State
         if ($agent) {
             $device->setAgent($agent);
         } else {
-            $original = $device->getAgent();
-            if ($original) {
-                //如果用户上级也是代理商，则设备代理商设置为上级代理商，否则设置为平台（即代理商为null)
-                $superior = $original->getSuperior();
-                if ($superior && $superior->isAgent()) {
-                    $device->setAgent($superior);
-                } else {
-                    $device->setAgent();
-                }
+            //解绑设备，根据系统设置决定设备归属
+            if (empty(settings('agent.device.unbind'))) {
+                $original = $device->getAgent();
+                if ($original) {
+                    //如果用户上级也是代理商，则设备代理商设置为上级代理商，否则设置为平台（即代理商为null)
+                    $superior = $original->getSuperior();
+                    if ($superior && $superior->isAgent()) {
+                        $device->setAgent($superior);
+                    } else {
+                        $device->setAgent();
+                    }
+                }                
+            } else {
+                $device->setAgent();
             }
         }
 

@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -10,7 +12,7 @@ use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
 
-class AQIInfoAccount
+class AQIInfoAccount extends AQIInfo
 {
     const API_URL = 'https://c.api.aqiinfo.com/ChannelApi/UfansTicket';
     const CB_RESPONSE = '{"code":200}';
@@ -22,11 +24,9 @@ class AQIInfoAccount
     {
         $this->app_key = $app_key;
         $this->app_secret = $app_secret;
-    }
 
-    public static function getUid(): string
-    {
-        return Account::makeSpecialAccountUID(Account::AQIINFO, Account::AQIINFO_NAME);
+        parent::$type = Account::AQIINFO;
+        parent::$name = Account::AQIINFO_NAME;
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -34,7 +34,7 @@ class AQIInfoAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::AQIINFO]);
+        $acc = Account::findOneFromType(Account::AQIINFO);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['key']) || empty($config['secret'])) {
@@ -119,69 +119,6 @@ class AQIInfoAccount
         return $v;
     }
 
-    public static function verifyData($params): array
-    {
-        if (!App::isAQiinfoEnabled()) {
-            return err('没有启用！');
-        }
-
-        $acc = Account::findOne(['state' => Account::AQIINFO]);
-        if (empty($acc)) {
-            return err('找不到指定公众号！');
-        }
-
-        $config = $acc->settings('config', []);
-        if (empty($config)) {
-            return err('没有配置！');
-        }
-
-        Util::logToFile('AQIInfo', [
-            'params' => $params,
-            'config' => $config,
-        ]);
-
-        // if ($config['key'] !== $params['appKey'] || self::sign($params, $config['secret']) !== $params['ufsign']) {
-        //     return err('签名校验失败！');
-        // }
-
-        return ['account' => $acc];
-    }
-
-    public static function cb($params = [])
-    {
-        try {
-            $res = self::verifyData($params);
-            if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
-            }
-
-            list($shadow_id, $openid) = explode(':', $params['extra'], 2);
-
-            /** @var userModelObj $user */
-            $user = User::get($openid, true);
-            if (empty($user) || $user->isBanned()) {
-                throw new RuntimeException('找不到指定的用户或者已禁用');
-            }
-
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $shadow_id]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $shadow_id);
-            }
-
-            $acc = $res['account'];
-
-            $order_uid = Order::makeUID($user, $device, strval($params['tradeNo']));
-
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
-
-        } catch (Exception $e) {
-            Util::logToFile('AQIInfo', [
-                'error' => '发生错误! ',
-                'result' => $e->getMessage(),
-            ]);
-        }
-    }
 
     public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array
     {
@@ -206,22 +143,5 @@ class AQIInfoAccount
         }
 
         return $result;
-    }
-
-    public static function sign(array $data, string $secret): string
-    {
-        ksort($data);
-
-        $arr = [];
-        foreach ($data as $key => $val) {
-            if ($key == 'ufsign') {
-                continue;
-            }
-            $arr[] = "$key=$val";
-        }
-
-        $str = implode('&', $arr);
-
-        return md5(hash_hmac('sha1', $str, $secret, true));
     }
 }

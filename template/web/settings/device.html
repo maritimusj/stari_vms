@@ -6,10 +6,33 @@
 <!--</div>-->
 {/if}
 {php \zovye\url(true, 'static/css/common.css?v=20201108');}
+<style>
+    .fa-info-circle {
+        position: relative;
+    }
+    .limits {
+        position: absolute;
+        z-index: 99;
+        background-color: #ffffff;
+        border: 1px solid #9e9e9e;
+        padding: 6px 10px;
+        white-space: nowrap;
+        display: none;
+    }
+    .fa-info-circle:hover .limits {
+        display: block;
+    }
+</style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default panel-first nav-tab-item">
         <div class="panel-body">
+            {if DEBUG}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>警告，</strong> 系统当前处于调试模式！如果需要关闭，请到zovye/include/constants.php中修改DEBUG常量值为FALSE！
+            </div>
+            {/if}
             <div class="seg">
                 <div class="title">界面</div>
                 <div class="form-group">
@@ -70,7 +93,28 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="siteWarning" class="col-md-2 control-label">腾讯LBS key</label>
+                    <label for="siteWarning" class="col-md-2 control-label">
+                        <div>
+                            腾讯LBS key 
+                            {if $lbs_limits}
+                            <i class="fa fa-info-circle" style="color:gray;">
+                                <div class="limits">
+                                    <div>
+                                         <span>当前并发量（次/秒）</span> : <span>{$lbs_limits['current_qps']} / {$lbs_limits['limit_qps']}</span>
+                                    </div>
+                                   <div>
+                                       <span>剩余调用量（次/日）</span> : <span>{php echo $lbs_limits['limit_pv'] - $lbs_limits['current_pv']}</span>
+                                   </div>
+                                   {if !empty($lbs_limits['updatetime'])}
+                                    <div>
+                                        <span>更新时间</span> : <span>{php echo date('Y-m-d H:i:s', $lbs_limits['updatetime'])}</span>
+                                    </div>
+                                   {/if}
+                                </div>
+                            </i>
+                            {/if}                
+                        </div>
+                    </label>
                     <div class="col-md-10">
                         <input type="text" class="form-control inputMask" name="lbsKey" id="lbsKey" value="{$lbsKey}">
                         <span class="help-block">* 指定腾讯LBS服务的APP KEY</span>
@@ -133,6 +177,20 @@
                             顺序出货
                         </label>
                         <span class="help-block">* 平衡出货：库存多的货道优先出货；顺序出货：库存少的货道优先出货。</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="waitQueueEnabled" class="col-md-2 control-label">排队出货</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="checkbox col-md-7">
+                                <label>
+                                    <input type="checkbox" name="waitQueueEnabled" id="waitQueueEnabled" value="1" {if $settings['order']['waitQueue']['enabled']}checked{/if}>
+                                    设备忙时，则进入等待队列，等待出设备空闲后再出货。
+                                </label>
+                                <span class="help-block">* 未启用时，尝试锁定设备失败后则出货失败，订单进入退款流程。</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="seg-divider"></div>
@@ -279,6 +337,20 @@
                                     记录设备位置变化
                                 </label>
                                 <span class="help-block">* 如果设备位置发生了变化，则显示提示图标（基站定位）</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="eventLog" class="col-md-2 control-label">设备消息</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="checkbox col-md-7">
+                                <label>
+                                    <input type="checkbox" name="eventLog" id="eventLog" value="1" {if $settings['device']['event']['enabled']}checked{/if}>
+                                    记录设备消息
+                                </label>
+                                <span class="help-block">* 记录设备上报的所有消息，可以在设备详情 > 设备消息中查看</span>
                             </div>
                         </div>
                     </div>

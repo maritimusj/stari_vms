@@ -316,7 +316,7 @@ body {
 .mask {
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 0;
     left: 0;
@@ -489,7 +489,7 @@ body {
 }
 
 .account-video {
-	width: calc(100% - 40px);
+	width: 50%;
 	margin-top: 15px;
 	position: relative;
 	display: flex;
@@ -535,6 +535,7 @@ body {
     padding: 0 20px 20px;
     text-align: center;
     font-weight: 400;
+    margin-top: 5px;
 }
 
 .back-circle {
@@ -809,4 +810,37 @@ body {
     flex-direction: row;
     align-items: center;
     margin-top: 10px;
+}
+
+.sex-view {
+    width: 100%;
+    padding: 20px 0;
+    background-color: white;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.sex-item {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sex-item img {
+    width: 80px;
+    height: 80px;
+}
+
+.sex-item span {
+    margin-top: 10px;
+}
+
+.sex-item:active {
+    opacity: 0.7;
 }

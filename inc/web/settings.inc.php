@@ -1,8 +1,7 @@
 <?php
-
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -79,6 +78,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['device']['shipment']['balanced'] = request::bool('shipmentBalance') ? 1 : 0;
 
+        $settings['order']['waitQueue']['enabled'] = request::bool('waitQueueEnabled') ? 1 : 0;
+        
         $settings['goods']['agent']['edit'] = request::bool('allowAgentEditGoods') ? 1 : 0;
 
         $settings['goods']['image']['proxy'] = [
@@ -91,6 +92,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['device']['v-device']['enabled'] = request::bool('vDevice') ? 1 : 0;
         $settings['device']['lac']['enabled'] = request::bool('lacConfirm') ? 1 : 0;
+        $settings['device']['event']['enabled'] = request::bool('eventLog') ? 1 : 0;
 
     } elseif ($save_type == 'user') {
         $settings['user']['center'] = [
@@ -149,10 +151,12 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
         $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;
+        $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
+        $settings['account']['douyin']['enabled'] = request::bool('douyin') ? 1 : 0;
 
-        $specialAccounts = [
+        $third_party_platform = [
             'jfbFAN' => [
                 __NAMESPACE__ . '\Account::createJFBAccount',
                 'jfb.fan.enabled',
@@ -186,24 +190,35 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createSNTOAccount',
                 'snto.fan.enabled',
             ],
+            'yfbFAN' => [
+                __NAMESPACE__ . '\Account::createYFBAccount',
+                'yfb.fan.enabled',
+            ],
+            'wxWorkFAN' => [
+                __NAMESPACE__ . '\Account::createWxWorkAccount',
+                'wxWork.fan.enabled',
+            ],
         ];
 
-        $accounts_need_refresh = false;
+        $accounts_updated = false;
 
-        foreach ($specialAccounts as $key => $v) {
+        foreach ($third_party_platform as $key => $v)  {
             $enabled = request::bool($key) ? 1 : 0;
-            if ($enabled) {
-                call_user_func($v[0]);
+
+            $acc = call_user_func($v[0]);
+            if ($acc) {
+                $acc->setState($enabled ? Account::NORMAL : Account::BANNED);
+                $acc->save();
             }
 
             if (getArray($settings, $v[1]) != $enabled) {
-                $accounts_need_refresh = true;
+                $accounts_updated = true;
             }
 
             setArray($settings, $v[1], $enabled);
         }
 
-        if ($accounts_need_refresh) {
+        if ($accounts_updated) {
             setArray($settings, 'accounts.lastupdate', '' . microtime(true));
         }
 
@@ -260,11 +275,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['agent']['reg']['mode'] = request::bool('agentRegMode') ? Agent::REG_MODE_AUTO : Agent::REG_MODE_NORMAL;
         $settings['agent']['reg']['referral'] = request::bool('agentReferral') ? 1 : 0;
 
+        $settings['agent']['device']['unbind'] = request::bool('deviceUnbind') ? 1 : 0;
+
         if ($settings['agent']['reg']['mode'] == Agent::REG_MODE_AUTO) {
 
             $settings['agent']['reg']['superior'] = request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
             $settings['agent']['reg']['level'] = request::str('agentRegLevel');
-            $settings['agent']['reg']['commission_fee'] = round(request::int('agentCommissionFee') * 100);
+            $settings['agent']['reg']['commission_fee'] = round(request::float('agentCommissionFee', 0, 2) * 100);
             $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 1 : 0;
 
             $settings['agent']['reg']['funcs'] = Util::parseAgentFNsFromGPC();
@@ -276,10 +293,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
                 if ($settings['agent']['reg']['rel_gsp']['enabled']) {
 
-                    $rel_0 = request::float('rel_gsp_level0', 0, 2);
-                    $rel_1 = request::float('rel_gsp_level1', 0, 2);
-                    $rel_2 = request::float('rel_gsp_level2', 0, 2);
-                    $rel_3 = request::float('rel_gsp_level3', 0, 2);
+                    $rel_0 = request::float('rel_gsp_level0', 0, 2) * 100;
+                    $rel_1 = request::float('rel_gsp_level1', 0, 2) * 100;
+                    $rel_2 = request::float('rel_gsp_level2', 0, 2) * 100;
+                    $rel_3 = request::float('rel_gsp_level3', 0, 2) * 100;
 
                     if ($settings['agent']['reg']['gsp_mode_type'] == 'amount') {
                         $rel_0 = intval(round($rel_0));
@@ -288,18 +305,24 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                         $rel_3 = intval(round($rel_3));
                     } else {
                         $total = $rel_0 + $rel_1 + $rel_2 + $rel_3;
-                        if ($total > 100) {
-                            $rel_3 = round($rel_3 / $total * 100, 2);
-                            $rel_2 = round($rel_2 / $total * 100, 2);
-                            $rel_1 = round($rel_1 / $total * 100, 2);
+                        if ($total > 10000) {
+                            $rel_3 = round($rel_3 / $total * 10000, 2);
+                            $rel_2 = round($rel_2 / $total * 10000, 2);
+                            $rel_1 = round($rel_1 / $total * 10000, 2);
                         }
-                        $rel_0 = 100.00 - $rel_1 - $rel_2 - $rel_3;
+                        $rel_0 = 10000 - $rel_1 - $rel_2 - $rel_3;
                     }
 
                     $settings['agent']['reg']['rel_gsp']['level0'] = $rel_0;
                     $settings['agent']['reg']['rel_gsp']['level1'] = $rel_1;
                     $settings['agent']['reg']['rel_gsp']['level2'] = $rel_2;
                     $settings['agent']['reg']['rel_gsp']['level3'] = $rel_3;
+
+                    $settings['agent']['reg']['rel_gsp']['order'] = [
+                        'f' => request::bool('freeOrderGSP') ? 1 : 0,
+                        'b' => request::bool('balanceOrderGSP') ? 1 : 0,
+                        'p' => request::bool('payOrderGSP') ? 1 : 0,
+                    ];
                 }
                 //佣金奖励
                 $settings['agent']['reg']['bonus']['enabled'] = request::bool('agentBonusEnabled') ? 1 : 0;
@@ -428,6 +451,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['account']['wx']['platform']['config']['key'] = request::trim('wxPlatformKey');
         }
 
+        if (App::isDouyinEnabled()) {
+            Config::douyin('client', [
+                'key' => request::trim('douyinClientKey', ''),
+                'secret' => request::trim('douyinClientSecret', ''),
+            ], true);
+        }
+
         $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
 
         $settings['misc']['adminAccount'] = request::trim('adminAccount');
@@ -547,6 +577,9 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             ], true);
         }
 
+        if (App::isZeroBonusEnabled()) {
+            $settings['custom']['bonus']['zero']['v'] = min(100, request::float('zeroBonus', 0, 2));
+        }
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;
         $settings['pay']['wx']['enable'] = $wx_enabled;
@@ -727,6 +760,10 @@ if ($op == 'account') {
         $tpl_data['moscaleRegionSaved'] = is_array($settings['moscale']['fan']['region']) ? $settings['moscale']['fan']['region'] : [];
     }
 
+    if (App::isDouyinEnabled()) {
+        $tpl_data['douyin'] = Config::douyin('client', []);
+    }
+
 } elseif ($op == 'refreshWxPlatformToken') {
 
     JSON::success([
@@ -761,6 +798,7 @@ if ($op == 'account') {
         if ($data['now']) {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
+        $tpl_data['queue'] = Config::app('queue', []);
     }
     $tpl_data['migrate'] = Migrate::detect(false);
 } elseif ($op == 'unlock') {
@@ -789,6 +827,7 @@ if ($op == 'account') {
     $tpl_data['test_url'] = Util::murl('testing');
     $tpl_data['get_schema'] = settings('device.get.theme');
     $tpl_data['themes'] = Theme::all();
+    $tpl_data['lbs_limits'] = Config::location('tencent.lbs.limits', []);
 
 } elseif ($op == 'agent') {
 

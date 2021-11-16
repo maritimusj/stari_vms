@@ -237,6 +237,18 @@
                 </div>
             </div>
             {/if}
+            {if \zovye\App::isZeroBonusEnabled()}
+            <div class="seg">
+                <div class="title">佣金</div>
+                <div class="form-group">
+                    <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
+                    <div class="col-md-10">
+                        <input type="number" step="0.01" class="form-control" name="zeroBonus" id="zeroBonus" value="{$settings['custom']['bonus']['zero']['v']}">
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
     <div class="form-btn">

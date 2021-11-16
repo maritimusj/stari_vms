@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 
 namespace zovye;
@@ -9,6 +13,11 @@ use zovye\model\orderModelObj;
 
 class VoucherEventHandler
 {
+    /**
+     * @param deviceModelObj $device
+     * @param orderModelObj $order
+     * @return bool
+     */
     public static function onDeviceOrderCreated(deviceModelObj $device, orderModelObj $order): bool
     {
         if (!App::isGoodsVoucherEnabled()) {

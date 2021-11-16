@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 
 namespace zovye\api\wx;
@@ -121,7 +125,7 @@ class commission
 
         $uid = request::trim('uid');
         if ($uid) {
-            $account = Account::findOne(['uid' => $uid]);
+            $account = Account::findOneFromUID($uid);
 
             if (!$account->getShared()) {
                 return error(State::ERROR, '公众号没有加入推广！');
@@ -281,13 +285,13 @@ class commission
             $user = $user->getPartnerAgent();
         }
 
-        $firstOrder = \zovye\Order::getFirstOrderOfUser($user);
-        if (empty($firstOrder)) {
+        $firstCommissionBalance = CommissionBalance::getFirstCommissionBalance($user);
+        if (empty($firstCommissionBalance)) {
             $data['data'] = [];
             return $data;
         }
 
-        $begin = new DateTime("@{$firstOrder->getCreatetime()}");
+        $begin = new DateTime("@{$firstCommissionBalance->getCreatetime()}");
         $end = new DateTime();
 
         $data = [];

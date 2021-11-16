@@ -1,19 +1,24 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
 use Closure;
 use Exception;
+use zovye\base\modelObj;
 use zovye\model\cacheModelObj;
 
 class Cache
 {
-    public static function create($data = []): ?cacheModelObj
+    protected static function create($data = []): ?cacheModelObj
     {
         return m('cache')->create($data);
     }
 
-    public static function query($condition = []): base\modelObjFinder
+    protected static function query($condition = []): base\modelObjFinder
     {
         return m('cache')->query($condition);
     }
@@ -21,7 +26,7 @@ class Cache
     /**
      * @return cacheModelObj
      */
-    public static function get($id, $is_uid = false): ?cacheModelObj
+    protected static function get($id, $is_uid = false): ?cacheModelObj
     {
         if ($is_uid) {
             return self::query(['uid' => $id])->findOne();
@@ -30,7 +35,7 @@ class Cache
         return self::query(['id' => $id])->findOne();
     }
 
-    public static function exists($condition = []): bool
+    protected static function exists($condition = []): bool
     {
         return self::query($condition)->exists();
     }
@@ -38,28 +43,28 @@ class Cache
     public static function ResultExpiredAfter(int $seconds): Closure
     {
         return function (array &$data) use ($seconds) {
-            $data['expire_time'] = time() + $seconds;
+            $data['expiration_time'] = time() + $seconds;
         };
     }
 
     public static function ResultExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['expire_time'] = is_int($time) ? $time : strtotime($time);
+            $data['expiration_time'] = is_int($time) ? $time : strtotime($time);
         };
     }
 
     public static function ErrorExpiredAfter(int $seconds): Closure
     {
         return function (array &$data) use ($seconds) {
-            $data['error_expired'] = time() + $seconds;
+            $data['error_expiration'] = time() + $seconds;
         };
     }
 
     public static function ErrorExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['error_expired'] = is_int($time) ? $time : strtotime($time);;
+            $data['error_expiration'] = is_int($time) ? $time : strtotime($time);;
         };
     }
 
@@ -70,22 +75,40 @@ class Cache
         };
     }
 
-    public static function makeUID(array $v = []): string
+    public static function makeUID($v): string
     {
-        $v = We7::uniacid($v);
-        return sha1(http_build_query($v));
+        $arr = We7::uniacid([]);
+
+        $v = is_array($v) ? $v : [$v];
+        foreach ($v as $index => $item) {
+            if ($item instanceof modelObj) {
+                $arr[$index] = get_class($item);
+                $arr[get_class($item)] = $item->getId();
+            } else {
+                $arr[$index] = strval($item);
+            }
+        }
+        return sha1(http_build_query($arr));
     }
 
     public static function expire($uid)
     {
-        $obj = self::get($uid, true);
+        $obj = self::get(self::makeUID($uid), true);
         if ($obj) {
             $obj->destroy();
         }
     }
 
-    public static function fetch($uid, callable $fn = null, callable ...$args)
+    /**
+     * @param $obj
+     * @param callable|null $fn 初始化方法
+     * @param callable ...$args 附加参数
+     * @return array|mixed|cacheModelObj|null
+     */
+    public static function fetch($obj, callable $fn = null, callable ...$args)
     {
+        $uid = self::makeUID($obj);
+
         $result = self::get($uid, true);
         if ($result) {
             if ($result->isExpired()) {
@@ -114,8 +137,8 @@ class Cache
             }
 
             if (is_error($res)) {
-                if (isset($conf['error_expired'])) {
-                    $data['expiretime'] = $conf['error_expired'];
+                if (isset($conf['error_expiration'])) {
+                    $data['expiration'] = $conf['error_expiration'];
                 } else {
                     return $result;
                 }
@@ -130,8 +153,8 @@ class Cache
         $now = time();
         $data['createtime'] = $now;
         $data['updatetime'] = $now;
-        if (!isset($data['expiretime'])) {
-            $data['expiretime'] = intval($conf['expire_time']);
+        if (!isset($data['expiration'])) {
+            $data['expiration'] = intval($conf['expiration_time']);
         }
 
         if (self::create($data)) {

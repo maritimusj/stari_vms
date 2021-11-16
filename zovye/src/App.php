@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -186,6 +190,28 @@ class App
     {
         return onceCall(function() {
             return !empty(settings('snto.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 粉丝宝 吸粉
+     *
+     */
+    public static function isYFBEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('yfb.fan.enabled'));
+        });
+    }
+
+    /**
+     * 是否开启 企业微信接新（阿旗） 吸粉
+     *
+     */
+    public static function isWxWorkEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('wxWork.fan.enabled'));
         });
     }
 
@@ -421,6 +447,8 @@ class App
             $_SESSION['ali_user_id'] = $user->getOpenid();
         } elseif ($user->isWxUser()) {
             $_SESSION['wx_user_id'] = $user->getOpenid();
+        } elseif ($user->isDouYinUser()) {
+            $_SESSION['douyin_user_id'] = $user->getOpenid();
         }
     }
 
@@ -431,6 +459,9 @@ class App
         }
         if (self::isWxUser()) {
             return strval($_SESSION['wx_user_id']);
+        }
+        if (self::isDouYinUser()) {
+            return strval($_SESSION['douyin_user_id']);
         }
         return '';
     }
@@ -444,6 +475,11 @@ class App
     {
         return !empty($_SESSION['wx_user_id']);
     }
+
+     public static function isDouYinUser(): bool
+    {
+        return !empty($_SESSION['douyin_user_id']);
+    }   
 
     public static function isChannelPayEnabled(): bool
     {
@@ -512,5 +548,13 @@ class App
         return onceCall(function() {
             return boolval(settings('account.appQRCode.enabled'));
         });
+    }
+
+    public static function isZeroBonusEnabled(): bool {
+        return settings('custom.bonus.zero.enabled', false);
+    }
+
+    public static function isDouyinEnabled(): bool {
+        return settings('account.douyin.enabled', false);
     }
 }

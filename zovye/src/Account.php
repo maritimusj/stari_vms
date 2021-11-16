@@ -1,14 +1,14 @@
 <?php
-
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
 
 //公众号状态
 use zovye\base\modelObjFinder;
+use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -19,12 +19,18 @@ use zovye\model\userModelObj;
  */
 class Account extends State
 {
-    const BANNED = 0;
+    const NORMAL = 0;
 
-    const NORMAL = 1;
+    const BANNED = 1;
 
     //视频
     const VIDEO = 10;
+
+    //抖音
+    const DOUYIN = 20;
+
+    //小程序
+    const WXAPP = 30;
 
     //授权接入公众号
     const AUTH = 98;
@@ -53,6 +59,13 @@ class Account extends State
     //史莱姆
     const SNTO = 106;
 
+    //粉丝宝
+    const YFB = 107;
+
+    //企业微信拉新
+    //refer: https://www.yuque.com/docs/share/cee4fad0-c591-4086-8fd1-79470ffb6b2b
+    const WxWORK = 108;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -79,6 +92,12 @@ class Account extends State
 
     const SNTO_NAME = '史莱姆';
     const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
+
+    const YFB_NAME = '粉丝宝';
+    const YFB_HEAD_IMG = MODULE_URL . 'static/img/yfb_pic.png';
+
+    const WxWORK_NAME = '企业微信拉新（阿旗）';
+    const WxWORK_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -129,19 +148,35 @@ class Account extends State
         return m('account')->where(We7::uniacid([]))->where($condition);
     }
 
+    public static function findOneFromType($type): ?accountModelObj
+    {
+        return self::findOne(['type' => $type]);
+    }
+
+    public static function findOneFromName($name): ?accountModelObj
+    {
+        return self::findOne(['name' => $name]);
+    }
+
+    public static function findOneFromUID($uid): ?accountModelObj
+    {
+        return self::findOne(['uid' => $uid]);
+    }
+
     public static function format(accountModelObj $entry): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
             'id' => $entry->getId(),
             'uid' => $entry->getUid(),
-            'state' => $entry->getState(),
+            'type' => $entry->getType(),
+            'banned' => $entry->isBanned(),
             'name' => $entry->getName(),
             'title' => $entry->getTitle(),
             'descr' => html_entity_decode($entry->getDescription()),
             'url' => $entry->getUrl(),
             'clr' => $entry->getClr(),
-            'img' => $entry->isSpecial() ? $entry->getImg() : Util::toMedia($entry->getImg()),
+            'img' => $entry->isThirdPartyPlatform() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia($entry->getImg()),
             'scname' => $entry->getScname(),
             'total' => $entry->getTotal(),
             'count' => $entry->getCount(),
@@ -152,6 +187,13 @@ class Account extends State
         if ($entry->isVideo()) {
             $data['media'] = $entry->getQrcode();
             $data['duration'] = $entry->getDuration();
+        } elseif ($entry->isDouyin()) {
+            $data['url'] = DouYin::makeHomePageUrl($entry->getConfig('url'));
+            $data['openid'] = $entry->getConfig('openid', '');
+        } elseif ($entry->isWxApp()) {
+            $data['username'] = $entry->getConfig('username', '');
+            $data['path'] = $entry->getConfig('path', '');
+            $data['delay'] = $entry->getConfig('delay', 1);
         } else {
             $data['qrcode'] = $entry->getQrcode();
         }
@@ -168,6 +210,30 @@ class Account extends State
         }
 
         return $data;
+    }
+
+    public static function getAllEnabledThirdPartyPlatform(): array
+    {
+        $arr = [
+            Account::JFB => App::isJfbEnabled(),
+            Account::MOSCALE => App::isMoscaleEnabled(),
+            Account::YUNFENBA => App::isYunfenbaEnabled(),
+            Account::AQIINFO => App::isAQiinfoEnabled(),
+            Account::ZJBAO => App::isZJBaoEnabled(),
+            Account::MEIPA => App::isMeiPaEnabled(),
+            Account::KINGFANS => App::isKingFansEnabled(),
+            Account::SNTO => App::isSNTOEnabled(),
+            Account::YFB => App::isSNTOEnabled(),
+            Account::WxWORK => App::isWxWorkEnabled(),
+
+        ];
+        $result = [];
+        foreach ($arr as $name => $enabled) {
+            if ($enabled) {
+                $result[] = $name;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -203,7 +269,30 @@ class Account extends State
         //处理分组
         $groups = [];
 
-        $accounts = $device->getAccounts();
+        $include = $params['type'] ?? [
+                Account::NORMAL,
+                Account::VIDEO,
+                Account::AUTH,
+                Account::WXAPP,
+            ];
+
+        $third_party_platform_includes = $params['type'] ?? [
+                Account::JFB,
+                Account::MOSCALE,
+                Account::YUNFENBA,
+                Account::AQIINFO,
+                Account::ZJBAO,
+                Account::MEIPA,
+                Account::KINGFANS,
+                Account::SNTO,
+                Account::YFB,
+                Account::WxWORK,
+            ];
+
+        $include = is_array($include) ? $include : [$include];
+        $third_party_platform_includes = is_array($third_party_platform_includes) ? $third_party_platform_includes : [$third_party_platform_includes];
+
+        $accounts = $device->getAccounts($include);
         foreach ($accounts as $uid => $entry) {
             $group_name = $entry['groupname'];
             if (empty($group_name)) {
@@ -235,61 +324,139 @@ class Account extends State
         }
 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
+        $third_party_platform = [
+            //准粉吧
+            Account::JFB => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::JFB, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return JfbAccount::fetch($device, $user);
+                },
+            ],
+            //公锤
+            Account::MOSCALE => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::MOSCALE, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return MoscaleAccount::fetch($device, $user);
+                },
+            ],
+            //云粉
+            Account::YUNFENBA => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::YUNFENBA, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return YunfenbaAccount::fetch($device, $user);
+                },
+            ],
+            //阿旗
+            Account::AQIINFO => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::AQIINFO, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return AQIInfoAccount::fetch($device, $user);
+                },
+            ],
 
-        //准粉吧
-        if (App::isJfbEnabled() && !in_array(JfbAccount::getUid(), $exclude)) {
-            $join(['state' => Account::JFB], function () use ($device, $user) {
-                return JfbAccount::fetch($device, $user);
-            });
-        }
+            //纸巾宝
+            Account::ZJBAO => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::ZJBAO, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return ZhiJinBaoAccount::fetch($device, $user);
+                },
+            ],
 
-        //公锤
-        if (App::isMoscaleEnabled() && !in_array(MoscaleAccount::getUid(), $exclude)) {
-            $join(['state' => Account::MOSCALE], function () use ($device, $user) {
-                return MoscaleAccount::fetch($device, $user);
-            });
-        }
+            //美葩
+            Account::MEIPA => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::MEIPA, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return MeiPaAccount::fetch($device, $user);
+                },
+            ],
 
-        //云粉
-        if (App::isYunfenbaEnabled() && !in_array(YunfenbaAccount::getUid(), $exclude)) {
-            $join(['state' => Account::YUNFENBA], function () use ($device, $user) {
-                return YunfenbaAccount::fetch($device, $user);
-            });
-        }
+            //金粉吧
+            Account::KINGFANS => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::KINGFANS, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return KingFansAccount::fetch($device, $user);
+                },
+            ],
 
-        //阿旗
-        if (App::isAQiinfoEnabled() && !in_array(AQIInfoAccount::getUid(), $exclude)) {
-            $join(['state' => Account::AQIINFO], function () use ($device, $user) {
-                return AQIInfoAccount::fetch($device, $user);
-            });
-        }
+            //史莱姆
+            Account::SNTO => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::SNTO, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return SNTOAccount::fetch($device, $user);
+                },
+            ],
 
-        //纸巾宝
-        if (App::isZJBaoEnabled() && !in_array(ZhiJinBaoAccount::getUid(), $exclude)) {
-            $join(['state' => Account::ZJBAO], function () use ($device, $user) {
-                return ZhiJinBaoAccount::fetch($device, $user);
-            });
-        }
+            //粉丝宝
+            Account::YFB => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::YFB, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isYFBEnabled() && !in_array(YfbAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return YfbAccount::fetch($device, $user);
+                },
+            ],
 
-        //美葩
-        if (App::isMeiPaEnabled() && !in_array(MeiPaAccount::getUid(), $exclude)) {
-            $join(['state' => Account::MEIPA], function () use ($device, $user) {
-                return MeiPaAccount::fetch($device, $user);
-            });
-        }
+            //企业微信拉新（阿旗）
+            Account::WxWORK => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::WxWORK, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isWxWorkEnabled() && !in_array(WxWorkAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return WxWorkAccount::fetch($device, $user);
+                },
+            ]
+        ];
 
-        //金粉吧
-        if (App::isKingFansEnabled() && !in_array(KingFansAccount::getUid(), $exclude)) {
-            $join(['state' => Account::KINGFANS], function () use ($device, $user) {
-                return KingFansAccount::fetch($device, $user);
-            });
-        }
-
-        //史莱姆
-        if (App::isSNTOEnabled() && !in_array(SNTOAccount::getUid(), $exclude)) {
-            $join(['state' => Account::SNTO], function () use ($device, $user) {
-                return SNTOAccount::fetch($device, $user);
-            });
+        foreach ($third_party_platform as $uid => $entry) {
+            if ($entry[0]()) {
+                $join(['type' => $uid], $entry[1]);
+            }
         }
 
         if (empty($list)) {
@@ -540,12 +707,12 @@ class Account extends State
         return Util::shortMobileUrl('entry', array_merge(['account' => $uid], $params));
     }
 
-    public static function createSpecialAccount(int $aid, string $name, string $img, string $url): ?accountModelObj
+    public static function createThirdPartyPlatform(int $aid, string $name, string $img, string $url): ?accountModelObj
     {
-        $uid = self::makeSpecialAccountUID($aid, $name);
+        $uid = self::makeThirdPartyPlatformUID($aid, $name);
         $account = self::findOne(['uid' => $uid]);
         if ($account) {
-            if ($account->getState() != $aid) {
+            if ($account->getType() != $aid) {
                 return null;
             }
 
@@ -561,9 +728,10 @@ class Account extends State
 
         $result = self::create([
             'uid' => $uid,
-            'state' => $aid,
+            'type' => $aid,
             'scname' => Schema::DAY,
             'name' => $name,
+            'title' => $name,
             'url' => $url,
             'img' => $img,
             'clr' => Util::randColor(),
@@ -576,57 +744,69 @@ class Account extends State
         return $result;
     }
 
-    public static function makeSpecialAccountUID($aid, $name): string
+    public static function makeThirdPartyPlatformUID($aid, $name): string
     {
-        return self::makeUID("{$aid}:{$name}");
+        return self::makeUID("$aid:$name");
     }
 
     public static function createJFBAccount(): ?accountModelObj
     {
         $url = Util::murl('jfb');
-        return self::createSpecialAccount(Account::JFB, Account::JFB_NAME, Account::JFB_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::JFB, Account::JFB_NAME, Account::JFB_HEAD_IMG, $url);
     }
 
     public static function createMoscaleAccount(): ?accountModelObj
     {
         $url = Util::murl('moscale');
-        return self::createSpecialAccount(Account::MOSCALE, Account::MOSCALE_NAME, Account::MOSCALE_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::MOSCALE, Account::MOSCALE_NAME, Account::MOSCALE_HEAD_IMG, $url);
     }
 
     public static function createYunFenBaAccount(): ?accountModelObj
     {
         $url = Util::murl('yunfenba');
-        return self::createSpecialAccount(Account::YUNFENBA, Account::YUNFENBA_NAME, Account::YUNFENBA_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::YUNFENBA, Account::YUNFENBA_NAME, Account::YUNFENBA_HEAD_IMG, $url);
     }
 
     public static function createAQiinfoAccount(): ?accountModelObj
     {
         $url = Util::murl('aqiinfo');
-        return self::createSpecialAccount(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
     }
 
     public static function createZJBaoAccount(): ?accountModelObj
     {
         $url = Util::murl('zjbao');
-        return self::createSpecialAccount(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
     }
 
     public static function createMeiPaAccount(): ?accountModelObj
     {
         $url = Util::murl('meipa');
-        return self::createSpecialAccount(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
     }
 
     public static function createKingFansAccount(): ?accountModelObj
     {
         $url = Util::murl('kingfans');
-        return self::createSpecialAccount(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
     }
 
     public static function createSNTOAccount(): ?accountModelObj
     {
         $url = Util::murl('snto');
-        return self::createSpecialAccount(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+        return self::createThirdPartyPlatform(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
+    }
+
+    public static function createYFBAccount(): ?accountModelObj
+    {
+        $url = Util::murl('yfb');
+        return self::createThirdPartyPlatform(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
+    }
+
+    public static function createWxWorkAccount(): ?accountModelObj
+    {
+        $url = Util::murl('wxwork');
+        return self::createThirdPartyPlatform(Account::WxWORK, Account::WxWORK_NAME, Account::WxWORK_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -702,7 +882,7 @@ class Account extends State
         $uid = Account::makeUID($app_id);
         $name = getArray($profile, 'authorizer_info.user_name');
 
-        $account = Account::findOne(['uid' => $uid]);
+        $account = Account::findOneFromUID($uid);
 
         if (empty($account)) {
             $qrcode_url = getArray($profile, 'authorizer_info.qrcode_url', '');
@@ -711,7 +891,7 @@ class Account extends State
             }
             $data = [
                 'agent_id' => $agent_id,
-                'state' => Account::AUTH,
+                'type' => Account::AUTH,
                 'uid' => $uid,
                 'name' => $name,
                 'title' => getArray($profile, 'authorizer_info.nick_name', '未知'),
@@ -748,7 +928,7 @@ class Account extends State
             }
 
             $account->setName($name);
-            $account->setState(Account::AUTH);
+            $account->setType(Account::AUTH);
 
             $account->save();
         }
@@ -764,7 +944,7 @@ class Account extends State
     public static function disableWxPlatformAccount(string $app_id): array
     {
         $uid = Account::makeUID($app_id);
-        $account = Account::findOne(['uid' => $uid]);
+        $account = Account::findOneFromUID($uid);
         if ($account) {
             $account->setState(Account::BANNED);
             if ($account->save()) {
@@ -784,18 +964,23 @@ class Account extends State
         $accounts = Account::match($device, $user, array_merge($params, ['admin', 'max' => settings('misc.maxAccounts', 0)]));
         if (!empty($accounts)) {
             foreach ($accounts as $index => &$account) {
-                if (App::useAccountQRCode()) {
-                    $obj = Account::get($account['id']);
-                    if (empty($obj) || $obj->useAccountQRCode()) {
-                        unset($accounts[$index]);
-                        continue;
+                if ($account['type'] == Account::WXAPP && empty($account['username'])) {
+                    unset($accounts[$index]);
+                    continue;
+                }
+                if ($account['type'] == Account::AUTH) {
+                    if (App::useAccountQRCode()) {
+                        $obj = Account::get($account['id']);
+                        if (empty($obj) || $obj->useAccountQRCode()) {
+                            unset($accounts[$index]);
+                            continue;
+                        }
+                    }
+                    if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
+                        //如果是授权服务号，需要使用场景二维码替换原二维码
+                        self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                     }
                 }
-                if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
-                    //如果是授权服务号，需要使用场景二维码替换原二维码
-                    self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
-                }
-
                 if (isset($account['qrcode'])) {
                     if ($account['qrcode']) {
                         $account['qrcode'] = Util::toMedia($account['qrcode']);
@@ -812,7 +997,8 @@ class Account extends State
                 }
             }
         }
-        return $accounts;
+        //防止json_encode成对象造成前端代码出错
+        return array_values($accounts);
     }
 
     /**
@@ -824,7 +1010,7 @@ class Account extends State
      */
     public static function updateAuthAccountQRCode(array &$account_data, $params, bool $temporary = true)
     {
-        if ($account_data['state'] == Account::AUTH) {
+        if ($account_data['type'] == Account::AUTH) {
             $str = is_array($params) ? implode(':', $params) : strval($params);
             $result = Account::getAuthorizerQrcodeById($account_data['id'], $str, $temporary);
             if (is_error($result)) {
@@ -910,7 +1096,16 @@ class Account extends State
         return $first;
     }
 
-    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null)
+    /**
+     * @param accountModelObj $account
+     * @param userModelObj $user
+     * @param deviceModelObj $device
+     * @param $request
+     * @param $result
+     * @param null $createtime
+     * @return account_queryModelObj|null
+     */
+    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null): ?account_queryModelObj
     {
         $data = [
             'request_id' => REQUEST_ID,
@@ -942,7 +1137,7 @@ class Account extends State
         return $query->findOne();
     }
 
-    public static function createSpecialAccountOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
+    public static function createThirdPartyPlatformOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
     {
         if (App::isAccountLogEnabled()) {
             $log = Account::getLastQueryLog($acc, $user, $device);
@@ -956,7 +1151,7 @@ class Account extends State
             }
         }
 
-        Job::createSpecialAccountOrder([
+        Job::createThirdPartyPlatformOrder([
             'device' => $device->getId(),
             'user' => $user->getId(),
             'account' => $acc->getId(),

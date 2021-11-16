@@ -39,10 +39,11 @@
         border-radius: 50%;
         border: 1px solid gray;
     }    
-    .accounts .item img.qrcode {
+    .accounts .item img.qrcode-x {
         margin: 10px 0;
         width: 100px;
         height: 100px;
+        background: rgb(255 255 255 / 30%);
     }    
     a:hover {
         color: inherit;
@@ -170,8 +171,8 @@
                     {loop $accounts $index $item}
                     <a href="{$item['edit_url']}">
                         <div class="item" style="background-color:{$item['clr']}" title="{$item['title']}">
-                            <img src="{media $item['img']}" class="headimg" />
-                            <img src="{media $item['qrcode']}" class="qrcode" />
+                            <img src="{$item['img']}" class="headimg" />
+                            <img src="{media $item['qrcode']}" class="qrcode-x" />
                             <div class="descr">{$item['descr']}</div>
                         </div>                        
                     </a>

@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -30,7 +32,7 @@ class MeiPaAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::MEIPA, Account::MEIPA_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::MEIPA, Account::MEIPA_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
@@ -38,7 +40,7 @@ class MeiPaAccount
         $v = [];
 
         /** @var accountModelObj $acc */
-        $acc = Account::findOne(['state' => Account::MEIPA]);
+        $acc = Account::findOneFromType(Account::MEIPA);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config['apiid']) || empty($config['appkey'])) {
@@ -71,7 +73,7 @@ class MeiPaAccount
                     $data['title'] = $result['data']['wechat_name'];
                     $data['qrcode'] = $result['data']['qrcodeurl'];
 
-                    if ($result['data']['joburl']) {
+                    if ($result['data']['joburl'] && We7::starts_with($result['data']['joburl'], 'http')) {
                         $data['redirect_url'] = $result['data']['joburl'];
                     }
 
@@ -97,7 +99,7 @@ class MeiPaAccount
         if (!App::isMeiPaEnabled()) {
             return err('没有启用！');
         }
-        $acc = Account::findOne(['state' => Account::MEIPA]);
+        $acc = Account::findOneFromType(Account::MEIPA);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }
@@ -142,7 +144,7 @@ class MeiPaAccount
 
             $order_uid = Order::makeUID($user, $device, $data['order_sn']);
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
             Util::logToFile('meipa', [

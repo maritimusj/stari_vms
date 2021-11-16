@@ -1,9 +1,7 @@
 <?php
 /**
- * www.zovye.com
- * Author: jjs
- * Date: 2019/12/10
- * Time: 20:35
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\Contract;

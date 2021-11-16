@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 class DeviceEventProcessor
 {
@@ -275,30 +277,32 @@ class DeviceEventProcessor
      */
     public static function handle(string $event, array $data)
     {
-        $e = self::$events[$event];
-        if (isset($e)) {
-            if (DEBUG) {
-                self::log($e, $data);
-            }
-            $fn = $e['handler'];
-            if (!empty($fn)) {
-                if (is_callable($fn)) {
-                    call_user_func($fn, $data);
-                } else {
-                    Util::logToFile('events', [
-                        'event' => $event,
-                        'data' => $data,
-                        'error' => 'handler is not function!',
-                    ]);
+        Util::transactionDo(function () use ($event, $data) {
+            $e = self::$events[$event];
+            if (isset($e)) {
+                if (settings('device.event.enabled')) {
+                    self::log($e, $data);
                 }
+                $fn = $e['handler'];
+                if (!empty($fn)) {
+                    if (is_callable($fn)) {
+                        call_user_func($fn, $data);
+                    } else {
+                        Util::logToFile('events', [
+                            'event' => $event,
+                            'data' => $data,
+                            'error' => 'handler is not function!',
+                        ]);
+                    }
+                }
+            } else {
+                Util::logToFile('events', [
+                    'event' => $event,
+                    'data' => $data,
+                    'error' => 'unhandled event!',
+                ]);
             }
-        } else {
-            Util::logToFile('events', [
-                'event' => $event,
-                'data' => $data,
-                'error' => 'unhandled event!',
-            ]);
-        }
+        });
 
         exit(CtrlServ::HANDLE_OK);
     }

@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\model;
@@ -464,5 +464,17 @@ class agentModelObj extends userModelObj
             }
         }
         return $locked;
+    }
+
+    public function getFirstOrderData()
+    {
+        return $this->settings('agentData.stats.first_order');
+    }
+    public function setFirstOrderData(orderModelObj $order): bool
+    {
+        return $this->updateSettings('agentData.stats.first_order', [
+            'id' => $order->getId(),
+            'createtime' => $order->getCreatetime(),
+        ]);
     }
 }

@@ -1,7 +1,9 @@
 <?php
 /**
- * Http协议.
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
+
 namespace we7;
 
 use CURLFile;

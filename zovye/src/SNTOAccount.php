@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -34,12 +38,12 @@ class SNTOAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::SNTO, Account::SNTO_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::SNTO, Account::SNTO_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $acc = Account::findOne(['state' => Account::SNTO]);
+        $acc = Account::findOneFromType(Account::SNTO);
         if (empty($acc)) {
             return [];
         }
@@ -137,7 +141,7 @@ class SNTOAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::SNTO]);
+        $acc = Account::findOneFromType(Account::SNTO);
         if (empty($acc)) {
             return err('找不到指定的公众号！');
         }
@@ -187,7 +191,7 @@ class SNTOAccount
 
             $order_uid = Order::makeUID($user, $device, sha1($data['order_id']));
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $data);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
         } catch (Exception $e) {
             Util::logToFile('snto', [
                 'error' => '回调处理发生错误! ',

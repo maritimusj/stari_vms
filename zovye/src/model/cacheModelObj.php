@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye\model;
@@ -29,13 +29,13 @@ class cacheModelObj extends modelObj
     protected $createtime;
 
     /** @var int */
-    protected $expiretime;
+    protected $expiration;
 
     /** @var int */
     protected $updatetime;
 
     public function isExpired(): bool
     {
-        return $this->expiretime && $this->expiretime < time();
+        return $this->expiration && $this->expiration < time();
     }
 }

@@ -4,7 +4,7 @@ namespace zovye;
 use zovye\model\agentModelObj;
 use zovye\We7;
 
-$tb_name = 'zovye_vms';
+$tb_name = APP_NAME;
 
 if (!We7::pdo_tableexists($tb_name . '_gsp_user')) {
     $sql = <<<SQL

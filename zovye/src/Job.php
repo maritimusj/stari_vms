@@ -1,13 +1,21 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
 use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 
 class Job
 {
-    public static function exit()
+    public static function exit(callable $fn = null)
     {
+        if ($fn != null) {
+            $fn();
+        }
         exit(CtrlServ::HANDLE_OK);
     }
 
@@ -127,10 +135,12 @@ class Job
 
     public static function order($order_id): bool
     {
-        if (Config::app('queue.size') < 100) {
-            $queued = CtrlServ::scheduleJob('order', ['id' => $order_id]);
-            Config::app('queue.size', $queued, true);
-            return $queued !== false;
+        $queue = Config::app('queue', []);
+        if (empty($queue['max_size']) || $queue['size'] < $queue['max_size']) {
+            $queue['size'] = CtrlServ::scheduleJob('order', ['id' => $order_id]);
+            $queue['updatetime'] = time();
+            Config::app('queue', $queue, true);
+            return $queue['size'] !== false;
         }
         return false;
     }
@@ -155,7 +165,7 @@ class Job
         return CtrlServ::scheduleJob('withdraw', ['id' => $user_id, 'amount' => $amount]);
     }
 
-    public static function createSpecialAccountOrder($params = []): bool
+    public static function createThirdPartyPlatformOrder($params = []): bool
     {
         return self::createAccountOrder($params);
     }
@@ -190,5 +200,15 @@ class Job
             return true;
         }
         return false;
+    }
+
+    public static function douyinOrder(userModelObj $user, deviceModelObj $device, $account_uid, $time = null)
+    {
+        return CtrlServ::scheduleJob('douyin', [
+            'id' => $user->getId(),
+            'device' => $device->getId(), 
+            'uid' => $account_uid, 
+            'time' => $time ?? time(),
+        ]);
     }
 }

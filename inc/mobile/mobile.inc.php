@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -94,10 +94,17 @@ if ($op == 'save') {
 
                 //佣金分享
                 if (App::isAgentGSPEnabled()) {
+                    $gsp = App::agentDefaultGSP();
                     $agent_data['gsp'] = [
                         'enabled' => 1,
                         'mode' => 'rel',
-                        'rel' => App::agentDefaultGSP(),
+                        'rel' => [
+                            'level0' => $gsp['level0'],
+                            'level1' => $gsp['level1'],
+                            'level2' => $gsp['level2'],
+                            'level3' => $gsp['level3'],
+                        ],
+                        'order' => $gsp['order'] ?? [],
                         'mode_type' => App::agentDefaultGSDModeType(),
                     ];
                 }

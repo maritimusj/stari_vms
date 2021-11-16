@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
 
 use Exception;
 use RuntimeException;
@@ -25,7 +27,7 @@ class YunfenbaAccount
 
     public static function getUid(): string
     {
-        return Account::makeSpecialAccountUID(Account::YUNFENBA, Account::YUNFENBA_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::YUNFENBA, Account::YUNFENBA_NAME);
     }
 
     /**
@@ -162,7 +164,7 @@ class YunfenbaAccount
     {
         $v = [];
 
-        $acc = Account::findOne(['state' => Account::YUNFENBA]);
+        $acc = Account::findOneFromType(Account::YUNFENBA);
         if ($acc) {
             $config = $acc->settings('config', []);
             if (empty($config) || empty($config['vendor']['uid'])) {
@@ -235,7 +237,7 @@ class YunfenbaAccount
             return err('没有启用！');
         }
 
-        $acc = Account::findOne(['state' => Account::YUNFENBA]);
+        $acc = Account::findOneFromType(Account::YUNFENBA);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }
@@ -262,14 +264,14 @@ class YunfenbaAccount
             /** @var deviceModelObj $device */
             $device = Device::findOne(['shadow_id' => $params['device']]);
             if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['state']);
+                throw new RuntimeException('找不到指定的设备:' . $params['device']);
             }
 
             $acc = $res['account'];
 
             $order_uid = Order::makeUID($user, $device);
 
-            Account::createSpecialAccountOrder($acc, $user, $device, $order_uid, $params);
+            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Util::logToFile('yunfenba', [

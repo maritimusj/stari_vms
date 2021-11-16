@@ -1,7 +1,7 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
@@ -34,6 +34,7 @@ if (in_array($op, [
         'create_order_account',
         'auth_account',
         'repair',
+        'douyin',
     ]
 )) {
     $job_filename = ZOVYE_CORE_ROOT . "jobs/{$op}.php";

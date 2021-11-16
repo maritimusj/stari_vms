@@ -1,11 +1,12 @@
 <?php
 /**
- * @author jjs@zovye.com
- * @url www.zovye.com
+ * @author jin@stariture.com
+ * @url www.stariture.com
  */
 
 namespace zovye;
 
+use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
 use zovye\model\orderModelObj;
@@ -133,17 +134,41 @@ class Order extends State
 
     public static function getFirstOrderOfDevice(deviceModelObj $device): ?orderModelObj
     {
-        $id = Config::device('order.first.id');
+        $id = $device->settings('stats.first_order.id');
         if ($id) {
             return Order::get($id);
         }
         $query = self::query(['device_id' => $device->getId()]);
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
-            Config::device('order.first.id', $order->getId());
+            $device->updateSettings('stats.first_order', [
+                'id' => $order->getId(),
+                'createtime' => $order->getCreatetime(),
+            ]);
             return $order;
         }
         return null;
+    }
+
+    public static function getFirstOrderOfAgent(agentModelObj $agent): ?orderModelObj
+    {
+        $data = $agent->getFirstOrderData();
+        if ($data && $data['id']) {
+            return Order::get($data['id']);
+        }
+        $query = self::query(['agent_id' => $agent->getId()]);
+        $order = $query->orderBy('id ASC')->findOne();
+        if ($order) {
+            $agent->setFirstOrderData($order);
+            return $order;
+        }
+        return null;
+    }
+
+    public static function getLastOrderOfAgent(agentModelObj $agent): ?orderModelObj
+    {
+        $query = self::query(['agent_id' => $agent->getId()]);
+        return $query->orderBy('id desc')->findOne();
     }
 
     /**
@@ -158,14 +183,16 @@ class Order extends State
 
     public static function getFirstOrderOfUser(userModelObj $user): ?orderModelObj
     {
-        $id = Config::user('order.first.id');
+        $id = $user->settings('extra.first.order.id');
         if ($id) {
             return Order::get($id);
         }
         $query = self::query(['openid' => $user->getOpenid()]);
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
-            Config::user('order.first.id', $order->getId());
+            $user->updateSettings('extra.first.order', [
+                'id' => $order->getId(),
+            ]);
             return $order;
         }
         return null;
@@ -199,76 +226,109 @@ class Order extends State
 
     public static function refund2($order_no, $total, array $refund_data = [])
     {
-        $order = Order::get($order_no, true);
-        if (empty($order)) {
-            //尝试订单id查找订单
-            $order = Order::get(intval($order_no));
+        return Util::transactionDo(function () use($order_no, $total, $refund_data) {
+            $order = Order::get($order_no, true);
             if (empty($order)) {
-                return error(State::FAIL, '找不到这个订单!');
-            }
-        }
-
-        $order_no = $order->getOrderNO();
-
-        $pay_log = Pay::getPayLog($order_no);
-        if (empty($pay_log)) {
-            return error(State::FAIL, '找不到支付信息!');
-        }
-
-        $percent = $total / $pay_log->getPrice();
-        $remain = $total;
-
-        //处理已分佣的金额
-        $commission = $order->getExtraData('commission');
-        if ($commission) {
-            if (is_array($commission['keepers'])) {
-                foreach ($commission['keepers'] as $entry) {
-                    $keeperUser = User::get($entry['openid'], true);
-                    if (empty($keeperUser)) {
-                        return error(State::ERROR, '找不到佣金用户，无法退款[201]');
-                    }
-                    $x_val = intval($entry['xval'] * $percent);
-                    if ($x_val > 0) {
-                        $remain -= $x_val;
-
-                        $commission_balance = $keeperUser->getCommissionBalance();
-                        if (empty($commission_balance)) {
-                            return error(State::ERROR, '找不到用户佣金帐户，无法退款[202]');
-                        }
-
-                        if ($commission_balance->total() < $x_val) {
-                            return error(State::FAIL, "运营人员{$keeperUser->getName()}帐户余额不足，无法退款！");
-                        }
-
-                        $r = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
-                            'orderid' => $order->getId(),
-                            'admin' => _W('username'),
-                        ]);
-
-                        if (empty($r) || !$r->update([], true)) {
-                            return error(State::FAIL, '返还用户佣金失败！');
-                        }
-                    }
+                //尝试订单id查找订单
+                $order = Order::get(intval($order_no));
+                if (empty($order)) {
+                    return error(State::FAIL, '找不到这个订单!');
                 }
             }
 
-            if (is_array($commission['gsp'])) {
-                foreach ($commission['gsp'] as $entry) {
-                    $user = User::get($entry['openid'], true);
-                    if (empty($user)) {
-                        return error(State::ERROR, '找不到佣金用户，无法退款[204]');
-                    }
-                    $x_val = intval($entry['xval'] * $percent);
-                    if ($x_val > 0) {
-                        $remain -= $x_val;
+            $order_no = $order->getOrderNO();
 
-                        $commission_balance = $user->getCommissionBalance();
+            $pay_log = Pay::getPayLog($order_no);
+            if (empty($pay_log)) {
+                return error(State::FAIL, '找不到支付信息!');
+            }
+
+            $percent = $total / $pay_log->getPrice();
+            $remain = $total;
+
+            //处理已分佣的金额
+            $commission = $order->getExtraData('commission');
+            if ($commission) {
+                if (is_array($commission['keepers'])) {
+                    foreach ($commission['keepers'] as $entry) {
+                        $keeperUser = User::get($entry['openid'], true);
+                        if (empty($keeperUser)) {
+                            return error(State::ERROR, '找不到佣金用户，无法退款[201]');
+                        }
+                        $x_val = intval($entry['xval'] * $percent);
+                        if ($x_val > 0) {
+                            $remain -= $x_val;
+
+                            $commission_balance = $keeperUser->getCommissionBalance();
+                            if (empty($commission_balance)) {
+                                return error(State::ERROR, '找不到用户佣金帐户，无法退款[202]');
+                            }
+
+                            if ($commission_balance->total() < $x_val) {
+                                return error(State::FAIL, "运营人员{$keeperUser->getName()}帐户余额不足，无法退款！");
+                            }
+
+                            $r = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
+                                'orderid' => $order->getId(),
+                                'admin' => _W('username'),
+                            ]);
+
+                            if (empty($r) || !$r->update([], true)) {
+                                return error(State::FAIL, '返还用户佣金失败！');
+                            }
+                        }
+                    }
+                }
+
+                if (is_array($commission['gsp'])) {
+                    foreach ($commission['gsp'] as $entry) {
+                        $user = User::get($entry['openid'], true);
+                        if (empty($user)) {
+                            return error(State::ERROR, '找不到佣金用户，无法退款[204]');
+                        }
+                        $x_val = intval($entry['xval'] * $percent);
+                        if ($x_val > 0) {
+                            $remain -= $x_val;
+
+                            $commission_balance = $user->getCommissionBalance();
+                            if (empty($commission_balance)) {
+                                return error(State::ERROR, '找不到用户佣金帐户，无法退款[205]');
+                            }
+
+                            if ($commission_balance->total() < $x_val) {
+                                return error(State::FAIL, "分佣帐户{$user->getName()}余额不足，无法退款！");
+                            }
+
+                            $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
+                                'orderid' => $order->getId(),
+                                'admin' => _W('username'),
+                            ]);
+
+                            if (empty($rx) || !$rx->update([], true)) {
+                                return error(State::FAIL, '返还用户佣金失败！');
+                            }
+                        }
+                    }
+                }
+
+                if (is_array($commission['agent'])) {
+                    $x_val = intval($commission['agent']['xval'] * $percent);
+                    if ($x_val > 0) {
+                        $x_val = min($remain, $x_val);
+
+                        $openid = strval($commission['agent']['openid']);
+                        $agent = User::get($openid, true);
+                        if (empty($agent)) {
+                            return error(State::ERROR, '找不到设备代理商，无法退款[206]');
+                        }
+
+                        $commission_balance = $agent->getCommissionBalance();
                         if (empty($commission_balance)) {
-                            return error(State::ERROR, '找不到用户佣金帐户，无法退款[205]');
+                            return error(State::ERROR, '找不到设备代理商佣金帐户，无法退款[207]');
                         }
 
                         if ($commission_balance->total() < $x_val) {
-                            return error(State::FAIL, "分佣帐户{$user->getName()}余额不足，无法退款！");
+                            return error(State::FAIL, '代理商帐户余额不足，无法退款！');
                         }
 
                         $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -277,62 +337,30 @@ class Order extends State
                         ]);
 
                         if (empty($rx) || !$rx->update([], true)) {
-                            return error(State::FAIL, '返还用户佣金失败！');
+                            return error(State::FAIL, '代理商返还佣金失败！');
                         }
                     }
                 }
             }
 
-            if (is_array($commission['agent'])) {
-                $x_val = intval($commission['agent']['xval'] * $percent);
-                if ($x_val > 0) {
-                    $x_val = min($remain, $x_val);
-
-                    $openid = strval($commission['agent']['openid']);
-                    $agent = User::get($openid, true);
-                    if (empty($agent)) {
-                        return error(State::ERROR, '找不到设备代理商，无法退款[206]');
-                    }
-
-                    $commission_balance = $agent->getCommissionBalance();
-                    if (empty($commission_balance)) {
-                        return error(State::ERROR, '找不到设备代理商佣金帐户，无法退款[207]');
-                    }
-
-                    if ($commission_balance->total() < $x_val) {
-                        return error(State::FAIL, '代理商帐户余额不足，无法退款！');
-                    }
-
-                    $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
-                        'orderid' => $order->getId(),
-                        'admin' => _W('username'),
-                    ]);
-
-                    if (empty($rx) || !$rx->update([], true)) {
-                        return error(State::FAIL, '代理商返还佣金失败！');
-                    }
-                }
+            if (empty($refund_data['createtime'])) {
+                $refund_data['createtime'] = time();
             }
-        }
 
-        if (empty($refund_data['createtime'])) {
-            $refund_data['createtime'] = time();
-        }
+            $res = Pay::refund($order_no, $total, $refund_data);
+            if (is_error($res)) {
+                return $res;
+            }
 
-        $res = Pay::refund($order_no, $total, $refund_data);
-        if (is_error($res)) {
-            return $res;
-        }
+            $order->setExtraData('refund', $refund_data);
+            $order->setRefund(Order::REFUND);
 
-        $order->setExtraData('refund', $refund_data);
-        $order->setRefund(Order::REFUND);
+            if ($order->save()) {
+                return true;
+            }
 
-        if ($order->save()) {
-            return true;
-        }
-
-        return error(State::FAIL, '退款失败!');
-
+            return error(State::FAIL, '退款失败!');
+        });
     }
 
     /**
@@ -619,12 +647,15 @@ class Order extends State
                     'address' => $device_obj->getAddress(),
                 ];
             }
+
             //代理商信息
             $agent_obj = $order->getAgent();
             if ($agent_obj) {
                 $data['agentId'] = $agent_obj->getId();
                 $data['agent'] = $agent_obj->profile();
             }
+
+            $data['is_zero_bonus'] = $order->isZeroBonus();
 
             //ip地址信息
             $ip_info = $order->getIpAddress();

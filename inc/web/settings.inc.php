@@ -877,9 +877,7 @@ if ($op == 'account') {
     $tpl_data['list'] = $list;
 
 } elseif ($op == 'user') {
-
-    $tpl_data['total'] = intval($query->get('sum(percent)'));
-
+    
     $res = CtrlServ::v2_query('idcard/balance');
     $tpl_data['idcard_balance'] = 0;
 
@@ -1115,10 +1113,12 @@ if ($op == 'account') {
                                 'dest' => $filename,
                             ];
                             $local_file = MODULE_ROOT . $filename;
-                            $stats = stat($local_file);
-                            if ($stats) {
-                                $fi['size'] = is_dir($local_file) ? '<文件夹>' : $stats[7];
-                                $fi['createtime'] = (new DateTime("@{$stats[9]}"))->format('Y-m-d H:i:s');
+                            if (file_exists($local_file)) {
+                                $stats = stat($local_file);
+                                if ($stats) {
+                                    $fi['size'] = is_dir($local_file) ? '<文件夹>' : $stats[7];
+                                    $fi['createtime'] = (new DateTime("@{$stats[9]}"))->format('Y-m-d H:i:s');
+                                }
                             }
                             $result[] = $fi;
                         }

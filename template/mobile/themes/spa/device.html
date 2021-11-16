@@ -114,7 +114,7 @@
 				</div>
 			</div>
 			<div :class="['goods-item', goods.length == 1 && packages.length == 0 ? 'goods-single' : '']" v-for="(item,index) in goods">
-				<img :class="['goods-pic', goods.length == 1 ? 'goods-pic-single' : '']" :src="item.img" @click="goodsClick(item)">
+				<img :class="['goods-pic', goods.length == 1 && packages.length == 0 ? 'goods-pic-single' : '']" :src="item.img" @click="goodsClick(item)">
 				<div :class="['sell-out-view', goods.length == 1 ? 'sell-out-view-single' : '']" v-if="item.num == 0" @click="goodsClick(item)">
 					<img class="sell-out-icon" src="{MODULE_URL}static/m/spa/img/sellout_icon.png">
 				</div>

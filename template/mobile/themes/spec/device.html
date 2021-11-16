@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+	<title>{$tpl['site']['title']}</title>
+	<!-- {php \zovye\url(true, CSS_SWIPER_URL);} -->
+	<link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
+	{php \zovye\url(true, 'static/m/spec/device.css?v=202111161543');}
+	<link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
+</head>
+<body ontouchstart>
+<div id="app" v-cloak>
+	<div class="header">
+		<span class="imei">No.{{imei}}</span>
+		<img src="{MODULE_URL}static/m/spec/img/wechat_icon.png" @click="wechat.visible = true" v-if="wechat.qrcode">
+		<img src="{MODULE_URL}static/m/spec/img/feedback_icon.png" @click="feedbackClick">
+	</div>
+	<div class="content">
+		{if !empty($tpl['site']['warning'])}
+		<div id="affiche">
+			<div class="affiche_text">
+				{$tpl['site']['warning']}
+			</div>
+		</div>
+		{/if}
+		<div class="swiper" id="adv-swiper-container">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide" v-for="(item,index) in slides">
+					<img class="swiper-img" :src="item.image" @click="slideClick(item)"/>
+				</div>
+			</div>
+		</div>
+		<div class="scroll-view" v-if="group.length > 0">
+			<div class="group-view">
+				<div class="group-item group-se">售货机商品</div>
+				<div class="group-item" v-for="(item,index) in group" :key="index" @click="groupClick(item)">
+					{{item.title}}
+				</div>
+			</div>
+		</div>
+		<div class="swiper" id="account-swiper-container" v-show="tabbar.currentValue === 'free' && accounts.length > 0">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide" v-for="(account, index) in accounts" :key="index"
+					:style="{'background-color':account.clr}">
+					<div class="account-view">
+						<div class="account-header">
+							<img :src="account.img">
+							<div>
+								<span class="title" v-html="account.title"></span>
+								<span class="desc" v-html="account.descr"></span>
+							</div>
+						</div>
+						<div class="qrcode-view">
+							<div class="bg" :style="{'background-color': account.clr}"></div>
+							<img class="qrcode" :src="account.qrcode" v-if="account.qrcode">
+							<div class="video-cover" v-else-if="account.media" @click="playClick(account)">
+								<img src="{MODULE_URL}static/m/spec/img/play_icon.png">
+							</div>
+							<div class="wxapp-container" v-else-if="account.username">
+								<img :src="account.img">
+								<div class="wxapp-cover">
+									<wx-open-launch-weapp :id="account.uid" :username="account.username" :path="account.path">
+										<script type="text/wxtag-template">
+											<style>.play-icon { width: 40px }</style>
+											<img class="play-icon" src="{MODULE_URL}static/m/spec/img/click.svg">
+										</script>
+									</wx-open-launch-weapp>
+								</div>
+							</div>
+						</div>
+						<div class="tips">
+							<div class="divider"></div>
+							<span v-if="account.qrcode">长按识别二维码</span>
+							<span v-else-if="account.media" style="margin-top: 3px;">点击观看视频</span>
+							<span v-else-if="account.username" style="margin-top: 3px;">点击打开小程序</span>
+							<div class="divider"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="goods-container" v-show="tabbar.currentValue === 'buy'">
+			<div class="package-view" v-for="(item, index) in packages" :key="index">
+				<span>{{item.title}}</span>
+				<div class="goods-list">
+					<div class="goods-list-item" v-for="(goods, i) in item.list">
+						<img class="goods-pic" :src="goods.image">
+						<span class="goods-name">{{goods.name}}</span>
+						<span>x{{goods.num}}</span>
+					</div>
+				</div>
+				<div class="package-line"></div>
+				<div class="package-footer">
+					<span>售价：</span>
+					<span class="goods-price">¥{{item.price}}</span>
+					<div v-if="item.isOk" class="buy-btn" @click="buyPackageClick(item)">购买</div>
+					<span v-else style="color: #9d9d9d;">暂时无法购买</span>
+				</div>
+			</div>
+			<div :class="['goods-view', goods.length == 1 && packages.length == 0 ? 'goods-single-view' : '']" v-for="(item, index) in goods" :key="index">
+				<div :class="['goods-pic-view', goods.length == 1 && packages.length == 0 ? 'goods-pic-single-view' : '']" @click="buyClick(item)">
+					<img class="goods-pic" :src="item.img">
+					<div class="goods-num" v-if="item.num > 0">剩余：{{item.num}}</div>
+					<div class="sold-out-view" v-else>
+						<img src="{MODULE_URL}static/m/spec/img/soldout.svg">
+					</div>
+				</div>
+				<div class="goods-row">
+					<div class="goods-name">{{item.name}}</div>
+				</div>
+				<div class="goods-row">
+					<div class="goods-price-view">
+						<span class="price">¥ {{(parseFloat(item.price * item.count) / 100).toFixed(2)}}</span>
+						<div class="goods-row" style="margin-top: 5px;">
+							<img class="circle-btn" style="margin-right: 10px;" src="{MODULE_URL}static/m/spec/img/minus.svg"
+								@click="minusClick(item)">
+							<span>{{item.count}}</span>
+							<img class="circle-btn" style="margin-left: 10px;" src="{MODULE_URL}static/m/spec/img/plus.svg"
+								@click="plusClick(item)">
+						</div>
+					</div>
+					<div class="buy-btn" @click="buyClick(item)">购买</div>
+				</div>
+			</div>
+		</div>
+		<div class="no-data-view" v-if="!loading && tabbar.currentValue === 'free' && accounts.length === 0">
+			<img src="{MODULE_URL}static/m/spec/img/information.svg">
+			<span>暂时无法免费领取</span>
+		</div>
+		<div class="no-data-view"  v-if="!loading && tabbar.currentValue === 'buy' && packages.length === 0 && goods.length === 0">
+			<img src="{MODULE_URL}static/m/spec/img/information.svg">
+			<span>暂时无法购买</span>
+		</div>
+		<div class="sales-view" v-if="sales.length > 0">
+			<div class="title">我要秒杀</div>
+			<div class="list">
+				<div class="sale-item" v-for="(item, index) in sales" :key="index" @click="saleClick(item)">
+					<img class="sale-pic" :src="item.data.image">
+					<span class="sale-name">{{item.title}}</span>
+					<span class="sale-price">{{item.data.discount_price}}</span>
+					<span class="sale-org">{{item.data.price}}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tab-bar">
+		<div class="tab-item" v-for="(item, index) in tabbar.list" :key="index" @click="tabClick(index)">
+			<img :src="item.value === tabbar.currentValue ? item.selectedIcon : item.icon">
+			<span :class="[item.value === tabbar.currentValue ? 'selected' : '']">{{item.title}}</span>
+		</div>
+	</div>
+	<div class="mask" v-if="wechat.visible">
+		<img class="close-icon" src="{MODULE_URL}static/m/spec/img/close.svg" @click="wechat.visible = false">
+		<div class="wechat-qrcode">
+			<img :src="wechat.qrcode">
+			<span>{{wechat.desc}}</span>
+		</div>
+	</div>
+	<div class="mask" style="background-color: #000000;" v-show="video.visible">
+		<div class="countdown">出货倒计时：{{video.countdown}}秒</div>
+		<video id="player" class="video-js" width="100%" height="100%" x5-video-player-type="h5-page" playsinline>
+		</video>
+	</div>
+	<div class="mask" v-if="passwd.visible">
+		<div class="alert-view">
+			<span class="title">提示</span>
+			<span class="text">{{passwd.data.text}}</span>
+			<div class="confirm" v-clipboard:copy="passwd.data.code" v-clipboard:success="onCopy" v-clipboard:error="onError">确定</div>
+		</div>
+	</div>
+	<div class="mask" v-if="retry.visible">
+		<div class="alert-view">
+			<span class="title">提示</span>
+			<span class="text">{{retry.text}}</span>
+			<div class="confirm" @click="retryClick">确定</div>
+		</div>
+	</div>
+	<div class="mask" v-if="saveUserProfile">
+		<div class="sex-view">
+			<span style="font-size: 18px;">完善信息获取更多服务</span>
+			<span style="margin-top: 10px;color: orchid;">您的性别</span>
+			<div style="width: 100%;display: flex;margin-top: 20px;">
+				<div class="sex-item" @click="sexClick(1)">
+					<img src="{MODULE_URL}static/m/spec/img/male_avatar.png">
+					<span style="color: lightblue;">男</span>
+				</div>
+				<div class="sex-item" @click="sexClick(2)">
+					<img src="{MODULE_URL}static/m/spec/img/female_avatar.png">
+					<span style="color: pink;">女</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toast" v-if="toast.visible">{{toast.text}}</div>
+	<div class="mask" style="background-color: rgba(0, 0, 0, 0);" v-if="loading">
+		<div class="loading-view">
+			<img src="{MODULE_URL}static/m/spec/img/loading.svg">
+			<span>正在加载中...</span>
+		</div>
+	</div>
+</div>
+{$tpl['js']['code']}
+{php \zovye\url(true, JS_VUE_URL);}
+<script type="text/javascript">
+		const initData = {
+			imei: "{$tpl['device']['imei']}",
+			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}'),
+			tabbar: {
+				list: [{
+					title: '免费',
+					icon: '{MODULE_URL}static/m/spec/img/follow_icon.png',
+					selectedIcon: '{MODULE_URL}static/m/spec/img/follow_icon_se.png',
+					value: 'free'
+				}, {
+					title: '购买',
+					icon: '{MODULE_URL}static/m/spec/img/buy_icon.png',
+					selectedIcon: '{MODULE_URL}static/m/spec/img/buy_icon_se.png',
+					value: 'buy'
+				}, {
+					title: '我的',
+					icon: '{MODULE_URL}static/m/spec/img/profile_icon.png',
+					selectedIcon: '{MODULE_URL}static/m/spec/img/profile_icon_se.png',
+					value: 'profile'
+				}],
+				currentValue: 'free'
+			}
+		};
+</script>
+{php \zovye\url(true, 'static/m/spec/device.js?v=202111161543');}
+<script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
+<script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
+<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
+{if !empty($tpl['site']['warning'])}
+<script type="text/javascript">
+		(function() {
+			setTimeout(this.marquee, 1000);
+		}());		
+</script>
+{/if}
+</body>
+</html>

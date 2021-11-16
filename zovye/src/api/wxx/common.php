@@ -1124,8 +1124,6 @@ class common
                         $data['status'] = '成功';
                     }
                 }
-            } elseif ($entry->getBalance()) {
-                $data['type'] = '余额订单';
             } else {
                 $data['type'] = '免费订单';
             }

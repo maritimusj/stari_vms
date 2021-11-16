@@ -157,7 +157,7 @@
                     <th>商品</th>
                     <th>图片</th>
                     <th>
-                        <div>数量(价格/余额)</div>
+                        <div>数量(价格)</div>
                     </th>
                     <th>用户</th>
                     <th class="center">归属</th>
@@ -253,8 +253,6 @@
                             <i class="fa fa-list" title="佣金记录" data-op="commissionDetail"></i>
                             {/if}
                             {/if})
-                            {elseif $order['balance']>0}
-                            (余额：<span class="balance">{$order['balance']} <i class="fa fa-tint disabled"></i></span>)
                             {else}
                             (<span class="zeroprice">免费领取</span>)
                             {/if}

@@ -563,9 +563,7 @@ if ($op == 'default') {
                     break;
                 case 'way':
                     if ($entry->getPrice() > 0) {
-                        $data[$header] = '现金';
-                    } elseif ($entry->getBalance() > 0) {
-                        $data[$header] = '余额';
+                        $data[$header] = '支付';
                     } else {
                         $data[$header] = '免费';
                     }

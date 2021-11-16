@@ -206,7 +206,7 @@ class Stats
         if ($stats) {
             $chart = [
                 'tooltip' => ['trigger' => 'axis'],
-                'legend' => ['data' => ['免费', '余额', '支付'], 'bottom' => 0],
+                'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
                 'xAxis' => ['type' => 'category'],
                 'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
                 'series' => [
@@ -220,12 +220,6 @@ class Stats
                         'type' => 'line',
                         'color' => '#FF3300',
                         'name' => '支付',
-                        'data' => [],
-                    ],
-                    [
-                        'type' => 'line',
-                        'color' => '#3399FF',
-                        'name' => '余额',
                         'data' => [],
                     ],
                 ],
@@ -272,7 +266,7 @@ class Stats
             $month = date('n月', $day);
             $chart = [
                 'tooltip' => ['trigger' => 'axis'],
-                'legend' => ['data' => ['免费', '余额', '支付'], 'bottom' => 0],
+                'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
                 'xAxis' => ['type' => 'category'],
                 'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
                 'series' => [
@@ -286,12 +280,6 @@ class Stats
                         'type' => 'line',
                         'color' => '#FF3300',
                         'name' => '支付',
-                        'data' => [],
-                    ],
-                    [
-                        'type' => 'line',
-                        'color' => '#3399FF',
-                        'name' => '余额',
                         'data' => [],
                     ],
                 ],

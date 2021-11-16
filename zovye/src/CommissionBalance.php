@@ -18,7 +18,7 @@ class CommissionBalance extends State
     const ORDER_WX_PAY = 2;
     const WITHDRAW = 3;
     const REFUND = 4;
-    //const ORDER_AAL = 5;
+
     const ORDER_REFUND = 6;
     const GSP = 7;
     const BONUS = 8;

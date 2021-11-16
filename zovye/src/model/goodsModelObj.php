@@ -22,8 +22,6 @@ use zovye\traits\ExtraDataGettersAndSetters;
  * @method setSync($syncAll)
  * @method getPrice()
  * @method setPrice(int $price)
- * @method getBalance()
- * @method setBalance($goodsBalance)
  * @method getCreatetime()
  * @method setDeleted(int $int)
  * @method isDeleted()

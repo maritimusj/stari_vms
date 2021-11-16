@@ -39,14 +39,7 @@ class AgentBonusEventHandler
 
         //免费订单
         if (empty($agent->settings('agentData.bonus.order.f')) &&
-            $order->getPrice() == 0 &&
-            $order->getBalance() == 0) {
-            return true;
-        }
-
-        //余额订单
-        if (empty($agent->settings('agentData.bonus.order.b')) &&
-            $order->getBalance() > 0) {
+            $order->getPrice() == 0) {
             return true;
         }
 

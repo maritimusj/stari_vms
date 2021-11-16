@@ -155,7 +155,7 @@ class accountModelObj extends modelObj
         }
 
         if ($this->isDouyin()) {
-            return App::isDouyinEnabled();
+            return !App::isDouyinEnabled();
         }
 
         if ($this->isThirdPartyPlatform()) {

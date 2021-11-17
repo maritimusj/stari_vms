@@ -13,14 +13,9 @@ SQL;
     $query = Account::query();
 
     foreach($query->findAll() as $entry) {
-        if ($entry->getState() != 0) {
-            $entry->setType($entry->getState());
-            $entry->setState(Account::NORMAL);
-        } else {
-            $type = intval($entry->settings('config.type'));
-            $entry->setType($type);
-            $entry->setState(Account::BANNED);
-        }
+        $type = intval($entry->settings('config.type', 0));
+        $entry->setType($type);
+        $entry->setState($entry->getState() != 0 ? Account::NORMAL : Account::BANNED);
         $entry->save();
     }
 

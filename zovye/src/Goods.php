@@ -113,9 +113,12 @@ class Goods
         $cost_price = $entry->getCostPrice();
 
         if (!empty($cost_price)) {
-
             $data['costPrice'] = $cost_price;
             $data['costPrice_formatted'] = '￥' . number_format($cost_price / 100, 2) . '元';
+        }
+
+        if (App::isBalanceEnabled()) {
+            $data['balance'] = $entry->getBalance();
         }
 
         $discountPrice = $entry->getExtraData('discountPrice', 0);

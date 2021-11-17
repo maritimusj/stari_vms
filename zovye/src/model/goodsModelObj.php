@@ -110,6 +110,11 @@ class goodsModelObj extends modelObj
         return $this->setExtraData('appendage', $data);
     }
 
+    public function getBalance(): int
+    {
+        return intval($this->getExtraData('balance', 0));
+    }
+
     public function getCostPrice(): int
     {
         return intval($this->getExtraData('costPrice', 0));

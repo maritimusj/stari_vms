@@ -74,14 +74,25 @@
                     <label class="col-md-2 control-label">领取方式</label>
                     <div class="col-md-10">
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="allowFree" value="balance" {if empty($goods) || $goods['allowFree']}checked{/if}> 免费领取
+                            <input type="checkbox" name="allowFree" value="_balance" {if empty($goods) || $goods['allowFree']}checked{/if}> 免费领取
                         </label>
                         <label class="checkbox-inline">
-                            <input type="checkbox" name="allowPay" value="price" {if empty($goods) || $goods['allowPay']}checked{/if}> 支付领取
+                            <input type="checkbox" name="allowPay" value="_price" {if empty($goods) || $goods['allowPay']}checked{/if}> 支付购买
                         </label>
                     </div>
                 </div>
-                <fieldset {if $goods && !$goods['allowPay']}disabled{/if} id="price">
+                {if \zovye\App::isBalanceEnabled()}
+                <fieldset {if $goods && !$goods['allowFree']}disabled{/if} id="_balance">
+                    <div class="form-group">
+                        <label for="balance" class="col-md-2 control-label">积分</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" id="balance" name="balance" step="1" min="0" value="{php echo $goods? $goods['balance'] : 0}">
+                            <span class="help-block">* 用户兑换该商品时需要消耗多少积分(为0则无法用积分兑换)</span>
+                        </div>
+                    </div>
+                </fieldset>
+                {/if}
+                <fieldset {if $goods && !$goods['allowPay']}disabled{/if} id="_price">
                 <div class="form-group">
                     <label for="goodsPrice" class="col-md-2 control-label">单价（元）</label>
                     <div class="col-md-10">
@@ -90,7 +101,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="costPrice" class="col-md-2 control-label">成本价（元）</label>
+                    <label for="costPrice" class="col-md-2 control-label">成本（元）</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" id="costPrice" name="costPrice" step="0.01" value="{php echo $goods? number_format($goods['costPrice'] / 100, 2) : 0}">
                         <span class="help-block">* 商品成本价格(可以不填写)</span>
@@ -106,11 +117,12 @@
                     </div>
                 </div>
                 {/if}
+
                 <div class="form-group">
-                    <label for="discountPrice" class="col-md-2 control-label">新用户首单优惠（元）</label>
+                    <label for="discountPrice" class="col-md-2 control-label">首单优惠（元）</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" id="discountPrice" name="discountPrice" step="0.01" value="{php echo $goods? number_format($goods['discountPrice'] / 100, 2) : 0}">
-                        <span class="help-block">* 商品优惠价格(可以不填写)</span>
+                        <span class="help-block">* 新用户首次购买该商品的优惠价格(可以不填写)</span>
                     </div>
                 </div>
                 </fieldset>
@@ -166,16 +178,23 @@
                 util.loaded();
             })
         })
-        $('body').on('click', '#addGoodsForm input[type=checkbox]', function(){
-            const val = $(this).val();
+        function check(e) {
+            const val = $(e).val();
             if (val) {
-                if ($(this).is(':checked')) {
+                if ($(e).is(':checked')) {
                     $('#' + val).removeAttr('disabled');
                 } else {
                     $('#' + val).attr('disabled', true);
                 }
-            }
+            }            
+        }
+
+        $('body').on('click', '#addGoodsForm input[type=checkbox]', function(){
+            check(this);
         })
+
+        check('#addGoodsForm input[name=allowFree]');
+        check('#addGoodsForm input[name=allowPay]');
     })
 </script>
 {template 'common/footer'}

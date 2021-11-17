@@ -377,7 +377,6 @@ ORDER;
     {
         if ($this->user) {
             $openid = $this->user->getOpenid();
-
             return CommissionBalance::query(['openid' => $openid]);
         }
 

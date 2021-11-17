@@ -1411,52 +1411,6 @@ if ($op == 'default') {
     }
 
     JSON::fail('出错了，无法读取消息内容！');
-} elseif ($op == 'commission_log') {
-
-    $user = User::get(request::int('id'));
-    if ($user) {
-        $title = "<b>{$user->getName()}</b>的佣金记录";
-        $page = max(1, request::int('page'));
-        $page_size = $page_size = request::int('pagesize', 5);
-
-        $query = $user->getCommissionBalance()->log();
-
-        $total = $query->count();
-        $total_page = ceil($total / $page_size);
-        $pager = '';
-
-        if ($page > $total_page) {
-            $page = 1;
-        }
-
-        $logs = [];
-        if ($total > 0) {
-            //检查有佣金记录的用户的佣金用户身份是否存在
-            if (!$user->isGSPor()) {
-                $user->setPrincipal(User::GSPOR);
-                $user->save();
-            }
-
-            $pager = We7::pagination($total, $page, $page_size);
-            $query->page($page, $page_size);
-            $query->orderBy('createtime DESC');
-
-            foreach ($query->findAll() as $entry) {
-                $logs[] = CommissionBalance::format($entry);
-            }
-        }
-
-        $content = app()->fetchTemplate(
-            'web/common/commission_log',
-            [
-                'user' => $user,
-                'logs' => $logs,
-                'pager' => $pager,
-            ]
-        );
-
-        JSON::success(['title' => $title, 'content' => $content]);
-    }
 } elseif ($op == 'gsp') {
 
     $result_msg = function ($msg, $status) {

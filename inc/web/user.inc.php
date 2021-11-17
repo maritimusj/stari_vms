@@ -31,6 +31,7 @@ if ($op == 'default') {
     $tpl_data['agent_levels'] = settings('agent.levels');
 
     $tpl_data['commission_enabled'] = App::isCommissionEnabled();
+    $tpl_data['balance_enabled'] = App::isBalanceEnabled();
 
     $credit_used = settings('we7credit.enabled');
 
@@ -213,7 +214,8 @@ if ($op == 'default') {
     $result = [];
 
     if (is_array($ids)) {
-        $commission_balance = App::isCommissionEnabled();
+        $commission_enabled = App::isCommissionEnabled();
+        $balance_enabled = App::isBalanceEnabled();
 
         $query = User::query(['id' => $ids]);
 
@@ -226,12 +228,16 @@ if ($op == 'default') {
                     'pay' => $user->getPayTotal(),
                 ];
 
-                if ($commission_balance) {
+                if ($commission_enabled) {
                     $total = $user->getCommissionBalance()->total();
                     if ($user->isAgent() || $user->isGSPor() || $user->isKeeper() || $user->isPartner()) {
                         $data['commission_balance'] = $total;
                         $data['commission_balance_formatted'] = number_format($total / 100, 2);
                     }
+                }
+
+                if ($balance_enabled) {
+                    $data['balance'] = $user->getBalance()->total();
                 }
 
                 $result[] = $data;
@@ -611,7 +617,7 @@ if ($op == 'default') {
         ]
     );
 
-    JSON::success(['title' => '调整用户余额', 'content' => $content]);
+    JSON::success(['title' => '调整用户<b>余额</b>', 'content' => $content]);
 
 } elseif ($op == 'commission_balance_save') {
 
@@ -626,7 +632,7 @@ if ($op == 'default') {
     }
 
     if ($user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-        $memo = strval(request('memo'));
+        $memo = request::str('memo');
         $r = $user->commission_change(
             $total,
             CommissionBalance::ADJUST,
@@ -644,4 +650,141 @@ if ($op == 'default') {
 
     JSON::fail('保存数据失败！');
 
+} elseif ($op == 'commission_log') {
+
+    $user = User::get(request::int('id'));
+    if ($user) {
+        $title = "<b>{$user->getName()}</b>的佣金记录";
+        $page = max(1, request::int('page'));
+        $page_size = $page_size = request::int('pagesize', 5);
+
+        $query = $user->getCommissionBalance()->log();
+
+        $total = $query->count();
+        $total_page = ceil($total / $page_size);
+        $pager = '';
+
+        if ($page > $total_page) {
+            $page = 1;
+        }
+
+        $logs = [];
+        if ($total > 0) {
+            //检查有佣金记录的用户的佣金用户身份是否存在
+            if (!$user->isGSPor()) {
+                $user->setPrincipal(User::GSPOR);
+                $user->save();
+            }
+
+            $pager = We7::pagination($total, $page, $page_size);
+            $query->page($page, $page_size);
+            $query->orderBy('createtime DESC');
+
+            foreach ($query->findAll() as $entry) {
+                $logs[] = CommissionBalance::format($entry);
+            }
+        }
+
+        $content = app()->fetchTemplate(
+            'web/common/commission_log',
+            [
+                'user' => $user,
+                'logs' => $logs,
+                'pager' => $pager,
+            ]
+        );
+
+        JSON::success(['title' => $title, 'content' => $content]);
+    }
+}  elseif ($op == 'balance_log') {
+
+    $user = User::get(request::int('id'));
+    if ($user) {
+        $title = "<b>{$user->getName()}</b>的积分记录";
+        $page = max(1, request::int('page'));
+        $page_size = $page_size = request::int('pagesize', 5);
+
+        $query = $user->getBalance()->log();
+
+        $total = $query->count();
+        $total_page = ceil($total / $page_size);
+        $pager = '';
+
+        if ($page > $total_page) {
+            $page = 1;
+        }
+
+        $logs = [];
+        if ($total > 0) {
+            $pager = We7::pagination($total, $page, $page_size);
+            $query->page($page, $page_size);
+            $query->orderBy('createtime DESC');
+
+            foreach ($query->findAll() as $entry) {
+                $logs[] = Balance::format($entry);
+            }
+        }
+
+        $content = app()->fetchTemplate(
+            'web/common/balance_log',
+            [
+                'user' => $user,
+                'logs' => $logs,
+                'pager' => $pager,
+            ]
+        );
+
+        JSON::success(['title' => $title, 'content' => $content]);
+    }
+} elseif ($op == 'balance_edit') {
+
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('没有找到这个用户！');
+    }
+
+    $content = app()->fetchTemplate(
+        'web/common/balance_edit',
+        [
+            'user' => [
+                'id' => $user->getId(),
+                'openid' => $user->getOpenid(),
+                'nickname' => $user->getNickname(),
+                'avatar' => $user->getAvatar(),
+            ],
+        ]
+    );
+
+    JSON::success(['title' => '调整用户<b>积分</b>', 'content' => $content]);
+
+} elseif ($op == 'balance_save') {
+
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('没有找到这个用户！');
+    }
+
+    $total = request::int('total');
+    if ($total == 0) {
+        JSON::fail('积分数量不能为零！');
+    }
+
+    if ($user->acquireLocker(User::BALANCE_LOCKER)) {
+        $memo = request::str('memo');
+        $r = $user->getBalance()->change(
+            $total,
+            Balance::ADJUST,
+            [
+                'admin' => _W('username'),
+                'ip' => CLIENT_IP,
+                'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                'memo' => $memo,
+            ]
+        );
+        if ($r) {
+            JSON::success('操作成功 ！');
+        }
+    }
+
+    JSON::fail('保存数据失败！');
 }

@@ -10,6 +10,9 @@ class Balance
 {
     const CACHE_EXPIRATION = 60 * 60;
 
+    const ADJUST = 0;
+    
+
     private $user;
 
     public function __construct(userModelObj $user)
@@ -109,5 +112,51 @@ class Balance
         }
 
         return $total;
+    }
+
+    /**
+     * 返回用户积分变动记录
+     */
+    public function log(): ?base\modelObjFinder
+    {
+        if ($this->user) {
+            $openid = $this->user->getOpenid();
+            return Balance::query(['openid' => $openid]);
+        }
+
+        return null;
+    }
+
+    public static function format(balanceModelObj $entry)
+    {
+        $data = [
+            'id' => $entry->getId(),
+            'xval' => $entry->getXVal(),
+            'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+        ];
+
+        if ($entry->getXVal() > 0) {
+            $data['xval'] = '+' . $data['xval'];
+        }
+
+        if ($entry->getSrc() == Balance::ADJUST) {
+            $name = $entry->getExtraData('admin');
+            $admin_info = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $memo = $entry->getExtraData('memo');
+            $data['memo'] = <<<REFUND
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">管理员调整</dd>
+{$admin_info}
+<dt>说明</dt>
+<dd class="memo">{$memo}</dd>
+</dl>
+REFUND;
+
+        }
+
+
+
+        return $data;
     }
 }

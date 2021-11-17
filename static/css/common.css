@@ -1261,25 +1261,28 @@ i.wxpay {
     background-color: rgba(0, 150, 136, .8);
 }
 
-#userlist td:not(:nth-child(2)),
-#userlist th:not(:nth-child(2)) {
-    vertical-align: middle;
-    text-align: center;
-}
-
 #userlist tr.banned td:not(:last-child) {
     text-decoration-line: line-through;
     filter: grayscale(100%);
     opacity: 0.66;
 }
 
-table tr td .commission_log {
+table tr td .commission .log {
     text-align: center;
     min-width: 150px;
 }
 
-table tr td .commission_log .price{
+table tr td .commission.log .price{
     color: #4CAF50;   
+    cursor: default;
+}
+table tr td .balance.log .price{
+    color: orange;
+    font-size: x-small;
+    cursor: default;
+}
+table tr td .log .price.zero{
+    color: lightgray;   
     cursor: default;
 }
 

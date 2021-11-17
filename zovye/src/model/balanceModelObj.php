@@ -7,7 +7,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
-
+use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
 /**
@@ -31,19 +31,15 @@ class balanceModelObj extends modelObj
     protected $x_val;
     /** @var int */
     protected $src;
-    /** @var json */
+
     protected $extra;
     /** @var int */
     protected $createtime;
 
+    use ExtraDataGettersAndSetters;
+
     public static function getTableName($readOrWrite): string
     {
         return tb('balance');
-    }
-
-    public function setExtra($data)
-    {
-        $this->extra = json_encode($data);
-        $this->setDirty(['extra']);
     }
 }

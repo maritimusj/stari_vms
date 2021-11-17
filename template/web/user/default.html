@@ -12,6 +12,9 @@
         width: 20px;
         height: 20px;
     }
+    .profile-sex img {
+        width: 100%;
+    }
     {loop $agent_levels $index $data}
     .profile.agent.{$index} {
     border-top-color: {$data['clr']};
@@ -27,16 +30,14 @@
     }
     {/loop}
 
-    .commission_log i.fa-list, .commission_log i.balance-edit {
+    .log i.fa-list, .log i.balance-edit {
         display: none;
         color: #fff;
         margin-left: 6px;
     }
-
-    .commission_log i.fa-list, .commission_log i.balance-edit{
+    .log i.fa-list, .log i.balance-edit{
         display: inline;
     }
-
     .fa-weixin {
         color: #4CAF50;
     }
@@ -152,15 +153,18 @@
                 <th>昵称</th>
                 <th>性别</th>
                 {if $commission_enabled}
-                <th style="width: 200px;">账户余额</th>
+                <th style="width: 150px;">余额 <img src="{MODULE_URL}static/img/yen.svg" class="yen"></th>
                 {/if}
-                <th>来源</th>                
+                {if $balance_enabled}
+                <th style="width: 150px;">积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></th>
+                {/if}
                 {if $principal == 'partner' || $principal == 'keeper'}
                 <th>代理商</th>
                 {/if}
                 {if $credit_used}
                 <th>积分</th>
                 {/if}
+                <th>来源</th>
                 <th>
                     <div>订单数量</div>
                     <div><span data-orderby="free_total" {if $orderby=='free_total'}class="fa {$order}"{/if}>免费</span>
@@ -226,12 +230,20 @@
                 <img src="{MODULE_URL}static/img/man.svg" title="男">
                 {elseif $item['sex'] == 2}
                 <img src="{MODULE_URL}static/img/woman.svg" title="女">
+                {else}
+                <img src="{MODULE_URL}static/img/unknown.svg" title="未知">
                 {/if}                
             </div>
         </td>
 {if $commission_enabled}
 <td>
-    <div class="commission_log" style="display:none;">
+    <div class="commission log" style="display:none;">
+    </div>
+</td>
+{/if}
+{if $balance_enabled}
+<td>
+    <div class="balance log" style="display:none;">
     </div>
 </td>
 {/if}
@@ -400,10 +412,6 @@
         })
     }
 
-    api.viewCommissionLog = function(userid) {
-        api.showResult({op: 'commission_log', id: userid}, "{php echo $this->createWebUrl('agent');}");
-    }
-
     api.resetMobile = function(userid) {
         if (confirm('确定要清除用户已登记的手机号码吗？')) {
             api.showResult({op: 'reset_mobile', id: userid});
@@ -424,6 +432,10 @@
         api.showResult({user_id: userid}, api.ordersUrl);
     }
 
+    api.viewCommissionLog = function(userid) {
+        api.showResult({op: 'commission_log', id: userid});
+    }
+
     api.CommissionBalanceEdit = function(userid, event) {
         api.showResult({id: userid, op: "commission_balance_edit"});
         event.stopPropagation();
@@ -438,6 +450,24 @@
         })
     }
 
+    api.viewBalanceLog = function(userid) {
+        api.showResult({op: 'balance_log', id: userid});
+    }
+
+    api.BalanceEdit = function(userid, event) {
+        api.showResult({id: userid, op: "balance_edit"});
+        event.stopPropagation();
+    }
+
+    api.saveBalance = function(userid) {
+        const total = $('input[name=total]').val();
+        const memo = $('input[name=memo]').val();
+        api.showResult({id: userid, total: total, memo: memo, op: "balance_save"}, '', false, function(){
+            $('#modal-message').modal('hide');
+            api.getUserStats([userid]);
+        })
+    }    
+
     api.getUserStats = function(ids) {
         $.post(api.url, {op: 'user_stats', ids}).then(function(res){
             if(res && res.status && $.isArray(res.data)) {
@@ -446,10 +476,21 @@
                     tr.find('.stats .free').text(stats.free || 0);
                     tr.find('.stats .pay').text(stats.pay || 0);
                     if (stats.commission_balance !== undefined) {
-                        tr.find('.commission_log').html(
+                        tr.find('.commission.log').html(
                             "<span class=\"price operate\">￥<b>" + stats.commission_balance_formatted + "</b> <i class=\"fa fa-list\"  data-op=\"viewCommissionLog\" title=\"点击查看详情...\"></i><i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='CommissionBalanceEdit'></i></span>"
                         ).show();
+                        if (stats.commission_balance === 0) {
+                            tr.find('.commission.log .price').addClass('zero');
+                        }
                     }
+                    if (stats.balance !== undefined) {
+                        tr.find('.balance.log').html(
+                            "<span class=\"price operate\"><b>" + stats.balance + "</b> <i class=\"fa fa-list\"  data-op=\"viewBalanceLog\" title=\"点击查看详情...\"></i><i class='balance-edit fa fa-pencil' title='修改用户积分...' data-op='BalanceEdit'></i></span>"
+                        ).show();
+                        if (stats.balance === 0) {
+                            tr.find('.balance.log .price').addClass('zero');
+                        }
+                    }                    
                 })
             }
         })

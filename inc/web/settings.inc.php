@@ -210,6 +210,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
         $settings['account']['appQRCode']['enabled'] = request::bool('AccountAppQRCode') ? 1 : 0;
 
+        Config::balance('enabled', request::bool('UserBalance') ? 1 : 0, true);
+
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
         if ($settings['app']['first']['enabled']) {
             $module_url = str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));

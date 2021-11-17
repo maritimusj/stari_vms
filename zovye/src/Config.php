@@ -127,7 +127,7 @@ class Config
         return globalConfig('location', $key, $v);
     }
 
-      /**
+    /**
      *  抖音设置
      */
 
@@ -138,5 +138,18 @@ class Config
         }
 
         return globalConfig('douyin', $key, $v);
-    }  
+    }
+
+    /**
+     *  积分、余额设置
+     */
+
+    public static function balance($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('balance', $key, $v);
+        }
+
+        return globalConfig('balance', $key, $v);
+    }
 }

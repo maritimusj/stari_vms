@@ -254,6 +254,7 @@ if ($op == 'default') {
         $data = [
             'isajax' => true,
             'orders' => $orders,
+            'user' => request::has('user_id'),
             'accounts' => $accounts,
             'pager' => $pager,
         ];
@@ -265,7 +266,7 @@ if ($op == 'default') {
         $content = app()->fetchTemplate('web/order/list', $data);
 
         JSON::success([
-            'title' => '',
+            'title' => $user ? '<b>' . $user->getName() . '</b>的订单列表' : '',
             'content' => $content,
         ]);
     }

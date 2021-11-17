@@ -39,7 +39,9 @@
         <thead>
         <tr>
             <th>#</th>
+            {if empty($user)}
             <th>用户</th>
+            {/if}
             <th>商品</th>
             <th>
                 数量(价格)
@@ -63,6 +65,7 @@
         {loop $orders $index $order}
         <tr>
             <td>{php echo $index + 1}</td>
+            {if empty($user)}
             <td>
                 <div class="profile">
                     <img src="{$order['user']['avatar']}" />
@@ -71,6 +74,7 @@
                     </span>
                 </div>
             </td>
+            {/if}
             <td>
                 <div class="name">
                     {if $order['goods']}

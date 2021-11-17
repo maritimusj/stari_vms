@@ -7,6 +7,7 @@
 
 namespace zovye\model;
 
+use zovye\Balance;
 use zovye\Locker;
 use zovye\Pay;
 use zovye\We7;
@@ -516,6 +517,16 @@ class userModelObj extends modelObj
     }
 
     /**
+     * 获取用户名积分帐户.
+     *
+     * @return Balance
+     */
+    public function getBalance(): Balance
+    {
+        return new Balance($this);
+    }
+
+    /**
      * 用户今日免费领取数.
      *
      * @return int
@@ -554,7 +565,7 @@ class userModelObj extends modelObj
      *
      * @return int
      */
-    public function getFeeTotal(): int
+    public function getPayTotal(): int
     {
         $query = Order::query(['openid' => $this->openid]);
         $query->where(['price >' => 0]);

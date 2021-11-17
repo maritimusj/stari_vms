@@ -16,14 +16,14 @@ use function zovye\tb;
  * @method getOpenid()
  * @method getXVal()
  * @method getSrc()
- * @method getMemo()
+ * @method getExtra()
  * @method getCreatetime()
- * @method setMemo(string $string)
  */
 class balanceModelObj extends modelObj
 {
     /** @var int */
     protected $id;
+    /** @var int */
     protected $uniacid;
     /** @var string */
     protected $openid;
@@ -31,8 +31,8 @@ class balanceModelObj extends modelObj
     protected $x_val;
     /** @var int */
     protected $src;
-    /** @var string */
-    protected $memo;
+    /** @var json */
+    protected $extra;
     /** @var int */
     protected $createtime;
 
@@ -41,4 +41,9 @@ class balanceModelObj extends modelObj
         return tb('balance');
     }
 
+    public function setExtra($data)
+    {
+        $this->extra = json_encode($data);
+        $this->setDirty(['extra']);
+    }
 }

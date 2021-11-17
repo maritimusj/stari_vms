@@ -223,8 +223,7 @@ if ($op == 'default') {
                 $data = [
                     'id' => $user->getId(),
                     'free' => $user->getFreeTotal(),
-                    'fee' => $user->getFeeTotal(),
-                    'balance' => $user->getBalanceTotal(),
+                    'pay' => $user->getPayTotal(),
                 ];
 
                 if ($commission_balance) {

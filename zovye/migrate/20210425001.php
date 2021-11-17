@@ -1,8 +1,6 @@
 <?php
 namespace zovye;
 
-use zovye\We7;
-
 $tb_name = APP_NAME;
 
 if (!We7::pdo_tableexists($tb_name . 'zovye_vms')) {

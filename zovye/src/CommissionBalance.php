@@ -386,21 +386,20 @@ ORDER;
 
     /**
      * 余额变动操作
-     * @param $n
-     * @param $src
+     * @param int $val
+     * @param int $src
      * @param array $extra
      * @return commission_balanceModelObj
      */
-    public function change($n, $src, array $extra = []): ?commission_balanceModelObj
+    public function change(int $val, int $src, array $extra = []): ?commission_balanceModelObj
     {
-        $n = intval($n);
-        if ($this->user && $n != 0) {
+        if ($this->user && $val != 0) {
             return m('commission_balance')->create(
                 We7::uniacid(
                     [
                         'openid' => $this->user->getOpenid(),
                         'src' => $src,
-                        'x_val' => $n,
+                        'x_val' => $val,
                         'extra' => serialize($extra),
                     ]
                 )

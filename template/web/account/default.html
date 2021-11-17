@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20201108');}
+{php \zovye\url(true, 'static/css/common.css?v=20211117');}
 <style>
     #accountlist td span.schema.loading{
         border-color: #ddd;
@@ -189,6 +189,17 @@
                         <div>公众号</div>
                     </th>
                     <th>
+                        {if \zovye\App::isCommissionEnabled()}
+                        佣金
+                        {/if}
+                        {if \zovye\App::isCommissionEnabled() && \zovye\App::isBalanceEnabled()}
+                        /
+                        {/if}
+                        {if \zovye\App::isBalanceEnabled()}
+                        积分
+                        {/if}
+                    </th>
+                    <th>
                         <div>所属代理</div>                        
                     </th>
                     <th>领取周期</th>
@@ -206,9 +217,7 @@
                     <td>
                         <div class="profile">
                             <img src="{media $a['img']}" title="{$a['uid']}">
-                            <span>{if $a['commission'] && $a['commission']['money'] > 0}
-                                <span class="commission" title="佣金：{php echo number_format($a['commission']['money']/100, 2)}元">*</span>
-                            {/if}{$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
+                            <span>{$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
                             {if $a['type'] == \zovye\Account::AUTH}
                             {if $a['service'] == 2}
                             <span class="state auth" title="授权接入的服务号{if $a['verified']}(已认证){else}(未认证){/if}"><i class="fa fa-check-circle"></i></span>
@@ -227,6 +236,30 @@
                             </span>
                             {/if}
                         </div>
+                    </td>
+                    <td>
+                        {if isset($a['commission'])}
+                            <img src="{MODULE_URL}static/img/yen.svg"
+                            {if $a['commission'] > 0}
+                            class="yen" 
+                            title="佣金：￥{php echo number_format($a['commission']/100, 2)}元"
+                            {else}
+                            class="yen disabled" 
+                            title="佣金未设置"
+                            {/if}
+                            >
+                        {/if}
+                        {if isset($a['balance'])}
+                            <img src="{MODULE_URL}static/img/coin.svg"
+                            {if $a['balance'] > 0}
+                            class="balance" 
+                            title="积分：{$a['balance']}"
+                            {else}
+                            class="balance disabled" 
+                            title="积分未设置"
+                            {/if}
+                            >
+                        {/if}
                     </td>
                     <td class="desc">
                         <div style="margin-bottom:10px;">

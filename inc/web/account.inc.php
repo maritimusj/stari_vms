@@ -149,7 +149,11 @@ if ($op == 'default') {
             }
 
             if (App::isCommissionEnabled()) {
-                $data['commission'] = $entry->get('commission', []);
+                $data['commission'] = $entry->commission_price();
+            }
+            
+            if (App::isBalanceEnabled()) {
+                $data['balance'] = $entry->balance_price();
             }
 
             $accounts[] = $data;
@@ -503,6 +507,12 @@ if ($op == 'default') {
                     ]
                 );
             }
+
+            // 积分
+            if (App::isBalanceEnabled()) {
+                $account->updateSettings('balance.val',  request::int('balance'));                  
+            }
+
             //退出佣金推广后,删除所有代理商分配
             if ($commission_share_closed) {
                 Account::removeAllAgents($account);
@@ -566,6 +576,7 @@ if ($op == 'default') {
 
         $limits = $account->get('limits');
         $commission = $account->get('commission', []);
+        $balance = $account->settings('balance.val', 0);
         $config = $account->get('config');
     }
 
@@ -577,6 +588,7 @@ if ($op == 'default') {
         'qrcodes' => $qr_codes ?? null,
         'limits' => $limits ?? null,
         'commission' => $commission ?? null,
+        'balance' => $balance,
         'agent_name' => $agent_name,
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,

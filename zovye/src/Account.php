@@ -184,6 +184,10 @@ class Account extends State
             'orderno' => $entry->getOrderNo(),
         ];
 
+        if (App::isBalanceEnabled()) {
+            $data['balance'] = $entry->balance_price();
+        }
+
         if ($entry->isVideo()) {
             $data['media'] = $entry->getQrcode();
             $data['duration'] = $entry->getDuration();

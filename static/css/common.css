@@ -1401,3 +1401,13 @@ form .inputMask {
     background-color: #067cf3;
     border-color: #056bd0;
 }
+
+img.balance, img.yen {
+    width: 16px;
+    height: 16px;
+}
+
+img.disabled {
+    filter: grayscale(100%);
+    opacity: 0.66;
+}

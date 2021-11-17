@@ -225,14 +225,14 @@ class accountModelObj extends modelObj
         return $this->getName();
     }
 
+    public function balance_price(): int
+    {
+        return $this->settings('balance.val', 0);
+    }
+
     public function commission_price(): int
     {
-        $commission = $this->get('commission', []);
-        if ($commission) {
-            return intval($commission['money']);
-        }
-
-        return 0;
+        return $this->settings('commission.money', 0);
     }
 
     public function format(): array

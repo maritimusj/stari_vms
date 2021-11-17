@@ -93,6 +93,9 @@
     #accountlist .qrcode-x {
         width: 22px;
     }
+    #accountlist .bonus img {
+        vertical-align: text-top;
+    }
     .operate:hover .auth-weixin:hover {
         color: #4CAF50;
         text-shadow: 1px 1px 1px #CDDC39;
@@ -189,15 +192,7 @@
                         <div>公众号</div>
                     </th>
                     <th>
-                        {if \zovye\App::isCommissionEnabled()}
-                        佣金
-                        {/if}
-                        {if \zovye\App::isCommissionEnabled() && \zovye\App::isBalanceEnabled()}
-                        /
-                        {/if}
-                        {if \zovye\App::isBalanceEnabled()}
-                        积分
-                        {/if}
+                        奖励
                     </th>
                     <th>
                         <div>所属代理</div>                        
@@ -237,28 +232,30 @@
                             {/if}
                         </div>
                     </td>
-                    <td>
-                        {if isset($a['commission'])}
+                    <td class="bonus">
+                        {if $a['commission']}
                             <img src="{MODULE_URL}static/img/yen.svg"
                             {if $a['commission'] > 0}
                             class="yen" 
-                            title="佣金：￥{php echo number_format($a['commission']/100, 2)}元"
+                            title="佣金"
                             {else}
                             class="yen disabled" 
                             title="佣金未设置"
                             {/if}
                             >
+                            <span class="commission">{php echo number_format($a['commission']/100, 2)}元</span>
                         {/if}
-                        {if isset($a['balance'])}
+                        {if $a['balance']}
                             <img src="{MODULE_URL}static/img/coin.svg"
                             {if $a['balance'] > 0}
                             class="balance" 
-                            title="积分：{$a['balance']}"
+                            title="积分"
                             {else}
                             class="balance disabled" 
                             title="积分未设置"
                             {/if}
                             >
+                            <span class="balance">{$a['balance']}</span>
                         {/if}
                     </td>
                     <td class="desc">

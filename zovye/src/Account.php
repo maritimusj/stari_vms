@@ -19,6 +19,9 @@ use zovye\model\userModelObj;
  */
 class Account extends State
 {
+    const COMMISSION = 'commission';
+    const BALANCE = 'balance';
+
     const NORMAL = 0;
 
     const BANNED = 1;
@@ -183,10 +186,6 @@ class Account extends State
             'groupname' => $entry->getGroupName(),
             'orderno' => $entry->getOrderNo(),
         ];
-
-        if (App::isBalanceEnabled()) {
-            $data['balance'] = $entry->balance_price();
-        }
 
         if ($entry->isVideo()) {
             $data['media'] = $entry->getQrcode();

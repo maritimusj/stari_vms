@@ -3,7 +3,26 @@
         zovye.enableInputMask();
         zovye.enableCopy();
     })
+    function changeBonus(w)
+    {
+        if (w == 'commission') {
+            $('#bonus .name').html('佣金（元）');
+            $('#bonus .desc').html('设备代理商获得佣金收入');
+            $('#bonus input[name=amount]').val($('#bonus').data('commission'));
+        } else if (w == 'balance') {
+            $('#bonus .name').html('积分');
+            $('#bonus .desc').html('会获得指定积分');
+            $('#bonus input[name=amount]').val($('#bonus').data('balance'));
+        } else {
+            const v = $('#bonus input:checked').val();
+            if (v == 'commission' || v == 'balance') {
+                changeBonus(v);
+            }
+        }
+    }
     $(function(){
+        changeBonus();
+
         const open_id = 0;
         $('#find_agent').click(function () {
             const keyword = $('input[name=keyword_agent]').val();

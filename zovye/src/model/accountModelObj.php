@@ -225,9 +225,18 @@ class accountModelObj extends modelObj
         return $this->getName();
     }
 
+    public function bonus_way()
+    {
+        $commission = $this->settings('commission', []);
+        if (isset($commission['balance'])) {
+            return Account::BALANCE;
+        }
+        return Account::COMMISSION;
+    }
+
     public function balance_price(): int
     {
-        return $this->settings('balance.val', 0);
+        return $this->settings('commission.balance', 0);
     }
 
     public function commission_price(): int

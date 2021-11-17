@@ -148,14 +148,14 @@ if ($op == 'default') {
                 }
             }
 
-            if (App::isCommissionEnabled()) {
-                $data['commission'] = $entry->commission_price();
+            if (App::isCommissionEnabled() || App::isBalanceEnabled()) {
+                if ($entry->bonus_way() == Account::COMMISSION) {
+                    $data['commission'] = $entry->commission_price();
+                } elseif ($entry->bonus_way() == Account::BALANCE) {
+                    $data['balance'] = $entry->balance_price();
+                }
             }
             
-            if (App::isBalanceEnabled()) {
-                $data['balance'] = $entry->balance_price();
-            }
-
             $accounts[] = $data;
         }
     }
@@ -499,19 +499,26 @@ if ($op == 'default') {
                 ]);
             }
 
+            $commission_data = [];
+
             if (App::isCommissionEnabled()) {
-                $account->set(
-                    'commission',
-                    [
-                        'money' => request::float('commission_money', 0, 2) * 100,
-                    ]
-                );
+                if (request::isset('commission_money')) {
+                    $commission_data['money'] =  request::float('commission_money', 0, 2) * 100;
+                } elseif (request::str('bonus_way') == Account::COMMISSION) {
+                    $commission_data['money'] =  request::float('amount', 0, 2) * 100;
+                }
             }
 
             // 积分
             if (App::isBalanceEnabled()) {
-                $account->updateSettings('balance.val',  request::int('balance'));                  
+                if (request::isset('commission_money')) {
+                    $commission_data['balance'] =  request::int('commission_balance');
+                } elseif (request::str('bonus_way') == Account::BALANCE) {
+                    $commission_data['balance'] =  request::int('amount');
+                }
             }
+
+            $account->set('commission', $commission_data);
 
             //退出佣金推广后,删除所有代理商分配
             if ($commission_share_closed) {
@@ -575,8 +582,14 @@ if ($op == 'default') {
         }
 
         $limits = $account->get('limits');
-        $commission = $account->get('commission', []);
-        $balance = $account->settings('balance.val', 0);
+
+        $bonus_way = $account->bonus_way();
+        if ($bonus_way == Account::COMMISSION) {
+            $amount = number_format($account->commission_price() / 100, 2);
+        } else {
+            $amount = $account->balance_price();
+        }
+
         $config = $account->get('config');
     }
 
@@ -587,8 +600,9 @@ if ($op == 'default') {
         'account' => $account ?? null,
         'qrcodes' => $qr_codes ?? null,
         'limits' => $limits ?? null,
-        'commission' => $commission ?? null,
-        'balance' => $balance,
+        'bonus_way' => $bonus_way,
+        'amount' => $amount ?? 0,
+        'balance' => $balance ?? 0,
         'agent_name' => $agent_name,
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,

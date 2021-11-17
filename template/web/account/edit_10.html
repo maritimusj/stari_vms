@@ -189,31 +189,20 @@
             </div>
             <!-- 其它设置 结束 -->
             <!-- 佣金设置 开始 -->
-            {if \zovye\App::isCommissionEnabled()}
+            {if \zovye\App::isCommissionEnabled() && !\zovye\App::isBalanceEnabled()}
             <div class="seg">
                 <div class="title">佣金</div>
                 <div class="form-group">
-                    <label for="commission_share" class="col-md-2 control-label">加入推广</label>
-                    <div class="col-md-10">
-                        <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="commission_share" id="commission_share" value="1" {if $account && $account->getShared()}checked{/if}>
-                            是否出现在代理商的广告平台中，并允许代理商帮助推广
-                        </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="commission_money" class="col-md-2 control-label">佣金（元）<img src="{MODULE_URL}static/img/yen.svg" class="yen"></label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="commission_money" id="commission_money" value="{php echo $commission ? number_format($commission['money']/100, 2) : '0'}" min="0" step="0.01">
+                        <input type="number" class="form-control" name="commission_money" id="commission_money" value="{php echo number_format($commission/100, 2)}" min="0" step="0.01">
                         <span class="help-block">* 用户通过这个公众号领取成功后，设备代理商会获得指定佣金</span>
                     </div>
                 </div>
             </div>
             {/if}
             <!-- 佣金设置 结束 -->
-            {if \zovye\App::isBalanceEnabled()}
+            {if \zovye\App::isBalanceEnabled() && !\zovye\App::isCommissionEnabled()}
             <!-- 积分设置 开始 -->
             <div class="seg">
                 <div class="title">积分</div>
@@ -226,6 +215,37 @@
                 </div>
             </div>
             <!-- 积分设置 结束 -->
+            {/if}
+            {if \zovye\App::isBalanceEnabled() && \zovye\App::isCommissionEnabled()}
+            <!-- 佣金和积分同时存在时设置 开始 -->
+            <div class="seg" id="bonus" {if $bonus_way == \zovye\Account::COMMISSION}data-commission="{$amount}"{else}data-balance="{$amount}"{/if}>
+                <div class="title">佣金 / 积分</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">奖励方式</label>
+                    <div class="col-md-10">
+                        <label class="radio-inline">
+                            <input type="radio" name="bonus_way" value="commission" 
+                            {if $bonus_way == \zovye\Account::COMMISSION}checked{/if}
+                            onclick="changeBonus('commission')">
+                            代理商获得佣金 <img src="{MODULE_URL}static/img/yen.svg" class="yen">
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="bonus_way" value="balance"
+                            {if $bonus_way == \zovye\Account::BALANCE}checked{/if}
+                             onclick="changeBonus('balance')">
+                            用户获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="amount" class="col-md-2 control-label"><span class="name"></span></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="amount" id="amount" value="{$amount}" min="0">
+                        <span class="help-block">* 用户关注这个公众号后，<span class="desc"></span></span>
+                    </div>
+                </div>
+            </div>
+            <!-- 佣金和积分同时存在时设置 结束 -->
             {/if}
         </div>
     </div>

@@ -97,7 +97,7 @@
                     </td>
                     <td>
                         {if isset($agent['commission'])}
-                        <div class="commission_log operate">
+                        <div class="commission log operate">
                             <span class="price">￥<b>{php echo number_format($agent['commission']['money']/100, 2);}</b>元</span>
                             <i class="fa fa-list" data-op="viewCommissionLog" title="点击查看详情..."></i>
                             <i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='balanceEdit'></i>
@@ -346,13 +346,13 @@
         window.location.href = "{php echo $this->createWebUrl('agent', array('op'=>'edit','id'=>'__id__'));}".replace('__id__', id);
     }
     api.balanceEdit = function (id, event) {
-        api.showResult({ id, op: "balance_edit" }, api.user_url);
+        api.showResult({ id, op: "commission_balance_edit" }, api.user_url);
     }
     api.saveUserBalanceLog = function (id) {
         $('#modal-message').modal('hide');
         const total = $('input[name=total]').val();
         const memo = $('input[name=memo]').val();
-        api.showResult({ id, total: total, memo: memo, op: "balance_edit_save" }, api.user_url, false, function () {
+        api.showResult({ id, total: total, memo: memo, op: "commission_balance_save" }, api.user_url, false, function () {
             api.getUserStats([id]);
         })
     }
@@ -395,7 +395,7 @@
         })
     }
     api.viewCommissionLog = function (id) {
-        api.showResult({ op: 'commission_log', id });
+        api.showResult({ op: 'commission_log', id }, api.user_url);
     }
     api.viewKeepers = function (id) {
         window.location.href = "{php echo $this->createWebUrl('agent', ['op' => 'keepers', 'id' => '__id__']);}".replace('__id__', id);

@@ -42,7 +42,7 @@ class users_vwModelObj extends userModelObj
     /**
      * 获取用户支付领取数量
      */
-    public function getFeeTotal(): int
+    public function getPayTotal(): int
     {
         return intval($this->fee_total);
     }

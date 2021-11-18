@@ -172,6 +172,12 @@ if (is_callable($cb)) {
         extract($res);
     }
 }
+//如果公众号奖励为积分，显示获取积分页面
+if (App::isBalanceEnabled()) {
+    if ($account && $account->getBonusType() == Account::BALANCE) {
+        app()->getBalanceBonusPage($user, $account);
+    }
+}
 
 if (empty($device)) {
     //设备扫描页面
@@ -212,7 +218,7 @@ if ($account)  {
     $res = Util::isAvailable($user, $account, $device);
     if (is_error($res)) {
         $user->remove('last');
-        $account = null;        
+        $account = null;
     }
 }
 

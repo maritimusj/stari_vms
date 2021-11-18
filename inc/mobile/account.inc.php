@@ -152,7 +152,10 @@ if ($op == 'default') {
     }
 
     $types = request::array('types');
-    $result = Account::getAvailableList($device, $user, ['type' => $types ?: null]);
+    $result = Account::getAvailableList($device, $user, [
+        'type' => $types ?: null, 
+        'include' => [Account::COMMISSION],
+    ]);
 
     JSON::success($result);
 

@@ -994,10 +994,12 @@ class Account extends State
 
                 if (!$include_balance && isset($account['balance'])) {
                     unset($accounts[$index]);
+                    continue;
                 }
 
                 if (!$include_commission && isset($account['commission'])) {
                     unset($accounts[$index]);
+                    continue;
                 }
 
                 if (isset($account['qrcode'])) {

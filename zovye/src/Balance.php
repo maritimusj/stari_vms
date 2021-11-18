@@ -149,13 +149,18 @@ class Balance
             $name = $entry->getExtraData('admin');
             $admin_info = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $memo = $entry->getExtraData('memo');
+            if ($memo) {
+                $memo_info = '<dt>说明</dt>
+                <dd class="memo">$memo</dd>';
+            } else {
+                $memo_info = '';
+            }
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">管理员调整</dd>
 $admin_info
-<dt>说明</dt>
-<dd class="memo">$memo</dd>
+$memo_info
 </dl>
 REFUND;
 

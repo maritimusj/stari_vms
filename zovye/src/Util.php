@@ -743,7 +743,7 @@ include './index.php';
                 'createtime <' => time(),
             ])->limit($sc_count)->count();
             if ($n1 >= $sc_count) {
-                return error(State::ERROR, '这个公众号暂时不能领取！');
+                return error(State::ERROR, '公众号免费额度已用完！');
             }
             $n2 = BalanceLog::query([
                 'account_id' => $account->getId(),
@@ -751,7 +751,7 @@ include './index.php';
                 'createtime <' => time(),
             ])->limit($sc_count - $n1)->count();
             if ($n1 + $n2 >= $sc_count) {
-                return error(State::ERROR, '这个公众号暂时不能领取！');
+                return error(State::ERROR, '公众号免费额度已用完！');
             }
         }
 
@@ -763,14 +763,14 @@ include './index.php';
                 'openid' => $user->getOpenid(),
             ])->limit($total)->count();
             if ($n1 >= $total) {
-                return error(State::ERROR, '这个公众号给您的免费额度已经用完！');
+                return error(State::ERROR, '您已经领过了！');
             }
             $n2 = BalanceLog::query([
                 'user_id' => $user->getId(),
                 'account_id' => $account->getId(),
             ])->limit($total - $n1)->count();
             if ($n1 + $n2 >= $total) {
-                return error(State::ERROR, '这个公众号给您的免费额度已经用完！');
+                return error(State::ERROR, '您已经领过了！');
             }
         }
 
@@ -779,11 +779,11 @@ include './index.php';
         if ($order_limits > 0) {
             $n1 = Order::query(['account' => $account->getName()])->limit($order_limits)->count();
             if ($n1 >= $order_limits) {
-                return error(State::ERROR, '公众号的免费数量已经超出限制！');
+                return error(State::ERROR, '公众号免费额度已用完！！');
             }
             $n2 = BalanceLog::query(['account_id' => $account->getId()])->limit($order_limits - $n1)->count();
             if ($n1 + $n2 >= $order_limits) {
-                return error(State::ERROR, '公众号的免费数量已经超出限制！');
+                return error(State::ERROR, '公众号免费额度已用完！！');
             }
         }
 

@@ -16,12 +16,12 @@ class BalanceLog
         if ($data['extra']) {
             $data['extra'] = balance_logsModelObj::serializeExtra($data['extra']);
         }
-        return m('balance_log')->create($data);
+        return m('balance_logs')->create($data);
     }
 
     public static function query($condition = []): base\modelObjFinder
     {
-        return m('balance_log')->query($condition);
+        return m('balance_logs')->query($condition);
     }
 
     public static function findOne($condition = []): ?balance_logsModelObj

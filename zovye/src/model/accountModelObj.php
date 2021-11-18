@@ -225,7 +225,7 @@ class accountModelObj extends modelObj
         return $this->getName();
     }
 
-    public function getBonusWay(): string
+    public function getBonusType(): string
     {
         $commission = $this->settings('commission', []);
         if (isset($commission['balance'])) {

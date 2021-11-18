@@ -149,9 +149,9 @@ if ($op == 'default') {
             }
 
             if (App::isCommissionEnabled() || App::isBalanceEnabled()) {
-                if ($entry->getBonusWay() == Account::COMMISSION) {
+                if ($entry->getBonusType() == Account::COMMISSION) {
                     $data['commission'] = $entry->getCommissionPrice();
-                } elseif ($entry->getBonusWay() == Account::BALANCE) {
+                } elseif ($entry->getBonusType() == Account::BALANCE) {
                     $data['balance'] = $entry->getBalancePrice();
                 }
             }
@@ -504,7 +504,7 @@ if ($op == 'default') {
             if (App::isCommissionEnabled()) {
                 if (request::isset('commission_money')) {
                     $commission_data['money'] =  request::float('commission_money', 0, 2) * 100;
-                } elseif (request::str('bonus_way') == Account::COMMISSION) {
+                } elseif (request::str('bonus_type') == Account::COMMISSION) {
                     $commission_data['money'] =  request::float('amount', 0, 2) * 100;
                 }
             }
@@ -513,7 +513,7 @@ if ($op == 'default') {
             if (App::isBalanceEnabled()) {
                 if (request::isset('commission_money')) {
                     $commission_data['balance'] =  request::int('commission_balance');
-                } elseif (request::str('bonus_way') == Account::BALANCE) {
+                } elseif (request::str('bonus_type') == Account::BALANCE) {
                     $commission_data['balance'] =  request::int('amount');
                 }
             }
@@ -554,7 +554,7 @@ if ($op == 'default') {
     $agent_openid = '';
     $config = [];
 
-    $type = Account::NORMAL;
+
 
     if ($id) {
         $account = Account::get($id);
@@ -583,14 +583,17 @@ if ($op == 'default') {
 
         $limits = $account->get('limits');
 
-        $bonus_way = $account->getBonusWay();
-        if ($bonus_way == Account::COMMISSION) {
+        $bonus_type = $account->getBonusType();
+        if ($bonus_type == Account::COMMISSION) {
             $amount = number_format($account->getCommissionPrice() / 100, 2);
         } else {
             $amount = $account->getBalancePrice();
         }
 
         $config = $account->get('config');
+    } else {
+        $type = Account::NORMAL;
+        $bonus_type = Account::COMMISSION;
     }
 
     app()->showTemplate('web/account/edit_' . $type, [
@@ -600,7 +603,7 @@ if ($op == 'default') {
         'account' => $account ?? null,
         'qrcodes' => $qr_codes ?? null,
         'limits' => $limits ?? null,
-        'bonus_way' => $bonus_way,
+        'bonus_type' => $bonus_type,
         'amount' => $amount ?? 0,
         'balance' => $balance ?? 0,
         'agent_name' => $agent_name,

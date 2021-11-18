@@ -94,13 +94,17 @@
         width: 22px;
     }
     #accountlist .bonus img {
-        vertical-align: text-top;
+        vertical-align: middle;
+        cursor: default;
     }
     #accountlist span.commission {
-        color: #ffc107;
+        color: green;
+        cursor: default;
     }
     #accountlist span.balance {
         color: #795548;
+        cursor: default;
+        font-style: italic
     }    
     .operate:hover .auth-weixin:hover {
         color: #4CAF50;
@@ -240,18 +244,10 @@
                     </td>
                     <td class="bonus">
                         {if $a['commission']}
-                            <img src="{MODULE_URL}static/img/yen.svg"
-                            {if $a['commission'] > 0}
-                            class="yen" 
-                            title="佣金"
-                            {else}
-                            class="yen disabled" 
-                            title="佣金未设置"
-                            {/if}
-                            >
-                            <span class="commission">{php echo number_format($a['commission']/100, 2)}元</span>
+                            <span class="commission" title="佣金">￥{php echo number_format($a['commission']/100, 2)}元</span>
                         {/if}
                         {if $a['balance']}
+                            <span class="balance" title="积分">{$a['balance']}</span>
                             <img src="{MODULE_URL}static/img/coin.svg"
                             {if $a['balance'] > 0}
                             class="balance" 
@@ -261,7 +257,6 @@
                             title="积分未设置"
                             {/if}
                             >
-                            <span class="balance">{$a['balance']}</span>
                         {/if}
                     </td>
                     <td class="desc">

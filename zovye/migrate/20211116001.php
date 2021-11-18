@@ -21,3 +21,17 @@ ALTER TABLE `ims_zovye_vms_balance` CHANGE `memo` `extra` TEXT CHARACTER SET utf
 SQL;
     Migrate::execSQL($sql);
 }
+
+if (!We7::pdo_tableexists($tb_name . '_balance_logs', 'extra')) {
+$sql = <<<SQL
+CREATE TABLE `ims_zovye_vms_balance_logs` (
+    `id` INT NOT NULL AUTO_INCREMENT ,
+    `user_id` INT NOT NULL , 
+    `account_id` INT NOT NULL , 
+    `extra` TEXT NULL , 
+    `createtime` INT NOT NULL , 
+    PRIMARY KEY (`id`), INDEX (`user_id`, `account_id`, `createtime`)
+) ENGINE = InnoDB;
+SQL;
+    Migrate::execSQL($sql);
+}

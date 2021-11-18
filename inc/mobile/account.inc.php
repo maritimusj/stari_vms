@@ -189,7 +189,7 @@ if ($op == 'default') {
     if (is_error($res)) {
         JSON::fail($res);
     }
-    
+
     $ticket_data = [
         'id' => Util::random(16),
         'time' => time(),
@@ -219,7 +219,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个公众号！');
     }
 
-    if ($account->getBonusType() != Account::BALANCE) {
+    if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() <= 0) {
         JSON::fail('没有设置积分奖励！');
     }
 

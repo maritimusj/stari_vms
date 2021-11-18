@@ -165,14 +165,29 @@ REFUND;
         return $data;
     }
 
-    public static function give(userModelObj $user, accountModelObj $account, $reason = ''): ?model\balance_logsModelObj
+    public static function give(userModelObj $user, accountModelObj $account, $reason = ''): bool
     {
-        return BalanceLog::create([
-            'user_id' => $user->getId(),
-            'account_id' => $account->getId(),
-            'extra' => [
-                'reason' => $reason,
-            ]
-        ]);
+        $result =  Util::transactionDo(function () use ($user, $account, $reason) {
+            if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() == 0) {
+                return err('公众号设置不正确！');
+            }
+            if  (!BalanceLog::create([
+                'user_id' => $user->getId(),
+                'account_id' => $account->getId(),
+                'extra' => [
+                    'reason' => $reason,
+                    'user' => $user->profile(),
+                    'account' => $account->profile(),
+                    'bonus' => $account->getBalancePrice(),
+                ]
+            ])) {
+                return err('创建领取记录失败！');
+            }
+            if (!$user->getBalance()->change($account->getBalancePrice(), Balance::ADJUST)) {
+                return err('创建用户积分记录失败！');
+            }
+            return true;
+        });
+        return !is_error($result);
     }
 }

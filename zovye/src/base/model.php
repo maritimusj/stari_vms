@@ -82,7 +82,7 @@ DEBUG_MODE;
             }
 
             if (isset($theme['fields']['extra']) && $theme['fields']['extra']['type'] == 'text') {
-                $c .= PHP_EOL . "\tuse ExtraDataGettersAndSetters;";
+                $c .= PHP_EOL . "\tuse \zovye\\traits\ExtraDataGettersAndSetters;";
             }
             $result = file_put_contents(
                 $mod_filename,
@@ -95,7 +95,7 @@ DEBUG_MODE;
 namespace zovye\model;
 
 use zovye\base\modelObj;
-use function zovye\tb;
+use function zovye\\tb;
 
 class {$classname} extends modelObj
 {

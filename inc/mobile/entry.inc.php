@@ -93,34 +93,43 @@ if ($device_id) {
     if (empty($account) || $account->isBanned()) {
         Util::resultAlert('公众号没有开通免费领取！', 'error');
     }
-    /**
-     * @param userModelObj $user
-     * @return array
-     */
-    $cb = function (userModelObj $user) use ($account) {
-        //用户从公众号链接进入的话，检查超时
-        if ($user->settings('last.deviceId') && time() - $user->settings('last.time') > settings(
-                'user.scanAlive',
-                VISIT_DATA_TIMEOUT
-            )) {
-            //设备扫描页面
-            $tpl_data = Util::getTplData([$user, $account]);
-            app()->scanPage($tpl_data);
-        }
 
-        //记录公众号ID
-        $user->updateSettings('last.accountId', $account->getId());
 
-        $last_deviceId = $user->settings('last.deviceId');
-        if ($last_deviceId) {
-            $device = Device::get($last_deviceId);
-            if ($device) {
-                return ['device' => $device];
+    //如果公众号奖励为积分，显示获取积分页面
+    if (App::isBalanceEnabled() && $account && $account->getBonusType() == Account::BALANCE) {
+        $cb = function(userModelObj $user) use ($account) {
+            app()->getBalanceBonusPage($user, $account);
+        };
+    } else {
+        /**
+         * @param userModelObj $user
+         * @return array
+         */
+        $cb = function (userModelObj $user) use ($account) {
+            //用户从公众号链接进入的话，检查超时
+            if ($user->settings('last.deviceId') && time() - $user->settings('last.time') > settings(
+                    'user.scanAlive',
+                    VISIT_DATA_TIMEOUT
+                )) {
+                //设备扫描页面
+                $tpl_data = Util::getTplData([$user, $account]);
+                app()->scanPage($tpl_data);
             }
-        }
 
-        return [];
-    };
+            //记录公众号ID
+            $user->updateSettings('last.accountId', $account->getId());
+
+            $last_deviceId = $user->settings('last.deviceId');
+            if ($last_deviceId) {
+                $device = Device::get($last_deviceId);
+                if ($device) {
+                    return ['device' => $device];
+                }
+            }
+
+            return [];
+        };        
+    }
 
     $params['from'] = [
         'src' => 'account',
@@ -170,12 +179,6 @@ if (is_callable($cb)) {
     $res = $cb($user);
     if ($res) {
         extract($res);
-    }
-}
-//如果公众号奖励为积分，显示获取积分页面
-if (App::isBalanceEnabled()) {
-    if ($account && $account->getBonusType() == Account::BALANCE) {
-        app()->getBalanceBonusPage($user, $account);
     }
 }
 

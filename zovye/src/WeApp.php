@@ -1102,9 +1102,6 @@ JSCODE;
         user: JSON.parse(`$user_json_str`),
         account: JSON.parse(`$account_json_str`),
     }
-    zovye_fn.getBonus = function() {
-        return $.getJSON(zovye_fn.api_url, {op: 'get_bonus', 'account': '{$account->getUid()}', 'user': '{$user->getOpenid()}'});
-    }
     zovye_fn.getAccountInfo = function (cb) {
         if (typeof cb === 'function') {
             return cb(zovye_fn.account)
@@ -1121,6 +1118,47 @@ JSCODE;
             resolve(zovye_fn.user);
         });
     }
+JSCODE;
+
+    $result = Util::checkBalanceAvailable($user, $account);
+    if (is_error($result)) {
+        $tpl_data['js']['code'] .= <<<JSCODE
+        \r\nzovye_fn.isOk = function(cb) {
+            const res = {
+                status: false,
+                data: {
+                    msg: `{$result['message']}`,
+                }
+            }
+            if (typeof cb === 'function') {
+                return cb(res)
+            }
+            return new Promise((resolve, reject) => {
+                resolve(res);
+            });
+        }
+JSCODE;
+    } else {
+        $tpl_data['js']['code'] .= <<<JSCODE
+        \r\nzovye_fn.isOk = function(cb) {
+            const res = {
+                status: true,
+                data: {
+                }
+            }
+            if (typeof cb === 'function') {
+                return cb(res)
+            }
+            return new Promise((resolve, reject) => {
+                resolve(res);
+            });
+        };
+        zovye_fn.getBonus = function() {
+            return $.getJSON(zovye_fn.api_url, {op: 'get_bonus', 'account': '{$account->getUid()}'});
+        };
+JSCODE;
+    }
+    $tpl_data['js']['code'] .= <<<JSCODE
 </script>
 JSCODE;
 

@@ -101,8 +101,9 @@
 			}
 			
 			.btn {
-				width: 200px;
+				min-width: 160px;
 				height: 40px;
+				padding: 0 20px;
 				background-color: orange;
 				text-align: center;
 				line-height: 40px;
@@ -198,7 +199,7 @@
 				<img class="icon" src="{MODULE_URL}static/m/balance/img/heart.gif" >
 				<span class="title">关注成功</span>
 				<span class="desc">点击下方按钮，领取积分奖励！</span>
-				<div :class="['btn', done ? 'done': '']" @click="btnClick">{{done ? '已领取' : '领取积分 +' + account.bonus}}</div>
+				<div :class="['btn', done ? 'done': '']" @click="btnClick">{{done ? doneDesc : '领取积分 +' + account.bonus}}</div>
 			</div>
 			<div class="mask" v-if="mask.visible">
 				<div class="alert-view">
@@ -222,13 +223,23 @@
 					mask: {
 						visible: false,
 						text: ''
-					}
+					},
+					doneDesc: ''
 				},
                 created() {
+					this.isOk()
                     this.getUserInfo()
                     this.getAccountInfo()
                 },
 				methods: {
+					isOk() {
+						zovye_fn.isOk().then(res => {
+							if(!res.status) {
+								this.done = true
+								this.doneDesc = res.data.msg
+							}
+						})
+					},
                     getUserInfo() {
                         zovye_fn.getUserInfo().then(res => {
                             if(res.status) {
@@ -256,6 +267,7 @@
                                 this.loading = false
                                 if(res.status) {
                                     this.done = true
+									this.doneDesc = '已领取'
 									this.show = true
 									setTimeout(() => {
 										this.show = false

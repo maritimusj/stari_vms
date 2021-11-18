@@ -9,6 +9,7 @@ namespace zovye;
 use Exception;
 use we7\template;
 use zovye\base\modelObj;
+use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\model\weapp_configModelObj;
@@ -1069,5 +1070,42 @@ HTML;
 </script>
 JSCODE;
         $this->showTemplate(Theme::file('douyin'), ['tpl' => $tpl_data]);
+    }
+
+    public function getBalanceBonusPage(userModelObj $user, accountModelObj $account)
+    {
+        $tpl_data = Util::getTplData([$user, $account]);
+
+        $api_url = Util::murl('account');
+        $jquery_url = JS_JQUERY_URL;
+
+        $user_profile = json_encode($user->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);
+        $account_profile = json_encode($account->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+    const zovye_fn = {
+        api_url: "$api_url",
+        user: JSON.parse("$user_profile"),
+        account: JSON.parse("$account_profile"),
+    }
+    zovye_fn.getBonus = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'get_bonus', 'account': '{$account->getUid()}', 'user': '{$user->getOpenid()}'});
+    }
+    zovye_fn.getAccountInfo = function (cb) {
+        if (typeof cb === 'function') {
+            cb(zovye_fn.account)
+        }
+    }
+    zovye_fn.getUserInfo = function (cb) {
+        if (typeof cb === 'function') {
+            cb(zovye_fn.user)
+        }
+    }
+</script>
+JSCODE;
+
+        $this->showTemplate(Theme::file('balance'), ['tpl' => $tpl_data]);
     }
 }

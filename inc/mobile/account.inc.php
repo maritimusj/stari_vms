@@ -202,4 +202,8 @@ if ($op == 'default') {
     $user->updateSettings('last.ticket', $ticket_data);
 
     JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
+
+} elseif ($op == 'get_bonus') {
+
+    JSON::success('成功！');
 }

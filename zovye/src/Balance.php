@@ -16,7 +16,8 @@ class Balance
     const CACHE_EXPIRATION = 60 * 60;
 
     const ADJUST = 0;
-    
+    const ACCOUNT_BONUS = 1;
+
 
     private $user;
 
@@ -146,21 +147,29 @@ class Balance
 
         if ($entry->getSrc() == Balance::ADJUST) {
             $name = $entry->getExtraData('admin');
-            $admin_info = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $admin_info = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $memo = $entry->getExtraData('memo');
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">管理员调整</dd>
-{$admin_info}
+$admin_info
 <dt>说明</dt>
-<dd class="memo">{$memo}</dd>
+<dd class="memo">$memo</dd>
 </dl>
 REFUND;
 
+        } elseif ($entry->getSrc() == Balance::ACCOUNT_BONUS) {
+            $account_data = $entry->getExtraData('account');
+            $account_info = "<dt>公众号</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
+            $data['memo'] = <<<REFUND
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">关注公众号</dd>
+$account_info
+</dl>
+REFUND;
         }
-
-
 
         return $data;
     }
@@ -183,7 +192,9 @@ REFUND;
             ])) {
                 return err('创建领取记录失败！');
             }
-            if (!$user->getBalance()->change($account->getBalancePrice(), Balance::ADJUST)) {
+            if (!$user->getBalance()->change($account->getBalancePrice(), Balance::ACCOUNT_BONUS, [
+                'account' => $account->profile(),
+            ])) {
                 return err('创建用户积分记录失败！');
             }
             return true;

@@ -250,6 +250,7 @@ if ($op == 'default') {
             if ($account->isJFB()) {
                 $data['name'] = Account::JFB_NAME;
                 $data['img'] = Account::JFB_HEAD_IMG;
+                $data['url'] = Util::murl('jfb');
                 $account->set('config', [
                     'type' => Account::JFB,
                     'url' => request::trim('apiURL'),
@@ -259,6 +260,7 @@ if ($op == 'default') {
             } elseif ($account->isMoscale()) {
                 $data['name'] = Account::MOSCALE_NAME;
                 $data['img'] = Account::MOSCALE_HEAD_IMG;
+                $data['url'] = Util::murl('moscale');
                 $account->set('config', [
                     'type' => Account::MOSCALE,
                     'appid' => request::trim('appid'),
@@ -267,6 +269,7 @@ if ($op == 'default') {
             } elseif ($account->isYunfenba()) {
                 $data['name'] = Account::YUNFENBA_NAME;
                 $data['img'] = Account::YUNFENBA_HEAD_IMG;
+                $data['url'] = Util::murl('yunfenba');
                 $account->set('config', [
                     'type' => Account::YUNFENBA,
                     'vendor' => [
@@ -277,6 +280,7 @@ if ($op == 'default') {
             } elseif ($account->isAQiinfo()) {
                 $data['name'] = Account::AQIINFO_NAME;
                 $data['img'] = Account::AQIINFO_HEAD_IMG;
+                $data['url'] = Util::murl('aqiinfo');
                 $account->set('config', [
                     'type' => Account::AQIINFO,
                     'key' => request::trim('key'),
@@ -285,6 +289,7 @@ if ($op == 'default') {
             } elseif ($account->isZJBao()) {
                 $data['name'] = Account::ZJBAO_NAME;
                 $data['img'] = Account::ZJBAO_HEAD_IMG;
+                $data['url'] = Util::murl('zjbao');
                 $account->set('config', [
                     'type' => Account::ZJBAO,
                     'key' => request::trim('key'),
@@ -293,6 +298,7 @@ if ($op == 'default') {
             } elseif ($account->isMeiPa()) {
                 $data['name'] = Account::MEIPA_NAME;
                 $data['img'] = Account::MEIPA_HEAD_IMG;
+                $data['url'] = Util::murl('meipa');
                 $account->set('config', [
                     'type' => Account::MEIPA,
                     'apiid' => request::trim('apiid'),
@@ -301,6 +307,7 @@ if ($op == 'default') {
             } elseif ($account->isKingFans()) {
                 $data['name'] = Account::KINGFANS_NAME;
                 $data['img'] = Account::KINGFANS_HEAD_IMG;
+                $data['url'] = Util::murl('kingfans');
                 $account->set('config', [
                     'type' => Account::KINGFANS,
                     'bid' => request::trim('bid'),
@@ -309,6 +316,7 @@ if ($op == 'default') {
             } elseif ($account->isSNTO()) {
                 $data['name'] = Account::SNTO_NAME;
                 $data['img'] = Account::SNTO_HEAD_IMG;
+                $data['url'] = Util::murl('snto');
                 $account->set('config', [
                     'type' => Account::SNTO,
                     'id' => request::trim('app_id'),
@@ -319,6 +327,7 @@ if ($op == 'default') {
             } elseif ($account->isYFB()) {
                 $data['name'] = Account::YFB_NAME;
                 $data['img'] = Account::YFB_HEAD_IMG;
+                $data['url'] = Util::murl('yfb');
                 $account->set('config', [
                     'type' => Account::YFB,
                     'id' => request::trim('app_id'),
@@ -329,6 +338,7 @@ if ($op == 'default') {
             } elseif ($account->isWxWork()) {
                 $data['name'] = Account::WxWORK_NAME;
                 $data['img'] = Account::WxWORK_HEAD_IMG;
+                $data['url'] = Util::murl('wxwork');
                 $account->set('config', [
                     'type' => Account::WxWORK,
                     'key' => request::trim('key'),
@@ -368,10 +378,9 @@ if ($op == 'default') {
                 $account->set('config', $config);
             } else {
                 $data['img'] = request::trim('img');
+                //如果网站更换域名后，需要更新url
+                $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);                
             }
-
-            //如果网站更换域名后，需要更新url
-            $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);
 
             foreach ($data as $key => $val) {
                 $key_name = 'get' . ucfirst(toCamelCase($key));
@@ -553,8 +562,6 @@ if ($op == 'default') {
     $agent_mobile = '';
     $agent_openid = '';
     $config = [];
-
-
 
     if ($id) {
         $account = Account::get($id);

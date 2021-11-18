@@ -212,6 +212,12 @@ class Account extends State
             }
         }
 
+        if (App::isBalanceEnabled() && $entry->getBonusType() == Account::BALANCE) {
+            $data['balance'] = $entry->getBalancePrice();
+        } else {
+            $data['commission'] = $entry->getCommissionPrice();
+        }
+
         return $data;
     }
 
@@ -321,7 +327,7 @@ class Account extends State
         }
 
         foreach ($accounts as $entry) {
-            $join(['id' => $entry['id']], function ($acc) {
+            $join(['id' => $entry['id']], function (accountModelObj $acc) {
                 return [$acc->format()];
             });
         }
@@ -965,6 +971,8 @@ class Account extends State
         //获取本地可用公众号列表
         $accounts = Account::match($device, $user, array_merge($params, ['admin', 'max' => settings('misc.maxAccounts', 0)]));
         if (!empty($accounts)) {
+            $include_balance = empty($params['include']) || in_array(Account::BALANCE, $params['include']);
+            $include_commission = empty($params['include']) || in_array(Account::COMMISSION, $params['include']);
             foreach ($accounts as $index => &$account) {
                 if ($account['type'] == Account::WXAPP && empty($account['username'])) {
                     unset($accounts[$index]);
@@ -983,6 +991,15 @@ class Account extends State
                         self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                     }
                 }
+
+                if (!$include_balance && isset($account['balance'])) {
+                    unset($accounts[$index]);
+                }
+
+                if (!$include_commission && isset($account['commission'])) {
+                    unset($accounts[$index]);
+                }
+
                 if (isset($account['qrcode'])) {
                     if ($account['qrcode']) {
                         $account['qrcode'] = Util::toMedia($account['qrcode']);

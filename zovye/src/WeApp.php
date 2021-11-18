@@ -362,6 +362,7 @@ JSCODE;
                         Account::VIDEO,
                         Account::AUTH,
                     ],
+                    'include' => [Account::COMMISSION],
                 ]);
             }
         }

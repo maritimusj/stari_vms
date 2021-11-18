@@ -205,5 +205,30 @@ if ($op == 'default') {
 
 } elseif ($op == 'get_bonus') {
 
-    JSON::success('成功！');
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('无法获取用户信息！');
+    }
+
+    if (!App::isBalanceEnabled()) {
+        JSON::fail('未开启这个功能！');
+    }
+
+    $account = Account::findOneFromUID(request::str('account'));
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号！');
+    }
+
+    if ($account->getBonusType() != Account::BALANCE) {
+        JSON::fail('没有设置积分奖励！');
+    }
+
+    //todo 判断用户是否可以获得该积分
+
+    $data = [
+        'balance' => $user->getBalance()->total(),
+        'bonus' => $account->getBalancePrice(),
+    ];
+
+    JSON::success($data);
 }

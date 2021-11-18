@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+		<title>领取积分</title>
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				width: 100vw;
+			}
+
+			body {
+				background-color: white;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #101010;
+				margin: 0;
+				padding: 0;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			}
+
+			#app {
+				width: 100vw;
+				height: 100vh;
+				background-color: #87CEFA11;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+			
+			.userinfo {
+				width: calc(100% - 120px);
+				padding: 20px;
+				background-color: white;
+				border-radius: 5px;
+				box-shadow: 0 0 10px #87CEFA;
+				display: flex;
+				flex: row;
+				align-items: center;
+			}
+			
+			.avatar {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				box-shadow: 0 0 10px #87CEFA;
+			}
+			
+			.info-view {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				margin-left: 20px;
+			}
+			
+			.nickname {
+				font-size: 16px;
+				font-weight: bold;
+			}
+			
+			.points {
+				margin-top: 3px;
+				color: #666;
+			}
+
+			.card {
+				width: calc(100% - 120px);
+				padding: 40px 20px;
+				background-color: white;
+				border-radius: 5px;
+				box-shadow: 0 0 10px #87CEFA;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin-top: 20px;
+			}
+			
+			.icon {
+				width: 100px;
+				height: 100px;
+			}
+			
+			.title {
+				font-size: 18px;
+				font-weight: bold;
+				color: #87CEFA;
+				margin-top: 10px;
+			}
+			
+			.desc {
+				color: #666;
+				margin-top: 20px;
+			}
+			
+			.btn {
+				width: 200px;
+				height: 40px;
+				background-color: orange;
+				text-align: center;
+				line-height: 40px;
+				border-radius: 20px;
+				color: white;
+				font-weight: 500;
+				margin-top: 30px;
+			}
+			
+			.btn:not(.done):active {
+				opacity: 0.7;
+			}
+			
+			.done {
+				background-color: lightgray;
+			}
+
+			.bonus {
+				font-weight: 500;
+				color: #F08080;
+				animation: fade 1.5s;
+			}
+
+			@keyframes fade {
+				from {
+					opacity: 0;
+				}
+
+				to {
+					opacity: 1;
+				}
+			}
+
+			.mask {
+				width: 100vw;
+				height: 100vh;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				position: fixed;
+				left: 0;
+				top: 0;
+			}
+
+			.alert-view {
+				width: 200px;
+				padding: 20px;
+				background-color: white;
+				border-radius: 10px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.alert-title {
+				font-size: 16px;
+				font-weight: bold;
+			}
+
+			.alert-text {
+				margin-top: 20px;
+				color: #9d9d9d;
+			}
+
+			.confirm {
+				width: 120px;
+				height: 30px;
+				text-align: center;
+				line-height: 30px;
+				border-radius: 20px;
+				color: white;
+				background-color: #F08080;
+				margin-top: 20px;
+			}
+
+			.confirm:active {
+				opacity: 0.7;
+			}
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app" v-cloak>
+			<div class="userinfo">
+				<img class="avatar" :src="userinfo.headimgurl" >
+				<div class="info-view">
+					<span class="nickname">{{userinfo.nickname}}</span>
+					<span class="points">当前积分：{{userinfo.balance || 0}} <span class="bonus" v-if="show">+{{account.bonus}}</span></span>
+				</div>
+			</div>
+			<div class="card">
+				<img class="icon" src="{MODULE_URL}static/m/balance/img/heart.gif" >
+				<span class="title">关注成功</span>
+				<span class="desc">点击下方按钮，领取积分奖励！</span>
+				<div :class="['btn', done ? 'done': '']" @click="btnClick">{{done ? '已领取' : '领取积分 +' + account.bonus}}</div>
+			</div>
+			<div class="mask" v-if="mask.visible">
+				<div class="alert-view">
+					<span class="alert-title">提示</span>
+					<span class="alert-text">{{mask.text}}</span>
+					<div class="confirm" @click="mask.visible = false">确定</div>
+				</div>
+			</div>
+		</div>
+        {$tpl['js']['code']}
+		{php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+			new Vue({
+				el: '#app',
+				data: {
+					userinfo: {},
+                    account: {},
+					done: false,
+                    loading: false,
+					show: false,
+					mask: {
+						visible: false,
+						text: ''
+					}
+				},
+                created() {
+                    this.getUserInfo()
+                    this.getAccountInfo()
+                },
+				methods: {
+                    getUserInfo() {
+                        zovye_fn.getUserInfo().then(res => {
+                            if(res.status) {
+                                this.userinfo = res.data
+                            } else {
+								this.mask.text = res.data.msg
+								this.mask.visible = true
+							}
+                        })
+                    },
+                    getAccountInfo() {
+                        zovye_fn.getAccountInfo().then(res => {
+                            if(res.status) {
+                                this.account = res.data
+                            } else {
+								this.mask.text = res.data.msg
+								this.mask.visible = true
+							}
+                        })
+                    },
+					btnClick() {
+                        if(!this.done && !this.loading) {
+                            this.loading = true
+                            zovye_fn.getBonus().then(res => {
+                                this.loading = false
+                                if(res.status) {
+                                    this.done = true
+									this.show = true
+									setTimeout(() => {
+										this.show = false
+										this.userinfo.balance += this.account.bonus
+									}, 2000);
+                                } else {
+									this.mask.text = res.data.msg
+									this.mask.visible = true
+								}
+                            })
+                        }
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

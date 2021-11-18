@@ -141,8 +141,8 @@ class accountModelObj extends modelObj
             'uid' => $this->getUid(),
             'title' => $this->getTitle(),
             'descr' => $this->getDescription(),
-            'img' => $this->getImg(),
-            'qrcode' => $this->getQrcode(),
+            'img' => Util::toMedia($this->getImg(), true),
+            'qrcode' => Util::toMedia($this->getQrcode(), true),
         ];
     }
 

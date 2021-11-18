@@ -259,7 +259,7 @@ class Account extends State
                 }
                 $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
                     //检查用户是否允许
-                    $res = Util::isAvailable($user, $acc, $device);
+                    $res = Util::checkAvailable($user, $acc, $device);
                     if (is_error($res)) {
                         return $res;
                     }

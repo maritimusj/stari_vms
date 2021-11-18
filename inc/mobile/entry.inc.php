@@ -218,7 +218,7 @@ if (App::isWxUser() && Util::mustValidateLocation($user, $device)) {
 }
 
 if ($account)  {
-    $res = Util::isAvailable($user, $account, $device);
+    $res = Util::checkAvailable($user, $account, $device);
     if (is_error($res)) {
         $user->remove('last');
         $account = null;

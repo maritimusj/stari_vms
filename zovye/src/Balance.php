@@ -1,7 +1,12 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
+use zovye\model\accountModelObj;
 use zovye\model\balanceModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
@@ -158,5 +163,16 @@ REFUND;
 
 
         return $data;
+    }
+
+    public static function give(userModelObj $user, accountModelObj $account, $reason = ''): ?model\balance_logsModelObj
+    {
+        return BalanceLog::create([
+            'user_id' => $user->getId(),
+            'account_id' => $account->getId(),
+            'extra' => [
+                'reason' => $reason,
+            ]
+        ]);
     }
 }

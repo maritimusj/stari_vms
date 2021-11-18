@@ -623,18 +623,194 @@ include './index.php';
         return false;
     }
 
+    /**
+     * 检查用户是否符合公众号设置的限制条件
+     * @param userModelObj $user
+     * @param accountModelObj $account
+     * @param array $params
+     * @return array|bool|mixed
+     */
+    protected static function checkAccountLimits(userModelObj $user, accountModelObj $account, array $params = [])
+    {
+        //检查性别，手机限制
+        $limits = $account->get('limits');
+        if (is_array($limits)) {
+            $limit_fn = [
+                'male' => function ($val) use ($user) {
+                    if ($val == 0 && $user->settings('fansData.sex') == 1) {
+                        return error(State::FAIL, '不允许男性用户');
+                    }
+                    return true;
+                },
+                'female' => function ($val) use ($user) {
+                    if ($val == 0 && $user->settings('fansData.sex') == 2) {
+                        return error(State::FAIL, '不允许女性用户');
+                    }
+                    return true;
+                },
+                'unknown_sex' => function ($val) use ($user) {
+                    if ($val == 0 && $user->settings('fansData.sex') == 0) {
+                        return error(State::FAIL, '不允许未知性别用户');
+                    }
+                    return true;
+                },
+                'ios' => function ($val) {
+                    if ($val == 0 && Util::getUserPhoneOS() == 'ios') {
+                        return error(State::FAIL, '不允许ios手机');
+                    }
+                    return true;
+                },
+                'android' => function ($val) {
+                    if ($val == 0) {
+                        $os = Util::getUserPhoneOS();
+                        if ($os == 'android' || $os == 'unknown') {
+                            return error(State::FAIL, '不允许android手机');
+                        }
+                    }
+                    return true;
+                },
+            ];
+
+            foreach ($limits as $item => $val) {
+                if ($val == 0 && $limit_fn[$item]) {
+                    $fn = $limit_fn[$item];
+                    $res = $fn($val);
+                    if (is_error($res)) {
+                        return $res;
+                    }
+                }
+            }
+        }
+
+        if ($params['unfollow'] || in_array('unfollow', $params, true)) {
+            if (Order::query()->exists([
+                    'account' => $account->getName(),
+                    'openid' => $user->getOpenid(),
+                ]) || BalanceLog::query()->exists([
+                    'user_id' => $user->getId(),
+                    'account_id' => $account->getId(),
+                ])) {
+                return error(State::ERROR, '您已经关注过这个公众号！');
+            }
+        }
+
+        $sc_name = $account->getScname();
+
+        if ($sc_name == Schema::DAY) {
+            $time = strtotime('today');
+        } elseif ($sc_name == Schema::WEEK) {
+            $time = date('D') == 'Mon' ? strtotime('today') : strtotime('last Mon');
+        } elseif ($sc_name == Schema::MONTH) {
+            $time = strtotime(date('Y-m'));
+        } else {
+            return error(State::ERROR, '公众号设置不正确！');
+        }
+
+        //count，单个用户在每个周期内可领取数量
+        $count = $account->getCount();
+        if ($count > 0) {
+            $n1 = Order::query([
+                'account' => $account->getName(),
+                'openid' => $user->getOpenid(),
+                'createtime >=' => $time,
+                'createtime <' => time(),
+            ])->limit($count)->count();
+            $desc = [
+                Schema::DAY => '您今天已经领过了，明天再来吧！',
+                Schema::WEEK => '下个星期再来试试吧！',
+                Schema::MONTH => '这个月的免费额度已经用完啦！',
+            ];
+            if ($n1 >= $count) {
+                return error(State::ERROR, $desc[$sc_name]);
+            }
+            $n2 = BalanceLog::query([
+                'user_id' => $user->getId(),
+                'account_id' => $account->getId(),
+                'createtime >=' => $time,
+                'createtime <' => time(),
+            ])->limit($count - $n1)->count();
+            if ($n1 + $n2 >= $count) {
+                return error(State::ERROR, $desc[$sc_name]);
+            }
+        }
+
+        //scCount, 所有用户在每个周期内总数量
+        $sc_count = $account->getSccount();
+        if ($sc_count > 0) {
+            $n1 = Order::query([
+                'account' => $account->getName(),
+                'createtime >=' => $time,
+                'createtime <' => time(),
+            ])->limit($sc_count)->count();
+            if ($n1 >= $sc_count) {
+                return error(State::ERROR, '这个公众号暂时不能领取！');
+            }
+            $n2 = BalanceLog::query([
+                'account_id' => $account->getId(),
+                'createtime >=' => $time,
+                'createtime <' => time(),
+            ])->limit($sc_count - $n1)->count();
+            if ($n1 + $n2 >= $sc_count) {
+                return error(State::ERROR, '这个公众号暂时不能领取！');
+            }
+        }
+
+        //total，单个用户累计可领取数量
+        $total = $account->getTotal();
+        if ($total > 0) {
+            $n1 = Order::query([
+                'account' => $account->getName(),
+                'openid' => $user->getOpenid(),
+            ])->limit($total)->count();
+            if ($n1 >= $total) {
+                return error(State::ERROR, '这个公众号给您的免费额度已经用完！');
+            }
+            $n2 = BalanceLog::query([
+                'user_id' => $user->getId(),
+                'account_id' => $account->getId(),
+            ])->limit($total - $n1)->count();
+            if ($n1 + $n2 >= $total) {
+                return error(State::ERROR, '这个公众号给您的免费额度已经用完！');
+            }
+        }
+
+        //$orderLimits，公众号最大订单数量
+        $order_limits = $account->getOrderLimits();
+        if ($order_limits > 0) {
+            $n1 = Order::query(['account' => $account->getName()])->limit($order_limits)->count();
+            if ($n1 >= $order_limits) {
+                return error(State::ERROR, '公众号的免费数量已经超出限制！');
+            }
+            $n2 = BalanceLog::query(['account_id' => $account->getId()])->limit($order_limits - $n1)->count();
+            if ($n1 + $n2 >= $order_limits) {
+                return error(State::ERROR, '公众号的免费数量已经超出限制！');
+            }
+        }
+
+        return true;
+    }
+
+    public static function checkBalanceAvailable(userModelObj $user, accountModelObj $account)
+    {
+        if ($account->getBonusType() != Account::BALANCE) {
+            return err('公众号没有配置积分奖励！');
+        }
+
+        return self::checkAccountLimits($user, $account);
+    }
+
 
     /**
      * 判断用户在指定公众号以及指定设备是否还有免费额度.
      *
-     * @param mixed $user 用户openid或者用户对象
-     * @param mixed $account 公众号名称或者对象
-     * @param deviceModelObj $device 设备对象
+     * @param userModelObj $user 用户
+     * @param accountModelObj $account 公众号
+     * @param deviceModelObj $device 设备
      * @param array $params 更多条件
      *
      * @return bool|array
      */
-    public static function isAvailable($user, accountModelObj $account, deviceModelObj $device, array $params = [])
+    public static function checkAvailable(userModelObj $user, accountModelObj $account, deviceModelObj $device, array $params = [])
     {
         //每日免费额度限制
         if (empty(Util::getUserTodayFreeNum($user, $device))) {
@@ -646,133 +822,7 @@ include './index.php';
             return error(State::ERROR, '没有允许从这个设备访问该公众号！');
         }
 
-        $sc_name = $account->getScname();
-        $total = $account->getTotal();
-        $count = $account->getCount();
-        $sc_count = $account->getSccount();
-        $order_limits = $account->getOrderLimits();
-
-        //检查性别，手机限制
-        $limits = $account->get('limits');
-        if (is_array($limits)) {
-            $limit_fn = [
-                'male' => function ($val) use ($user) {
-                    if ($val == 0 && $user->settings('fansData.sex') == 1) {
-                        return error(State::FAIL, '不允许男性用户');
-                    }
-
-                    return true;
-                },
-                'female' => function ($val) use ($user) {
-                    if ($val == 0 && $user->settings('fansData.sex') == 2) {
-                        return error(State::FAIL, '不允许女性用户');
-                    }
-
-                    return true;
-                },
-                'unknown_sex' => function ($val) use ($user) {
-                    if ($val == 0 && $user->settings('fansData.sex') == 0) {
-                        return error(State::FAIL, '不允许未知性别用户');
-                    }
-
-                    return true;
-                },
-                'ios' => function ($val) {
-                    if ($val == 0 && Util::getUserPhoneOS() == 'ios') {
-                        return error(State::FAIL, '不允许ios手机');
-                    }
-
-                    return true;
-                },
-                'android' => function ($val) {
-                    if ($val == 0) {
-                        $os = Util::getUserPhoneOS();
-                        if ($os == 'android' || $os == 'unknown') {
-                            return error(State::FAIL, '不允许android手机');
-                        }
-                    }
-
-                    return true;
-                },
-            ];
-
-            foreach ($limits as $item => $val) {
-                if ($val == 0 && $limit_fn[$item]) {
-                    $fn = $limit_fn[$item];
-                    $res = $fn($val);
-
-                    if (is_error($res)) {
-                        return $res;
-                    }
-                }
-            }
-        }
-
-        $name = $account->getName();
-        $condition = [
-            'account' => $name,
-            'openid' => $user->getOpenid(),
-        ];
-
-        if ($params['unfollow'] || in_array('unfollow', $params, true)) {
-            if (Order::query()->exists($condition)) {
-                return error(State::ERROR, '你已经关注过这个公众号！');
-            }
-        }
-
-        $time = 0;
-        if ($name && Schema::has($sc_name)) {
-            if ($sc_name == Schema::DAY) {
-                $time = strtotime('today');
-            } elseif ($sc_name == Schema::WEEK) {
-                $time = date('D') == 'Mon' ? strtotime('today') : strtotime('last Mon');
-            } elseif ($sc_name == Schema::MONTH) {
-                $time = strtotime(date('Y-m'));
-            }
-
-            //count，单个用户在每个周期内可领取数量
-            if ($count > 0) {
-                $query = Order::query($condition);
-                $query->where(['createtime >=' => $time, 'createtime <' => time()]);
-                if ($query->limit($count + 1)->get('sum(num)') >= $count) {
-                    $desc = [
-                        Schema::DAY => '您今天已经领过了，明天再来吧！',
-                        Schema::WEEK => '下个星期再来试试吧',
-                        Schema::MONTH => '这个月的免费额度已经用完啦！',
-                    ];
-                    return error(State::ERROR, $desc[$sc_name]);
-                }
-            }
-
-            //scCount, 所有用户在每个周期内总数量
-            if ($sc_count > 0) {
-                $query = Order::query(['account' => $name]);
-                $query->where(['createtime >=' => $time, 'createtime <' => time()]);
-                if ($query->limit($sc_count + 1)->get('sum(num)') >= $sc_count) {
-                    return error(State::ERROR, '这个公众号暂时不能领取！');
-                }
-            }
-
-            //total，单个用户累计可领取数量
-            if ($total > 0) {
-                $query = Order::query($condition);
-                if ($query->limit($total + 1)->get('sum(num)') >= $total) {
-                    return error(State::ERROR, '这个公众号的免费额度已经用完！');
-                }
-            }
-
-            //$orderLimits，公众号最大订单数量
-            if ($order_limits > 0) {
-                $query = Order::query(['account' => $name]);
-                if ($query->limit($order_limits + 1)->get('sum(num)') >= $order_limits) {
-                    return error(State::ERROR, '公众号的免费数量已经超出限制！');
-                }
-            }
-
-            return true;
-        }
-
-        return error(State::ERROR, '您的免费额度已经用完！');
+        return self::checkAccountLimits($user, $account, $params);
     }
 
     /**
@@ -1880,7 +1930,7 @@ HTML_CONTENT;
 
             $data = [
                 'online' => !($args['online'] === false),
-                'index' =>  $mcb_index,
+                'index' => $mcb_index,
                 'channel' => $mcb_channel,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 'userid' => $user->getOpenid(),

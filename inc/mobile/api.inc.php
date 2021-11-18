@@ -65,7 +65,7 @@ if (!$device->isMcbOnline()) {
    JSON::fail('设备不在线！');
 }
 
-$res = Util::isAvailable($user, $account, $device);
+$res = Util::checkAvailable($user, $account, $device);
 if (is_error($res)) {
     JSON::fail($res['message']);
 }

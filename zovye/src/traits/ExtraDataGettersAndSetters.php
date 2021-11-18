@@ -30,7 +30,7 @@ trait ExtraDataGettersAndSetters
 
     /**
      * 获取扩展数据
-     * @param string $key
+     * @param mixed $key
      * @param null $default
      * @return mixed|null
      */

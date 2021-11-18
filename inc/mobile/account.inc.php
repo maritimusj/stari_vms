@@ -185,7 +185,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个小程序！');
     }
 
-    $res = Util::isAvailable($user, $account, $device);
+    $res = Util::checkAvailable($user, $account, $device);
     if (is_error($res)) {
         JSON::fail($res);
     }
@@ -223,7 +223,14 @@ if ($op == 'default') {
         JSON::fail('没有设置积分奖励！');
     }
 
-    //todo 判断用户是否可以获得该积分
+    $result = Util::checkBalanceAvailable($user, $account);
+    if (is_error($result)) {
+        JSON::fail($result);
+    }
+
+    if (!Balance::give($user, $account)) {
+        JSON::fail('操作失败！');
+    }
 
     $data = [
         'balance' => $user->getBalance()->total(),

@@ -6,6 +6,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
 class balance_logsModelObj extends modelObj
@@ -29,5 +30,5 @@ class balance_logsModelObj extends modelObj
     /** @var int */
 	protected $createtime;
 
-	use \zovye\traits\ExtraDataGettersAndSetters;
+	use ExtraDataGettersAndSetters;
 }

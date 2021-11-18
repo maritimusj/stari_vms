@@ -87,7 +87,7 @@ if ($op == 'auth' || $op == 'get_openid') {
         JSON::fail('抖音号没有正确配置[03]');
     }
 
-    if (!Util::isAvailable($user, $account, $device)) {
+    if (!Util::checkAvailable($user, $account, $device)) {
         JSON::fail('暂时无法免费领取，请重试[01]');
     }
 

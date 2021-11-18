@@ -25,7 +25,7 @@ class AccountEventHandler
     {
         if ($account && empty($order)) {
             //检查用户是否允许
-            $res = Util::isAvailable($user, $account, $device);
+            $res = Util::checkAvailable($user, $account, $device);
             if (is_error($res)) {
                 ZovyeException::throwWith($res['message'], -1, $device);
             }

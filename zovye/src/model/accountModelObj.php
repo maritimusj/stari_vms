@@ -225,7 +225,7 @@ class accountModelObj extends modelObj
         return $this->getName();
     }
 
-    public function bonus_way()
+    public function getBonusWay(): string
     {
         $commission = $this->settings('commission', []);
         if (isset($commission['balance'])) {
@@ -234,12 +234,12 @@ class accountModelObj extends modelObj
         return Account::COMMISSION;
     }
 
-    public function balance_price(): int
+    public function getBalancePrice(): int
     {
         return $this->settings('commission.balance', 0);
     }
 
-    public function commission_price(): int
+    public function getCommissionPrice(): int
     {
         return $this->settings('commission.money', 0);
     }

@@ -82,7 +82,7 @@ class CommissionEventHandler
             }
         }
 
-        $total_commission_price = $account->commission_price();
+        $total_commission_price = $account->getCommissionPrice();
 
         if ($total_commission_price <= 0) {
             return true;
@@ -94,7 +94,7 @@ class CommissionEventHandler
             $order->setExtraData('commission.local.total', $total_commission_price);
 
             //可分佣的金额
-            $commission_price = $account->commission_price();
+            $commission_price = $account->getCommissionPrice();
             $commission_price = self::processKeeperCommissions($commission_price, $device, $order);
             if ($commission_price < 1) {
                 return true;

@@ -149,10 +149,10 @@ if ($op == 'default') {
             }
 
             if (App::isCommissionEnabled() || App::isBalanceEnabled()) {
-                if ($entry->bonus_way() == Account::COMMISSION) {
-                    $data['commission'] = $entry->commission_price();
-                } elseif ($entry->bonus_way() == Account::BALANCE) {
-                    $data['balance'] = $entry->balance_price();
+                if ($entry->getBonusWay() == Account::COMMISSION) {
+                    $data['commission'] = $entry->getCommissionPrice();
+                } elseif ($entry->getBonusWay() == Account::BALANCE) {
+                    $data['balance'] = $entry->getBalancePrice();
                 }
             }
             
@@ -583,11 +583,11 @@ if ($op == 'default') {
 
         $limits = $account->get('limits');
 
-        $bonus_way = $account->bonus_way();
+        $bonus_way = $account->getBonusWay();
         if ($bonus_way == Account::COMMISSION) {
-            $amount = number_format($account->commission_price() / 100, 2);
+            $amount = number_format($account->getCommissionPrice() / 100, 2);
         } else {
-            $amount = $account->balance_price();
+            $amount = $account->getBalancePrice();
         }
 
         $config = $account->get('config');

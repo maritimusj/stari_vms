@@ -1079,29 +1079,47 @@ JSCODE;
         $api_url = Util::murl('account');
         $jquery_url = JS_JQUERY_URL;
 
-        $user_profile = json_encode($user->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);
-        $account_profile = json_encode($account->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);
+        $user_data = [
+            'status' => true,
+            'data' => $user->profile(),
+        ];
+        $user_data['data']['balance'] = $user->getBalance()->total();
+        $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $account_data = [
+            'status' => true,
+            'data' => $account->profile(),
+        ];
+
+        $account_data['data']['bonus'] = $account->getBalancePrice();
+        $account_json_str = json_encode($account_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 <script>
     const zovye_fn = {
         api_url: "$api_url",
-        user: JSON.parse("$user_profile"),
-        account: JSON.parse("$account_profile"),
+        user: JSON.parse(`$user_json_str`),
+        account: JSON.parse(`$account_json_str`),
     }
     zovye_fn.getBonus = function() {
         return $.getJSON(zovye_fn.api_url, {op: 'get_bonus', 'account': '{$account->getUid()}', 'user': '{$user->getOpenid()}'});
     }
     zovye_fn.getAccountInfo = function (cb) {
         if (typeof cb === 'function') {
-            cb(zovye_fn.account)
+            return cb(zovye_fn.account)
         }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.account);
+        });
     }
     zovye_fn.getUserInfo = function (cb) {
         if (typeof cb === 'function') {
-            cb(zovye_fn.user)
+            return cb(zovye_fn.user)
         }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.user);
+        });
     }
 </script>
 JSCODE;

@@ -36,8 +36,6 @@ use function zovye\tb;
  * @method setSccount($count)
  * @method string getScname()
  * @method setScname($name)
- * @method int getBalanceDeductNum()
- * @method setBalanceDeductNum($num)
  * @method int getTotal()
  * @method setTotal($total)
  * @method int getOrderLimits()

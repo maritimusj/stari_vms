@@ -20,6 +20,7 @@ use zovye\model\userModelObj;
 class Account extends State
 {
     const COMMISSION = 'commission';
+
     const BALANCE = 'balance';
 
     const NORMAL = 0;
@@ -969,7 +970,7 @@ class Account extends State
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         //获取本地可用公众号列表
-        $accounts = Account::match($device, $user, array_merge($params, ['admin', 'max' => settings('misc.maxAccounts', 0)]));
+        $accounts = Account::match($device, $user, array_merge(['admin', 'max' => settings('misc.maxAccounts', 0), $params]));
         if (!empty($accounts)) {
             $include_balance = empty($params['include']) || in_array(Account::BALANCE, $params['include']);
             $include_commission = empty($params['include']) || in_array(Account::COMMISSION, $params['include']);

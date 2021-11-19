@@ -1121,9 +1121,9 @@ JSCODE;
     }
 JSCODE;
 
-    $result = Util::checkBalanceAvailable($user, $account);
-    if (is_error($result)) {
-        $tpl_data['js']['code'] .= <<<JSCODE
+        $result = Util::checkBalanceAvailable($user, $account);
+        if (is_error($result)) {
+            $tpl_data['js']['code'] .= <<<JSCODE
         \r\nzovye_fn.isOk = function(cb) {
             const res = {
                 status: false,
@@ -1139,8 +1139,8 @@ JSCODE;
             });
         }
 JSCODE;
-    } else {
-        $tpl_data['js']['code'] .= <<<JSCODE
+        } else {
+            $tpl_data['js']['code'] .= <<<JSCODE
         \r\nzovye_fn.isOk = function(cb) {
             const res = {
                 status: true,
@@ -1158,11 +1158,60 @@ JSCODE;
             return $.getJSON(zovye_fn.api_url, {op: 'get_bonus', 'account': '{$account->getUid()}'});
         };
 JSCODE;
-    }
-    $tpl_data['js']['code'] .= <<<JSCODE
+        }
+        $tpl_data['js']['code'] .= <<<JSCODE
 </script>
 JSCODE;
 
         $this->showTemplate(Theme::file('balance'), ['tpl' => $tpl_data]);
     }
+
+    public function bonusPage(userModelObj $user)
+    {
+        $tpl_data = Util::getTplData([$user]);
+
+        $user_data = [
+            'status' => true,
+            'data' => $user->profile(),
+        ];
+        $user_data['data']['balance'] = $user->getBalance()->total();
+        $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $api_url = Util::murl('bonus');
+        $account_url = Util::murl('account');
+        $jquery_url = JS_JQUERY_URL;
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+    const zovye_fn = {
+        api_url: "$api_url",
+        user: JSON.parse(`$user_json_str`),
+    }
+    zovye_fn.getUserInfo = function (cb) {
+        if (typeof cb === 'function') {
+            return cb(zovye_fn.user)
+        }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.user);
+        });
+    }
+    zovye_fn.signIn = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'signIn'});
+    }
+    zovye_fn.getAccounts = function(type, max) {
+        return $.getJSON(zovye_fn.api_url, {op: 'account', type, max});
+    }
+    zovye_fn.play = function(uid, seconds, cb) {
+        $.get($account_url, {op: 'play', uid, seconds}).then(function(res){
+            if (cb) cb(res);
+        })
+    }
+</script>
+JSCODE;
+
+        $this->showTemplate(Theme::file('bonus'), ['tpl' => $tpl_data]);
+    }
+
 }
+

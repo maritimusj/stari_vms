@@ -78,7 +78,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['device']['shipment']['balanced'] = request::bool('shipmentBalance') ? 1 : 0;
 
         $settings['order']['waitQueue']['enabled'] = request::bool('waitQueueEnabled') ? 1 : 0;
-        
+
         $settings['goods']['agent']['edit'] = request::bool('allowAgentEditGoods') ? 1 : 0;
 
         $settings['goods']['image']['proxy'] = [
@@ -100,6 +100,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['user']['verify18']['enabled'] = request::bool('userVerify18') ? 1 : 0;
         $settings['user']['verify18']['Title'] = request::trim('userVerify18Title');
+
+        if (App::isBalanceEnabled()) {
+            Config::balance('sign.bonus', [
+                'enabled' => request::bool('') ? 1 : 0,
+                'val' => request::int('dailySignInBonus'),
+            ], true);
+        }
 
     } elseif ($save_type == 'ctrl') {
         $url = request::trim('controlAddr');
@@ -183,7 +190,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $accounts_updated = false;
 
-        foreach ($third_party_platform as $key => $v)  {
+        foreach ($third_party_platform as $key => $v) {
             $enabled = request::bool($key) ? 1 : 0;
 
             $acc = call_user_func($v[0]);
@@ -879,7 +886,7 @@ if ($op == 'account') {
     $tpl_data['list'] = $list;
 
 } elseif ($op == 'user') {
-    
+
     $res = CtrlServ::v2_query('idcard/balance');
     $tpl_data['idcard_balance'] = 0;
 

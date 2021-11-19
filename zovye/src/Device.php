@@ -480,9 +480,18 @@ class Device extends State
         return Util::findObject('device', $cond, $hints);
     }
 
-    public static function findOne($cond): ?deviceModelObj
+    public static function findOne($cond = []): ?deviceModelObj
     {
         return self::query()->findOne($cond);
+    }
+
+    public static function getBalanceVDevice(): deviceModelObj
+    {
+        $deviceClassname = m('device')->objClassname();
+
+        $device = new $deviceClassname(0, m('device'));
+        $device->setImei('U' . Util::random(16));
+        return $device;
     }
 
     public static function createBluetoothCmdLog(deviceModelObj $device, ICmd $cmd)
@@ -656,7 +665,7 @@ class Device extends State
                     } else {
                         $device->setAgent();
                     }
-                }                
+                }
             } else {
                 $device->setAgent();
             }

@@ -16,7 +16,10 @@ class Balance
     const CACHE_EXPIRATION = 60 * 60;
 
     const ADJUST = 0;
-    const ACCOUNT_BONUS = 1;
+    const ACCOUNT_BONUS = 1; // 关注公众号
+    const SIGN_IN_BONUS = 2; // 每日签到
+    const VIDEO_BONUS = 3; // 观看视频
+    const WX_APP_BONUS = 4; // 关注微信小程序
 
 
     private $user;
@@ -179,13 +182,26 @@ REFUND;
         return $data;
     }
 
-    public static function give(userModelObj $user, accountModelObj $account, $reason = ''): bool
+    public static function give(userModelObj $user, accountModelObj $account, $reason = '')
     {
-        $result =  Util::transactionDo(function () use ($user, $account, $reason) {
+        if ($user->acquireLocker("balance:give")) {
+            return err('无法锁定用户！');
+        }
+
+        if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() <= 0) {
+            return err('没有设置积分奖励！');
+        }
+
+        $result = Util::checkBalanceAvailable($user, $account);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        return Util::transactionDo(function () use ($user, $account, $reason) {
             if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() == 0) {
                 return err('公众号设置不正确！');
             }
-            if  (!BalanceLog::create([
+            if (!BalanceLog::create([
                 'user_id' => $user->getId(),
                 'account_id' => $account->getId(),
                 'extra' => [
@@ -197,13 +213,13 @@ REFUND;
             ])) {
                 return err('创建领取记录失败！');
             }
-            if (!$user->getBalance()->change($account->getBalancePrice(), Balance::ACCOUNT_BONUS, [
+            $result = $user->getBalance()->change($account->getBalancePrice(), Balance::ACCOUNT_BONUS, [
                 'account' => $account->profile(),
-            ])) {
+            ]);
+            if (!$result) {
                 return err('创建用户积分记录失败！');
             }
-            return true;
+            return $result;
         });
-        return !is_error($result);
     }
 }

@@ -53,7 +53,7 @@
             <div class="seg">
                 <div class="title">认证18+</div>
                 <div class="form-group">
-                    <label for="userVerify" class="col-md-2 control-label">是否启用</label>
+                    <label for="userVerify18" class="col-md-2 control-label">是否启用</label>
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
@@ -70,6 +70,29 @@
                     </div>
                 </div>
             </div>
+            {if \zovye\App::isBalanceEnabled()}
+            <div class="seg">
+                <div class="title">每日签到</div>
+                <div class="form-group">
+                    <label for="dailySignIn" class="col-md-2 control-label">是否启用</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="dailySignInEnabled" id="dailySignIn" value="1" {if \zovye\Config('sign.bonus.enabled', false)}checked{/if}>
+                                是否启用每日签到功能
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dailySignInBonus" class="col-md-2 control-label">奖励积分
+                    </label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="dailySignInBonus" id="dailySignInBonus" value="{php echo \zovye\Config('sign.bonus.val', 0)}" min="0" step="1">
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
     <div class="form-btn">

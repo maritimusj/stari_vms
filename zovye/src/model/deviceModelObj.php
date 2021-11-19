@@ -1621,11 +1621,19 @@ class deviceModelObj extends modelObj
 
         $query = Account::query(['state <>' => Account::BANNED]);
 
+        $balance_enabled = App::isBalanceEnabled();
+
         /** @var accountModelObj $entry */
         foreach ($query->findAll() as $entry) {
             if ($entry->isBanned()) {
                 continue;
             }
+
+            if ($balance_enabled && $entry->getBonusType() == Account::BALANCE) {
+                $accounts[$entry->getUid()] = $entry->format();
+                continue;
+            }
+
             $assign_data = $entry->settings('assigned');
             if ($this->isMatched($assign_data)) {
                 $accounts[$entry->getUid()] = $entry->format();

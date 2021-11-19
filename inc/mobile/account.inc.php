@@ -45,42 +45,59 @@ if ($op == 'default') {
         JSON::fail(['msg' => '广告类型不正确！']);
     }
 
-    $device = Device::get(request::trim('device'), true);
-    if (empty($device)) {
-        JSON::fail(['msg' => '找不到指定设备！']);
-    }
-
     $seconds = request::int('seconds');
     $duration = $account->getDuration();
-    $exclusive_locker = $account->settings('config.video.exclusive', false);
-    if ($exclusive_locker) {
-        $serial = request::str('serial');
-        if ($seconds == 0) {
-            if (!Locker::try("account:video@{$device->getId()}", $serial, 0, 0, 2, $duration + 3, false)) {
-                JSON::fail([
-                    'msg' => '请稍等，有人正在使用设备！',
-                    'redirect' => Util::murl('entry', ['device' => $device->getShadowId()]),
-                ]);
+
+    $device = Device::get(request::trim('device'), true);
+    if ($device) {
+        $exclusive_locker = $account->settings('config.video.exclusive', false);
+        if ($exclusive_locker) {
+            $serial = request::str('serial');
+            if ($seconds == 0) {
+                if (!Locker::try("account:video@{$device->getId()}", $serial, 0, 0, 2, $duration + 3, false)) {
+                    JSON::fail([
+                        'msg' => '请稍等，有人正在使用设备！',
+                        'redirect' => Util::murl('entry', ['device' => $device->getShadowId()]),
+                    ]);
+                }
+                JSON::success(['msg' => '请继续观看']);
+            } elseif ($seconds < $duration) {
+                if (!Locker::enter($serial)) {
+                    JSON::fail([
+                        'msg' => '请稍等，有人正在使用设备！!',
+                        'redirect' => Util::murl('entry', ['device' => $device->getShadowId()]),
+                    ]);
+                }
+                JSON::success(['msg' => '请继续观看']);
+            } else {
+                $locker = Locker::enter($serial);
+                if ($locker) {
+                    $locker->destroy();
+                }
             }
-            JSON::success(['msg' => '请继续观看']);
-        } elseif ($seconds < $duration) {
-            if (!Locker::enter($serial)) {
-                JSON::fail([
-                    'msg' => '请稍等，有人正在使用设备！!',
-                    'redirect' => Util::murl('entry', ['device' => $device->getShadowId()]),
-                ]);
-            }
-            JSON::success(['msg' => '请继续观看']);
         } else {
-            $locker = Locker::enter($serial);
-            if ($locker) {
-                $locker->destroy();
+            if ($seconds < $duration) {
+                JSON::success(['msg' => '请继续观看']);
             }
         }
     } else {
+        if (!App::isBalanceEnabled()) {
+            JSON::fail(['msg' => '找不到这个设备！']);
+        }
+
         if ($seconds < $duration) {
             JSON::success(['msg' => '请继续观看']);
         }
+
+        $result = Balance::give($user, $account);
+        if (is_error($result)) {
+            JSON::fail($result);
+        }
+
+        JSON::success([
+            'balance' => $user->getBalance()->total(),
+            'bonus' => $result->getXVal(),
+        ]);
     }
 
     $ticket_data = [
@@ -153,7 +170,7 @@ if ($op == 'default') {
 
     $types = request::array('types');
     $result = Account::getAvailableList($device, $user, [
-        'type' => $types ?: null, 
+        'type' => $types ?: null,
         'include' => [Account::COMMISSION],
     ]);
 
@@ -222,17 +239,9 @@ if ($op == 'default') {
         JSON::fail('找不到这个公众号！');
     }
 
-    if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() <= 0) {
-        JSON::fail('没有设置积分奖励！');
-    }
-
-    $result = Util::checkBalanceAvailable($user, $account);
+    $result = Balance::give($user, $account);
     if (is_error($result)) {
         JSON::fail($result);
-    }
-
-    if (!Balance::give($user, $account)) {
-        JSON::fail('操作失败！');
     }
 
     $data = [

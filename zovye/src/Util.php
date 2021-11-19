@@ -697,11 +697,11 @@ include './index.php';
         $sc_name = $account->getScname();
 
         if ($sc_name == Schema::DAY) {
-            $time = strtotime('today');
+            $time = strtotime('today 00:00');
         } elseif ($sc_name == Schema::WEEK) {
-            $time = date('D') == 'Mon' ? strtotime('today') : strtotime('last Mon');
+            $time = date('D') == 'Mon' ? strtotime('today 00:00') : strtotime('last Mon 00:00');
         } elseif ($sc_name == Schema::MONTH) {
-            $time = strtotime(date('Y-m'));
+            $time = strtotime('first day of this month 00:00');
         } else {
             return error(State::ERROR, '公众号设置不正确！');
         }

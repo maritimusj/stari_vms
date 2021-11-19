@@ -593,7 +593,12 @@ class common
         $type = request::int('typeid');
         $num = empty(request('num')) ? 10 : request::int('num');
 
-        return Util::getDeviceAdvs(request('deviceid'), $type, $num);
+        $device = Device::get(request::str('deviceid'));
+        if (empty($device)) {
+            return error(State::ERROR, '找不到这个设备！');
+        }
+
+        return Util::getDeviceAdvs($device, $type, $num);
     }
 
     public static function orderDefault(): array

@@ -1179,6 +1179,7 @@ JSCODE;
 
         $api_url = Util::murl('bonus');
         $account_url = Util::murl('account');
+        $adv_api_url = Util::murl('adv');
         $jquery_url = JS_JQUERY_URL;
 
         $tpl_data['js']['code'] = <<<JSCODE
@@ -1195,6 +1196,23 @@ JSCODE;
         return new Promise((resolve, reject) => {
             resolve(zovye_fn.user);
         });
+    }
+    zovye_fn.getAdvs = function(typeid, num, cb) {
+        const params = {num};
+        if (typeof typeid == 'number') {
+            params['typeid'] = typeid;
+        } else {
+            params['type'] = typeid;
+        }
+        $.get("$adv_api_url", params).then(function(res){
+            if (res && res.status) {
+                if (typeof cb === 'function') {
+                    cb(res.data);
+                } else {
+                    console.log(res.data);
+                }
+            }
+        })           
     }
     zovye_fn.signIn = function() {
         return $.getJSON(zovye_fn.api_url, {op: 'signIn'});

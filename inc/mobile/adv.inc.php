@@ -8,6 +8,11 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+$user = Util::getCurrentUser();
+if (empty($user) || $user->isBanned()) {
+    JSON::fail('找不到用户或者用户无法领取');
+}
+
 if (request::has('typeid')) {
     $type_id = request::int('typeid');
 } else {
@@ -16,19 +21,17 @@ if (request::has('typeid')) {
 }
 
 $num = request::int('num', 10);
-$device_id = request::str('deviceid');
 
-$user = Util::getCurrentUser();
-if (empty($user) || $user->isBanned()) {
-    JSON::fail('找不到用户或者用户无法领取');
+if (request::has('deviceid')) {
+    $device = Device::get(request::str('deviceid'), true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备');
+    }
+} else {
+    $device = Device::getBalanceVDevice();
 }
 
-$device = Device::get($device_id, true);
-if (empty($device)) {
-    JSON::fail('找不到这个设备');
-}
-
-$result = Util::getDeviceAdvs($device_id, $type_id, $num);
+$result = Util::getDeviceAdvs($device, $type_id, $num);
 if (is_error($result)) {
     JSON::fail($result);
 }

@@ -2618,13 +2618,8 @@ HTML_CONTENT;
         return '已指定部分设备';
     }
 
-    public static function getDeviceAdvs($device_uid, $type, $max_total): array
+    public static function getDeviceAdvs(deviceModelObj $device, $type, $max_total): array
     {
-        $device = Device::get($device_uid, true);
-        if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
-        }
-
         $result = [];
         foreach ($device->getAdvs($type) as $item) {
             $data = [

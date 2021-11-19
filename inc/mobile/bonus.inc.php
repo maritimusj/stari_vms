@@ -74,12 +74,8 @@ if ($op == 'signIn') {
         JSON::fail('用户暂时不可用！');
     }
 
-    $type = request::int('type');
+    $type = request::int('type', Account::NORMAL);
     $max = request::int('max', 10);
-
-    if (empty($type)) {
-        JSON::fail('没有指定类型参数！');
-    }
 
     $result = Account::getAvailableList(Device::getBalanceVDevice(), $user, [
         'type' => [$type],

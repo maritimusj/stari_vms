@@ -26,22 +26,24 @@ if ($op == 'signIn') {
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
+    
     if ($user->isBanned()) {
         JSON::fail('用户暂时不可用！');
     }
-    $bonus = Config::balance('sign.bonus', 0);
+
+    $bonus = Config::balance('sign.bonus', []);
     if (empty($bonus) || !$bonus['enabled'] || empty($bonus['val'])) {
         JSON::fail('这个功能没有启用！');
     }
 
-    if ($user->acquireLocker("balance:daily_sign_in")) {
+    if (!$user->acquireLocker("balance:daily:sign_in")) {
         JSON::fail('请稍后再试！');
     }
 
     if ($user->getBalance()->log()->where([
             'src' => Balance::SIGN_IN_BONUS,
-            'createtime >=' => date('today'),
-            'createtime <' => date('next day'),
+            'createtime >=' => strtotime('today 00:00'),
+            'createtime <' => strtotime('next day 00:00'),
         ])->count() > 0) {
         JSON::fail('已经签到了！');
     }

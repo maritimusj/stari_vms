@@ -93,7 +93,7 @@
                     <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多领取总数</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="orderlimits" id="orderlimits" value="{php echo $account?$account->getOrderLimits():'0'}">
-                        <span class="help-block">* 所有用户在这个公众号领取的商品总数量，0表示不限制数量，<b>超过后，系统会自动禁用该公众号！</b></span>
+                        <span class="help-block">* 所有用户在这个公众号领取的奖励总数量，0表示不限制数量，<b>超过后，系统会自动隐藏该公众号！</b></span>
                     </div>
                 </div> 
             </div>

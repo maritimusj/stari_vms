@@ -533,6 +533,10 @@ class App
         return settings('account.douyin.enabled', false);
     }
 
+    public static function isMultiQRCodesEnabled(): bool {
+        return false;
+    }
+
     public static function isBalanceEnabled(): bool {
         return Config::balance('enabled', false);
     }

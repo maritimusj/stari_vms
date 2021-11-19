@@ -1,203 +1,54 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20211117');}
+{php \zovye\url(true, './static/css/assign.css?v=20180422001');}
 <style>
-    .more_btn{
-        text-align:center;color:gray;
-    }
-    .more_btn i{
-        cursor:pointer;
-    }
-    .operate i.onlycm {
-        color: #FF5722;
-        text-shadow: 1px 1px grey;
-        font-size: 1.4em;
-    }
-    #app .tag.agent.selected.commission {
-        background-color: #3c4e56;
-    }
-    #app .tag.commission {
-        background-color: #607D8B;
+    dd{
+        color: gray;
     }
 </style>
-<div id="app" v-cloak>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <i class="fa fa-wrench"></i> {php echo $entry->getTitle()}
-            <span class="operate">
-                <i class="fa fa-reply" title="返回" @click="back(true)"></i>
-            </span>            
-        </div>
-        <div class="panel-body" style="display:flex;">
-            <div  id="limitslist">
-                <div :class="['limits', l.selected ? 'selected':'']" v-for="l in limits" @click="limitClicked(l)">
-                    <span v-text="l.title"></span>
-                </div>                
+<div id="app">
+    <assign-ctrl>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <dl class="dl-horizontal">
+                <dt>公众号帐号</dt>
+                <dd>{$account['name']}</dd>                    
+                <dt>名称</dt>
+                <dd>{$account['title']}</dd>
+
+                {if $account['agent']}
+                <dt>代理商</dt>
+                <dd>
+                    {$account['agent']['name']}
+                </dd>
+                {/if}
+                </dl>
             </div>
         </div>
-    </div>
-    
-    <div class="panel panel-default"  v-show="limits.agents.selected">
-        <div class="panel-heading">
-            发布到以下选定代理商的所有终端
-            <div style="display:inline-block;color:gray;user-select:none;" v-show="agentsSelected.length > 0">
-                (<span v-text="(agentsSelected.length || 0) + '个代理'"></span>）
-            </div>
-            <span class="operate">
-                <i class="fa fa-ban" @click="limits.agents.selected=false"  title="关闭"></i>
-            </span>            
-        </div>
-        <div class="panel-body" style="min-height:7em;">
-            <div id="selected-agentslist">
-                 <div :class="['tag', 'agent', agent.sel?'selected':'']" title="点击移除" 
-                 v-for="agent in agentsSelected" :key="agent.id"
-                 @click="removeAgent(agent)">
-                    <img :src="agent.avatar">
-                    <span v-text="nameof(agent)"></span>
-                    <span v-text="'(' + agent.total + '台)'"></span>
-                </div>               
-            </div>
-        </div>
-        <div class="panel-heading operate">
-            可选代理商列表
-            <div style="display:inline-block;color:gray;user-select:none;" v-show="agents.total > 1">
-                ( <i class="fa fa-caret-left" title="上一页" @click="prePage('agents')" v-show="agents.total > 1" :disabled="loading"></i> 第<span v-text="agents.page"></span>页/共<span v-text="agents.total"></span>页
-                <i class="fa fa-caret-right" title="下一页" @click="nextPage('agents')"  v-show="agents.total > 1"  :disabled="loading"></i> )&nbsp;
-            </div>
-           <div style="display:inline-block;color:gray;user-select:none;" v-show="agents.total > 1">
-                (第<span v-text="agents.page"></span>页/共<span v-text="agents.total"></span>页)
-            </div>
-            <i class="fa fa-spinner fa-spin" v-if="loading"></i>
-            <template v-else>
-            <i class="fa fa-chevron-down" title="全部取消" @click="selectAllAgents(false)"></i>      
-            <i class="fa fa-chevron-up" title="全部选中" @click="selectAllAgents(true)"></i>
-            {if $commission_enabled}
-            &nbsp;
-            <i class="fa fa-sort-amount-asc fa-flip-horizontal" title="取消所有分佣代理商" @click="selectAllCMAgents(false)"></i>
-            <i class="fa fa-sort-amount-asc fa-flip-vertical fa-flip-horizontal" title="选中所有分佣代理商" @click="selectAllCMAgents(true)"></i>
-            {/if}
-            </template>
-            <span class="pull-right" v-show="!agentSearchBox">
-                <i class="fa fa-search" @click="agentSearchBox=true"  title="搜索"></i>
-            </span>
-            <form class="form-inline" style="text-align: right;padding: 6px;background-color: #eee;color:gray;float: right;" v-show="agentSearchBox" @submit.prevent="return false;">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="只能搜索昵称和手机号码..." v-model="agent_keywords" >
-              </div>
-              <span class="operate" style="float:none;">
-                <i class="fa fa-spinner fa-spin" v-if="loading"></i>
-                <i class="fa fa-ban" @click="agentSearchBox=false;agent_keywords=''" title="关闭搜索" v-else></i>
-              </span>
-            </form>  
-        </div>   
-        <div class="panel-body" style="position:relative;">
-            <div class="arrow left-arrow" title="上一页" @click="prePage('agents')"  v-show="agents.total > 1">&lt;</div>
-            <div class="arrow right-arrow" title="下一页" @click="nextPage('agents')"  v-show="agents.total > 1">&gt;</div>
-            <div id="agentslist">
-                 <div :class="['tag', 'agent', agent.sel?'selected':'', agent.commission_enabled?'commission':'']" :title="agent.sel?'点击移除':'点击加入'" 
-                 v-for="agent in agents.list" :key="agent.id"
-                 @click="selAgent(agent)">
-                    <img :src="agent.avatar">
-                    <span v-text="nameof(agent)"></span>
-                    <span v-text="'(' + agent.total + '台)'"></span>
-                </div>                
-            </div>
-            <div class="more_btn" v-if="more_agents">
-                <i class="fa fa-spinner fa-spin" v-if="loading"></i>
-                <i class="fa fa-angle-double-down" title="显示更多..." @click="changeAgentPageSize()" v-else></i>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default"  v-show="limits.tags.selected">
-        <div class="panel-heading">
-            发布到以下选定标签标记的所有终端
-            <span class="operate">
-                <i class="fa fa-ban" @click="limits.tags.selected=false"  title="关闭"></i>
-            </span>            
-        </div>
-        <div class="panel-body" id="tagslist">
-            <div class="tag" v-for="t in tags" :key="t.id" :class="t.sel?'selected':''"  @click="tagClicked(t)">
-                <span v-text="t.title + '(' + t.count + '台)'"></span>
-            </div>
-        </div>
-    </div> 
-    <div class="panel panel-default"  v-show="limits.devices.selected">
-        <div class="panel-heading">
-            发布到以下选定的终端
-            <div style="display:inline-block;color:gray;user-select:none;" v-show="devicesSelected.length > 0">
-                (<span v-text="(devicesSelected.length || 0) + '台'"></span>）
-            </div>
-            <span class="operate">
-                <i class="fa fa-ban" @click="limits.devices.selected=false" title="关闭"></i>
-            </span>             
-        </div>
-        <div class="panel-body"  style="min-height:5em;">
-            <div class="selectedevicelist">
-                <div class="tag device selected"  title="点击移除" 
-                v-for="dev in devicesSelected" :key="dev.id"
-                @click="removeDevice(dev)">
-                    <span v-text="dev.name"></span>
-                </div>
-            </div>
-        </div>        
-        <div class="panel-heading operate">
-            可选终端列表
-            <div style="display:inline-block;color:gray;user-select:none;" v-show="devices.total > 1">
-                ( <i class="fa fa-caret-left" title="上一页" @click="prePage('devices')" v-show="devices.total > 1" :disabled="loading"></i> 第<span v-text="devices.page"></span>页/共<span v-text="devices.total"></span>页
-                <i class="fa fa-caret-right" title="下一页" @click="nextPage('devices')"  v-show="devices.total > 1"  :disabled="loading"></i> )&nbsp;
-            </div>
-            <i class="fa fa-spinner fa-spin" v-if="loading"></i>
-            <template v-else>
-            <i class="fa fa-chevron-down" title="全部取消" @click="selectAllDevices(false)"></i>      
-            <i class="fa fa-chevron-up" title="全部选中" @click="selectAllDevices(true)"></i>               
-            </template>
-            <span class="pull-right" v-show="!deviceSearchBox">
-                <i class="fa fa-search" @click="deviceSearchBox=true"  title="搜索"></i>
-            </span>
-            <form class="form-inline" style="text-align: right;padding: 6px;background-color: #eee;color:gray;float: right;" v-show="deviceSearchBox" @submit.prevent="return false;">
-              <div class="form-group">
-                <input type="text" class="form-control" placeholder="请输入查找..." v-model="device_keywords" >
-              </div>
-              <span class="operate" style="float:none;">
-                <i class="fa fa-spinner fa-spin" v-if="loading"></i>
-                <i class="fa fa-ban" @click="deviceSearchBox=false;deviceSearchBox=''" title="关闭搜索" v-else></i>
-              </span>
-            </form>  
-        </div>
-        <div class="panel-body" style="position:relative;">
-            <div class="arrow left-arrow" title="上一页" @click="prePage('devices')" v-show="devices.total > 1">&lt;</div>
-            <div class="arrow right-arrow" title="下一页" @click="nextPage('devices')"  v-show="devices.total > 1">&gt;</div>
-            <div class="deviceslist">
-                <div :class="['tag', 'device', dev.sel?'selected':'']" :title="dev.agent?'所属代理商：' + dev.agent : '未绑定代理商'" 
-                v-for="dev in devices.list" :key="dev.id"
-                @click="selDevice(dev)">
-                    <span v-text="dev.name"></span>
-                </div>
-            </div>
-            <div class="more_btn" v-if="more_devices">
-                <i class="fa fa-spinner fa-spin" v-if="loading"></i>
-                <i class="fa fa-angle-double-down" title="显示更多..." @click="changeDevicePageSize()" v-else></i>
-            </div>
-        </div>
-    </div>
-    <div style="float:right;">
-        <button class="btn btn-primary" @click="saveClicked()" :disabled="loading">保存</button>
-        <button class="btn btn-default" @click="back()">返回</button>
-    </div>    
+    </assign-ctrl>
 </div>
 
 <script>
-    require(['{php echo MODULE_URL}static/js/accountAssign.js?v=20180420'], function (m) {
-        const cfg = {
-            id: "{php echo intval($id)}",
-            url:"{php echo $this->createWebUrl('account');}",
-            advs: "{php echo $this->createWebUrl('advlist')}",
-            tags: "{php echo $this->createWebUrl('tags')}",
-            agents: "{php echo $this->createWebUrl('agent')}",
-            devices: "{php echo $this->createWebUrl('device');}",
-            settings: "{php echo $this->createWebUrl('advlist', array('op'=>'settings'));}",
-        }
-        m.init(cfg);
+    const cfg = {
+        id: "{$id}",
+        multi: {php echo intval(zovye\settings('advs.assign.multi'));},
+        data: JSON.parse(`{$assign_data}`),
+        agents: "{php echo $this->createWebUrl('agent')}",
+        groups: "{php echo $this->createWebUrl('device', array('op' => 'group'))}",
+        tags: "{php echo $this->createWebUrl('tags')}",
+        devices: "{php echo $this->createWebUrl('device');}",
+        save: "{php echo $this->createWebUrl('account', array('op' => 'saveAssignData'));}",
+        back_url: "{php echo $this->createWebUrl('account');}",
+    }
+    require(['{php echo MODULE_URL}static/js/assign.min.js?v=20180507001'], function (m) {
+        m.init(cfg, function (res) {
+            $.post(cfg.save, {id: cfg.id, data: JSON.stringify(res)}, function(res){
+                if (res) {
+                    if (res.data && res.data.msg) {
+                         alert(res.data.msg);
+                    }
+                }
+            })
+            return true;
+        })
     })
-</script>
-
-{template 'common/footer'}
+</script>{template 'common/footer'}

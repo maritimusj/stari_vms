@@ -346,6 +346,11 @@ class accountModelObj extends modelObj
         return (array)$this->get('assigned', []);
     }
 
+    public function setAssignData($data = [])
+    {
+        return $this->set('assigned', $data);
+    }
+
     public function destroy(): bool
     {
         $this->remove('qrcodesData');

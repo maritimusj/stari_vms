@@ -28,10 +28,6 @@
         position: absolute;
         border-radius: 1em 1em 0 0;
     }
-    #accountlist .profile .commission{
-        display: inline-block;
-        color: #f00;
-    }
     #accountlist div.limit:hover{
         text-shadow: 1px 1px #666;
         height: calc(100% + 4em);
@@ -101,6 +97,9 @@
         color: green;
         cursor: default;
     }
+    #accountlist span.commission.disabled {
+        color: lightgray;
+    }    
     #accountlist span.balance {
         color: #795548;
         cursor: default;
@@ -243,10 +242,10 @@
                         </div>
                     </td>
                     <td class="bonus">
-                        {if $a['commission']}
-                            <span class="commission" title="佣金">￥{php echo number_format($a['commission']/100, 2)}元</span>
+                        {if isset($a['commission'])}
+                            <span class="commission{if empty($a['commission'])} disabled{/if}" title="佣金">￥{php echo number_format($a['commission']/100, 2)}元</span>
                         {/if}
-                        {if $a['balance']}
+                        {if isset($a['balance'])}
                             <span class="balance" title="积分">{$a['balance']}</span>
                             <img src="{MODULE_URL}static/img/coin.svg"
                             {if $a['balance'] > 0}
@@ -327,13 +326,19 @@
                             {if $banned}
                             <a  class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'ban','id'=>$a['id']))}" title="启用"><i class="fa fa-eye"></i></a>
                             {else}
-                             <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id']))}" title="分配设备"><i class="fa fa-wrench{if empty($a['assigned'])} active{/if}"></i></a>
+                                {if isset($a['balance'])}
+                                <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'edit', 'id'=>$a['id']))}" title="编辑"><i class="fa fa-edit"></i></a>
+                                {else}
+                                <a class="btn btn-default" href="{php echo $this->createWebUrl('account', array('op'=>'assign', 'id'=>$a['id']))}" title="分配设备"><i class="fa fa-wrench{if empty($a['assigned'])} active{/if}"></i></a>
+                                {/if}
                             {/if}
                           <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                           <span class="fa fa-caret-down"></span></a>
                           <ul class="dropdown-menu">
+                            {if !isset($a['balance'])}
                             <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
                             <li role="separator" class="divider"></li>
+                            {/if}
                             <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
                             {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
                             <li>

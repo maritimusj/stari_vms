@@ -510,6 +510,8 @@ if ($op == 'default') {
 
             $commission_data = [];
 
+            $original_bonus_type = $account->getBonusType();
+
             if (App::isCommissionEnabled()) {
                 if (request::isset('commission_money')) {
                     $commission_data['money'] =  request::float('commission_money', 0, 2) * 100;
@@ -517,7 +519,7 @@ if ($op == 'default') {
                     $commission_data['money'] =  request::float('amount', 0, 2) * 100;
                 }
             }
-
+            
             // 积分
             if (App::isBalanceEnabled()) {
                 if (request::isset('commission_money')) {
@@ -527,7 +529,21 @@ if ($op == 'default') {
                 }
             }
 
+            //设置奖励
             $account->set('commission', $commission_data);
+            
+            //处理分配数据
+            if ($account->getBonusType() != $original_bonus_type) {
+                if ($original_bonus_type == Account::COMMISSION) {
+                    //备份设置
+                    $account->set('assigned_commission', $account->getAssignData());
+                    //分配到所有设备
+                    $account->setAssignData(['all' => 1]);
+                } else {
+                  //备份设置
+                  $account->setAssignData($account->get('assigned_commission', []));
+                }
+            }
 
             //退出佣金推广后,删除所有代理商分配
             if ($commission_share_closed) {
@@ -676,6 +692,10 @@ if ($op == 'default') {
         Util::itoast('这个公众号不存在！', $this->createWebUrl('account'), 'error');
     }
 
+    // if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
+    //     Util::itoast('积分奖励的公众号无法分配到指定设备！', $this->createWebUrl('account'), 'error');
+    // }
+
     $data = [
         'id' => $account->getId(),
         'agentId' => $account->getAgentId(),
@@ -702,7 +722,7 @@ if ($op == 'default') {
     $assigned = $account->settings('assigned', []);
     $assigned = isEmptyArray($assigned) ? [] : $assigned;
 
-    app()->showTemplate('web/account/assign_v', [
+    app()->showTemplate('web/account/assign', [
         'id' => $id,
         'commission_enabled' => $commission_enabled,
         'account' => $data,

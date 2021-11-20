@@ -1303,7 +1303,7 @@ HTML_CONTENT;
 
     /**
      * 查找指定对象
-     *
+     * @deprecated
      * @param $tb
      * @param $val
      * @param null $hint

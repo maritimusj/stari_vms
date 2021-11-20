@@ -112,7 +112,6 @@ return [
         'siteTitle' => DEFAULT_SITE_TITLE,
         'siteCopyrights' => DEFAULT_COPYRIGHTS,
         'banner' => '',
-        'adminAccount' => '',
         'pushAccountMsg_type' => '',
         'pushAccountMsg_val' => '',
         'pushAccountMsg_delay' => '',

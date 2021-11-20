@@ -471,6 +471,7 @@ class Device extends State
 
     /**
      * 根据指定条件查找设备，可以传入id,imei或者影子ID
+     * @deprecated
      * @param $cond
      * @param null $hints
      * @return deviceModelObj|null

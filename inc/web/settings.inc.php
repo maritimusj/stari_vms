@@ -450,7 +450,6 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
 
-        $settings['misc']['adminAccount'] = request::trim('adminAccount');
         $settings['misc']['pushAccountMsg_type'] = request::trim('pushAccountMsg_type');
         $settings['misc']['pushAccountMsg_val'] = request::trim('pushAccountMsg_val');
         $settings['misc']['pushAccountMsg_delay'] = request::int('pushAccountMsg_delay');

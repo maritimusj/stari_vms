@@ -24,9 +24,11 @@ class AQIInfoAccount extends AQIInfo
     {
         $this->app_key = $app_key;
         $this->app_secret = $app_secret;
+    }
 
-        parent::$type = Account::AQIINFO;
-        parent::$name = Account::AQIINFO_NAME;
+    public static function getUid(): string
+    {
+        return Account::makeThirdPartyPlatformUID(Account::AQIINFO, Account::AQIINFO_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array

@@ -61,7 +61,7 @@ Util::logToFile('aqiinfo', [
 ]);
 
 if (App::isAQiinfoEnabled()) {
-    AQIInfoAccount::cb($data);
+    AQIInfoAccount::cb(Account::AQIINFO, $data);
 } else {
     Util::logToFile('aqiinfo', [
         'error' => '阿旗数据平台没有启用！',

@@ -13,17 +13,16 @@ if (empty($raw)) {
 
 parse_str($raw, $data);
 
-Util::logToFile('aqiinfo', [
+Util::logToFile('wxwork', [
     'raw' => $raw,
     'data' => $data,
 ]);
 
-
-if (App::isAQiinfoEnabled()) {
-    WxWorkAccount::cb($data);
+if (App::isWxWorkEnabled()) {
+    WxWorkAccount::cb(Account::WxWORK, $data);
 } else {
-    Util::logToFile('aqiinfo', [
-        'error' => '阿旗数据平台没有启用！',
+    Util::logToFile('wxwork', [
+        'error' => '没有启用！',
     ]);
 }
 

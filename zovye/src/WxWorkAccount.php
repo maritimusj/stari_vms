@@ -24,9 +24,11 @@ class WxWorkAccount extends AQIInfo
     {
         $this->app_key = $app_key;
         $this->app_secret = $app_secret;
+    }
 
-        parent::$type = Account::WxWORK;
-        parent::$name = Account::WxWORK_NAME;
+    public static function getUid(): string
+    {
+        return Account::makeThirdPartyPlatformUID(Account::WxWORK, Account::WxWORK_NAME);
     }
 
     public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null): array

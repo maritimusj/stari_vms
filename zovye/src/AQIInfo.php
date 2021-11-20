@@ -9,19 +9,11 @@ use zovye\model\userModelObj;
 
 class AQIInfo
 {
-    protected static $type;
-    protected static $name;
-
-    public static function getUid(): string
+    public static function verifyData($type, $params): array
     {
-        return Account::makeThirdPartyPlatformUID(self::$type, self::$name);
-    }
-
-    public static function verifyData($params): array
-    {
-        $acc = Account::findOneFromType(self::$type);
+        $acc = Account::findOneFromType($type);
         if (empty($acc)) {
-            return err('找不到指定公众号！');
+            return err('找不到指定公众号！[' . $type . ']');
         }
 
         $config = $acc->settings('config', []);
@@ -41,10 +33,10 @@ class AQIInfo
         return ['account' => $acc];
     }
 
-    public static function cb($params = [])
+    public static function cb($type, $params = [])
     {
         try {
-            $res = self::verifyData($params);
+            $res = self::verifyData($type, $params);
             if (is_error($res)) {
                 throw new RuntimeException('发生错误：' . $res['message']);
             }

@@ -190,13 +190,15 @@ FEE;
             $name = $entry->getExtraData('admin');
             $admin_info = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
             $memo = $entry->getExtraData('memo');
+            if ($memo) {
+                $memo = '<dt>说明</dt><dd class="memo">{$memo}</dd>';
+            }
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">管理员调整</dd>
 {$admin_info}
-<dt>说明</dt>
-<dd class="memo">{$memo}</dd>
+{$memo}
 </dl>
 REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::RELOAD_OUT) {

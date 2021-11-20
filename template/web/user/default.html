@@ -164,8 +164,8 @@
                 {if $credit_used}
                 <th>积分</th>
                 {/if}
-                <th>来源</th>
-                <th>
+                <th class="center">来源</th>
+                <th class="center">
                     <div>订单数量</div>
                     <div><span data-orderby="free_total" {if $orderby=='free_total'}class="fa {$order}"{/if}>免费</span>
                         /
@@ -247,7 +247,7 @@
     </div>
 </td>
 {/if}
-<td>
+<td class="center">
     <span class="fa fa-ali fa-fw" data-url="{$item['openid']}">
         <img src="{$item['type']['icon']}" style="width:inherit;" title="{$item['type']['title']} {$item['openid']}">
     </span>

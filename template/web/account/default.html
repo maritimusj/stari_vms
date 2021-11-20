@@ -215,7 +215,7 @@
             <tbody>
                 {loop $accounts $index $a}
                 <tr {if $a['banned']}class="banned"{/if} data-id="{$a['id']}">
-                    <td>
+                    <td style="text-align: left;">
                         <span class="orderno normal"  title="排序值">{if $a['orderno']}{$a['orderno']}{else}#{/if}</span>
                     </td>
                     <td>

@@ -191,7 +191,7 @@ FEE;
             $admin_info = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
             $memo = $entry->getExtraData('memo');
             if ($memo) {
-                $memo = '<dt>说明</dt><dd class="memo">{$memo}</dd>';
+                $memo = "<dt>说明</dt><dd class=\"memo\">{$memo}</dd>";
             }
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">

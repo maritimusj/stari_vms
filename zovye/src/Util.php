@@ -530,20 +530,17 @@ include './index.php';
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
     }
 
-    /**
-     * 缓存指定函数的调用结果，指定时间内不再重复调用
-     * @param $interval_seconds
-     * @param callable $fn
-     * @param mixed ...$params 用来区分同一个函数应用了不同的参数的情况
-     * @return mixed
-     */
-    public static function cachedCall($interval_seconds, callable $fn, ...$params)
+    public static function expire(string $uid) 
     {
-        $key = App::uid(6) . 'delay' . hashFN($fn, ...$params);
+        We7::cache_delete(App::uid(6) . $uid);
+    }
 
-        $last = We7::cache_read($key);
-        if ($last && is_array($last) && ($interval_seconds === 0 || time() - intval($last['time']) < $interval_seconds)) {
-            return $last['v'];
+    public static function expiredCall(string $uid, $interval_seconds, callable $fn)
+    {
+        $key = App::uid(6) . $uid;
+        $data = We7::cache_read($key);
+        if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval($data['time']) < $interval_seconds)) {
+            return $data['v'];
         }
 
         try {
@@ -560,10 +557,21 @@ include './index.php';
         }
     }
 
-    public static function cachedCallUtil($expired, callable $fn, ...$params)
+    /**
+     * 缓存指定函数的调用结果，指定时间内不再重复调用
+     * @param $interval_seconds
+     * @param callable $fn
+     * @param mixed ...$params 用来区分同一个函数应用了不同的参数的情况
+     * @return mixed
+     */
+    public static function cachedCall($interval_seconds, callable $fn, ...$params)
     {
-        $key = App::uid(6) . 'expired' . hashFN($fn, ...$params);
+        return self::expiredCall('delay' . hashFN($fn, ...$params), $interval_seconds, $fn);
+    }
 
+    public static function expiredCallUtil($uid, $expired, $fn)
+    {
+        $key = App::uid(6) . $uid;
         $data = We7::cache_read($key);
         if ($data && is_array($data) && time() <= intval($data['time'])) {
             return $data['v'];
@@ -580,7 +588,12 @@ include './index.php';
             return $result;
         } catch (Exception $e) {
             return err($e->getMessage());
-        }
+        }        
+    }
+
+    public static function cachedCallUtil($expired, callable $fn, ...$params)
+    {
+        return self::expiredCallUtil('expired' . hashFN($fn, ...$params), $expired, $fn);
     }
 
     public static function isAssigned($data, deviceModelObj $device): bool

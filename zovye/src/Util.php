@@ -427,6 +427,8 @@ class Util
                 });
             }
 
+            $log_filename = self::logFileName($name);
+
             ob_start();
 
             echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
@@ -434,8 +436,6 @@ class Util
             print_r($data);
 
             echo PHP_EOL;
-
-            $log_filename = self::logFileName($name);
 
             self::$log_cache[$log_filename][] = ob_get_clean();
         }

@@ -20,7 +20,6 @@ use zovye\request;
 use zovye\WxPlatform;
 use function zovye\err;
 use function zovye\error;
-use function zovye\request;
 use function zovye\is_error;
 use zovye\model\agentModelObj;
 use function zovye\toCamelCase;
@@ -164,7 +163,7 @@ class mp
 
             $assign_data = [$account];
 
-            if (request('all')) {
+            if (request::bool('all')) {
                 $assign_data[] = $user->isAgent() ? $user : $user->getPartnerAgent();
             } else {
                 foreach ($devices as $id) {

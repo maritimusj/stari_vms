@@ -40,27 +40,18 @@ if ($op == 'signIn') {
         JSON::fail('请稍后再试！');
     }
 
-    if ($user->getBalance()->log()->where([
-            'src' => Balance::SIGN_IN_BONUS,
-            'createtime >=' => strtotime('today 00:00'),
-            'createtime <' => strtotime('next day 00:00'),
-        ])->count() > 0) {
+    if ($user->isSigned()) {
         JSON::fail('已经签到了！');
     }
 
-    $res = $user->getBalance()->change($bonus['val'], Balance::SIGN_IN_BONUS, [
-        'date' => date('Y-m-d'),
-        'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-        'ip' => $user->getLastActiveData('ip') ?: Util::getClientIp(),
-    ]);
-
+    $res = $user->signIn($bonus['val']);
     if (empty($res)) {
         JSON::fail('签到失败！');
     }
-
+    
     JSON::success([
         'balance' => $user->getBalance()->total(),
-        'bonus' => $res->getXVal(),
+        'bonus' => $bonus['val'],
     ]);
 
 } elseif ($op == 'account') {

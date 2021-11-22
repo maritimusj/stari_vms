@@ -610,6 +610,15 @@ JSCODE;
             }
         }
 
+        if (App::isBalanceEnabled()) {
+            $bonus_url = Util::murl('bonus');
+            $tpl['js']['code'] .= <<<JSCODE
+\r\nzovye_fn.redirectToBonusPage = function() {
+    window.location.href = "$bonus_url";
+}
+JSCODE;
+        }
+
         $tpl['js']['code'] .= "\r\n</script>";
 
         if (App::isSQMPayEnabled()) {
@@ -1160,7 +1169,7 @@ JSCODE;
 JSCODE;
         }
         $tpl_data['js']['code'] .= <<<JSCODE
-</script>
+\r\n</script>
 JSCODE;
 
         $this->showTemplate(Theme::file('balance'), ['tpl' => $tpl_data]);
@@ -1214,20 +1223,27 @@ JSCODE;
             }
         })           
     }
-    zovye_fn.signIn = function() {
-        return $.getJSON(zovye_fn.api_url, {op: 'signIn'});
-    }
     zovye_fn.getAccounts = function(type, max) {
         return $.getJSON(zovye_fn.api_url, {op: 'account', type, max});
     }
     zovye_fn.play = function(uid, seconds, cb) {
-        $.get($account_url, {op: 'play', uid, seconds}).then(function(res){
+        $.get("$account_url", {op: 'play', uid, seconds}).then(function(res){
             if (cb) cb(res);
         })
     }
-</script>
 JSCODE;
+    
+    if (!$user->isSigned()) {
+        $tpl_data['js']['code'] .= <<<JSCODE
+    \r\nzovye_fn.signIn = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'signIn'});
+    }    
+JSCODE;
+    }
 
+$tpl_data['js']['code'] .= <<<JSCODE
+\r\n</script>
+JSCODE;
         $this->showTemplate(Theme::file('bonus'), ['tpl' => $tpl_data]);
     }
 

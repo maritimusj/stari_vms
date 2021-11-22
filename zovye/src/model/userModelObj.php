@@ -7,6 +7,7 @@
 
 namespace zovye\model;
 
+use DateTime;
 use zovye\Balance;
 use zovye\Locker;
 use zovye\Pay;
@@ -524,6 +525,34 @@ class userModelObj extends modelObj
     public function getBalance(): Balance
     {
         return new Balance($this);
+    }
+
+    public function isSigned(): bool
+    {
+        return Util::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function() {
+            if ($this->getBalance()->log()->where([
+                'src' => Balance::SIGN_IN_BONUS,
+                'createtime >=' => strtotime('today 00:00'),
+                'createtime <' => strtotime('next day 00:00'),
+            ])->count() > 0) {
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public function signIn($val)
+    {
+        $res = $this->getBalance()->change($val, Balance::SIGN_IN_BONUS, [
+            'date' => date('Y-m-d'),
+            'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+            'ip' => $this->getLastActiveData('ip') ?: Util::getClientIp(),
+        ]);
+        if (empty($res)) {
+            return false;
+        }
+        Util::expire("daily:sign_in:{$this->getId()}");
+        return true;
     }
 
     /**

@@ -518,7 +518,7 @@ class Account extends State
             }
         }
 
-        return $result;
+        return $shuffle_accounts($result);
     }
 
     /**

@@ -874,7 +874,7 @@ class agent
 
         $target = agent::getUserByGUID(request('guid'));
         if (empty($target)) {
-            return error(State::ERROR, '找不到这个用户！');
+            return error(State::ERROR, '用户不存在！');
         }
 
         $device_ids = [];
@@ -1218,7 +1218,7 @@ class agent
         } else {
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
-                return error(State::ERROR, '找不到这个用户！');
+                return error(State::ERROR, '用户不存在！');
             } else {
                 $query->where(['superior_id' => $res->getAgentId()]);
             }
@@ -1292,7 +1292,7 @@ class agent
 
         $res = agent::getUserByGUID($guid);
         if (empty($res)) {
-            return error(State::ERROR, '找不到这个用户！');
+            return error(State::ERROR, '用户不存在！');
         }
 
         $name = request::trim('name');
@@ -1606,7 +1606,7 @@ class agent
 
         $user = User::findONe(['mobile' => $mobile]);
         if (empty($user)) {
-            return error(State::ERROR, '找不到这个用户！');
+            return error(State::ERROR, '用户不存在！');
         }
 
         if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {

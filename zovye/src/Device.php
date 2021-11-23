@@ -471,10 +471,10 @@ class Device extends State
 
     /**
      * 根据指定条件查找设备，可以传入id,imei或者影子ID
-     * @deprecated
      * @param $cond
      * @param null $hints
      * @return deviceModelObj|null
+     * @deprecated
      */
     public static function find($cond, $hints = null): ?deviceModelObj
     {
@@ -717,6 +717,7 @@ class Device extends State
             LOG_GOODS_VOUCHER => '取货',
             LOG_GOODS_ADVS => '广告',
             LOG_GOODS_RETRY => '重试',
+            LOG_GOODS_BALANCE => '积分',
         ];
         if (isset($titles[$type])) {
             return $titles[$type];

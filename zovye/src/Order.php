@@ -49,7 +49,7 @@ class Order extends State
     const SQM = 2;
     const ALI_TICKET = 3;
     const VOUCHER = 10;
-
+    const BALANCE = 20;
     /**
      * @param mixed $condition
      * @return ModelObjFinderProxy
@@ -94,7 +94,7 @@ class Order extends State
 
     public static function makeUID(userModelObj $user, deviceModelObj $device, $nonce = ''): string
     {
-        return substr("U{$user->getId()}D{$device->getId()}{$nonce}" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
+        return substr("U{$user->getId()}D{$device->getId()}$nonce" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
     /**

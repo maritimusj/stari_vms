@@ -42,6 +42,7 @@ define('LOG_GOODS_GETX', 113);
 define('LOG_GOODS_VOUCHER', 114);
 define('LOG_GOODS_ADVS', 115);
 define('LOG_GOODS_RETRY', 116);
+define('LOG_GOODS_BALANCE', 117);
 
 define('DEFAULT_PAGESIZE', 20);
 define('DEFAULT_DEVICE_CAPACITY', 10);

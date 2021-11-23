@@ -20,7 +20,7 @@ class Balance
     const SIGN_IN_BONUS = 2; // 每日签到
     const VIDEO_BONUS = 3; // 观看视频
     const WX_APP_BONUS = 4; // 关注微信小程序
-
+    const GOODS_EXCHANGE = 5; // 商品兑换
 
     private $user;
 
@@ -39,9 +39,14 @@ class Balance
         return m('balance')->where(We7::uniacid([]))->where($condition);
     }
 
-    public static function findOne($condition = []): ?commission_balanceModelObj
+    public static function findOne($condition = []): ?balanceModelObj
     {
         return self::query($condition)->findOne();
+    }
+
+    public static function get($id): ?balanceModelObj
+    {
+        return self::findOne(['id' => $id]);
     }
 
     /**

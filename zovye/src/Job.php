@@ -6,8 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\balanceModelObj;
 use zovye\model\deviceModelObj;
-use zovye\model\goodsModelObj;
 use zovye\model\userModelObj;
 
 class Job
@@ -52,14 +52,10 @@ class Job
         return CtrlServ::scheduleJob('device_online', ['id' => $device->getId(), 'event' => $msg]);
     }
 
-    public static function createBalanceOrder($order_no, $user, $device, $goods): bool
+    public static function createBalanceOrder(balanceModelObj $balance): bool
     {
         return CtrlServ::scheduleJob('create_order_balance', [
-            'orderNO' => $order_no,
-            'user' => $user instanceof userModelObj ? $user->getId() : $user,
-            'device' => $device instanceof deviceModelObj ? $device->getId() : $device,
-            'goods' => $goods instanceof goodsModelObj ? $goods->getId() : $goods,
-
+            'balance' => $balance->getId(),
         ], LEVEL_HIGH);
     }
 

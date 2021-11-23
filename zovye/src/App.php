@@ -366,10 +366,9 @@ class App
     public static function orderMaxGoodsNum(): int
     {
         return onceCall(function() {
-            return intval(settings('order.goods.maxNum')) ?: 100;
+            return intval(settings('order.goods.maxNum')) ?: 10;
         });
     }
-
 
     public static function imageProxyURL(): string
     {

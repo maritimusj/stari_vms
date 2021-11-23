@@ -619,9 +619,25 @@ JSCODE;
 
         if (App::isBalanceEnabled()) {
             $bonus_url = Util::murl('bonus');
+            $user_data = [
+                'status' => true,
+                'data' => $user->profile(),
+            ];
+            $user_data['data']['balance'] = $user->getBalance()->total();
+            $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
             $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.redirectToBonusPage = function() {
     window.location.href = "$bonus_url";
+}
+zovye_fn.user = JSON.parse(`$user_json_str`);
+zovye_fn.getUserInfo = function (cb) {
+    if (typeof cb === 'function') {
+        return cb(zovye_fn.user)
+    }
+    return new Promise((resolve, reject) => {
+        resolve(zovye_fn.user);
+    });
 }
 JSCODE;
         }

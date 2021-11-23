@@ -165,6 +165,20 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_commission_balance` (
   KEY `src` (`src`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS `ims_zy_saas_balance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uniacid` int(11) DEFAULT NULL,
+  `openid` varchar(128) NOT NULL,
+  `src` tinyint(4) DEFAULT NULL,
+  `x_val` int(11) NOT NULL,
+  `extra` text,
+  `createtime` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `openid` (`openid`,`uniacid`),
+  KEY `createtime` (`createtime`),
+  KEY `src` (`src`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `ims_zy_saas_component_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,

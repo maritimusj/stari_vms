@@ -22,7 +22,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name . '_balance_logs', 'extra')) {
+if (!We7::pdo_tableexists($tb_name . '_balance_logs')) {
 $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_balance_logs` (
     `id` INT NOT NULL AUTO_INCREMENT ,

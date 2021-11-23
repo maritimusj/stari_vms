@@ -76,4 +76,39 @@ if ($op == 'signIn') {
 
     JSON::success($result);
 
-}
+} elseif ($op == 'exchange') {
+
+    if (App::isBalanceEnabled()) {
+         JSON::fail('这个功能没有启用！');
+    }
+    
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('用户无法使用该功能！');
+    }
+
+    $device_uid = request::str('device');
+    $device = Device::get($device_uid, true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $goods_id = request::int('goods');
+
+    $goods = $device->getGoods($goods_id);
+    if (empty($goods) || empty($goods['balance'])) {
+        JSON::fail('无法兑换这个商品，请联系管理员！');
+    }
+
+    $total = min(App::orderMaxGoodsNum(), max(request::int('num'), 1));
+
+    if ($goods['num'] < $total) {
+        JSON::fail('对不起，商品数量不足！');
+    }
+
+    $result = Job::createBalanceOrder('', $user, $device, $goods['id']);
+    if ($result) {
+        JSON::success('请稍后，正在出货中！');
+    }
+    JSON::success('失败，请稍后再试！');
+}   

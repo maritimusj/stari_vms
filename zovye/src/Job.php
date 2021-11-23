@@ -7,6 +7,7 @@
 namespace zovye;
 
 use zovye\model\deviceModelObj;
+use zovye\model\goodsModelObj;
 use zovye\model\userModelObj;
 
 class Job
@@ -49,6 +50,17 @@ class Job
     public static function deviceOnlineNotify(deviceModelObj $device, $msg = '上线'): bool
     {
         return CtrlServ::scheduleJob('device_online', ['id' => $device->getId(), 'event' => $msg]);
+    }
+
+    public static function createBalanceOrder($order_no, $user, $device, $goods): bool
+    {
+        return CtrlServ::scheduleJob('create_order_balance', [
+            'orderNO' => $order_no,
+            'user' => $user instanceof userModelObj ? $user->getId() : $user,
+            'device' => $device instanceof deviceModelObj ? $device->getId() : $device,
+            'goods' => $goods instanceof goodsModelObj ? $goods->getId() : $goods,
+
+        ], LEVEL_HIGH);
     }
 
     /**

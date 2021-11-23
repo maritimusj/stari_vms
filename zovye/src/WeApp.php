@@ -1111,9 +1111,16 @@ JSCODE;
         $account_data['data']['bonus'] = $account->getBalancePrice();
         $account_json_str = json_encode($account_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
+        $js_sdk = Util::fetchJSSDK();
+
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
+$js_sdk
 <script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+
     const zovye_fn = {
         api_url: "$api_url",
         user: JSON.parse(`$user_json_str`),

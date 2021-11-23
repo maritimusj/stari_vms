@@ -2605,7 +2605,7 @@ class deviceModelObj extends modelObj
                     if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
                         continue;
                     }
-                    if ($params['balance'] && !empty($goods_data['balance'])) {
+                    if ((!empty($params['balance']) || in_array('balance', $params)) && empty($goods_data['balance'])) {
                         continue;
                     }
                 }
@@ -2622,6 +2622,9 @@ class deviceModelObj extends modelObj
                     if ($result['goods'][$key]['price'] < $goods_data['price']) {
                         $result['goods'][$key]['price'] = $goods_data['price'];
                         $result['goods'][$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
+                        if ($goods_data['balance']) {
+                            $result['goods'][$key]['balance'] = $goods_data['balance'];
+                        }
                     }
                 } else {
                     $result['goods'][$key] = [
@@ -2635,6 +2638,10 @@ class deviceModelObj extends modelObj
                         'allowFree' => $goods_data['allowFree'],
                         'allowPay' => $goods_data['allowPay'],
                     ];
+                    
+                    if ($goods_data['balance']) {
+                        $result['goods'][$key]['balance'] = $goods_data['balance'];
+                    }
 
                     if (!empty($user)) {
                         $discount = User::getUserDiscount($user, $goods_data);

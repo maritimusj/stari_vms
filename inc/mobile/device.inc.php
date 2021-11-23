@@ -515,6 +515,13 @@ if ($op == 'default') {
         JSON::fail('找不到用户！');
     }
 
-    $result = $device->getGoodsAndPackages($user, ['allowPay']);
+    $type = request::str('type'); //free or pay or balance
+
+    if ($type == 'balance') {
+        $result =  $device->getGoodsList($user, ['balance']);
+    } else {
+        $result = $device->getGoodsAndPackages($user, ['allowPay']);
+    }
+
     JSON::success($result);
 }

@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
@@ -90,6 +91,7 @@ if ($op == 'default') {
         }
 
         $result = Balance::give($user, $account);
+
         if (is_error($result)) {
             JSON::fail($result);
         }
@@ -101,7 +103,7 @@ if ($op == 'default') {
     }
 
     $ticket_data = [
-        'id' => Util::random(16),
+        'id' => request::str('serial'),
         'time' => time(),
         'deviceId' => $device->getId(),
         'shadowId' => $device->getShadowId(),

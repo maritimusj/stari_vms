@@ -2605,6 +2605,9 @@ class deviceModelObj extends modelObj
                     if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
                         continue;
                     }
+                    if ($params['balance'] && !empty($goods_data['balance'])) {
+                        continue;
+                    }
                 }
 
                 $goods_data['num'] = $entry['num'];

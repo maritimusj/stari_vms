@@ -368,7 +368,7 @@ JSCODE;
         }
 
         //如果设置必须关注公众号以后才能购买商品
-        $goods_lis_FN = false;
+        $goods_list_FN = false;
         if (Helper::MustFollowAccount($device)) {
             if ($tpl['from'] != 'account') {
                 if (empty($tpl['accounts'])) {
@@ -378,11 +378,11 @@ JSCODE;
                     }
                 }
             } else {
-                $goods_lis_FN = true;
+                $goods_list_FN = true;
                 $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
             }
         } else {
-            $goods_lis_FN = true;
+            $goods_list_FN = true;
             $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
         }
 
@@ -539,10 +539,17 @@ JSCODE;
         })
     }
 JSCODE;
-        if ($goods_lis_FN) {
+        if ($goods_list_FN) {
             $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.getGoodsList = function(cb) {
-$.get("$device_api_url", {op: 'goods'}).then(function(res) {
+$.get("$device_api_url", {op: 'goods', type:'pay'}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+zovye_fn.getBalanceGoodsList = function(cb) {
+    $.get("$device_api_url", {op: 'goods', type:'balance'}).then(function(res) {
         if (typeof cb === 'function') {
             cb(res);
         }
@@ -1191,9 +1198,16 @@ JSCODE;
         $adv_api_url = Util::murl('adv');
         $jquery_url = JS_JQUERY_URL;
 
+        $js_sdk = Util::fetchJSSDK();
+
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
+$js_sdk
 <script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+
     const zovye_fn = {
         api_url: "$api_url",
         user: JSON.parse(`$user_json_str`),

@@ -169,11 +169,28 @@ REFUND;
 
         } elseif ($entry->getSrc() == Balance::ACCOUNT_BONUS) {
             $account_data = $entry->getExtraData('account');
-            $account_info = "<dt>公众号</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
+            $account_typeifno = [
+                Account::NORMAL => ['公众号', '成功关注公众号'], 
+                Account::VIDEO => ['视频', '完成观看视频任务'],
+                Account::DOUYIN => ['抖音', '完成关注抖音号任务'],
+                Account::WXAPP => ['小程序', '完成进入小程序任务'],
+                Account::AUTH => ['公众号', '关注公众号'],
+                Account::JFB => ['准粉吧', '完成关准粉吧任务'],
+                Account::MOSCALE => ['公锤', '完成公锤任务'],
+                Account::YUNFENBA => ['云粉吧', '完成云粉吧任务'],
+                Account::AQIINFO => ['阿旗', '完成阿旗数据平台任务'],
+                Account::ZJBAO => ['纸巾宝', '完成纸巾宝任务'],
+                Account::MEIPA => ['美葩', '完成美葩任务'],
+                Account::KINGFANS => ['金粉吧', '完成金粉吧任务'],
+                Account::SNTO => ['史莱姆', '完成史莱姆任务'],
+                Account::YFB => ['粉丝宝', '完成粉丝宝任务'],
+            ][$account_data['type']] ?? ['公众号', '成功关注公众号'];
+
+            $account_info = "<dt>{$account_typeifno[0]}</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">关注公众号</dd>
+<dd class="event">{$account_typeifno[1]}</dd>
 $account_info
 </dl>
 REFUND;
@@ -194,7 +211,7 @@ REFUND;
 
     public static function give(userModelObj $user, accountModelObj $account, $reason = '')
     {
-        if ($user->acquireLocker("balance:give")) {
+        if (!$user->acquireLocker("balance:give")) {
             return err('无法锁定用户！');
         }
 

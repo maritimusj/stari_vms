@@ -1,6 +1,7 @@
 const app = new Vue({
     el: '#app',
     data: {
+        userInfo: null,
         imei: initData.imei,
         max: initData.max || 1,
         wechat: {
@@ -9,12 +10,25 @@ const app = new Vue({
             visible: false
         },
         slides: [],
-        tabbar: initData.tabbar,
-        group: [],
-        accounts: [],
-        packages: [],
-        goods: [],
+        groups: [],
         sales: [],
+        free: {
+            accounts: [],
+            desc: '',
+            visible: false
+        },
+        pay: {
+            packages: [],
+            goods: [],
+            desc: '',
+            visible: false,
+            loading: false
+        },
+        balance: {
+            goods: [],
+            visible: false,
+            loading: false
+        },
         toast: {
             text: '',
             visible: false,
@@ -38,12 +52,7 @@ const app = new Vue({
         saveUserProfile: false,
         isHidden: null,
         wechatState: null,
-        timeout: null,
-        loading: false
-    },
-    mounted() {
-        this.getSlideList();
-        this.getAccountList();
+        timeout: null
     },
     created() {
         this.visibilitychange();
@@ -70,7 +79,7 @@ const app = new Vue({
             }
         });
         zovye_fn.getAdvs(9, 10, (data) => {
-            this.group = data;
+            this.groups = data;
         });
         zovye_fn.getAdvs('passwd', 1, (data) => {
             if (data.length > 0) {
@@ -80,6 +89,13 @@ const app = new Vue({
                 };                
             }
         })
+    },
+    mounted() {
+        this.getUserInfo();
+        this.getSlideList();
+        this.getAccountList();
+        this.getGoodsList();
+        this.getBalanceGoodsList();
     },
     methods: {
         judgeWechat(){
@@ -103,6 +119,13 @@ const app = new Vue({
                 }
             });
         },
+        getUserInfo() {
+            zovye_fn.getUserInfo().then(res => {
+                if(res.status) {
+                    this.userInfo = res.data;
+                }
+            })
+        },
         getSlideList() {
             zovye_fn.getAdvs(4, 10, (data) => {
                 let array = [];
@@ -113,36 +136,47 @@ const app = new Vue({
                             url: e.data.link,
                             id: e.id
                         };
-                        array.push(obj)
+                        array.push(obj);
                     })
                 });
                 this.slides = array;
-                Vue.nextTick(() => {
+                this.$nextTick(() => {
                     new Swiper('#adv-swiper-container', {
                         autoplay: {
                             delay: 3000,
                             disableOnInteraction: false
-                        }
+                        },
+						pagination: {
+							el: '.swiper-pagination'
+						}
                     });
-                })
+                });
             });
         },
+        slideClick(item) {
+            if (item.url) {
+                window.location.href = item.url;
+            }
+        },
         getAccountList() {
-            this.loading = true;
             zovye_fn.getAccounts([], res => {
-                this.accounts = res.data
-                if (this.wechatState === false && this.accounts.findIndex(e => e.username) !== -1) {
-                    alert('当前微信版本过低，建议升级微信后再试！')
+                this.free.accounts = res.data
+                if (this.free.accounts.length > 0) {
+                    this.free.desc = '还有' + this.free.accounts.length + '个未领取';
+                } else {
+                    this.free.desc = '暂时无法领取';
                 }
-                Vue.nextTick(() => {
+                if (this.wechatState === false && this.free.accounts.findIndex(e => e.username) !== -1) {
+                    alert('当前微信版本过低，建议升级微信后再试！');
+                }
+                this.$nextTick(() => {
                     new Swiper('#account-swiper-container', {
                         effect: 'cards'
                     });
-                })
-                this.getGoodsList()
-                this.wechatState && this.accounts.forEach(account => {
+                });
+                this.wechatState && this.free.accounts.forEach(account => {
                     if(account.username) {
-                        Vue.nextTick(() => {
+                        this.$nextTick(() => {
                             var btn = document.getElementById(account.uid);
                             btn.addEventListener('launch', (e) => {
                                 if(this.timeout) {
@@ -165,32 +199,142 @@ const app = new Vue({
         },
         getGoodsList() {
             zovye_fn.getGoodsList((res) => {
-                this.loading = false;
                 if(res.status) {
                     const data = res.data;
                     if(data.goods) {
-                        this.goods = data.goods.map(e => {
+                        this.pay.goods = data.goods.map(e => {
                             e.count = 1;
                             return e;
                         });
                     }
-                    this.packages = data.packages || [];
-                }
-                if (this.accounts.length === 0 && (this.goods.length > 0 || this.packages.length > 0)) {
-                    this.tabbar.currentValue = 'buy';
+                    this.pay.packages = data.packages || [];
+                    if(this.pay.packages.length === 0 && this.pay.goods.length === 0) {
+                        this.pay.desc = '暂时无法购买';
+                    } else {
+                        let desc = '可购买';
+                        this.pay.packages.forEach(e => {
+                            desc = desc + e.title + '、';
+                        });
+                        this.pay.goods.forEach(e => {
+                            desc = desc + e.name + '、';
+                        });
+                        this.pay.desc = desc.substr(0, desc.length - 1);
+                    }
                 }
             })
         },
-        slideClick(item) {
-            if (item.url) {
-                window.location.href = item.url;
+        getBalanceGoodsList() {
+            zovye_fn.getBalanceGoodsList(res => {
+                if(res.status) {
+                    this.balance.goods = res.data.map(e => {
+                        e.count = 1;
+                        return e;
+                    })
+                }
+            })
+        },
+        freeClick() {
+            if (this.free.accounts.length > 0) {
+                this.free.visible = true;
+            } else {
+                this.showToast('暂时无法领取');
             }
         },
-        feedbackClick() {
-            zovye_fn.redirectToFeedBack();
+        payClick() {
+            if (this.pay.packages.length > 0 || this.pay.goods.length > 0) {
+                this.pay.visible = true;
+            } else {
+                this.showToast('暂时无法购买');
+            }
         },
-        groupClick(item) {
-            window.location.href = item.data.url;
+        balanceClick() {
+            if (this.balance.goods.length > 0) {
+                this.balance.visible = true;
+            } else {
+                this.showToast('暂时无法购买');
+            }
+        },
+        missionClick() {
+            if(zovye_fn.redirectToBonusPage && typeof zovye_fn.redirectToBonusPage === 'function') {
+                zovye_fn.redirectToBonusPage();
+            } else {
+                this.showToast('该功能未开启');
+            }
+        },
+        minusClick(item, type) {
+            if (item.num === 0) {
+                this.showToast(type === 'goods' ? '商品已售罄' : '商品已兑完');
+            } else {
+                if (item.count > 1) {
+                    item.count--;
+                } else {
+                    this.showToast('不能再减啦');
+                }
+            }
+        },
+        plusClick(item, type) {
+            if (item.num === 0) {
+                this.showToast(type === 'goods' ? '商品已售罄' : '商品已兑完');
+            } else {
+                if (item.count < item.num && item.count < this.max) {
+                    item.count++;
+                } else {
+                    this.showToast('不能再加啦');
+                }
+            }
+        },
+        buyPackageClick(item) {
+            if (!this.pay.loading) {
+                this.pay.loading = true;
+                zovye_fn.package_pay(item.id).then(() => {
+                    this.pay.loading = false;
+                }).catch(() => {
+                    this.pay.loading = false;
+                });
+            }
+        },
+        buyClick(item) {
+            if (item.num === 0) {
+                this.showToast('商品已售罄');
+            } else if (!this.pay.loading) {
+                this.pay.loading = true;
+                const data = {
+                    goodsID: item.id,
+                    total: item.count
+                }
+                zovye_fn.goods_wxpay(data).then(() => {
+                    this.pay.loading = false;
+                }).catch(() => {
+                    this.pay.loading = false;
+                });
+            }
+        },
+        exchangeClick(item) {
+            if (item.num === 0) {
+                this.showToast('商品已兑完');
+            } else if (!this.balance.loading) {
+                // this.balance.loading = true;
+                // const data = {
+                //     goodsID: item.id,
+                //     total: item.count
+                // }
+                // zovye_fn.goods_wxpay(data).then(() => {
+                //     this.balance.loading = false;
+                // }).catch(() => {
+                //     this.balance.loading = false;
+                // });
+            }
+        },
+        showToast(text) {
+            if (this.toast.visible) {
+                clearTimeout(this.toast.timeout);
+                this.toast.timeout = null;
+            }
+            this.toast.text = text;
+            this.toast.visible = true;
+            this.toast.timeout = setTimeout(() => {
+                this.toast.visible = false;
+            }, 2000);
         },
         playClick(item) {
             const that = this;
@@ -243,62 +387,18 @@ const app = new Vue({
                 }
             });
         },
-        minusClick(item) {
-            if (item.num === 0) {
-                this.showToast('商品已售罄');
-            } else {
-                if (item.count > 1) {
-                    item.count--;
-                } else {
-                    this.showToast('不能再减啦')
-                }
-            }
+        orderClick() {
+            zovye_fn.redirectToOrder();
         },
-        plusClick(item) {
-            if (item.num === 0) {
-                this.showToast('商品已售罄');
-            } else {
-                if (item.count < item.num && item.count < this.max) {
-                    item.count++;
-                } else {
-                    this.showToast('不能再加啦')
-                }
-            }
+        feedbackClick() {
+            zovye_fn.redirectToFeedBack();
         },
-        tabClick(index) {
-            this.tabbar.currentValue = this.tabbar.list[index].value;
-            if (index === 2) {
-                zovye_fn.redirectToOrder();
-            }
+        groupClick(item) {
+            window.location.href = item.data.url;
         },
-        showToast(text) {
-            if (this.toast.visible) {
-                clearTimeout(this.toast.timeout);
-                this.toast.timeout = null;
-            }
-            this.toast.text = text;
-            this.toast.visible = true;
-            this.toast.timeout = setTimeout(() => {
-                this.toast.visible = false
-            }, 2000)
-        },
-        buyPackageClick(item) {
-            zovye_fn.package_pay(item.id);
-        },
-        buyClick(item) {
-            if (item.num === 0) {
-                this.showToast('商品已售罄');
-            } else if (!this.loading) {
-                this.loading = true;
-                const data = {
-                    goodsID: item.id,
-                    total: item.count
-                }
-                zovye_fn.goods_wxpay(data).then(() => {
-                    this.loading = false;
-                }).catch(() => {
-                    this.loading = false;
-                });
+        saleClick(item) {
+            if (item.data.url) {
+                window.location.href = item.data.url;
             }
         },
         onCopy() {
@@ -309,11 +409,6 @@ const app = new Vue({
         },
         retryClick() {
             zovye_fn.closeWindow && zovye_fn.closeWindow();
-        },
-        saleClick(item) {
-            if (item.data.url) {
-                window.location.href = item.data.url;
-            }
         },
         sexClick(value) {
             zovye_fn.saveUserProfile({sex : value});

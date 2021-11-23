@@ -416,8 +416,8 @@
 				<span @click="closeVideo">关闭</span>
 			</div>
 		</div>
-		<div class="mask" v-if="follow.visible">
-			<div class="follow-card">
+		<div class="mask" v-if="follow.visible" @click="follow.visible = false">
+			<div class="follow-card" @click.stop>
 				<div class="header">
 					<img class="avatar" :src="follow.data.img">
 					<span>{{follow.data.title}}</span>

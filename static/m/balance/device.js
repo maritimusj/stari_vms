@@ -14,13 +14,13 @@ const app = new Vue({
         sales: [],
         free: {
             accounts: [],
-            desc: '',
+            desc: 'Loading...',
             visible: false
         },
         pay: {
             packages: [],
             goods: [],
-            desc: '',
+            desc: 'Loading...',
             visible: false,
             loading: false
         },
@@ -313,16 +313,16 @@ const app = new Vue({
             if (item.num === 0) {
                 this.showToast('商品已兑完');
             } else if (!this.balance.loading) {
-                // this.balance.loading = true;
-                // const data = {
-                //     goodsID: item.id,
-                //     total: item.count
-                // }
-                // zovye_fn.goods_wxpay(data).then(() => {
-                //     this.balance.loading = false;
-                // }).catch(() => {
-                //     this.balance.loading = false;
-                // });
+                this.balance.loading = true;
+                zovye_fn.balancePay(item.id, item.count).then(res => {
+                    console.log(res)
+                    this.balance.loading = false;
+                    if (res.status) {
+                        
+                    } else {
+                        this.showToast(res.data.msg);
+                    }
+                });
             }
         },
         showToast(text) {

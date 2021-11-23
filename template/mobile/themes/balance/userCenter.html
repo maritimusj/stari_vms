@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>个人中心</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
+    <style type="text/css">
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #f8f8f8;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #101010;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: calc(54px + constant(safe-area-inset-bottom));
+            padding-bottom: calc(54px + env(safe-area-inset-bottom));
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .tabbar {
+            width: 100%;
+            height: 44px;
+            background-color: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            flex-direction: row;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -1px 5px #eee;
+            z-index: 99;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-item img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .tab-item span {
+            font-size: 12px;
+            margin-top: 2px;
+            color: #9d9d9d;
+        }
+
+        .tab-item .selected {
+            color: #FA639B;
+        }
+
+        .userinfo {
+            width: 100%;
+            height: 200px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #888;
+        }
+
+        .nickname {
+            font-size: 20px;
+            font-weight: bolder;
+            margin-top: 10px;
+            text-shadow: 2px 2px 5px #ccc;
+        }
+
+        .bonus {
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .menu {
+            width: calc(100% - 40px);
+            padding: 20px;
+            background-color: white;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .clickable:active {
+            background-color: #eee;
+        }
+
+        .menu .icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        .menu .title {
+            margin: 0 20px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .arrow {
+            width: 15px;
+            height: 15px;
+        }
+
+        .menu .desc {
+            color: #9d9d9d;
+            margin-right: 10px;
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="userinfo">
+            <img class="avatar" :src="userinfo.avatar">
+            <span class="nickname">{{userinfo.nickname}}</span>
+            <span class="bonus">当前积分：{{userinfo.bonus}}</span>
+        </div>
+        <div class="menu clickable" style="margin-top: 10px;">
+            <img class="icon" src="img/coin_icon.svg">
+            <span class="title">积分记录</span>
+            <img class="arrow" src="img/arrow.svg">
+        </div>
+        <div class="menu clickable" style="margin-top: 1px;">
+            <img class="icon" src="img/order_icon.svg">
+            <span class="title">订单记录</span>
+            <img class="arrow" src="img/arrow.svg">
+        </div>
+        <div class="menu clickable" style="margin-top: 10px;">
+            <img class="icon" src="img/mobile_icon.svg">
+            <span class="title">手机号</span>
+            <span class="desc">未绑定</span>
+            <img class="arrow" src="img/arrow.svg">
+        </div>
+        <div class="menu clickable" style="margin-top: 1px;">
+            <img class="icon" src="img/wxapp_icon2.svg">
+            <span class="title">小程序</span>
+            <span class="desc">未关联</span>
+            <img class="arrow" src="img/arrow.svg">
+        </div>
+        <div class="tabbar">
+            <div class="tab-item" @click="jumpToMission">
+                <img src="img/mission_icon.svg">
+                <span>任务大厅</span>
+            </div>
+            <div class="tab-item">
+                <img src="img/profile_icon_se.svg">
+                <span class="selected">个人中心</span>
+            </div>
+        </div>
+        <div class="mask"></div>
+    </div>
+    {$tpl['js']['code']}
+	{php \zovye\url(true, JS_VUE_URL);}
+    <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
+    <script type="text/javascript">
+        new Vue({
+            el: '#app',
+            data: {
+                userinfo: {
+                    avatar: 'https://img2.baidu.com/it/u=2285567582,1185119578&fm=26&fmt=auto',
+                    nickname: '我是小熊维尼',
+                    bonus: 20
+                }
+            },
+            mounted() {
+
+            },
+            created() {
+
+            },
+            methods: {
+                jumpToMission() {
+                    window.location.replace('mission.html')
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

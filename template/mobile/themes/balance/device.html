@@ -216,7 +216,7 @@
 				</div>
 				<div class="goods-row">
 					<div class="goods-price-view">
-						<span class="price">消耗：{{item.balance * item.count}}积分</span>
+						<span class="price">{{item.balance * item.count}}积分</span>
 						<div class="goods-row" style="margin-top: 5px;">
 							<img class="circle-btn" style="margin-right: 10px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
 								@click="minusClick(item, 'balance')">
@@ -289,7 +289,7 @@
 			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
 		};
 </script>
-{php \zovye\url(true, 'static/m/balance/device.js?v=2021112313111111');}
+{php \zovye\url(true, 'static/m/balance/device.js?v=202111231419111111');}
 <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>

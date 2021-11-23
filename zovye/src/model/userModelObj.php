@@ -680,7 +680,7 @@ class userModelObj extends modelObj
         return $this->updateSettings('last.active', $data);
     }
 
-    public function getLastActiveData($name = '', $default = [])
+    public function getLastActiveData($name = '', $default = null)
     {
         if (empty($name)) {
             return $this->settings('last.active', $default);

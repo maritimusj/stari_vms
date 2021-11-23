@@ -14,6 +14,7 @@ use zovye\CtrlServ;
 use zovye\Device;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
+use zovye\Helper;
 use zovye\Job;
 use zovye\model\balanceModelObj;
 use zovye\model\deviceModelObj;
@@ -132,9 +133,10 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
             $fail = 0;
             $success = 0;
             $is_pull_result_updated = false;
+            $goods['goods_id'] = $goods['id'];
 
             for ($i = 0; $i < $num; $i++) {
-                $result = pullGoods($order, $device, $user, LOG_GOODS_BALANCE, $goods);
+                $result = Helper::pullGoods($order, $device, $user, LOG_GOODS_BALANCE, $goods);
                 if (is_error($result) || !$is_pull_result_updated) {
                     $order->setResultCode($result['errno']);
                     $order->setExtraData('pull.result', $result);

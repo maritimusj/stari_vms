@@ -149,7 +149,7 @@ function process($order_no): bool
 
         foreach ($goods_list as $goods) {
             for ($i = 0; $i < $goods['num']; $i++) {
-                $result = pullGoods($order, $device, $user, $level, $goods);
+                $result = Helper::pullGoods($order, $device, $user, $level, $goods);
                 if (is_error($result) || !$is_pull_result_updated) {
                     $order->setResultCode($result['errno']);
                     $order->setExtraData('pull.result', $result);
@@ -293,86 +293,6 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
     return $order;
 }
 
-/**
- * @param orderModelObj $order
- * @param deviceModelObj $device
- * @param userModelObj $user
- * @param $level
- * @param $data
- * @return array
- */
-function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, $level, $data): array
-{
-    //todo 处理优惠券
-    //$voucher = $pay_log->getVoucher();
-
-    $goods = $device->getGoods($data['goods_id']);
-    if (empty($goods)) {
-        return err('找不到对应的商品！');
-    }
-
-    if ($goods['num'] < 1) {
-        return err('对不起，商品库存不足！');
-    }
-
-    $pull_data = preparePullData($order, $device, $user);
-
-    if ($goods['lottery']) {
-        $mcb_channel = intval($goods['lottery']['size']);
-        if ($goods['lottery']['index']) {
-            $pull_data['index'] = intval($goods['lottery']['index']);
-        }
-    } else {
-        $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
-    }
-
-    if ($mcb_channel == Device::CHANNEL_INVALID) {
-        return err('商品货道配置不正确！');
-    }
-
-    $pull_data['channel'] = $mcb_channel;
-
-    $result = $device->pull($pull_data);
-
-    //v1版本新版本返回数据包含在json的data下
-    if (is_error($result)) {
-        $device->setError($result['errno'], $result['message']);
-        $device->scheduleErrorNotifyJob($result['errno'], $result['message']);
-    } elseif (is_error($result['data'])) {
-        $device->setError($result['data']['errno'], $result['data']['message']);
-        $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
-    } else {
-        $locker = $device->payloadLockAcquire(3);
-        if (empty($locker)) {
-            return error(State::ERROR, '设备正忙，请重试！');
-        }
-        $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
-        if (is_error($res)) {
-            return err('保存库存失败！');
-        }
-        $locker->unlock();
-    }
-
-    $device->save();
-
-    $log_data = [
-        'order' => $order->getId(),
-        'result' => $result,
-        'user' => $user->profile(),
-        'goods' => $goods,
-        'price' => $data['price'],
-        'voucher' => isset($voucher) ? ['id' => $voucher->getId()] : [],
-    ];
-
-    $device->goodsLog($level, $log_data);
-
-    if (!is_error($result)) {
-        $device->updateRemain();
-    }
-
-    return $result;
-}
-
 
 function refund(string $order_no, deviceModelObj $device, string $reason)
 {
@@ -392,28 +312,4 @@ function refund(string $order_no, deviceModelObj $device, string $reason)
     } else {
         $device->appShowMessage($reason, 'error');
     }
-}
-
-function preparePullData(orderModelObj $order, deviceModelObj $device, userModelObj $user): array
-{
-    $pull_data = [
-        'online' => false,
-        'timeout' => App::deviceWaitTimeout(),
-        'userid' => $user->getOpenid(),
-        'num' => $order->getNum(),
-        'user-agent' => $order->getExtraData('from.user_agent'),
-        'ip' => $order->getExtraData('from.ip'),
-    ];
-
-    $loc = $device->settings('extra.location', []);
-    if ($loc && $loc['lng'] && $loc['lat']) {
-        $pull_data['location'] = [
-            'device' => [
-                'lng' => $loc['lng'],
-                'lat' => $loc['lat'],
-            ],
-        ];
-    }
-
-    return $pull_data;
 }

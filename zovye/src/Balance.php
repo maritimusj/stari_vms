@@ -157,8 +157,7 @@ class Balance
             $admin_info = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $memo = $entry->getExtraData('memo');
             if ($memo) {
-                $memo_info = '<dt>说明</dt>
-                <dd class="memo">$memo</dd>';
+                $memo_info = "<dt>说明</dt><dd class=\"memo\">$memo</dd>";
             } else {
                 $memo_info = '';
             }

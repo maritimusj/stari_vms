@@ -104,7 +104,7 @@
     user-select: none;
 }
 #orderlist .balance {
-    color: #3F51B5;
+    color: #ffc107;
 }
 #orderlist .tips.wxpay{
     background: #FF5722;
@@ -113,7 +113,7 @@
     background: #4CAF50;
 }
 #orderlist .tips.balancex{
-    background: #3F51B5;
+    background: #ffc107;
 }
 #orderlist [data-op] {
     cursor: pointer;

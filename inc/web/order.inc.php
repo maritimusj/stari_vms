@@ -76,10 +76,10 @@ if ($op == 'default') {
     $way = request::str('way');
     if ($way == 'free') {
         $query->where(['price' => 0, 'balance' => 0]);
-    } elseif ($way == 'fee') {
+    } elseif ($way == 'pay') {
         $query->where(['price >' => 0]);
     } elseif ($way == 'balance') {
-        $query->where(['balance >' => 0]);
+        $query->where(['src' => Order::BALANCE]);
     } elseif ($way == 'refund') {
         $query->where(['refund' => 1]);
     } elseif ($way == 'except') {
@@ -189,13 +189,15 @@ if ($op == 'default') {
 
             $data['clr'] = $accounts[$data['account']]['clr'];
         } else {
-            $data['account_title'] = 'n/a';
-            $data['clr'] = '#ccc';
+            if ($data['balance']) {
+                $data['clr'] = '#ffc107';
+            } else {
+                $data['account_title'] = 'n/a';
+                $data['clr'] = '#ccc';
+            }
 
             if ($data['refund']) {
                 $data['clr'] = '#ccc';
-            } else {
-                $data['clr'] = $data['from']['color'];
             }
         }
 

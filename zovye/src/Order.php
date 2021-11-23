@@ -595,7 +595,6 @@ class Order extends State
             'createtime' => date('Y-m-d H:i:s', $order->getCreatetime()),
             'agentId' => $order->getAgentId(),
             'from' => $userCharacter,
-
         ];
 
         if ($detail) {
@@ -677,6 +676,8 @@ class Order extends State
 
             if ($data['price'] > 0) {
                 $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
+            } elseif ($data['balance'] > 0) {
+                $data['tips'] = ['text' => '积分', 'class' => 'balanceex'];
             } else {
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }

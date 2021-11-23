@@ -12,22 +12,29 @@
     {else}
     <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
     {/if}
+    {if $s_way=='pay'}
+    <li role="presentation" class="active"><a href="#">支付</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'pay'));}">支付</a></li>
+    {/if}
     {if $s_way=='free'}
     <li role="presentation" class="active"><a href="#">免费</a></li>
     {else}
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
     {/if}
-    {if $s_way=='fee'}
-    <li role="presentation" class="active"><a href="#">支付</a></li>
-    {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'fee'));}">支付</a></li>
+    {if \zovye\App::isBalanceEnabled()}
+        {if $s_way=='balance'}
+        <li role="presentation" class="active"><a href="#">积分</a></li>
+        {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">积分</a></li>
+        {/if}
     {/if}
     {if \zovye\App::isCustomAliTicketEnabled()}
-    {if $s_way=='aliTicket'}
-    <li role="presentation" class="active"><a href="#">天猫拉新</a></li>
-    {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'aliTicket'));}">天猫拉新</a></li>
-    {/if}
+        {if $s_way=='aliTicket'}
+        <li role="presentation" class="active"><a href="#">天猫拉新</a></li>
+        {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'aliTicket'));}">天猫拉新</a></li>
+        {/if}
     {/if}
     {if \zovye\App::isSQMPayEnabled()}
     {if $s_way=='sqm'}
@@ -181,6 +188,9 @@
                         <div class="orderId">
                             {$order['orderId']}
                         </div>
+                        {elseif $order['balance'] > 0}
+                        积分兑换：<span class="balance">{$order['balance']}</span>
+                        <img src="{MODULE_URL}static/img/coin.svg" class="balance">
                         {else}
                         <div class="color-gray">
                             {if $order['account']}
@@ -352,12 +362,12 @@
                         <div class="tips {$order['tips']['class']}" style="background-color:{$order['clr']}">
                             {$order['tips']['text']}
                         </div>
-                        {if $order['price'] > 0}
-                        <img src="{$order['from']['icon']}" title="{$order['from']['title']}" />
-                        {elseif $order['account']}
-                        <img src="{media $accounts[$order['account']]['img']}" alt=""/>
+                        {if $order['account']}
+                            <img src="{media $accounts[$order['account']]['img']}" alt=""/>
                         {elseif $order['voucher'] > 0}
-                        <i class="fa fa-ticket"></i>
+                            <i class="fa fa-ticket"></i>
+                        {else}
+                        <img src="{$order['from']['icon']}" title="{$order['from']['title']}" />
                         {/if}
                     </div>
                     {if $order['agent']}

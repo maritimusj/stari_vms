@@ -35,6 +35,7 @@ if (in_array($op, [
         'auth_account',
         'repair',
         'douyin',
+        'create_order_balance',
     ]
 )) {
     $job_filename = ZOVYE_CORE_ROOT . "jobs/{$op}.php";

@@ -36,13 +36,13 @@ $log = [
 ];
 
 $writeLog = function () use (&$log) {
-    Util::logToFile('balance_order', $log);
+    Util::logToFile('create_order_balance', $log);
 };
 
 if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balance_id])) {
 
     try {
-        if (App::isBalanceEnabled()) {
+        if (!App::isBalanceEnabled()) {
             throw new RuntimeException('积分功能没有启用！');
         }
 
@@ -117,7 +117,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
         });
 
         if (is_error($orderResult)) {
-            ExceptionNeedsRefund::throw($device, $orderResult['message']);
+            ExceptionNeedsRefund::throwWith($device, $orderResult['message']);
         } else {
             /** @var orderModelObj $order */
             $order = $orderResult;
@@ -143,7 +143,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
                     }
                 }
                 if (is_error($result)) {
-                    Util::logToFile('order_create_balance', [
+                    Util::logToFile('create_order_balance', [
                         'orderNO' => $order_no,
                         'error' => $result,
                     ]);
@@ -169,11 +169,12 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
         }
 
     } catch (ExceptionNeedsRefund $e) {
-
+        $log['error'] = $e->getMessage();
     } catch (Exception $e) {
         $log['error'] = $e->getMessage();
-        Job::exit($writeLog);
     }
+
+    Job::exit($writeLog);
 }
 
 /**
@@ -195,7 +196,7 @@ function createOrder(string          $order_no,
         'device_id' => $device->getId(),
         'num' => $balance->getExtraData('num'),
         'price' => 0,
-        'balance' => $balance->getXVal(),
+        'balance' => abs($balance->getXVal()),
         'ip' => $balance->getExtraData('ip'),
         'extra' => [
             'payResult' => [],

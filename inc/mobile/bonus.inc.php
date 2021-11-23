@@ -78,7 +78,7 @@ if ($op == 'signIn') {
 
 } elseif ($op == 'exchange') {
 
-    if (App::isBalanceEnabled()) {
+    if (!App::isBalanceEnabled()) {
         JSON::fail('这个功能没有启用！');
     }
 
@@ -123,6 +123,7 @@ if ($op == 'signIn') {
     $result = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
         'user' => $user->getId(),
         'device' => $device->getId(),
+        'goods' => $goods['id'],
         'num' => $num,
         'ip' => $user->getLastActiveData('ip') ?: Util::getClientIp(),
     ]);

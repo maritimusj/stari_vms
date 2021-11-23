@@ -639,12 +639,8 @@ zovye_fn.getUserInfo = function (cb) {
         resolve(zovye_fn.user);
     });
 }
-zovye_fn.balancePay = function(goods, num, cb) {
-    $.get("$bonus_url", {op: 'exchange', device: '$device_imei', goods, num}).then(function(res){
-        if (typeof cb === 'function') {
-            cb(res);
-        }
-    });
+zovye_fn.balancePay = function(goods, num) {
+    return $.get("$bonus_url", {op: 'exchange', device: '$device_imei', goods, num});
 }
 JSCODE;
         }

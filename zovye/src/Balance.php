@@ -219,7 +219,7 @@ TEXT;
 $line
 </dl>
 TEXT;
-        } elseif ($entry->getSrc() == Balance::TEXT) {
+        } elseif ($entry->getSrc() == Balance::REFUND) {
             $reason = $entry->getExtraData('reason', '');
             $reason_data = "<dt>失败原因：</dt><dd>$reason</dd>";
             $data['memo'] = <<<TEXT

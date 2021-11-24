@@ -155,21 +155,17 @@ class Balance
 
         if ($entry->getSrc() == Balance::ADJUST) {
             $name = $entry->getExtraData('admin');
-            $admin_info = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
-            $memo = $entry->getExtraData('memo');
+            $line = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $memo = $entry->getExtraData('memo', '');
             if ($memo) {
-                $memo_info = "<dt>说明</dt><dd class=\"memo\">$memo</dd>";
-            } else {
-                $memo_info = '';
+                $line .= "<dt>说明</dt><dd class=\"memo\">{$memo}</dd>";
             }
-            $data['memo'] = <<<REFUND
+            $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
-<dt>事件</dt>
-<dd class="event">管理员调整</dd>
-$admin_info
-$memo_info
+<dt>事件</dt><dd class="event">管理员调整</dd>
+$line
 </dl>
-REFUND;
+TEXT;
 
         } elseif ($entry->getSrc() == Balance::ACCOUNT_BONUS) {
             $account_data = $entry->getExtraData('account');
@@ -191,23 +187,20 @@ REFUND;
                 ][$account_data['type']] ?? ['公众号', '成功关注公众号'];
 
             $account_info = "<dt>{$account_typeifno[0]}</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
-            $data['memo'] = <<<REFUND
+            $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">{$account_typeifno[1]}</dd>
 $account_info
 </dl>
-REFUND;
+TEXT;
         } elseif ($entry->getSrc() == Balance::SIGN_IN_BONUS) {
-            $time = date('Y-m-d H:i:s', $entry->getCreatetime());
-            $sign_in_data = "<dt>签到时间</dt><dd>$time</dd>";
-            $data['memo'] = <<<REFUND
+            $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">每日签到</dd>
-$sign_in_data
 </dl>
-REFUND;
+TEXT;
         } elseif ($entry->getSrc() == Balance::GOODS_EXCHANGE) {
             $line = '';
             $goods = Goods::get($entry->getExtraData('goods'));
@@ -219,23 +212,23 @@ REFUND;
             if ($device) {
                 $line .= "<dt>设备</dt><dd class=\"goods\">{$device->getName()}</dd>";
             }
-            $data['memo'] = <<<REFUND
+            $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">兑换商品</dd>
 $line
 </dl>
-REFUND;
-        } elseif ($entry->getSrc() == Balance::REFUND) {
+TEXT;
+        } elseif ($entry->getSrc() == Balance::TEXT) {
             $reason = $entry->getExtraData('reason', '');
             $reason_data = "<dt>失败原因：</dt><dd>$reason</dd>";
-            $data['memo'] = <<<REFUND
+            $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">积分退回</dd>
 $reason_data
 </dl>
-REFUND;
+TEXT;
         }
 
         return $data;

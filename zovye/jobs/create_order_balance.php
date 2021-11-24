@@ -26,7 +26,6 @@ use zovye\User;
 use zovye\Util;
 use function zovye\err;
 use function zovye\is_error;
-use function zovye\job\createOrderMulti\pullGoods;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -52,8 +51,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
             throw new RuntimeException('找不到积分记录！');
         }
 
-        $user_id = $balance->getExtraData('user');
-        $user = User::get($user_id);
+        $user = $balance->getUser();
         if (empty($user)) {
             throw new RuntimeException('找不到这个用户！');
         }
@@ -68,25 +66,24 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
             throw new RuntimeException('订单已经完成！');
         }
 
-        $device_id = $balance->getExtraData('device');
-        $device = Device::get($device_id);
+        $device = $balance->getDevice();
         if (empty($device)) {
             throw new RuntimeException('找不到这个设备！');
         }
 
-        $num = $balance->getExtraData('num');
+        $num = $balance->getNum();
         if ($num < 1) {
             throw new RuntimeException('商品数量于小1！');
         }
 
-        $goods_id = $balance->getExtraData('goods');
+        $goods_id = $balance->getGoodsId();
         $goods = $device->getGoods($goods_id);
         if (empty($goods)) {
-            ExceptionNeedsRefund::throw($device, '无法兑换这个商品！');
+            ExceptionNeedsRefund::throwWith($device, '无法兑换这个商品！');
         }
 
         if ($goods['num'] < $num) {
-            ExceptionNeedsRefund::throw($device, '商品库存不够！');
+            ExceptionNeedsRefund::throwWith($device, '商品库存不够！');
         }
 
         //锁定设备
@@ -96,11 +93,11 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
         if (!$device->lockAcquire($retries, $delay)) {
             if (settings('order.waitQueue.enabled', false)) {
                 if (!Job::createBalanceOrder($balance)) {
-                    throw new RuntimeException('启动排队任务失败！');
+                    ExceptionNeedsRefund::throwWith($device, '启动排队任务失败！');
                 }
                 return true;
             }
-            ExceptionNeedsRefund::throw($device, '设备被占用！');
+            ExceptionNeedsRefund::throwWith($device, '设备被占用！');
         }
 
         //事件：设备已锁定
@@ -111,6 +108,8 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
 
         if (empty($order_no)) {
             $order_no = Order::makeUID($user, $device, sha1($balance->getId() . $balance->getCreatetime()));
+            $balance->setExtraData('order', $order_no);
+            $balance->save();
         }
 
         $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $goods, $balance) {
@@ -172,6 +171,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
 
     } catch (ExceptionNeedsRefund $e) {
         $log['error'] = $e->getMessage();
+        refund($balance_id, $e->getNum(), $e->getMessage());
     } catch (Exception $e) {
         $log['error'] = $e->getMessage();
     }
@@ -242,4 +242,67 @@ function createOrder(string          $order_no,
     $user->remove('donate');
 
     return $order;
+}
+
+function refund(int $balance_id, int $num, string $reason)
+{
+    $balance = Balance::get($balance_id);
+    if (empty($balance)) {
+        return err('找不到积分记录！');
+    }
+
+    $device = $balance->getDevice();
+    if (empty($device)) {
+        return err('找不到这个设备！');
+    }
+
+    $need = Helper::NeedAutoRefund($device);
+    if ($need) {
+        $result = Util::transactionDo(function () use ($balance, $num, $device, $reason) {
+            $user = $balance->getUser();
+            if (empty($user)) {
+                return err('找不到这个用户！');
+            }
+
+            $max = $balance->getNum();
+            if ($max < 1) {
+                return err('商品数量于小1！');
+            }
+
+            if (empty($num) || $num > $max) {
+                $num = $max;
+            }
+
+            $goods_balance = $balance->getGoodsBalance();
+
+            $x = $user->getBalance()->change($num * $goods_balance, Balance::REFUND, [
+                'related' => $balance->getId(),
+                'reason' => $reason,
+            ]);
+
+            if (empty($x)) {
+                return err('退款失败！');
+            }
+
+            $balance->setExtraData('refund', [
+                'time' => time(),
+                'related' => $x->getId(),
+            ]);
+
+            if (!$balance->save()) {
+                return err('保存数据失败！');
+            }
+            return $x;
+        });
+
+        if (is_error($result)) {
+            $device->appShowMessage('出货失败，积分退回失败，请联系管理员！', 'error');
+        } else {
+            $device->appShowMessage('出货失败，积分已退回！', 'error');
+        }
+
+        return true;
+    }
+
+    return err('设置不允许退款！');
 }

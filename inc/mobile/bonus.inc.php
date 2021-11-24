@@ -121,9 +121,9 @@ if ($op == 'signIn') {
     }
 
     $result = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
-        'user' => $user->getId(),
-        'device' => $device->getId(),
-        'goods' => $goods['id'],
+        'user' => $user->profile(),
+        'device' => $device->profile(),
+        'goods' => $goods,
         'num' => $num,
         'ip' => $user->getLastActiveData('ip') ?: Util::getClientIp(),
     ]);

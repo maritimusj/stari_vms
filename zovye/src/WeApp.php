@@ -451,6 +451,7 @@ JSCODE;
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
         $feedback_url = Util::murl('order', ['op' => 'feedback']);
         $account_url = Util::murl('account');
+        $order_jump_url = Util::murl('order', ['op' => 'jump']);
 
         $agent = $device->getAgent();
         $mobile = '';
@@ -537,6 +538,9 @@ JSCODE;
                alert('请求转跳网址失败！');
            }
         })
+    }
+    zovye_fn.redirectToOrderPage = function() {
+        window.location.href = "$order_jump_url";
     }
 JSCODE;
         if ($goods_list_FN) {
@@ -1271,6 +1275,9 @@ $js_sdk
             if (cb) cb(res);
         })
     }
+    zovye_fn.getBonus = function(uid) {
+        return $.getJSON('$account_url', {op: 'get_bonus', 'account': uid});
+    };
     zovye_fn.redirectToUserPage = function() {
         window.location.replace("$user_home_page");
     }

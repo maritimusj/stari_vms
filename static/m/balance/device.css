@@ -623,6 +623,10 @@ body {
     background-color: #ccc;
 }
 
+.circle-btn-disabled {
+    opacity: 0.3;
+}
+
 .buy-btn {
     background-color: #FA639B;
     color: white;

@@ -6,7 +6,7 @@
 	<title>{$tpl['site']['title']}</title>
 	<!-- {php \zovye\url(true, CSS_SWIPER_URL);} -->
 	<link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
-	{php \zovye\url(true, 'static/m/balance/device.css?v=202111231742');}
+	{php \zovye\url(true, 'static/m/balance/device.css?v=202111231749');}
 	<link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
 </head>
 <body ontouchstart>
@@ -180,10 +180,10 @@
 					<div class="goods-price-view">
 						<span class="price">¥ {{(parseFloat(item.price * item.count) / 100).toFixed(2)}}</span>
 						<div class="goods-row" style="margin-top: 5px;">
-							<img class="circle-btn" style="margin-right: 10px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
+							<img :class="['circle-btn', item.count === 1 ? 'circle-btn-disabled' : '' ]" style="margin-right: 10px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
 								@click="minusClick(item, 'goods')">
 							<span>{{item.count}}</span>
-							<img class="circle-btn" style="margin-left: 10px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
+							<img :class="['circle-btn', (item.count === item.num || item.count === max || item.num === 0) ? 'circle-btn-disabled' : '' ]" style="margin-left: 10px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
 								@click="plusClick(item, 'goods')">
 						</div>
 					</div>
@@ -221,7 +221,7 @@
 							<img :class="['circle-btn', item.count === 1 ? 'circle-btn-disabled' : '' ]" style="margin-right: 10px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
 								@click="minusClick(item, 'balance')">
 							<span>{{item.count}}</span>
-							<img :class="['circle-btn', (item.count === item.num || item.count === max) ? 'circle-btn-disabled' : '' ]" style="margin-left: 10px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
+							<img :class="['circle-btn', (item.count === item.num || item.count === max || item.num === 0) ? 'circle-btn-disabled' : '' ]" style="margin-left: 10px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
 								@click="plusClick(item, 'balance')">
 						</div>
 					</div>
@@ -289,7 +289,7 @@
 			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
 		};
 </script>
-{php \zovye\url(true, 'static/m/balance/device.js?v=202111231419111111');}
+{php \zovye\url(true, 'static/m/balance/device.js?v=202111231749');}
 <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>

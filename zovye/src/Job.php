@@ -52,9 +52,10 @@ class Job
         return CtrlServ::scheduleJob('device_online', ['id' => $device->getId(), 'event' => $msg]);
     }
 
-    public static function createBalanceOrder(balanceModelObj $balance): bool
+    public static function createBalanceOrder($order_no, balanceModelObj $balance): bool
     {
         return CtrlServ::scheduleJob('create_order_balance', [
+            'orderNO' => $order_no,
             'balance' => $balance->getId(),
         ], LEVEL_HIGH);
     }

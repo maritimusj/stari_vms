@@ -52,9 +52,14 @@ if ($op == 'default') {
         }
     }
 
+    $url_params = ['op' => 'result', 'orderNO' => $order_no];
+    if (request::has('balance')) {
+        $url_params['balance'] = request::int('balance', 0);
+    }
+
     app()->showTemplate(Theme::file('payresult'), [
         'tpl' => $tpl,
-        'url' => Util::murl('order', ['op' => 'result', 'orderNO' => $order_no]),
+        'url' => Util::murl('order', $url_params),
         'idcard_url' => Util::murl('idcard', ['orderNO' => $order_no]),
     ]);
 

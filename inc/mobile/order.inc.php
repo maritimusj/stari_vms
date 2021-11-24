@@ -207,6 +207,21 @@ if ($op === 'create') {
         JSON::success($response);
     }
 
+    if (request::has('balance')) {
+        $balance_id = request::int('balance');
+        $balance = Balance::get($balance_id);
+        if (empty($balance)) {
+            JSON::fail(['code' => 400, 'msg' => "找不到支付信息！" . $order_no]);
+        }
+        
+        $refund = $balance->getExtraData('refund');
+        if ($refund) {
+            JSON::fail(['code' => 502, 'msg' => '出货失败，积分已退回！']);
+        }
+        
+        JSON::success(['code' => 100, 'msg' => '正在查询订单，请稍等...']);
+    }
+
     /** @var pay_logsModelObj $pay_log */
     $pay_log = Pay::getPayLog($order_no);
     if (empty($pay_log)) {

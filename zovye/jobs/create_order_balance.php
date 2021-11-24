@@ -29,9 +29,11 @@ use function zovye\is_error;
 use function zovye\settings;
 
 $op = request::op('default');
+$order_no = request::str('orderNO');
 $balance_id = request::int('balance');
 $log = [
     'op' => $op,
+    'orderNO' => $orderNO,
     'balance_id' => $balance_id,
 ];
 
@@ -39,7 +41,10 @@ $writeLog = function () use (&$log) {
     Util::logToFile('create_order_balance', $log);
 };
 
-if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balance_id])) {
+if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
+        'orderNO' => $order_no,
+        'balance' => $balance_id,
+    ])) {
 
     try {
         if (!App::isBalanceEnabled()) {
@@ -61,8 +66,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
         }
 
         //判断订单是否存在一定要在锁定用户成功后判断
-        $order_no = $balance->getExtraData('order');
-        if ($order_no && Order::exists($order_no)) {
+        if (Order::exists($order_no)) {
             throw new RuntimeException('订单已经完成！');
         }
 
@@ -92,7 +96,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
 
         if (!$device->lockAcquire($retries, $delay)) {
             if (settings('order.waitQueue.enabled', false)) {
-                if (!Job::createBalanceOrder($balance)) {
+                if (!Job::createBalanceOrder($order_no, $balance)) {
                     ExceptionNeedsRefund::throwWith($device, '启动排队任务失败！');
                 }
                 return true;
@@ -106,14 +110,16 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
             'user' => $user,
         ]);
 
-        if (empty($order_no)) {
-            $order_no = Order::makeUID($user, $device, sha1($balance->getId() . $balance->getCreatetime()));
-            $balance->setExtraData('order', $order_no);
-            $balance->save();
-        }
-
         $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $goods, $balance) {
-            return createOrder($order_no, $device, $user, $goods, $balance);
+            $result = createOrder($order_no, $device, $user, $goods, $balance);
+            if (is_error($result)) {
+                return $result;
+            }
+            $balance->setExtraData('order.id', $order_no);
+            if (!$balance->save()) {
+                return err('保存订单数据失败！');
+            }
+            return $result;
         });
 
         if (is_error($orderResult)) {
@@ -176,9 +182,12 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign(['balance' => $balan
         $log['error'] = $e->getMessage();
     }
 
-    Job::exit($writeLog);
-}
 
+} else {
+    $log['error'] = '签名校验失败！';
+}
+    
+Job::exit($writeLog);
 /**
  * @throws Exception
  */

@@ -581,7 +581,6 @@ JSCODE;
 }
 JSCODE;
         }
-
         if (empty($user->settings('fansData.sex'))) {
             $profile_url = Util::murl('util', ['op' => 'profile']);
             $tpl['js']['code'] .= <<<JSCODE
@@ -590,7 +589,6 @@ JSCODE;
 }
 JSCODE;
         }
-
         //检查用户在该设备上最近失败的免费订单
         $retry = settings('order.retry', []);
         if ($retry['last'] > 0) {

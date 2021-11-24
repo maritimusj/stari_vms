@@ -132,8 +132,12 @@ if ($op == 'signIn') {
         JSON::fail('积分操作失败，请联系管理员！');
     }
 
-    if (Job::createBalanceOrder($result)) {
-        JSON::success('请稍后，正在出货中！');
+    $order_no = Order::makeUID($user, $device, sha1($result->getId() . $result->getCreatetime()));
+    if (Job::createBalanceOrder($order_no, $result)) {
+        JSON::success([
+            'msg' => '请稍后，正在出货中！',
+            'redirect' => Util::murl('payresult', ['orderNO' => $order_no, 'balance' => $result->getId()]),
+        ]);
     }
 
     JSON::success('失败，请稍后再试！');

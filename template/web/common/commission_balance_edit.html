@@ -16,7 +16,7 @@
     <div class="form-group">
         <label for="total" class="col-md-2 control-label"><img src="{MODULE_URL}static/img/yen.svg" class="yen"> 金额（元）</label>
         <div class="col-md-10">
-          <input type="text" class="form-control" id="total" name="total"  required>
+          <input type="number" class="form-control" id="total" name="total" step="0.01"  required>
           <span class="help-block">* 金额不能为零，正数增加用户余额，负数减少用户余额。</span>
         </div>
     </div>

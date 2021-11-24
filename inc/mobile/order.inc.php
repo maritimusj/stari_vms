@@ -366,6 +366,8 @@ if ($op === 'create') {
         $page = 1;
     }
 
+    $balance_enabled = App::isBalanceEnabled();
+
     $orders = [];
     /** @var orderModelObj $entry */
     foreach ($query->page($page, $page_size)->orderBy('id DESC')->findAll() as $entry) {
@@ -383,6 +385,10 @@ if ($op === 'create') {
             'status' => '',
         ];
 
+        if ($balance_enabled && $entry->getBalance() > 0) {
+            $data['balance'] = $entry->getBalance();
+        }
+
         //商品
         $data['goods'] = $entry->getExtraData('goods', []);
 
@@ -398,6 +404,8 @@ if ($op === 'create') {
 
         if ($data['price'] > 0) {
             $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
+        } elseif ($data['balance'] > 0) {
+            $data['tips'] = ['text' => '积分', 'class' => 'balance'];
         } else {
             $data['tips'] = ['text' => '免费', 'class' => 'free'];
         }

@@ -448,7 +448,7 @@ JSCODE;
 
         $device_api_url = Util::murl('device', ['id' => $device->getId()]);
         $adv_api_url = Util::murl('adv', ['deviceid' => $device->getImei()]);
-        $order_jump_url = Util::murl('order', ['op' => 'jump']);
+        $user_home_page = Util::murl('bonus', ['op' => 'home']);
         $feedback_url = Util::murl('order', ['op' => 'feedback']);
         $account_url = Util::murl('account');
 
@@ -505,8 +505,8 @@ JSCODE;
             if (cb) cb(res);
         })    
     }
-    zovye_fn.redirectToOrder = function() {
-        window.location.href= "$order_jump_url";
+    zovye_fn.redirectToUserPage = function() {
+        window.location.href= "$user_home_page";
     }
     zovye_fn.redirectToFeedBack = function() {
         window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
@@ -1220,6 +1220,8 @@ JSCODE;
         $api_url = Util::murl('bonus');
         $account_url = Util::murl('account');
         $adv_api_url = Util::murl('adv');
+        $user_home_page = Util::murl('bonus', ['op' => 'home']);
+
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
@@ -1269,6 +1271,9 @@ $js_sdk
             if (cb) cb(res);
         })
     }
+    zovye_fn.redirectToUserPage = function() {
+        window.location.replace("$user_home_page");
+    }
 JSCODE;
     
     if (!$user->isSigned()) {
@@ -1283,6 +1288,104 @@ $tpl_data['js']['code'] .= <<<JSCODE
 \r\n</script>
 JSCODE;
         $this->showTemplate(Theme::file('bonus'), ['tpl' => $tpl_data]);
+    }
+
+    public function userPage(userModelObj $user)
+    {
+        $tpl_data = Util::getTplData([$user]);
+
+        $user_data = [
+            'status' => true,
+            'data' => $user->profile(),
+        ];
+
+        $user_data['data']['balance'] = $user->getBalance()->total();
+        $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $api_url = Util::murl('bonus');
+        $balance_logs_url = Util::murl('bonus' ,['op' => 'logsPage']);
+        $order_jump_url = Util::murl('order', ['op' => 'jump']);
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_sdk = Util::fetchJSSDK();
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+$js_sdk
+<script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+
+    const zovye_fn = {
+        api_url: "$api_url",
+        user: JSON.parse(`$user_json_str`),
+    }
+    zovye_fn.getUserInfo = function (cb) {
+        if (typeof cb === 'function') {
+            return cb(zovye_fn.user)
+        }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.user);
+        });
+    }
+    zovye_fn.redirectToBalanceLogPage = function() {
+        window.location.href = "$balance_logs_url";
+    }
+    zovye_fn.redirectToOrderPage = function() {
+        window.location.href = "$order_jump_url";
+    }    
+    zovye_fn.redirectToBonusPage = function() {
+        window.location.replace("$api_url");
+    }
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('user'), ['tpl' => $tpl_data]);
+    }
+
+    public function userBalanceLogPage(userModelObj $user)
+    {
+        $tpl_data = Util::getTplData([$user]);
+
+        $user_data = [
+            'status' => true,
+            'data' => $user->profile(),
+        ];
+
+        $user_data['data']['balance'] = $user->getBalance()->total();
+        $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $api_url = Util::murl('bonus');
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_sdk = Util::fetchJSSDK();
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+$js_sdk
+<script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+
+    const zovye_fn = {
+        api_url: "$api_url",
+        user: JSON.parse(`$user_json_str`),
+    }
+    zovye_fn.getUserInfo = function (cb) {
+        if (typeof cb === 'function') {
+            return cb(zovye_fn.user)
+        }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.user);
+        });
+    }
+    zovye_fn.getBalanceLog = function(lastId, pagesize) {
+        return $.getJSON(zovye_fn.api_url, {op: 'logs', lastId, pagesize});
+    }
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('balance_log'), ['tpl' => $tpl_data]);
     }
 
 }

@@ -6,30 +6,39 @@
 
 namespace zovye;
 
+$user = Util::getCurrentUser([
+    'create' => true,
+    'update' => true,
+]);
+
+if (empty($user)) {
+    if (request::is_ajax()) {
+        JSON::fail('找不到这个用户！');
+    }
+    Util::resultAlert('找不到这个用户！', 'error');
+}
+
+if ($user->isBanned()) {
+    if (request::is_ajax()) {
+        JSON::fail('用户暂时不可用！');
+    }
+    Util::resultAlert('用户暂时不可用！');
+}
+
 $op = request::op('default');
 if ($op == 'default') {
 
-    $user = Util::getCurrentUser();
-    if (empty($user)) {
-        Util::resultAlert('找不到这个用户！', 'error');
-    }
-    if ($user->isBanned()) {
-        Util::resultAlert('用户暂时不可用！');
-    }
-
     app()->bonusPage($user);
 
-}
-if ($op == 'signIn') {
+} elseif ($op == 'home') {
 
-    $user = Util::getCurrentUser();
-    if (empty($user)) {
-        JSON::fail('找不到这个用户！');
-    }
+    app()->userPage($user);
 
-    if ($user->isBanned()) {
-        JSON::fail('用户暂时不可用！');
-    }
+} elseif ($op == 'logsPage') {
+
+    app()->userBalanceLogPage($user);
+
+} elseif ($op == 'signIn') {
 
     $bonus = Config::balance('sign.bonus', []);
     if (empty($bonus) || !$bonus['enabled'] || empty($bonus['val'])) {
@@ -56,15 +65,6 @@ if ($op == 'signIn') {
 
 } elseif ($op == 'account') {
 
-    $user = Util::getCurrentUser();
-    if (empty($user)) {
-        JSON::fail('找不到这个用户！');
-    }
-
-    if ($user->isBanned()) {
-        JSON::fail('用户暂时不可用！');
-    }
-
     $type = request::int('type', Account::NORMAL);
     $max = request::int('max', 10);
 
@@ -80,11 +80,6 @@ if ($op == 'signIn') {
 
     if (!App::isBalanceEnabled()) {
         JSON::fail('这个功能没有启用！');
-    }
-
-    $user = Util::getCurrentUser();
-    if (empty($user) || $user->isBanned()) {
-        JSON::fail('用户无法使用该功能！');
     }
 
     $device_uid = request::str('device');
@@ -141,4 +136,21 @@ if ($op == 'signIn') {
     }
 
     JSON::success('失败，请稍后再试！');
-}   
+
+}  elseif ($op == 'logs') {
+
+    $query = $user->getBalance()->log();
+    if (request::has('lastId')) {
+        $query->where(['id <' => request::int('lastId')]);
+    }
+
+    $query->limit(request::int('pagesize', 20));
+    $query->orderBy('createtime DESC');
+
+    $result = [];
+    foreach($query->findAll() as $entry) {
+        $result[] = Balance::format($entry);
+    }
+
+    JSON::success($result);
+}

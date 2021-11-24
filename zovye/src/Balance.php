@@ -200,7 +200,7 @@ $account_info
 REFUND;
         } elseif ($entry->getSrc() == Balance::SIGN_IN_BONUS) {
             $time = date('Y-m-d H:i:s', $entry->getCreatetime());
-            $sign_in_data = "<dt>签到时间：</dt><dd>$time</dd>";
+            $sign_in_data = "<dt>签到时间</dt><dd>$time</dd>";
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -213,11 +213,11 @@ REFUND;
             $goods = Goods::get($entry->getExtraData('goods'));
             if ($goods) {
                 $img = Util::toMedia($goods->getImg(), true);
-                $line .= "<dt>商品：</dt><dd class=\"goods\"><img src=\"{$img}\" >{$goods->getName()}</dd>";
+                $line .= "<dt>商品</dt><dd class=\"goods\"><img src=\"{$img}\" >{$goods->getName()}</dd>";
             }
             $device = Device::get($entry->getExtraData('device'));
             if ($device) {
-                $line .= "<dt>设备：</dt><dd class=\"goods\">{$device->getName()}</dd>";
+                $line .= "<dt>设备</dt><dd class=\"goods\">{$device->getName()}</dd>";
             }
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
@@ -228,7 +228,7 @@ $line
 REFUND;
         } elseif ($entry->getSrc() == Balance::REFUND) {
             $reason = $entry->getExtraData('reason', '');
-            $reason_data = "<dt>失败原因，：</dt><dd>$reason</dd>";
+            $reason_data = "<dt>失败原因：</dt><dd>$reason</dd>";
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>

@@ -331,6 +331,25 @@
     		text-shadow: 1px 1px 2px #ccc;
 		}
 
+		.qrcode-container {
+			width: 150px;
+			height: 150px;
+			position: relative;
+		}
+
+		.wxapp-cover {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			left: 0;
+			top: 0;
+			background-color: rgba(0, 0, 0, 0.5);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+
 		.follow-card .qrcode {
 			width: 150px;
 			height: 150px;
@@ -365,24 +384,32 @@
 		<div class="menu-item">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/sign_in_icon.svg">
 			<div class="info">
-				<span class="title">签到</span>
+				<span class="title">每日签到</span>
 				<span class="desc">每日签到领积分</span>
 			</div>
 			<div :class="['sign-in', done ? 'done' : '']" v-if="done !== null" @click="signInClick">{{done ? '已签到' :
 				'签到'}}</div>
 		</div>
 		<div class="menu-item clickable" @click="videoClick">
+			<img class="icon" src="{MODULE_URL}static/m/balance/img/clock_icon.svg">
+			<div class="info">
+				<span class="title">日常任务</span>
+				<span class="desc">完成任务获得奖励</span>
+			</div>
+			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
+		</div>
+		<div class="menu-item clickable" @click="videoClick">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/video_icon.svg">
 			<div class="info">
-				<span class="title">视频任务</span>
-				<span class="desc">看完视频获取随机积分</span>
+				<span class="title">看视频</span>
+				<span class="desc">看完视频获取积分</span>
 			</div>
 			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
 		</div>
 		<div class="menu-item clickable" @click="followClick">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/follow_icon.svg">
 			<div class="info">
-				<span class="title">关注任务</span>
+				<span class="title">关注公众号</span>
 				<span class="desc">关注公众号领取积分</span>
 			</div>
 			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
@@ -390,7 +417,7 @@
 		<div class="menu-item clickable" @click="wxappClick">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/wxapp_icon.svg">
 			<div class="info">
-				<span class="title">小程序任务</span>
+				<span class="title">关注小程序</span>
 				<span class="desc">去小程序发现更多奖励</span>
 			</div>
 			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
@@ -425,6 +452,27 @@
 				<img class="qrcode" :src="follow.data.qrcode">
 				<span class="desc" v-html="follow.data.descr"></span>
 				<img class="close-icon" src="{MODULE_URL}static/m/balance/img/close_black.svg" @click="follow.visible = false">
+			</div>
+		</div>
+		<div class="mask" v-if="wxapp.visible" @click="wxapp.visible = false">
+			<div class="follow-card" @click.stop>
+				<div class="header">
+					<img class="avatar" :src="wxapp.data.img">
+					<span>{{wxapp.data.title}}</span>
+				</div>
+				<div class="qrcode-container">
+					<img class="qrcode" :src="wxapp.data.img">
+					<div class="wxapp-cover">
+						<wx-open-launch-weapp :id="wxapp.data.uid" :username="wxapp.data.username" :path="wxapp.data.path">
+							<script type="text/wxtag-template">
+								<style>.play-icon { width: 40px }</style>
+								<img class="play-icon" src="{MODULE_URL}static/m/balance/img/click.svg">
+							</script>
+						</wx-open-launch-weapp>
+					</div>
+				</div>
+				<span class="desc" v-html="wxapp.data.descr"></span>
+				<img class="close-icon" src="{MODULE_URL}static/m/balance/img/close_black.svg" @click="wxapp.visible = false">
 			</div>
 		</div>
 		<div class="mask" v-if="success.visible">
@@ -463,6 +511,11 @@
 				follow: {
 					data: null,
 					visible: false
+				},
+				wxapp: {
+					data: null,
+					visible: false,
+					timeout: null
 				},
 				toast: {
 					text: '',
@@ -581,7 +634,6 @@
 				playRequest() {
 					this.video.data && zovye_fn.play(this.video.data.uid, this.video.data.duration - this.video.countdown, res => {
 						if (res) {
-							console.log(res)
 							if (res.status) {
 								if (res.data.bonus) {
 									this.success.data = res.data;
@@ -633,7 +685,11 @@
 						if (res.status) {
 							const data = res.data || [];
 							if (data.length > 0) {
-
+								this.wxapp.data = data[0];
+								this.wxapp.visible = true;
+								this.$nextTick(() => {
+									this.addListener(this.wxapp.data)
+								});
 							} else {
 								this.showToast('暂无小程序任务');
 							}
@@ -641,6 +697,29 @@
 							alert(res.data.msg);
 						}
 					})
+				},
+				addListener(data) {
+					var btn = document.getElementById(data.uid);
+					btn.addEventListener('launch', (e) => {
+						if(this.wxapp.timeout) {
+							clearTimeout(this.wxapp.timeout);
+							this.wxapp.timeout = null;
+						}
+						this.wxapp.timeout = setTimeout(() => {
+							if(document.hidden) {
+								this.wxapp.visible = false;
+								zovye_fn.getBonus(data.uid).then(res => {
+									if (res.status) {
+										this.success.data = res.data;
+										this.success.title = '关注成功';
+										this.success.visible = true;
+									} else {
+										alert(res.data.msg);
+									}
+								})
+							}
+						}, data.delay * 1000);
+					});
 				},
 				showToast(text) {
 					if (this.toast.visible) {
@@ -654,7 +733,7 @@
 					}, 2000);
 				},
 				jumpToProfile() {
-
+					zovye_fn.redirectToUserPage();
 				}
 			}
 		})

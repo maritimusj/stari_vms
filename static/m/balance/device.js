@@ -120,7 +120,7 @@ const app = new Vue({
             });
         },
         getUserInfo() {
-            zovye_fn.getUserInfo().then(res => {
+            zovye_fn.getUserInfo && zovye_fn.getUserInfo().then(res => {
                 if(res.status) {
                     this.userInfo = res.data;
                 }
@@ -251,7 +251,7 @@ const app = new Vue({
             if (this.balance.goods.length > 0) {
                 this.balance.visible = true;
             } else {
-                this.showToast('暂时无法购买');
+                this.showToast('暂时无法兑换');
             }
         },
         missionClick() {
@@ -318,7 +318,7 @@ const app = new Vue({
                     console.log(res)
                     this.balance.loading = false;
                     if (res.status) {
-                        
+                        res.data.redirect && window.location.replace(res.data.redirect);
                     } else {
                         this.showToast(res.data.msg);
                     }
@@ -388,7 +388,11 @@ const app = new Vue({
             });
         },
         orderClick() {
-            zovye_fn.redirectToOrder();
+            if (zovye_fn.redirectToBonusPage) {
+                zovye_fn.redirectToUserPage();
+            } else {
+                zovye_fn.redirectToOrderPage();
+            }
         },
         feedbackClick() {
             zovye_fn.redirectToFeedBack();

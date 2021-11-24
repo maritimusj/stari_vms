@@ -59,7 +59,7 @@
 				<span class="desc">{{pay.desc}}</span>
 			</div>
 			<div class="menu-item clickable"
-				style="background-image: linear-gradient(to top right, #FCBDAB , #FDD5C6);" @click="balanceClick">
+				style="background-image: linear-gradient(to top right, #FCBDAB , #FDD5C6);" @click="balanceClick" v-if="zovye_fn.redirectToBonusPage">
 				<div class="row">
 					<img src="{MODULE_URL}static/m/balance/img/diamond_icon.svg">
 					<span>积分兑换</span>
@@ -67,7 +67,7 @@
 				<span class="desc">当前积分：{{userInfo ? userInfo.balance : 0}}</span>
 			</div>
 			<div class="menu-item clickable"
-				style="background-image: linear-gradient(to top right, #1A83FB , #7AB4FF);" @click="missionClick">
+				style="background-image: linear-gradient(to top right, #1A83FB , #7AB4FF);" @click="missionClick" v-if="zovye_fn.redirectToBonusPage">
 				<div class="row">
 					<img src="{MODULE_URL}static/m/balance/img/star_icon.svg">
 					<span>我要赚积分</span>
@@ -289,7 +289,7 @@
 			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
 		};
 </script>
-{php \zovye\url(true, 'static/m/balance/device.js?v=202111231749');}
+{php \zovye\url(true, 'static/m/balance/device.js?v=202111241816');}
 <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>

@@ -98,9 +98,18 @@
 				text-shadow: 2px 2px 5px #ccc;
 			}
 
-			.bonus {
+			.bonus-row {
 				color: #888;
 				margin-top: 5px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			.bonus-row img {
+				width: 20px;
+				height: 20px;
+				margin-left: 3px
 			}
 
 			.menu {
@@ -239,7 +248,10 @@
 			<div class="userinfo" v-if="userinfo">
 				<img class="avatar" :src="userinfo.headimgurl">
 				<span class="nickname">{{userinfo.nickname}}</span>
-				<span class="bonus">当前积分：{{userinfo.balance}}</span>
+				<div class="bonus-row">
+					<span>当前积分：{{userinfo.balance}}</span>
+					<img src="{MODULE_URL}static/m/balance/img/coin.svg">
+				</div>
 			</div>
 			<div class="menu clickable" style="margin-top: 10px;" @click="balanceLogClick">
 				<img class="icon" src="{MODULE_URL}static/m/balance/img/coin_icon.svg">

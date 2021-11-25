@@ -86,6 +86,7 @@ class common
             LoginData::AGENT,
             LoginData::AGENT_WEB,
             LoginData::KEEPER,
+            LoginData::USER,
         ]);
 
         if (empty($login_data)) {

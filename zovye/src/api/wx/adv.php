@@ -408,4 +408,10 @@ class adv
 
         return error(State::ERROR, '操作失败！');
     }
+
+    public static function getBonus()
+    {
+        $user = common::getUser();
+
+    }
 }

@@ -1187,7 +1187,6 @@ class common
 
     public static function doUserLogin($res): array
     {
-        Util::logToFile("user", $res);
         $openid = strval($res['openId']);
         $user = User::get($openid, true, User::WxAPP);
         if (empty($user)) {
@@ -1225,7 +1224,7 @@ class common
 
         $token = sha1($openid . Util::random(16));
         $data = [
-            'src' => LoginData::User,
+            'src' => LoginData::USER,
             'user_id' => $user->getId(),
             'session_key' => '',
             'openid_x' => $openid,

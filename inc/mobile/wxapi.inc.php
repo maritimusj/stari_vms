@@ -29,6 +29,8 @@ router::exec($op, [
     'LoginQR' => '\zovye\api\wx\agent::loginQR',
     'LoginScan' => '\zovye\api\wx\agent::loginScan',
     'LoginPoll' => '\zovye\api\wx\agent::loginPoll',
+    'UserLogin' => '\zovye\api\wxx\common\login',
+
     'AgentApplication' => '\zovye\api\wx\agent::application',
     'AgentMsg' => '\zovye\api\wx\agent::agentMsg',
     'SetAgentBank' => '\zovye\api\wx\agent::setAgentBank',

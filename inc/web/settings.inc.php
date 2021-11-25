@@ -432,12 +432,25 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
     } elseif ($save_type == 'wxapp') {
 
-        Config::app('wxapp.advs', [
-            'bannerAdvsID' => request::str('bannerAdvsID'),
-            'rewardAdvsID' => request::str('rewardAdvsID'),
-            'interstitialAdvsID' => request::str('interstitialAdvsID'),
-            'videoAdvsID' => request::str('videoAdvsID'),
-        ], true);
+        if (App::isBalanceEnabled()) {
+            Config::app('wxapp.advs', [
+                'banner' => [
+                    'id' => request::str('banner'),
+                ],
+                'reward' => [
+                    'id' => request::str('reward'),
+                    'bonus' => request::str('rewardBonus'),
+                ],
+                'interstitial' => [
+                    'id' => [
+                        request::str('interstitial'),
+                    ],
+                ],
+                'video' => [
+                    'id' => request::str('video'),
+                ],
+            ], true);
+        }
 
     } elseif ($save_type == 'account') {
 
@@ -887,30 +900,33 @@ if ($op == 'account') {
         $list[] = $data;
     }
 
-    $tpl_data['advs_position'] = [
-        'bannerAdvsID' => [
-            'id' => 1,
-            'title' => 'Banner广告',
-            'description' => '灵活性较高，适用于用户停留较久或访问频繁等场景',
-        ],
-        'rewardAdvsID' => [
-            'id' => 2,
-            'title' => '激励式广告',
-            'description' => '用户观看广告获得奖励，适用于道具解锁或获得积分等场景',
-        ],
-        'interstitialAdvsID' => [
-            'id' => 3,
-            'title' => '插屏广告',
-            'description' => '弹出展示广告，适用于页面切换或回合结束等场景',
-        ],
-        'videoAdvsID' => [
-            'id' => 4,
-            'title' => '视频广告',
-            'description' => '适用于信息流场景或固定位置，展示自动播放的视频广告',
-        ],
-    ];
+    if (app::isBalanceEnabled()) {
+        $tpl_data['advs_position'] = [
+            'banner' => [
+                'id' => 1,
+                'title' => 'Banner广告',
+                'description' => '灵活性较高，适用于用户停留较久或访问频繁等场景',
+            ],
+            'reward' => [
+                'id' => 2,
+                'title' => '激励式广告',
+                'description' => '用户观看广告获得奖励，适用于道具解锁或获得积分等场景',
+                'balance' => true,
+            ],
+            'interstitial' => [
+                'id' => 3,
+                'title' => '插屏广告',
+                'description' => '弹出展示广告，适用于页面切换或回合结束等场景',
+            ],
+            'video' => [
+                'id' => 4,
+                'title' => '视频广告',
+                'description' => '适用于信息流场景或固定位置，展示自动播放的视频广告',
+            ],
+        ];
 
-    $tpl_data['advsID'] = Config::app('wxapp.advs', []);
+        $tpl_data['advsID'] = Config::app('wxapp.advs', []);
+    }
 
     $tpl_data['list'] = $list;
 
@@ -998,6 +1014,7 @@ if ($op == 'account') {
     if (App::isDonatePayEnabled()) {
         $tpl_data['donatePay'] = Config::donatePay('qsc');
     }
+
 } elseif ($op == 'accountMsgConfig') {
 
     $media = request('media') ?: [

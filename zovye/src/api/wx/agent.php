@@ -97,7 +97,7 @@ class agent
     }
 
     /**
-     * @return array
+     * @deprecated
      */
     public static function reg(): array
     {
@@ -208,6 +208,9 @@ class agent
         return $result;
     }
 
+    /**
+     * @deprecated
+     */
     public static function pluginsList(): array
     {
         return [

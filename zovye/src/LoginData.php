@@ -13,7 +13,7 @@ class LoginData
 {
     const AGENT = 0;
     const KEEPER = 1;
-    const User = 2;
+    const USER = 2;
 
     const AGENT_WEB = 3;
 
@@ -67,7 +67,7 @@ class LoginData
 
     public static function user(array $cond = []): modelObjFinder
     {
-        return self::query(['src' => LoginData::User])->where($cond);
+        return self::query(['src' => LoginData::USER])->where($cond);
     }
 
     /**

@@ -54,7 +54,12 @@ class common
             return error(State::ERROR, '用户登录失败，请稍后再试！[103]');
         }
 
-        return self::doUserLogin($res);
+        //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
+        if (request::has('openId')) {
+            $res['openId'] = request::str('openId');
+        }
+
+        return self::doUserLogin($res, request::array('userInfo', []));
     }
 
     public static function getDeviceInfo(): array
@@ -1185,16 +1190,16 @@ class common
         return $user;
     }
 
-    public static function doUserLogin($res): array
+    public static function doUserLogin($res, $user_info): array
     {
         $openid = strval($res['openId']);
-        $user = User::get($openid, true, User::WxAPP);
+        $user = User::get($openid, true);
         if (empty($user)) {
             $user = User::create([
                 'app' => User::WxAPP,
                 'openid' => $openid,
-                'nickname' => $res['nickName'],
-                'avatar' => $res['avatarUrl'],
+                'nickname' => $user_info['nickName'] ?? '',
+                'avatar' => $user_info['avatarUrl'] ?? '',
                 'mobile' => $res['phoneNumber'] ?? '',
                 'createtime' => time(),
             ]);
@@ -1203,14 +1208,20 @@ class common
                 return error(State::ERROR, '创建用户失败！');
             }
         } else {
-            $user->setNickname($res['nickName']);
-            $user->setAvatar($res['avatarUrl']);
+            if ($user_info['nickName']) {
+                $user->setNickname($user_info['nickName']);
+            }
+            
+            if ($user_info['avatarUrl']) {
+                $user->setAvatar($user_info['avatarUrl']);
+            }
+            
             if (isset($res['phoneNumber'])) {
                 $user->setMobile($res['phoneNumber']);
             }
         }
 
-        $user->set('fansData', $res);
+        $user->set('fansData', $user_info);
         $user->save();
 
         if ($user->isBanned()) {

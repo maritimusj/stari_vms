@@ -405,6 +405,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['commission']['agreement']['version'] = sha1($settings['commission']['agreement']['content']);
         }
 
+        if (App::isBalanceEnabled()) {
+            Config::balance('order.commission.val', (int)(request::float('balanceOrderPrice', 0, 2) * 100), true);
+        }
+
     } elseif ($save_type == 'advs') {
 
         if ($settings['custom']['SQMPay']['enabled']) {

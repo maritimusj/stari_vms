@@ -13,6 +13,7 @@ use zovye\model\agentModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\accountModelObj;
+use zovye\model\balanceModelObj;
 
 class CommissionEventHandler
 {
@@ -25,10 +26,10 @@ class CommissionEventHandler
      * @return bool
      * @throws Exception
      */
-    public static function onDeviceOrderCreated(deviceModelObj $device, userModelObj $user, orderModelObj $order, accountModelObj $account = null): bool
+    public static function onDeviceOrderCreated(deviceModelObj $device, orderModelObj $order, accountModelObj $account = null, balanceModelObj $balance = null): bool
     {
-        if ($account) {
-            return self::free($user, $device, $order, $account);
+        if ($account || $balance) {
+            return self::free($device, $order, $account, $balance);
         }
 
         //如果订单支持不是系统支付商户号，则不参与分佣
@@ -56,13 +57,13 @@ class CommissionEventHandler
      * @return bool
      * @throws Exception
      */
-    protected static function free(userModelObj $user, deviceModelObj $device, orderModelObj $order, accountModelObj $account = null): bool
+    protected static function free(deviceModelObj $device, orderModelObj $order, accountModelObj $account = null, balanceModelObj $balance = null): bool
     {
         if (!App::isCommissionEnabled()) {
             return true;
         }
 
-        if (empty($account)) {
+        if (empty($account) && empty($balance)) {
             return true;
         }
 
@@ -82,19 +83,22 @@ class CommissionEventHandler
             }
         }
 
-        $total_commission_price = $account->getCommissionPrice();
-
-        if ($total_commission_price <= 0) {
+        if ($account) {
+            $commission_price = $account->getCommissionPrice();
+        } else {
+            $commission_price =  Config::balance('order.commission.val', 0);
+        }
+        
+        if ($commission_price <= 0) {
             return true;
         }
 
         $agent = $device->getAgent();
 
         if ($agent && $agent->settings('agentData.commission.enabled')) {
-            $order->setExtraData('commission.local.total', $total_commission_price);
+            $order->setExtraData('commission.local.total', $commission_price);
 
             //可分佣的金额
-            $commission_price = $account->getCommissionPrice();
             $commission_price = self::processKeeperCommissions($commission_price, $device, $order);
             if ($commission_price < 1) {
                 return true;

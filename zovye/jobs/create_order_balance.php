@@ -240,6 +240,7 @@ function createOrder(string          $order_no,
         'device' => $device,
         'user' => $user,
         'order' => $order,
+        'balance' => $balance,
     ]);
 
     //保存在事件处理中存入订单的数据

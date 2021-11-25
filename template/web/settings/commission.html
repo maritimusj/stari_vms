@@ -120,6 +120,20 @@
                 -->
                 </fieldset>
             </div>
+            {if \zovye\App::isBalanceEnabled()}
+            <div class="seg">
+                <div class="title">积分订单佣金</div>
+                <div class="form-group">
+                    <label for="balanceOrderPrice" class="col-md-2 control-label">佣金（元）
+                        <img src="{MODULE_URL}static/img/yen.svg" class="yen">
+                    </label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="balanceOrderPrice" id="balanceOrderPrice" value="{php echo number_format(\zovye\Config::balance('order.commission.val', 0)/100, 2)}" min="0" step="0.01">
+                        <span class="help-block">* 用户使用积分兑换商品后，设备代理商获得指定佣金奖励</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
             <div class="seg">
                 <div class="title">佣金广告平台</div>
                 <div class="form-group">
@@ -140,6 +154,7 @@
                     {php echo tpl_ueditor('commission_agreement_content', $settings['commission']['agreement']['content']);}
                     </div>
                 </div>
+                </fieldset>
             </div>
         </div>
     </div>

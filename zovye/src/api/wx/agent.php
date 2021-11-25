@@ -189,6 +189,7 @@ class agent
     public static function preLogin(): array
     {
         $result = [
+            'secret' => sha1(App::uid(10)),
             //邀请登记手机号码网址
             'url' => Util::murl('mobile'),
             'debug' => 0,

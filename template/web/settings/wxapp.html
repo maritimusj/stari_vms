@@ -65,9 +65,10 @@
                         <span class="help-block">* {$pos['description']}，请填写该广告位ID</span>
                     </div>
                     {if $pos['balance']}
+                    <label for="{$index}Bonus" class="col-md-2 control-label"></label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="{$index}Bonus" id="{$index}Bonus" value="{$advsID[$index]['bonus']}">
-                        <span class="help-block">* 用户获取积分</span>
+                        <span class="help-block">* 积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></span>
                     </div>
                     {/if}
                 </div>

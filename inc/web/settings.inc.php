@@ -442,9 +442,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                     'bonus' => request::str('rewardBonus'),
                 ],
                 'interstitial' => [
-                    'id' => [
-                        request::str('interstitial'),
-                    ],
+                    'id' => request::str('interstitial'),
                 ],
                 'video' => [
                     'id' => request::str('video'),
@@ -900,7 +898,7 @@ if ($op == 'account') {
         $list[] = $data;
     }
 
-    if (app::isBalanceEnabled()) {
+    if (App::isBalanceEnabled()) {
         $tpl_data['advs_position'] = [
             'banner' => [
                 'id' => 1,
@@ -909,7 +907,7 @@ if ($op == 'account') {
             ],
             'reward' => [
                 'id' => 2,
-                'title' => '激励式广告',
+                'title' => '激励广告',
                 'description' => '用户观看广告获得奖励，适用于道具解锁或获得积分等场景',
                 'balance' => true,
             ],

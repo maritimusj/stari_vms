@@ -21,6 +21,7 @@ class Balance
     const WX_APP_BONUS = 4; // 关注微信小程序
     const GOODS_EXCHANGE = 5; // 商品兑换
     const REFUND = 6; // 退款
+    const REWARD_ADV = 7; // 激励广告    
 
     private $user;
 
@@ -227,6 +228,15 @@ TEXT;
 <dt>事件</dt>
 <dd class="event">积分退回</dd>
 $reason_data
+</dl>
+TEXT;
+        } elseif ($entry->getSrc() == Balance::REWARD_ADV) {
+            $data['memo'] = <<<TEXT
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">广告奖励</dd>
+<dt>说明</dt>
+<dd class="event">完成观看小程序激励广告，获得奖励</dd>
 </dl>
 TEXT;
         }

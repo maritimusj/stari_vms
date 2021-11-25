@@ -29,7 +29,7 @@ router::exec($op, [
     'LoginQR' => '\zovye\api\wx\agent::loginQR',
     'LoginScan' => '\zovye\api\wx\agent::loginScan',
     'LoginPoll' => '\zovye\api\wx\agent::loginPoll',
-    'UserLogin' => '\zovye\api\wxx\common\login',
+    'UserLogin' => '\zovye\api\wxx\common::login',
 
     'AgentApplication' => '\zovye\api\wx\agent::application',
     'AgentMsg' => '\zovye\api\wx\agent::agentMsg',
@@ -116,6 +116,8 @@ router::exec($op, [
     'AdvDelete' => '\zovye\api\wx\adv::delete',
     'UploadFile' => '\zovye\api\wx\adv::uploadFile',
     'AdvGroupAssign' => '\zovye\api\wx\adv::groupAssign',
+
+    'AdvGetBonus' => 'zovye\api\wx\adv::getBonus',
 
     'ArticleDetail' => '\zovye\api\wx\article::detail',
     'Article' => '\zovye\api\wx\article::list',

@@ -8,6 +8,8 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\Advertising;
+use zovye\Balance;
+use zovye\Config;
 use zovye\model\advertisingModelObj;
 use zovye\Device;
 use zovye\model\device_groupsModelObj;
@@ -412,6 +414,17 @@ class adv
     public static function getBonus()
     {
         $user = common::getUser();
-
+        $bonus = Config::app('wxapp.advs.reward.bonus', 0);
+        if (empty($bonus)) {
+            return err(State::ERROR, '暂时没有奖励！');
+        }
+        $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);
+        if (empty($result)) {
+            return err(State::ERROR, '获取奖励失败！');
+        }
+        return [
+            'balance' => $user->getBalance()->total(),
+            'bonus' => $result->getXVal(),
+        ];
     }
 }

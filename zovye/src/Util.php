@@ -1060,7 +1060,7 @@ include './index.php';
             }
             //暂时禁用，客户数据过多的情况下，该函数很难完成
             //$result['counter'] = self::updateOrderCounters($order);
-
+            $result['order'] = $order->getId() . ' Ok!';
         } else {
             $result[] = $order->getId() . ' lock failed!';
         }

@@ -88,4 +88,14 @@ if ($op == 'add' || $op == 'edit') {
         JSON::success('删除成功！');
     }
     JSON::success('删除失败！');
+
+} elseif ($op == 'addAdvs' || $op == 'editAdvs') {
+
+    $tpl_data = [];
+
+    $content = app()->fetchTemplate('web/wxapp/advs', $tpl_data);
+    JSON::success([
+        'title' => $op == 'add' ? '创建广告位' : '编辑广告位',
+        'content' => $content,
+    ]);
 }

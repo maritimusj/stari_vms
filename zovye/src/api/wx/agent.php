@@ -192,6 +192,11 @@ class agent
             //邀请登记手机号码网址
             'url' => Util::murl('mobile'),
             'debug' => 0,
+            'plugs' => [
+                'wxplatform' => App::isWxPlatformEnabled(),
+                'douyin' => App::isDouyinEnabled(),
+            ],
+            'wxapp' => Config::app('wxapp.advs', []),
         ];
 
         //是否为微信审核模式
@@ -199,7 +204,7 @@ class agent
         if ($data) {
             $result['debug'] = intval($data['debug']);
         }
-
+        
         return $result;
     }
 

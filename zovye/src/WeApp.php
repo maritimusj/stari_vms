@@ -1315,6 +1315,8 @@ JSCODE;
         $order_jump_url = Util::murl('order', ['op' => 'jump']);
         $jquery_url = JS_JQUERY_URL;
 
+        $wxapp_username = settings('agentWxapp.username', '');
+
         $js_sdk = Util::fetchJSSDK();
 
         $tpl_data['js']['code'] = <<<JSCODE
@@ -1328,6 +1330,7 @@ $js_sdk
     const zovye_fn = {
         api_url: "$api_url",
         user: JSON.parse(`$user_json_str`),
+        wxapp_username: "$wxapp_username",
     }
     zovye_fn.getUserInfo = function (cb) {
         if (typeof cb === 'function') {

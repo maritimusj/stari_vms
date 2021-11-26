@@ -748,6 +748,10 @@ if (!$settings['custom']['SQMPay']['enabled']) {
     unset($tpl_data['navs']['advs']);
 }
 
+if (!$settings['agent']['wx']['app']['enabled'] && !App::isBalanceEnabled()) {
+    unset($tpl_data['navs']['wxapp']);
+}
+
 if ($op == 'account') {
     if (App::isWxPlatformEnabled()) {
         if (empty($settings['account']['wx']['platform']['config']['token']) || empty($settings['account']['wx']['platform']['config']['key'])) {
@@ -867,43 +871,47 @@ if ($op == 'account') {
     //var_dump($tpl_data);exit();
 
 } elseif ($op == 'wxapp') {
-    $query = WxApp::query();
 
-    $keyword = request::trim('keyword');
-    if (!empty($keywords)) {
-        $query->where([
-            'name REGEXP' => $keyword,
-            'key REGEXP' => $keyword,
-        ]);
-        $tpl_data['s_keyword'] = $keyword;
+    if (App::isCustomWxAppEnabled()) {
+        $query = WxApp::query();
+
+        $keyword = request::trim('keyword');
+        if (!empty($keywords)) {
+            $query->where([
+                'name REGEXP' => $keyword,
+                'key REGEXP' => $keyword,
+            ]);
+            $tpl_data['s_keyword'] = $keyword;
+        }
+
+        $total = $query->count();
+
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+
+        if ($page > ceil($total / $page_size)) {
+            $page = 1;
+        }
+
+        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
+        $query->page($page, $page_size);
+        $query->orderBy('id desc');
+
+        $list = [];
+        foreach ($query->findAll() as $wxapp) {
+            $data = [
+                'id' => $wxapp->getId(),
+                'name' => $wxapp->getName(),
+                'key' => $wxapp->getKey(),
+                'secret' => $wxapp->getSecret(),
+                'createtime_formatted' => date('Y-m-d H:i:s', $wxapp->getCreatetime()),
+            ];
+            $list[] = $data;
+        }
+
+        $tpl_data['list'] = $list;        
     }
-
-    $total = $query->count();
-
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
-
-    if ($page > ceil($total / $page_size)) {
-        $page = 1;
-    }
-
-    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
-
-    $query->page($page, $page_size);
-    $query->orderBy('id desc');
-
-    $list = [];
-    foreach ($query->findAll() as $wxapp) {
-        $data = [
-            'id' => $wxapp->getId(),
-            'name' => $wxapp->getName(),
-            'key' => $wxapp->getKey(),
-            'secret' => $wxapp->getSecret(),
-            'createtime_formatted' => date('Y-m-d H:i:s', $wxapp->getCreatetime()),
-        ];
-        $list[] = $data;
-    }
-
     if (App::isBalanceEnabled()) {
         $tpl_data['advs_position'] = [
             'banner' => [
@@ -931,9 +939,6 @@ if ($op == 'account') {
 
         $tpl_data['advsID'] = Config::app('wxapp.advs', []);
     }
-
-    $tpl_data['list'] = $list;
-
 } elseif ($op == 'user') {
 
     $res = CtrlServ::v2_query('idcard/balance');

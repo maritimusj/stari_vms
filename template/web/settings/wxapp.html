@@ -5,11 +5,13 @@
     <div class="panel panel-default nav-tab-item">
         <div class="heading">
             <span class="operate">
+                {if \zovye\App::isCustomWxAppEnabled()}
                 <i class="fa fa-plus fa-fw" title="添加小程序" data-op="add"></i>
+                {/if}
             </span>
         </div>
         <div class="panel-body">
-            {if !\zovye\App::isCustomWxAppEnabled()}
+            {if \zovye\App::isCustomWxAppEnabled()}
             <div class="seg">
                 <div class="title">多个小程序</div>
                 <div class="form-group">

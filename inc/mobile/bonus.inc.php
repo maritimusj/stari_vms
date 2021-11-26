@@ -55,7 +55,7 @@ if ($op == 'default') {
 
     $val = random_int(intval($bonus['min']), intval($bonus['max']));
     if (empty($val)) {
-        JSON::fail('没有获得积分！');
+        JSON::fail('真遗憾，没有获得积分！');
     }
 
     $res = $user->signIn($val);

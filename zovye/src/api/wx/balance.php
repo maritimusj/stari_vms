@@ -197,6 +197,7 @@ class balance
                         'openid' => $user->getOpenid(),
                         'ip' => CLIENT_IP,
                         'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+                        'current' => $balance_total,
                         'remain' => $balance_total - $amount - $fee,
                     ]
                 );

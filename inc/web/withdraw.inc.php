@@ -116,7 +116,7 @@ if ($op == 'export') {
 
             $fee = $entry->getExtraData('fee');
             if (isset($fee)) {
-                $data['fee'] = number_format($fee / 100, 2);
+                $data['fee'] = $fee;
             }
 
             $state = $entry->getExtraData('state');

@@ -9,7 +9,6 @@
     #commission-log .event {
          color:#9E9E9E;
     }
-
     #commission-log .wxpay i{
         color: #4CAF50;
     }
@@ -24,6 +23,9 @@
     }
     #commission-log .balance .num {
         color:blue;
+    }
+    #withdraw-list .price.val {
+        font-weight: 700;
     }
     #commission-log td{
         vertical-align: middle;
@@ -161,7 +163,9 @@
                     <th>#</th>
                     <th>申请方</th>
                     <th>手号码</th>
-                    <th>金额</th>
+                    <th>账户余额</th>
+                    <th>提现金额</th>
+                    <th>手续费</th>
                     <th>收款二维码</th>
                     <th>申请人</th>
                     <th>提交时间</th>
@@ -194,7 +198,12 @@
                         </div>
                     </td>
                     <td>
-                        <div class="price">
+                        <div class="price"{if isset($item['remain'])} title="剩余：{$item['remain']}"{/if}>
+                            {if isset($item['current'])}￥{$item['current']}{else}<span class="text-muted">n/a</span>{/if}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="price val">
                             ￥{$item['xval']}
                         </div>
                         {if $item['paymentNO']}
@@ -202,6 +211,15 @@
                             <i class="wi wi-money color-gray"></i>{$item['paymentNO']}
                         </div>
                         {/if}
+                    </td>
+                    <td>
+                        <div class="price">
+                            {if isset($item['fee'])}
+                            <span{if empty($item['fee'])} class="text-muted"{/if}>￥{php echo number_format($item['fee'] / 100, 2);}</span>
+                            {else}
+                            <span class="text-muted">n/a</span>
+                            {/if}
+                        </div>
                     </td>
                     <td>
                     	<div class="agent-qrcode">

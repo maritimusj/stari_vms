@@ -128,7 +128,6 @@
     	position: absolute;
     }
 </style>
-{if $commission_enabled}
 <ul class="nav nav-tabs" id="navbar">
 {if empty($user)}
     <li role="presentation" class="active">
@@ -151,11 +150,18 @@
 </ul>
 <div class="panel panel-default {if empty($user)}panel-first{/if}">
     <div class="heading">
+        {if $commission_enabled}
         <span class="operate">
             <a href="{php echo $this->createWebUrl('withdraw', array('op'=>'export'));}" target="_blank"><i class="fa fa-filter" title="导出"></i></a>
         </span>
+        {/if}
     </div>
     <div class="panel-body">
+        {if !$commission_enabled}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 没有启用佣金系统！
+        </div>
+        {else}
         {if $apps}
         <table class="table" id="withdraw-list">
             <thead>
@@ -290,6 +296,7 @@
             <i class="fa fa-question-circle"></i> 没有任何提现申请！
         </div>
         {/if}
+        {/if}
     </div>
 </div>
 <script>
@@ -360,8 +367,3 @@
         })
     })
 </script>
-{else}
-<div class="text-center text-muted">
-    没有开启佣金系统！
-</div>
-{/if}

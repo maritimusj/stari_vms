@@ -226,10 +226,17 @@ class accountModelObj extends modelObj
     public function getBonusType(): string
     {
         $commission = $this->settings('commission', []);
-        if (isset($commission['balance'])) {
-            return Account::BALANCE;
+        if (App::isBalanceEnabled()) {
+            if (isset($commission['balance'])) {
+                return Account::BALANCE;
+            }            
         }
-        return Account::COMMISSION;
+        if (App::isCommissionEnabled()) {
+            if (isset($commission['money'])) {
+                return Account::COMMISSION;
+            }
+        }
+        return '';
     }
 
     public function getBalancePrice(): int

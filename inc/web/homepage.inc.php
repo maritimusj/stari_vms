@@ -101,5 +101,6 @@ if ($op == 'stats') {
 }
 
 app()->showTemplate('web/home/default', [
+    'commission_enabled' => App::isCommissionEnabled(),
     'url' => Util::url('homepage'),
 ]);

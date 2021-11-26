@@ -524,8 +524,8 @@ if ($op == 'default') {
             
             // 积分
             if (App::isBalanceEnabled()) {
-                if (request::isset('commission_money')) {
-                    $commission_data['balance'] =  request::int('commission_balance');
+                if (request::has('balance')) {
+                    $commission_data['balance'] =  request::int('balance');
                 } elseif (request::str('bonus_type') == Account::BALANCE) {
                     $commission_data['balance'] =  request::int('amount');
                 }
@@ -630,7 +630,7 @@ if ($op == 'default') {
         'limits' => $limits ?? null,
         'bonus_type' => $bonus_type,
         'amount' => $amount ?? 0,
-        'balance' => $balance ?? 0,
+        'balance' => $amount ?? 0,
         'agent_name' => $agent_name,
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,

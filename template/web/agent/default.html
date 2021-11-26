@@ -69,7 +69,9 @@
                 <tr>
                     <th>#</th>
                     <th>昵称</th>
+                    {if \zovye\App::isCommissionEnabled()}
                     <th class="center">账户余额</th>
+                    {/if}
                     <th>手机号码</th>
                     <th class="text-center"><span id="J_money" data-sort="{$s_money}" style="cursor: pointer;">等级</span></th>                    
                     <th class="center"><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
@@ -95,6 +97,7 @@
                             </div>
                         <!--</a>-->
                     </td>
+                    {if \zovye\App::isCommissionEnabled()}
                     <td>
                         {if isset($agent['commission'])}
                         <div class="commission log operate">
@@ -104,6 +107,7 @@
                         </div>
                         {/if}
                     </td>
+                    {/if}
                     <td>
                         <div>{$agent['mobile']}</div>
                         {if $agent['referral']}

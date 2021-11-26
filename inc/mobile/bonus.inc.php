@@ -53,7 +53,15 @@ if ($op == 'default') {
         JSON::fail('已经签到了！');
     }
 
-    $val = random_int(intval($bonus['min']), intval($bonus['max']));
+    $min = intval($bonus['min']);
+    $max = intval($bonus['max']);
+
+    if ($min >= $max) {
+        $val = $min;
+    } else {
+        $val = random_int($min, $max);
+    }
+    
     if (empty($val)) {
         JSON::fail('真遗憾，没有获得积分！');
     }

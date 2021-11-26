@@ -345,6 +345,7 @@ if ($op == 'default') {
                     'secret' => request::trim('secret'),
                 ]);
             } elseif ($account->isWxApp()) {
+                $data['img'] = request::trim('img');
                 $account->set('config', [
                     'type' => Account::WXAPP,
                     'username' => request::trim('username'),
@@ -352,6 +353,7 @@ if ($op == 'default') {
                     'delay' => request::int('delay', 1),
                 ]);
             } elseif ($account->isAuth()) {
+                $data['img'] = request::trim('img');
                 $timing = request::int('OpenTiming');
                 if (!$account->isVerified()) {
                     $timing = 1;

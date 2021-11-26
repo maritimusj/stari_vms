@@ -193,11 +193,14 @@ class agent
             //邀请登记手机号码网址
             'url' => Util::murl('mobile'),
             'debug' => 0,
-            'plugs' => [
+            'plugin' => [
                 'wxplatform' => App::isWxPlatformEnabled(),
                 'douyin' => App::isDouyinEnabled(),
             ],
-            'wxapp' => Config::app('wxapp.advs', []),
+            'wxapp' => [
+                'debug' => false,
+                'config' => Config::app('wxapp.advs', []),
+            ],
         ];
 
         //是否为微信审核模式

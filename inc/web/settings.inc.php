@@ -104,7 +104,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         if (App::isBalanceEnabled()) {
             Config::balance('sign.bonus', [
                 'enabled' => request::bool('') ? 1 : 0,
-                'val' => request::int('dailySignInBonus'),
+                'min' => request::int('dailySignInBonusMin'),
+                'max' => request::int('dailySignInBonusMax'),
             ], true);
         }
 

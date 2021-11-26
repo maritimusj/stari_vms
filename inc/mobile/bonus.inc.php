@@ -41,7 +41,7 @@ if ($op == 'default') {
 } elseif ($op == 'signIn') {
 
     $bonus = Config::balance('sign.bonus', []);
-    if (empty($bonus) || !$bonus['enabled'] || empty($bonus['val'])) {
+    if (empty($bonus) || !$bonus['enabled']) {
         JSON::fail('这个功能没有启用！');
     }
 
@@ -53,14 +53,19 @@ if ($op == 'default') {
         JSON::fail('已经签到了！');
     }
 
-    $res = $user->signIn($bonus['val']);
+    $val = random_int(intval($bonus['min']), intval($bonus['max']));
+    if (empty($val)) {
+        JSON::fail('没有获得积分！');
+    }
+
+    $res = $user->signIn($val);
     if (empty($res)) {
         JSON::fail('签到失败！');
     }
 
     JSON::success([
         'balance' => $user->getBalance()->total(),
-        'bonus' => $bonus['val'],
+        'bonus' => $val,
     ]);
 
 } elseif ($op == 'account') {

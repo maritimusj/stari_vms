@@ -85,12 +85,18 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="dailySignInBonus" class="col-md-2 control-label">奖励积分
+                    <label for="dailySignInBonusMin" class="col-md-2 control-label">奖励积分
                         <img src="{MODULE_URL}static/img/coin.svg" class="balance">
                     </label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="dailySignInBonus" id="dailySignInBonus" value="{php echo \zovye\Config::balance('sign.bonus.val', 0)}" min="0" step="1">
-                        <span class="help-block">* 用户签到后，会获得指定积分</span>
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="dailySignInBonusMin" id="dailySignInBonusMin" value="{php echo \zovye\Config::balance('sign.bonus.min', 0)}" min="0" step="1" title="最小值">
+                            <span class="help-block">* 用户签到后，会获得指定范围<b>随机数量</b>的积分</span>
+                        </div>
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="dailySignInBonusMax" id="dailySignInBonusMax" value="{php echo \zovye\Config::balance('sign.bonus.max', 0)}" min="0" step="1" title="最大值">
+                            <span class="help-block"></span>
+                        </div>
                     </div>
                 </div>
             </div>

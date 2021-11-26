@@ -74,11 +74,11 @@
             <div class="seg">
                 <div class="title">每日签到</div>
                 <div class="form-group">
-                    <label for="dailySignIn" class="col-md-2 control-label">是否启用</label>
+                    <label for="dailySignInEnabled" class="col-md-2 control-label">是否启用</label>
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="dailySignInEnabled" id="dailySignIn" value="1" {if \zovye\Config::balance('sign.bonus.enabled', false)}checked{/if}>
+                                <input type="checkbox" name="dailySignInEnabled" id="dailySignInEnabled" value="1" {if \zovye\Config::balance('sign.bonus.enabled', false)}checked{/if}>
                                 启用后，用户可以通过每日签到获得指定积分
                             </label>
                         </div>
@@ -100,6 +100,24 @@
                     </div>
                 </div>
             </div>
+            <div class="seg">
+                <div class="title">第三方接口</div>
+                <div class="form-group">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">API网址</label>
+                        <div class="col-md-10">
+                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$api_url}"></i> {$api_url}</span>
+                            <span class="help-block">该接口用于获取积分用户列表，操作用户积分</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">API Key</label>
+                        <div class="col-md-10">
+                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$app_key}"></i> {$app_key}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {/if}
         </div>
     </div>
@@ -109,4 +127,11 @@
         <button type="submit" class="btn btn-primary">保存</button>
     </div>
 </form>
+<script>
+    $(function(){
+        $('[data-url]').each(function(){
+            util.clip(this, $(this).data('url'));
+        })
+    });
+</script>
 {template 'common/footer'}

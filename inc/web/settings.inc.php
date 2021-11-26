@@ -218,7 +218,13 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
         $settings['account']['appQRCode']['enabled'] = request::bool('AccountAppQRCode') ? 1 : 0;
 
-        Config::balance('enabled', request::bool('UserBalance') ? 1 : 0, true);
+        $balance_enabled = request::bool('UserBalance');
+        Config::balance('enabled',  $balance_enabled? 1 : 0, true);
+        if ($balance_enabled) {
+            if (empty(Config::balance('app.key'))) {
+                Config::balance('app.key', Util::random(32), true);
+            }
+        }
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
         if ($settings['app']['first']['enabled']) {
@@ -949,7 +955,8 @@ if ($op == 'account') {
     } else {
         $tpl_data['idcard_balance'] = $res['data']['msg'];
     }
-
+    $tpl_data['api_url'] = Util::murl('user');
+    $tpl_data['app_key'] = Config::balance('app.key');
 } elseif ($op == 'advs') {
 
     if ($settings['custom']['SQMPay']['enabled']) {

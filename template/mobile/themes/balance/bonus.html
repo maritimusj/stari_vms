@@ -390,13 +390,25 @@
 			<div :class="['sign-in', done ? 'done' : '']" v-if="done !== null" @click="signInClick">{{done ? '已签到' :
 				'签到'}}</div>
 		</div>
-		<div class="menu-item clickable">
+		<div class="menu-item clickable" style="position: relative;">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/clock_icon.svg">
 			<div class="info">
 				<span class="title">日常任务</span>
-				<span class="desc">完成任务获得奖励</span>
+				<span class="desc">打开小程序完成任务</span>
 			</div>
 			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
+			<div style="width: 100%;height: 100%;position: absolute;left: 0;top: 0;opacity: 0;overflow: hidden;" v-if="userInfo">
+				<wx-open-launch-weapp
+					id="launch-btn"
+					:username="wxapp_username"
+					:path="'pages/bigcms/user/task/task?openId=' + userInfo.openid"
+					>
+					<script type="text/wxtag-template">
+						<style>.btn { width: 1000px; height: 82px; }</style>
+						<button class="btn">打开小程序</button>
+					</script>
+				</wx-open-launch-weapp>
+			</div>
 		</div>
 		<div class="menu-item clickable" @click="videoClick">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/video_icon.svg">
@@ -418,7 +430,7 @@
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/wxapp_icon.svg">
 			<div class="info">
 				<span class="title">关注小程序</span>
-				<span class="desc">去小程序发现更多奖励</span>
+				<span class="desc">关注小程序获取积分</span>
 			</div>
 			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
 		</div>
@@ -521,10 +533,13 @@
 					text: '',
 					visible: false,
 					timeout: null
-				}
+				},
+				userInfo: null,
+				wxapp_username: zovye_fn.wxapp_username
 			},
 			created() {
 				this.done = !zovye_fn.signIn;
+				this.getUserInfo();
 				this.getSlideList();
 				this.visibilitychange();
 			},
@@ -542,6 +557,13 @@
 							}
 						}
 					});
+				},
+				getUserInfo() {
+					zovye_fn.getUserInfo().then(res => {
+						if (res.status) {
+							this.userInfo = res.data;
+						}
+					})
 				},
 				getSlideList() {
 					zovye_fn.getAdvs(4, 10, (data) => {

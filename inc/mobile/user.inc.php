@@ -62,9 +62,9 @@ if ($op == 'default') {
         JSON::fail('积分值不能为0！');
     }
     
-    $result = $user->getBalance()->change($val, Balance::REWARD_ADV, [
+    $result = $user->getBalance()->change($val, Balance::API_UPDATE, [
         'appkey' => $appkey,
-        'reason' => request::str('reason', ''),
+        'reason' => request::str('reason', '', true),
         'ip' => Util::getClientIp(),
     ]);
 

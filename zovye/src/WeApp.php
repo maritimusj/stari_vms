@@ -1229,6 +1229,7 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
+        $wxapp_username = settings('agentWxapp.username', '');
 
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
@@ -1237,10 +1238,10 @@ $js_sdk
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
     });
-
     const zovye_fn = {
         api_url: "$api_url",
         user: JSON.parse(`$user_json_str`),
+        wxapp_username: "$wxapp_username",
     }
     zovye_fn.getUserInfo = function (cb) {
         if (typeof cb === 'function') {

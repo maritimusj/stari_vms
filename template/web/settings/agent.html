@@ -34,19 +34,26 @@
                     {/if}
                 </div>
                 <div class="form-group">
-                    <label for="WxAppKey" class="col-md-2 control-label">AppID(小程序ID)</label>
+                    <label for="WxAppKey" class="col-md-2 control-label">小程序ID AppID</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="WxAppKey" id="WxAppKey" value="{$settings['agentWxapp']['key']}">
                         <span class="help-block">* 微信小程序 AppID</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="WxAppSecret" class="col-md-2 control-label">AppSecret(小程序密钥)</label>
+                    <label for="WxAppSecret" class="col-md-2 control-label">小程序密钥 AppSecret</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control inputMask" name="WxAppSecret" id="WxAppSecret" value="{$settings['agentWxapp']['secret']}">
                         <span class="help-block">* 微信小程序 AppSecret</span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="WxAppUsername" class="col-md-2 control-label">小程序原始ID Username</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="WxAppUsername" id="WxAppUsername" value="{$settings['agentWxapp']['username']}">
+                        <span class="help-block">* 微信小程序的原始ID</span>
+                    </div>
+                </div>                
             </div>
             <div class="seg">
                 <div class="title">设备管理</div>

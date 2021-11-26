@@ -244,6 +244,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['agentWxapp'] = [
             'key' => request::trim('WxAppKey'),
             'secret' => request::trim('WxAppSecret'),
+            'username' => request::trim('WxAppUsername'),
         ];
 
         $settings['agent']['order']['refund'] = request::bool('allowAgentRefund') ? 1 : 0;

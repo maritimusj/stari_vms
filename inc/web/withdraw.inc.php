@@ -100,8 +100,24 @@ if ($op == 'export') {
             $data = [
                 'id' => $entry->getId(),
                 'xval' => number_format(abs($entry->getXVal()) / 100, 2),
+                'remain' => $entry->getExtraData('remain'),
                 'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];
+
+            $current = $entry->getExtraData('current');
+            if (isset($current)) {
+                $data['current'] = number_format($current / 100, 2);
+            }
+
+            $remain = $entry->getExtraData('remain');
+            if (isset($remain)) {
+                $data['remain'] = number_format($remain / 100, 2);
+            }
+
+            $fee = $entry->getExtraData('fee');
+            if (isset($fee)) {
+                $data['fee'] = number_format($fee / 100, 2);
+            }
 
             $state = $entry->getExtraData('state');
             if (empty($state)) {

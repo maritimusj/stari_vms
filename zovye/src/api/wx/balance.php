@@ -199,6 +199,7 @@ class balance
                         'user-agent' => $_SERVER['HTTP_USER_AGENT'],
                         'current' => $balance_total,
                         'remain' => $balance_total - $amount - $fee,
+                        'fee' => $fee,
                     ]
                 );
 

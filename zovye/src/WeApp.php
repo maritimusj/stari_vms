@@ -1304,7 +1304,7 @@ JSCODE;
 
         $user_data = [
             'status' => true,
-            'data' => $user->profile(),
+            'data' => $user->profile(true),
         ];
 
         $user_data['data']['balance'] = $user->getBalance()->total();

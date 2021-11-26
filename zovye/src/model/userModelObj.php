@@ -178,6 +178,7 @@ class userModelObj extends modelObj
                     }
                 }
             }
+            $data['mobile'] = $this->getMobile();
         }
 
         return $data;

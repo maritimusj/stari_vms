@@ -61,7 +61,7 @@ class Balance
     public function change(int $val, int $src, array $extra = []): ?balanceModelObj
     {
         if ($this->user && $val != 0) {
-            return m('balance')->create(
+            $result = m('balance')->create(
                 We7::uniacid(
                     [
                         'openid' => $this->user->getOpenid(),
@@ -71,9 +71,37 @@ class Balance
                     ]
                 )
             );
+            if ($result) {
+                $this->on_change($result);
+                return $result;
+            }
         }
 
         return null;
+    }
+
+    public function on_change(balanceModelObj $item)
+    {
+        $notify_url = Config::balance('app.notify_url');
+        if ($notify_url) {
+            $profile = $this->user->profile(true);
+            $profile['balance'] = $this->total();
+            $profile['change'] = $item->getXVal();
+            
+            $data = json_encode([
+                'data' => $profile,
+                'sign' => hash_hmac('sha1', http_build_query($profile), Config::balance('app.key')),
+            ], JSON_UNESCAPED_UNICODE);
+
+            $result = CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify_url, $data);
+            if (is_error($result)) {
+                Util::logToFile('balance', [
+                    'notify_url' => $notify_url,
+                    'data' => $data,
+                    'result' => $result,
+                ]);
+            }
+        }
     }
 
     /**

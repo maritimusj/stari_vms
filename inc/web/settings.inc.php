@@ -107,6 +107,8 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 'min' => request::int('dailySignInBonusMin'),
                 'max' => request::int('dailySignInBonusMax'),
             ], true);
+
+            Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
         }
 
     } elseif ($save_type == 'ctrl') {
@@ -955,8 +957,11 @@ if ($op == 'account') {
     } else {
         $tpl_data['idcard_balance'] = $res['data']['msg'];
     }
+
     $tpl_data['api_url'] = Util::murl('user');
     $tpl_data['app_key'] = Config::balance('app.key');
+    $tpl_data['notify_url'] = Config::balance('app.notify_url');    
+
 } elseif ($op == 'advs') {
 
     if ($settings['custom']['SQMPay']['enabled']) {

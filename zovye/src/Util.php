@@ -398,7 +398,11 @@ class Util
         }
         $date = new DateTime();
         do {
-            unset($files[$date->format('Ymd')]);
+            $time = $date->format('Ymd');
+            unset($files[$time]);
+            foreach(Log::$suffix as $suffix) {
+                unset($files["$time.$suffix"]);
+            }
             $date->modify('-1 day');
         } while (--$keep_days > 0);
 

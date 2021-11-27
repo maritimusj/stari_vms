@@ -6,7 +6,7 @@ class Log
 {
     public static $level = L_ALL;
 
-    private static $suffix = [
+    public static $suffix = [
         L_ALL => '',
         L_DEBUG => 'debug',
         L_INFO => 'info',

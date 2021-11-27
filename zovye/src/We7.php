@@ -560,7 +560,7 @@ EOF;
         return self::pdo()->fieldexists($tbname, $field);
     }
 
-    public static function indexexists($tbname, $indexname)
+    public static function pdo_indexexists($tbname, $indexname)
     {
         return self::pdo()->indexexists($tbname, $indexname);
     }

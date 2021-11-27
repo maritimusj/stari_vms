@@ -11,6 +11,7 @@ use zovye\Account;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Job;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\request;
 use zovye\Order;
@@ -155,4 +156,4 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
 
 $params['serial'] = request::str('serial');
 
-Util::logToFile('create_order_account', $params);
+Log::debug('create_order_account', $params);

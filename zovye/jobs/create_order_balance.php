@@ -11,11 +11,11 @@ use RuntimeException;
 use zovye\App;
 use zovye\Balance;
 use zovye\CtrlServ;
-use zovye\Device;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
 use zovye\Job;
+use zovye\Log;
 use zovye\model\balanceModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
@@ -33,12 +33,12 @@ $order_no = request::str('orderNO');
 $balance_id = request::int('balance');
 $log = [
     'op' => $op,
-    'orderNO' => $orderNO,
+    'orderNO' => $order_no,
     'balance_id' => $balance_id,
 ];
 
 $writeLog = function () use (&$log) {
-    Util::logToFile('create_order_balance', $log);
+    Log::debug('create_order_balance', $log);
 };
 
 if ($op == 'create_order_balance' && CtrlServ::checkJobSign([

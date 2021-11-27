@@ -10,6 +10,7 @@ namespace zovye\job\orderPayResult;
 
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Log;
 use zovye\request;
 use zovye\Job;
 use zovye\Order;
@@ -93,6 +94,6 @@ if ($op == 'order_pay_result' && CtrlServ::checkJobSign(['orderNO' => $order_no,
 
 function writeLogAndExit($log)
 {
-    Util::logToFile('order_pay_result', $log);
+    Log::debug('order_pay_result', $log);
     Job::exit();
 }

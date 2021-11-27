@@ -10,6 +10,7 @@ use Exception;
 use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
@@ -47,12 +48,12 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
         if ($device) {
             $device->appShowMessage($e->getMessage(), 'error');
         }
-        Util::logToFile('order_create_multi', [
+        Log::error('order_create_multi', [
             'orderNO' => $order_no,
             'error' => $e->getMessage(),
         ]);
     } catch (Exception $e) {
-        Util::logToFile('order_create_multi', [
+        Log::error('order_create_multi', [
             'orderNO' => $order_no,
             'error' => $e->getMessage(),
         ]);

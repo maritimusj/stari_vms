@@ -13,6 +13,9 @@ define('REQUEST_ID', Util::generateUID());
 
 Util::setErrorHandler();
 
+//设置日志等级
+Log::$level = LOG_LEVEL;
+
 //初始化事件驱动
 EventBus::init();
 

@@ -16,8 +16,17 @@ define('MOD_CACHE_DIR', DATA_DIR . 'mod_cache' . DIRECTORY_SEPARATOR);
 define('PEM_DIR', DATA_DIR . 'pem' . DIRECTORY_SEPARATOR); //微信支付企业密钥文件生成目录，最好设置到web目录以外的目录，需要可写权限
 define('LIB_DIR', ZOVYE_ROOT . 'lib' . DIRECTORY_SEPARATOR);
 
+define('L_ALL', 0);
+define('L_INFO', 1);
+define('L_DEBUG', 2);
+define('L_WARN', 3);
+define('L_ERROR', 4);
+define('L_FATAL', 5);
+
 define('APP_NAME', basename(ZOVYE_ROOT));
 define('DEBUG', true);
+
+define('LOG_LEVEL', L_ERROR);
 
 define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'] . $_SERVER['HTTP_HOST'] . '/addons/' . APP_NAME . '/');
 
@@ -25,12 +34,7 @@ define('LEVEL_HIGH', 'order');
 define('LEVEL_NORMAL', 'normal');
 define('LEVEL_LOW', 'lower');
 
-define('L_ALL', 0);
-define('L_INFO', 1);
-define('L_DEBUG', 2);
-define('L_WARN', 3);
-define('L_ERROR', 4);
-define('L_FATAL', 5);
+
 
 define('LOG_PAY_RESULT', 60);
 define('LOG_PAY', 101);

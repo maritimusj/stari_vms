@@ -9,8 +9,7 @@ namespace zovye;
 $op = request::op('default');
 $appkey = request::str('appkey');
 
-
-if ($appkey !== Config::balance('app.key')) {
+if (empty($appkey) || $appkey !== Config::balance('app.key')) {
     JSON::fail('非法请求！');
 }
 

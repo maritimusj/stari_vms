@@ -508,6 +508,8 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_order` (
   KEY `order_id` (`order_id`,`uniacid`),
   KEY `agent_id` (`agent_id`,`uniacid`),
   KEY `openid` (`openid`,`uniacid`),
+  KEY `result_code` (`result_code`,`uniacid`),
+  KEY `refund` (`refund`,`uniacid`),
   KEY `createtime` (`createtime`),
   KEY `updatetime` (`updatetime`),
   KEY `account` (`account`,`uniacid`)

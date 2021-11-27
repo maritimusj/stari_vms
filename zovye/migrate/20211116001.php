@@ -41,4 +41,18 @@ if (!We7::pdo_indexexists($tb_name . '_order', 'src')) {
     ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`src`);
 SQL;
     Migrate::execSQL($sql);
-} 
+}
+
+if (!We7::pdo_indexexists($tb_name . '_order', 'refund')) {
+    $sql = <<<SQL
+    ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`refund`);
+SQL;
+    Migrate::execSQL($sql);
+}
+
+if (!We7::pdo_indexexists($tb_name . '_order', 'result_code')) {
+    $sql = <<<SQL
+    ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`result_code`);
+SQL;
+    Migrate::execSQL($sql);
+}

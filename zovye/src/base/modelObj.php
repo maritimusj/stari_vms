@@ -11,7 +11,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
 use zovye\Contract\ISettings;
-use zovye\Log;
+use zovye\LogObj;
 use zovye\Settings;
 use zovye\traits\DirtyChecker;
 use zovye\traits\GettersAndSetters;
@@ -91,11 +91,11 @@ class modelObj implements ISettings
     {
         if ($level && $title) {
             if (!isset($this->logger)) {
-                $this->logger = new Log($this->factory->shortName());
+                $this->logger = new LogObj($this->factory->shortName());
             }
 
             if ($this->logger) {
-                return $this->logger->log($level, $title, $data);
+                return $this->logger->create($level, $title, $data);
             }
         }
 

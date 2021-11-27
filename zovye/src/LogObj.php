@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-class Log
+class LogObj
 {
     private $tb_name;
 
@@ -46,7 +46,7 @@ SQL_STATEMENT;
         return $this->tb_name;
     }
 
-    public function log($level, $title, $data): bool
+    public function create($level, $title, $data): bool
     {
         $res = We7::pdo_insert(
             $this->getTableName(),

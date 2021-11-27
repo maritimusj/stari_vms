@@ -171,11 +171,11 @@ class WeApp extends Settings
     public function log($level = null, $title = null, $data = null)
     {
         if (!isset($this->logger)) {
-            $this->logger = new Log('app');
+            $this->logger = new LogObj('app');
         }
 
         if ($this->logger && isset($level) && isset($title) && isset($data)) {
-            $this->logger->log($level, $title, $data);
+            $this->logger->create($level, $title, $data);
         }
     }
 

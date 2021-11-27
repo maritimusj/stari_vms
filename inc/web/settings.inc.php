@@ -958,6 +958,7 @@ if ($op == 'account') {
         $tpl_data['idcard_balance'] = $res['data']['msg'];
     }
 
+    $tpl_data['bonus_url'] = Util::murl('bonus');
     $tpl_data['api_url'] = Util::murl('user');
     $tpl_data['app_key'] = Config::balance('app.key');
     $tpl_data['notify_url'] = Config::balance('app.notify_url');    

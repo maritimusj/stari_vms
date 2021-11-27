@@ -33,5 +33,12 @@ CREATE TABLE `ims_zovye_vms_balance_logs` (
     PRIMARY KEY (`id`), INDEX (`user_id`, `account_id`, `createtime`)
 ) ENGINE = InnoDB;
 SQL;
-    Migrate::execSQL($sql);
+    Migrate::execSQL($sql);   
 }
+
+if (!We7::pdo_indexexists($tb_name . '_order', 'src')) {
+    $sql = <<<SQL
+    ALTER TABLE `ims_zovye_vms_order` ADD INDEX(`src`);
+SQL;
+    Migrate::execSQL($sql);
+} 

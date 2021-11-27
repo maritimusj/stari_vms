@@ -376,10 +376,15 @@ class Util
      * @param string $name
      * @return string
      */
-    public static function logFileName(string $name): string
+    public static function logFileName(string $name, string $suffix = ''): string
     {
         $log_dir = self::logDir($name);
-        return $log_dir . DIRECTORY_SEPARATOR . date('Ymd') . '.log';
+        $filename = $log_dir . DIRECTORY_SEPARATOR . date('Ymd');
+        if ($suffix) {
+            $filename .= ".$suffix";
+        }
+        $filename .= '.log';
+        return $filename;
     }
 
     public static function deleteExpiredLogFiles(string $name, $keep_days = 3)
@@ -402,16 +407,18 @@ class Util
         }
     }
 
+    static $log_cache = [];
+
     /**
      * 输出指定变量到文件中
      * @param string $name 日志名称
      * @param mixed $data 数据
+     * @param bool $force
+     * @param string $suffix
      * @return bool
      */
 
-    static $log_cache = [];
-
-    public static function logToFile(string $name, $data, bool $force = false): bool
+    public static function logToFile(string $name, $data, bool $force = false, string $suffix = ''): bool
     {
         if (DEBUG || $force) {
             if (empty(self::$log_cache)) {
@@ -427,7 +434,7 @@ class Util
                 });
             }
 
-            $log_filename = self::logFileName($name);
+            $log_filename = self::logFileName($name, $suffix);
 
             ob_start();
 

@@ -6,10 +6,19 @@ class Log
 {
     public static $level = L_ALL;
 
+    private static $suffix = [
+        L_ALL => '',
+        L_DEBUG => 'debug',
+        L_INFO => 'info',
+        L_WARN => 'warn',
+        L_ERROR => 'error',
+        L_FATAL => 'fatal',
+    ];
+
     public static function append($level, $title, $data = [])
     {
         if ($level >= self::$level) {
-            Util::logToFile($title, $data, true);
+            Util::logToFile($title, $data, true, self::$suffix[$level] ?? '');
         }
     }
 

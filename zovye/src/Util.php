@@ -411,9 +411,9 @@ class Util
 
     static $log_cache = [];
 
-    public static function logToFile(string $name, $data): bool
+    public static function logToFile(string $name, $data, bool $force = false): bool
     {
-        if (DEBUG) {
+        if (DEBUG || $force) {
             if (empty(self::$log_cache)) {
                 register_shutdown_function(function () use ($name) {
                     foreach (self::$log_cache as $filename => $data) {

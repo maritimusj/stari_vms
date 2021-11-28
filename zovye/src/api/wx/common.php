@@ -27,10 +27,7 @@ class common
     public static function getDecryptedWxUserData(): array
     {
         $code = request::str('code');
-        $iv = request::str('iv');
-        $encrypted_data = request::str('encryptedData');
-
-        if (empty($code) || empty($iv) || empty($encrypted_data)) {
+        if (empty($code)) {
             return error(State::ERROR, '缺少必要的请求参数！');
         }
 
@@ -51,6 +48,9 @@ class common
         if (empty($config)) {
             return error(State::ERROR, '小程序配置为空！');
         }
+
+        $iv = request::str('iv');
+        $encrypted_data = request::str('encryptedData');
 
         $result = Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);
         if (is_error($result)) {

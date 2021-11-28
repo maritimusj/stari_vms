@@ -76,11 +76,15 @@ class Wx
             return $auth_data;
         }
 
-        //微擎的pkcs7Encode()解密函数需要从$_SESSION中读取session_key
-        $_SESSION['session_key'] = $auth_data['session_key'];
-        $res = $wxApp->pkcs7Encode($encryptedData, $iv);
-        if (is_error($res)) {
-            return $res;
+        if ($iv && $encryptedData) {
+            //微擎的pkcs7Encode()解密函数需要从$_SESSION中读取session_key
+            $_SESSION['session_key'] = $auth_data['session_key'];
+            $res = $wxApp->pkcs7Encode($encryptedData, $iv);
+            if (is_error($res)) {
+                return $res;
+            }
+        } else {
+            $res = [];
         }
 
         $res['session_key'] = $_SESSION['session_key'];

@@ -35,13 +35,13 @@ class OrderCounter
             }
         }
         $arr = array_merge($arr, $extra);
-        rsort($arr);
-        return sha1(implode(':', $arr));
+        sort($arr);
+        return sha1(http_build_query($arr));
     }
 
     public static function fillCondition(array $objs, DateTimeInterface $begin, DateTimeInterface $end, $param = [])
     {
-        $condition = $param;
+        $condition = array_merge([], $param);
         foreach ($objs as $obj) {
             if ($obj instanceof agentModelObj) {
                 $condition['agent_id'] = $obj->getId();
@@ -74,7 +74,7 @@ class OrderCounter
             $extra[] = 'goods';
         }
 
-        $uid = self::makeUID($objs, $extra);
+        $uid = self::makeUID($objs, array_merge($extra, $params));
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);
@@ -112,7 +112,7 @@ class OrderCounter
             $extra[] = 'goods';
         }
 
-        $uid = self::makeUID($objs, $extra);
+        $uid = self::makeUID($objs, array_merge($extra, $params));
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);
@@ -162,7 +162,7 @@ class OrderCounter
             $extra[] = 'goods';
         }
 
-        $uid = self::makeUID($objs, $extra);
+        $uid = self::makeUID($objs, array_merge($extra, $params));
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);
@@ -211,7 +211,7 @@ class OrderCounter
             $extra[] = 'goods';
         }
 
-        $uid = self::makeUID($objs, $extra);
+        $uid = self::makeUID($objs, array_merge($extra, $params));
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);

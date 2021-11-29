@@ -329,7 +329,7 @@ TEXT;
 
     public static function isFreeOrder(): bool
     {
-        return !self::isPayOrder();
+        return  Config::balance('order.as', 'free') == 'free';
     }
 
     public static function isPayOrder(): bool

@@ -613,7 +613,7 @@ class userModelObj extends modelObj
     {
         $condition = ['openid' => $this->openid];
         
-        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+        if (App::isBalanceEnabled() && Balance::isPayOrder()) {
             $condition['src'] = [Order::PAY, Order::BALANCE];
         } else {
             $condition['src'] = Order::PAY;

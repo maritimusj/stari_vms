@@ -118,7 +118,9 @@
 		}
 
 		.desc {
-			color: #9d9d9d;
+			color: #aaa;
+			font-size: 13px;
+			margin-top: 2px;
 		}
 
 		.arrow {
@@ -535,13 +537,15 @@
 					timeout: null
 				},
 				userInfo: null,
-				wxapp_username: zovye_fn.wxapp_username
+				wxapp_username: zovye_fn.wxapp_username,
+				wechatState: null
 			},
 			created() {
 				this.done = !zovye_fn.signIn;
 				this.getUserInfo();
 				this.getSlideList();
 				this.visibilitychange();
+				this.judgeWechat();
 			},
 			methods: {
 				visibilitychange() {
@@ -557,6 +561,15 @@
 							}
 						}
 					});
+				},
+				judgeWechat(){
+					let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i);
+					let judgewechat = wechat[1].split('.');
+					if(judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
+						this.wechatState = true;
+					} else {
+						this.wechatState = false;
+					}
 				},
 				getUserInfo() {
 					zovye_fn.getUserInfo().then(res => {
@@ -712,6 +725,9 @@
 								this.$nextTick(() => {
 									this.addListener(this.wxapp.data)
 								});
+								if (this.wechatState === false) {
+									alert('当前微信版本过低，建议升级微信后再试！');
+								}
 							} else {
 								this.showToast('暂无小程序任务');
 							}

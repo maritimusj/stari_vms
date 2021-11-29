@@ -85,6 +85,24 @@
             .red {
                 color: #FF6347;
             }
+
+            .no-data-view {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 15vh;
+            }
+
+            .no-data-img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .no-data-desc {
+                margin-top: 10px;
+                color: #bbb;
+            }
 		</style>
 	</head>
 	<body ontouchstart>
@@ -99,6 +117,10 @@
                 </div>
                 <span :class="['xval', parseInt(item.xval) > 0 ? 'green' : 'red']">{{item.xval}}</span>
             </div>
+            <div class="no-data-view" v-if="list && list.length === 0">
+                <img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
+                <span class="no-data-desc">暂无数据</span>
+            </div>
 		</div>
 		{$tpl['js']['code']}
 		{php \zovye\url(true, JS_VUE_URL);}
@@ -106,7 +128,7 @@
 			new Vue({
 				el: '#app',
 				data: {
-					list: [],
+					list: null,
                     done: false,
                     loading: false
 				},
@@ -124,7 +146,11 @@
                             this.loading = false;
                             if (res.status) {
                                 this.done = res.data.length === 0;
-                                this.list = this.list.concat(res.data);
+                                if (lastId) {
+                                    this.list = this.list.concat(res.data);
+                                } else {
+                                    this.list = res.data;
+                                }
                             }
                         })
                     },

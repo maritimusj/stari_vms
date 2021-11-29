@@ -66,9 +66,6 @@ const app = new Vue({
                 }
             })
         }
-        if (typeof zovye_fn.saveUserProfile === 'function' && this.accounts.length > 0) {
-            this.saveUserProfile = true;
-        }
         zovye_fn.getAdvs(10, 10, (data) => {
             this.sales = data;
         });
@@ -163,6 +160,9 @@ const app = new Vue({
                 this.free.accounts = res.data
                 if (this.free.accounts.length > 0) {
                     this.free.desc = '还有' + this.free.accounts.length + '个未领取';
+                    if (typeof zovye_fn.saveUserProfile === 'function') {
+                        this.saveUserProfile = true;
+                    }
                 } else {
                     this.free.desc = '暂时无法领取';
                 }
@@ -180,12 +180,12 @@ const app = new Vue({
                             var btn = document.getElementById(account.uid);
                             btn.addEventListener('launch', (e) => {
                                 if(this.timeout) {
-                                    clearTimeout(this.timeout)
-                                    this.timeout = null
+                                    clearTimeout(this.timeout);
+                                    this.timeout = null;
                                 }
                                 this.timeout = setTimeout(() => {
                                     if(document.hidden) {
-                                        zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(account.uid)
+                                        zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(account.uid);
                                     }
                                 }, account.delay * 1000);
                             });
@@ -376,7 +376,7 @@ const app = new Vue({
                         alert(res.data.msg || '播放出错！'); 
                     }
                     if (res.data && res.data.redirect) {
-                        window.location.replace(res.data.redirect)
+                        window.location.replace(res.data.redirect);
                     } else if (res.status) {
                         setTimeout(() => {
                             if (this.isHidden !== true) {

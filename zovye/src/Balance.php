@@ -90,6 +90,7 @@ class Balance
             
             $data = json_encode([
                 'data' => $profile,
+                'serial' => sha1(App::uid(6) . $item->getId()),
                 'sign' => hash_hmac('sha1', http_build_query($profile), Config::balance('app.key')),
             ], JSON_UNESCAPED_UNICODE);
 

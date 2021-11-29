@@ -417,14 +417,15 @@ class CtrlServ
      */
     public static function httpQueuedCallback($level, $url, string $data = '')
     {
-        $query = [
+        $body = [
             'type' => $level,
             'url' => $url,
             'data' => $data,
+            'content-type' => 'application/json',
         ];
 
         $uid = Util::random(16, true);
 
-        return self::query("job/queue/$uid", [], http_build_query($query));
+        return self::query("job/queue/$uid", [], $body);
     }
 }

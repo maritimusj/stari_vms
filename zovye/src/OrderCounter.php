@@ -17,7 +17,7 @@ class OrderCounter
 {
     public static function makeUID(array $objs, $extra = []): string
     {
-        $arr = ["order"];
+        $arr = ["order:counter"];
         foreach ($objs as $obj) {
             if ($obj instanceof agentModelObj) {
                 $arr[] = "agent:{$obj->getId()}";
@@ -35,6 +35,7 @@ class OrderCounter
             }
         }
         $arr = array_merge($arr, $extra);
+        rsort($arr);
         return sha1(implode(':', $arr));
     }
 
@@ -112,6 +113,7 @@ class OrderCounter
         }
 
         $uid = self::makeUID($objs, $extra);
+      
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);
@@ -122,12 +124,17 @@ class OrderCounter
         try {
             $begin = new DateTime($time->format('Y-m-d 00:00'));
             $end = new DateTime($time->format('Y-m-d 00:00'));
+ 
+            $end->modify('next day 00:00');
+            if ($end->getTimestamp() > time()) {
+                $end->setTimestamp(time());
+            }
 
-            $end->modify("next day 00:00");
             $total = 0;
 
             while ($begin < $end) {
                 $total += self::getHour($objs, $begin, $params, $sumGoods);
+                $begin->modify('+1 hour');
             }
 
             if ($time->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
@@ -169,10 +176,15 @@ class OrderCounter
             $end = new DateTime($time->format('Y-m 00:00'));
 
             $end->modify("first day of next month 00:00");
+            if ($end->getTimestamp() > time()) {
+                $end->setTimestamp(time());
+            }
+
             $total = 0;
 
             while ($begin < $end) {
                 $total += self::getDay($objs, $begin, $params, $sumGoods);
+                $begin->modify('next day');
             }
 
             if ($time->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
@@ -213,10 +225,15 @@ class OrderCounter
             $end = new DateTime($time->format('Y-01-01 00:00'));
 
             $end->modify("first day of next year 00:00");
+            if ($end->getTimestamp() > time()) {
+                $end->setTimestamp(time());
+            }
+
             $total = 0;
 
             while ($begin < $end) {
                 $total += self::getMonth($objs, $begin, $params, $sumGoods);
+                $begin->modify('next month');
             }
 
             if ($time->format('Y') != date('Y') && Locker::try("counter:init:$uid")) {

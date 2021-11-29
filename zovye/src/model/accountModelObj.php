@@ -353,7 +353,7 @@ class accountModelObj extends modelObj
         return (array)$this->get('assigned', []);
     }
 
-    public function setAssignData($data = [])
+    public function setAssignData($data = []): bool
     {
         return $this->set('assigned', $data);
     }

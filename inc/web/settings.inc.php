@@ -7,6 +7,7 @@
 namespace zovye;
 
 use DateTime;
+use zovye\model\accountModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -197,10 +198,15 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         foreach ($third_party_platform as $key => $v) {
             $enabled = request::bool($key) ? 1 : 0;
 
+            /** @var accountModelObj $acc */
             $acc = call_user_func($v[0]);
             if ($acc) {
                 $acc->setState($enabled ? Account::NORMAL : Account::BANNED);
                 $acc->save();
+                if (!$enabled) {
+                    //如果是禁用公众号，则清空设备分配数据
+                    $acc->setAssignData();
+                }
             }
 
             if (getArray($settings, $v[1]) != $enabled) {
@@ -222,7 +228,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['account']['appQRCode']['enabled'] = request::bool('AccountAppQRCode') ? 1 : 0;
 
         $balance_enabled = request::bool('UserBalance');
-        Config::balance('enabled',  $balance_enabled? 1 : 0, true);
+        Config::balance('enabled', $balance_enabled ? 1 : 0, true);
         if ($balance_enabled) {
             if (empty(Config::balance('app.key'))) {
                 Config::balance('app.key', Util::random(32), true);
@@ -920,7 +926,7 @@ if ($op == 'account') {
             $list[] = $data;
         }
 
-        $tpl_data['list'] = $list;        
+        $tpl_data['list'] = $list;
     }
     if (App::isBalanceEnabled()) {
         $tpl_data['advs_position'] = [
@@ -963,7 +969,7 @@ if ($op == 'account') {
     $tpl_data['bonus_url'] = Util::murl('bonus');
     $tpl_data['api_url'] = Util::murl('user');
     $tpl_data['app_key'] = Config::balance('app.key');
-    $tpl_data['notify_url'] = Config::balance('app.notify_url');    
+    $tpl_data['notify_url'] = Config::balance('app.notify_url');
 
 } elseif ($op == 'advs') {
 

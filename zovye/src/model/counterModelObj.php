@@ -8,6 +8,9 @@ namespace zovye\model;
 use zovye\base\modelObj;
 use function zovye\tb;
 
+/**
+ * @method getNum()
+ */
 class counterModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

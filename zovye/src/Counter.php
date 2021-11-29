@@ -81,7 +81,7 @@ class Counter
                         ])) {
                             continue;
                         } else {
-                            return err('create db item failed');
+                            return err('failed to create db item!');
                         }
                     }
                     return err('lock failed');

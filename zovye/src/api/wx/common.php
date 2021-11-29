@@ -236,7 +236,7 @@ class common
     {
         $user = common::getAgent();
 
-        $commission_state = App::isCommissionEnabled() && $user->settings('agentData.commission.enabled');
+        $commission_state = App::isCommissionEnabled() && $user->isCommissionEnabled();
 
         $funcs = $user->settings('agentData.funcs');
         $res = common::checkFuncs($funcs, $fn, function ($name) use ($commission_state) {

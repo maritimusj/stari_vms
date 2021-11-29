@@ -25,7 +25,7 @@ class AgentBonusEventHandler
 
         $agent = $device->getAgent();
         if (empty($agent) ||
-            !$agent->settings('agentData.commission.enabled') ||
+            !$agent->isCommissionEnabled() ||
             !$agent->settings('agentData.bonus.enabled')) {
             return true;
         }
@@ -54,7 +54,7 @@ class AgentBonusEventHandler
         $level = 1;
         $superior = $agent->getSuperior();
         while ($superior && $level <= 3) {
-            if ($superior->settings('agentData.commission.enabled')) {
+            if ($superior->isCommissionEnabled()) {
                 $agents['level' . $level] = $superior;
             }
             $superior = $superior->getSuperior();

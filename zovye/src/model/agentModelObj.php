@@ -109,6 +109,11 @@ class agentModelObj extends userModelObj
         return 0;
     }
 
+    public function isCommissionEnabled(): bool
+    {
+        return $this->settings('agentData.commission.enabled');
+    }
+
     /**
      * 指定代理商等级比当前用户代理商等级，大返回1，一样返回0,小返回-1
      * @param agentModelObj|string $agent
@@ -384,7 +389,7 @@ class agentModelObj extends userModelObj
             if (empty($device) || $device->getAgentId() == $this->getId()) {
                 //1，直接上级
                 $superior = $this->getSuperior();
-                if ($superior && $superior->settings('agentData.commission.enabled')) {
+                if ($superior && $superior->isCommissionEnabled()) {
 
                     $result[] = [
                         'percent' => $this->settings('agentData.gsp.rel.level1', 0),
@@ -395,7 +400,7 @@ class agentModelObj extends userModelObj
 
                     //上级的上级
                     $x_superior = $superior->getSuperior();
-                    if ($x_superior && $x_superior->settings('agentData.commission.enabled')) {
+                    if ($x_superior && $x_superior->isCommissionEnabled()) {
                         $result[] = [
                             'percent' => $this->settings('agentData.gsp.rel.level2', 0),
                             '__obj' => $x_superior,
@@ -405,7 +410,7 @@ class agentModelObj extends userModelObj
 
                         //上上上级
                         $xx_superior = $x_superior->getSuperior();
-                        if ($xx_superior && $xx_superior->settings('agentData.commission.enabled')) {
+                        if ($xx_superior && $xx_superior->isCommissionEnabled()) {
                             $result[] = [
                                 'percent' => $this->settings('agentData.gsp.rel.level3', 0),
                                 '__obj' => $xx_superior,

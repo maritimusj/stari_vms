@@ -41,7 +41,7 @@ if ($op == 'default') {
                 'avatar' => strval($agent->getAvatar()),
                 'mobile' => strval($agent->getMobile()),
                 'state' => intval($agent->getState()),
-                'commission_enabled' => $commission_enabled && $agent->settings('agentData.commission.enabled'),
+                'commission_enabled' => $commission_enabled && $agent->isCommissionEnabled(),
             ];
 
             $data['agentData'] = [
@@ -121,7 +121,7 @@ if ($op == 'default') {
                 'mobile' => $entry->getMobile(),
                 'state' => $entry->getState(),
                 'total' => $entry->getDeviceTotal(),
-                'commission_enabled' => $commission_enabled && $entry->settings('agentData.commission.enabled'),
+                'commission_enabled' => $commission_enabled && $entry->isCommissionEnabled(),
             ];
 
             if ($is_ajax) {
@@ -220,7 +220,7 @@ if ($op == 'default') {
                     'mobile' => strval($entry->getMobile()),
                     'state' => intval($entry->getState()),
                     'total' => intval($entry->getDeviceTotal()),
-                    'commission_enabled' => $commission_enabled && $entry->settings('agentData.commission.enabled'),
+                    'commission_enabled' => $commission_enabled && $entry->isCommissionEnabled(),
                 ];
 
                 $agent_data = $entry->get('agentData', []);
@@ -1431,7 +1431,7 @@ if ($op == 'default') {
         $result_msg('找不到这个代理商！', false);
     }
 
-    if (empty($agent->settings('agentData.commission.enabled'))) {
+    if (empty($agent->isCommissionEnabled())) {
         $result_msg('代理商没有加入佣金系统！', false);
     }
 

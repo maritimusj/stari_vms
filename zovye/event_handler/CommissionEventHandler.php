@@ -95,7 +95,7 @@ class CommissionEventHandler
 
         $agent = $device->getAgent();
 
-        if ($agent && $agent->settings('agentData.commission.enabled')) {
+        if ($agent && $agent->isCommissionEnabled()) {
             $order->setExtraData('commission.local.total', $commission_price);
 
             //可分佣的金额
@@ -339,7 +339,7 @@ class CommissionEventHandler
         if (App::isCommissionEnabled()) {
 
             $agent = $device->getAgent();
-            if ($agent && $agent->settings('agentData.commission.enabled')) {
+            if ($agent && $agent->isCommissionEnabled()) {
 
                 $commission_price = $order->getCommissionPrice();
 

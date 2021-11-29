@@ -113,7 +113,6 @@ class OrderCounter
         }
 
         $uid = self::makeUID($objs, $extra);
-      
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);

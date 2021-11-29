@@ -111,15 +111,19 @@
                 <div class="form-group">
                     <label class="col-xs-12 col-md-2 col-md-2 control-label">积分订单</label>
                     <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="balanceOrderAsBalance" class="radio-inline">
+                            <input name="balanceOrderAs" id="balanceOrderAsBalance" type="radio" value="balance"  {if \zovye\Config::balance('order.as', 'balance') == 'balance'}checked="checked"{/if}>
+                            忽略
+                        </label>
                         <label for="balanceOrderAsFree" class="radio-inline">
                             <input name="balanceOrderAs" id="balanceOrderAsFree" type="radio" value="free" {if \zovye\Config::balance('order.as') == 'free'}checked="checked"{/if}>
                             免费订单
                         </label>
-                        
                         <label for="balanceOrderAsPay" class="radio-inline">
                             <input name="balanceOrderAs" id="balanceOrderAsPay" type="radio" value="pay"  {if \zovye\Config::balance('order.as') == 'pay'}checked="checked"{/if}>
                             支付订单
                         </label>
+
                         <span class="help-block">* 积分订单做为免费订单或者支付订单将影响用户订单统计，比如用户每天可以免费领取的次数</span>
                     </div>
                 </div>
@@ -131,7 +135,7 @@
                         <label class="col-md-2 control-label">API Key</label>
                         <div class="col-md-10">
                             <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$app_key}"></i> {$app_key}</span>
-                            <span class="help-block">* 用户第三方接口鉴别身份</span>
+                            <span class="help-block">* 用户第三方接口鉴别身份，详情请参考<a href="https://www.stariata.com/upload/file/20211129.pdf" target="_blank"><b>文档</b></a></span>
                         </div>
                     </div>
                     <div class="form-group">

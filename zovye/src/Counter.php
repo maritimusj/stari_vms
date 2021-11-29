@@ -33,6 +33,13 @@ class Counter
         return self::query(['uid' => $uid])->exists();
     }
 
+    /**
+     * @param array|string $uid
+     * @param int $delta
+     * @param callable|null $initFN
+     * @param bool $force
+     * @return bool
+     */
     public static function increment($uid, int $delta = 1, callable $initFN = null, bool $force = false): bool
     {
         if ($delta == 0) {

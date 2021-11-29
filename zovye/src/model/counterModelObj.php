@@ -14,6 +14,7 @@ class counterModelObj extends modelObj
     {
         return tb('counter');
     }
+
     /** @var int */
     protected $id;
     

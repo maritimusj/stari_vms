@@ -72,21 +72,17 @@
             </div>
             {if \zovye\App::isBalanceEnabled()}
             <div class="seg">
-                <div class="title">任务中心</div>
+                <div class="title">积分</div>
                 <div class="form-group">
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">网址</label>
-                        <div class="col-md-10">
-                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$bonus_url}"></i> {$bonus_url}</span>
-                            <span class="help-block">* 直接进入积分任务中心的网址链接</span>
-                        </div>
+                    <label class="col-md-2 control-label">任务中心网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$bonus_url}"></i> {$bonus_url}</span>
+                        <span class="help-block">* 直接进入积分任务中心的网址链接</span>
                     </div>
                 </div>
-            </div>
-            <div class="seg">
-                <div class="title">每日签到</div>
+                <div class="seg-divider"></div>
                 <div class="form-group">
-                    <label for="dailySignInEnabled" class="col-md-2 control-label">是否启用</label>
+                    <label for="dailySignInEnabled" class="col-md-2 control-label">每日签到</label>
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
@@ -109,6 +105,22 @@
                             <input type="number" class="form-control" name="dailySignInBonusMax" id="dailySignInBonusMax" value="{php echo \zovye\Config::balance('sign.bonus.max', 0)}" min="0" step="1" title="最大值">
                             <span class="help-block"></span>
                         </div>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">积分订单</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="balanceOrderAsFree" class="radio-inline">
+                            <input name="balanceOrderAs" id="balanceOrderAsFree" type="radio" value="free" {if \zovye\Config::balance('order.as') == 'free'}checked="checked"{/if}>
+                            免费订单
+                        </label>
+                        
+                        <label for="balanceOrderAsPay" class="radio-inline">
+                            <input name="balanceOrderAs" id="balanceOrderAsPay" type="radio" value="pay"  {if \zovye\Config::balance('order.as') == 'pay'}checked="checked"{/if}>
+                            支付订单
+                        </label>
+                        <span class="help-block">* 积分订单做为免费订单或者支付订单将影响用户订单统计，比如用户每天可以免费领取的次数</span>
                     </div>
                 </div>
             </div>

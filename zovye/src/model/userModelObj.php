@@ -8,6 +8,7 @@
 namespace zovye\model;
 
 use DateTime;
+use zovye\Account;
 use zovye\Balance;
 use zovye\Locker;
 use zovye\Pay;
@@ -15,6 +16,7 @@ use zovye\We7;
 use zovye\User;
 use zovye\Util;
 use zovye\Agent;
+use zovye\App;
 use zovye\Order;
 use zovye\State;
 use zovye\WxMCHPay;
@@ -565,9 +567,14 @@ class userModelObj extends modelObj
     {
         $condition = [
             'openid' => $this->openid,
-            'src' => Order::ACCOUNT,
             'createtime >=' => strtotime('today'),
         ];
+
+        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+            $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+        } else {
+            $condition['src'] = Order::ACCOUNT;
+        }
 
         $query = Order::query($condition);
         $res = $query->get('sum(num)');
@@ -582,9 +589,16 @@ class userModelObj extends modelObj
      */
     public function getFreeTotal(): int
     {
-        $query = Order::query(['openid' => $this->openid]);
-        $query->where(['src' => Order::ACCOUNT]);
-
+        $condition = [
+            'openid' => $this->openid,
+        ];
+        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+            $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+        } else {
+            $condition['src'] = Order::ACCOUNT;
+        }
+        
+        $query = Order::query($condition);
         $res = $query->get('sum(num)');
 
         return intval($res);
@@ -597,9 +611,15 @@ class userModelObj extends modelObj
      */
     public function getPayTotal(): int
     {
-        $query = Order::query(['openid' => $this->openid]);
-        $query->where(['src' => Order::PAY]);
+        $condition = ['openid' => $this->openid];
+        
+        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+            $condition['src'] = [Order::PAY, Order::BALANCE];
+        } else {
+            $condition['src'] = Order::PAY;
+        }
 
+        $query = Order::query($condition);
         $res = $query->get('sum(num)');
 
         return intval($res);

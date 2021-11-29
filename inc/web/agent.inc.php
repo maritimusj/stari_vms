@@ -564,6 +564,7 @@ if ($op == 'default') {
             $user->updateSettings(
                 'agentData.misc',
                 [
+                    'maxTotalFree' => request::int('maxTotalFree'),
                     'maxFree' => request::int('maxFree'),
                     'maxAccounts' => request::int('maxAccounts'),
                     'pushAccountMsg' => request::trim('pushAccountMsg'),

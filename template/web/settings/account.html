@@ -122,12 +122,19 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="maxFree" class="col-md-2 control-label">用户每天的免费额度</label>
+                    <label for="maxTotalFree" class="col-md-2 control-label">用户免费额度</label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="maxFree" id="maxFree" value="{$settings['user']['maxFree']}">
+                        <input type="number" class="form-control" name="maxTotalFree" id="maxTotalFree" value="{php echo intval($settings['user']['maxTotalFree'])}">
+                        <span class="help-block">* 用户免费领取的最大次数, 0表示不限制</span>
+                    </div>
+                </div>  
+                <div class="form-group">
+                    <label for="maxFree" class="col-md-2 control-label">用户<b>每天</b>的免费额度</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="maxFree" id="maxFree" value="{php echo intval($settings['user']['maxFree'])}">
                         <span class="help-block">* 用户每天可免费领取的最大次数, 0表示不限制</span>
                     </div>
-                </div>
+                </div>              
                 <div class="form-group">
                     <label for="orderRetryLastTime" class="col-md-2 control-label">领取失败后重试</label>
                     <div class="col-md-10">

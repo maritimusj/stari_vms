@@ -109,6 +109,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             ], true);
 
             Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
+            Config::balance('order.as', request::str('balanceOrderAs'), true);
         }
 
     } elseif ($save_type == 'ctrl') {
@@ -488,6 +489,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['misc']['pushAccountMsg_val'] = request::trim('pushAccountMsg_val');
         $settings['misc']['pushAccountMsg_delay'] = request::int('pushAccountMsg_delay');
         $settings['misc']['maxAccounts'] = request::int('maxAccounts');
+        $settings['user']['maxTotalFree'] = request::int('maxTotalFree');
         $settings['user']['maxFree'] = request::int('maxFree');
         $settings['misc']['accountsPromote'] = request::bool('accountsPromote') ? 1 : 0;
 

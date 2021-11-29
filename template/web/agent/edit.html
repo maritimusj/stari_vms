@@ -1051,7 +1051,7 @@
                             <input name="shipmentBalance" id="shipmentBalance0" type="radio" value="0"  {if isset($agent_data['device']['shipment']['balanced']) && empty($agent_data['device']['shipment']['balanced'])}checked="checked"{/if}>
                             顺序出货
                         </label>
-                        <span class="help-block">* 平衡出货：库存多的货道优先出货；顺序出货：库存少的货道优先出货。</span>
+                        <span class="help-block">* 平衡出货：库存多的货道优先出货；顺序出货：库存少的货道优先出货</span>
                     </div>
                 </div>
             </div>
@@ -1067,10 +1067,17 @@
                 </div>
                 -->
                 <div class="form-group">
-                    <label for="maxFree" class="col-md-2 control-label">用户每天的免费额度</label>
+                    <label for="maxTotalFree" class="col-md-2 control-label">用户免费额度</label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="maxFree" id="maxFree" value="{$agent_data['misc']['maxFree']}">
-                        <span class="help-block">* 用户每天可免费领取的最大次数, 0表示系统默认。</span>
+                        <input type="number" class="form-control" name="maxTotalFree" id="maxTotalFree" value="{php echo intval($agent_data['misc']['maxTotalFree'])}">
+                        <span class="help-block">* 用户可免费领取的最大次数, 0表示系统默认</span>
+                    </div>
+                </div>                
+                <div class="form-group">
+                    <label for="maxFree" class="col-md-2 control-label">用户<b>每天</b>的免费额度</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="maxFree" id="maxFree" value="{php echo intval($agent_data['misc']['maxFree'])}">
+                        <span class="help-block">* 用户每天可免费领取的最大次数, 0表示系统默认</span>
                     </div>
                 </div>
                 <div class="form-group">

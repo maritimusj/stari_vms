@@ -842,6 +842,11 @@ include './index.php';
             return error(State::ERROR, '今天领的太多了，明天再来！');
         }
 
+        //全部免费额度限制
+        if (empty(Util::getUserMaxFreeNum($user, $device))) {
+            return error(State::ERROR, '您的免费额度已用完！');
+        }        
+
         $assign_data = $account->settings('assigned', []);
         if (!Util::isAssigned($assign_data, $device)) {
             return error(State::ERROR, '没有允许从这个设备访问该公众号！');
@@ -874,6 +879,30 @@ include './index.php';
 
             if ($max_free > 0) {
                 $remain = max(0, $max_free - $user->getTodayFreeTotal());
+            } else {
+                $remain = 1;
+            }
+        }
+
+        return $remain;
+    }
+
+    public static function getUserMaxFreeNum(userModelObj $user, deviceModelObj $device): int
+    {
+        $remain = null;
+
+        if (is_null($remain)) {
+            $max_free = 0;
+
+            $agent = $device->getAgent();
+            if ($agent) {
+                $max_free = $agent->getAgentData('misc.maxTotalFree', 0);
+            }
+
+            $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxTotalFree', 0);
+
+            if ($max_free > 0) {
+                $remain = max(0, $max_free - $user->getUserMaxFreeNum());
             } else {
                 $remain = 1;
             }

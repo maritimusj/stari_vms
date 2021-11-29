@@ -325,4 +325,14 @@ TEXT;
             return $result;
         });
     }
+
+    public static function isFreeOrder(): bool
+    {
+        return !self::isPayOrder();
+    }
+
+    public static function isPayOrder(): bool
+    {
+        return  Config::balance('order.as', 'free') == 'pay';
+    }
 }

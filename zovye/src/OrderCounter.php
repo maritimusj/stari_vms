@@ -39,7 +39,7 @@ class OrderCounter
         return sha1(http_build_query($arr));
     }
 
-    public static function fillCondition(array $objs, DateTimeInterface $begin, DateTimeInterface $end, $param = [])
+    public static function fillCondition(array $objs, DateTimeInterface $begin, DateTimeInterface $end, $param = []): array
     {
         $condition = array_merge([], $param);
         foreach ($objs as $obj) {
@@ -62,9 +62,6 @@ class OrderCounter
         return $condition;
     }
 
-    /**
-     * @throws Exception
-     */
     public static function getHour(array $objs, DateTimeInterface $time, $params = [], $sumGoods = false): int
     {
         $extra = [
@@ -82,25 +79,30 @@ class OrderCounter
             return $counter->getNum();
         }
 
-        $begin = new DateTimeImmutable($time->format('Y-m-d H:00:00'));
-        $end = $begin->modify('+1 hour');
+        try {
+            $begin = new DateTimeImmutable($time->format('Y-m-d H:00:00'));
+            $end = $begin->modify('+1 hour');
 
-        $condition = self::fillCondition($objs, $begin, $end, $params);
-        if ($sumGoods) {
-            $v = Order::query($condition)->get('sum(num)');
-        } else {
-            $v = Order::query($condition)->count();
-        }
+            $condition = self::fillCondition($objs, $begin, $end, $params);
+            if ($sumGoods) {
+                $v = Order::query($condition)->get('sum(num)');
+            } else {
+                $v = Order::query($condition)->count();
+            }
 
-        if ($time->format('YmdH') != date('YmdH') && Locker::try("counter:init:$uid")) {
-            Counter::create([
-                'uid' => $uid,
-                'num' => $v,
-                'createtime' => time(),
-                'updatetime' => 0,
-            ]);
+            if ($time->format('YmdH') != date('YmdH') && Locker::try("counter:init:$uid")) {
+                Counter::create([
+                    'uid' => $uid,
+                    'num' => $v,
+                    'createtime' => time(),
+                    'updatetime' => 0,
+                ]);
+            }
+            return $v;
+
+        } catch (Exception $e) {
         }
-        return $v;
+        return 0;
     }
 
     public static function getDay(array $objs, DateTimeInterface $time, $params = [], $sumGoods = false): int
@@ -123,7 +125,7 @@ class OrderCounter
         try {
             $begin = new DateTime($time->format('Y-m-d 00:00'));
             $end = new DateTime($time->format('Y-m-d 00:00'));
- 
+
             $end->modify('next day 00:00');
             if ($end->getTimestamp() > time()) {
                 $end->setTimestamp(time());
@@ -248,5 +250,117 @@ class OrderCounter
         } catch (Exception $e) {
         }
         return 0;
+    }
+
+    public static function getHourAll($obj, DateTimeInterface $time): array
+    {
+        $objs = is_array($obj) ? $obj : [$obj];
+        $result = [
+            'free' => self::getHourFree($objs, $time),
+            'pay' => self::getHourPay($objs, $time),
+            'balance' => self::getHourBalance($objs, $time),
+        ];
+
+        $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+        return $result;
+    }
+
+    public static function getHourFree($obj, DateTimeInterface $time): int
+    {
+        return self::getHour(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::ACCOUNT]);
+    }
+
+    public static function getHourPay($obj, DateTimeInterface $time): int
+    {
+        return self::getHour(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::PAY]);
+    }
+
+    public static function getHourBalance($obj, DateTimeInterface $time): int
+    {
+        return self::getHour(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::BALANCE]);
+    }
+
+    public static function getDayAll($obj, DateTimeInterface $time): array
+    {
+        $objs = is_array($obj) ? $obj : [$obj];
+        $result = [
+            'free' => self::getDayFree($objs, $time),
+            'pay' => self::getDayPay($objs, $time),
+            'balance' => self::getDayBalance($objs, $time),
+        ];
+
+        $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+        return $result;
+    }
+
+    public static function getDayFree($obj, DateTimeInterface $time): int
+    {
+        return self::getDay(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::ACCOUNT]);
+    }
+
+    public static function getDayPay($obj, DateTimeInterface $time): int
+    {
+        return self::getDay(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::PAY]);
+    }
+
+    public static function getDayBalance($obj, DateTimeInterface $time): int
+    {
+        return self::getDay(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::BALANCE]);
+    }
+
+    public static function getMonthAll($obj, DateTimeInterface $time): array
+    {
+        $objs = is_array($obj) ? $obj : [$obj];
+        $result = [
+            'free' => self::getMonthFree($objs, $time),
+            'pay' => self::getMonthPay($objs, $time),
+            'balance' => self::getMonthBalance($objs, $time),
+        ];
+
+        $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+        return $result;
+    }
+
+    public static function getMonthFree($obj, DateTimeInterface $time): int
+    {
+        return self::getMonth(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::ACCOUNT]);
+    }
+
+    public static function getMonthPay($obj, DateTimeInterface $time): int
+    {
+        return self::getMonth(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::PAY]);
+    }
+
+    public static function getMonthBalance($obj, DateTimeInterface $time): int
+    {
+        return self::getMonth(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::BALANCE]);
+    }
+
+    public static function getYearAll($obj, DateTimeInterface $time): array
+    {
+        $objs = is_array($obj) ? $obj : [$obj];
+        $result = [
+            'free' => self::getYearFree($objs, $time),
+            'pay' => self::getYearPay($objs, $time),
+            'balance' => self::getYearBalance($objs, $time),
+        ];
+
+        $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+        return $result;
+    }
+
+    public static function getYearFree($obj, DateTimeInterface $time): int
+    {
+        return self::getYear(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::ACCOUNT]);
+    }
+
+    public static function getYearPay($obj, DateTimeInterface $time): int
+    {
+        return self::getYear(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::PAY]);
+    }
+
+    public static function getYearBalance($obj, DateTimeInterface $time): int
+    {
+        return self::getYear(is_array($obj) ? $obj : [$obj], $time, ['src' => Order::BALANCE]);
     }
 }

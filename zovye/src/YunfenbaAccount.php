@@ -145,6 +145,11 @@ class YunfenbaAccount
             $data['scene'] = $scene;
         }
 
+        $area = $device->getArea();
+        if ($area) {
+            $data['device_area'] = implode('', $area);
+        }
+
         $result = Util::post($url, $data);
 
         if ($cb) {

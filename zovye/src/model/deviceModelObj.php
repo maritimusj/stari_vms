@@ -441,6 +441,18 @@ class deviceModelObj extends modelObj
         return $this->settings('extra.v1.status.disp', false);
     }
 
+    public function getArea($default = []): array
+    {
+        $address = $this->settings('extra.location.tencent.area', []);
+        if (empty($address)) {
+            $address = $this->settings('extra.location.baidu.area', []);
+            if (empty($address)) {
+                $address = $this->settings('extra.location.area', []);
+            }
+        }
+        return empty($address) ? $default : $address;
+    }
+
     public function getAddress($default = ''): string
     {
         $address = $this->settings('extra.location.tencent.address', '');

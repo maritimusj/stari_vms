@@ -127,7 +127,7 @@ class pay_logsModelObj extends BaseLogsModelObj
         return !empty($this->getData('refund'));
     }
 
-    public function isPaied(): bool
+    public function isPaid(): bool
     {
         return !empty($this->getPayResult()) || !empty($this->getQueryResult());
     }

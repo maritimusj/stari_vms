@@ -542,7 +542,7 @@ class userModelObj extends modelObj
         });
     }
 
-    public function signIn($val)
+    public function signIn($val): bool
     {
         $res = $this->getBalance()->change($val, Balance::SIGN_IN_BONUS, [
             'date' => date('Y-m-d'),
@@ -565,7 +565,7 @@ class userModelObj extends modelObj
     {
         $condition = [
             'openid' => $this->openid,
-            'price' => 0,
+            'src' => Order::ACCOUNT,
             'createtime >=' => strtotime('today'),
         ];
 
@@ -583,7 +583,7 @@ class userModelObj extends modelObj
     public function getFreeTotal(): int
     {
         $query = Order::query(['openid' => $this->openid]);
-        $query->where(['price' => 0]);
+        $query->where(['src' => Order::ACCOUNT]);
 
         $res = $query->get('sum(num)');
 
@@ -598,7 +598,7 @@ class userModelObj extends modelObj
     public function getPayTotal(): int
     {
         $query = Order::query(['openid' => $this->openid]);
-        $query->where(['price >' => 0]);
+        $query->where(['src' => Order::PAY]);
 
         $res = $query->get('sum(num)');
 
@@ -645,7 +645,7 @@ class userModelObj extends modelObj
      *
      * @return array
      */
-    public function MCHPay($n, $trade_no, $desc = ''): array
+    public function MCHPay($n, $trade_no, string $desc = ''): array
     {
         if ($trade_no && $n > 0) {
             $params = Pay::getDefaultPayParams('wx');

@@ -374,6 +374,7 @@ class Util
     /**
      * 返回日志文件名
      * @param string $name
+     * @param string $suffix
      * @return string
      */
     public static function logFileName(string $name, string $suffix = ''): string

@@ -40,7 +40,7 @@ class OrderCounter extends StatsCounter
 
     protected function initFN(DateTimeInterface $begin, DateTimeInterface $end, array $params = [])
     {
-        $condition = self::fillCondition($params, $begin, $end);
+        $condition = $this->fillCondition($params, $begin, $end);
         if (in_array('goods', $params)) {
             $v = Order::query($condition)->get('sum(num)');
         } else {
@@ -79,9 +79,9 @@ class OrderCounter extends StatsCounter
     {
         $objs = is_array($obj) ? $obj : [$obj];
         $result = [
-            'free' => self::getHourFreeTotal($objs, $time),
-            'pay' => self::getHourPayTotal($objs, $time),
-            'balance' => self::getHourBalanceTotal($objs, $time),
+            'free' => $this->getHourFreeTotal($objs, $time),
+            'pay' => $this->getHourPayTotal($objs, $time),
+            'balance' => $this->getHourBalanceTotal($objs, $time),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
@@ -93,7 +93,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return self::getHour($time, $params);
+        return $this->getHour($time, $params);
     }
 
     public function getHourPayTotal($obj, DateTimeInterface $time): int
@@ -101,7 +101,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return self::getHour($time, $params);
+        return $this->getHour($time, $params);
     }
 
     public function getHourBalanceTotal($obj, DateTimeInterface $time): int
@@ -109,15 +109,15 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return self::getHour($time, $params);
+        return $this->getHour($time, $params);
     }
 
     public function getDayAll($obj, DateTimeInterface $time): array
     {
         $result = [
-            'free' => self::getDayFreeTotal($obj, $time),
-            'pay' => self::getDayPayTotal($obj, $time),
-            'balance' => self::getDayBalanceTotal($obj, $time),
+            'free' => $this->getDayFreeTotal($obj, $time),
+            'pay' => $this->getDayPayTotal($obj, $time),
+            'balance' => $this->getDayBalanceTotal($obj, $time),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
@@ -129,7 +129,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return self::getDay($time, $params);
+        return $this->getDay($time, $params);
     }
 
     public function getDayPayTotal($obj, DateTimeInterface $time): int
@@ -137,7 +137,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return self::getDay($time, $params);
+        return $this->getDay($time, $params);
     }
 
     public function getDayBalanceTotal($obj, DateTimeInterface $time): int
@@ -145,15 +145,15 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return self::getDay($time, $params);
+        return $this->getDay($time, $params);
     }
 
     public function getMonthAll($obj, DateTimeInterface $time): array
     {
         $result = [
-            'free' => self::getMonthFreeTotal($obj, $time),
-            'pay' => self::getMonthPayTotal($obj, $time),
-            'balance' => self::getMonthBalanceTotal($obj, $time),
+            'free' => $this->getMonthFreeTotal($obj, $time),
+            'pay' => $this->getMonthPayTotal($obj, $time),
+            'balance' => $this->getMonthBalanceTotal($obj, $time),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
@@ -165,7 +165,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return self::getMonth($time, $params);
+        return $this->getMonth($time, $params);
     }
 
     public function getMonthPayTotal($obj, DateTimeInterface $time): int
@@ -173,7 +173,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return self::getMonth($time, $params);
+        return $this->getMonth($time, $params);
     }
 
     public function getMonthBalanceTotal($obj, DateTimeInterface $time): int
@@ -181,15 +181,15 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return self::getMonth($time, $params);
+        return $this->getMonth($time, $params);
     }
 
     public function getYearAll($obj, DateTimeInterface $time): array
     {
         $result = [
-            'free' => self::getYearFreeTotal($obj, $time),
-            'pay' => self::getYearPayTotal($obj, $time),
-            'balance' => self::getYearBalanceTotal($obj, $time),
+            'free' => $this->getYearFreeTotal($obj, $time),
+            'pay' => $this->getYearPayTotal($obj, $time),
+            'balance' => $this->getYearBalanceTotal($obj, $time),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
@@ -201,7 +201,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return self::getYear($time, $params);
+        return $this->getYear($time, $params);
     }
 
     public function getYearPayTotal($obj, DateTimeInterface $time): int
@@ -209,7 +209,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return self::getYear($time, $params);
+        return $this->getYear($time, $params);
     }
 
     public function getYearBalanceTotal($obj, DateTimeInterface $time): int
@@ -217,7 +217,7 @@ class OrderCounter extends StatsCounter
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return self::getYear($time, $params);
+        return $this->getYear($time, $params);
     }
 
 }

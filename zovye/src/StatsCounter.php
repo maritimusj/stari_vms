@@ -67,7 +67,7 @@ abstract class StatsCounter
             $total = 0;
 
             while ($begin < $end) {
-                $total += self::getHour($begin, $params);
+                $total += $this->getHour($begin, $params);
                 $begin->modify('+1 hour');
             }
 
@@ -110,7 +110,7 @@ abstract class StatsCounter
             $total = 0;
 
             while ($begin < $end) {
-                $total += self::getDay($begin, $params);
+                $total += $this->getDay($begin, $params);
                 $begin->modify('next day');
             }
 
@@ -152,7 +152,7 @@ abstract class StatsCounter
             $total = 0;
 
             while ($begin < $end) {
-                $total += self::getMonth($begin, $params);
+                $total += $this->getMonth($begin, $params);
                 $begin->modify('next month');
             }
 

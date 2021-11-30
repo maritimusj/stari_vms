@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use DateTimeImmutable;
+use zovye\model\agentModelObj;
 use zovye\model\balanceModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -215,9 +217,58 @@ class Job
     {
         return CtrlServ::scheduleJob('douyin', [
             'id' => $user->getId(),
-            'device' => $device->getId(), 
-            'uid' => $account_uid, 
+            'device' => $device->getId(),
+            'uid' => $account_uid,
             'time' => $time ?? time(),
         ]);
+    }
+
+    public static function updateAgentCounter(agentModelObj $agent)
+    {
+        if ($agent->acquireLocker("update_counter")) {
+            if (time() - $agent->settings('extra.counter.last', 0) > 300) {
+                $agent->updateSettings('extra.counter.last', time());
+                return CtrlServ::scheduleJob('update_counter', [
+                    'agent' => $agent->getId(),
+                    'device' => 0,
+                    'datetime' => (new DateTimeImmutable('-1 hour'))->getTimestamp(),
+                ]);
+            }
+        }
+
+        return true;
+    }
+
+    public static function updateDeviceCounter(deviceModelObj $device)
+    {
+        if (Locker::try("device:{$device->getId()}:update_counter", REQUEST_ID, 3)) {
+            if (time() - $device->settings('extra.counter.last', 0) > 400) {
+                $device->updateSettings('extra.counter.last', time());
+                return CtrlServ::scheduleJob('update_counter', [
+                    'agent' => 0,
+                    'device' => $device->getId(),
+                    'datetime' => (new DateTimeImmutable('-1 hour'))->getTimestamp(),
+                ]);
+            }
+        }
+
+        return true;
+    }
+
+    public static function updateAppCounter()
+    {
+        $uid = APP_NAME;
+        if (Locker::try("app:$uid:update_counter", REQUEST_ID, 3)) {
+            if (time() - Config::app('order.counter.last', 0) > 600) {
+                Config::app('order.counter.last', time(), true);
+                return CtrlServ::scheduleJob('update_counter', [
+                    'agent' => 0,
+                    'device' => 0,
+                    'datetime' => (new DateTimeImmutable('-1 hour'))->getTimestamp(),
+                ]);
+            }
+        }
+
+        return true;
     }
 }

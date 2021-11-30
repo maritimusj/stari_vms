@@ -75,7 +75,7 @@ class OrderCounter extends StatsCounter
         return $condition;
     }
 
-    public function getHourAll($obj, DateTimeInterface $time): array
+    public function getHourAll($obj, DateTimeInterface $time = null): array
     {
         $objs = is_array($obj) ? $obj : [$obj];
         $result = [

@@ -21,7 +21,6 @@ use function zovye\request;
 use function zovye\isEmptyArray;
 use function zovye\settings;
 
-//订单后续处理
 
 $id = request::int('id');
 
@@ -37,10 +36,13 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
         if ($id > 0) {
             $order = Order::get($id);
             if ($order) {
+                Job::updateAppCounter();
+
                 $agent_id = $order->getAgentId();
                 if ($agent_id) {
                     $agent = Agent::get($agent_id);
                     if ($agent) {
+                        Job::updateAgentCounter($agent);
                         $agent->updateSettings('agentData.stats.last_order', [
                             'id' => $order->getId(),
                             'createtime' => $order->getCreatetime(),
@@ -63,6 +65,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 ];
 
                 if ($device) {
+                    Job::updateDeviceCounter($device);
                     $log['device'] = [
                         'name' => $device->getName(),
                         'imei' => $device->getImei(),
@@ -135,4 +138,3 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
     }
 }
 Util::logToFile('order', $log);
- 

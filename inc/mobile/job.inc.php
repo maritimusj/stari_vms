@@ -36,16 +36,17 @@ if (in_array($op, [
         'repair',
         'douyin',
         'create_order_balance',
+        'update_counter',
     ]
 )) {
     $job_filename = ZOVYE_CORE_ROOT . "jobs/{$op}.php";
 
     if (file_exists($job_filename)) {
         set_time_limit(0);
-        include_once $job_filename;        
+        include_once $job_filename;
     } else {
         Util::logToFile('job', "job file [{$job_filename}] not exists!");
-    }    
+    }
 } else {
     Util::logToFile('job', "job [{$op}] not allowed!");
 }

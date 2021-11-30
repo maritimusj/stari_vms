@@ -16,6 +16,9 @@ Util::setErrorHandler();
 //设置日志等级
 Log::$level = LOG_LEVEL;
 
+//设置日志按名称输出过滤
+Log::$include = [];
+
 //初始化事件驱动
 EventBus::init();
 

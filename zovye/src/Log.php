@@ -5,6 +5,7 @@ namespace zovye;
 class Log
 {
     public static $level = L_ALL;
+    public static $include = [];
 
     public static $suffix = [
         L_ALL => '',
@@ -17,7 +18,7 @@ class Log
 
     public static function append($level, $title, $data = [])
     {
-        if ($level >= self::$level) {
+        if ($level >= self::$level && (empty(self::$include) || in_array($title, self::$include))) {
             Util::logToFile($title, $data, true, self::$suffix[$level] ?? '');
         }
     }

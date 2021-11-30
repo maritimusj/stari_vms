@@ -403,7 +403,11 @@ class Device extends State
     }
 
     public static function cacheExists($id): bool
-    {
+    {if (!is_array(self::$cache)) {
+        Log::error([
+            'cache is not array' => gettype(self::$cache),
+        ]);
+    }
         return isset(self::$cache[$id]);
     }
 

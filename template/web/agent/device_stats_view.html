@@ -105,7 +105,7 @@
                                 <td v-text="i + 1"></td>
                                 <td v-text="e.name"></td>
                                 <td v-text="e.stats.free"></td>
-                                <td v-text="e.stats.fee"></td>
+                                <td v-text="e.stats.pay"></td>
                                 <td v-text="e.stats.total"></td>
                             </tr>
                         </tbody>
@@ -326,7 +326,7 @@
                         data.forEach(e => {
                             option.yAxis.data.push(e.name);
                             option.series[0].data.push(e.stats.free);
-                            option.series[1].data.push(e.stats.fee);
+                            option.series[1].data.push(e.stats.pay);
                         });
 
                         this.chart.setOption(option);                        

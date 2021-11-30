@@ -55,31 +55,31 @@ class Statistics
         return Util::cachedCall($end->getTimestamp() > time() ? 10 : 0, function() use($device, $begin, $end) {
             $result = [
                 'free' => 0,
-                'fee' => 0,
+                'pay' => 0,
                 'total' => 0,
             ];
 
             $free = //random_int(1, 1000);
             (int)Order::query()->where([
                 'device_id' => $device->getId(),
-                'price' => 0,
+                'src' => Order::ACCOUNT,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
 
             $result['free'] = intval($free);
 
-            $fee = //random_int(1, 1000);
+            $pay = //random_int(1, 1000);
             (int)Order::query()->where([
                 'device_id' => $device->getId(),
-                'price >' => 0,
+                'src' => Order::PAY,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp(),
             ])->get('sum(num)');
 
-            $result['fee'] = $fee;
+            $result['pay'] = $pay;
 
-            $result['total'] = $result['fee'] + $result['free'];
+            $result['total'] = $result['pay'] + $result['free'];
 
             return $result;            
         }, $device->getId(), $begin->getTimestamp(), $end->getTimestamp());
@@ -99,14 +99,14 @@ class Statistics
 
             $result = [
                 'free' => 0,
-                'fee' => 0,
+                'pay' => 0,
                 'total' => 0,
             ];
 
             $free =// random_int(1, 1000);
             (int)Order::query()->where([
                 'device_id' => $device->getId(),
-                'price' => 0,
+                'src' => Order::ACCOUNT,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
@@ -116,14 +116,14 @@ class Statistics
             $fee =// random_int(1, 1000);
             (int)Order::query()->where([
                 'device_id' => $device->getId(),
-                'price >' => 0,
+                'src' => Order::PAY,
                 'createtime >=' => $begin->getTimestamp(),
                 'createtime <' => $end->getTimestamp(),
             ])->get('sum(num)');
 
-            $result['fee'] = $fee;
+            $result['pay'] = $fee;
 
-            $result['total'] = $result['fee'] + $result['free'];
+            $result['total'] = $result['pay'] + $result['free'];
 
             return $result;
         }, $device->getId(), $begin->format('Y-m'));
@@ -141,7 +141,7 @@ class Statistics
             'summary' => [
                 'order' => [
                     'free' => 0,
-                    'fee' => 0,
+                    'pay' => 0,
                 ],
                 'commission' => [
                     'total' => 0,
@@ -162,7 +162,7 @@ class Statistics
                 $data = self::userMonth($user, $start);
                 $data['summary']['m'] = $start->format('Y年m月');
                 $result['summary']['order']['free'] += $data['summary']['order']['free'];
-                $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
+                $result['summary']['order']['pay'] += $data['summary']['order']['pay'];
                 $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
                 $result['list'][$start->format('m月')] = $data['summary'];
             }            
@@ -171,7 +171,7 @@ class Statistics
             $data = self::userMonth($user, $date, 1);
             $data['summary']['m'] = $date->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
-            $result['summary']['order']['fee'] += $data['summary']['order']['fee'];
+            $result['summary']['order']['pay'] += $data['summary']['order']['fee'];
             $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
             $result['list'][$date->format('m月')] = $data['summary'];
         }
@@ -185,7 +185,7 @@ class Statistics
             $result = [
                 'order' => [
                     'free' => 0,
-                    'fee' => 0,
+                    'pay' => 0,
                 ],
                 'commission' => [
                     'total' => 0,
@@ -196,17 +196,17 @@ class Statistics
                 (int) Util::cachedCall(0, function() use($user, $begin, $end) {
                     return Order::query()->where([
                         'agent_id' => $user->getId(),
-                        'price' => 0,
+                        'src' => Order::ACCOUNT,
                         'createtime >=' => $begin->getTimestamp(),
                         'createtime <' => $end->getTimestamp()
                     ])->get('sum(num)');
                 }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp());
 
-            $result['order']['fee'] = //random_int(0, 1000);
+            $result['order']['pay'] = //random_int(0, 1000);
                 (int)Util::cachedCall(0, function () use($user, $begin, $end) {
                     return Order::query()->where([
                         'agent_id' => $user->getId(),
-                        'price >' => 0,
+                        'src' => Order::PAY,
                         'createtime >=' => $begin->getTimestamp(),
                         'createtime <' => $end->getTimestamp(),
                     ])->get('sum(num)');

@@ -46,11 +46,6 @@ class OrderCounter extends StatsCounter
         } else {
             $v = Order::query($condition)->count();
         }
-        print_r([
-            'conditioin' => $condition,
-            'begin' => date('Y-m-d H:i:s', $condition['createtime >=']),
-            'end' => date('Y-m-d H:i:s', $condition['createtime <']),
-        ]);
         return intval($v);
     }
 

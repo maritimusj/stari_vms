@@ -34,19 +34,19 @@ if ($op == 'update_counter' && CtrlServ::checkJobSign($data)) {
     if ($data['agent']) {
         $agent = Agent::get($data['agent']);
         if ($agent) {
-            $log["agent $str"] = '测试版本未开启';//(new OrderCounter())->getHourAll($agent, $datetime);
+            $log["agent $str"] = (new OrderCounter())->getHourAll($agent, $datetime);
         }
     }
 
     if ($data['device']) {
         $device = Device::get($data['device']);
         if ($device) {
-            $log["device $str"] = '测试版本未开启';//(new OrderCounter())->getHourAll($device, $datetime);
+            $log["device $str"] = (new OrderCounter())->getHourAll($device, $datetime);
         }
     }
 
     if (!isset($agent) && !isset($device)) {
-        $log["app $str"] = '测试版本未开启';//(new OrderCounter())->getHourAll(app(), $datetime);
+        $log["app $str"] = (new OrderCounter())->getHourAll(app(), $datetime);
     }
 } else {
     $log['error'] = '签名检验失败！';

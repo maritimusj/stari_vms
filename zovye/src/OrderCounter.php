@@ -38,7 +38,7 @@ class OrderCounter extends StatsCounter
         return sha1('order:counter:' . http_build_query($arr));
     }
 
-    protected function initFN(DateTimeInterface $begin, DateTimeInterface $end, array $params = [])
+    protected function initFN(DateTimeInterface $begin, DateTimeInterface $end, array $params = []): int
     {
         $condition = $this->fillCondition($params, $begin, $end);
         if (in_array('goods', $params)) {

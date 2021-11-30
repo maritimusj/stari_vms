@@ -505,7 +505,7 @@ if ($op === 'create') {
     $jquery_url = JS_JQUERY_URL;
 
     $js_code = <<<CODE
-<script src="{$jquery_url}"></script>
+<script src="$jquery_url"></script>
 <script>
 const zovye_fn = {};
 
@@ -540,7 +540,6 @@ zovye_fn.get_order_detail =function(orderNO) {
 CODE;
 
     $tpl_data['js']['code'] = $js_code;
-
     app()->showTemplate(Theme::file('order'), ['tpl' => $tpl_data]);
 
 } elseif ($op == 'feedback') {
@@ -550,7 +549,7 @@ CODE;
 
     $axios_url = JS_AXIOS_URL;
     $js_code = <<<CODE
-<script src="{$axios_url}"></script>
+<script src="$axios_url"></script>
 <script>
 const zovye_fn = {};
 zovye_fn.upload = function(filename) {
@@ -563,7 +562,7 @@ zovye_fn.upload = function(filename) {
         }
     }
     return new Promise((resolve, reject) => {
-         axios.post('{$api_url1}',param, config).then((res) => {
+         axios.post('$api_url1',param, config).then((res) => {
             return res.data;
          }).then((res) => {
              if (res.status && res.data) {
@@ -587,7 +586,7 @@ zovye_fn.feedback = function(device, text, pics) {
     }
     
     return new Promise((resolve, reject) => {
-        axios.post("{$api_url2}", data).then((res) => {
+        axios.post("$api_url2", data).then((res) => {
             return res.data;
         }).then((res) => {
             if (res.status) {
@@ -605,6 +604,5 @@ zovye_fn.feedback = function(device, text, pics) {
 CODE;
 
     $tpl_data['js']['code'] = $js_code;
-
     app()->showTemplate(Theme::file('feedback'), ['tpl' => $tpl_data]);
 }

@@ -321,7 +321,9 @@ JSCODE;
         }
 JSCODE;
         $tpl['js']['code'] .= "\r\n</script>";
-        $this->showTemplate(Theme::file('prepare'), ['tpl' => $tpl]);
+
+        $file = Theme::getThemeFile($device, 'prepare');
+        $this->showTemplate($file, ['tpl' => $tpl]);
     }
 
     /**
@@ -654,7 +656,8 @@ JSCODE;
             $tpl['js']['code'] .= "\r\n$js\r\n";
         }
 
-        $this->showTemplate(Theme::file('device'), ['tpl' => $tpl]);
+        $file = Theme::getThemeFile($device, 'device');
+        $this->showTemplate($file, ['tpl' => $tpl]);
     }
 
     /**
@@ -740,7 +743,9 @@ $js_sdk
     }
 </script>
 JSCODE;
-        $this->showTemplate(Theme::file('get'), ['tpl' => $tpl]);
+
+        $file = Theme::getThemeFile($device, 'get');
+        $this->showTemplate($file, ['tpl' => $tpl]);
     }
 
 
@@ -1283,16 +1288,16 @@ $js_sdk
         window.location.replace("$user_home_page");
     }
 JSCODE;
-    
-    if (!$user->isSigned()) {
-        $tpl_data['js']['code'] .= <<<JSCODE
+
+        if (!$user->isSigned()) {
+            $tpl_data['js']['code'] .= <<<JSCODE
     \r\nzovye_fn.signIn = function() {
         return $.getJSON(zovye_fn.api_url, {op: 'signIn'});
     }    
 JSCODE;
-    }
+        }
 
-$tpl_data['js']['code'] .= <<<JSCODE
+        $tpl_data['js']['code'] .= <<<JSCODE
 \r\n</script>
 JSCODE;
         $this->showTemplate(Theme::file('bonus'), ['tpl' => $tpl_data]);
@@ -1311,7 +1316,7 @@ JSCODE;
         $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
         $api_url = Util::murl('bonus');
-        $balance_logs_url = Util::murl('bonus' ,['op' => 'logsPage']);
+        $balance_logs_url = Util::murl('bonus', ['op' => 'logsPage']);
         $order_jump_url = Util::murl('order', ['op' => 'jump']);
         $jquery_url = JS_JQUERY_URL;
 

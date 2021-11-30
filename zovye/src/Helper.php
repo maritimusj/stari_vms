@@ -14,6 +14,24 @@ use zovye\model\userModelObj;
 
 class Helper
 {
+    public static function getTheme(deviceModelObj $device = null)
+    {
+        if ($device) {
+            $theme = $device->settings('extra.theme', '');
+            if ($theme) {
+                return $theme;
+            }
+            $agent = $device->getAgent();
+            if ($agent) {
+                $theme = $agent->settings('agentData.device.theme', '');
+                if ($theme) {
+                    return $theme;
+                }
+            }
+        }
+        return settings('device.get.theme', 'default');
+    }
+
     /**
      * 设备故障时，订单是否需要自动退款
      * @param null $obj

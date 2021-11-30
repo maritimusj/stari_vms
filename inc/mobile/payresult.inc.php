@@ -56,8 +56,8 @@ if ($op == 'default') {
     if (request::has('balance')) {
         $url_params['balance'] = request::int('balance', 0);
     }
-
-    app()->showTemplate(Theme::file('payresult'), [
+    $file = Theme::getThemeFile($device,'payresult');
+    app()->showTemplate($file, [
         'tpl' => $tpl,
         'url' => Util::murl('order', $url_params),
         'idcard_url' => Util::murl('idcard', ['orderNO' => $order_no]),

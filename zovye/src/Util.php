@@ -401,7 +401,7 @@ class Util
         do {
             $time = $date->format('Ymd');
             unset($files[$time]);
-            foreach(Log::$suffix as $suffix) {
+            foreach (Log::$suffix as $suffix) {
                 unset($files["$time.$suffix"]);
             }
             $date->modify('-1 day');
@@ -542,7 +542,7 @@ include './index.php';
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
     }
 
-    public static function expire(string $uid) 
+    public static function expire(string $uid)
     {
         We7::cache_delete(App::uid(6) . $uid);
     }
@@ -600,7 +600,7 @@ include './index.php';
             return $result;
         } catch (Exception $e) {
             return err($e->getMessage());
-        }        
+        }
     }
 
     public static function cachedCallUtil($expired, callable $fn, ...$params)
@@ -845,7 +845,7 @@ include './index.php';
         //全部免费额度限制
         if (empty(Util::getUserMaxFreeNum($user, $device))) {
             return error(State::ERROR, '您的免费额度已用完！');
-        }        
+        }
 
         $assign_data = $account->settings('assigned', []);
         if (!Util::isAssigned($assign_data, $device)) {
@@ -1357,13 +1357,13 @@ HTML_CONTENT;
 
     /**
      * 查找指定对象
-     * @deprecated
      * @param $tb
      * @param $val
      * @param null $hint
      * @param null $must
      *
      * @return mixed
+     * @deprecated
      */
     public static function findObject($tb, $val, $hint = null, $must = null)
     {

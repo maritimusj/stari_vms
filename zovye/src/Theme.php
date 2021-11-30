@@ -24,14 +24,23 @@ class Theme
         return $themes;
     }
 
+    public static function getThemeFile($device, $name): string
+    {
+        return self::file($name, Helper::getTheme($device));
+    }
+
     /**
      * 获取皮肤文件名，当前皮肤不包括指定文件时，则返回默认皮肤的相应文件
+     * @param string $theme
      * @param $name
      * @return string
      */
-    public static function file($name): string
+    public static function file($name, string $theme = ''): string
     {
-        $theme = settings('device.get.theme', 'default');
+        if (empty($theme)) {
+            $theme = Helper::getTheme();
+        }
+
         $filename = MODULE_ROOT . "/template/mobile/themes/{$theme}/$name.html";
         if (file_exists($filename)) {
             return "themes/{$theme}/$name";

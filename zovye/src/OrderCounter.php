@@ -14,29 +14,28 @@ class OrderCounter extends StatsCounter
 {
     protected function makeUID(array $params = []): string
     {
-        $arr = ["order:counter"];
+        $arr = [];
 
         foreach ($params as $index => $obj) {
             if ($obj instanceof agentModelObj) {
-                $arr[] = "agent:{$obj->getId()}";
+                $arr['agent'] = $obj->getId();
             } elseif ($obj instanceof userModelObj) {
-                $arr[] = "user:{$obj->getId()}";
+                $arr['user'] = $obj->getId();
             } elseif ($obj instanceof deviceModelObj) {
-                $arr[] = "device:{$obj->getId()}";
+                $arr['device'] = $obj->getId();
             } elseif ($obj instanceof accountModelObj) {
-                $arr[] = "account:{$obj->getId()}";
+                $arr['account'] = $obj->getId();
             } elseif ($obj instanceof goodsModelObj) {
-                $arr[] = "goods:{$obj->getId()}";
+                $arr['goods'] = $obj->getId();
             } elseif ($obj instanceof WeApp) {
-                $uid = App::uid();
-                $arr[] = "app:$uid";
+                $arr['app'] =  App::uid();
             } else {
                 $arr[$index] = $obj;
             }
         }
 
-        sort($arr);
-        return sha1(http_build_query($arr));
+        ksort($arr);
+        return sha1('order:counter:' . http_build_query($arr));
     }
 
     protected function initFN(DateTimeInterface $begin, DateTimeInterface $end, array $params = [])
@@ -47,7 +46,12 @@ class OrderCounter extends StatsCounter
         } else {
             $v = Order::query($condition)->count();
         }
-        return $v;
+        print_r([
+            'conditioin' => $condition,
+            'begin' => date('Y-m-d H:i:s', $condition['createtime >=']),
+            'end' => date('Y-m-d H:i:s', $condition['createtime <']),
+        ]);
+        return intval($v);
     }
 
     protected function fillCondition(array $params, DateTimeInterface $begin, DateTimeInterface $end): array

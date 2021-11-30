@@ -14,125 +14,138 @@ abstract class StatsCounter
 
     abstract protected function initFN(DateTimeInterface $begin, DateTimeInterface $end, array $params = []);
 
-    public function getHour(DateTimeInterface $time, array $params = []): int
+    public function getHour(array $params, DateTimeInterface...$hours): int
     {
-        $uid = $this->makeUID(array_merge(['datetime' => $time->format('YmdH')], $params));
+        $total = 0;
 
-        /** @var counterModelObj $counter */
-        $counter = Counter::get($uid, true);
-        if ($counter) {
-            return $counter->getNum();
-        }
+        foreach ($hours as $hour) {
+            $uid = $this->makeUID(array_merge(['datetime' => $hour->format('YmdH')], $params));
 
-        try {
-            $begin = new DateTimeImmutable($time->format('Y-m-d H:00:00'));
-            $end = $begin->modify('+1 hour');
-
-            $v = $this->initFN($begin, $end, $params);
-
-            if ($time->format('YmdH') != date('YmdH') && Locker::try("counter:init:$uid")) {
-                Counter::create([
-                    'uid' => $uid,
-                    'num' => $v,
-                    'createtime' => time(),
-                    'updatetime' => 0,
-                ]);
+            /** @var counterModelObj $counter */
+            $counter = Counter::get($uid, true);
+            if ($counter) {
+                $total += $counter->getNum();
             }
-            return $v;
 
-        } catch (Exception $e) {
+            try {
+                $begin = new DateTimeImmutable($hour->format('Y-m-d H:00:00'));
+                $end = $begin->modify('+1 hour');
+
+                $v = $this->initFN($begin, $end, $params);
+
+                if ($hour->format('YmdH') != date('YmdH') && Locker::try("counter:init:$uid")) {
+                    Counter::create([
+                        'uid' => $uid,
+                        'num' => $v,
+                        'createtime' => time(),
+                        'updatetime' => 0,
+                    ]);
+                }
+
+                $total += $v;
+
+            } catch (Exception $e) {
+            }
         }
-        return 0;
+
+        return $total;
     }
 
-    public function getDay(DateTimeInterface $time, $params = []): int
+    public function getDay(array $params = [], DateTimeInterface...$days): int
     {
-        $uid = $this->makeUID(array_merge(['datetime' => $time->format('Ymd')], $params));
+        $total = 0;
 
-        /** @var counterModelObj $counter */
-        $counter = Counter::get($uid, true);
-        if ($counter) {
-            return $counter->getNum();
+        foreach ($days as $day) {
+            $uid = $this->makeUID(array_merge(['datetime' => $day->format('Ymd')], $params));
+
+            /** @var counterModelObj $counter */
+            $counter = Counter::get($uid, true);
+            if ($counter) {
+                $total += $counter->getNum();
+            }
+
+            try {
+                $begin = new DateTime($day->format('Y-m-d 00:00'));
+                $end = new DateTime($day->format('Y-m-d 00:00'));
+
+                $end->modify('next day 00:00');
+                if ($end->getTimestamp() > time()) {
+                    $end->setTimestamp(time());
+                }
+
+                $time_arr = [];
+                while ($begin < $end) {
+                    $time_arr[] = DateTimeImmutable::createFromMutable($begin);
+                    $begin->modify('+1 hour');
+                }
+
+                $total += $this->getHour($params, ...$time_arr);
+
+                if ($day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
+                    Counter::create([
+                        'uid' => $uid,
+                        'num' => $total,
+                        'createtime' => time(),
+                        'updatetime' => 0,
+                    ]);
+                }
+            } catch (Exception $e) {
+            }
         }
 
-        try {
-            $begin = new DateTime($time->format('Y-m-d 00:00'));
-            $end = new DateTime($time->format('Y-m-d 00:00'));
-
-            $end->modify('next day 00:00');
-            if ($end->getTimestamp() > time()) {
-                $end->setTimestamp(time());
-            }
-
-            $total = 0;
-
-            while ($begin < $end) {
-                $total += $this->getHour($begin, $params);
-                $begin->modify('+1 hour');
-            }
-
-            if ($time->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
-                Counter::create([
-                    'uid' => $uid,
-                    'num' => $total,
-                    'createtime' => time(),
-                    'updatetime' => 0,
-                ]);
-            }
-
-            return $total;
-
-        } catch (Exception $e) {
-        }
-
-        return 0;
+        return $total;
     }
 
-    public function getMonth(DateTimeInterface $time, $params = []): int
+    public function getMonth(array $params, DateTimeInterface...$months): int
     {
-        $uid = $this->makeUID(array_merge(['datetime' => $time->format('Ym')], $params));
+        $total = 0;
 
-        /** @var counterModelObj $counter */
-        $counter = Counter::get($uid, true);
-        if ($counter) {
-            return $counter->getNum();
+        foreach ($months as $month) {
+            $uid = $this->makeUID(array_merge(['datetime' => $month->format('Ym')], $params));
+
+            /** @var counterModelObj $counter */
+            $counter = Counter::get($uid, true);
+            if ($counter) {
+                $total += $counter->getNum();
+            }
+
+            try {
+                $begin = new DateTime($month->format('Y-m 00:00'));
+                $end = new DateTime($month->format('Y-m 00:00'));
+
+                $end->modify("first day of next month 00:00");
+                if ($end->getTimestamp() > time()) {
+                    $end->setTimestamp(time());
+                }
+
+                $time_arr = [];
+
+                while ($begin < $end) {
+                    $time_arr[] = DateTimeImmutable::createFromMutable($begin);
+                    $begin->modify('next day');
+                }
+
+                $total += $this->getDay($params, ...$time_arr);
+
+                if ($month->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
+                    Counter::create([
+                        'uid' => $uid,
+                        'num' => $total,
+                        'createtime' => time(),
+                        'updatetime' => 0,
+                    ]);
+                }
+
+            } catch (Exception $e) {
+            }
         }
 
-        try {
-            $begin = new DateTime($time->format('Y-m 00:00'));
-            $end = new DateTime($time->format('Y-m 00:00'));
-
-            $end->modify("first day of next month 00:00");
-            if ($end->getTimestamp() > time()) {
-                $end->setTimestamp(time());
-            }
-
-            $total = 0;
-
-            while ($begin < $end) {
-                $total += $this->getDay($begin, $params);
-                $begin->modify('next day');
-            }
-
-            if ($time->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
-                Counter::create([
-                    'uid' => $uid,
-                    'num' => $total,
-                    'createtime' => time(),
-                    'updatetime' => 0,
-                ]);
-            }
-            return $total;
-
-        } catch (Exception $e) {
-        }
-
-        return 0;
+        return $total;
     }
 
-    public function getYear(DateTimeInterface $time, $params = []): int
+    public function getYear(array $params, DateTimeInterface $year): int
     {
-        $uid = $this->makeUID(array_merge(['datetime' => $time->format('Y')], $params));
+        $uid = $this->makeUID(array_merge(['datetime' => $year->format('Y')], $params));
 
         /** @var counterModelObj $counter */
         $counter = Counter::get($uid, true);
@@ -141,22 +154,23 @@ abstract class StatsCounter
         }
 
         try {
-            $begin = new DateTime($time->format('Y-01-01 00:00'));
-            $end = new DateTime($time->format('Y-01-01 00:00'));
+            $begin = new DateTime($year->format('Y-01-01 00:00'));
+            $end = new DateTime($year->format('Y-01-01 00:00'));
 
             $end->modify("first day of next year 00:00");
             if ($end->getTimestamp() > time()) {
                 $end->setTimestamp(time());
             }
 
-            $total = 0;
-
+            $time_arr = [];
             while ($begin < $end) {
-                $total += $this->getMonth($begin, $params);
+                $time_arr[] = DateTimeImmutable::createFromMutable($begin);
                 $begin->modify('next month');
             }
 
-            if ($time->format('Y') != date('Y') && Locker::try("counter:init:$uid")) {
+            $total = $this->getMonth($params, ...$time_arr);
+
+            if ($year->format('Y') != date('Y') && Locker::try("counter:init:$uid")) {
                 Counter::create([
                     'uid' => $uid,
                     'num' => $total,

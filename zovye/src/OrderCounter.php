@@ -2,6 +2,7 @@
 
 namespace zovye;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
@@ -88,136 +89,136 @@ class OrderCounter extends StatsCounter
         return $result;
     }
 
-    public function getHourFreeTotal($obj, DateTimeInterface $time): int
+    public function getHourFreeTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return $this->getHour($time, $params);
+        return $this->getHour($params, $hour ?? new DateTimeImmutable());
     }
 
-    public function getHourPayTotal($obj, DateTimeInterface $time): int
+    public function getHourPayTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return $this->getHour($time, $params);
+        return $this->getHour($params, $hour ?? new DateTimeImmutable());
     }
 
-    public function getHourBalanceTotal($obj, DateTimeInterface $time): int
+    public function getHourBalanceTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return $this->getHour($time, $params);
+        return $this->getHour($params, $hour ?? new DateTimeImmutable());
     }
 
-    public function getDayAll($obj, DateTimeInterface $time): array
+    public function getDayAll($obj, DateTimeInterface $day = null): array
     {
         $result = [
-            'free' => $this->getDayFreeTotal($obj, $time),
-            'pay' => $this->getDayPayTotal($obj, $time),
-            'balance' => $this->getDayBalanceTotal($obj, $time),
+            'free' => $this->getDayFreeTotal($obj, $day),
+            'pay' => $this->getDayPayTotal($obj, $day),
+            'balance' => $this->getDayBalanceTotal($obj, $day),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
         return $result;
     }
 
-    public function getDayFreeTotal($obj, DateTimeInterface $time): int
+    public function getDayFreeTotal($obj, DateTimeInterface $day = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return $this->getDay($time, $params);
+        return $this->getDay($params, $day ?? new DateTimeImmutable());
     }
 
-    public function getDayPayTotal($obj, DateTimeInterface $time): int
+    public function getDayPayTotal($obj, DateTimeInterface $day = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return $this->getDay($time, $params);
+        return $this->getDay($params, $day ?? new DateTimeImmutable());
     }
 
-    public function getDayBalanceTotal($obj, DateTimeInterface $time): int
+    public function getDayBalanceTotal($obj, DateTimeInterface $day = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return $this->getDay($time, $params);
+        return $this->getDay($params, $day ?? new DateTimeImmutable());
     }
 
-    public function getMonthAll($obj, DateTimeInterface $time): array
+    public function getMonthAll($obj, DateTimeInterface $month = null): array
     {
         $result = [
-            'free' => $this->getMonthFreeTotal($obj, $time),
-            'pay' => $this->getMonthPayTotal($obj, $time),
-            'balance' => $this->getMonthBalanceTotal($obj, $time),
+            'free' => $this->getMonthFreeTotal($obj, $month),
+            'pay' => $this->getMonthPayTotal($obj, $month),
+            'balance' => $this->getMonthBalanceTotal($obj, $month),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
         return $result;
     }
 
-    public function getMonthFreeTotal($obj, DateTimeInterface $time): int
+    public function getMonthFreeTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return $this->getMonth($time, $params);
+        return $this->getMonth($params, $month ?? new DateTimeImmutable());
     }
 
-    public function getMonthPayTotal($obj, DateTimeInterface $time): int
+    public function getMonthPayTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return $this->getMonth($time, $params);
+        return $this->getMonth($params, $month ?? new DateTimeImmutable());
     }
 
-    public function getMonthBalanceTotal($obj, DateTimeInterface $time): int
+    public function getMonthBalanceTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return $this->getMonth($time, $params);
+        return $this->getMonth($params, $month ?? new DateTimeImmutable());
     }
 
-    public function getYearAll($obj, DateTimeInterface $time): array
+    public function getYearAll($obj, DateTimeInterface $year = null): array
     {
         $result = [
-            'free' => $this->getYearFreeTotal($obj, $time),
-            'pay' => $this->getYearPayTotal($obj, $time),
-            'balance' => $this->getYearBalanceTotal($obj, $time),
+            'free' => $this->getYearFreeTotal($obj, $year),
+            'pay' => $this->getYearPayTotal($obj, $year),
+            'balance' => $this->getYearBalanceTotal($obj, $year),
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
         return $result;
     }
 
-    public function getYearFreeTotal($obj, DateTimeInterface $time): int
+    public function getYearFreeTotal($obj, DateTimeInterface $year = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::ACCOUNT;
 
-        return $this->getYear($time, $params);
+        return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
 
-    public function getYearPayTotal($obj, DateTimeInterface $time): int
+    public function getYearPayTotal($obj, DateTimeInterface $year = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::PAY;
 
-        return $this->getYear($time, $params);
+        return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
 
-    public function getYearBalanceTotal($obj, DateTimeInterface $time): int
+    public function getYearBalanceTotal($obj, DateTimeInterface $year = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
         $params['src'] = Order::BALANCE;
 
-        return $this->getYear($time, $params);
+        return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
 
 }

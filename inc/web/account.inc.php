@@ -539,12 +539,15 @@ if ($op == 'default') {
                 if ($original_bonus_type == Account::COMMISSION) {
                     //备份设置
                     $account->set('assigned_commission', $account->getAssignData());
-                    //分配到所有设备
-                    $account->setAssignData(['all' => 1]);
                 } else {
                   //备份设置
                   $account->setAssignData($account->get('assigned_commission', []));
                 }
+            }
+
+            if ($account->getBonusType() == Account::BALANCE) {
+                //分配到所有设备
+                $account->setAssignData(['all' => 1]);
             }
 
             //退出佣金推广后,删除所有代理商分配

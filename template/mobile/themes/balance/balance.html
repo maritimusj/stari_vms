@@ -198,8 +198,8 @@
 			<div class="card">
 				<img class="icon" src="{MODULE_URL}static/m/balance/img/heart.gif" >
 				<span class="title">关注成功</span>
-				<span class="desc">点击下方按钮，领取积分奖励！</span>
-				<div :class="['btn', done ? 'done': '']" @click="btnClick">{{done ? doneDesc : '领取积分 +' + account.bonus}}</div>
+				<span class="desc">恭喜您获得<span style="color: #F08080;"> {{account.bonus}} </span>个积分</span>
+				<div class="btn done">{{doneDesc}}</div>
 			</div>
 			<div class="mask" v-if="mask.visible">
 				<div class="alert-view">
@@ -234,7 +234,9 @@
 				methods: {
 					isOk() {
 						zovye_fn.isOk().then(res => {
-							if(!res.status) {
+							if(res.status) {
+								this.getBonus();
+							} else {
 								this.done = true
 								this.doneDesc = res.data.msg
 							}
@@ -260,14 +262,14 @@
 							}
                         })
                     },
-					btnClick() {
+					getBonus() {
                         if(!this.done && !this.loading) {
                             this.loading = true
                             zovye_fn.getBonus().then(res => {
                                 this.loading = false
                                 if(res.status) {
                                     this.done = true
-									this.doneDesc = '已领取'
+									this.doneDesc = '领取成功'
 									this.show = true
 									setTimeout(() => {
 										this.show = false

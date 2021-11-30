@@ -370,6 +370,38 @@
 			top: 20px;
 			right: 20px;
 		}
+
+		.loading-view {
+			width: 120px;
+			height: 120px;
+			background-color: rgba(255, 255, 255, 0.9);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			border-radius: 10px;
+			box-shadow: 0 0 5px lightgray;
+		}
+
+		.loading-view img {
+			width: 50px;
+			height: 50px;
+			animation: loading 1s infinite;
+		}
+
+		.loading-view span {
+			font-size: 13px;
+			margin-top: 10px;
+		}
+
+		@keyframes loading {
+			from {
+				transform: rotate(0deg);
+			}
+			to {
+				transform: rotate(360deg);
+			}
+		}
 	</style>
 </head>
 
@@ -498,6 +530,12 @@
 			</div>
 		</div>
 		<div class="toast" v-if="toast.visible">{{toast.text}}</div>
+		<div class="mask" style="background-color: rgba(0, 0, 0, 0);" v-if="loading">
+			<div class="loading-view">
+				<img src="{MODULE_URL}static/m/spec/img/loading.svg">
+				<span>正在加载中...</span>
+			</div>
+		</div>
 	</div>
 	{$tpl['js']['code']}
 	{php \zovye\url(true, JS_VUE_URL);}
@@ -538,7 +576,8 @@
 				},
 				userInfo: null,
 				wxapp_username: zovye_fn.wxapp_username,
-				wechatState: null
+				wechatState: null,
+				loading: false
 			},
 			created() {
 				this.done = !zovye_fn.signIn;
@@ -612,7 +651,9 @@
 				},
 				signInClick() {
 					if (!this.done) {
+						this.loading = true;
 						zovye_fn.signIn().then(res => {
+							this.loading = false;
 							if (res.status) {
 								this.done = true;
 								this.success.data = res.data;
@@ -625,7 +666,9 @@
 					}
 				},
 				videoClick() {
+					this.loading = true;
 					zovye_fn.getAccounts(10, 1).then(res => {
+						this.loading = false;
 						if (res.status) {
 							const data = res.data || [];
 							if (data.length > 0) {
@@ -699,8 +742,9 @@
 					}
 				},
 				followClick() {
+					this.loading = true;
 					zovye_fn.getAccounts(0, 1).then(res => {
-						console.log(res)
+						this.loading = false;
 						if (res.status) {
 							const data = res.data || [];
 							if (data.length > 0) {
@@ -715,8 +759,9 @@
 					})
 				},
 				wxappClick() {
+					this.loading = true;
 					zovye_fn.getAccounts(30, 1).then(res => {
-						console.log(res)
+						this.loading = false;
 						if (res.status) {
 							const data = res.data || [];
 							if (data.length > 0) {

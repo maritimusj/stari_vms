@@ -430,7 +430,9 @@ if ($op == 'list') {
         ];
     }
 
+    $tpl_data['themes'] = Theme::all();
     app()->showTemplate('web/device/edit_new', $tpl_data);
+
 } elseif ($op == 'deviceTestAll') {
 
     $device = Device::get(request('id'));
@@ -632,6 +634,7 @@ if ($op == 'list') {
                 'lat' => floatval(request('location')['lat']),
             ],
             'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
+            'theme' => request::str('theme'),
         ];
 
         if (App::isMustFollowAccountEnabled()) {

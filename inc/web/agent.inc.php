@@ -363,7 +363,7 @@ if ($op == 'default') {
         }
     }
 
-    app()->showTemplate('web/agent/edit', [
+    $tpl_data = [
         'op' => $op,
         'agent_levels' => $agent_levels,
         'id' => $id,
@@ -373,7 +373,13 @@ if ($op == 'default') {
         'superior_data' => $superior_data,
         'free_gsp_users' => $free_gsp_users ?? null,
         'mixed_gsp_users' => $mixed_gsp_users ?? null,
-    ]);
+    ];
+
+    if ($op == 'agent_misc') {
+        $tpl_data['themes'] = Theme::all();
+    }
+
+    app()->showTemplate('web/agent/edit', $tpl_data);
 } elseif ($op == 'save') {
 
     $id = request::int('id');
@@ -578,6 +584,7 @@ if ($op == 'default') {
             $user->updateSettings(
                 'agentData.device',
                 [
+                    'theme' => request::str('theme'),
                     'remainWarning' => request::int('remainWarning'),
                     'shipment' => [
                         'balanced' => request::bool('shipmentBalance') ? 1 : 0,

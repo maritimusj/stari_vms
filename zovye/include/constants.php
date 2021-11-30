@@ -27,7 +27,7 @@ define('APP_NAME', basename(ZOVYE_ROOT));
 define('DEBUG', true);
 
 //日志等级
-define('LOG_LEVEL', L_ERROR);
+define('LOG_LEVEL', L_DEBUG);
 
 define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'] . $_SERVER['HTTP_HOST'] . '/addons/' . APP_NAME . '/');
 

@@ -540,9 +540,20 @@
                     </div>
                 -->
                 <div class="form-group">
-                    <label for="group" class="col-md-2 control-label">购买界面</label>
+                    <label for="theme" class="col-md-2 control-label">手机端界面</label>
                     <div class="col-md-10">
-                        <select name="goodsList" id="group" style="width:80%;">
+                        <select name="theme" class="form-control" id="theme">
+                            <option value=""{if empty($extra['theme'])} selected{/if}> 系统默认界面 </option>
+                            {loop $themes $index $item}
+                            <option value="{$item}"{if $extra['theme'] == $item} selected{/if}> {$item} </option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="group" class="col-md-2 control-label">商品列表</label>
+                    <div class="col-md-10">
+                        <select name="goodsList" id="group" style="width:100%;">
                             <option value="goods" {if $extra['goodsList'] == 'goods'}selected{/if}>只显示商品，不显示套餐</option>
                             <option value="packages" {if $extra['goodsList'] == 'packages'}selected{/if}>只显示套餐，不显示商品</option>
                             <option value="all" {if $extra['goodsList'] == 'all'}selected{/if}>商品和套餐都显示</option>
@@ -553,7 +564,7 @@
                     <label for="group" class="col-md-2 control-label">分组</label>
                     <div class="col-md-10">
                         {if $groups}
-                        <select name="group" id="group" style="width:80%;">
+                        <select name="group" id="group" style="width:100%;">
                             {loop $groups $index $group}
                             <option value="{$index}" {if $device && $device->getGroupId() == $index}selected{/if}>{$group['title']}</option>
                             {/loop}

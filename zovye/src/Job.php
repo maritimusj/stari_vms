@@ -231,7 +231,7 @@ class Job
                 return CtrlServ::scheduleJob('update_counter', [
                     'agent' => $agent->getId(),
                     'device' => 0,
-                    'datetime' => (new DateTimeImmutable('-1 hour'))->getTimestamp(),
+                    'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
                 ]);
             }
         }
@@ -247,7 +247,7 @@ class Job
                 return CtrlServ::scheduleJob('update_counter', [
                     'agent' => 0,
                     'device' => $device->getId(),
-                    'datetime' => (new DateTimeImmutable('-1 hour'))->getTimestamp(),
+                    'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
                 ]);
             }
         }
@@ -264,7 +264,7 @@ class Job
                 return CtrlServ::scheduleJob('update_counter', [
                     'agent' => 0,
                     'device' => 0,
-                    'datetime' => (new DateTimeImmutable('-1 hour'))->getTimestamp(),
+                    'datetime' => (new DateTimeImmutable('-1 hour'))->format("Y-m-d H:00:00"),
                 ]);
             }
         }

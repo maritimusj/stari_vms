@@ -19,32 +19,34 @@ $op = request::op('default');
 $data = [
     'agent' => request::int('agent'),
     'device' => request::str('device'),
-    'datetime' => request::int('datetime'),
+    'datetime' => request::str('datetime'),
 ];
 
 $log = [
     'params' => $data,
+
 ];
 
 if ($op == 'update_counter' && CtrlServ::checkJobSign($data)) {
-    $datetime = new DateTimeImmutable("@{$data['datetime']}");
-    $str = $datetime->format('Y-m-d H');
+
+    $datetime = new DateTimeImmutable($data['datetime']);
+    $str = $datetime->format('Y-m-d H:i:s');
     if ($data['agent']) {
         $agent = Agent::get($data['agent']);
         if ($agent) {
-            $log["agent:$str"] = '测试版本未开启';//(new OrderCounter())->getHourAll($agent, $datetime);
+            $log["agent $str"] = '测试版本未开启';//(new OrderCounter())->getHourAll($agent, $datetime);
         }
     }
 
     if ($data['device']) {
         $device = Device::get($data['device']);
         if ($device) {
-            $log["device:$str"] = '测试版本未开启';//(new OrderCounter())->getHourAll($device, $datetime);
+            $log["device $str"] = '测试版本未开启';//(new OrderCounter())->getHourAll($device, $datetime);
         }
     }
 
     if (!isset($agent) && !isset($device)) {
-        $log["app:$str"] = '测试版本未开启';//(new OrderCounter())->getHourAll(app(), $datetime);
+        $log["app $str"] = '测试版本未开启';//(new OrderCounter())->getHourAll(app(), $datetime);
     }
 } else {
     $log['error'] = '签名检验失败！';

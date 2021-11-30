@@ -45,18 +45,16 @@ class we7HttpClient implements IHttpClient
 
         $resp = ihttp::request($url, $http_options['content'], $extra, $timeout);
 
-        if (DEBUG) {
-            Util::logToFile(
-                'we7httpClientRequest',
-                [
-                    'url' => $url,
-                    'method' => $method,
-                    'header' => $headers,
-                    'body' => $data,
-                    'response' => $resp,
-                ]
-            );
-        }
+        Log::debug(
+            'we7httpClientRequest',
+            [
+                'url' => $url,
+                'method' => $method,
+                'header' => $headers,
+                'body' => $data,
+                'response' => $resp,
+            ]
+        );
 
         if (!is_error($resp)) {
             if ($resp['code'] == 200 && $resp['content']) {

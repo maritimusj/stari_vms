@@ -111,6 +111,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
 
             Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
             Config::balance('order.as', request::str('balanceOrderAs'), true);
+            Config::balance('order.auto_rb', request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
         }
 
     } elseif ($save_type == 'ctrl') {

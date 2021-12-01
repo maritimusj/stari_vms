@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\App;
 use zovye\Balance;
+use zovye\Config;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\EventBus;
@@ -313,9 +314,9 @@ function refund(int $balance_id, int $num, string $reason)
         return err('找不到这个设备！');
     }
 
-    $need = Helper::NeedAutoRefund($device);
+    $need = Config::balance('order.auto_rb', 0);
     if ($need) {
-        $result = Util::transactionDo(function () use ($balance, $num, $device, $reason) {
+        $result = Util::transactionDo(function () use ($balance, $num, $reason) {
             $user = $balance->getUser();
             if (empty($user)) {
                 return err('找不到这个用户！');

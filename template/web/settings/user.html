@@ -127,6 +127,19 @@
                         <span class="help-block">* 积分订单做为免费订单或者支付订单将影响用户订单统计，比如用户每天可以免费领取的次数</span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="autoRollbackOrderBalance" class="col-md-2 control-label">出货失败</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="checkbox col-md-7">
+                                <label>
+                                    <input type="checkbox" name="autoRollbackOrderBalance" id="autoRollbackOrderBalance" value="1" {if \zovye\Config::balance('order.auto_rb', 0)}checked{/if}>
+                                    设备故障或者超时，出货失败后自动返回积分
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="seg">
                 <div class="title">第三方接口</div>

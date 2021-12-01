@@ -20,6 +20,7 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\device_logsModelObj;
 use zovye\model\device_recordModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\packageModelObj;
 use zovye\model\payload_logsModelObj;
 use zovye\model\userModelObj;
 use zovye\model\versionModelObj;
@@ -755,6 +756,7 @@ if ($op == 'list') {
 
             //绑定套餐
             if (!$device->isBlueToothDevice()) {
+                /** @var packageModelObj $entry */
                 foreach (Package::query(['device_id' => 0])->findAll() as $entry) {
                     $entry->setDeviceId($device->getId());
                     $entry->save();

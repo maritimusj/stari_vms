@@ -14,6 +14,7 @@ use zovye\base\modelObj;
 /**
  * @method getTitle()
  * @method getPrice()
+ * @method setDeviceId($id)
  */
 class packageModelObj extends modelObj
 {

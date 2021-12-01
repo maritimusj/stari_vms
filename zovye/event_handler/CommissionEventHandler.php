@@ -85,8 +85,8 @@ class CommissionEventHandler
 
         if ($account) {
             $commission_price = $account->getCommissionPrice();
-        } else {
-            $commission_price =  Config::balance('order.commission.val', 0);
+        } elseif ($balance) {
+            $commission_price =  Config::balance('order.commission.val', 0) * $order->getNum();
         }
         
         if ($commission_price <= 0) {

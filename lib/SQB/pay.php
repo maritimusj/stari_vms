@@ -8,6 +8,7 @@ namespace SQB;
 
 use we7\ihttp;
 use zovye\App;
+use zovye\Log;
 use zovye\State;
 use function zovye\err;
 use function zovye\error;
@@ -50,11 +51,11 @@ fwIDAQAB
             'Authorization' => "{$this->config['sn']} {$this->sign($params)}",
         ]);
 
-        // \zovye\Util::logToFile('SQB', [
-        //     'url' => $url,
-        //     'request' => $params,
-        //     'result' => $res,
-        // ]);
+         Log::debug('SQB', [
+             'url' => $url,
+             'request' => $params,
+             'result' => $res,
+         ]);
 
         if (is_error($res)) {
             return $res;

@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-Util::logToFile('yfb', [
+Log::debug('yfb', [
     'raw' => request::raw(),
     'user' => request::json('openId'),
     'device' => request::json('params'),
@@ -17,7 +17,7 @@ Util::logToFile('yfb', [
 if (App::isYFBEnabled()) {
     YfbAccount::cb(request::json());
 } else {
-    Util::logToFile('yfb', [
+    Log::debug('yfb', [
         'error' => '粉丝宝没有启用！',
     ]);
 }

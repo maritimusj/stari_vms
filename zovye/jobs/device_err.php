@@ -10,8 +10,9 @@ namespace zovye\job\deviceError;
 
 use zovye\CtrlServ;
 use zovye\Device;
-use zovye\request;
+use zovye\Log;
 use zovye\model\deviceModelObj;
+use zovye\request;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\settings;
@@ -66,4 +67,4 @@ if ($op == 'device_err' && CtrlServ::checkJobSign($data)) {
     }
 }
 
-Util::logToFile('device_err', $log);
+Log::debug('device_err', $log);

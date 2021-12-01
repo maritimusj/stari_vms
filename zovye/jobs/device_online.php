@@ -10,6 +10,7 @@ namespace zovye\job\DeviceOnline;
 
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Log;
 use zovye\request;
 use zovye\Util;
 use zovye\Wx;
@@ -56,4 +57,4 @@ if ($op == 'device_online' && CtrlServ::checkJobSign($data)) {
     }
 }
 
-Util::logToFile('device_online', $log);
+Log::debug('device_online', $log);

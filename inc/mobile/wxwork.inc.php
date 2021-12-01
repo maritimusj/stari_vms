@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $raw = request::raw();
 if (empty($raw)) {
     Util::resultAlert('请重新扫描设备二维码，谢谢！');
@@ -13,7 +15,7 @@ if (empty($raw)) {
 
 parse_str($raw, $data);
 
-Util::logToFile('wxwork', [
+Log::debug('wxwork', [
     'raw' => $raw,
     'data' => $data,
 ]);
@@ -21,7 +23,7 @@ Util::logToFile('wxwork', [
 if (App::isWxWorkEnabled()) {
     WxWorkAccount::cb(Account::WxWORK, $data);
 } else {
-    Util::logToFile('wxwork', [
+    Log::debug('wxwork', [
         'error' => '没有启用！',
     ]);
 }

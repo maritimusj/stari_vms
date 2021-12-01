@@ -49,7 +49,7 @@ class VoucherEventHandler
             'res' => $res,
         ];
 
-        Util::logToFile('vouchers', $res);
+        Log::debug('vouchers', $res);
 
         if ($res) {
             $order->setExtraData('extra.voucher.recv', count($res));

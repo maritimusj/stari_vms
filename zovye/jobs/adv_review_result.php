@@ -10,6 +10,7 @@ namespace zovye\job\advReviewResult;
 
 use zovye\Advertising;
 use zovye\CtrlServ;
+use zovye\Log;
 use zovye\request;
 use zovye\ReviewResult;
 use zovye\Util;
@@ -25,7 +26,7 @@ if ($op == 'adv_review_result' && CtrlServ::checkJobSign(['id' => request('id')]
     $adv = Advertising::get(request::int('id'));
     if (empty($adv)) {
         $log['error'] = '广告不存在!';
-        return Util::logToFile('adv_review_result', $log);
+        Log::fatal('adv_review_result', $log);
     }
 
     $tpl_id = settings('notice.advReviewResultTplid');
@@ -59,4 +60,4 @@ if ($op == 'adv_review_result' && CtrlServ::checkJobSign(['id' => request('id')]
     }
 }
 
-Util::logToFile('adv_review_result', $log);
+Log::debug('adv_review_result', $log);

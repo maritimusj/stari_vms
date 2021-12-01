@@ -66,7 +66,7 @@ class JfbAccount
             if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $data, $result);
                 if (empty($log)) {
-                    Util::logToFile('jfb_query', [
+                    Log::error('jfb_query', [
                         'request' => $data,
                         'result' => $result,
                     ]);
@@ -107,7 +107,7 @@ class JfbAccount
                     $log->setExtraData('error_msg', $e->getMessage());
                     $log->save();
                 } else {
-                    Util::logToFile('jfb', [
+                    Log::error('jfb', [
                         'error' => $e->getMessage()
                     ]);
                 }
@@ -161,7 +161,7 @@ class JfbAccount
                 Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
             } catch (Exception $e) {
-                Util::logToFile('jfb', [
+                Log::error('jfb', [
                     'error' => $e->getMessage(),
                     'params' => $params,
                 ]);

@@ -9,15 +9,16 @@ namespace zovye\job\agentApp;
 //代理商申请提交
 
 use zovye\CtrlServ;
-use zovye\request;
+use zovye\Job;
+use zovye\Log;
 use zovye\model\agent_appModelObj;
+use zovye\request;
 use zovye\User;
-use zovye\Util;
 use zovye\We7;
 use zovye\Wx;
-use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
+use function zovye\request;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -47,10 +48,11 @@ if ($op == 'agent_app' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 $log['result']['error'] = '没有指定用户！';
             }
             $log['data'] = $notify_data;
-            return Util::logToFile('agent_app', $log);
+            Log::debug('agent_app', $log);
+            Job::exit();
         }
     }
 }
 
 $log['result'] = 'fail';
-Util::logToFile('agent_app', $log);
+Log::debug('agent_app', $log);

@@ -43,7 +43,7 @@ class AliTicket
 
         $result = Util::post(self::API_URL, $params, false);
 
-        Util::logToFile('aliTicket', [
+        Log::debug('aliTicket', [
             'method' => 'fetch',
             'request' => $params,
             'response' => $result,
@@ -90,7 +90,7 @@ class AliTicket
 
         $result = Util::post(self::API_VM_URL . '/SyncVm', $params, false);
 
-        Util::logToFile('aliTicket', [
+        Log::debug('aliTicket', [
             'method' => 'syncVm',
             'params' => $params,
             'response' => $result,
@@ -123,7 +123,7 @@ class AliTicket
 
         $result = Util::post(self::API_VM_URL . '/VmStatus', $params, false);
 
-        Util::logToFile('aliTicket', [
+        Log::debug('aliTicket', [
             'method' => 'VmStatus',
             'params' => $params,
             'response' => $result,
@@ -156,7 +156,7 @@ class AliTicket
 
         $result = Util::post(self::API_VM_URL . '/CancelVm', $params, false);
 
-        Util::logToFile('aliTicket', [
+        Log::debug('aliTicket', [
             'method' => 'cancelVm',
             'request' => $params,
             'response' => $result,
@@ -275,7 +275,7 @@ class AliTicket
         } else {
             $res = Util::createQrcodeFile("ali_ticket{$result['ticket']}", $result['url']);
             if (is_error($res)) {
-                Util::logToFile('aliTicket', [
+                Log::error('aliTicket', [
                     'error' => 'fail to createQrcode file',
                     'result' => $res,
                 ]);            

@@ -10,13 +10,15 @@ namespace zovye\job\agentMsg;
 
 use zovye\Agent;
 use zovye\CtrlServ;
-use zovye\request;
+use zovye\Job;
+use zovye\Log;
 use zovye\model\msgModelObj;
+use zovye\request;
 use zovye\Util;
 use zovye\We7;
 use zovye\Wx;
-use function zovye\request;
 use function zovye\m;
+use function zovye\request;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -65,10 +67,11 @@ if ($op == 'agent_msg' && CtrlServ::checkJobSign(['id' => request('id')])) {
             }
 
             $log['data'] = $notify_data;
-            return Util::logToFile('agent_msg', $log);
+            Log::debug('agent_msg', $log);
+            Job::exit();
         }
     }
 }
 
 $log['result'] = 'fail';
-Util::logToFile('agent_msg', $log);
+Log::debug('agent_msg', $log);

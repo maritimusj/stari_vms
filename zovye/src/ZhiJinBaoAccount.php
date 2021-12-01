@@ -54,7 +54,7 @@ class ZhiJinBaoAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('zjbao_query', [
+                        Log::error('zjbao_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -94,7 +94,7 @@ class ZhiJinBaoAccount
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('zjbao', [
+                        Log::error('zjbao', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -159,7 +159,7 @@ class ZhiJinBaoAccount
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
-            Util::logToFile('zjbao', [
+            Log::error('zjbao', [
                 'error' => '回调处理发生错误! ',
                 'result' => $e->getMessage(),
             ]);

@@ -7,11 +7,12 @@
 namespace zovye\job\orderStats;
 
 use zovye\CtrlServ;
-use zovye\Locker;
-use zovye\request;
 use zovye\Job;
+use zovye\Locker;
+use zovye\Log;
 use zovye\model\orderModelObj;
 use zovye\Order;
+use zovye\request;
 use zovye\Util;
 use function zovye\request;
 
@@ -59,4 +60,4 @@ if ($op == 'order_stats' && CtrlServ::checkJobSign(['id' => request('id')])) {
     }
 }
 
-Util::logToFile('order_stats', $log);
+Log::debug('order_stats', $log);

@@ -10,13 +10,15 @@ namespace zovye\job\advReview;
 
 use zovye\Advertising;
 use zovye\CtrlServ;
-use zovye\request;
+use zovye\Job;
+use zovye\Log;
 use zovye\Media;
+use zovye\request;
 use zovye\User;
 use zovye\Util;
 use zovye\Wx;
-use function zovye\request;
 use function zovye\is_error;
+use function zovye\request;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -25,8 +27,8 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $id = request::int('id');
     $adv = Advertising::get($id);
     if (empty($adv)) {
-        return Util::logToFile('adv_review', [
-            'error' => "adv[{$id}] not found!",
+        Log::fatal('adv_review', [
+            'error' => "adv[$id] not found!",
         ]);
     }
 
@@ -34,7 +36,7 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
     if ($tpl_id) {
         $agent = $adv->getOwner();
         if (empty($agent)) {
-            return Util::logToFile('adv_review', [
+             Log::fatal('adv_review', [
                 'error' => 'adv\'s agent is empty!',
             ]);
         }
@@ -66,8 +68,9 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
             $res = '没有指定用户！';
         }
 
-        return Util::logToFile('adv_review', ['result' => $res]);
+        Log::debug('adv_review', ['result' => $res]);
+        Job::exit();
     }
 }
 
-Util::logToFile('adv_review', ['result' => 'failed, advReviewTplid is empty!']);
+Log::debug('adv_review', ['result' => 'failed, advReviewTplid is empty!']);

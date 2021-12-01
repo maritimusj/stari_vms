@@ -6,4 +6,4 @@
 
 namespace  zovye;
 
-Util::logToFile('event', request::raw());
+Log::debug('event', request::raw());

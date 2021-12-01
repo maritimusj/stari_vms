@@ -218,7 +218,7 @@ class Device extends State
             $device->setRemain(intval($lowest));
             $device->setCargoLanes($lanes_data);
         } else {
-            Util::logToFile("resetPayload", [
+            Log::error("resetPayload", [
                 'error' => '货道数据错误！',
                 'data' => $data,
             ]);
@@ -373,7 +373,7 @@ class Device extends State
                     $data['params'] = $params;
                     $data['result'] = '设备已自动加入！';
 
-                    Util::logToFile('device', $data);
+                    Log::info('device', $data);
 
                     return $device;
                 }
@@ -518,7 +518,7 @@ class Device extends State
             ]);
 
             if (!m('device_events')->create($data)) {
-                Util::logToFile('events', [
+                Log::error('events', [
                     'error' => 'create device log failed',
                     'data' => $data,
                 ]);
@@ -545,7 +545,7 @@ class Device extends State
             }
 
             if (!m('device_events')->create($data)) {
-                Util::logToFile('events', [
+                Log::error('events', [
                     'error' => 'create device log failed',
                     'data' => $data,
                 ]);

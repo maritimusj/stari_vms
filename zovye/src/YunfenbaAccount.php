@@ -183,7 +183,7 @@ class YunfenbaAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('yunfenba_query', [
+                        Log::error('yunfenba_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -223,7 +223,7 @@ class YunfenbaAccount
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('yunfenba', [
+                        Log::error('yunfenba', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -279,7 +279,7 @@ class YunfenbaAccount
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Util::logToFile('yunfenba', [
+            Log::error('yunfenba', [
                 'error' => '发生错误! ',
                 'result' => $e->getMessage(),
             ]);

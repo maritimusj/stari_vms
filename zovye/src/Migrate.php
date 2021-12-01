@@ -20,9 +20,10 @@ class Migrate
         $sql = preg_replace('/ims_/', $prefix, $sql);
         $sql = preg_replace('/zovye_vms/', $tb_name, $sql);
 
-        Util::logToFile('migrate', [
+        $result = We7::pdo_query($sql);
+        Log::debug('migrate', [
             'sql' => $sql,
-            'result' => We7::pdo_query($sql),
+            'result' => $result,
         ]);
     }
 
@@ -47,6 +48,8 @@ class Migrate
         $history = [];
 
         $query = self::query(['result' => 0]);
+
+        /** @var migrationModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $history[$entry->getName()] = $entry->getCreatetime();
         }
@@ -102,7 +105,7 @@ class Migrate
                 include_once $filename;     
 
             } catch (Exception $e) {
-                Util::logToFile('migrate', [
+                Log::error('migrate', [
                     'name' => $name,
                     'filename' => $filename,
                     'err' => $e->getMessage(),
@@ -121,7 +124,7 @@ class Migrate
         }
 
         if(!self::create($data)) {
-            Util::logToFile('migrate', [
+            Log::error('migrate', [
                 'error' => '无法保存migrate记录！',
             ]);
         }        

@@ -29,6 +29,9 @@ define('DEBUG', true);
 //日志等级
 define('LOG_LEVEL', L_DEBUG);
 
+//按主题过滤日志
+define('LOG_TOPIC_INCLUDES', []);
+
 define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'] . $_SERVER['HTTP_HOST'] . '/addons/' . APP_NAME . '/');
 
 define('LEVEL_HIGH', 'order');

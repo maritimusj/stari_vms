@@ -55,7 +55,7 @@ if (empty($raw)) {
 
 parse_str($raw, $data);
 
-Util::logToFile('aqiinfo', [
+Log::debug('aqiinfo', [
     'raw' => $raw,
     'data' => $data,
 ]);
@@ -63,7 +63,7 @@ Util::logToFile('aqiinfo', [
 if (App::isAQiinfoEnabled()) {
     AQIInfoAccount::cb(Account::AQIINFO, $data);
 } else {
-    Util::logToFile('aqiinfo', [
+    Log::warning('aqiinfo', [
         'error' => '阿旗数据平台没有启用！',
     ]);
 }

@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\Device;
+use zovye\Log;
 use zovye\request;
 use zovye\LoginData;
 use zovye\State;
@@ -39,7 +40,7 @@ class fb
                 try {
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
-                    Util::logToFile('doPageFeedBack', $e->getMessage());
+                    Log::error('doPageFeedBack', $e->getMessage());
                 }
 
             }

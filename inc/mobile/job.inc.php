@@ -39,16 +39,17 @@ if (in_array($op, [
         'update_counter',
     ]
 )) {
-    $job_filename = ZOVYE_CORE_ROOT . "jobs/{$op}.php";
+    $job_filename = ZOVYE_CORE_ROOT . "jobs/$op.php";
 
     if (file_exists($job_filename)) {
         set_time_limit(0);
+        define('IN_JOB', true);
         include_once $job_filename;
     } else {
-        Util::logToFile('job', "job file [{$job_filename}] not exists!");
+        Log::error('job', "job file [$job_filename] not exists!");
     }
 } else {
-    Util::logToFile('job', "job [{$op}] not allowed!");
+    Log::warning('job', "job [$op] not allowed!");
 }
 
 Job::exit();

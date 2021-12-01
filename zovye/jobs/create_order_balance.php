@@ -150,7 +150,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
                     }
                 }
                 if (is_error($result)) {
-                    Util::logToFile('create_order_balance', [
+                    Log::error('create_order_balance', [
                         'orderNO' => $order_no,
                         'error' => $result,
                     ]);
@@ -186,7 +186,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
 } else {
     $log['error'] = '签名校验失败！';
 }
-    
+
 Job::exit($writeLog);
 /**
  * @throws Exception

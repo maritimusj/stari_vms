@@ -14,7 +14,7 @@ return [
         'remainWarning' => 10,
         'waitTimeout' => DEFAULT_DEVICE_WAIT_TIMEOUT,
         'lockRetries' => 10,
-        'lockRetryDelay' => 3,
+        'lockRetryDelay' => 1,
         'lockTimeout' => 30,
         'get' => [
             'theme' => 'rewatch',

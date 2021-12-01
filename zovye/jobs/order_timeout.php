@@ -9,12 +9,12 @@ namespace zovye\job\orderTimeout;
 //订单支付超时处理
 
 use zovye\CtrlServ;
-use zovye\request;
 use zovye\Job;
+use zovye\Log;
 use zovye\model\pay_logsModelObj;
 use zovye\Order;
 use zovye\Pay;
-use zovye\Util;
+use zovye\request;
 use function zovye\request;
 
 $op = request::op('default');
@@ -40,10 +40,11 @@ if ($op == 'order_timeout' && CtrlServ::checkJobSign(['orderNO' => $order_no])) 
                     $pay_log->save();
                 }
                 $log['data'] = $data;
-                return Util::logToFile('order_timeout', $log);
+                Log::debug('order_timeout', $log);
+                Job::exit();
             }
         }
     }
 }
 
-Util::logToFile('order_timeout', $log);
+Log::debug('order_timeout', $log);

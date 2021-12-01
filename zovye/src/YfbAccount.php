@@ -91,7 +91,7 @@ class YfbAccount
 
         $str = implode('&', array_values($arr)) . $this->app_secret;
 
-        Util::logToFile('yfb', [
+        Log::debug('yfb', [
             'str' => $str,
             'arr' => array_values($arr),
         ]);
@@ -137,7 +137,7 @@ class YfbAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($account, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('yfb_query', [
+                        Log::error('yfb_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -179,7 +179,7 @@ class YfbAccount
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('yfb', [
+                        Log::error('yfb', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -249,7 +249,7 @@ class YfbAccount
             Account::createThirdPartyPlatformOrder($account, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Util::logToFile('yfb', [
+            Log::error('yfb', [
                 'error' => '发生错误! ',
                 'result' => $e->getMessage(),
             ]);

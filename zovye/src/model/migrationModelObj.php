@@ -9,6 +9,9 @@ use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
+/**
+ * @method string getName()
+ */
 class migrationModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

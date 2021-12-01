@@ -1036,7 +1036,7 @@ class Account extends State
             $str = is_array($params) ? implode(':', $params) : strval($params);
             $result = Account::getAuthorizerQrcodeById($account_data['id'], $str, $temporary);
             if (is_error($result)) {
-                Util::logToFile('wxplatform', [
+                Log::error('wxplatform', [
                     'fn' => 'updateAuthAccountQRCode',
                     'error' => $result,
                 ]);

@@ -9,9 +9,9 @@ namespace zovye\job\newAgent;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Goods;
-use zovye\request;
+use zovye\Log;
 use zovye\model\goodsModelObj;
-use zovye\Util;
+use zovye\request;
 use zovye\Wx;
 use zovye\YZShop;
 use function zovye\request;
@@ -75,4 +75,4 @@ if ($op == 'new_agent' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $log['err'] = 'check sign failed!';
 }
 
-Util::logToFile('new_agent', $log);
+Log::debug('new_agent', $log);

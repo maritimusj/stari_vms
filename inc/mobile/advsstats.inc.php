@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\model\advs_statsModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\advs_statsModelObj;
 
 $user = Util::getCurrentUser();
 $adv = Advertising::get(request::int('advsid'));
@@ -42,6 +42,6 @@ if ($user && $adv) {
     }
 
     if ($url) {
-        header("location:{$url}");
+        header("location:$url");
     }
 }

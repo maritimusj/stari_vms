@@ -15,6 +15,7 @@ use Exception;
 use zovye\Cache;
 use zovye\Config;
 use zovye\Inventory;
+use zovye\Log;
 use zovye\model\agent_msgModelObj;
 use zovye\model\agentModelObj;
 use zovye\App;
@@ -232,7 +233,7 @@ class agent
     {
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
-            Util::logToFile('wxapi', $res);
+            Log::error('wxapi', $res);
         }
 
         $result = agent::doUserLogin($res);
@@ -1770,7 +1771,7 @@ class agent
                 try {
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
-                    Util::logToFile('doPageUserQRcode', $e->getMessage());
+                    Log::error('doPageUserQRcode', $e->getMessage());
                 }
             }
 

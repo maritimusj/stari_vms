@@ -48,7 +48,7 @@ if ($op == 'default') {
             try {
                 We7::file_remote_upload($filename);
             } catch (Exception $e) {
-                Util::logToFile('mobile_device_fb', $e->getMessage());
+                Log::error('mobile_device_fb', $e->getMessage());
             }
         }
         $url = $filename;

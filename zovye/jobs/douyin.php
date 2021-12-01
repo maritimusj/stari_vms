@@ -6,18 +6,16 @@
 
 namespace zovye\job\douyin;
 
-use zovye\Job;
-use zovye\User;
-use zovye\Util;
-use zovye\Order;
+use zovye\Account;
+use zovye\CtrlServ;
 use zovye\Device;
 use zovye\DouYin;
+use zovye\Job;
 use zovye\Locker;
-
-use zovye\Account;
+use zovye\Log;
+use zovye\Order;
 use zovye\request;
-
-use zovye\CtrlServ;
+use zovye\User;
 use function zovye\is_error;
 
 $op = request::op('default');
@@ -33,7 +31,7 @@ $log = [
 ];
 
 $writeLog = function () use (&$log) {
-    Util::logToFile('douyin_order', $log);
+    Log::debug('douyin_order', $log);
 };
 
 if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {

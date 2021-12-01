@@ -10,15 +10,16 @@ use zovye\Advertising;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Device;
-use zovye\Locker;
-use zovye\request;
 use zovye\Job;
+use zovye\Locker;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\Order;
+use zovye\request;
 use zovye\Util;
-use function zovye\request;
 use function zovye\isEmptyArray;
+use function zovye\request;
 use function zovye\settings;
 
 
@@ -137,4 +138,4 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
         }
     }
 }
-Util::logToFile('order', $log);
+Log::debug('order', $log);

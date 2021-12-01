@@ -21,7 +21,7 @@ class AQIInfo
             return err('没有配置！');
         }
 
-        Util::logToFile('AQIInfo', [
+        Log::debug('AQIInfo', [
             'params' => $params,
             'config' => $config,
         ]);
@@ -62,7 +62,7 @@ class AQIInfo
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Util::logToFile('AQIInfo', [
+            Log::error('AQIInfo', [
                 'error' => '发生错误! ',
                 'result' => $e->getMessage(),
             ]);

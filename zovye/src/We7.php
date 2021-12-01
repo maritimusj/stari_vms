@@ -54,7 +54,7 @@ class We7
         if (function_exists("\\{$name}")) {
             return call_user_func("\\{$name}", ...$arguments);
         } else {
-            Util::logToFile(
+            Log::error(
                 'we7',
                 [
                     'name' => $name,

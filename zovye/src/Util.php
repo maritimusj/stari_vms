@@ -245,7 +245,7 @@ class Util
                 throw new RuntimeException('获取用户信息失败：' . $result->alipay_user_info_share_response->sub_msg);
             }
 
-            //Util::logToFile('ali', $result->alipay_user_info_share_response);
+            Log::debug('ali', $result->alipay_user_info_share_response);
 
             $ali_user_id = $result->alipay_user_info_share_response->user_id;
             $nick_name = $result->alipay_user_info_share_response->nick_name;
@@ -290,7 +290,7 @@ class Util
 
             return $user;
         } catch (Exception $e) {
-            Util::logToFile('error', [
+            Log::error('error', [
                 'msg' => '获取支付宝用户失败！',
                 'error' => $e->getMessage(),
             ]);
@@ -357,104 +357,6 @@ class Util
         return $user;
     }
 
-    /**
-     * 创建并返回日志目录
-     * @param string $name
-     * @return string
-     */
-    public static function logDir(string $name): string
-    {
-        $log_dir = LOG_DIR . App::uid(8) . DIRECTORY_SEPARATOR . $name;
-
-        We7::mkDirs($log_dir);
-
-        return $log_dir;
-    }
-
-    /**
-     * 返回日志文件名
-     * @param string $name
-     * @param string $suffix
-     * @return string
-     */
-    public static function logFileName(string $name, string $suffix = ''): string
-    {
-        $log_dir = self::logDir($name);
-        $filename = $log_dir . DIRECTORY_SEPARATOR . date('Ymd');
-        if ($suffix) {
-            $filename .= ".$suffix";
-        }
-        $filename .= '.log';
-        return $filename;
-    }
-
-    public static function deleteExpiredLogFiles(string $name, $keep_days = 3)
-    {
-        $files = [];
-        $patten = self::logDir($name) . '/*.log';
-        foreach (glob($patten) as $filename) {
-            if (is_file($filename)) {
-                $files[basename($filename, '.log')] = $filename;
-            }
-        }
-        $date = new DateTime();
-        do {
-            $time = $date->format('Ymd');
-            unset($files[$time]);
-            foreach (Log::$suffix as $suffix) {
-                unset($files["$time.$suffix"]);
-            }
-            $date->modify('-1 day');
-        } while (--$keep_days > 0);
-
-        foreach ($files as $filename) {
-            unlink($filename);
-        }
-    }
-
-    static $log_cache = [];
-
-    /**
-     * 输出指定变量到文件中
-     * @param string $name 日志名称
-     * @param mixed $data 数据
-     * @param bool $force
-     * @param string $suffix
-     * @return bool
-     */
-
-    public static function logToFile(string $name, $data, bool $force = false, string $suffix = ''): bool
-    {
-        if (DEBUG || $force) {
-            if (empty(self::$log_cache)) {
-                register_shutdown_function(function () use ($name) {
-                    foreach (self::$log_cache as $filename => $data) {
-                        if ($filename && $data) {
-                            file_put_contents($filename, $data, FILE_APPEND);
-                        }
-                    }
-                    if (rand(0, 10) == 10) {
-                        self::deleteExpiredLogFiles($name);
-                    }
-                });
-            }
-
-            $log_filename = self::logFileName($name, $suffix);
-
-            ob_start();
-
-            echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
-
-            print_r($data);
-
-            echo PHP_EOL;
-
-            self::$log_cache[$log_filename][] = ob_get_clean();
-        }
-
-        return true;
-    }
-
     public static function setErrorHandler()
     {
         if (DEBUG) {
@@ -464,7 +366,7 @@ class Util
         }
 
         set_error_handler(function ($severity, $str, $file, $line) {
-            Util::logToFile('error', [
+            Log::error('app', [
                 'level' => $severity,
                 'str' => $str,
                 'file' => $file,
@@ -473,7 +375,7 @@ class Util
         }, E_ALL ^ E_NOTICE);
 
         set_exception_handler(function (Throwable $e) {
-            Util::logToFile('error', [
+            Log::error('app', [
                 'type' => get_class($e),
                 'code' => $e->getCode(),
                 'msg' => $e->getMessage(),
@@ -1142,6 +1044,7 @@ include './index.php';
      * @param $msg
      * @param string $redirect
      * @param string $type
+     * @return never-return
      */
     public static function message($msg, string $redirect = '', string $type = '')
     {
@@ -1152,6 +1055,7 @@ include './index.php';
      * @param $msg
      * @param string $redirect
      * @param string $type
+     * @return never-return
      */
     public static function itoast($msg, string $redirect = '', string $type = '')
     {
@@ -1163,6 +1067,7 @@ include './index.php';
      *
      * @param bool $status 结果
      * @param mixed $data 数据
+     * @return never-return
      */
     public static function resultJSON(bool $status, $data = [])
     {
@@ -1183,6 +1088,7 @@ include './index.php';
      * @param string $msg
      * @param string $type
      * @param string $redirect
+     * @return never-return
      */
     public static function resultAlert(string $msg, string $type = 'success', string $redirect = '')
     {
@@ -1580,7 +1486,7 @@ HTML_CONTENT;
             try {
                 We7::file_remote_upload("{$dirname}{$filename}");
             } catch (Exception $e) {
-                self::logToFile('createQrcodeFile', $e->getMessage());
+                Log::error('createQrcodeFile', $e->getMessage());
             }
 
             return "{$dirname}{$filename}";

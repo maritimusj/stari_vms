@@ -16,6 +16,7 @@ use zovye\Agent;
 use zovye\App;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;
 use zovye\Helper;
@@ -50,7 +51,7 @@ class common
     {
         $res = \zovye\api\wx\common::getDecryptedWxUserData();
         if (is_error($res)) {
-            Util::logToFile('wxapi', $res);
+            Log::error('wxapi', $res);
             return error(State::ERROR, '用户登录失败，请稍后再试！[103]');
         }
 

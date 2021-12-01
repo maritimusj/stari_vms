@@ -10,6 +10,7 @@ use Exception;
 use zovye\Advertising;
 use zovye\Balance;
 use zovye\Config;
+use zovye\Log;
 use zovye\model\advertisingModelObj;
 use zovye\Device;
 use zovye\model\device_groupsModelObj;
@@ -338,7 +339,7 @@ class adv
                 try {
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
-                    Util::logToFile('doPageUploadFile', $e->getMessage());
+                    Log::error('doPageUploadFile', $e->getMessage());
                     return error(State::ERROR, $e->getMessage());
                 }
                 return [

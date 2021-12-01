@@ -96,7 +96,7 @@ class Balance
 
             $result = CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify_url, $data);
             if (is_error($result)) {
-                Util::logToFile('balance', [
+                Log::error('balance', [
                     'notify_url' => $notify_url,
                     'data' => $data,
                     'result' => $result,

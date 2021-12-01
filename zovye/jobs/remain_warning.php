@@ -10,6 +10,7 @@ namespace zovye\job\refund;
 
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Log;
 use zovye\request;
 use zovye\Util;
 use zovye\Wx;
@@ -95,4 +96,4 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
     }
 }
 
-Util::logToFile('remain_warning', $log);
+Log::debug('remain_warning', $log);

@@ -8,22 +8,23 @@ namespace zovye\job\createOrder;
 
 //创建订单
 use Exception;
-use zovye\model\accountModelObj;
 use zovye\base\modelObj;
 use zovye\CtrlServ;
 use zovye\Device;
-use zovye\model\deviceModelObj;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
-use zovye\model\goods_voucher_logsModelObj;
 use zovye\Helper;
-use zovye\request;
 use zovye\Job;
+use zovye\Log;
+use zovye\model\accountModelObj;
+use zovye\model\deviceModelObj;
+use zovye\model\goods_voucher_logsModelObj;
+use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Pay;
+use zovye\request;
 use zovye\State;
 use zovye\User;
-use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\error;
@@ -43,7 +44,7 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
             $res = Job::refund($order_no, $e->getMessage());
             if (empty($res) || is_error($res)) {
                 $device->appShowMessage('退款失败，请联系客服，谢谢！');
-                return Util::logToFile('order_create', [
+                 Log::fatal('order_create', [
                     'orderNO' => $order_no,
                     'msg' => '启动退款任务！',
                     'error' => $res,
@@ -52,7 +53,7 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
                 $device->appShowMessage('正在退款，请稍后再试，谢谢！');
             }
         }
-        return Util::logToFile('order_create', [
+        Log::fatal('order_create', [
             'orderNO' => $order_no,
             'refund' => $refund,
             'error' => $e->getMessage(),
@@ -63,12 +64,12 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
         if ($device) {
             $device->appShowMessage($e->getMessage(), 'error');
         }
-        Util::logToFile('order_create_multi', [
+        Log::error('order_create', [
             'orderNO' => $order_no,
             'error' => $e->getMessage(),
         ]);
     } catch (Exception $e) {
-        return Util::logToFile('order_create', [
+        Log::error('order_create', [
             'orderNO' => $order_no,
             'refund' => false,
             'error' => $e->getMessage(),

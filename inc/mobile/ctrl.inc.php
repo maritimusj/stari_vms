@@ -31,13 +31,12 @@ if (settings('ctrl.checkSign') && CtrlServ::makeNotifierSign(
     $nostr,
     request::raw()
 ) !== $sign) {
-    Util::logToFile('ctrl', [
+    Log::fatal('ctrl', [
         'error' => '签名检验失败！',
         'op' => $op,
         'sign' => $sign,
         'payload' => request::raw(),
     ]);
-    exit();
 }
 
 DeviceEventProcessor::handle($op, $data);

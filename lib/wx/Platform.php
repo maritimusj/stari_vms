@@ -7,6 +7,7 @@
 
 namespace wx;
 
+use zovye\Log;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
@@ -45,12 +46,10 @@ class Platform
             return $result;
         }
 
-        if (DEBUG) {
-            Util::logToFile('wxplatform', [
-                'fn' => 'parseEncryptedData',
-                'error' => $err,
-            ]);
-        }
+        Log::debug('wxplatform', [
+            'fn' => 'parseEncryptedData',
+            'error' => $err,
+        ]);
 
         return '';
     }

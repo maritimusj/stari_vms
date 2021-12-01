@@ -290,7 +290,7 @@ class GoodsVoucher
                     $data['id'] = $v->getId();
                     $result[] = $data;
                 } else {
-                    Util::logToFile('Voucher', ['error' => '创建 voucher 记录失败！']);
+                    Log::error('Voucher', ['error' => '创建 voucher 记录失败！']);
                 }
             }
         }

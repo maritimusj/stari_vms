@@ -81,7 +81,7 @@ if ($op == 'default') {
 
         $res = Util::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
         if (is_error($res)) {
-            Util::logToFile('location', $res);
+            Log::error('location', $res);
             JSON::fail('哎呀，出错了');
         }
 
@@ -257,7 +257,7 @@ if ($op == 'default') {
         Util::redirect($url);
 
     } catch (Exception $e) {
-        Util::logToFile('auth_user', [
+        Log::error('auth_user', [
             'error' => $e->getMessage(),
         ]);
 

@@ -8,13 +8,12 @@ namespace zovye\payment;
 
 use wx\pay;
 use zovye\Contract\IPay;
+use zovye\Log;
 use zovye\model\deviceModelObj;
-use zovye\State;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
 use function zovye\_W;
-use function zovye\error;
 use function zovye\is_error;
 
 class WXPay implements IPay
@@ -82,7 +81,7 @@ class WXPay implements IPay
 
         $res = $wx->buildUnifiedOrder($params);
 
-        Util::logToFile('js_pay', [
+        Log::debug('js_pay', [
             'params' => $params,
             'res' => $res,
         ]);

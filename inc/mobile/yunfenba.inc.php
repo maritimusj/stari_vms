@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-Util::logToFile('yunfenba', [
+Log::debug('yunfenba', [
     'raw' => request::raw(),
     'user' => request::str('user'),
     'device' => request::str('device'),
@@ -20,7 +20,7 @@ if (App::isYunfenbaEnabled()) {
         'device' => request::str('device'),
     ]);
 } else {
-    Util::logToFile('yunfenba', [
+    Log::debug('yunfenba', [
         'error' => '云粉没有启用！',
     ]);
 }

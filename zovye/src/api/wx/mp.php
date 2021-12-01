@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\App;
+use zovye\Log;
 use zovye\We7;
 use zovye\Util;
 use zovye\Media;
@@ -209,7 +210,7 @@ class mp
                 try {
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
-                    Util::logToFile('doPageMpupload', $e->getMessage());
+                    Log::error('doPageMpupload', $e->getMessage());
                     return error(State::ERROR, $e->getMessage());
                 }
 

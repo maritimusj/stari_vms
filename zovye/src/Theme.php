@@ -58,7 +58,7 @@ class Theme
             return $name;
         }
 
-        Util::logToFile('theme', [
+        Log::error('theme', [
             'theme' => $name,
             'file' => $filename,
             'error' => 'theme file not found!',

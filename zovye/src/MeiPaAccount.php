@@ -53,7 +53,7 @@ class MeiPaAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('meipa_query', [
+                        Log::error('meipa_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -61,7 +61,7 @@ class MeiPaAccount
                 }
 
                 if (is_error($result) || $result['status'] != 1) {
-                    Util::logToFile('meipa', [
+                    Log::error('meipa', [
                         'user' => $user->profile(),
                         'acc' => $acc->getName(),
                         'device' => $device->profile(),
@@ -147,7 +147,7 @@ class MeiPaAccount
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
 
         } catch (Exception $e) {
-            Util::logToFile('meipa', [
+            Log::error('meipa', [
                 'data' => $data,
                 'error' => '回调处理发生错误! ',
                 'result' => $e->getMessage(),

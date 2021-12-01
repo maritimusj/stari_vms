@@ -60,6 +60,10 @@ if ($op == 'default') {
     if (empty($val)) {
         JSON::fail('积分值不能为0！');
     }
+
+    if (empty($user)) {
+        JSON::fail('用户不存在！');
+    }
     
     $result = $user->getBalance()->change($val, Balance::API_UPDATE, [
         'appkey' => $appkey,

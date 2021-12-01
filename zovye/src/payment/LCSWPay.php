@@ -9,6 +9,7 @@ namespace zovye\payment;
 use lcsw\pay;
 use zovye\App;
 use zovye\Contract\IPay;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\State;
 use zovye\model\userModelObj;
@@ -66,7 +67,7 @@ class LCSWPay implements IPay
 
         $res = $fn($lcsw, $params);
 
-        Util::logToFile('lcsw_xapppay', [
+        Log::debug('lcsw_xapppay', [
             'params' => $params,
             'res' => $res,
         ]);

@@ -9,10 +9,10 @@ namespace zovye\job\authAccount;
 use zovye\Account;
 use zovye\Agent;
 use zovye\CtrlServ;
-use zovye\request;
 use zovye\Job;
+use zovye\Log;
 use zovye\model\agentModelObj;
-use zovye\Util;
+use zovye\request;
 
 $agent_id = request::str('agent');
 $accountUID = request::str('account');
@@ -46,4 +46,4 @@ if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
     }
 }
 
-Util::logToFile('auth_account', $params);
+Log::debug('auth_account', $params);

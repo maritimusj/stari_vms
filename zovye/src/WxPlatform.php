@@ -68,7 +68,7 @@ class WxPlatform
                 request::raw()
             );
 
-            //Util::logToFile('wxplatform', $result);
+            Log::debug('wxplatform', $result);
 
             if (is_error($result)) {
                 return $result;
@@ -95,13 +95,10 @@ class WxPlatform
                 request::raw()
             );
 
-            //Util::logToFile('wxplatform', $result);
-
-            if (is_error($result)) {
-                return $result;
-            }
+            Log::debug('wxplatform', $result);
 
             return $result;
+
         }
 
         return err('没有配置！');
@@ -265,7 +262,7 @@ class WxPlatform
         if ($platform) {
             $result = $platform->getComponentAccessToken($ticket);
             if ($result['errcode'] != 0) {
-                Util::logToFile('wxplatform', [
+                Log::error('wxplatform', [
                     'fn' => 'getComponentAccessToken',
                     'error' => $result,
                 ]);
@@ -290,7 +287,7 @@ class WxPlatform
         if ($platform) {
             $result = $platform->getPreAuthCode($accessToken);
             if ($result['errcode'] != 0) {
-                Util::logToFile('wxplatform', [
+                Log::error('wxplatform', [
                     'fn' => 'getPreAuthCode',
                     'error' => $result,
                 ]);
@@ -419,7 +416,7 @@ class WxPlatform
 
         $result = Util::post($url, $params);
 
-        //Util::logToFile('wxplatform', $result);
+        Log::debug('wxplatform', $result);
 
         if (is_error($result)) {
             return $result;
@@ -468,7 +465,7 @@ class WxPlatform
         });
 
         if (is_error($result)) {
-            Util::logToFile('wxplatform', [
+            Log::error('wxplatform', [
                 'fn' => 'handleAuthorizerNotify',
                 'error' => $result,
             ]);
@@ -485,7 +482,7 @@ class WxPlatform
     {
         $msg = WxPlatform::parseEncryptedMsgData();
         if (is_error($msg)) {
-            Util::logToFile('wxplatform', [
+            Log::error('wxplatform', [
                 'fn' => 'handleAuthorizerEvent[1]',
                 'error' => $msg,
             ]);
@@ -501,7 +498,7 @@ class WxPlatform
             }
 
             if (is_error($result)) {
-                Util::logToFile('wxplatform', [
+                Log::error('wxplatform', [
                     'fn' => 'handleAuthorizerEvent[2]',
                     'error' => $result,
                 ]);
@@ -679,13 +676,11 @@ class WxPlatform
                 ZovyeException::throwWith('指定的商品库存不足！', -1, $device);
             }
 
-            if (DEBUG) {
-                Util::logToFile('wxplatform', [
-                    'account' => $acc->format(),
-                    'user' => $user->profile(),
-                    'device' => $device->profile(),
-                ]);
-            }
+            Log::debug('wxplatform', [
+                'account' => $acc->format(),
+                'user' => $user->profile(),
+                'device' => $device->profile(),
+            ]);
 
             $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
             $order_uid = Order::makeUID($user, $device, $uid);
@@ -701,7 +696,7 @@ class WxPlatform
             return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
 
         } catch (ZovyeException $e) {
-            Util::logToFile('debug', [
+            Log::error('wxplatform', [
                 'error' => $e->getMessage()
             ]);
             $device = $e->getDevice();
@@ -712,7 +707,7 @@ class WxPlatform
             return err($e->getMessage());
 
         } catch (Exception $e) {
-            Util::logToFile('debug', [
+            Log::error('wxplatform', [
                 'error' => $e->getMessage()
             ]);
             return err($e->getMessage());

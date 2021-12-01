@@ -15,6 +15,7 @@ use zovye\Config;
 use zovye\Device;
 use zovye\Inventory;
 use zovye\Locker;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\request;
@@ -64,7 +65,7 @@ class keeper
     {
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
-            Util::logToFile('wxapi', $res);
+            Log::error('wxapi', $res);
         } else {
             $mobile = $res['phoneNumber'];
             $session_key = $res['session_key'];
@@ -930,7 +931,7 @@ class keeper
         if ($total > 0) {
             $err = $create_commission_fn($total);
             if (is_error($err)) {
-                Util::logToFile('keeper', [
+                Log::error('keeper', [
                     'error' => '创建营运人员补货佣金失败:' . $err['message'],
                     'total' => $total,
                 ]);

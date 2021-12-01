@@ -48,7 +48,7 @@ class YZShop
 
         $res = ihttp::get($url);
         if (is_error($res)) {
-            Util::logToFile('yzshop', [
+            Log::error('yzshop', [
                 'request_url' => $url,
                 'error' => $res,
             ]);
@@ -60,7 +60,7 @@ class YZShop
                 return true;
             }
 
-            Util::logToFile('yzshop', [
+            Log::debug('yzshop', [
                 'request_url' => $url,
                 'response' => $res,
             ]);

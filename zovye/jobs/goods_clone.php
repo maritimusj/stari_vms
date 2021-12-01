@@ -11,8 +11,8 @@ namespace zovye\job\goodsClone;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Goods;
+use zovye\Log;
 use zovye\request;
-use zovye\Util;
 use function zovye\request;
 
 $op = request::op('default');
@@ -48,4 +48,4 @@ if ($op == 'goods_clone' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $log['error'] = 'checkJobSign failed';
 }
 
-Util::logToFile('goods_clone', $log);
+Log::debug('goods_clone', $log);

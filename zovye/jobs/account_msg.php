@@ -9,8 +9,8 @@ namespace zovye\job\accountMsg;
 //公众号消息推送
 
 use zovye\CtrlServ;
+use zovye\Log;
 use zovye\request;
-use zovye\Util;
 use zovye\Wx;
 use function zovye\request;
 
@@ -50,7 +50,7 @@ if ($op == 'account_msg' && CtrlServ::checkJobSign($media)) {
     }
 }
 
-Util::logToFile(
+Log::debug(
     'accountMsg',
     [
         'media' => $media,

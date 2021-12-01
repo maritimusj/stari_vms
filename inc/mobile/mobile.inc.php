@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use RuntimeException;
-
 defined('IN_IA') or exit('Access Denied');
+
+use RuntimeException;
 
 //用户参数
 $params = [

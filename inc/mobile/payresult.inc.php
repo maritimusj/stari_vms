@@ -73,7 +73,7 @@ if ($op == 'default') {
     
 } elseif ($op == 'notify') {
 
-    Util::logToFile('payresult', [
+    Log::debug('payresult', [
         'from' => $_GET['from'],
         'raw' => request::raw(),
     ]);

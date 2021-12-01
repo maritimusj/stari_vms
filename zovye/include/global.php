@@ -13,12 +13,6 @@ define('REQUEST_ID', Util::generateUID());
 
 Util::setErrorHandler();
 
-//设置日志等级
-Log::$level = LOG_LEVEL;
-
-//设置日志按名称输出过滤
-Log::$include = [];
-
 //初始化事件驱动
 EventBus::init();
 
@@ -31,7 +25,7 @@ We7::load()->func('cache');
 try {
     app()->run();
 } catch (Exception $e) {
-    Util::logToFile("app", [
+    Log::error("app", [
         'error' => $e->getMessage(),
         'trace' => $e->getTraceAsString(),
     ]);

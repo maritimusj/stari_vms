@@ -211,7 +211,7 @@ class Pay
                 throw new Exception('创建订单任务失败！');
             }
         } catch (Exception $e) {
-            Util::logToFile('notifyChannel', [
+            Log::error('notifyChannel', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -280,7 +280,7 @@ class Pay
             return $pay->getResponse(true);
 
         } catch (Exception $e) {
-            Util::logToFile('pay', [
+            Log::error('pay', [
                 'error' => $e->getMessage(),
                 'name' => $name,
                 'input' => $input,
@@ -509,7 +509,7 @@ class Pay
             ) {
                 return $pem_file;
             } else {
-                Util::logToFile("getPEMFile", [
+                Log::error("getPEMFile", [
                     'pem' => $pem_file,
                     'error' => '写入PEM文件出错！',
                 ]);

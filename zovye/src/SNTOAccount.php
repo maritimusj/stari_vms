@@ -63,12 +63,12 @@ class SNTOAccount
                 $config['data']['last'] = time();
                 $acc->updateSettings('config', $config);
             } else {
-                Util::logToFile('snto_error', $res);
+                Log::error('snto_error', $res);
             }
         }
 
         if (empty($config['data']['token'])) {
-            Util::logToFile('snto', '无法获取token！');
+            Log::error('snto', '无法获取token！');
             return [];
         }
 
@@ -80,7 +80,7 @@ class SNTOAccount
             if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
-                    Util::logToFile('snto_query', [
+                    Log::debug('snto_query', [
                         'query' => $request,
                         'result' => $result,
                     ]);
@@ -124,7 +124,7 @@ class SNTOAccount
                     $log->setExtraData('error_msg', $e->getMessage());
                     $log->save();
                 } else {
-                    Util::logToFile('snto', [
+                    Log::error('snto', [
                         'error' => $e->getMessage()
                     ]);
                 }
@@ -162,7 +162,7 @@ class SNTOAccount
 
     public static function cb($data = [])
     {
-        Util::logToFile('snto', $data);
+        Log::debug('snto', $data);
 
         try {
             $res = self::verifyData($data);
@@ -193,7 +193,7 @@ class SNTOAccount
 
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
         } catch (Exception $e) {
-            Util::logToFile('snto', [
+            Log::error('snto', [
                 'error' => '回调处理发生错误! ',
                 'result' => $e->getMessage(),
             ]);

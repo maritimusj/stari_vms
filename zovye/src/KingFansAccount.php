@@ -52,7 +52,7 @@ class KingFansAccount
             if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
-                    Util::logToFile('kingfans_query', [
+                    Log::error('kingfans_query', [
                         'query' => $request,
                         'result' => $result,
                     ]);
@@ -91,7 +91,7 @@ class KingFansAccount
                     $log->setExtraData('error_msg', $e->getMessage());
                     $log->save();
                 } else {
-                    Util::logToFile('kingfans', [
+                    Log::error('kingfans', [
                         'error' => $e->getMessage()
                     ]);
                 }
@@ -158,7 +158,7 @@ class KingFansAccount
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Util::logToFile('kingfans', [
+            Log::error('kingfans', [
                 'error' => '发生错误! ',
                 'result' => $e->getMessage(),
             ]);

@@ -751,7 +751,7 @@ class Stats
             return $obj->set('statsData', $stats);
 
         } catch (Exception $e) {
-            Util::logToFile('stats', [
+            Log::error('stats', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);

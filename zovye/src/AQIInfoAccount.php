@@ -48,7 +48,7 @@ class AQIInfoAccount extends AQIInfo
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('AQIInfo_query', [
+                        Log::debug('AQIInfo_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -89,7 +89,7 @@ class AQIInfoAccount extends AQIInfo
 
                     $res = Util::createQrcodeFile("aqiinfo{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
-                        Util::logToFile('AQIInfo', [
+                        Log::error('AQIInfo', [
                             'error' => 'fail to createQrcode file',
                             'result' => $res,
                         ]);
@@ -110,7 +110,7 @@ class AQIInfoAccount extends AQIInfo
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('AQIInfo', [
+                        Log::error('AQIInfo', [
                             'error' => $e->getMessage()
                         ]);
                     }

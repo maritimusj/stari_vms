@@ -9,10 +9,10 @@ namespace zovye\job\getResult;
 //出货
 
 use zovye\CtrlServ;
-use zovye\request;
+use zovye\Log;
 use zovye\Order;
+use zovye\request;
 use zovye\User;
-use zovye\Util;
 use function zovye\request;
 
 $op = request::op('default');
@@ -37,4 +37,4 @@ if ($op == 'get_result' && CtrlServ::checkJobSign($data)) {
     }
 }
 
-Util::logToFile('get_result', $log);
+Log::debug('get_result', $log);

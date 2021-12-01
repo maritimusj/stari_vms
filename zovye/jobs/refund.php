@@ -11,14 +11,15 @@ namespace zovye\job\refund;
 use Exception;
 use zovye\CtrlServ;
 use zovye\Helper;
-use zovye\request;
-use zovye\Order;
+use zovye\Job;
+use zovye\Log;
 use zovye\model\orderModelObj;
+use zovye\Order;
+use zovye\request;
 use zovye\State;
-use zovye\Util;
 use function zovye\error;
-use function zovye\request;
 use function zovye\is_error;
+use function zovye\request;
 
 $op = request::op('default');
 $order_no = request::str('orderNO');
@@ -50,7 +51,8 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
                 'msg' => $e->getMessage(),
             ];
         }
-        return Util::logToFile('refund', $log);
+        Log::debug('refund', $log);
+        Job::exit();
     }
 
     $device = $order->getDevice();
@@ -58,7 +60,8 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
     if ($device && $device->isBlueToothDevice()) {
         if ($order->isBluetoothResultOk()) {
             $log['result'] = '订单已成功，取消退款！';
-            return Util::logToFile('refund', $log);
+            Log::debug('refund', $log);
+            Job::exit();
         }
 
         //退款
@@ -67,13 +70,15 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
             resetPayload($order, $num);
         }
         $log['result'] = is_error($res) ? $res : '退款成功！';
-        return Util::logToFile('refund', $log);
+        Log::debug('refund', $log);
+        Job::exit();
     }
 
     //以下是普通设备退款
     if (empty($num) && $order->isPullOk()) {
         $log['result'] = '订单已成功，取消退款！';
-        return Util::logToFile('refund', $log);
+        Log::debug('refund', $log);
+        Job::exit();
     }
 
     $res = [];
@@ -108,7 +113,7 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
     $log['result'] = !is_error($res) ? '退款成功！' : $res;
 }
 
-Util::logToFile('refund', $log);
+Log::debug('refund', $log);
 
 function resetPayload(orderModelObj $order, int $num = 0): array
 {

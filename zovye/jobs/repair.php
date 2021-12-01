@@ -9,9 +9,9 @@ namespace zovye\job\repair;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Job;
+use zovye\Log;
 use zovye\request;
 use zovye\Stats;
-use zovye\Util;
 use function zovye\is_error;
 
 $op = request::op('default');
@@ -59,6 +59,6 @@ writeLogAndExit($log);
 
 function writeLogAndExit($log)
 {
-    Util::logToFile('repair', $log);
+    Log::debug('repair', $log);
     Job::exit();
 }

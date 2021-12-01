@@ -11,13 +11,15 @@ namespace zovye\job\agentMsg;
 use zovye\Agent;
 use zovye\AgentApp;
 use zovye\CtrlServ;
-use zovye\request;
+use zovye\Job;
+use zovye\Log;
 use zovye\model\agent_appModelObj;
+use zovye\request;
 use zovye\Util;
 use zovye\We7;
 use zovye\Wx;
-use function zovye\request;
 use function zovye\m;
+use function zovye\request;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -53,9 +55,10 @@ if ($op == 'forward_agent_app' && CtrlServ::checkJobSign(['id' => request('id'),
                 }
             }
 
-            return Util::logToFile('forward_agent_app', 'forwardAgentApp => finished!');
+            Log::debug('forward_agent_app', 'forwardAgentApp => finished!');
+            Job::exit();
         }
     }
 }
 
-Util::logToFile('forward_agent_app', 'forwardAgentApp => fail!');
+Log::debug('forward_agent_app', 'forwardAgentApp => fail!');

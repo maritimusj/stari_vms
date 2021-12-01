@@ -7,13 +7,14 @@
 namespace zovye\job\withdraw;
 
 use zovye\CtrlServ;
-use zovye\request;
+use zovye\Job;
+use zovye\Log;
 use zovye\model\userModelObj;
+use zovye\request;
 use zovye\User;
-use zovye\Util;
 use zovye\Wx;
-use function zovye\request;
 use function zovye\is_error;
+use function zovye\request;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -58,10 +59,11 @@ if ($op == 'withdraw' && CtrlServ::checkJobSign($data)) {
             }
 
             $log['data'] = $notify_data;
-            return Util::logToFile('withdraw', $log);
+            Log::debug('withdraw', $log);
+            Job::exit();
         }
     }
 }
 
 $log['result'] = 'fail';
-Util::logToFile('withdraw', $log);
+Log::debug('withdraw', $log);

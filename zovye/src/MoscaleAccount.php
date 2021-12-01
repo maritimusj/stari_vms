@@ -54,7 +54,7 @@ class MoscaleAccount
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('moscale_query', [
+                        Log::error('moscale_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -90,7 +90,7 @@ class MoscaleAccount
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('moscale', [
+                        Log::error('moscale', [
                             'error' => $e->getMessage()
                         ]);
                     }
@@ -196,7 +196,7 @@ class MoscaleAccount
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Util::logToFile('moscale', [
+            Log::error('moscale', [
                 'error' => '回调处理发生错误! ',
                 'result' => $e->getMessage(),
             ]);

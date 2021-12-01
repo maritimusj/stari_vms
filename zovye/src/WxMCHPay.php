@@ -132,9 +132,7 @@ class WxMCHPay
 
         $result = We7::xml2array($input);
 
-        if (DEBUG) {
-            Util::logToFile('mchpay', array('req' => $req, 'resp' => $result));
-        }
+        Log::debug('mchpay', array('req' => $req, 'resp' => $result));
 
         if (!is_array($result)) {
             return error(State::ERROR, '数据解析失败！');

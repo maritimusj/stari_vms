@@ -11,7 +11,7 @@ use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Contract\bluetooth\ICmd;
 use zovye\Contract\bluetooth\IResult;
 use zovye\Device;
-use zovye\Util;
+use zovye\Log;
 
 class protocol implements IBlueToothProtocol
 {
@@ -99,7 +99,7 @@ class protocol implements IBlueToothProtocol
         //蓝牙连接成功，返回握手请求命令
         $cmd = new ShakeHandCMD($device_id, $data);
 
-        Util::logToFile($device_id, [
+        Log::debug($device_id, [
             'data' => $data,
             'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
         ]);
@@ -171,11 +171,6 @@ class protocol implements IBlueToothProtocol
      */
     function parseMessage($device_id, $data):?IResult
     {
-//        Util::logToFile($device_id, [
-//            'data' => $data,
-//            'hex' => bin2hex(base64_decode($data)),
-//        ]);
-
         $device = Device::get($device_id, true);
         if (empty($device)) {
             return null;
@@ -183,7 +178,7 @@ class protocol implements IBlueToothProtocol
 
         $result = new result($device_id, $data);
         if (!$result->isValid()) {
-            Util::logToFile($device_id, [
+            Log::error($device_id, [
                 'data' => $data,
                 'hex' => bin2hex(base64_decode($data)),
                 'error' => '无效的回复！',

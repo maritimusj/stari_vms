@@ -6,11 +6,13 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use Exception;
 
 $op = request::op('default');
 
-Util::logToFile('SQM', request::raw());
+Log::debug('SQM', request::raw());
 
 if ($op == 'default') {
     try {
@@ -73,10 +75,9 @@ if ($op == 'default') {
         exit('Ok');    
 
     }catch(Exception $e) {
-         Util::logToFile('SQM', [
+         Log::error('SQM', [
              'error' => $e->getMessage(),
          ]);
-
          exit($e->getMessage());  
     }
 }

@@ -45,7 +45,7 @@ if ($op == WxPlatform::AUTH_NOTIFY) {
     //启用任务
     $r = Job::authAccount($agent_id, Account::makeUID($app_id));
 
-    Util::logToFile('wxplatform', [
+    Log::debug('wxplatform', [
         'msg' => '授权成功！',
         'data' => [
             'auth_code' => $code,

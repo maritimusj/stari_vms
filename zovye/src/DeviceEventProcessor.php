@@ -288,7 +288,7 @@ class DeviceEventProcessor
                     if (is_callable($fn)) {
                         call_user_func($fn, $data);
                     } else {
-                        Util::logToFile('events', [
+                        Log::warning('events', [
                             'event' => $event,
                             'data' => $data,
                             'error' => 'handler is not function!',
@@ -296,7 +296,7 @@ class DeviceEventProcessor
                     }
                 }
             } else {
-                Util::logToFile('events', [
+                Log::warning('events', [
                     'event' => $event,
                     'data' => $data,
                     'error' => 'unhandled event!',
@@ -333,13 +333,13 @@ class DeviceEventProcessor
                 ]);
 
                 if (!m('device_events')->create($data)) {
-                    Util::logToFile('events', [
+                    Log::error('events', [
                         'error' => 'create device log failed',
                         'data' => $data,
                     ]);
                 }
             } else {
-                Util::logToFile('events', [
+                Log::warning('events', [
                     'msg' => 'device not exists',
                     'event' => $event,
                     'data' => $data,

@@ -9,6 +9,7 @@ namespace zovye\payment;
 use SQB\pay;
 use zovye\App;
 use zovye\Contract\IPay;
+use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\request;
@@ -54,7 +55,7 @@ class SQBPay implements IPay
 
         $res = $SQB->xAppPay($user_uid, $order_no, $price, $device_uid, $body, $notify_url);
 
-        Util::logToFile('sqb_xapppay', [
+        Log::debug('sqb_xapppay', [
             'params' => [
                 'user_uid' => $user_uid,
                 'order_no' => $order_no,

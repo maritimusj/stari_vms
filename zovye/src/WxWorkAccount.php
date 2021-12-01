@@ -77,7 +77,7 @@ class WxWorkAccount extends AQIInfo
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Util::logToFile('wxWork_query', [
+                        Log::debug('wxWork_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -116,7 +116,7 @@ class WxWorkAccount extends AQIInfo
 
                     $res = Util::createQrcodeFile("wxWork{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
-                        Util::logToFile('wxWork', [
+                        Log::error('wxWork', [
                             'error' => 'fail to createQrcode file',
                             'result' => $res,
                         ]);
@@ -137,7 +137,7 @@ class WxWorkAccount extends AQIInfo
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Util::logToFile('wxWork', [
+                        Log::error('wxWork', [
                             'error' => $e->getMessage()
                         ]);
                     }

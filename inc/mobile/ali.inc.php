@@ -17,7 +17,7 @@ if ($op == 'ticket') {
     }
     $res = AliTicket::cb();
     if (is_error($res)) {
-        Util::logToFile('ali_ticket', [
+        Log::error('ali_ticket', [
             'request' => request::raw(),
             'result' => $res,
         ]);

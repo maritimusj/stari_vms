@@ -10,12 +10,11 @@ namespace zovye\job\orderPayResult;
 
 use zovye\CtrlServ;
 use zovye\Device;
-use zovye\Log;
-use zovye\request;
 use zovye\Job;
+use zovye\Log;
 use zovye\Order;
 use zovye\Pay;
-use zovye\Util;
+use zovye\request;
 use function zovye\is_error;
 
 $op = request::op('default');

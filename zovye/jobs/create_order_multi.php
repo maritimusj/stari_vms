@@ -7,27 +7,24 @@
 namespace zovye\job\createOrderMulti;
 
 use Exception;
-use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
-use zovye\Log;
-use zovye\model\deviceModelObj;
 use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
-use zovye\request;
 use zovye\Job;
-use zovye\Order;
+use zovye\Log;
+use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
-use zovye\Pay;
 use zovye\model\pay_logsModelObj;
-use zovye\State;
-use zovye\User;
 use zovye\model\userModelObj;
+use zovye\Order;
+use zovye\Pay;
+use zovye\request;
+use zovye\User;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\err;
-use function zovye\error;
 use function zovye\getArray;
 use function zovye\is_error;
 use function zovye\settings;
@@ -124,7 +121,7 @@ function process($order_no): bool
     });
 
     if (is_error($orderResult)) {
-        Util::logToFile('order_create_multi', [
+        Log::error('order_create_multi', [
             'msg' => '创建订单失败！',
             'orderNO' => $order_no,
             'error' => $orderResult,
@@ -159,7 +156,7 @@ function process($order_no): bool
                     }
                 }
                 if (is_error($result)) {
-                    Util::logToFile('order_create_multi', [
+                    Log::error('order_create_multi', [
                         'orderNO' => $order_no,
                         'error' => $result,
                     ]);
@@ -301,7 +298,7 @@ function refund(string $order_no, deviceModelObj $device, string $reason)
     if ($need) {
         $result = Job::refund($order_no, $reason, -1);
         if (empty($result) || is_error($result)) {
-            Util::logToFile('order_create_multi', [
+            Log::error('order_create_multi', [
                 'orderNO' => $order_no,
                 'msg' => '启动退款任务！',
                 'error' => $result,

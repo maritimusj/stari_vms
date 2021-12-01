@@ -622,7 +622,7 @@ JSCODE;
         }
 
         if (App::isBalanceEnabled()) {
-            $bonus_url = Util::murl('bonus');
+            $bonus_url = Util::murl('bonus', ['serial' => REQUEST_ID]);
             $user_data = [
                 'status' => true,
                 'data' => $user->profile(),

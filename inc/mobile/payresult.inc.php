@@ -54,8 +54,9 @@ if ($op == 'default') {
 
     $url_params = ['op' => 'result', 'orderNO' => $order_no];
     if (request::has('balance')) {
-        $url_params['balance'] = request::int('balance', 0);
+        $url_params['balance'] = 1;
     }
+
     $file = Theme::getThemeFile($device,'payresult');
     app()->showTemplate($file, [
         'tpl' => $tpl,

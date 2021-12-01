@@ -20,9 +20,9 @@ class CommissionEventHandler
     /**
      * 事件：device.orderCreated
      * @param deviceModelObj $device
-     * @param userModelObj $user
      * @param orderModelObj $order
      * @param accountModelObj|null $account
+     * @param balanceModelObj|null $balance
      * @return bool
      * @throws Exception
      */
@@ -50,10 +50,10 @@ class CommissionEventHandler
 
     /**
      * 免费订单分佣
-     * @param userModelObj $user
      * @param deviceModelObj $device
      * @param orderModelObj $order
      * @param accountModelObj|null $account
+     * @param balanceModelObj|null $balance
      * @return bool
      * @throws Exception
      */

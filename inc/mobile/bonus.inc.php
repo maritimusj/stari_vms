@@ -117,34 +117,17 @@ if ($op == 'default') {
         JSON::fail('对不起，商品数量不足！');
     }
 
-    if (!$user->acquireLocker(User::BALANCE_LOCKER)) {
+    if (!$user->acquireLocker(User::ORDER_LOCKER)) {
         JSON::fail('无法锁定用户，请稍后再试！');
     }
 
-    $balance = $user->getBalance();
-    $total = $goods['balance'] * $num;
+    $order_no = Order::makeUID($user, $device, sha1(request::str('serial')));
+    $ip = $user->getLastActiveData('ip') ?: Util::getClientIp();
 
-    if ($balance->total() < $total) {
-        JSON::fail('您的积分不够！');
-    }
-
-    $result = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
-        'user' => $user->profile(),
-        'device' => $device->profile(),
-        'goods' => $goods,
-        'num' => $num,
-        'ip' => $user->getLastActiveData('ip') ?: Util::getClientIp(),
-    ]);
-
-    if (empty($result)) {
-        JSON::fail('积分操作失败，请联系管理员！');
-    }
-
-    $order_no = Order::makeUID($user, $device, sha1($result->getId() . $result->getCreatetime()));
-    if (Job::createBalanceOrder($order_no, $result)) {
+    if (Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
         JSON::success([
             'msg' => '请稍后，正在出货中！',
-            'redirect' => Util::murl('payresult', ['orderNO' => $order_no, 'balance' => $result->getId()]),
+            'redirect' => Util::murl('payresult', ['orderNO' => $order_no, 'balance' => 1]),
         ]);
     }
 

@@ -234,11 +234,11 @@ TEXT;
 TEXT;
         } elseif ($entry->getSrc() == Balance::GOODS_EXCHANGE) {
             $line = '';
-            $goods = Goods::get($entry->getExtraData('goods'));
+            $goods = $entry->getExtraData('goods', []);
             $num = $entry->getExtraData('num', 1);
             if ($goods) {
-                $img = Util::toMedia($goods->getImg(), true);
-                $line .= "<dt>商品</dt><dd class=\"goods\"><img src=\"$img\" >{$goods->getName()}x$num</dd>";
+                $img = Util::toMedia($goods['img'], true);
+                $line .= "<dt>商品</dt><dd class=\"goods\"><img src=\"$img\" >{$goods['name']} x$num</dd>";
             }
             $device = Device::get($entry->getExtraData('device'));
             if ($device) {

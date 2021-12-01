@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use DateTime;
 use Exception;
 use zovye\Advertising;
 use zovye\Balance;
@@ -415,14 +416,31 @@ class adv
     public static function getBonus()
     {
         $user = common::getUser();
+        
         $bonus = Config::app('wxapp.advs.reward.bonus', 0);
         if (empty($bonus)) {
             return err(State::ERROR, '暂时没有奖励！');
         }
+        
+        $limit = Config::app('wxapp.advs.reward.limit', 0);
+        if ($limit > 0) {
+            $begin = new DateTime();
+            $begin->modify('00:00');
+
+            $total = $user->getBalance()->query([
+                'src' => Balance::REWARD_ADV,
+                'createtime >' => $begin->getTimestamp(),
+            ])->count();
+            if ($total > $limit) {
+                return err(State::ERROR, '对不起，今天的广告奖励额度已用完！');
+            }    
+        }
+
         $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);
         if (empty($result)) {
             return err(State::ERROR, '获取奖励失败！');
         }
+
         return [
             'balance' => $user->getBalance()->total(),
             'bonus' => $result->getXVal(),

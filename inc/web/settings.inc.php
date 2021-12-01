@@ -461,6 +461,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 'reward' => [
                     'id' => request::str('reward'),
                     'bonus' => request::str('rewardBonus'),
+                    'limit' => request::str('rewardBonusLimit'),
                 ],
                 'interstitial' => [
                     'id' => request::str('interstitial'),

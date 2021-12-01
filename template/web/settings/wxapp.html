@@ -60,20 +60,35 @@
             <div class="seg">
                 <div class="title">流量主广告位</div>
                 {loop $advs_position $index $pos}
+                {if $pos['balance']}
+                <div class="seg-divider"></div>
+                {/if}
                 <div class="form-group">
                     <label for="{$index}" class="col-md-2 control-label">{$pos['title']}</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="{$index}" id="{$index}" value="{$advsID[$index]['id']}" required>
                         <span class="help-block">* {$pos['description']}，请填写该广告位ID，点<a href="https://ad.weixin.qq.com/guide/1189" target="_blank">这里</a>了解更多</span>
                     </div>
-                    {if $pos['balance']}
-                    <label for="{$index}Bonus" class="col-md-2 control-label"></label>
+                </div>
+                {if $pos['balance']}
+                <div class="form-group">
+                    <label for="{$index}Bonus" class="col-md-2 control-label">积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="{$index}Bonus" id="{$index}Bonus" value="{$advsID[$index]['bonus']}">
-                        <span class="help-block">* 积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></span>
+                        <span class="help-block">* 奖励积分数量</span>
                     </div>
-                    {/if}
                 </div>
+                <div class="form-group">
+                    <label for="{$index}BonusLimit" class="col-md-2 control-label">每日限额（次）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="{$index}BonusLimit" id="{$index}BonusLimit" value="{php echo intval($advsID[$index]['limit'])}" min="0">
+                        <span class="help-block">* 最大次数限制，０表示不限制</span>
+                    </div>
+                </div>
+                {/if}
+                {if $pos['balance']}
+                <div class="seg-divider"></div>
+                {/if}
                 {/loop}
             </div>
             {/if}

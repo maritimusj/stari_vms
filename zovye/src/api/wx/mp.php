@@ -91,6 +91,8 @@ class mp
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }
 
+        $data['bonus_type'] = $account->getBonusType();
+
         $user = common::getAgent();
 
         if ($more) {

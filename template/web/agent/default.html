@@ -442,5 +442,11 @@
         const url = $(this).attr("href");
         api.showResult({}, url, false);
     })
+    $('#search-form').submit(function(e){
+        e.preventDefault();
+        const url = $(this).attr('action');
+        const keywords = $('input[name=keywords').val();
+        window.location.replace(url + '&keywords=' + keywords);
+    });
 </script>
 {template 'common/footer'}

@@ -164,6 +164,7 @@ if ($op == 'default') {
     $tpl_data['page'] = $page;
     $tpl_data['agents'] = $agents['list'];
     $tpl_data['mobile_url'] = Util::murl('mobile');
+    $tpl_data['keywords'] = $keywords;
 
     $tpl_data['agent_levels'] = $agent_levels;
 

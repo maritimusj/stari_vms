@@ -121,6 +121,11 @@ if ($op == 'default') {
         JSON::fail('无法锁定用户，请稍后再试！');
     }
 
+    $balance = $user->getBalance();
+    if ($goods['balance'] * $num > $balance->total()) {
+        JSON::fail('您的积分不够！');
+    }
+
     $order_no = Order::makeUID($user, $device, sha1(request::str('serial')));
     $ip = $user->getLastActiveData('ip') ?: Util::getClientIp();
 

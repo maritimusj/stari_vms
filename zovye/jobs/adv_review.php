@@ -9,6 +9,7 @@ namespace zovye\job\advReview;
 //广告审核
 
 use zovye\Advertising;
+use zovye\App;
 use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
@@ -49,13 +50,13 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
             'keyword1' => ['value' => "{$type}广告"],
             'keyword2' => ['value' => '<无>'],
             'keyword3' => ['value' => date('Y-m-d H:i:s', $adv->getCreatetime())],
-            'remark' => ['value' => "代理商：{$agentName}"],
+            'remark' => ['value' => "代理商：$agentName"],
         ];
 
         if (settings('notice.reviewAdminUserId')) {
             $user = User::findOne(['id' => settings('notice.reviewAdminUserId')]);
             if ($user) {
-                $url = Util::murl('util', ['op' => 'adv_review', 'id' => $adv->getId(), 'sign' => sha1(\zovye\App::uid() . $user->getOpenid() . $adv->getId())]);
+                $url = Util::murl('util', ['op' => 'adv_review', 'id' => $adv->getId(), 'sign' => sha1(App::uid() . $user->getOpenid() . $adv->getId())]);
                 if (!is_error(Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data, $url))) {
                     $res[] = "[ {$user->getNickname()} ]=> Ok" . PHP_EOL;
                 } else {

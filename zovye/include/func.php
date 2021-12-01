@@ -332,9 +332,9 @@ function url($tag, ...$names)
         }
         if ($tag) {
             if (substr($name, strpos($name, '?') - 4, 4) === '.css') {
-                echo "<link  rel=\"stylesheet\" type=\"text/css\" href=\"{$name}\">\r\n";
+                echo "<link  rel=\"stylesheet\" type=\"text/css\" href=\"$name\">\r\n";
             } else {
-                echo "<script src=\"{$name}\"></script>\r\n";
+                echo "<script src=\"$name\"></script>\r\n";
             }
         } else {
             echo $name;

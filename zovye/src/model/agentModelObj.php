@@ -23,7 +23,7 @@ class agentModelObj extends userModelObj
 {
     public function agentData($path, $default = null)
     {
-        return $this->settings("agentData.{$path}", $default);
+        return $this->settings("agentData.$path", $default);
     }
 
     public function getName(): string

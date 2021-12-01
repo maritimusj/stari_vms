@@ -421,7 +421,7 @@ class accountModelObj extends modelObj
                     $arr = explode('{/url}', $arr[1], 2);
                     $text .= '<a href="' . $redirect_url . '">' . $arr[0] . '</a>' . $arr[1];
                 } else {
-                    $text = str_replace('{url}', "<a href=\"{$redirect_url}\">这里</a>", $str);
+                    $text = str_replace('{url}', "<a href=\"$redirect_url\">这里</a>", $str);
                 }
             } else {
                 $text = $str;

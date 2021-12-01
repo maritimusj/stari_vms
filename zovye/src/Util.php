@@ -1484,12 +1484,12 @@ HTML_CONTENT;
             }
 
             try {
-                We7::file_remote_upload("{$dirname}{$filename}");
+                We7::file_remote_upload("$dirname$filename");
             } catch (Exception $e) {
                 Log::error('createQrcodeFile', $e->getMessage());
             }
 
-            return "{$dirname}{$filename}";
+            return "$dirname$filename";
         }
 
         return error(State::ERROR, '创建文件失败！');

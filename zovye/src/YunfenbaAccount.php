@@ -124,7 +124,7 @@ class YunfenbaAccount
     {
         $url = str_replace('{vendor_uid}', $this->vendor_uid, self::GET_TASK_URL);
         if (!empty($this->sub_uid)) {
-            $url .= "/{$this->sub_uid}";
+            $url .= "/$this->sub_uid";
         }
 
         $scene = $device->settings('extra.yunfenba.scene', '');

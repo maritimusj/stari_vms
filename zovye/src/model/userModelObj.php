@@ -112,7 +112,7 @@ class userModelObj extends modelObj
     {
         $classname = str_replace('zovye\model', 'lltjs', userModelObj::class);
 
-        return "{$classname}:{$this->getId()}:{$key}";
+        return "$classname:{$this->getId()}:$key";
     }
 
     protected function getSettingsBindClassName(): string

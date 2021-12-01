@@ -44,7 +44,7 @@ class YZShop
 
         $mid = intval(isset($agent) ? We7::mc_openid2uid($agent->getOpenid()) : 0);
 
-        $url = _W('siteroot') . "/addons/yun_shop/api.php?i=" . We7::uniacid() . "&uid={$uid}&mid={$mid}&type=5&route=member.member.memberFromHXQModule";
+        $url = _W('siteroot') . "/addons/yun_shop/api.php?i=" . We7::uniacid() . "&uid=$uid&mid=$mid&type=5&route=member.member.memberFromHXQModule";
 
         $res = ihttp::get($url);
         if (is_error($res)) {
@@ -100,7 +100,7 @@ class YZShop
             'is_deleted' => 0,
         ];
         if ($keywords) {
-            $condition['title LIKE'] = "%{$keywords}%";
+            $condition['title LIKE'] = "%$keywords%";
         }
 
         $res = We7::pdo_getall(self::TB_GOODS, We7::uniacid($condition), ['id', 'title']);

@@ -216,7 +216,7 @@ class mp
 
                 $x = sha1(App::uid() . CLIENT_IP . $filename);
 
-                return ['file' => "{$x}@{$filename}", 'fullpath' => Util::toMedia($filename)];
+                return ['file' => "$x@$filename", 'fullpath' => Util::toMedia($filename)];
             }
         }
 
@@ -243,9 +243,9 @@ class mp
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
             $query->whereOr([
-                'name LIKE' => "%{$keyword}%",
-                'title LIKE' => "%{$keyword}%",
-                'descr LIKE' => "%{$keyword}%",
+                'name LIKE' => "%$keyword%",
+                'title LIKE' => "%$keyword%",
+                'descr LIKE' => "%$keyword%",
             ]);
         }
 

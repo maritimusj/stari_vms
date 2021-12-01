@@ -309,7 +309,7 @@ class WxPlatform
 
         $v = sha1(http_build_query($params));
 
-        $filename = "/{$v}.php";
+        $filename = "/$v.php";
         Util::createApiRedirectFile($filename, 'wxplatform', $params);
 
         $notify_url = _W('siteroot');

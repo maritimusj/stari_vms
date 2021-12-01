@@ -120,7 +120,7 @@ class WXPay implements IPay
         $pay_fail_url = Util::murl('payfailed', ['msg' => '__msg__']);
 
         return <<<JS_CODE
-<script src="{$jquery_url}"></script>
+<script src="$jquery_url"></script>
 {$js_sdk}
 <script>
     wx.ready(function(){
@@ -129,13 +129,13 @@ class WXPay implements IPay
     
     const zovye_fn = {};
     zovye_fn.redirectToGetPayResultPage = function(orderNO, msg) {
-        let api_url = "{$pay_result_url}".replace("__orderNO__", orderNO);
+        let api_url = "$pay_result_url".replace("__orderNO__", orderNO);
         api_url = api_url.replace("__msg__", encodeURIComponent(msg));
         window.location.replace(api_url);
     }
     
     zovye_fn.redirectToPayFailedPage = function(msg) {
-        //window.location.replace("{$pay_fail_url}".replace('__msg__', encodeURIComponent(msg)));
+        //window.location.replace("$pay_fail_url".replace('__msg__', encodeURIComponent(msg)));
         alert(msg);
     }
     
@@ -164,13 +164,13 @@ class WXPay implements IPay
                 "paySign": data.paySign,
             }, function (res) {
                 if (res.err_msg === "get_brand_wcpay_request:ok") {
-                    $.get("{$order_api_url}", { op: "finished", orderNO: data.orderNO });
+                    $.get("$order_api_url", { op: "finished", orderNO: data.orderNO });
                     resolve(data.orderNO, data.msg || "");
                 } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
-                    $.get("{$order_api_url}", { op: "cancel", orderNO: data.orderNO });
+                    $.get("$order_api_url", { op: "cancel", orderNO: data.orderNO });
                     reject("支付取消!");
                 } else {
-                    $.get("{$order_api_url}", { op: "cancel", orderNO: data.orderNO });
+                    $.get("$order_api_url", { op: "cancel", orderNO: data.orderNO });
                     reject("支付失败!");
                 }
             })
@@ -181,7 +181,7 @@ class WXPay implements IPay
         return new Promise(function(resolve, reject) {
             const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
             const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
-            $.get("{$order_api_url}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
+            $.get("$order_api_url", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
               zovye_fn.pay(res).then(function(orderNO, msg) {
                   if (typeof successFN !== 'function' || !successFN(orderNO)) {
                     zovye_fn.redirectToGetPayResultPage(orderNO, msg);
@@ -200,7 +200,7 @@ class WXPay implements IPay
     }
     zovye_fn.package_pay = function(packageID, successFN, failFN) {
         return new Promise(function(resolve, reject) {
-            $.get("{$order_api_url}", {op: "create", packageID: packageID}).then(function(res) {
+            $.get("$order_api_url", {op: "create", packageID: packageID}).then(function(res) {
               zovye_fn.pay(res).then(function(orderNO, msg) {
                   if (typeof successFN !== 'function' || !successFN(orderNO)) {
                     zovye_fn.redirectToGetPayResultPage(orderNO, msg);

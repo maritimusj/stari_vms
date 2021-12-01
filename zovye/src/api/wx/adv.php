@@ -287,7 +287,7 @@ class adv
 
         /** @var advertisingModelObj $adv */
         $adv = Advertising::query(['state' => Advertising::NORMAL])->where(
-            "SHA1(CONCAT(id,'{$user->getOpenid()}'))='{$guid}'"
+            "SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'"
         )->findAll()->current();
 
         if (empty($adv)) {
@@ -359,7 +359,7 @@ class adv
         common::checkCurrentUserPrivileges('F_gg');
 
         $guid = request::trim('id');
-        $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='{$guid}'");
+        $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
         if (empty($adv)) {
             return error(State::ERROR, '找不到这条广告！');

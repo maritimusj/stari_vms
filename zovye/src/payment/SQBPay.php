@@ -101,7 +101,7 @@ class SQBPay implements IPay
         $order_api_url = Util::murl('order', ['deviceUID' => $device_uid]);
 
         return <<<JS_CODE
-<script src="{$jquery_url}"></script>
+<script src="$jquery_url"></script>
 {$js_sdk}
 <script>
     wx.ready(function(){
@@ -134,7 +134,7 @@ class SQBPay implements IPay
         return new Promise(function(resolve, reject) {
             const goodsID = typeof params === 'object' && params.goodsID !== undefined ? params.goodsID : params;
             const total = typeof params === 'object' && params.total !== undefined ? params.total : 1;
-            $.get("{$order_api_url}", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
+            $.get("$order_api_url", {op: "create", goodsID: goodsID, total: total}).then(function(res) {
               zovye_fn.pay(res).catch(function(msg) {
                   reject(msg);
               });
@@ -145,7 +145,7 @@ class SQBPay implements IPay
     }
     zovye_fn.package_pay = function(packageID) {
         return new Promise(function(resolve, reject) {
-            $.get("{$order_api_url}", {op: "create", packageID: packageID}).then(function(res) {
+            $.get("$order_api_url", {op: "create", packageID: packageID}).then(function(res) {
               zovye_fn.pay(res).catch(function(msg) {
                   reject(msg);
               });

@@ -136,7 +136,7 @@ class modelObjFinder extends SqlParser
      */
     public function count($field = '*'): int
     {
-        $res = $this->get("COUNT({$field})");
+        $res = $this->get("COUNT($field)");
         return intval($res);
     }
 
@@ -188,7 +188,7 @@ class modelObjFinder extends SqlParser
             $sql = 'DELETE FROM ' . We7::tablename($objClassname::getTableName(modelObj::OP_WRITE));
         } else {
             $select = parent::parseSelect($fields);
-            $sql = "{$select} FROM " . We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+            $sql = "$select FROM " . We7::tablename($objClassname::getTableName(modelObj::OP_READ));
         }
 
 

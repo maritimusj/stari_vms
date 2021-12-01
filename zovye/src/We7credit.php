@@ -67,7 +67,7 @@ class We7credit extends State
                 $n,
                 [
                     0,
-                    "用户免费领取商品，{$act}{$abs_n}积分",
+                    "用户免费领取商品，$act{$abs_n}积分",
                     APP_NAME,
                 ]
             );

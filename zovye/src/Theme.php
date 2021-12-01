@@ -41,9 +41,9 @@ class Theme
             $theme = Helper::getTheme();
         }
 
-        $filename = MODULE_ROOT . "/template/mobile/themes/{$theme}/$name.html";
+        $filename = MODULE_ROOT . "/template/mobile/themes/$theme/$name.html";
         if (file_exists($filename)) {
-            return "themes/{$theme}/$name";
+            return "themes/$theme/$name";
         }
 
         if ($theme != 'default') {

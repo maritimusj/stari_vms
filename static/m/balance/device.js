@@ -52,7 +52,8 @@ const app = new Vue({
         saveUserProfile: false,
         isHidden: null,
         wechatState: null,
-        timeout: null
+        timeout: null,
+        showWarning: false
     },
     created() {
         this.visibilitychange();
@@ -167,6 +168,7 @@ const app = new Vue({
                     this.free.desc = '暂时无法领取';
                 }
                 if (this.wechatState === false && this.free.accounts.findIndex(e => e.username) !== -1) {
+                    this.showWarning = true;
                     alert('当前微信版本过低，建议升级微信后再试！');
                 }
                 this.$nextTick(() => {

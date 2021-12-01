@@ -85,8 +85,14 @@ body {
         opacity: 1;
     }
 
+    25%,
+    75% {
+        transform: translateY(-5px);
+    }
+
     50% {
         opacity: 0.7;
+        transform: translateY(10px);
     }
 }
 
@@ -365,7 +371,6 @@ body {
     margin-top: 3px;
     line-height: 14px;
     word-break: break-all;
-    color: #eee;
 }
 
 .qrcode-view {

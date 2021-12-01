@@ -6,7 +6,7 @@
 	<title>{$tpl['site']['title']}</title>
 	<!-- {php \zovye\url(true, CSS_SWIPER_URL);} -->
 	<link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
-	{php \zovye\url(true, 'static/m/balance/device.css?v=202111231749');}
+	{php \zovye\url(true, 'static/m/balance/device.css?v=202112011634');}
 	<link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
 </head>
 <body ontouchstart>
@@ -104,7 +104,7 @@
 							<img :src="account.img">
 							<div>
 								<span class="title" v-html="account.title"></span>
-								<span class="desc" v-html="account.desc"></span>
+								<span class="desc" v-html="account.descr"></span>
 							</div>
 						</div>
 						<div class="qrcode-view">
@@ -136,6 +136,7 @@
 				</div>
 			</div>
 		</div>
+		<div v-if="showWarning" style="text-align: center;margin-top: 20px;">当前微信版本过低，建议升级微信后再试！</div>
 	</div>
 	<div class="mask" v-show="pay.visible">
 		<div class="nav">
@@ -289,7 +290,7 @@
 			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
 		};
 </script>
-{php \zovye\url(true, 'static/m/balance/device.js?v=202111291443');}
+{php \zovye\url(true, 'static/m/balance/device.js?v=202112011628');}
 <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
 <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
 <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>

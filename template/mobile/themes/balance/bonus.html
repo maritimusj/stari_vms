@@ -518,6 +518,7 @@
 					</div>
 				</div>
 				<span class="desc" v-html="wxapp.data.descr"></span>
+				<div v-if="wechatState === false">当前微信版本过低，建议升级微信后再试！</div>
 				<img class="close-icon" src="{MODULE_URL}static/m/balance/img/close_black.svg" @click="wxapp.visible = false">
 			</div>
 		</div>
@@ -768,7 +769,7 @@
 								this.wxapp.data = data[0];
 								this.wxapp.visible = true;
 								this.$nextTick(() => {
-									this.addListener(this.wxapp.data)
+									this.addListener(this.wxapp.data);
 								});
 								if (this.wechatState === false) {
 									alert('当前微信版本过低，建议升级微信后再试！');

@@ -161,7 +161,7 @@ class GoodsVoucher
         if (isset($params['pagesize'])) {
             $page_size = max(1, intval($params['pagesize']));
         } else {
-            $page_size = DEFAULT_PAGESIZE;
+            $page_size = DEFAULT_PAGE_SIZE;
         }
 
         $total = $query->count();

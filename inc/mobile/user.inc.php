@@ -19,7 +19,7 @@ if ($op == 'default') {
     $query = User::query();
 
     $page = request::int('page', 1);
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query->page($page, $page_size);
     $query->orderBy('id DESC');

@@ -291,10 +291,10 @@ class balance
      *
      * @return array
      */
-    public static function getUserBalanceLog(userModelObj $user, string $type, int $page = 0, int $page_size = DEFAULT_PAGESIZE): array
+    public static function getUserBalanceLog(userModelObj $user, string $type, int $page = 0, int $page_size = DEFAULT_PAGE_SIZE): array
     {
         $page = max(1, intval($page));
-        $page_size = !empty($page_size) ? max(1, intval($page_size)) : DEFAULT_PAGESIZE;
+        $page_size = !empty($page_size) ? max(1, intval($page_size)) : DEFAULT_PAGE_SIZE;
 
         $balance = $user->getCommissionBalance();
         $query = $balance->log();
@@ -430,7 +430,7 @@ class balance
 
             $type = request::str('type');
             $page = request::int('page');
-            $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $page = max(1, $page);
             $page_size = max(1, $page_size);

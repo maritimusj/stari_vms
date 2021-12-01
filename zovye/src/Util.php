@@ -2492,7 +2492,7 @@ HTML_CONTENT;
         exit($str_export);
     }
 
-    public static function getWe7Material($typename, $page, $page_size = DEFAULT_PAGESIZE): array
+    public static function getWe7Material($typename, $page, $page_size = DEFAULT_PAGE_SIZE): array
     {
         $title = '';
         $list = [];

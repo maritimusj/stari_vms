@@ -49,7 +49,7 @@ class commission
         }
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('account')->query();
         $query->where(

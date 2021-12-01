@@ -342,7 +342,7 @@ class agent
         $user = common::getAgent();
 
         $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $user->getAgentId()]));
 
@@ -474,7 +474,7 @@ class agent
         }
 
         $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $total = $query->count();
 
@@ -943,7 +943,7 @@ class agent
         }
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::query([
             'remain <' => $remain_warning,
@@ -988,7 +988,7 @@ class agent
         common::checkCurrentUserPrivileges('F_gz');
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::query(['agent_id' => $user->getAgentId()]);
 
@@ -1085,7 +1085,7 @@ class agent
         $query->where($condition);
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $total = $query->count();
         $result = [
@@ -1211,7 +1211,7 @@ class agent
         common::checkCurrentUserPrivileges('F_xj');
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = User::query("LOCATE('agent',passport)>0");
 

@@ -30,7 +30,7 @@ if ($op == 'default') {
     }
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = m('tags')->where(We7::uniacid([]));
 

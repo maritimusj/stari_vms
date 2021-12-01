@@ -905,7 +905,7 @@ if ($op == 'account') {
         $total = $query->count();
 
         $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         if ($page > ceil($total / $page_size)) {
             $page = 1;

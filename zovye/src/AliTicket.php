@@ -335,7 +335,7 @@ class AliTicket
         list($order_no, $pay_log) = Pay::prepareDataWithPay('ali_ticket', $device, $user, $goods, [
             'order_no' => $data['tradeNo'],
             'src' => Order::ALI_TICKET,
-            'level' => LOG_GOODS_ADVS,
+            'level' => LOG_GOODS_ADV,
             'total' => $total,
             'price' => $price,
         ]);

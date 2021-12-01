@@ -104,7 +104,7 @@ if ($op == 'default') {
     $url_params = [];
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = Advertising::query(['type' => $type]);
 

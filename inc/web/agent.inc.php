@@ -1777,7 +1777,7 @@ if ($op == 'default') {
 
     $count = $query->count();
 
-    $query->page($page, DEFAULT_PAGESIZE);
+    $query->page($page, DEFAULT_PAGE_SIZE);
 
     /** @var agentModelObj $entry */
     foreach ($query->findAll() as $entry) {
@@ -1795,7 +1795,7 @@ if ($op == 'default') {
         }
     }
 
-    JSON::success(['more' => $page * DEFAULT_PAGESIZE < $count ? 'y' : 'n']);
+    JSON::success(['more' => $page * DEFAULT_PAGE_SIZE < $count ? 'y' : 'n']);
 } elseif ($op == 'detail') {
 
     $pages = [
@@ -2060,7 +2060,7 @@ if ($op == 'default') {
         $title = "<b>{$user->getName()}</b>的佣金记录";
 
         $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $query = $user->getCommissionBalance()->log();
         $query->where($cond);
@@ -2143,7 +2143,7 @@ if ($op == 'default') {
     }
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = Device::query(['agent_id' => $agent->getId()]);
 

@@ -54,7 +54,7 @@ class article
         common::checkCurrentUserPrivileges('F_wd');
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('article')->where(We7::uniacid(['type' => 'article']));
         $total = $query->count();
@@ -93,7 +93,7 @@ class article
 
         $archive_types = settings('doc.types');
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('files')->where(We7::uniacid([]));
         $total = $query->count();
@@ -136,7 +136,7 @@ class article
         common::checkCurrentUserPrivileges('F_wt');
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('article')->where(We7::uniacid(['type' => 'faq']));
         $total = $query->count();

@@ -62,7 +62,7 @@ try {
     }
 
     //出货流程，EventBus会抛出异常
-    $result = Util::openDevice(['level' => LOG_GOODS_GETX, $device, $user, $account, 'goodsId' => $goods_id, 'online' => false]);
+    $result = Util::openDevice(['level' => LOG_GOODS_GET, $device, $user, $account, 'goodsId' => $goods_id, 'online' => false]);
     if (is_error($result)) {
         if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
             $params = [

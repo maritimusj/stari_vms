@@ -27,7 +27,7 @@ $tpl_data = [
 if ($op == 'art' || $op == 'default' || $op == 'article') {
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = m('article')->where(We7::uniacid(['type' => 'article']));
 
@@ -131,7 +131,7 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
 } elseif ($op == 'files') {
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = m('files')->where(We7::uniacid([]));
 

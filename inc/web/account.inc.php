@@ -17,7 +17,7 @@ $op = request::op('default');
 
 if ($op == 'default') {
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 
     $query = Account::query();
@@ -912,7 +912,7 @@ if ($op == 'default') {
 
     if ($total > 0) {
         $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $total_page = ceil($total / $page_size);
         if ($page > $total_page) {

@@ -88,7 +88,7 @@ class maintenance
         $cate = request::int('cate');
 
         $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         if (request::has('start')) {
             $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');

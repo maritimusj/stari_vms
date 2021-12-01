@@ -53,7 +53,7 @@ class SQM
 
     public static function createOrder(deviceModelObj $device, userModelObj $user, $goodsData, $num, $params = []): bool
     {
-        $params['level'] = LOG_GOODS_ADVS;
+        $params['level'] = LOG_GOODS_ADV;
         $params['total'] = $num;
 
         list($order_no, $pay_log) = Pay::prepareDataWithPay('SQM', $device, $user, $goodsData, $params);

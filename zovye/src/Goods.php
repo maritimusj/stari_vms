@@ -146,7 +146,7 @@ class Goods
     public static function getList(array $params = []): array
     {
         $page = max(1, intval($params['page']));
-        $page_size = empty($params['pagesize']) ? DEFAULT_PAGESIZE : intval($params['pagesize']);
+        $page_size = empty($params['pagesize']) ? DEFAULT_PAGE_SIZE : intval($params['pagesize']);
 
         $query = Goods::query();
 

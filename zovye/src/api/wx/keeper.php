@@ -634,7 +634,7 @@ class keeper
 
             $type = request::int('type');
             $page = max(1, request::int('page'));
-            $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+            $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
             return balance::getUserBalanceLog($user, $type, $page, $page_size);
         }
@@ -658,7 +658,7 @@ class keeper
         }
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::keeper($keeper, \zovye\Keeper::OP)->where(['remain <' => $remainWarning]);
         $query->where(['agent_id' => $keeper->getAgentId()]);
@@ -705,7 +705,7 @@ class keeper
         $keeper = keeper::getKeeper();
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::keeper($keeper, \zovye\Keeper::OP)->where(['error_code <>' => 0]);
         $query->where(['agent_id' => $keeper->getAgentId()]);
@@ -1022,7 +1022,7 @@ class keeper
         }
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $result = [
             'page' => $page,

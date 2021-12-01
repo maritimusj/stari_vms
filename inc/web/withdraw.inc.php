@@ -28,7 +28,7 @@ if ($op == 'export') {
     set_time_limit(60);
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
 
@@ -68,7 +68,7 @@ if ($op == 'export') {
     $tpl_data['mch_pay_enabled'] = !empty(settings('pay.wx.pem'));
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
     //$query->where('(updatetime IS NULL OR updatetime=0)');

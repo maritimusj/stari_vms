@@ -42,7 +42,7 @@ if ($op == 'default') {
     }
 
     $params['page'] = max(1, request::int('page'));
-    $params['pagesize'] = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+    $params['pagesize'] = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
     $res = GoodsVoucher::logList($params);
     if (is_error($res)) {
@@ -67,7 +67,7 @@ if ($op == 'default') {
     }
 
     $page = max(1, request::int('page'));
-    $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+    $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
     $total = $query->count();
     if (ceil($total / $page_size) < $page) {

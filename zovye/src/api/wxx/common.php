@@ -650,7 +650,7 @@ class common
         }
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query->where($condition);
         $total = $query->count();
@@ -1084,7 +1084,7 @@ class common
         }
 
         $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query->where($condition);
         $total = $query->count();
@@ -1268,7 +1268,7 @@ class common
         }
 
         $params['page'] = max(1, request::int('page'));
-        $params['pagesize'] = max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+        $params['pagesize'] = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $res = GoodsVoucher::logList($params);
         if (is_error($res)) {

@@ -44,13 +44,13 @@ define('LOG_PAY', 101);
 define('LOG_GOODS_TEST', 110);
 define('LOG_GOODS_PAY', 111);
 define('LOG_GOODS_CB', 112);
-define('LOG_GOODS_GETX', 113);
+define('LOG_GOODS_GET', 113);
 define('LOG_GOODS_VOUCHER', 114);
-define('LOG_GOODS_ADVS', 115);
+define('LOG_GOODS_ADV', 115);
 define('LOG_GOODS_RETRY', 116);
 define('LOG_GOODS_BALANCE', 117);
 
-define('DEFAULT_PAGESIZE', 20);
+define('DEFAULT_PAGE_SIZE', 20);
 define('DEFAULT_DEVICE_CAPACITY', 10);
 define('DEFAULT_DEVICE_WAIT_TIMEOUT', 15);
 define('DEFAULT_LOCK_TIMEOUT', 15);

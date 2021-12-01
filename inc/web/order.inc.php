@@ -128,7 +128,7 @@ if ($op == 'default') {
     }
 
     $page = max(1, request::int('page'));
-    $page_size = $is_ajax ? 10 : request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = $is_ajax ? 10 : request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $total = Config::app('order.total');
     if ($total < 100000) {
@@ -625,7 +625,7 @@ if ($op == 'default') {
 } elseif ($op == 'log') {
 
     $page = max(1, request::str('page'));
-    $page_size = $is_ajax ? 10 : max(1, request::int('pagesize', DEFAULT_PAGESIZE));
+    $page_size = $is_ajax ? 10 : max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
     $query = m('user_logs')->where(['level' => LOG_PAY])->orderBy('id DESC');
 

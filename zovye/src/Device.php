@@ -719,9 +719,9 @@ class Device extends State
             LOG_GOODS_TEST => '测试',
             LOG_GOODS_PAY => '支付',
             LOG_GOODS_CB => '回调',
-            LOG_GOODS_GETX => '领取',
+            LOG_GOODS_GET => '领取',
             LOG_GOODS_VOUCHER => '取货',
-            LOG_GOODS_ADVS => '广告',
+            LOG_GOODS_ADV => '广告',
             LOG_GOODS_RETRY => '重试',
             LOG_GOODS_BALANCE => '积分',
         ];
@@ -869,7 +869,7 @@ class Device extends State
             }
 
             $page = max(1, request::int('page'));
-            $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $total = $query->count();
             $total_page = ceil($total / $page_size);

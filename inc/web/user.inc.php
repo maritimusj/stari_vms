@@ -36,7 +36,7 @@ if ($op == 'default') {
     $credit_used = settings('we7credit.enabled');
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     //身份
     $s_principal = request::trim('s_principal');
@@ -336,7 +336,7 @@ if ($op == 'default') {
 } elseif ($op == 'search') {
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = User::query();
 
@@ -403,7 +403,7 @@ if ($op == 'default') {
     }
 
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = Device::query(['keeper_id' => $keeper->getId()]);
 
@@ -449,7 +449,7 @@ if ($op == 'default') {
 
     //补货记录
     $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGESIZE);
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
     $pager = '';
 
     $user = User::get(request::int('id'));

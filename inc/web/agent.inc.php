@@ -2027,9 +2027,11 @@ if ($op == 'default') {
                     } else {
                         $spec = "免费领取：" . $goods['name'] . "x" . $order->getNum();
                     }
-                    $account_name = $order->getAccount();
-                    if ($account_name) {
-                        $data['wx_account'] = $account_name;
+                    $account = $order->getAccount(true);
+                    if ($account) {
+                        $data['wx_account'] = $account->getTitle();
+                    } else {
+                        $data['wx_account'] = $order->getAccount();
                     }
                     $device_name = $device ? $device->getName() : '未知';
                     $data['event'] = $spec;

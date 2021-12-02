@@ -427,7 +427,8 @@ class adv
             $begin = new DateTime();
             $begin->modify('00:00');
 
-            $total = $user->getBalance()->query([
+            $total = Balance::query([
+                'openid' => $user->getOpenid(),
                 'src' => Balance::REWARD_ADV,
                 'createtime >=' => $begin->getTimestamp(),
             ])->count();

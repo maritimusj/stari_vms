@@ -431,7 +431,7 @@ class adv
                 'src' => Balance::REWARD_ADV,
                 'createtime >=' => $begin->getTimestamp(),
             ])->count();
-            if ($total > $limit) {
+            if ($total >= $limit) {
                 return err(State::ERROR, '对不起，今天的广告奖励额度已用完！');
             }    
         }

@@ -419,7 +419,7 @@ class adv
         
         $bonus = Config::app('wxapp.advs.reward.bonus', 0);
         if (empty($bonus)) {
-            return err(State::ERROR, '暂时没有奖励！');
+            return err('暂时没有奖励！');
         }
         
         $limit = Config::app('wxapp.advs.reward.limit', 0);
@@ -432,13 +432,13 @@ class adv
                 'createtime >=' => $begin->getTimestamp(),
             ])->count();
             if ($total >= $limit) {
-                return err(State::ERROR, '对不起，今天的广告奖励额度已用完！');
+                return err('对不起，今天的广告奖励额度已用完！');
             }    
         }
 
         $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);
         if (empty($result)) {
-            return err(State::ERROR, '获取奖励失败！');
+            return err('获取奖励失败！');
         }
 
         return [

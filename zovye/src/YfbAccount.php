@@ -130,7 +130,8 @@ class YfbAccount
             //请求对方API
             $yfb = self::getYFB($account);
             if (is_error($yfb)) {
-                throw new RuntimeException($yfb['message']);
+                Log::warning('yfb_query', $yfb);
+                return $v;
             }
 
             $yfb->getQRCode($device, $user, function ($request, $result) use ($account, $device, $user, &$v) {

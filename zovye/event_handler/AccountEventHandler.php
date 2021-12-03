@@ -48,13 +48,18 @@ class AccountEventHandler
         $matched = ($config['third_platform'] && $account->isThirdPartyPlatform()) ||
             ($config['account'] && ($account->isNormal() || $account->isAuth())) ||
             ($config['video'] && $account->isVideo()) ||
-            ($config['wxapp'] && $account->isWxApp());
+            ($config['wxapp'] && $account->isWxApp()) ||
+            ($config['douyin'] && $account->isDouyin());
 
         if (!$matched) {
             return true;
         }
 
-        $v = random_int($config['min'], $config['max']);
+        try {
+            $v = random_int($config['min'], $config['max']);
+        } catch (Exception $e) {
+        }
+
         if (empty($v)) {
             return true;
         }

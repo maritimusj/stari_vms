@@ -123,7 +123,6 @@
                             <input name="balanceOrderAs" id="balanceOrderAsPay" type="radio" value="pay"  {if \zovye\Config::balance('order.as') == 'pay'}checked="checked"{/if}>
                             支付订单
                         </label>
-
                         <span class="help-block">* 积分订单做为免费订单或者支付订单将影响用户订单统计，比如用户每天可以免费领取的次数</span>
                     </div>
                 </div>
@@ -137,6 +136,39 @@
                                     设备故障或者超时，出货失败后自动返还积分
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="agentRegMode" class="col-md-2 control-label">任务激励</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="third_platform" {if \zovye\Config::balance('account.promote_bonus.third_platform', 0)}checked{/if}> 第三方平台
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="account" {if \zovye\Config::balance('account.promote_bonus.account', 0)}checked{/if}> 公众号
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="video" {if \zovye\Config::balance('account.promote_bonus.video', 0)}checked{/if}> 视频
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="wxapp" {if \zovye\Config::balance('account.promote_bonus.wxapp', 0)}checked{/if}> 小程序
+                        </label>
+                        <span class="help-block">* 用户完成指定任务后，会额外获得指定范围<b>随机数量</b>的积分（不包括已设置积分奖励的任务）</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="accountPromoteBonus" class="col-md-2 control-label">奖励积分
+                        <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                    </label>
+                    <div class="col-md-10">
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="accountPromoteBonusMin" id="accountPromoteBonusMin" value="{php echo \zovye\Config::balance('account.promote_bonus.min', 0)}" min="0" step="1" title="最小值">
+                            <span class="help-block">* 指定积分随机范围</span>
+                        </div>
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="accountPromoteBonusMax" id="accountPromoteBonusMin" value="{php echo \zovye\Config::balance('account.promote_bonus.max', 0)}" min="0" step="1" title="最大值">
                         </div>
                     </div>
                 </div>

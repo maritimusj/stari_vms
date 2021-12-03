@@ -717,12 +717,12 @@ class Account extends State
         return Util::shortMobileUrl('entry', array_merge(['account' => $uid], $params));
     }
 
-    public static function createThirdPartyPlatform(int $aid, string $name, string $img, string $url): ?accountModelObj
+    public static function createThirdPartyPlatform(int $type, string $name, string $img, string $url): ?accountModelObj
     {
-        $uid = self::makeThirdPartyPlatformUID($aid, $name);
+        $uid = self::makeThirdPartyPlatformUID($type, $name);
         $account = self::findOne(['uid' => $uid]);
         if ($account) {
-            if ($account->getType() != $aid) {
+            if ($account->getType() != $type) {
                 return null;
             }
 
@@ -738,7 +738,7 @@ class Account extends State
 
         $result = self::create([
             'uid' => $uid,
-            'type' => $aid,
+            'type' => $type,
             'scname' => Schema::DAY,
             'name' => $name,
             'title' => $name,
@@ -748,15 +748,15 @@ class Account extends State
         ]);
 
         if ($result) {
-            $result->settings('config.type', $aid);
+            $result->settings('config.type', $type);
         }
 
         return $result;
     }
 
-    public static function makeThirdPartyPlatformUID($aid, $name): string
+    public static function makeThirdPartyPlatformUID($type, $name): string
     {
-        return self::makeUID("$aid:$name");
+        return self::makeUID("$type:$name");
     }
 
     public static function createJFBAccount(): ?accountModelObj

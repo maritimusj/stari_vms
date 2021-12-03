@@ -69,14 +69,14 @@ if ($op == 'default') {
     if ($s_keywords) {
         if (in_array($s_principal, [User::AGENT, User::PARTNER, User::KEEPER, User::TESTER, User::GSPOR])) {
             $query->whereOr([
-                'name LIKE' => "%{$s_keywords}%",
-                'nickname LIKE' => "%{$s_keywords}%",
-                'mobile LIKE' => "%{$s_keywords}%",
+                'name LIKE' => "%$s_keywords%",
+                'nickname LIKE' => "%$s_keywords%",
+                'mobile LIKE' => "%$s_keywords%",
             ]);
         } else {
             $query->whereOr([
-                'nickname LIKE' => "%{$s_keywords}%",
-                'mobile LIKE' => "%{$s_keywords}%",
+                'nickname LIKE' => "%$s_keywords%",
+                'mobile LIKE' => "%$s_keywords%",
             ]);
         }
     }
@@ -344,8 +344,8 @@ if ($op == 'default') {
     if (!empty($keywords)) {
         $query->whereOr(
             [
-                'nickname LIKE' => "%{$keywords}%",
-                'mobile LIKE' => "%{$keywords}%",
+                'nickname LIKE' => "%$keywords%",
+                'mobile LIKE' => "%$keywords%",
             ]
         );
     }
@@ -354,7 +354,7 @@ if ($op == 'default') {
     if (!empty($passport)) {
         $query->where(
             [
-                'passport LIKE' => "%{$passport}%",
+                'passport LIKE' => "%$passport%",
             ]
         );
     }
@@ -477,7 +477,7 @@ if ($op == 'default') {
                         'goods_id' => $item->getGoodsId(),
                     ];
                     $d_data = json_decode($item->getExtra());
-                    $d_name = isset($d_data->device->name) ? $d_data->device->name : '';
+                    $d_name = $d_data->device->name ?? '';
                     $goods_arr[] = $item->getGoodsId();
                     $data['device_name'] = $d_name;
 
@@ -656,7 +656,7 @@ if ($op == 'default') {
     if ($user) {
         $title = "<b>{$user->getName()}</b>的佣金记录";
         $page = max(1, request::int('page'));
-        $page_size = $page_size = request::int('pagesize', 5);
+        $page_size = request::int('pagesize', 5);
 
         $query = $user->getCommissionBalance()->log();
 
@@ -702,7 +702,7 @@ if ($op == 'default') {
     if ($user) {
         $title = "<b>{$user->getName()}</b>的积分记录";
         $page = max(1, request::int('page'));
-        $page_size = $page_size = request::int('pagesize', 5);
+        $page_size = request::int('pagesize', 5);
 
         $query = $user->getBalance()->log();
 

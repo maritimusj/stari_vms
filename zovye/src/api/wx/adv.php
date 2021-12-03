@@ -327,7 +327,7 @@ class adv
 
         $type = request('type') ?: Media::IMAGE;
 
-         if ($_FILES['file']) {
+        if ($_FILES['file']) {
             We7::load()->func('file');
             $res = We7::file_upload($_FILES['file'], $type);
 
@@ -416,12 +416,16 @@ class adv
     public static function getBonus()
     {
         $user = common::getUser();
-        
+
+        if (!$user->isWxUser()) {
+            return err('无法获得奖励，请从任务大厅授权进入！');
+        }
+
         $bonus = Config::app('wxapp.advs.reward.bonus', 0);
         if (empty($bonus)) {
             return err('暂时没有奖励！');
         }
-        
+
         $limit = Config::app('wxapp.advs.reward.limit', 0);
         if ($limit > 0) {
             $begin = new DateTime();
@@ -434,7 +438,7 @@ class adv
             ])->count();
             if ($total >= $limit) {
                 return err('对不起，今天的广告奖励额度已用完！');
-            }    
+            }
         }
 
         $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);

@@ -1180,4 +1180,25 @@ class Account extends State
             'orderUID' => $order_uid,
         ]);
     }
+
+    public static function getTypeTitle($type)
+    {
+        static $titles = [
+            self::NORMAL => '公众号',
+            self::VIDEO => '视频',
+            self::DOUYIN => '抖音',
+            self::WXAPP => '小程序',
+            self::AUTH => '公众号',
+            self::JFB => '准粉吧',
+            self::MOSCALE => '公锤',
+            self::YUNFENBA => '云粉吧',
+            self::AQIINFO => '阿旗数据平台',
+            self::ZJBAO => '纸巾宝',
+            self::MEIPA => '美葩',
+            self::KINGFANS => '金粉吧',
+            self::SNTO => '史莱姆',
+            self::YFB => '粉丝宝',
+        ];
+        return $titles[$type] ?? '未知';
+    }
 }

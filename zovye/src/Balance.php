@@ -22,7 +22,9 @@ class Balance
     const GOODS_EXCHANGE = 5; // 商品兑换
     const REFUND = 6; // 退款
     const REWARD_ADV = 7; // 激励广告
-    const API_UPDATE = 8; // 第三方通过api接口修改    
+    const API_UPDATE = 8; // 第三方通过api接口修改
+    const PROMOTE_BONUS = 9; // 任务奖励
+
 
     private $user;
 
@@ -280,6 +282,18 @@ TEXT;
 <dt>说明</dt>
 <dd class="event">第三方API接口请求修改积分</dd>
 $reason_data
+</dl>
+TEXT;
+        } elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
+            $account_profile = $entry->getExtraData('account', []);
+            $type_title = Account::getTypeTitle($account_profile['type']);
+            $text =  $account_profile ? "<dt>{$type_title}</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
+            $data['memo'] = <<<TEXT
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">任务奖励</dd>
+$text
+<dt>说明</dt><dd class="event">用户完成指定任务，系统奖励积分</dd>
 </dl>
 TEXT;
         }

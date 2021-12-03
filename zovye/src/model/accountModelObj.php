@@ -343,6 +343,11 @@ class accountModelObj extends modelObj
         return $this->getType() == Account::WxWORK;
     }
 
+    public function isNormal(): bool
+    {
+        return $this->getType() == Account::NORMAL;
+    }
+    
     public function isAuth(): bool
     {
         return $this->getType() == Account::AUTH;

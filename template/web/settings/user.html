@@ -155,6 +155,11 @@
                         <label class="checkbox-inline">
                             <input type="checkbox" name="accountPromoteBonusOption[]" value="wxapp" {if \zovye\Config::balance('account.promote_bonus.wxapp', 0)}checked{/if}> 小程序
                         </label>
+                        {if \zovye\App::isDouyinEnabled()}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="douyin" {if \zovye\Config::balance('account.promote_bonus.douyin', 0)}checked{/if}> 抖音号
+                        </label>
+                        {/if}
                         <span class="help-block">* 用户完成指定任务后，会额外获得指定范围<b>随机数量</b>的积分（不包括已设置积分奖励的任务）</span>
                     </div>
                 </div>

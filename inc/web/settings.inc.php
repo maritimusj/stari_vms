@@ -114,7 +114,7 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
             Config::balance('order.auto_rb', request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
 
             $promote_opts = request::array('accountPromoteBonusOption', []);
-            foreach(['third_platform', 'account', 'video', 'wxapp'] as $name) {
+            foreach(['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
                 Config::balance("account.promote_bonus.{$name}", in_array($name, $promote_opts) ? 1 : 0, true);
             }
             

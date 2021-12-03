@@ -66,7 +66,7 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
 
     for($i = 0; $i < 10; $i ++ ) {
         //延时一定时间后读取用户关注列表
-        sleep(2 + log($i + 1, 2));
+        usleep((2 + log($i + 1, 2)) * 1000000);
 
         $result = DouYin::getUserFollowList($user);
         if (is_error($result)) {

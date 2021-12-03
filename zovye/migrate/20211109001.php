@@ -55,7 +55,11 @@ SQL;
         Account::YFB => [
             Util::murl('yfb'),
             Account::YFB_NAME,
-        ]
+        ],
+        Account::WxWORK => [
+            Util::murl('wxwork'),
+            Account::WxWORK_NAME,
+        ],
     ];
 
     foreach ($spec as $type => $item) {

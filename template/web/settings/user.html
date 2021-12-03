@@ -88,6 +88,7 @@
                             <label>
                                 <input type="checkbox" name="dailySignInEnabled" id="dailySignInEnabled" value="1" {if \zovye\Config::balance('sign.bonus.enabled', false)}checked{/if}>
                                 启用后，用户可以通过每日签到获得指定积分
+                                <span class="help-block">* 用户签到后，会获得指定范围<b>随机数量</b>的积分</span>
                             </label>
                         </div>
                     </div>
@@ -99,11 +100,11 @@
                     <div class="col-md-10">
                         <div class="col-md-5" style="padding-left:0;">
                             <input type="number" class="form-control" name="dailySignInBonusMin" id="dailySignInBonusMin" value="{php echo \zovye\Config::balance('sign.bonus.min', 0)}" min="0" step="1" title="最小值">
-                            <span class="help-block">* 用户签到后，会获得指定范围<b>随机数量</b>的积分</span>
+                            <span class="help-block">* 随机积分的最小值</span>
                         </div>
                         <div class="col-md-5" style="padding-left:0;">
                             <input type="number" class="form-control" name="dailySignInBonusMax" id="dailySignInBonusMax" value="{php echo \zovye\Config::balance('sign.bonus.max', 0)}" min="0" step="1" title="最大值">
-                            <span class="help-block"></span>
+                            <span class="help-block">* 随机积分的最大值</span>
                         </div>
                     </div>
                 </div>
@@ -170,10 +171,11 @@
                     <div class="col-md-10">
                         <div class="col-md-5" style="padding-left:0;">
                             <input type="number" class="form-control" name="accountPromoteBonusMin" id="accountPromoteBonusMin" value="{php echo \zovye\Config::balance('account.promote_bonus.min', 0)}" min="0" step="1" title="最小值">
-                            <span class="help-block">* 指定积分随机范围</span>
+                            <span class="help-block">* 随机积分的最小值</span>
                         </div>
                         <div class="col-md-5" style="padding-left:0;">
                             <input type="number" class="form-control" name="accountPromoteBonusMax" id="accountPromoteBonusMin" value="{php echo \zovye\Config::balance('account.promote_bonus.max', 0)}" min="0" step="1" title="最大值">
+                            <span class="help-block">* 随机积分的最大值</span>
                         </div>
                     </div>
                 </div>

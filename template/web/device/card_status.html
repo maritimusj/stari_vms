@@ -1,0 +1,34 @@
+<div>
+    <table class="table" id="sms_card_status">
+        <tbody>
+            <tr>
+                <td>ICCID</td>
+                <td>{$card['iccid']}</td>
+            </tr>          
+            <tr>
+                <td>运营商</td>
+                <td>{$card['carrier']}</td>
+            </tr>
+            <tr>
+                <td>卡状态</td>
+                <td style="color:{if $card[account_status] == '00'}green{else}red{/if};">{$card['status']}</td>
+            </tr>
+            <tr>
+                <td>套餐</td>
+                <td>{$card['data_plan']}MB</td>
+            </tr>             
+            <tr>
+                <td>当月流量</td>
+                <td>{$card['data_usage']}MB</td>
+            </tr> 
+            <tr>
+                <td>激活日期</td>
+                <td>{$card['active_date']}</td>
+            </tr>
+            <tr>
+                <td>计费结束日期</td>
+                <td>{$card['expiry_date']}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

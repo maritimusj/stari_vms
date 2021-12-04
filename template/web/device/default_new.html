@@ -250,6 +250,20 @@
     .operate [data-op="showMonthStats"],.operate [data-op="setNormal"]  {
         cursor: pointer;
     }
+    span.card_status {
+        padding-left: 6px;
+        color: rgb(76 175 80 / 48%);
+        cursor: pointer;
+    }
+    span.card_status:hover {
+        color: #4caf50;
+    }
+    span.card_status:active i {
+        transform: translate3d(0, 1px, 0);
+    }
+    #sms_card_status tr td:first-child {
+        font-weight: 800;
+    }
 </style>
 <div id="appx" v-cloak>
     <div class="init-loading" v-if="device.list === undefined">
@@ -596,8 +610,14 @@
                                         <div class="devcie-detail">
                                             <div class="detail-seg">
                                                 <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 
-                                                <div><span class="title">ICCID：</span><span>{{o.ICCID ? o.ICCID : 'n/a'}}</span></div>
-
+                                                <div>
+                                                    <span class="title">ICCID：</span>
+                                                    <span>{{o.ICCID ? o.ICCID : 'n/a'}}
+                                                        <span class="card_status" v-if="o.ICCID" :data-uid="o.ICCID">
+                                                            <i class="fa fa-info-circle" title="查询流量卡状态" data-op="viewCardStatus"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
                                                 <template v-if="o.appId">
                                                     <div><span class="title">AppID：</span><span>{{o.appId}}</span></div>
                                                     <div><span class="title">AppVersion：</span><span>{{o.appVersion ? o.appVersion : 'n/a'}}</span></div>

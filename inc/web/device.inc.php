@@ -2488,4 +2488,49 @@ if ($op == 'list') {
     $zip->close();
 
     JSON::success(['url' => Util::toMedia($file_name)]);
+
+} elseif ($op == 'card_status') {
+
+    $iccid = request::str('iccid');
+    if (empty($iccid)) {
+        JSON::fail('错误：iccid 为空！');
+    }
+ 
+    $result = CtrlServ::v2_query("iccid/$iccid");
+    if (is_error($result)) {
+        JSON::fail($result);
+    }
+
+    if (!$result['status']) {
+        JSON::fail($result['data']['message'] ?? '查询失败！');
+    }
+
+    $card = $result['data'] ?? [];
+    if (empty($card)) {
+        JSON::fail('查询失败，请稍后再试！');
+    }
+
+    $status_title = [
+        "00" => '正常使用',
+        "10" => '测试期',
+        "02" => '停机',
+        "03" => '预销号',
+        "04" => '销号',
+        "11" => '沉默期',
+        "12" => '停机保号',
+        "99" => '未知',
+    ];
+
+    $card['status'] = $status_title[$card['account_status']] ?? '未知';
+
+    $content = app()->fetchTemplate(
+        'web/device/card_status',
+        [
+            'card' => $card,
+        ]
+    );
+    JSON::success([
+        'title' => "流量卡状态",
+        'content' => $content,
+    ]);
 }

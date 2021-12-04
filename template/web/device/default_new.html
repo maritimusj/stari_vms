@@ -613,9 +613,11 @@
                                                 <div>
                                                     <span class="title">ICCID：</span>
                                                     <span>{{o.ICCID ? o.ICCID : 'n/a'}}
+                                                        {if $gate['build'] >= '20211204'}
                                                         <span class="card_status" v-if="o.ICCID" :data-uid="o.ICCID">
                                                             <i class="fa fa-info-circle" title="查询流量卡状态" data-op="viewCardStatus"></i>
                                                         </span>
+                                                        {/if}
                                                     </span>
                                                 </div>
                                                 <template v-if="o.appId">

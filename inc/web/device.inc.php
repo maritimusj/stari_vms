@@ -86,6 +86,8 @@ if ($op == 'list') {
 
     $tpl_data['page'] = request::int('page', 1);
 
+    $tpl_data['gate'] = CtrlServ::status();
+
     app()->showTemplate('web/device/default_new', $tpl_data);
 } elseif ($op == 'search') {
 

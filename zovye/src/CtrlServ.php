@@ -189,6 +189,20 @@ class CtrlServ
         return hash_hmac("sha256", "$app_key$nostr", $app_secret);
     }
 
+    public static function status()
+    {
+        $res = self::v2_query();
+        if ($res) {
+            if (is_error($res)) {
+                return $res;
+            }
+            if ($res['status']) {
+                return $res['data'];
+            }
+        }
+        return err('请求失败！');
+    }
+
     /**
      * 与控制中心交互 api版本v2
      * @param string $path
@@ -198,7 +212,7 @@ class CtrlServ
      * @param string $method
      * @return mixed
      */
-    public static function v2_query(string $path, array $params = [], $body = '', string $contentType = '', string $method = '')
+    public static function v2_query(string $path = '', array $params = [], $body = '', string $contentType = '', string $method = '')
     {
         return self::queryData('v2', $path, $params, $body, $contentType, $method);
     }

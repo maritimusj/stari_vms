@@ -45,7 +45,7 @@ class Group
             if (isset($cache[$id])) {
                 return $cache[$id];
             }
-            $res = self::findOne(['id' => $id]);;
+            $res = self::findOne(['id' => $id]);
             if ($res) {
                 $cache[$res->getId()] = $res;
                 return $res;

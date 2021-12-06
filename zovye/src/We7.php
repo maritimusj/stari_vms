@@ -217,7 +217,7 @@ EOF;
         return 1 == $level ? $s . '</xml>' : $s;
     }
 
-    public static function xml2array($xml): array
+    public static function xml2array($xml)
     {
         if (empty($xml)) {
             return [];

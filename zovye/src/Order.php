@@ -642,7 +642,7 @@ class Order extends State
                     'id' => $device_obj->getId(),
                     'name' => $device_obj->getName(),
                     'type' => $device_obj->getDeviceType(),
-                    'qrcode' => strval($device_obj->getQrcode()),
+                    'qrcode' => $device_obj->getQrcode(),
                     'address' => $device_obj->getAddress(),
                 ];
             }
@@ -686,7 +686,7 @@ class Order extends State
                 $time = $order->getExtraData('refund.createtime');
                 $time_formatted = date('Y-m-d H:i:s', $time);
                 $data['refund'] = [
-                    'title' => "退款时间：{$time_formatted}",
+                    'title' => "退款时间：$time_formatted",
                     'reason' => $order->getExtraData('refund.message'),
                 ];
             }

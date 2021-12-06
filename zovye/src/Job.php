@@ -69,9 +69,9 @@ class Job
     /**
      * @param $order_no
      * @param deviceModelObj|null $device
-     * @return bool
+     * @return mixed
      */
-    public static function createOrder($order_no, deviceModelObj $device = null): bool
+    public static function createOrder($order_no, deviceModelObj $device = null)
     {
         if ($device && $device->isBlueToothDevice()) {
             return CtrlServ::scheduleJob('create_order', ['orderNO' => $order_no], LEVEL_HIGH);
@@ -79,12 +79,12 @@ class Job
         return CtrlServ::scheduleJob('create_order_multi', ['orderNO' => $order_no], LEVEL_HIGH);
     }
 
-    public static function orderPayResult($order_no, $start = 0, $timeout = 3): bool
+    public static function orderPayResult($order_no, $start = 0, $timeout = 3)
     {
         return CtrlServ::scheduleDelayJob('order_pay_result', ['orderNO' => $order_no, 'start' => $start ?: time()], $timeout);
     }
 
-    public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT): bool
+    public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT)
     {
         return CtrlServ::scheduleDelayJob('order_timeout', ['orderNO' => $order_no], $timeout);
     }

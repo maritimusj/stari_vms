@@ -257,9 +257,13 @@ class User
         return $discount;
     }
 
+    /**
+     * @param mixed $data
+     * @return string
+     */
     public static function makeUserFootprint($data = []): string
     {
-        if ($data  instanceof userModelObj) {
+        if ($data instanceof userModelObj) {
             $data = $data->profile();
         }
         return sha1(http_build_query(

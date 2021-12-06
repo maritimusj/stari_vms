@@ -23,7 +23,7 @@ class LogObj
         if (!We7::pdo_tableexists($tb_name)) {
             $we7tb_name = We7::tablename($tb_name);
             $sql = <<<SQL_STATEMENT
-CREATE TABLE IF NOT EXISTS {$we7tb_name} (
+CREATE TABLE IF NOT EXISTS $we7tb_name (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `uniacid` int(11) NULL,
     `level` tinyint(4) NOT NULL,

@@ -440,11 +440,11 @@ class Pay
 
     /**
      * 获取设备关联的支付配置
-     * @param deviceModelObj|null $device
+     * @param mixed $device
      * @param string $name
      * @return array
      */
-    public static function getPayParams(deviceModelObj $device = null, string $name = ''): array
+    public static function getPayParams($device = null, string $name = ''): array
     {
         if (!empty($device) && is_string($device)) {
             $device = Device::get($device, true);

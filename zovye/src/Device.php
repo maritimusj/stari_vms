@@ -884,7 +884,7 @@ class Device extends State
             /** @var deviceModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $data = [
-                    'id' => intval($entry->getId()),
+                    'id' => $entry->getId(),
                     'name' => strval($entry->getName()),
                     'IMEI' => strval($entry->getImei()),
                     'appId' => strval($entry->getAppId()),

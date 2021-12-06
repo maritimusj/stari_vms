@@ -20,6 +20,6 @@ class Topic
             $app_key = settings('ctrl.appKey');
         }
 
-        return md5("{$app_key}{$name}");
+        return md5("$app_key$name");
     }
 }

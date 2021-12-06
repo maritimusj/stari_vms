@@ -104,7 +104,6 @@ class GoodsVoucher
             $data['assigned'] = (array)$voucher->getExtraData('assigned', []);
         } else {
             $assign_data = $voucher->getExtraData('assigned', []);
-            $data['limitGoodsNum'] = count($data['limitGoods']);
             $data['assigned'] = count((array)$assign_data);
             $data['assignedStatus'] = Util::descAssignedStatus($assign_data);
         }
@@ -174,7 +173,7 @@ class GoodsVoucher
         /** @var goods_voucherModelObj $entry */
         foreach ($query->page($page, $page_size)->orderBy('id DESC')->findAll() as $entry) {
             $data = [
-                'id' => intval($entry->getId()),
+                'id' => $entry->getId(),
                 'code' => $entry->getCode(),
                 'ownerId' => intval($entry->getOwnerId()),
                 'usedUserId' => intval($entry->getUsedUserId()),

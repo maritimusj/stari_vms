@@ -63,7 +63,7 @@ class AgentBonusEventHandler
 
         $bonus_log = [];
         foreach ($agents as $level => $user) {
-            $money = intval($agent->settings("agentData.bonus.{$level}"));
+            $money = intval($agent->settings("agentData.bonus.$level"));
             if ($money > 0) {
                 $r = $user->commission_change($money, CommissionBalance::BONUS, ['orderid' => $order->getId()]);
                 if ($r && $r->update([], true)) {

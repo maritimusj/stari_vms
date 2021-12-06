@@ -106,7 +106,7 @@ class Locker
             'request_id' => $requestID,
             'available' => max(1, $available),
             'used' => 1,
-            'expired_at' => $expired_at > 0 ? $expired_at : 0,
+            'expired_at' => max($expired_at, 0),
         ]);
         if ($locker && $auto_release) {
             self::registerLockerDestroy($locker);

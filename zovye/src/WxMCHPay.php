@@ -64,7 +64,7 @@ class WxMCHPay
             if (empty($val)) {
                 continue;
             }
-            $str .= "{$key}={$val}&";
+            $str .= "$key=$val&";
         }
 
         return strtoupper(md5("{$str}key=" . $this->config['key']));
@@ -112,10 +112,10 @@ class WxMCHPay
     {
         $content = '';
         foreach ($data as $key => $val) {
-            $content .= "<$key>{$val}</{$key}>" . PHP_EOL;
+            $content .= "<$key>$val</{$key}>" . PHP_EOL;
         }
 
-        return "<xml>{$content}</xml>";
+        return "<xml>$content</xml>";
     }
 
     /**

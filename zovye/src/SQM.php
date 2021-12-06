@@ -44,7 +44,7 @@ class SQM
             if ($index == 'sign') {
                 continue;
             }
-            $arr[] = "{$index}={$v}";
+            $arr[] = "$index=$v";
         }
 
         $app_secret = settings('custom.SQMPay.appSecret', '');

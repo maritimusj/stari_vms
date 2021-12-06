@@ -89,7 +89,7 @@ class CommissionEventHandler
             $commission_price =  Config::balance('order.commission.val', 0) * $order->getNum();
         }
         
-        if ($commission_price <= 0) {
+        if (empty($commission_price) ||  $commission_price < 1) {
             return true;
         }
 
@@ -237,7 +237,7 @@ class CommissionEventHandler
         if ($agent->getGSPMode() == GSP::REL || $agent->getGSPMode() == GSP::FREE) {
             //获取佣金分享用户列表
             $gsp_users = $agent->getGspUsers();
-            foreach ($gsp_users as &$entry) {
+            foreach ($gsp_users as $entry) {
                 if (($order->getPrice() > 0 && $entry['order']['p']) ||
                     ($order->getPrice() == 0 && $entry['order']['f'])) {
                     /** @var userModelObj $user */

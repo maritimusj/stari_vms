@@ -53,11 +53,7 @@ class Statistics
         }
         
         return Util::cachedCall($end->getTimestamp() > time() ? 10 : 0, function() use($device, $begin, $end) {
-            $result = [
-                'free' => 0,
-                'pay' => 0,
-                'total' => 0,
-            ];
+            $result = [];
 
             $free = //random_int(1, 1000);
             (int)Order::query()->where([
@@ -67,7 +63,7 @@ class Statistics
                 'createtime <' => $end->getTimestamp()
             ])->get('sum(num)');
 
-            $result['free'] = intval($free);
+            $result['free'] = $free;
 
             $pay = //random_int(1, 1000);
             (int)Order::query()->where([
@@ -97,11 +93,7 @@ class Statistics
         return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($begin, $device) {
             $end = $begin->modify('first day of next month 00:00');
 
-            $result = [
-                'free' => 0,
-                'pay' => 0,
-                'total' => 0,
-            ];
+            $result = [];
 
             $free =// random_int(1, 1000);
             (int)Order::query()->where([

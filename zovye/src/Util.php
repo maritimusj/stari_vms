@@ -10,7 +10,6 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use ali\aop\request\AlipayUserInfoShareRequest;
 use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use QRcode;
@@ -402,7 +401,7 @@ class Util
 
         $header_str = '';
         foreach ($headers as $name => $val) {
-            $header_str .= "\$_SERVER['{$name}'] = '{$val}';\r\n";
+            $header_str .= "\$_SERVER['$name'] = '$val';\r\n";
         }
 
         $memo = !empty($params['memo']) ? strval($params['memo']) : 'API转发程序';
@@ -418,19 +417,19 @@ class Util
 
         $content = "<?php
 /**
- * {$memo}
+ * $memo
  *
  * @author jin@stariture.com
  * @url www.stariture.com
  */
 
-{$header_str}
-\$_GET['m'] = '{$appName}';
-\$_GET['i'] = {$uniacid};
+$header_str
+\$_GET['m'] = '$appName';
+\$_GET['i'] = $uniacid;
 \$_GET['c'] = 'entry';
 ";
         foreach ($params as $name => $val) {
-            $content .= "\$_GET['{$name}'] = '{$val}';\r\n";
+            $content .= "\$_GET['$name'] = '$val';\r\n";
         }
 
         if ($fn) {
@@ -438,7 +437,7 @@ class Util
         }
 
         $content .= "
-chdir('{$appPath}');
+chdir('$appPath');
 include './index.php';
 ";
         return file_put_contents(ZOVYE_ROOT . $filename, $content);
@@ -1046,7 +1045,7 @@ include './index.php';
      * @param string $type
      * @return never-return
      */
-    public static function message($msg, string $redirect = '', string $type = '')
+    public static function message($msg, string $redirect = '', string $type = ''): void
     {
         We7::message($msg, $redirect, $type);
     }
@@ -1057,7 +1056,7 @@ include './index.php';
      * @param string $type
      * @return never-return
      */
-    public static function itoast($msg, string $redirect = '', string $type = '')
+    public static function itoast($msg, string $redirect = '', string $type = ''): void
     {
         We7::itoast($msg, $redirect, $type);
     }
@@ -1103,9 +1102,9 @@ include './index.php';
         if (_W('container') == 'wechat') {
             $jssdk = Util::fetchJSSDK();
             $js = <<<JS1
-{$jssdk}
+$jssdk
 <script type="text/javascript">
-    const url = "{$redirect}";
+    const url = "$redirect";
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
     });
@@ -1122,7 +1121,7 @@ JS1;
             $js = <<<JS2
 <script src="https://gw.alipayobjects.com/as/g/h5-lib/alipayjsapi/3.1.1/alipayjsapi.inc.min.js"></script>
 <script>
-const url = "{$redirect}";
+const url = "$redirect";
 function xclose(){
     if(url) {
         location.href = url;
@@ -1135,7 +1134,7 @@ JS2;
         } else {
             $js = <<<JS3
 <script type="text/javascript">
-    const url = "{$redirect}";
+    const url = "$redirect";
     function xclose(){
         if(url) {
             location.href = url;
@@ -1157,23 +1156,23 @@ JS3;
     	<meta name="apple-mobile-web-app-capable" content="yes" /> <!-- apple devices fullscreen -->
     	<meta name="apple-touch-fullscreen" content="yes"/>
     	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    	<link href="{$css_url}" rel="stylesheet">
+    	<link href="$css_url" rel="stylesheet">
 	</head>
     <body>
         <div class="mui-content">
 		    <div class="mui-content-padded">
 	        <div class="mui-message">
     			<div class="mui-message-icon">
-    				<span class="mui-msg-{$icon}"></span>
+    				<span class="mui-msg-$icon"></span>
     			</div>
-    			<h4 class="title">{$msg}</h4>
+    			<h4 class="title">$msg</h4>
     			<div class="mui-button-area">
-    				<button type="button" class="mui-btn mui-btn-{$btn} mui-btn-block" onClick="xclose()">确定</button>
+    				<button type="button" class="mui-btn mui-btn-$btn mui-btn-block" onClick="xclose()">确定</button>
     			</div>
 		    </div>
 		</div>
 
-    {$js}
+    $js
     </div>
     </body>
 </html>
@@ -1350,7 +1349,7 @@ HTML_CONTENT;
     {
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
         $url = 'https://apis.map.qq.com/ws/location/v1/ip';
-        $params = urlencode("?ip={$ip}&key={$lbs_key}");
+        $params = urlencode("?ip=$ip&key=$lbs_key");
 
         $resp = ihttp::get($url . $params);
 
@@ -1466,8 +1465,8 @@ HTML_CONTENT;
             $type = 'default';
         }
 
-        $filename = "{$id}.png";
-        $dirname = "zovye/{$type}/";
+        $filename = "$id.png";
+        $dirname = "zovye/$type/";
 
         $full_filename = self::getAttachmentFileName($dirname, $filename);
 
@@ -1504,7 +1503,7 @@ HTML_CONTENT;
             }
             $full_filename = self::getAttachmentFileName($dirname, $filename);
             if (file_put_contents($full_filename, $content) !== false) {
-                return "{$dirname}{$filename}";
+                return "$dirname$filename";
             }
         }
 
@@ -1542,7 +1541,7 @@ HTML_CONTENT;
             } elseif (is_array($msg)) {
                 $arr = [];
                 foreach ($msg as $key => $value) {
-                    $arr[] = "#{$key}#=" . urlencode($value);
+                    $arr[] = "#$key#=" . urlencode($value);
                 }
 
                 $tpl_value = implode('&', $arr);
@@ -2042,7 +2041,7 @@ HTML_CONTENT;
     public static function convert2Baidu($lng, $lat): array
     {
         $ak = settings('device.location.baidu.ak', '8DlEgGEN0rDIVvnbaFLAn3rTxowBAjZm');
-        $url = "https://api.map.baidu.com/geoconv/v1/?coords={$lng},{$lat}&from=3&to=5&ak={$ak}";
+        $url = "https://api.map.baidu.com/geoconv/v1/?coords=$lng,$lat&from=3&to=5&ak=$ak";
 
         $resp = ihttp::get($url);
 
@@ -2065,7 +2064,7 @@ HTML_CONTENT;
     {
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
         $url = 'https://apis.map.qq.com/ws/coord/v1/translate?';
-        $params = urlencode("locations={$lat},{$lng}&type=5&&key={$lbs_key}");
+        $params = urlencode("locations=$lat,$lng&type=5&&key=$lbs_key");
 
         $resp = ihttp::get($url . $params);
 
@@ -2088,7 +2087,7 @@ HTML_CONTENT;
     {
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
         $url = 'https://apis.map.qq.com/ws/geocoder/v1/?';
-        $params = urlencode("location={$lat},{$lng}&key={$lbs_key}&get_poi=0");
+        $params = urlencode("location=$lat,$lng&key=$lbs_key&get_poi=0");
 
         $resp = ihttp::get($url . $params);
 
@@ -2112,7 +2111,7 @@ HTML_CONTENT;
     public static function getDistance($from, $to)
     {
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
-        $url = "https://apis.map.qq.com/ws/distance/v1/matrix?mode=walking&from={$from['lat']},{$from['lng']}&to={$to['lat']},{$to['lng']}&key={$lbs_key}";
+        $url = "https://apis.map.qq.com/ws/distance/v1/matrix?mode=walking&from={$from['lat']},{$from['lng']}&to={$to['lat']},{$to['lng']}&key=$lbs_key";
         $resp = ihttp::get($url);
 
         if (is_error($resp)) {
@@ -2347,7 +2346,7 @@ HTML_CONTENT;
             $params['eid'] = request('eid');
         }
 
-        return We7::url("site/entry/{$do}", $params);
+        return We7::url("site/entry/$do", $params);
     }
 
     /**
@@ -2405,7 +2404,7 @@ HTML_CONTENT;
      */
     public static function activeDevice($imei, array $params = [])
     {
-        $res = CtrlServ::query("device/{$imei}/active", [], '', '', 'PUT');
+        $res = CtrlServ::query("device/$imei/active", [], '', '', 'PUT');
         if (is_error($res)) {
             return $res;
         }
@@ -2628,7 +2627,7 @@ HTML_CONTENT;
             $url = rtrim($url, '\\/');
         }
 
-        return "{$url}{$signStr}/{$image_url}";
+        return "$url$signStr/$image_url";
     }
 
     /**

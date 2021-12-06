@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\advertisingModelObj;
+use zovye\model\goodsModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
@@ -150,12 +152,14 @@ class Agent
 
             //删除相关商品
             $query = Goods::query(['agent_id' => $agent->getId()]);
+            /** @var goodsModelObj $goods */
             foreach ($query->findAll() as $goods) {
                 $goods->destroy();
             }
 
             //删除相关广告
             $query = Advertising::query(['agent_id' => $agent->getId()]);
+            /** @var advertisingModelObj $adv */
             foreach ($query->findAll() as $adv) {
                 Advertising::setAdvsLastUpdate($adv->getType());
                 $adv->destroy();

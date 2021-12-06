@@ -170,6 +170,7 @@ class accountModelObj extends modelObj
                     Account::SNTO => App::isSNTOEnabled(),
                     Account::YFB => App::isYFBEnabled(),
                     Account::WxWORK => App::isWxWorkEnabled(),
+                    Account::YOUFEN => App::isYouFenEnabled(),
                 ];
             }
 
@@ -229,7 +230,7 @@ class accountModelObj extends modelObj
         if (App::isBalanceEnabled()) {
             if (isset($commission['balance'])) {
                 return Account::BALANCE;
-            }            
+            }
         }
         if (App::isCommissionEnabled()) {
             if (isset($commission['money'])) {
@@ -267,6 +268,7 @@ class accountModelObj extends modelObj
             Account::SNTO,
             Account::YFB,
             Account::WxWORK,
+            Account::YOUFEN,
         ]);
     }
 
@@ -292,7 +294,7 @@ class accountModelObj extends modelObj
     {
         return $this->getType() == Account::WXAPP;
     }
-   
+
     public function isJFB(): bool
     {
         return $this->getType() == Account::JFB;
@@ -317,7 +319,7 @@ class accountModelObj extends modelObj
     {
         return $this->getType() == Account::ZJBAO;
     }
-    
+
     public function isMeiPa(): bool
     {
         return $this->getType() == Account::MEIPA;
@@ -343,11 +345,16 @@ class accountModelObj extends modelObj
         return $this->getType() == Account::WxWORK;
     }
 
+    public function isYouFen(): bool
+    {
+        return $this->getType() == Account::YOUFEN;
+    }
+
     public function isNormal(): bool
     {
         return $this->getType() == Account::NORMAL;
     }
-    
+
     public function isAuth(): bool
     {
         return $this->getType() == Account::AUTH;

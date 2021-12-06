@@ -217,6 +217,8 @@ TEXT;
                     Account::KINGFANS => ['金粉吧', '完成金粉吧任务'],
                     Account::SNTO => ['史莱姆', '完成史莱姆任务'],
                     Account::YFB => ['粉丝宝', '完成粉丝宝任务'],
+                    Account::WxWORK => ['阿旗(企业微信)', '完成阿旗(企业微信)任务'],
+                    Account::YOUFEN => ['友粉', '完成友粉任务'],
                 ][$account_data['type']] ?? ['公众号', '成功关注公众号'];
 
             $account_info = "<dt>{$account_typeifno[0]}</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";

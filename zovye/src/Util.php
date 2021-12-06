@@ -2783,10 +2783,15 @@ HTML_CONTENT;
     /**
      * 重定向客户端浏览器
      * @param string $url
+     * @param array $params
      */
-    public static function redirect(string $url)
+    public static function redirect(string $url, array $params = [])
     {
-        header("Location:{$url}", true, 302);
+        if ($params) {
+            $url = PlaceHolder::url($url, $params);
+        }
+
+        header("Location:$url", true, 302);
     }
 
     /**

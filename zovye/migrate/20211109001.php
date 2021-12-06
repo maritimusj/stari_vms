@@ -60,6 +60,10 @@ SQL;
             Util::murl('wxwork'),
             Account::WxWORK_NAME,
         ],
+        Account::YOUFEN => [
+            Util::murl('youfen'),
+            Account::YOUFEN_NAME,
+        ],
     ];
 
     foreach ($spec as $type => $item) {

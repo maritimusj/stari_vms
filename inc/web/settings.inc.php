@@ -200,6 +200,10 @@ if (isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createWxWorkAccount',
                 'wxWork.fan.enabled',
             ],
+            'youFenFAN' => [
+                __NAMESPACE__ . '\Account::createYouFenAccount',
+                'YouFen.fan.enabled',
+            ],
         ];
 
         $accounts_updated = false;

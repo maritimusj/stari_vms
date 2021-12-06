@@ -344,6 +344,15 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'secret' => request::trim('secret'),
                 ]);
+            } elseif ($account->isYouFen()) {
+                $data['name'] = Account::YOUFEN_NAME;
+                $data['img'] = Account::YOUFEN_HEAD_IMG;
+                $data['url'] = Util::murl('youfen');
+                $account->set('config', [
+                    'type' => Account::YOUFEN,
+                    'app_number' => request::trim('app_number'),
+                    'app_key' => request::trim('app_key'),
+                ]);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');
                 $account->set('config', [
@@ -413,6 +422,8 @@ if ($op == 'default') {
                 Account::KINGFANS_NAME,
                 Account::SNTO_NAME,
                 Account::YFB_NAME,
+                Account::WxWORK_NAME,
+                Account::YOUFEN,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

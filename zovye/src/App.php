@@ -215,6 +215,17 @@ class App
         });
     }
 
+    /**
+     * 是否开启 友粉
+     *
+     */
+    public static function isYouFenEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('YouFen.fan.enabled'));
+        });
+    }
+
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function() {

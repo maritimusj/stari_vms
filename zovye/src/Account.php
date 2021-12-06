@@ -66,9 +66,15 @@ class Account extends State
     //粉丝宝
     const YFB = 107;
 
-    //企业微信拉新
-    //refer: https://www.yuque.com/docs/share/cee4fad0-c591-4086-8fd1-79470ffb6b2b
+    // 企业微信拉新
+    // refer: https://www.yuque.com/docs/share/cee4fad0-c591-4086-8fd1-79470ffb6b2b
     const WxWORK = 108;
+
+    // 友粉
+    // https://www.showdoc.com.cn/p/96e1339954947631fdeb196c36436f66
+    // https://www.showdoc.com.cn/p/a2585efa11f4240fdb9b906f40e7313c
+    // https://www.showdoc.com.cn/p/f5e459aaab1b8fdd4b1ee30ae7a2cebd
+    const YOUFEN = 109;
 
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
@@ -102,6 +108,9 @@ class Account extends State
 
     const WxWORK_NAME = '企业微信拉新（阿旗）';
     const WxWORK_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
+
+    const YOUFEN_NAME = '友粉';
+    const YOUFEN_HEAD_IMG = MODULE_URL . 'static/img/youfen.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -235,7 +244,7 @@ class Account extends State
             Account::SNTO => App::isSNTOEnabled(),
             Account::YFB => App::isSNTOEnabled(),
             Account::WxWORK => App::isWxWorkEnabled(),
-
+            Account::YOUFEN => App::isYouFenEnabled(),
         ];
         $result = [];
         foreach ($arr as $name => $enabled) {
@@ -460,7 +469,20 @@ class Account extends State
                 function () use ($device, $user) {
                     return WxWorkAccount::fetch($device, $user);
                 },
-            ]
+            ],
+
+            //友粉
+            Account::YOUFEN => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    if ($third_party_platform_includes && !in_array(Account::YOUFEN, $third_party_platform_includes)) {
+                        return false;
+                    }
+                    return App::isYouFenEnabled() && !in_array(YouFenAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return YouFenAccount::fetch($device, $user);
+                },
+            ],
         ];
 
         foreach ($third_party_platform as $uid => $entry) {
@@ -574,7 +596,7 @@ class Account extends State
      */
     public static function isRelated(array $assign_data, $dst): bool
     {
-        if (empty($assign_data) || empty($dst) || !is_array($assign_data)) {
+        if (empty($assign_data) || empty($dst)) {
             return false;
         }
 
@@ -817,6 +839,12 @@ class Account extends State
     {
         $url = Util::murl('wxwork');
         return self::createThirdPartyPlatform(Account::WxWORK, Account::WxWORK_NAME, Account::WxWORK_HEAD_IMG, $url);
+    }
+
+    public static function createYouFenAccount(): ?accountModelObj
+    {
+        $url = Util::murl('youfen');
+        return self::createThirdPartyPlatform(Account::YOUFEN, Account::YOUFEN_NAME, Account::YOUFEN_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -1181,7 +1209,7 @@ class Account extends State
         ]);
     }
 
-    public static function getTypeTitle($type)
+    public static function getTypeTitle($type): string
     {
         static $titles = [
             self::NORMAL => '公众号',
@@ -1192,12 +1220,14 @@ class Account extends State
             self::JFB => '准粉吧',
             self::MOSCALE => '公锤',
             self::YUNFENBA => '云粉吧',
-            self::AQIINFO => '阿旗数据平台',
+            self::AQIINFO => '阿旗',
             self::ZJBAO => '纸巾宝',
             self::MEIPA => '美葩',
             self::KINGFANS => '金粉吧',
             self::SNTO => '史莱姆',
             self::YFB => '粉丝宝',
+            self::WxWORK => '阿旗（企业微信）',
+            self::YOUFEN => '友粉',
         ];
         return $titles[$type] ?? '未知';
     }

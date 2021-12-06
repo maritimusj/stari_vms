@@ -207,7 +207,7 @@
                                 固定金额 &nbsp;
                             </label>
                             <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="agentCommissionFee" id="agentCommissionFee" value="{php echo number_format($settings['agent']['reg']['commission_fee'] /100, 2)}" min="0" step="0.01">
-                            <span class="help-block">* 用户微信支付购买商品，平台扣除相应费用，0表示不扣手续费</span>
+                            <span class="help-block">* 扣除支付订单手续费后，剩余金额作为代理商佣金</span>
                         </div>
                     </div>
                 </div>

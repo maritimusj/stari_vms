@@ -160,7 +160,6 @@ class goods
             }
         } else {
             $goods_data = [
-                'agent_id' => 0,
                 'name' => request::trim('goodsName'),
                 'img' => request::trim('goodsImg'),
 

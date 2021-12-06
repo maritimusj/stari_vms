@@ -807,11 +807,7 @@ class common
         $agent = $user->getAgent();
         $condition['agent_id'] = $agent->getId();
 
-        $device_stat = [
-            'all' => 0,
-            'on' => 0,
-            'off' => 0,
-        ];
+        $device_stat = [];
 
         $time_less_15 = new DateTime('-15 min');
         $power_time = $time_less_15->getTimestamp();

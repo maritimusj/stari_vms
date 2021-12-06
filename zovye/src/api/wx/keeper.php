@@ -1027,8 +1027,6 @@ class keeper
         $result = [
             'page' => $page,
             'pagesize' => $page_size,
-            'totalpage' => 0,
-            'total' => 0,
             'list' => [],
         ];
 

@@ -1002,7 +1002,7 @@ if ($op == 'default') {
         'id' => $account->getId(),
     ]);
 
-    $result = Util::createQrcodeFile("douyin_{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
+    $result = Util::createQrcodeFile("douyin.{$account->getId()}", DouYin::redirectToAuthorizeUrl($url, true));
 
     if (is_error($result)) {
         JSON::fail('创建二维码文件失败！');

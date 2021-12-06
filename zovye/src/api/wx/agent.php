@@ -1948,11 +1948,7 @@ class agent
             $condition = [];
             $condition['agent_id'] = $user->getAgentId();
 
-            $device_stat = [
-                'all' => 0,
-                'on' => 0,
-                'off' => 0,
-            ];
+            $device_stat = [];
 
             $time_less_15 = new DateTime('-15 min');
             $power_time = $time_less_15->getTimestamp();
@@ -1960,11 +1956,7 @@ class agent
             $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
             $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
 
-
             $data['all']['n'] = 0;
-            $data['today']['n'] = 0;
-            $data['yesterday']['n'] = 0;
-            $data['month']['n'] = 0;
 
             $uid_data = [
                 'api' => 'homepage',

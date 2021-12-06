@@ -39,7 +39,7 @@
 	<div class="category-view">
 		<div :class="{'category-item':true,'category-se':item.se}" v-for="(item,index) in categories" @click="categoryClick(index)">
 		    <span class="category-title">{{item.title}}</span>
-		    <span class="category-desc">{{item.desc}}</span>
+		    <span class="category-desc" v-html="item.desc"></span>
 		</div>
 	</div>
 	<div class="none-desc" v-else-if="accounts.length == 0 && goods.length == 0">
@@ -55,7 +55,7 @@
 				</div>
 				<img class="account-qrcode" :src="item.qrcode"/>
 				<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
-				<span class="desc">{{item.desc}}</span>
+				<span class="desc" v-html="item.desc"></span>
 			</div>
 		</div>
 	</div>
@@ -73,7 +73,7 @@
 					</div>
 				</div>
 				<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
-				<span class="desc">{{item.desc}}</span>
+				<span class="desc" v-html="item.desc"></span>
 			</div>
 		</div>
 	</div>
@@ -193,8 +193,8 @@
 				{
 					uid: "{$item['uid']}",
 					img: "{$item['img']}",
-					title: "{$item['title']}",
-					desc:"{$item['descr']}",
+					title: `{$item['title']}`,
+					desc: `{$item['descr']}`,
 					clr:"{$item['clr']}",
 					{if $item['qrcode']}
 					qrcode:"{$item['qrcode']}"
@@ -211,8 +211,8 @@
     				{
     					uid: "{$item['uid']}",
     					img: "{$item['img']}",
-    					title: "{$item['title']}",
-    					desc:"{$item['descr']}",
+    					title: `{$item['title']}`,
+    					desc:`{$item['descr']}`,
     					clr:"{$item['clr']}",
     					qrcode:"{$item['qrcode']}"
     				},
@@ -225,8 +225,8 @@
     				{
     					uid: "{$item['uid']}",
     					img: "{$item['img']}",
-    					title: "{$item['title']}",
-    					desc:"{$item['descr']}",
+    					title: `{$item['title']}`,
+    					desc:`{$item['descr']}`,
     					clr:"{$item['clr']}",
     					media:"{$item['media']}",
     					duration:{$item['duration']}

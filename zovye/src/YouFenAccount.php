@@ -101,7 +101,7 @@ class YouFenAccount
     public function sign($data): string
     {
         ksort($data);
-        $str = urlencode(http_build_query($data, null, '&ammp;'));
+        $str = urlencode(http_build_query($data, '', '&ammp;'));
         return md5($str);
     }
 

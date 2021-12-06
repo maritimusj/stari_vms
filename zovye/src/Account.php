@@ -246,12 +246,14 @@ class Account extends State
             Account::WxWORK => App::isWxWorkEnabled(),
             Account::YOUFEN => App::isYouFenEnabled(),
         ];
+
         $result = [];
         foreach ($arr as $name => $enabled) {
             if ($enabled) {
                 $result[] = $name;
             }
         }
+        
         return $result;
     }
 
@@ -295,7 +297,7 @@ class Account extends State
                 Account::WXAPP,
             ];
 
-        $third_party_platform_includes = $params['type'] ?? [
+        $third_party_platform_includes = $params['s_type'] ?? [
                 Account::JFB,
                 Account::MOSCALE,
                 Account::YUNFENBA,
@@ -306,6 +308,7 @@ class Account extends State
                 Account::SNTO,
                 Account::YFB,
                 Account::WxWORK,
+                Account::YOUFEN,
             ];
 
         $include = is_array($include) ? $include : [$include];

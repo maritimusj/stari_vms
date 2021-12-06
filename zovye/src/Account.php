@@ -534,7 +534,7 @@ class Account extends State
 
                     $arr = [];
                     foreach ($keys as $key) {
-                        $arr[$key] = $result[$key];
+                        $arr[] = $result[$key];
                     }
                     return $arr;
                 }

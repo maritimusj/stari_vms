@@ -71,7 +71,7 @@
 					</div>
 					<img class="account-qrcode" :src="item.qrcode" />
 					<span class="tips">长按识别二维码</span>
-					<span class="desc">{{item.desc}}</span>
+					<span class="desc" v-html="item.desc"></span>
 				</div>
 			</div>
 		</div>

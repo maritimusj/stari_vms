@@ -268,23 +268,35 @@ class Account extends State
     public static function match(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
         $list = [];
-        $join = function ($cond, $getter_fn) use ($device, $user, &$list) {
-            $acc = Account::findOne($cond);
-            if ($acc) {
-                $index = sprintf("%03d", $acc->getOrderNo());
-                if ($list[$index]) {
-                    $index .= $acc->getId();
-                }
-                $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
-                    //检查用户是否允许
-                    $res = Util::checkAvailable($user, $acc, $device);
-                    if (is_error($res)) {
-                        return $res;
-                    }
 
-                    return $getter_fn($acc);
-                };
+        $include_balance = empty($params['include']) || in_array(Account::BALANCE, $params['include']);
+        $include_commission = empty($params['include']) || in_array(Account::COMMISSION, $params['include']);
+
+        $join = function ($cond, $getter_fn) use ($device, $user, &$list, $include_balance, $include_commission) {
+            $acc = Account::findOne($cond);
+            if (empty($acc)) {
+                return false;
             }
+            if (!$include_balance && $acc->getBonusType() == Account::BALANCE) {
+                return false;
+            }
+            if (!$include_commission && $acc->getBonusType() == Account::COMMISSION) {
+                return false;
+            }
+            $index = sprintf("%03d", $acc->getOrderNo());
+            if ($list[$index]) {
+                $index .= $acc->getId();
+            }
+            $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
+                //检查用户是否允许
+                $res = Util::checkAvailable($user, $acc, $device);
+                if (is_error($res)) {
+                    return $res;
+                }
+
+                return $getter_fn($acc);
+            };
+            return true;
         };
 
         //处理分组
@@ -1003,8 +1015,6 @@ class Account extends State
         //获取本地可用公众号列表
         $accounts = Account::match($device, $user, array_merge(['max' => settings('misc.maxAccounts', 0)], $params));
         if (!empty($accounts)) {
-            $include_balance = empty($params['include']) || in_array(Account::BALANCE, $params['include']);
-            $include_commission = empty($params['include']) || in_array(Account::COMMISSION, $params['include']);
             foreach ($accounts as $index => &$account) {
                 if ($account['type'] == Account::WXAPP && empty($account['username'])) {
                     unset($accounts[$index]);
@@ -1022,16 +1032,6 @@ class Account extends State
                         //如果是授权服务号，需要使用场景二维码替换原二维码
                         self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
                     }
-                }
-
-                if (!$include_balance && isset($account['balance'])) {
-                    unset($accounts[$index]);
-                    continue;
-                }
-
-                if (!$include_commission && isset($account['commission'])) {
-                    unset($accounts[$index]);
-                    continue;
                 }
 
                 if (isset($account['qrcode'])) {

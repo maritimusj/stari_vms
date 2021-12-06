@@ -673,6 +673,10 @@ class DeviceEventProcessor
                 $device->updateSettings('extra.v1.lac.v', strval($data['extra']['LAC']));
             }
 
+            if (isset($data['extra']['qoe'])) {
+                $device->setQoe($data['extra']['qoe']);
+            }
+
             $LED_status = $device->hasMcbDisp();
             $device->updateMcbStatus($data['extra']);
 

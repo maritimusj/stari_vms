@@ -123,7 +123,6 @@ class YouFenAccount
         $data['sign'] = $this->sign($data);
 
         $result = Util::post(self::API_URL, $data);
-
         if ($cb) {
             $cb($data, $result);
         }

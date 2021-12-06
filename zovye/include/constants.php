@@ -17,8 +17,8 @@ define('PEM_DIR', DATA_DIR . 'pem' . DIRECTORY_SEPARATOR); //微信支付企业�
 define('LIB_DIR', ZOVYE_ROOT . 'lib' . DIRECTORY_SEPARATOR);
 
 define('L_ALL', 0);
-define('L_INFO', 1);
-define('L_DEBUG', 2);
+define('L_DEBUG', 1);
+define('L_INFO', 2);
 define('L_WARN', 3);
 define('L_ERROR', 4);
 define('L_FATAL', 5);

@@ -57,16 +57,15 @@ class agent
     public static function getAgent($token = null): ?agentModelObj
     {
         $user = common::getAgent($token);
-        if ($user && $user->isAgent()) {
+        if ($user->isAgent()) {
             return $user;
         }
 
-        if ($user && $user->isPartner()) {
+        if ($user->isPartner()) {
             return $user->getPartnerAgent();
         }
 
         JSON::fail('操作失败，无法获取代理商身份！');
-        return null;
     }
 
     /**

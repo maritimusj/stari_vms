@@ -352,6 +352,8 @@ if ($op == 'default') {
                     'type' => Account::YOUFEN,
                     'app_number' => request::trim('app_number'),
                     'app_key' => request::trim('app_key'),
+                    'followed_title' => request::trim('followed_title'),
+                    'followed_description' => request::trim('followed_description'),
                 ]);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');

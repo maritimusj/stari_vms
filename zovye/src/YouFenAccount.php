@@ -124,6 +124,8 @@ class YouFenAccount
             'wx_headimg' => empty($fans['avatar']) ? $fans['headimgurl'] : $fans['avatar'],
             'reply_title' => $acc->getTitle() == Account::YOUFEN_NAME ? '点击免费领取' : $acc->getTitle(),
             'reply_description' => $acc->getDescription(),
+            'followed_title' => $acc->settings('config.followed_title', '出货成功'),
+            'followed_description' => $acc->settings('config.followed_description', '如果没有领取到商品，请重新扫描屏幕二维码！'),
             'notify_data' => "$uid:{$device->getShadowId()}:{$user->getOpenid()}",
         ];
 

@@ -148,10 +148,14 @@ if ($op == 'default') {
                 }
             }
 
-            if (App::isCommissionEnabled() || App::isBalanceEnabled()) {
+            if (App::isCommissionEnabled()) {
                 if ($entry->getBonusType() == Account::COMMISSION) {
                     $data['commission'] = $entry->getCommissionPrice();
-                } elseif ($entry->getBonusType() == Account::BALANCE) {
+                }
+            }
+
+            if (App::isBalanceEnabled()) {
+                if ($entry->getBonusType() == Account::BALANCE) {
                     $data['balance'] = $entry->getBalancePrice();
                 }
             }

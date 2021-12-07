@@ -61,7 +61,7 @@ class YouFenAccount
                     }
                 }
 
-                if (is_error($result) || !$result['success']) {
+                if (empty($result) || is_error($result) || !$result['success']) {
                     Log::error('youfen', [
                         'user' => $user->profile(),
                         'acc' => $acc->getName(),
@@ -69,17 +69,22 @@ class YouFenAccount
                         'error' => $result,
                     ]);
                 } else {
-                    $data = $acc->format();
+                    if ($result['result']) {
+                        $item = current((array)$result['result']);
+                        if ($item && $item['qr_url']) {
+                            $data = $acc->format();
 
-                    $data['title'] = $result['result']['wx_nickname'];
-                    $data['qrcode'] = $result['result']['qr_url'];
+                            $data['title'] = $item['wx_nickname'] ?? Account::YOUFEN_NAME;
+                            $data['qrcode'] = $item['qr_url'];
 
-                    if (App::isAccountLogEnabled() && isset($log)) {
-                        $log->setExtraData('account', $data);
-                        $log->save();
+                            if (App::isAccountLogEnabled() && isset($log)) {
+                                $log->setExtraData('account', $data);
+                                $log->save();
+                            }
+
+                            $v[] = $data;                              
+                        }
                     }
-
-                    $v[] = $data;
                 }
             });
         } else {
@@ -101,7 +106,7 @@ class YouFenAccount
     public function sign($data): string
     {
         ksort($data);
-        $str = urlencode(http_build_query($data, '', '&amp;'));
+        $str = urldecode(http_build_query($data, '', '&amp;'));
         return md5($str);
     }
 

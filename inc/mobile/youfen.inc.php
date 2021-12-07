@@ -30,7 +30,14 @@ if ($op == 'yf_auth') {
         'raw' => request::raw(),
     ]);
 
-    YouFenAccount::cb(request::json());
+    YouFenAccount::cb([
+        'request_id' => request::str('request_id'),
+        'openid' => request::str('openid'),
+        'sub_time' => request::int('sub_time'),
+        'wx_appid' => request::str('wx_appid'),
+        'notify_data' => request::str('notify_data', '', true),
+        'sub_type' => request::int('sub_type'),
+    ]);
 
     exit('success');
 }

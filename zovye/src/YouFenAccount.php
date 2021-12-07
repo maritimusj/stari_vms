@@ -50,7 +50,7 @@ class YouFenAccount
         if ($yf_openid) {
             //请求API
             $youFen = new YouFenAccount($config['app_number'], $config['app_key']);
-            $youFen->fetchOne($device, $user, $yf_openid, function ($request, $result) use ($acc, $device, $user, &$v) {
+            $youFen->fetchOne($device, $user, $acc, $yf_openid, function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
@@ -110,7 +110,7 @@ class YouFenAccount
         return md5($str);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, string $yf_openid, callable $cb = null)
+    public function fetchOne(deviceModelObj $device, userModelObj $user, accountModelObj $acc, string $yf_openid, callable $cb = null)
     {
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
         $uid = App::uid(6);
@@ -122,6 +122,8 @@ class YouFenAccount
             'wx_openid' => $yf_openid,
             'wx_nickname' => $fans['nickname'],
             'wx_headimg' => empty($fans['avatar']) ? $fans['headimgurl'] : $fans['avatar'],
+            'reply_title' => $acc->getTitle() == Account::YOUFEN_NAME ? '点击免费领取' : $acc->getTitle(),
+            'reply_description' => $acc->getDescription(),
             'notify_data' => "$uid:{$device->getShadowId()}:{$user->getOpenid()}",
         ];
 
@@ -167,8 +169,8 @@ class YouFenAccount
             }
 
             list($uid, $device_uid, $user_uid) = explode(':', $params['notify_data']);
-            if ($uid !== App::uid(6)) {
-                throw new RuntimeException('发生错误：应用不匹配！');
+            if ($uid !== App::uid(6) || empty($device_uid) || empty($user_uid)) {
+                throw new RuntimeException('发生错误：异常数据！');
             }
 
             /** @var userModelObj $user */
@@ -185,7 +187,7 @@ class YouFenAccount
 
             $account = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, sha1($params['wx_appid'] ?? ''));
+            $order_uid = Order::makeUID($user, $device, sha1($params['request_id'] ?? ''));
 
             Account::createThirdPartyPlatformOrder($account, $user, $device, $order_uid, $params);
 

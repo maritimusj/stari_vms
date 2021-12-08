@@ -13,6 +13,7 @@ use zovye\model\deviceModelObj;
 
 class JfbAccount
 {
+    const REDIRECT_URL = 'http://wx.zhuna888.com/fans/?redirectUri={redirectUri}&channelId={channelId}&userId={userId}#/Jump';
     const CB_RESPONSE = 'ok';
 
     public static function getUid(): string
@@ -22,18 +23,25 @@ class JfbAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user = null): array
     {
+        $acc = Account::findOneFromType(Account::JFB);
+        if (empty($acc)) {
+            return [];
+        }
+
+        $config = $acc->get('config', []);
+        if (empty($config['url'])) {
+            return [];
+        }
+
         $v = [];
 
-        $acc = Account::findOneFromType(Account::JFB);
-        if ($acc) {
-            $config = $acc->get('config', []);
-            if (empty($config['url'])) {
-                return err('没有配置api url');
-            }
+        $jfb_openid = $user->settings('customData.jfb.openid', '');
 
+        if ($jfb_openid) {
             $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
             $data = [
+                'zhunaOpenId' => $jfb_openid,
                 'scene' => strval($config['scene']),
                 'openId' => $fans['openid'],
                 'facilityId' => $device->getImei(),
@@ -53,10 +61,10 @@ class JfbAccount
                 'facilityDistrict' => '',
                 'showTimes' => 0,
                 'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
-                    'op' => 'feedback',
-                    'device_imei' => $device->getImei(),
-                    'device_name' => $device->getName(),
-                ]) . '">如未出货请点我！</a>',
+                        'op' => 'feedback',
+                        'device_imei' => $device->getImei(),
+                        'device_name' => $device->getName(),
+                    ]) . '">如未出货请点我！</a>',
             ];
 
             $result = Util::post(strval($config['url']), $data);
@@ -108,6 +116,22 @@ class JfbAccount
                     Log::error('jfb', [
                         'error' => $e->getMessage()
                     ]);
+                }
+            }
+        } else {
+            if (preg_match('/channelId=(\w*)/', $config['url'], $result) > 0) {
+                $channelId = $result[1];
+                if ($channelId) {
+                    $url = PlaceHolder::url(self::REDIRECT_URL, [
+                        'redirectUri' => urlencode(Util::murl('jfb', ['op' => 'jfb_auth', 'device' => $device->getShadowId()])),
+                        'channelId' => $channelId,
+                        'userId' => $user,
+                    ]);
+
+                    $data = $acc->format();
+                    $data['redirect_url'] = $url;
+
+                    $v[] = $data;
                 }
             }
         }

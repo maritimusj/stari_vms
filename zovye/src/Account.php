@@ -40,6 +40,7 @@ class Account extends State
     const AUTH = 98;
 
     //准粉吧公众号
+    //https://www.showdoc.com.cn/1660977313040831/7833225636342042
     const JFB = 99;
 
     //公锤公众号

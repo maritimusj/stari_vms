@@ -33,6 +33,8 @@ class JfbAccount
             return [];
         }
 
+        $api_url = strval($config['url']);
+
         $v = [];
 
         $jfb_openid = $user->settings('customData.jfb.openid', '');
@@ -67,7 +69,7 @@ class JfbAccount
                     ]) . '">如未出货请点我！</a>',
             ];
 
-            $result = Util::post(strval($config['url']), $data);
+            $result = Util::post($api_url, $data);
 
             if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $data, $result);
@@ -92,14 +94,15 @@ class JfbAccount
                     throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
                 }
 
-                $data = $acc->format();
                 $item = current($result['result']['data']);
-                if (empty($item)) {
+                if (empty($item) || empty($item['qrPicUrl'])) {
                     throw new RuntimeException('没有数据！');
                 }
 
-                $data['title'] = $item['nickName'];
-                $data['img'] = $item['headImgUrl'];
+                $data = $acc->format();
+
+                $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
+                $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
                 $data['qrcode'] = $item['qrPicUrl'];
 
                 $v[] = $data;
@@ -119,7 +122,7 @@ class JfbAccount
                 }
             }
         } else {
-            if (preg_match('/channelId=(\w*)/', $config['url'], $result) > 0) {
+            if (preg_match('/channelId=(\w*)/', $api_url, $result) > 0) {
                 $channelId = $result[1];
                 if ($channelId) {
                     $url = PlaceHolder::url(self::REDIRECT_URL, [

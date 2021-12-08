@@ -13,7 +13,7 @@ use zovye\model\deviceModelObj;
 
 class JfbAccount
 {
-    const CB_RESPONSE = '{"result_code":0,"result_message":"成功"}';
+    const CB_RESPONSE = 'ok';
 
     public static function getUid(): string
     {
@@ -34,14 +34,13 @@ class JfbAccount
             $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
             $data = [
-                'appNo' => '',
                 'scene' => strval($config['scene']),
                 'openId' => $fans['openid'],
                 'facilityId' => $device->getImei(),
                 'nickname' => $fans['nickname'],
                 'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
                 'headUrl' => $fans['headimgurl'],
-                'ipAddress' => CLIENT_IP,
+                'ipAddress' => Util::getClientIp(),
                 'userAgent' => $_SERVER['HTTP_USER_AGENT'],
                 'countryName' => $fans['country'],
                 'provinceName' => $fans['province'],
@@ -53,7 +52,6 @@ class JfbAccount
                 'facilityCity' => $fans['city'],
                 'facilityDistrict' => '',
                 'showTimes' => 0,
-                'redirect' => Util::murl('order', ['op' => 'feedback', 'device_imei' => $device->getImei(), 'device_name' => $device->getName()]),
                 'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
                     'op' => 'feedback',
                     'device_imei' => $device->getImei(),
@@ -87,14 +85,14 @@ class JfbAccount
                 }
 
                 $data = $acc->format();
-                $x = $result['result']['data'][0];
-                if (empty($x)) {
+                $item = current($result['result']['data']);
+                if (empty($item)) {
                     throw new RuntimeException('没有数据！');
                 }
 
-                $data['title'] = $x['nickName'];
-                $data['img'] = $x['headImgUrl'];
-                $data['qrcode'] = $x['qrPicUrl'];
+                $data['title'] = $item['nickName'];
+                $data['img'] = $item['headImgUrl'];
+                $data['qrcode'] = $item['qrPicUrl'];
 
                 $v[] = $data;
 
@@ -135,6 +133,7 @@ class JfbAccount
 
     public static function cb($params)
     {
+        //op_type == 1 表示新关注
         if ($params['op_type'] == 1) {
             try {
                 $res = self::verifyData($params);

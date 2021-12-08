@@ -803,7 +803,7 @@ include './index.php';
             $max_free = $max_free > 0 ? $max_free : (int)settings('user.maxTotalFree', 0);
 
             if ($max_free > 0) {
-                $remain = max(0, $max_free - $user->getUserMaxFreeNum());
+                $remain = max(0, $max_free - $user->getFreeTotal());
             } else {
                 $remain = 1;
             }

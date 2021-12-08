@@ -744,7 +744,7 @@ include './index.php';
         }
 
         //全部免费额度限制
-        if (empty(Util::getUserMaxFreeNum($user, $device))) {
+        if (empty(Util::getUserFreeNum($user, $device))) {
             return error(State::ERROR, '您的免费额度已用完！');
         }
 
@@ -788,7 +788,7 @@ include './index.php';
         return $remain;
     }
 
-    public static function getUserMaxFreeNum(userModelObj $user, deviceModelObj $device): int
+    public static function getUserFreeNum(userModelObj $user, deviceModelObj $device): int
     {
         $remain = null;
 

@@ -630,8 +630,12 @@ JSCODE;
             $user_data['data']['balance'] = $user->getBalance()->total();
             $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
+            $wxapp_username = settings('agentWxapp.username', '');
+
             $tpl['js']['code'] .= <<<JSCODE
-\r\nzovye_fn.redirectToBonusPage = function() {
+\r\n
+zovye_fn.wxapp_username = "$wxapp_username";
+zovye_fn.redirectToBonusPage = function() {
     window.location.href = "$bonus_url";
 }
 zovye_fn.user = JSON.parse(`$user_json_str`);

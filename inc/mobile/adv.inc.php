@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use DateTime;
+
 defined('IN_IA') or exit('Access Denied');
 
 $user = Util::getCurrentUser();
@@ -36,18 +38,15 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
-//对广告链接中的特殊点位符进行替换
-$replacer = function ($url) use ($user, $device) {
-    return str_ireplace(['{user_uid}', '{device_uid}'], [$user->getOpenid(), $device->getShadowId()], $url);
-};
+$params = [$user, $device, new DateTime()];
 
 foreach ($result as $index => $adv) {
     if ($adv['data']) {
         if ($adv['data']['url']) {
-            $result[$index]['data']['url'] = $replacer($adv['data']['url']);
+            $result[$index]['data']['url'] = PlaceHolder::url($adv['data']['url'], $params);
         }
         if ($adv['data']['link']) {
-            $result[$index]['data']['link'] = $replacer($adv['data']['link']);
+            $result[$index]['data']['link'] = PlaceHolder::url($adv['data']['link'], $params);
         }
     }
 }

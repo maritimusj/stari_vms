@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use DateTime;
+use DateTimeInterface;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -19,7 +19,7 @@ class PlaceHolder
                 $url = str_ireplace(is_string($index) ? "\{$index}" : '{user_uid}', $o->getOpenid(), $url);
             } elseif ($o instanceof deviceModelObj) {
                 $url = str_ireplace(is_string($index) ? "\{$index}" : '{device_uid}', $o->getShadowId(), $url);
-            } elseif ($o instanceof DateTime) {
+            } elseif ($o instanceof DateTimeInterface) {
                 $url = str_ireplace(is_string($index) ? "\{$index}" : '{timestamp}', $o->getTimestamp(), $url);
             }
         }

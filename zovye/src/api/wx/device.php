@@ -111,17 +111,6 @@ class device
             ],
         ];
 
-        if ($location) {
-            $result['extra']['location'] = $location;
-            if (!isset($result['extra']['location']['area'])) {
-                $result['extra']['location']['area'] = [];
-            }
-        }
-
-        $sig = $device->getSig();
-        if ($sig != -1) {
-            $result['status']['sig'] = $sig;
-        }
 
         if ($is_percent) {
             $result['keeper']['percent'] = $v;
@@ -176,10 +165,11 @@ class device
             }
         }
 
-        //电量
-        $qoe = $device->getQoe();
-        if (isset($qoe) && $qoe > 0) {
-            $result['status']['qoe'] = intval($qoe);
+        if ($location) {
+            $result['extra']['location'] = $location;
+            if (!isset($result['extra']['location']['area'])) {
+                $result['extra']['location']['area'] = [];
+            }
         }
 
         //app报告的位置数据
@@ -200,6 +190,26 @@ class device
             $result['location']['area'] = array_values($result['location']['area']);
         }
 
+        //信号强度
+        $sig = $device->getSig();
+        if ($sig != -1) {
+            $result['status']['sig'] = $sig;
+        }
+
+        //电量
+        $qoe = $device->getQoe();
+        if (isset($qoe) && $qoe > 0) {
+            $result['status']['qoe'] = intval($qoe);
+        }
+
+        $result['v0_status'] = [
+            \zovye\Device::V0_STATUS_SIG => $device->getSig(),
+            \zovye\Device::V0_STATUS_QOE => $device->getQoe(),
+            \zovye\Device::V0_STATUS_VOLTAGE => $device->getV0Status(\zovye\Device::V0_STATUS_VOLTAGE),
+            \zovye\Device::V0_STATUS_COUNT => (int)$device->getV0Status(\zovye\Device::V0_STATUS_COUNT),
+            \zovye\Device::V0_STATUS_ERROR => $device->getV0ErrorDescription(),
+        ];
+        
         return $result;
     }
 

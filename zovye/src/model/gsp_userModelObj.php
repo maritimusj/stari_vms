@@ -12,6 +12,7 @@ use function zovye\tb;
 /**
  * @method getUid()
  * @method getVal()
+ * @method getValType()
  */
 class gsp_userModelObj extends modelObj
 {
@@ -44,7 +45,7 @@ class gsp_userModelObj extends modelObj
         return $this->val_type == 'amount';
     }
 
-    public function isRole(): bool 
+    public function isRole(): bool
     {
         return in_array($this->uid, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3]);
     }

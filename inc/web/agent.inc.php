@@ -84,7 +84,6 @@ if ($op == 'default') {
 
     //搜索用户昵称或者手机号码
     $keywords = request::trim('keywords');
-    $tpl_data['keywords'] = $keywords;
     if ($keywords) {
         $query->whereOr([
             'nickname LIKE' => "%{$keywords}%",
@@ -214,7 +213,7 @@ if ($op == 'default') {
             /** @var  agent_vwModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $data = [
-                    'id' => intval($entry->getId()),
+                    'id' => $entry->getId(),
                     'openid' => $entry->getOpenid(),
                     'nickname' => strval($entry->getNickname()),
                     'avatar' => strval($entry->getAvatar()),
@@ -403,7 +402,7 @@ if ($op == 'default') {
         }
 
         if (User::findOne(['mobile' => $mobile, 'id <>' => $user->getId()])) {
-            Util::itoast('手机号码已经被其它用户使用！',  $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
+            Util::itoast('手机号码已经被其它用户使用！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
         }
 
         $name = request::trim('name');
@@ -426,7 +425,7 @@ if ($op == 'default') {
                 $user->setSuperiorId($superior->getId());
                 $superior_data = [
                     'openid' => $superior->getOpenid(),
-                    'name' => $superior_data['name'] ?: $superior->getNickname(),
+                    'name' => $superior->getNickname(),
                 ];
             }
         } else {
@@ -809,7 +808,7 @@ if ($op == 'default') {
             'chartid' => Util::random(10),
             'title' => $title,
             'chart' => Util::cachedCall(30, function () use ($agent, $datetime, $title) {
-                return Stats::chartDataOfMonth($agent, $datetime, "代理商：{$agent->getName()}({$title})");
+                return Stats::chartDataOfMonth($agent, $datetime, "代理商：{$agent->getName()}($title)");
             }, $agent->getId(), $title),
         ]
     );
@@ -1491,12 +1490,7 @@ if ($op == 'default') {
         } elseif ($from == 'mixed') {
             if ($fn == 'adduser') {
                 $user = User::get(request::int('id'));
-                if (empty($user)) {
-                    $result_msg('找不到这个用户！', false);
-                }
-
-                $tpl_data['user'] = $user;
-            } elseif ($fn == 'edituser') {
+            } else {
                 $entry = GSP::findOne(['agent_id' => $agent->getId(), 'id' => request::int('id')]);
                 if (empty($entry)) {
                     $result_msg('找不到这个设置！', false);
@@ -1507,12 +1501,12 @@ if ($op == 'default') {
                 }
 
                 $user = User::get($entry->getUid(), true);
-                if (empty($user)) {
-                    $result_msg('找不到这个用户！', false);
-                }
-
-                $tpl_data['user'] = $user;
             }
+
+            if (empty($user)) {
+                $result_msg('找不到这个用户！', false);
+            }
+            $tpl_data['user'] = $user;
 
             app()->showTemplate('web/agent/mixed-edit-user', $tpl_data);
         } else {
@@ -1535,13 +1529,13 @@ if ($op == 'default') {
 
             $key_name = "agentData.gsp.users.{$user->getOpenid()}";
 
-            $agent->updateSettings("{$key_name}.order", $order_type);
+            $agent->updateSettings("$key_name.order", $order_type);
 
             $mode_type = request::trim('mode_type', 'percent');
             if ($mode_type == 'percent') {
                 $percent = min(10000, max(0, request::float('val', 0, 2) * 100));
                 if ($agent->settings($key_name)) {
-                    $agent->updateSettings("{$key_name}.percent", $percent);
+                    $agent->updateSettings("$key_name.percent", $percent);
                 } else {
                     $agent->updateSettings(
                         $key_name,
@@ -1555,7 +1549,7 @@ if ($op == 'default') {
             } else {
                 $amount = request::float('val', 0, 2) * 100;
                 if ($agent->settings($key_name)) {
-                    $agent->updateSettings("{$key_name}.amount", $amount);
+                    $agent->updateSettings("$key_name.amount", $amount);
                 } else {
                     $agent->updateSettings(
                         $key_name,
@@ -1578,10 +1572,10 @@ if ($op == 'default') {
 
             $entries = [];
             foreach ([
-                'f' => ['type' => 'freeOrderType', 'val' => 'freeOrderVal'],
-                'b' => ['type' => 'balanceOrderType', 'val' => 'balanceOrderVal'],
-                'p' => ['type' => 'payOrderType', 'val' => 'payOrderVal'],
-            ] as $key => $v) {
+                         'f' => ['type' => 'freeOrderType', 'val' => 'freeOrderVal'],
+                         'b' => ['type' => 'balanceOrderType', 'val' => 'balanceOrderVal'],
+                         'p' => ['type' => 'payOrderType', 'val' => 'payOrderVal'],
+                     ] as $key => $v) {
                 if (request::isset($v['type'])) {
                     if (request::bool($v['type'])) {
                         $entries[$key] = [
@@ -1643,7 +1637,7 @@ if ($op == 'default') {
     } elseif ($fn == 'add_role') {
         $tpl_data['agentId'] = $agent->getId();
 
-        $tpl_data['level'] = request::trim('level', '');
+        $tpl_data['level'] = request::trim('level');
 
         $content = app()->fetchTemplate('web/agent/gsp-add-role', $tpl_data);
         JSON::success([
@@ -1682,10 +1676,10 @@ if ($op == 'default') {
         ];
         $entries = [];
         foreach ([
-            'f' => ['type' => 'freeOrderType', 'val' => 'freeOrderVal'],
-            'b' => ['type' => 'balanceOrderType', 'val' => 'balanceOrderVal'],
-            'p' => ['type' => 'payOrderType', 'val' => 'payOrderVal'],
-        ] as $key => $v) {
+                     'f' => ['type' => 'freeOrderType', 'val' => 'freeOrderVal'],
+                     'b' => ['type' => 'balanceOrderType', 'val' => 'balanceOrderVal'],
+                     'p' => ['type' => 'payOrderType', 'val' => 'payOrderVal'],
+                 ] as $key => $v) {
             if (request::isset($v['type'])) {
                 if (request::bool($v['type'])) {
                     $entries[$key] = [
@@ -1901,7 +1895,6 @@ if ($op == 'default') {
     if (request::bool('is_export')) {
         if (empty($user)) {
             Util::itoast('请指定用户！', '', 'error');
-            exit();
         }
 
         set_time_limit(60);
@@ -1925,7 +1918,7 @@ if ($op == 'default') {
         /** @var commission_balanceModelObj $entry */
         foreach ($query->findAll() as $index => $entry) {
             $data = [
-                'id' =>  $index + 1,
+                'id' => $index + 1,
                 'xval' => number_format($entry->getXVal() / 100, 2),
                 'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 'event' => '',  //事件

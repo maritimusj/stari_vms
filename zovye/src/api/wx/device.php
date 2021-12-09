@@ -71,7 +71,7 @@ class device
                     'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\Device::STATUS_MAINTENANCE ? 1 : 0,
                 ],
             ];
-            if ($location) {
+            if (!isEmptyArray($location)) {
                 $result['extra']['location'] = $location;
             }
             if ($is_percent) {
@@ -165,11 +165,8 @@ class device
             }
         }
 
-        if ($location) {
+        if (!isEmptyArray($location)) {
             $result['extra']['location'] = $location;
-            if (!isset($result['extra']['location']['area'])) {
-                $result['extra']['location']['area'] = [];
-            }
         }
 
         //app报告的位置数据

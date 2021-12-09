@@ -5,6 +5,9 @@
         <th class="text-center">月份</th>
         <th class="text-center">免费</th>
         <th class="text-center">支付</th>
+        {if \zovye\App::isBalanceEnabled()}
+        <th class="text-center">积分</th>
+        {/if}
         <th class="text-center">小计</th>
         <th class="text-center">操作</th>
     </tr>
@@ -13,7 +16,10 @@
     <tr  data-fetchid="{$device_id}" data-month="{$item['month']}">
         <td>{$i}</td>
         <td>{$item['free']}</td>
-        <td>{$item['fee']}</td>
+        <td>{$item['pay']}</td>
+        {if \zovye\App::isBalanceEnabled()}
+        <td>{$item['balance']}</td>
+        {/if}
         <td>{$item['total']}</td>
         <td class="operate">
             <i class="fa fa-wrench fa-fw" data-op="repairMonthStats"  title="修复{$i}的出货统计"></i>

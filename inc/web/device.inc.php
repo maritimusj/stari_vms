@@ -1395,71 +1395,75 @@ if ($op == 'list') {
         $total_num = 0;
         $months = [];
         try {
-            $begin = new DateTime('@' . $first_order_datetime);
-            $end = new DateTime('@' . $last_order_datetime);
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order_datetime));
+            $end = new DateTime(date('Y-m-d H:i:s', $last_order_datetime));
 
-            $end = $end->modify('last day of this month');
+            $end = $end->modify('last day of this month 00:00');
 
             while ($begin < $end) {
                 $result = [
                     'total' => 0,
                     'free' => 0,
-                    'fee' => 0,
+                    'pay' => 0,
                     'balance' => 0,
                 ];
 
-                $begin->modify('first day of this month');
-                $begin->modify('00:00:00');
+                $begin->modify('first day of this month 00:00');
+                $result['begin'] = $begin->format("Y-m-d H:i:s");
 
                 $t_begin = $begin->getTimestamp();
 
                 $month = $begin->format('Y-m-d');
                 $title = $begin->format('Y年m月');
 
-                $begin->modify('first day of next month');
+                $begin->modify('first day of next month 00:00');
                 $t_end = $begin->getTimestamp();
+                $result['end'] = $begin->format("Y-m-d H:i:s");
 
                 $free = Order::query()->where([
                     'device_id' => $device->getId(),
-                    'price' => 0,
-                    'balance' => 0,
+                    'src' => Order::ACCOUNT,
                     'createtime >=' => $t_begin,
                     'createtime <' => $t_end
                 ])->get('sum(num)');
 
                 $result['free'] = intval($free);
 
-                $fee = Order::query()->where([
+                $pay = Order::query()->where([
                     'device_id' => $device->getId(),
-                    'price >' => 0,
+                    'src' => Order::PAY,
                     'createtime >=' => $t_begin,
                     'createtime <' => $t_end,
                 ])->get('sum(num)');
 
-                $result['fee'] = intval($fee);
+                $result['pay'] = intval($pay);
 
                 $balance = Order::query()->where([
                     'device_id' => $device->getId(),
-                    'balance >' => 0,
+                    'src' => Order::BALANCE,
                     'createtime >=' => $t_begin,
                     'createtime <' => $t_end,
                 ])->get('sum(num)');
 
                 $result['balance'] = intval($balance);
 
-                $result['total'] = $result['fee'] + $result['free'] + $result['balance'];
+                $result['total'] = $result['pay'] + $result['free'] + $result['balance'];
                 $total_num += $result['total'];
 
                 $result['month'] = $month;
+
                 $months[$title] = $result;
             }
+
             return [$months, $total_num];
+
         } catch (Exception $e) {
+
         }
 
         return [];
     }, $device->getId());
-
+    
     $content = app()->fetchTemplate(
         'web/device/all_stats',
         [

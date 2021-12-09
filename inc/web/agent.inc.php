@@ -833,8 +833,8 @@ if ($op == 'default') {
         $months = [];
 
         try {
-            $begin = new DateTime('@' . $first_order->getCreatetime());
-            $end = new DateTime('@' . $last_order->getCreatetime());
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order->getCreatetime()));
+            $end = new DateTime(date('Y-m-d H:i:s', $last_order->getCreatetime()));
 
             $end = $end->modify('first day of next month');
             $end->modify('-1 day');
@@ -2199,7 +2199,7 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOfAgent($agent);
     if ($first_order) {
         try {
-            $begin = new DateTime('@' . $first_order->getCreatetime());
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order->getCreatetime()));
         } catch (Exception $e) {
             $begin = new DateTime();
         }

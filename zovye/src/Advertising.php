@@ -154,7 +154,7 @@ class Advertising extends State
     public static function setAdvsLastUpdate($type, $ts = null): bool
     {
         $ts = $ts ?? time();
-        return updateSettings("advs.version.type{$type}", $ts);
+        return updateSettings("advs.version.type$type", $ts);
     }
 
     /**
@@ -165,7 +165,7 @@ class Advertising extends State
     public static function version($obj)
     {
         $type = $obj instanceof advertisingModelObj ? $obj->getType() : intval($obj);
-        return settings("advs.version.type{$type}", 0);
+        return settings("advs.version.type$type", 0);
     }
 
     /**
@@ -328,19 +328,19 @@ class Advertising extends State
                 return err('创建失败！');
             }
 
-        } else {
-            $adv->setTitle($title);
-            foreach ($extra as $key => $val) {
-                $adv->setExtraData($key, $val);
-            }
         }
 
-        if ($adv && $adv->save()) {
+        $adv->setTitle($title);
+        foreach ($extra as $key => $val) {
+            $adv->setExtraData($key, $val);
+        }
+
+        if ($adv->save()) {
             //广告内容已变化
             $content_md5 = md5(http_build_query($extra));
-            if (empty($adv->settings("reviewData.{$content_md5}"))) {
+            if (empty($adv->settings("reviewData.$content_md5"))) {
                 $adv->updateSettings(
-                    "reviewData.{$content_md5}",
+                    "reviewData.$content_md5",
                     [
                         'result' => ReviewResult::WAIT,
                         'adv' => [
@@ -399,7 +399,7 @@ class Advertising extends State
             if ($adv) {
                 $current = $adv->settings('reviewData.current');
                 if ($current) {
-                    $data = $adv->settings("reviewData.{$current}", []);
+                    $data = $adv->settings("reviewData.$current", []);
                     $data['result'] = ReviewResult::PASSED;
                     $data['reviewer'] = [
                         'username' => $admin,
@@ -407,7 +407,7 @@ class Advertising extends State
                         'time' => TIMESTAMP,
                     ];
     
-                    if ($adv->updateSettings("reviewData.{$current}", $data) && Advertising::update($adv)) {
+                    if ($adv->updateSettings("reviewData.$current", $data) && Advertising::update($adv)) {
     
                         if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
                             //通知设备更新屏幕广告
@@ -435,7 +435,7 @@ class Advertising extends State
                     if ($current == $unknown) {
                         $adv->updateSettings('reviewData.current', $unknown);
                     }
-                    if ($adv->updateSettings("reviewData.{$current}.result", ReviewResult::REJECTED) && Advertising::update($adv)) {
+                    if ($adv->updateSettings("reviewData.$current.result", ReviewResult::REJECTED) && Advertising::update($adv)) {
                         Job::advReviewResult($adv->getId());
                         return true;
                     }

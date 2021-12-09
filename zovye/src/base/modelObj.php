@@ -16,7 +16,6 @@ use zovye\Settings;
 use zovye\traits\DirtyChecker;
 use zovye\traits\GettersAndSetters;
 use zovye\Util;
-use function zovye\app;
 use function zovye\getArray;
 use function zovye\ifEmpty;
 use function zovye\setArray;
@@ -108,9 +107,8 @@ class modelObj implements ISettings
 
         if ($name) {
             $res = $this->factory->__loadFromDb($this, $name, true);
-            if ($res !== false) {
+            if ($res) {
                 $this->$name = $res[$name];
-
                 return $this->$name;
             }
         }
@@ -143,7 +141,8 @@ class modelObj implements ISettings
         return false;
     }
 
-    public function settings(string $key, $default = null)
+
+    public function settings($key, $default = null)
     {
         if (empty($key)) {
             return $default;

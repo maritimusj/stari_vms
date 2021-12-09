@@ -94,11 +94,12 @@ class modelFactory
      * @param mixed $obj
      * @param array|mixed $seg_arr
      * @param bool $ignoreCache
-     * @return array|false
+     * @return array
      */
-    public function __loadFromDb($obj, $seg_arr = [], bool $ignoreCache = false)
+    public function __loadFromDb($obj, $seg_arr = [], bool $ignoreCache = false): array
     {
         $seg_arr = is_array($seg_arr) ? $seg_arr : [$seg_arr];
+
         /** @var modelObj $objClassname */
         $objClassname = $this->objClassname;
 

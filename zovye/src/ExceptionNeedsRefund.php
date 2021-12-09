@@ -18,7 +18,7 @@ class ExceptionNeedsRefund extends RuntimeException
     /**
      * @return deviceModelObj
      */
-    public function getDevice(): deviceModelObj
+    public function getDevice(): ?deviceModelObj
     {
         return $this->device;
     }

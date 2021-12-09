@@ -48,7 +48,7 @@ class modelObjFinder extends SqlParser
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return $this
      */
     public function where($condition = []): modelObjFinder
@@ -63,9 +63,9 @@ class modelObjFinder extends SqlParser
     /**
      * @param $condition
      * @param bool $or
-     * @return bool
+     * @return void
      */
-    private function parseCondition($condition, $or = false): bool
+    private function parseCondition($condition, bool $or = false): void
     {
         $res = parent::parseParameter($condition, $or ? 'OR' : 'AND');
         if (!is_error($res)) {
@@ -75,16 +75,14 @@ class modelObjFinder extends SqlParser
                 $this->condition[] = "{$res['fields']}";
             }
             $this->params = array_merge($this->params, $res['params']);
-            return true;
         } elseif (DEBUG) {
             trigger_error('sqlParser has occurred an error!', E_USER_ERROR);
         }
 
-        return false;
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @return $this
      */
     public function whereOr($condition = []): modelObjFinder
@@ -233,11 +231,11 @@ class modelObjFinder extends SqlParser
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @param bool $lazy
      * @return mixed
      */
-    public function findOne($condition = [], $lazy = false)
+    public function findOne($condition = [], bool $lazy = false)
     {
         $res = $this->limit(1)->findAll($condition, $lazy);
         if ($res) {
@@ -248,11 +246,11 @@ class modelObjFinder extends SqlParser
     }
 
     /**
-     * @param array $condition
+     * @param mixed $condition
      * @param bool $lazy
      * @return modelObjIterator|modelObjIteratorLazy
      */
-    public function findAll($condition = [], $lazy = false)
+    public function findAll($condition = [], bool $lazy = false)
     {
         $this->where($condition);
 

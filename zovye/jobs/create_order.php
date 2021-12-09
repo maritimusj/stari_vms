@@ -42,12 +42,11 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
         $refund = Helper::NeedAutoRefund($device);
         if ($refund) {
             $res = Job::refund($order_no, $e->getMessage());
-            if (empty($res) || is_error($res)) {
+            if (!$res) {
                 $device->appShowMessage('退款失败，请联系客服，谢谢！');
                  Log::fatal('order_create', [
                     'orderNO' => $order_no,
                     'msg' => '启动退款任务！',
-                    'error' => $res,
                 ]);
             } else {
                 $device->appShowMessage('正在退款，请稍后再试，谢谢！');

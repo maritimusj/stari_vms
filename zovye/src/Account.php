@@ -662,10 +662,6 @@ class Account extends State
      */
     public static function bind(array $objs, array $params = []): bool
     {
-        if (!is_array($objs)) {
-            return false;
-        }
-
         $accounts = [
             'classname' => m('account')->objClassname(),
             'list' => [],

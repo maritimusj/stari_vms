@@ -262,7 +262,7 @@ if ($op == 'list') {
                     Device::V0_STATUS_QOE => $entry->getQoe(),
                     Device::V0_STATUS_VOLTAGE => $entry->getV0Status(Device::V0_STATUS_VOLTAGE),
                     Device::V0_STATUS_COUNT => (int)$entry->getV0Status(Device::V0_STATUS_COUNT),
-                    Device::V0_STATUS_ERROR => $entry->getV0Status(Device::V0_STATUS_ERROR),
+                    Device::V0_STATUS_ERROR => $entry->getV0ErrorDescription(),
                 ],
                 'capacity' => intval($entry->getCapacity()),
                 'remain' => intval($entry->getRemainNum()),

@@ -414,6 +414,20 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("extra.v0.status.$name", $val);
     }
 
+    public function getV0ErrorDescription(): string
+    {
+        $error = $this->getV0Status(Device::V0_STATUS_ERROR);
+        if ($error) {
+            static $description = [
+                1 => '计数器故障',
+                2 => '卡膜',
+                3 => '电量低',
+            ];
+            return ($description[$error] ?? '未知') . "($error)";
+        }
+        return '';
+    }
+
     /**
      * 电量是否过低
      */

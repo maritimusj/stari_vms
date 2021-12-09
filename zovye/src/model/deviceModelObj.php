@@ -404,6 +404,16 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.v0.status.qoe', $qoe);
     }
 
+    public function getV0Status($name)
+    {
+        return $this->settings("extra.v0.status.$name");
+    }
+
+    public function setV0Status($name, $val): bool
+    {
+        return $this->updateSettings("extra.v0.status.$name", $val);
+    }
+
     /**
      * 电量是否过低
      */

@@ -493,8 +493,8 @@
                                 <input type="checkbox" id="downloadQRCode" :value="o.id" v-model="selectedInputCtrl">                                
                             </template>
                             <template v-else>
-                                <template v-if="o.lockedtime">
-                                    <i class="fa fa-lock" :title="'锁定时间：' + o.lockedtime" data-op="unlock" :data-index="index + 1"></i>
+                                <template v-if="o.lockedTime">
+                                    <i class="fa fa-lock" :title="'锁定时间：' + o.lockedTime" data-op="unlock" :data-index="index + 1"></i>
                                 </template>
                                 <template v-else>
                                     <template v-if="o.s1">
@@ -625,19 +625,43 @@
                                                     <div><span class="title">AppVersion：</span><span>{{o.appVersion ? o.appVersion : 'n/a'}}</span></div>
                                                 </template>
 
-                                                <template v-if="o.sig !== undefined && o.sig != -1">
+                                                <template v-if="o.v0_status && o.v0_status.sig !== undefined && o.v0_status.sig != -1">
                                                     <div>
                                                         <span class="title">信号强度：</span>
                                                         <div class="bar sig">
-                                                            <div :style="{minWidth:'2em', width: o.sig + '%'}">{{o.sig + '%'}}</div>
+                                                            <div :style="{minWidth:'2em', width: o.v0_status.sig + '%'}">{{o.v0_status.sig + '%'}}</div>
                                                         </div>
                                                     </div>
                                                 </template>
-                                                <template v-if="o.qoe != undefined && o.qoe != -1">
+                                                <template v-if="o.v0_status && o.v0_status.qoe != undefined && o.v0_status.qoe != -1">
                                                     <div>
                                                         <span class="title">电池电量：</span>
                                                         <div class="bar qoe">
-                                                            <div :style="{minWidth:'2em',width: o.qoe + '%'}">{{o.qoe + '%'}}</div>
+                                                            <div :style="{minWidth:'2em',width: o.v0_status.qoe + '%'}">{{o.v0_status.qoe + '%'}}</div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template v-if="o.v0_status && o.v0_status.voltage">
+                                                    <div>
+                                                        <span class="title">工作电压：</span>
+                                                        <div class="bar qoe">
+                                                            <span>{{o.v0_status.voltage}}</span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template v-if="o.v0_status && o.v0_status.count">
+                                                    <div>
+                                                        <span class="title">累计出货：</span>
+                                                        <div class="bar qoe">
+                                                            <span>{{o.v0_status.count}}</span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template v-if="o.v0_status && o.v0_status.error">
+                                                    <div>
+                                                        <span class="title">错误代码：</span>
+                                                        <div class="bar qoe">
+                                                            <span>{{o.v0_status.error}}</span>
                                                         </div>
                                                     </div>
                                                 </template>

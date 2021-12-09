@@ -106,8 +106,8 @@ if ($op == 'list') {
     $keyword = trim(urldecode(request('keyword')));
     if ($keyword) {
         $query->whereOr([
-            'imei LIKE' => "%{$keyword}%",
-            'name LIKE' => "%{$keyword}%",
+            'imei LIKE' => "%$keyword%",
+            'name LIKE' => "%$keyword%",
         ]);
     }
 
@@ -180,7 +180,7 @@ if ($op == 'list') {
         /** @var deviceModelObj $entry */
         foreach ($devices as $entry) {
             $data = [
-                'id' => intval($entry->getId()),
+                'id' => $entry->getId(),
                 'status' => [
                     'mcb' => false,
                     'app' => empty($entry->getAppId()) ? null : false,
@@ -249,7 +249,7 @@ if ($op == 'list') {
         /** @var deviceModelObj $entry */
         foreach ($devices as $entry) {
             $data = [
-                'id' => intval($entry->getId()),
+                'id' => $entry->getId(),
                 'name' => $entry->getName(),
                 'IMEI' => $entry->getImei(),
                 'ICCID' => $entry->getIccid(),
@@ -257,8 +257,13 @@ if ($op == 'list') {
                 'model' => $entry->getDeviceModel(),
                 'activeQrcode' => $entry->isActiveQrcodeEnabled(),
                 'getUrl' => $entry->getUrl(),
-                'sig' => $entry->getSig(),
-                'qoe' => $entry->getQoe(),
+                'v0_status' => [
+                    Device::V0_STATUS_SIG => $entry->getSig(),
+                    Device::V0_STATUS_QOE => $entry->getQoe(),
+                    Device::V0_STATUS_VOLTAGE => $entry->getV0Status(Device::V0_STATUS_VOLTAGE),
+                    Device::V0_STATUS_COUNT => $entry->getV0Status(Device::V0_STATUS_COUNT),
+                    Device::V0_STATUS_ERROR => $entry->getV0Status(Device::V0_STATUS_ERROR),
+                ],
                 'capacity' => intval($entry->getCapacity()),
                 'remain' => intval($entry->getRemainNum()),
                 'reset' => $entry->getReset(),
@@ -266,7 +271,7 @@ if ($op == 'list') {
                 'lastOnline' => $entry->getLastOnline() ? date('Y-m-d H:i:s', $entry->getLastOnline()) : '',
                 'lastPing' => $entry->getLastPing() ? date('Y-m-d H:i:s', $entry->getLastPing()) : '',
                 'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                'lockedtime' => $entry->isLocked() ? date('Y-m-d H:i:s', $entry->getLockedTime()) : '',
+                'lockedTime' => $entry->isLocked() ? date('Y-m-d H:i:s', $entry->getLockedTime()) : '',
                 'appId' => $entry->getAppId(),
                 'appVersion' => $entry->getAppVersion(),
                 'total' => [
@@ -281,7 +286,7 @@ if ($op == 'list') {
                     'web' => $entry->settings('extra.location.baidu.address', ''),
                     'agent' => $entry->settings('extra.location.tencent.address', ''),
                 ],
-                'isDown' => $entry->settings('extra.isDown', 0),
+                'isDown' => $entry->settings('extra.isDown', Device::STATUS_NORMAL),
             ];
 
             $groupId = $entry->getGroupId();
@@ -629,7 +634,7 @@ if ($op == 'list') {
         $tags = request::trim('tags');
         $extra = [
             'pushAccountMsg' => request::trim('pushAccountMsg'),
-            'isDown' => request::bool('isDown') ? 1 : 0,
+            'isDown' => request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::NORMAL_DEVICE,
             'activeQrcode' => request::bool('activeQrcode') ? 1 : 0,
             'address' => request::trim('address'),
             'grantloc' => [
@@ -813,7 +818,7 @@ if ($op == 'list') {
                 'num' => '@' . max(0, request::int("lane{$index}_num")),
             ];
             if ($device_type->getDeviceId() == $device->getId()) {
-                $cargo_lanes[$index]['price'] = request::float("price{$index}", 0, 2) * 100;
+                $cargo_lanes[$index]['price'] = request::float("price$index", 0, 2) * 100;
             }
         }
 
@@ -1049,6 +1054,7 @@ if ($op == 'list') {
 
     $packages = [];
     $query = Package::query(['device_id' => $device->getId()]);
+    /** @var packageModelObj $i */
     foreach ($query->findAll() as $i) {
         $packages[] = $i->format(true);
     }
@@ -1174,7 +1180,7 @@ if ($op == 'list') {
     foreach ($query->findAll() as $entry) {
         $data = [
             'id' => $entry->getId(),
-            'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'imei' => $entry->getTitle(),
             'title' => Device::formatPullTitle($entry->getLevel()),
             'goods' => $entry->getData('goods'),
@@ -1185,7 +1191,7 @@ if ($op == 'list') {
 
         $result = $entry->getData('result');
         if (is_array($result)) {
-            $result_data = isset($result['data']) ? $result['data'] : $result;
+            $result_data = $result['data'] ?? $result;
             if (isset($result_data['errno'])) {
                 $data['result'] = [
                     'errno' => intval($result_data['errno']),
@@ -1255,7 +1261,7 @@ if ($op == 'list') {
         $query->where(['event' => request('event')]);
     }
 
-    $detail = request('detail') ? true : false;
+    $detail = request::bool('detail');
 
     $page = max(1, request::int('page'));
     $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -1275,7 +1281,7 @@ if ($op == 'list') {
     foreach ($query->findAll() as $entry) {
         $data = [
             'id' => $entry->getId(),
-            'createtime_foramtted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'event' => $entry->getEvent(),
         ];
         if ($device->isBlueToothDevice()) {
@@ -1315,7 +1321,7 @@ if ($op == 'list') {
             'chartid' => Util::random(10),
             'title' => $title,
             'chart' => Util::cachedCall(30, function () use ($device, $title) {
-                return Stats::chartDataOfDay($device, time(), "设备：{$device->getName()}({$title})");
+                return Stats::chartDataOfDay($device, time(), "设备：{$device->getName()}($title)");
             }, $device->getId()),
         ]
     );
@@ -1341,7 +1347,7 @@ if ($op == 'list') {
             'chartid' => Util::random(10),
             'title' => $title,
             'chart' => Util::cachedCall(30, function () use ($device, $month, $title) {
-                return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}({$title})");
+                return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}($title)");
             }, $device->getId(), $month),
         ]
     );
@@ -1547,7 +1553,7 @@ if ($op == 'list') {
     $id = request::int('id');
     if ($id) {
         $device = Device::get($id);
-        if ($device && $device->updateSettings('extra.isDown', 0) && $device->save()) {
+        if ($device && $device->updateSettings('extra.isDown', Device::STATUS_NORMAL) && $device->save()) {
             JSON::success('维护状态已取消！');
         }
     }
@@ -1689,12 +1695,13 @@ if ($op == 'list') {
         'list' => [],
     ];
 
+    /** @var device_groupsModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $result['list'][] = [
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
-            'total' => (int)Device::query(['group_id' => $entry->getId()])->count(),
+            'total' => Device::query(['group_id' => $entry->getId()])->count(),
         ];
     }
 
@@ -1721,9 +1728,10 @@ if ($op == 'list') {
     }
 
     $result = [];
+    /** @var device_groupsModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $data = [
-            'id' => intval($entry->getId()),
+            'id' => $entry->getId(),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
             'createtime' => date('Y-m-d H:i', $entry->getCreatetime()),
@@ -1773,14 +1781,14 @@ if ($op == 'list') {
     $query->page($page, $page_size);
 
     $list = [];
-    /** @var device_groupsModelObj */
+    /** @var device_groupsModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $data = [
             'id' => $entry->getId(),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
             'total' => Device::query(['group_id' => $entry->getId()])->count(),
-            'createtime_foramtted' => date('Y-m-d H:i', $entry->getCreatetime()),
+            'createtime_formatted' => date('Y-m-d H:i', $entry->getCreatetime()),
         ];
         $agent = $entry->getAgent();
         if ($agent) {
@@ -1797,7 +1805,7 @@ if ($op == 'list') {
     $tpl_data['groups'] = $list;
     $tpl_data['filter'] = $filter;
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
-    $tpl_data['agentId'] = isset($agent_id) ? $agent_id : null;
+    $tpl_data['agentId'] = $agent_id ?? null;
     $tpl_data['navs'] = $navs;
 
     app()->showTemplate('web/device/new_group', $tpl_data);
@@ -1807,6 +1815,7 @@ if ($op == 'list') {
     $tpl_data['clr'] = Util::randColor();
 
     app()->showTemplate('web/device/new_group', $tpl_data);
+
 } elseif ($op == 'new_group_edit') {
 
     $id = request::int('id');
@@ -1823,15 +1832,13 @@ if ($op == 'list') {
         'clr' => $one->getClr(),
     ];
 
-    if ($one) {
-        $agent = $one->getAgent();
-        if (!empty($agent)) {
-            $tpl_data['agent'] = [
-                'id' => $agent->getId(),
-                'name' => $agent->getName(),
-                'mobile' => $agent->getMobile(),
-            ];
-        }
+    $agent = $one->getAgent();
+    if (!empty($agent)) {
+        $tpl_data['agent'] = [
+            'id' => $agent->getId(),
+            'name' => $agent->getName(),
+            'mobile' => $agent->getMobile(),
+        ];
     }
 
     app()->showTemplate('web/device/new_group', $tpl_data);
@@ -1912,8 +1919,8 @@ if ($op == 'list') {
     $user_ids = [];
     if ($nickname != '') {
         $user_res = User::query()->whereOr([
-            'nickname LIKE' => "%{$nickname}%",
-            'mobile LIKE' => "%{$nickname}%",
+            'nickname LIKE' => "%$nickname%",
+            'mobile LIKE' => "%$nickname%",
         ])->findAll();
         foreach ($user_res as $item) {
             $user_ids[] = $item->getId();

@@ -45,6 +45,12 @@ class Device extends State
     const STATUS_NORMAL = 0;
     const STATUS_MAINTENANCE = 1;
 
+    const V0_STATUS_QOE = 'qoe';
+    const V0_STATUS_SIG = 'sig';
+    const V0_STATUS_VOLTAGE = 'voltage';
+    const V0_STATUS_COUNT = 'count';
+    const V0_STATUS_ERROR = 'error';
+
     private static $cache = [];
 
     public static function objClassname(): string

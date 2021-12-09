@@ -677,6 +677,18 @@ class DeviceEventProcessor
                 $device->setQoe($data['extra']['qoe']);
             }
 
+            if (isset($data['extra']['voltage'])) {
+                $device->setV0Status(Device::V0_STATUS_VOLTAGE, $data['extra']['voltage']);
+            }
+
+            if (isset($data['extra']['count'])) {
+                $device->setV0Status(Device::V0_STATUS_COUNT, $data['extra']['count']);
+            }
+
+            if (isset($data['extra']['error'])) {
+                $device->setV0Status(Device::V0_STATUS_ERROR, $data['extra']['error']);
+            }
+
             $LED_status = $device->hasMcbDisp();
             $device->updateMcbStatus($data['extra']);
 

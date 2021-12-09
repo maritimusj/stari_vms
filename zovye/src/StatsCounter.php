@@ -61,6 +61,8 @@ abstract class StatsCounter
         $total = 0;
         $time_arr = [];
 
+        $uid = '';
+
         foreach ($days as $day) {
             $uid = $this->makeUID(array_merge(['datetime' => $day->format('Ymd')], $params));
 
@@ -90,7 +92,7 @@ abstract class StatsCounter
 
         $total += $this->getHour($params, ...$time_arr);
 
-        if ($day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
+        if (isset($day) && $day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
             Counter::create([
                 'uid' => $uid,
                 'num' => $total,

@@ -93,7 +93,7 @@ class balance
      * @param $amount
      * @return array
      */
-    public static function balanceWithdraw($user, $amount): array
+    public static function balanceWithdraw(userModelObj $user, $amount): array
     {
         //先锁定用户，防止恶意重复提交
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
@@ -293,8 +293,8 @@ class balance
      */
     public static function getUserBalanceLog(userModelObj $user, string $type, int $page = 0, int $page_size = DEFAULT_PAGE_SIZE): array
     {
-        $page = max(1, intval($page));
-        $page_size = !empty($page_size) ? max(1, intval($page_size)) : DEFAULT_PAGE_SIZE;
+        $page = max(1, $page);
+        $page_size = !empty($page_size) ? max(1, $page_size) : DEFAULT_PAGE_SIZE;
 
         $balance = $user->getCommissionBalance();
         $query = $balance->log();
@@ -392,7 +392,7 @@ class balance
                             }
 
                             $username = $user ? $user->getNickname() : '未知';
-                            $data['memo'] = "<{$username}>{$account_info}在设备[ {$device_name} ]上{$spec}，获得{$subtitle}！";
+                            $data['memo'] = "<$username>{$account_info}在设备[ $device_name ]上{$spec}，获得{$subtitle}！";
                         }
                     }
                 }

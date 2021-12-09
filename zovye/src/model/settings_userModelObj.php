@@ -9,6 +9,9 @@ use zovye\base\modelObj;
 
 use function zovye\tb;
 
+/**
+ * @method getName()
+ */
 class settings_userModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

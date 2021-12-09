@@ -155,9 +155,8 @@ if ($op == 'default') {
 
         if ($user->isAgent()) {
             $agent = $user->agent();
-            if ($agent) {
-                $data['agent'] = $agent->getAgentLevel();
-            }
+            $data['agent'] = $agent->getAgentLevel();
+
         } elseif ($user->isPartner()) {
             $agent = $user->getPartnerAgent();
             if ($agent) {
@@ -213,35 +212,33 @@ if ($op == 'default') {
 
     $result = [];
 
-    if (is_array($ids)) {
-        $commission_enabled = App::isCommissionEnabled();
-        $balance_enabled = App::isBalanceEnabled();
+    $commission_enabled = App::isCommissionEnabled();
+    $balance_enabled = App::isBalanceEnabled();
 
-        $query = User::query(['id' => $ids]);
+    $query = User::query(['id' => $ids]);
 
-        /** @var userModelObj $user */
-        foreach ($query->findAll() as $user) {
-            if ($user) {
-                $data = [
-                    'id' => $user->getId(),
-                    'free' => $user->getFreeTotal(),
-                    'pay' => $user->getPayTotal(),
-                ];
+    /** @var userModelObj $user */
+    foreach ($query->findAll() as $user) {
+        if ($user) {
+            $data = [
+                'id' => $user->getId(),
+                'free' => $user->getFreeTotal(),
+                'pay' => $user->getPayTotal(),
+            ];
 
-                if ($commission_enabled) {
-                    $total = $user->getCommissionBalance()->total();
-                    if ($user->isAgent() || $user->isGSPor() || $user->isKeeper() || $user->isPartner()) {
-                        $data['commission_balance'] = $total;
-                        $data['commission_balance_formatted'] = number_format($total / 100, 2);
-                    }
+            if ($commission_enabled) {
+                $total = $user->getCommissionBalance()->total();
+                if ($user->isAgent() || $user->isGSPor() || $user->isKeeper() || $user->isPartner()) {
+                    $data['commission_balance'] = $total;
+                    $data['commission_balance_formatted'] = number_format($total / 100, 2);
                 }
-
-                if ($balance_enabled) {
-                    $data['balance'] = $user->getBalance()->total();
-                }
-
-                $result[] = $data;
             }
+
+            if ($balance_enabled) {
+                $data['balance'] = $user->getBalance()->total();
+            }
+
+            $result[] = $data;
         }
     }
 

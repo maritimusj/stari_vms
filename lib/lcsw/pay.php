@@ -45,7 +45,7 @@ class pay
             if ($key == 'key_sign') {
                 continue;
             }
-            $arr[] = "{$key}={$val}";
+            $arr[] = "$key=$val";
         }
 
         $arr[] = "access_token={$this->config['access_token']}";
@@ -97,7 +97,7 @@ class pay
 
         $data['key_sign'] = $this->sign($data, true);
 
-        return $this->requestApi("{$this->api}{$path}", $data);
+        return $this->requestApi("$this->api$path", $data);
     }
 
     public function xAppPay($params = [])
@@ -124,7 +124,7 @@ class pay
         $data['attach'] = $params['deviceUID'];
         $data['order_body'] = $params['body'];
                 
-        return $this->requestApi("{$this->api}{$path}", $data);
+        return $this->requestApi("$this->api$path", $data);
     }
 
 
@@ -153,7 +153,7 @@ class pay
         $data['order_body'] = $params['body'];
         
        
-        return $this->requestApi("{$this->api}{$path}", $data);
+        return $this->requestApi("$this->api$path", $data);
     }   
 
     public function queryOrder($uid)
@@ -172,7 +172,7 @@ class pay
 
         $params['key_sign'] = $this->sign($params);
 
-        return $this->requestApi("{$this->api}{$path}", $params);
+        return $this->requestApi("$this->api$path", $params);
     }
 
     public function doRefund($out_trade_no, $total_fee, $pay_type, $serial = '')
@@ -193,6 +193,6 @@ class pay
 
         $params['key_sign'] = $this->sign($params);
 
-        return $this->requestApi("{$this->api}{$path}", $params);
+        return $this->requestApi("$this->api$path", $params);
     }
 }

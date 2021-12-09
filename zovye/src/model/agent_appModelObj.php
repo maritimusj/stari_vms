@@ -47,7 +47,7 @@ class agent_appModelObj extends modelObj
             'first' => ['value' => '代理商申请通知'],
             'keyword1' => ['value' => $this->name],
             'keyword2' => ['value' => $this->mobile],
-            'remark' => ['value' => "区域：{$this->address}，推荐人：{$this->referee}，日期：{$datetime}"],
+            'remark' => ['value' => "区域：{$this->address}，推荐人：{$this->referee}，日期：$datetime"],
         ];
     }
 

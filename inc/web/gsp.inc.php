@@ -30,7 +30,7 @@ if ($op == 'search') {
     /** @var  userModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $result[] = [
-            'id' => intval($entry->getId()),
+            'id' => $entry->getId(),
             'openid' => $entry->getOpenid(),
             'nickname' => $entry->getNickname(),
             'name' => $entry->getName(),

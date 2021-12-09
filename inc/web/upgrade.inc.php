@@ -81,7 +81,7 @@ if ($op == 'apk') {
             ]
         );
 
-        JSON::success(['title' => "请选择要升级的版本(设备：{$device_name})", 'content' => $content]);
+        JSON::success(['title' => "请选择要升级的版本(设备：$device_name)", 'content' => $content]);
     }
 
     app()->showTemplate('web/version/upgrade', [

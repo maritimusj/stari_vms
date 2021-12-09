@@ -13,6 +13,11 @@ use function zovye\tb;
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
+/**
+ * @method getRequestId()
+ * @method getRequest()
+ * @method getResult()
+ */
 class account_queryModelObj extends modelObj
 {
 	public static function getTableName($readOrWrite): string
@@ -48,18 +53,18 @@ class account_queryModelObj extends modelObj
 
 	use ExtraDataGettersAndSetters;
 
-	public function getAccount()
-	{
+	public function getAccount(): ?accountModelObj
+    {
 		return Account::get($this->account_id);
 	}
 
-	public function getUser()
-	{
+	public function getUser(): ?userModelObj
+    {
 		return User::get($this->user_id);
 	}
 
-	public function getDevice()
-	{
+	public function getDevice(): ?deviceModelObj
+    {
 		return Device::get($this->device_id);
 	}
 }

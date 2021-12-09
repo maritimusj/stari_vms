@@ -16,6 +16,7 @@ use QRcode;
 use RuntimeException;
 use Throwable;
 use we7\ihttp;
+use WeAccount;
 use zovye\base\modelObj;
 use zovye\model\accountModelObj;
 use zovye\model\keeperModelObj;
@@ -182,7 +183,7 @@ class Util
         if ($openid) {
             if ($update) {
                 $userinfo = self::cachedCall(6, function () use ($openid) {
-                    $oauth_account = \WeAccount::createByUniacid();
+                    $oauth_account = WeAccount::createByUniacid();
                     $userinfo = $oauth_account->fansQueryInfo($openid);
                     $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
                     $userinfo['avatar'] = $userinfo['headimgurl'];

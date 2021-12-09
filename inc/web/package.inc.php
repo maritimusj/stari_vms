@@ -7,6 +7,7 @@
 namespace zovye;
 
 use RuntimeException;
+use zovye\model\packageModelObj;
 
 $op = request::op('default');
 
@@ -23,6 +24,8 @@ if ($op == 'list') {
     $query->orderBy('id ASC');
 
     $result = [];
+
+    /** @var packageModelObj $entry */
     foreach($query->findAll() as $entry) {
         $result[] = $entry->format(true);
     }

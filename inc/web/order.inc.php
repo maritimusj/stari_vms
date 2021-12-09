@@ -9,7 +9,6 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
-use zovye\model\device_logsModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\user_logsModelObj;
 
@@ -93,8 +92,8 @@ if ($op == 'default') {
     $keyword = request::str('keyword');
     if ($keyword) {
         $query->whereOr([
-            'nickname LIKE' => "%{$keyword}%",
-            'account LIKE' => "%{$keyword}%",
+            'nickname LIKE' => "%$keyword%",
+            'account LIKE' => "%$keyword%",
         ]);
 
         $tpl_data['s_keyword'] = $keyword;
@@ -103,8 +102,8 @@ if ($op == 'default') {
     $order_no = request::str('order');
     if ($order_no) {
         $query->whereOr([
-            'order_id LIKE' => "%{$order_no}%",
-            'extra REGEXP' => "\"transaction_id\":\"[0-9]*{$order_no}[0-9]*\"",
+            'order_id LIKE' => "%$order_no%",
+            'extra REGEXP' => "\"transaction_id\":\"[0-9]*$order_no[0-9]*\"",
         ]);
         $tpl_data['s_order'] = $order_no;
     }
@@ -272,7 +271,7 @@ if ($op == 'default') {
         $content = app()->fetchTemplate('web/order/list', $data);
 
         JSON::success([
-            'title' => $user ? '<b>' . $user->getName() . '</b>的订单列表' : '',
+            'title' => isset($user) ? '<b>' . $user->getName() . '</b>的订单列表' : '',
             'content' => $content,
         ]);
     }
@@ -306,7 +305,7 @@ if ($op == 'default') {
     }
 
     $pay_result = $order->getExtraData('payResult');
-    $data['transaction_id'] = isset($pay_result['transaction_id']) ? $pay_result['transaction_id'] : (isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $data['orderId']);
+    $data['transaction_id'] = $pay_result['transaction_id'] ?? ($pay_result['uniontid'] ?? $data['orderId']);
 
     $tpl = [
         'order' => $data,
@@ -488,7 +487,7 @@ if ($op == 'default') {
     $result = [];
 
     /** @var orderModelObj $entry */
-    foreach ($query->findAll() as $index => $entry) {
+    foreach ($query->findAll() as $entry) {
 
         $user = User::get($entry->getOpenid(), true);
         $goods = Goods::data($entry->getGoodsId());
@@ -618,7 +617,7 @@ if ($op == 'default') {
 
     $all_headers = getHeaders();
     $column = array_values(array_intersect_key($all_headers, array_flip($headers)));  
-    $filename =  "export/{$uid}.xls";
+    $filename =  "export/$uid.xls";
 
     Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
 

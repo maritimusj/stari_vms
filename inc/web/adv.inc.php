@@ -133,7 +133,7 @@ if ($op == 'default') {
 
     $keywords = trim(urldecode(request('keywords')));
     if ($keywords) {
-        $query->where(['title LIKE' => "%{$keywords}%"]);
+        $query->where(['title LIKE' => "%$keywords%"]);
         $tpl_data['keywords'] = $keywords;
     }
 
@@ -141,7 +141,7 @@ if ($op == 'default') {
         $filter_media = request::trim('media');
         if (in_array($filter_media, ['image', 'video', 'audio', 'srt'])) {
             $len = strlen($filter_media);
-            $query->where(['extra LIKE' => "%s:5:\"media\";s:{$len}:\"{$filter_media}\"%"]);
+            $query->where(['extra LIKE' => "%s:5:\"media\";s:$len:\"$filter_media\"%"]);
 
             $url_params['media'] = $filter_media;
             $tpl_data['filter_media'] = $filter_media;
@@ -149,7 +149,7 @@ if ($op == 'default') {
     } elseif ($type == Advertising::PUSH_MSG) {
         $filter_msg_type = request::trim('msgtype');
         if (in_array($filter_msg_type, ['image', 'mpnews', 'text'])) {
-            $query->where(['extra REGEXP' => "s:4:\"type\";s:.+:\"{$filter_msg_type}\""]);
+            $query->where(['extra REGEXP' => "s:4:\"type\";s:.+:\"$filter_msg_type\""]);
 
             $url_params['msgtype'] = $filter_msg_type;
             $tpl_data['filter_msgtype'] = $filter_msg_type;
@@ -172,14 +172,14 @@ if ($op == 'default') {
         /** @var advertisingModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = [
-                'id' => intval($entry->getId()),
+                'id' => $entry->getId(),
                 'agentId' => intval($entry->getAgentId()),
                 'type' => intval($entry->getType()),
                 'state' => intval($entry->getState()),
                 'type_formatted' => Advertising::desc(intval($entry->getType())),
                 'title' => strval($entry->getTitle()),
                 'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                'assigned' => isEmptyArray($entry->settings('assigned', [])) ? false : true,
+                'assigned' => !isEmptyArray($entry->settings('assigned', [])),
             ];
 
             $data['state_formatted'] = $entry->getState() == Advertising::NORMAL ? 'normal' : 'banned';
@@ -222,11 +222,11 @@ if ($op == 'default') {
                 $data['count'] = count($entry->getExtraData('images'));
                 $data['link'] = $entry->getExtraData('link');
 
-            } elseif (in_array($type, [Advertising::REDIRECT_URL])) {
+            } elseif ($type == Advertising::REDIRECT_URL) {
 
                 $data['url'] = $entry->getExtraData('url');
 
-            } elseif (in_array($type, [Advertising::PUSH_MSG])) {
+            } elseif ($type == Advertising::PUSH_MSG) {
 
                 $data['msg_type'] = $entry->getExtraData('msg.type');
                 $data['msg_typename'] = $wx_data[$data['msg_type']]['title'];
@@ -306,7 +306,7 @@ if ($op == 'default') {
     }
 
     $adv = [
-        'id' => intval($res->getId()),
+        'id' => $res->getId(),
         'state' => intval($res->getState()),
         'agentId' => intval($res->getAgentId()),
         'type' => intval($res->getType()),
@@ -413,7 +413,7 @@ if ($op == 'default') {
                 $tpl_data['app_path'] = $adv->getExtraData('app_path');
             }
 
-        } elseif (in_array($type, [Advertising::REDIRECT_URL])) {
+        } elseif ($type == Advertising::REDIRECT_URL) {
 
             $tpl_data['url'] = $adv->getExtraData('url', '');
             $tpl_data['delay'] = $adv->getExtraData('delay', 10);
@@ -425,7 +425,7 @@ if ($op == 'default') {
                 ]
             );
 
-        } elseif (in_array($type, [Advertising::PUSH_MSG])) {
+        } elseif ($type == Advertising::PUSH_MSG) {
 
             $tpl_data['delay'] = $adv->getExtraData('delay');
             $tpl_data['msg'] = $adv->getExtraData('msg');
@@ -631,4 +631,4 @@ if ($op == 'default') {
 }
 
 $filename = Advertising::$names[$type];
-app()->showTemplate("web/adv/{$filename}", $tpl_data);
+app()->showTemplate("web/adv/$filename", $tpl_data);

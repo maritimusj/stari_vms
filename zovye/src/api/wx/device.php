@@ -45,7 +45,7 @@ class device
      *
      * @return array
      */
-    public static function formatDeviceInfo(userModelObj $user, deviceModelObj $device, $simple = false, $keeper_id = 0, $online = false): array
+    public static function formatDeviceInfo(userModelObj $user, deviceModelObj $device, bool $simple = false, int $keeper_id = 0, bool $online = false): array
     {
         unset($user);
 
@@ -595,8 +595,8 @@ class device
             $keyword = request::trim('keyword');
             if ($keyword) {
                 $query->whereOr([
-                    'name LIKE' => "%{$keyword}%",
-                    'imei LIKE' => "%{$keyword}%",
+                    'name LIKE' => "%$keyword%",
+                    'imei LIKE' => "%$keyword%",
                 ]);
             }
         }
@@ -632,7 +632,7 @@ class device
                     $order_by = 'imei';
                 }
                 $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(request::str('order')) : 'ASC';
-                $query->orderBy("{$order_by} {$order}");
+                $query->orderBy("$order_by $order");
             } else {
                 $query->orderBy('rank DESC, id DESC');
             }
@@ -878,8 +878,8 @@ class device
         if (request::has('keyword')) {
             $keyword = request::trim('keyword');
             $query->where([
-                'name LIKE' => "%{$keyword}%",
-                'imei LIKE' => "%{$keyword}%",
+                'name LIKE' => "%$keyword%",
+                'imei LIKE' => "%$keyword%",
             ]);
         }
 
@@ -895,7 +895,7 @@ class device
                     $order_by = 'imei';
                 }
                 $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(request::str('order')) : 'ASC';
-                $query->orderBy("{$order_by} {$order}");
+                $query->orderBy("$order_by $order");
             } else {
                 $query->orderBy('name ASC');
             }

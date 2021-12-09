@@ -212,7 +212,7 @@ class commission
         $gsp = $agent->settings('agentData.gsp');
         if ($gsp['enabled']) {
             if ($gsp['mode'] == 'rel') {
-                if ($agent->updateSettings("agentData.gsp.rel.level{$level}", $val)) {
+                if ($agent->updateSettings("agentData.gsp.rel.level$level", $val)) {
                     return ['msg' => '设置成功！'];
                 } else {
                     return error(State::ERROR, '保存失败，请与管理员联系！[101]');

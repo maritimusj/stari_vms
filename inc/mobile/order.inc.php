@@ -338,10 +338,10 @@ if ($op === 'create') {
     //
     $way = request::str('way');
     if ($way == 'free') {
-        $condition['price'] = 0;
-    } elseif ($way == 'fee') {
-        $condition['price >'] = 0;
-    } elseif (isset($device) || isset($user)) {
+        $condition['src'] = Order::ACCOUNT;
+    } elseif ($way == 'pay') {
+        $condition['src'] = Order::PAY;
+    } elseif (isset($device)) {
         $way = 'spec';
     }
 
@@ -370,7 +370,6 @@ if ($op === 'create') {
             'orderId' => $entry->getOrderId(),
             'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'agentId' => $entry->getAgentId(),
-            'type' => '',
             'status' => '',
         ];
 
@@ -402,13 +401,13 @@ if ($op === 'create') {
         if ($data['price'] > 0 && $entry->getExtraData('refund')) {
             $time = $entry->getExtraData('refund.createtime');
             $time_formatted = date('Y-m-d H:i:s', $time);
-            $data['refund'] = "已退款，退款时间：{$time_formatted}";
+            $data['refund'] = "已退款，退款时间：$time_formatted";
             $data['clr'] = '#8bc34a';
         }
 
         $pay_result = $entry->getExtraData('payResult');
         if ($pay_result['result'] === 'success') {
-            $data['uniontid'] = isset($pay_result['uniontid']) ? $pay_result['uniontid'] : $pay_result['transaction_id'];
+            $data['uniontid'] = $pay_result['uniontid'] ?? $pay_result['transaction_id'];
         }
 
         //出货结果
@@ -500,7 +499,7 @@ const zovye_fn = {};
 
 zovye_fn.get_list = function(way, page, pagesize) {
   return new Promise((resolve) => {
-     $.getJSON("{$api_url}", {op: 'list', way, page, pagesize}).then(function(res) {
+     $.getJSON("$api_url", {op: 'list', way, page, pagesize}).then(function(res) {
         resolve(res);
      });
   });
@@ -511,12 +510,12 @@ zovye_fn.get_free_list = function(page, pagesize) {
 }
 
 zovye_fn.get_fee_list = function(page, pagesize) {
-    return zovye_fn.get_list('fee', page, pagesize);
+    return zovye_fn.get_list('pay', page, pagesize);
 }
 
 zovye_fn.get_order_detail =function(orderNO) {
     return new Promise((resolve, reject) => {
-        $.getJSON("{$api_url}", {op: 'detail', orderNO}).then(function(res) {
+        $.getJSON("$api_url", {op: 'detail', orderNO}).then(function(res) {
             if (res && res.status) {
                 resolve(res);
             } else {

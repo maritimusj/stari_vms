@@ -24,6 +24,7 @@ use zovye\Device;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\DeviceTypes;
+use zovye\model\settings_userModelObj;
 use zovye\request;
 use zovye\Job;
 use zovye\JSON;
@@ -83,7 +84,7 @@ class agent
             $session_key = $login_data->getSessionKey() ?: _W('token');
 
             /** @var userModelObj $res */
-            $res = User::findOne("SHA1(CONCAT('{$session_key}', id))='{$guid}'");
+            $res = User::findOne("SHA1(CONCAT('$session_key', id))='$guid'");
             if ($res) {
                 if ($res->isAgent()) {
                     return $res->agent();
@@ -129,7 +130,7 @@ class agent
                 $entry->destroy();
             }
 
-            $token = sha1(time() . "{$mobile}{$session_key}");
+            $token = sha1(time() . "$mobile$session_key");
             $data = [
                 'src' => LoginData::AGENT,
                 'user_id' => $user->getId(),
@@ -466,8 +467,8 @@ class agent
             $keyword = request::trim('keyword');
             if ($keyword) {
                 $query->whereOr([
-                    'name LIKE' => "%{$keyword}%",
-                    'imei LIKE' => "%{$keyword}%",
+                    'name LIKE' => "%$keyword%",
+                    'imei LIKE' => "%$keyword%",
                 ]);
             }
         }
@@ -1217,8 +1218,8 @@ class agent
         $keyword = request::trim('keyword');
         if ($keyword) {
             $query->whereOr([
-                'name LIKE' => "%{$keyword}%",
-                'mobile LIKE' => "%{$keyword}%",
+                'name LIKE' => "%$keyword%",
+                'mobile LIKE' => "%$keyword%",
             ]);
         }
 
@@ -1249,7 +1250,7 @@ class agent
             'pagesize' => $page_size,
             'totalpage' => ceil($total / $page_size),
             'total' => $total,
-            'sup_guid' => "{$superior_guid}",
+            'sup_guid' => "$superior_guid",
             'list' => [],
             'remove' => (bool)$user->settings('agentData.misc.power')
         ];
@@ -1262,31 +1263,29 @@ class agent
             foreach ($query->findAll() as $entry) {
                 $agent = $entry->agent();
 
-                if ($agent instanceof agentModelObj) {
-                    $agent_data = $agent->getAgentData();
+                $agent_data = $agent->getAgentData();
 
-                    $data = [
-                        'guid' => common::getGUID($agent),
-                        'name' => $agent->getName(),
-                        'avatar' => $agent->getAvatar(),
-                        'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
-                        'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
-                        'level' => $agent_levels[$agent_data['level']],
-                        'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
-                        'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
-                    ];
+                $data = [
+                    'guid' => common::getGUID($agent),
+                    'name' => $agent->getName(),
+                    'avatar' => $agent->getAvatar(),
+                    'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
+                    'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
+                    'level' => $agent_levels[$agent_data['level']],
+                    'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
+                    'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
+                ];
 
-                    $gsp = $agent->settings('agentData.gsp', []);
-                    if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
-                        foreach ((array)$gsp['rel'] as $level => $val) {
-                            $gsp['rel'][$level] = number_format($val / 100, 2);
-                        }
-                        $data['gsp_rel'] = $gsp['rel'];
-                        $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
+                $gsp = $agent->settings('agentData.gsp', []);
+                if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
+                    foreach ((array)$gsp['rel'] as $level => $val) {
+                        $gsp['rel'][$level] = number_format($val / 100, 2);
                     }
-
-                    $result['list'][] = $data;
+                    $data['gsp_rel'] = $gsp['rel'];
+                    $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
                 }
+
+                $result['list'][] = $data;
             }
         }
 
@@ -1336,19 +1335,18 @@ class agent
 
         $s_query = m('settings_user');
         $s_arr = [];
-        if ($s_query) {
-            $s_query = $s_query->query(We7::uniacid([]))->where(['name LIKE' => '%partnerData']);
-            $s_res = $s_query->findAll();
-            $_reg = '/.+:(.+):.+/';
-            foreach ($s_res as $val) {
-                $s_data = unserialize($val->getData());
-                $s_agent = $s_data['agent'] ?? '';
-                if ($s_agent == $agent->getId()) {
-                    $str = $val->getName();
-                    preg_match($_reg, $str, $mat);
-                    if (isset($mat[1])) {
-                        $s_arr[] = $mat[1];
-                    }
+        $s_query = $s_query->query(We7::uniacid([]))->where(['name LIKE' => '%partnerData']);
+        $s_res = $s_query->findAll();
+        $_reg = '/.+:(.+):.+/';
+        /** @var settings_userModelObj $val */
+        foreach ($s_res as $val) {
+            $s_data = unserialize($val->getData());
+            $s_agent = $s_data['agent'] ?? '';
+            if ($s_agent == $agent->getId()) {
+                $str = $val->getName();
+                preg_match($_reg, $str, $mat);
+                if (isset($mat[1])) {
+                    $s_arr[] = $mat[1];
                 }
             }
         }
@@ -1474,46 +1472,43 @@ class agent
                     /** @var  userModelObj $entry */
                     foreach ($query->findAll() as $entry) {
                         $agent = $entry->agent();
-
-                        if ($agent instanceof agentModelObj) {
-                            $agent_data = $agent->getAgentData();
-                            if ($keyword) {
-                                $h_key = false;
-                                if (strpos($entry->getNickname(), $keyword) !== false) {
-                                    $h_key = true;
-                                }
-                                if (strpos($entry->getMobile(), $keyword) !== false) {
-                                    $h_key = true;
-                                }
-                                $a_name = $agent_data['name'] ?: $agent->getNickname();
-                                if (strpos($a_name, $keyword) !== false) {
-                                    $h_key = true;
-                                }
-                            } else {
+                        $agent_data = $agent->getAgentData();
+                        if ($keyword) {
+                            $h_key = false;
+                            if (strpos($entry->getNickname(), $keyword) !== false) {
                                 $h_key = true;
                             }
-                            if ($h_key) {
-                                $data = [
-                                    'guid' => common::getGUID($agent),
-                                    'name' => $agent->getName(),
-                                    'avatar' => $agent->getAvatar(),
-                                    'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
-                                    'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
-                                    'level' => $agent_levels[$agent_data['level']],
-                                    'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
-                                    'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
-                                ];
-
-                                $gsp = $agent->settings('agentData.gsp', []);
-                                if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
-                                    foreach ((array)$gsp['rel'] as $level => $val) {
-                                        $gsp['rel'][$level] = number_format($val / 100, 2);
-                                    }
-                                    $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
-                                }
-
-                                $result['list'][] = $data;
+                            if (strpos($entry->getMobile(), $keyword) !== false) {
+                                $h_key = true;
                             }
+                            $a_name = $agent_data['name'] ?: $agent->getNickname();
+                            if (strpos($a_name, $keyword) !== false) {
+                                $h_key = true;
+                            }
+                        } else {
+                            $h_key = true;
+                        }
+                        if ($h_key) {
+                            $data = [
+                                'guid' => common::getGUID($agent),
+                                'name' => $agent->getName(),
+                                'avatar' => $agent->getAvatar(),
+                                'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
+                                'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
+                                'level' => $agent_levels[$agent_data['level']],
+                                'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
+                                'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
+                            ];
+
+                            $gsp = $agent->settings('agentData.gsp', []);
+                            if ($gsp['enabled'] && $gsp['mode'] == 'rel') {
+                                foreach ((array)$gsp['rel'] as $level => $val) {
+                                    $gsp['rel'][$level] = number_format($val / 100, 2);
+                                }
+                                $data['gsp_rel_mode_type'] = $gsp['mode_type'] ?? 'percent';
+                            }
+
+                            $result['list'][] = $data;
                         }
                     }
                 }
@@ -1639,7 +1634,7 @@ class agent
             $entry->destroy();
         }
 
-        $token = sha1(time() . "{$mobile}{$session_key}");
+        $token = sha1(time() . "$mobile$session_key");
 
         $data = [
             'src' => LoginData::AGENT_WEB,

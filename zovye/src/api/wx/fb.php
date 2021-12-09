@@ -13,7 +13,6 @@ use zovye\request;
 use zovye\LoginData;
 use zovye\State;
 use zovye\User;
-use zovye\Util;
 use zovye\We7;
 use function zovye\error;
 use function zovye\is_error;
@@ -31,7 +30,7 @@ class fb
         }
 
         We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic'], 'image');
+        $res = We7::file_upload($_FILES['pic']);
 
         if (!is_error($res)) {
 

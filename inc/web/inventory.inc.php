@@ -7,6 +7,8 @@
 namespace zovye;
 
 use RuntimeException;
+use zovye\model\inventory_goodsModelObj;
+use zovye\model\inventory_logModelObj;
 use zovye\model\inventoryModelObj;
 
 defined('IN_IA') or exit('Access Denied');
@@ -24,7 +26,7 @@ if ($op == 'default') {
     $keywords = request::trim('keywords');
     if ($keywords) {
         $query->whereOr([
-            'title LIKE' => "%{$keywords}%",
+            'title LIKE' => "%$keywords%",
         ]);
     }
 
@@ -51,6 +53,8 @@ if ($op == 'default') {
         $inventories['totalpage'] = $total_page;
 
         $query->orderBy('id DESC');
+
+        /** @var inventoryModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $inventories['list'][] = $entry->format();
         }
@@ -81,12 +85,15 @@ if ($op == 'default') {
     $keywords = request::trim('keywords');
     if ($keywords) {
         $query->whereOr([
-            'title LIKE' => "%{$keywords}%",
+            'title LIKE' => "%$keywords%",
         ]);
     }
 
     $query->limit(100)->orderBy('id DESC');
+
     $result = [];
+
+    /** @var inventoryModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $result[] = $entry->format();
     }
@@ -210,7 +217,7 @@ if ($op == 'default') {
     $keywords = request::trim('keywords');
     if ($keywords) {
         $query->whereOr([
-            'name LIKE' => "%{$keywords}%",
+            'name LIKE' => "%$keywords%",
         ]);
     }
 
@@ -231,6 +238,7 @@ if ($op == 'default') {
         $query->page($page, $page_size);
         $query->orderBy('id ASC');
 
+        /** @var inventory_goodsModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $goods = $entry->getGoods();
             if ($goods) {
@@ -248,7 +256,7 @@ if ($op == 'default') {
         $content = app()->fetchTemplate('web/inventory/choose', [
             'list' => $list,
             'pager' => $tpl_data['pager'],
-            'backer' => $keywords ? true : false,
+            'backer' => (bool)$keywords,
         ]);
 
         JSON::success([
@@ -304,6 +312,7 @@ if ($op == 'default') {
         $query->page($page, $page_size);
         $query->orderBy('id DESC');
 
+        /** @var inventory_logModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = [
                 'num' => $entry->getNum(),
@@ -502,7 +511,7 @@ if ($op == 'default') {
 
     JSON::success([
         'msg' => '库存保存成功！',
-        'num' => $result > 0 ? "+{$result}" : $result,
+        'num' => $result > 0 ? "+$result" : $result,
     ]);
 
 } elseif ($op == 'removeGoods') {

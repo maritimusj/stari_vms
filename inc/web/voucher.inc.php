@@ -13,7 +13,7 @@ use Exception;
 use zovye\model\goods_voucherModelObj;
 
 $op = request::op('default');
-$type = strval(request('type'));
+$type = request::str('type');
 
 $tpl_data = [
     'op' => $op,
@@ -37,7 +37,7 @@ if ($op == 'default') {
         $params['voucherId'] = $voucher_id;
     }
 
-    if (isset($type)) {
+    if ($type) {
         $params['type'] = $type;
     }
 
@@ -63,7 +63,7 @@ if ($op == 'default') {
 
     $keywords = request::trim('keywords');
     if ($keywords) {
-        $condition['goods_name LIKE'] = "%{$keywords}%";
+        $query->where(['goods_name LIKE' => "%$keywords%"]);
     }
 
     $page = max(1, request::int('page'));

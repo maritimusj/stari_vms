@@ -36,7 +36,7 @@ class users_vwModelObj extends userModelObj
      */
     public function getFreeTotal(): int
     {
-        return intval($this->free_total);
+        return $this->free_total;
     }
 
     /**
@@ -44,6 +44,6 @@ class users_vwModelObj extends userModelObj
      */
     public function getPayTotal(): int
     {
-        return intval($this->fee_total);
+        return $this->fee_total;
     }
 }

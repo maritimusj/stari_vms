@@ -71,8 +71,8 @@ if ($op == 'default') {
         ]
     );
 
-    $str = base64_encode("{$name}|{$num}");
-    $res = CtrlServ::v2_query("idcard/check/{$str}");
+    $str = base64_encode("$name|$num");
+    $res = CtrlServ::v2_query("idcard/check/$str");
     if (empty($res) || empty($res['status'])) {
         if ($res['data']['message'] == 'invalid idcard') {
             JSON::fail('身份证号码填写有误，请检查后再试！');
@@ -96,7 +96,7 @@ if ($op == 'default') {
         JSON::fail(['code' => 201, 'msg' => $message]);
     }
 
-    $user->setIDCardVerified(sha1("{$name}|{$num}"));
+    $user->setIDCardVerified(sha1("$name|$num"));
 
     Job::getResult($order_no, $user->getOpenid());
 
@@ -168,15 +168,13 @@ if ($op == 'default') {
         JSON::fail('年龄未超过18岁，不能购买！');
     }
 
-    $hash = sha1("{$name}|{$num}");
+    $hash = sha1("$name|$num");
 
     $s_query = m('settings_user');
-    if ($s_query) {
-        $s_query = $s_query->query(We7::uniacid([]));
-        $s_count = $s_query->where(['data LIKE' => "%{$hash}%"])->count();
-        if ($s_count > 0) {
-            JSON::fail('该身份证已用于认证！');
-        }
+    $s_query = $s_query->query(We7::uniacid([]));
+    $s_count = $s_query->where(['data LIKE' => "%$hash%"])->count();
+    if ($s_count > 0) {
+        JSON::fail('该身份证已用于认证！');
     }
 
     $user->setIDCardVerified($hash);

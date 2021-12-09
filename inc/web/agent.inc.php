@@ -86,9 +86,9 @@ if ($op == 'default') {
     $keywords = request::trim('keywords');
     if ($keywords) {
         $query->whereOr([
-            'nickname LIKE' => "%{$keywords}%",
-            'mobile LIKE' => "%{$keywords}%",
-            'name LIKE' => "%{$keywords}%",
+            'nickname LIKE' => "%$keywords%",
+            'mobile LIKE' => "%$keywords%",
+            'name LIKE' => "%$keywords%",
         ]);
     }
 
@@ -177,9 +177,6 @@ if ($op == 'default') {
     ];
 
     $agents = [
-        'total' => 0,
-        'page' => 1,
-        'totalpage' => 1,
         'list' => [],
     ];
 
@@ -200,10 +197,6 @@ if ($op == 'default') {
             if ($page > $total_page) {
                 $page = 1;
             }
-
-            $agents['total'] = $total;
-            $agents['totalpage'] = $total_page;
-            $agents['page'] = $page;
 
             $query->page($page, $page_size);
             $query->orderBy('id desc');
@@ -778,7 +771,7 @@ if ($op == 'default') {
     /** @var  userModelObj $entry */
     foreach ($query->findAll() as $entry) {
         $result[] = [
-            'id' => intval($entry->getId()),
+            'id' => $entry->getId(),
             'openid' => $entry->getOpenid(),
             'nickname' => $entry->getNickname(),
             'name' => $entry->getName(),
@@ -1545,7 +1538,7 @@ if ($op == 'default') {
                         ]
                     );
                 }
-                $agent->updateSettings("{$key_name}.amount", []);
+                $agent->updateSettings("$key_name.amount", []);
             } else {
                 $amount = request::float('val', 0, 2) * 100;
                 if ($agent->settings($key_name)) {
@@ -1559,7 +1552,7 @@ if ($op == 'default') {
                         ]
                     );
                 }
-                $agent->updateSettings("{$key_name}.percent", []);
+                $agent->updateSettings("$key_name.percent", []);
             }
 
             $agent->updateSettings('agentData.gsp.enabled', 1);
@@ -1833,7 +1826,7 @@ if ($op == 'default') {
 
     $page_name = request::trim('page_name', 'default');
 
-    app()->showTemplate("web/agent/detail/{$page_name}", [
+    app()->showTemplate("web/agent/detail/$page_name", [
         'agent' => $agent,
         'pages' => $pages,
         'id' => $id,

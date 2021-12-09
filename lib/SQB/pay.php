@@ -76,7 +76,7 @@ fwIDAQAB
     public function activate($device_id, $code)
     {
         $path = '/terminal/activate';
-        return $this->requestApi("{$this->api}{$path}", [
+        return $this->requestApi("$this->api$path", [
             'app_id' => $this->config['app_id'],
             'code' => $code,
             'device_id' => $device_id,
@@ -86,7 +86,7 @@ fwIDAQAB
     public function checkin($device_id)
     {
         $path = '/terminal/checkin';
-        return $this->requestApi("{$this->api}{$path}", [
+        return $this->requestApi("$this->api$path", [
             'terminal_sn' => $this->config['sn'],
             'device_id' => $device_id,
         ]);
@@ -97,7 +97,7 @@ fwIDAQAB
         $params = [];
         $params['terminal_sn'] = $this->config['sn'];       //收钱吧终端ID
         $params['client_sn'] = $order_no;                    //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
-        $params['total_amount'] = "{$amount}";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
+        $params['total_amount'] = "$amount";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
 
         if (App::isAliUser()) {
             $params['payway'] = '2';
@@ -115,7 +115,7 @@ fwIDAQAB
         }
 
         $path = '/upay/v2/precreate';
-        return $this->requestApi("{$this->api}{$path}", $params);
+        return $this->requestApi("$this->api$path", $params);
     }
 
     public function wapApiPro($orderNO, $amount, $deviceUID, $desc = '', $notifyURL = '', $returnURL = ''): string
@@ -123,7 +123,7 @@ fwIDAQAB
         $params = [];
         $params['terminal_sn'] = $this->config['sn'];       //收钱吧终端ID
         $params['client_sn'] = $orderNO;                    //商户系统订单号,必须在商户系统内唯一；且长度不超过64字节
-        $params['total_amount'] = "{$amount}";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
+        $params['total_amount'] = "$amount";              //以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
         $params['subject'] = $desc;                         //本次交易的概述
         $params['notify_url'] = $notifyURL;                 //支付回调的地址
         $params['operator'] = $deviceUID;                   //发起本次交易的操作员
@@ -155,7 +155,7 @@ fwIDAQAB
         $path = '/upay/v2/refund';
         $params = [
             'terminal_sn' => $this->config['sn'],
-            'refund_amount' => "{$amount}",
+            'refund_amount' => "$amount",
             'refund_request_no' => empty($serial) ? 'R' . time() : $serial,
         ];
         if ($isSN) {
@@ -164,13 +164,13 @@ fwIDAQAB
             $params['client_sn'] = $uid;
         }
 
-        return $this->requestApi("{$this->api}{$path}", $params);
+        return $this->requestApi("$this->api$path", $params);
     }
 
     public function query($orderNO)
     {
         $path = '/upay/v2/query';
-        return $this->requestApi("{$this->api}{$path}", [
+        return $this->requestApi("$this->api$path", [
             'terminal_sn' => $this->config['sn'],
             'client_sn' => $orderNO,
         ]);

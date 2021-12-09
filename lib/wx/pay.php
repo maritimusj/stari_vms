@@ -105,10 +105,9 @@ class pay
             if ((empty($val) || is_array($val)) && !in_array($key, $ignore)) {
                 continue;
             }
-            $str .= "{$key}={$val}&";
+            $str .= "$key=$val&";
         }
-        $str = trim($str, '&');
-        return $str;
+        return trim($str, '&');
     }
 
     /*

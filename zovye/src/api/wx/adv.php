@@ -41,7 +41,7 @@ class adv
         common::checkCurrentUserPrivileges('F_gg');
 
         $guid = request::trim('id');
-        $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='{$guid}'");
+        $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
         if (empty($adv)) {
             return error(State::ERROR, '找不到这条广告！');
@@ -262,7 +262,7 @@ class adv
                 'state' => Advertising::NORMAL,
             ]);
 
-            $query->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='{$guid}'");
+            $query->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
             $adv = $query->findOne();
             if (empty($adv)) {
@@ -413,7 +413,7 @@ class adv
         return error(State::ERROR, '操作失败！');
     }
 
-    public static function getBonus()
+    public static function getBonus(): array
     {
         $user = common::getUser();
 

@@ -5,7 +5,6 @@
  */
 namespace zovye\model;
 
-use zovye\api\wx\fb;
 use zovye\Util;
 use function zovye\tb;
 use zovye\PackageGoods;

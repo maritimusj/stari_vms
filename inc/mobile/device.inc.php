@@ -111,7 +111,6 @@ if ($op == 'default') {
     }
 
     $arr = [
-        'd_uid' => '',
         'per' => 0,
         'm_mod' => $set_data['mod'],
         'sw' => [],
@@ -277,7 +276,7 @@ if ($op == 'default') {
         }
 
         $uid = $device->getUid();
-        CtrlServ::v2_query("wdevice/{$uid}", [], $body);
+        CtrlServ::v2_query("wdevice/$uid", [], $body);
     }
 
     echo json_encode(['arr' => $arr, 'the_14th_id' => $the_14th_id, 'the_20th_id' => $the_20th_id]);
@@ -361,7 +360,7 @@ if ($op == 'default') {
             $body['door'] = [0, 1];
         }
 
-        $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
+        $res = CtrlServ::v2_query("wdevice/$uid", [], $body);
         echo json_encode($res);
 
     } elseif ($type == 'sw') {
@@ -370,7 +369,7 @@ if ($op == 'default') {
             'sw03' => $val
         ];
 
-        $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
+        $res = CtrlServ::v2_query("wdevice/$uid", [], $body);
         echo json_encode($res);
 
     } elseif ($type == 'mode') {
@@ -385,7 +384,7 @@ if ($op == 'default') {
             'mode' => $val
         ];
 
-        $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
+        $res = CtrlServ::v2_query("wdevice/$uid", [], $body);
         if ($res['status']) {
             $device->updateSettings('weight', $set_data);
         }
@@ -400,7 +399,7 @@ if ($op == 'default') {
             'high' => $set_data['t2'],
         ];
 
-        $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
+        $res = CtrlServ::v2_query("wdevice/$uid", [], $body);
         if ($res['status']) {
             $device->updateSettings('weight', $set_data);
         }
@@ -409,7 +408,7 @@ if ($op == 'default') {
     } elseif ($type == 'cc') {
 
         $num = request::int('num');
-        $res = CtrlServ::v2_query("wdevice/{$uid}/reset", ['num' => $num, 'timeout' => 0]);
+        $res = CtrlServ::v2_query("wdevice/$uid/reset", ['num' => $num, 'timeout' => 0]);
         echo json_encode($res);
 
     } elseif ($type == 'price') {
@@ -452,7 +451,7 @@ if ($op == 'default') {
             'disp' => $set_data['price'],
         ];
 
-        $res = CtrlServ::v2_query("wdevice/{$uid}", [], $body);
+        $res = CtrlServ::v2_query("wdevice/$uid", [], $body);
         if ($res['status']) {
             $device->updateSettings('weight', $set_data);
         }

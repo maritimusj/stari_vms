@@ -10,6 +10,7 @@ use DateTime;
 use zovye\Device;
 use zovye\model\device_recordModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\settings_userModelObj;
 use zovye\request;
 use zovye\Keeper;
 use zovye\model\keeperModelObj;
@@ -121,8 +122,8 @@ class maintenance
         $device_ids = [];
         if ($device != '') {
             $device_res = Device::query()->whereOr([
-                'name LIKE' => "%{$device}%",
-                'imei LIKE' => "%{$device}%",
+                'name LIKE' => "%$device%",
+                'imei LIKE' => "%$device%",
             ])->findAll();
             foreach ($device_res as $item) {
                 $device_ids[] = $item->getId();
@@ -158,23 +159,22 @@ class maintenance
 
         $s_query = m('settings_user');
         $s_arr = [];
-        if ($s_query) {
-            $s_query = $s_query->query(We7::uniacid([]));
-            $s_res = $s_query->where(['name LIKE' => '%partnerData'])->findAll();
-            $_reg = '/.+:(.+):.+/';
-            foreach ($s_res as $val) {
-                $s_data = unserialize($val->getData());
-                $s_agent = $s_data['agent'] ?? '';
-                if ($s_agent == $agent->getId()) {
-                    $str = $val->getName();
-                    preg_match($_reg, $str, $mat);
-                    if (isset($mat[1])) {
-                        $s_arr[] = $mat[1];
-                    }
+
+        $s_query = $s_query->query(We7::uniacid([]));
+        $s_res = $s_query->where(['name LIKE' => '%partnerData'])->findAll();
+        $_reg = '/.+:(.+):.+/';
+        /** @var settings_userModelObj $val */
+        foreach ($s_res as $val) {
+            $s_data = unserialize($val->getData());
+            $s_agent = $s_data['agent'] ?? '';
+            if ($s_agent == $agent->getId()) {
+                $str = $val->getName();
+                preg_match($_reg, $str, $mat);
+                if (isset($mat[1])) {
+                    $s_arr[] = $mat[1];
                 }
             }
         }
-
         $user_res = User::query()->where(['id' => $s_arr])->findAll();
         /** @var userModelObj $item */
         foreach ($user_res as $item) {

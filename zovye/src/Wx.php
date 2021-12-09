@@ -31,15 +31,11 @@ class Wx
      * @param string $url
      * @return mixed
      */
-    public static function sendTplNotice($openid, $tpl_id, $content, $url = ''): bool
+    public static function sendTplNotice($openid, $tpl_id, $content, string $url = ''): bool
     {
         $wx = self::getWx();
-        if ($wx) {
-            $result = $wx->sendTplNotice($openid, $tpl_id, $content, $url);
-            return !is_error($result);
-        }
-
-        return false;
+        $result = $wx->sendTplNotice($openid, $tpl_id, $content, $url);
+        return !is_error($result);
     }
 
     /**
@@ -50,12 +46,8 @@ class Wx
     public static function sendCustomNotice($msg): bool
     {
         $wx = self::getWx();
-        if ($wx) {
-            $result = $wx->sendCustomNotice($msg);
-            return !is_error($result);
-        }
-
-        return false;
+        $result = $wx->sendCustomNotice($msg);
+        return !is_error($result);
     }
 
     public static function getWxApp($config = []): WxappAccount

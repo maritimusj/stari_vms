@@ -37,7 +37,7 @@ class ChannelPay
             if ($sKey == 'ufsign') {
                 continue;
             }
-            $aQuery[] = "{$sKey}={$sVal}";
+            $aQuery[] = "$sKey=$sVal";
         }
 
         $sSignStr = implode('&', $aQuery);
@@ -97,7 +97,7 @@ class ChannelPay
             'exUid' => $user->getOpenid(),
             'price' => $goods->getPrice(),
             'amount' => $goods->getPrice() * $num,
-            'exSkuId' => "goods{$goods->getId()}x{$num}",
+            'exSkuId' => "goods{$goods->getId()}x$num",
             'exSkuImg' => Util::toMedia($goods->getImg()),
             'exSkuName' => $goods->getName(),
             'time' => time(),

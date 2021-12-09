@@ -506,10 +506,10 @@ class WxPlatform
                 if (DEBUG) {
                     $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
                 }
-            } else {
-                if ($result) {
-                    return self::getEncryptedMsg($result);
-                }                
+            }
+
+            if ($result && !is_error($result)) {
+                return self::getEncryptedMsg($result);
             }
         }
 

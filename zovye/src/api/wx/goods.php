@@ -73,14 +73,12 @@ class goods
             return error(State::ERROR, '找不到指定的商品');
         }
 
-        if ($goods) {
-            $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-            if ($goods->getAgentId() !== $agent->getId()) {
-                return error(State::ERROR, '没有权限管理这个商品');
-            }
-            if ($goods->destroy()) {
-                return ['msg' => '商品删除成功！'];
-            }
+        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
+        if ($goods->getAgentId() !== $agent->getId()) {
+            return error(State::ERROR, '没有权限管理这个商品');
+        }
+        if ($goods->destroy()) {
+            return ['msg' => '商品删除成功！'];
         }
 
         return error(State::ERROR, '商品删除失败！');

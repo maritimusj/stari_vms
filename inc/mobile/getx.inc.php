@@ -75,7 +75,7 @@ try {
             if (!Job::createAccountOrder($params)) {
                 throw new Exception('启动排队任务失败！');
             }
-            $device->appShowMessage('正在排除出货，请稍等！', 'success');
+            $device->appShowMessage('正在排除出货，请稍等！');
         } else {
             $response = [
                 'text' => $result['errno'] > 0 ? '请重试' : '领取失败',

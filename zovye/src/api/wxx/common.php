@@ -902,6 +902,7 @@ class common
         $res = Device::query(['agent_id' => $agent->getId()])->findAll();
         $devices = [];
         $device_keys = [];
+        /** @var deviceModelObj $item */
         foreach ($res as $item) {
             $devices[$item->getId()] = $item->getName() . ' - ' . $item->getImei();
             $device_keys[] = $item->getId();

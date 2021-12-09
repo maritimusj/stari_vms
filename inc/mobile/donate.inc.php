@@ -61,7 +61,7 @@ if ($op == 'default') {
         Util::resultAlert('不正确的调用[101]！', 'error');
     }
 
-    if (!Locker::try("donate:{$order_no}")) {
+    if (!Locker::try("donate:$order_no")) {
         Util::resultAlert('不正确的调用[102]！', 'error');
     }
 

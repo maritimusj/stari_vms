@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\userModelObj;
+
 $op = request::op('default');
 $appkey = request::str('appkey');
 
@@ -25,6 +27,8 @@ if ($op == 'default') {
     $query->orderBy('id DESC');
 
     $result = [];
+
+    /** @var userModelObj $user */
     foreach($query->findAll() as $user) {
         $data = $user->profile(true);
         $data['balance'] = $user->getBalance()->total();

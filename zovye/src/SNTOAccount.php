@@ -221,11 +221,11 @@ class SNTOAccount
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'ip' => CLIENT_IP,
-            'params' => "{$uid}:{$device->getShadowId()}:{$user->getOpenid()}",
+            'params' => "$uid:{$device->getShadowId()}:{$user->getOpenid()}",
         ];
 
         $result = Util::post($url, $data, true, 3, [
-            CURLOPT_HTTPHEADER => ["AUTH: {$this->token}"],
+            CURLOPT_HTTPHEADER => ["AUTH: $this->token"],
         ]);
 
         if ($cb) {

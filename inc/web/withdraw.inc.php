@@ -301,7 +301,7 @@ if ($op == 'withdraw_pay') {
                             [
                                 'refund' => [
                                     'time' => intval($r->getCreatetime()),
-                                    'refund_gid' => intval($r->getId()),
+                                    'refund_gid' => $r->getId(),
                                 ],
                             ],
                             true

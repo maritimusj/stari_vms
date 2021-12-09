@@ -42,7 +42,7 @@ if (empty($op)) {
         ]);
     }
 
-    $detail = CtrlServ::v2_query("device/{$imei}");
+    $detail = CtrlServ::v2_query("device/$imei");
     
     if (is_error($detail)) {
         JSON::fail('获取设备详情失败！' );
@@ -66,7 +66,7 @@ if (empty($op)) {
         if ($x->isVDevice()) {
             JSON::success([
                 'lane' => $channel,
-                'msg' => "设备：{$imei}\r\n货道：{$channel} 出货成功！",
+                'msg' => "设备：$imei\r\n货道：$channel 出货成功！",
             ]);
         }
 
@@ -98,7 +98,7 @@ if (empty($op)) {
 
         JSON::success([
             'lane' => $channel,
-            'msg' => "设备：{$device->getImei()}\r\n货道：{$channel} 出货成功！",
+            'msg' => "设备：{$device->getImei()}\r\n货道：$channel 出货成功！",
         ]);
     }
 

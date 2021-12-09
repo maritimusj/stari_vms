@@ -2296,7 +2296,7 @@ class deviceModelObj extends modelObj
         $delay = 0;
 
         $advs = $this->getAdvs(Advertising::REDIRECT_URL);
-        if ($advs && is_array($advs)) {
+        if ($advs) {
             foreach ($advs as $adv) {
 
                 if ($adv['extra']['when'][$when]) {
@@ -2757,7 +2757,7 @@ class deviceModelObj extends modelObj
         }
 
         foreach ($all as $entry) {
-            $result = $entry->getData('result');
+            $result = $entry->getData();
             if ($result) {
                 $result_data = $result['data'] ?? $result;
                 $time_used = intval($result_data['timeUsed']);

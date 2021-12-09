@@ -123,18 +123,18 @@ class CommissionBalance extends State
             $data['memo'] = <<<WITHDRAW
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">佣金提现{$status}</dd>
-{$user_info}
+<dd class="event">佣金提现$status</dd>
+$user_info
 </dl>
 WITHDRAW;
         } elseif ($entry->getSrc() == CommissionBalance::REFUND) {
             $name = $entry->getExtraData('admin');
-            $admin_info = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $admin_info = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">退款</dd>
-{$admin_info}
+$admin_info
 </dl>
 REFUND;
         } elseif (in_array(
@@ -154,14 +154,14 @@ REFUND;
             if ($order) {
                 $order_info = $order->getOrderNO();
             }
-            $admin_info = empty($name) ? '' : "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $admin_info = empty($name) ? '' : "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $data['memo'] = <<<ORDER_REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">订单退款，返还佣金</dd>
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
-{$admin_info}
+$admin_info
 </dl>
 ORDER_REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::GSP) {
@@ -183,22 +183,22 @@ ORDER_REFUND;
             $data['memo'] = <<<FEE
             <dl class="log dl-horizontal">
             <dt>事件</dt>
-            <dd class="event">提现手续费{$title}</dd>
+            <dd class="event">提现手续费$title</dd>
             </dl>
 FEE;
         } elseif ($entry->getSrc() == CommissionBalance::ADJUST) {
             $name = $entry->getExtraData('admin');
-            $admin_info = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $admin_info = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $memo = $entry->getExtraData('memo');
             if ($memo) {
-                $memo = "<dt>说明</dt><dd class=\"memo\">{$memo}</dd>";
+                $memo = "<dt>说明</dt><dd class=\"memo\">$memo</dd>";
             }
             $data['memo'] = <<<REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">管理员调整</dd>
-{$admin_info}
-{$memo}
+$admin_info
+$memo
 </dl>
 REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::RELOAD_OUT) {
@@ -206,36 +206,36 @@ REFUND;
             $keeperId = $entry->getExtraData('keeper');
             $device = Device::get($device_id);
             $device_name = $device ? $device->getName() : 'n/a';
-            $device_info = "<dt>设备</dt><dd class=\"admin\">{$device_name}</dd>";
+            $device_info = "<dt>设备</dt><dd class=\"admin\">$device_name</dd>";
 
             $keeper = Keeper::get($keeperId);
             $keeperName = $keeper ? $keeper->getName() : 'n/a';
-            $keeper_info = "<dt>营运人员</dt><dd class=\"admin\">{$keeperName}</dd>";
+            $keeper_info = "<dt>营运人员</dt><dd class=\"admin\">$keeperName</dd>";
 
             $memo = $entry->getExtraData('memo');
             $data['memo'] = <<<REALOD_OUT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">支付补货佣金</dd>
-{$device_info}
-{$keeper_info}
+$device_info
+$keeper_info
 <dt>说明</dt>
-<dd class="memo">{$memo}</dd>
+<dd class="memo">$memo</dd>
 </dl>
 REALOD_OUT;
         } elseif ($entry->getSrc() == CommissionBalance::RELOAD_IN) {
             $device_id = $entry->getExtraData('device');
             $device = Device::get($device_id);
             $device_name = $device ? $device->getName() : 'n/a';
-            $device_info = "<dt>设备</dt><dd class=\"admin\">{$device_name}</dd>";
+            $device_info = "<dt>设备</dt><dd class=\"admin\">$device_name</dd>";
             $memo = $entry->getExtraData('memo');
             $data['memo'] = <<<REALOD_IN
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">补货佣金</dd>
-{$device_info}
+$device_info
 <dt>说明</dt>
-<dd class="memo">{$memo}</dd>
+<dd class="memo">$memo</dd>
 </dl>
 REALOD_IN;
         }
@@ -250,7 +250,7 @@ REALOD_IN;
     protected static function format_order_memo($id, string $addition_spec = ''): string
     {
         if ($addition_spec) {
-            $addition_spec = "<dt>其它</dt><dd class=\"additional\">{$addition_spec}</dd>";
+            $addition_spec = "<dt>其它</dt><dd class=\"additional\">$addition_spec</dd>";
         }
 
         if ($id) {
@@ -265,13 +265,13 @@ REALOD_IN;
 
                     $m = number_format($order->getPrice() / 100, 2);
                     $userData = User::getUserCharacter($order->getOpenid());
-                    $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥{$m}</span>元购买：{$goods['name']}x{$order->getNum()}</span>";
+                    $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";
 
                 } elseif ($order->getBalance() > 0) {
 
                     $balance_title = settings('user.balance.title', DEFAULT_BALANCE_TITLE);
                     $unit_title = settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME);
-                    $spec = "<span class=\"balance\">使用<span class=\"num\">{$order->getBalance()}</span>{$unit_title}{$balance_title}购买：{$goods['name']}x{$order->getNum()}</span>";
+                    $spec = "<span class=\"balance\">使用<span class=\"num\">{$order->getBalance()}</span>$unit_title{$balance_title}购买：{$goods['name']}x{$order->getNum()}</span>";
 
                 } else {
                     $spec = "<span class=\"free\">免费领取：{$goods['name']}x{$order->getNum()}</span>";
@@ -279,7 +279,7 @@ REALOD_IN;
 
                 $account_name = $order->getAccount();
                 if ($account_name) {
-                    $account_info = "<dt>公众号</dt><dd>{$account_name}</dd>";
+                    $account_info = "<dt>公众号</dt><dd>$account_name</dd>";
                 } else {
                     $account_info = '';
                 }
@@ -290,13 +290,13 @@ REALOD_IN;
                 $memo = <<<ORDER
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">{$spec}</dd>
+<dd class="event">$spec</dd>
 <dt>设备</dt>
-<dd class="device">{$device_name}</dd>
-{$account_info}
+<dd class="device">$device_name</dd>
+$account_info
 <dt>用户</dt>
-<dd class="user"><img src="{$user_avatar}" alt=""/>{$user_name}</dd>
-{$addition_spec}
+<dd class="user"><img src="$user_avatar" alt=""/>$user_name</dd>
+$addition_spec
 </dl>
 ORDER;
             } else {
@@ -306,7 +306,7 @@ ORDER;
 <dd class="event"><未知></dd>
 <dt>设备</dt>
 <dd class="device"><未知></dd>
-{$addition_spec}
+$addition_spec
 </dl>
 ORDER;
             }

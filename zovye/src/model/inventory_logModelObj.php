@@ -11,6 +11,9 @@ use zovye\base\modelObj;
 use zovye\Inventory;
 use zovye\traits\ExtraDataGettersAndSetters;
 
+/**
+ * @method getNum()
+ */
 class inventory_logModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

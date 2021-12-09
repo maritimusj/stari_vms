@@ -30,10 +30,7 @@ if ($op == 'stats') {
         ];
 
         $data = Stats::brief();
-        $device_stat = [
-            'on' => 0,
-            'off' => 0,
-        ];
+        $device_stat = [];
 
         $all_device = Device::query()->count();
         $time_less_15 = new DateTime('-15 min');

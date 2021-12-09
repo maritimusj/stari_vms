@@ -95,7 +95,7 @@ if ($op == 'add' || $op == 'edit') {
 
     $content = app()->fetchTemplate('web/wxapp/advs', $tpl_data);
     JSON::success([
-        'title' => $op == 'add' ? '创建广告位' : '编辑广告位',
+        'title' => $op == 'addAdvs' ? '创建广告位' : '编辑广告位',
         'content' => $content,
     ]);
 }

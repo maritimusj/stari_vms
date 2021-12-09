@@ -63,7 +63,7 @@ trait GettersAndSetters
             return property_exists($this, $prop);
         } else {
             if (DEBUG) {
-                trigger_error("call undefined method {$name} on " . get_called_class(), E_USER_ERROR);
+                trigger_error("call undefined method $name on " . get_called_class(), E_USER_ERROR);
             }
         }
         return null;

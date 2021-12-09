@@ -68,9 +68,7 @@ class agentModelObj extends userModelObj
      */
     public function getDeviceCount(): int
     {
-        $count = Device::query(['agent_id' => $this->getAgentId()])->count();
-
-        return intval($count);
+        return Device::query(['agent_id' => $this->getAgentId()])->count();
     }
 
     /**
@@ -429,7 +427,7 @@ class agentModelObj extends userModelObj
 
                 $user = User::get($openid, true);
 
-                if ($user && $entry['percent'] > 0) {
+                if ($user) {
                     if (empty($device) || empty($entry['assigned']) || $device->isMatched($entry['assigned'])) {
                         $data = [
                             '__obj' => $user,
@@ -453,7 +451,6 @@ class agentModelObj extends userModelObj
 
     public function tryLock(): bool
     {
-        $locked = false;
         for ($i = 0; $i < 10; $i++) {
             $locked = !!$this->lock();
             if (!$locked) {

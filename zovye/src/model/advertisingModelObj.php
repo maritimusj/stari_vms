@@ -121,7 +121,7 @@ class advertisingModelObj extends modelObj
         if ($this->agent_id > 0) {
             $current = $this->settings('reviewData.current');
             if ($current) {
-                return $this->settings("reviewData.{$current}.result");
+                return $this->settings("reviewData.$current.result");
             }
         }
 

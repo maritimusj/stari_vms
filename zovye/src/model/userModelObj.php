@@ -8,7 +8,6 @@
 namespace zovye\model;
 
 use DateTime;
-use zovye\Account;
 use zovye\Balance;
 use zovye\Locker;
 use zovye\Pay;
@@ -497,7 +496,7 @@ class userModelObj extends modelObj
      *
      * @return commission_balanceModelObj
      */
-    public function commission_change($price, $src, $extra = []): ?commission_balanceModelObj
+    public function commission_change($price, $src, array $extra = []): ?commission_balanceModelObj
     {
         $balance = $this->getCommissionBalance();
 
@@ -706,7 +705,7 @@ class userModelObj extends modelObj
         if (empty($name)) {
             return $this->settings('last.active', $default);
         }
-        return $this->settings("last.active.{$name}", $default);
+        return $this->settings("last.active.$name", $default);
     }
 
     public function isWxAppAllowed($appID): bool

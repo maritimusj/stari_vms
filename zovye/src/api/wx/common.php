@@ -188,7 +188,7 @@ class common
             $session_key = _W('token');
         }
 
-        return sha1("{$session_key}{$id}");
+        return sha1("$session_key$id");
     }
 
     /**

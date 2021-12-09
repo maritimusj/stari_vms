@@ -112,7 +112,7 @@ class keeper
             }
 
             if ($keeper_data) {
-                $token = sha1(time() . "{$mobile}{$session_key}");
+                $token = sha1(time() . "$mobile$session_key");
                 $data = [
                     'src' => LoginData::KEEPER,
                     'user_id' => 0,
@@ -773,7 +773,7 @@ class keeper
         }
 
         //信号强度
-        $sig = intval($device->getSig());
+        $sig = $device->getSig();
         if ($sig != -1) {
             $result['status']['sig'] = $sig;
         }
@@ -1041,7 +1041,7 @@ class keeper
 
         if ($d) {
             //请求某天的出货记录
-            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', "{$y}-{$m}-{$d} 00:00:00");
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', "$y-$m-$d 00:00:00");
             $begin = $datetime->getTimestamp();
             $datetime->modify('+1 day');
             $end = $datetime->getTimestamp();
@@ -1074,8 +1074,8 @@ class keeper
             }
         } else {
             //请求一月中每天的出货统计
-            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', "{$y}-{$m}-01 00:00:00");
-            $day = DateTime::createFromFormat('Y-m-d H:i:s', "{$y}-{$m}-01 00:00:00");
+            $datetime = DateTime::createFromFormat('Y-m-d H:i:s', "$y-$m-01 00:00:00");
+            $day = DateTime::createFromFormat('Y-m-d H:i:s', "$y-$m-01 00:00:00");
             $day->modify('+1 month');
             if ($day->getTimestamp() > time()) {
                 $day = new DateTime('tomorrow');

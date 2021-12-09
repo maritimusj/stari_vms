@@ -67,12 +67,12 @@ class keeper_devicesModelObj extends modelObj
      */
     public function getCommissionValue(): array
     {
-        if (intval($this->commission_percent) != -1) {
-            return [intval($this->commission_percent), intval($this->way), true];
+        if ($this->commission_percent != -1) {
+            return [$this->commission_percent, intval($this->way), true];
         }
 
-        if (intval($this->commission_fixed) != -1) {
-            return [intval($this->commission_fixed), intval($this->way), false];
+        if ($this->commission_fixed != -1) {
+            return [$this->commission_fixed, intval($this->way), false];
         }
 
         return Keeper::DEFAULT_COMMISSION_VAL;

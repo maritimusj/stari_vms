@@ -51,8 +51,8 @@ class We7
      */
     public static function __callStatic($name, $arguments)
     {
-        if (function_exists("\\{$name}")) {
-            return call_user_func("\\{$name}", ...$arguments);
+        if (function_exists("\\$name")) {
+            return call_user_func("\\$name", ...$arguments);
         } else {
             Log::error(
                 'we7',
@@ -193,7 +193,7 @@ EOF;
      *
      * @return string
      */
-    public static function array2xml(array $arr, $level = 1): string
+    public static function array2xml(array $arr, int $level = 1): string
     {
         $s = 1 == $level ? '<xml>' : '';
         foreach ($arr as $tag_name => $value) {
@@ -203,13 +203,13 @@ EOF;
             }
             if (!is_array($value)) {
                 if (is_null($value)) {
-                    $s .= "<{$tag_name}></{$tag_name}>";
+                    $s .= "<$tag_name></$tag_name>";
                 } else {
-                    $s .= "<{$tag_name}>" . (!is_numeric($value) ? '<![CDATA[' : '') . $value . (!is_numeric($value) ? ']]>' : '') . "</{$tag_name}>";
+                    $s .= "<$tag_name>" . (!is_numeric($value) ? '<![CDATA[' : '') . $value . (!is_numeric($value) ? ']]>' : '') . "</$tag_name>";
                 }
 
             } else {
-                $s .= "<{$tag_name}>" . We7::array2xml($value, $level + 1) . "</{$tag_name}>";
+                $s .= "<$tag_name>" . We7::array2xml($value, $level + 1) . "</$tag_name>";
             }
         }
         $s = preg_replace("/([\x01-\x08\x0b-\x0c\x0e-\x1f])+/", ' ', $s);
@@ -243,7 +243,7 @@ EOF;
      *
      * @return string
      */
-    public static function random(int $length, $numeric = false): string
+    public static function random(int $length, bool $numeric = false): string
     {
         $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
         $seed = $numeric ? (str_replace('0', '', $seed) . '012340567890') : ($seed . 'zZ' . strtoupper($seed));
@@ -324,7 +324,7 @@ EOF;
      *
      * @return boolean
      */
-    public static function is_serialized($data, $strict = true): bool
+    public static function is_serialized($data, bool $strict = true): bool
     {
         if (!is_string($data)) {
             return false;
@@ -372,7 +372,7 @@ EOF;
             // or else fall through
             // no break
             case 'a':
-                return (bool)preg_match("/^{$token}:[0-9]+:/s", $data);
+                return (bool)preg_match("/^$token:[0-9]+:/s", $data);
             case 'O':
                 return false;
             case 'b':
@@ -380,7 +380,7 @@ EOF;
             case 'd':
                 $end = $strict ? '$' : '';
 
-                return (bool)preg_match("/^{$token}:[0-9.E-]+;$end/", $data);
+                return (bool)preg_match("/^$token:[0-9.E-]+;$end/", $data);
         }
 
         return false;

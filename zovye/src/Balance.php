@@ -188,10 +188,10 @@ class Balance
 
         if ($entry->getSrc() == Balance::ADJUST) {
             $name = $entry->getExtraData('admin');
-            $line = "<dt>管理员</dt><dd class=\"admin\">{$name}</dd>";
+            $line = "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
             $memo = $entry->getExtraData('memo', '');
             if ($memo) {
-                $line .= "<dt>说明</dt><dd class=\"memo\">{$memo}</dd>";
+                $line .= "<dt>说明</dt><dd class=\"memo\">$memo</dd>";
             }
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
@@ -221,11 +221,11 @@ TEXT;
                     Account::YOUFEN => ['友粉', '完成友粉任务'],
                 ][$account_data['type']] ?? ['公众号', '成功关注公众号'];
 
-            $account_info = "<dt>{$account_typeifno[0]}</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
+            $account_info = "<dt>$account_typeifno[0]</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">{$account_typeifno[1]}</dd>
+<dd class="event">$account_typeifno[1]</dd>
 $account_info
 </dl>
 TEXT;
@@ -289,7 +289,7 @@ TEXT;
         } elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
             $account_profile = $entry->getExtraData('account', []);
             $type_title = Account::getTypeTitle($account_profile['type']);
-            $text =  $account_profile ? "<dt>{$type_title}</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
+            $text =  $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>

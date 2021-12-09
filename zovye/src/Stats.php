@@ -234,7 +234,7 @@ class Stats
             $i = key($stats);
             $g = date('G', $day);
             for (; $i <= $g; $i++) {
-                $chart['xAxis']['data'][] = "{$i}:00";
+                $chart['xAxis']['data'][] = "$i:00";
                 $chart['series'][0]['data'][] = intval($stats[$i]['f']);
                 $chart['series'][1]['data'][] = intval($stats[$i]['p']);
             }
@@ -297,7 +297,7 @@ class Stats
             for (; $i <= $end; $i++) {
                 $chart['series'][0]['data'][] = intval($stats[$i]['f']);
                 $chart['series'][1]['data'][] = intval($stats[$i]['p']);
-                $chart['xAxis']['data'][] = "{$month}{$i}日";
+                $chart['xAxis']['data'][] = "$month{$i}日";
             }
         }
 
@@ -322,14 +322,15 @@ class Stats
         ];
 
         for ($days = $len; $days >= 0; $days--) {
-            $l = strtotime("-{$days} days");
+            $l = strtotime("-$days days");
             $chart['xAxis']['data'][] = date('m-d', $l);
         }
 
         $agents = Agent::query()->findAll();
         $index = 0;
-        foreach ($agents as $agent) {
 
+        /** @var agentModelObj $agent */
+        foreach ($agents as $agent) {
             $stats = $agent->get('statsData', []);
             if (isEmptyArray($stats)) {
                 continue;
@@ -347,7 +348,7 @@ class Stats
 
             for ($days = $len; $days >= 0; $days--) {
 
-                $l = strtotime("-{$days} days");
+                $l = strtotime("-$days days");
                 $y = date('Y', $l);
                 $n = date('n', $l);
                 $j = date('j', $l);
@@ -394,7 +395,7 @@ class Stats
         ];
 
         for ($days = $len; $days >= 0; $days--) {
-            $l = strtotime("-{$days} days");
+            $l = strtotime("-$days days");
             $chart['xAxis']['data'][] = date('m-d', $l);
         }
 
@@ -420,7 +421,7 @@ class Stats
 
             for ($days = $len; $days >= 0; $days--) {
 
-                $l = strtotime("-{$days} days");
+                $l = strtotime("-$days days");
                 $y = date('Y', $l);
                 $n = date('n', $l);
                 $j = date('j', $l);
@@ -467,7 +468,7 @@ class Stats
         ];
 
         for ($days = $len; $days >= 0; $days--) {
-            $l = strtotime("-{$days} days");
+            $l = strtotime("-$days days");
             $chart['xAxis']['data'][] = date('m-d', $l);
         }
 
@@ -495,7 +496,7 @@ class Stats
 
             for ($days = $len; $days >= 0; $days--) {
 
-                $l = strtotime("-{$days} days");
+                $l = strtotime("-$days days");
                 $y = date('Y', $l);
                 $n = date('n', $l);
                 $j = date('j', $l);
@@ -570,7 +571,7 @@ class Stats
 
             for ($index = 0; $index < 7; $index++) {
 
-                $l = strtotime("-{$index} days");
+                $l = strtotime("-$index days");
 
                 $y1 = date('Y', $l);
                 $n1 = date('n', $l);
@@ -822,7 +823,7 @@ class Stats
             $data = $stats['data'][$y]['days'][$n];
             if ($data) {
                 foreach ($data as $index => $entry) {
-                    $time = strtotime("{$y}-{$n}-{$index}");
+                    $time = strtotime("$y-$n-$index");
                     $result[date('m-d', $time)] = [
                         'free' => intval($entry['f']),
                         'fee' => intval($entry['p']),
@@ -868,7 +869,7 @@ class Stats
             $data = $stats['data'][$y]['hours'][$z];
             if ($data) {
                 foreach ($data as $index => $entry) {
-                    $result["{$index}"] = [
+                    $result["$index"] = [
                         'free' => intval($entry['f']),
                         'fee' => intval($entry['p']),
                     ];

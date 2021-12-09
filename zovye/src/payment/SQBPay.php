@@ -102,7 +102,7 @@ class SQBPay implements IPay
 
         return <<<JS_CODE
 <script src="$jquery_url"></script>
-{$js_sdk}
+$js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();

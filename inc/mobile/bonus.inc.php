@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use Exception;
+
 $user = Util::getCurrentUser([
     'create' => true,
     'update' => true,
@@ -59,7 +61,10 @@ if ($op == 'default') {
     if ($min >= $max) {
         $val = $min;
     } else {
-        $val = random_int($min, $max);
+        try {
+            $val = random_int($min, $max);
+        } catch (Exception $e) {
+        }
     }
     
     if (empty($val)) {

@@ -111,7 +111,7 @@ if ($op == 'default') {
     }
 
     if ($adv->getReviewResult() == ReviewResult::PASSED) {
-        request::is_ajax() ? JSON::success('已通过审核！') : Util::resultAlert('已通过审核！', 'success');
+        request::is_ajax() ? JSON::success('已通过审核！') : Util::resultAlert('已通过审核！');
     }
 
     if ($adv->getReviewResult() == ReviewResult::REJECTED) {
@@ -121,12 +121,12 @@ if ($op == 'default') {
     $fn = request::str('fn');
     if ($fn == 'pass') {
         if (Advertising::pass($adv_id, _W('username'))) {
-            request::is_ajax() ? JSON::success('广告已经通过审核！') : Util::resultAlert('广告已经通过审核！', 'success');
+            request::is_ajax() ? JSON::success('广告已经通过审核！') : Util::resultAlert('广告已经通过审核！');
         }
         request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
     } elseif ($fn == 'reject') {
         if (Advertising::reject($adv_id)) {
-            request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！', 'success');
+            request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！');
         }
         request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
     }

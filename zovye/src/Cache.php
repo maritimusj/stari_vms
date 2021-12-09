@@ -64,7 +64,7 @@ class Cache
     public static function ErrorExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['error_expiration'] = is_int($time) ? $time : strtotime($time);;
+            $data['error_expiration'] = is_int($time) ? $time : strtotime($time);
         };
     }
 

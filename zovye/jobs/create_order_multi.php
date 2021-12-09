@@ -297,7 +297,7 @@ function refund(string $order_no, deviceModelObj $device, string $reason)
     $need = Helper::NeedAutoRefund($device);
     if ($need) {
         $result = Job::refund($order_no, $reason, -1);
-        if (empty($result) || is_error($result)) {
+        if (empty($result)) {
             Log::error('order_create_multi', [
                 'orderNO' => $order_no,
                 'msg' => '启动退款任务！',

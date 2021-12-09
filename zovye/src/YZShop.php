@@ -150,28 +150,27 @@ class YZShop
                 $result['thumb'] = $goods['thumb'];
             }
 
-            if ($user) {
-                $res = We7::pdo_get(
-                    self::TB_MEMBER,
-                    We7::uniacid(['yz_openid' => $user->getOpenid()]),
-                    ['member_id']
-                );
-                if ($res && $res['member_id']) {
-                    $status = settings('agent.yzshop.goods_limits.order_status', []);
-                    if ($status) {
-                        $sql = 'SELECT SUM(g.total) AS total FROM ' . We7::tablename(
-                                self::TB_ORDER_GOODS
-                            ) . ' g LEFT JOIN ' . We7::tablename(
-                                self::TB_ORDER
-                            ) . ' o ON g.order_id=o.id WHERE g.goods_id=:goods_id AND g.uid=:uid AND o.is_deleted=0 AND o.status IN (' . implode(
-                                ',',
-                                $status
-                            ) . ')';
+            $res = We7::pdo_get(
+                self::TB_MEMBER,
+                We7::uniacid(['yz_openid' => $user->getOpenid()]),
+                ['member_id']
+            );
 
-                        $res = We7::pdo_fetch($sql, [':goods_id' => $goods_id, ':uid' => $res['member_id']]);
-                        if ($res) {
-                            $result['order_total'] = intval($res['total']);
-                        }
+            if ($res && $res['member_id']) {
+                $status = settings('agent.yzshop.goods_limits.order_status', []);
+                if ($status) {
+                    $sql = 'SELECT SUM(g.total) AS total FROM ' . We7::tablename(
+                            self::TB_ORDER_GOODS
+                        ) . ' g LEFT JOIN ' . We7::tablename(
+                            self::TB_ORDER
+                        ) . ' o ON g.order_id=o.id WHERE g.goods_id=:goods_id AND g.uid=:uid AND o.is_deleted=0 AND o.status IN (' . implode(
+                            ',',
+                            $status
+                        ) . ')';
+
+                    $res = We7::pdo_fetch($sql, [':goods_id' => $goods_id, ':uid' => $res['member_id']]);
+                    if ($res) {
+                        $result['order_total'] = intval($res['total']);
                     }
                 }
             }

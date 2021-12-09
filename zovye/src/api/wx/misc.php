@@ -37,10 +37,8 @@ class misc
         foreach ($list as $sub) {
             if ($sub->isAgent()) {
                 $sa = $sub->agent();
-                if ($sa) {
-                    $all_devices += $sa->getDeviceCount();
-                    $low_remain_total += self::getLowRemainDeviceTotal($sa);
-                }
+                $all_devices += $sa->getDeviceCount();
+                $low_remain_total += self::getLowRemainDeviceTotal($sa);
             }
         }
 

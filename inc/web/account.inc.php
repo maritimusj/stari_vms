@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\orderModelObj;
@@ -64,9 +65,9 @@ if ($op == 'default') {
     $keywords = trim(urldecode(request::str('keywords')));
     if ($keywords) {
         $query->whereOr([
-            'name LIKE' => "%{$keywords}%",
-            'title LIKE' => "%{$keywords}%",
-            'descr LIKE' => "%{$keywords}%",
+            'name LIKE' => "%$keywords%",
+            'title LIKE' => "%$keywords%",
+            'descr LIKE' => "%$keywords%",
         ]);
     }
 
@@ -183,8 +184,8 @@ if ($op == 'default') {
     $keyword = trim(urldecode(request::str('keyword')));
     if ($keyword) {
         $query->whereOr([
-            'name LIKE' => "%{$keyword}%",
-            'title LIKE' => "%{$keyword}%",
+            'name LIKE' => "%$keyword%",
+            'title LIKE' => "%$keyword%",
         ]);
     }
 
@@ -509,7 +510,7 @@ if ($op == 'default') {
                     'type' => Account::VIDEO,
                     'video' => [
                         'duration' => request::int('duration', 1),
-                        'exclusive' => request::int('exclusive', 0),
+                        'exclusive' => request::int('exclusive'),
                     ]
                 ]);
             } elseif ($account->isDouyin()) {
@@ -837,7 +838,7 @@ if ($op == 'default') {
     $time = request::has('month') ? date('Y-') . request::int('month') . date('-01 00:00:00') : 'today';
 
     $caption = date('Y年n月', strtotime($time));
-    $data = Stats::chartDataOfMonth($acc, $time, "公众号：{$title}({$caption})");
+    $data = Stats::chartDataOfMonth($acc, $time, "公众号：$title($caption)");
 
     $content = app()->fetchTemplate(
         'web/account/stats',
@@ -869,7 +870,7 @@ if ($op == 'default') {
         ]
     );
 
-    JSON::success(['title' => "<b>{$title}</b>的出货统计", 'content' => $content]);
+    JSON::success(['title' => "<b>$title</b>的出货统计", 'content' => $content]);
 
 } elseif ($op == 'repairMonthStats') {
 
@@ -941,6 +942,7 @@ if ($op == 'default') {
         $query->page($page, $page_size);
         $query->orderBy('id DESC');
 
+        /** @var account_queryModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = [
                 'id' => $entry->getId(),

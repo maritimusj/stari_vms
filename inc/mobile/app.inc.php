@@ -58,7 +58,7 @@ if ($op == 'default') {
 
                 $device = Device::find($device_id, ['id', 'imei']);
                 if (empty($device)) {
-                    $res = CtrlServ::query("device/{$device_id}", []);
+                    $res = CtrlServ::query("device/$device_id", []);
                     if (!is_error($res) && $res['id']) {
                         //创建设备
                         $data = [

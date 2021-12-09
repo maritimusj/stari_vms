@@ -19,7 +19,7 @@ if ($op == 'default') {
         $res = m('tags')->findOne(We7::uniacid(['id' => request::int('id')]));
         if ($res) {
             $tag = [
-                'id' => intval($res->getId()),
+                'id' => $res->getId(),
                 'title' => strval($res->getTitle()),
                 'count' => intval($res->getCount()),
             ];
@@ -43,7 +43,7 @@ if ($op == 'default') {
     //搜索关键字
     $keywords = request::trim('keywords');
     if ($keywords) {
-        $query->where(['title LIKE' => "%{$keywords}%"]);
+        $query->where(['title LIKE' => "%$keywords%"]);
     }
 
     $total = $query->count();

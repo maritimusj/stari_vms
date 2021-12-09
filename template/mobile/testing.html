@@ -1,7 +1,6 @@
 <html>
-
 <head>
-    <title>主板测试入口v2.1</title>
+    <title>主板测试入口v2.2</title>
     <meta name="viewport"
         content="width=device-width, initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
         <link href="{MODULE_URL}/static/testing/pure-min.css" rel="stylesheet">
@@ -134,7 +133,12 @@
             white-space: nowrap;
             min-width: 100px;
         }
-
+        .task .title {
+            padding: 6px 3px;
+            width: 300px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
         button.pure-button.pure-button-primary.busy {
             color: #F44336;
         }
@@ -273,7 +277,7 @@
                             <span class="iconfont" :class="'icon-signal-'+task.signal"></span>
                             <span v-text="task.percent" v-if="task.percent>0" class="signal"></span>
                         </td>
-                        <td style="padding: 6px 3px;width: 300px;"><span v-text="task.id"></span></td>
+                        <td class="title"><span v-text="task.id"></span></td>
                         <td>
                             <div class="status animated flipInY"
                                 :class="{error:task.fail&&task.fail > 0, offline:task.offline}">

@@ -2200,7 +2200,7 @@ class deviceModelObj extends modelObj
 
     public function isDown(): bool
     {
-        if ($this->settings('extra.isDown')) {
+        if ($this->settings('extra.isDown') == Device::STATUS_MAINTENANCE) {
             return true;
         }
 

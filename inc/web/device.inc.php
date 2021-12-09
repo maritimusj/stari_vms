@@ -634,7 +634,7 @@ if ($op == 'list') {
         $tags = request::trim('tags');
         $extra = [
             'pushAccountMsg' => request::trim('pushAccountMsg'),
-            'isDown' => request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::NORMAL_DEVICE,
+            'isDown' => request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
             'activeQrcode' => request::bool('activeQrcode') ? 1 : 0,
             'address' => request::trim('address'),
             'grantloc' => [

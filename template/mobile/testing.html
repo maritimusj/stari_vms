@@ -23,24 +23,37 @@
             background: red;
         }
 
+        #app {
+            padding-bottom: 3em;
+        }
         .lanes {
             margin: 10px;
             background: #ccc;
             border: 1px solid #ccc;
             border-radius: 6px;
-            padding: 10px;
             display: flex;
             flex-wrap: wrap;
             justify-content: flex-start;
+            padding: 10px 10px 0px;
         }
 
         .lanes div {
-            width: 24%;
+            width: calc((100% - 8px) / 4);
             margin: 1px;
         }
 
         .lanes div button {
             width: 100%;
+            padding: .5em 0px;
+            font-size: small;
+        }
+        .lanes div button span {
+            font-style: italic;
+            font-size: large;
+            font-weight: bolder;
+        }
+        .lanes div button:not(.pure-button-primary) span {
+            color: #0078e7;
         }
 
         .lanes.view {
@@ -99,6 +112,7 @@
         }
 
         .task {
+            min-height: 2em;
             margin: 10px;
             background: #ccc;
             border: 1px solid #ccc;
@@ -201,23 +215,34 @@
             content: "\ed0a";
             color: #2f6731;
         }
+        .more-lanes {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .more-lanes .icon {
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 
 <body>
     <div id="app">
         <div class="lanes">
-            <template v-for="lane in lanes" :key="lane.id">
+            <template v-for="(lane, index) in lanes" :key="lane.id">
                 <div>
                     <button class="pure-button"
                         :class="{'pure-button-primary': lane.selected, 'animated':true, 'flash infinite': lane.state == 'busy'}"
                         @click="clickLane(lane)" @touchstart="touchstartHandler(lane)"
                         @touchmove="touchmoveHandler(lane, $event)" @touchend="touchendHandler(lane, $event)">
-                        货道{{lane.id}}
+                        <span>{{lane.id}}</span> <template v-if="index < 100">货道</template>
                         <sup v-if="lane.total>1">x{{lane.total}}</sup>
                     </button>
                 </div>
             </template>
+            <div class="more-lanes" @click="moreLanes">
+                <svg t="1639017675259" class="icon animated bounceIn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4282" width="200" height="200"><path d="M894.944 480.96c-9.248-24.864-36.864-37.472-61.728-28.224l-321.472 119.776-318.208-121.248c-24.768-9.504-52.512 3.008-61.952 27.776-9.44 24.768 3.008 52.512 27.776 61.952l334.08 127.232c1.536 0.608 3.104 0.448 4.64 0.832 0.864 0.288 1.824 0.288 2.72 0.512 3.232 0.672 6.464 1.824 9.696 1.824 0.352 0 0.672-0.16 1.056-0.16 0.352 0 0.672 0.16 1.024 0.16 3.456 0 6.944-1.088 10.432-1.888 0.576-0.192 1.216-0.16 1.792-0.352 1.504-0.416 3.04-0.256 4.512-0.8l337.376-125.632C891.552 533.44 904.192 505.824 894.944 480.96z" p-id="4283"></path></svg>
+            </div>
         </div>
         <div class="pure-g">
             <div class="pure-u-1-1" style="text-align:center;margin-top:2em;">
@@ -232,7 +257,7 @@
                     <div class="task-button animated"
                         :class="{error:lane.fail && lane.fail > 0,normal:lane.success&&lane.success>0&&!lane.fail,timeout:lane.errno==9,malfunction:lane.errno==10,'flash infinite': lane.state==='busy'}"
                         v-for="lane in viewObj.lanes">
-                        货道 {{lane.id}}
+                        {{lane.id}}
                         <sup v-if="lane.success!==undefined||lane.fail!==undefined">
                             ( <span v-if="lane.success!==undefined">{{lane.success}}√</span> <span
                                 v-if="lane.fail!==undefined">{{lane.fail}}*</span> )</sup><sup v-else>(...)</sup>
@@ -305,8 +330,20 @@
                 }
             },
             methods: {
+                moreLanes: function() {
+                    const n = this.lanes.length + 1;
+                    for(i = 0; i < 4; i ++ ) {
+                        this.lanes.push({
+                            id: n + i,
+                        })
+                    }
+                },
                 setLaneState: function (task, id, state) {
                     e = task.lanes.find(entry => entry.id === id);
+                    if (e) {
+                        Vue.set(e, "state", state);
+                    }
+                    e = this.lanes.find(lane => lane.id == id);
                     if (e) {
                         Vue.set(e, "state", state);
                     }

@@ -190,6 +190,12 @@ class device
             $result['location']['area'] = array_values($result['location']['area']);
         }
 
+        $result['status'] = [
+            \zovye\Device::V0_STATUS_VOLTAGE => $device->getV0Status(\zovye\Device::V0_STATUS_VOLTAGE),
+            \zovye\Device::V0_STATUS_COUNT => (int)$device->getV0Status(\zovye\Device::V0_STATUS_COUNT),
+            \zovye\Device::V0_STATUS_ERROR => $device->getV0ErrorDescription(),
+        ];
+
         //信号强度
         $sig = $device->getSig();
         if ($sig != -1) {
@@ -202,14 +208,6 @@ class device
             $result['status']['qoe'] = intval($qoe);
         }
 
-        $result['v0_status'] = [
-            \zovye\Device::V0_STATUS_SIG => $device->getSig(),
-            \zovye\Device::V0_STATUS_QOE => $device->getQoe(),
-            \zovye\Device::V0_STATUS_VOLTAGE => $device->getV0Status(\zovye\Device::V0_STATUS_VOLTAGE),
-            \zovye\Device::V0_STATUS_COUNT => (int)$device->getV0Status(\zovye\Device::V0_STATUS_COUNT),
-            \zovye\Device::V0_STATUS_ERROR => $device->getV0ErrorDescription(),
-        ];
-        
         return $result;
     }
 

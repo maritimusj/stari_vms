@@ -419,11 +419,11 @@ class deviceModelObj extends modelObj
         $error = $this->getV0Status(Device::V0_STATUS_ERROR);
         if ($error) {
             static $description = [
-                1 => '计数器故障',
-                2 => '卡膜',
-                3 => '电量低',
+                '1' => '计数器故障',
+                '2' => '卡膜',
+                '3' => '电量低',
             ];
-            return ($description[$error] ?? '未知') . "($error)";
+            return ($description[$error] ?? '未知') . " [ $error ]";
         }
         return '';
     }

@@ -643,26 +643,17 @@
                                                 </template>
                                                 <template v-if="o.v0_status && o.v0_status.voltage">
                                                     <div>
-                                                        <span class="title">工作电压：</span>
-                                                        <div class="bar qoe">
-                                                            <span>{{o.v0_status.voltage}}</span>
-                                                        </div>
+                                                        <span class="title">工作电压：</span><span>{{o.v0_status.voltage}}v</span>
                                                     </div>
                                                 </template>
                                                 <template v-if="o.v0_status && o.v0_status.count">
                                                     <div>
-                                                        <span class="title">累计出货：</span>
-                                                        <div class="bar qoe">
-                                                            <span>{{o.v0_status.count}}</span>
-                                                        </div>
+                                                        <span class="title">累计出货：</span><span>{{o.v0_status.count}}</span>
                                                     </div>
                                                 </template>
-                                                <template v-if="o.v0_status && o.v0_status.error">
+                                                <template v-if="o.v0_status && o.v0_status.error > 0">
                                                     <div>
-                                                        <span class="title">错误代码：</span>
-                                                        <div class="bar qoe">
-                                                            <span>{{o.v0_status.error}}</span>
-                                                        </div>
+                                                        <span class="title">错误代码：</span><span>{{o.v0_status.error}}</span>
                                                     </div>
                                                 </template>
                                             </div>

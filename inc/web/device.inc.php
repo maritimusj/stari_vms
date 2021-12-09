@@ -261,7 +261,7 @@ if ($op == 'list') {
                     Device::V0_STATUS_SIG => $entry->getSig(),
                     Device::V0_STATUS_QOE => $entry->getQoe(),
                     Device::V0_STATUS_VOLTAGE => $entry->getV0Status(Device::V0_STATUS_VOLTAGE),
-                    Device::V0_STATUS_COUNT => $entry->getV0Status(Device::V0_STATUS_COUNT),
+                    Device::V0_STATUS_COUNT => (int)$entry->getV0Status(Device::V0_STATUS_COUNT),
                     Device::V0_STATUS_ERROR => $entry->getV0Status(Device::V0_STATUS_ERROR),
                 ],
                 'capacity' => intval($entry->getCapacity()),

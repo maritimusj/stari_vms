@@ -2838,6 +2838,6 @@ HTML_CONTENT;
     public static function isSysLoadAverageOk(): bool
     {
         $load = sys_getloadavg();
-        return $load[0] < SYS_MAX_LOAD_AVERAGE_VALUE;
+        return $load === false || $load[0] < SYS_MAX_LOAD_AVERAGE_VALUE;
     }
 }

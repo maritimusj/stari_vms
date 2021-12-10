@@ -278,6 +278,7 @@ if ($op == 'list') {
                 'lockedTime' => $entry->isLocked() ? date('Y-m-d H:i:s', $entry->getLockedTime()) : '',
                 'appId' => $entry->getAppId(),
                 'appVersion' => $entry->getAppVersion(),
+                'total' => 'n/a',
                 'gettype' => [
                     'location' => $entry->needValidateLocation(),
                 ],

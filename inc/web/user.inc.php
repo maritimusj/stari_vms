@@ -222,9 +222,12 @@ if ($op == 'default') {
         if ($user) {
             $data = [
                 'id' => $user->getId(),
-                'free' => $user->getFreeTotal(),
-                'pay' => $user->getPayTotal(),
             ];
+            
+            if (Util::isSysLoadAverageOk()) {
+                $data['free'] = $user->getFreeTotal();
+                $data['pay'] = $user->getPayTotal();
+            }
 
             if ($commission_enabled) {
                 $total = $user->getCommissionBalance()->total();

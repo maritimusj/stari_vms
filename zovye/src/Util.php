@@ -2834,4 +2834,10 @@ HTML_CONTENT;
             'p31' => '新疆',
         ];
     }
+
+    public static function isSysLoadAverageOk(): bool
+    {
+        $load = sys_getloadavg();
+        return $load[0] < SYS_MAX_LOAD_AVERAGE_VALUE;
+    }
 }

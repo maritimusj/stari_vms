@@ -24,6 +24,9 @@ define('L_ERROR', 4);
 define('L_FATAL', 5);
 
 define('APP_NAME', basename(ZOVYE_ROOT));
+
+define('SYS_MAX_LOAD_AVERAGE_VALUE', 10);
+
 define('DEBUG', true);
 
 //日志等级

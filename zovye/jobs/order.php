@@ -37,13 +37,17 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
         if ($id > 0) {
             $order = Order::get($id);
             if ($order) {
-                Job::updateAppCounter();
+                if (Util::isSysLoadAverageOk()) {
+                    Job::updateAppCounter();
+                }
 
                 $agent_id = $order->getAgentId();
                 if ($agent_id) {
                     $agent = Agent::get($agent_id);
                     if ($agent) {
-                        Job::updateAgentCounter($agent);
+                        if (Util::isSysLoadAverageOk()) {
+                            Job::updateAgentCounter($agent);
+                        }
                         $agent->updateSettings('agentData.stats.last_order', [
                             'id' => $order->getId(),
                             'createtime' => $order->getCreatetime(),
@@ -66,7 +70,9 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 ];
 
                 if ($device) {
-                    Job::updateDeviceCounter($device);
+                    if (Util::isSysLoadAverageOk()) {
+                        Job::updateDeviceCounter($device);
+                    }
                     $log['device'] = [
                         'name' => $device->getName(),
                         'imei' => $device->getImei(),
@@ -116,25 +122,27 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
             }            
         }
 
-        //其它未处理订单
-        $other_order = Order::query([
-            'updatetime' => 0,
-        ])->limit(100);
+        if (Util::isSysLoadAverageOk()) {
+            //其它未处理订单
+            $other_order = Order::query([
+                'updatetime' => 0,
+            ])->limit(100);
 
-        $total = 0;
-        /** @var orderModelObj $entry */
-        foreach ($other_order->findAll() as $entry) {
-            if ($entry && empty($entry->getUpdatetime())) {
-                $result = Util::transactionDo(function () use ($entry) {
-                    return Util::orderStatistics($entry);
-                });
-                $log['statistics'][$entry->getId()] = $result ?: 'success';
+            $total = 0;
+            /** @var orderModelObj $entry */
+            foreach ($other_order->findAll() as $entry) {
+                if ($entry && empty($entry->getUpdatetime())) {
+                    $result = Util::transactionDo(function () use ($entry) {
+                        return Util::orderStatistics($entry);
+                    });
+                    $log['statistics'][$entry->getId()] = $result ?: 'success';
+                }
+                $total++;
             }
-            $total++;
-        }
 
-        if ($total > 50) {
-            Job::order(0);
+            if ($total > 50) {
+                Job::order(0);
+            }
         }
     }
 }

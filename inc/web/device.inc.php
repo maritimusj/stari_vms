@@ -225,10 +225,14 @@ if ($op == 'list') {
     }
 
     $result = Util::cachedCall(60, function () use ($device) {
-        return $device->getPullStats();
+        if (Util::isSysLoadAverageOk()) {
+            return $device->getPullStats();
+        }
+        throw new RuntimeException('系统繁忙！');
     }, $device->getId());
 
     JSON::success($result);
+
 } elseif ($op == 'device_data') {
 
     $ids = request::has('id') ? [request::int('id')] : request('ids');
@@ -274,12 +278,7 @@ if ($op == 'list') {
                 'lockedTime' => $entry->isLocked() ? date('Y-m-d H:i:s', $entry->getLockedTime()) : '',
                 'appId' => $entry->getAppId(),
                 'appVersion' => $entry->getAppVersion(),
-                'total' => [
-                    'month' => intval($entry->getMTotal(['total'])),
-                    'today' => intval($entry->getDTotal(['total'])),
-                ],
                 'gettype' => [
-                    'freeLimitsReached' => $entry->isFreeLimitsReached(),
                     'location' => $entry->needValidateLocation(),
                 ],
                 'address' => [
@@ -288,6 +287,44 @@ if ($op == 'list') {
                 ],
                 'isDown' => $entry->settings('extra.isDown', Device::STATUS_NORMAL),
             ];
+
+            if (Util::isSysLoadAverageOk()) {
+                $data['total'] =  [
+                    'month' => Util::isSysLoadAverageOk() ? intval($entry->getMTotal(['total'])) : '',
+                    'today' => Util::isSysLoadAverageOk() ? intval($entry->getDTotal(['total'])) : '',
+                ];
+
+                $data['gettype']['freeLimitsReached'] = $entry->isFreeLimitsReached();
+
+                $accounts = $entry->getAssignedAccounts();
+                if ($accounts) {
+                    $data['gettype']['free'] = true;
+                }
+
+                $payload = $entry->getPayload(true);
+                $data = array_merge($data, $payload);
+
+                $low_price = 0;
+                $high_price = 0;
+
+                foreach ((array)$payload['cargo_lanes'] as $lane) {
+                    $goods_data = Goods::data($lane['goods'], ['useImageProxy' => true]);
+                    if ($goods_data && $goods_data['allowPay']) {
+                        if ($low_price === 0 || $low_price > $goods_data['price']) {
+                            $low_price = $goods_data['price'];
+                        }
+                        if ($high_price == 0 || $high_price < $goods_data['price']) {
+                            $high_price = $goods_data['price'];
+                        }
+                    }
+                }
+
+                if ($low_price == $high_price) {
+                    $data['gettype']['price'] = number_format($low_price / 100, 2);
+                } else {
+                    $data['gettype']['price'] = number_format($low_price / 100, 2) . '-' . number_format($high_price / 100, 2);
+                }
+            }
 
             $groupId = $entry->getGroupId();
             if ($groupId > 0) {
@@ -303,33 +340,6 @@ if ($op == 'list') {
                     'id' => $i,
                     'title' => $title,
                 ];
-            }
-
-            $accounts = $entry->getAssignedAccounts();
-            if ($accounts) {
-                $data['gettype']['free'] = true;
-            }
-
-            $payload = $entry->getPayload();
-            $low_price = 0;
-            $high_price = 0;
-
-            foreach ((array)$payload['cargo_lanes'] as $lane) {
-                $goods_data = Goods::data($lane['goods'], ['useImageProxy' => true]);
-                if ($goods_data && $goods_data['allowPay']) {
-                    if ($low_price === 0 || $low_price > $goods_data['price']) {
-                        $low_price = $goods_data['price'];
-                    }
-                    if ($high_price == 0 || $high_price < $goods_data['price']) {
-                        $high_price = $goods_data['price'];
-                    }
-                }
-            }
-
-            if ($low_price == $high_price) {
-                $data['gettype']['price'] = number_format($low_price / 100, 2);
-            } else {
-                $data['gettype']['price'] = number_format($low_price / 100, 2) . '-' . number_format($high_price / 100, 2);
             }
 
             if (App::isVDeviceSupported()) {
@@ -349,7 +359,7 @@ if ($op == 'list') {
             }
 
             $data['device_type'] = $entry->getDeviceType();
-            $data = array_merge($data, $entry->getPayload(true));
+
 
             $statistic = $entry->get('firstMsgStatistic', []);
             if ($statistic) {

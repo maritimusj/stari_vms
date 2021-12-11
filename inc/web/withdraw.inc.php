@@ -129,7 +129,7 @@ if ($op == 'export') {
             } elseif ($state == 'confirmed') {
                 $status = '已完成';
             } elseif ($state == 'cancelled') {
-                $status = '已退款';
+                $status = '已退回';
             } else {
                 $status = '未知';
             }

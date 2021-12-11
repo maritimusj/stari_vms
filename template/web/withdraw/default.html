@@ -279,7 +279,7 @@
                             {if $mch_pay_enabled}
                             <button type="button" class="btn btn-danger btn-sm"  data-op="pay" title="打款到代理商微信?">打款</button>
                             {/if}
-                            <button type="button" class="btn btn-success btn-sm" data-op="confirm" title="标记为已经打款完成">已完成</button>
+                            <button type="button" class="btn btn-success btn-sm" data-op="confirm" title="标记为已经打款完成">完成</button>
                             <button type="button" class="btn btn-warning btn-sm" data-op="refund" title="退款到代理商的佣金帐户">退回</button> 
                         {else}
                             <span class="state {$item['state']}" title="操作时间：{$item['updatetime_formatted']}">{$item['state_formatted']}</span>

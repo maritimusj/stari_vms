@@ -380,12 +380,12 @@ function hashFN(callable $fn, ...$val): string
     return '';
 }
 
-function onceCall(callable $fn, ...$val)
+function onceCall(callable $fn, ...$params)
 {
     static $cache = [];
-    $v = hashFN($fn, ...$val);
+    $v = hashFN($fn, ...$params);
     if (!isset($cache[$v])) {
-        $result = $fn(...$val);
+        $result = $fn(...$params);
         $cache[$v] = $result;
         return $result;
     }

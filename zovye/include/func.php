@@ -385,7 +385,9 @@ function onceCall(callable $fn, ...$val)
     static $cache = [];
     $v = hashFN($fn, ...$val);
     if (!isset($cache[$v])) {
-        $cache[$v] = $fn();
+        $result = $fn();
+        $cache[$v] = $result;
+        return $result;
     }
     return $cache[$v];
 }

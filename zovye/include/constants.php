@@ -32,6 +32,9 @@ define('DEBUG', true);
 //日志等级
 define('LOG_LEVEL', L_DEBUG);
 
+//日志最多保留天数
+define('LOG_MAX_DAY', 3);
+
 //按主题过滤日志
 define('LOG_TOPIC_INCLUDES', []);
 

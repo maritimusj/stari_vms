@@ -91,7 +91,7 @@ class Log
         return $filename;
     }
 
-    public static function deleteExpiredLogFiles(string $name, $keep_days = 3)
+    public static function deleteExpiredLogFiles(string $name, int $keep_days): void
     {
         $files = [];
         $patten = self::logDir($name) . '/*.log';
@@ -136,7 +136,7 @@ class Log
                         }
                     }
                     if (rand(0, 10) == 10) {
-                        self::deleteExpiredLogFiles($name);
+                        self::deleteExpiredLogFiles($name, LOG_MAX_DAY);
                     }
                 });
             }

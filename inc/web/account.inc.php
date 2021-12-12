@@ -259,7 +259,7 @@ if ($op == 'default') {
                 $account->set('config', [
                     'type' => Account::JFB,
                     'url' => request::trim('apiURL'),
-                    'appno' => request::trim('appNO'),
+                    'auth' => request::bool('authUser'),
                     'scene' => request::trim('scene'),
                 ]);
             } elseif ($account->isMoscale()) {

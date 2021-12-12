@@ -82,6 +82,14 @@
                         <span class="help-block">* 准粉吧 API 接口网址</span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="authUser" class="col-xs-12 col-md-2 col-md-2 control-label">静默授权</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="authUser" name="authUser[]" value="1" {if $config['auth']}checked{/if}> 使用静默授权可以过滤重复用户
+                        </label>
+                    </div>
+                </div>
             </div>
             <!-- 平台设置 结束 -->
             <!-- 用户限制 开始 -->

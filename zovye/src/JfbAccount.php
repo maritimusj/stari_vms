@@ -35,93 +35,8 @@ class JfbAccount
 
         $api_url = strval($config['url']);
 
-        $v = [];
-
         $jfb_openid = $user->settings('customData.jfb.openid', '');
-
-        if ($jfb_openid) {
-            $fans = empty($user) ? Util::fansInfo() : $user->profile();
-
-            $data = [
-                'zhunaOpenId' => $jfb_openid,
-                'scene' => strval($config['scene']),
-                'openId' => $fans['openid'],
-                'facilityId' => $device->getImei(),
-                'nickname' => $fans['nickname'],
-                'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
-                'headUrl' => $fans['headimgurl'],
-                'ipAddress' => Util::getClientIp(),
-                'userAgent' => $_SERVER['HTTP_USER_AGENT'],
-                'countryName' => $fans['country'],
-                'provinceName' => $fans['province'],
-                'cityName' => $fans['city'],
-                'requestType' => 1,
-                'creativityType' => 0,
-                'facilityCountry' => $fans['country'],
-                'facilityProvince' => $fans['province'],
-                'facilityCity' => $fans['city'],
-                'facilityDistrict' => '',
-                'showTimes' => 0,
-                'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
-                        'op' => 'feedback',
-                        'device_imei' => $device->getImei(),
-                        'device_name' => $device->getName(),
-                    ]) . '">如未出货请点我！</a>',
-            ];
-
-            $result = Util::post($api_url, $data);
-
-            if (App::isAccountLogEnabled()) {
-                $log = Account::createQueryLog($acc, $user, $device, $data, $result);
-                if (empty($log)) {
-                    Log::error('jfb_query', [
-                        'request' => $data,
-                        'result' => $result,
-                    ]);
-                }
-            }
-
-            try {
-                if (empty($result)) {
-                    throw new RuntimeException('返回数据为空！');
-                }
-
-                if (is_error($result)) {
-                    throw new RuntimeException($result['message']);
-                }
-
-                if (!$result['status'] || $result['errorCode'] != '0000') {
-                    throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
-                }
-
-                $item = current($result['result']['data']);
-                if (empty($item) || empty($item['qrPicUrl'])) {
-                    throw new RuntimeException('没有数据！');
-                }
-
-                $data = $acc->format();
-
-                $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
-                $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
-                $data['qrcode'] = $item['qrPicUrl'];
-
-                $v[] = $data;
-
-                if (App::isAccountLogEnabled() && isset($log)) {
-                    $log->setExtraData('account', $data);
-                    $log->save();
-                }
-            } catch (Exception $e) {
-                if (App::isAccountLogEnabled() && isset($log)) {
-                    $log->setExtraData('error_msg', $e->getMessage());
-                    $log->save();
-                } else {
-                    Log::error('jfb', [
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        } else {
+        if (!empty($config['auth']) && empty($jfb_openid)) {
             if (preg_match('/channelId=(\w*)/', $api_url, $result) > 0) {
                 $channelId = $result[1];
                 if ($channelId) {
@@ -134,8 +49,95 @@ class JfbAccount
                     $data = $acc->format();
                     $data['redirect_url'] = $url;
 
-                    $v[] = $data;
+                    return [$data];
                 }
+            }
+        }
+
+        $fans = empty($user) ? Util::fansInfo() : $user->profile();
+
+        $data = [
+            'scene' => strval($config['scene']),
+            'openId' => $fans['openid'],
+            'facilityId' => $device->getImei(),
+            'nickname' => $fans['nickname'],
+            'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
+            'headUrl' => $fans['headimgurl'],
+            'ipAddress' => Util::getClientIp(),
+            'userAgent' => $_SERVER['HTTP_USER_AGENT'],
+            'countryName' => $fans['country'],
+            'provinceName' => $fans['province'],
+            'cityName' => $fans['city'],
+            'requestType' => 1,
+            'creativityType' => 0,
+            'facilityCountry' => $fans['country'],
+            'facilityProvince' => $fans['province'],
+            'facilityCity' => $fans['city'],
+            'facilityDistrict' => '',
+            'showTimes' => 0,
+            'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
+                    'op' => 'feedback',
+                    'device_imei' => $device->getImei(),
+                    'device_name' => $device->getName(),
+                ]) . '">如未出货请点我！</a>',
+        ];
+
+        if ($jfb_openid) {
+            $data['zhunaOpenId'] = $jfb_openid;
+        }
+
+        $result = Util::post($api_url, $data);
+
+        if (App::isAccountLogEnabled()) {
+            $log = Account::createQueryLog($acc, $user, $device, $data, $result);
+            if (empty($log)) {
+                Log::error('jfb_query', [
+                    'request' => $data,
+                    'result' => $result,
+                ]);
+            }
+        }
+
+        $v = [];
+
+        try {
+            if (empty($result)) {
+                throw new RuntimeException('返回数据为空！');
+            }
+
+            if (is_error($result)) {
+                throw new RuntimeException($result['message']);
+            }
+
+            if (!$result['status'] || $result['errorCode'] != '0000') {
+                throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
+            }
+
+            $item = current($result['result']['data']);
+            if (empty($item) || empty($item['qrPicUrl'])) {
+                throw new RuntimeException('没有数据！');
+            }
+
+            $data = $acc->format();
+
+            $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
+            $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
+            $data['qrcode'] = $item['qrPicUrl'];
+
+            $v[] = $data;
+
+            if (App::isAccountLogEnabled() && isset($log)) {
+                $log->setExtraData('account', $data);
+                $log->save();
+            }
+        } catch (Exception $e) {
+            if (App::isAccountLogEnabled() && isset($log)) {
+                $log->setExtraData('error_msg', $e->getMessage());
+                $log->save();
+            } else {
+                Log::error('jfb', [
+                    'error' => $e->getMessage()
+                ]);
             }
         }
 

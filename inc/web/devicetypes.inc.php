@@ -25,7 +25,7 @@ if ($op == 'default' || $op == 'device_types') {
         'detail' => true,
     ];
 
-    $keywords = trim(urldecode(request::trim('keywords')));
+    $keywords = request::trim('keywords', '', true);
     if (!empty($keywords)) {
         $params['keywords'] = $keywords;
         $tpl_data['s_keywords'] = $keywords;
@@ -231,7 +231,7 @@ if ($op == 'default' || $op == 'device_types') {
 
 } elseif ($op == 'search') {
 
-    $keywords = trim(urldecode(request::trim('keywords')));
+    $keywords = request::trim('keywords', '', true);
     $params = [
         'keywords' => $keywords,
     ];
@@ -244,7 +244,7 @@ if ($op == 'default' || $op == 'device_types') {
 
 } elseif ($op == 'searchGoods') {
 
-    $keywords = trim(urldecode(request::trim('keywords')));
+    $keywords = request::trim('keywords', '', true);
     if (empty($keywords)) {
         $res = Goods::getList(['page' => 1, 'pagesize' => 100, 'default_goods' => true]);
     } else {

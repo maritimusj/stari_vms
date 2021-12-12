@@ -24,7 +24,7 @@ class goods
         $params = [
             'page' => request::int('page'),
             'pagesize' => request::int('pagesize', DEFAULT_PAGE_SIZE),
-            'keywords' => trim(urldecode(request::trim('keywords'))),
+            'keywords' => request::trim('keywords', '', true),
             'default_goods' => true,
         ];
 

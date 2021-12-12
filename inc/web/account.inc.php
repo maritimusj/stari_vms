@@ -62,7 +62,7 @@ if ($op == 'default') {
         }
     }
 
-    $keywords = trim(urldecode(request::str('keywords')));
+    $keywords = request::trim('keywords', '', true);
     if ($keywords) {
         $query->whereOr([
             'name LIKE' => "%$keywords%",
@@ -181,7 +181,7 @@ if ($op == 'default') {
 
     $query = Account::query();
 
-    $keyword = trim(urldecode(request::str('keyword')));
+    $keyword = request::trim('keyword', '', true);
     if ($keyword) {
         $query->whereOr([
             'name LIKE' => "%$keyword%",

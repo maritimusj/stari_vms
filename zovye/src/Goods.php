@@ -176,7 +176,7 @@ class Goods
             $query->where(['price' => $params['price'] * 100]);
         }
 
-        $keywords = trim(urldecode($params['keywords']));
+        $keywords = $params['keywords'];
         if ($keywords) {
             $query->where(['name LIKE' => "%$keywords%"]);
         }

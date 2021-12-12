@@ -62,7 +62,7 @@ if ($op == 'default' || $op == 'goods') {
     $params = [
         'page' => request::int('page'),
         'pagesize' => request::int('pagesize'),
-        'keywords' => trim(urldecode(request::trim('keywords'))),
+        'keywords' => request::trim('keywords', '', true),
         'default_goods' => false,
     ];
 

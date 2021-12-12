@@ -95,7 +95,7 @@ if ($op == 'list') {
 
     $query = Device::query();
 
-    $openid = trim(urldecode(request('openid')));
+    $openid = request::trim('openid', '', true);
     if ($openid) {
         $agent = Agent::get($openid, true);
         if ($agent) {
@@ -103,7 +103,7 @@ if ($op == 'list') {
         }
     }
 
-    $keyword = trim(urldecode(request('keyword')));
+    $keyword = request::trim('keyword', '', true);
     if ($keyword) {
         $query->whereOr([
             'imei LIKE' => "%$keyword%",

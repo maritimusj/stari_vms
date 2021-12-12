@@ -131,7 +131,7 @@ if ($op == 'default') {
         $tpl_data['filter_agentId'] = $filter_agentId;
     }
 
-    $keywords = trim(urldecode(request('keywords')));
+    $keywords = request::trim('keywords', '', true);
     if ($keywords) {
         $query->where(['title LIKE' => "%$keywords%"]);
         $tpl_data['keywords'] = $keywords;

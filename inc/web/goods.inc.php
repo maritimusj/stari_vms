@@ -21,7 +21,7 @@ if ($op == 'default' || $op == 'goods') {
         'pagesize' => request::int('pagesize', 20),
     ];
 
-    $keywords = trim(urldecode(request::trim('keywords')));
+    $keywords = request::trim('keywords', '', true);
     if (!empty($keywords)) {
         $params['keywords'] = $keywords;
         $tpl_data['s_keywords'] = $keywords;

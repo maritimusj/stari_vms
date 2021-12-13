@@ -6,8 +6,10 @@
 
 namespace zovye\model;
 
+use zovye\App;
+use zovye\Balance;
 use zovye\GSP;
-use zovye\We7;
+use zovye\Order;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -163,7 +165,7 @@ class agentModelObj extends userModelObj
     public function isPaymentConfigEnabled(): bool
     {
         $pay = $this->getAgentData('pay', []);
-        foreach((array)$pay as $config) {
+        foreach ((array)$pay as $config) {
             if (is_array($config) && $config['enable']) {
                 return true;
             }
@@ -289,7 +291,7 @@ class agentModelObj extends userModelObj
         $result = [
             'total' => 0,
             'free' => 0,
-            'fee' => 0,
+            'pay' => 0,
         ];
 
         if (!($this->isAgent() || $this->isPartner())) {
@@ -319,17 +321,19 @@ class agentModelObj extends userModelObj
 
         $agent_id = $this->getAgentId();
         if ($agent_id) {
-            $result['free'] = (int)m('order')
-                ->where(We7::uniacid(['agent_id' => $agent_id, 'price' => 0]))
+            $freeOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::ACCOUNT, Order::BALANCE] : Order::ACCOUNT;
+            $result['free'] = (int)Order::query()
+                ->where(['agent_id' => $agent_id, 'src' => $freeOrder])
                 ->where(['createtime >=' => $begin, 'createtime <' => $end])
                 ->get('sum(num)');
 
-            $result['fee'] = (int)m('order')
-                ->where(We7::uniacid(['agent_id' => $agent_id, 'price >' => 0]))
+            $payOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::PAY, Order::BALANCE] : Order::PAY;
+            $result['pay'] = (int)Order::query()
+                ->where(['agent_id' => $agent_id, 'src' => $payOrder])
                 ->where(['createtime >=' => $begin, 'createtime <' => $end])
                 ->get('sum(num)');
 
-            $result['total'] = $result['fee'] + $result['free'];
+            $result['total'] = $result['pay'] + $result['free'];
 
             if ($m_label != date('Ym')) {
                 $M_total[$m_label] = $result;
@@ -466,6 +470,7 @@ class agentModelObj extends userModelObj
     {
         return $this->settings('agentData.stats.first_order');
     }
+
     public function setFirstOrderData(orderModelObj $order): bool
     {
         return $this->updateSettings('agentData.stats.first_order', [

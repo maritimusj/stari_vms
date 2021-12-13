@@ -14,7 +14,7 @@
 <tr data-id="{php echo ($agent ? $agent->getId() : 0) . ':' . $i}">
    <td>{$i}</i></td>
    <td>{php echo intval($item['free'])}</td>
-   <td>{php echo intval($item['fee'])}</td>
+   <td>{php echo intval($item['pay'] ?? $item['fee'])}</td>
    <td>{php echo intval($item['total'])}</td>
    <td class="operate">
         <i class="fa fa-wrench fa-fw" data-op="repair"  title="修复{$i}的出货统计"></i>

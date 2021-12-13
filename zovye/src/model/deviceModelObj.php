@@ -9,6 +9,7 @@ namespace zovye\model;
 
 use Exception;
 use zovye\App;
+use zovye\Balance;
 use zovye\Job;
 
 use zovye\Locker;
@@ -1501,7 +1502,8 @@ class deviceModelObj extends modelObj
                 ]
             );
 
-            $query->where(['price' => 0]);
+            $freeOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::ACCOUNT, Order::BALANCE] : Order::ACCOUNT;
+            $query->where(['src' => $freeOrder]);
 
             $total['free'] = (int)$query->get('sum(num)');
         }
@@ -1517,7 +1519,8 @@ class deviceModelObj extends modelObj
                 ]
             );
 
-            $query->where(['price >' => 0]);
+            $payOrder = App::isBalanceEnabled() && Balance::isPayOrder() ? [Order::PAY, Order::BALANCE] : Order::PAY;
+            $query->where(['src' => $payOrder]);
 
             $total['pay'] = (int)$query->get('sum(num)');
         }
@@ -2234,7 +2237,7 @@ class deviceModelObj extends modelObj
         $no_str = Util::random(16, true);
         $order_no = 'P' . We7::uniacid() . "NO$no_str";
 
-        $params =  [
+        $params = [
             'deviceGUID' => $this->imei,
             'src' => json_encode($extra),
             'channel' => $channel,
@@ -2682,7 +2685,7 @@ class deviceModelObj extends modelObj
                         'allowFree' => $goods_data['allowFree'],
                         'allowPay' => $goods_data['allowPay'],
                     ];
-                    
+
                     if ($goods_data['balance']) {
                         $result['goods'][$key]['balance'] = $goods_data['balance'];
                     }
@@ -2793,7 +2796,7 @@ class deviceModelObj extends modelObj
 
     public function openDoor($index)
     {
-        return $this->mcbNotify('run', '',  [
+        return $this->mcbNotify('run', '', [
             'ser' => Util::random(16, true),
             'sw' => $index,
         ]);

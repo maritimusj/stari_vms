@@ -14,6 +14,7 @@ use zovye\Account;
 use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;
+use zovye\Balance;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
 use zovye\Log;
@@ -642,11 +643,19 @@ class common
 
         $way = request::trim('way');
         if ($way == 'free') {
-            $condition['price'] = 0;
+            if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::ACCOUNT;
+            }
         } elseif ($way == 'fee') {
-            $condition['price >'] = 0;
+            if (App::isBalanceEnabled() && Balance::isPayOrder()) {
+                $condition['src'] = [Order::PAY, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::PAY;
+            }
         } elseif ($way == 'refund') {
-            $condition['extra LIKE'] = '%refund%';
+            $condition['refund'] = 1;
         }
 
         $page = max(1, request::int('page'));
@@ -1073,11 +1082,19 @@ class common
 
         $way = request::trim('way');
         if ($way == 'free') {
-            $condition['price'] = 0;
+            if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::ACCOUNT;
+            }
         } elseif ($way == 'fee') {
-            $condition['price >'] = 0;
+            if (App::isBalanceEnabled() && Balance::isPayOrder()) {
+                $condition['src'] = [Order::PAY, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::PAY;
+            }
         } elseif ($way == 'refund') {
-            $condition['extra LIKE'] = '%refund%';
+            $condition['refund'] = 1;
         }
 
         $page = max(1, request::int('page'));
@@ -1209,11 +1226,11 @@ class common
             if ($user_info['nickName']) {
                 $user->setNickname($user_info['nickName']);
             }
-            
+
             if ($user_info['avatarUrl']) {
                 $user->setAvatar($user_info['avatarUrl']);
             }
-            
+
             if (isset($res['phoneNumber'])) {
                 $user->setMobile($res['phoneNumber']);
             }

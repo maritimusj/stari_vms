@@ -9,6 +9,8 @@ namespace zovye\api\wx;
 use DateTime;
 use zovye\Account;
 use zovye\Agent;
+use zovye\App;
+use zovye\Balance;
 use zovye\Device;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
@@ -132,11 +134,19 @@ class order
 
         $way = request::trim('way');
         if ($way == 'free') {
-            $condition['price'] = 0;
+            if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+                $condition['src'] = [\zovye\Order::ACCOUNT, \zovye\Order::BALANCE];
+            } else {
+                $condition['src'] = \zovye\Order::ACCOUNT;
+            }
         } elseif ($way == 'fee') {
-            $condition['price >'] = 0;
+            if (App::isBalanceEnabled() && Balance::isPayOrder()) {
+                $condition['src'] = [\zovye\Order::PAY, \zovye\Order::BALANCE];
+            } else {
+                $condition['src'] = \zovye\Order::PAY;
+            }
         } elseif ($way == 'refund') {
-            $condition['extra LIKE'] = '%refund%';
+            $condition['refund'] = 1;
         }
 
         if (request::bool('export')) {

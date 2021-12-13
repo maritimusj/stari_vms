@@ -550,4 +550,10 @@ class App
     public static function isBalanceEnabled(): bool {
         return Config::balance('enabled', false);
     }
+
+    public static function isDeviceWithDoorEnabled(): bool {
+        return onceCall(function() {
+            return Config::device('door.enable', false);
+        });
+    }    
 }

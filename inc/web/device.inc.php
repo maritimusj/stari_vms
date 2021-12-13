@@ -2589,5 +2589,5 @@ if ($op == 'list') {
         JSON::fail($result);
     }
 
-    JSON::success('开锁请求已发送！');
+    JSON::success('开锁指令已发送！');
 }

@@ -997,7 +997,7 @@ class device
 
         $index = request::int('index', 1);
 
-        $msg = $device->openDoor($index) ? '开锁命令已发送！' : '请求发送失败！';
+        $msg = $device->openDoor($index) ? '开锁指令已发送！' : '开锁指令发送失败！';
 
         return ['msg' => $msg];
     }

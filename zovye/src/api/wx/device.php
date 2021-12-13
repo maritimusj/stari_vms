@@ -111,7 +111,6 @@ class device
             ],
         ];
 
-
         if ($is_percent) {
             $result['keeper']['percent'] = $v;
         } else {
@@ -202,6 +201,10 @@ class device
         $qoe = $device->getQoe();
         if (isset($qoe) && $qoe > 0) {
             $result['status']['qoe'] = intval($qoe);
+        }
+
+        if (App::isDeviceWithDoorEnabled()) {
+            $result['doorNum'] = $device->getDoorNum();
         }
 
         return $result;
@@ -974,5 +977,28 @@ class device
         }
 
         return error(State::ERROR, '操作失败，请联系管理员！');
+    }
+
+    public static function openDoor(): array
+    {
+        $user = common::getAgent();
+
+        common::checkCurrentUserPrivileges('F_sb');
+
+        $device = device::getDevice(request::str('id'), $user);
+        if (is_error($device)) {
+            return $device;
+        }
+
+        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
+        if (!\zovye\Device::isOwner($device, $agent)) {
+            return error(State::FAIL, '没有权限执行这个操作！');
+        }
+
+        $index = request::int('index', 1);
+
+        $msg = $device->openDoor($index) ? '开锁命令已发送！' : '请求发送失败！';
+
+        return ['msg' => $msg];
     }
 }

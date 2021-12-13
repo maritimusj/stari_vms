@@ -77,6 +77,8 @@ router::exec($op, [
     'GetDeviceInfo' => '\zovye\api\wx\device::getDeviceInfo',
     'DeviceSub' => '\zovye\api\wx\device::deviceSub',
 
+    'DeviceOpenDoor' => '\zovye\api\wx\device::openDoor',
+
     'SetKeeper' => '\zovye\api\wx\keeper::setKeeper',
     'KeeperLogin' => '\zovye\api\wx\keeper::keeperLogin',
     'DeleteKeeper' => '\zovye\api\wx\keeper::deleteKeeper',

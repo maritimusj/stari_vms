@@ -70,7 +70,7 @@ class MeiPaAccount
                 } else {
                     $data = $acc->format();
 
-                    $data['title'] = $result['data']['wechat_name'];
+                    $data['title'] = $result['data']['wechat_name'] ?: Account::MEIPA_NAME;
                     $data['qrcode'] = $result['data']['qrcodeurl'];
 
                     if ($result['data']['joburl'] && We7::starts_with($result['data']['joburl'], 'http')) {

@@ -74,7 +74,7 @@ class KingFansAccount
 
                 $data = $acc->format();
 
-                $data['name'] = $result['list']['ghname'];
+                $data['name'] = $result['list']['ghname'] ?: Account::KINGFANS_NAME;
                 $data['qrcode'] = $result['list']['qrcode_url'];
                 if ($result['list']['head_img']) {
                     $data['img'] = $result['list']['head_img'];

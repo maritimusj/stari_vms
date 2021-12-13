@@ -80,7 +80,7 @@ class ZhiJinBaoAccount
 
                     $data = $acc->format();
 
-                    $data['name'] = $result['data']['nickname'];
+                    $data['name'] = $result['data']['nickname'] ?: Account::ZJBAO_NAME;
                     $data['qrcode'] = $result['data']['qrcodeUrl'];
 
                     $v[] = $data;

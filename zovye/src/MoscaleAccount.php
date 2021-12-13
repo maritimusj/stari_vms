@@ -76,7 +76,7 @@ class MoscaleAccount
 
                     $data = $acc->format();
 
-                    $data['name'] = $result['data']['name'];
+                    $data['name'] = $result['data']['name'] ?: Account::MOSCALE_NAME;
                     $data['qrcode'] = $result['data']['qrcode_url'];
 
                     $v[] = $data;

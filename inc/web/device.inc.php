@@ -289,6 +289,10 @@ if ($op == 'list') {
                 'isDown' => $entry->settings('extra.isDown', Device::STATUS_NORMAL),
             ];
 
+            if (App::isDeviceWithDoorEnabled()) {
+                $data['doorNum'] = $entry->getDoorNum();
+            }
+
             if (Util::isSysLoadAverageOk()) {
                 $data['total'] =  [
                     'month' => Util::isSysLoadAverageOk() ? intval($entry->getMTotal(['total'])) : '',
@@ -459,13 +463,15 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
+    $data = [
+        'is_vd' => $device->isVDevice(),
+        'device_id' => $device->getId(),
+        'params' => $device->getPayload(true),
+    ];
+
     $content = app()->fetchTemplate(
         'web/device/cargo_lanes_test',
-        [
-            'is_vd' => $device->isVDevice(),
-            'device_id' => $device->getId(),
-            'params' => $device->getPayload(true),
-        ]
+        $data
     );
 
     JSON::success([
@@ -655,6 +661,12 @@ if ($op == 'list') {
             'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
             'theme' => request::str('theme'),
         ];
+
+        if (App::isDeviceWithDoorEnabled()) {
+            $extra['door'] = [
+                'num' => request::int('doorNum', 1),
+            ];
+        }
 
         if (App::isMustFollowAccountEnabled()) {
             $extra['mfa'] = [
@@ -2557,4 +2569,25 @@ if ($op == 'list') {
         'title' => "流量卡状态",
         'content' => $content,
     ]);
+
+} elseif ($op == 'openDoor') {
+
+    if (!App::isDeviceWithDoorEnabled()) {
+        JSON::fail('没有启用这个功能！');
+    }
+
+    $id = request::int('id');
+    $device = Device::get($id);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $index = request::int('index', 1);
+
+    $result = $device->openDoor($index);
+    if (is_error($result)) {
+        JSON::fail($result);
+    }
+
+    JSON::success('开锁请求已发送！');
 }

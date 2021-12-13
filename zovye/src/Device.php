@@ -376,6 +376,16 @@ class Device extends State
                     $device->setCapacity(DEFAULT_DEVICE_CAPACITY);
                     $device->updateQrcode(true);
 
+                    $extra = [];
+                    
+                    if (App::isDeviceWithDoorEnabled()) {
+                        $extra['door'] = [
+                            'num' => 1,
+                        ];
+                    }
+                   
+                    $device->set('extra', $extra);
+
                     $data['params'] = $params;
                     $data['result'] = '设备已自动加入！';
 

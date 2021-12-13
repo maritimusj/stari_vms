@@ -264,6 +264,24 @@
     #sms_card_status tr td:first-child {
         font-weight: 800;
     }
+    .door i {
+        border: 1px solid #fff;
+        background: #8bc34a;
+        color: #fff;
+        font-style: normal;
+        padding: 0px 3px;
+        overflow: hidden;
+        cursor: pointer;
+        user-select: none;
+    }
+    .door i:hover {
+        border-color: #9e9e9e;
+        border-bottom: 4px solid #9e9e9e;
+    }
+    .door i:active {
+        background-color: #4CAF50;
+        color: #8bc34a;
+    }    
 </style>
 <div id="appx" v-cloak>
     <div class="init-loading" v-if="device.list === undefined">
@@ -661,7 +679,18 @@
                                                         <span class="title">错误代码：</span><span  class="error">{{o.v0_status.error}}</span>
                                                     </div>
                                                 </template>
+                                                
                                             </div>
+                                            <template v-if="o.doorNum && o.doorNum > 0">
+                                            <div class="detail-seg">
+                                                <div class="door">
+                                                    <span class="title">门锁：</span>
+                                                    <span>
+                                                        <i v-for="i in o.doorNum" v-text="i" @click="openDoor(o.id, i)" title="点击开锁"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            </template>
                                             <div class="detail-seg" v-if="o.cargo_lanes && o.cargo_lanes.length > 0">
                                                 <div v-for="(lane,index) in o.cargo_lanes">
                                                     <span class="title">{{index + 1}}，<span :class="{'text-gray': lane.goods_id === 0}">{{lane.goods_name}}</span>：</span>
@@ -784,5 +813,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625009"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625010"></script>
 {template 'common/footer'}

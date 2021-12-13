@@ -428,6 +428,11 @@ class deviceModelObj extends modelObj
         return '';
     }
 
+    public function getDoorNum(): int
+    {
+        return $this->settings('extra.door.num', 0);
+    }
+
     /**
      * 电量是否过低
      */
@@ -1885,6 +1890,9 @@ class deviceModelObj extends modelObj
     public function mcbNotify(string $op = 'params', string $code = '', array $data = []): bool
     {
         if ($this->imei) {
+            if (empty($code)) {
+                $code = $this->getProtocolV1Code();
+            }
             return CtrlServ::mcbNotify($this->imei, $code, $op, $data);
         }
 
@@ -2781,5 +2789,13 @@ class deviceModelObj extends modelObj
     {
         $this->setS1(0);
         return $this->save();
+    }
+
+    public function openDoor($index)
+    {
+        return $this->mcbNotify('run', '',  [
+            'ser' => Util::random(16, true),
+            'sw' => $index,
+        ]);
     }
 }

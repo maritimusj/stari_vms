@@ -208,8 +208,8 @@ class YunfenbaAccount
 
                     $data = $acc->format();
 
-                    $data['title'] = $result['data']['wechat_name'];
-                    $data['img'] = $result['data']['headimg_url'];
+                    $data['title'] = $result['data']['wechat_name'] ?: Account::YUNFENBA_NAME;
+                    $data['img'] = $result['data']['headimg_url'] ?: Account::YUNFENBA_HEAD_IMG;
                     $data['qrcode'] = $result['data']['qrcode_url'];
 
                     $v[] = $data;

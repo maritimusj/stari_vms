@@ -453,7 +453,7 @@
                                     return res.data;
                                 } else {
                                     if (res.data.message) {
-                                        alert(res.data.message);
+                                        util.message(res.data.msg, '', 'error');
                                     }
                                 }
                             }).then(data => {

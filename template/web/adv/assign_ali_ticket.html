@@ -43,7 +43,7 @@
         m.init(cfg, function (res) {
             $.post(cfg.save, {id: cfg.id, data: JSON.stringify(res)}, function(res){
                 if (res && res.data && res.data.msg) {
-                    alert(res.data.msg);
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
                 }
             })
             return true;

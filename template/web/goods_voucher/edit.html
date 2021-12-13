@@ -196,7 +196,7 @@
                                         });
                                     }
                                 }
-                                alert(res.data.msg);
+                                util.message(res.data.msg, '', res.status ? 'success' : 'error');
                             }
                         }).always(function(){util.loaded();});
                     }

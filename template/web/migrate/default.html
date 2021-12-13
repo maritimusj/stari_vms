@@ -21,9 +21,8 @@
         function step() {
             $.getJSON(api_url).then(function(res) {
                 if (!res || !res.status) {
-                    alert('升级失败，请联系管理员！');
+                    util.message('升级失败，请联系管理员！', '', 'error');
                 } else {
-
                     if (res.data.remain > 0) {
                         $('.current').text(res.data.remain);
                     } else {

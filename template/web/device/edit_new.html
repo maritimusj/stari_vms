@@ -1132,7 +1132,7 @@
                             } else {
                                 this.creating = false;
                                 if (res && res.data && res.data.msg) {
-                                    alert(res.data.msg);
+                                    util.message(res.data.msg, '', 'error');
                                 }
                             }
                         })

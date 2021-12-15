@@ -1684,14 +1684,15 @@ class deviceModelObj extends modelObj
             }
         }
 
-        $this->set(
-            'accountsData',
-            [
-                'lastupdate' => $last_update,
-                'data' => $accounts,
-            ]
-        );
-
+        if (!preg_match('/^' . Device::BALANCE_VDEVICE_PREFIX . '/', $this->imei)) {
+            $this->set(
+                'accountsData',
+                [
+                    'lastupdate' => $last_update,
+                    'data' => $accounts,
+                ]
+            );
+        }
         return $accounts;
     }
 

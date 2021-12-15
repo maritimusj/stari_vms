@@ -86,14 +86,6 @@ class template
             We7::mkDirs($path);
         }
         $content = self::parse(file_get_contents($from), $inmodule);
-        if (defined('IN_MODULE') &&
-            STATUS_ON == module_get_direct_enter_status($_W['current_module']['name']) &&
-            !preg_match('/\<script\>var we7CommonForModule.*document\.body\.appendChild\(we7CommonForModule\)\<\/script\>/', $content) &&
-            !preg_match('/(footer|header|account\/welcome|module\/welcome)+/', $from)) {
-            $extra_code = "<script>var we7CommonForModule = document.createElement(\"script\");we7CommonForModule.src = '//cdn.w7.cc/we7/w7windowside.js?v=" . IMS_RELEASE_DATE . "';document.body.appendChild(we7CommonForModule)
-</script>";
-            $content .= $extra_code;
-        }
         file_put_contents($to, $content);
     }
 

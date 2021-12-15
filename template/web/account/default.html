@@ -174,32 +174,41 @@
 </ul>
 <div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
     <div class="heading">
+        {if !$banned}
         <span class="operate">
+            {if empty($type)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
-            {if \zovye\App::isWxPlatformEnabled()}
+            {/if}
+            {if (empty($type) || $type ==\zovye\Account::AUTH) && \zovye\App::isWxPlatformEnabled()}
             <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
             {/if}
+            {if !isset($type) || $type == \zovye\Account::VIDEO}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
-            {if \zovye\App::isDouyinEnabled()}
+            {/if}
+
+            {if (!isset($type) || $type ==\zovye\Account::DOUYIN) && \zovye\App::isDouyinEnabled()}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
                 <span class="state auth" title="抖音">
                     <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}" title="添加抖音号">
                 </span>
             </a>
             {/if}
+            {if (!isset($type) || $type ==\zovye\Account::WXAPP)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::WXAPP));}">
                 <span class="state auth" title="小程序">
                     <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}" title="添加小程序">
                 </span>
             </a>
-            {if \zovye\App::isBalanceEnabled()}
+            {/if}
+            {if (!isset($type) || $type ==\zovye\Account::TASK) && \zovye\App::isBalanceEnabled()}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::TASK));}">
                 <span class="state auth" title="自定义任务">
                     <img src="{php echo MODULE_URL . 'static/img/task.svg'}" title="添加自定义任务">
                 </span>
             </a>
             {/if}
-        </span>       
+        </span>
+        {/if}    
     </div>
     <div class="panel-body">
         {if $accounts || ($one_res && !$banned)}

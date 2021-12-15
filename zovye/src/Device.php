@@ -51,6 +51,8 @@ class Device extends State
     const V0_STATUS_COUNT = 'count';
     const V0_STATUS_ERROR = 'error';
 
+    const BALANCE_VDEVICE_PREFIX = 'B#';
+
     private static $cache = [];
 
     public static function objClassname(): string
@@ -507,7 +509,8 @@ class Device extends State
         $deviceClassname = m('device')->objClassname();
 
         $device = new $deviceClassname(0, m('device'));
-        $device->setImei('U' . Util::random(16));
+        $device->setImei(self::BALANCE_VDEVICE_PREFIX . Util::random(16, true));
+        
         return $device;
     }
 

@@ -30,7 +30,12 @@ if ($user->isBanned()) {
 $op = request::op('default');
 if ($op == 'default') {
 
-    app()->bonusPage($user);
+    $device_shadow_id = request::str('device');
+    if ($device_shadow_id) {
+        $device = Device::findOne(['shadow_id' => $device_shadow_id]);
+    }
+    
+    app()->bonusPage($user, $device);
 
 } elseif ($op == 'home') {
 

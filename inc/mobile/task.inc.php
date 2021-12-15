@@ -31,8 +31,8 @@ if ($op == 'default') {
     $data['detail'] = [
         [
             'title' => '任务说明',
-            'desc' => $entry->getConfig('desc', ''),
-        ],               
+            'desc' => $account->getConfig('desc', ''),
+        ],              
     ];
 
     json::success($data);

@@ -77,6 +77,8 @@ class Account extends State
     // https://www.showdoc.com.cn/p/f5e459aaab1b8fdd4b1ee30ae7a2cebd
     const YOUFEN = 109;
 
+    const TASK = 110;    
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -112,6 +114,9 @@ class Account extends State
 
     const YOUFEN_NAME = '友粉';
     const YOUFEN_HEAD_IMG = MODULE_URL . 'static/img/youfen.png';
+
+    const TASK_NAME = '自定义任务';
+    const TASK_HEAD_IMG = MODULE_URL . 'static/img/task.svg';    
 
     protected static $title = [
         self::BANNED => '已禁用',

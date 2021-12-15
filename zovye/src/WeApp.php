@@ -622,7 +622,7 @@ JSCODE;
         }
 
         if (App::isBalanceEnabled()) {
-            $bonus_url = Util::murl('bonus', ['serial' => REQUEST_ID]);
+            $bonus_url = Util::murl('bonus', ['serial' => REQUEST_ID, 'device' => $device->getShadowId()]);
             $user_data = [
                 'status' => true,
                 'data' => $user->profile(),
@@ -1219,7 +1219,7 @@ JSCODE;
         $this->showTemplate(Theme::file('balance'), ['tpl' => $tpl_data]);
     }
 
-    public function bonusPage(userModelObj $user)
+    public function bonusPage(userModelObj $user, deviceModelObj $device = null)
     {
         $tpl_data = Util::getTplData([$user]);
 
@@ -1234,6 +1234,7 @@ JSCODE;
         $account_url = Util::murl('account');
         $adv_api_url = Util::murl('adv');
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
+        $task_page = Util::murl('task', ['serial' => REQUEST_ID, 'device' => $device ? $device->getShadowId() : '']);
 
         $jquery_url = JS_JQUERY_URL;
 
@@ -1291,6 +1292,9 @@ $js_sdk
     zovye_fn.redirectToUserPage = function() {
         window.location.replace("$user_home_page");
     }
+    zovye_fn.redirectToTaskPage = function() {
+        window.location.href = "$task_page";
+    }
 JSCODE;
 
         if (!$user->isSigned()) {
@@ -1304,7 +1308,90 @@ JSCODE;
         $tpl_data['js']['code'] .= <<<JSCODE
 \r\n</script>
 JSCODE;
-        $this->showTemplate(Theme::file('bonus'), ['tpl' => $tpl_data]);
+        $filename = Theme::getThemeFile($device, 'bonus');
+        $this->showTemplate($filename, ['tpl' => $tpl_data]);
+    }
+
+    public function taskPage(userModelObj $user, deviceModelObj $device = null)
+    {
+        $tpl_data = Util::getTplData([$user]);
+
+        $user_data = [
+            'status' => true,
+            'data' => $user->profile(),
+        ];
+        $user_data['data']['balance'] = $user->getBalance()->total();
+        $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $api_url = Util::murl('bonus');
+        $task_url = Util::murl('task');
+        $adv_api_url = Util::murl('adv');
+        $user_home_page = Util::murl('bonus', ['op' => 'home']);
+
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_sdk = Util::fetchJSSDK();
+        $wxapp_username = settings('agentWxapp.username', '');
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+$js_sdk
+<script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+    const zovye_fn = {
+        api_url: "$api_url",
+        task_url: "$task_url",
+        user: JSON.parse(`$user_json_str`),
+        wxapp_username: "$wxapp_username",
+    }
+    zovye_fn.getUserInfo = function (cb) {
+        if (typeof cb === 'function') {
+            return cb(zovye_fn.user)
+        }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.user);
+        });
+    }
+    zovye_fn.getAdvs = function(typeid, num, cb) {
+        const params = {num};
+        if (typeof typeid == 'number') {
+            params['typeid'] = typeid;
+        } else {
+            params['type'] = typeid;
+        }
+        $.get("$adv_api_url", params).then(function(res){
+            if (res && res.status) {
+                if (typeof cb === 'function') {
+                    cb(res.data);
+                } else {
+                    console.log(res.data);
+                }
+            }
+        })           
+    }
+    zovye_fn.getTask = function(max) {
+        return $.getJSON(zovye_fn.api_url, {op: 'account', type:110, max});
+    }
+    zovye_fn.getDetail = function(uid) {
+        return $.getJSON(zovye_fn.task_url, {op: 'detail', uid});
+    }    
+    zovye_fn.submit = function(uid, data, cb) {
+        $.post(zovye_fn.task_url, {op: 'submit', uid, data}).then(function(res){
+            if (cb) cb(res);
+        })
+    }
+    zovye_fn.redirectToUserPage = function() {
+        window.location.replace("$user_home_page");
+    }
+JSCODE;
+
+        $tpl_data['js']['code'] .= <<<JSCODE
+\r\n</script>
+JSCODE;
+        $filename = Theme::getThemeFile($device, 'task');
+        $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }
 
     public function userPage(userModelObj $user)

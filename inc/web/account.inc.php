@@ -394,6 +394,12 @@ if ($op == 'default') {
                     ];
                 }
                 $account->set('config', $config);
+            } elseif ($account->isTask()) {
+                $data['img'] = request::trim('img') ?: Account::TASK_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::TASK,
+                    'desc' => request::trim('task_desc'),
+                ]);
             } else {
                 $data['img'] = request::trim('img');
                 //如果网站更换域名后，需要更新url
@@ -430,7 +436,8 @@ if ($op == 'default') {
                 Account::SNTO_NAME,
                 Account::YFB_NAME,
                 Account::WxWORK_NAME,
-                Account::YOUFEN,
+                Account::YOUFEN_NAME,
+                Account::TASK_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
             }

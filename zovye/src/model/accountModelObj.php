@@ -356,6 +356,11 @@ class accountModelObj extends modelObj
         return $this->getType() == Account::AUTH;
     }
 
+    public function isTask(): bool
+    {
+        return $this->getType() == Account::TASK;
+    }    
+
     public function getAssignData(): array
     {
         return (array)$this->get('assigned', []);

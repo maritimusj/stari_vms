@@ -468,6 +468,14 @@
 			</div>
 			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
 		</div>
+		<div class="menu-item clickable" @click="taskClick">
+			<img class="icon" src="{MODULE_URL}static/m/balance/img/more_icon.svg">
+			<div class="info">
+				<span class="title">高佣任务</span>
+				<span class="desc">完成更多任务获取更多奖励</span>
+			</div>
+			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
+		</div>
 		<div class="tabbar">
 			<div class="tab-item">
 				<img src="{MODULE_URL}static/m/balance/img/mission_icon_se.svg">
@@ -533,7 +541,7 @@
 		<div class="toast" v-if="toast.visible">{{toast.text}}</div>
 		<div class="mask" style="background-color: rgba(0, 0, 0, 0);" v-if="loading">
 			<div class="loading-view">
-				<img src="{MODULE_URL}static/m/spec/img/loading.svg">
+				<img src="{MODULE_URL}static/m/balance/img/loading.svg">
 				<span>正在加载中...</span>
 			</div>
 		</div>
@@ -804,6 +812,9 @@
 							}
 						}, data.delay * 1000);
 					});
+				},
+				taskClick() {
+					zovye_fn.redirectToTaskPage();
 				},
 				showToast(text) {
 					if (this.toast.visible) {

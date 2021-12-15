@@ -2426,6 +2426,12 @@ HTML_CONTENT;
                 $params
             );
 
+            if (App::isDeviceWithDoorEnabled() && empty($data['extra']['door'])) {
+                $data['extra']['door'] = [
+                    'num' => request::int('doorNum', 1),
+                ];
+            }
+
             //设置默认型号
             $type_id = settings('device.multi-types.first', 0);
             $device_type = DeviceTypes::get($type_id);

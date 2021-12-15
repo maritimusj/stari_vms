@@ -620,6 +620,10 @@ class agent
             }
         }
 
+        if (App::isDeviceWithDoorEnabled()) {
+            setArray($extra, 'door.num', request::int('doorNum', 1));
+        }
+
         //修改位置信息
         $location = request::is_array('location') ? request::array('location') :
             json_decode(html_entity_decode(request::str('location')), true);

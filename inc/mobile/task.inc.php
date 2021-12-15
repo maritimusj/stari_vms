@@ -9,14 +9,17 @@ namespace zovye;
 $op = request::op('default');
 
 if ($op == 'default') {
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        Util::resultAlert('请用微信打开！', 'error');
+    }
+
     $device_shadow_id = request::str('device');
     if ($device_shadow_id) {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
 
-    $user = Util::getCurrentUser();
-    
-    app()->taskPage($user, $device);
+    app()->taskPage($user, $device ?? null);
 
 } elseif ($op == 'detail') {
 
@@ -26,14 +29,13 @@ if ($op == 'default') {
     }
 
     $data = $account->format();
-    $config = $account->getConfig();
 
     $data['detail'] = [
         [
             'title' => '任务说明',
             'desc' => $account->getConfig('desc', ''),
-        ],              
+        ]
     ];
 
-    json::success($data);
+    JSON::success($data);
 }

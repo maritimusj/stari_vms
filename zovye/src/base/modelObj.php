@@ -445,6 +445,8 @@ class modelObj implements ISettings
                 $isOk = function ($key) use ($seg) {
                     return $seg($key);
                 };
+            } elseif ($seg == 'all') {
+                $isOk = function() { return true; };
             }
         } else {
             if ($seg === null) {

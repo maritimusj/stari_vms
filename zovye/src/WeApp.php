@@ -1327,14 +1327,17 @@ JSCODE;
         $task_url = Util::murl('task');
         $adv_api_url = Util::murl('adv');
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
+        $upload_api_url = Util::murl('util', ['op' => 'upload_pic']);
 
         $jquery_url = JS_JQUERY_URL;
+        $axios_url = JS_AXIOS_URL;
 
         $js_sdk = Util::fetchJSSDK();
         $wxapp_username = settings('agentWxapp.username', '');
 
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
+<script src="$axios_url"></script>
 $js_sdk
 <script>
     wx.ready(function(){
@@ -1376,7 +1379,29 @@ $js_sdk
     }
     zovye_fn.getDetail = function(uid) {
         return $.getJSON(zovye_fn.task_url, {op: 'detail', uid});
-    }    
+    }
+    zovye_fn.upload = function(data) {
+        const param = new FormData();
+        param.append('pic', data);
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+        return new Promise((resolve, reject) => {
+             axios.post("$upload_api_url", param, config).then((res) => {
+                return res.data;
+             }).then((res) => {
+                 if (res.status && res.data) {
+                     resolve(res.data.data);
+                 } else {
+                    reject(res.msg || '上传失败！');
+                 }
+             }).catch(() => {
+               reject("上传失败！");
+             });
+        })
+    }
     zovye_fn.submit = function(uid, data, cb) {
         $.post(zovye_fn.task_url, {op: 'submit', uid, data}).then(function(res){
             if (cb) cb(res);

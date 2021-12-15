@@ -6,32 +6,26 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
-use zovye\traits\ExtraDataGettersAndSetters;
 use function zovye\tb;
 
-class balance_logsModelObj extends modelObj
+class task_viewModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-        return tb('balance_logs');
+        return tb('task_view');
     }
+    
+	protected $id;
 
-    /** @var int */
-    protected $id;
-
-    /** @var int */
 	protected $user_id;
 
-    /** @var int */
 	protected $account_id;
 
-    /** @var int */
 	protected $s1;
 
 	protected $extra;
 
-    /** @var int */
 	protected $createtime;
 
-	use ExtraDataGettersAndSetters;
+	use \zovye\traits\ExtraDataGettersAndSetters;
 }

@@ -33,9 +33,34 @@ if ($op == 'default') {
     $data['detail'] = [
         [
             'title' => '任务说明',
-            'desc' => $account->getConfig('desc', ''),
-        ]
+            'desc' => html_entity_decode($account->getConfig('desc', '')) ,
+        ],
     ];
 
     JSON::success($data);
+
+} elseif ($op == 'submit') {
+
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $uid = request::str("uid");
+    $account = Account::findOneFromUID($uid);
+    if (empty($account)) {
+        JSON::fail('找不到这个公任务！');
+    }
+
+    if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() == 0) {
+        JSON::fail('任务未设置积分奖励！');
+    }
+
+    $data = request::array('data');
+    
+    if (Task::createLog($user, $account, $data)) {
+         JSON::success('提交成功！');
+    }
+
+    JSON::fail('保存记录失败！');
 }

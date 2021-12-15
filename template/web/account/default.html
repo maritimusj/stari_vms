@@ -155,7 +155,9 @@
             <li role="presentation"{if $type == \zovye\Account::DOUYIN} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::DOUYIN]);}">抖音</a></li>
             {/if}
             <li role="presentation"{if $type == \zovye\Account::WXAPP} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::WXAPP]);}">小程序</a></li>
+            {if \zovye\App::isBalanceEnabled()}
             <li role="presentation"{if $type == \zovye\Account::TASK} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::TASK]);}">自定义任务</a></li>
+            {/if}
             <li role="presentation"{if $banned} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['banned' => 1]);}">已隐藏的吸粉号</a></li>
         {/if}
     {else}
@@ -190,11 +192,13 @@
                     <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}" title="添加小程序">
                 </span>
             </a>
+            {if \zovye\App::isBalanceEnabled()}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::TASK));}">
                 <span class="state auth" title="自定义任务">
                     <img src="{php echo MODULE_URL . 'static/img/task.svg'}" title="添加自定义任务">
                 </span>
             </a>
+            {/if}
         </span>       
     </div>
     <div class="panel-body">

@@ -53,6 +53,9 @@ if ($op == 'default') {
         if (!App::isDouyinEnabled()) {
             $query->where(['type <>' => Account::DOUYIN]);
         }
+        if (!App::isBalanceEnabled()) {
+            $query->where(['type <>' => Account::TASK]);
+        }        
     }
 
     if (request::has('agentId')) {

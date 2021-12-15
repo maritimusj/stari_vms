@@ -532,7 +532,7 @@ CODE;
 
 } elseif ($op == 'feedback') {
 
-    $api_url1 = Util::murl('device', ['op' => 'fb_pic']);
+    $api_url1 = Util::murl('util', ['op' => 'upload_pic']);
     $api_url2 = Util::murl('device', ['op' => 'feed_back']);
 
     $axios_url = JS_AXIOS_URL;
@@ -540,9 +540,9 @@ CODE;
 <script src="$axios_url"></script>
 <script>
 const zovye_fn = {};
-zovye_fn.upload = function(filename) {
+zovye_fn.upload = function(data) {
     const param = new FormData();
-    param.append('pic', filename);
+    param.append('pic', data);
     
     const config = {
         headers: {

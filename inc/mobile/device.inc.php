@@ -32,31 +32,6 @@ if ($op == 'default') {
 
     header('location:' . Util::murl('entry', ['from' => 'device', 'device' => $device->getShadowId()]));
 
-} else if ($op == 'fb_pic') {
-
-    $user = Util::getCurrentUser();
-    if (empty($user) || $user->isBanned()) {
-        JSON::fail('找不到用户！');
-    }
-
-    We7::load()->func('file');
-    $res = We7::file_upload($_FILES['pic']);
-
-    if (!is_error($res)) {
-        $filename = $res['path'];
-        if ($res['success'] && $filename) {
-            try {
-                We7::file_remote_upload($filename);
-            } catch (Exception $e) {
-                Log::error('mobile_device_fb', $e->getMessage());
-            }
-        }
-        $url = $filename;
-        JSON::success(['data' => $url]);
-    } else {
-        JSON::fail(['mst' => '上传失败！']);
-    }
-
 } else if ($op == 'feed_back') {
 
     $user = Util::getCurrentUser();

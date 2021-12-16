@@ -444,6 +444,14 @@
 				</wx-open-launch-weapp>
 			</div>
 		</div>
+		<div class="menu-item clickable" @click="taskClick">
+			<img class="icon" src="{MODULE_URL}static/m/balance/img/more_icon.svg">
+			<div class="info">
+				<span class="title">高佣任务</span>
+				<span class="desc">完成更多任务获取更多奖励</span>
+			</div>
+			<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
+		</div>
 		<div class="menu-item clickable" @click="videoClick">
 			<img class="icon" src="{MODULE_URL}static/m/balance/img/video_icon.svg">
 			<div class="info">
@@ -518,6 +526,7 @@
 					</div>
 				</div>
 				<span class="desc" v-html="wxapp.data.descr"></span>
+				<div v-if="wechatState === false">当前微信版本过低，建议升级微信后再试！</div>
 				<img class="close-icon" src="{MODULE_URL}static/m/balance/img/close_black.svg" @click="wxapp.visible = false">
 			</div>
 		</div>
@@ -532,7 +541,7 @@
 		<div class="toast" v-if="toast.visible">{{toast.text}}</div>
 		<div class="mask" style="background-color: rgba(0, 0, 0, 0);" v-if="loading">
 			<div class="loading-view">
-				<img src="{MODULE_URL}static/m/spec/img/loading.svg">
+				<img src="{MODULE_URL}static/m/balance/img/loading.svg">
 				<span>正在加载中...</span>
 			</div>
 		</div>
@@ -768,7 +777,7 @@
 								this.wxapp.data = data[0];
 								this.wxapp.visible = true;
 								this.$nextTick(() => {
-									this.addListener(this.wxapp.data)
+									this.addListener(this.wxapp.data);
 								});
 								if (this.wechatState === false) {
 									alert('当前微信版本过低，建议升级微信后再试！');
@@ -803,6 +812,9 @@
 							}
 						}, data.delay * 1000);
 					});
+				},
+				taskClick() {
+					zovye_fn.redirectToTaskPage();
 				},
 				showToast(text) {
 					if (this.toast.visible) {

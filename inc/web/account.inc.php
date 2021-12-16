@@ -534,7 +534,8 @@ if ($op == 'default') {
                 $data['img'] = request::trim('img') ?: Account::TASK_HEAD_IMG;
                 $account->set('config', [
                     'type' => Account::TASK,
-                    'desc' => request::trim('task_desc'),
+                    'url' => request::trim('task_url'),
+                    'desc' => request::str('task_desc'),
                 ]);
             }
 

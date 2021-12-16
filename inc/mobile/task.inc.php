@@ -128,7 +128,7 @@ if ($op == 'default') {
     if ($url) {
         $data['detail'][] = [
             'title' => '任务链接',
-            'qrcode' => $url,
+            'url' => $url,
         ];
     }
 
@@ -138,10 +138,12 @@ if ($op == 'default') {
             'img' => [],
         ];
         $images = $task->settings('extra.images', []);
-        foreach ($images as $img) {
-            $item['img'][] = Util::toMedia($img, true);
+        if ($images) {
+            foreach ($images as $img) {
+                $item['img'][] = Util::toMedia($img, true);
+            }
+            $data['detail'][] = $item;            
         }
-        $data['detail'][] = $item;
     }
 
     JSON::success($data);

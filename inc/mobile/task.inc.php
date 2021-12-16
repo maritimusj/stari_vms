@@ -133,7 +133,7 @@ if ($op == 'default') {
 
     if (isset($task)) {
         $item = [
-            'title' => '已提交的任务图片',
+            'title' => '我提交的截图',
             'img' => [],
         ];
         $images = $task->getExtraData('data.images', []);

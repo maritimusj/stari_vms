@@ -316,7 +316,13 @@ TEXT;
         return $data;
     }
 
-    public static function give(userModelObj $user, accountModelObj $account, $reason = '')
+    /**
+     * @param userModelObj $user
+     * @param accountModelObj $account
+     * @param string $reason
+     * @return array|balanceModelObj|bool
+     */
+    public static function give(userModelObj $user, accountModelObj $account, string $reason = '')
     {
         if (!$user->acquireLocker("balance:give")) {
             return err('无法锁定用户！');
@@ -360,9 +366,10 @@ TEXT;
                 if (!$result) {
                     return err('创建用户积分记录失败！');
                 }
+                return $result;
             }
 
-            return $result;
+            return true;
         });
     }
 

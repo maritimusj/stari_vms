@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\model\balance_logsModelObj;
+use zovye\model\balanceModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
@@ -97,7 +100,7 @@ if ($op == 'default') {
 
         JSON::success([
             'balance' => $user->getBalance()->total(),
-            'bonus' => $result->getXVal(),
+            'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
         ]);
     }
 
@@ -247,7 +250,7 @@ if ($op == 'default') {
 
     $data = [
         'balance' => $user->getBalance()->total(),
-        'bonus' => $account->getBalancePrice(),
+        'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
     ];
 
     JSON::success($data);

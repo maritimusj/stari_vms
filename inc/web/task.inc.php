@@ -113,6 +113,10 @@ if ($op == 'view') {
                 return err('找不到用户！');
             }
 
+            if (!$user->acquireLocker(User::TASK_LOCKER)) {
+                return err('用户无法锁定，请重试！');
+            }
+
             $result = Balance::give($user, $account);
             if (is_error($result)) {
                 return $result;

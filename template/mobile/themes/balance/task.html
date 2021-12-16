@@ -30,8 +30,8 @@
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			padding-bottom: calc(54px + constant(safe-area-inset-bottom));
-			padding-bottom: calc(54px + env(safe-area-inset-bottom));
+			padding-bottom: calc(10px + constant(safe-area-inset-bottom));
+			padding-bottom: calc(10px + env(safe-area-inset-bottom));
 		}
 
 		[v-cloak] {
@@ -49,20 +49,33 @@
 			border-radius: 10px;
 		}
 
-		.row {
+		.list-view {
 			width: calc(100% - 40px);
-			padding: 20px 10px;
+			padding: 10px 10px 0;
+			margin-top: 10px;
+			display: flex;
+			flex-direction: column;
+			background-color: white;
+			border-radius: 10px;
+		}
+
+		.list-view .title {
+			font-weight: bold;
+			font-size: 16px;
+		}
+
+		.row {
+			width: 100%;
+			padding: 15px 0;
 			display: flex;
 			flex-direction: row;
 			align-items: center;
-			background-color: white;
-			border-radius: 10px;
-			margin-top: 10px;
 		}
 
 		.row .icon {
 			width: 45px;
 			height: 45px;
+			border-radius: 5px;
 		}
 
 		.info {
@@ -80,13 +93,13 @@
 		}
 
 		.title-row .title {
-			font-size: 16px;
-			font-weight: bold;
+			font-size: 14px;
+			font-weight: 500;
 		}
 
 		.title-row .coin {
-			width: 15px;
-			height: 15px;
+			width: 14px;
+			height: 14px;
 			margin-left: 10px;
 		}
 
@@ -97,7 +110,7 @@
 
 		.info .desc {
 			color: #aaa;
-			font-size: 13px;
+			font-size: 12px;
 			margin-top: 2px;
 		}
 
@@ -114,6 +127,18 @@
 
 		.clickable:active {
 			opacity: 0.7;
+		}
+
+		.row .status {
+			font-size: 13px;
+			color: #aaa;
+			font-weight: normal;
+			margin-right: 5px;
+		}
+
+		.row .arrow {
+			width: 15px;
+			height: 15px;
 		}
 
 		.no-data-view {
@@ -301,16 +326,16 @@
 			border-radius: 19px;
 		}
 
-		.status {
+		.detail-view .footer .status {
 			font-weight: 500;
 		}
 
 		.success {
-			color: #04BE02;
+			color: #04BE02 !important;
 		}
 
 		.fail {
-			color: #FF4B34;
+			color: #FF4B34 !important;
 		}
 
 		.mask {
@@ -519,19 +544,39 @@
 			</div>
 			<div class="swiper-pagination"></div>
 		</div>
-		<div class="row" v-for="item in list">
-			<img class="icon" src="{MODULE_URL}static/m/balance/img/mission.svg">
-			<div class="info">
-				<div class="title-row">
-					<span class="title">{{item.title}}</span>
-					<img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">
-					<span class="bonus">+{{item.balance}}</span>
+		<div class="list-view" v-if="participatedList && participatedList.length > 0">
+			<span class="title">进行中</span>
+			<div class="row clickable" v-for="item in participatedList" @click="detailClick(item)">
+				<img class="icon" :src="item.img ? item.img : '{MODULE_URL}static/m/balance/img/mission.svg'">
+				<div class="info">
+					<div class="title-row">
+						<span class="title">{{item.title}}</span>
+						<img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">
+						<span class="bonus">+{{item.balance}}</span>
+					</div>
+					<span class="desc">{{item.descr}}</span>
 				</div>
-				<span class="desc">{{item.descr}}</span>
+				<span class="status" v-if="item.status === 0">审核中</span>
+				<span class="status fail" v-else-if="item.status === 1">未通过</span>
+				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
 			</div>
-			<div class="btn clickable" @click="detailClick(item)">去完成</div>
 		</div>
-		<div class="no-data-view" v-if="list && list.length === 0">
+		<div class="list-view" v-if="newList && newList.length > 0">
+			<span class="title">任务列表</span>
+			<div class="row" v-for="item in newList" @click="detailClick(item)">
+				<img class="icon" :src="item.img ? item.img : '{MODULE_URL}static/m/balance/img/mission.svg'">
+				<div class="info">
+					<div class="title-row">
+						<span class="title">{{item.title}}</span>
+						<img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">
+						<span class="bonus">+{{item.balance}}</span>
+					</div>
+					<span class="desc">{{item.descr}}</span>
+				</div>
+				<div class="btn clickable">去完成</div>
+			</div>
+		</div>
+		<div class="no-data-view" v-if="newList && participatedList && newList.length === 0 && participatedList.length === 0">
 			<img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
 			<span class="no-data-desc">暂无数据</span>
 		</div>
@@ -567,11 +612,11 @@
 			<div class="footer">
 				<span>任务奖励</span>
 				<img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">
-				<span class="bonus">+50</span>
-				<div class="btn clickable" v-if="detail.result === 0" @click="upload.visible = true">立即提交</div>
-				<span class="status" v-else-if="detail.result === 1">等待审核</span>
-				<span class="status success" v-else-if="detail.result === 2">任务成功</span>
-				<template v-else-if="detail.result === 3">
+				<span class="bonus">+{{detail.data.balance}}</span>
+				<div class="btn clickable" v-if="detail.data.status === undefined" @click="upload.visible = true">立即提交</div>
+				<span class="status" v-else-if="detail.data.status === 0">等待审核</span>
+				<!-- <span class="status success" v-else-if="detail.result === 2">任务成功</span> -->
+				<template v-else-if="detail.data.status === 1">
 					<span class="status fail">任务失败</span>
 					<span class="btn clickable" style="margin-left: 10px;" @click="upload.visible = true">重新提交</span>
 				</template>
@@ -588,7 +633,7 @@
 						<img class="img" :src="img">
 						<img class="delete" src="{MODULE_URL}static/m/balance/img/delete_fill.svg" @click="deleteFile(index)">
 					</div>
-					<div class="upload-view clickable" v-if="upload.max > 0">
+					<div class="upload-view clickable" v-if="upload.files.length < upload.max">
 						<img class="plus" src="{MODULE_URL}static/m/balance/img/plus.svg">
 						<span>点击添加截图</span>
 						<input class="file-input" type="file" accept="image/*" multiple="multiple"
@@ -624,11 +669,11 @@
 			data: {
 				slides: [],
 				userInfo: null,
-				list: null,
+				newList: null,
+				participatedList: null,
 				detail: {
 					visible: false,
-					data: null,
-					result: 0
+					data: null
 				},
 				toast: {
 					visible: false,
@@ -696,7 +741,8 @@
 				getTask() {
 					zovye_fn.getTask().then(res => {
 						if (res.status) {
-							this.list = res.data || [];
+							this.newList = res.data.new || [];
+							this.participatedList = res.data.participated || [];
 						}
 					})
 				},
@@ -707,6 +753,8 @@
 						if (res.status) {
 							this.detail.data = res.data;
 							this.detail.visible = true;
+							this.upload.files = [];
+							this.upload.imgs = [];
 						} else {
 							alert(res.data.msg);
 						}
@@ -731,15 +779,16 @@
 				},
 				chooseImg(event) {
 					const that = this;
-					const files = event.target.files;
-					if (files.length > that.upload.max) {
-						this.showToast('最多选择' + that.upload.max + '张图片');
-						return;
-					} else {
-						that.upload.max = that.upload.max - files.length;
+					const targetFiles = event.target.files;
+					let files = [];
+					for (let i = 0; i < targetFiles.length; i++) {
+						files.push(targetFiles[i]);
 					}
-					for (let i = 0; i < files.length; i++) {
-						let file = files[i];
+					if (files.length > that.upload.max - that.upload.files.length) {
+						files = files.slice(0, that.upload.max - that.upload.files.length);
+						this.showToast('最多上传' + that.upload.max + '张图片');
+					}
+					files.forEach(file => {
 						that.upload.files.push(file);
 						if (file.type.indexOf("image") === 0) {
 							let reader = new FileReader();
@@ -749,12 +798,11 @@
 								that.upload.imgs.push(newUrl);
 							};
 						}
-					}
+					});
 				},
 				deleteFile(index) {
 					this.upload.files.splice(index, 1);
 					this.upload.imgs.splice(index, 1);
-					this.upload.max++;
 				},
 				uploadClick() {
 					if (this.upload.files.length === 0) {

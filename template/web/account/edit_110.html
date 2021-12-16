@@ -53,16 +53,10 @@
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">
-                        任务头像
+                        头像
                     </label>
                     <div class="col-md-10">
                         {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">边框颜色</label>
-                    <div class="col-md-10">
-                        {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
                     </div>
                 </div>
             </div>
@@ -71,14 +65,14 @@
             <div class="seg">
                 <div class="title">任务</div>
                 <div class="form-group">
-                    <label for="task_url" class="col-md-2 control-label">任务链接（可选）</label>
+                    <label for="task_url" class="col-md-2 control-label">链接（可选）</label>
                     <div class="col-md-10">
                         <input type="task_url" class="form-control" name="task_url" id="task_url" value="{$config['url']}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">
-                        任务二维码（可选）
+                        二维码（可选）
                     </label>
                     <div class="col-md-10">
                         {php echo tpl_form_field_image('task_qrcode', $config['qrcode']);}
@@ -92,7 +86,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">任务详情（可选）</label>
+                    <label class="col-md-2 control-label">详情（可选）</label>
                     <div class="col-md-10">
                     {php echo tpl_ueditor('task_desc', $config['desc']);}
                     </div>
@@ -106,42 +100,42 @@
             <div class="seg">
                 <div class="title">高级设置</div>
                 <div class="form-group">
-                    <label for="scname" class="col-md-2 control-label">领取周期</label>
+                    <label for="scname" class="col-md-2 control-label">任务周期</label>
                     <div class="col-md-10">
                         <select  class="form-control" name="scname" id="scname">
                             <option value="{php echo zovye\Schema::DAY}" {if $account && $account->getScname() == zovye\Schema::DAY}selected{/if}>每天</option>
                             <option value="{php echo zovye\Schema::WEEK}" {if $account && $account->getScname() == zovye\Schema::WEEK}selected{/if}>每周</option>
                             <option value="{php echo zovye\Schema::MONTH}" {if $account && $account->getScname() == zovye\Schema::MONTH}selected{/if}>每月</option>
                         </select>
-                        <span class="help-block">* 每天/每周/每月可领取一次奖励</span>
+                        <span class="help-block">* 每天/每周/每月可完成一次该任务</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="count" class="col-md-2 control-label">一个周期内<br/><b>单个用户</b>可领取数量</label>
+                    <label for="count" class="col-md-2 control-label">一个周期内<br/><b>单个用户</b>可完成次数</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="count" id="count" value="{php echo $account?$account->getCount():'1'}">
-                        <span class="help-block">* 每个用户在关注该公众号以后<b>每个周期</b>最多可领取的奖励数量，0表示不限制数量</span>
+                        <span class="help-block">* 每个用户在<b>每个周期</b>最多可完成的任务次数，0表示不限制次数</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="sccount" class="col-md-2 control-label">一个周期内<br/><b>全部用户</b>可领取总数</label>
+                    <label for="sccount" class="col-md-2 control-label">一个周期内<br/><b>全部用户</b>可用任务次数</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="sccount" id="sccount" value="{php echo $account?$account->getSccount():'0'}">
-                        <span class="help-block">* 全部用户在一个周期内领取总数量的最大值，0表示不限制数量</span>
+                        <span class="help-block">* 全部用户在一个周期内完成任务总次数的最大值，0表示不限制次数</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="total" class="col-md-2 control-label"><b>单个用户</b><br/>累计最多领取数量</label>
+                    <label for="total" class="col-md-2 control-label"><b>单个用户</b><br/>累计最多完成任务次数</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="total" id="total" value="{php echo $account?$account->getTotal():'1'}">
-                        <span class="help-block">* 每个用户在关注该公众号以后累计最多可领取的奖励数量，0表示不限制数量</span>
+                        <span class="help-block">* 每个用户最多可以完成任务次数，0表示不限制次数</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多领取总数</label>
+                    <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多可完成任务总次数</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="orderlimits" id="orderlimits" value="{php echo $account?$account->getOrderLimits():'0'}">
-                        <span class="help-block">* 所有用户在这个公众号领取的奖励总数量，0表示不限制数量，<b>超过后，系统会自动隐藏该公众号！</b></span>
+                        <span class="help-block">* 所有用户可以完成的任务总次数，0表示不限制次数，<b>超过后，系统会自动隐藏该公众号！</b></span>
                     </div>
                 </div> 
             </div>
@@ -180,13 +174,6 @@
             <div class="seg">
                 <div class="title">其它设置</div>
                 <div class="form-group">
-                    <label for="groupname" class="col-md-2 control-label">分组名称</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="groupname" id="groupname" value="{php echo $account?$account->getGroupName():''}">
-                        <span class="help-block">* 可选，同一分组的公众号只有排序值最大的才会显示在公众号关注页面中</span>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="orderno" class="col-md-2 control-label">排序</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
@@ -199,10 +186,10 @@
             <div class="seg">
                 <div class="title">积分</div>
                 <div class="form-group">
-                    <label for="balance" class="col-md-2 control-label">获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
+                    <label for="balance" class="col-md-2 control-label">积分数量 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="balance" id="balance" value="{$balance}" min="0" step="1">
-                        <span class="help-block">* 用户关注这个公众号后，会获得指定积分</span>
+                        <span class="help-block">* 用户提交的任务次数通过审核后，会获得指定积分</span>
                     </div>
                 </div>
             </div>

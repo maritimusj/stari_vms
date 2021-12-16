@@ -367,44 +367,46 @@
                           <span class="fa fa-caret-down"></span></a>
                           <ul class="dropdown-menu">
                             {if !isset($a['balance'])}
-                            <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
-                            <li role="separator" class="divider"></li>
+                                <li><a href="{php echo $this->createWebUrl('account', array('op'=>'edit','id'=>$a['id']));}"><i class="fa fa-edit fa-fw"></i> 编辑</a></li>
+                                <li role="separator" class="divider"></li>
                             {/if}
-                            <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
-                            {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
-                            <li>
-                                <a href="#" data-op="useAccountQRCode" onclick="return false;">
-                                    <i class="fa fa-desktop fa-fw"></i>
-                                    <span class="text">
-                                        {if $a['useAccountQRCode']}
-                                        取消设备二维码
-                                        {else}
-                                        设为设备二维码
-                                        {/if}
-                                    </span>
-                                </a>
-                            </li>
+                            {if $a['type'] == \zovye\Account::TASK}
+                                <li><a href="#"  data-op="viewTaskLog"><i class="fa fa-list fa-fw"></i> 用户任务记录</a></li>
+                            {else}
+                                <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
+                                {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
+                                <li>
+                                    <a href="#" data-op="useAccountQRCode" onclick="return false;">
+                                        <i class="fa fa-desktop fa-fw"></i>
+                                        <span class="text">
+                                            {if $a['useAccountQRCode']}
+                                            取消设备二维码
+                                            {else}
+                                            设为设备二维码
+                                            {/if}
+                                        </span>
+                                    </a>
+                                </li>
+                                {/if}
+                                {if $a['more_url']}
+                                <li role="separator" class="divider"></li>
+                                {loop $a['more_url'] $index $xurl}
+                                {if $xurl}
+                                <li><a href="#" data-url="{$xurl}"  onclick="return false;"><i class="fa fa-external-link-square fa-fw"></i> 领取链接 [{php echo $index + 1}]</a></li>
+                                {/if}
+                                {/loop}
+                                {/if}                            
                             {/if}
-                            {if $a['more_url']}
-                            <li role="separator" class="divider"></li>
-                            {loop $a['more_url'] $index $xurl}
-                            {if $xurl}
-                            <li><a href="#" data-url="{$xurl}"  onclick="return false;"><i class="fa fa-external-link-square fa-fw"></i> 领取链接 [{php echo $index + 1}]</a></li>
-                            {/if}
-                            {/loop}
-                            {/if}
+
                             {if $a['is_third_party_platform']}
-                            <li>
-                                <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $a['id']])}">
-                                    <i class="fa fa-history fa-fw"></i> 查看请求日志
-                                </a>
-                            </li>
+                                <li>
+                                    <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $a['id']])}">
+                                        <i class="fa fa-history fa-fw"></i> 查看请求日志
+                                    </a>
+                                </li>
                             {/if}
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewFansCount"><i class="fa fa-users fa-fw"></i> 统计净增粉量</a></li>
-                            {if $a['type'] == \zovye\Account::TASK}
-                            <li><a href="#"  data-op="viewTaskLog"><i class="fa fa-list fa-fw"></i> 用户任务记录</a></li>
-                            {/if}
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewStats"><i class="fa fa-area-chart fa-fw"></i> 查看本月统计</a></li>
                             <li><a href="#" data-op="viewHistoryStats"><i class="fa fa-line-chart fa-fw"></i> 查看历史数据</a></li>

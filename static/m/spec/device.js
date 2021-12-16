@@ -268,7 +268,7 @@ const app = new Vue({
         tabClick(index) {
             this.tabbar.currentValue = this.tabbar.list[index].value;
             if (index === 2) {
-                zovye_fn.redirectToOrder();
+                zovye_fn.redirectToOrderPage();
             }
         },
         showToast(text) {

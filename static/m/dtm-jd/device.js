@@ -223,7 +223,7 @@ const app = new Vue({
             }
         },
         orderClick() {
-            zovye_fn.redirectToOrder();
+            zovye_fn.redirectToOrderPage();
         },
         feedbackClick() {
             zovye_fn.redirectToFeedBack();

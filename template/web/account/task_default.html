@@ -1,0 +1,226 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20211127');}
+<style>
+    .nav img {
+        width: 24px;
+        height: 24px;
+    }
+    .status0 .status_title {
+        color: orange;
+    }
+    .status1 .status_title {
+        color:orangered;
+    }
+    .status2 .status_title {
+        color: green;
+    }
+    .fb-img {
+        width: 100px;
+        height: 100px;
+        margin: 3px;
+        border: 1px solid #ccc;
+        padding: 3px;
+        cursor: pointer;
+    }
+    ul.images-list {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: center;
+        align-content: center;
+    }
+    .status {
+        text-align: center;
+        width: 6em;
+        padding: 5px 10px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        color: #ccc;
+        user-select: none;
+    }
+    .status1 .status {
+        border-color: #f44336;
+        color: #f44336;
+    }
+    .status2 .status {
+        border-color: #5cb85c;
+        color: #5cb85c;
+    }
+    
+</style>
+<link rel="stylesheet" href="https://cdn.staticfile.org/viewerjs/1.9.0/viewer.min.css">
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if $user}
+            <div class="profile">
+                <img src="{$user['headimgurl']}">
+                <span class="title">
+                    <b>{$user['nickname']}</b>的任务记录
+                </span>
+            </div>
+            {elseif $account}
+            <div class="profile">
+                <img src="{$account['img']}">
+                <span class="title">
+                    <b>{$account['title']}</b>的任务记录
+                </span>
+            </div>
+            {/if}
+            
+        </a>
+    </li>
+</ul>
+<div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'add'));}"  title="添加活码转跳">
+                <i class="fa fa-fw fa-pencil"></i>
+            </a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table" id="qrcodelist">
+            <thead>
+            <tr>
+                <th>#</th>
+                {if empty($account)}
+                <th>任务</th>
+                {/if}
+                <th>用户</th>
+                <th class="center">图片</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                {loop $list $index $item}
+                <tr class="status{$item['status']}" data-id="{$item['id']}">
+                    <td>{php echo $index + 1}</td>
+                    {if empty($account)}
+                    <td>
+                        <div class="profile">
+                            <img src="{$item['img']}">
+                            <span class="title">{$item['title']}</span>
+                        </div>
+                    </td>
+                    {/if}
+                    <td>
+                        <div class="profile">
+                            <img src="{$item['user']['headimgurl']}">
+                            <span class="title">
+                                {$item['user']['nickname']}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <ul class="images-list">
+                            {loop $item['submit']['images'] $p}
+                            <li>
+                                <img src="{php echo \zovye\Util::toMedia($p)}" class="fb-img" />
+                            </li>
+                            {/loop}
+                        </ul>
+                    </td>
+                    <td>
+                        {php echo date('Y-m-d H:i:s', $item['createtime']);}
+                    </td>
+                    <td class="operate">
+                        {if $item['status'] == \zovye\Task::INIT}
+                        <button type="button" class="btn btn-danger btn-sm" data-op="reject">拒绝</button>
+                        <button type="button" class="btn btn-success btn-sm" data-op="accept">通过</button>
+                        {else}
+                        <span class="status">
+                            {$item['status_formatted']}
+                        </span>
+                        {/if}
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何记录！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    require(['https://cdn.staticfile.org/viewerjs/1.9.0/viewer.min.js'], function (Viewer) {
+        $('.images-list').each((i, e) => {
+            new Viewer(e);
+        })
+    })
+
+    $(function() {
+        const api = {
+            url: "{php echo $this->createWebUrl('task');}",
+        }
+        
+        api.showResult = function(params, url, cb) {
+            $.getJSON(url || api.url, params).done(function(res){
+                if(res) {
+                    if(res.status && res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show')
+                    }else{
+                        if(res.data && res.data.msg) {
+                            util.message(res.data.msg, '', res.status?'success':'error');
+                        }
+                    }
+                    if (typeof cb == 'function') {
+                        cb(res);
+                    }
+                }
+            })
+        }
+        
+        api.reject = function(id) {
+            if (confirm('确定要拒绝该用户提交的资料吗？')) {
+                api.showResult({op: 'verify', id, way: 'reject'}, null, function(res) {
+                    if (res.status && res.data) {
+                        const title = res.data.code == 1 ? '已拒绝' : '已通过';
+                        $("tr[data-id=" + id + "]").removeClass("status0").addClass(res.data.code == 1 ? 'status1' : 'status2');
+                        $("tr[data-id=" + id + "] .operate").html(`<span class="status">` + title + `</span>`);                        
+                    }
+                });
+            }
+        }
+        api.accept = function(id) {
+            if (confirm('确定要通过该用户提交的资料吗？')) {
+                api.showResult({op: 'verify', id, way: 'accept'}, null, function(res) {
+                    if (res.status && res.data) {
+                        const title = res.data.code == 1 ? '已拒绝' : '已通过';
+                        $("tr[data-id=" + id + "]").removeClass("status0").addClass(res.data.code == 1 ? 'status1' : 'status2');
+                        $("tr[data-id=" + id + "] .operate").html(`<span class="status">` + title + `</span>`);                        
+                    }
+                });
+            }
+        }
+
+        $("body").on("click", ":not(.loading)[data-op]", function(e){
+            const self = $(this);
+            const op = self.data('op');
+            if(op && api[op]){
+                const id = self.closest('tr').data('id');
+                if(id) {
+                    self.addClass('loading');
+                    api[op](id, self);
+                    self.removeClass('loading');
+                } else {
+                    api[op](self);
+                }
+            }
+            e.preventDefault();
+        })
+
+    })
+</script>
+{template 'common/footer'}

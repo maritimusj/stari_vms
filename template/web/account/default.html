@@ -262,8 +262,10 @@
                                 <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
                             </span>
                             {elseif $a['type'] == \zovye\Account::TASK}
-                            <span class="state auth" title="自定义任务">
-                                <img src="{php echo MODULE_URL . 'static/img/task.svg'}">
+                            <span class="state auth">
+                                <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $a['id']]);}"  title="查看自定义任务用户记录">
+                                    <img src="{php echo MODULE_URL . 'static/img/task.svg'}">
+                                </a>
                             </span>
                             {/if}
                         </div>
@@ -400,6 +402,9 @@
                             {/if}
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewFansCount"><i class="fa fa-users fa-fw"></i> 统计净增粉量</a></li>
+                            {if $a['type'] == \zovye\Account::TASK}
+                            <li><a href="#"  data-op="viewTaskLog"><i class="fa fa-list fa-fw"></i> 用户任务记录</a></li>
+                            {/if}
                             <li role="separator" class="divider"></li>
                             <li><a href="#"  data-op="viewStats"><i class="fa fa-area-chart fa-fw"></i> 查看本月统计</a></li>
                             <li><a href="#" data-op="viewHistoryStats"><i class="fa fa-line-chart fa-fw"></i> 查看历史数据</a></li>
@@ -511,6 +516,10 @@
                 op: 'viewFansCount',
                 id: id,
             })
+        }
+
+        api.viewTaskLog = function(id) {
+            window.location.href = "{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => '__id__'])}".replace('__id__', id);
         }
 
         api.viewStats = function(id, self) {

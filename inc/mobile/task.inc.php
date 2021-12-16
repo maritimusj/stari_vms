@@ -136,7 +136,7 @@ if ($op == 'default') {
             'title' => '已提交的任务图片',
             'img' => [],
         ];
-        $images = $task->settings('extra.images', []);
+        $images = $task->getExtraData('data.images', []);
         if ($images) {
             foreach ($images as $img) {
                 $item['img'][] = Util::toMedia($img, true);
@@ -192,7 +192,7 @@ if ($op == 'default') {
 
         if ($task) {
             $task->setS1(Task::INIT);
-            $task->updateSettings('extra', $data);
+            $task->setExtraData('data', $data);
             if ($task->save()) {
                 return true;
             }

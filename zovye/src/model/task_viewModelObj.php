@@ -7,7 +7,9 @@
 namespace zovye\model;
 
 use zovye\Account;
+use zovye\BalanceLog;
 use zovye\base\modelObj;
+use zovye\Log;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 
@@ -79,6 +81,7 @@ class task_viewModelObj extends modelObj
         $result = $acc ? $acc->format() : [];
         if ($result) {
             $result['status'] = $this->s1;
+            $result['createtime'] = $this->createtime;
         }
         return $result;
     }

@@ -643,7 +643,7 @@ include './index.php';
                 'createtime <' => time(),
             ])->limit($count)->count();
             $desc = [
-                Schema::DAY => '您今天已经领过了，明天再来吧！',
+                Schema::DAY => '今天已经领过了，明天再来吧！',
                 Schema::WEEK => '下个星期再来试试吧！',
                 Schema::MONTH => '这个月的免费额度已经用完啦！',
             ];

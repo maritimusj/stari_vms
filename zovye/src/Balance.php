@@ -24,7 +24,7 @@ class Balance
     const REWARD_ADV = 7; // 激励广告
     const API_UPDATE = 8; // 第三方通过api接口修改
     const PROMOTE_BONUS = 9; // 任务奖励
-
+    const TASK_BONUS = 10; // 任务奖励
 
     private $user;
 
@@ -286,7 +286,20 @@ TEXT;
 $reason_data
 </dl>
 TEXT;
-        } elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
+        } elseif ($entry->getSrc() == Balance::TASK_BONUS) {
+            $account_profile = $entry->getExtraData('account', []);
+            $type_title = '任务';
+            $text =  $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
+            $data['memo'] = <<<TEXT
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">任务奖励</dd>
+$text
+<dt>说明</dt><dd class="event">用户完成指定任务，系统奖励积分</dd>
+</dl>
+TEXT;
+        }
+        elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
             $account_profile = $entry->getExtraData('account', []);
             $type_title = Account::getTypeTitle($account_profile['type']);
             $text =  $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
@@ -309,37 +322,46 @@ TEXT;
             return err('无法锁定用户！');
         }
 
-        if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() <= 0) {
+        if ($account->getBonusType() != Account::BALANCE) {
             return err('没有设置积分奖励！');
         }
 
-        $result = Util::checkBalanceAvailable($user, $account);
-        if (is_error($result)) {
-            return $result;
-        }
-
         return Util::transactionDo(function () use ($user, $account, $reason) {
-            if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() == 0) {
-                return err('公众号设置不正确！');
+
+            $bonus = $account->getBalancePrice();
+
+            if (!$account->isTask()) {
+                $result = Util::checkBalanceAvailable($user, $account);
+                if (is_error($result)) {
+                    return $result;
+                }
+                
+                if (!BalanceLog::create([
+                    'user_id' => $user->getId(),
+                    'account_id' => $account->getId(),
+                    'extra' => [
+                        'reason' => $reason,
+                        'user' => $user->profile(),
+                        'account' => $account->profile(),
+                        'bonus' => $bonus,
+                    ]
+                ])) {
+                    return err('创建领取记录失败！');
+                }
             }
-            if (!BalanceLog::create([
-                'user_id' => $user->getId(),
-                'account_id' => $account->getId(),
-                'extra' => [
-                    'reason' => $reason,
-                    'user' => $user->profile(),
-                    'account' => $account->profile(),
-                    'bonus' => $account->getBalancePrice(),
-                ]
-            ])) {
-                return err('创建领取记录失败！');
+
+            if ($bonus > 0) {
+                $result = $user->getBalance()->change(
+                    $account->getBalancePrice(), 
+                    $account->isTask() ? Balance::TASK_BONUS : Balance::ACCOUNT_BONUS,
+                    [
+                        'account' => $account->profile(),
+                    ]);
+                if (!$result) {
+                    return err('创建用户积分记录失败！');
+                }
             }
-            $result = $user->getBalance()->change($account->getBalancePrice(), Balance::ACCOUNT_BONUS, [
-                'account' => $account->profile(),
-            ]);
-            if (!$result) {
-                return err('创建用户积分记录失败！');
-            }
+
             return $result;
         });
     }

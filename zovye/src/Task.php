@@ -23,6 +23,7 @@ class Task
             'user_id' => $user->getId(),
             'account_id' => $account->getId(),
             's1' => self::INIT,
+            's2' => sha1("{$user->getId()}{$account->getId()}" . Util::random(16)),
             'extra' => [
                 'data' => $data,
             ],
@@ -42,6 +43,14 @@ class Task
     public static function query($condition = [])
     {
         return m('task_view')->query($condition);
+    }
+
+    public static function get($id, bool $is_uid = false): ?task_viewModelObj
+    {
+        if ($is_uid) {
+            return self::findOne(['s2' => $id]);
+        }
+        return self::findOne(['id' => $id]);
     }
 
     public static function findOne($condition = []): ?task_viewModelObj

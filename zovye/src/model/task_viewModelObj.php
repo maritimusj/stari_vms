@@ -38,6 +38,9 @@ class task_viewModelObj extends modelObj
     /** @var int */
     protected $s1;
 
+     /** @var string */
+    protected $s2;
+
     /** @var int */
     protected $state;
 
@@ -62,6 +65,11 @@ class task_viewModelObj extends modelObj
     public function getUser(): ?userModelObj
     {
         return User::get($this->user_id);
+    }
+
+    public function getUid(): string
+    {
+        return strval($this->s2);
     }
 
     public function format(): array

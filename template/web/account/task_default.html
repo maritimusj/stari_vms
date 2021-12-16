@@ -2,8 +2,8 @@
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
 <style>
     .nav img {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
     }
     .status0 .status_title {
         color: orange;
@@ -52,12 +52,12 @@
 </style>
 <link rel="stylesheet" href="https://cdn.staticfile.org/viewerjs/1.9.0/viewer.min.css">
 <ul class="nav nav-tabs" id="navbar">
-    {if empty($s_status)}
+    {if !isset($s_status)}
     <li role="presentation" class="active">
         <a href="#">
             {if $account}
             <div class="profile">
-                <!-- <img src="{$account['img']}"> -->
+                <img src="{$account['img']}">
                 <span class="title">
                     <b>{$account['title']}</b>任务记录
                 </span>
@@ -68,16 +68,9 @@
     {else}
     <li role="presentation">
         <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0])}">
-            {if $user}
+            {if $account}
             <div class="profile">
-                <!-- <img src="{$user['headimgurl']}"> -->
-                <span class="title">
-                    <b>{$user['nickname']}</b>的任务记录
-                </span>
-            </div>
-            {elseif $account}
-            <div class="profile">
-                <!-- <img src="{$account['img']}"> -->
+                <img src="{$account['img']}">
                 <span class="title">
                     <b>{$account['title']}</b>的任务记录
                 </span>
@@ -86,7 +79,16 @@
         </a>
     </li>
     {/if}
-    {if $s_status ==  \zovye\Task::REJECT}
+    {if $s_status ===  \zovye\Task::INIT}
+    <li role="presentation" class="active">
+        <a href="#">待审核</a>
+    </li>
+    {else}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::INIT])}">待审核</a>
+    </li>
+    {/if}    
+    {if $s_status ===  \zovye\Task::REJECT}
     <li role="presentation" class="active">
         <a href="#">已拒绝</a>
     </li>
@@ -95,7 +97,7 @@
         <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::REJECT])}">已拒绝</a>
     </li>
     {/if}
-    {if $s_status ==  \zovye\Task::ACCEPT}
+    {if $s_status ===  \zovye\Task::ACCEPT}
     <li role="presentation" class="active">
         <a href="#">已通过</a>
     </li>
@@ -109,7 +111,7 @@
 <div class="panel panel-default panel-first nav-tab-item">
     <div class="heading">
         <span class="operate">
-
+            <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>
         </span>
     </div>
     <div class="panel-body">
@@ -225,7 +227,7 @@
             }
         }
         api.accept = function(id) {
-            if (confirm('确定要通过该用户提交的资料吗？')) {
+            if (confirm('确定要通过该用户提交的资料吗？\r\n注意：通过审核后，用户会获得相应的任务积分奖励！')) {
                 api.showResult({op: 'verify', id, way: 'accept'}, null, function(res) {
                     if (res.status && res.data) {
                         const title = res.data.code == 1 ? '已拒绝' : '已通过';

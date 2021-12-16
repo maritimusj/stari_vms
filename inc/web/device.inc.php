@@ -1645,15 +1645,15 @@ if ($op == 'list') {
     $join = $query
         ->from(m('maintenance')->getTableName(), 'm')
         ->leftjoin(Device::getTableName(), 'd')
-        ->on('m.device_id', 'd.id');
+        ->on('m.device_id', 'd.imei');
 
     //搜索关键字
     $keywords = request::trim('keywords');
     if ($keywords) {
-        $join->whereor("d.name LIKE", "%" . $keywords . "%")
-            ->whereor("d.imei LIKE", "%" . $keywords . "%")
-            ->whereor("d.app_id LIKE", "%" . $keywords . "%")
-            ->whereor("d.iccid LIKE", "%" . $keywords . "%");
+        $join->whereor("d.name LIKE", "%$keywords%")
+            ->whereor("d.imei LIKE", "%$keywords%")
+            ->whereor("d.app_id LIKE", "%$keywords%")
+            ->whereor("d.iccid LIKE", "%$keywords%");
     }
 
     $res = $join
@@ -1664,13 +1664,12 @@ if ($op == 'list') {
         ->getAll();
 
     foreach ($res as $entry) {
-
         $data[] = [
             'id' => $entry['id'],
             'mobile' => $entry['mobile'],
             'mname' => $entry['mname'],
             'result' => $entry['result'],
-            'create' => date('Y-m-d H:i', $entry['createtime']),
+            'createtime_formatted' => date('Y-m-d H:i', $entry['createtime']),
             'dname' => is_null($entry['dname']) ? '' : $entry['dname'],
             'imei' => $entry['imei'],
         ];

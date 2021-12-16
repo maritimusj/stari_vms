@@ -159,11 +159,11 @@
             <tr>
                 <th>#</th>
                 <th style="width: 20em;">设备名称</th>
-                <th>imei</th>
+                <th>IMEI</th>
                 <th>提交原因</th>
-                <th>提交时间</th>
                 <th>姓名</th>
                 <th>联系号码</th>
+                <th>提交时间</th>
             </tr>
             </thead>
             <tbody>
@@ -173,9 +173,9 @@
                 <td>{$d['dname']}</td>
                 <td>{$d['imei']}</td>
                 <td>{$d['result']}</td>
-                <td>{$d['create']}</td>
                 <td>{$d['mname']}</td>
                 <td>{$d['mobile']}</td>
+                <td>{$d['createtime_formatted']}</td>
             </tr>
             {/loop}
             </tbody>

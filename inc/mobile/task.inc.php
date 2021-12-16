@@ -95,31 +95,54 @@ if ($op == 'default') {
         $data['uid'] = $task->getUid();
     }
 
-    $data['detail'] = [
-        [
-            'title' => '任务说明',
-            'desc' => html_entity_decode($account->getConfig('desc', '')),
-        ],
-        [
-            'title' => '完成条件',
-            'text' => '上传截图',
-        ],
-        [
-            'title' => '图片',
-            'img' => [
-                Util::toMedia('images/2/2021/11/bUiuE0Zq30AE47eaIInQliIE4qE0i3.jpg'),
-                Util::toMedia('images/2/2021/11/bUiuE0Zq30AE47eaIInQliIE4qE0i3.jpg')
-            ],
-        ],
-        [
-            'title' => '二维码',
-            'qrcode' => Util::toMedia('images/2/2021/11/bUiuE0Zq30AE47eaIInQliIE4qE0i3.jpg'),
-        ],
-        [
-            'title' => '任务链接',
-            'url' => 'http://www.baidu.com',
-        ],
+    $data['detail'] = [];
+
+    $desc = html_entity_decode($account->getConfig('desc', ''));
+    $data['detail'][] = [
+        'title' => '任务说明',
+        'desc' => $desc,
     ];
+
+    $images = $account->getConfig('images', []);
+    if ($images) {
+        $item = [
+            'title' => '图片',
+            'img' => [],
+        ];
+        foreach ($images as $img) {
+            $item['img'][] = Util::toMedia($img, true);
+        }
+        $data['detail'][] = $item;
+    }
+
+
+    $qrcode = $account->getConfig('qrcode', '');
+    if ($qrcode) {
+        $data['detail'][] = [
+            'title' => '二维码',
+            'qrcode' => Util::toMedia($qrcode),
+        ];
+    }
+
+    $url = $account->getConfig('url', '');
+    if ($url) {
+        $data['detail'][] = [
+            'title' => '任务链接',
+            'qrcode' => $url,
+        ];
+    }
+
+    if (isset($task)) {
+        $item = [
+            'title' => '已提交的任务图片',
+            'img' => [],
+        ];
+        $images = $task->settings('extra.images', []);
+        foreach ($images as $img) {
+            $item['img'][] = Util::toMedia($img, true);
+        }
+        $data['detail'][] = $item;
+    }
 
     JSON::success($data);
 } elseif ($op == 'submit') {

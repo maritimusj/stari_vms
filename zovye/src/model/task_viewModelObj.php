@@ -18,6 +18,7 @@ use function zovye\tb;
  * @method getUserId()
  * @method getS1()
  * @method getState()
+ * @method setS1(int $INIT)
  */
 class task_viewModelObj extends modelObj
 {

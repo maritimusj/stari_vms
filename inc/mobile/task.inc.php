@@ -87,7 +87,7 @@ if ($op == 'default') {
     ]);
 
     if ($task) {
-        $data['status'] = $task->getState();
+        $data['status'] = $task->getS1();
     }
 
     $data['detail'] = [

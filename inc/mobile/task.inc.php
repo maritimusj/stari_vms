@@ -97,6 +97,12 @@ if ($op == 'default') {
 
     $data['detail'] = [];
 
+    $desc = html_entity_decode($account->getConfig('desc', ''));
+    $data['detail'][] = [
+        'title' => '任务说明',
+        'desc' => $desc,
+    ];
+
     $url = $account->getConfig('url', '');
     if ($url) {
         $data['detail'][] = [
@@ -124,12 +130,6 @@ if ($op == 'default') {
         }
         $data['detail'][] = $item;
     }
-
-    $desc = html_entity_decode($account->getConfig('desc', ''));
-    $data['detail'][] = [
-        'title' => '任务说明',
-        'desc' => $desc,
-    ];
 
     if (isset($task)) {
         $item = [

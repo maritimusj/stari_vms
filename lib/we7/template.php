@@ -3,7 +3,6 @@
 namespace we7;
 
 use zovye\We7;
-use function zovye\_W;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -119,9 +118,7 @@ class template
         $str = preg_replace('/{([A-Z_\x7f-\xff][A-Z0-9_\x7f-\xff]*)}/s', '<?php echo $1;?>', $str);
         $str = str_replace('{##', '{', $str);
         $str = str_replace('##}', '}', $str);
-        if (!empty(_W('setting.remote.type'))) {
-            $str = str_replace('</body>', "<script>$(function(){\$('img').attr('onerror', '').on('error', function(){if (!\$(this).data('check-src') && (this.src.indexOf('http://') > -1 || this.src.indexOf('https://') > -1)) {this.src = this.src.indexOf('{_W('attachurl_local')}') == -1 ? this.src.replace('{_W('attachurl_remote')}', '{_W('attachurl_local')}') : this.src.replace('{_W('attachurl_local')}', '{_W('attachurl_remote')}');\$(this).data('check-src', true);}});});</script></body>", $str);
-        }
+
         $str = "<?php defined('IN_IA') or exit('Access Denied');?>" . $str;
 
         return $str;

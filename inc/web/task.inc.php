@@ -35,6 +35,7 @@ if ($op == 'view') {
     if (request::isset('status')) {
         $status = request::int('status');
         $query->where(['s1' => $status]);
+        $tpl_data['s_status'] = $status;
     }
 
     $total = $query->count();

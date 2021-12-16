@@ -52,33 +52,64 @@
 </style>
 <link rel="stylesheet" href="https://cdn.staticfile.org/viewerjs/1.9.0/viewer.min.css">
 <ul class="nav nav-tabs" id="navbar">
+    {if empty($s_status)}
     <li role="presentation" class="active">
         <a href="#">
+            {if $account}
+            <div class="profile">
+                <!-- <img src="{$account['img']}"> -->
+                <span class="title">
+                    <b>{$account['title']}</b>任务记录
+                </span>
+            </div>
+            {/if}
+        </a>
+    </li>
+    {else}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0])}">
             {if $user}
             <div class="profile">
-                <img src="{$user['headimgurl']}">
+                <!-- <img src="{$user['headimgurl']}"> -->
                 <span class="title">
                     <b>{$user['nickname']}</b>的任务记录
                 </span>
             </div>
             {elseif $account}
             <div class="profile">
-                <img src="{$account['img']}">
+                <!-- <img src="{$account['img']}"> -->
                 <span class="title">
                     <b>{$account['title']}</b>的任务记录
                 </span>
             </div>
             {/if}
-            
         </a>
     </li>
+    {/if}
+    {if $s_status ==  \zovye\Task::REJECT}
+    <li role="presentation" class="active">
+        <a href="#">已拒绝</a>
+    </li>
+    {else}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::REJECT])}">已拒绝</a>
+    </li>
+    {/if}
+    {if $s_status ==  \zovye\Task::ACCEPT}
+    <li role="presentation" class="active">
+        <a href="#">已通过</a>
+    </li>
+    {else}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $account['id'] ?? 0, 'status' => \zovye\Task::ACCEPT])}">已通过</a>
+    </li>
+    {/if}
+
 </ul>
 <div class="panel panel-default panel-first nav-tab-item">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('qrcode', array('op'=>'add'));}"  title="添加活码转跳">
-                <i class="fa fa-fw fa-pencil"></i>
-            </a>
+
         </span>
     </div>
     <div class="panel-body">

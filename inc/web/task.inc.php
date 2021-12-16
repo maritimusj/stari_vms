@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\task_viewModelObj;
+
 $op = request::op('default');
 
 if ($op == 'view') {
@@ -53,6 +55,7 @@ if ($op == 'view') {
         $query->orderBy('id desc');
 
         $list = [];
+        /** @var task_viewModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = $entry->format();
             $data['id'] = $entry->getId();
@@ -80,7 +83,7 @@ if ($op == 'view') {
 
 } elseif ($op == 'verify') {
 
-    $result = Util::transactionDo(function() {
+    $result = Util::transactionDo(function () {
         $task = Task::get(request::int('id'));
 
         if (empty($task)) {
@@ -114,9 +117,9 @@ if ($op == 'view') {
             if (is_error($result)) {
                 return $result;
             }
-        
+
             if ($task->save()) {
-               return ['code' => Task::ACCEPT, 'title' => '已通过！'];
+                return ['code' => Task::ACCEPT, 'title' => '已通过！'];
             }
         }
 

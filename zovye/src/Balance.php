@@ -295,7 +295,7 @@ TEXT;
 <dt>事件</dt>
 <dd class="event">任务奖励</dd>
 $text
-<dt>说明</dt><dd class="event">用户完成指定任务，系统奖励积分</dd>
+<dt>说明</dt><dd class="event">任务资料通过审核，获得积分</dd>
 </dl>
 TEXT;
         }

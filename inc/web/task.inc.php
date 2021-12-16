@@ -91,7 +91,7 @@ if ($op == 'view') {
         }
 
         if ($task->getS1() != Task::INIT) {
-            return err('记录的不需要审核！');
+            return err('这个记录不需要审核！');
         }
 
         $way = request::str('way');

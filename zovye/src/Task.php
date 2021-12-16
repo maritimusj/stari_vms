@@ -44,7 +44,7 @@ class Task
         return m('task_view')->query($condition);
     }
 
-    public static function findOne($condition = [])
+    public static function findOne($condition = []): ?task_viewModelObj
     {
         return self::query($condition)->findOne();
     }

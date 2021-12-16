@@ -68,12 +68,27 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
     $account = Account::findOneFromUID(request::str('uid'));
     if (empty($account)) {
         JSON::fail('任务不存在！');
     }
 
     $data = $account->format();
+
+    $task = Task::findOne([
+        'user_id' => $user->getId(),
+        'account_id' => $account->getId(),
+        's1' => [Task::INIT, Task::REJECT],
+    ]);
+
+    if ($task) {
+        $data['status'] = $task->getState();
+    }
 
     $data['detail'] = [
         [

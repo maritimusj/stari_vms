@@ -133,7 +133,7 @@
                 <div class="form-group">
                     <label for="total" class="col-md-2 control-label"><b>单个用户</b><br/>累计最多领取数量</label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="total" id="total" value="{php echo $account?$account->getTotal():'0'}">
+                        <input type="number" class="form-control" name="total" id="total" value="{php echo $account?$account->getTotal():'1'}">
                         <span class="help-block">* 每个用户在关注该公众号以后累计最多可领取的奖励数量，0表示不限制数量</span>
                     </div>
                 </div>

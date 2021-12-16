@@ -1323,7 +1323,6 @@ JSCODE;
         $user_data['data']['balance'] = $user->getBalance()->total();
         $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
-        $api_url = Util::murl('bonus');
         $task_url = Util::murl('task');
         $adv_api_url = Util::murl('adv');
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
@@ -1344,8 +1343,7 @@ $js_sdk
         wx.hideAllNonBaseMenuItem();
     });
     const zovye_fn = {
-        api_url: "$api_url",
-        task_url: "$task_url",
+        api_url: "$task_url",
         user: JSON.parse(`$user_json_str`),
         wxapp_username: "$wxapp_username",
     }
@@ -1375,10 +1373,10 @@ $js_sdk
         })           
     }
     zovye_fn.getTask = function(max) {
-        return $.getJSON(zovye_fn.api_url, {op: 'account', type:110, max});
+        return $.getJSON(zovye_fn.api_url, {op: 'get_list', max});
     }
     zovye_fn.getDetail = function(uid) {
-        return $.getJSON(zovye_fn.task_url, {op: 'detail', uid});
+        return $.getJSON(zovye_fn.api_url, {op: 'detail', uid});
     }
     zovye_fn.upload = function(data) {
         const param = new FormData();
@@ -1403,7 +1401,7 @@ $js_sdk
         })
     }
     zovye_fn.submit = function(uid, data, cb) {
-        $.post(zovye_fn.task_url, {op: 'submit', uid, data}).then(function(res){
+        $.post(zovye_fn.api_url, {op: 'submit', uid, data}).then(function(res){
             if (cb) cb(res);
         })
     }

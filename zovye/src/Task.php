@@ -43,4 +43,9 @@ class Task
     {
         return m('task_view')->query($condition);
     }
+
+    public static function findOne($condition = [])
+    {
+        return self::query($condition)->findOne();
+    }
 }

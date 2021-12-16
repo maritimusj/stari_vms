@@ -397,12 +397,6 @@ if ($op == 'default') {
                     ];
                 }
                 $account->set('config', $config);
-            } elseif ($account->isTask()) {
-                $data['img'] = request::trim('img') ?: Account::TASK_HEAD_IMG;
-                $account->set('config', [
-                    'type' => Account::TASK,
-                    'desc' => request::trim('task_desc'),
-                ]);
             } else {
                 $data['img'] = request::trim('img');
                 //如果网站更换域名后，需要更新url
@@ -536,6 +530,12 @@ if ($op == 'default') {
                     'path' => request::trim('path'),
                     'delay' => request::int('delay'),
                 ]);
+            }  elseif ($account->isTask()) {
+                $data['img'] = request::trim('img') ?: Account::TASK_HEAD_IMG;
+                $account->set('config', [
+                    'type' => Account::TASK,
+                    'desc' => request::trim('task_desc'),
+                ]);
             }
 
             $commission_data = [];
@@ -552,7 +552,7 @@ if ($op == 'default') {
             
             // 积分
             if (App::isBalanceEnabled()) {
-                if (request::has('balance')) {
+                if (request::isset('balance')) {
                     $commission_data['balance'] =  request::int('balance');
                 } elseif (request::str('bonus_type') == Account::BALANCE) {
                     $commission_data['balance'] =  request::int('amount');

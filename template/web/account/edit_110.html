@@ -71,13 +71,28 @@
             <div class="seg">
                 <div class="title">任务</div>
                 <div class="form-group">
-                    <label for="task_url" class="col-md-2 control-label">任务链接</label>
+                    <label for="task_url" class="col-md-2 control-label">任务链接（可选）</label>
                     <div class="col-md-10">
                         <input type="task_url" class="form-control" name="task_url" id="task_url" value="{$config['url']}">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">任务详情</label>
+                    <label class="col-md-2 control-label">
+                        任务二维码（可选）
+                    </label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_image('task_qrcode', $config['qrcode']);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">截图示例（可选）</label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_multi_image('task_images', $config['images']);}
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">任务详情（可选）</label>
                     <div class="col-md-10">
                     {php echo tpl_ueditor('task_desc', $config['desc']);}
                     </div>

@@ -535,6 +535,8 @@ if ($op == 'default') {
                 $account->set('config', [
                     'type' => Account::TASK,
                     'url' => request::trim('task_url'),
+                    'qrcode' => request::trim('task_qrcode'),
+                    'images' => request::array('task_images'),
                     'desc' => request::str('task_desc'),
                 ]);
             }

@@ -97,24 +97,13 @@ if ($op == 'default') {
 
     $data['detail'] = [];
 
-    $desc = html_entity_decode($account->getConfig('desc', ''));
-    $data['detail'][] = [
-        'title' => '任务说明',
-        'desc' => $desc,
-    ];
-
-    $images = $account->getConfig('images', []);
-    if ($images) {
-        $item = [
-            'title' => '图片',
-            'img' => [],
+    $url = $account->getConfig('url', '');
+    if ($url) {
+        $data['detail'][] = [
+            'title' => '任务链接',
+            'url' => $url,
         ];
-        foreach ($images as $img) {
-            $item['img'][] = Util::toMedia($img, true);
-        }
-        $data['detail'][] = $item;
     }
-
 
     $qrcode = $account->getConfig('qrcode', '');
     if ($qrcode) {
@@ -124,13 +113,23 @@ if ($op == 'default') {
         ];
     }
 
-    $url = $account->getConfig('url', '');
-    if ($url) {
-        $data['detail'][] = [
-            'title' => '任务链接',
-            'url' => $url,
+    $images = $account->getConfig('images', []);
+    if ($images) {
+        $item = [
+            'title' => '截图示例',
+            'img' => [],
         ];
+        foreach ($images as $img) {
+            $item['img'][] = Util::toMedia($img, true);
+        }
+        $data['detail'][] = $item;
     }
+
+    $desc = html_entity_decode($account->getConfig('desc', ''));
+    $data['detail'][] = [
+        'title' => '任务说明',
+        'desc' => $desc,
+    ];
 
     if (isset($task)) {
         $item = [

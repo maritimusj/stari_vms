@@ -39,6 +39,7 @@ class User
     const ORDER_LOCKER = 'order';
     const COMMISSION_BALANCE_LOCKER = 'commission::balance';
     const BALANCE_LOCKER = 'user::balance';
+    const TASK_LOCKER = 'user::task';
 
     const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
 

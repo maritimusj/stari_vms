@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\task_viewModelObj;
+
 $op = request::op('default');
 
 if ($op == 'default') {
@@ -51,10 +53,11 @@ if ($op == 'default') {
     $query->orderBy('id DESC');
 
     $result['participated'] = [];
-    foreach($query->findAll() as $entry) {
+    /** @var task_viewModelObj $entry */
+    foreach ($query->findAll() as $entry) {
         $result['participated'][] = $entry->format();
         //过滤掉已参与未完成的任务
-        foreach($result['new'] as $index => $item) {
+        foreach ($result['new'] as $index => $item) {
             if ($entry->getAccountId() == $item['id']) {
                 unset($result['new'][$index]);
             }
@@ -75,7 +78,7 @@ if ($op == 'default') {
     $data['detail'] = [
         [
             'title' => '任务说明',
-            'desc' => html_entity_decode($account->getConfig('desc', '')) ,
+            'desc' => html_entity_decode($account->getConfig('desc', '')),
         ],
         [
             'title' => '完成条件',
@@ -95,7 +98,7 @@ if ($op == 'default') {
         [
             'title' => '任务链接',
             'url' => 'http://www.baidu.com',
-        ], 
+        ],
     ];
 
     JSON::success($data);
@@ -107,10 +110,10 @@ if ($op == 'default') {
         JSON::fail('找不到这个用户！');
     }
 
-    $uid = request::str("uid");
+    $uid = request::str('uid');
     $account = Account::findOneFromUID($uid);
     if (empty($account)) {
-        JSON::fail('找不到这个公任务！');
+        JSON::fail('找不到这个任务！');
     }
 
     if ($account->getBonusType() != Account::BALANCE || $account->getBalancePrice() == 0) {
@@ -121,12 +124,16 @@ if ($op == 'default') {
     if (empty($data)) {
         JSON::fail('提交的数据为空！');
     }
-    
+
+    if (!$user->acquireLocker(User::TASK_LOCKER)) {
+        JSON::fail('用户无法锁定，请重试！');
+    }
+
     $data['time'] = time();
 
-    $result = Util::transactionDo(function() use ($user, $account, $data) {
+    $result = Util::transactionDo(function () use ($user, $account, $data) {
         $exists_task = Task::findOne([
-            'user_id' => $user->getId(), 
+            'user_id' => $user->getId(),
             'account_id' => $account->getId(),
             's1' => [Task::INIT, Task::REJECT],
         ]);
@@ -143,7 +150,7 @@ if ($op == 'default') {
             }
         }
 
-        return err('保存记录失败！');        
+        return err('保存记录失败！');
     });
 
     if (is_error($result)) {

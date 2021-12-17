@@ -164,16 +164,24 @@ if ($op === 'create') {
 
     $order = Order::get($order_no, true);
     if ($order) {
-        $response = ['code' => 200];
-
         $errno = $order->getExtraData('pull.result.errno', 'n/a');
         if ($errno == 'n/a') {
-            $response['msg'] = '订单正在处理中...';
+            $response = [
+                'code' => 100,
+                'msg' => '订单正在处理中...',
+            ];
         } elseif ($errno == 0) {
-            $response['msg'] = '出货完成!';
+            $response = [
+                'code' => 200,
+                'msg' => '出货完成!',
+            ];
         } elseif ($errno == 12) {
-            $response['msg'] = '订单正在处理中，请稍等！';
+            $response = [
+                'code' => 100,
+                'msg' => '订单正在处理中，请稍等！',
+            ];
         } else {
+            $response = ['code' => 502];
             if (Helper::NeedAutoRefund($order)) {
                 $response['msg'] = '出货失败，已提交退款申请！';
             } else {

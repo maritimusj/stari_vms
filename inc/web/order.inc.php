@@ -198,7 +198,6 @@ if ($op == 'default') {
                 $data['account_title'] = 'n/a';
                 $data['clr'] = '#ccc';
             }
-
             if ($data['refund']) {
                 $data['clr'] = '#ccc';
             }

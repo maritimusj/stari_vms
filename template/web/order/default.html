@@ -1,11 +1,7 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20201235');}
-<style>
-    .fa-question-circle.disabled {
-        color: coral;
-    }
-</style>
+{php \zovye\url(true, 'static/css/orderlist.css?v=20201236');}
+
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -234,114 +230,125 @@
                         </div>
                         {/if}
                     </td>
-                    <td class="status">
-                        单价：<span class="price">{php echo number_format($order['goods']['price'] / 100, 2)}</span>
-                        <div class="pay operate">
-                            {if $order['price']>0}
-                            (总计：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
-                                {if $order['discount'] > 0}
-                                {php echo number_format($order['goods']['price'] * $order['num'] / 100, 2)}
-                                {else}
-                                {$order['price']}
+                    <td>
+                        <div  class="status">
+                            <div class="detail">
+                                单价：<span class="price">{php echo number_format($order['goods']['price'] / 100, 2)}</span>
+                                {if $order['price']>0}
+                                (总计：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
+                                    {if $order['discount'] > 0}
+                                        {php echo number_format($order['goods']['price'] * $order['num'] / 100, 2)}
+                                    {else}
+                                        {$order['price']}
+                                    {/if}
+                                </span>
+                                    {if $order['discount']>0}
+                                        <span class="price">{php echo number_format($order['price'], 2)}</span>
+                                    {/if}
+                                    {if !$order['refund']}
+                                    <img src="{php echo MODULE_URL . 'static/img/refund.svg'}" class="icon" title="退款" data-op="refund">
+                                    {/if}
+                                )
                                 {/if}
-                            </span>
-                            {if $order['discount']>0}
-                            <span class="price">{php echo number_format($order['price'], 2)}</span>
-                            {/if}
-                            {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0}
-                            <i class="fa fa-info-circle">
-                                <div class="order_err_message">
-                                    <span>{php echo empty($order['refund']) ?  $order["result"]["message"] : $order['refund']['reason']}</span>
+                            <!-- 佣金详情开始 -->
+                            {if $order['commission']}
+                            <div class="commission_detail local">
+                                <div class="total">
+                                    <span class="title">订单佣金 </span><span data-op="commissionDetail">￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元</span>
                                 </div>
-                            </i>
+                                {if $order['commission']['bonus']}
+                                {loop $order['commission']['bonus'] $index $item}
+                                {php $bonus_user = \zovye\User::get($item['openid'], true);}
+                                {if $bonus_user}
+                                <div class="gspor bonus_item">
+                                    <div class="profile">
+                                        <img src="{php echo $bonus_user->getAvatar();}" alt="">
+                                        <span>{php echo $bonus_user->getName()}</span>
+                                        {if $bonus_user->getMobile()}                                
+                                        <span class="mobile" data-mobile="{php echo $bonus_user->getMobile();}" title="{php echo $bonus_user->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                        {/if}
+                                    </div>
+                                    <div class="income">
+                                        <b>奖励：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                    </div>
+                                </div>
+                                {/if}
+                                {/loop}
+                                {/if}
+                                {if $order['commission']['gsp']}
+                                {loop $order['commission']['gsp'] $index $item}
+                                {php $gspor = \zovye\User::get($item['openid'], true);}
+                                {if $gspor}
+                                <div class="gspor">
+                                    <div class="profile">
+                                        <img src="{php echo $gspor->getAvatar();}" alt="">
+                                        <span>{php echo $gspor->getName()}</span>
+                                        {if $gspor->getMobile()}                                
+                                        <span class="mobile" data-mobile="{php echo $gspor->getMobile();}" title="{php echo $gspor->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                        {/if}
+                                    </div>
+                                    <div class="income">
+                                        <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                    </div>
+                                </div>
+                                {/if}
+                                {/loop}
+                                {/if}
+                                {if $order['commission']['agent']}
+                                <div class="gspor agent_item">
+                                    <div class="profile">
+                                        <img src="{$order['agent']['avatar']}" alt="">
+                                        <span>{$order['agent']['name']}</span>
+                                    </div>
+                                    <div class="income">
+                                        <b>佣金：</b><span class="money">￥{php echo number_format($order['commission']['agent']['xval']/100, 2)}元</span>
+                                    </div>
+                                </div>
+                                {/if}
+                                {if $order['commission']['keepers']}
+                                {loop $order['commission']['keepers'] $index $item}
+                                {php $keeper = \zovye\User::get($item['openid'], true);}
+                                {if $keeper}
+                                <div class="gspor keeper_item">
+                                    <div class="profile">
+                                        <img src="{php echo $keeper->getAvatar();}" alt="">
+                                        <span>{php echo $keeper->getName()}</span>
+                                        {if $keeper->getMobile()}                                
+                                        <span class="mobile" data-mobile="{php echo $keeper->getMobile();}" title="{php echo $keeper->getMobile();}"><i class="fa fa-mobile"></i></span>
+                                        {/if}
+                                    </div>
+                                    <div class="income">
+                                        <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
+                                    </div>
+                                </div>
+                                {/if}
+                                {/loop}
+                                {/if}
+                            </div>
                             {/if}
-                            {if $order['refund']}
-                            <span title="{$order['refund']['title']}"> 已退款</span>
-                            {else}
-                            <i class="fa fa-reply-all" title="退款" data-op="refund"></i>
-                            {if $commission_balance}
-                            <i class="fa fa-list" title="佣金记录" data-op="commissionDetail"></i>
-                            {/if}
-                            {/if})
-                            {else}
-                            (<span class="zeroprice">免费领取</span>)
-                            {/if}
+                            <!-- 佣金详情结束 -->
+                            </div>
+                            <div class="pay operate">
+                                {if $order['price'] > 0}
+                                {if $order['refund']}
+                                <span  class="refund-title" title="{$order['refund']['title']}"> 已退款
+                                    {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0}
+                                    <i class="fa fa-info-circle" title="{php echo empty($order['refund']) ?  $order["result"]["message"] : $order['refund']['reason']}">
+                                    </i>
+                                    {/if}
+                                </span>
+                                {/if}
+                                {else}
+                                (
+                                    <span class="zeroprice">免费领取</span>
+                                )
+                                {if $order['refund']}
+                                <span class="refund-title" title="{$order['refund']['title']}"> 已退积分和佣金</span>
+                                {/if}
+                                {/if}
+                            </div>
+
                         </div>
-                        {if $order['commission']}
-                        <div class="commission_detail local">
-                            <div class="total">
-                                <span class="title">订单佣金 </span><span>￥{php echo number_format($order['commission']['local']['total'] / 100, 2)}元</span>
-                            </div>
-                            {if $order['commission']['bonus']}
-                            {loop $order['commission']['bonus'] $index $item}
-                            {php $bonus_user = \zovye\User::get($item['openid'], true);}
-                            {if $bonus_user}
-                            <div class="gspor bonus_item">
-                                <div class="profile">
-                                    <img src="{php echo $bonus_user->getAvatar();}" alt="">
-                                    <span>{php echo $bonus_user->getName()}</span>
-                                    {if $bonus_user->getMobile()}                                
-                                    <span class="mobile" data-mobile="{php echo $bonus_user->getMobile();}" title="{php echo $bonus_user->getMobile();}"><i class="fa fa-mobile"></i></span>
-                                    {/if}
-                                </div>
-                                <div class="income">
-                                    <b>奖励：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
-                                </div>
-                            </div>
-                            {/if}
-                            {/loop}
-                            {/if}
-                            {if $order['commission']['gsp']}
-                            {loop $order['commission']['gsp'] $index $item}
-                            {php $gspor = \zovye\User::get($item['openid'], true);}
-                            {if $gspor}
-                            <div class="gspor">
-                                <div class="profile">
-                                    <img src="{php echo $gspor->getAvatar();}" alt="">
-                                    <span>{php echo $gspor->getName()}</span>
-                                    {if $gspor->getMobile()}                                
-                                    <span class="mobile" data-mobile="{php echo $gspor->getMobile();}" title="{php echo $gspor->getMobile();}"><i class="fa fa-mobile"></i></span>
-                                    {/if}
-                                </div>
-                                <div class="income">
-                                    <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
-                                </div>
-                            </div>
-                            {/if}
-                            {/loop}
-                            {/if}
-                            {if $order['commission']['agent']}
-                            <div class="gspor agent_item">
-                                <div class="profile">
-                                    <img src="{$order['agent']['avatar']}" alt="">
-                                    <span>{$order['agent']['name']}</span>
-                                </div>
-                                <div class="income">
-                                    <b>佣金：</b><span class="money">￥{php echo number_format($order['commission']['agent']['xval']/100, 2)}元</span>
-                                </div>
-                            </div>
-                            {/if}
-                            {if $order['commission']['keepers']}
-                            {loop $order['commission']['keepers'] $index $item}
-                            {php $keeper = \zovye\User::get($item['openid'], true);}
-                            {if $keeper}
-                            <div class="gspor keeper_item">
-                                <div class="profile">
-                                    <img src="{php echo $keeper->getAvatar();}" alt="">
-                                    <span>{php echo $keeper->getName()}</span>
-                                    {if $keeper->getMobile()}                                
-                                    <span class="mobile" data-mobile="{php echo $keeper->getMobile();}" title="{php echo $keeper->getMobile();}"><i class="fa fa-mobile"></i></span>
-                                    {/if}
-                                </div>
-                                <div class="income">
-                                    <b>佣金：</b><span class="money">￥{php echo number_format($item['xval'] / 100, 2);}元</span>
-                                </div>
-                            </div>
-                            {/if}
-                            {/loop}
-                            {/if}
-                        </div>
-                        {/if}
                 </td>
                 <td>
                     <div class="profile">

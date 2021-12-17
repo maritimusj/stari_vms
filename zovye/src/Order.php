@@ -682,12 +682,12 @@ class Order extends State
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }
 
-            if ($data['price'] > 0 && $order->getExtraData('refund')) {
-                $time = $order->getExtraData('refund.createtime');
-                $time_formatted = date('Y-m-d H:i:s', $time);
+            $refund = $order->getExtraData('refund');
+            if ($refund) {
+                $time_formatted = date('Y-m-d H:i:s', $refund['createtime']);
                 $data['refund'] = [
                     'title' => "退款时间：$time_formatted",
-                    'reason' => $order->getExtraData('refund.message'),
+                    'reason' => $refund['message'] ?? '未知',
                 ];
             }
         }

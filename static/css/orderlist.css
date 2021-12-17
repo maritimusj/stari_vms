@@ -151,11 +151,12 @@
     transform: rotate(-90deg);
     font-size: 14px;
 }
-#orderlist tr td.status {
+#orderlist tr td .status {
     position: relative;
+    display: flex;
     white-space: nowrap;
 }
-#orderlist .status:hover .commission_detail {
+#orderlist .detail:hover .commission_detail {
     display: flex;
 }
 #orderlist .commission_detail {
@@ -223,20 +224,7 @@
     width: 15em;
     overflow: hidden;
 }
-#orderlist .fa-info-circle .order_err_message {
-    position: absolute;
-    width: 200px;
-    background: #FF5722;
-    text-align: center;
-    color: #fff;
-    z-index: 1000;
-    left: 130px;
-    overflow: hidden;
-    box-shadow: 1px 1px 2px 1px #9E9E9E;
-    padding: 6px;
-    display: none;
-    text-shadow: none;
-}
+
 #orderlist .account .fa {
     font-size: 40px;
     color: #607d8b;
@@ -326,4 +314,26 @@
 }
 #orderlist .order-uid {
     color: #4caf50;
+}
+.fa-question-circle.disabled {
+    color: coral;
+}
+.refund-title {
+    font-size: smaller;
+    vertical-align: super;
+    cursor: default;
+}
+img.icon {
+    width: 16px;
+    height: 16px;
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+img.icon:hover {
+    filter: grayscale(0);
+    opacity: 1;
+}
+img.icon:active {
+    opacity: 0.3;
+    transform: translate3d(0, 1px, 0);
 }

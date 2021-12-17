@@ -352,9 +352,10 @@ function refund(int $balance_id, int $num, string $reason)
                 return err('保存数据失败！');
             }
 
-            $users = [];
             $order = $balance_log->getOrder();
             if ($order) {
+                $users = [];
+
                 $keeperCommissionLogs = $order->getExtraData('commission.keepers', []);
                 foreach ($keeperCommissionLogs as $log) {
                     $users[] = [

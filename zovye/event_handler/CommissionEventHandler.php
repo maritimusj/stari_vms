@@ -250,8 +250,10 @@ class CommissionEventHandler
             //获取佣金分享用户列表
             $gsp_users = $agent->getGspUsers();
             foreach ($gsp_users as $entry) {
-                if (($order->getPrice() > 0 && $entry['order']['p']) ||
-                    ($order->getPrice() == 0 && $entry['order']['f'])) {
+                $matched = ($entry['order']['p'] && ($order->getPrice() > 0 || ($order->getBalance() > 0 && Balance::isPayOrder()))) ||
+                ($entry['order']['f'] && (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0 && Balance::isFreeOrder())));
+
+                if ($matched) {
                     /** @var userModelObj $user */
                     $user = $entry['__obj'];
                     $percent = $entry['percent'];
@@ -284,6 +286,14 @@ class CommissionEventHandler
                 }
                 if ($order->getPrice() == 0 && $order->getBalance() == 0 && !$entry->isFreeOrderIncluded()) {
                     continue;
+                }
+                if ($order->getBalance() > 0) {
+                    if (Balance::isFreeOrder() && !$entry->isFreeOrderIncluded()) {
+                        continue;
+                    }
+                    if (Balance::isPayOrder() && !$entry->isPayOrderIncluded()) {
+                        continue;
+                    }
                 }
                 $price = 0;
                 if ($entry->isPercent()) {

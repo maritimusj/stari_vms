@@ -133,9 +133,11 @@
                         <div class="m_pay"><span>支付 {$agent['m']['pay']}</span></div>
                     </td>
                     <td class="partners operate">
-                        <span {if empty($agent['partners'])}class="nopartners"{/if}>
-                            {php echo $agent['partners'] ? $agent['partners'].'人' : '&lt;无&gt;'}
-                        </span>
+                        <a href="{php echo $this->createWebUrl('agent', array('op'=>'partner','id'=>$agent['id']));}">
+                            <span {if empty($agent['partners'])}class="nopartners"{/if}>
+                                {php echo $agent['partners'] ? $agent['partners'].'人' : '&lt;无&gt;'}
+                            </span>                            
+                        </a>
                     </td>
                     <td class="superior">
                         {if $agent['superior']}

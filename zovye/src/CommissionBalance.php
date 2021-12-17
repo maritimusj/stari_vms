@@ -148,6 +148,7 @@ REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::ORDER_REFUND) {
 
             $name = $entry->getExtraData('admin');
+            $reason = $entry->getExtraData('reason');
             $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             $order_info = "订单ID：$order_id";
@@ -155,6 +156,7 @@ REFUND;
                 $order_info = $order->getOrderNO();
             }
             $admin_info = empty($name) ? '' : "<dt>管理员</dt><dd class=\"admin\">$name</dd>";
+            $reason_info = empty($reason) ? '' : "<dt>原因</dt><dd class=\"admin\">$reason</dd>";
             $data['memo'] = <<<ORDER_REFUND
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -162,6 +164,7 @@ REFUND;
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
 $admin_info
+$reason_info
 </dl>
 ORDER_REFUND;
         } elseif ($entry->getSrc() == CommissionBalance::GSP) {

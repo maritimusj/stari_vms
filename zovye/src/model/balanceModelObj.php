@@ -8,6 +8,7 @@ namespace zovye\model;
 
 use zovye\base\modelObj;
 use zovye\Device;
+use zovye\Order;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 use function zovye\tb;
@@ -70,5 +71,14 @@ class balanceModelObj extends modelObj
     public function getGoodsBalance(): int
     {
         return $this->getExtraData('goods.balance', 0);
+    }
+
+    public function getOrder():?orderModelObj
+    {
+        $order_no = $this->getExtraData('order.id');
+        if ($order_no) {
+            return Order::get($order_no, true);
+        }
+        return null;
     }
 }

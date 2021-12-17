@@ -10,6 +10,7 @@ use Exception;
 use RuntimeException;
 use zovye\App;
 use zovye\Balance;
+use zovye\CommissionBalance;
 use zovye\Config;
 use zovye\CtrlServ;
 use zovye\Device;
@@ -304,25 +305,25 @@ function createOrder(string          $order_no,
 
 function refund(int $balance_id, int $num, string $reason)
 {
-    $balance = Balance::get($balance_id);
-    if (empty($balance)) {
+    $balance_log = Balance::get($balance_id);
+    if (empty($balance_log)) {
         return err('找不到积分记录！');
     }
 
-    $device = $balance->getDevice();
+    $device = $balance_log->getDevice();
     if (empty($device)) {
         return err('找不到这个设备！');
     }
 
     $need = Config::balance('order.auto_rb', 0);
     if ($need) {
-        $result = Util::transactionDo(function () use ($balance, $num, $reason) {
-            $user = $balance->getUser();
-            if (empty($user)) {
+        $result = Util::transactionDo(function () use ($balance_log, $num, $reason) {
+            $users = $balance_log->getUser();
+            if (empty($users)) {
                 return err('找不到这个用户！');
             }
 
-            $max = $balance->getNum();
+            $max = $balance_log->getNum();
             if ($max < 1) {
                 return err('商品数量于小1！');
             }
@@ -331,10 +332,10 @@ function refund(int $balance_id, int $num, string $reason)
                 $num = $max;
             }
 
-            $goods_balance = $balance->getGoodsBalance();
+            $goods_balance = $balance_log->getGoodsBalance();
 
-            $x = $user->getBalance()->change($num * $goods_balance, Balance::REFUND, [
-                'related' => $balance->getId(),
+            $x = $users->getBalance()->change($num * $goods_balance, Balance::REFUND, [
+                'related' => $balance_log->getId(),
                 'reason' => $reason,
             ]);
 
@@ -342,14 +343,68 @@ function refund(int $balance_id, int $num, string $reason)
                 return err('退款失败！');
             }
 
-            $balance->setExtraData('refund', [
+            $balance_log->setExtraData('refund', [
                 'time' => time(),
                 'related' => $x->getId(),
             ]);
 
-            if (!$balance->save()) {
+            if (!$balance_log->save()) {
                 return err('保存数据失败！');
             }
+
+            $users = [];
+            $order = $balance_log->getOrder();
+            if ($order) {
+                $keeperCommissionLogs = $order->getExtraData('commission.keepers', []);
+                foreach ($keeperCommissionLogs as $log) {
+                    $users[] = [
+                        'openid' => $log['openid'],
+                        'xval' => $log['xval'],
+                    ];
+                }
+                $gspCommissionLogs = $order->getExtraData('commission.gsp', []);
+                foreach ($gspCommissionLogs as $log) {
+                    $users[] = [
+                        'openid' => $log['openid'],
+                        'xval' => $log['xval'],
+                    ];
+                }
+                $agentCommissionLog = $order->getExtraData('commission.agent', []);
+                if ($agentCommissionLog) {
+                    $users[] = [
+                        'openid' => $agentCommissionLog['openid'],
+                        'xval' => $agentCommissionLog['xval'],
+                    ];
+                }
+                $percent = floatval($num) / floatval($max);
+                foreach ($users as $item) {
+                    $user = User::get($item['openid'], true);
+                    if (empty($user)) {
+                        Log::error('create_order_balance', [
+                            'error' => '退款，找不到这个用户！',
+                            'order' => $order->getOrderNO(),
+                            'data' => $item
+                        ]);
+                        continue;
+                    }
+                    $val = intval($item['xval'] * $percent);
+                    if ($val > 0) {
+                        $x = $user->getCommissionBalance()->change(-$val, CommissionBalance::ORDER_REFUND, [
+                            'orderid' => $order->getId(),
+                            'reason' => '出货失败，返还佣金！',
+                        ]);
+                        if (!$x) {
+                            Log::error('create_order_balance', [
+                                'error' => '退款失败！',
+                                'order' => $order->getOrderNO(),
+                                'user' => $user->profile(false),
+                                'xval' => $val,
+                            ]);
+                        }
+                    }
+                }
+            }
+
             return $x;
         });
 

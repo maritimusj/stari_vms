@@ -355,7 +355,6 @@ function refund(int $balance_id, int $num, string $reason)
             $order = $balance_log->getOrder();
             if ($order) {
                 $users = [];
-
                 $keeperCommissionLogs = $order->getExtraData('commission.keepers', []);
                 foreach ($keeperCommissionLogs as $log) {
                     $users[] = [
@@ -390,7 +389,7 @@ function refund(int $balance_id, int $num, string $reason)
                     }
                     $val = intval($item['xval'] * $percent);
                     if ($val > 0) {
-                        $x = $user->getCommissionBalance()->change(-$val, CommissionBalance::ORDER_REFUND, [
+                        $x = $user->getCommissionBalance()->change(0 - $val, CommissionBalance::ORDER_REFUND, [
                             'orderid' => $order->getId(),
                             'reason' => '出货失败，返还佣金！',
                         ]);
@@ -404,13 +403,21 @@ function refund(int $balance_id, int $num, string $reason)
                         }
                     }
                 }
+
+                $order->setExtraData('refund', [
+                    'message' => '出货失败！',
+                    'createtime' => time(),
+                ]);
+                $order->setRefund(Order::REFUND);
+                $order->save();
             }
 
-            return $x;
+            return true;
         });
 
         if (is_error($result)) {
             $device->appShowMessage('出货失败，积分退回失败，请联系管理员！', 'error');
+            return $result;
         } else {
             $device->appShowMessage('出货失败，积分已退回！', 'error');
         }

@@ -143,7 +143,7 @@
                             </li>
                             <li>
                                 <a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_sub','id'=>$agent['id']));}">
-                                    <i class="fa fa-users"></i> 所有下级代理商
+                                    <i class="fa fa-users"></i> 他的下级代理商
                                 </a>
                             </li>
                             {if isset($agent['commission'])}
@@ -203,7 +203,7 @@
                 })
         </script>
         {else}
-        <div sclass="text-center text-muted">
+        <div class="text-center text-muted">
             <i class="fa fa-question-circle"></i> 暂时还没有任何代理商！
         </div>
         {/if}

@@ -141,7 +141,7 @@ if ($op == 'default') {
                 $data['m'] = Stats::getMonthTotal($entry); //$entry->getMTotal('today');
                 if ($data['commission_enabled']) {
                     $data['commission'] = [
-                        'money' => $entry->getCommissionBalance()->total(),
+                        'total' => $entry->getCommissionBalance()->total(),
                     ];
                 }
             }
@@ -224,7 +224,7 @@ if ($op == 'default') {
                 $data['m'] = Stats::getMonthTotal($entry); //$entry->getMTotal('today');
                 if ($data['commission_enabled']) {
                     $data['commission'] = [
-                        'money' => $entry->getCommissionBalance()->total(),
+                        'total' => $entry->getCommissionBalance()->total(),
                     ];
                 }
 
@@ -239,10 +239,7 @@ if ($op == 'default') {
         }
     }
 
-    $withdraw_query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
-    $withdraw_query->where('(updatetime IS NULL OR updatetime=0)');
-
-    $tpl_data['withdraw_num'] = $withdraw_query->count();
+    $tpl_data['agent_levels'] = $agent_levels;
     $tpl_data['agents'] = $agents['list'];
     $tpl_data['mobile_url'] = Util::murl('mobile');
 

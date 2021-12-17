@@ -101,7 +101,7 @@
                     <td>
                         {if isset($agent['commission'])}
                         <div class="commission log operate">
-                            <span class="price">￥<b>{php echo number_format($agent['commission']['money']/100, 2);}</b>元</span>
+                            <span class="price">￥<b>{php echo number_format($agent['commission']['total']/100, 2);}</b>元</span>
                             <i class="fa fa-list" data-op="viewCommissionLog" title="点击查看详情..."></i>
                             <i class='balance-edit fa fa-pencil' title='修改用户余额...' data-op='balanceEdit'></i>
                         </div>
@@ -130,7 +130,7 @@
                     </td>
                     <td class="operate">
                         <div class="m_free"><span>免费 {$agent['m']['free']}</span></div>
-                        <div class="m_pay"><span>支付 {$agent['m']['fee']}</span></div>
+                        <div class="m_pay"><span>支付 {$agent['m']['pay']}</span></div>
                     </td>
                     <td class="partners operate">
                         <span {if empty($agent['partners'])}class="nopartners"{/if}>

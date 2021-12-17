@@ -121,11 +121,11 @@ class Stats
 
         $stats = $obj->get('statsData', [])['data'][$y]['total'][$n];
         $result = [
-            'fee' => intval($stats['p']),
+            'pay' => intval($stats['p']),
             'free' => intval($stats['f']),
         ];
 
-        $result['total'] = $result['fee'] + $result['free'];
+        $result['total'] = $result['pay'] + $result['free'];
 
         return $result;
     }

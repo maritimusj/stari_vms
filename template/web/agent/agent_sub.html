@@ -47,11 +47,14 @@
                 <th>#</th>
                 <th>昵称</th>
                 <th>手机号码</th>
-                <th><span id="J_total" data-sort="{$s_total}" style="cursor: pointer;">终端数量</span></th>
+                {if \zovye\App::isCommissionEnabled()}
+                <th>账户余额</th>
+                {/if}
+                <th><span id="J_total" data-sort="{$s_total}">终端数量</span></th>
                 <th>
-                    <div><span id="J_ffee" data-sort="{$s_ffee}" style="cursor: pointer;">本月出货</span></div>
+                    <div><span id="J_ffee" data-sort="{$s_ffee}">本月出货</span></div>
                 </th>
-                <th class="text-center"><span id="J_money" data-sort="{$s_money}" style="cursor: pointer;">等级</span></th>
+                <th class="text-center"><span id="J_money" data-sort="{$s_money}">等级</span></th>
                 <th class="partners">合伙人</th>
                 <th class="text-center">上级代理</th>
                 <th>操作</th>
@@ -77,21 +80,27 @@
                     <div class="referral">推荐码: {$agent['referral']}</div>
                     {/if}
                 </td>
+                {if \zovye\App::isCommissionEnabled()}
+                <td>
+                    {if isset($agent['commission'])}
+                    <div class="commission log ">
+                        <span class="price">￥<b>{php echo number_format($agent['commission']['total']/100, 2);}</b>元</span>
+                    </div>
+                    {/if}
+                </td>
+                {/if}
                 <td>
                     {$agent['total']}
                 </td>
                 <td class="operate">
                     <div class="m_free"><span>免费 {$agent['m']['free']}</span></div>
-                    <div class="m_pay"><span>支付 {$agent['m']['fee']}</span></div>
+                    <div class="m_pay"><span>支付 {$agent['m']['pay']}</span></div>
                 </td>
                 <td>
                     <div class="levels">
                             <span class="level" style="background-color:{$agent_levels[$agent['agentData']['level']]['clr']}">
                                 {php echo $agent_levels[$agent['agentData']['level']]['title']?:'&lt;未知等级&gt;'}
                             </span>
-                        {if isset($agent['commission'])}
-                        <div class="commission_log" data-op="viewCommissionLog" title="点击查看详情...">￥<b>{php echo number_format($agent['commission']['money']/100, 2);}</b>元</div>
-                        {/if}
                     </div>
                 </td>
                 <td class="partners operate">
@@ -115,10 +124,12 @@
                 </td>
                 <td class="operate"  style="width: 6em;">
                     <div class="btn-group">
-                        <a class="btn btn-default" href="{php echo $this->createWebUrl('agent', array('op'=>'edit','id'=>$agent['id']));}" title="设置"><i class="fa fa-gear"> </i></a>
+                        <a class="btn btn-default" href="{php echo $this->createWebUrl('agent', ['op' => 'commission_stats_view', 'id' => $agent['id']]);}" title="统计数据"><i class="fa fa-area-chart"> </i></a>
                         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                            <span class="fa fa-caret-down"></span></a>
+                        <span class="fa fa-caret-down"></span></a>
                         <ul class="dropdown-menu">
+                            <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'edit','id'=>$agent['id']));}"> <i class="fa fa-gear"></i> 设置</a></li>
+                            <li role="separator" class="divider"></li>
                             <li><a href="#" data-op="viewMsg"> <i class="fa fa-envelope fa-fw"></i> 他的消息</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="{php echo $this->createWebUrl('device', array('agentId'=>$agent['id']));}"> <i class="fa fa-share-alt fa-fw"></i> 他的设备</a></li>
@@ -135,9 +146,6 @@
                                     <i class="fa fa-users"></i> 所有下级代理商
                                 </a>
                             </li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#" data-op="viewStatsChart"> <i class="fa fa-line-chart fa-fw"></i> 本月统计图</a></li>
-                            <li><a href="#" data-op="viewStats"> <i class="fa fa-list-alt fa-fw"></i> 全部统计数据</a></li>
                             {if isset($agent['commission'])}
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 佣金明细</a></li>

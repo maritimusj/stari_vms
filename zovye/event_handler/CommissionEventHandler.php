@@ -28,17 +28,17 @@ class CommissionEventHandler
      */
     public static function onDeviceOrderCreated(deviceModelObj $device, orderModelObj $order, accountModelObj $account = null, balanceModelObj $balance = null): bool
     {
-        if ($account || $balance) {
-            return self::free($device, $order, $account, $balance);
+        if (!App::isCommissionEnabled()) {
+            return true;
         }
 
-        //如果订单支持不是系统支付商户号，则不参与分佣
-        // if (settings('lcsw.enabled')) {
-        //     $merchant_no = $order->getExtraData('payResult.raw.merchant_no');
-        //     if ($merchant_no && $merchant_no != settings('lcsw.merchant_no')) {
-        //         return true;
-        //     }
-        // }
+        if ($account) {
+            return self::free($device, $order, $account);
+        }
+
+        if ($balance) {
+            return self::balance($device, $order, $balance);
+        }
 
         if ($order->getPrice() > 0) {
             return self::pay($device, $order);
@@ -47,26 +47,34 @@ class CommissionEventHandler
         return true;
     }
 
+    /**
+     * @param deviceModelObj $device
+     * @param orderModelObj $order
+     * @param balanceModelObj|null $balance
+     * @return bool
+     * @throws Exception
+     */
+    protected static function balance(deviceModelObj $device, orderModelObj $order, balanceModelObj $balance): bool
+    {
+        if (Balance::isFreeOrder() && App::isZeroBonusEnabled() && $order->getExtraData('custom.zero_bonus', false)) {
+            return true;
+        }
+
+        $commission_price = Config::balance('order.commission.val', 0) * $order->getNum();
+
+        return self::processCommissions($device, $order, $commission_price);
+    }
 
     /**
      * 免费订单分佣
      * @param deviceModelObj $device
      * @param orderModelObj $order
      * @param accountModelObj|null $account
-     * @param balanceModelObj|null $balance
      * @return bool
      * @throws Exception
      */
-    protected static function free(deviceModelObj $device, orderModelObj $order, accountModelObj $account = null, balanceModelObj $balance = null): bool
+    protected static function free(deviceModelObj $device, orderModelObj $order, accountModelObj $account): bool
     {
-        if (!App::isCommissionEnabled()) {
-            return true;
-        }
-
-        if (empty($account) && empty($balance)) {
-            return true;
-        }
-
         if (settings('agent.yzshop.goods_limits.enabled') && YZShop::isInstalled()) {
             $agent = $device->getAgent();
             if ($agent) {
@@ -81,13 +89,19 @@ class CommissionEventHandler
             return true;
         }
 
-        if ($account) {
-            $commission_price = $account->getCommissionPrice();
-        } elseif ($balance) {
-            $commission_price = Config::balance('order.commission.val', 0) * $order->getNum();
-        }
+        return self::processCommissions($device, $order, $account->getCommissionPrice());
+    }
 
-        if (empty($commission_price) || $commission_price < 1) {
+    /**
+     * @param deviceModelObj $device
+     * @param orderModelObj $order
+     * @param int $commission_price
+     * @return bool
+     * @throws Exception
+     */
+    protected static function processCommissions(deviceModelObj $device, orderModelObj $order, int $commission_price): bool
+    {
+        if ($commission_price < 1) {
             return true;
         }
 
@@ -103,12 +117,12 @@ class CommissionEventHandler
         $order->setExtraData('commission.local.total', $commission_price);
 
         //可分佣的金额
-        $commission_price = self::processKeeperCommissions($commission_price, $device, $order);
+        $commission_price = self::processGSP($commission_price, $agent, $order);
         if ($commission_price < 1) {
             return true;
         }
 
-        $commission_price = self::processGSP($commission_price, $agent, $order);
+        $commission_price = self::processKeeperCommissions($commission_price, $device, $order);
         if ($commission_price < 1) {
             return true;
         }
@@ -251,7 +265,7 @@ class CommissionEventHandler
             $gsp_users = $agent->getGspUsers();
             foreach ($gsp_users as $entry) {
                 $matched = ($entry['order']['p'] && ($order->getPrice() > 0 || ($order->getBalance() > 0 && Balance::isPayOrder()))) ||
-                ($entry['order']['f'] && (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0 && Balance::isFreeOrder())));
+                    ($entry['order']['f'] && (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0 && Balance::isFreeOrder())));
 
                 if ($matched) {
                     /** @var userModelObj $user */
@@ -357,11 +371,6 @@ class CommissionEventHandler
      */
     protected static function pay(deviceModelObj $device, orderModelObj $order): bool
     {
-        //分佣系统
-        if (!App::isCommissionEnabled()) {
-            return true;
-        }
-
         $agent = $device->getAgent();
         if (empty($agent)) {
             return true;

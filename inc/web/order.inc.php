@@ -81,6 +81,9 @@ if ($op == 'default') {
         $query->where(['src' => Order::BALANCE]);
     } elseif ($way == 'refund') {
         $query->where(['refund' => 1]);
+        if (!Balance::isPayOrder()) {
+            $query->where(['src' => Order::PAY]);
+        }
     } elseif ($way == 'except') {
         $query->where(['result_code >' => 0]);
     } else if ($way == 'sqm') {

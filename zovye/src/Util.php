@@ -2846,4 +2846,33 @@ HTML_CONTENT;
         $load = sys_getloadavg();
         return $load === false || $load[0] < SYS_MAX_LOAD_AVERAGE_VALUE;
     }
+
+    public static function selectSiteUrl()
+    {
+        $siteurl = _W('siteurl');
+        $domain  = settings('app.domain', []);
+        if (empty($domain['enabled']) || empty($domain['main']) || empty($domain['bak'])) {
+            return false;
+        }
+
+        if (strpos($siteurl, $domain['main']) === false) {
+            return false;
+        }
+
+        $url = array_rand(array_flip($domain['bak']));
+        if (empty($url)) {
+           return false;
+        }
+
+        return str_replace($domain['main'], $url, $siteurl);
+    }
+
+    public static function redirectToBakSite()
+    {
+        $res = self::selectSiteUrl();
+        if ($res) {
+            Util::redirect($res);
+            exit();
+        }
+    }
 }

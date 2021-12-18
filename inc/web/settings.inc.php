@@ -251,6 +251,16 @@ if (isset(\$_SERVER['HTTP_LLT_API']) || isset(\$_SERVER['HTTP_STA_API'])) {
         Config::device('door.enable', request::bool('DeviceWithDoor') ? 1 : 0, true);
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
+        $settings['app']['domain']['enabled'] = request::bool('MultiDomainEnable') ? 1 : 0;
+        $settings['app']['domain']['main'] = trim(request::trim('mainUrl'), '\\\/');
+        $settings['app']['domain']['bak'] = request::array('bakUrl');
+        foreach ($settings['app']['domain']['bak'] as $index => &$url) {
+            $url = trim($url, " \t\n\r\0\x0B\\\/");
+            if (empty($url)) {
+                unset($settings['app']['domain']['bak'][$index]);
+            }
+        }
+
         if ($settings['app']['first']['enabled']) {
             $module_url = str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
             $files = [

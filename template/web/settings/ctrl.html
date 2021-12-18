@@ -102,7 +102,7 @@
                     {/if}
                 </div>
             </div>
-            <div class="seg">
+            <div class="seg" id="app_">
                 <div class="title">系统设置</div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
@@ -114,6 +114,42 @@
                         </div>
                     </div>
                 </div>
+                <!-- <div class="seg-divider"></div>
+                <div class="form-group" v-cloak>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="MultiDomainEnable" value="1" :checked = "enabled">
+                                启用多域名负载均衡机制
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="mainUrl" class="col-md-2 control-label">主域名</label>
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">{php echo \zovye\_W('sitescheme')}</span>
+                            <input type="text" class="form-control" name="mainUrl" id="mainUrl" value="{php echo $settings['app']['domain']['main'] ?? \zovye\_W('siteroot')}" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" v-for="(url,i) in list">
+                    <label :for="'bakUrl' + (i + 1)" class="col-md-2 control-label" v-text="'备用域名' + (i + 1)"></label>
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">{php echo \zovye\_W('sitescheme')}</span>
+                            <input type="text" class="form-control" name="bakUrl[]" :id="'bakUrl'+(i+1)" :value="url">
+                            <span class="input-group-addon operate"><i class="fa fa-ban" @click="remove(i)" title="删除"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bakUrl" class="col-md-2 control-label"></label>
+                    <div class="col-md-10 operate">
+                        <i class="fa fa-plus" @click="add" title="增加更多域名"></i>
+                    </div>
+                </div> -->
             </div>
             <div class="seg">
                 <div class="title">功能选项</div>
@@ -389,5 +425,27 @@
         })
         zovye.enableInputMask();
     });
+    require(["{php \zovye\url(false, JS_VUE_URL);}"], function(Vue) {
+        new Vue({
+            el: "#app",
+            data: {
+                enabled: "{php echo $settings['app']['domain']['enabled'] ? 1 : 0}",
+                list: [],
+            },
+            created() {
+                {loop (array)$settings['app']['domain']['bak'] $url}
+                this.list.push("{$url}")
+                {/loop}
+            },
+            methods: {
+                add() {
+                    this.list.push('');
+                },
+                remove(i) {
+                    this.list.splice(i, 1);
+                }
+            }
+        })
+    })
 </script>
 {template 'common/footer'}

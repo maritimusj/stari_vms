@@ -72,7 +72,6 @@ class WeApp extends Settings
         return $compile;
     }
 
-
     public function forceUnlock(): bool
     {
         return We7::pdo_update(weapp_configModelObj::getTableName(modelObj::OP_WRITE),

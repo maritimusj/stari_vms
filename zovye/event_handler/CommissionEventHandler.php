@@ -264,27 +264,35 @@ class CommissionEventHandler
             //获取佣金分享用户列表
             $gsp_users = $agent->getGspUsers();
             foreach ($gsp_users as $entry) {
-                $matched = ($entry['order']['p'] && ($order->getPrice() > 0 || ($order->getBalance() > 0 && Balance::isPayOrder()))) ||
-                    ($entry['order']['f'] && (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0 && Balance::isFreeOrder())));
-
-                if ($matched) {
-                    /** @var userModelObj $user */
-                    $user = $entry['__obj'];
-                    $percent = $entry['percent'];
-                    if (empty($user) || $percent <= 0) {
+                //收费订单
+                if ($order->getPrice() > 0 || ($order->getBalance() > 0 && Balance::isPayOrder())) {
+                    if (!$entry['order']['p']) {
                         continue;
                     }
-                    if ($entry['type'] == 'amount') {
-                        $price = intval($percent);
-                    } else {
-                        $price = intval(round($commission_price * $percent / 10000));
-                    }
-                    $more = $createCommission($price, $user);
-                    if (!$more) {
-                        //佣金为零，退出循环
-                        break;
+                }
+                //免费订单
+                if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0 && Balance::isFreeOrder())) {
+                    if (!$entry['order']['f']) {
+                        continue;
                     }
                 }
+                /** @var userModelObj $user */
+                $user = $entry['__obj'];
+                $percent = $entry['percent'];
+                if (empty($user) || $percent <= 0) {
+                    continue;
+                }
+                if ($entry['type'] == 'amount') {
+                    $price = intval($percent);
+                } else {
+                    $price = intval(round($commission_price * $percent / 10000));
+                }
+                $more = $createCommission($price, $user);
+                if (!$more) {
+                    //佣金为零，退出循环
+                    break;
+                }
+
             }
         } elseif ($agent->getGSPMode() == GSP::MIXED) {
             $query = GSP::from($agent);
@@ -295,12 +303,15 @@ class CommissionEventHandler
                 if (empty($user)) {
                     continue;
                 }
+                //支付订单
                 if ($order->getPrice() > 0 && !$entry->isPayOrderIncluded()) {
                     continue;
                 }
+                //免费订单
                 if ($order->getPrice() == 0 && $order->getBalance() == 0 && !$entry->isFreeOrderIncluded()) {
                     continue;
                 }
+                //积分订单
                 if ($order->getBalance() > 0) {
                     if (Balance::isFreeOrder() && !$entry->isFreeOrderIncluded()) {
                         continue;

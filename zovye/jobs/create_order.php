@@ -88,14 +88,14 @@ function prepare(string $order_no)
     }
 
     $pay_result = $pay_log->getQueryResult();
-    if (empty($pay_result)) {
-        $query_result = $pay_log->getPayResult();
-        if (empty($query_result)) {
+    if ($pay_result) {
+        $pay_result['from'] = 'query';
+    } else {
+        $pay_result = $pay_log->getPayResult();
+        if (empty($pay_result)) {
             throw new Exception('订单未支付！');
         }
         $pay_result['from'] = 'cb';
-    } else {
-        $pay_result['from'] = 'query';
     }
 
     $device = Device::get($pay_log->getDeviceId());

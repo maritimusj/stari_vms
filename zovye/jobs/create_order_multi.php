@@ -70,14 +70,6 @@ function process($order_no): bool
         throw new Exception('找不到支付信息！');
     }
 
-    $pay_result = $pay_log->getPayResult();
-    if (empty($pay_result)) {
-        $query_result = $pay_log->getQueryResult();
-        if (empty($query_result)) {
-            throw new Exception('订单未支付！');
-        }
-    }
-
     $device = Device::get($pay_log->getDeviceId());
     if (empty($device)) {
         ExceptionNeedsRefund::throw('找不到指定的设备！');
@@ -238,13 +230,16 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
     }
 
     $query_result = $pay_log->getQueryResult();
-    if (empty($query_result)) {
-        $pay_result = $pay_log->getPayResult();
-        $pay_result['from'] = 'cb';
-        $order_data['extra']['payResult'] = $pay_result;
-    } else {
+    if ($query_result) {
         $query_result['from'] = 'query';
         $order_data['extra']['payResult'] = $query_result;
+    } else {
+        $pay_result = $pay_log->getPayResult();
+        if (empty($pay_result)) {
+            throw new Exception('订单未支付！');
+        }
+        $pay_result['from'] = 'cb';
+        $order_data['extra']['payResult'] = $pay_result;
     }
 
     if (!empty($voucher)) {

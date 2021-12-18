@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20201236');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20201238');}
 
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
@@ -156,12 +156,10 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>来源</th>                    
-                    <th>商品</th>
-                    <th>图片</th>
-                    <th>
-                        <div>数量(价格)</div>
-                    </th>
+                    <th>来源</th>
+                    <th>商品图片</th>                
+                    <th>商品名称/数量</th>
+                    <th>价格</th>
                     <th>用户</th>
                     <th class="center">归属</th>
                     <th class="center">设备</th>
@@ -205,16 +203,6 @@
                         {/if}
                     </td>
                     <td>
-                        <div class="name">
-                            {if $order['goods']}                            
-                            {$order['goods']['name']}                            
-                            {else}
-                            {$order['package']['title']}
-                            {/if}
-                            <span {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num gray" title="{$order['pull_logs']}"{/if}> x{$order['num']}</span>
-                        </div>
-                    </td>
-                    <td>
                         {if $order['goods']}
                         <div class="goods">
                             <img src="{$order['goods']['img']}"/>
@@ -231,11 +219,23 @@
                         {/if}
                     </td>
                     <td>
+                        <div class="name">
+                            <span {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0} title="{php echo empty($order['refund']) ?  $order["result"]["message"] : $order['refund']['reason']}{/if}">
+                                {if $order['goods']}                            
+                                {$order['goods']['name']}                            
+                                {else}
+                                {$order['package']['title']}
+                                {/if}                                
+                            </span>
+                            <span {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num gray" title="{$order['pull_logs']}"{/if}> x{$order['num']}</span>
+                        </div>
+                    </td>
+                    <td>
                         <div  class="status">
                             <div class="detail">
                                 单价：<span class="price">{php echo number_format($order['goods']['price'] / 100, 2)}</span>
                                 {if $order['price']>0}
-                                (总计：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
+                                / 总价：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
                                     {if $order['discount'] > 0}
                                         {php echo number_format($order['goods']['price'] * $order['num'] / 100, 2)}
                                     {else}
@@ -248,7 +248,7 @@
                                     {if !$order['refund']}
                                     <img src="{php echo MODULE_URL . 'static/img/refund.svg'}" class="icon" title="退款" data-op="refund">
                                     {/if}
-                                )
+                                
                                 {/if}
                             <!-- 佣金详情开始 -->
                             {if $order['commission']}
@@ -329,22 +329,8 @@
                             <!-- 佣金详情结束 -->
                             </div>
                             <div class="pay operate">
-                                {if $order['price'] > 0}
                                 {if $order['refund']}
-                                <span  class="refund-title" title="{$order['refund']['title']}"> 已退款
-                                    {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0}
-                                    <i class="fa fa-info-circle" title="{php echo empty($order['refund']) ?  $order["result"]["message"] : $order['refund']['reason']}">
-                                    </i>
-                                    {/if}
-                                </span>
-                                {/if}
-                                {else}
-                                (
-                                    <span class="zeroprice">免费领取</span>
-                                )
-                                {if $order['refund']}
-                                <span class="refund-title" title="{$order['refund']['title']}"> 已退积分和佣金</span>
-                                {/if}
+                                <span class="refund-title" title="{$order['refund']['title']}"> （已退款） </span>
                                 {/if}
                             </div>
 

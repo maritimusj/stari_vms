@@ -9,7 +9,7 @@
 }
 
 #orderlist .price:before {
-    content: '￥';
+    content: '¥';
     padding-right: 3px;
 }
 
@@ -120,7 +120,7 @@
 }
 #orderlist .goods img{
     min-width: 45px;
-    width: 100px;
+    width: 60px;
 }
 #orderlist .profile img{
     min-width: 45px;
@@ -319,6 +319,7 @@
     color: coral;
 }
 .refund-title {
+    color: #ff5722;
     font-size: smaller;
     vertical-align: super;
     cursor: default;

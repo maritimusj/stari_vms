@@ -90,15 +90,22 @@ class Balance
             $profile['balance'] = $this->total();
             $profile['change'] = $item->getXVal();
             
-            $data = json_encode([
+            $data = [
                 'data' => $profile,
                 'serial' => sha1(App::uid(6) . $item->getId()),
                 'sign' => hash_hmac('sha1', http_build_query($profile), Config::balance('app.key')),
-            ], JSON_UNESCAPED_UNICODE);
+            ];
 
-            $result = CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify_url, $data);
+            $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
+
+            Log::debug('balance_notify', [
+                'notify' => $notify_url,
+                'data' => $data,
+            ]);
+
+            $result = CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify_url, $json_str);
             if (is_error($result)) {
-                Log::error('balance', [
+                Log::error('balance_notify', [
                     'notify_url' => $notify_url,
                     'data' => $data,
                     'result' => $result,

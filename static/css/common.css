@@ -46,6 +46,10 @@ tr:hover .operate i {
     font-size: inherit;
 }
 
+.content {
+    overflow: hidden;
+}
+
 .panel-first {
     border-top-left-radius: unset;
 }

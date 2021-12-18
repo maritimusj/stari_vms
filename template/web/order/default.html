@@ -1,7 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
 {php \zovye\url(true, 'static/css/orderlist.css?v=20201238');}
-
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -163,7 +162,7 @@
                     <th>用户</th>
                     <th class="center">归属</th>
                     <th class="center">设备</th>
-                    <th>
+                    <th class="sm-0">
                         <div>地区(IP定位)</div>
                         <div>创建时间</div>
                     </th>
@@ -403,7 +402,7 @@
                         {/if}
                     {/if}
                 </td>
-                <td>
+                <td class="sm-0">
                     <div title="{$order['ip']}">{$order['ip_info']}{if $order['isp']}({$order['isp']}){/if}</div>
                     <div style="color:#9E9E9E;font-size:12px;">{$order['createtime']}</div>
                 </td>

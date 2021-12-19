@@ -179,7 +179,7 @@
         }
 
         .iconfont {
-            font-family: "iconfont" !important;
+            font-family: "iconfont",serif !important;
             font-size: 16px;
             font-style: normal;
             -webkit-font-smoothing: antialiased;
@@ -239,7 +239,7 @@
         <template v-for="(lane, index) in lanes" :key="lane.id">
             <div>
                 <button class="pure-button"
-                        :class="{'pure-button-primary': lane.selected, 'animated':true, 'flash infinite': lane.state == 'busy'}"
+                        :class="{'pure-button-primary': lane.selected, 'animated':true, 'flash infinite': lane.state === 'busy'}"
                         @click="clickLane(lane)" @touchstart="touchstartHandler(lane)"
                         @touchmove="touchmoveHandler(lane, $event)" @touchend="touchendHandler(lane, $event)">
                     <span>{{lane.id}}</span>
@@ -267,7 +267,7 @@
         <div class="lanes view" v-if="viewObj" @click="viewObj=null">
             <div class="list" id="list">
                 <div class="task-button animated"
-                     :class="{error:lane.fail && lane.fail > 0,normal:lane.success&&lane.success>0&&!lane.fail,timeout:lane.errno==9,malfunction:lane.errno==10,'flash infinite': lane.state==='busy'}"
+                     :class="{error:lane.fail && lane.fail > 0,normal:lane.success&&lane.success>0&&!lane.fail,timeout:lane.errno===9,malfunction:lane.errno===10,'flash infinite': lane.state==='busy'}"
                      v-for="lane in viewObj.lanes">
                     {{lane.id}}
                     <sup v-if="lane.success!==undefined||lane.fail!==undefined">
@@ -289,7 +289,7 @@
                 <td>
                     <div class="status animated flipInY"
                          :class="{error:task.fail&&task.fail > 0, offline:task.offline}">
-                        <span v-if="task.status!='已完成'" v-text="task.status"></span>
+                        <span v-if="task.status!=='已完成'" v-text="task.status"></span>
                         <span v-else>
                                     {{task.status}} (<span v-text="task.success ? task.success+'√':''"></span> <span
                                 v-text="task.fail ? task.fail+'*':''"></span>)
@@ -352,7 +352,7 @@
                 }
             },
             setLaneState: function (task, id, state) {
-                let t = task.lanes.find(entry => entry.id === id);
+                let t = task.lanes.find(lane => lane.id === id);
                 if (t) {
                     Vue.set(t, "state", state);
                 }
@@ -547,17 +547,17 @@
                 this.viewObj = this.viewObj === task ? null : task;
             },
             testAllForever: function () {
-                const ids = this.lanes.filter(function (lane) {
+                const lanes = this.lanes.filter(function (lane) {
                     return lane.selected === true;
                 }).map(function (lane) {
                     return {id: lane.id, total: 1000};
                 });
-                if (ids.length > 0) {
+                if (lanes.length > 0) {
                     const self = this;
                     scan(function (id) {
                         const task = {
                             id: id,
-                            lanes: ids,
+                            lanes: lanes,
                             status: "等待...",
                         }
                         self.taskQueue.unshift(task);
@@ -566,17 +566,17 @@
                 }
             },
             testAll: function () {
-                const ids = this.lanes.filter(function (lane) {
+                const lanes = this.lanes.filter(function (lane) {
                     return lane.selected === true;
                 }).map(function (lane) {
                     return {id: lane.id, total: lane.total};
                 });
-                if (ids.length > 0) {
+                if (lanes.length > 0) {
                     const self = this;
                     scan(function (id) {
                         let task = {
                             id: id,
-                            lanes: ids,
+                            lanes: lanes,
                             status: "等待...",
                         }
                         self.taskQueue.unshift(task);

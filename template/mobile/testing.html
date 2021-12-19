@@ -352,13 +352,13 @@
                 }
             },
             setLaneState: function (task, id, state) {
-                let e = task.lanes.find(entry => entry.id === id);
-                if (e) {
-                    Vue.set(e, "state", state);
+                let t = task.lanes.find(entry => entry.id === id);
+                if (t) {
+                    Vue.set(t, "state", state);
                 }
-                e = this.lanes.find(lane => lane.id === id);
-                if (e) {
-                    Vue.set(e, "state", state);
+                let l = this.lanes.find(lane => lane.id === id);
+                if (l) {
+                    Vue.set(l, "state", state);
                 }
             },
             getResult: function (task, getLaneFN, done, fail, success) {

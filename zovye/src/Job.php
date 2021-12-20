@@ -62,7 +62,7 @@ class Job
             'goods' => $goods_id,
             'num' => $num,
             'ip' => $ip,
-        ], LEVEL_HIGH);
+        ], LEVEL_HIGH) !== false;
     }
 
     /**

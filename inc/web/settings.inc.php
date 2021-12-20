@@ -26,11 +26,13 @@ header(\"Access-Control-Allow-Methods: GET,POST\");
 header(\"Access-Control-Allow-Headers: Content-Type, STA-API, LLT-API\");
 header(\"Access-Control-Max-Age: 86400\");
 
-if (isset(\$_SERVER['HTTP_LLT_API']) || isset(\$_SERVER['HTTP_STA_API'])) {
+if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
     \$_GET['do'] = 'wxapi';
     \$_GET['vendor'] = \$_SERVER['HTTP_STA_API'] ?? \$_SERVER['HTTP_LLT_API'];
 } elseif (isset(\$_SERVER['HTTP_STA_WXAPI']) || isset(\$_SERVER['HTTP_LLT_WXAPI'])) {
     \$_GET['do'] = 'wxxapi';
+}  elseif (isset(\$_SERVER['HTTP_STA_WXWEB'])) {
+    \$_GET['do'] = 'wxweb';
 } else {
     exit('invalid request!');
 }

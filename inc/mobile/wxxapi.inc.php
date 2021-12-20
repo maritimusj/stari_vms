@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye\wxxApp;
+namespace zovye\wxxApi;
 
 defined('IN_IA') or exit('Access Denied');
 

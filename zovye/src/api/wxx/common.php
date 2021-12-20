@@ -598,7 +598,7 @@ class common
     public static function deviceAdvs(): array
     {
         $type = request::int('typeid');
-        $num = empty(request('num')) ? 10 : request::int('num');
+        $num = request::int('num', 10);
 
         $device = Device::get(request::str('deviceid'), true);
         if (empty($device)) {

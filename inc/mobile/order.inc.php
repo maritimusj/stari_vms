@@ -164,8 +164,8 @@ if ($op === 'create') {
 
     $order = Order::get($order_no, true);
     if ($order) {
-        $errno = $order->getExtraData('pull.result.errno', 'n/a');
-        if ($errno == 'n/a') {
+        $errno = $order->getExtraData('pull.result.errno', -1);
+        if ($errno == -1) {
             $response = [
                 'code' => 100,
                 'msg' => '订单正在处理中...',

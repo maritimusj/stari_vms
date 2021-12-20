@@ -220,13 +220,9 @@ class api
             ];
         }
 
-        $response = ['code' => 502];
-        if (Helper::NeedAutoRefund($order)) {
-            $response['msg'] = '出货失败，已提交退款申请！';
-        } else {
-            $response['msg'] = '出货失败，请联系管理员！';
-        }
-
-        return $response;
+        return [
+            'code' => 502,
+            'msg' => '出货失败！',
+        ];
     }
 }

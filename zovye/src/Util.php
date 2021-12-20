@@ -1940,8 +1940,8 @@ HTML_CONTENT;
                         if (empty($locker)) {
                             return error(State::ERROR, '设备正忙，请重试！');
                         }
-                        $res = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
-                        if (is_error($res)) {
+                        $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                        if (is_error($v)) {
                             return error(State::ERROR, '保存库存失败！');
                         }
                         $locker->unlock();

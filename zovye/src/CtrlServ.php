@@ -417,7 +417,7 @@ class CtrlServ
         $result = self::httpQueuedCallback($level, self::makeJobUrl($op, $params));
 
         if (!is_error($result) && $result !== false) {
-            return $result['queued'];
+            return $result['queued'] ?? true;
         }
         return false;
     }

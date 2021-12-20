@@ -8,6 +8,9 @@
 namespace zovye\api\wxweb;
 
 use zovye\Account;
+use zovye\Helper;
+use zovye\Job;
+use zovye\Order;
 use zovye\Util;
 use zovye\State;
 use zovye\Device;
@@ -15,6 +18,7 @@ use zovye\request;
 use zovye\api\wxx\common;
 use zovye\Log;
 
+use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\is_error;
 
@@ -88,7 +92,7 @@ class api
             return [];
         }
 
-        $params =  [
+        $params = [
             'type' => [Account::VIDEO],
             's_type' => [],
             'include' => $include,
@@ -101,7 +105,7 @@ class api
         return Account::getAvailableList($device, $user, $params);
     }
 
-    public static function goods():array
+    public static function goods(): array
     {
         $user = \zovye\api\wx\common::getUser();
 
@@ -117,17 +121,112 @@ class api
         if (empty($device)) {
             return err('找不到这个设备！');
         }
-    
+
         $type = request::str('type'); //free or pay or balance
-    
+
         if ($type == 'balance') {
-            $result =  $device->getGoodsList($user, ['balance']);
+            $result = $device->getGoodsList($user, ['balance']);
         } elseif ($type == 'free') {
             $result = $device->getGoodsList($user, ['allowFree']);
         } else {
             $result = $device->getGoodsAndPackages($user, ['allowPay']);
         }
-    
+
         return $result;
+    }
+
+    public static function get(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        if (!$device->isMcbOnline()) {
+            return err('设备不在线！');
+        }
+
+        $account = Account::findOneFromUID(request::str('uid'));
+        if (empty($account)) {
+            return err('找不到指定任务！');
+        }
+
+        $goods_id = request::int('goodsId');
+        if (empty($goods_id)) {
+            $goods = $device->getGoodsByLane(0);
+            if ($goods && $goods['num'] < 1) {
+                $goods = $device->getGoods($goods['id']);
+            }
+        } else {
+            $goods = $device->getGoods($goods_id);
+        }
+
+        if (empty($goods)) {
+            return err('找不到商品！');
+        }
+
+        if ($goods['num'] < 1) {
+            return err('商品数量不足！');
+        }
+
+        $orderUID = Order::makeUID($user, $device);
+
+        if (Job::createAccountOrder([
+            'device' => $device->getId(),
+            'user' => $user->getId(),
+            'account' => $account->getId(),
+            'goods' => $goods['id'],
+            'orderUID' => $orderUID,
+            'ip' => Util::getClientIp(),
+        ])) {
+            return ['orderUID' => $orderUID];
+        }
+
+        return err('请求出货失败！');
+    }
+
+    public static function orderStatus(): array
+    {
+        $order = Order::get(request::str('uid'), true);
+        if (empty($order)) {
+            return ['msg' => '正在查询订单'];
+        }
+
+        $errno = $order->getExtraData('pull.result.errno', 'n/a');
+        if ($errno == 'n/a') {
+            return [
+                'msg' => '订单正在处理中',
+                'code' => 100,
+            ];
+        } elseif ($errno == 0) {
+            return [
+                'code' => 200,
+                'msg' => '出货完成!',
+            ];
+        } elseif ($errno == 12) {
+            return [
+                'code' => 100,
+                'msg' => '订单正在处理中，请稍等！',
+            ];
+        }
+
+        $response = ['code' => 502];
+        if (Helper::NeedAutoRefund($order)) {
+            $response['msg'] = '出货失败，已提交退款申请！';
+        } else {
+            $response['msg'] = '出货失败，请联系管理员！';
+        }
+
+        return $response;
     }
 }

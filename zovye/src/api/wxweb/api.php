@@ -199,7 +199,10 @@ class api
     {
         $order = Order::get(request::str('uid'), true);
         if (empty($order)) {
-            return ['msg' => '正在查询订单'];
+            return [
+                'msg' => '正在查询订单',
+                'code' => 100,
+            ];
         }
 
         $errno = $order->getExtraData('pull.result.errno', 'n/a');

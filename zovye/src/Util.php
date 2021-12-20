@@ -2426,8 +2426,10 @@ HTML_CONTENT;
                 $params
             );
 
+            $extra = [];
+
             if (App::isDeviceWithDoorEnabled() && empty($data['extra']['door'])) {
-                $data['extra']['door'] = [
+                $extra['door'] = [
                     'num' => request::int('doorNum', 1),
                 ];
             }
@@ -2442,6 +2444,10 @@ HTML_CONTENT;
             $device = Device::create($data);
             if (empty($device)) {
                 return error(State::ERROR, '创建设备失败！');
+            }
+
+            if ($extra) {
+                $device->set('extra', $extra);
             }
 
             $device->updateQrcode(true);

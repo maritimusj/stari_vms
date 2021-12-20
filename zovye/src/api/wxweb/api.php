@@ -10,7 +10,9 @@ namespace zovye\api\wxweb;
 use zovye\Account;
 use zovye\Helper;
 use zovye\Job;
+use zovye\JSON;
 use zovye\Order;
+use zovye\User;
 use zovye\Util;
 use zovye\State;
 use zovye\Device;
@@ -147,6 +149,10 @@ class api
             return err('用户暂时无法使用！');
         }
 
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            JSON::fail('无法锁定用户，请稍后再试！');
+        }
+
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -193,6 +199,30 @@ class api
         }
 
         return err('请求出货失败！');
+    }
+
+    public static function exchange(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        $device_uid = request::str('deviceId');
+        $goods_id = request::int('goodsId');
+        $num = request::int('num');
+
+        $res = Helper::exchange($user, $device_uid, $goods_id, $num);
+        if (is_error($res)) {
+            JSON::fail($res);
+        }
+
+        return ['orderUID' => $res];
     }
 
     public static function orderStatus(): array

@@ -168,7 +168,7 @@ class Helper
         return false;
     }
 
-    
+
     public static function preparePullData(orderModelObj $order, deviceModelObj $device, userModelObj $user): array
     {
         $pull_data = [
@@ -272,5 +272,52 @@ class Helper
         }
 
         return $result;
+    }
+
+    public static function exchange(userModelObj $user, $device_uid, $goods_id, $num, $order_no = '')
+    {
+        if (!App::isBalanceEnabled()) {
+            return err('这个功能没有启用！');
+        }
+
+        $device = Device::get($device_uid, true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        $goods = $device->getGoods($goods_id);
+        if (empty($goods) || empty($goods['balance'])) {
+            return err('无法兑换这个商品，请联系管理员！');
+        }
+
+        $num = min(App::orderMaxGoodsNum(), max($num, 1));
+        if ($num < 1) {
+            return err('对不起，商品数量不正确！');
+        }
+
+        if ($goods['num'] < $num) {
+            return err('对不起，商品数量不足！');
+        }
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
+        $balance = $user->getBalance();
+        if ($goods['balance'] * $num > $balance->total()) {
+            return err('您的积分不够！');
+        }
+
+        if (empty($order_no)) {
+            $order_no = Order::makeUID($user, $device, sha1(REQUEST_ID));
+        }
+
+        $ip = $user->getLastActiveData('ip') ?: Util::getClientIp();
+
+        if (Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
+            return $order_no;
+        }
+
+        return err('失败，请稍后再试！');
     }
 }

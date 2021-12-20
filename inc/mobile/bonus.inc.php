@@ -35,7 +35,7 @@ if ($op == 'default') {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
     
-    app()->bonusPage($user, $device);
+    app()->bonusPage($user, $device ?? null);
 
 } elseif ($op == 'home') {
 
@@ -101,52 +101,19 @@ if ($op == 'default') {
 
 } elseif ($op == 'exchange') {
 
-    if (!App::isBalanceEnabled()) {
-        JSON::fail('这个功能没有启用！');
-    }
-
     $device_uid = request::str('device');
-    $device = Device::get($device_uid, true);
-    if (empty($device)) {
-        JSON::fail('找不到这个设备！');
-    }
-
     $goods_id = request::int('goods');
+    $num = request::int('num');
 
-    $goods = $device->getGoods($goods_id);
-    if (empty($goods) || empty($goods['balance'])) {
-        JSON::fail('无法兑换这个商品，请联系管理员！');
+    $res = Helper::exchange($user, $device_uid, $goods_id, $num);
+    if (is_error($res)) {
+        JSON::fail($res);
     }
 
-    $num = min(App::orderMaxGoodsNum(), max(request::int('num'), 1));
-    if (empty($num) || $num < 1) {
-        JSON::fail('对不起，商品数量不正确！');
-    }
-
-    if ($goods['num'] < $num) {
-        JSON::fail('对不起，商品数量不足！');
-    }
-
-    if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-        JSON::fail('无法锁定用户，请稍后再试！');
-    }
-
-    $balance = $user->getBalance();
-    if ($goods['balance'] * $num > $balance->total()) {
-        JSON::fail('您的积分不够！');
-    }
-
-    $order_no = Order::makeUID($user, $device, sha1(request::str('serial')));
-    $ip = $user->getLastActiveData('ip') ?: Util::getClientIp();
-
-    if (Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
-        JSON::success([
-            'msg' => '请稍后，正在出货中！',
-            'redirect' => Util::murl('payresult', ['orderNO' => $order_no, 'balance' => 1]),
-        ]);
-    }
-
-    JSON::success('失败，请稍后再试！');
+    JSON::success([
+        'msg' => '请稍后，正在出货中！',
+        'redirect' => Util::murl('payresult', ['orderNO' => $res, 'balance' => 1]),
+    ]);
 
 }  elseif ($op == 'logs') {
 

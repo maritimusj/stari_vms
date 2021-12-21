@@ -919,6 +919,7 @@ class deviceModelObj extends modelObj
 
         $params['from'] = 'device';
         $params['device'] = $id;
+
         return Util::murl('entry', $params, true);
     }
 

@@ -19,8 +19,8 @@ class WxPlatform
 
     const SUCCESS_RESPONSE = 'success';
 
-    const SCOPE_SNSAPI_BASE = 'snsapi_base';
-    const SCOPE_SNSAPI_USERINFO = 'snsapi_userinfo';
+    const SCOPE_SNS_API_BASE = 'snsapi_base';
+    const SCOPE_SNS_API_USERINFO = 'snsapi_userinfo';
 
     const CREATE_AUTHORIZER_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={TOKEN}';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={TICKET}';
@@ -112,7 +112,7 @@ class WxPlatform
      * @param string $state
      * @return string
      */
-    public static function getAuthorizationCodeRedirectUrl(accountModelObj $account, $redirect_url, $scope = self::SCOPE_SNSAPI_BASE, $state = ''): string
+    public static function getAuthorizationCodeRedirectUrl(accountModelObj $account, $redirect_url, $scope = self::SCOPE_SNS_API_BASE, $state = ''): string
     {
         $component_appid = settings('account.wx.platform.config.appid');
         $appid = $account->settings('authdata.authorization_info.authorizer_appid');
@@ -140,7 +140,7 @@ class WxPlatform
             return $res;
         }
         $scopes = explode($res['scope'], ',');
-        if (in_array(self::SCOPE_SNSAPI_USERINFO, $scopes)) {
+        if (in_array(self::SCOPE_SNS_API_USERINFO, $scopes)) {
             $res = self::getUserProfile($res['access_token'], $res['openid']);
             if (!is_error($res)) {
                 return $res;

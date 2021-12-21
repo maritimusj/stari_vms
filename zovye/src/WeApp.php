@@ -407,9 +407,7 @@ JSCODE;
         } else {
             $tpl['accounts'] = [];
         }
-
-        ComponentUser::removeAll(['user_id' => $user->getId()]);
-
+        
         foreach ($tpl['accounts'] as $index => $account) {
             //检查直接转跳的吸粉广告或公众号
             if (!empty($account['redirect_url'])) {
@@ -419,28 +417,6 @@ JSCODE;
                     exit('正在转跳...');
                 }
                 unset($tpl['accounts'][$index]);
-            }
-
-            //检查需要关注出货的订阅号
-            if (isset($account['service_type']) && $account['service_type'] != Account::SERVICE_ACCOUNT && empty($account['open_timing'])) {
-                $footprint = User::makeUserFootprint($user);
-                if (!ComponentUser::exists(['user_id' => $user->getId(), 'appid' => $account['appid']])) {
-                    ComponentUser::create([
-                        'appid' => $account['appid'],
-                        'user_id' => $user->getId(),
-                        'openid' => $footprint,
-                        'extra' => [
-                            'device' => $device->getShadowId(),
-                            'time' => time(),
-                        ]
-                    ]);
-                } else {
-                    $obj = ComponentUser::findOne(['user_id' => $user->getId(), 'appid' => $account['appid']]);
-                    if ($obj) {
-                        $obj->setOpenid($footprint);
-                        $obj->save();
-                    }
-                }
             }
         }
 

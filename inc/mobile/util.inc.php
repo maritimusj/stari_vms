@@ -205,64 +205,6 @@ if ($op == 'default') {
 
     app()->showTemplate('review', $tpl_data);
 
-} elseif ($op == 'auth') {
-
-    try {
-        $user = User::get(request::int('user'));
-        if (empty($user)) {
-            throw new RuntimeException('找不到这个用户！');
-        }
-
-        $device = Device::get(request::int('device'));
-        if (empty($device)) {
-            throw new RuntimeException('找不到这个设备！');
-        }
-
-        $account = Account::get(request::int('account'));
-        if (empty($account)) {
-            throw new RuntimeException('找不到这个公众号！');
-        }
-
-        $code = request::str('code');
-
-        $res = WxPlatform::getUserInfo($account, $code);
-        if (is_error($res)) {
-            throw new RuntimeException($res['message']);
-        }
-
-        if (empty($res['openid'])) {
-            throw new RuntimeException('缺少openid');
-        }
-
-        $appid = $account->settings('authorization_info.authorizer_appid');
-        if (!ComponentUser::exists(['appid' => $appid, 'openid' => $res['openid']])) {
-            if (!ComponentUser::create([
-                'appid' => $appid,
-                'openid' => $res['openid'],
-                'extra' => $res,
-            ])) {
-                throw new RuntimeException('保存用户授权信息出错！');
-            }
-        }
-
-        $data = $account->format();
-        unset($data['service_type']);
-
-        $user->setLastActiveData([
-            'account' => $data,
-            'time' => time(),
-        ]);
-
-        $url = Util::murl('entry', ['device' => $device->getImei()]);
-        Util::redirect($url);
-
-    } catch (Exception $e) {
-        Log::error('auth_user', [
-            'error' => $e->getMessage(),
-        ]);
-
-        Util::resultAlert($e->getMessage(), 'error');
-    }
 } elseif ($op == 'profile') {
     $user = Util::getCurrentUser();
     if ($user) {

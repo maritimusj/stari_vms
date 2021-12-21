@@ -323,18 +323,6 @@ class Helper
 
     public static function createWxAppOrder(userModelObj $user, deviceModelObj $device, $goods_id, $num = 1, $order_no = '')
     {
-        if ($num < 1) {
-            return err('购买数量不能小于1！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
-
-        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-            return err('无法锁定用户，请稍后再试！');
-        }
-
         if (!$device->isMcbOnline()) {
             return err('设备不在线！');
         }

@@ -233,13 +233,27 @@ class api
             return err('找不到这个用户！');
         }
 
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
         $goods_id = request::int('goodsId');
+        if (empty($goods_id)) {
+            return err('没有指定商品！');
+        }
         $num = request::int('num', 1);
+        if ($num < 1) {
+            return err('购买数量不能小于1！');
+        }
 
         return Helper::createWxAppOrder($user, $device, $goods_id, $num);
     }

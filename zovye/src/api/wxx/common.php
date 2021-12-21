@@ -409,6 +409,14 @@ class common
     {
         $user = self::getUser();
 
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
         App::setContainer($user);
 
         $imei = request::str('device');
@@ -423,6 +431,10 @@ class common
         }
 
         $goods_id = request::int('goodsId');
+        if (empty($goods_id)) {
+            return err('没有指定商品！');
+        }
+        
         return Helper::createWxAppOrder($user, $device, $goods_id);
     }
 

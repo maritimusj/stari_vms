@@ -23,5 +23,6 @@ router::exec($op, [
     'goods' => '\zovye\api\wxweb\api::goods',
     'get' => '\zovye\api\wxweb\api::get',
     'exchange' => '\zovye\api\wxweb\api::exchange',
+    'pay' => '\zovye\api\wxweb\api::pay',
     'orderStatus' => '\zovye\api\wxweb\api::orderStatus',
 ]);

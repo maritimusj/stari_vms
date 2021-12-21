@@ -609,54 +609,32 @@ class WxPlatform
                 return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
-            if ($acc->isServiceAccount()) {
-                $event_key = str_replace('qrscene_', '', strval($msg['EventKey']));
-                list($prefix, $first, $second) = explode(':', $event_key, 3);
-                if ($prefix != App::uid(6)) {
-                    return [];
-                }
+            if ($acc->isSubscriptionAccount() || !$acc->isVerified()) {
+                throw new RuntimeException('订阅号或者未认证服务号无法自动出货，请联系管理员！');
+            }
 
-                $device = Device::get($second);
+            $event_key = str_replace('qrscene_', '', strval($msg['EventKey']));
+            list($prefix, $first, $second) = explode(':', $event_key, 3);
+            if ($prefix != App::uid(6)) {
+                return [];
+            }
 
-                if (empty($device)) {
-                    throw new RuntimeException('找不到这个设备！');
-                }
+            $device = Device::get($second);
 
-                //如果是来自屏幕二维码
-                if ($first == 'device') {
-                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
-                }
+            if (empty($device)) {
+                throw new RuntimeException('找不到这个设备！');
+            }
 
-                //如果来自公众号屏幕推广二维码
-                if ($first == 'app') {
-                    $user = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName'], true);
-                } else {
-                    $user = User::get($first);
-                }
+            //如果是来自屏幕二维码
+            if ($first == 'device') {
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+            }
+
+            //公众号屏幕推广二维码自2021年12月27日后失效
+            if ($first == 'app') {
+                throw new RuntimeException('屏幕公众号二维码功能已失效，请联系管理员！');
             } else {
-                $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
-
-                $appid = $acc->settings('authdata.authorization_info.authorizer_appid');
-                $user_uid = User::makeUserFootprint($profile);
-                $obj = ComponentUser::findOne([
-                    'appid' => $appid,
-                    'openid' => $user_uid,
-                ]);
-
-                if (empty($obj)) {
-                    //throw new RuntimeException('请先扫描设备二维码，谢谢！');
-                    //用户匹配失败，直接返回设定的消息，点击接领取
-                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
-                }
-
-                ComponentUser::removeAll(['appid' => $appid, 'openid' => $user_uid]);
-
-                $device = Device::findOne(['shadow_id' => $obj->getExtraData('device')]);
-                if (empty($device)) {
-                    throw new RuntimeException('找不到这个设备！');
-                }
-
-                $user = User::get($obj->getUserId());
+                $user = User::get($first);
             }
 
             if (empty($user)) {

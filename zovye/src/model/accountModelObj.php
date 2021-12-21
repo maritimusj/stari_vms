@@ -409,6 +409,10 @@ class accountModelObj extends modelObj
         return $this->getServiceType() == Account::SERVICE_ACCOUNT;
     }
 
+    public function isSubscriptionAccount(): bool
+    {
+        return $this->getServiceType() == Account::SUBSCRIPTION_ACCOUNT;
+    }
     /**
      * 使用这个授权服务号的二维码做为设备二维码，推送到APP上显示
      * @param null $enable

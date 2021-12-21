@@ -169,24 +169,15 @@
                 </div>
                 <!-- 授权接入公众号特殊设置 开始 -->
                 <div class="seg-divider"></div>
-                {if $account && $account->isVerified()}
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕推广</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="useAppQRCode" name="useAppQRCode" value="1" {if $config['appQRCode']}checked{/if}> 在设备屏幕上进行推广
-                        </label>
-                        <span class="help-block">* 推送公众号二维码到指定设备屏幕上</span>
-                    </div>
-                </div>
-                {/if}
                 <div class="form-group">
                     <label class="col-md-2 control-label">出货时机</label>
                     <div class="col-md-8">
+                        {if $account && $account->isServiceAccount() && $account->isVerified()}
                         <label for="scan" class="radio-inline{if !$account->isVerified()} disabled{/if}">
-                            <input name="OpenTiming" id="scan" type="radio" value="0"{if $account && !$account->isVerified()} disabled {else}{if empty($config['open']['timing'])} checked="checked"{/if}{/if}>
+                            <input name="OpenTiming" id="scan" type="radio" value="0"{if empty($config['open']['timing'])} checked="checked"{/if}>
                             扫码进入公众号
                         </label>
+                        {/if}
                         <label for="link" class="radio-inline">
                             <input name="OpenTiming" id="link" type="radio" value="1"{if $config['open']['timing'] == 1} checked="checked"{/if}>
                             打开取货链接

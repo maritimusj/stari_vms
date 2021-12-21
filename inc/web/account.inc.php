@@ -374,7 +374,7 @@ if ($op == 'default') {
             } elseif ($account->isAuth()) {
                 $data['img'] = request::trim('img');
                 $timing = request::int('OpenTiming');
-                if (!$account->isVerified()) {
+                if ($account->isSubscriptionAccount() || !$account->isVerified()) {
                     $timing = 1;
                 }
                 $config = [

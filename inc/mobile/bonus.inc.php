@@ -91,7 +91,7 @@ if ($op == 'default') {
     $type = request::int('type', Account::NORMAL);
     $max = request::int('max', 10);
 
-    $result = Account::getAvailableList(Device::getBalanceVDevice(), $user, [
+    $result = Account::getAvailableList(Device::getDummyDevice(), $user, [
         'type' => [$type],
         'include' => [Account::BALANCE],
         'max' => $max,

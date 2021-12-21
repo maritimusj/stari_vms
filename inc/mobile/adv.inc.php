@@ -30,7 +30,7 @@ if (request::has('deviceid')) {
         JSON::fail('找不到这个设备');
     }
 } else {
-    $device = Device::getBalanceVDevice();
+    $device = Device::getDummyDevice();
 }
 
 $result = Util::getDeviceAdvs($device, $type_id, $num);

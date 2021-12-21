@@ -34,7 +34,7 @@ if ($op == 'default') {
 
     $result = [];
 
-    $result['new'] = Account::getAvailableList(Device::getBalanceVDevice(), $user, [
+    $result['new'] = Account::getAvailableList(Device::getDummyDevice(), $user, [
         'type' => [Account::TASK],
         's_type' => [],
         'include' => [Account::BALANCE],

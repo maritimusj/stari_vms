@@ -51,7 +51,7 @@ class Device extends State
     const V0_STATUS_COUNT = 'count';
     const V0_STATUS_ERROR = 'error';
 
-    const BALANCE_VDEVICE_PREFIX = 'B#';
+    const DUMMY_DEVICE_PREFIX = 'B#';
 
     private static $cache = [];
 
@@ -504,12 +504,12 @@ class Device extends State
         return self::query()->findOne($cond);
     }
 
-    public static function getBalanceVDevice(): deviceModelObj
+    public static function getDummyDevice(): deviceModelObj
     {
         $deviceClassname = m('device')->objClassname();
 
         $device = new $deviceClassname(0, m('device'));
-        $device->setImei(self::BALANCE_VDEVICE_PREFIX . Util::random(16, true));
+        $device->setImei(self::DUMMY_DEVICE_PREFIX . Util::random(16, true));
         
         return $device;
     }

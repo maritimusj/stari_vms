@@ -1684,7 +1684,7 @@ class deviceModelObj extends modelObj
             }
         }
 
-        if (!preg_match('/^' . Device::BALANCE_VDEVICE_PREFIX . '/', $this->imei)) {
+        if (!preg_match('/^' . Device::DUMMY_DEVICE_PREFIX . '/', $this->imei)) {
             $this->set(
                 'accountsData',
                 [

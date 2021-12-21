@@ -57,12 +57,14 @@ class api
         $type = request::int('typeId');
         $num = request::int('num', 10);
 
-        $device = Device::get(request::str('deviceId'), true);
-        if (empty($device)) {
-            return err('找不到这个设备！');
+        if (request::has('deviceId')) {
+            $device = Device::get(request::str('deviceId'), true);
+            if (empty($device)) {
+                return err('找不到这个设备！');
+            }
         }
 
-        return Util::getDeviceAdvs($device, $type, $num);
+        return Util::getDeviceAdvs($device ?? Device::getDummyDevice(), $type, $num);
     }
 
     public static function accounts(): array

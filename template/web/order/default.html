@@ -232,7 +232,7 @@
                     <td>
                         <div  class="status">
                             <div class="detail">
-                                单价：<span class="price">{php echo number_format($order['goods']['price'] / 100, 2)}</span>
+                                单价：<span class="price">{php echo number_format($order['goods']['price']??$order['package']['price'] / 100, 2)}</span>
                                 {if $order['price']>0}
                                 / 总价：<span class="price{if $order['price']==0} zeroprice{/if}{if $order['discount'] > 0} discount{/if}">
                                     {if $order['discount'] > 0}

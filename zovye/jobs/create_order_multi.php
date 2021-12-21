@@ -169,7 +169,10 @@ function process($order_no): bool
             ExceptionNeedsRefund::throwWithN($device, -1,'部分商品出货失败！');
         }
 
-        $order->setExtraData('pull.result', ['message' => '出货完成！']);
+        $order->setExtraData('pull.result', [
+            'errno' => 0,
+            'message' => '出货完成！'
+        ]);
         $order->save();
 
         $device->appShowMessage('出货完成，欢迎下次使用！');

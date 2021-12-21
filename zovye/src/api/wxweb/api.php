@@ -247,9 +247,18 @@ class api
             return err('找不到这个设备！');
         }
 
+        if (!$device->isMcbOnline()) {
+            return err('设备不在线！');
+        }
+
+        if ($device->isLocked()) {
+            return err('设备正忙，请稍后再试！');
+        }
+
+        $is_package = false;
         if (request::has('goodsId')) {
-            $goods_id = request::int('goodsId');
-            if (empty($goods_id)) {
+            $goods_or_package_id = request::int('goodsId');
+            if (empty($goods_or_package_id)) {
                 return err('没有指定商品！');
             }
             $num = min(App::orderMaxGoodsNum(), max(request::int('num'), 1));
@@ -257,14 +266,14 @@ class api
                 return err('购买数量不能小于1！');
             }
         } else {
-            $package_id = request::int('packageId');
-            if (empty($package_id)) {
+            $goods_or_package_id = request::int('packageId');
+            if (empty($goods_or_package_id)) {
                 return err('没有指定套餐！');
-            }   
-            $num = 1;
+            }
+            $is_package = true;
         }
 
-        return Helper::createWxAppOrder($user, $device, $goods_id ?? $package_id, $num, $package_id ? true : false);
+        return Helper::createWxAppOrder($user, $device, $goods_or_package_id, $num ?? 1, $is_package);
     }
 
     public static function orderStatus(): array

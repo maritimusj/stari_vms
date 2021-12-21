@@ -430,11 +430,19 @@ class common
             return error(State::ERROR, '不是蓝牙设备！');
         }
 
+        if (!$device->isMcbOnline()) {
+            return err('设备不在线！');
+        }
+
+        if ($device->isLocked()) {
+            return err('设备正忙，请稍后再试！');
+        }
+
         $goods_id = request::int('goodsId');
         if (empty($goods_id)) {
             return err('没有指定商品！');
         }
-        
+
         return Helper::createWxAppOrder($user, $device, $goods_id);
     }
 

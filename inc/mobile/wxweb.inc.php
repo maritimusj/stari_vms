@@ -25,4 +25,6 @@ router::exec($op, [
     'exchange' => '\zovye\api\wxweb\api::exchange',
     'pay' => '\zovye\api\wxweb\api::pay',
     'orderStatus' => '\zovye\api\wxweb\api::orderStatus',
+    'userInfo' => '\zovye\api\wxweb\api::userInfo',
+    'feedback' => '\zovye\api\wxweb\api::feedback',
 ]);

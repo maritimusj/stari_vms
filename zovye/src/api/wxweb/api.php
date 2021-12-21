@@ -21,9 +21,9 @@ use zovye\api\wxx\common;
 use zovye\App;
 use zovye\Log;
 
-use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\is_error;
+use function zovye\m;
 
 class api
 {
@@ -309,5 +309,56 @@ class api
             'code' => 502,
             'msg' => '出货失败！',
         ];
+    }
+
+    public static function userInfo(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        $data = $user->profile();
+        $data['banned'] = $user->isBanned();
+
+        if (App::isBalanceEnabled()) {
+            $data['balance'] = $user->getBalance()->total();
+        }
+
+        return $data;
+    }
+
+    public static function feedback(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        $imei = request::str('deviceId');
+
+        $text = request::str('text');
+        $pics = request::array('pics');
+
+        $device = Device::get($imei, true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        $data = [
+            'device_id' => $device->getId(),
+            'user_id' => $user->getId(),
+            'text' => $text,
+            'pics' => serialize($pics),
+            'createtime' => time(),
+        ];
+
+        if (m('device_feedback')->create($data)) {
+            return ['msg' => '反馈成功！'];
+        }
+
+        return err('反馈失败！');
     }
 }

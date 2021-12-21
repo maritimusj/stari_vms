@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20201238');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20201239');}
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -63,7 +63,6 @@
         </span>
     </div>
     <div class="panel-body">
-        {if empty($s_way)}
         <div id="search-bar">
             <div class="text-input">
                 <span>根据条件搜索订单 ...</span>
@@ -142,6 +141,7 @@
                         </button>
                     </div>
                     <div class="col-md-2">
+                        <input name="way" type="hidden" value="{php echo $s_way}"/>
                         <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
                         <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
                     </div>
@@ -149,7 +149,6 @@
                 </div>
             </form>
         </div>
-        {/if}
         {if $orders}
             <table class="table" id="orderlist">
                 <thead>
@@ -178,16 +177,15 @@
                         <div class="transactionId">
                            <i class="wi wi-money {$order['src']}" title="{$order['pay_name']}"></i> {$order['transaction_id']}
                         </div>
-                        <div class="orderId">
-                            {$order['orderId']}
-                        </div>
                         {elseif $order['balance'] > 0}
-                        积分兑换：<span class="balance">{$order['balance']}</span>
-                        <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                        <div class="orderSrc">
+                            积分兑换：<span class="balance">{$order['balance']}</span>
+                            <img src="{MODULE_URL}static/img/coin.svg" class="balance">                            
+                        </div>
                         {else}
-                        <div class="color-gray">
+                        <div class="orderSrc">
                             {if $order['account']}
-                            <div class="account-title" title="{$order['orderId']}">
+                            <div class="account-title">
                                 {if $accounts[$order['account']]}
                                 <img src="{media $accounts[$order['account']]['img']}" alt=""/>
                                 {/if}
@@ -200,6 +198,9 @@
                             {/if}
                         </div>
                         {/if}
+                        <div class="orderId">
+                            {$order['orderId']}
+                        </div>
                     </td>
                     <td>
                         {if $order['goods']}

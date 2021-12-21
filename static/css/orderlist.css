@@ -250,6 +250,10 @@
     color: #9E9E9E;
     white-space: nowrap;
 }
+#orderlist .orderSrc{
+    cursor: default;
+    white-space: nowrap;
+}
 #orderlist .account-title img {
     width: 30px;
     height: 30px;

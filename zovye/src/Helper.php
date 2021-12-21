@@ -336,13 +336,18 @@ class Helper
             return error(State::ERROR, '商品库存不足！');
         }
 
-        $discount = User::getUserDiscount($user, $goods);
-        $goods['price'] -= $discount;
+        $discount = User::getUserDiscount($user, $goods, $num);
+        $total_price = $goods['price'] * $num - $discount;
+        if ($total_price < 1) {
+            return error(State::ERROR, '商品价格不能小于1，否则无法支付！');
+        }
 
         list($order_no, $data) = Pay::createXAppPay($device, $user, $goods, [
             'level' => LOG_GOODS_PAY,
             'discount' => $discount,
             'order_no' => $order_no,
+            'total' => $num,
+            'price' => $total_price,
         ]);
 
         if (is_error($data)) {

@@ -250,6 +250,7 @@ class api
         if (empty($goods_id)) {
             return err('没有指定商品！');
         }
+        
         $num = request::int('num', 1);
         if ($num < 1) {
             return err('购买数量不能小于1！');

@@ -428,7 +428,7 @@ class keeper
                 return ['msg' => '分配成功！'];
             }
 
-            return ['msg' => '请求失败！'];
+            return err('操作失败！');
         });
     }
 

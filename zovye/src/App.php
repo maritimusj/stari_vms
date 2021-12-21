@@ -526,15 +526,6 @@ class App
         });        
     }
 
-    /**
-     * 使用屏幕推广公众号二维码
-     */
-    public static function useAccountAppQRCode(): bool {
-        return onceCall(function() {
-            return boolval(settings('account.appQRCode.enabled'));
-        });
-    }
-
     public static function isZeroBonusEnabled(): bool {
         return settings('custom.bonus.zero.enabled', false);
     }

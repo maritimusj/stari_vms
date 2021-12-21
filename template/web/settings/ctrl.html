@@ -213,14 +213,6 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="AccountAppQRCode" id="AccountAppQRCode" value="1" {if $settings['account']['appQRCode']['enabled']}checked{/if}>
-                                开启公众号屏幕推广功能
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="checkbox">
-                            <label>
                                 <input type="checkbox" name="UserBalance" id="UserBalance" value="1" {if \zovye\App::isBalanceEnabled()}checked{/if}>
                                 开启用户积分功能 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
                             </label>

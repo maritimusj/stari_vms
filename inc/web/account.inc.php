@@ -379,7 +379,6 @@ if ($op == 'default') {
                 }
                 $config = [
                     'type' => Account::AUTH,
-                    'appQRCode' => request::bool('useAppQRCode'),
                 ];
                 if (request::str('openMsgType') == 'text') {
                     $config['open'] = [

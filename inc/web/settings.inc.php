@@ -240,7 +240,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;
         $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;
         $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
-        $settings['account']['appQRCode']['enabled'] = request::bool('AccountAppQRCode') ? 1 : 0;
 
         $balance_enabled = request::bool('UserBalance');
         Config::balance('enabled', $balance_enabled ? 1 : 0, true);

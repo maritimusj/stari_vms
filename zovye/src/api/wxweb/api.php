@@ -18,6 +18,7 @@ use zovye\State;
 use zovye\Device;
 use zovye\request;
 use zovye\api\wxx\common;
+use zovye\App;
 use zovye\Log;
 
 use zovye\ZovyeException;
@@ -246,19 +247,25 @@ class api
             return err('找不到这个设备！');
         }
 
-        $goods_id = request::int('goodsId');
-        if (empty($goods_id)) {
-            return err('没有指定商品！');
-        }
-        
-        $num = request::int('num', 1);
-        if ($num < 1) {
-            return err('购买数量不能小于1！');
+        if (request::has('goodsId')) {
+            $goods_id = request::int('goodsId');
+            if (empty($goods_id)) {
+                return err('没有指定商品！');
+            }
+            $num = min(App::orderMaxGoodsNum(), max(request::int('num'), 1));
+            if ($num < 1) {
+                return err('购买数量不能小于1！');
+            }
+        } else {
+            $package_id = request::int('packageId');
+            if (empty($package_id)) {
+                return err('没有指定套餐！');
+            }   
+            $num = 1;
         }
 
-        return Helper::createWxAppOrder($user, $device, $goods_id, $num);
+        return Helper::createWxAppOrder($user, $device, $goods_id ?? $package_id, $num, $package_id ? true : false);
     }
-
 
     public static function orderStatus(): array
     {

@@ -321,27 +321,54 @@ class Helper
         return err('失败，请稍后再试！');
     }
 
-    public static function createWxAppOrder(userModelObj $user, deviceModelObj $device, $goods_id, $num = 1, $order_no = '')
+    public static function createWxAppOrder(userModelObj $user, deviceModelObj $device, $goodsOrPackageId, $num = 1, $is_package = false, $order_no = '')
     {
         if (!$device->isMcbOnline()) {
             return err('设备不在线！');
         }
 
-        $goods = $device->getGoods($goods_id);
-        if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
-            return err('无法购买这个商品！');
+        if ($device->isLocked()) {
+            return err('设备正忙，请稍后再试！');
         }
-
-        if ($goods['num'] < $num) {
-            return error(State::ERROR, '商品库存不足！');
+    
+        $total_price = 0;
+        $discount = 0;
+        $goods = [];
+    
+        if ($is_package) {
+            $package = $device->getPackage($goodsOrPackageId);
+            if (empty($package)) {
+                return err('找不到这个商品套餐！');
+            }
+    
+            if (empty($package['isOk'])) {
+                return err('暂时无法购买这个商品套餐！');
+            }
+    
+            $num = 1;
+            $total_price = $package['price'];
+    
+            $goods = $package;
+    
+        } else {
+            $goods = $device->getGoods($goodsOrPackageId);
+            if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
+                return err('无法购买这个商品，请联系管理员！');
+            }
+    
+            if ($goods['num'] < $num) {
+                return err('对不起，商品数量不足！');
+            }
+    
+            //获取用户折扣
+            $discount = User::getUserDiscount($user, $goods, $num);
+            $total_price = $goods['price'] * $num - $discount;
         }
-
-        $discount = User::getUserDiscount($user, $goods, $num);
-        $total_price = $goods['price'] * $num - $discount;
+    
         if ($total_price < 1) {
-            return error(State::ERROR, '商品价格不能小于1，否则无法支付！');
+            return err('支付金额不能为零！');
         }
-
+    
         list($order_no, $data) = Pay::createXAppPay($device, $user, $goods, [
             'level' => LOG_GOODS_PAY,
             'discount' => $discount,
@@ -349,20 +376,20 @@ class Helper
             'total' => $num,
             'price' => $total_price,
         ]);
-
+    
         if (is_error($data)) {
             return err('创建支付失败: ' . $data['message']);
         }
-
+    
         //加入一个支付结果检查
         Job::orderPayResult($order_no);
-
+    
         //加入一个支付超时任务
         $res = Job::orderTimeout($order_no);
         if (empty($res) || is_error($res)) {
-            return err('创建支付超时任务失败！');
+            return err('创建支付任务失败！');
         }
-
+    
         $data['orderNO'] = $order_no;
         return $data;
     }

@@ -225,6 +225,26 @@ class api
         return ['orderUID' => $res];
     }
 
+    public static function pay(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        $goods_id = request::int('goodsId');
+        $num = request::int('num', 1);
+
+        return Helper::createWxAppOrder($user, $device, $goods_id, $num);
+    }
+
+
     public static function orderStatus(): array
     {
         $order = Order::get(request::str('uid'), true);

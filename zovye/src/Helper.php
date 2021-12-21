@@ -320,4 +320,57 @@ class Helper
 
         return err('失败，请稍后再试！');
     }
+
+    public static function createWxAppOrder(userModelObj $user, deviceModelObj $device, $goods_id, $num = 1, $order_no = '')
+    {
+        if ($num < 1) {
+            return err('购买数量不能小于1！');
+        }
+
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
+        if (!$device->isMcbOnline()) {
+            return err('设备不在线！');
+        }
+
+        $goods = $device->getGoods($goods_id);
+        if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
+            return err('无法购买这个商品！');
+        }
+
+        if ($goods['num'] < $num) {
+            return error(State::ERROR, '商品库存不足！');
+        }
+
+        $discount = User::getUserDiscount($user, $goods);
+        $goods['price'] -= $discount;
+
+        list($order_no, $data) = Pay::createXAppPay($device, $user, $goods, [
+            'level' => LOG_GOODS_PAY,
+            'discount' => $discount,
+            'order_no' => $order_no,
+        ]);
+
+        if (is_error($data)) {
+            return err('创建支付失败: ' . $data['message']);
+        }
+
+        //加入一个支付结果检查
+        Job::orderPayResult($order_no);
+
+        //加入一个支付超时任务
+        $res = Job::orderTimeout($order_no);
+        if (empty($res) || is_error($res)) {
+            return err('创建支付超时任务失败！');
+        }
+
+        $data['orderNO'] = $order_no;
+        return $data;
+    }
 }

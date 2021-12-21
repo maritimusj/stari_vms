@@ -412,7 +412,6 @@ class common
         App::setContainer($user);
 
         $imei = request::str('device');
-        $goods_id = request::int('goodsId');
 
         $device = Device::get($imei, true);
         if (empty($device)) {
@@ -423,38 +422,8 @@ class common
             return error(State::ERROR, '不是蓝牙设备！');
         }
 
-        $goods = $device->getGoods($goods_id);
-        if (empty($goods) || empty($goods['allowPay']) || $goods['price'] <= 0) {
-            return error(State::ERROR, '无法购买这个商品，请联系管理员！');
-        }
-
-        if ($goods['num'] <= 0) {
-            return error(State::ERROR, '对不起，您来晚了！');
-        }
-
-        $discount = User::getUserDiscount($user, $goods);
-        $goods['price'] -= $discount;
-
-        list($order_no, $data) = Pay::createXAppPay($device, $user, $goods, [
-            'level' => LOG_GOODS_PAY,
-            'discount' => $discount,
-        ]);
-
-        if (is_error($data)) {
-            return error(State::ERROR, '创建支付失败: ' . $data['message']);
-        }
-
-        //加入一个支付结果检查
-        Job::orderPayResult($order_no);
-
-        //加入一个支付超时任务
-        $res = Job::orderTimeout($order_no);
-        if (empty($res) || is_error($res)) {
-            return error(State::ERROR, '创建支付超时任务失败！');
-        }
-
-        $data['orderNO'] = $order_no;
-        return $data;
+        $goods_id = request::int('goodsId');
+        return Helper::createWxAppOrder($user, $device, $goods_id);
     }
 
     public static function orderGet(): array

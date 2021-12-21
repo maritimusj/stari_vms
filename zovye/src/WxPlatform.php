@@ -610,7 +610,8 @@ class WxPlatform
             }
 
             if ($acc->isServiceAccount()) {
-                list($prefix, $first, $second) = explode(':', ltrim(strval($msg['EventKey']), 'qrscene_'), 3);
+                $event_key = str_replace('qrscene_', '', strval($msg['EventKey']));
+                list($prefix, $first, $second) = explode(':', $event_key, 3);
                 if ($prefix != App::uid(6)) {
                     return [];
                 }

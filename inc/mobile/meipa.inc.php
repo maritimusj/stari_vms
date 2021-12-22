@@ -21,3 +21,5 @@ MeiPaAccount::cb([
     'order_sn' => request::str('order_sn'),
     'sing' => request::str('sing'),
 ]);
+
+exit(REQUEST_ID);

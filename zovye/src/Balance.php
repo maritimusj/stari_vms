@@ -210,7 +210,7 @@ TEXT;
 
         } elseif ($entry->getSrc() == Balance::ACCOUNT_BONUS) {
             $account_data = $entry->getExtraData('account');
-            $account_typeifno = [
+            $account_typehint = [
                     Account::NORMAL => ['公众号', '成功关注公众号'],
                     Account::VIDEO => ['视频', '完成观看视频任务'],
                     Account::DOUYIN => ['抖音', '完成关注抖音号任务'],
@@ -229,11 +229,11 @@ TEXT;
                     Account::YOUFEN => ['友粉', '完成友粉任务'],
                 ][$account_data['type']] ?? ['公众号', '成功关注公众号'];
 
-            $account_info = "<dt>$account_typeifno[0]</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
+            $account_info = "<dt>$account_typehint[0]</dt><dd class=\"user\"><img src=\"{$account_data['img']}\" alt=''/>{$account_data['title']}</dd>";
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">$account_typeifno[1]</dd>
+<dd class="event">$account_typehint[1]</dd>
 $account_info
 </dl>
 TEXT;

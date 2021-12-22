@@ -760,10 +760,13 @@ class Order extends State
     
             $src = $entry->getSrc();
             if ($src == Order::PAY) {
+                $data['type'] = '支付订单';
                 $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
             } elseif ($src == Order::BALANCE) {
+                $data['type'] = '积分订单';
                 $data['tips'] = ['text' => '积分', 'class' => 'balance'];
             } else {
+                $data['type'] = '免费订单';
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }
     
@@ -781,13 +784,7 @@ class Order extends State
     
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
-    
-            if ($src == Order::PAY) {
-                $data['type'] = '支付订单';
-            } else {
-                $data['type'] = '免费订单';
-            }
-
+            
             if (is_error($data['result'])) {
                 $data['status'] = '故障';
             } else {

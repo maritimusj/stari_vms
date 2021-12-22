@@ -7,6 +7,7 @@
 
 namespace zovye\api\wxweb;
 
+use DateTime;
 use zovye\Account;
 use zovye\Helper;
 use zovye\Job;
@@ -20,6 +21,7 @@ use zovye\request;
 use zovye\api\wxx\common;
 use zovye\App;
 use zovye\Balance;
+use zovye\Config;
 use zovye\Log;
 
 use function zovye\err;
@@ -357,12 +359,64 @@ class api
         ];
     }
 
+    public static function reward(): array
+    {
+        $user = common::getUser();
+
+        if (!$user->isWxUser()) {
+            return err('无法获得奖励，请先授权后进入！');
+        }
+
+        if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
+            return err('无法锁定用户！');
+        }
+
+        $bonus = Config::app('wxapp.advs.reward.bonus', 0);
+        if (empty($bonus)) {
+            return err('暂时没有奖励！');
+        }
+
+        $limit = Config::app('wxapp.advs.reward.limit', 0);
+        if ($limit > 0) {
+            $begin = new DateTime();
+            $begin->modify('00:00');
+
+            $total = Balance::query([
+                'openid' => $user->getOpenid(),
+                'src' => Balance::REWARD_ADV,
+                'createtime >=' => $begin->getTimestamp(),
+            ])->count();
+            
+            if ($total >= $limit) {
+                return err('对不起，今天的广告奖励额度已用完！');
+            }
+        }
+
+        $last_reward = Balance::query()->orderBy('id DESC')->findOne([
+            'openid' => $user->getOpenid(),
+            'src' => Balance::REWARD_ADV,
+        ]);
+        if ($last_reward && time() - $last_reward->getCreatetime() < 3) {
+            return err('操作太快，请稍后再试！');
+        }
+
+        $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);
+        if (empty($result)) {
+            return err('获取奖励失败！');
+        }
+
+        return [
+            'balance' => $user->getBalance()->total(),
+            'bonus' => $result->getXVal(),
+        ];
+    }
+
     public static function balanceLog(): array 
     {
         $user = \zovye\api\wx\common::getUser();
         
         $query = $user->getBalance()->log();
-        
+
         $last_id = request::int('lastId');
         if ($last_id > 0) {
             $query->where(['id <' => $last_id]);

@@ -412,43 +412,4 @@ class adv
 
         return error(State::ERROR, '操作失败！');
     }
-
-    public static function getBonus(): array
-    {
-        $user = common::getUser();
-
-        if (!$user->isWxUser()) {
-            return err('无法获得奖励，请从任务大厅授权进入！');
-        }
-
-        $bonus = Config::app('wxapp.advs.reward.bonus', 0);
-        if (empty($bonus)) {
-            return err('暂时没有奖励！');
-        }
-
-        $limit = Config::app('wxapp.advs.reward.limit', 0);
-        if ($limit > 0) {
-            $begin = new DateTime();
-            $begin->modify('00:00');
-
-            $total = Balance::query([
-                'openid' => $user->getOpenid(),
-                'src' => Balance::REWARD_ADV,
-                'createtime >=' => $begin->getTimestamp(),
-            ])->count();
-            if ($total >= $limit) {
-                return err('对不起，今天的广告奖励额度已用完！');
-            }
-        }
-
-        $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);
-        if (empty($result)) {
-            return err('获取奖励失败！');
-        }
-
-        return [
-            'balance' => $user->getBalance()->total(),
-            'bonus' => $result->getXVal(),
-        ];
-    }
 }

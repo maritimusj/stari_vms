@@ -332,7 +332,7 @@ TEXT;
      */
     public static function give(userModelObj $user, accountModelObj $account, string $reason = '')
     {
-        if (!$user->acquireLocker("balance:give")) {
+        if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
             return err('无法锁定用户！');
         }
 

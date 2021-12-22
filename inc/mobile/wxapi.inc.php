@@ -119,7 +119,7 @@ router::exec($op, [
     'UploadFile' => '\zovye\api\wx\adv::uploadFile',
     'AdvGroupAssign' => '\zovye\api\wx\adv::groupAssign',
 
-    'AdvGetBonus' => 'zovye\api\wx\adv::getBonus',
+    'AdvGetBonus' =>  '\zovye\api\wxweb\api::reward',
 
     'ArticleDetail' => '\zovye\api\wx\article::detail',
     'Article' => '\zovye\api\wx\article::list',

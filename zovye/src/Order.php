@@ -695,7 +695,7 @@ class Order extends State
         return $data;
     }
 
-    public static function getList(userModelObj $user, $way, $page, $pagesize = DEFAULT_PAGE_SIZE): array
+    public static function getList(userModelObj $user, $way, $page, $page_size = DEFAULT_PAGE_SIZE): array
     {
         $query = self::query();
 
@@ -713,7 +713,7 @@ class Order extends State
         $query->where($condition);
     
         $page = max(1, $page);
-        $page_size = max(1, $pagesize);
+        $page_size = max(1, $page_size);
     
         $total = $query->count();
         if (ceil($total / $page_size) < $page) {
@@ -814,7 +814,7 @@ class Order extends State
         return [
             'total' => $total,
             'page' => $page,
-            'pagesize' => $page_size,
+            'page_size' => $page_size,
             'list' => $result,
         ];
     }

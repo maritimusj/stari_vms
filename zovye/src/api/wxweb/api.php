@@ -362,8 +362,10 @@ class api
         $user = \zovye\api\wx\common::getUser();
         
         $query = $user->getBalance()->log();
-        if (request::has('lastId')) {
-            $query->where(['id <' => request::int('lastId')]);
+        
+        $last_id = request::int('lastId');
+        if ($last_id > 0) {
+            $query->where(['id <' => $last_id]);
         }
 
         $query->limit(request::int('pagesize', DEFAULT_PAGE_SIZE));

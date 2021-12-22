@@ -114,15 +114,29 @@ class JfbAccount
             }
 
             $item = current($result['result']['data']);
-            if (empty($item) || empty($item['qrPicUrl'])) {
+            if (isEmptyArray($item)) {
                 throw new RuntimeException('没有数据！');
             }
 
             $data = $acc->format();
-
-            $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
-            $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
-            $data['qrcode'] = $item['qrPicUrl'];
+            if ($item['qrPicUrl']) {
+                $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
+                $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
+                $data['qrcode'] = $item['qrPicUrl'];
+            } elseif ($item['link']) {
+                $res = Util::createQrcodeFile("jfb." . sha1($item['link']), $item['link']);
+                if (is_error($res)) {
+                    Log::error('jfb', [
+                        'error' => 'fail to createQrcode file',
+                        'result' => $res,
+                    ]);
+                    $data['redirect_url'] = $item['link'];
+                } else {
+                    $data['qrcode'] = Util::toMedia($res);
+                }
+            } else {
+                throw new RuntimeException('没有URL数据！');
+            }
 
             $v[] = $data;
 

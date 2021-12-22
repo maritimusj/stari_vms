@@ -14,7 +14,6 @@ use zovye\JSON;
 use zovye\Order;
 use zovye\User;
 use zovye\Util;
-use zovye\State;
 use zovye\Device;
 use zovye\request;
 use zovye\api\wxx\common;
@@ -80,9 +79,13 @@ class api
             return err('用户暂时无法使用！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
-        if (empty($device)) {
-            return err('找不到这个设备！');
+        if (request::has('deviceId')) {
+            $device = Device::get(request::str('deviceId'), true);
+            if (empty($device)) {
+                return err('找不到这个设备！');
+            }            
+        } else {
+            $device = Device::getDummyDevice();
         }
 
         $include = [];

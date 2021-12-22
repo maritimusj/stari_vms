@@ -102,7 +102,7 @@ class userModelObj extends modelObj
 
     //overwrite
     //因为users_vw继续user，所以在这里要绑定settings一些参数
-    protected function getSettingsKeyNew($key, $classname = ''): string
+    protected function getSettingsKeyNew($key, string $classname = ''): string
     {
         return parent::getSettingsKeyNew($key, userModelObj::class);
     }

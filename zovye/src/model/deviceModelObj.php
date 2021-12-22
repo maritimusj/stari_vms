@@ -2519,7 +2519,7 @@ class deviceModelObj extends modelObj
      * @param string $classname
      * @return string
      */
-    protected function getSettingsKeyNew($key, $classname = ''): string
+    protected function getSettingsKeyNew($key, string $classname = ''): string
     {
         return parent::getSettingsKeyNew($key, deviceModelObj::class);
     }

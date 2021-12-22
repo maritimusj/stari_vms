@@ -19,6 +19,7 @@ use zovye\Device;
 use zovye\request;
 use zovye\api\wxx\common;
 use zovye\App;
+use zovye\Balance;
 use zovye\Log;
 
 use function zovye\err;
@@ -325,6 +326,7 @@ class api
         $data['banned'] = $user->isBanned();
 
         if (App::isBalanceEnabled()) {
+            $data['signed'] = $user->isSigned();
             $data['balance'] = $user->getBalance()->total();
         }
 
@@ -362,5 +364,28 @@ class api
         }
 
         return err('反馈失败！');
+    }
+
+    public static function signIn(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        $res = Balance::dailySignIn($user);
+        if (is_error($res)) {
+            return $res;
+        }
+        
+        return [
+            'balance' => $user->getBalance()->total(),
+            'bonus' => $res,
+        ];
     }
 }

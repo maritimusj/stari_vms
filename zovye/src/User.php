@@ -40,6 +40,7 @@ class User
     const COMMISSION_BALANCE_LOCKER = 'commission::balance';
     const BALANCE_LOCKER = 'user::balance';
     const TASK_LOCKER = 'user::task';
+    const DAILY_SIGN_IN_LOCKER = 'balance:daily:sign_in';
 
     const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
 

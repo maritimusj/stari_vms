@@ -27,4 +27,5 @@ router::exec($op, [
     'orderStatus' => '\zovye\api\wxweb\api::orderStatus',
     'userInfo' => '\zovye\api\wxweb\api::userInfo',
     'feedback' => '\zovye\api\wxweb\api::feedback',
+    'signIn' => '\zovye\api\wxweb\api::signIn',
 ]);

@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use Exception;
 use zovye\model\accountModelObj;
 use zovye\model\balanceModelObj;
 use zovye\model\userModelObj;
@@ -378,6 +379,45 @@ TEXT;
 
             return true;
         });
+    }
+
+    public static function dailySignIn(userModelObj $user)
+    {
+        $bonus = Config::balance('sign.bonus', []);
+        if (empty($bonus) || !$bonus['enabled']) {
+            return err('这个功能没有启用！');
+        }
+    
+        if (!$user->acquireLocker(User::DAILY_SIGN_IN_LOCKER)) {
+            return err('请稍后再试！');
+        }
+    
+        if ($user->isSigned()) {
+            return err('已经签到了！');
+        }
+    
+        $min = intval($bonus['min']);
+        $max = intval($bonus['max']);
+    
+        if ($min >= $max) {
+            $val = $min;
+        } else {
+            try {
+                $val = random_int($min, $max);
+            } catch (Exception $e) {
+            }
+        }
+        
+        if (empty($val)) {
+            return err('真遗憾，没有获得积分！');
+        }
+    
+        $res = $user->signIn($val);
+        if (empty($res)) {
+            return err('签到失败！');
+        }
+
+        return $val;
     }
 
     public static function isFreeOrder(): bool

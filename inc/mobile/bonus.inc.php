@@ -6,8 +6,6 @@
 
 namespace zovye;
 
-use Exception;
-
 $user = Util::getCurrentUser([
     'create' => true,
     'update' => true,
@@ -47,43 +45,14 @@ if ($op == 'default') {
 
 } elseif ($op == 'signIn') {
 
-    $bonus = Config::balance('sign.bonus', []);
-    if (empty($bonus) || !$bonus['enabled']) {
-        JSON::fail('这个功能没有启用！');
-    }
-
-    if (!$user->acquireLocker("balance:daily:sign_in")) {
-        JSON::fail('请稍后再试！');
-    }
-
-    if ($user->isSigned()) {
-        JSON::fail('已经签到了！');
-    }
-
-    $min = intval($bonus['min']);
-    $max = intval($bonus['max']);
-
-    if ($min >= $max) {
-        $val = $min;
-    } else {
-        try {
-            $val = random_int($min, $max);
-        } catch (Exception $e) {
-        }
-    }
-    
-    if (empty($val)) {
-        JSON::fail('真遗憾，没有获得积分！');
-    }
-
-    $res = $user->signIn($val);
-    if (empty($res)) {
-        JSON::fail('签到失败！');
+    $res = Balance::dailySignIn($user);
+    if (is_error($res)) {
+        JSON::fail($res);
     }
 
     JSON::success([
         'balance' => $user->getBalance()->total(),
-        'bonus' => $val,
+        'bonus' => $res,
     ]);
 
 } elseif ($op == 'account') {

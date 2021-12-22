@@ -383,7 +383,7 @@ class api
         
         $way = request::str('way');
         $page = request::int('page');
-        $page_size = request::int('pagesize');
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
     
         return Order::getList($user, $way, $page, $page_size);
     }

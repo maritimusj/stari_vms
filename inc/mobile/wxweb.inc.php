@@ -32,4 +32,7 @@ router::exec($op, [
     'reward' => '\zovye\api\wxweb\api::reward',
     'balanceLog' => '\zovye\api\wxweb\api::balanceLog',
     'orderList' => '\zovye\api\wxweb\api::orderList',
+    'task' => '\zovye\api\wxweb\api::task',
+    'detail' => '\zovye\api\wxweb\api::detail',
+    'submit' => '\zovye\api\wxweb\api::submit',
 ]);

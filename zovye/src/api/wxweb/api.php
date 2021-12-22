@@ -14,6 +14,7 @@ use zovye\Job;
 use zovye\JSON;
 use zovye\model\balanceModelObj;
 use zovye\Order;
+use zovye\Task;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -78,7 +79,7 @@ class api
             $device = Device::get(request::str('deviceId'), true);
             if (empty($device)) {
                 return err('找不到这个设备！');
-            }            
+            }
         } else {
             $device = Device::getDummyDevice();
         }
@@ -332,7 +333,7 @@ class api
         if (is_error($res)) {
             return $res;
         }
-        
+
         return [
             'balance' => $user->getBalance()->total(),
             'bonus' => $res,
@@ -386,7 +387,7 @@ class api
                 'src' => Balance::REWARD_ADV,
                 'createtime >=' => $begin->getTimestamp(),
             ])->count();
-            
+
             if ($total >= $limit) {
                 return err('对不起，今天的广告奖励额度已用完！');
             }
@@ -411,10 +412,10 @@ class api
         ];
     }
 
-    public static function balanceLog(): array 
+    public static function balanceLog(): array
     {
         $user = \zovye\api\wx\common::getUser();
-        
+
         $query = $user->getBalance()->log();
 
         $last_id = request::int('lastId');
@@ -426,7 +427,7 @@ class api
         $query->orderBy('id DESC');
 
         $result = [];
-        foreach($query->findAll() as $entry) {
+        foreach ($query->findAll() as $entry) {
             $result[] = Balance::format($entry);
         }
 
@@ -436,11 +437,37 @@ class api
     public static function orderList(): array
     {
         $user = \zovye\api\wx\common::getUser();
-        
+
         $way = request::str('way');
         $page = request::int('page');
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
-    
+
         return Order::getList($user, $way, $page, $page_size);
+    }
+
+    public static function task(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        $max = request::int('max', 10);
+
+        return Task::getList($user, $max);
+    }
+
+    public static function detail(): array
+    {
+        $uid = request::str('uid');
+        return Task::detail($uid);
+    }
+
+    public static function submit(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+        if (!$user->acquireLocker(User::TASK_LOCKER)) {
+            return err('用户无法锁定，请重试！');
+        }
+
+        $uid = request::str('uid');
+        return Task::submit($user, $uid);
     }
 }

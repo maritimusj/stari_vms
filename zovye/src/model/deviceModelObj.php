@@ -2519,15 +2519,9 @@ class deviceModelObj extends modelObj
      * @param string $classname
      * @return string
      */
-    protected function getSettingsKeyNew($key, string $classname = ''): string
+    protected function getSettingsKey($key, string $classname = ''): string
     {
-        return parent::getSettingsKeyNew($key, deviceModelObj::class);
-    }
-
-    protected function getSettingsKey($key): string
-    {
-        $classname = str_replace('zovye\model', 'lltjs', deviceModelObj::class);
-        return "$classname:{$this->getId()}:$key";
+        return parent::getSettingsKey($key, deviceModelObj::class);
     }
 
     protected function getSettingsBindClassName(): string
@@ -2546,7 +2540,6 @@ class deviceModelObj extends modelObj
         $day = date('d');
 
         $statistic[$month][$day]['total'] = intval($statistic[$month][$day]['total']) + 1;
-        //$statistic[$month][$day]['rec'][] = TIMESTAMP;
 
         $this->set('firstMsgStatistic', [$month => $statistic[$month]]);
 

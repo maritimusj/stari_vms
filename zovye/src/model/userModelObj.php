@@ -102,16 +102,9 @@ class userModelObj extends modelObj
 
     //overwrite
     //因为users_vw继续user，所以在这里要绑定settings一些参数
-    protected function getSettingsKeyNew($key, string $classname = ''): string
+    protected function getSettingsKey($key, string $classname = ''): string
     {
-        return parent::getSettingsKeyNew($key, userModelObj::class);
-    }
-
-    protected function getSettingsKey($key): string
-    {
-        $classname = str_replace('zovye\model', 'lltjs', userModelObj::class);
-
-        return "$classname:{$this->getId()}:$key";
+        return parent::getSettingsKey($key, userModelObj::class);
     }
 
     protected function getSettingsBindClassName(): string

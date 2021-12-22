@@ -166,22 +166,8 @@ class modelObj implements ISettings
     public function get($key, $default = null)
     {
         if ($this->id && $key) {
-
-            $new_key = $this->getSettingsKeyNew($key);
-            $data = $this->createSettings()->get($new_key);
-
-            if (is_null($data)) {
-
-                $indexed_key = $this->getSettingsKey($key);
-                $data = $this->createSettings()->get($indexed_key);
-
-                if (!is_null($data)) {
-                    $this->set($new_key, $data);
-                }
-                //删除原值
-                //$this->createSettings()->remove($indexed_key);
-            }
-
+            $settings_key = $this->getSettingsKey($key);
+            $data = $this->createSettings()->get($settings_key);
             $this->settings_container[$key] = $data;
             return ifEmpty($data, $default);
         }
@@ -195,18 +181,12 @@ class modelObj implements ISettings
      * @param string $classname
      * @return string
      */
-    protected function getSettingsKeyNew($key, string $classname = ''): string
+    protected function getSettingsKey($key, string $classname = ''): string
     {
         if (empty($classname)) {
             $classname = get_called_class();
         }
         return sha1("$classname:$this->id:$key");
-    }
-
-    protected function getSettingsKey($key): string
-    {
-        $classname = str_replace('zovye\model', 'lltjs', get_called_class());
-        return "$classname:$this->id:$key";
     }
 
     public function createSettings(): Settings
@@ -249,10 +229,8 @@ class modelObj implements ISettings
     public function set($key, $val): bool
     {
         if ($this->id && $key) {
-
-            $new_key = $this->getSettingsKeyNew($key);
-
-            if ($this->createSettings()->set($new_key, $val)) {
+            $settings_key = $this->getSettingsKey($key);
+            if ($this->createSettings()->set($settings_key, $val)) {
                 $this->settings_container[$key] = $val;
                 return true;
             }
@@ -264,11 +242,8 @@ class modelObj implements ISettings
     public function has($key): bool
     {
         if ($this->id && $key) {
-
-            $new_key = $this->getSettingsKeyNew($key);
-            $indexed_key = $this->getSettingsKey($key);
-
-            return $this->createSettings()->has($new_key) || $this->createSettings()->has($indexed_key);
+            $settings_key = $this->getSettingsKey($key);
+            return $this->createSettings()->has($settings_key);
         }
 
         return false;
@@ -277,14 +252,10 @@ class modelObj implements ISettings
     public function remove($key): bool
     {
         if ($this->id && $key) {
-
             unset($this->settings_container[$key]);
 
-            $indexed_key = $this->getSettingsKey($key);
-            $new_key = $this->getSettingsKeyNew($key);
-
-            $this->createSettings()->remove($indexed_key);
-            $this->createSettings()->remove($new_key);
+            $settings_key = $this->getSettingsKey($key);
+            $this->createSettings()->remove($settings_key);
 
             return true;
         }
@@ -300,17 +271,9 @@ class modelObj implements ISettings
     public function pop($key, $default = null)
     {
         if ($this->id && $key) {
-
             unset($this->settings_container[$key]);
-
-            $indexed_key = $this->getSettingsKey($key);
-            $new_key = $this->getSettingsKeyNew($key);
-
-            $v = $this->createSettings()->pop($new_key, $default);
-            if (is_null($v)) {
-                return $this->createSettings()->pop($indexed_key, $default);
-            }
-            return $v;
+            $settings_key = $this->getSettingsKey($key);
+            return $this->createSettings()->pop($settings_key, $default);
         }
 
         return null;

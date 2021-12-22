@@ -366,8 +366,8 @@ class api
             $query->where(['id <' => request::int('lastId')]);
         }
 
-        $query->limit(request::int('pagesize', 20));
-        $query->orderBy('createtime DESC');
+        $query->limit(request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $query->orderBy('id DESC');
 
         $result = [];
         foreach($query->findAll() as $entry) {

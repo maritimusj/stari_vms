@@ -7,8 +7,6 @@
 
 namespace zovye;
 
-use zovye\model\task_viewModelObj;
-
 $op = request::op('default');
 
 if ($op == 'default') {

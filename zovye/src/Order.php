@@ -705,9 +705,19 @@ class Order extends State
         $condition['openid'] = $user->getOpenid();
     
         if ($way == 'free') {
-            $condition['src'] = Order::ACCOUNT;
+            if (Balance::isFreeOrder()) {
+                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::ACCOUNT;
+            }
         } elseif ($way == 'pay') {
-            $condition['src'] = Order::PAY;
+            if (Balance::isPayOrder()) {
+                $condition['src'] = [Order::PAY, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::PAY;
+            }
+        } elseif ($way == 'balance') {
+            $condition['src'] = Order::BALANCE;
         }
     
         $query->where($condition);
@@ -784,7 +794,7 @@ class Order extends State
     
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
-            
+
             if (is_error($data['result'])) {
                 $data['status'] = '故障';
             } else {

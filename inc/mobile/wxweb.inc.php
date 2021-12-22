@@ -28,4 +28,5 @@ router::exec($op, [
     'userInfo' => '\zovye\api\wxweb\api::userInfo',
     'feedback' => '\zovye\api\wxweb\api::feedback',
     'signIn' => '\zovye\api\wxweb\api::signIn',
+    'bonus' => '\zovye\api\wxweb\api::bonus',
 ]);

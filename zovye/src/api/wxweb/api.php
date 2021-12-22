@@ -11,6 +11,7 @@ use zovye\Account;
 use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
+use zovye\model\balanceModelObj;
 use zovye\Order;
 use zovye\User;
 use zovye\Util;
@@ -389,6 +390,34 @@ class api
         return [
             'balance' => $user->getBalance()->total(),
             'bonus' => $res,
+        ];
+    }
+
+    public static function bonus(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        if ($user->isBanned()) {
+            return err('用户暂时无法使用！');
+        }
+
+        $account = Account::findOneFromUID(request::str('uid'));
+        if (empty($account)) {
+            return err('找不到这个公众号！');
+        }
+
+        $result = Balance::give($user, $account);
+        if (is_error($result)) {
+            return err($result);
+        }
+
+        return [
+            'balance' => $user->getBalance()->total(),
+            'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
         ];
     }
 }

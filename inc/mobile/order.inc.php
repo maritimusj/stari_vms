@@ -316,150 +316,33 @@ if ($op === 'create') {
         JSON::fail('找不到用户！');
     }
 
-    $user_profile = User::query(['openid' => $user->getOpenid()])->findOne();
-
-    $role_assoc = [
-        'agent' => '代理商',
-        'partner' => '合伙人',
-        'keeper' => '运营人员',
-        'gspor' => '佣金用户',
-    ];
-
-    $role = '';
-    if (isset($user_profile->passport) && $user_profile->passport != '') {
-        foreach ($role_assoc as $k => $v) {
-            if (strpos($user_profile->passport, $k) !== false) {
-                $role = $v;
-                break;
-            }
-        }
+    $role_title = '';
+    if ($user->isAgent()) {
+        $role_title = '代理商';
+    } elseif ($user->isPartner()) {
+        $role_title = '合伙人';
+    } elseif($user->isKeeper()) {
+        $role_title = '运营人员';
+    } elseif ($user->isGSPor()) {
+        $role_title = '佣金用户';
     } else {
-        $role = '普通会员';
+        $role_title = '普通会员';
     }
 
-    $query = Order::query();
-    $condition = [];
-
-    //指定用户
-    $condition['openid'] = $user->getOpenid();
-
-    //
     $way = request::str('way');
-    if ($way == 'free') {
-        $condition['src'] = Order::ACCOUNT;
-    } elseif ($way == 'pay') {
-        $condition['src'] = Order::PAY;
-    } elseif (isset($device)) {
-        $way = 'spec';
-    }
+    $page = request::int('page');
+    $page_size = request::int('pagesize');
 
-    $query->where($condition);
-
-    $page = max(1, request::int('page'));
-    $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
-
-    $total = $query->count();
-    if (ceil($total / $page_size) < $page) {
-        $page = 1;
-    }
-
-    $balance_enabled = App::isBalanceEnabled();
-
-    $orders = [];
-    /** @var orderModelObj $entry */
-    foreach ($query->page($page, $page_size)->orderBy('id DESC')->findAll() as $entry) {
-
-        $data = [
-            'id' => $entry->getId(),
-            'num' => $entry->getNum(),
-            'price' => number_format($entry->getPrice() / 100, 2),
-            'ip' => $entry->getIp(),
-            'account' => $entry->getAccount(),
-            'orderId' => $entry->getOrderId(),
-            'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-            'agentId' => $entry->getAgentId(),
-            'status' => '',
-        ];
-
-        if ($balance_enabled && $entry->getBalance() > 0) {
-            $data['balance'] = $entry->getBalance();
-        }
-
-        //商品
-        $data['goods'] = $entry->getExtraData('goods', []);
-
-        //设备信息
-        $device_id = $entry->getDeviceId();
-        $device_obj = Device::get($device_id);
-        if ($device_obj) {
-            $data['device'] = [
-                'name' => $device_obj->getName(),
-                'id' => $device_obj->getId(),
-            ];
-        }
-
-        if ($data['price'] > 0) {
-            $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-        } elseif ($data['balance'] > 0) {
-            $data['tips'] = ['text' => '积分', 'class' => 'balance'];
-        } else {
-            $data['tips'] = ['text' => '免费', 'class' => 'free'];
-        }
-
-        if ($data['price'] > 0 && $entry->getExtraData('refund')) {
-            $time = $entry->getExtraData('refund.createtime');
-            $time_formatted = date('Y-m-d H:i:s', $time);
-            $data['refund'] = "已退款，退款时间：$time_formatted";
-            $data['clr'] = '#8bc34a';
-        }
-
-        $pay_result = $entry->getExtraData('payResult');
-        if ($pay_result['result'] === 'success') {
-            $data['uniontid'] = $pay_result['uniontid'] ?? $pay_result['transaction_id'];
-        }
-
-        //出货结果
-        $data['result'] = $entry->getExtraData('pull.result', []);
-
-        if ($entry->getPrice() > 0) {
-            $data['type'] = '支付订单';
-            if ($data['refund']) {
-                $data['status'] = '已退款';
-            } else {
-                if (is_error($data['result'])) {
-                    $data['status'] = '故障';
-                } else {
-                    $data['status'] = '成功';
-                }
-            }
-        } else {
-            $data['type'] = '免费订单';
-        }
-
-        if (User::isAliUser($entry->getOpenid())) {
-            $pay_type = '支付宝';
-        } elseif (User::isWxUser($entry->getOpenid())) {
-            $pay_type = '微信';
-        } elseif (User::isWXAppUser($entry->getOpenid())) {
-            $pay_type = '微信小程序';
-        } else {
-            $pay_type = '未知';
-        }
-
-        $data['pay_type'] = $pay_type;
-        $orders[] = $data;
-    }
-
-    $user_profile = ['name' => $user->getNickname(), 'avatar' => $user->getAvatar()];
+    $result = Order::getList($user, $way, $page, $page_size);
 
     JSON::success([
         'code' => 200,
-        'orders' => $orders,
-        'user' => $user_profile,
-        'role' => $role,
-        'page' => $page,
-        'pagesize' => $page_size,
-        'total' => $total,
+        'orders' => $result['list'],
+        'user' => $user->profile(),
+        'role' => $role_title,
+        'page' => $result['page'],
+        'pagesize' => $result['page_size'],
+        'total' => $result['total'],
         'way' => $way,
     ]);
 

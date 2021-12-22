@@ -29,4 +29,6 @@ router::exec($op, [
     'feedback' => '\zovye\api\wxweb\api::feedback',
     'signIn' => '\zovye\api\wxweb\api::signIn',
     'bonus' => '\zovye\api\wxweb\api::bonus',
+    'balanceLog' => '\zovye\api\wxweb\api::balanceLog',
+    'orderList' => '\zovye\api\wxweb\api::orderList',
 ]);

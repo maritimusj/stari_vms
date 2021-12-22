@@ -694,4 +694,128 @@ class Order extends State
 
         return $data;
     }
+
+    public static function getList(userModelObj $user, $way, $page, $pagesize = DEFAULT_PAGE_SIZE): array
+    {
+        $query = self::query();
+
+        $condition = [];
+    
+        //指定用户
+        $condition['openid'] = $user->getOpenid();
+    
+        if ($way == 'free') {
+            $condition['src'] = Order::ACCOUNT;
+        } elseif ($way == 'pay') {
+            $condition['src'] = Order::PAY;
+        }
+    
+        $query->where($condition);
+    
+        $page = max(1, $page);
+        $page_size = max(1, $pagesize);
+    
+        $total = $query->count();
+        if (ceil($total / $page_size) < $page) {
+            $page = 1;
+        }
+
+        $query->page($page, $page_size);
+        $query->orderBy('id DESC');
+
+        $result = [];
+
+        $balance_enabled = App::isBalanceEnabled();
+
+        /** @var orderModelObj $entry */
+        foreach ($query->findAll() as $entry) {
+            $data = [
+                'id' => $entry->getId(),
+                'num' => $entry->getNum(),
+                'price' => number_format($entry->getPrice() / 100, 2),
+                'ip' => $entry->getIp(),
+                'account' => $entry->getAccount(),
+                'orderId' => $entry->getOrderId(),
+                'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                'agentId' => $entry->getAgentId(),
+                'status' => '',
+            ];
+    
+            if ($balance_enabled && $entry->getBalance() > 0) {
+                $data['balance'] = $entry->getBalance();
+            }
+    
+            //商品
+            $data['goods'] = $entry->getExtraData('goods', []);
+    
+            //设备信息
+            $device_id = $entry->getDeviceId();
+            $device_obj = Device::get($device_id);
+            if ($device_obj) {
+                $data['device'] = [
+                    'name' => $device_obj->getName(),
+                    'id' => $device_obj->getId(),
+                ];
+            }
+    
+            $src = $entry->getSrc();
+            if ($src == Order::PAY) {
+                $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
+            } elseif ($src == Order::BALANCE) {
+                $data['tips'] = ['text' => '积分', 'class' => 'balance'];
+            } else {
+                $data['tips'] = ['text' => '免费', 'class' => 'free'];
+            }
+    
+            if ($src == Order::PAY && $entry->getExtraData('refund')) {
+                $time = $entry->getExtraData('refund.createtime');
+                $time_formatted = date('Y-m-d H:i:s', $time);
+                $data['refund'] = "已退款，退款时间：$time_formatted";
+                $data['clr'] = '#8bc34a';
+            }
+    
+            $pay_result = $entry->getExtraData('payResult');
+            if ($pay_result['result'] === 'success') {
+                $data['uniontid'] = $pay_result['uniontid'] ?? $pay_result['transaction_id'];
+            }
+    
+            //出货结果
+            $data['result'] = $entry->getExtraData('pull.result', []);
+    
+            if ($src == Order::PAY) {
+                $data['type'] = '支付订单';
+                if ($data['refund']) {
+                    $data['status'] = '已退款';
+                } else {
+                    if (is_error($data['result'])) {
+                        $data['status'] = '故障';
+                    } else {
+                        $data['status'] = '成功';
+                    }
+                }
+            } else {
+                $data['type'] = '免费订单';
+            }
+    
+            if (User::isAliUser($entry->getOpenid())) {
+                $pay_type = '支付宝';
+            } elseif (User::isWxUser($entry->getOpenid())) {
+                $pay_type = '微信';
+            } elseif (User::isWXAppUser($entry->getOpenid())) {
+                $pay_type = '微信小程序';
+            } else {
+                $pay_type = '未知';
+            }
+    
+            $data['pay_type'] = $pay_type;
+            $result[] = $data;
+        }
+
+        return [
+            'total' => $total,
+            'page' => $page,
+            'pagesize' => $page_size,
+            'list' => $result,
+        ];
+    }
 }

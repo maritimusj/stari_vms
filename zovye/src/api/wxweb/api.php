@@ -72,14 +72,6 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
-
         if (request::has('deviceId')) {
             $device = Device::get(request::str('deviceId'), true);
             if (empty($device)) {
@@ -119,14 +111,6 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
-
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -148,14 +132,6 @@ class api
     public static function get(): array
     {
         $user = \zovye\api\wx\common::getUser();
-
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
 
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             JSON::fail('无法锁定用户，请稍后再试！');
@@ -213,14 +189,6 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
-
         $device_uid = request::str('deviceId');
         $goods_id = request::int('goodsId');
         $num = request::int('num');
@@ -236,14 +204,6 @@ class api
     public static function pay(): array
     {
         $user = \zovye\api\wx\common::getUser();
-
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
 
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
@@ -322,10 +282,6 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
         $data = $user->profile();
         $data['banned'] = $user->isBanned();
 
@@ -340,10 +296,6 @@ class api
     public static function feedback(): array
     {
         $user = \zovye\api\wx\common::getUser();
-
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
 
         $imei = request::str('deviceId');
 
@@ -374,14 +326,6 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
-
         $res = Balance::dailySignIn($user);
         if (is_error($res)) {
             return $res;
@@ -397,14 +341,6 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (empty($user)) {
-            return err('找不到这个用户！');
-        }
-
-        if ($user->isBanned()) {
-            return err('用户暂时无法使用！');
-        }
-
         $account = Account::findOneFromUID(request::str('uid'));
         if (empty($account)) {
             return err('找不到这个公众号！');
@@ -419,5 +355,36 @@ class api
             'balance' => $user->getBalance()->total(),
             'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
         ];
+    }
+
+    public static function balanceLog(): array 
+    {
+        $user = \zovye\api\wx\common::getUser();
+        
+        $query = $user->getBalance()->log();
+        if (request::has('lastId')) {
+            $query->where(['id <' => request::int('lastId')]);
+        }
+
+        $query->limit(request::int('pagesize', 20));
+        $query->orderBy('createtime DESC');
+
+        $result = [];
+        foreach($query->findAll() as $entry) {
+            $result[] = Balance::format($entry);
+        }
+
+        return $result;
+    }
+
+    public static function orderList(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+        
+        $way = request::str('way');
+        $page = request::int('page');
+        $page_size = request::int('pagesize');
+    
+        return Order::getList($user, $way, $page, $page_size);
     }
 }

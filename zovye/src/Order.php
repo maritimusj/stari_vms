@@ -784,19 +784,20 @@ class Order extends State
     
             if ($src == Order::PAY) {
                 $data['type'] = '支付订单';
-                if ($data['refund']) {
-                    $data['status'] = '已退款';
-                } else {
-                    if (is_error($data['result'])) {
-                        $data['status'] = '故障';
-                    } else {
-                        $data['status'] = '成功';
-                    }
-                }
             } else {
                 $data['type'] = '免费订单';
             }
-    
+
+            if (is_error($data['result'])) {
+                $data['status'] = '故障';
+            } else {
+                $data['status'] = '成功';
+            }
+
+            if ($data['refund']) {
+                $data['status'] = '已退款';
+            }
+
             if (User::isAliUser($entry->getOpenid())) {
                 $pay_type = '支付宝';
             } elseif (User::isWxUser($entry->getOpenid())) {

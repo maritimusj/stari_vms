@@ -13,6 +13,9 @@ class CommissionBalance extends State
 {
     const CACHE_EXPIRATION = 60 * 60;
 
+    const PRINCIPAL_ORDER = 'order';
+    const PRINCIPAL_GOODS = 'goods';
+
     const ORDER_FREE = 0;
     const ORDER_BALANCE = 1;
     const ORDER_WX_PAY = 2;

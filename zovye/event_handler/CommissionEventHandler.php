@@ -37,7 +37,7 @@ class CommissionEventHandler
         }
 
         if ($balance) {
-            return self::balance($device, $order, $balance);
+            return self::balance($device, $order);
         }
 
         if ($order->getPrice() > 0) {
@@ -50,11 +50,10 @@ class CommissionEventHandler
     /**
      * @param deviceModelObj $device
      * @param orderModelObj $order
-     * @param balanceModelObj|null $balance
      * @return bool
      * @throws Exception
      */
-    protected static function balance(deviceModelObj $device, orderModelObj $order, balanceModelObj $balance): bool
+    protected static function balance(deviceModelObj $device, orderModelObj $order): bool
     {
         if (Balance::isFreeOrder() && App::isZeroBonusEnabled() && $order->getExtraData('custom.zero_bonus', false)) {
             return true;

@@ -24,9 +24,7 @@ class AgentBonusEventHandler
         }
 
         $agent = $device->getAgent();
-        if (empty($agent) ||
-            !$agent->isCommissionEnabled() ||
-            !$agent->settings('agentData.bonus.enabled')) {
+        if (empty($agent) || !$agent->isCommissionEnabled() || !$agent->settings('agentData.bonus.enabled')) {
             return true;
         }
 
@@ -38,15 +36,23 @@ class AgentBonusEventHandler
         }
 
         //免费订单
-        if (empty($agent->settings('agentData.bonus.order.f')) &&
-            $order->getPrice() == 0) {
-            return true;
+        if (!$agent->settings('agentData.bonus.order.f')) {
+            if ($order->getSrc() == Order::ACCOUNT) {
+                return true;
+            }
+            if ($order->getSrc() == Order::BALANCE && Balance::isFreeOrder()) {
+                return true;
+            }
         }
 
         //支付订单
-        if (empty($agent->settings('agentData.bonus.order.p')) &&
-            $order->getPrice() > 0) {
-            return true;
+        if (!$agent->settings('agentData.bonus.order.p')) {
+            if ($order->getSrc() == Order::PAY) {
+                return true;
+            }
+            if ($order->getSrc() == Order::BALANCE && Balance::isPayOrder()) {
+                return true;
+            }
         }
 
         $agents = ['level0' => $agent];
@@ -61,11 +67,16 @@ class AgentBonusEventHandler
             $level++;
         }
 
+        $principal = $agent->settings('agentData.bonus.principal', CommissionBalance::PRINCIPAL_ORDER);
+
         $bonus_log = [];
         foreach ($agents as $level => $user) {
-            $money = intval($agent->settings("agentData.bonus.$level"));
-            if ($money > 0) {
-                $r = $user->commission_change($money, CommissionBalance::BONUS, ['orderid' => $order->getId()]);
+            $amount = $agent->settings("agentData.bonus.$level", 0);
+            if ($amount > 0) {
+                if ($principal == CommissionBalance::PRINCIPAL_GOODS) {
+                    $amount *= $order->getNum();
+                }
+                $r = $user->commission_change($amount, CommissionBalance::BONUS, ['orderid' => $order->getId()]);
                 if ($r && $r->update([], true)) {
                     $bonus_log[] = [
                         'id' => $r->getId(),

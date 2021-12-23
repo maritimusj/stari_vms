@@ -713,6 +713,23 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">计算方式</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="principal" value="order" {if $agent_data['bonus']['principal'] == 'order'}checked{/if}">
+                                订单（每个订单给予奖励）
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="principal" value="goods"  {if $agent_data['bonus']['principal'] == 'goods'}checked{/if}>
+                                商品（按每个商品给予奖励）
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="bonus_level0" class="col-md-2 control-label"><b>代理商</b><br/>获得奖励（元）</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="bonus_level0" id="bonus_level0" value="{php echo number_format($agent_data['bonus']['level0'] / 100, 2)}" min="0" step="0.01">

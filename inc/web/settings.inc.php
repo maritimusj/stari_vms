@@ -360,6 +360,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 //佣金奖励
                 $settings['agent']['reg']['bonus']['enabled'] = request::bool('agentBonusEnabled') ? 1 : 0;
                 if ($settings['agent']['reg']['bonus']['enabled']) {
+                    $settings['agent']['reg']['bonus']['principal'] = request::trim('principal');
                     $settings['agent']['reg']['bonus']['order'] = [
                         'f' => request::bool('freeOrder') ? 1 : 0,
                         'b' => request::bool('balanceOrder') ? 1 : 0,

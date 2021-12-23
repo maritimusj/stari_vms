@@ -541,6 +541,7 @@ if ($op == 'default') {
                     'agentData.bonus',
                     [
                         'enabled' => true,
+                        'principal' => request::trim('principal'),
                         'order' => [
                             'f' => request::bool('freeOrder') ? 1 : 0,
                             'b' => request::bool('balanceOrder') ? 1 : 0,

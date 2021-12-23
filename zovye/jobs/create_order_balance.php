@@ -225,6 +225,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
     } catch (ExceptionNeedsRefund $e) {
         $log['error'] = $e->getMessage();
         $res = refund($balance_id, $e->getNum(), $e->getMessage());
+        $log['refund'] = $res;
         if (is_error($res)) {
             Log::error('balance_refund', [
                 'error' => $e->getMessage(),

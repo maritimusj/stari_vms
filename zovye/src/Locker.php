@@ -90,7 +90,7 @@ class Locker
         if ($locker) {            
             if ($locker->isExpired()) {
                 $locker->destroy();
-            } else {               
+            } else {
                 if ($locker->reenter($requestID)) {    
                     if ($auto_release) {
                         self::registerLockerDestroy($locker);

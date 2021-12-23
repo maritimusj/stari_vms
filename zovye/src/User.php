@@ -38,8 +38,8 @@ class User
     const ORDER_ACCOUNT_LOCKER  = 'account::order';
     const ORDER_LOCKER = 'order';
     const COMMISSION_BALANCE_LOCKER = 'commission::balance';
-    const BALANCE_LOCKER = 'user::balance';
-    const TASK_LOCKER = 'user::task';
+    const BALANCE_LOCKER = 'balance';
+    const TASK_LOCKER = 'task';
     const DAILY_SIGN_IN_LOCKER = 'balance:daily:sign_in';
     const BALANCE_GIVE_LOCKER = 'balance:give';
     const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";

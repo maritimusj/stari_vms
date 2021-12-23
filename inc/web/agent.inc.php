@@ -541,7 +541,7 @@ if ($op == 'default') {
                     'agentData.bonus',
                     [
                         'enabled' => true,
-                        'principal' => request::trim('principal'),
+                        'principal' => request::trim('principal', CommissionBalance::PRINCIPAL_ORDER),
                         'order' => [
                             'f' => request::bool('freeOrder') ? 1 : 0,
                             'b' => request::bool('balanceOrder') ? 1 : 0,

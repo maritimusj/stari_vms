@@ -542,20 +542,22 @@ class common
         We7::load()->func('file');
         $res = We7::file_upload($_FILES['pic'], 'image');
 
-        if (!is_error($res)) {
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    return error(State::ERROR, $e->getMessage());
-                }
-            }
-            $url = $filename;
-            return ['data' => $url];
+        if (is_error($res)) {
+            Log::error('FBPic', $res);
+            return error(State::ERROR, '上传失败！');
         }
 
-        return error(State::ERROR, '上传失败！');
+        $filename = $res['path'];
+        if ($res['success'] && $filename) {
+            try {
+                We7::file_remote_upload($filename);
+            } catch (Exception $e) {
+                return error(State::ERROR, $e->getMessage());
+            }
+        }
+        
+        $url = $filename;
+        return ['data' => $url];
     }
 
     public static function feedback(): array

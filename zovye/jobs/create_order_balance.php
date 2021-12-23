@@ -109,8 +109,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
 
         $log['goods'] = $goods;
 
-        $num = min(App::orderMaxGoodsNum(), max(request::int('num'), 1));
-        if (empty($num) || $num < 1) {
+        if ($num < 1) {
             throw new RuntimeException('对不起，商品数量不正确！');
         }
 
@@ -181,6 +180,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
 
         $fail = 0;
         $success = 0;
+
         $is_pull_result_updated = false;
         $goods['goods_id'] = $goods['id'];
 
@@ -399,7 +399,7 @@ function refund(int $balance_id, int $num, string $reason)
                         ]);
                         continue;
                     }
-                    $val = intval($item['xval'] * $percent);
+                    $val = (int)round($item['xval'] * $percent);
                     if ($val > 0) {
                         $x = $user->getCommissionBalance()->change(0 - $val, CommissionBalance::ORDER_REFUND, [
                             'orderid' => $order->getId(),

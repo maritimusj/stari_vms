@@ -453,19 +453,6 @@ class agentModelObj extends userModelObj
         return $result;
     }
 
-    public function tryLock(): bool
-    {
-        for ($i = 0; $i < 10; $i++) {
-            $locked = !!$this->lock();
-            if (!$locked) {
-                usleep(100000);
-            } else {
-                break;
-            }
-        }
-        return $locked;
-    }
-
     public function getFirstOrderData()
     {
         return $this->settings('agentData.stats.first_order');

@@ -146,7 +146,6 @@ if ($op == 'default') {
             'isKeeper' => $user->isKeeper(),
             'isTester' => $user->isTester(),
             'verified' => $user->isIDCardVerified(),
-            'isLocked' => $user->isLocked(),
         ];
 
         if ($credit_used) {
@@ -580,19 +579,6 @@ if ($op == 'default') {
     );
 
     JSON::success(['title' => "<b>{$user->getName()}</b>的收提统计", 'content' => $content]);
-
-} elseif ($op == 'unlock') {
-
-    $user = User::get(request::int('id'));
-    if (empty($user)) {
-        JSON::fail('没有找到这个用户！');
-    }
-
-    if (!$user->unlock()) {
-        JSON::fail('失败！');
-    }
-
-    JSON::success('成功！');
 
 } elseif ($op == 'commission_balance_edit') {
 

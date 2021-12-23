@@ -183,13 +183,7 @@
     {loop $users $index $item}
     <tr class="{$user_state_class[$item['state']]}" data-id="{$item['id']}">
         <td>
-            {if $item['isLocked']}
-            <div class="operate">
-                <i class="fa fa-lock" data-op="unlock"></i>
-            </div>
-            {else}
             {php echo $index + 1}
-            {/if}
         </td>
         <td>
             <div class="profile{if $item['agent']} agent {$item['agent']['level']}{/if}"{if $item['from']} title="{$item['from']}"{/if}>
@@ -511,10 +505,6 @@
 
     api.monthStat = function (userid) {
         api.showResult({op: 'month_stat', id: userid});
-    }
-
-    api.unlock = function(userid) {
-        api.showResult({op: 'unlock', id: userid});
     }
 
     $(function(){

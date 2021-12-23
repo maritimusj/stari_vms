@@ -628,27 +628,6 @@ class userModelObj extends modelObj
     }
 
     /**
-     * 锁定用户.
-     *
-     * @return ?RowLocker
-     */
-    public function lock(): ?RowLocker
-    {
-        return Util::lockObject($this, [OBJ_LOCKED_UID => self::UNLOCKED], true);
-    }
-
-    public function isLocked(): bool
-    {
-        return $this->locked_uid != self::UNLOCKED;
-    }
-
-    public function unlock(): bool
-    {
-        $this->setLockedUid(self::UNLOCKED);
-        return $this->save();
-    }
-
-    /**
      * 给用户打款.
      *
      * @param $n

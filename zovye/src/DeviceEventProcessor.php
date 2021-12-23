@@ -359,7 +359,8 @@ class DeviceEventProcessor
             if ($device) {
                 $signal = intval($data['Signal']);
                 $device->setSig($signal);
-                $device->setLastPing(time());
+                $device->setLastPing(TIMESTAMP);
+                $device->setLastOnline(TIMESTAMP);
                 $device->save();
             }
         }
@@ -702,6 +703,7 @@ class DeviceEventProcessor
                 }
             }
 
+            $device->setLastOnline(TIMESTAMP);
             $device->save();
         }
     }
@@ -743,7 +745,8 @@ class DeviceEventProcessor
         $device = Device::get($data['uid'], true);
         if ($device) {
             $device->setMcbOnline(Device::ONLINE);
-            $device->setLastPing(time());
+            $device->setLastPing(TIMESTAMP);
+            $device->setLastOnline(TIMESTAMP);
             $device->save();
         }
     }
@@ -761,10 +764,9 @@ class DeviceEventProcessor
             //重置设置锁
             $device->resetLock();
 
-            $now = time();
             $device->setMcbOnline(Device::ONLINE);
-            $device->setLastOnline($now);
-            $device->setLastPing($now);
+            $device->setLastOnline(TIMESTAMP);
+            $device->setLastPing(TIMESTAMP);
             if ($device->isLastOnlineNotifyTimeout()) {
                 Job::deviceOnlineNotify($device);
             }

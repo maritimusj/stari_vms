@@ -34,9 +34,9 @@ if ($op == 'stats') {
 
         $all_device = Device::query()->count();
         $time_less_15 = new DateTime('-15 min');
-        $power_time = $time_less_15->getTimestamp();
+        $ts = $time_less_15->getTimestamp();
 
-        $device_stat['on'] = Device::query('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
+        $device_stat['on'] = Device::query('last_online IS NOT NULL AND last_online > ' . $ts)->count();
         $device_stat['off'] = $all_device - $device_stat['on'];
         
         return [

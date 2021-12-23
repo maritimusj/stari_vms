@@ -1222,13 +1222,10 @@ class common
                 $user->setAvatar($user_info['avatarUrl']);
             }
 
-            if (isset($res['phoneNumber'])) {
-                $user->setMobile($res['phoneNumber']);
-            }
+            $user->save();
         }
 
         $user->set('fansData', $user_info);
-        $user->save();
 
         if ($h5_openid) {
             $user->updateSettings('customData.wx.openid', $h5_openid);
@@ -1241,6 +1238,20 @@ class common
             if (empty($user)) {
                 return error(State::ERROR, '没有找到关联的微信用户！');
             }
+        }
+
+        if ($res['phoneNumber']) {
+            //清除此手机绑定的其他用户
+            $query = User::query(['mobile' => $res['phoneNumber']]);
+            /** @var userModelObj $entry */
+            foreach ($query->findAll() as $entry) {
+                if ($entry->getId() != $user->getId()) {
+                    $entry->setMobile('');
+                    $entry->save();
+                }
+            }
+            $user->setMobile($res['phoneNumber']);
+            $user->save();
         }
 
         if ($user->isBanned()) {

@@ -172,9 +172,9 @@ class Task
         return $data;
     }
 
-    public static function submit(userModelObj $user, string $uid)
+    public static function submit(userModelObj $user, string $uid, array $data = [])
     {
-        return Util::transactionDo(function () use ($user, $uid) {
+        return Util::transactionDo(function () use ($user, $uid, $data) {
 
             $task = null;
 
@@ -196,11 +196,6 @@ class Task
 
             if ($account->getBonusType() != Account::BALANCE) {
                 return err('任务未设置积分奖励！');
-            }
-
-            $data = request::array('data');
-            if (empty($data)) {
-                return err('提交的数据为空！');
             }
 
             $data['time'] = time();

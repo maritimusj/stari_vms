@@ -488,6 +488,16 @@ class api
         }
 
         $uid = request::str('uid');
-        return Task::submit($user, $uid);
+        $data = request::array('data');
+        if (empty($data)) {
+            return err('提交的数据为空！');
+        }
+
+        $res = Task::submit($user, $uid, $data);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return ['msg' => '提交成功！'];
     }
 }

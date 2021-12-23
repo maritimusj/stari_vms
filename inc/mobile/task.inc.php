@@ -63,7 +63,12 @@ if ($op == 'default') {
     }
 
     $uid = request::str('uid');
-    $result = Task::submit($user, $uid);
+    $data = request::array('data');
+    if (empty($data)) {
+        return err('提交的数据为空！');
+    }
+
+    $result = Task::submit($user, $uid, $data);
 
     if (is_error($result)) {
         JSON::fail($result);

@@ -27,6 +27,7 @@ use zovye\Log;
 
 use function zovye\err;
 use function zovye\is_error;
+use function zovye\isEmptyArray;
 use function zovye\m;
 
 class api
@@ -372,11 +373,12 @@ class api
             return err('无法锁定用户！');
         }
 
-        $bonus = Config::app('wxapp.advs.reward.bonus', 0);
-        if (empty($bonus)) {
+        $bonusData = Config::app('wxapp.advs.reward.bonus', []);
+        if (isEmptyArray($bonusData)) {
             return err('暂时没有奖励！');
         }
 
+        //每日限额
         $limit = Config::app('wxapp.advs.reward.limit', 0);
         if ($limit > 0) {
             $begin = new DateTime();
@@ -399,6 +401,24 @@ class api
         ]);
         if ($last_reward && time() - $last_reward->getCreatetime() < 3) {
             return err('操作太快，请稍后再试！');
+        }
+
+        //获取用户奖励等级
+        $total = Balance::query([
+            'openid' => $user->getOpenid(),
+            'src' => Balance::REWARD_ADV,
+        ])->count();
+
+        $bonus = 0;
+        foreach((array)$bonusData as $data) {
+            if ($total <= $data['max']) {
+                $bonus = intval($data['v']);
+                break;
+            }
+        }
+
+        if ($bonus < 1) {
+            return err('暂时没有奖励！');
         }
 
         $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);

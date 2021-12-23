@@ -1,5 +1,14 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
+<style>
+    .level-title {
+        font-size: 16px;
+        color: #ffc107;
+        font-style: italic;
+        font-weight: bolder;
+        margin-right: 6px;
+    }
+</style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default nav-tab-item">
@@ -72,9 +81,41 @@
                 </div>
                 {if $pos['balance']}
                 <div class="form-group">
-                    <label for="{$index}Bonus" class="col-md-2 control-label">积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="{$index}Bonus" id="{$index}Bonus" value="{$advsID[$index]['bonus']}">
+                    <label for="{$index}AdsNum0" class="col-md-2 control-label">
+                        <span class="level-title">1级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                    </label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="{$index}AdsNumLevel0" id="{$index}AdsNumLevel0" value="{$advsID[$index]['bonus']['level0']['max']}">
+                        <span class="help-block">* 广告数量</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="{$index}BonusLevel0" id="{$index}BonusLevel0" value="{$advsID[$index]['bonus']['level0']['v']}">
+                        <span class="help-block">* 奖励积分数量</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{$index}AdsNum1" class="col-md-2 control-label">
+                        <span class="level-title">2级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                    </label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="{$index}AdsNumLevel1" id="{$index}AdsNumLevel1" value="{$advsID[$index]['bonus']['level1']['max']}">
+                        <span class="help-block">* 广告数量</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="{$index}BonusLevel1" id="{$index}BonusLevel1" value="{$advsID[$index]['bonus']['level1']['v']}">
+                        <span class="help-block">* 奖励积分数量</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{$index}AdsNum2" class="col-md-2 control-label">
+                        <span class="level-title">3级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                    </label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="{$index}AdsNumLevel2" id="{$index}AdsNumLevel2" value="{$advsID[$index]['bonus']['level2']['max']}">
+                        <span class="help-block">* 广告数量</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="{$index}BonusLevel2" id="{$index}BonusLevel2" value="{$advsID[$index]['bonus']['level2']['v']}">
                         <span class="help-block">* 奖励积分数量</span>
                     </div>
                 </div>
@@ -82,7 +123,7 @@
                     <label for="{$index}BonusLimit" class="col-md-2 control-label">每日限额（次）</label>
                     <div class="col-md-10">
                         <input type="number" class="form-control" name="{$index}BonusLimit" id="{$index}BonusLimit" value="{php echo intval($advsID[$index]['limit'])}" min="0">
-                        <span class="help-block">* 最大次数限制，０表示不限制</span>
+                        <span class="help-block">* 限制每天可以获得奖励的最大次数，０表示不限制</span>
                     </div>
                 </div>
                 {/if}

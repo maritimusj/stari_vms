@@ -119,7 +119,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             foreach(['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
                 Config::balance("account.promote_bonus.{$name}", in_array($name, $promote_opts) ? 1 : 0, true);
             }
-            
+ 
             Config::balance('account.promote_bonus.min', request::int('accountPromoteBonusMin'), true);
             Config::balance('account.promote_bonus.max', request::int('accountPromoteBonusMax'), true);
         }
@@ -487,7 +487,20 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 ],
                 'reward' => [
                     'id' => request::str('reward'),
-                    'bonus' => request::str('rewardBonus'),
+                    'bonus' => [
+                        'level0' => [
+                            'max' => request::int('rewardAdsNumLevel0'),
+                            'v' => request::int('rewardBonusLevel0'),
+                        ],
+                        'level1' => [
+                            'max' => request::int('rewardAdsNumLevel1'),
+                            'v' => request::int('rewardBonusLevel1'),
+                        ],
+                        'level2' => [
+                            'max' => request::int('rewardAdsNumLevel2'),
+                            'v' => request::int('rewardBonusLevel2'),
+                        ],
+                    ],
                     'limit' => request::str('rewardBonusLimit'),
                 ],
                 'interstitial' => [

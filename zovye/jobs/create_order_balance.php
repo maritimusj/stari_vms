@@ -321,122 +321,122 @@ function refund(int $balance_id, int $num, string $reason)
     }
 
     $need = Config::balance('order.auto_rb', 0);
-    if ($need) {
-        $result = Util::transactionDo(function () use ($balance_log, $num, $reason) {
-            $users = $balance_log->getUser();
-            if (empty($users)) {
-                return err('找不到这个用户！');
+    if (!$need) {
+        return err('设置不允许退款！');
+    }
+
+    $result = Util::transactionDo(function () use ($balance_log, $num, $reason) {
+        $users = $balance_log->getUser();
+        if (empty($users)) {
+            return err('找不到这个用户！');
+        }
+
+        $max = $balance_log->getNum();
+        if ($max < 1) {
+            return err('商品数量于小1！');
+        }
+
+        if (empty($num) || $num > $max) {
+            $num = $max;
+        }
+
+        $goods_balance = $balance_log->getGoodsBalance();
+
+        $x = $users->getBalance()->change($num * $goods_balance, Balance::REFUND, [
+            'related' => $balance_log->getId(),
+            'reason' => $reason,
+        ]);
+
+        if (empty($x)) {
+            return err('退款失败！');
+        }
+
+        $balance_log->setExtraData('refund', [
+            'time' => time(),
+            'related' => $x->getId(),
+        ]);
+
+        if (!$balance_log->save()) {
+            return err('保存数据失败！');
+        }
+
+        $order = $balance_log->getOrder();
+        if ($order) {
+            $users = [];
+            $keeperCommissionLogs = $order->getExtraData('commission.keepers', []);
+            foreach ($keeperCommissionLogs as $log) {
+                $users[] = [
+                    'openid' => $log['openid'],
+                    'xval' => $log['xval'],
+                ];
+            }
+            $gspCommissionLogs = $order->getExtraData('commission.gsp', []);
+            foreach ($gspCommissionLogs as $log) {
+                $users[] = [
+                    'openid' => $log['openid'],
+                    'xval' => $log['xval'],
+                ];
+            }
+            $agentCommissionLog = $order->getExtraData('commission.agent', []);
+            if ($agentCommissionLog) {
+                $users[] = [
+                    'openid' => $agentCommissionLog['openid'],
+                    'xval' => $agentCommissionLog['xval'],
+                ];
+            }
+            $bonusCommissionLogs = $order->getExtraData('commission.bonus', []);
+            foreach ($bonusCommissionLogs as $log) {
+                $users[] = [
+                    'openid' => $log['openid'],
+                    'xval' => $log['xval'],
+                ];
             }
 
-            $max = $balance_log->getNum();
-            if ($max < 1) {
-                return err('商品数量于小1！');
-            }
-
-            if (empty($num) || $num > $max) {
-                $num = $max;
-            }
-
-            $goods_balance = $balance_log->getGoodsBalance();
-
-            $x = $users->getBalance()->change($num * $goods_balance, Balance::REFUND, [
-                'related' => $balance_log->getId(),
-                'reason' => $reason,
-            ]);
-
-            if (empty($x)) {
-                return err('退款失败！');
-            }
-
-            $balance_log->setExtraData('refund', [
-                'time' => time(),
-                'related' => $x->getId(),
-            ]);
-
-            if (!$balance_log->save()) {
-                return err('保存数据失败！');
-            }
-
-            $order = $balance_log->getOrder();
-            if ($order) {
-                $users = [];
-                $keeperCommissionLogs = $order->getExtraData('commission.keepers', []);
-                foreach ($keeperCommissionLogs as $log) {
-                    $users[] = [
-                        'openid' => $log['openid'],
-                        'xval' => $log['xval'],
-                    ];
+            $percent = floatval($num) / floatval($max);
+            foreach ($users as $item) {
+                $user = User::get($item['openid'], true);
+                if (empty($user)) {
+                    Log::error('create_order_balance', [
+                        'error' => '退款，找不到这个用户！',
+                        'order' => $order->getOrderNO(),
+                        'data' => $item
+                    ]);
+                    continue;
                 }
-                $gspCommissionLogs = $order->getExtraData('commission.gsp', []);
-                foreach ($gspCommissionLogs as $log) {
-                    $users[] = [
-                        'openid' => $log['openid'],
-                        'xval' => $log['xval'],
-                    ];
-                }
-                $agentCommissionLog = $order->getExtraData('commission.agent', []);
-                if ($agentCommissionLog) {
-                    $users[] = [
-                        'openid' => $agentCommissionLog['openid'],
-                        'xval' => $agentCommissionLog['xval'],
-                    ];
-                }
-                $bonusCommissionLogs = $order->getExtraData('commission.bonus', []);
-                foreach ($bonusCommissionLogs as $log) {
-                    $users[] = [
-                        'openid' => $log['openid'],
-                        'xval' => $log['xval'],
-                    ];
-                }
-
-                $percent = floatval($num) / floatval($max);
-                foreach ($users as $item) {
-                    $user = User::get($item['openid'], true);
-                    if (empty($user)) {
+                $val = (int)round($item['xval'] * $percent);
+                if ($val > 0) {
+                    $x = $user->getCommissionBalance()->change(0 - $val, CommissionBalance::ORDER_REFUND, [
+                        'orderid' => $order->getId(),
+                        'reason' => '出货失败，返还佣金！',
+                    ]);
+                    if (!$x) {
                         Log::error('create_order_balance', [
-                            'error' => '退款，找不到这个用户！',
+                            'error' => '退款失败！',
                             'order' => $order->getOrderNO(),
-                            'data' => $item
+                            'user' => $user->profile(false),
+                            'xval' => $val,
                         ]);
-                        continue;
-                    }
-                    $val = (int)round($item['xval'] * $percent);
-                    if ($val > 0) {
-                        $x = $user->getCommissionBalance()->change(0 - $val, CommissionBalance::ORDER_REFUND, [
-                            'orderid' => $order->getId(),
-                            'reason' => '出货失败，返还佣金！',
-                        ]);
-                        if (!$x) {
-                            Log::error('create_order_balance', [
-                                'error' => '退款失败！',
-                                'order' => $order->getOrderNO(),
-                                'user' => $user->profile(false),
-                                'xval' => $val,
-                            ]);
-                        }
                     }
                 }
-
-                $order->setExtraData('refund', [
-                    'message' => '出货失败！',
-                    'createtime' => time(),
-                ]);
-                $order->setRefund(Order::REFUND);
-                $order->save();
             }
 
-            return true;
-        });
-
-        if (is_error($result)) {
-            $device->appShowMessage('出货失败，积分退回失败，请联系管理员！', 'error');
-            return $result;
-        } else {
-            $device->appShowMessage('出货失败，积分已退回！', 'error');
+            $order->setExtraData('refund', [
+                'message' => '出货失败！',
+                'createtime' => time(),
+            ]);
+            $order->setRefund(Order::REFUND);
+            $order->save();
         }
 
         return true;
+    });
+
+    if (is_error($result)) {
+        $device->appShowMessage('出货失败，积分退回失败，请联系管理员！', 'error');
+        return $result;
+    } else {
+        $device->appShowMessage('出货失败，积分已退回！', 'error');
     }
 
-    return err('设置不允许退款！');
+    return true;
 }

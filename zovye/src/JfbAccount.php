@@ -75,11 +75,6 @@ class JfbAccount
             'facilityCity' => $fans['city'],
             'facilityDistrict' => '',
             'showTimes' => 0,
-            'replyMsg' => '出货中，请稍等！<a href="' . Util::murl('order', [
-                    'op' => 'feedback',
-                    'device_imei' => $device->getImei(),
-                    'device_name' => $device->getName(),
-                ]) . '">如未出货请点我！</a>',
         ];
 
         if ($jfb_openid) {

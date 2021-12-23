@@ -142,6 +142,10 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
                 $order_no = Order::makeUID($user, $device, sha1($balance_log->getId() . $balance_log->getCreatetime()));
             }
 
+            if (Order::exists($order_no)) {
+                return err('订单已存在！');
+            }
+
             //事件：设备已锁定
             EventBus::on('device.locked', [
                 'device' => $device,

@@ -46,11 +46,12 @@ class api
         }
 
         //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
+        $h5_openid = '';
         if (request::has('openId')) {
-            $res['openId'] = request::str('openId');
+            $h5_openid = request::str('openId');
         }
 
-        return common::doUserLogin($res, request::array('userInfo', []));
+        return common::doUserLogin($res, request::array('userInfo', []), $h5_openid);
     }
 
     /**

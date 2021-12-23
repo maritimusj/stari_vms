@@ -1196,7 +1196,7 @@ class common
         return $user;
     }
 
-    public static function doUserLogin($res, $user_info): array
+    public static function doUserLogin($res, $user_info, $h5_openid = ''): array
     {
         $openid = strval($res['openId']);
         $user = User::get($openid, true);
@@ -1229,6 +1229,19 @@ class common
 
         $user->set('fansData', $user_info);
         $user->save();
+
+        if ($h5_openid) {
+            $user->updateSettings('customData.wx.openid', $h5_openid);
+        } else {
+            $h5_openid = $user->settings('customData.wx.openid', '');
+        }
+
+        if ($h5_openid) {
+            $user = User::get($h5_openid, true, User::WX);
+            if (empty($user)) {
+                return error(State::ERROR, '没有找到关联的微信用户！');
+            }
+        }
 
         if ($user->isBanned()) {
             return error(State::ERROR, '登录失败，请稍后再试！');

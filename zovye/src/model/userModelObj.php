@@ -624,7 +624,7 @@ class userModelObj extends modelObj
      */
     public function acquireLocker(string $name = ''): ?lockerModelObj
     {
-        return Locker::try("user:{$this->getId()}:$name", REQUEST_ID, 3);
+        return Locker::try("user:{$this->getId()}:$name", REQUEST_ID);
     }
 
     /**

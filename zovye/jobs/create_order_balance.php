@@ -380,6 +380,14 @@ function refund(int $balance_id, int $num, string $reason)
                         'xval' => $agentCommissionLog['xval'],
                     ];
                 }
+                $bonusCommissionLogs = $order->getExtraData('commission.bonus', []);
+                foreach ($bonusCommissionLogs as $log) {
+                    $users[] = [
+                        'openid' => $log['openid'],
+                        'xval' => $log['xval'],
+                    ];
+                }
+
                 $percent = floatval($num) / floatval($max);
                 foreach ($users as $item) {
                     $user = User::get($item['openid'], true);

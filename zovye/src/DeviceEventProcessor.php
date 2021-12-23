@@ -651,6 +651,7 @@ class DeviceEventProcessor
         if ($device) {
             $device->setLastPing(time());
             $device->setMcbOnline(Device::ONLINE);
+            $device->setLastOnline(TIMESTAMP);
 
             $device->setProtocolV1Code($data['code']);
 
@@ -703,7 +704,6 @@ class DeviceEventProcessor
                 }
             }
 
-            $device->setLastOnline(TIMESTAMP);
             $device->save();
         }
     }

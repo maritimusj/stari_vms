@@ -409,6 +409,7 @@
 <script>
     require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210716')}"], function (zovye) {
         zovye.enableOp();
+        zovye.enableCopy();
         zovye.setApiUrl("{php echo $this->createWebUrl('settings');}");
         zovye.op('reset', function(self, next) {
             if (confirm('确定要重置升级吗？')) {

@@ -184,8 +184,11 @@ class Task
                 if (empty($task)) {
                     return err('任务不存在！');
                 }
-                if ($task->getS1() != Task::INIT && $task->getS1() != Task::REJECT) {
+                if ($task->getS1() == Task::ACCEPT) {
                     return err('任务已完成！');
+                }
+                if (!in_array($task->getS1(), [Task::INIT, Task::REJECT])) {
+                    return err('任务状态异常！');
                 }
                 $account = $task->getAccount();
             }

@@ -35,4 +35,5 @@ router::exec($op, [
     'task' => '\zovye\api\wxweb\api::task',
     'detail' => '\zovye\api\wxweb\api::detail',
     'submit' => '\zovye\api\wxweb\api::submit',
+    'upload' => '\zovye\api\wxx\common::FBPic',
 ]);

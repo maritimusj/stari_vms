@@ -274,4 +274,12 @@ class Job
 
         return true;
     }
+
+    public static function uploadDevieInfo($lastId = 0)
+    {
+        if (CtrlServ::scheduleJob('upload_device_info', ['lastId' => $lastId]) !== false) {
+            return true;
+        }
+        return false;
+    }
 }

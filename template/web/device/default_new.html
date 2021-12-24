@@ -302,6 +302,9 @@
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'report_list'));}"><i class="fa fa-exclamation fa-fw" title="故障报告列表"></i></a>
                 <i class="fa fa-exchange fa-fw" title="通知所有设备刷新配置？" onclick="api.refreshAll();"></i>
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'clean_error'));}"><i class="fa fa-undo fa-fw" title="清除所有设备错误代码"></i></a>
+                {if $upload}
+                <i class="fa fa-cloud-upload fa-fw" title="上传设备信息" onclick="api.uploadInfo();"></i>
+                {/if}
             </span>
         </div>
         <div class="panel-body">
@@ -813,5 +816,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20210625011"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20211224001"></script>
 {template 'common/footer'}

@@ -85,8 +85,9 @@ if ($op == 'list') {
     }
 
     $tpl_data['page'] = request::int('page', 1);
-
+    $tpl_data['upload'] = settings('device.upload.url', '') ? true : false;
     $tpl_data['gate'] = CtrlServ::status();
+
 
     app()->showTemplate('web/device/default_new', $tpl_data);
 } elseif ($op == 'search') {
@@ -2589,4 +2590,17 @@ if ($op == 'list') {
     }
 
     JSON::success('开锁指令已发送！');
+
+} elseif ($op == 'upload_info') {
+
+    $config = settings('device.upload', []);
+    if (empty($config['url'])) {
+        JSON::fail('没有配置第三方平台！');
+    }
+
+    if (Job::uploadDevieInfo()) {
+        JSON::success('已启动设备上传任务！');
+    }
+
+    JSON::fail('设备信息上传任务启动失败！');
 }

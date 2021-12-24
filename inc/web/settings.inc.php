@@ -252,6 +252,12 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         Config::device('door.enable', request::bool('DeviceWithDoor') ? 1 : 0, true);
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
+        $settings['device']['upload'] = [
+            'url' => request::trim('deviceUploadApiUrl'),
+            'key' => request::trim('deviceUploadAppKey'),
+            'secret' => request::trim('deviceUploadAppSecret'),
+        ];
+        
         $settings['app']['domain']['enabled'] = request::bool('MultiDomainEnable') ? 1 : 0;
         $settings['app']['domain']['main'] = trim(request::trim('mainUrl'), '\\\/');
         $settings['app']['domain']['bak'] = request::array('bakUrl');

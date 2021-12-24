@@ -244,6 +244,11 @@
 				} else {
 					stoptick('error');
 				}
+				if (res.data.redirect) {
+					setTimeout(() => {
+						window.location.replace(res.data.redirect);
+					}, 2000);
+				}
 			} else {
 				stoptick('error');
 			}
@@ -260,11 +265,11 @@
 			waiting.style.display = "none";
 			error.style.display = "none";
 			
-			if (sucess_redirect_url && sucess_redirect_url.length > 0) {
-				setTimeout(function () {
-					window.location.href = sucess_redirect_url;
-				}, 2000);
-			}
+			// if (sucess_redirect_url && sucess_redirect_url.length > 0) {
+			// 	setTimeout(function () {
+			// 		window.location.href = sucess_redirect_url;
+			// 	}, 2000);
+			// }
 
 		} else if (result === 'error') {
 

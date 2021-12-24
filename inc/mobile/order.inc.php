@@ -197,20 +197,21 @@ if ($op === 'create') {
             ];
         }
 
-        $url = settings('misc.redirect.success.url');
-        if (!empty($url)) {
-            $response['url'] = $url;
-        }
-
         $device = $order->getDevice();
-        if ($device && $device->isVDevice()) {
-            $response['goods'] = Goods::data($order->getGoodsId(), ['useImageProxy' => true]);
-            $response['order'] = [
-                'id' => $order->getOrderId(),
-                'num' => $order->getNum(),
-                'createtime_formatted' => date('Y-m-d H:i:s', $order->getCreatetime()),
-            ];
-            $response['user'] = $user->profile();
+        if ($device) {
+            $url = $device->getRedirectUrl()['url'];
+            if (!empty($url)) {
+                $response['redirect'] = $url;
+            }
+            if ($device->isVDevice()) {
+                $response['goods'] = Goods::data($order->getGoodsId(), ['useImageProxy' => true]);
+                $response['order'] = [
+                    'id' => $order->getOrderId(),
+                    'num' => $order->getNum(),
+                    'createtime_formatted' => date('Y-m-d H:i:s', $order->getCreatetime()),
+                ];
+                $response['user'] = $user->profile();                
+            }
         }
         JSON::success($response);
     }
@@ -225,20 +226,29 @@ if ($op === 'create') {
         JSON::fail(['code' => 400, 'msg' => "找不到支付信息！" . $order_no]);
     }
 
+    $url = '';
+    $device_id = $pay_log->getDeviceId();
+    if ($device_id) {
+        $device = Device::get($device_id);
+        if ($device) {
+            $url = $device->getRedirectUrl('fail')['url'];
+        }      
+    }
+
     //已取消
     if ($pay_log->getData('cancelled')) {
-        JSON::fail(['code' => 500, 'msg' => '订单已取消！']);
+        JSON::fail(['code' => 500, 'msg' => '订单已取消！', 'redirect' => $url]);
     }
 
     //已超时
     if ($pay_log->getData('timeout')) {
-        JSON::fail(['code' => 501, 'msg' => '订单已超时！']);
+        JSON::fail(['code' => 501, 'msg' => '订单已超时！', 'redirect' => $url]);
     }
 
     //已退款
     $refund = $pay_log->getData('refund');
     if ($refund) {
-        JSON::fail(['code' => 502, 'msg' => '出货失败，订单已退款！']);
+        JSON::fail(['code' => 502, 'msg' => '出货失败，订单已退款！', 'redirect' => $url]);
     }
 
     //支付成功

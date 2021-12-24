@@ -54,8 +54,8 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
             $data = [
                 'name' => $device->getName(),
                 'imei' => $device->getImei(),
-                'iccid' => $device->getIccid(),
-                'app_id' => $device->getAppId(),
+                'iccid' => $device->getIccid() ?? '',
+                'app_id' => $device->getAppId() ?? '',
                 'model' => $device->getDeviceModel(),
                 'location' =>  isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
                 'createtime' => $device->getCreatetime(),
@@ -73,8 +73,15 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
                 $data['location']['area'] = array_values($data['location']['area']);
             }
 
+            if (isEmptyArray($data['location'])) {
+                $data['location'] = null;
+            }
+
             $data['sign'] = sign($data, strval($config['secret']));
-            $res = Util::post($url, $data);
+
+            $res = Util::post($url, $data, true, 3, [
+                CURLOPT_HTTPHEADER => ["APPKEY: {$config['key']}"],
+            ]);
 
             Log::info('upload_device_info', [
                 'data' => $data,

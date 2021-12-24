@@ -412,10 +412,12 @@ class api
 
         $bonus = 0;
         foreach((array)$bonusData as $data) {
-            if ($total <= $data['max']) {
-                $bonus = intval($data['v']);
-                break;
+            if ($total > $data['max']) {
+                $total -= $data['max'];
+                continue;
             }
+            $bonus = intval($data['v']);
+            break;
         }
 
         if ($bonus < 1) {

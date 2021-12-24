@@ -10,9 +10,11 @@ use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Job;
 use zovye\Log;
+use zovye\model\deviceModelObj;
 use zovye\request;
 use zovye\Util;
 
+use function zovye\isEmptyArray;
 use function zovye\settings;
 
 $op = request::op('default');
@@ -47,15 +49,33 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
         /** @var deviceModelObj $device */
         $device = null;
         foreach($query->findAll() as $device) {
+            $extra = $device->get('extra', []);
+
             $data = [
                 'name' => $device->getName(),
                 'imei' => $device->getImei(),
                 'iccid' => $device->getIccid(),
                 'app_id' => $device->getAppId(),
+                'model' => $device->getDeviceModel(),
+                'location' =>  isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
+                'createtime' => $device->getCreatetime(),
             ];
+
+            if (isEmptyArray($data['location']['area'])) {
+                $agent = $device->getAgent();
+                if ($agent) {
+                    $agent_data = $agent->getAgentData();
+                    if (!isEmptyArray($agent_data['area'])) {
+                        $data['location']['area'] = array_values($agent_data['area']);
+                    }
+                }
+            } else {
+                $data['location']['area'] = array_values($data['location']['area']);
+            }
 
             $data['sign'] = sign($data, strval($config['secret']));
             $res = Util::post($url, $data);
+
             Log::info('upload_device_info', [
                 'data' => $data,
                 'response' => $res,

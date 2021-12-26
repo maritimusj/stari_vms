@@ -584,6 +584,7 @@ class userModelObj extends modelObj
         $condition = [
             'openid' => $this->openid,
         ];
+
         if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
             $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
         } else {

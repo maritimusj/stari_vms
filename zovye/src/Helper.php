@@ -285,6 +285,13 @@ class Helper
             return err('找不到这个设备！');
         }
 
+        if (Balance::isFreeOrder()) {
+            $res = Util::checkFreeOrderLimits($user, $device);
+            if (is_error($res)) {
+                return err('今天的免费兑换额度已用完，请明天再来吧！');
+            }
+        }
+
         $goods = $device->getGoods($goods_id);
         if (empty($goods) || empty($goods['balance'])) {
             return err('无法兑换这个商品，请联系管理员！');

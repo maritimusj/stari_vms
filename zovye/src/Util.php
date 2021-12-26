@@ -739,14 +739,9 @@ include './index.php';
      */
     public static function checkAvailable(userModelObj $user, accountModelObj $account, deviceModelObj $device, array $params = [])
     {
-        //每日免费额度限制
-        if (Util::getUserTodayFreeNum($user, $device) < 1) {
-            return error(State::ERROR, '今天领的太多了，明天再来！');
-        }
-
-        //全部免费额度限制
-        if (Util::getUserFreeNum($user, $device) < 1) {
-            return error(State::ERROR, '您的免费额度已用完！');
+        $res = self::checkFreeOrderLimits($user, $device);
+        if (is_error($res)) {
+            return $res;
         }
 
         $assign_data = $account->settings('assigned', []);
@@ -755,6 +750,20 @@ include './index.php';
         }
 
         return self::checkAccountLimits($user, $account, $params);
+    }
+
+    public static function checkFreeOrderLimits(userModelObj $user, deviceModelObj $device) {
+        //每日免费额度限制
+        if (Util::getUserTodayFreeNum($user, $device) < 1) {
+            return error(State::ERROR, '今天领的太多了，明天再来吧！');
+        }
+
+        //全部免费额度限制
+        if (Util::getUserFreeNum($user, $device) < 1) {
+            return error(State::ERROR, '您的免费额度已用完！');
+        }
+
+        return true;
     }
 
     /**

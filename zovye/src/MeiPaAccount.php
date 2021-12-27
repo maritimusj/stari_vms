@@ -15,6 +15,7 @@ use zovye\model\userModelObj;
 class MeiPaAccount
 {
     const API_URL = 'http://hz.web.meipa.net/api/qrcode/getqrcode';
+    const AUTH_URL = 'http://hz.api.meipa.net/wechat/api.other/authopenid?callbackurl=';
 
     private $api_id;
     private $app_key;
@@ -37,59 +38,67 @@ class MeiPaAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $v = [];
-
         /** @var accountModelObj $acc */
         $acc = Account::findOneFromType(Account::MEIPA);
-        if ($acc) {
-            $config = $acc->settings('config', []);
-            if (empty($config['apiid']) || empty($config['appkey'])) {
-                return [];
+        if (empty($acc)) {
+            return [];
+        }
+
+        $meipa_openid = $user->settings('customData.meipa.openid', '');
+        if (empty($meipa_openid)) {
+            $data = $acc->format();
+            $data['redirect_url'] = self::AUTH_URL . urlencode(Util::murl('meipa', ['op' => 'meipa_auth', 'device' => $device->getShadowId()]));
+            return [$data];
+        }
+
+        $config = $acc->settings('config', []);
+        if (empty($config['apiid']) || empty($config['appkey'])) {
+            return [];
+        }
+
+        $v = [];
+        //请求API
+        $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
+        $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
+            if (App::isAccountLogEnabled()) {
+                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                if (empty($log)) {
+                    Log::error('meipa_query', [
+                        'query' => $request,
+                        'result' => $result,
+                    ]);
+                }
             }
 
-            //请求API
-            $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
-            $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
-                if (App::isAccountLogEnabled()) {
-                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                    if (empty($log)) {
-                        Log::error('meipa_query', [
-                            'query' => $request,
-                            'result' => $result,
-                        ]);
-                    }
+            if (is_error($result) || $result['status'] != 1) {
+                Log::error('meipa', [
+                    'user' => $user->profile(),
+                    'acc' => $acc->getName(),
+                    'device' => $device->profile(),
+                    'error' => $result,
+                ]);
+            } else {
+                $data = $acc->format();
+
+                $data['title'] = $result['data']['wechat_name'] ?: Account::MEIPA_NAME;
+                $data['qrcode'] = $result['data']['qrcodeurl'];
+
+                if ($result['data']['joburl'] && We7::starts_with($result['data']['joburl'], 'http')) {
+                    $data['redirect_url'] = $result['data']['joburl'];
                 }
 
-                if (is_error($result) || $result['status'] != 1) {
-                    Log::error('meipa', [
-                        'user' => $user->profile(),
-                        'acc' => $acc->getName(),
-                        'device' => $device->profile(),
-                        'error' => $result,
-                    ]);
-                } else {
-                    $data = $acc->format();
-
-                    $data['title'] = $result['data']['wechat_name'] ?: Account::MEIPA_NAME;
-                    $data['qrcode'] = $result['data']['qrcodeurl'];
-
-                    if ($result['data']['joburl'] && We7::starts_with($result['data']['joburl'], 'http')) {
-                        $data['redirect_url'] = $result['data']['joburl'];
-                    }
-
-                    if ($result['data']['code_words']) {
-                        $data['descr'] = "回复<b>{$result['data']['code_words']}</b>免费领取！";
-                    }
-
-                    if (App::isAccountLogEnabled() && isset($log)) {
-                        $log->setExtraData('account', $data);
-                        $log->save();
-                    }
-
-                    $v[] = $data;
+                if ($result['data']['code_words']) {
+                    $data['descr'] = "回复<b>{$result['data']['code_words']}</b>免费领取！";
                 }
-            });
-        }
+
+                if (App::isAccountLogEnabled() && isset($log)) {
+                    $log->setExtraData('account', $data);
+                    $log->save();
+                }
+
+                $v[] = $data;
+            }
+        });
         
         return $v;
     }

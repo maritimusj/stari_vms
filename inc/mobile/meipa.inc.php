@@ -8,6 +8,26 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
+$op = request::op('default');
+
+if ($op == 'meipa_auth') {
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        Util::resultAlert('请用微信打开！', 'error');
+    }
+
+    $openid = request::str('meipaopenid');
+    $user->updateSettings('customData.meipa', [
+        'openid' => $openid,
+        'createdAt' => time(),
+    ]);
+
+    $device_uid = request::str('device');
+
+    $url = Util::murl('entry', ['device' => $device_uid, 'from' => 'device']);
+    Util::redirect($url);
+}
+
 if (request::is_get()) {
     Util::resultAlert('出货成功，如果未领取到商品，请扫描二维码重试！');
 }

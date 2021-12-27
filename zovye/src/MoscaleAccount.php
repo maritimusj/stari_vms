@@ -78,6 +78,11 @@ class MoscaleAccount
 
                     $data['name'] = $result['data']['name'] ?: Account::MOSCALE_NAME;
                     $data['qrcode'] = $result['data']['qrcode_url'];
+                    if ($result['data']['rand_key']) {
+                        $data['descr'] = PlaceHolder::url($data['descr'], [
+                            'key' => $result['data']['rand_key'],
+                        ]);
+                    }
 
                     $v[] = $data;
 

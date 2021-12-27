@@ -59,7 +59,11 @@ class MeiPaAccount
         $v = [];
         //请求API
         $MeiPa = new MeiPaAccount($config['apiid'], $config['appkey']);
-        $MeiPa->fetchOne($device, $user, [], function ($request, $result) use ($acc, $device, $user, &$v) {
+        $params = [
+            'meipaopenid' => $meipa_openid,
+            'apiversion' => 'v2.1',
+        ];
+        $MeiPa->fetchOne($device, $user, $params, function ($request, $result) use ($acc, $device, $user, &$v) {
             if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {

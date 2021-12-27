@@ -43,10 +43,10 @@ $params = [$user, $device, new DateTime()];
 foreach ($result as $index => $adv) {
     if ($adv['data']) {
         if ($adv['data']['url']) {
-            $result[$index]['data']['url'] = PlaceHolder::url($adv['data']['url'], $params);
+            $result[$index]['data']['url'] = PlaceHolder::replace($adv['data']['url'], $params);
         }
         if ($adv['data']['link']) {
-            $result[$index]['data']['link'] = PlaceHolder::url($adv['data']['link'], $params);
+            $result[$index]['data']['link'] = PlaceHolder::replace($adv['data']['link'], $params);
         }
     }
 }

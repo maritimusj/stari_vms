@@ -2302,7 +2302,7 @@ class deviceModelObj extends modelObj
             $url = settings("misc.redirect.$when.url");
         }
 
-        return ['url' => PlaceHolder::url($url, [$this]), 'delay' => intval($delay)];
+        return ['url' => PlaceHolder::replace($url, [$this]), 'delay' => intval($delay)];
     }
 
     /**

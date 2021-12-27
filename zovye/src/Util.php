@@ -2809,7 +2809,7 @@ HTML_CONTENT;
     public static function redirect(string $url, array $params = [])
     {
         if ($params) {
-            $url = PlaceHolder::url($url, $params);
+            $url = PlaceHolder::replace($url, $params);
         }
 
         header("Location:$url", true, 302);

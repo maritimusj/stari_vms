@@ -12,7 +12,7 @@ use zovye\model\userModelObj;
 
 class PlaceHolder
 {
-    public static function url($url, $params = [])
+    public static function replace($url, $params = [])
     {
         foreach ($params as $index => $o) {
             if ($o instanceof userModelObj) {

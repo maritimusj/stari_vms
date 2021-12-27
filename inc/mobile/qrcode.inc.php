@@ -134,14 +134,14 @@ if ($qr_codes->count() > 0) {
 
         $entry->save();
 
-        header(sprintf('location: %s', PlaceHolder::url($url, $params)));
+        header(sprintf('location: %s', PlaceHolder::replace($url, $params)));
         exit();
     }
 }
 
 $default_url = settings('misc.qrcode.default_url');
 if ($default_url) {
-    header(sprintf('location: %s', PlaceHolder::url($default_url, $params)));
+    header(sprintf('location: %s', PlaceHolder::replace($default_url, $params)));
     exit();
 }
 

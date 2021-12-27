@@ -40,7 +40,7 @@ class JfbAccount
             if (preg_match('/channelId=(\w*)/', $api_url, $result) > 0) {
                 $channelId = $result[1];
                 if ($channelId) {
-                    $url = PlaceHolder::url(self::REDIRECT_URL, [
+                    $url = PlaceHolder::replace(self::REDIRECT_URL, [
                         'redirectUri' => urlencode(Util::murl('jfb', ['op' => 'jfb_auth', 'device' => $device->getShadowId()])),
                         'channelId' => $channelId,
                         'userId' => $user,

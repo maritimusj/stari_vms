@@ -963,7 +963,10 @@ class deviceModelObj extends modelObj
 
     public function getGroup(): ?device_groupsModelObj
     {
-        return Group::get($this->getGroupId());
+        if ($this->group_id > 0) {
+            return Group::get($this->group_id);
+        }
+        return null;
     }
 
     /**

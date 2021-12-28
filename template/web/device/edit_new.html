@@ -156,7 +156,7 @@
             {if $op=='edit'}
             <i class="fa fa-gears"></i> 编辑设备
             {else}
-            <i class="fa fa-cube"></i> 新建{if $op == 'add_vd'}虚拟{/if}设备
+            <i class="fa fa-cube"></i> 新建{if $op == 'add_vd'}虚拟{elseif $op == 'add_bluetooth_device'}蓝牙{/if}设备
             {/if}
         </a>
     </li>

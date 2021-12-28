@@ -1399,9 +1399,31 @@ form .inputMask {
     border-color: #056bd0;
 }
 
-img.balance, img.yen {
+img.balance, img.yen, img.icon {
     width: 16px;
     height: 16px;
+}
+
+.operate img.icon {
+    filter: grayscale(100%);
+    opacity: 0.66;    
+}
+
+.operate img.icon.disabled {
+    cursor: default;
+}
+
+.operate img.icon:not(.disabled) {
+    cursor: pointer;
+}
+
+.operate img.icon:not(.disabled):active {
+    transform: translate3d(0, 2px, 0);
+}
+
+.operate img.icon:not(.disabled):hover {
+    filter: none;
+    opacity: 1.0;    
 }
 
 img.disabled {

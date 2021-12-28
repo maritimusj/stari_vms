@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20211128');}
+{php \zovye\url(true, 'static/css/common.css?v=20211129');}
 <style>
     #devicelist .device-qrcode {
         position: relative;
@@ -291,19 +291,33 @@
         <div class="heading">
             <span class="operate">
                 {if \zovye\App::isVDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_vd'));}"><i class="fa fa-hdd-o fa-fw" title="添加虚拟设备"></i></a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_vd'));}">
+                    <img src="{MODULE_URL}static/img/vdevice.svg" class="icon" title="添加虚拟设备">
+                </a>
                 {/if}
                 {if \zovye\App::isBluetoothDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_bluetooth_device'));}"><i class="fa fa-rss fa-fw" title="添加蓝牙设备"></i></a>
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'import_bluetooth_device_upload'));}"><i class="fa fa-plus-square fa-fw" title="导入蓝牙设备"></i></a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_bluetooth_device'));}">
+                    <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon" title="添加蓝牙设备">
+                </a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'import_bluetooth_device_upload'));}">
+                    <img src="{MODULE_URL}static/img/upload_bluetooth.svg" class="icon" title="导入蓝牙设备">
+                </a>
                 {/if}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'add'));}"><i class="fa fa-cube fa-fw" title="添加新设备"></i></a>
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group'));}"><i class="fa fa-cubes fa-fw" title="分组管理"></i></a>
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'report_list'));}"><i class="fa fa-exclamation fa-fw" title="故障报告列表"></i></a>
-                <i class="fa fa-exchange fa-fw" title="通知所有设备刷新配置？" onclick="api.refreshAll();"></i>
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'clean_error'));}"><i class="fa fa-undo fa-fw" title="清除所有设备错误代码"></i></a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add'));}">
+                    <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
+                </a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group'));}">
+                    <img src="{MODULE_URL}static/img/group.svg" class="icon" title="分组管理">
+                </a>
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'report_list'));}">
+                    <img src="{MODULE_URL}static/img/malfunction.svg" class="icon" title="故障报告列表">
+                </a>
+                <img src="{MODULE_URL}static/img/reload.svg" class="icon" title="通知所有设备刷新配置？"  onclick="api.refreshAll();">
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'clean_error'));}">
+                    <img src="{MODULE_URL}static/img/clear.svg" class="icon" title="清除所有设备错误代码">
+                </a>
                 {if $upload}
-                <i class="fa fa-cloud-upload fa-fw" title="上传设备信息" onclick="api.uploadInfo();"></i>
+                <img src="{MODULE_URL}static/img/upload_device.svg" class="icon" title="上传设备信息"  onclick="api.uploadInfo();">
                 {/if}
             </span>
         </div>

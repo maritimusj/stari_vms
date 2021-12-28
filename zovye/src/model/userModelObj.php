@@ -55,8 +55,6 @@ use function zovye\is_error;
  */
 class userModelObj extends modelObj
 {
-    const UNLOCKED = 'n/a';
-
     /** @var int */
     protected $id;
 
@@ -89,9 +87,6 @@ class userModelObj extends modelObj
 
     /** @var int */
     protected $createtime;
-
-    /** @var string */
-    protected $locked_uid;
 
     private $loginData = null;
 

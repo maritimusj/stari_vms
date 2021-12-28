@@ -364,11 +364,7 @@ class api
 
     public static function reward(): array
     {
-        $user = common::getUser();
-
-        if (!$user->isWxUser()) {
-            return err('无法获得奖励，请先授权后进入！');
-        }
+        $user = \zovye\api\wx\common::getUser();
 
         if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
             return err('无法锁定用户！');

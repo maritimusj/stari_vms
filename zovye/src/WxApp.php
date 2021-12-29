@@ -26,11 +26,11 @@ class WxApp
             } else {
                 $cond['id'] = intval($id);
             }
-            $wxapp = self::findOne($cond);
-            if ($wxapp) {
-                $cache[$wxapp->getId()] = $wxapp;
-                $cache[$wxapp->getKey()] = $wxapp;
-                return $wxapp;
+            $wx_app = self::findOne($cond);
+            if ($wx_app) {
+                $cache[$wx_app->getId()] = $wx_app;
+                $cache[$wx_app->getKey()] = $wx_app;
+                return $wx_app;
             }            
         }
         return null;

@@ -8,6 +8,7 @@ namespace zovye;
 
 use DateTime;
 use zovye\model\accountModelObj;
+use zovye\model\wx_appModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -21,7 +22,7 @@ if ($op == 'save') {
         'memo' => '这个文件是小程序请求转发程序!',
     ], function () use ($url) {
         return "
-header(\"Access-Control-Allow-Origin: {$url}\");
+header(\"Access-Control-Allow-Origin: $url\");
 header(\"Access-Control-Allow-Methods: GET,POST\");
 header(\"Access-Control-Allow-Headers: Content-Type, STA-API, LLT-API\");
 header(\"Access-Control-Max-Age: 86400\");
@@ -116,10 +117,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             Config::balance('order.auto_rb', request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
 
             $promote_opts = request::array('accountPromoteBonusOption', []);
-            foreach(['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
-                Config::balance("account.promote_bonus.{$name}", in_array($name, $promote_opts) ? 1 : 0, true);
+            foreach (['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
+                Config::balance("account.promote_bonus.$name", in_array($name, $promote_opts) ? 1 : 0, true);
             }
- 
+
             Config::balance('account.promote_bonus.min', request::int('accountPromoteBonusMin'), true);
             Config::balance('account.promote_bonus.max', request::int('accountPromoteBonusMax'), true);
         }
@@ -511,8 +512,8 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         if (App::isDouyinEnabled()) {
             Config::douyin('client', [
-                'key' => request::trim('douyinClientKey', ''),
-                'secret' => request::trim('douyinClientSecret', ''),
+                'key' => request::trim('douyinClientKey'),
+                'secret' => request::trim('douyinClientSecret'),
             ], true);
         }
 
@@ -864,7 +865,7 @@ if ($op == 'account') {
         }
         $tpl_data['queue'] = Config::app('queue', []);
     }
-    $tpl_data['migrate'] = Migrate::detect(false);
+    $tpl_data['migrate'] = Migrate::detect();
 } elseif ($op == 'unlock') {
 
     app()->resetLock();
@@ -872,14 +873,14 @@ if ($op == 'account') {
 
 } elseif ($op == 'migrate') {
 
-    if (Migrate::detect(false)) {
+    if (Migrate::detect()) {
         JSON::success(['redirect' => Util::url('migrate')]);
     }
 
 } elseif ($op == 'reset') {
 
     Migrate::reset();
-    if (Migrate::detect(false)) {
+    if (Migrate::detect()) {
         JSON::success(['redirect' => Util::url('migrate')]);
     }
     JSON::success('已重置！');
@@ -917,7 +918,6 @@ if ($op == 'account') {
     }
 
     $tpl_data['agreement'] = Config::agent('agreement', []);
-    //var_dump($tpl_data);exit();
 
 } elseif ($op == 'wxapp') {
 
@@ -948,13 +948,14 @@ if ($op == 'account') {
         $query->orderBy('id desc');
 
         $list = [];
-        foreach ($query->findAll() as $wxapp) {
+        /** @var wx_appModelObj $wx_app */
+        foreach ($query->findAll() as $wx_app) {
             $data = [
-                'id' => $wxapp->getId(),
-                'name' => $wxapp->getName(),
-                'key' => $wxapp->getKey(),
-                'secret' => $wxapp->getSecret(),
-                'createtime_formatted' => date('Y-m-d H:i:s', $wxapp->getCreatetime()),
+                'id' => $wx_app->getId(),
+                'name' => $wx_app->getName(),
+                'key' => $wx_app->getKey(),
+                'secret' => $wx_app->getSecret(),
+                'createtime_formatted' => date('Y-m-d H:i:s', $wx_app->getCreatetime()),
             ];
             $list[] = $data;
         }
@@ -991,7 +992,6 @@ if ($op == 'account') {
 } elseif ($op == 'user') {
 
     $res = CtrlServ::v2_query('idcard/balance');
-    $tpl_data['idcard_balance'] = 0;
 
     if (!empty($res) && $res['status']) {
         $tpl_data['idcard_balance'] = $res['data']['balance'];
@@ -1235,7 +1235,7 @@ if ($op == 'account') {
                                 $stats = stat($local_file);
                                 if ($stats) {
                                     $fi['size'] = is_dir($local_file) ? '<文件夹>' : $stats[7];
-                                    $fi['createtime'] = (new DateTime("@{$stats[9]}"))->format('Y-m-d H:i:s');
+                                    $fi['createtime'] = (new DateTime("@$stats[9]"))->format('Y-m-d H:i:s');
                                 }
                             }
                             $result[] = $fi;
@@ -1257,8 +1257,7 @@ if ($op == 'account') {
 
 } elseif ($op == 'showTestingQrcode') {
 
-    $url = Util::murl('testing');
-    $result = Util::createQrcodeFile('testing', $url);
+    $result = Util::createQrcodeFile('testing', Util::murl('testing'));
 
     if (is_error($result)) {
         JSON::fail('创建二维码文件失败！');
@@ -1275,8 +1274,7 @@ if ($op == 'account') {
     ]);
 } elseif ($op == 'showDeviceNearbyQrcode') {
 
-    $url = Util::murl('util');
-    $result = Util::createQrcodeFile('deviceNearby', $url);
+    $result = Util::createQrcodeFile('deviceNearby', Util::murl('util'));
 
     if (is_error($result)) {
         JSON::fail('创建二维码文件失败！');
@@ -1293,8 +1291,7 @@ if ($op == 'account') {
     ]);
 } elseif ($op == 'showAgentRegQrcode') {
 
-    $url = Util::murl('mobile');
-    $result = Util::createQrcodeFile('agent', $url);
+    $result = Util::createQrcodeFile('agent', Util::murl('mobile'));
 
     if (is_error($result)) {
         JSON::fail('创建二维码文件失败！');
@@ -1318,4 +1315,4 @@ if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {
 $tpl_data['op'] = $op;
 $tpl_data['settings'] = $settings;
 
-app()->showTemplate("web/settings/{$op}", $tpl_data);
+app()->showTemplate("web/settings/$op", $tpl_data);

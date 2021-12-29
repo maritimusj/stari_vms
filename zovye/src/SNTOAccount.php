@@ -78,7 +78,7 @@ class SNTOAccount
 
             $data = $acc->format();
             $data['redirect_url'] = $auth_url . http_build_query([
-                    'redirectUrl' => Util::murl('snto', ['op' => 'stno_auth', 'device' => $device->getShadowId()]),
+                    'redirectUrl' => Util::murl('snto', ['op' => 'snto_auth', 'device' => $device->getShadowId()]),
                     'channel' => $config['channel'],
                     'mac' => $user->getOpenid(),
                 ]);

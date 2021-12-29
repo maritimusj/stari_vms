@@ -11,14 +11,14 @@ defined('IN_IA') or exit('Access Denied');
 if (App::isSNTOEnabled()) {
 
     $op = request::op('default');
-    if ($op == 'stno_auth') {
+    if ($op == 'snto_auth') {
         $user = Util::getCurrentUser();
         if (empty($user)) {
             Util::resultAlert('请用微信打开！', 'error');
         }
 
         $openid = request::str('stOpenId');
-        $user->updateSettings('customData.stno', [
+        $user->updateSettings('customData.snto', [
             'openid' => $openid,
             'createdAt' => time(),
         ]);

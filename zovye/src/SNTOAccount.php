@@ -72,11 +72,28 @@ class SNTOAccount
             return [];
         }
 
+        $stno_openid = $user->settings('customData.stno.openid', '');
+        if (empty($stno_openid)) {
+            $auth_url = self::API_URL . '/v3/qrcode/userAuth.json?';
+
+            $data = $acc->format();
+            $data['redirect_url'] = $auth_url . http_build_query([
+                    'redirectUrl' => Util::murl('stno', ['op' => 'stno_auth', 'device' => $device->getShadowId()]),
+                    'channel' => $config['channel'],
+                    'mac' => $user->getOpenid(),
+                ]);
+            $data['extraFN'] = function () use ($config) {
+                header("Auth: {$config['data']['token']}");
+            };
+
+            return [$data];
+        }
+
         $obj->token = $config['data']['token'];
 
         $v = [];
 
-        $obj->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
+        $obj->fetchOne($device, $user, $stno_openid, function ($request, $result) use ($acc, $device, $user, &$v) {
             if (App::isAccountLogEnabled()) {
                 $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                 if (empty($log)) {
@@ -203,19 +220,20 @@ class SNTOAccount
     public function fetchToken()
     {
         $url = self::API_URL . '/token/scanQr.json?' . http_build_query([
-            'app_id' => $this->id,
-            'app_key' => $this->key,
-        ]);
+                'app_id' => $this->id,
+                'app_key' => $this->key,
+            ]);
         return Util::getJSON($url);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, callable $cb = null)
+    public function fetchOne(deviceModelObj $device, userModelObj $user, $stno_openid, callable $cb = null)
     {
         $url = self::API_URL . '/v2/resource.json';
 
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
         $uid = App::uid(6);
         $data = [
+            'stOpenId' => $stno_openid,
             'channel' => $this->channel,
             'mac' => $user->getOpenid(),
             'nickname' => $fans['nickname'],

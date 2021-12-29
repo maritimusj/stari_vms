@@ -407,8 +407,15 @@ JSCODE;
         } else {
             $tpl['accounts'] = [];
         }
-        
+
         foreach ($tpl['accounts'] as $index => $account) {
+            if (isset($account['extraFN'])) {
+                $fn = $account['extraFN'];
+                if (is_callable($fn)) {
+                    $fn();
+                }
+                unset($account['extraFN']);
+            }
             //检查直接转跳的吸粉广告或公众号
             if (!empty($account['redirect_url'])) {
                 //链接转跳前，先判断设备是否在线

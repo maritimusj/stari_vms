@@ -482,28 +482,13 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
     } elseif ($save_type == 'wxapp') {
 
         if (App::isBalanceEnabled()) {
+            $reward = Config::app('wxapp.advs.reward', []);
+            $reward['id'] = request::str('reward');
             Config::app('wxapp.advs', [
                 'banner' => [
                     'id' => request::str('banner'),
                 ],
-                'reward' => [
-                    'id' => request::str('reward'),
-                    'bonus' => [
-                        'level0' => [
-                            'max' => request::int('rewardAdsNumLevel0'),
-                            'v' => request::int('rewardBonusLevel0'),
-                        ],
-                        'level1' => [
-                            'max' => request::int('rewardAdsNumLevel1'),
-                            'v' => request::int('rewardBonusLevel1'),
-                        ],
-                        'level2' => [
-                            'max' => request::int('rewardAdsNumLevel2'),
-                            'v' => request::int('rewardBonusLevel2'),
-                        ],
-                    ],
-                    'limit' => request::str('rewardBonusLimit'),
-                ],
+                'reward' => $reward,
                 'interstitial' => [
                     'id' => request::str('interstitial'),
                 ],

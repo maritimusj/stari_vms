@@ -378,17 +378,30 @@ class api
         //每日限额
         $limit = Config::app('wxapp.advs.reward.limit', 0);
         if ($limit > 0) {
-            $begin = new DateTime();
-            $begin->modify('00:00');
+            $today = new DateTime();
+            $today->modify('00:00');
 
             $total = Balance::query([
                 'openid' => $user->getOpenid(),
                 'src' => Balance::REWARD_ADV,
-                'createtime >=' => $begin->getTimestamp(),
+                'createtime >=' => $today->getTimestamp(),
             ])->count();
 
             if ($total >= $limit) {
-                return err('对不起，今天的广告奖励额度已用完！');
+                return err('今天的广告奖励额度已到达上限，明天再来！');
+            }
+        }
+
+        //最大限额
+        $max = Config::app('wxapp.advs.reward.max', 0);
+        if ($max > 0) {
+            $total = Balance::query([
+                'openid' => $user->getOpenid(),
+                'src' => Balance::REWARD_ADV,
+            ])->count();
+
+            if ($total >= $max) {
+                return err('您的广告奖励总额度已到达上限！');
             }
         }
 
@@ -396,15 +409,25 @@ class api
             'openid' => $user->getOpenid(),
             'src' => Balance::REWARD_ADV,
         ]);
+
         if ($last_reward && time() - $last_reward->getCreatetime() < 3) {
             return err('操作太快，请稍后再试！');
         }
 
         //获取用户奖励等级
-        $total = Balance::query([
+        $condition = [
             'openid' => $user->getOpenid(),
             'src' => Balance::REWARD_ADV,
-        ])->count();
+        ];
+
+        $way = Config::app('wxapp.advs.reward.w', 'all'); 
+        if ($way == 'day') {
+            $today = new DateTime();
+            $today->modify('00:00');
+            $condition['createtime >='] = $today->getTimestamp();
+        }
+
+        $total = Balance::query($condition)->count();
 
         $bonus = 0;
         foreach((array)$bonusData as $data) {

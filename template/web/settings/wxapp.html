@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20211127');}
+{php \zovye\url(true, 'static/css/common.css?v=20211128');}
 <style>
     .level-title {
         font-size: 16px;
@@ -69,67 +69,22 @@
             <div class="seg">
                 <div class="title">流量主广告位</div>
                 {loop $advs_position $index $pos}
-                {if $pos['balance']}
-                <div class="seg-divider"></div>
-                {/if}
                 <div class="form-group">
                     <label for="{$index}" class="col-md-2 control-label">{$pos['title']}</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="{$index}" id="{$index}" value="{$advsID[$index]['id']}" required>
+                        {if $pos['balance']}
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="{$index}" id="{$index}" value="{$advsID[$index]['id']}">
+                            <div class="input-group-addon operate" title="设置">
+                                <i class="fa fa-gears" data-op="rewardConfig"></i>
+                            </div>        
+                        </div>
+                        {else}
+                        <input type="text" class="form-control" name="{$index}" id="{$index}" value="{$advsID[$index]['id']}">
+                        {/if}
                         <span class="help-block">* {$pos['description']}，请填写该广告位ID，点<a href="https://ad.weixin.qq.com/guide/1189" target="_blank">这里</a>了解更多</span>
                     </div>
                 </div>
-                {if $pos['balance']}
-                <div class="form-group">
-                    <label for="{$index}AdsNum0" class="col-md-2 control-label">
-                        <span class="level-title">1级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
-                    </label>
-                    <div class="col-md-5">
-                        <input type="number" class="form-control" name="{$index}AdsNumLevel0" id="{$index}AdsNumLevel0" value="{$advsID[$index]['bonus']['level0']['max']}">
-                        <span class="help-block">* 广告数量</span>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="number" class="form-control" name="{$index}BonusLevel0" id="{$index}BonusLevel0" value="{$advsID[$index]['bonus']['level0']['v']}">
-                        <span class="help-block">* 奖励积分数量</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="{$index}AdsNum1" class="col-md-2 control-label">
-                        <span class="level-title">2级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
-                    </label>
-                    <div class="col-md-5">
-                        <input type="number" class="form-control" name="{$index}AdsNumLevel1" id="{$index}AdsNumLevel1" value="{$advsID[$index]['bonus']['level1']['max']}">
-                        <span class="help-block">* 广告数量</span>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="number" class="form-control" name="{$index}BonusLevel1" id="{$index}BonusLevel1" value="{$advsID[$index]['bonus']['level1']['v']}">
-                        <span class="help-block">* 奖励积分数量</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="{$index}AdsNum2" class="col-md-2 control-label">
-                        <span class="level-title">3级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
-                    </label>
-                    <div class="col-md-5">
-                        <input type="number" class="form-control" name="{$index}AdsNumLevel2" id="{$index}AdsNumLevel2" value="{$advsID[$index]['bonus']['level2']['max']}">
-                        <span class="help-block">* 广告数量</span>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="number" class="form-control" name="{$index}BonusLevel2" id="{$index}BonusLevel2" value="{$advsID[$index]['bonus']['level2']['v']}">
-                        <span class="help-block">* 奖励积分数量</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="{$index}BonusLimit" class="col-md-2 control-label">每日限额（次）</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="{$index}BonusLimit" id="{$index}BonusLimit" value="{php echo intval($advsID[$index]['limit'])}" min="0">
-                        <span class="help-block">* 限制每天可以获得奖励的最大次数，０表示不限制</span>
-                    </div>
-                </div>
-                {/if}
-                {if $pos['balance']}
-                <div class="seg-divider"></div>
-                {/if}
                 {/loop}
             </div>
             {/if}
@@ -176,6 +131,7 @@
     }
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableOp();
+        zovye.enableCopy('secret');
         zovye.setApiUrl("{php echo $this->createWebUrl('wxapp');}");
         zovye.op('edit', function(self, next) {
             const tr = self.closest('tr');
@@ -197,7 +153,21 @@
                }
             });
         })
-        zovye.enableCopy('secret');
+        zovye.op('saveRewardConfig', function(self, next) {
+            const form = self.closest('form');
+            next({
+                'way':  form.find('input[name=rewardWay]:checked').val(),
+                'numLevel0': form.find('input[name=rewardAdsNumLevel0]').val(),
+                'bonusLevel0': form.find('input[name=rewardBonusLevel0]').val(),
+                'numLevel1': form.find('input[name=rewardAdsNumLevel1]').val(),
+                'bonusLevel1': form.find('input[name=rewardBonusLevel1]').val(),
+                'numLevel2': form.find('input[name=rewardAdsNumLevel2]').val(),
+                'bonusLevel2': form.find('input[name=rewardBonusLevel2]').val(),
+                'limit': form.find('input[name=rewardBonusLimit]').val(),
+                'max': form.find('input[name=rewardBonusMax]').val(),                
+            });
+            $('#modal-message').modal('hide');
+        })
     });
 </script>
 {template 'common/footer'}

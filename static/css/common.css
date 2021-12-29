@@ -174,7 +174,7 @@ span.form-control {
     margin-left: 2em;
 }
 
-.panel-body .seg .seg-divider {
+.seg .seg-divider {
     width: calc(100% + 20px);
     border-top: 1px solid #CCC;
     margin: 2em 0;

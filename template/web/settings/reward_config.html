@@ -1,0 +1,78 @@
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">分级奖励</label>
+        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+            <div class="radio">
+              <label>
+                <input type="radio" name="rewardWay" id="rewardWay0" value="day" {if $config['w'] == 'day'}checked{/if}>
+                每天 <span style="color:gray;">（按用户每天观看的广告数量计算）</span>
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="rewardWay" id="rewardWay1" value="all"  {if empty($config['w']) || $config['w'] == 'all'}checked{/if}>
+               全部 <span style="color:gray;">（按用户观看的全部广告数量计算）</span>
+              </label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="rewardAdsNum0" class="col-md-2 control-label">
+            <span class="level-title">1级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+        </label>
+        <div class="col-md-5">
+            <input type="number" class="form-control" name="rewardAdsNumLevel0" id="rewardAdsNumLevel0" value="{$config['bonus']['level0']['max']}">
+            <span class="help-block">* 广告数量</span>
+        </div>
+        <div class="col-md-5">
+            <input type="number" class="form-control" name="rewardBonusLevel0" id="rewardBonusLevel0" value="{$config['bonus']['level0']['v']}">
+            <span class="help-block">* 奖励积分数量</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="rewardAdsNum1" class="col-md-2 control-label">
+            <span class="level-title">2级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+        </label>
+        <div class="col-md-5">
+            <input type="number" class="form-control" name="rewardAdsNumLevel1" id="rewardAdsNumLevel1" value="{$config['bonus']['level1']['max']}">
+            <span class="help-block">* 广告数量</span>
+        </div>
+        <div class="col-md-5">
+            <input type="number" class="form-control" name="rewardBonusLevel1" id="rewardBonusLevel1" value="{$config['bonus']['level1']['v']}">
+            <span class="help-block">* 奖励积分数量</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="rewardAdsNum2" class="col-md-2 control-label">
+            <span class="level-title">3级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+        </label>
+        <div class="col-md-5">
+            <input type="number" class="form-control" name="rewardAdsNumLevel2" id="rewardAdsNumLevel2" value="{$config['bonus']['level2']['max']}">
+            <span class="help-block">* 广告数量</span>
+        </div>
+        <div class="col-md-5">
+            <input type="number" class="form-control" name="rewardBonusLevel2" id="rewardBonusLevel2" value="{$config['bonus']['level2']['v']}">
+            <span class="help-block">* 奖励积分数量</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="rewardBonusLimit" class="col-md-2 control-label">每日限额（次）</label>
+        <div class="col-md-10">
+            <input type="number" class="form-control" name="rewardBonusLimit" id="rewardBonusLimit" value="{php echo intval($config['limit'])}" min="0">
+            <span class="help-block">* 限制每天可以获得奖励的最大次数，０表示不限制</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="rewardBonusMax" class="col-md-2 control-label">全部限额（次）</label>
+        <div class="col-md-10">
+            <input type="number" class="form-control" name="rewardBonusMax" id="rewardBonusMax" value="{php echo intval($config['max'])}" min="0">
+            <span class="help-block">* 限制单个用户最多可以获得奖励的次数，０表示不限制</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <button type="button" class="btn btn-primary" data-op="saveRewardConfig">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>

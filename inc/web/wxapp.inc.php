@@ -98,4 +98,35 @@ if ($op == 'add' || $op == 'edit') {
         'title' => $op == 'addAdvs' ? '创建广告位' : '编辑广告位',
         'content' => $content,
     ]);
+
+} elseif ($op == 'rewardConfig') {
+    $reward = Config::app('wxapp.advs.reward', []);
+    $content = app()->fetchTemplate(
+        'web/settings/reward_config',
+        [
+            'config' => $reward,
+        ]
+    );
+
+    JSON::success(['title' => '激励广告设置', 'content' => $content]);
+
+} elseif ($op == 'saveRewardConfig') {
+    Config::app('wxapp.advs.reward.bonus', [
+        'level0' => [
+            'max' => request::int('numLevel0'),
+            'v' => request::int('bonusLevel0'),
+        ],
+        'level1' => [
+            'max' => request::int('numLevel1'),
+            'v' => request::int('bonusLevel1'),
+        ],
+        'level2' => [
+            'max' => request::int('numLevel2'),
+            'v' => request::int('bonusLevel2'),
+        ],
+    ], true);
+
+    Config::app('wxapp.advs.reward.w', request::str('way'), true);
+    Config::app('wxapp.advs.reward.limit', request::str('limit'), true);
+    Config::app('wxapp.advs.reward.max', request::str('max'), true);
 }

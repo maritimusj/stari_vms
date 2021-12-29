@@ -228,7 +228,7 @@ class SNTOAccount
 
     public function fetchOne(deviceModelObj $device, userModelObj $user, $snto_openid, callable $cb = null)
     {
-        $url = self::API_URL . '/v2/resource.json';
+        $url = self::API_URL . '/v3/qrcode.json';
 
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
         $uid = App::uid(6);

@@ -191,15 +191,12 @@ function process($order_no): bool
  */
 function createOrder(string $order_no, deviceModelObj $device, userModelObj $user, pay_logsModelObj $pay_log): orderModelObj
 {
-    //定制功能：零佣金
-    $is_zero_bonus = Helper::isZeroBonus($device, Order::PAY_STR);
-
     $order_data = [
         'src' => intval($pay_log->getData('src', Order::PAY)),
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
-        'agent_id' => $is_zero_bonus ? 0 : $device->getAgentId(),
-        'device_id' => $is_zero_bonus ? 0 : $device->getId(),
+        'agent_id' => $device->getAgentId(),
+        'device_id' => $device->getId(),
         'num' => $pay_log->getTotal(),
         'price' => $pay_log->getPrice(),
         'ip' => $pay_log->getData('orderData.ip'),
@@ -213,14 +210,20 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
                 'name' => $device->getName(),
             ],
             'user' => $user->profile(),
-            'custom' => [
-                'zero_bonus' => $is_zero_bonus,
-                'device' => $device->getId(),
-                'agent' => $device->getAgentId(),
-            ],
         ],
         'result_code' => 0,
     ];
+
+    //定制功能：零佣金
+    if (Helper::isZeroBonus($device, Order::PAY_STR)) {
+        $order_data['agent_id'] = 0;
+        $order_data['device_id'] = 0;
+        $order_data['extra']['custom'] = [
+            'zero_bonus' => true,
+            'device' => $device->getId(),
+            'agent' => $device->getAgentId(),
+        ];
+    }
 
     if ($pay_log->isGoods()) {
 

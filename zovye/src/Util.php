@@ -1807,13 +1807,10 @@ HTML_CONTENT;
             /** @var goods_voucher_logsModelObj $voucher */
             $voucher = $params['voucher'];
 
-            //定制功能：零佣金
-            $is_zero_bonus = Helper::isZeroBonus($device, Order::FREE_STR);
-
             $order_data = [
                 'openid' => $user->getOpenid(),
-                'agent_id' => $is_zero_bonus ? 0 : $device->getAgentId(),
-                'device_id' => $is_zero_bonus ? 0 : $device->getId(),
+                'agent_id' => $device->getAgentId(),
+                'device_id' => $device->getId(),
                 'src' => Order::ACCOUNT,
                 'name' => $goods['name'],
                 'goods_id' => $goods['id'],
@@ -1828,13 +1825,20 @@ HTML_CONTENT;
                         'name' => $device->getName(),
                     ],
                     'user' => $user->profile(),
-                    'custom' => [
-                        'zero_bonus' => $is_zero_bonus,
-                        'device' => $device->getId(),
-                        'agent' => $device->getAgentId(),
-                    ]
                 ],
             ];
+
+            //定制功能：零佣金
+            $is_zero_bonus = Helper::isZeroBonus($device, Order::FREE_STR);
+            if ($is_zero_bonus) {
+                $order_data['agent_id'] = 0;
+                $order_data['device_id'] = 0;
+                $order_data['extra']['custom'] = [
+                    'zero_bonus' => true,
+                    'device' => $device->getId(),
+                    'agent' => $device->getAgentId(),
+                ];
+            }
 
             if ($acc) {
                 $order_data['extra']['account'] = [

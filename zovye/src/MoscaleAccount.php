@@ -79,8 +79,9 @@ class MoscaleAccount
                     $data['name'] = $result['data']['name'] ?: Account::MOSCALE_NAME;
                     $data['qrcode'] = $result['data']['qrcode_url'];
                     if ($result['data']['rand_key']) {
+                        $rand_key = $result['data']['rand_key'];
                         $data['descr'] = PlaceHolder::replace($data['descr'], [
-                            'key' => "<span data-key=\"{$result['data']['rand_key']}\">{$result['data']['rand_key']}</span>",
+                            'key' => "<span data-key=\"$rand_key\">$rand_key</span>",
                         ]);
                     }
 

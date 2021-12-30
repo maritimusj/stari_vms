@@ -294,12 +294,15 @@ class Account extends State
                 $index .= $acc->getId();
             }
             $list[$index] = function () use ($getter_fn, $acc, $device, $user) {
-                //检查用户是否允许
-                $res = Util::checkAvailable($user, $acc, $device);
+                if ($acc->getBonusType() == Account::BALANCE) {
+                    $res = Util::checkBalanceAvailable($user, $acc);
+                } else {
+                    //检查用户是否允许
+                    $res = Util::checkAvailable($user, $acc, $device);
+                }
                 if (is_error($res)) {
                     return $res;
                 }
-
                 return $getter_fn($acc);
             };
             return true;

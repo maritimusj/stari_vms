@@ -965,19 +965,21 @@ include './index.php';
             //更新统计
             $stats_objs = [app()];
 
-            $device = $order->getDevice();
-            if ($device) {
-                $stats_objs[] = $device;
-            }
+            if (!$order->isZeroBonus()) {
+                $device = $order->getDevice();
+                if ($device) {
+                    $stats_objs[] = $device;
+                }
 
-            $agent = $order->getAgent();
-            if ($agent) {
-                $stats_objs[] = $agent;
-            }
+                $agent = $order->getAgent();
+                if ($agent) {
+                    $stats_objs[] = $agent;
+                }
 
-            $goods = $order->getGoods();
-            if ($goods) {
-                $stats_objs[] = $goods;
+                $goods = $order->getGoods();
+                if ($goods) {
+                    $stats_objs[] = $goods;
+                }
             }
 
             Stats::update($order, $stats_objs);

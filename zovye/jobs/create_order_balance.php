@@ -255,14 +255,17 @@ function createOrder(string          $order_no,
                      array           $goods,
                      balanceModelObj $balance): orderModelObj
 {
+    //定制功能：零佣金
+    $is_zero_bonus = Helper::isZeroBonus($device, Order::BALANCE_STR);
+
     $order_data = [
         'name' => $goods['name'],
         'goods_id' => $goods['id'],
         'src' => Order::BALANCE,
         'order_id' => $order_no,
         'openid' => $user->getOpenid(),
-        'agent_id' => $device->getAgentId(),
-        'device_id' => $device->getId(),
+        'agent_id' => $is_zero_bonus ? 0 : $device->getAgentId(),
+        'device_id' => $is_zero_bonus ? 0 : $device->getId(),
         'num' => $balance->getExtraData('num'),
         'price' => 0,
         'balance' => abs($balance->getXVal()),
@@ -278,6 +281,11 @@ function createOrder(string          $order_no,
                 'id' => $balance->getId(),
             ],
             'goods' => $goods,
+            'custom' => [
+                'zero_bonus' => $is_zero_bonus,
+                'device' => $device->getId(),
+                'agent' => $device->getAgentId(),
+            ],
         ],
         'result_code' => 0,
     ];

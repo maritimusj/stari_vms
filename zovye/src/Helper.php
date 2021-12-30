@@ -149,20 +149,37 @@ class Helper
         return $list;
     }
 
-    public static function isZeroBonus(deviceModelObj $device): bool
+    public static function isZeroBonus(deviceModelObj $device, $w): bool
     {
         if (App::isZeroBonusEnabled()) {
-            $v = $device->settings('extra.custom.bonus.zero.v', -1.0);
-            if ($v < 0) {
-                $agent = $device->getAgent();
-                if ($agent) {
-                    $v = $agent->settings('agentData.custom.bonus.zero.v', -1.0);
-                }
-                if ($v < 0) {
-                    $v = settings('custom.bonus.zero.v', -1.0);
+            $zero = $device->settings('extra.custom.bonus.zero', []);
+
+            $enabled = false;
+            if ($w == Order::PAY_STR && $zero['order']['p']) {
+                $enabled = true;
+            } elseif ($w == Order::FREE_STR && $zero['order']['f']) {
+                $enabled = true;
+            } elseif ($w == Order::BALANCE_STR) {
+                if (Balance::isFreeOrder() && $zero['order']['f']) {
+                    $enabled = true;
+                } elseif (Balance::isPayOrder() && $zero['order']['p']) {
+                    $enabled = true;
                 }
             }
-            return $v > 0 && mt_rand(1, 10000) <= intval($v * 100);
+
+            if ($enabled) {
+                $v = $zero['v'];
+                if ($v < 0) {
+                    $agent = $device->getAgent();
+                    if ($agent) {
+                        $v = $agent->settings('agentData.custom.bonus.zero.v', -1.0);
+                    }
+                    if ($v < 0) {
+                        $v = settings('custom.bonus.zero.v', -1.0);
+                    }
+                }
+                return $v > 0 && mt_rand(1, 10000) <= intval($v * 100);
+            }
         }
 
         return false;
@@ -242,15 +259,18 @@ class Helper
             $device->setError($result['data']['errno'], $result['data']['message']);
             $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
         } else {
-            $locker = $device->payloadLockAcquire(3);
-            if (empty($locker)) {
-                return error(State::ERROR, '设备正忙，请重试！');
+            //如果不是零佣金订单，则记录库存变动
+            if (!$order->isZeroBonus()) {
+                $locker = $device->payloadLockAcquire(3);
+                if (empty($locker)) {
+                    return error(State::ERROR, '设备正忙，请重试！');
+                }
+                $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
+                if (is_error($res)) {
+                    return err('保存库存失败！');
+                }
+                $locker->unlock();
             }
-            $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
-            if (is_error($res)) {
-                return err('保存库存失败！');
-            }
-            $locker->unlock();
         }
 
         $device->save();

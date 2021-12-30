@@ -1808,7 +1808,7 @@ HTML_CONTENT;
             $voucher = $params['voucher'];
 
             //定制功能：零佣金
-            $is_zero_bonus = Helper::isZeroBonus($device);
+            $is_zero_bonus = Helper::isZeroBonus($device, Order::FREE_STR);
 
             $order_data = [
                 'openid' => $user->getOpenid(),
@@ -1942,7 +1942,7 @@ HTML_CONTENT;
                 }
             } else {
                 $order->setResultCode(0);
-
+                //如果是零佣金，则不记录库存变动
                 if (!$is_zero_bonus) {
                     if (isset($goods['cargo_lane'])) {
                         $locker = $device->payloadLockAcquire(3);

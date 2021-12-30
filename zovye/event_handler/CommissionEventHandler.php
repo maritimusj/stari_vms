@@ -32,6 +32,10 @@ class CommissionEventHandler
             return true;
         }
 
+        if (App::isZeroBonusEnabled() && $order->isZeroBonus()) {
+            return true;
+        }
+
         if ($account) {
             return self::free($device, $order, $account);
         }
@@ -55,10 +59,6 @@ class CommissionEventHandler
      */
     protected static function balance(deviceModelObj $device, orderModelObj $order): bool
     {
-        if (Balance::isFreeOrder() && App::isZeroBonusEnabled() && $order->getExtraData('custom.zero_bonus', false)) {
-            return true;
-        }
-
         $commission_price = Config::balance('order.commission.val', 0) * $order->getNum();
 
         return self::processCommissions($device, $order, $commission_price);
@@ -84,11 +84,82 @@ class CommissionEventHandler
             }
         }
 
-        if (App::isZeroBonusEnabled() && $order->getExtraData('custom.zero_bonus', false)) {
+        return self::processCommissions($device, $order, $account->getCommissionPrice());
+    }
+
+    /**
+     * 处理支付订单的佣金分配
+     * 第1步，扣除平台费用
+     * 第2步，计算商品利润（减去成本价）
+     * 第3步，对利润进行佣金分配
+     *       1，处理佣金分享用户
+     *       2，处理营运人员佣金
+     * 第4步，成本及剩余利润分配给代理商
+     *
+     * @param deviceModelObj $device
+     * @param orderModelObj $order
+     * @return bool
+     * @throws Exception
+     */
+    protected static function pay(deviceModelObj $device, orderModelObj $order): bool
+    {
+        $agent = $device->getAgent();
+        if (empty($agent)) {
             return true;
         }
 
-        return self::processCommissions($device, $order, $account->getCommissionPrice());
+        if (!$agent->isCommissionEnabled()) {
+            return true;
+        }
+
+        $commission_price = $order->getCommissionPrice();
+
+        //第1步，扣除平台费用
+        $commission_price = self::ProcessFee($commission_price, $agent, $order);
+        if ($commission_price < 1) {
+            return true;
+        }
+
+        $order->setExtraData('commission.local.total', $commission_price);
+
+        //第2步，计算商品利润（减去成本价）
+        $goods = $order->getGoods();
+
+        $costPrice = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
+
+        $commission_price -= $costPrice;
+
+        //第3步，对利润进行佣金分配
+        if ($commission_price > 0) {
+            $commission_price = self::processProfit($device, $order, $agent, $commission_price);
+        }
+
+        //第4步，成本及剩余利润分配给代理商
+        if ($goods && empty($goods->getExtraData('cw', 0))) {
+            //成本参与分佣
+            $commission_price += $costPrice;
+        }
+
+        if ($commission_price < 1) {
+            return true;
+        }
+
+        $balance = $agent->getCommissionBalance();
+
+        $r = $balance->change($commission_price, CommissionBalance::ORDER_WX_PAY, ['orderid' => $order->getId()]);
+        if ($r && $r->update([], true)) {
+            //记录佣金
+            $order->setExtraData('commission.agent', [
+                'id' => $r->getId(),
+                'xval' => $r->getXVal(),
+                'openid' => $agent->getOpenid(),
+                'name' => $agent->getName(),
+            ]);
+        } else {
+            throw new Exception('创建代理佣金数据失败！', State::ERROR);
+        }
+
+        return true;
     }
 
     /**
@@ -363,81 +434,6 @@ class CommissionEventHandler
 
         //处理营运人员佣金
         return self::processKeeperCommissions($commission_price, $device, $order);
-    }
-
-    /**
-     * 处理支付订单的佣金分配
-     * 第1步，扣除平台费用
-     * 第2步，计算商品利润（减去成本价）
-     * 第3步，对利润进行佣金分配
-     *       1，处理佣金分享用户
-     *       2，处理营运人员佣金
-     * 第4步，成本及剩余利润分配给代理商
-     *
-     * @param deviceModelObj $device
-     * @param orderModelObj $order
-     * @return bool
-     * @throws Exception
-     */
-    protected static function pay(deviceModelObj $device, orderModelObj $order): bool
-    {
-        $agent = $device->getAgent();
-        if (empty($agent)) {
-            return true;
-        }
-
-        if (!$agent->isCommissionEnabled()) {
-            return true;
-        }
-
-        $commission_price = $order->getCommissionPrice();
-
-        //第1步，扣除平台费用
-        $commission_price = self::ProcessFee($commission_price, $agent, $order);
-        if ($commission_price < 1) {
-            return true;
-        }
-
-        $order->setExtraData('commission.local.total', $commission_price);
-
-        //第2步，计算商品利润（减去成本价）
-        $goods = $order->getGoods();
-
-        $costPrice = empty($goods) ? 0 : $goods->getCostPrice() * $order->getNum();
-
-        $commission_price -= $costPrice;
-
-        //第3步，对利润进行佣金分配
-        if ($commission_price > 0) {
-            $commission_price = self::processProfit($device, $order, $agent, $commission_price);
-        }
-
-        //第4步，成本及剩余利润分配给代理商
-        if ($goods && empty($goods->getExtraData('cw', 0))) {
-            //成本参与分佣
-            $commission_price += $costPrice;
-        }
-
-        if ($commission_price < 1) {
-            return true;
-        }
-
-        $balance = $agent->getCommissionBalance();
-
-        $r = $balance->change($commission_price, CommissionBalance::ORDER_WX_PAY, ['orderid' => $order->getId()]);
-        if ($r && $r->update([], true)) {
-            //记录佣金
-            $order->setExtraData('commission.agent', [
-                'id' => $r->getId(),
-                'xval' => $r->getXVal(),
-                'openid' => $agent->getOpenid(),
-                'name' => $agent->getName(),
-            ]);
-        } else {
-            throw new Exception('创建代理佣金数据失败！', State::ERROR);
-        }
-
-        return true;
     }
 
     /**

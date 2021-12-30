@@ -50,6 +50,11 @@ class Order extends State
     const ALI_TICKET = 3;
     const VOUCHER = 10;
     const BALANCE = 20;
+
+    const PAY_STR = 'pay';
+    const FREE_STR = 'free';
+    const BALANCE_STR = 'balance';
+
     /**
      * @param mixed $condition
      * @return ModelObjFinderProxy
@@ -226,7 +231,7 @@ class Order extends State
 
     public static function refund2($order_no, $total, array $refund_data = [])
     {
-        return Util::transactionDo(function () use($order_no, $total, $refund_data) {
+        return Util::transactionDo(function () use ($order_no, $total, $refund_data) {
             $order = Order::get($order_no, true);
             if (empty($order)) {
                 //尝试订单id查找订单
@@ -700,10 +705,10 @@ class Order extends State
         $query = self::query();
 
         $condition = [];
-    
+
         //指定用户
         $condition['openid'] = $user->getOpenid();
-    
+
         if ($way == 'free') {
             if (Balance::isFreeOrder()) {
                 $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
@@ -719,12 +724,12 @@ class Order extends State
         } elseif ($way == 'balance') {
             $condition['src'] = Order::BALANCE;
         }
-    
+
         $query->where($condition);
-    
+
         $page = max(1, $page);
         $page_size = max(1, $page_size);
-    
+
         $total = $query->count();
         if (ceil($total / $page_size) < $page) {
             $page = 1;
@@ -750,14 +755,14 @@ class Order extends State
                 'agentId' => $entry->getAgentId(),
                 'status' => '',
             ];
-    
+
             if ($balance_enabled && $entry->getBalance() > 0) {
                 $data['balance'] = $entry->getBalance();
             }
-    
+
             //商品
             $data['goods'] = $entry->getExtraData('goods', []);
-    
+
             //设备信息
             $device_id = $entry->getDeviceId();
             $device_obj = Device::get($device_id);
@@ -767,7 +772,7 @@ class Order extends State
                     'id' => $device_obj->getId(),
                 ];
             }
-    
+
             $src = $entry->getSrc();
             if ($src == Order::PAY) {
                 $data['type'] = '支付订单';
@@ -779,19 +784,19 @@ class Order extends State
                 $data['type'] = '免费订单';
                 $data['tips'] = ['text' => '免费', 'class' => 'free'];
             }
-    
+
             if ($src == Order::PAY && $entry->getExtraData('refund')) {
                 $time = $entry->getExtraData('refund.createtime');
                 $time_formatted = date('Y-m-d H:i:s', $time);
                 $data['refund'] = "已退款，退款时间：$time_formatted";
                 $data['clr'] = '#8bc34a';
             }
-    
+
             $pay_result = $entry->getExtraData('payResult');
             if ($pay_result['result'] === 'success') {
                 $data['uniontid'] = $pay_result['uniontid'] ?? $pay_result['transaction_id'];
             }
-    
+
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
 
@@ -814,7 +819,7 @@ class Order extends State
             } else {
                 $pay_type = '未知';
             }
-    
+
             $data['pay_type'] = $pay_type;
             $result[] = $data;
         }

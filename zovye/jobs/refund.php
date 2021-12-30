@@ -117,12 +117,16 @@ Log::debug('refund', $log);
 
 function resetPayload(orderModelObj $order, int $num = 0): array
 {
+    if ($order->isZeroBonus()) {
+        return ['msg' => '零佣金订单，无需重置库存！'];
+    }
+
     $device = $order->getDevice();
     if ($device) {
         $goods_id = $order->getGoodsId();
         $total = $num == 0 ? $order->getNum() : $num;
 
-        $locker = $device->payloadLockAcquire(30);
+        $locker = $device->payloadLockAcquire(10);
         if ($locker) {
             $device->resetGoodsNum($goods_id, '+' . $total, "订单退款：{$order->getOrderNO()}");
         } else {
@@ -139,9 +143,13 @@ function resetPayload(orderModelObj $order, int $num = 0): array
 
 function resetPayload2(orderModelObj $order): array
 {
+    if ($order->isZeroBonus()) {
+        return ['msg' => '零佣金订单，无需重置库存！'];
+    }
+
     $device = $order->getDevice();
     if ($device) {
-        $locker = $device->payloadLockAcquire(30);
+        $locker = $device->payloadLockAcquire(10);
         if (empty($locker)) {
             return error(State::ERROR, '锁定设备库存失败!');
         }

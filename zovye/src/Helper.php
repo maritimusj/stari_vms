@@ -155,16 +155,20 @@ class Helper
             $zero = $device->settings('extra.custom.bonus.zero', []);
 
             $enabled = false;
-            if ($w == Order::PAY_STR && $zero['order']['p']) {
+            if (empty($zero['order'])) {
                 $enabled = true;
-            } elseif ($w == Order::FREE_STR && $zero['order']['f']) {
-                $enabled = true;
-            } elseif ($w == Order::BALANCE_STR) {
-                if (Balance::isFreeOrder() && $zero['order']['f']) {
+            } else {
+                if ($w == Order::PAY_STR && $zero['order']['p']) {
                     $enabled = true;
-                } elseif (Balance::isPayOrder() && $zero['order']['p']) {
+                } elseif ($w == Order::FREE_STR && $zero['order']['f']) {
                     $enabled = true;
-                }
+                } elseif ($w == Order::BALANCE_STR) {
+                    if (Balance::isFreeOrder() && $zero['order']['f']) {
+                        $enabled = true;
+                    } elseif (Balance::isPayOrder() && $zero['order']['p']) {
+                        $enabled = true;
+                    }
+                }                
             }
 
             if ($enabled) {

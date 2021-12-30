@@ -252,7 +252,7 @@ TEXT;
                 $img = Util::toMedia($goods['img'], true);
                 $line .= "<dt>商品</dt><dd class=\"goods\"><img src=\"$img\" >{$goods['name']} x$num</dd>";
             }
-            $device = Device::get($entry->getExtraData('device'));
+            $device = $entry->getDevice();
             if ($device) {
                 $line .= "<dt>设备</dt><dd class=\"goods\">{$device->getName()}</dd>";
             }

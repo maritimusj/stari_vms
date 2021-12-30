@@ -263,25 +263,25 @@
             {/if}
             {if \zovye\App::isZeroBonusEnabled()}
             <div class="seg">
-                <div class="title">佣金</div>
+                <div class="title">零佣金</div>
                 <div class="form-group">
-                    <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
+                    <label class="col-md-2 control-label">订单类型</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="zeroBonusOrderFree" value="free" {if empty($settings['custom']['bonus']['zero']['order']) || $settings['custom']['bonus']['zero']['order']['f']}checked{/if}> 免费订单
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="zeroBonusOrderPay" value="pay" {if empty($settings['custom']['bonus']['zero']['order']) || $settings['custom']['bonus']['zero']['order']['p']}checked{/if}> 支付订单
+                        </label>
+                        <span class="help-block">* 请勾选零佣金订单是否包括免费订单和支付订单</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="zeroBonus" class="col-md-2 control-label">概率(%)</label>
                     <div class="col-md-10">
                         <input type="number" step="0.01" class="form-control" name="zeroBonus" id="zeroBonus" value="{$settings['custom']['bonus']['zero']['v']}">
                         <span class="help-block"></span>
                     </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">订单类型</label>
-                <div class="col-md-10">
-                    <label class="checkbox-inline">
-                        <input type="checkbox" name="zeroBonusOrderFree" value="free" {if $settings['custom']['bonus']['zero']['order']['f']}checked{/if}> 免费订单
-                    </label>
-                    <label class="checkbox-inline">
-                        <input type="checkbox" name="zeroBonusOrderPay" value="pay" {if $settings['custom']['bonus']['zero']['order']['p']}checked{/if}> 支付订单
-                    </label>
-                    <span class="help-block">* 请勾选零佣金订单是否包括免费订单和支付订单</span>
                 </div>
             </div>
             {/if}

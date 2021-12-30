@@ -152,30 +152,34 @@ class Helper
     public static function isZeroBonus(deviceModelObj $device, $w): bool
     {
         if (App::isZeroBonusEnabled()) {
-            $zero = $device->settings('extra.custom.bonus.zero', []);
+            $zero = settings('custom.bonus.zero', []);
 
             $enabled = false;
-            if ($w == Order::PAY_STR && $zero['order']['p']) {
+            if (empty($zero['order'])) {
                 $enabled = true;
-            } elseif ($w == Order::FREE_STR && $zero['order']['f']) {
-                $enabled = true;
-            } elseif ($w == Order::BALANCE_STR) {
-                if (Balance::isFreeOrder() && $zero['order']['f']) {
+            } else {
+                if ($w == Order::PAY_STR && $zero['order']['p']) {
                     $enabled = true;
-                } elseif (Balance::isPayOrder() && $zero['order']['p']) {
+                } elseif ($w == Order::FREE_STR && $zero['order']['f']) {
                     $enabled = true;
-                }
+                } elseif ($w == Order::BALANCE_STR) {
+                    if (Balance::isFreeOrder() && $zero['order']['f']) {
+                        $enabled = true;
+                    } elseif (Balance::isPayOrder() && $zero['order']['p']) {
+                        $enabled = true;
+                    }
+                }                
             }
 
             if ($enabled) {
-                $v = $zero['v'];
+                $v = $device->settings('extra.custom.bonus.zero.v', -1.0);
                 if ($v < 0) {
                     $agent = $device->getAgent();
                     if ($agent) {
                         $v = $agent->settings('agentData.custom.bonus.zero.v', -1.0);
                     }
                     if ($v < 0) {
-                        $v = settings('custom.bonus.zero.v', -1.0);
+                        $v = $zero['v'];
                     }
                 }
                 return $v > 0 && mt_rand(1, 10000) <= intval($v * 100);

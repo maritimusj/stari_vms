@@ -449,7 +449,7 @@ class mp
                 //不再要求用户填写唯一的name
                 do {
                     $name = Util::random(16, true);
-                } while(Account::findOneFromName($name));
+                } while (Account::findOneFromName($name));
                 $data['name'] = $name;
             } else {
                 $account = Account::findOneFromName($data['name']);
@@ -477,8 +477,8 @@ class mp
         if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
             if ($account->isAuth()) {
                 $account->updateSettings('config.open', [
-                        'timing' => request::int('OpenTiming'),
-                        'msg' => request::str('OpenMsg'),                    
+                    'timing' => request::int('OpenTiming'),
+                    'msg' => request::str('OpenMsg'),
                 ]);
             } elseif ($account->isVideo()) {
                 $account->set('config', [
@@ -584,13 +584,13 @@ class mp
             'op' => 'get_openid',
             'uid' => $account_uid,
         ]);
-     
+
         $result = Util::createQrcodeFile("douyin_$account_uid", DouYin::redirectToAuthorizeUrl($url, true));
-    
+
         if (is_error($result)) {
             return err('创建二维码文件失败！');
         }
-    
+
         return [
             'uid' => $account_uid,
             'qrcode_url' => Util::toMedia($result),

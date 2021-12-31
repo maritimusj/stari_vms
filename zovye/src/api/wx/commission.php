@@ -321,7 +321,7 @@ class commission
             if (is_error($res)) {
                 return $res;
             }
-            
+
             $data = array_merge($data, $res);
         }
 

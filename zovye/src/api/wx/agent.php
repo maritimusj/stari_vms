@@ -209,7 +209,7 @@ class agent
         if ($data) {
             $result['debug'] = intval($data['debug']);
         }
-        
+
         return $result;
     }
 
@@ -1845,7 +1845,7 @@ class agent
                 ];
                 $device_keys[] = $item->getId();
             }
-            
+
             if ($device_id != 0) {
                 $d_id = request::int('deviceid');
                 if (in_array($d_id, $device_keys)) {

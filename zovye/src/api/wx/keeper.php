@@ -287,7 +287,7 @@ class keeper
                 $query->whereOr([
                     'name LIKE' => "%$keyword%",
                     'mobile LIKE' => "%$keyword%",
-                ]);                
+                ]);
             }
         }
 
@@ -887,7 +887,7 @@ class keeper
         if (request::isset('lane')) {
             $num = request::int('num');
             $data = [
-                request::int('lane') => $num != 0 ? '@' . $num :  0,
+                request::int('lane') => $num != 0 ? '@' . $num : 0,
             ];
         } else {
             $data = [];

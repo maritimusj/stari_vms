@@ -33,7 +33,6 @@ use function zovye\settings;
 
 class device
 {
-
     /**
      * 格式化设备信息.
      *

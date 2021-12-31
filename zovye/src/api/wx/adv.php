@@ -28,7 +28,6 @@ use function zovye\is_error;
 
 class adv
 {
-
     /**
      * 保存广告分配.
      *

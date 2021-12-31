@@ -26,7 +26,6 @@ use function zovye\error;
 
 class order
 {
-
     public static function detail(): array
     {
         $order_id = request::int('orderid');

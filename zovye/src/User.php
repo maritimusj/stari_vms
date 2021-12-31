@@ -15,15 +15,12 @@ use zovye\base\modelObjFinder;
  */
 class User
 {
-    const WX = 0;
-    const WxAPP = 1;
-    const ALI = 2;
-    const DouYin = 3;
-
-    //API用户
-    const API = 10;
-    //第三方公众号
-    const THIRD_ACCOUNT = 15;
+    const WX = 0;   //微信H5用户
+    const WxAPP = 1;    //微信小程序用户
+    const ALI = 2;  //阿里支付宝用户
+    const DouYin = 3;   //抖音用户
+    const API = 10;     //API用户
+    const THIRD_ACCOUNT = 15;   //第三方公众号
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -35,15 +32,15 @@ class User
     const GSPOR = 'gspor';
     const TESTER = 'tester';
 
-    const ORDER_ACCOUNT_LOCKER  = 'account::order';
+    const ORDER_ACCOUNT_LOCKER = 'account::order';
     const ORDER_LOCKER = 'order';
     const COMMISSION_BALANCE_LOCKER = 'commission::balance';
     const BALANCE_LOCKER = 'balance';
     const TASK_LOCKER = 'task';
     const DAILY_SIGN_IN_LOCKER = 'balance:daily:sign_in';
     const BALANCE_GIVE_LOCKER = 'balance:give';
-    const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
 
+    const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
 
     public static function getTableName(): string
     {
@@ -82,7 +79,7 @@ class User
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL . "static/img/api.svg",
             ],
-           'third' => [
+            'third' => [
                 'name' => 'api',
                 'title' => '第三方公众号授权用户',
                 'color' => '#4CAF50',

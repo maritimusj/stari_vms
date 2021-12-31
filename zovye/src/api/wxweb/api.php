@@ -420,7 +420,7 @@ class api
             'src' => Balance::REWARD_ADV,
         ];
 
-        $way = Config::app('wxapp.advs.reward.w', 'all'); 
+        $way = Config::app('wxapp.advs.reward.w', 'all');
         if ($way == 'day') {
             $today = new DateTime();
             $today->modify('00:00');
@@ -430,7 +430,7 @@ class api
         $total = Balance::query($condition)->count();
 
         $bonus = 0;
-        foreach((array)$bonusData as $data) {
+        foreach ((array)$bonusData as $data) {
             if ($total > $data['max']) {
                 $total -= $data['max'];
                 continue;

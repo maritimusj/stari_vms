@@ -14,7 +14,6 @@ use function zovye\error;
 
 class group
 {
-
     /**
      * 设备分组列表.
      *

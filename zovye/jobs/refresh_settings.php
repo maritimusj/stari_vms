@@ -14,6 +14,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\request;
 use zovye\Util;
+use function zovye\_W;
 use function zovye\is_error;
 
 $op = request::op('default');
@@ -63,6 +64,7 @@ if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
     }
 
     Log::debug('refresh_settings', [
+        'domain' => _W('siteroot'),
         'time' => date('Y-m-d H:i:s'),
         'msg' => 'refresh settings Ok!',
     ]);

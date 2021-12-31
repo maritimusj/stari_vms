@@ -753,17 +753,12 @@ class Account extends State
         $uid = self::makeThirdPartyPlatformUID($type, $name);
         $account = self::findOne(['uid' => $uid]);
         if ($account) {
-            if ($account->getType() != $type) {
-                return null;
-            }
-
+            $account->setType($type);
             $account->setName($name);
             $account->setTitle($name);
             $account->setImg($img);
             $account->setUrl($url);
-
             $account->save();
-
             return $account;
         }
 

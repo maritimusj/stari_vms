@@ -263,18 +263,15 @@ class Helper
             $device->setError($result['data']['errno'], $result['data']['message']);
             $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
         } else {
-            //如果不是零佣金订单，则记录库存变动
-            if (!$order->isZeroBonus()) {
-                $locker = $device->payloadLockAcquire(3);
-                if (empty($locker)) {
-                    return error(State::ERROR, '设备正忙，请重试！');
-                }
-                $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
-                if (is_error($res)) {
-                    return err('保存库存失败！');
-                }
-                $locker->unlock();
+            $locker = $device->payloadLockAcquire(3);
+            if (empty($locker)) {
+                return error(State::ERROR, '设备正忙，请重试！');
             }
+            $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
+            if (is_error($res)) {
+                return err('保存库存失败！');
+            }
+            $locker->unlock();
         }
 
         $device->save();

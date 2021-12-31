@@ -752,7 +752,8 @@ include './index.php';
         return self::checkAccountLimits($user, $account, $params);
     }
 
-    public static function checkFreeOrderLimits(userModelObj $user, deviceModelObj $device) {
+    public static function checkFreeOrderLimits(userModelObj $user, deviceModelObj $device)
+    {
         //每日免费额度限制
         if (Util::getUserTodayFreeNum($user, $device) < 1) {
             return error(State::ERROR, '今天领的太多了，明天再来吧！');
@@ -1831,8 +1832,7 @@ HTML_CONTENT;
             ];
 
             //定制功能：零佣金
-            $is_zero_bonus = Helper::isZeroBonus($device, Order::FREE_STR);
-            if ($is_zero_bonus) {
+            if (Helper::isZeroBonus($device, Order::FREE_STR)) {
                 $order_data['agent_id'] = 0;
                 $order_data['device_id'] = 0;
                 $order_data['extra']['custom'] = [
@@ -1948,26 +1948,24 @@ HTML_CONTENT;
                 }
             } else {
                 $order->setResultCode(0);
-                //如果是零佣金，则不记录库存变动
-                if (!$is_zero_bonus) {
-                    if (isset($goods['cargo_lane'])) {
-                        $locker = $device->payloadLockAcquire(3);
-                        if (empty($locker)) {
-                            return error(State::ERROR, '设备正忙，请重试！');
-                        }
-                        $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
-                        if (is_error($v)) {
-                            return error(State::ERROR, '保存库存失败！');
-                        }
-                        $locker->unlock();
-                    }
 
-                    if ($voucher) {
-                        $voucher->setUsedUserId($user->getId());
-                        $voucher->setUsedtime(time());
-                        if (!$voucher->save()) {
-                            return error(State::ERROR, '出货失败：使用取货码失败！');
-                        }
+                if (isset($goods['cargo_lane'])) {
+                    $locker = $device->payloadLockAcquire(3);
+                    if (empty($locker)) {
+                        return error(State::ERROR, '设备正忙，请重试！');
+                    }
+                    $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                    if (is_error($v)) {
+                        return error(State::ERROR, '保存库存失败！');
+                    }
+                    $locker->unlock();
+                }
+
+                if ($voucher) {
+                    $voucher->setUsedUserId($user->getId());
+                    $voucher->setUsedtime(time());
+                    if (!$voucher->save()) {
+                        return error(State::ERROR, '出货失败：使用取货码失败！');
                     }
                 }
             }
@@ -2871,7 +2869,7 @@ HTML_CONTENT;
     public static function selectSiteUrl()
     {
         $siteurl = _W('siteurl');
-        $domain  = settings('app.domain', []);
+        $domain = settings('app.domain', []);
         if (empty($domain['enabled']) || empty($domain['main']) || empty($domain['bak'])) {
             return false;
         }
@@ -2882,7 +2880,7 @@ HTML_CONTENT;
 
         $url = array_rand(array_flip($domain['bak']));
         if (empty($url)) {
-           return false;
+            return false;
         }
 
         return str_replace($domain['main'], $url, $siteurl);

@@ -422,6 +422,11 @@
                 next();
             }
         })
+        zovye.op('refresh', function(self, next) {
+            if (confirm('确定要以当前域名刷新相关配置吗？')) {
+                next();
+            }
+        })
         zovye.enableInputMask();
     });
     require(["{php \zovye\url(false, JS_VUE_URL);}"], function(Vue) {

@@ -151,7 +151,7 @@ class CtrlServ
                 $headers['llt-sign'] = $sign;
             } else {
                 $headers['zovye-key'] = $appKey;
-                $headers['zovye-sign'] = self::makeCtrlServerSign(settings('ctrl.appKey', ''), settings('ctrl.appSecret', ''), $params['nostr']);                
+                $headers['zovye-sign'] = self::makeCtrlServerSign(settings('ctrl.appKey', ''), settings('ctrl.appSecret', ''), $params['nostr']);
             }
 
             return self::$http_client->request($ctrlServerUrl, $method, $headers, $body);
@@ -228,7 +228,7 @@ class CtrlServ
     {
         if ($app_id) {
             $topic = ["app/$app_id"];
-            
+
             $data = [
                 'op' => $op,
                 'serial' => microtime(true) . '',
@@ -327,10 +327,10 @@ class CtrlServ
 
     /**
      * 检查job参数的签名
-     * @param $params
+     * @param array $params
      * @return bool
      */
-    public static function checkJobSign($params): bool
+    public static function checkJobSign(array $params = []): bool
     {
         $params = is_array($params) ? $params : [$params];
 

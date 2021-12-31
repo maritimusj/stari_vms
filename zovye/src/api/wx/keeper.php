@@ -166,7 +166,7 @@ class keeper
             }
 
             if ($id) {
-                if (\zovye\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id])) {
+                if (\zovye\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id, 'app' => User::WX])) {
                     return error(State::ERROR, '手机号码已经被其它运营人员使用！');
                 }
                 /** @var keeperModelObj $keeper */

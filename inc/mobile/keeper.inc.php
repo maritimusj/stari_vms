@@ -41,7 +41,11 @@ if ($op == 'save') {
         JSON::fail('您已经是我们代理商的合伙人！');
     }
 
-    $res = User::findOne(['id <>' => $user->getId(), 'mobile' => $mobile]);
+    $res = User::findOne([
+        'id <>' => $user->getId(), 
+        'mobile' => $mobile, 
+        'app' => User::WX,
+    ]);
     if (!empty($res)) {
         JSON::fail('手机号码已经被其它用户使用！');
     }

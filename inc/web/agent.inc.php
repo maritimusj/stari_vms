@@ -391,7 +391,7 @@ if ($op == 'default') {
             Util::itoast('手机号码无效！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
         }
 
-        if (User::findOne(['mobile' => $mobile, 'id <>' => $user->getId()])) {
+        if (User::findOne(['mobile' => $mobile, 'id <>' => $user->getId(), 'app' => User::WX])) {
             Util::itoast('手机号码已经被其它用户使用！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
         }
 

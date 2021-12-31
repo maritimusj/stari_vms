@@ -1241,15 +1241,6 @@ class common
         }
 
         if ($res['phoneNumber']) {
-            //清除此手机绑定的其他用户
-            $query = User::query(['mobile' => $res['phoneNumber']]);
-            /** @var userModelObj $entry */
-            foreach ($query->findAll() as $entry) {
-                if ($entry->getId() != $user->getId()) {
-                    $entry->setMobile('');
-                    $entry->save();
-                }
-            }
             $user->setMobile($res['phoneNumber']);
             $user->save();
         }

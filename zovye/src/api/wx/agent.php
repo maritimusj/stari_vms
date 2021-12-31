@@ -115,7 +115,7 @@ class agent
             return error(State::ERROR, '获取用户手机号码失败，请稍后再试！');
         }
 
-        $user = User::findOne(['mobile' => $mobile]);
+        $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if ($user) {
             if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
                 return error(State::ERROR, '登录失败，无法使用这个小程序！');

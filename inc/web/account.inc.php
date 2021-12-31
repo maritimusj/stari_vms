@@ -530,7 +530,6 @@ if ($op == 'default') {
                     'delay' => request::int('delay'),
                 ]);
             }  elseif ($account->isTask()) {
-                $data['img'] = request::trim('img') ?: Account::TASK_HEAD_IMG;
                 $account->set('config', [
                     'type' => Account::TASK,
                     'url' => request::trim('task_url'),

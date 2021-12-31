@@ -21,9 +21,16 @@ $op = request::op('default');
 
 if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
 
-    $query = Account::query(['type' => Account::NORMAL]);
+    $query = Account::query(['type' => [Account::NORMAL, Account::AUTH, Account::VIDEO]]);
+
     /** @var accountModelObj $acc */
     foreach ($query->findAll() as $acc) {
+        $qrcodesData = $acc->get('qrcodesData', []);;
+        foreach ($qrcodesData as &$qrcode_data) {
+            $qrcode_data['url'] = Account::createUrl($acc->getUid(), $qrcode_data['xid']);
+        }
+        $acc->set('qrcodesData', $qrcodesData);
+
         $acc->setUrl(Account::createUrl($acc->getUid(), ['from' => 'account']));
         $acc->save();
     }

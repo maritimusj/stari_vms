@@ -282,4 +282,12 @@ class Job
         }
         return false;
     }
+
+    public static function refreshSettings()
+    {
+        if (CtrlServ::scheduleJob('refresh_settings') !== false) {
+            return true;
+        }
+        return false;
+    }
 }

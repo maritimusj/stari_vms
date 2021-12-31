@@ -889,6 +889,13 @@ if ($op == 'account') {
     }
     JSON::success('已重置！');
 
+} elseif ($op == 'refresh') {
+
+    if (Job::refreshSettings()) {
+        JSON::success('启动刷新任务成功！');
+    }
+    JSON::success('启动刷新任务失败！');
+
 } elseif ($op == 'device') {
 
     $tpl_data['lbsKey'] = settings('user.location.appkey', DEFAULT_LBS_KEY);

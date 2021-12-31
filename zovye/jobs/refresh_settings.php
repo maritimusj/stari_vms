@@ -75,6 +75,5 @@ if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
     Log::debug('refresh_settings', [
         'domain' => _W('siteroot'),
         'time' => date('Y-m-d H:i:s'),
-        'msg' => 'refresh settings Ok!',
     ]);
 }

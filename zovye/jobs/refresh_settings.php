@@ -25,11 +25,13 @@ if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
 
     /** @var accountModelObj $acc */
     foreach ($query->findAll() as $acc) {
-        $qrcodesData = $acc->get('qrcodesData', []);;
-        foreach ($qrcodesData as &$qrcode_data) {
-            $qrcode_data['url'] = Account::createUrl($acc->getUid(), $qrcode_data['xid']);
+        $qrcodesData = $acc->get('qrcodesData', []);
+        if ($qrcodesData) {
+            foreach ($qrcodesData as &$qrcode_data) {
+                $qrcode_data['url'] = Account::createUrl($acc->getUid(), $qrcode_data['xid']);
+            }
+            $acc->set('qrcodesData', $qrcodesData);
         }
-        $acc->set('qrcodesData', $qrcodesData);
 
         $acc->setUrl(Account::createUrl($acc->getUid(), ['from' => 'account']));
         $acc->save();

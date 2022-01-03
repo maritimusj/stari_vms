@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>大数据展示平台</title>
+		<style type="text/css">
+			html,
+			body {
+				width: 100vw;
+				height: 100vh;
+			}
+
+			body {
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 18px;
+				color: white;
+				margin: 0;
+				padding: 0;
+				background-image: url({MODULE_URL}static/misc/img/bg.jpeg);
+				background-size: cover;
+				background-position: center;
+			}
+
+			#app {
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+
+			.header {
+				width: 100%;
+				height: 60px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background-image: url({MODULE_URL}static/misc/img/bar.png);
+				background-size: cover;
+				background-position: center;
+			}
+
+			.header img {
+				width: 100%;
+			}
+
+			.main {
+				width: calc(100% - 40px);
+				flex: 1;
+				padding: 20px;
+				display: flex;
+				flex-direction: row;
+			}
+
+			.col {
+				flex: 1;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.card {
+				background-color: #1C467366;
+				width: calc(100% - 40px);
+				flex: 1;
+				padding: 0 20px;
+				position: relative;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				overflow: hidden;
+			}
+
+			.card:not(:first-child) {
+				margin-top: 20px;
+			}
+
+			.horn {
+				width: 10px;
+				height: 10px;
+				position: absolute;
+			}
+
+			.lt {
+				border-top: 2px solid #2FB7C4;
+				border-left: 2px solid #2FB7C4;
+				left: 0;
+				top: 0;
+			}
+
+			.rt {
+				border-top: 2px solid #2FB7C4;
+				border-right: 2px solid #2FB7C4;
+				right: 0;
+				top: 0;
+			}
+
+			.rb {
+				border-bottom: 2px solid #2FB7C4;
+				border-right: 2px solid #2FB7C4;
+				right: 0;
+				bottom: 0;
+			}
+
+			.lb {
+				border-bottom: 2px solid #2FB7C4;
+				border-left: 2px solid #2FB7C4;
+				left: 0;
+				bottom: 0;
+			}
+
+			.card .title {
+				flex: 1;
+			}
+
+			.card .value {
+				font-size: 30px;
+				font-weight: bold;
+				background: linear-gradient(to bottom, #3977e6, #37bbf8);
+				-webkit-background-clip: text;
+				color: transparent;
+			}
+
+			.card .device-list {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
+
+			.card .device-list .device-row {
+				width: calc(50% - 5px);
+				height: 40px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-around;
+				background-color: #1C467366;
+				margin-top: 10px;
+			}
+
+			.card .device-list .device-row:nth-child(2n) {
+				margin-left: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app" v-cloak>
+			<div class="header">
+				<h1>{{title}}</h1>
+			</div>
+			<div class="main">
+				<div class="col">
+					<div class="card">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<span class="title">总销售额（元）</span>
+						<span class="value">{{totalSale.toLocaleString()}}</span>
+					</div>
+					<div class="card">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<span class="title">今日销售额（元）</span>
+						<span class="value">{{todaySale.toLocaleString()}}</span>
+					</div>
+					<div class="card">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<span class="title">订单总数（笔）</span>
+						<span class="value">{{totalOrder.toLocaleString()}}</span>
+					</div>
+					<div class="card">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<span class="title">今日订单数（笔）</span>
+						<span class="value">{{todayOrder.toLocaleString()}}</span>
+					</div>
+					<div class="card">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<span class="title">设备总数（台）</span>
+						<span class="value">{{totalDevice.toLocaleString()}}</span>
+					</div>
+					<div class="card" style="flex:none;height:210px;">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<div id="income-chart" style="width: 100%;height: 100%;"></div>
+					</div>
+				</div>
+				<div class="col" style="flex: 2;margin: 0 20px;">
+					<div style="flex: 1;">
+						<div id="map" style="width: 100%;height: 100%;"></div>
+					</div>
+					<div class="card"
+						style="flex:none;height:210px;background-color: transparent;align-items: flex-start;">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<div class="device-list" ref="list">
+							<div class="device-row" v-for="(item, index) in deviceList">
+								<span>{{item.key1}}</span>
+								<span>{{item.value1}}台</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col">
+					<div class="card">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<div id="goods-chart" style="width: 100%;height: 100%;"></div>
+					</div>
+					<div class="card" style="flex:none;height:210px;">
+						<div class="lt horn"></div>
+						<div class="rt horn"></div>
+						<div class="rb horn"></div>
+						<div class="lb horn"></div>
+						<div id="sex-chart" style="width: 100%;height: 100%;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdn.staticfile.org/vue/2.6.9/vue.min.js"></script>
+		<script src="https://cdn.staticfile.org/axios/0.24.0/axios.min.js"></script>
+		<script src="https://cdn.staticfile.org/echarts/5.2.2/echarts.min.js"></script>
+		<script src="{MODULE_URL}static/misc/js/china.js"></script>
+		<script type="text/javascript">
+			new Vue({
+				el: '#app',
+				data: {
+					url: 'https://dev.zovye.com',
+					title: '',
+					totalSale: 0,
+					todaySale: 0,
+					totalOrder: 0,
+					todayOrder: 0,
+					totalDevice: 0,
+					deviceList: [],
+					income: {
+						chart: null,
+						option: {
+							title: {
+								text: '收入来源',
+								textStyle: {
+									color: 'white',
+									fontWeight: 'normal'
+								},
+								top: 10
+							},
+							tooltip: {
+								trigger: 'item',
+								formatter: (params) => {
+									return params.seriesName + '<br>' + params.marker + ' ' + params.name + '：' +
+										params.percent + '%'
+								}
+							},
+							legend: {
+								top: 10,
+								right: 0,
+								orient: 'vertical',
+								textStyle: {
+									color: 'white'
+								}
+							},
+							series: {
+								name: '收入来源',
+								type: 'pie',
+								radius: ['40%', '70%'],
+								label: {
+									formatter: '{b}：{d}%',
+									color: 'inherit',
+									overflow: 'none'
+								},
+								data: [{
+										value: 0,
+										name: '微信'
+									},
+									{
+										value: 0,
+										name: '支付宝'
+									}
+								],
+								color: ['#04BE02', '#1678ff'],
+								center: ['50%', '55%']
+							}
+						}
+					},
+					sex: {
+						chart: null,
+						option: {
+							title: {
+								text: '性别比例',
+								textStyle: {
+									color: 'white',
+									fontWeight: 'normal'
+								},
+								top: 10
+							},
+							tooltip: {
+								trigger: 'item',
+								formatter: (params) => {
+									return params.seriesName + '<br>' + params.marker + ' ' + params.name + '：' +
+										params.percent + '%'
+								}
+							},
+							legend: {
+								top: 10,
+								right: 0,
+								orient: 'vertical',
+								textStyle: {
+									color: 'white'
+								}
+							},
+							series: {
+								name: '性别比例',
+								type: 'pie',
+								radius: ['40%', '70%'],
+								label: {
+									formatter: '{b}：{d}%',
+									color: 'inherit',
+									overflow: 'none'
+								},
+								data: [{
+										value: 0,
+										name: '男性'
+									},
+									{
+										value: 0,
+										name: '女性'
+									}
+								],
+								color: ['#6495ED', '#FFC0CB'],
+								center: ['50%', '55%']
+							}
+						}
+					},
+					goods: {
+						chart: null,
+						option: {
+							title: {
+								text: '商品TOP10',
+								textStyle: {
+									color: 'white',
+									fontWeight: 'normal'
+								},
+								top: 10
+							},
+							tooltip: {
+								trigger: 'axis',
+								axisPointer: {
+									type: 'shadow'
+								}
+							},
+							grid: {
+								left: '0',
+								top: '10%',
+								right: '0',
+								bottom: '5%',
+								containLabel: true
+							},
+							xAxis: {
+								type: 'value',
+								splitLine: {
+									show: false
+								},
+								axisLine: {
+									show: true,
+									lineStyle: {
+										color: 'white'
+									}
+								},
+								axisTick: {
+									show: true
+								},
+								splitNumber: 2
+							},
+							yAxis: {
+								type: 'category',
+								inverse: true,
+								axisLine: {
+									lineStyle: {
+										color: 'white'
+									}
+								},
+								data: []
+							},
+							series: {
+								type: 'bar',
+								realtimeSort: true,
+								itemStyle: {
+									normal: {
+										label: {
+											show: true,
+											position: 'right',
+											color: 'white'
+										},
+										color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+												offset: 0,
+												color: '#3977e6'
+											},
+											{
+												offset: 1,
+												color: '#37bbf8'
+											}
+										])
+									}
+								},
+								data: [],
+								color: '#2FB7C4'
+							}
+						}
+					},
+					map: {
+						chart: null,
+						option: {
+							tooltip: {
+								show: false
+							},
+							geo: {
+								map: "china",
+								roam: false, // 一定要关闭拖拽
+								zoom: 1.23,
+								center: [105, 36], // 调整地图位置
+								label: {
+									normal: {
+										show: false, //关闭省份名展示
+										fontSize: "10",
+										color: "rgba(0,0,0,0.7)"
+									},
+									emphasis: {
+										show: false
+									}
+								}
+							}
+						}
+					}
+				},
+				created() {
+
+				},
+				mounted() {
+					this.getTitle();
+
+					this.income.chart = echarts.init(document.getElementById('income-chart'));
+					this.income.chart.setOption(this.income.option);
+					this.getIncome();
+
+					this.sex.chart = echarts.init(document.getElementById('sex-chart'));
+					this.sex.chart.setOption(this.sex.option);
+					this.getSexRate();
+
+					this.goods.chart = echarts.init(document.getElementById('goods-chart'));
+					this.goods.chart.setOption(this.goods.option);
+
+					this.map.chart = echarts.init(document.getElementById('map'));
+					this.initMap();
+
+					this.getData();
+					setInterval(() => {
+						this.getData();
+					}, 1000 * 10);
+
+					setInterval(() => {
+						let top = parseInt(this.$refs.list.style.marginTop.replace('px', '')) || 0;
+						let t = 200;
+						const interval = setInterval(() => {
+							if (t) {
+								t--;
+								top--;
+								this.$refs.list.style.marginTop = top + 'px';
+							} else {
+								clearInterval(interval);
+							}
+							if (top <= -Math.ceil(this.deviceList.length / 8) * 200) {
+								this.$refs.list.style.marginTop = '0px';
+							}
+						}, 10)
+					}, 1000 * 10)
+				},
+				methods: {
+					initMap() {
+						var dataValue = this.dealWithData();
+						var data1 = dataValue.splice(0, 6);
+						this.map.option.series = [{
+								type: "map",
+								map: "china",
+								roam: false,
+								zoom: 1.23,
+								center: [105, 36],
+								// geoIndex: 1,
+								// aspectScale: 0.75, //长宽比
+								showLegendSymbol: false, // 存在legend时显示
+								label: {
+									normal: {
+										show: false
+									},
+									emphasis: {
+										show: false
+									}
+								},
+								itemStyle: {
+									normal: {
+										areaColor: "#0d0059",
+										borderColor: "#389dff",
+										borderWidth: 0.5
+									},
+									emphasis: {
+										areaColor: "#17008d",
+										shadowOffsetX: 0,
+										shadowOffsetY: 0,
+										shadowBlur: 5,
+										borderWidth: 0,
+										shadowColor: "rgba(0, 0, 0, 0.5)"
+									}
+								}
+							},
+							{
+								name: "",
+								type: "scatter",
+								coordinateSystem: "geo",
+								data: dataValue,
+								//   symbolSize: function(val) {
+								//     return val[2] / 10;
+								//   },
+								symbol: "circle",
+								symbolSize: 8,
+								hoverSymbolSize: 10,
+								// tooltip: {
+								// 	formatter(value) {
+								// 		return value.data.name + "<br/>" + "设备数：" + "22";
+								// 	},
+								// 	show: true
+								// },
+								encode: {
+									value: 2
+								},
+								label: {
+									formatter: "{b}",
+									position: "right",
+									show: false
+								},
+								itemStyle: {
+									color: "#0efacc"
+								},
+								emphasis: {
+									label: {
+										show: false
+									}
+								}
+							},
+							{
+								name: "Top 5",
+								type: "effectScatter",
+								coordinateSystem: "geo",
+								data: data1,
+								symbolSize: 15,
+								tooltip: {
+									show: false
+								},
+								encode: {
+									value: 2
+								},
+								showEffectOn: "render",
+								rippleEffect: {
+									brushType: "stroke",
+									color: "#0efacc",
+									period: 9,
+									scale: 5
+								},
+								hoverAnimation: true,
+								label: {
+									formatter: "{b}",
+									position: "right",
+									show: true
+								},
+								itemStyle: {
+									color: "#0efacc",
+									shadowBlur: 2,
+									shadowColor: "#333"
+								},
+								zlevel: 1
+							}
+						];
+						this.map.chart.setOption(this.map.option);
+					},
+					dealWithData() {
+						var geoCoordMap = {
+							北京: [116.46, 39.92],
+							上海: [121.48, 31.22],
+							杭州: [120.19, 30.26],
+							青岛: [120.33, 36.07],
+							深圳: [114.07, 22.62],
+							武汉: [114.31, 30.52],
+							海门: [121.15, 31.89],
+							鄂尔多斯: [109.781327, 39.608266],
+							招远: [120.38, 37.35],
+							舟山: [122.207216, 29.985295],
+							齐齐哈尔: [123.97, 47.33],
+							盐城: [120.13, 33.38],
+							赤峰: [118.87, 42.28],
+							乳山: [121.52, 36.89],
+							宁波: [121.56, 29.86],
+							金昌: [102.188043, 38.520089],
+							泉州: [118.58, 24.93],
+							莱西: [120.53, 36.86],
+							日照: [119.46, 35.42],
+							胶南: [119.97, 35.88],
+							南通: [121.05, 32.08],
+							拉萨: [91.11, 29.97],
+							云浮: [112.02, 22.93],
+							梅州: [116.1, 24.55],
+							文登: [122.05, 37.2],
+							攀枝花: [101.718637, 26.582347],
+							威海: [122.1, 37.5],
+							承德: [117.93, 40.97],
+							厦门: [118.1, 24.46],
+							汕尾: [115.375279, 22.786211],
+							潮州: [116.63, 23.68],
+							丹东: [124.37, 40.13],
+							太仓: [121.1, 31.45],
+							曲靖: [103.79, 25.51],
+							烟台: [121.39, 37.52],
+							福州: [119.3, 26.08],
+							瓦房店: [121.979603, 39.627114],
+							即墨: [120.45, 36.38],
+							抚顺: [123.97, 41.97],
+							玉溪: [102.52, 24.35],
+							张家口: [114.87, 40.82],
+							阳泉: [113.57, 37.85],
+							莱州: [119.942327, 37.177017],
+							湖州: [120.1, 30.86],
+							汕头: [116.69, 23.39],
+							昆山: [120.95, 31.39],
+							湛江: [110.359377, 21.270708],
+							揭阳: [116.35, 23.55],
+							荣成: [122.41, 37.16],
+							连云港: [119.16, 34.59],
+							葫芦岛: [120.836932, 40.711052],
+							常熟: [120.74, 31.64],
+							东莞: [113.75, 23.04],
+							河源: [114.68, 23.73],
+							淮安: [119.15, 33.5],
+							泰州: [119.9, 32.49],
+							南宁: [108.33, 22.84],
+							营口: [122.18, 40.65],
+							惠州: [114.4, 23.09],
+							江阴: [120.26, 31.91],
+							蓬莱: [120.75, 37.8],
+							韶关: [113.62, 24.84],
+							嘉峪关: [98.289152, 39.77313],
+							广州: [113.23, 23.16],
+							延安: [109.47, 36.6],
+							太原: [112.53, 37.87],
+							清远: [113.01, 23.7],
+							中山: [113.38, 22.52],
+							昆明: [102.73, 25.04],
+							寿光: [118.73, 36.86],
+							盘锦: [122.070714, 41.119997],
+							长治: [113.08, 36.18],
+							珠海: [113.52, 22.3],
+							宿迁: [118.3, 33.96],
+							咸阳: [108.72, 34.36],
+							铜川: [109.11, 35.09],
+							平度: [119.97, 36.77],
+							佛山: [113.11, 23.05],
+							海口: [110.35, 20.02],
+							江门: [113.06, 22.61],
+							章丘: [117.53, 36.72],
+							肇庆: [112.44, 23.05],
+							大连: [121.62, 38.92],
+							临汾: [111.5, 36.08],
+							吴江: [120.63, 31.16],
+							石嘴山: [106.39, 39.04],
+							沈阳: [123.38, 41.8],
+							苏州: [120.62, 31.32],
+							茂名: [110.88, 21.68],
+							嘉兴: [120.76, 30.77],
+							长春: [125.35, 43.88],
+							胶州: [120.03336, 36.264622],
+							银川: [106.27, 38.47],
+							张家港: [120.555821, 31.875428],
+							三门峡: [111.19, 34.76],
+							锦州: [121.15, 41.13],
+							南昌: [115.89, 28.68],
+							柳州: [109.4, 24.33],
+							三亚: [109.511909, 18.252847],
+							自贡: [104.778442, 29.33903],
+							吉林: [126.57, 43.87],
+							阳江: [111.95, 21.85],
+							泸州: [105.39, 28.91],
+							西宁: [101.74, 36.56],
+							宜宾: [104.56, 29.77],
+							呼和浩特: [111.65, 40.82],
+							成都: [104.06, 30.67],
+							大同: [113.3, 40.12],
+							镇江: [119.44, 32.2],
+							桂林: [110.28, 25.29],
+							张家界: [110.479191, 29.117096],
+							宜兴: [119.82, 31.36],
+							北海: [109.12, 21.49],
+							西安: [108.95, 34.27],
+							金坛: [119.56, 31.74],
+							东营: [118.49, 37.46],
+							牡丹江: [129.58, 44.6],
+							遵义: [106.9, 27.7],
+							绍兴: [120.58, 30.01],
+							扬州: [119.42, 32.39],
+							常州: [119.95, 31.79],
+							潍坊: [119.1, 36.62],
+							重庆: [106.54, 29.59],
+							台州: [121.420757, 28.656386],
+							南京: [118.78, 32.04],
+							滨州: [118.03, 37.36],
+							贵阳: [106.71, 26.57],
+							无锡: [120.29, 31.59],
+							本溪: [123.73, 41.3],
+							克拉玛依: [84.77, 45.59],
+							渭南: [109.5, 34.52],
+							马鞍山: [118.48, 31.56],
+							宝鸡: [107.15, 34.38],
+							焦作: [113.21, 35.24],
+							句容: [119.16, 31.95],
+							徐州: [117.2, 34.26],
+							衡水: [115.72, 37.72],
+							包头: [110, 40.58],
+							绵阳: [104.73, 31.48],
+							乌鲁木齐: [87.68, 43.77],
+							枣庄: [117.57, 34.86],
+							淄博: [118.05, 36.78],
+							鞍山: [122.85, 41.12],
+							溧阳: [119.48, 31.43],
+							库尔勒: [86.06, 41.68],
+							安阳: [114.35, 36.1],
+							开封: [114.35, 34.79],
+							济南: [117, 36.65],
+							德阳: [104.37, 31.13],
+							温州: [120.65, 28.01],
+							九江: [115.97, 29.71],
+							邯郸: [114.47, 36.6],
+							临安: [119.72, 30.23],
+							兰州: [103.73, 36.03],
+							沧州: [116.83, 38.33],
+							临沂: [118.35, 35.05],
+							南充: [106.110698, 30.837793],
+							天津: [117.2, 39.13],
+							富阳: [119.95, 30.07],
+							泰安: [117.13, 36.18],
+							诸暨: [120.23, 29.71],
+							郑州: [113.65, 34.76],
+							哈尔滨: [126.63, 45.75],
+							聊城: [115.97, 36.45],
+							芜湖: [118.38, 31.33],
+							唐山: [118.02, 39.63],
+							平顶山: [113.29, 33.75],
+							邢台: [114.48, 37.05],
+							德州: [116.29, 37.45],
+							济宁: [116.59, 35.38],
+							荆州: [112.239741, 30.335165],
+							宜昌: [111.3, 30.7],
+							义乌: [120.06, 29.32],
+							丽水: [119.92, 28.45],
+							洛阳: [112.44, 34.7],
+							秦皇岛: [119.57, 39.95],
+							株洲: [113.16, 27.83],
+							石家庄: [114.48, 38.03],
+							莱芜: [117.67, 36.19],
+							常德: [111.69, 29.05],
+							保定: [115.48, 38.85],
+							湘潭: [112.91, 27.87],
+							金华: [119.64, 29.12],
+							岳阳: [113.09, 29.37],
+							长沙: [113, 28.21],
+							衢州: [118.88, 28.97],
+							廊坊: [116.7, 39.53],
+							菏泽: [115.480656, 35.23375],
+							合肥: [117.27, 31.86],
+							大庆: [125.03, 46.58]
+						};
+						var data = [];
+						for (var key in geoCoordMap) {
+							data.push({
+								name: key,
+								value: geoCoordMap[key]
+							});
+						}
+						return data;
+					},
+					getData() {
+						this.getTotalSale();
+						this.getTodaySale();
+						this.getTotalOrder();
+						this.getTodayOrder();
+						this.getTotalDevice();
+						this.getGoodsList();
+						this.getDeviceList();
+					},
+					getTitle() {
+						axios.get(this.url + '/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=title')
+							.then(res => {
+								this.title = res.data[0].value;
+							});
+					},
+					getTotalSale() {
+						axios.get(this.url + '/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=total_sale')
+							.then(res => {
+								const value = res.data[0].value;
+								if (this.totalSale === 0) {
+									this.totalSale = value;
+								} else {
+									this.updateData('totalSale', value);
+								}
+							});
+					},
+					getTodaySale() {
+						axios.get(this.url + '/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=today_sale')
+							.then(res => {
+								const value = res.data[0].value;
+								if (this.todaySale === 0) {
+									this.todaySale = value;
+								} else {
+									this.updateData('todaySale', value);
+								}
+							})
+					},
+					getTotalOrder() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=total_order')
+							.then(res => {
+								const value = res.data[0].value;
+								if (this.totalOrder === 0) {
+									this.totalOrder = value;
+								} else {
+									this.updateData('totalOrder', value);
+								}
+							})
+					},
+					getTodayOrder() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=today_order')
+							.then(res => {
+								const value = res.data[0].value;
+								if (this.todayOrder === 0) {
+									this.todayOrder = value;
+								} else {
+									this.updateData('todayOrder', value);
+								}
+							})
+					},
+					getTotalDevice() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=device_total')
+							.then(res => {
+								const value = res.data[0].value;
+								if (this.totalDevice === 0) {
+									this.totalDevice = value;
+								} else {
+									this.updateData('totalDevice', value);
+								}
+							})
+					},
+					getGoodsList() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=goods')
+							.then(res => {
+								const data = res.data;
+								const xData = [];
+								const yData = [];
+								data.forEach(e => {
+									xData.push(e.value1);
+									yData.push(e.value2);
+								})
+								this.goods.option.yAxis.data = xData;
+								this.goods.option.series.data = yData;
+								this.goods.chart.setOption(this.goods.option, true);
+							})
+					},
+					getDeviceList() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=provinces')
+							.then(res => {
+								this.deviceList = res.data;
+							})
+					},
+					getIncome() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=income')
+							.then(res => {
+								const data = res.data;
+								const array = [];
+								data.forEach(e => {
+									array.push({
+										name: e.x,
+										value: e.y
+									})
+								})
+								this.income.option.series.data = array;
+								this.income.chart.setOption(this.income.option, true);
+							})
+					},
+					getSexRate() {
+						axios.get(this.url +
+								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=user')
+							.then(res => {
+								const data = res.data;
+								const array = [];
+								data.forEach(e => {
+									array.push({
+										name: e.x,
+										value: e.y
+									})
+								})
+								this.sex.option.series.data = array;
+								this.sex.chart.setOption(this.sex.option, true);
+							})
+					},
+					updateData(key, value) {
+						let t = 300;
+						const interval = setInterval(() => {
+							if (this[key] === value || t === 0) {
+								this[key] = value;
+								clearInterval(interval);
+							} else {
+								this[key]++;
+							}
+							t--;
+						}, 10);
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

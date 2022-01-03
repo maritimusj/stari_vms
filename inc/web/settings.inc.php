@@ -1077,7 +1077,9 @@ if ($op == 'account') {
     We7::load()->model('mc');
     $tpl_data['credit_types'] = We7::mc_credit_types();
 
+    $tpl_data['data_url'] = Util::murl('data');
     $tpl_data['api_url'] = Util::murl('api');
+
     $app_key = settings('app.key');
     if (empty($app_key)) {
         $app_key = Util::random(16);

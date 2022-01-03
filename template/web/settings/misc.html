@@ -181,7 +181,15 @@
             <div class="seg">
                 <div class="title">数据大屏</div>
                 <div class="form-group">
-                    <a href="{php echo $this->createWebUrl('settings', ['op'=>'data_view'])}">进入设置</a>
+                    <label class="col-md-2 control-label operate">
+                        <a href="{php echo $this->createWebUrl('settings', ['op'=>'data_view'])}">
+                            进入设置 <i class="fa fa-cogs"></i>
+                        </a>
+                    </label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$data_url}"></i> {$data_url}</span>
+                        <span class="help-block">* 大屏数据展示网址</span>
+                    </div>
                 </div>
             </div>
             <div class="seg">
@@ -191,7 +199,7 @@
                         <label class="col-md-2 control-label">API网址</label>
                         <div class="col-md-10">
                             <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$api_url}"></i> {$api_url}</span>
-                            <span class="help-block">使用HTTP GET请求，必要参数：appkey，device(设备IMEI编号)，user(第三方用户唯一UID)</span>
+                            <span class="help-block">* 使用HTTP GET请求，必要参数：appkey，device(设备IMEI编号)，user(第三方用户唯一UID)</span>
                         </div>
                     </div>
                     <div class="form-group">

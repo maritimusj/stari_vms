@@ -63,7 +63,7 @@
 
         #runBtn.busy {
             transform: rotate(-45deg);
-            background-color: #dda95c;
+            background-color: #ffc107;
         }
 
         #runBtn.no-selected {
@@ -448,7 +448,7 @@
             success: function (data) {
                 if (data && data.resultStr) {
                     const url = data.resultStr;
-                    const result = url.match(/(device=|id=|IMEI:|\?)(\w{3,})/i);
+                    const result = url.match(/(.*=|IMEI:|\?|^)(\w{3,})/i);
                     const id = result ? result[2] : url;
                     return cb(id);
                 }

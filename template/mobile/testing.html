@@ -436,19 +436,19 @@
 <script src="{MODULE_URL}/static/testing/axios.min.js"></script>
 <script src="{MODULE_URL}/static/testing/vue.min.js"></script>
 <script>
-    wx.ready(function(){
+    wx.ready(function () {
         wx.hideAllNonBaseMenuItem();
     });
 
     const API_URL = "{$api_url}";
     function scan(cb) {
-        //cb("V648313348946316");return;
+        //cb("20201210011");return;
         wx.scanQRCode({
             needResult: 1,
             success: function (data) {
                 if (data && data.resultStr) {
                     const url = data.resultStr;
-                    const result = url.match(/(.*=|IMEI:|\?|^)(\w{3,})/i);
+                    const result = url.match(/(device=|id=|IMEI:|\?)(\w{3,})/i);
                     const id = result ? result[2] : url;
                     return cb(id);
                 }
@@ -462,7 +462,7 @@
         data: {
             apiUrl: API_URL,
             lanes: [
-                {id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}, {id: 8}, {id: 9}, {id: 10}, {id: 11}, {id: 12}, {id: 13}, {id: 14}, {id: 15}, {id: 16},
+                { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }, { id: 8 }, { id: 9 }, { id: 10 }, { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 }, { id: 16 },
             ],
             testing: false,
             taskQueue: [],
@@ -476,7 +476,7 @@
                     return lane.selected === true;
                 });
             },
-            isBusy: function() {
+            isBusy: function () {
                 return this.lanes.find(function (lane) {
                     return lane.state === 'busy';
                 }) != null;
@@ -507,7 +507,7 @@
                 const self = this;
                 self.setLaneState(task, lane.id, "busy");
 
-                axios.get(self.apiUrl, {params: {imei: task.id, channel: lane.id, op: "test"}}).then(function (res) {
+                axios.get(self.apiUrl, { params: { imei: task.id, channel: lane.id, op: "test" } }).then(function (res) {
                     self.setLaneState(task, lane.id, "idle");
                     return res.data;
                 }).then(function (res) {
@@ -531,7 +531,7 @@
                 Vue.set(task, 'signal', 0);
                 Vue.set(task, 'percent', 0);
 
-                axios.get(this.apiUrl, {params: {imei: task.id, op: "detail"}}).then(function (res) {
+                axios.get(this.apiUrl, { params: { imei: task.id, op: "detail" } }).then(function (res) {
                     return res.data;
                 }).then(function (res) {
                     if (res) {
@@ -547,11 +547,11 @@
                     }
                 })
             },
-            testDevice: function (task) {
+            runTask: function (task) {
                 const self = this;
                 this.getDetail(task, function (online, msg) {
                     if (online) {
-                        self.doTestDevice(task);
+                        self.dorunTask(task);
                     } else {
                         task.status = msg || "设备离线";
                         Vue.set(task, 'fail', 1)
@@ -561,7 +561,7 @@
 
             },
 
-            doTestDevice: function (task) {
+            dorunTask: function (task) {
                 const lanes = task.lanes.map(function (lane) {
                     return {
                         id: lane.id,
@@ -686,70 +686,39 @@
                 }
                 this.viewObj = this.viewObj === task ? null : task;
             },
-            testAllForever: function () {
+            testDevice: function(id) {
                 const lanes = this.lanes.filter(function (lane) {
                     return lane.selected === true;
                 }).map(function (lane) {
-                    return {id: lane.id, total: 1000};
+                    return { id: lane.id, total: lane.total };
                 });
                 if (lanes.length > 0) {
-                    const self = this;
-                    scan(function (id) {
-                        const task = {
+                    const task = {
                             id: id,
                             lanes: lanes,
                             status: "等待...",
                         }
-                        self.taskQueue.unshift(task);
-                        self.testDevice(task);
-                    });
+                    this.taskQueue.unshift(task);
+                    this.runTask(task);
                 }
             },
             testAll: function () {
-                const lanes = this.lanes.filter(function (lane) {
-                    return lane.selected === true;
-                }).map(function (lane) {
-                    return {id: lane.id, total: lane.total};
+                const self = this;
+                scan(function (id) {
+                    self.testDevice(id);
                 });
-                if (lanes.length > 0) {
-                    const self = this;
-                    scan(function (id) {
-                        let task = {
-                            id: id,
-                            lanes: lanes,
-                            status: "等待...",
-                        }
-                        self.taskQueue.unshift(task);
-                        self.testDevice(task);
-                    });
-                }
             },
-            openDoor: function() {
-                    const self = this;
-                    scan(function(imei) {
-                        axios.get(self.apiUrl, { params: { imei, op: "openDoor" } }).then(function (res) {
-                            
-                        })
-                    })
+            openDoor: function () {
+                const self = this;
+                scan(function (imei) {
+                    axios.get(self.apiUrl, { params: { imei, op: "openDoor" } });
+                })
             },
             inputEnter() {
                 if (this.isBusy) {
                     return;
                 }
-                const lanes = this.lanes.filter(function (lane) {
-                    return lane.selected === true;
-                }).map(function (lane) {
-                    return {id: lane.id, total: lane.total};
-                });
-                if (lanes.length > 0) {
-                    let task = {
-                            id: this.imei,
-                            lanes: lanes,
-                            status: "等待...",
-                        }
-                    this.taskQueue.unshift(task);
-                    this.testDevice(task);
-                }
+                this.testDevice(this.imei);
             }
         }
     })

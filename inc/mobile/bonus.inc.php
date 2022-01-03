@@ -62,6 +62,7 @@ if ($op == 'default') {
 
     $result = Account::getAvailableList(Device::getDummyDevice(), $user, [
         'type' => [$type],
+        's_type' => [],
         'include' => [Account::BALANCE],
         'max' => $max,
     ]);

@@ -244,10 +244,10 @@
 		<script src="https://cdn.staticfile.org/echarts/5.2.2/echarts.min.js"></script>
 		<script src="{MODULE_URL}static/misc/js/china.js"></script>
 		<script type="text/javascript">
+			const api_url = "{$api_url}";
 			new Vue({
 				el: '#app',
 				data: {
-					url: 'https://dev.zovye.com',
 					title: '',
 					totalSale: 0,
 					todaySale: 0,
@@ -814,13 +814,13 @@
 						this.getDeviceList();
 					},
 					getTitle() {
-						axios.get(this.url + '/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=title')
+						axios.get(api_url, {params: {type: 'title'}})
 							.then(res => {
 								this.title = res.data[0].value;
 							});
 					},
 					getTotalSale() {
-						axios.get(this.url + '/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=total_sale')
+						axios.get(api_url, {params: {type: 'total_sale'}})
 							.then(res => {
 								const value = res.data[0].value;
 								if (this.totalSale === 0) {
@@ -831,7 +831,7 @@
 							});
 					},
 					getTodaySale() {
-						axios.get(this.url + '/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=today_sale')
+						axios.get(api_url, {params: {type: 'today_sale'}})
 							.then(res => {
 								const value = res.data[0].value;
 								if (this.todaySale === 0) {
@@ -842,8 +842,7 @@
 							})
 					},
 					getTotalOrder() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=total_order')
+						axios.get(api_url, {params: {type: 'total_order'}})
 							.then(res => {
 								const value = res.data[0].value;
 								if (this.totalOrder === 0) {
@@ -854,8 +853,7 @@
 							})
 					},
 					getTodayOrder() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=today_order')
+						axios.get(api_url, {params: {type: 'today_order'}})
 							.then(res => {
 								const value = res.data[0].value;
 								if (this.todayOrder === 0) {
@@ -866,8 +864,7 @@
 							})
 					},
 					getTotalDevice() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=device_total')
+						axios.get(api_url, {params: {type: 'device_total'}})
 							.then(res => {
 								const value = res.data[0].value;
 								if (this.totalDevice === 0) {
@@ -878,8 +875,7 @@
 							})
 					},
 					getGoodsList() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=goods')
+						axios.get(api_url, {params: {type: 'goods'}})
 							.then(res => {
 								const data = res.data;
 								const xData = [];
@@ -894,15 +890,13 @@
 							})
 					},
 					getDeviceList() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=provinces')
+						axios.get(api_url, {params: {type: 'provinces'}})
 							.then(res => {
 								this.deviceList = res.data;
 							})
 					},
 					getIncome() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=income')
+						axios.get(api_url, {params: {type: 'income'}})
 							.then(res => {
 								const data = res.data;
 								const array = [];
@@ -917,8 +911,7 @@
 							})
 					},
 					getSexRate() {
-						axios.get(this.url +
-								'/app/index.php?i=2&c=entry&op=data_view&do=app&m=llt_afan&type=user')
+						axios.get(api_url, {params: {type: 'user'}})
 							.then(res => {
 								const data = res.data;
 								const array = [];

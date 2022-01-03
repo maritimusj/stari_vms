@@ -8,5 +8,7 @@ namespace zovye;
 
 $op = request::op('default');
 if ($op == 'default') {
-    app()->showTemplate('misc/data');
+    app()->showTemplate('misc/data', [
+        'api_url' => Util::murl('app', ['op' => 'data_view']),
+    ]);
 }

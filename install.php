@@ -8,7 +8,7 @@
 namespace zovye;
 
 $sql = <<<SQL
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_migration` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_migration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(64) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_migration` (
   UNIQUE KEY `name` (`name`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_weapp_config` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_weapp_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_weapp_config` (
   KEY `locked_uid` (`locked_uid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_order` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_order` (
   KEY `locked_uid` (`locked_uid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_account` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_account` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `agent_id` int(11) DEFAULT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_account` (
   KEY `agent_id` (`agent_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_advertising` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advertising` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `state` tinyint(4) NOT NULL DEFAULT '0',
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_advertising` (
   KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_advs_stats` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_advs_stats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `count` int(11) NOT NULL DEFAULT '0',
   `uniacid` int(11) DEFAULT NULL,
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_advs_stats` (
   KEY `openid` (`openid`,`advs_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_agent_app` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_agent_app` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) DEFAULT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_agent_app` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_agent_msg` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_agent_msg` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `agent_id` int(11) DEFAULT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_agent_msg` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_app_logs` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_app_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `level` tinyint(4) NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_app_logs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_article` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_article` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `type` varchar(32) DEFAULT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_article` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_commission_balance` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_commission_balance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `openid` varchar(128) NOT NULL,
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_commission_balance` (
   KEY `src` (`src`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_balance` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_balance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `openid` varchar(128) NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_balance` (
   KEY `src` (`src`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_component_user` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_component_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_component_user` (
   KEY `openid` (`openid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_coupon` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_coupon` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `uid` varchar(64) NOT NULL,
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_coupon` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_data_view` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,
   `v` varchar(120) NOT NULL,
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_data_view` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `group_id` int(11) DEFAULT '0',
@@ -261,7 +261,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device` (
   KEY `s1` (`s1`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_events` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `device_uid` varchar(64) NOT NULL,
@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_events` (
   KEY `device_uid` (`device_uid`(8),`event`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_feedback` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_feedback` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
@@ -285,7 +285,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_feedback` (
   KEY `device_id` (`device_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_groups` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `title` varchar(64) NOT NULL DEFAULT '',
@@ -296,7 +296,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_groups` (
   KEY `agent_id` (`agent_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_logs` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `level` tinyint(4) NOT NULL,
@@ -308,7 +308,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_logs` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_record` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_record` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `device_id` int(11) NOT NULL,
@@ -322,7 +322,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_record` (
   KEY `agent_id` (`agent_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_types` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_device_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `agent_id` int(11) NOT NULL,
@@ -335,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_device_types` (
   KEY `device_id` (`device_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_files` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `title` varchar(255) NOT NULL,
@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_files` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_goods` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `agent_id` int(11) NOT NULL DEFAULT '0',
@@ -360,7 +360,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_goods` (
   KEY `agent_id` (`agent_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_goods_voucher` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods_voucher` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `enable` tinyint(4) NOT NULL DEFAULT '0',
@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_goods_voucher` (
   KEY `goods_id` (`goods_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_goods_voucher_logs` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_goods_voucher_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `code` varchar(16) NOT NULL,
@@ -395,7 +395,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_goods_voucher_logs` (
   KEY `voucher_id` (`voucher_id`,`uniacid`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_gsp_user` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_gsp_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `agent_id` int(11) NOT NULL,
   `uid` varchar(64) NOT NULL,
@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_gsp_user` (
   KEY `uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_keeper_devices` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keeper_devices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `device_id` int(11) NOT NULL,
   `keeper_id` int(11) NOT NULL,
@@ -422,7 +422,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_keeper_devices` (
   KEY `device` (`device_id`,`keeper_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_keepers` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keepers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(64) DEFAULT NULL,
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_keepers` (
   KEY `agent_id` (`agent_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_login_data` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_login_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `src` tinyint(4) NOT NULL DEFAULT '0',
   `user_id` int(11) DEFAULT NULL,
@@ -447,7 +447,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_login_data` (
   UNIQUE KEY `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_maintenance` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_maintenance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `device_id` varchar(64) DEFAULT NULL,
@@ -461,7 +461,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_maintenance` (
   KEY `device_id` (`device_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_migration` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_migration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(64) NOT NULL,
@@ -475,7 +475,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_migration` (
   UNIQUE KEY `name` (`name`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_msg` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_msg` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
@@ -484,7 +484,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_msg` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_order` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `src` int(11) DEFAULT '0',
@@ -515,7 +515,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_order` (
   KEY `account` (`account`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_payload_logs` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_payload_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `device_id` int(11) NOT NULL,
@@ -529,7 +529,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_payload_logs` (
   KEY `device_id` (`device_id`,`uniacid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_principal` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_principal` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `principal_id` int(11) NOT NULL,
@@ -541,7 +541,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_principal` (
   KEY `index` (`user_id`,`principal_id`,`enable`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_referral` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_referral` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `agent_id` int(11) NOT NULL DEFAULT '0',
   `code` varchar(32) NOT NULL,
@@ -550,7 +550,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_referral` (
   KEY `agent_id` (`agent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_replenish` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_replenish` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `device_uid` varchar(64) NOT NULL,
@@ -568,7 +568,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_replenish` (
   KEY `goods_id` (`goods_id`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_account` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_account` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -580,7 +580,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_account` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_advertising` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_advertising` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -592,7 +592,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_advertising` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_commission_balance` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_commission_balance` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -604,7 +604,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_commission_balance` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_component_user` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_component_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -616,7 +616,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_component_user` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_device` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_device` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -628,7 +628,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_device` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_device_types` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_device_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -640,7 +640,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_device_types` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_goods` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_goods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -652,7 +652,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_goods` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_keeper` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_keeper` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -664,7 +664,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_keeper` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_order` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
@@ -676,7 +676,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_order` (
   KEY `locked_uid` (`locked_uid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_user` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_settings_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `name` varchar(128) NOT NULL,
@@ -688,7 +688,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_settings_user` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_tags` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_tags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `title` varchar(128) NOT NULL,
@@ -698,7 +698,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_tags` (
   KEY `title` (`title`(16),`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_user` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `state` tinyint(4) DEFAULT '0',
@@ -718,7 +718,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_user` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_user_logs` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_user_logs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `level` tinyint(4) NOT NULL,
@@ -730,7 +730,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_user_logs` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_version` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_version` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `title` varchar(128) CHARACTER SET utf8 NOT NULL,
@@ -740,7 +740,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_voucher` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_voucher` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
   `uid` varchar(64) NOT NULL,
@@ -755,7 +755,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_voucher` (
   UNIQUE KEY `uid` (`uid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_weapp_config` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_weapp_config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL DEFAULT '0',
   `name` varchar(128) NOT NULL,
@@ -767,7 +767,7 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_weapp_config` (
   KEY `locked_uid` (`locked_uid`,`uniacid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_wx_app` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_wx_app` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) NOT NULL,
   `name` varchar(128) NOT NULL,
@@ -778,38 +778,38 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_wx_app` (
   UNIQUE KEY `key` (`key`,`uniacid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4;
 
-CREATE OR REPLACE VIEW `ims_zy_saas_device_view` AS
+CREATE OR REPLACE VIEW `ims_zovye_vms_device_view` AS
 SELECT *,
 (
-    SELECT SUM(o.num) FROM `ims_zy_saas_order` o
+    SELECT SUM(o.num) FROM `ims_zovye_vms_order` o
 	  WHERE o.device_id=d.id AND  DATE_FORMAT(now(),"%Y%m")=DATE_FORMAT(FROM_UNIXTIME(o.createtime),"%Y%m")
 ) AS m_total,
 (
-    SELECT SUM(o.num) FROM `ims_zy_saas_order` o
+    SELECT SUM(o.num) FROM `ims_zovye_vms_order` o
 	  WHERE o.device_id=d.id AND DATE_FORMAT(now(),"%Y%m%d")=DATE_FORMAT(FROM_UNIXTIME(o.createtime),"%Y%m%d")
 ) AS d_total
-FROM `ims_zy_saas_device` d;
+FROM `ims_zovye_vms_device` d;
 
-CREATE OR REPLACE VIEW `ims_zy_saas_agent_vw` AS
+CREATE OR REPLACE VIEW `ims_zovye_vms_agent_vw` AS
 SELECT *,
-(SELECT count(id) FROM `ims_zy_saas_device` WHERE agent_id=u.id) AS deviceTotal
-FROM `ims_zy_saas_user` u
+(SELECT count(id) FROM `ims_zovye_vms_device` WHERE agent_id=u.id) AS deviceTotal
+FROM `ims_zovye_vms_user` u
 WHERE locate('agent', u.passport)>0;
 
-CREATE OR REPLACE VIEW `ims_zy_saas_goods_stats_vw` AS 
+CREATE OR REPLACE VIEW `ims_zovye_vms_goods_stats_vw` AS 
 SELECT agent_id,device_id,goods_id AS id,name,sum(num) as total,FROM_UNIXTIME(createtime,'%Y-%m-%d') as date 
-FROM `ims_zy_saas_order` GROUP BY device_id,goods_id,date;
+FROM `ims_zovye_vms_order` GROUP BY device_id,goods_id,date;
 
-CREATE OR REPLACE VIEW `ims_zy_saas_device_keeper_view` AS 
-SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,k.commission_percent, k.commission_fixed,IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zy_saas_device` d 
-LEFT JOIN `ims_zy_saas_keeper_devices` k ON d.id=k.device_id WHERE 1;
+CREATE OR REPLACE VIEW `ims_zovye_vms_device_keeper_view` AS 
+SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,k.commission_percent, k.commission_fixed,IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zovye_vms_device` d 
+LEFT JOIN `ims_zovye_vms_keeper_devices` k ON d.id=k.device_id WHERE 1;
 
-CREATE OR REPLACE VIEW `ims_zy_saas_goods_voucher_view` AS
+CREATE OR REPLACE VIEW `ims_zovye_vms_goods_voucher_view` AS
 SELECT v.*,g.name AS goods_name
-FROM `ims_zy_saas_goods_voucher` v
-LEFT JOIN  `ims_zy_saas_goods` g ON v.goods_id=g.id;
+FROM `ims_zovye_vms_goods_voucher` v
+LEFT JOIN  `ims_zovye_vms_goods` g ON v.goods_id=g.id;
 
-CREATE TABLE IF NOT EXISTS `ims_zy_saas_data_view` (
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
 `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,
   `v` varchar(120) NOT NULL,

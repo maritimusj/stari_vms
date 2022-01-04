@@ -864,9 +864,9 @@ class Order extends State
 
     public static function getExportIDS($params = []): array
     {
-        $agent_openid = $params['agent_openid'] ?? 0;
-        $account_id = $params['account_id'] ?? 0;
-        $device_id = $params['device_id'] ?? 0;
+        $agent_openid = $params['agent_openid'] ?? false;
+        $account_id = $params['account_id'] ?? false;
+        $device_id = $params['device_id'] ?? false;
         $last_id = $params['last_id'] ?? 0;
 
         $query = Order::query();

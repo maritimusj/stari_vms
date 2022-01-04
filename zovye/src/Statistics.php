@@ -125,7 +125,6 @@ class Statistics
             return [];
         }
 
-
         $result = [
             'summary' => [
                 'order' => [

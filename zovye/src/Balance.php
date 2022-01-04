@@ -90,7 +90,7 @@ class Balance
             $profile = $this->user->profile(true);
             $profile['balance'] = $this->total();
             $profile['change'] = $item->getXVal();
-            
+
             $data = [
                 'data' => $profile,
                 'serial' => sha1(App::uid(6) . $item->getId()),
@@ -284,7 +284,7 @@ TEXT;
 TEXT;
         } elseif ($entry->getSrc() == Balance::API_UPDATE) {
             $reason = $entry->getExtraData('reason', '');
-            $reason_data =  $reason ? "<dt>第三方备注</dt><dd>$reason</dd>" : '';
+            $reason_data = $reason ? "<dt>第三方备注</dt><dd>$reason</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -297,7 +297,7 @@ TEXT;
         } elseif ($entry->getSrc() == Balance::TASK_BONUS) {
             $account_profile = $entry->getExtraData('account', []);
             $type_title = '任务';
-            $text =  $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
+            $text = $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -306,11 +306,10 @@ $text
 <dt>说明</dt><dd class="event">任务资料通过审核，获得积分</dd>
 </dl>
 TEXT;
-        }
-        elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
+        } elseif ($entry->getSrc() == Balance::PROMOTE_BONUS) {
             $account_profile = $entry->getExtraData('account', []);
             $type_title = Account::getTypeTitle($account_profile['type']);
-            $text =  $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
+            $text = $account_profile ? "<dt>$type_title</dt><dd><img src=\"{$account_profile['img']}\">{$account_profile['title']}</dd>" : '';
             $data['memo'] = <<<TEXT
 <dl class="log dl-horizontal">
 <dt>事件</dt>
@@ -349,7 +348,7 @@ TEXT;
                 if (is_error($result)) {
                     return $result;
                 }
-                
+
                 if (!BalanceLog::create([
                     'user_id' => $user->getId(),
                     'account_id' => $account->getId(),
@@ -366,7 +365,7 @@ TEXT;
 
             if ($bonus > 0) {
                 $result = $user->getBalance()->change(
-                    $account->getBalancePrice(), 
+                    $account->getBalancePrice(),
                     $account->isTask() ? Balance::TASK_BONUS : Balance::ACCOUNT_BONUS,
                     [
                         'account' => $account->profile(),
@@ -387,18 +386,18 @@ TEXT;
         if (empty($bonus) || !$bonus['enabled']) {
             return err('这个功能没有启用！');
         }
-    
+
         if (!$user->acquireLocker(User::DAILY_SIGN_IN_LOCKER)) {
             return err('请稍后再试！');
         }
-    
+
         if ($user->isSigned()) {
             return err('已经签到了！');
         }
-    
+
         $min = intval($bonus['min']);
         $max = intval($bonus['max']);
-    
+
         if ($min >= $max) {
             $val = $min;
         } else {
@@ -407,11 +406,11 @@ TEXT;
             } catch (Exception $e) {
             }
         }
-        
+
         if (empty($val)) {
             return err('真遗憾，没有获得积分！');
         }
-    
+
         $res = $user->signIn($val);
         if (empty($res)) {
             return err('签到失败！');
@@ -422,11 +421,19 @@ TEXT;
 
     public static function isFreeOrder(): bool
     {
-        return  Config::balance('order.as', 'free') == 'free';
+        static $result = null;
+        if (is_null($result)) {
+            $result = Config::balance('order.as', 'free') == 'free';
+        }
+        return $result;
     }
 
     public static function isPayOrder(): bool
     {
-        return  Config::balance('order.as', 'free') == 'pay';
+        static $result = null;
+        if (is_null($result)) {
+            $result = Config::balance('order.as', 'free') == 'pay';
+        }
+        return $result;
     }
 }

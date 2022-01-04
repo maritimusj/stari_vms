@@ -1085,7 +1085,7 @@ class Order extends State
             $result[] = $data;
         }
 
-        $all_headers = getHeaders();
+        $all_headers = Order::getExportHeaders();
         $column = array_values(array_intersect_key($all_headers, array_flip($headers)));
         $filename = "export/$uid.xls";
 

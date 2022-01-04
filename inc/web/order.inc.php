@@ -189,7 +189,7 @@ if ($op == 'default') {
                 $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['third-party-platform']) {
                 $data['account_title'] = '第三方平台 ' . $accounts[$data['account']]['title'];
-            }  else {
+            } else {
                 $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'];
             }
 
@@ -301,7 +301,7 @@ if ($op == 'default') {
         'orderId' => $order->getOrderId(),
         'createtime' => date('Y-m-d H:i:s', $order->getCreatetime()),
     ];
-    
+
     if ($order->isPackage()) {
         $data['package'] = $order->getPackageId();
     }
@@ -334,7 +334,7 @@ if ($op == 'default') {
             'admin' => _W('username'),
             'ip' => CLIENT_IP,
             'message' => '管理员退款',
-        ]);        
+        ]);
     } elseif (request::has('price')) {
         $price = request::int('price');
 
@@ -389,7 +389,7 @@ if ($op == 'default') {
     JSON::success(['title' => '详情', 'content' => $content]);
 } elseif ($op == 'export') {
 
-    $all_headers = getHeaders();    
+    $all_headers = Order::getExportHeaders();
     unset($all_headers['ID']);
 
     $tpl_data['headers'] = $all_headers;
@@ -400,232 +400,26 @@ if ($op == 'default') {
 
 } elseif ($op == 'export_list') {
 
-    $agent_openid = request::str('agent_openid');
-    $account_id = request::int('accountid');
-    $device_id = request::int('deviceid');
-    $last_id = request::int('lastid');
-
-    $query = Order::query();
-    if ($agent_openid) {
-        $agent = User::get($agent_openid, true);
-        if (empty($agent)) {
-            Util::itoast('找不到指定的代理商！', Util::url('order', ['op' => 'export']), 'error');
-        }
-        $query->where(['agent_id' => $agent->getId()]);
-    }
-
-    if ($account_id) {
-        $account = Account::get($account_id);
-        if (empty($account)) {
-            Util::itoast('找不到指定的公众号！', Util::url('order', ['op' => 'export']), 'error');
-        }
-        $query->where(['account' => $account->getName()]);
-    }
-
-    if ($device_id) {
-        $device = Device::get($device_id);
-        if (empty($device)) {
-            Util::itoast('找不到指定的设备！', Util::url('order', ['op' => 'export']), 'error');
-        }
-        $query->where(['device_id' => $device->getId()]);
-    }
-
-    $date_start = request::str('start');
-    if ($date_start) {
-        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_start . ' 00:00:00');
-    }
-
-    if (empty($s_date)) {
-        $s_date = new DateTime('first day of this month 00:00:00');
-    }
-
-    $date_end = request::str('end');
-    if ($date_end) {
-        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_end . ' 00:00:00');
-    }
-    if (empty($e_date)) {
-        $e_date = new DateTime();
-    }
-
-    $e_date = $e_date->modify('next day 00:00:00');
-
-    $query->where([
-        'createtime >=' => $s_date->getTimestamp(),
-        'createtime <' => $e_date->getTimestamp(),
+    $res = Order::getExportIDS([
+        'agent_openid' => request::str('agent_openid'),
+        'account_id' => request::int('accountid'),
+        'device_id' => request::int('deviceid'),
+        'last_id' => request::int('lastid'),
+        'start' => request::str('start'),
+        'end' => request::str('end'),
     ]);
 
-    if ($last_id > 0) {
-        $query->where(['id >' => $last_id]);
-    }
-
-    $query->orderBy('id ASC');
-    $query->limit(500);
-
-    $result = $query->findAll([], true);
-    $total = $result->count();
-
-    $ids = [];
-    for($i = 0; $i < $total; $i ++) {
-        $ids[] = $result[$i]['id'];
-    }
-
-    JSON::success($ids);
+    JSON::result($res);
 
 } elseif ($op == 'export_update') {
-    
-    $headers = request::array('headers');
-    if (empty($headers)) {
-        $headers = ['order_no', 'createtime'];
-    } 
 
-    array_unshift($headers, 'ID');
-
-    $uid = request::trim('uid');
-    $ids = request::array('ids');
-
-    $query = Order::query(['id' => $ids]);
-    $query->orderBy('id ASC');
-
-    $result = [];
-
-    /** @var orderModelObj $entry */
-    foreach ($query->findAll() as $entry) {
-
-        $user = User::get($entry->getOpenid(), true);
-        $goods = Goods::data($entry->getGoodsId());
-        $device = Device::get($entry->getDeviceId());
-
-        $data = [];
-
-        foreach ($headers as $header) {
-            switch ($header) {
-                case 'ID':
-                    $data[$header] = $entry->getId();
-                    break;
-                case 'order_no':
-                    $data[$header] = 'NO.' . $entry->getOrderId();
-                    break;
-                case 'pay_no':
-                    $pay_result = $entry->getExtraData('payResult');
-                    if ($pay_result) {
-                        if (isset($pay_result['uniontid'])) {
-                            $data[$header] = $pay_result['uniontid'];
-                        } elseif (isset($pay_result['transaction_id'])) {
-                            $data[$header] = $pay_result['transaction_id'];
-                        } else {
-                            $data[$header] = '';
-                        }
-                    } else {
-                        $data[$header] = '';
-                    }
-                    break;
-                case 'pay_type':
-                    $data[$header] = User::getUserCharacter($entry->getUser())['title'];
-                    break;
-                case 'openid':
-                    $data[$header] = $user ? $user->getOpenid() : '';
-                    break;
-                case 'username':
-                    $data[$header] = $user ? str_replace('"', '', $user->getName()) : '';
-                    break;
-                case 'sex':
-                    if ($user) {
-                        $profile = $user->profile();
-                        $data[$header] = $profile['sex'] == 1 ? '男' : ($profile['sex'] == 2 ? '女' : '未知');
-                    } else {
-                        $data[$header] = '';
-                    }
-                    break;
-                case 'region':
-                    if ($user) {
-                        $profile = $user->profile();
-                        $data[$header] = "{$profile['country']} {$profile['province']} {$profile['city']}";
-                    } else {
-                        $data[$header] = '';
-                    }
-                    break;
-                case 'ip':
-                    $data[$header] = $entry->getIp();
-                    break;
-                case 'address':
-                    $info = $entry->get('ip_info', []);
-                    if ($info) {
-                        $json = json_decode($info, true);
-                        if ($json) {
-                            $data[$header] = "{$json['data']['region']}{$json['data']['city']}{$json['data']['district']}";
-                        } else {
-                            $data[$header] = '';
-                        }
-                    } else {
-                        $data[$header] = '';
-                    }
-                    break;
-                case 'goods_name':
-                    $data[$header] = str_replace('"', '', $goods['name']);
-                    break;
-                case 'goods_num':
-                    $data[$header] = $entry->getNum();
-                    break;
-                case 'goods_price':
-                    $data[$header] = number_format($entry->getPrice() / 100, 2);
-                    break;
-                case 'way':
-                    if ($entry->getPrice() > 0) {
-                        $data[$header] = '支付';
-                    } else {
-                        $data[$header] = '免费';
-                    }
-                    break;
-                case 'refund':
-                    if ($entry->getPrice() > 0 && $entry->getExtraData('refund')) {
-                        $data[$header] = '已退款';
-                    } else {
-                        $data[$header] = '';
-                    }
-                    break;
-                case 'refund_time':
-                    if ($entry->getPrice() > 0 && $entry->getExtraData('refund')) {
-                        $time = $entry->getExtraData('refund.createtime');
-                        $data[$header] = date('Y-m-d H:i:s', $time);
-                    } else {
-                        $data[$header] = '';
-                    }
-                    break;
-                case 'account_title':
-                    $account = Account::findOneFromName($entry->getAccount());
-                    $title = $account ? $account->getTitle() : $entry->getAccount();
-                    $data[$header] = str_replace('"', '', $title);
-                    break;
-                case 'agent':
-                    $agent = Agent::get($entry->getAgentId());
-                    $name = $agent ? $agent->getName() : $entry->getExtraData('agent.name', '');
-                    $data[$header] = str_replace('"', '', $name);
-                    break;
-                case 'device_title':
-                    $data[$header] = $device ? str_replace('"', '', $device->getName()) : '';
-                    break;
-                case 'device_imei':
-                    $data[$header] = $device ? $device->getImei() : $entry->getExtraData('device.imei', '');
-                    break;
-                case 'createtime':
-                    $data[$header] = date('Y-m-d H:i:s', $entry->getCreatetime());
-                    break;
-                default:
-                    $data[$header] = '';
-            }
-        }
-        $result[] = $data;
-    }
-
-    $all_headers = getHeaders();
-    $column = array_values(array_intersect_key($all_headers, array_flip($headers)));  
-    $filename =  "export/$uid.xls";
-
-    Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
-
-    JSON::success([
-        'filename' => Util::toMedia($filename),
+    $res = Order::export([
+        'headers' => request::array('headers'),
+        'uid' => request::trim('uid'),
+        'ids' => request::array('ids'),
     ]);
+
+    JSON::result($res);
 
 } elseif ($op == 'log') {
 
@@ -638,7 +432,7 @@ if ($op == 'default') {
     //注意：需要先调用$query->orderBy('id desc'); 
     $last = $query->findOne();
     $total = $last ? $last->getId() : 0;
-    
+
     if (ceil($total / $page_size) < $page) {
         $page = 1;
     }
@@ -731,36 +525,6 @@ if ($op == 'default') {
     $tpl_data['total'] = $total;
 
     app()->showTemplate('web/order/stat', $tpl_data);
-}
-
-/**
- * @return string[]
- */
-function getHeaders(): array
-{
-    return [
-        'ID' => 'ID',
-        'order_no' => '订单号',
-        'pay_no' => '支付号',
-        'pay_type' => '支付类型',
-        'username' => '用户名',
-        'openid' => '用户openid',
-        'sex' => '用户性别',
-        'region' => '用户区域',
-        'goods_name' => '商品名称',
-        'goods_num' => '商品数量',
-        'goods_price' => '商品价格',
-        'way' => '购买方式',
-        'refund' => '是否退款',
-        'refund_time' => '退款时间',
-        'account_title' => '公众号',
-        'agent' => '代理商名称',
-        'device_title' => '设备名称',
-        'device_imei' => '设备IMEI',
-        'ip' => 'ip地址',
-        'address' => '定位地址',
-        'createtime' => '创建时间',
-    ];
 }
 
 function calc_stats($agent_openid, $device_id, $start, $end): array

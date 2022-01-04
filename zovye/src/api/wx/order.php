@@ -12,6 +12,7 @@ use zovye\Agent;
 use zovye\App;
 use zovye\Balance;
 use zovye\Device;
+use zovye\JSON;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\model\goods_voucherModelObj;
@@ -374,5 +375,26 @@ class order
                 'total' => $total ?? 0
             ];
         }
+    }
+
+    public static function getExportIds(): array
+    {
+        return \zovye\Order::getExportIDS([
+            'agent_openid' => request::str('openid'),
+            'account_id' => request::int('accountId'),
+            'device_id' => request::int('deviceId'),
+            'last_id' => request::int('lastId'),
+            'start' => request::str('start'),
+            'end' => request::str('end'),
+        ]);
+    }
+
+    public static function export(): array
+    {
+        return \zovye\Order::export([
+            'headers' => request::array('headers', \zovye\Order::getExportHeaders()),
+            'uid' => request::trim('uid'),
+            'ids' => request::array('ids'),
+        ]);
     }
 }

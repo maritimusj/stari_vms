@@ -119,7 +119,7 @@ router::exec($op, [
     'UploadFile' => '\zovye\api\wx\adv::uploadFile',
     'AdvGroupAssign' => '\zovye\api\wx\adv::groupAssign',
 
-    'AdvGetBonus' =>  '\zovye\api\wxweb\api::reward',
+    'AdvGetBonus' => '\zovye\api\wxweb\api::reward',
 
     'ArticleDetail' => '\zovye\api\wx\article::detail',
     'Article' => '\zovye\api\wx\article::list',
@@ -133,6 +133,8 @@ router::exec($op, [
 
     'OrderDetail' => '\zovye\api\wx\order::detail',
     'OrderDefault' => '\zovye\api\wx\order::default',
+    'OrderGetIDS' => '\zovye\api\wx\order::getExportIds',
+    'OrderExport' => '\zovye\api\wx\order::export',
 
     'CommissionSharedAccount' => '\zovye\api\wx\commission::sharedAccount',
     'CommissionAccountAssign' => '\zovye\api\wx\commission::accountAssign',

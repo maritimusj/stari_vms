@@ -2176,7 +2176,7 @@ if ($op == 'default') {
     }
 
     if ($year->getTimestamp() > time()) {
-        JSON::fail('时间不超过当前时间！');
+        JSON::fail('时间不能超过当前时间！');
     }
 
     $year_list = [];

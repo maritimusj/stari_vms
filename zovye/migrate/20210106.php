@@ -234,8 +234,8 @@ FROM `ims_zovye_vms_device` d;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_users_vw` AS
 SELECT *,
-(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.price=0) AS free_total,
-(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.price>0) AS fee_total,
+(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.src=1) AS free_total,
+(SELECT COUNT(id) FROM `ims_zovye_vms_order` o WHERE o.openid=u.openid AND o.src=0) AS fee_total
 FROM `ims_zovye_vms_user` u;
 
 CREATE OR REPLACE VIEW `ims_zovye_vms_agent_vw` AS

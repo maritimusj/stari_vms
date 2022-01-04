@@ -730,7 +730,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_user_logs` (
   KEY `createtime` (`createtime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
 CREATE TABLE IF NOT EXISTS `ims_zy_saas_version` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uniacid` int(11) DEFAULT NULL,
@@ -740,7 +739,6 @@ CREATE TABLE IF NOT EXISTS `ims_zy_saas_version` (
   `createtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 CREATE TABLE IF NOT EXISTS `ims_zy_saas_voucher` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -791,12 +789,6 @@ SELECT *,
 	  WHERE o.device_id=d.id AND DATE_FORMAT(now(),"%Y%m%d")=DATE_FORMAT(FROM_UNIXTIME(o.createtime),"%Y%m%d")
 ) AS d_total
 FROM `ims_zy_saas_device` d;
-
-CREATE OR REPLACE VIEW `ims_zy_saas_users_vw` AS
-SELECT *,
-(SELECT COUNT(id) FROM `ims_zy_saas_order` o WHERE o.openid=u.openid AND o.price=0) AS free_total,
-(SELECT COUNT(id) FROM `ims_zy_saas_order` o WHERE o.openid=u.openid AND o.price>0) AS fee_total,
-FROM `ims_zy_saas_user` u;
 
 CREATE OR REPLACE VIEW `ims_zy_saas_agent_vw` AS
 SELECT *,

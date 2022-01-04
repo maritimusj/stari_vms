@@ -14,7 +14,6 @@ use zovye\model\keeper_devicesModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\replenishModelObj;
 use zovye\model\userModelObj;
-use zovye\model\users_vwModelObj;
 
 $op = request::op('default');
 
@@ -129,7 +128,7 @@ if ($op == 'default') {
 
     $query->orderBy('id desc');
     $users = [];
-    /** @var  users_vwModelObj $user */
+    /** @var  userModelObj $user */
     foreach ($query->findAll() as $user) {
         $data = [
             'id' => $user->getId(),

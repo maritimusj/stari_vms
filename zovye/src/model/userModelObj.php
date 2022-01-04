@@ -95,13 +95,6 @@ class userModelObj extends modelObj
         return tb('user');
     }
 
-    //overwrite
-    //因为users_vw继续user，所以在这里要绑定settings一些参数
-    protected function getSettingsKey($key, string $classname = ''): string
-    {
-        return parent::getSettingsKey($key, userModelObj::class);
-    }
-
     protected function getSettingsBindClassName(): string
     {
         return 'user';

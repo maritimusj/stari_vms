@@ -474,7 +474,7 @@ class device
                             'name' => $x['name'],
                             'all' => [
                                 'free' => $data['free'],
-                                'fee' => $data['fee'],
+                                'fee' => $data['pay'],
                             ],
                             'area' => $location($item),
                         ];
@@ -526,7 +526,7 @@ class device
             $result['all'] = [
                 'name' => $agent->getName(),
                 'free' => $data['free'],
-                'fee' => $data['fee'],
+                'fee' => $data['pay'],
             ];
         }
 

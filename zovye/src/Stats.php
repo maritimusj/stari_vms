@@ -93,11 +93,17 @@ class Stats
 
         $stats = $obj->get('statsData', [])['data'][$y]['days'][$n][$j];
         $result = [
-            'fee' => intval($stats['p']),
+            'pay' => intval($stats['p']),
             'free' => intval($stats['f']),
         ];
 
-        $result['total'] = $result['fee'] + $result['free'];
+        if (Balance::isPayOrder()) {
+            $result['pay'] += intval($stats['b']);
+        } elseif (Balance::isFreeOrder()) {
+            $result['free'] += intval($stats['b']);
+        }
+
+        $result['total'] = $result['pay'] + $result['free'];
 
         return $result;
     }
@@ -125,6 +131,12 @@ class Stats
             'free' => intval($stats['f']),
         ];
 
+        if (Balance::isPayOrder()) {
+            $result['pay'] += intval($stats['b']);
+        } elseif (Balance::isFreeOrder()) {
+            $result['free'] += intval($stats['b']);
+        }
+
         $result['total'] = $result['pay'] + $result['free'];
 
         return $result;
@@ -142,9 +154,16 @@ class Stats
             'start' => $stats['start'],
             'end' => $stats['end'],
             'free' => intval($stats['total']['f']),
-            'fee' => intval($stats['total']['p']),
+            'pay' => intval($stats['total']['p']),
         ];
-        $result['total'] = $result['free'] + $result['fee'];
+
+        if (Balance::isPayOrder()) {
+            $result['pay'] += intval($stats['b']);
+        } elseif (Balance::isFreeOrder()) {
+            $result['free'] += intval($stats['b']);
+        }
+
+        $result['total'] = $result['free'] + $result['pay'];
 
         return $result;
     }
@@ -641,7 +660,16 @@ class Stats
     {
         $num = intval($order->getNum());
         if ($num > 0) {
-            $way = $order->getPrice() > 0 ? 'p' : ($order->getBalance() > 0 ? 'b' : 'f');
+            if ($order->getSrc() == Order::PAY) {
+                $way = 'p';
+            } elseif ($order->getSrc() == Order::ACCOUNT) {
+                $way = 'f';
+            } elseif ($order->getSrc() == Order::BALANCE) {
+                $way = 'b';
+            } else {
+                $way = 'p';
+            }
+
             $createtime = $order->getCreatetime();
 
             $G = date('G', $createtime); //小时
@@ -707,46 +735,56 @@ class Stats
 
             unset($stats['data'][$y]['total'][$n]['p']);
             unset($stats['data'][$y]['total'][$n]['f']);
+            unset($stats['data'][$y]['total'][$n]['b']);
 
             $p = 0;
-            $b = 0;
             $f = 0;
+            $b = 0;
 
-            foreach ((array)$stats['data'][$y]['days'][$n] as $key => $val) {
+            foreach ((array)$stats['data'][$y]['days'][$n] as $val) {
                 $p += intval($val['p']);
                 $f += intval($val['f']);
+                $b += intval($val['b']);
             }
 
             $stats['data'][$y]['total'][$n]['p'] = $p;
             $stats['data'][$y]['total'][$n]['f'] = $f;
+            $stats['data'][$y]['total'][$n]['b'] = $b;
 
             unset($stats['data'][$y]['total']['p']);
             unset($stats['data'][$y]['total']['f']);
+            unset($stats['data'][$y]['total']['b']);
 
             $p = 0;
             $f = 0;
+            $b = 0;
 
-            foreach ((array)$stats['data'][$y]['total'] as $key => $val) {
+            foreach ((array)$stats['data'][$y]['total'] as $val) {
                 $p += intval($val['p']);
                 $f += intval($val['f']);
+                $b += intval($val['b']);
             }
 
             $stats['data'][$y]['total']['p'] = $p;
             $stats['data'][$y]['total']['f'] = $f;
+            $stats['data'][$y]['total']['b'] = $b;
 
             unset($stats['total']);
 
             $p = 0;
             $f = 0;
+            $b = 0;
 
-            foreach ((array)$stats['data'] as $key => $val) {
+            foreach ((array)$stats['data'] as $val) {
                 $p += intval($val['total']['p']);
                 $f += intval($val['total']['f']);
+                $b += intval($val['total']['b']);
             }
 
             $stats['total'] = [
                 'p' => $p,
                 'f' => $f,
+                'b' => $b,
             ];
 
             return $obj->set('statsData', $stats);
@@ -824,11 +862,17 @@ class Stats
             if ($data) {
                 foreach ($data as $index => $entry) {
                     $time = strtotime("$y-$n-$index");
-                    $result[date('m-d', $time)] = [
+                    $e = [
                         'free' => intval($entry['f']),
                         'fee' => intval($entry['p']),
                         '_day' => $index,
                     ];
+                    if (Balance::isFreeOrder()) {
+                        $e['free'] += intval($entry['b']);
+                    } elseif (Balance::isPayOrder()) {
+                        $e['fee'] += intval($entry['b']);
+                    }
+                    $result[date('m-d', $time)] = $e;
                 }
             }
         }
@@ -869,10 +913,16 @@ class Stats
             $data = $stats['data'][$y]['hours'][$z];
             if ($data) {
                 foreach ($data as $index => $entry) {
-                    $result["$index"] = [
+                    $e = [
                         'free' => intval($entry['f']),
                         'fee' => intval($entry['p']),
                     ];
+                    if (Balance::isFreeOrder()) {
+                        $e['free'] += intval($entry['b']);
+                    } elseif (Balance::isPayOrder()) {
+                        $e['fee'] += intval($entry['b']);
+                    }
+                    $result["$index"] = $e;
                 }
             }
 

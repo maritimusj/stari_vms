@@ -110,14 +110,14 @@ class order
         if (request::has('start')) {
             $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
         } else {
-            $s_date = new DateTime('first day of this month 00:00:00');
+            $s_date = new DateTime('-30 days 00:00:00');
         }
 
         if (request::has('end')) {
             $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
             $e_date->modify('next day');
         } else {
-            $e_date = new DateTime('first day of next month 00:00:00');
+            $e_date = new DateTime();
         }
 
         $condition['createtime >='] = $s_date->getTimestamp();

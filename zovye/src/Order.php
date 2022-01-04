@@ -835,9 +835,9 @@ class Order extends State
     /**
      * @return string[]
      */
-    public static function getExportHeaders(): array
+    public static function getExportHeaders($onlyKeys = false): array
     {
-        return [
+        static $headers = [
             'ID' => 'ID',
             'order_no' => '订单号',
             'pay_no' => '支付号',
@@ -860,6 +860,7 @@ class Order extends State
             'address' => '定位地址',
             'createtime' => '创建时间',
         ];
+        return $onlyKeys ? array_keys($headers) : $headers;
     }
 
     public static function getExportIDS($params = []): array

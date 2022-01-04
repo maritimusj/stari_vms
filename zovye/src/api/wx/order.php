@@ -395,7 +395,7 @@ class order
     public static function export(): array
     {
         return \zovye\Order::export([
-            'headers' => request::array('headers', \zovye\Order::getExportHeaders()),
+            'headers' => request::array('headers', \zovye\Order::getExportHeaders(true)),
             'uid' => request::trim('uid'),
             'ids' => request::array('ids'),
         ]);

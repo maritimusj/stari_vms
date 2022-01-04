@@ -379,8 +379,11 @@ class order
 
     public static function getExportIds(): array
     {
+        $user = common::getAgent();
+        $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
+
         return \zovye\Order::getExportIDS([
-            'agent_openid' => request::str('openid'),
+            'agent_openid' => $agent->getOpenid(),
             'account_id' => request::int('accountId'),
             'device_id' => request::int('deviceId'),
             'last_id' => request::int('lastId'),

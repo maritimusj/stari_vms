@@ -80,9 +80,13 @@ class MoscaleAccount
                     $data['qrcode'] = $result['data']['qrcode_url'];
                     if ($result['data']['rand_key']) {
                         $rand_key = $result['data']['rand_key'];
-                        $data['descr'] = PlaceHolder::replace($data['descr'], [
-                            'key' => "<span data-key=\"$rand_key\">$rand_key</span>",
-                        ]);
+                        if (strpos($data['descr'], '{key}') !== false) {
+                            $data['descr'] = PlaceHolder::replace($data['descr'], [
+                                'key' => "<span data-key=\"$rand_key\">$rand_key</span>",
+                            ]);
+                        } else {
+                            $data['descr'] = "回复<b>$rand_key</b>免费领取！";
+                        }
                     }
 
                     $v[] = $data;

@@ -92,7 +92,14 @@ class MeiPaAccount
                 }
 
                 if ($result['data']['code_words']) {
-                    $data['descr'] = "回复<b>{$result['data']['code_words']}</b>免费领取！";
+                    $code = $result['data']['code_words'];
+                    if (strpos($data['descr'], '{code}') !== false) {
+                        $data['descr'] = PlaceHolder::replace($data['descr'], [
+                            'code' => "<span data-key=\"$code\">$code</span>",
+                        ]);
+                    } else {
+                        $data['descr'] = "回复<b>$code</b>免费领取！";
+                    }
                 }
 
                 if (App::isAccountLogEnabled() && isset($log)) {

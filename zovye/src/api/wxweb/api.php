@@ -13,6 +13,7 @@ use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
 use zovye\model\balanceModelObj;
+use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Task;
 use zovye\User;
@@ -362,14 +363,8 @@ class api
         ];
     }
 
-    public static function reward(): array
+    protected static function getRewardBonus(userModelObj $user)
     {
-        $user = \zovye\api\wx\common::getUser();
-
-        if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
-            return err('无法锁定用户！');
-        }
-
         $bonusData = Config::app('wxapp.advs.reward.bonus', []);
         if (isEmptyArray($bonusData)) {
             return err('暂时没有奖励！');
@@ -405,15 +400,6 @@ class api
             }
         }
 
-        $last_reward = Balance::query()->orderBy('id DESC')->findOne([
-            'openid' => $user->getOpenid(),
-            'src' => Balance::REWARD_ADV,
-        ]);
-
-        if ($last_reward && time() - $last_reward->getCreatetime() < 3) {
-            return err('操作太快，请稍后再试！');
-        }
-
         //获取用户奖励等级
         $condition = [
             'openid' => $user->getOpenid(),
@@ -443,7 +429,39 @@ class api
             return err('暂时没有奖励！');
         }
 
-        $result = $user->getBalance()->change($bonus, Balance::REWARD_ADV);
+        return $bonus;
+    }
+
+    public static function rewardQuota(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
+            return err('无法锁定用户！');
+        }
+
+        $res = self::getRewardBonus($user);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return ['msg' => 'Ok'];
+    }
+
+    public static function reward(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
+            return err('无法锁定用户！');
+        }
+
+        $res = self::getRewardBonus($user);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        $result = $user->getBalance()->change($res, Balance::REWARD_ADV);
         if (empty($result)) {
             return err('获取奖励失败！');
         }

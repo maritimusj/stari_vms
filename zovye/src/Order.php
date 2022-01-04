@@ -924,7 +924,7 @@ class Order extends State
         }
 
         $query->orderBy('id ASC');
-        $query->limit(500);
+        $query->limit($params['max'] ?? 200);
 
         $result = $query->findAll([], true);
         $total = $result->count();

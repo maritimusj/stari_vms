@@ -138,7 +138,7 @@ class Statistics
             'list' => []
         ];
 
-        $fn = function ($data, $start) use ($result) {
+        $fn = function ($data, $start) use (&$result) {
             $data['summary']['m'] = $start->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
             $result['summary']['order']['pay'] += $data['summary']['order']['pay'];

@@ -2170,7 +2170,7 @@ if ($op == 'default') {
 
     $year = null;
     try {
-        $year = new DateTimeImmutable(sprintf("%s-%02d-01", (new Datetime($year_str))->format('Y'), $month));
+        $year = new DateTimeImmutable(sprintf("%s-%02d-01", (new DateTime("{$year_str}-01-01"))->format('Y'), $month));
     } catch (Exception $e) {
         JSON::fail('时间格式不正确！');
     }

@@ -115,7 +115,7 @@
                                 <td v-text="e.m"></td>
                                 <td v-text="e.order.free"></td>
                                 <td v-text="e.order.pay"></td>
-                                <td v-text="e.commission.total"></td>
+                                <td>￥{{e.commission.total}}</td>
                                 <td :class="{operate: !repairing, 'text-muted': repairing}">
                                     <template v-if="repairing && repairing === e.m">
                                         <i class="fa fa-spin fa-spinner"></i>

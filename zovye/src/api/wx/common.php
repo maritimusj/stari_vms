@@ -15,10 +15,9 @@ use zovye\LoginData;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Wx;
-use zovye\State;
 use zovye\WxApp;
 use function zovye\_W;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -28,7 +27,7 @@ class common
     {
         $code = request::str('code');
         if (empty($code)) {
-            return error(State::ERROR, '缺少必要的请求参数！');
+            return err('缺少必要的请求参数！');
         }
 
         $config = settings('agentWxapp', []);
@@ -37,7 +36,7 @@ class common
         if (!empty($vendorUID) && $vendorUID != 'v1' && $vendorUID != $config['key']) {
             $app = WxApp::get($vendorUID, true);
             if (empty($app)) {
-                return error(State::ERROR, '找不到指定的小程序配置！');
+                return err('找不到指定的小程序配置！');
             }
             $config = [
                 'key' => $app->getKey(),
@@ -46,7 +45,7 @@ class common
         }
 
         if (empty($config)) {
-            return error(State::ERROR, '小程序配置为空！');
+            return err('小程序配置为空！');
         }
 
         $iv = request::str('iv');

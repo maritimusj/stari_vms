@@ -6,11 +6,8 @@
 
 namespace zovye\api\wx;
 
-use DateTime;
 use Exception;
 use zovye\Advertising;
-use zovye\Balance;
-use zovye\Config;
 use zovye\Log;
 use zovye\model\advertisingModelObj;
 use zovye\Device;

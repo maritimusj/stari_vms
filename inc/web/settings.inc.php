@@ -24,7 +24,7 @@ if ($op == 'save') {
         return "
 header(\"Access-Control-Allow-Origin: $url\");
 header(\"Access-Control-Allow-Methods: GET,POST\");
-header(\"Access-Control-Allow-Headers: Content-Type, STA-API, STA_WXWEB, LLT-API\");
+header(\"Access-Control-Allow-Headers: Content-Type, STA-API, STA-WXAPI, STA-WXWEB, LLT-API, LLT-WXAPI\");
 header(\"Access-Control-Max-Age: 86400\");
 
 if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {

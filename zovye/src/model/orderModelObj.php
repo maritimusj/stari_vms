@@ -40,6 +40,7 @@ use function zovye\is_error;
  * @method setResultCode(int $int)
  * @method setRefund(bool $bool)
  * @method getResultCode()
+ * @method isRefund()
  */
 class orderModelObj extends modelObj
 {

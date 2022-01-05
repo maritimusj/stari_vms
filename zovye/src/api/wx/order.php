@@ -7,16 +7,10 @@
 namespace zovye\api\wx;
 
 use DateTime;
-use zovye\Account;
-use zovye\Agent;
 use zovye\App;
 use zovye\Balance;
 use zovye\Device;
-use zovye\JSON;
-use zovye\model\deviceModelObj;
 use zovye\Goods;
-use zovye\model\goods_voucherModelObj;
-use zovye\GoodsVoucher;
 use zovye\request;
 use zovye\model\orderModelObj;
 use zovye\State;
@@ -66,63 +60,42 @@ class order
 
     public static function default(): array
     {
-        $user = common::getAgent();
-        $condition = [];
-
-        $guid = request::str('guid');
-        if (!empty($guid)) {
-            $user = \zovye\api\wx\agent::getUserByGUID($guid);
+        if (request::has('guid')) {
+            $guid = request::str('guid');
+            $user = agent::getUserByGUID($guid);
             if (empty($user)) {
                 return err('找不到这个用户！');
             }
+        } else {
+            $user = common::getAgent();
         }
 
-        $condition['agent_id'] = $user->getAgentId();
+        $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-        $query = \zovye\Order::query();
-
-        $res = Device::query($condition)->findAll();
-
-        $devices = [];
-        $device_keys = [];
-
-        /** @var deviceModelObj $item */
-        foreach ($res as $item) {
-            $devices[] = [
-                'id' => $item->getId(),
-                'name' => $item->getName(),
-                'imei' => $item->getImei(),
-            ];
-            $device_keys[] = $item->getId();
-        }
+        $query = \zovye\Order::query(['agent_id' => $agent->getId()]);
 
         if (request::has('deviceid')) {
-            $d_id = request::int('deviceid');
-            if (in_array($d_id, $device_keys)) {
-                $condition['device_id'] = $d_id;
-            } else {
-                $condition['device_id'] = -1;
+            $device_id = request::int('deviceid');
+            $device = Device::get($device_id);
+            if (empty($device)) {
+                return err('找不到这个设备！');
             }
+            if ($device->getAgentId() != $agent->getId()) {
+                return err('没有权限管理这个设备！');
+            }
+            $query->where(['device_id' => $device->getId()]);
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
-
         if (request::has('start')) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
-        } else {
-            $s_date = new DateTime('-30 days 00:00:00');
+            $begin = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
+            $query->where(['createtime >=' => $begin->getTimestamp()]);
         }
 
         if (request::has('end')) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
-            $e_date->modify('next day');
-        } else {
-            $e_date = new DateTime();
+            $end = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
+            $end->modify('next day 00:00');
+            $query->where(['createtime <' => $end->getTimestamp()]);
         }
-
-        $condition['createtime >='] = $s_date->getTimestamp();
-        $condition['createtime <'] = $e_date->getTimestamp();
 
         $order_no = request::trim('order');
         if ($order_no) {
@@ -135,55 +108,54 @@ class order
         $way = request::trim('way');
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-                $condition['src'] = [\zovye\Order::ACCOUNT, \zovye\Order::BALANCE];
+                $query->where([
+                    'src' => [\zovye\Order::ACCOUNT, \zovye\Order::BALANCE],
+                ]);
             } else {
-                $condition['src'] = \zovye\Order::ACCOUNT;
+                $query->where(['src' => \zovye\Order::ACCOUNT]);
             }
-        } elseif ($way == 'fee') {
+        } elseif ($way == 'pay') {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {
-                $condition['src'] = [\zovye\Order::PAY, \zovye\Order::BALANCE];
+                $query->where(['src' => [\zovye\Order::PAY, \zovye\Order::BALANCE]]);
             } else {
-                $condition['src'] = \zovye\Order::PAY;
+                $query->where(['src' => \zovye\Order::PAY]);
             }
         } elseif ($way == 'refund') {
-            $condition['refund'] = 1;
+            $query->where(['refund' => 1]);
         }
 
-        if (request::bool('export')) {
-            $t_res = $query->where($condition)->orderBy('id DESC')->findAll();
-        } else {
-            $query->where($condition);
-            $total = $query->count();
-            if (ceil($total / $page_size) < $page) {
-                $page = 1;
-            }
-            $t_res = $query->page($page, $page_size)->orderBy('id DESC')->findAll();
+        $page = max(1, request::int('page'));
+        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+
+        $total = $query->count();
+        if (ceil($total / $page_size) < $page) {
+            $page = 1;
         }
 
-        $accounts = [];
+        $query->page($page, $page_size);
+        $query->orderBy('id DESC');
+
         $orders = [];
 
         /** @var orderModelObj $entry */
-        foreach ($t_res as $entry) {
-            $character = User::getUserCharacter($entry->getOpenid());
+        foreach ($query->findAll() as $entry) {
             $data = [
                 'id' => $entry->getId(),
                 'num' => $entry->getNum(),
                 'price' => number_format($entry->getPrice() / 100, 2),
-                'ip' => $entry->getIp(),
                 'account' => $entry->getAccount(),
                 'orderId' => $entry->getOrderId(),
-                'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 'agentId' => $entry->getAgentId(),
-                'from' => $character,
+                'from' => User::getUserCharacter($entry->getOpenid()),
+                'ip' => $entry->getIp(),
+                'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];
 
             $data['goods'] = $entry->getExtraData('goods');
             $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
 
             //用户信息
-            $user_openid = $entry->getOpenid();
-            $user_obj = User::get($user_openid, true);
+            $user_obj = $entry->getUser();
             if ($user_obj) {
                 $data['user'] = [
                     'id' => $user_obj->getId(),
@@ -193,8 +165,7 @@ class order
             }
 
             //设备信息
-            $device_id = $entry->getDeviceId();
-            $device_obj = Device::get($device_id);
+            $device_obj = $entry->getDevice();
             if ($device_obj) {
                 $data['device'] = [
                     'name' => $device_obj->getName(),
@@ -203,76 +174,17 @@ class order
             }
 
             //代理商信息
-            $agent_id = $entry->getAgentId();
-            $agent = Agent::get($agent_id);
-            if ($agent) {
-                $level = $agent->getAgentLevel();
-                $data['agentId'] = $agent->getId();
+            $agent_obj = $entry->getAgent();
+            if ($agent_obj) {
+                $data['agentId'] = $agent_obj->getId();
                 $data['agent'] = [
-                    'name' => $agent->getName(),
-                    'avatar' => $agent->getAvatar(),
-                    'level' => $level,
+                    'name' => $agent_obj->getName(),
+                    'avatar' => $agent_obj->getAvatar(),
+                    'level' => $agent_obj->getAgentLevel(),
                 ];
             }
 
-            //ip地址信息
-            if ($data['ip']) {
-                $info = $entry->get('ip_info', []);
-                if (empty($info)) {
-                    $info = Util::getIpInfo($data['ip']);
-                    if ($info) {
-                        $entry->set('ip_info', $info);
-                    }
-                }
-                if ($info) {
-                    $json = json_decode($info, true);
-                    if ($json) {
-                        $data['ip_info'] = "{$json['data']['region']}{$json['data']['city']}{$json['data']['district']}";
-                    }
-                }
-            }
-
-            //公众号信息
-            if (empty($accounts[$entry->getAccount()])) {
-                $account = Account::findOneFromName($entry->getAccount());
-                if ($account) {
-                    $accounts[$entry->getAccount()] = [
-                        'name' => $account->getName(),
-                        'clr' => $account->getClr(),
-                        'title' => $account->getTitle(),
-                        'img' => Util::toMedia($account->getImg()),
-                        'qrcode' => Util::toMedia($account->getQrcode()),
-                    ];
-                }
-            }
-
-            $voucher_id = intval($entry->getExtraData('voucher.id'));
-            if ($voucher_id > 0) {
-                $data['voucher'] = [
-                    'id' => $voucher_id,
-                    'code' => '&lt;n/a&gt;',
-                ];
-
-                /** @var goods_voucherModelObj $v */
-                $v = GoodsVoucher::getLogById($voucher_id);
-                if ($v) {
-                    $data['voucher']['code'] = $v->getCode();
-                }
-            }
-
-            if ($data['price'] > 0) {
-                $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-            } else {
-                $data['tips'] = ['text' => '免费', 'class' => 'free'];
-            }
-
-            if ($accounts[$data['account']]) {
-                $data['clr'] = $accounts[$data['account']]['clr'];
-            } else {
-                $data['clr'] = $character['color'];
-            }
-
-            if ($data['price'] > 0 && $entry->getExtraData('refund')) {
+            if ($entry->isRefund() && $entry->getExtraData('refund')) {
                 $time = $entry->getExtraData('refund.createtime');
                 $time_formatted = date('Y-m-d H:i:s', $time);
                 $data['refund'] = [
@@ -280,11 +192,6 @@ class order
                     'reason' => $entry->getExtraData('refund.message'),
                 ];
                 $data['clr'] = '#ccc';
-            }
-            //分佣
-            $commission = $entry->getExtraData('commission', []);
-            if ($commission) {
-                $data['commission'] = $commission;
             }
 
             $pay_result = $entry->getExtraData('payResult');
@@ -295,86 +202,12 @@ class order
             $orders[] = $data;
         }
 
-        if (request::bool('export')) {
-            //
-            $headers = [
-                '订单ID',  //id
-                '订单号',  //orderId  NO
-                '支付号',  //transaction_id
-                '支付类型', //from -> title
-                '用户名',  //user -> nickname
-                '商品名称', //goods -> name
-                '商品数量', //num
-                '商品价格', //goods -> price_formatted
-                '购买方式', // price  现金  .. 免费
-                '是否退款', // refund exist
-                '退款时间', // refund -> title
-                '公众号', //
-                '代理商名称', //agent  -> name
-                '设备名称', //device -> name
-                '设备IMEI', //result -> deviceGUID
-                'ip地址', //ip
-                '创建时间' //createtime
-            ];
-
-            $tab_header = implode("\t", $headers);
-            $str_export = $tab_header . "\r\n";
-
-            foreach ($orders as $item) {
-
-                $str_export .= $item['id'] . "\t";
-                $str_export .= 'NO.' . $item['orderId'] . "\t";
-                $str_export .= 'NO.' . $item['transaction_id'] . "\t";
-                $str_export .= ($item['from']['title'] ?: '') . "\t";
-                $str_export .= ($item['user']['nickname'] ?: '') . "\t";
-                $str_export .= ($item['goods']['name'] ?: '') . "\t";
-                $str_export .= $item['num'] . "\t";
-                $str_export .= ($item['goods']['price_formatted'] ?: '') . "\t";
-                if ($item['price'] > 0) {
-                    $str_export .= "支付\t";
-                } else {
-                    $str_export .= "免费\t";
-                }
-
-                if (isset($item['refund'])) {
-                    $str_export .= "是\t";
-                    $str_export .= $item['refund']['title'] . "\t";
-                } else {
-                    $str_export .= "\t\t";
-                }
-                if (isset($accounts[$item['account']]['title'])) {
-                    $str_export .= $accounts[$item['account']]['title'] . "\t";
-                } else {
-                    $str_export .= "\t";
-                }
-
-                $str_export .= ($item['agent']['name'] ?? '') . "\t";
-                $str_export .= ($item['device']['name'] ?? '') . "\t";
-                $str_export .= ($item['result']['deviceGUID'] ?? '') . "\t";
-                $str_export .= $item['ip'] . "\t";
-                $str_export .= $item['createtime'] . "\t";
-
-                $str_export .= "\r\n";
-            }
-
-            $file_name = time() . '_' . rand() . '.xls';
-            file_put_contents(ATTACHMENT_ROOT . '/' . $file_name, $str_export);
-
-            readfile(ATTACHMENT_ROOT . '/' . $file_name);
-            @unlink(ATTACHMENT_ROOT . '/' . $file_name);
-            exit;
-
-
-        } else {
-            return [
-                'orders' => $orders,
-                'accounts' => $accounts,
-                'devices' => $devices,
-                'page' => $page,
-                'pagesize' => $page_size,
-                'total' => $total ?? 0
-            ];
-        }
+        return [
+            'orders' => $orders,
+            'page' => $page,
+            'pagesize' => $page_size,
+            'total' => $total ?? 0
+        ];
     }
 
     public static function getExportIds(): array

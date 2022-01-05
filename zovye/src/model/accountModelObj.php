@@ -460,4 +460,17 @@ class accountModelObj extends modelObj
 
         return '';
     }
+
+    public function getFirstOrderData()
+    {
+        return $this->settings('misc.first_order');
+    }
+
+    public function setFirstOrderData(orderModelObj $order): bool
+    {
+        return $this->updateSettings('misc.first_order', [
+            'id' => $order->getId(),
+            'createtime' => $order->getCreatetime(),
+        ]);
+    }
 }

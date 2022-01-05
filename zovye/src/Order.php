@@ -7,6 +7,7 @@
 namespace zovye;
 
 use DateTime;
+use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
 use zovye\model\userModelObj;
@@ -166,6 +167,21 @@ class Order extends State
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $agent->setFirstOrderData($order);
+            return $order;
+        }
+        return null;
+    }
+
+    public static function getFirstOrderOfAccount(accountModelObj $account): ?orderModelObj
+    {
+        $data = $account->getFirstOrderData();
+        if ($data && $data['id']) {
+            return Order::get($data['id']);
+        }
+        $query = self::query(['account' => $account->getName()]);
+        $order = $query->orderBy('id ASC')->findOne();
+        if ($order) {
+            $account->setFirstOrderData($order);
             return $order;
         }
         return null;

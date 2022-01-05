@@ -9,6 +9,8 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use DateTimeImmutable;
+use Exception;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -1155,4 +1157,82 @@ if ($op == 'default') {
     }
 
     JSON::fail('设置失败！');
+
+} elseif ($op == 'commission_stats_view') {
+    $account_id = request::int('id');
+    $account = Account::get($account_id);
+
+    if (empty($account)) {
+        Util::itoast('找不到这个公众号或任务！', '', 'error');
+    }
+
+    app()->showTemplate('web/account/commission_stats_view', [
+        'account' => $account,
+    ]);
+
+} elseif ($op == 'year_commission_statistics') {
+
+    $account_id = request::int('id');
+    $account = Account::get($account_id);
+
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号或任务！');
+    }
+
+    $year_str = request::str('year');
+    $month = request::int('month');
+
+    $year = null;
+    try {
+        $year = new DateTimeImmutable(sprintf("%s-%02d-01", (new DateTime("{$year_str}-01-01"))->format('Y'), $month));
+    } catch (Exception $e) {
+        JSON::fail('时间格式不正确！');
+    }
+
+    if ($year->getTimestamp() > time()) {
+        JSON::fail('时间不能超过当前时间！');
+    }
+
+    $year_list = [];
+    $first_order = Order::getFirstOrderOfAccount($agent);
+    if ($first_order) {
+        try {
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order->getCreatetime()));
+        } catch (Exception $e) {
+            $begin = new DateTime();
+        }
+        $nextYear = new DateTime('first day of jan next year 00:00');
+        while ($begin < $nextYear) {
+            $year_list[] = $begin->format('Y');
+            $begin->modify('next year');
+        }
+    } else {
+        $year_list[] = (new DateTime())->format('Y');
+    }
+
+    $result = Statistics::accountYear($account, $year, $month);
+    $result['title'] = $year->format('Y年');
+    $result['year'] = $year_list;
+
+    JSON::success($result);
+} elseif ($op == 'month_commission_statistics') {
+    $account_id = request::int('id');
+    $account = Account::get($account_id);
+
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号或任务！');
+    }
+
+    $month_str = request::str('month');
+    $month = null;
+    try {
+        $month = new DateTimeImmutable($month_str);
+    } catch (Exception $e) {
+        JSON::fail('时间格式不正确！');
+    }
+
+    $result = Statistics::accountMonth($account, $month, request::int('day'));
+    $result['title'] = $month->format('Y年m月');
+
+    JSON::success($result);
 }

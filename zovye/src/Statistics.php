@@ -263,4 +263,11 @@ class Statistics
             return $result;
         }, $user->getId(), $begin->format('Y-m'), $day);
     }
+
+    public static function accountYear(accountModelObj $account, $year = '', $month = 0): array
+    {
+    }
+    public static function accountMonth(accountModelObj $account, $month = '', $day = 0)
+    {
+    }
 }

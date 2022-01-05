@@ -45,9 +45,6 @@ class Stats
                     if ($entry instanceof ISettings) {
                         $stats = $entry->get('statsData', []);
 
-                        //只保存今年的数据
-                        //$stats = ['total' => $stats['total'] , date('Y') => $stats[date('Y')]);
-
                         if (empty($stats['start']) || $createtime < $stats['start']) {
                             $stats['start'] = $createtime;
                         }
@@ -81,29 +78,24 @@ class Stats
      */
     public static function getDayTotal(ISettings $obj, $day = null): array
     {
-        if (empty($day)) {
-            $day = time();
-        } elseif (is_string($day)) {
-            $day = strtotime($day);
+        if (is_string($day)) {
+            try {
+                $begin = new DateTime($day);
+            } catch (Exception $e) {
+                return [];
+            }
+        } else {
+            $begin = new DateTime();
         }
 
-        $y = date('Y', $day); //年
-        $n = date('n', $day); //月
-        $j = date('j', $day); //月份中的第几天
-
-        $stats = $obj->get('statsData', [])['data'][$y]['days'][$n][$j];
-        $result = [
-            'pay' => intval($stats['p']),
-            'free' => intval($stats['f']),
-        ];
+        $counter = new OrderCounter();
+        $result = $counter->getDayAll($obj, $begin);
 
         if (Balance::isPayOrder()) {
-            $result['pay'] += intval($stats['b']);
+            $result['pay'] += intval($result['balance']);
         } elseif (Balance::isFreeOrder()) {
-            $result['free'] += intval($stats['b']);
+            $result['free'] += intval($result['balance']);
         }
-
-        $result['total'] = $result['pay'] + $result['free'];
 
         return $result;
     }
@@ -116,28 +108,24 @@ class Stats
      */
     public static function getMonthTotal(ISettings $obj, $month = null): array
     {
-        if (empty($month)) {
-            $month = time();
-        } elseif (is_string($month)) {
-            $month = strtotime($month);
+        if (is_string($month)) {
+            try {
+                $begin = new DateTime($month);
+            } catch (Exception $e) {
+                return [];
+            }
+        } else {
+            $begin = new DateTime();
         }
 
-        $y = date('Y', $month); //年
-        $n = date('n', $month); //月
-
-        $stats = $obj->get('statsData', [])['data'][$y]['total'][$n];
-        $result = [
-            'pay' => intval($stats['p']),
-            'free' => intval($stats['f']),
-        ];
+        $counter = new OrderCounter();
+        $result = $counter->getMonthAll($obj, $begin);
 
         if (Balance::isPayOrder()) {
-            $result['pay'] += intval($stats['b']);
+            $result['pay'] += intval($result['balance']);
         } elseif (Balance::isFreeOrder()) {
-            $result['free'] += intval($stats['b']);
+            $result['free'] += intval($result['balance']);
         }
-
-        $result['total'] = $result['pay'] + $result['free'];
 
         return $result;
     }
@@ -845,36 +833,42 @@ class Stats
      */
     public static function daysOfMonth(ISettings $obj, $day = null): array
     {
-        if (empty($day)) {
-            $day = time();
-        } elseif (is_string($day)) {
-            $day = strtotime($day);
+        if (is_string($day)) {
+            try {
+                $begin = new DateTime($day);
+            } catch (Exception $e) {
+                return [];
+            }
+        } else {
+            $begin = new DateTime();
         }
 
-        $y = date('Y', $day); //年
-        $n = date('n', $day); //月
+        $begin->modify('first day of this month 00:00');
+        try {
+            $end = new DateTime($begin->format('Y-m-d 00:00:00'));
+            $end->modify('first day of next month');
+            if ($end->getTimestamp() > time()) {
+                $end->setTimestamp(time());
+            }
+        } catch (Exception $e) {
+            return [];
+        }
 
         $result = [];
-        $stats = $obj->get('statsData', []);
-
-        if ($stats) {
-            $data = $stats['data'][$y]['days'][$n];
-            if ($data) {
-                foreach ($data as $index => $entry) {
-                    $time = strtotime("$y-$n-$index");
-                    $e = [
-                        'free' => intval($entry['f']),
-                        'fee' => intval($entry['p']),
-                        '_day' => $index,
-                    ];
-                    if (Balance::isFreeOrder()) {
-                        $e['free'] += intval($entry['b']);
-                    } elseif (Balance::isPayOrder()) {
-                        $e['fee'] += intval($entry['b']);
-                    }
-                    $result[date('m-d', $time)] = $e;
-                }
+        $counter =  new OrderCounter();
+        while ($begin < $end) {
+            $data = $counter->getDayAll($obj, $begin);
+            if (Balance::isFreeOrder()) {
+                $data['free'] += intval($data['balance']);
+            } elseif (Balance::isPayOrder()) {
+                $data['pay'] += intval($data['balance']);
             }
+            $result[$begin->format('m-d')] = [
+                'free' =>  $data['free'],
+                'fee' => $data['pay'],
+                '_day' => $begin->format('d'),
+            ];
+            $begin->modify('next day');
         }
 
         uasort(
@@ -895,37 +889,41 @@ class Stats
      */
     public static function hoursOfDay(ISettings $obj, $day = null): array
     {
-        if (empty($day)) {
-            $day = time();
-        } elseif (is_string($day)) {
-            $day = strtotime($day);
+        if (is_string($day)) {
+            try {
+                $begin = new DateTime($day);
+            } catch (Exception $e) {
+                return [];
+            }
+        } else {
+            $begin = new DateTime();
         }
 
-        $y = date('Y', $day); //年
-        //$n = date('n', $day); //月
-        $z = date('z', $day); //一年中的第几天
-        //$j = date('j', $day); //月份中的第几天
+        $begin->modify('00:00:00');
+        try {
+            $end = new DateTime($begin->format('Y-m-d 00:00'));
+            $end->modify('next day 00:00');
+            if ($end->getTimestamp() > time()) {
+                $end->setTimestamp(time());
+            }
+        } catch (Exception $e) {
+            return [];
+        }
 
         $result = [];
-        $stats = $obj->get('statsData', []);
-
-        if ($stats) {
-            $data = $stats['data'][$y]['hours'][$z];
-            if ($data) {
-                foreach ($data as $index => $entry) {
-                    $e = [
-                        'free' => intval($entry['f']),
-                        'fee' => intval($entry['p']),
-                    ];
-                    if (Balance::isFreeOrder()) {
-                        $e['free'] += intval($entry['b']);
-                    } elseif (Balance::isPayOrder()) {
-                        $e['fee'] += intval($entry['b']);
-                    }
-                    $result["$index"] = $e;
-                }
+        $counter =  new OrderCounter();
+        while($begin < $end) {
+            $data = $counter->getHourAll($obj, $begin);
+            if (Balance::isFreeOrder()) {
+                $data['free'] += intval($data['balance']);
+            } elseif (Balance::isPayOrder()) {
+                $data['pay'] += intval($data['balance']);
             }
-
+            $result[intval($begin->format('H'))] = [
+                'free' =>  $data['free'],
+                'fee' => $data['pay'],
+            ];
+            $begin->modify('+1 hour');
         }
 
         return $result;

@@ -33,7 +33,7 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
 
     $start = microtime(true);
 
-    $result = Stats::repairMonthData($agent, $log['month']);
+    $result = Stats::repairMonthData($agent, $data['month']);
     if (is_error($result)) {
         $agent->updateSettings('repair', [
             'error' => $result,

@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use zovye\base\modelObj;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
@@ -40,8 +41,6 @@ class Statistics
      */
     public static function calc($obj, DateTimeInterface $begin, DateTimeInterface $end): array
     {
-        $result = [];
-
         $condition = [
             'createtime >=' => $begin->getTimestamp(),
             'createtime <' => $end->getTimestamp()
@@ -58,6 +57,8 @@ class Statistics
         } else {
             return [];
         }
+
+        $result = [];
 
         $result['free'] = (int)Order::query($condition)->where(['src' => Order::ACCOUNT])->get('sum(num)');
         $result['pay'] = (int)Order::query($condition)->where(['src' => Order::PAY])->get('sum(num)');
@@ -118,13 +119,8 @@ class Statistics
         }, $device->getId(), $begin->format('Y-m'));
     }
 
-    public static function userYear(userModelObj $user, $year = '', $month = 0): array
+    protected static function yearData($obj, $year = '', $month = 0): array
     {
-        $date = self::parseMonth($year);
-        if (!$date) {
-            return [];
-        }
-
         $result = [
             'summary' => [
                 'order' => [
@@ -138,6 +134,11 @@ class Statistics
             'list' => []
         ];
 
+        $date = self::parseMonth($year);
+        if (!$date) {
+            return $result;
+        }
+
         $fn = function ($data, $start) use (&$result) {
             $data['summary']['m'] = $start->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
@@ -145,6 +146,7 @@ class Statistics
             $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
             $result['list'][$start->format('m月')] = $data['summary'];
         };
+
         if ($month == 0) {
             $date->modify('first day of January 00:00');
             $end = DateTimeImmutable::createFromMutable($date)->modify('first day of January next year 00:00');
@@ -155,57 +157,59 @@ class Statistics
                 }
                 $start = DateTimeImmutable::createFromMutable($date);
                 $date->modify('next month 00:00');
-                $data = self::userMonth($user, $start);
+                $data = self::monthData($obj, $start);
                 $fn($data, $start);
             }
         } else {
             $date->modify('first day of this month 00:00');
-            $data = self::userMonth($user, $date, 1);
+            $data = self::monthData($obj, $date, 1);
             $fn($data, $date);
         }
 
         return $result;
     }
 
-    public static function userMonth(userModelObj $user, $month = '', $day = 0)
+    public static function monthData(modelObj $obj, $month = '', $day = 0)
     {
-        $fn = function (DateTimeInterface $begin, DateTimeInterface $end) use ($user) {
+        $condition = [];
+        if ($obj instanceof agentModelObj) {
+            $condition['agent_id'] = $obj->getId();
+        } elseif ($obj instanceof accountModelObj) {
+            $condition['account'] = $obj->getName();
+        } elseif ($obj instanceof deviceModelObj) {
+            $condition['device_id'] = $obj->getId();
+        } elseif ($obj instanceof goodsModelObj) {
+            $condition['goods_id'] = $obj->getId();
+        }
+
+        $fn = function (DateTimeInterface $begin, DateTimeInterface $end) use ($obj, $condition) {
             $result = [
                 'order' => [
                     'free' => 0,
                     'pay' => 0,
-                ],
-                'commission' => [
-                    'total' => 0,
                 ]
             ];
 
-            $result['order']['free'] = (int)Util::cachedCall(0, function () use ($user, $begin, $end) {
-                return Order::query()->where([
-                    'agent_id' => $user->getId(),
+            $condition['createtime >='] = $begin->getTimestamp();
+            $condition['createtime <'] = $end->getTimestamp();
+
+            $result['order']['free'] = (int)Util::cachedCall(0, function () use ($condition) {
+                return Order::query($condition)->where([
                     'src' => Order::ACCOUNT,
-                    'createtime >=' => $begin->getTimestamp(),
-                    'createtime <' => $end->getTimestamp()
                 ])->get('sum(num)');
-            }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp());
+            }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
 
-            $result['order']['pay'] = (int)Util::cachedCall(0, function () use ($user, $begin, $end) {
-                return Order::query()->where([
-                    'agent_id' => $user->getId(),
+            $result['order']['pay'] = (int)Util::cachedCall(0, function () use ($condition) {
+                return Order::query($condition)->where([
                     'src' => Order::PAY,
-                    'createtime >=' => $begin->getTimestamp(),
-                    'createtime <' => $end->getTimestamp(),
                 ])->get('sum(num)');
-            }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp());
+            }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
 
-            $balance = (int)Util::cachedCall(0, function () use ($user, $begin, $end) {
-                return Order::query()->where([
-                    'agent_id' => $user->getId(),
+            $balance = (int)Util::cachedCall(0, function () use ($condition) {
+                return Order::query($condition)->where([
                     'src' => Order::BALANCE,
-                    'createtime >=' => $begin->getTimestamp(),
-                    'createtime <' => $end->getTimestamp(),
                 ])->get('sum(num)');
-            }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp());
+            }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
 
             if (Balance::isPayOrder()) {
                 $result['order']['pay'] += $balance;
@@ -213,9 +217,10 @@ class Statistics
                 $result['order']['free'] += $balance;
             }
 
-            $result['commission']['total'] = number_format((int)Util::cachedCall(0, function () use ($user, $begin, $end) {
+            if ($obj instanceof agentModelObj) {
+                $total = (int)Util::cachedCall(0, function () use ($obj, $begin, $end) {
                     return CommissionBalance::query()->where([
-                        'openid' => $user->getOpenid(),
+                        'openid' => $obj->getOpenid(),
                         'src' => [
                             CommissionBalance::ORDER_FREE,
                             CommissionBalance::ORDER_BALANCE,
@@ -225,9 +230,14 @@ class Statistics
                             CommissionBalance::BONUS,
                         ],
                         'createtime >=' => $begin->getTimestamp(),
-                        'createtime <' => $end->getTimestamp(),
+                        'createtime <' => $end->getTimestamp()
                     ])->get('sum(x_val)');
-                }, $user->getId(), $begin->getTimestamp(), $end->getTimestamp()) / 100, 2, '.', '');
+                }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
+
+                $result['commission'] = [
+                    'total' => number_format($total / 100, 2, '.', ''),
+                ];
+            }
 
             return $result;
         };
@@ -261,13 +271,26 @@ class Statistics
             }
 
             return $result;
-        }, $user->getId(), $begin->format('Y-m'), $day);
+        }, get_class($obj), $obj->getId(), $begin->format('Y-m'), $day);
+    }
+
+    public static function userYear(userModelObj $user, $year = '', $month = 0): array
+    {
+        return self::yearData($user, $year, $month);
+    }
+
+    public static function userMonth(userModelObj $user, $month = '', $day = 0)
+    {
+        return self::monthData($user, $month, $day);
     }
 
     public static function accountYear(accountModelObj $account, $year = '', $month = 0): array
     {
+        return self::yearData($account, $year, $month);
     }
+
     public static function accountMonth(accountModelObj $account, $month = '', $day = 0)
     {
+        return self::monthData($account, $month, $day);
     }
 }

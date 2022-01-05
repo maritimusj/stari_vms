@@ -129,6 +129,27 @@ class Order extends State
         return CtrlServ::v2_query("goods/{$serialNO}", ["nostr" => microtime(true)]);
     }
 
+    public static function getFirstOrderOf($obj): ?orderModelObj
+    {
+        if ($obj instanceof deviceModelObj) {
+            return self::getFirstOrderOfDevice($obj);
+        }
+        
+        if ($obj instanceof agentModelObj) {
+            return self::getFirstOrderOfAgent($obj);
+        }
+
+        if ($obj instanceof userModelObj) {
+            return self::getFirstOrderOfUser($obj);
+        }
+
+        if ($obj instanceof accountModelObj) {
+            return self::getFirstOrderOfAccount($obj);
+        }
+
+        return null;
+    }
+
     /**
      * @param deviceModelObj $device
      * @return orderModelObj

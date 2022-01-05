@@ -57,21 +57,15 @@
 </style>
 <div style="margin-bottom: 1em;display: block;">
     <div style="position:absolute;float:right;right:2em;top:1em;z-index:999;">
-        <div class="profile {if $agent->isAgent()}agent{/if}" style="position:relative" title="微信昵称：{php echo $agent->getNickname();}，手机号码：{php echo $agent->getMobile()}">
-            <img src="{php echo $agent->getAvatar();}">
-            <span>{php echo $agent->getName() ?: '<未知>'}</span>
-            {if $agent->isAgent()}
-            <span class="agent-user">[ 代理商 ]</span>
-            {/if}
+        <div class="profile" style="position:relative">
+            <img src="{php echo $account->getImg();}">
+            <span>{php echo $account->getTitle() ?: '<未知>'}</span>
         </div>        
     </div>
 </div>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active">
         <a href="#">全部</a>
-    </li>
-    <li role="presentation">
-        <a href="{php echo $this->createWebUrl('agent', array('op'=>'device_stats_view', 'id' => $agent->getId()));}">设备</a>
     </li>
 </ul>
 <div id="app" v-cloak>
@@ -105,17 +99,13 @@
                     <table class="table" v-show="year_view=='form' && year_data && year_data.length > 0">
                         <thead>
                             <th>#</th>
-                            <th>免费订单</th>
-                            <th>支付订单</th>
-                            <th>收益</th>
+                            <th>出货数量</th>
                             <th>操作</th>
                         </thead>
                         <tbody>
                             <tr v-for="(e, i) in year_data">
                                 <td v-text="e.m"></td>
-                                <td v-text="e.order.free"></td>
-                                <td v-text="e.order.pay"></td>
-                                <td>￥{{e.commission.total}}</td>
+                                <td v-text="e.order.total"></td>
                                 <td :class="{operate: !repairing, 'text-muted': repairing}">
                                     <template v-if="repairing && repairing === e.m">
                                         <i class="fa fa-spin fa-spinner"></i>
@@ -162,16 +152,12 @@
                     <table class="table"  v-show="month_view=='form'">
                         <thead>
                             <th>#</th>
-                            <th>免费订单</th>
-                            <th>支付订单</th>
-                            <th>收益（元）</th>
+                            <th>出货数量</th>
                         </thead>
                         <tbody>
                             <tr v-for="(e, i) in month_data">
                                 <td v-text="e.title"></td>
-                                <td v-text="e.order.free"></td>
-                                <td v-text="e.order.pay"></td>
-                                <td v-text="'￥' + e.commission.total"></td>
+                                <td v-text="e.order.total"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -198,7 +184,7 @@
 
                 },
                 legend: {
-                    data: ['免费订单', '支付订单', '收益']
+                    data: ['商品']
                 },
                 xAxis: {
                     type: 'category',
@@ -210,7 +196,7 @@
                 yAxis: [
                     {
                         type: 'value',
-                        name: '订单数量',
+                        name: '',
                         min: 0,
                         position: 'left',
                         axisLine: {
@@ -223,25 +209,10 @@
                             formatter: '{value}'
                         }
                     },
-                    {
-                        type: 'value',
-                        name: '收益（元）',
-                        min: 0,
-                        position: 'right',
-                        axisLine: {
-                            show: true,
-                            lineStyle: {
-                                color: colors[2]
-                            }
-                        },
-                        axisLabel: {
-                            formatter: '{value}'
-                        }
-                    }
                 ],
                 series: [
                     {
-                        name: '免费订单',
+                        name: '商品',
                         type: 'bar',
                         emphasis: {
                             focus: 'series'
@@ -249,24 +220,6 @@
                         yAxisIndex: 0,
                         data: [],
                     },
-                    {
-                        name: '支付订单',
-                        type: 'bar',
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        yAxisIndex: 0,
-                        data: [],
-                    },
-                    {
-                        name: '收益',
-                        type: 'line',
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        yAxisIndex: 1,
-                        data: [],
-                    }
                 ]
             };
 
@@ -282,7 +235,7 @@
 
                 },
                 legend: {
-                    data: ['免费订单', '支付订单', '收益']
+                    data: ['商品']
                 },
                 xAxis: {
                     type: 'category',
@@ -294,7 +247,7 @@
                 yAxis: [
                     {
                         type: 'value',
-                        name: '订单数量',
+                        name: '',
                         min: 0,
                         position: 'left',
                         axisLine: {
@@ -307,25 +260,10 @@
                             formatter: '{value}'
                         }
                     },
-                    {
-                        type: 'value',
-                        name: '收益（元）',
-                        min: 0,
-                        position: 'right',
-                        axisLine: {
-                            show: true,
-                            lineStyle: {
-                                color: colors[2]
-                            }
-                        },
-                        axisLabel: {
-                            formatter: '{value}'
-                        }
-                    }
                 ],
                 series: [
                     {
-                        name: '免费订单',
+                        name: '商品',
                         type: 'bar',
                         emphasis: {
                             focus: 'series'
@@ -333,36 +271,18 @@
                         yAxisIndex: 0,
                         data: [],
                     },
-                    {
-                        name: '支付订单',
-                        type: 'bar',
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        yAxisIndex: 0,
-                        data: [],
-                    },
-                    {
-                        name: '收益',
-                        type: 'line',
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        yAxisIndex: 1,
-                        data: [],
-                    }
                 ]
             };
 
             new Vue({
                 el: '#app',
                 data: {
-                    month_view: localStorage.getItem('stari_month_chart_view') || 'chart',
+                    month_view: localStorage.getItem('stari_account_mcv') || 'chart',
                     month_chart: null,
                     month_title: '',
                     month_data: [],
                     month_loading: false,
-                    year_view: localStorage.getItem('stari_year_chart_view') || 'chart',
+                    year_view: localStorage.getItem('stari_account_ycv') || 'chart',
                     year_chart: null,
                     year_title: '',
                     year_data: [],
@@ -464,13 +384,13 @@
                     toggleChartView($w) {
                         if ($w === 'month') {
                             this.month_view = (this.month_view === 'chart' ? 'form' : 'chart');
-                            localStorage.setItem('stari_month_chart_view', this.month_view);
+                            localStorage.setItem('stari_account_mcv', this.month_view);
                             Vue.nextTick(() => {
                                 this.month_chart && this.month_chart.resize();
                             })
                         } else if ($w === 'year') {
                             this.year_view = (this.year_view === 'chart' ? 'form' : 'chart');
-                            localStorage.setItem('stari_year_chart_view', this.year_view);
+                            localStorage.setItem('stari_account_ycv', this.year_view);
                             Vue.nextTick(() => {
                                 this.year_chart && this.year_chart.resize();
                             })
@@ -491,6 +411,15 @@
                         const month = (new Date()).getMonth() + 1;
                         return this.year < year || (this.year === year && m < month);
                     },
+                    isValidateDay(m, d) {
+                        if (m > 12 || d > 31) {
+                            return false;
+                        }
+                        const year = (new Date()).getFullYear();
+                        const month = (new Date()).getMonth() + 1;
+                        const day = (new Date()).getDay() + 1;
+                        return this.year < year || (this.year === year && m <= month && d <= day);
+                    },                    
                     isValidateYear(y) {
                         y += '';
                         return (this.year_list || []).indexOf(y) !== -1;
@@ -547,7 +476,7 @@
                             }
                         }).then(data => {
                             this.initMonthChart(data);
-                            if (day++ < 31) {
+                            if (this.isValidateDay(month, day++)) {
                                 this.getDayOfMonth(month, day);
                             } else {
                                 this.month_loading = false;
@@ -576,8 +505,6 @@
                         this.year_data = [];
                         year_option.xAxis.data = [];
                         year_option.series[0].data = [];
-                        year_option.series[1].data = [];
-                        year_option.series[2].data = [];
                         this.year_chart && this.year_chart.setOption(year_option, true);
                     },
                     initYearChart(data) {
@@ -590,9 +517,7 @@
                         for (const key in (data['list'] || {})) {
                             this.year_data.push(data['list'][key]);
                             year_option.xAxis.data.push(key);
-                            year_option.series[0].data.push(data['list'][key]['order']['free']);
-                            year_option.series[1].data.push(data['list'][key]['order']['pay']);
-                            year_option.series[2].data.push(data['list'][key]['commission']['total']);
+                            year_option.series[0].data.push(data['list'][key]['order']['total']);
                         }
                         this.year_chart.setOption(year_option, true);
                     },
@@ -600,8 +525,6 @@
                         this.month_data = [];
                         month_option.xAxis.data = [];
                         month_option.series[0].data = [];
-                        month_option.series[1].data = [];
-                        month_option.series[2].data = [];
                         this.month_chart && this.month_chart.setOption(month_option, true);
                     },
                     initMonthChart(data) {
@@ -611,9 +534,7 @@
                         for (const key in (data['list'] || {})) {
                             this.month_data.push(Object.assign({}, {'title': key}, data['list'][key]));
                             month_option.xAxis.data.push(key);
-                            month_option.series[0].data.push(data['list'][key]['order']['free']);
-                            month_option.series[1].data.push(data['list'][key]['order']['pay']);
-                            month_option.series[2].data.push(data['list'][key]['commission']['total']);
+                            month_option.series[0].data.push(data['list'][key]['order']['total']);
                         }
                         this.month_chart.setOption(month_option, true);
                     }

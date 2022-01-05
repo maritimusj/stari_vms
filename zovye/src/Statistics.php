@@ -126,6 +126,7 @@ class Statistics
                 'order' => [
                     'free' => 0,
                     'pay' => 0,
+                    'total' => 0,
                 ],
                 'commission' => [
                     'total' => 0,
@@ -143,7 +144,10 @@ class Statistics
             $data['summary']['m'] = $start->format('Y年m月');
             $result['summary']['order']['free'] += $data['summary']['order']['free'];
             $result['summary']['order']['pay'] += $data['summary']['order']['pay'];
-            $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
+            $result['summary']['order']['total'] += $data['summary']['order']['total'];
+            if (isset($result['summary']['commission']['total'])) {
+                 $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
+            }
             $result['list'][$start->format('m月')] = $data['summary'];
         };
 
@@ -187,6 +191,7 @@ class Statistics
                 'order' => [
                     'free' => 0,
                     'pay' => 0,
+                    'total' => 0,
                 ]
             ];
 
@@ -216,6 +221,8 @@ class Statistics
             } elseif (Balance::isFreeOrder()) {
                 $result['order']['free'] += $balance;
             }
+
+            $result['order']['total'] = $result['order']['pay'] + $result['order']['free'];
 
             if ($obj instanceof agentModelObj) {
                 $total = (int)Util::cachedCall(0, function () use ($obj, $begin, $end) {

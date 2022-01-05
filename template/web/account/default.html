@@ -534,10 +534,7 @@
         }
 
         api.viewHistoryStats = function(id) {
-            api.showResult({
-                id: id,
-                op: 'viewHistoryStats',
-            })
+            window.location.href = "{php echo $this->createWebUrl('account', ['op' => 'commission_stats_view', 'id' => '__id__'])}".replace('__id__', id);
         }
 
         api.repairMonthStats = function(id, self) {

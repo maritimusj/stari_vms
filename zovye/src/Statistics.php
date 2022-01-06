@@ -104,7 +104,7 @@ class Statistics
         }, $device->getId(), $begin->getTimestamp(), $end->getTimestamp());
     }
 
-    public static function deviceOrderMonth(deviceModelObj $device, $month = '')
+    public static function deviceOrderMonth(deviceModelObj $device, $month = ''): array
     {
         $date = self::parseMonth($month);
         if (!$date) {
@@ -112,11 +112,15 @@ class Statistics
         }
 
         $begin = DateTimeImmutable::createFromMutable($date);
-        $end = $begin->modify('first day of next month 00:00');
 
-        return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($begin, $end, $device) {
-            return self::calc($device, $begin, $end);
-        }, $device->getId(), $begin->format('Y-m'));
+        $data = (new OrderCounter())->getMonthAll([$device, 'goods'], $begin);
+        if (Balance::isPayOrder()) {
+            $data['pay'] += $data['balance'];
+        } elseif (Balance::isFreeOrder()) {
+            $data['free'] += $data['balance'];
+        }
+
+        return $data;
     }
 
     protected static function yearData($obj, $year = '', $month = 0): array
@@ -146,7 +150,7 @@ class Statistics
             $result['summary']['order']['pay'] += $data['summary']['order']['pay'];
             $result['summary']['order']['total'] += $data['summary']['order']['total'];
             if (isset($result['summary']['commission']['total'])) {
-                 $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
+                $result['summary']['commission']['total'] += $data['summary']['commission']['total'];
             }
             $result['list'][$start->format('m月')] = $data['summary'];
         };
@@ -175,54 +179,27 @@ class Statistics
 
     public static function monthData(modelObj $obj, $month = '', $day = 0)
     {
-        $condition = [];
-        if ($obj instanceof agentModelObj) {
-            $condition['agent_id'] = $obj->getId();
-        } elseif ($obj instanceof accountModelObj) {
-            $condition['account'] = $obj->getName();
-        } elseif ($obj instanceof deviceModelObj) {
-            $condition['device_id'] = $obj->getId();
-        } elseif ($obj instanceof goodsModelObj) {
-            $condition['goods_id'] = $obj->getId();
-        }
+        $counter = new OrderCounter();
 
-        $fn = function (DateTimeInterface $begin, DateTimeInterface $end) use ($obj, $condition) {
-            $result = [
-                'order' => [
-                    'free' => 0,
-                    'pay' => 0,
-                    'total' => 0,
-                ]
-            ];
+        $fn = function (DateTimeInterface $begin, $w = 'day') use ($obj, $counter) {
+            $result = [];
 
-            $condition['createtime >='] = $begin->getTimestamp();
-            $condition['createtime <'] = $end->getTimestamp();
-
-            $result['order']['free'] = (int)Util::cachedCall(0, function () use ($condition) {
-                return Order::query($condition)->where([
-                    'src' => Order::ACCOUNT,
-                ])->get('sum(num)');
-            }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
-
-            $result['order']['pay'] = (int)Util::cachedCall(0, function () use ($condition) {
-                return Order::query($condition)->where([
-                    'src' => Order::PAY,
-                ])->get('sum(num)');
-            }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
-
-            $balance = (int)Util::cachedCall(0, function () use ($condition) {
-                return Order::query($condition)->where([
-                    'src' => Order::BALANCE,
-                ])->get('sum(num)');
-            }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
-
-            if (Balance::isPayOrder()) {
-                $result['order']['pay'] += $balance;
-            } elseif (Balance::isFreeOrder()) {
-                $result['order']['free'] += $balance;
+            $end = new DateTime($begin->format('Y-m-d 00:00'));
+            if ($w == 'day') {
+                $result['order'] = $counter->getDayAll([$obj, 'goods'], $begin);
+                $end->modify('next day 00:00');
+            } elseif ($w == 'month') {
+                $result['order'] = $counter->getMonthAll([$obj, 'goods'], $begin);
+                $end->modify('first day of next month 00:00');
+            } else {
+                return [];
             }
 
-            $result['order']['total'] = $result['order']['pay'] + $result['order']['free'];
+            if (Balance::isPayOrder()) {
+                $result['order']['pay'] += $result['order']['balance'];
+            } elseif (Balance::isFreeOrder()) {
+                $result['order']['free'] += $result['order']['balance'];
+            }
 
             if ($obj instanceof agentModelObj) {
                 $total = (int)Util::cachedCall(0, function () use ($obj, $begin, $end) {
@@ -255,17 +232,17 @@ class Statistics
         }
 
         return Util::cachedCall($begin->format('Y-m') === date('Y-m') ? 10 : 0, function () use ($fn, $day, $begin) {
-            $end = DateTimeImmutable::createFromMutable($begin)->modify('first day of next month 00:00');
             $result = [
-                'summary' => $fn($begin, $end),
+                'summary' => $fn($begin, 'month'),
             ];
 
             if ($day === true) {
                 $result['list'] = [];
+                $end = DateTimeImmutable::createFromMutable($begin)->modify('first day of next month 00:00');
                 while ($begin < $end) {
                     $start = DateTimeImmutable::createFromMutable($begin);
                     $begin->modify('next day 00:00');
-                    $result['list'][$start->format('m月d日')] = $fn($start, $begin);
+                    $result['list'][$start->format('m月d日')] = $fn($start, 'day');
                 }
             } elseif ($day > 0) {
                 $result['list'] = [];
@@ -273,8 +250,7 @@ class Statistics
                 if ($start->format('Y-m') != $begin->format('Y-m')) {
                     return [];
                 }
-                $end = $start->modify('next day 00:00');
-                $result['list'][$start->format('m月d日')] = $fn($start, $end);
+                $result['list'][$start->format('m月d日')] = $fn($start, 'day');
             }
 
             return $result;

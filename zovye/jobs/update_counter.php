@@ -25,30 +25,28 @@ $data = [
 
 $log = [
     'params' => $data,
-
 ];
 
 if ($op == 'update_counter' && CtrlServ::checkJobSign($data)) {
 
+    $counter =  new OrderCounter();
     try {
         $datetime = new DateTimeImmutable($data['datetime']);
         $str = $datetime->format('Y-m-d H:i:s');
         if ($data['agent']) {
             $agent = Agent::get($data['agent']);
             if ($agent) {
-                $log["agent $str"] = (new OrderCounter())->getHourAll($agent, $datetime);
+                $log["agent $str"] = $counter->getHourAll([$agent, 'goods'], $datetime);
             }
         }
-
         if ($data['device']) {
             $device = Device::get($data['device']);
             if ($device) {
-                $log["device $str"] = (new OrderCounter())->getHourAll($device, $datetime);
+                $log["device $str"] = $counter->getHourAll([$device, 'goods'], $datetime);
             }
         }
-
         if (!isset($agent) && !isset($device)) {
-            $log["app $str"] = (new OrderCounter())->getHourAll(app(), $datetime);
+            $log["app $str"] = $counter->getHourAll([app(), 'goods'], $datetime);
         }
     } catch (Exception $e) {
         $log['error'] = $e->getMessage();

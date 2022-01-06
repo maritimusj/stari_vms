@@ -6,7 +6,8 @@
 
 namespace zovye\job\repair;
 
-use DateTimeImmutable;
+use DateTime;
+use Exception;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Job;
@@ -47,16 +48,27 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
         $log['save result'] = $agent->save();
     }
 
+    $counter = new OrderCounter();
+    try {
+        $begin = new DateTime($data['month']);
+        $end = new DateTime($begin->format('Y-m-d H:i:s'));
+        $end->modify('first day of next month 00:00');
+
+        $counter->removeMonthAll([$agent, 'goods'], $begin);
+
+        while ($begin < $end) {
+            $counter->removeDayAll([$agent, 'goods'], $begin);
+            $begin->modify('+ 1 days');
+        }
+    } catch (Exception $e) {
+    }
+
     $agent->updateSettings('repair', [
         'status' => 'finished',
         'time' => time(),
         'used' => $used ?? 0,
     ]);
 
-    $counter = new OrderCounter();
-    $counter->removeDayAll($agent, new DateTimeImmutable());
-    $counter->removeMonthAll($agent, new DateTimeImmutable());
-    $counter->removeYearAll($agent, new DateTimeImmutable());
 
 } else {
     $log['error'] = '参数或签名错误！';

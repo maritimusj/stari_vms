@@ -89,7 +89,7 @@ class Stats
         }
 
         $counter = new OrderCounter();
-        $result = $counter->getDayAll($obj, $begin);
+        $result = $counter->getDayAll([$obj, 'goods'], $begin);
 
         if (Balance::isPayOrder()) {
             $result['pay'] += intval($result['balance']);
@@ -119,7 +119,7 @@ class Stats
         }
 
         $counter = new OrderCounter();
-        $result = $counter->getMonthAll($obj, $begin);
+        $result = $counter->getMonthAll([$obj, 'goods'], $begin);
 
         if (Balance::isPayOrder()) {
             $result['pay'] += intval($result['balance']);
@@ -855,16 +855,16 @@ class Stats
         }
 
         $result = [];
-        $counter =  new OrderCounter();
+        $counter = new OrderCounter();
         while ($begin < $end) {
-            $data = $counter->getDayAll($obj, $begin);
+            $data = $counter->getDayAll([$obj, 'goods'], $begin);
             if (Balance::isFreeOrder()) {
                 $data['free'] += intval($data['balance']);
             } elseif (Balance::isPayOrder()) {
                 $data['pay'] += intval($data['balance']);
             }
             $result[$begin->format('m-d')] = [
-                'free' =>  $data['free'],
+                'free' => $data['free'],
                 'fee' => $data['pay'],
                 '_day' => $begin->format('d'),
             ];
@@ -911,16 +911,16 @@ class Stats
         }
 
         $result = [];
-        $counter =  new OrderCounter();
-        while($begin < $end) {
-            $data = $counter->getHourAll($obj, $begin);
+        $counter = new OrderCounter();
+        while ($begin < $end) {
+            $data = $counter->getHourAll([$obj, 'goods'], $begin);
             if (Balance::isFreeOrder()) {
                 $data['free'] += intval($data['balance']);
             } elseif (Balance::isPayOrder()) {
                 $data['pay'] += intval($data['balance']);
             }
             $result[intval($begin->format('H'))] = [
-                'free' =>  $data['free'],
+                'free' => $data['free'],
                 'fee' => $data['pay'],
             ];
             $begin->modify('+1 hour');

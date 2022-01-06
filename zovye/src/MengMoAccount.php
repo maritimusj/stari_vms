@@ -140,7 +140,7 @@ class MengMoAccount
         }
 
         $str = implode('&', $arr);
-        
+
         if (!self::verifySignByMD5withRSA(self::PUBLIC_KEY, $str, $params['sign'])) {
             return err('签名检验失败！');
         }
@@ -180,7 +180,7 @@ class MengMoAccount
 
                 $acc = $res['account'];
 
-                $order_uid = Order::makeUID($user, $device, $params['ad_code_no']);
+                $order_uid = Order::makeUID($user, $device, sha1($params['ad_code_no']));
 
                 Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 

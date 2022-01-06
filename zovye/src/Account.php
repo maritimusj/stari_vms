@@ -121,7 +121,7 @@ class Account extends State
     const TASK_HEAD_IMG = MODULE_URL . 'static/img/task.svg';
 
     const MENGMO_NAME = '涨啊';
-    const MENGMO_HEAD_IMG = MODULE_URL . 'static/img/mengmo.png';
+    const MENGMO_HEAD_IMG = MODULE_URL . 'static/img/mengmo.jpg';
 
     protected static $title = [
         self::BANNED => '已禁用',

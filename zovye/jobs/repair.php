@@ -6,10 +6,12 @@
 
 namespace zovye\job\repair;
 
+use DateTimeImmutable;
 use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
+use zovye\OrderCounter;
 use zovye\request;
 use zovye\Stats;
 use function zovye\is_error;
@@ -50,6 +52,11 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
         'time' => time(),
         'used' => $used ?? 0,
     ]);
+
+    $counter = new OrderCounter();
+    $counter->removeDayAll($agent, new DateTimeImmutable());
+    $counter->removeMonthAll($agent, new DateTimeImmutable());
+    $counter->removeYearAll($agent, new DateTimeImmutable());
 
 } else {
     $log['error'] = '参数或签名错误！';

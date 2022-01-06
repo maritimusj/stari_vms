@@ -235,25 +235,25 @@ class OrderCounter extends StatsCounter
         $this->removeDays(array_merge(['src' => Order::BALANCE], $params), $day);
     }
 
-    public function removeMonthAll($obj, DateTimeInterface $day = null)
+    public function removeMonthAll($obj, DateTimeInterface $month = null)
     {
         $params = is_array($obj) ? $obj : [$obj];
-        if (!$day) {
-            $day = new DateTimeImmutable();
+        if (!$month) {
+            $month = new DateTimeImmutable();
         }
-        $this->removeMonths(array_merge(['src' => Order::ACCOUNT], $params), $day);
-        $this->removeMonths(array_merge(['src' => Order::PAY], $params), $day);
-        $this->removeMonths(array_merge(['src' => Order::BALANCE], $params), $day);
+        $this->removeMonths(array_merge(['src' => Order::ACCOUNT], $params), $month);
+        $this->removeMonths(array_merge(['src' => Order::PAY], $params), $month);
+        $this->removeMonths(array_merge(['src' => Order::BALANCE], $params), $month);
     }
 
-    public function removeYearAll($obj, DateTimeInterface $day = null)
+    public function removeYearAll($obj, DateTimeInterface $year = null)
     {
         $params = is_array($obj) ? $obj : [$obj];
-        if (!$day) {
-            $day = new DateTimeImmutable();
+        if (!$year) {
+            $year = new DateTimeImmutable();
         }
-        $this->removeYears(array_merge(['src' => Order::ACCOUNT], $params), $day);
-        $this->removeYears(array_merge(['src' => Order::PAY], $params), $day);
-        $this->removeYears(array_merge(['src' => Order::BALANCE], $params), $day);
+        $this->removeYears(array_merge(['src' => Order::ACCOUNT], $params), $year);
+        $this->removeYears(array_merge(['src' => Order::PAY], $params), $year);
+        $this->removeYears(array_merge(['src' => Order::BALANCE], $params), $year);
     }
 }

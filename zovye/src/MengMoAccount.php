@@ -134,11 +134,13 @@ class MengMoAccount
             'op_type',
         ];
 
-        $str = '';
+        $arr = [];
         foreach ($keys as $key) {
-            $str .= "$key=$params[$key]";
+            $arr[] = "$key=$params[$key]";
         }
 
+        $str = implode('&', $arr);
+        
         if (!self::verifySignByMD5withRSA(self::PUBLIC_KEY, $str, $params['sign'])) {
             return err('签名检验失败！');
         }

@@ -20,7 +20,12 @@ class Counter
         return m('counter')->query($condition);
     }
 
-    public static function get($id, bool $is_uid = false)
+    /**
+     * @param $id
+     * @param bool $is_uid
+     * @return counterModelObj|null
+     */
+    public static function get($id, bool $is_uid = false): ?counterModelObj
     {
         if ($is_uid) {
             return self::query(['uid' => $id])->findOne();

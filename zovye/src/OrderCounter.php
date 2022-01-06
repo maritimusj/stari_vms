@@ -32,7 +32,7 @@ class OrderCounter extends StatsCounter
             } elseif ($obj instanceof goodsModelObj) {
                 $arr['goods'] = $obj->getId();
             } elseif ($obj instanceof WeApp) {
-                $arr['app'] =  App::uid();
+                $arr['app'] = App::uid();
             } else {
                 $arr[$index] = $obj;
             }
@@ -224,4 +224,36 @@ class OrderCounter extends StatsCounter
         return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
 
+    public function removeDayAll($obj, DateTimeInterface $day = null)
+    {
+        $params = is_array($obj) ? $obj : [$obj];
+        if (!$day) {
+            $day = new DateTimeImmutable();
+        }
+        $this->removeDays(array_merge(['src' => Order::ACCOUNT], $params), $day);
+        $this->removeDays(array_merge(['src' => Order::PAY], $params), $day);
+        $this->removeDays(array_merge(['src' => Order::BALANCE], $params), $day);
+    }
+
+    public function removeMonthAll($obj, DateTimeInterface $day = null)
+    {
+        $params = is_array($obj) ? $obj : [$obj];
+        if (!$day) {
+            $day = new DateTimeImmutable();
+        }
+        $this->removeMonths(array_merge(['src' => Order::ACCOUNT], $params), $day);
+        $this->removeMonths(array_merge(['src' => Order::PAY], $params), $day);
+        $this->removeMonths(array_merge(['src' => Order::BALANCE], $params), $day);
+    }
+
+    public function removeYearAll($obj, DateTimeInterface $day = null)
+    {
+        $params = is_array($obj) ? $obj : [$obj];
+        if (!$day) {
+            $day = new DateTimeImmutable();
+        }
+        $this->removeYears(array_merge(['src' => Order::ACCOUNT], $params), $day);
+        $this->removeYears(array_merge(['src' => Order::PAY], $params), $day);
+        $this->removeYears(array_merge(['src' => Order::BALANCE], $params), $day);
+    }
 }

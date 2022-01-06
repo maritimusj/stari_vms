@@ -97,7 +97,7 @@ abstract class StatsCounter
                 }
 
                 $total += $num;
-                
+
             } catch (Exception $e) {
             }
         }
@@ -108,7 +108,6 @@ abstract class StatsCounter
     public function getMonth(array $params, DateTimeInterface...$months): int
     {
         $total = 0;
-
 
         foreach ($months as $month) {
             $uid = $this->makeUID(array_merge(['datetime' => $month->format('Ym')], $params));
@@ -196,5 +195,38 @@ abstract class StatsCounter
         }
 
         return 0;
+    }
+
+    public function removeDays(array $params = [], DateTimeInterface...$days)
+    {
+        foreach ($days as $day) {
+            $uid = $this->makeUID(array_merge(['datetime' => $day->format('Ymd')], $params));
+            $counter = Counter::get($uid, true);
+            if ($counter && Locker::try("counter:init:$uid")) {
+                $counter->destroy();
+            }
+        }
+    }
+
+    public function removeMonths(array $params, DateTimeInterface...$months)
+    {
+        foreach ($months as $month) {
+            $uid = $this->makeUID(array_merge(['datetime' => $month->format('Ym')], $params));
+            $counter = Counter::get($uid, true);
+            if ($counter && Locker::try("counter:init:$uid")) {
+                $counter->destroy();
+            }
+        }
+    }
+
+    public function removeYears(array $params, DateTimeInterface... $years)
+    {
+        foreach ($years as $year) {
+            $uid = $this->makeUID(array_merge(['datetime' => $year->format('Y')], $params));
+            $counter = Counter::get($uid, true);
+            if ($counter && Locker::try("counter:init:$uid")) {
+                $counter->destroy();
+            }
+        }
     }
 }

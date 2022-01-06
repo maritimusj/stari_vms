@@ -77,7 +77,9 @@ class Account extends State
     // https://www.showdoc.com.cn/p/f5e459aaab1b8fdd4b1ee30ae7a2cebd
     const YOUFEN = 109;
 
-    const TASK = 110;    
+    const TASK = 110;
+
+    const MENGMO = 111;
 
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
@@ -116,7 +118,10 @@ class Account extends State
     const YOUFEN_HEAD_IMG = MODULE_URL . 'static/img/youfen.png';
 
     const TASK_NAME = '自定义任务';
-    const TASK_HEAD_IMG = MODULE_URL . 'static/img/task.svg';    
+    const TASK_HEAD_IMG = MODULE_URL . 'static/img/task.svg';
+
+    const MENGMO_NAME = '涨啊';
+    const MENGMO_HEAD_IMG = MODULE_URL . 'static/img/mengmo.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -251,6 +256,7 @@ class Account extends State
             Account::YFB => App::isSNTOEnabled(),
             Account::WxWORK => App::isWxWorkEnabled(),
             Account::YOUFEN => App::isYouFenEnabled(),
+            Account::MENGMO => App::isMengMoEnabled(),
         ];
 
         $result = [];
@@ -330,6 +336,7 @@ class Account extends State
                 Account::YFB,
                 Account::WxWORK,
                 Account::YOUFEN,
+                Account::MENGMO,
             ];
 
         $include = is_array($include) ? $include : [$include];
@@ -494,6 +501,18 @@ class Account extends State
                 },
                 function () use ($device, $user) {
                     return YouFenAccount::fetch($device, $user);
+                },
+            ],
+
+            //涨啊
+            Account::MENGMO => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    return App::isMengMoEnabled()
+                        && in_array(Account::MENGMO, $third_party_platform_includes)
+                        && !in_array(MengMoAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return MengMoAccount::fetch($device, $user);
                 },
             ],
         ];
@@ -849,6 +868,12 @@ class Account extends State
     {
         $url = Util::murl('youfen');
         return self::createThirdPartyPlatform(Account::YOUFEN, Account::YOUFEN_NAME, Account::YOUFEN_HEAD_IMG, $url);
+    }
+
+    public static function createMengMoAccount(): ?accountModelObj
+    {
+        $url = Util::murl('mengmo');
+        return self::createThirdPartyPlatform(Account::MENGMO, Account::MENGMO_NAME, Account::MENGMO_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -1220,6 +1245,7 @@ class Account extends State
             self::YFB => '粉丝宝',
             self::WxWORK => '阿旗（企业微信）',
             self::YOUFEN => '友粉',
+            self::MENGMO => '涨啊',
         ];
         return $titles[$type] ?? '未知';
     }

@@ -207,6 +207,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__ . '\Account::createYouFenAccount',
                 'YouFen.fan.enabled',
             ],
+            'mengMoFenFAN' => [
+                __NAMESPACE__ . '\Account::createYouFenAccount',
+                'MengMo.fan.enabled',
+            ],
         ];
 
         $accounts_updated = false;

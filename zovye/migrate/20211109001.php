@@ -64,6 +64,10 @@ SQL;
             Util::murl('youfen'),
             Account::YOUFEN_NAME,
         ],
+        Account::MENGMO => [
+            Util::murl('mengmo'),
+            Account::MENGMO_NAME,
+        ],
     ];
 
     foreach ($spec as $type => $item) {

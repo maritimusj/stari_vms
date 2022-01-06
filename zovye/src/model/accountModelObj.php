@@ -171,6 +171,7 @@ class accountModelObj extends modelObj
                     Account::YFB => App::isYFBEnabled(),
                     Account::WxWORK => App::isWxWorkEnabled(),
                     Account::YOUFEN => App::isYouFenEnabled(),
+                    Account::MENGMO => App::isMengMoEnabled(),
                 ];
             }
 
@@ -265,6 +266,7 @@ class accountModelObj extends modelObj
             Account::YFB,
             Account::WxWORK,
             Account::YOUFEN,
+            Account::MENGMO,
         ]);
     }
 
@@ -344,6 +346,11 @@ class accountModelObj extends modelObj
     public function isYouFen(): bool
     {
         return $this->getType() == Account::YOUFEN;
+    }
+
+    public function isMengMo(): bool
+    {
+        return $this->getType() == Account::MENGMO;
     }
 
     public function isNormal(): bool

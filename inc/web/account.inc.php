@@ -365,6 +365,16 @@ if ($op == 'default') {
                     'followed_title' => request::trim('followed_title'),
                     'followed_description' => request::trim('followed_description'),
                 ]);
+            }
+            elseif ($account->isMengMo()) {
+                $data['name'] = Account::MENGMO_NAME;
+                $data['img'] = Account::MENGMO_HEAD_IMG;
+                $data['url'] = Util::murl('mengmo');
+                $account->set('config', [
+                    'type' => Account::MENGMO,
+                    'app_no' => request::trim('app_number'),
+                    'scene' => request::trim('scene'),
+                ]);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');
                 $account->set('config', [

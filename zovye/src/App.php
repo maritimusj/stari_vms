@@ -226,6 +226,17 @@ class App
         });
     }
 
+    /**
+     * 是否开启 涨啊
+     *
+     */
+    public static function isMengMoEnabled(): bool
+    {
+        return onceCall(function() {
+            return !empty(settings('MengMo.fan.enabled'));
+        });
+    }
+
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function() {

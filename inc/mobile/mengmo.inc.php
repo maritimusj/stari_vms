@@ -15,6 +15,7 @@ MengMoAccount::cb([
     'op_type' => request::int('op_type'),
     'ad_code_no' => request::str('ad_code_no'),
     'qr_code_url' => request::str('qr_code_url'),
+    'wx_id' => request::str('wx_id'),
     'subscribe_time' => request::int('subscribe_time'),
     'sign' => request::str('sign'),
 ]);

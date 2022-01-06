@@ -10,6 +10,7 @@ use zovye\model\userModelObj;
 class MengMoAccount
 {
     const API_URL = 'https://search-api.shenghuoq.com/dmp-search-api/v4/ad/noauth';
+    const PUBLIC_KEY = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCQrNccDHWDJdXg2j13y8wNjf2de/ELKztcbLstpZfRm89GUHx9taCShli4bEVfxRDNiKvGVM20GbmKb/d2s9DSAPH5YlLtT0axZBdtTfENIUXzPZh9KhR2+owHX4O0sR41vqYjT7SGTyQhZKN13P/OcEAsLdq9r8ulycla0QMzyQIDAQAB';
 
     public static function getUid(): string
     {
@@ -123,13 +124,34 @@ class MengMoAccount
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }
+        $keys = [
+            'open_id',
+            'qr_code_url',
+            'subscribe_time',
+            'facility_id',
+            'ad_code_no',
+            'wx_id',
+            'op_type',
+        ];
 
-        $sign = md5("open_id={$params['open_id']}&qr_code_url={$params['qr_code_url']}&subscribe_time={$params['subscribe_time']}");
-        if ($sign !== $params['sign']) {
+        $str = '';
+        foreach ($keys as $key) {
+            $str .= "$key=$params[$key]";
+        }
+
+        if (!self::verifySignByMD5withRSA(self::PUBLIC_KEY, $str, $params['sign'])) {
             return err('签名检验失败！');
         }
 
         return ['account' => $acc];
+    }
+
+    public static function verifySignByMD5withRSA($publicKey, $data, $sign): bool
+    {
+        $publicKey = chunk_split($publicKey, 64, "\n");
+        $publicKey = "-----BEGIN PUBLIC KEY-----\n$publicKey-----END PUBLIC KEY-----\n";
+        $sign = base64_decode($sign, true);
+        return openssl_verify($data, $sign, $publicKey, OPENSSL_ALGO_MD5) === 1;
     }
 
     public static function cb($params = [])

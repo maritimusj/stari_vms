@@ -1073,7 +1073,7 @@ class Order extends State
                         $data[$header] = $entry->getNum();
                         break;
                     case 'goods_price':
-                        $data[$header] = number_format($entry->getPrice() / 100, 2);
+                        $data[$header] = number_format($entry->getPrice() / 100, 2, '.', '');
                         break;
                     case 'way':
                         if ($entry->getPrice() > 0) {

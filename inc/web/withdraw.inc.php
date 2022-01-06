@@ -47,12 +47,12 @@ if ($op == 'export') {
                 $data = [
                     'id' => $entry->getId(),
                     'name' => $agent->getName(),
-                    'mobile' => $agent->getMobile(),
-                    'xval' => number_format(abs($entry->getXVal()) / 100, 2),
+                    'mobile' => "[{$agent->getMobile()}]",
+                    'xval' => number_format(abs($entry->getXVal()) / 100, 2, '.', ''),
                     'bank' => $bank['bank'],
                     'branch' => $bank['branch'],
                     'realname' => $bank['realname'],
-                    'account' => $bank['account'],
+                    'account' => "[{$bank['account']}]",
                     'address' => $bank['address']['province'] . $bank['address']['city'],
                     'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 ];
@@ -61,7 +61,7 @@ if ($op == 'export') {
         }
     }
 
-    Util::exportExcel('withdraw', ['#', '代理商', '手机', '金额', '开户行', '开户支行', '姓名', '卡号', '开户行地址', '创建时间'], $list);
+    Util::exportExcel('withdraw', ['#', '代理商', '手机', '金额(元)', '开户行', '开户支行', '姓名', '卡号', '开户行地址', '创建时间'], $list);
 
 } elseif ($op == 'default') {
 

@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use DateTime;
 use Exception;
 use zovye\Inventory;
 use zovye\Locker;
@@ -398,11 +399,6 @@ class device
             return [];
         };
 
-        //是首页请求时，忽略F_tj权限
-        if (request('date')) {
-            common::checkCurrentUserPrivileges('F_tj');
-        }
-
         $result = [
             'list' => [
                 [
@@ -413,6 +409,8 @@ class device
         ];
 
         if (request::has('date')) {
+            common::checkCurrentUserPrivileges('F_tj');
+
             //统计修复状态
             $v = $user->isAgent() ? $user : $user->getPartnerAgent();
             if ($v) {
@@ -452,6 +450,13 @@ class device
 
             $first_order = Order::getFirstOrderOf($agent);
             if ($first_order) {
+                try {
+                    $date_obj = new DateTime(request::str('date'));
+                    if ($date_obj < $first_order) {
+                        return err('没有任何订单！');
+                    }
+                } catch (Exception $e) {
+                }
                 $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
             }
 

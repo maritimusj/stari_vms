@@ -85,7 +85,7 @@ if ($op == 'list') {
     }
 
     $tpl_data['page'] = request::int('page', 1);
-    $tpl_data['upload'] = settings('device.upload.url', '') ? true : false;
+    $tpl_data['upload'] = (bool)settings('device.upload.url', '');
     $tpl_data['gate'] = CtrlServ::status();
 
 

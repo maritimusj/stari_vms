@@ -986,18 +986,28 @@ class device
 
     public static function openDoor(): array
     {
-        $user = common::getAgent();
+        $user = common::getUser();
 
-        common::checkCurrentUserPrivileges('F_sb');
-
-        $device = device::getDevice(request::str('id'), $user);
-        if (is_error($device)) {
-            return $device;
-        }
-
-        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
-        if (!\zovye\Device::isOwner($device, $agent)) {
-            return error(State::FAIL, '没有权限执行这个操作！');
+        if ($user->isAgent() || $user->isPartner()) {
+            common::checkCurrentUserPrivileges('F_sb');
+            $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
+            $device = device::getDevice(request::str('id'), $agent);
+            if (is_error($device)) {
+                return $device;
+            }
+            if (!\zovye\Device::isOwner($device, $agent)) {
+                return error(State::FAIL, '没有权限执行这个操作！');
+            }
+        } elseif ($user->isKeeper()) {
+            $device = \zovye\Device::find(request('id'), ['imei', 'shadow_id']);
+            if (!$device) {
+                return err('找不到这个设备！');
+            }
+            if (!$device->hasKeeper($user->getKeeper())) {
+                return err('没有权限管理这个设备！');
+            }
+        } else {
+            return err('没有权限管理这个设备！');
         }
 
         $index = request::int('index', 1);

@@ -29,6 +29,7 @@ class MengMoAccount
         }
 
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $area = $device->getArea();
 
         $data = [
             'appNo' => strval($config['app_no']),
@@ -45,10 +46,10 @@ class MengMoAccount
             'cityName' => $fans['city'],
             'requestType' => 1,
             'creativityType' => 0,
-            'facilityCountry' => $fans['country'],
-            'facilityProvince' => $fans['province'],
-            'facilityCity' => $fans['city'],
-            'facilityDistrict' => '',
+            'facilityCountry' => '',
+            'facilityProvince' => $area[0] ?? '',
+            'facilityCity' => $area[1] ?? '',
+            'facilityDistrict' => $area[2] ?? '',
         ];
 
         $result = Util::post(self::API_URL, $data);

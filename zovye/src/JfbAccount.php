@@ -55,6 +55,7 @@ class JfbAccount
         }
 
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
+        $area = $device->getArea();
 
         $data = [
             'scene' => strval($config['scene']),
@@ -70,10 +71,10 @@ class JfbAccount
             'cityName' => $fans['city'],
             'requestType' => 1,
             'creativityType' => 0,
-            'facilityCountry' => $fans['country'],
-            'facilityProvince' => $fans['province'],
-            'facilityCity' => $fans['city'],
-            'facilityDistrict' => '',
+            'facilityCountry' => '',
+            'facilityProvince' => $area[0] ?? '',
+            'facilityCity' => $area[1] ?? '',
+            'facilityDistrict' => $area[2] ?? '',
             'showTimes' => 0,
         ];
 

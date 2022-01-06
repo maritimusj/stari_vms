@@ -21,6 +21,7 @@ use zovye\request;
 use zovye\State;
 use zovye\Stats;
 use zovye\model\userModelObj;
+use zovye\Order;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
@@ -420,6 +421,11 @@ class device
                     $result['repair'] = [
                         'state' => $repair['status'],
                     ];
+                }
+
+                $first_order = Order::getFirstOrderOf($v);
+                if ($first_order) {
+                    $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
                 }
             }
 

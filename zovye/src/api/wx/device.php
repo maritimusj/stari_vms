@@ -433,7 +433,7 @@ class device
                 //具体哪天的时候需要设备出货列表
                 $result['devices'] = [];
             } else {
-                return error(State::ERROR, '日期不对！');
+                return error(State::ERROR, '日期不正确！');
             }
 
             //指定了下级代理guid
@@ -452,12 +452,14 @@ class device
             if ($first_order) {
                 try {
                     $date_obj = new DateTime(request::str('date'));
-                    if ($date_obj < $first_order) {
-                        return err('没有任何订单！');
+                    if ($date_obj->getTimestamp() < $first_order->getCreatetime()) {
+                        return [];
                     }
                 } catch (Exception $e) {
                 }
                 $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
+            } else {
+                return [];
             }
 
             //设备列表

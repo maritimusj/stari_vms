@@ -31,7 +31,7 @@
             <entry title="代理管理" do="agent" state="" direct=""/>
             <entry title="提现管理" do="withdraw" state="" direct=""/>
             <entry title="订单管理" do="order" state="" direct=""/>
-            <entry title="吸粉管理" do="account" state="" direct=""/>
+            <entry title="任务管理" do="account" state="" direct=""/>
             <entry title="广告管理" do="adv" state="" direct=""/>
             <entry title="活码管理" do="qrcode" state="" direct=""/>
             <entry title="标签管理" do="tags" state="" direct=""/>

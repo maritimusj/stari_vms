@@ -413,6 +413,17 @@ class device
         ];
 
         if (request::has('date')) {
+            //统计修复状态
+            $v = $user->isAgent() ? $user : $user->getPartnerAgent();
+            if ($v) {
+                $repair = $v->settings('repair', []);
+                if ($repair) {
+                    $result['repair'] = [
+                        'state' => $repair['status'],
+                    ];
+                }
+            }
+
             $arr = explode('-', request::str('date'));
             if (count($arr) == 2) {
                 //月份的每一天
@@ -424,7 +435,7 @@ class device
                 //具体哪天的时候需要设备出货列表
                 $result['devices'] = [];
             } else {
-                return error(State::ERROR, '日期不正确！');
+                return error(State::ERROR, '日期不对！');
             }
 
             //指定了下级代理guid
@@ -439,14 +450,6 @@ class device
                 $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
             }
 
-            //统计修复状态
-            $repair = $agent->settings('repair', []);
-            if ($repair) {
-                $result['repair'] = [
-                    'state' => $repair['status'],
-                ];
-            }
-
             $first_order = Order::getFirstOrderOf($agent);
             if ($first_order) {
                 $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
@@ -454,11 +457,7 @@ class device
 
             //设备列表
             $devices_query = \zovye\Device::query();
-            if (request::has('guid')) {
-                $devices_query->where(['agent_id' => $agent->getAgentId()]);
-            } else {
-                $devices_query->where(['agent_id' => $user->getAgentId()]);
-            }
+            $devices_query->where(['agent_id' => $agent->getId()]);
 
             /** @var  deviceModelObj $item */
             foreach ($devices_query->findAll() as $item) {
@@ -516,15 +515,16 @@ class device
             $low_query = \zovye\Device::query(['remain <' => $remainWarning]);
             $error_query = \zovye\Device::query(['error_code <>' => 0]);
 
-            $low_query->where(['agent_id' => $user->getAgentId()]);
-            $error_query->where(['agent_id' => $user->getAgentId()]);
+            $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-            $result['msg'] = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $user->getAgentId(), 'updatetime' => 0])) ? 1 : 0; //是否有未读消息
+            $low_query->where(['agent_id' => $agent->getId()]);
+            $error_query->where(['agent_id' => $agent->getId()]);
+
+            $result['msg'] = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $agent->getId(), 'updatetime' => 0])) ? 1 : 0; //是否有未读消息
             $result['low'] = $low_query->count();
             $result['error'] = $error_query->count();
 
             //今日出货
-            $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
             $data = Stats::getDayTotal($agent);
             $result['all'] = [
                 'name' => $agent->getName(),

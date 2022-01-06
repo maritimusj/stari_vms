@@ -208,7 +208,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 'YouFen.fan.enabled',
             ],
             'mengMoFenFAN' => [
-                __NAMESPACE__ . '\Account::createYouFenAccount',
+                __NAMESPACE__ . '\Account::createMengMoAccount',
                 'MengMo.fan.enabled',
             ],
         ];

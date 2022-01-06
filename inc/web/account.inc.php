@@ -372,7 +372,7 @@ if ($op == 'default') {
                 $data['url'] = Util::murl('mengmo');
                 $account->set('config', [
                     'type' => Account::MENGMO,
-                    'app_no' => request::trim('app_number'),
+                    'app_no' => request::trim('app_no'),
                     'scene' => request::trim('scene'),
                 ]);
             } elseif ($account->isWxApp()) {
@@ -445,6 +445,7 @@ if ($op == 'default') {
                 Account::YFB_NAME,
                 Account::WxWORK_NAME,
                 Account::YOUFEN_NAME,
+                Account::MENGMO_NAME,
                 Account::TASK_NAME,
             ])) {
                 return err('名称 "' . $name . '" 是系统保留名称，无法使用！');

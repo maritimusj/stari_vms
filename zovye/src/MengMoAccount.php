@@ -18,7 +18,7 @@ class MengMoAccount
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $acc = Account::findOneFromType(Account::JFB);
+        $acc = Account::findOneFromType(Account::MENGMO);
         if (empty($acc)) {
             return [];
         }

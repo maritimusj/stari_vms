@@ -413,22 +413,6 @@ class device
         ];
 
         if (request::has('date')) {
-            //统计修复状态
-            $v = $user->isAgent() ? $user : $user->getPartnerAgent();
-            if ($v) {
-                $repair = $v->settings('repair', []);
-                if ($repair) {
-                    $result['repair'] = [
-                        'state' => $repair['status'],
-                    ];
-                }
-
-                $first_order = Order::getFirstOrderOf($v);
-                if ($first_order) {
-                    $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
-                }
-            }
-
             $arr = explode('-', request::str('date'));
             if (count($arr) == 2) {
                 //月份的每一天
@@ -440,7 +424,7 @@ class device
                 //具体哪天的时候需要设备出货列表
                 $result['devices'] = [];
             } else {
-                return error(State::ERROR, '日期不对！');
+                return error(State::ERROR, '日期不正确！');
             }
 
             //指定了下级代理guid
@@ -453,6 +437,19 @@ class device
                 }
             } else {
                 $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
+            }
+
+            //统计修复状态
+            $repair = $agent->settings('repair', []);
+            if ($repair) {
+                $result['repair'] = [
+                    'state' => $repair['status'],
+                ];
+            }
+
+            $first_order = Order::getFirstOrderOf($agent);
+            if ($first_order) {
+                $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
             }
 
             //设备列表

@@ -373,7 +373,15 @@
                             {if $a['type'] == \zovye\Account::TASK}
                                 <li><a href="#"  data-op="viewTaskLog"><i class="fa fa-list fa-fw"></i> 用户任务记录</a></li>
                             {else}
-                                <li><a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 专用领取链接</a></li>
+                                <li>
+                                    <a href="#" data-url="{$a['url']}" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 
+                                        {if $a['is_third_party_platform']}
+                                        平台回调地址
+                                        {else}
+                                        专用领取链接
+                                        {/if}
+                                    </a>
+                                </li>
                                 {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
                                 <li>
                                     <a href="#" data-op="useAccountQRCode" onclick="return false;">

@@ -86,8 +86,8 @@ class MengMoAccount
 
             $data = $acc->format();
             if ($item['qrPicUrl']) {
-                $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
-                $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
+                $data['title'] = $item['nickName'] ?: Account::MENGMO_NAME;
+                $data['img'] = $item['headImgUrl'] ?: Account::MENGMO_HEAD_IMG;
                 $data['qrcode'] = $item['qrPicUrl'];
             } else {
                 throw new RuntimeException('没有二维码数据！');

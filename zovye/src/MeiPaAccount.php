@@ -74,14 +74,14 @@ class MeiPaAccount
                 }
             }
 
-            if (is_error($result) || $result['status'] != 1) {
+            if (is_error($result)) {
                 Log::error('meipa', [
                     'user' => $user->profile(),
                     'acc' => $acc->getName(),
                     'device' => $device->profile(),
                     'error' => $result,
                 ]);
-            } else {
+            } elseif ($result['status'] == 1) {
                 $data = $acc->format();
 
                 $data['title'] = $result['data']['wechat_name'] ?: Account::MEIPA_NAME;

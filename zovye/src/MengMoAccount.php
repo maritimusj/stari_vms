@@ -49,7 +49,6 @@ class MengMoAccount
             'facilityProvince' => $fans['province'],
             'facilityCity' => $fans['city'],
             'facilityDistrict' => '',
-            'showTimes' => 0,
         ];
 
         $result = Util::post(self::API_URL, $data);

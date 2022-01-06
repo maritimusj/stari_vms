@@ -452,7 +452,8 @@ class device
             if ($first_order) {
                 try {
                     $date_obj = new DateTime(request::str('date'));
-                    if ($date_obj->getTimestamp() < $first_order->getCreatetime()) {
+                    $order_date_obj = new DateTime(date('Y-m', $first_order->getCreatetime()));
+                    if ($date_obj < $order_date_obj) {
                         return [];
                     }
                 } catch (Exception $e) {

@@ -59,9 +59,6 @@ abstract class StatsCounter
     public function getDay(array $params = [], DateTimeInterface...$days): int
     {
         $total = 0;
-        $time_arr = [];
-
-        $uid = '';
 
         foreach ($days as $day) {
             $uid = $this->makeUID(array_merge(['datetime' => $day->format('Ymd')], $params));
@@ -82,23 +79,27 @@ abstract class StatsCounter
                     $end->setTimestamp(time());
                 }
 
+                $time_arr = [];
                 while ($begin < $end) {
                     $time_arr[] = DateTimeImmutable::createFromMutable($begin);
                     $begin->modify('+1 hour');
                 }
+
+                $num = $this->getHour($params, ...$time_arr);
+
+                if ($day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
+                    Counter::create([
+                        'uid' => $uid,
+                        'num' => $num,
+                        'createtime' => time(),
+                        'updatetime' => 0,
+                    ]);
+                }
+
+                $total += $num;
+                
             } catch (Exception $e) {
             }
-        }
-
-        $total += $this->getHour($params, ...$time_arr);
-
-        if (isset($day) && $day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
-            Counter::create([
-                'uid' => $uid,
-                'num' => $total,
-                'createtime' => time(),
-                'updatetime' => 0,
-            ]);
         }
 
         return $total;
@@ -107,7 +108,7 @@ abstract class StatsCounter
     public function getMonth(array $params, DateTimeInterface...$months): int
     {
         $total = 0;
-        $time_arr = [];
+
 
         foreach ($months as $month) {
             $uid = $this->makeUID(array_merge(['datetime' => $month->format('Ym')], $params));
@@ -128,24 +129,27 @@ abstract class StatsCounter
                     $end->setTimestamp(time());
                 }
 
+                $time_arr = [];
                 while ($begin < $end) {
                     $time_arr[] = DateTimeImmutable::createFromMutable($begin);
                     $begin->modify('next day');
                 }
 
+                $num = $this->getDay($params, ...$time_arr);
+
+                if ($month->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
+                    Counter::create([
+                        'uid' => $uid,
+                        'num' => $num,
+                        'createtime' => time(),
+                        'updatetime' => 0,
+                    ]);
+                }
+
+                $total += $num;
+
             } catch (Exception $e) {
             }
-        }
-
-        $total += $this->getDay($params, ...$time_arr);
-
-        if ($month->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
-            Counter::create([
-                'uid' => $uid,
-                'num' => $total,
-                'createtime' => time(),
-                'updatetime' => 0,
-            ]);
         }
 
         return $total;

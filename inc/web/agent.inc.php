@@ -2200,9 +2200,10 @@ if ($op == 'default') {
         }
 
         try {
+            $order_date_obj = new DateTime(date('Y-m-01', $first_order->getCreatetime()));
             $date = new DateTime("$year_str-$month-01 00:00");
-            if ($date < $begin) {
-                $result['title'] .= '!';
+            if ($date < $order_date_obj) {
+                $result['title'] .=  '*';
                 JSON::success($result);
             }
         } catch (Exception $e) {
@@ -2247,7 +2248,7 @@ if ($op == 'default') {
             $order_date_obj = new DateTime(date('Y-m-d', $first_order->getCreatetime()));
             $date = new DateTime("$month_str-$day");
             if ($date < $order_date_obj) {
-                $result['title'] .= '!';
+                $result['title'] .= '*';
                 JSON::success($result);
             }
         } catch (Exception $e) {

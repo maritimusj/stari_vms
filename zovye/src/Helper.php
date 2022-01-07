@@ -33,6 +33,17 @@ class Helper
     }
 
     /**
+     * 如果当前皮肤需要tpl_data中获取任务列表，否返回true
+     * @param deviceModelObj|null $device
+     * @return bool
+     */
+    public static function needTplAccountsData(deviceModelObj $device = null): bool
+    {
+        $theme = self::getTheme($device);
+        return !in_array($theme, ['balance', 'balanace2', 'spa', 'spec']);
+    }
+
+    /**
      * 设备故障时，订单是否需要自动退款
      * @param null $obj
      * @return bool
@@ -168,7 +179,7 @@ class Helper
                     } elseif (Balance::isPayOrder() && $zero['order']['p']) {
                         $enabled = true;
                     }
-                }                
+                }
             }
 
             if ($enabled) {

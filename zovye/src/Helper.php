@@ -40,7 +40,7 @@ class Helper
     public static function needTplAccountsData(deviceModelObj $device = null): bool
     {
         $theme = self::getTheme($device);
-        return !in_array($theme, ['balance', 'balanace2', 'spa', 'spec']);
+        return !in_array($theme, ['balance', 'balance2', 'spa', 'spec']);
     }
 
     /**

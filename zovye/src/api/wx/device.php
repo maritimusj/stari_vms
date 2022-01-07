@@ -467,20 +467,21 @@ class device
             foreach ($devices_query->findAll() as $item) {
                 $id = $item->getId();
                 $name = $item->getName();
-
-                //具体到哪一天时，顺便加入设备详情
-                if ($m == 'hours') {
-                    $data = Stats::getDayTotal($item, $date_str);
-                    if ($data['total'] > 0) {
-                        $result['devices'][$id] = [
-                            'name' => $name,
-                            'all' => [
-                                'free' => $data['free'],
-                                'fee' => $data['pay'],
-                            ],
-                            'area' => $locationFN($item),
-                        ];
-                    }
+                if (empty($params['deviceid']) || $params['deviceid'] == $id) {
+                    //具体到哪一天时，顺便加入设备详情
+                    if ($m == 'hours') {
+                        $data = Stats::getDayTotal($item, $date_str);
+                        if ($data['total'] > 0) {
+                            $result['devices'][$id] = [
+                                'name' => $name,
+                                'all' => [
+                                    'free' => $data['free'],
+                                    'fee' => $data['pay'],
+                                ],
+                                'area' => $locationFN($item),
+                            ];
+                        }
+                    }                    
                 }
 
                 $result['list'][] = [

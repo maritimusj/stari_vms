@@ -2179,7 +2179,13 @@ if ($op == 'default') {
         JSON::fail('时间不能超过当前时间！');
     }
 
-    $year_list = [];
+    $result = [
+        'title' => $year->format('Y年'),
+        'list' => [],
+        'summary' => [],
+        'year' => [],
+    ];
+
     $first_order = Order::getFirstOrderOfAgent($agent);
     if ($first_order) {
         try {
@@ -2189,16 +2195,26 @@ if ($op == 'default') {
         }
         $nextYear = new DateTime('first day of jan next year 00:00');
         while ($begin < $nextYear) {
-            $year_list[] = $begin->format('Y');
+            $result['year'][] = $begin->format('Y');
             $begin->modify('next year');
         }
+
+        try {
+            $date = new DateTime("$year_str-$month-01 00:00");
+            if ($date < $begin) {
+                $result['title'] .= '!';
+                JSON::success($result);
+            }
+        } catch (Exception $e) {
+        }
+
     } else {
-        $year_list[] = (new DateTime())->format('Y');
+        $result['year'][] = (new DateTime())->format('Y');
+        JSON::success($result);
     }
 
-    $result = Statistics::userYear($agent, $year, $month);
-    $result['title'] = $year->format('Y年');
-    $result['year'] = $year_list;
+    $data = Statistics::userYear($agent, $year, $month);
+    $result = array_merge($result, $data);
 
     JSON::success($result);
 } elseif ($op == 'month_commission_statistics') {

@@ -85,7 +85,7 @@ class MoscaleAccount
                                 'key' => "<span data-key=\"$rand_key\">$rand_key</span>",
                             ]);
                         } else {
-                            $data['descr'] = "回复<b>$rand_key</b>免费领取！";
+                            $data['descr'] = "回复<span data-key=\"$rand_key\">$rand_key</span>免费领取！";
                         }
                     }
 

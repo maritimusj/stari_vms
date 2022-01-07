@@ -98,7 +98,7 @@ class MeiPaAccount
                             'code' => "<span data-key=\"$code\">$code</span>",
                         ]);
                     } else {
-                        $data['descr'] = "回复<b>$code</b>免费领取！";
+                        $data['descr'] = "回复<span data-key=\"$code\">$code</span>免费领取！";
                     }
                 }
 

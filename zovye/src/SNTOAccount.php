@@ -137,7 +137,7 @@ class SNTOAccount
                             'key' => "<span data-key=\"$keyword\">$keyword</span>",
                         ]);
                     } else {
-                        $data['descr'] = "回复<b>$keyword</b>免费领取！";
+                        $data['descr'] = "回复<span data-key=\"$keyword\">$keyword</span>免费领取！";
                     }
                 }
 

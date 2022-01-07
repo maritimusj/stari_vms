@@ -109,37 +109,36 @@ class JfbAccount
                 throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
             }
 
-            $item = current($result['result']['data']);
-            if (isEmptyArray($item)) {
+            $list = $result['result']['data'];
+
+            if (isEmptyArray($list)) {
                 throw new RuntimeException('没有数据！');
             }
 
             $data = $acc->format();
-            if ($item['qrPicUrl']) {
-                $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
-                $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
-                $data['qrcode'] = $item['qrPicUrl'];
-            } elseif ($item['link']) {
-                $res = Util::createQrcodeFile("jfb." . sha1($item['link']), $item['link']);
-                if (is_error($res)) {
-                    Log::error('jfb', [
-                        'error' => 'fail to createQrcode file',
-                        'result' => $res,
-                    ]);
-                    $data['redirect_url'] = $item['link'];
+            foreach ($list as $item) {
+                if ($item['qrPicUrl']) {
+                    $data['title'] = $item['nickName'] ?: Account::JFB_NAME;
+                    $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
+                    $data['qrcode'] = $item['qrPicUrl'];
+                } elseif ($item['link']) {
+                    $res = Util::createQrcodeFile("jfb." . sha1($item['link']), $item['link']);
+                    if (is_error($res)) {
+                        Log::error('jfb', [
+                            'error' => 'fail to createQrcode file',
+                            'result' => $res,
+                        ]);
+                        $data['redirect_url'] = $item['link'];
+                    } else {
+                        $data['qrcode'] = Util::toMedia($res);
+                    }
                 } else {
-                    $data['qrcode'] = Util::toMedia($res);
+                    continue;
                 }
-            } else {
-                throw new RuntimeException('没有URL数据！');
+
+                $v[] = $data;
             }
 
-            $v[] = $data;
-
-            if (App::isAccountLogEnabled() && isset($log)) {
-                $log->setExtraData('account', $data);
-                $log->save();
-            }
         } catch (Exception $e) {
             if (App::isAccountLogEnabled() && isset($log)) {
                 $log->setExtraData('error_msg', $e->getMessage());

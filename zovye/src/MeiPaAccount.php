@@ -102,11 +102,6 @@ class MeiPaAccount
                     }
                 }
 
-                if (App::isAccountLogEnabled() && isset($log)) {
-                    $log->setExtraData('account', $data);
-                    $log->save();
-                }
-
                 $v[] = $data;
             }
         });

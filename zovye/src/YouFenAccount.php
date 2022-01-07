@@ -69,20 +69,15 @@ class YouFenAccount
                         'error' => $result,
                     ]);
                 } else {
-                    if ($result['result']) {
-                        $item = current((array)$result['result']);
-                        if ($item && $item['qr_url']) {
-                            $data = $acc->format();
-
-                            $data['title'] = $item['wx_nickname'] ?? Account::YOUFEN_NAME;
-                            $data['qrcode'] = $item['qr_url'];
-
-                            if (App::isAccountLogEnabled() && isset($log)) {
-                                $log->setExtraData('account', $data);
-                                $log->save();
+                    $list = $result['result'];
+                    if (!isEmptyArray($list)) {
+                        $data = $acc->format();
+                        foreach ($list as $item) {
+                            if ($item && $item['qr_url']) {
+                                $data['title'] = $item['wx_nickname'] ?? Account::YOUFEN_NAME;
+                                $data['qrcode'] = $item['qr_url'];
+                                $v[] = $data;
                             }
-
-                            $v[] = $data;                              
                         }
                     }
                 }

@@ -82,10 +82,6 @@ class KingFansAccount
 
                 $v[] = $data;
 
-                if (App::isAccountLogEnabled() && isset($log)) {
-                    $log->setExtraData('account', $data);
-                    $log->save();
-                }
             } catch (Exception $e) {
                 if (App::isAccountLogEnabled() && isset($log)) {
                     $log->setExtraData('error_msg', $e->getMessage());

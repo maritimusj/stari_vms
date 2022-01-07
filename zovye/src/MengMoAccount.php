@@ -80,26 +80,24 @@ class MengMoAccount
                 throw new RuntimeException('错误代码：' . $result['errorCode']);
             }
 
-            $item = current($result['result']['data']);
-            if (isEmptyArray($item)) {
+            $list = $result['result']['data'];
+            if (isEmptyArray($list)) {
                 throw new RuntimeException('没有数据！');
             }
 
             $data = $acc->format();
-            if ($item['qrPicUrl']) {
-                $data['title'] = $item['nickName'] ?: Account::MENGMO_NAME;
-                $data['img'] = $item['headImgUrl'] ?: Account::MENGMO_HEAD_IMG;
-                $data['qrcode'] = $item['qrPicUrl'];
-            } else {
-                throw new RuntimeException('没有二维码数据！');
+
+            foreach ($list as $item) {
+                if ($item['qrPicUrl']) {
+                    $data['title'] = $item['nickName'] ?: Account::MENGMO_NAME;
+                    $data['img'] = $item['headImgUrl'] ?: Account::MENGMO_HEAD_IMG;
+                    $data['qrcode'] = $item['qrPicUrl'];
+                } else {
+                    continue;
+                }
+                $v[] = $data;
             }
 
-            $v[] = $data;
-
-            if (App::isAccountLogEnabled() && isset($log)) {
-                $log->setExtraData('account', $data);
-                $log->save();
-            }
         } catch (Exception $e) {
             if (App::isAccountLogEnabled() && isset($log)) {
                 $log->setExtraData('error_msg', $e->getMessage());

@@ -78,6 +78,7 @@ class MoscaleAccount
 
                     $data['name'] = $result['data']['name'] ?: Account::MOSCALE_NAME;
                     $data['qrcode'] = $result['data']['qrcode_url'];
+
                     if ($result['data']['rand_key']) {
                         $rand_key = $result['data']['rand_key'];
                         if (strpos($data['descr'], '{key}') !== false) {
@@ -91,10 +92,6 @@ class MoscaleAccount
 
                     $v[] = $data;
 
-                    if (App::isAccountLogEnabled() && isset($log)) {
-                        $log->setExtraData('account', $data);
-                        $log->save();
-                    }
                 } catch (Exception $e) {
                     if (App::isAccountLogEnabled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());

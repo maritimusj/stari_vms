@@ -25,6 +25,11 @@ body {
     display: none !important;
 }
 
+[data-key] {
+    font-weight: 600;
+    color: red;
+}
+
 .follow-view {
     width: 100%;
     padding: 10px 0;

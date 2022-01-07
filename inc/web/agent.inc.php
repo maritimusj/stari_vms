@@ -2210,6 +2210,8 @@ if ($op == 'default') {
     }
 
     $month_str = request::str('month');
+    $day = request::int('day');
+
     $month = null;
     try {
         $month = new DateTimeImmutable($month_str);
@@ -2217,8 +2219,28 @@ if ($op == 'default') {
         JSON::fail('时间格式不正确！');
     }
 
-    $result = Statistics::userMonth($agent, $month, request::int('day'));
-    $result['title'] = $month->format('Y年m月');
+    $result = [
+        'title' => $month->format('Y年m月'),
+        'list' => [],
+        'summary' => [],
+    ];
+    
+    $first_order = Order::getFirstOrderOf($agent);
+    if ($first_order) {
+        try {
+            $order_date_obj = new DateTime(date('Y-m-d', $first_order->getCreatetime()));
+            $date = new DateTime("$month_str-$day");
+            if ($date < $order_date_obj) {
+                $result['title'] .= '!';
+                JSON::success($result);
+            }
+        } catch (Exception $e) {
+        }
+    } else {
+        JSON::success($result);
+    }
 
+    $data = Statistics::userMonth($agent, $month, $day);
+    $result = array_merge($result, $data);
     JSON::success($result);
 }

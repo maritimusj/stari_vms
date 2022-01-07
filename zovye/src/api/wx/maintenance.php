@@ -124,7 +124,7 @@ class maintenance
             $device_res = Device::query()->whereOr([
                 'name LIKE' => "%$device%",
                 'imei LIKE' => "%$device%",
-            ])->findAll();
+            ])->findAll([], true);
             foreach ($device_res as $item) {
                 $device_ids[] = $item->getId();
             }

@@ -410,7 +410,7 @@ JSCODE;
             $tpl['accounts'] = [];
         }
 
-        foreach ($tpl['accounts'] as $index => $account) {
+        foreach ((array)$tpl['accounts'] as $index => $account) {
             if (isset($account['extraFN'])) {
                 $fn = $account['extraFN'];
                 if (is_callable($fn)) {

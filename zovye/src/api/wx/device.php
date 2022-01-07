@@ -374,22 +374,24 @@ class device
          * @return array
          */
         $locationFN = function (deviceModelObj $device) {
-            $extra = $device->get('extra', []);
-            //位置
-            if ($extra['location']['tencent']['area']) {
-                return array_values($extra['location']['tencent']['area']);
-            } else {
-                $agent = $device->getAgent();
-                if ($agent) {
-                    $agent_data = $agent->getAgentData();
-                    if ($agent_data['area']) {
-                        return array_values($agent_data['area']);
+            return Util::cachedCall(300, function() use ($device) {
+                $extra = $device->get('extra', []);
+                //位置
+                if ($extra['location']['tencent']['area']) {
+                    return array_values($extra['location']['tencent']['area']);
+                } else {
+                    $agent = $device->getAgent();
+                    if ($agent) {
+                        $agent_data = $agent->getAgentData();
+                        if ($agent_data['area']) {
+                            return array_values($agent_data['area']);
+                        }
                     }
+                    //else 获取定位地址？
                 }
-                //else 获取定位地址？
-            }
 
-            return [];
+                return [];                
+            }, $device->getId());
         };
 
         $result = [
@@ -401,7 +403,7 @@ class device
             ],
         ];
 
-        if (isset($params['date'])) {
+        if ($params['date']) {
             common::checkCurrentUserPrivileges('F_tj');
 
             //统计修复状态
@@ -431,7 +433,7 @@ class device
             }
 
             //指定了下级代理guid
-            if (isset($params['guid'])) {
+            if ($params['guid']) {
                 $res = agent::getUserByGUID($params['guid']);
                 if (empty($res)) {
                     return error(State::ERROR, '找不到这个用户！');
@@ -490,7 +492,7 @@ class device
             $obj = $agent;
 
             //指定了设备
-            if (isset($params['deviceid'])) {
+            if ($params['deviceid']) {
                 $device = \zovye\Device::get($params['deviceid']);
                 if (empty($device)) {
                     return error(State::ERROR, '找不到这个设备！');
@@ -559,7 +561,7 @@ class device
 
         return Util::cachedCall(6, function () use ($user, $params) {
             return self::getStatisticsData($user, $params);
-        }, $user->getId(), ...$params);
+        }, $user->getId(),  http_build_query($params));
     }
 
     public static function getDeviceOnline(): array

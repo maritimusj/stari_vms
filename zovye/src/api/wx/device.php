@@ -366,15 +366,8 @@ class device
         return $result;
     }
 
-    /**
-     * 获取统计信息.
-     *
-     * @return array
-     */
-    public static function statistics(): array
+    protected static function getStatisticsData($user, $params = []): array
     {
-        $user = common::getAgent();
-
         /**
          * @param deviceModelObj $device
          *
@@ -408,7 +401,7 @@ class device
             ],
         ];
 
-        if (request::has('date')) {
+        if (isset($params['date'])) {
             common::checkCurrentUserPrivileges('F_tj');
 
             //统计修复状态
@@ -422,7 +415,7 @@ class device
                 }
             }
 
-            $date_str = request::str('date');
+            $date_str = $params['date'];
             $arr = explode('-', $date_str);
             if (count($arr) == 2) {
                 //月份的每一天
@@ -438,8 +431,8 @@ class device
             }
 
             //指定了下级代理guid
-            if (request::has('guid')) {
-                $res = agent::getUserByGUID(request::str('guid'));
+            if (isset($params['guid'])) {
+                $res = agent::getUserByGUID($params['guid']);
                 if (empty($res)) {
                     return error(State::ERROR, '找不到这个用户！');
                 } else {
@@ -452,7 +445,7 @@ class device
             $first_order = Order::getFirstOrderOf($agent);
             if ($first_order) {
                 try {
-                    $date_obj = new DateTime(request::str('date'));
+                    $date_obj = new DateTime($date_str);
                     $order_date_obj = new DateTime(date('Y-m', $first_order->getCreatetime()));
                     if ($date_obj < $order_date_obj) {
                         return $result;
@@ -497,8 +490,8 @@ class device
             $obj = $agent;
 
             //指定了设备
-            if (request::has('deviceid')) {
-                $device = \zovye\Device::get(request::int('deviceid'));
+            if (isset($params['deviceid'])) {
+                $device = \zovye\Device::get($params['deviceid']);
                 if (empty($device)) {
                     return error(State::ERROR, '找不到这个设备！');
                 }
@@ -549,6 +542,24 @@ class device
         }
 
         return $result;
+    }
+    /**
+     * 获取统计信息.
+     *
+     * @return array
+     */
+    public static function statistics(): array
+    {
+        $user = common::getAgent();
+        $params = [
+            'date' => request('date'),
+            'guid' => request('guid'),
+            'deviceid' => request('deviceid'),
+        ];
+
+        return Util::cachedCall(6, function () use ($user, $params) {
+            return self::getStatisticsData($user, $params);
+        }, $user->getId(), ...$params);
     }
 
     public static function getDeviceOnline(): array

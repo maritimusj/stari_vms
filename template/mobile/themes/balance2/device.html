@@ -124,7 +124,7 @@
 							<img :src="account.img">
 							<div>
 								<span class="title" v-html="account.title"></span>
-								<span class="desc" v-html="account.descr"></span>
+								<span class="desc" v-html="account.descr" @click="parseCode(account)"></span>
 							</div>
 						</div>
 						<div class="qrcode-view">

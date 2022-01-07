@@ -21,6 +21,7 @@ body {
     align-items: center;
 }
 
+
 [v-cloak] {
     display: none !important;
 }
@@ -28,6 +29,16 @@ body {
 [data-key] {
     font-weight: 600;
     color: red;
+    white-space: nowrap;
+}
+
+[data-key]::after{
+    display: inline-flex;
+    content: '';
+    background-image: url('../../img/copy.svg');
+    background-size: 14px, 14px;
+    width: 14px;
+    height: 14px;
 }
 
 .follow-view {

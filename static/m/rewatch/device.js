@@ -17,7 +17,7 @@ const app = new Vue({
         goods: initData.goods,
         sales: [],
         toast: {
-            title: "已售罄",
+            title: "",
             show: false
         },
         qrcode: "",
@@ -149,7 +149,7 @@ const app = new Vue({
         },
         goodsClick(item) {
             if (item.num === 0) {
-                this.showToast();
+                this.showToast('已售罄');
             } else {
                 if (item.detail_img) {
                     this.detail = item;
@@ -161,7 +161,7 @@ const app = new Vue({
         },
         buyClick(item) {
             if (item.num === 0) {
-                this.showToast();
+                this.showToast('已售罄');
             } else {
                 if (!this.buyFlag) {
                     this.buyFlag = true;
@@ -177,9 +177,10 @@ const app = new Vue({
                 }
             }
         },
-        showToast() {
+        showToast(title) {
             if (!this.toast.show) {
                 this.toast.show = true;
+                this.toast.title = title;
                 setTimeout(() => {
                     this.toast.show = false;
                 }, 2000);
@@ -276,7 +277,15 @@ const app = new Vue({
 		},
 		alertConfirmClick() {
 		    zovye_fn.closeWindow && zovye_fn.closeWindow();
-		}
+		},
+        parseCode(item) {
+            $res = (item.desc || item.descr || "").match(/data-key=\"(.*)\"/);
+            if ($res) {
+                this.$copyText($res[1]).then(() => {
+                    this.showToast('出货口令已复制');
+                })
+            }
+        },
     }
 });
 

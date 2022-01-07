@@ -74,7 +74,7 @@
 						</div>
 					</div>
 					<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
-					<span class="desc" v-html="item.desc"></span>
+					<span class="desc" v-html="item.desc" @click="parseCode(item)"></span>
 				</div>
 			</div>
 		</div>

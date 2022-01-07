@@ -71,7 +71,7 @@
 					</div>
 					<img class="account-qrcode" :src="item.qrcode" />
 					<span class="tips">长按识别二维码</span>
-					<span class="desc" v-html="item.desc"></span>
+					<span class="desc" v-html="item.desc" @click="parseCode(item)"></span>
 				</div>
 			</div>
 		</div>
@@ -174,7 +174,7 @@
 					id: "{$item['id']}",
 					img: "{$item['img']}",
 					title: "{$item['title']}",
-					desc:"{$item['descr']}",
+					desc:`{$item['descr']}`,
 					clr:"{$item['clr']}",
 					qrcode:"{$item['qrcode']}"
 				},
@@ -197,6 +197,7 @@
 		};
 </script>
 {php \zovye\url(true, 'static/m/shopping/device.js?v=20211216001');}
+<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 {if !empty($tpl['site']['warning'])}
 <script type="text/javascript">
 		(function() {

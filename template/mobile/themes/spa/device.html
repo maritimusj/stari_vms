@@ -88,7 +88,7 @@
 							</wx-open-launch-weapp>
 						</div>
 					</div>
-					<span class="desc" v-html="item.descr" v-if="item.descr"></span>
+					<span class="desc" v-html="item.descr" v-if="item.descr"  @click="parseCode(item)"></span>
 					<span v-else-if="item.qrcode">长按识别二维码</span>
 					<span v-else-if="item.media" style="margin-top: 3px;">点击观看</span>
 					<span v-else-if="item.username" style="margin-top: 3px;">点击打开小程序</span>

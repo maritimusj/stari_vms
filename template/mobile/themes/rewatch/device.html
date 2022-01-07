@@ -74,7 +74,7 @@
 						</div>
 					</div>
 					<span class="tips">{{item.qrcode ? '长按识别二维码' : '点击观看'}}</span>
-					<span class="desc" v-html="item.desc"></span>
+					<span class="desc" v-html="item.desc" @click="parseCode(item)"></span>
 				</div>
 			</div>
 		</div>
@@ -211,6 +211,7 @@
 		};
 </script>
 {php \zovye\url(true, 'static/m/rewatch/device.js?v=20211216001');}
+<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 {if !empty($tpl['site']['warning'])}
 <script type="text/javascript">
 		(function() {

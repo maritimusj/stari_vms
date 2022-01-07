@@ -17,7 +17,7 @@ const app = new Vue({
         goods: initData.goods,
         sales: [],
         toast: {
-            title: "已售罄",
+            title: "",
             show: false
         },
         qrcode: "",
@@ -31,7 +31,7 @@ const app = new Vue({
         },
         buyFlag: false,
         remain: null,
-        online: null
+        online: true
     },
     mounted() {
         zovye_fn.getAdvs(4, 10, (data) => {
@@ -72,13 +72,6 @@ const app = new Vue({
     },
     created() {
         this.imei = this.imei.substring(this.imei.length - 6);
-        zovye_fn.getDetail((res) => {
-            if (res.data.mcb && res.data.mcb.online) {
-                this.online = true;
-            } else {
-                this.online = false;
-            }
-        });
         zovye_fn.getAdvs(10, 10, (data) => {
             this.sales = data;
         });
@@ -128,7 +121,7 @@ const app = new Vue({
         },
         goodsClick(item) {
             if (item.num === 0) {
-                this.showToast();
+                this.showToast('已售罄');
             } else {
                 if (item.detail_img) {
                     this.detail = item;
@@ -140,7 +133,7 @@ const app = new Vue({
         },
         buyClick(item) {
             if (item.num === 0) {
-                this.showToast();
+                this.showToast('已售罄');
             } else {
                 if (!this.buyFlag) {
                     this.buyFlag = true;
@@ -156,8 +149,9 @@ const app = new Vue({
                 }
             }
         },
-        showToast() {
+        showToast(title) {
             if (!this.toast.show) {
+                this.toast.title = title;
                 this.toast.show = true;
                 setTimeout(() => {
                     this.toast.show = false;
@@ -200,6 +194,14 @@ const app = new Vue({
                     }
                     return true;
                 });
+            }
+        },
+        parseCode(item) {
+            $res = (item.desc || item.descr || "").match(/data-key=\"(.*)\"/);
+            if ($res) {
+                this.$copyText($res[1]).then(() => {
+                    this.showToast('出货口令已复制');
+                })
             }
         }
     }

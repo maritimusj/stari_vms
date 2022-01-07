@@ -307,6 +307,14 @@ const app = new Vue({
         onError() {
             this.passwd.visible = false;
         },
+        parseCode(item) {
+            $res = (item.desc || item.descr || "").match(/data-key=\"(.*)\"/);
+            if ($res) {
+                this.$copyText($res[1]).then(() => {
+                    this.showToast('出货口令已复制');
+                })
+            }
+        },
         retryClick() {
             zovye_fn.closeWindow && zovye_fn.closeWindow();
         },

@@ -380,7 +380,7 @@ class device
          *
          * @return array
          */
-        $location = function (deviceModelObj $device) {
+        $locationFN = function (deviceModelObj $device) {
             $extra = $device->get('extra', []);
             //位置
             if ($extra['location']['tencent']['area']) {
@@ -422,7 +422,8 @@ class device
                 }
             }
 
-            $arr = explode('-', request::str('date'));
+            $date_str = request::str('date');
+            $arr = explode('-', $date_str);
             if (count($arr) == 2) {
                 //月份的每一天
                 $m = 'days';
@@ -454,13 +455,13 @@ class device
                     $date_obj = new DateTime(request::str('date'));
                     $order_date_obj = new DateTime(date('Y-m', $first_order->getCreatetime()));
                     if ($date_obj < $order_date_obj) {
-                        return [];
+                        return $result;
                     }
                 } catch (Exception $e) {
                 }
                 $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
             } else {
-                return [];
+                return $result;
             }
 
             //设备列表
@@ -469,27 +470,28 @@ class device
 
             /** @var  deviceModelObj $item */
             foreach ($devices_query->findAll() as $item) {
-                $x = [
-                    'id' => $item->getId(),
-                    'name' => $item->getName() ?: '<未登记>',
-                ];
-
-                $result['list'][] = $x;
+                $id = $item->getId();
+                $name = $item->getName();
 
                 //具体到哪一天时，顺便加入设备详情
                 if ($m == 'hours') {
-                    $data = Stats::getDayTotal($item, request::str('date'));
+                    $data = Stats::getDayTotal($item, $date_str);
                     if ($data['total'] > 0) {
-                        $result['devices'][$x['id']] = [
-                            'name' => $x['name'],
+                        $result['devices'][$id] = [
+                            'name' => $name,
                             'all' => [
                                 'free' => $data['free'],
                                 'fee' => $data['pay'],
                             ],
-                            'area' => $location($item),
+                            'area' => $locationFN($item),
                         ];
                     }
                 }
+
+                $result['list'][] = [
+                    'id' => $item->getId(),
+                    'name' => $item->getName() ?: '<未登记>',
+                ];
             }
 
             $obj = $agent;
@@ -508,29 +510,34 @@ class device
                 $obj = $device;
             }
 
-            $data = [];
             if ($m == 'days') {
-                $data = Stats::daysOfMonth($obj, request::str('date'));
+                $data = Stats::daysOfMonth($obj, $date_str);
             } elseif ($m == 'hours') {
-                $data = Stats::hoursOfDay($obj, request::str('date'));
+                $data = Stats::hoursOfDay($obj, $date_str);
+            } else {
+                $data = [];
             }
 
             $result[$m] = $data;
         } else {
+            $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
+
             //首页
             $remainWarning = settings('device.remainWarning', 1);
 
-            $low_query = \zovye\Device::query(['remain <' => $remainWarning]);
-            $error_query = \zovye\Device::query(['error_code <>' => 0]);
+            $low_query = \zovye\Device::query([
+                'remain <' => $remainWarning,
+                'agent_id' => $agent->getId(),
+            ]);
+            $error_query = \zovye\Device::query([
+                'error_code <>' => 0,
+                'agent_id' => $agent->getId(),
+            ]);
 
-            $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
-
-            $low_query->where(['agent_id' => $agent->getId()]);
-            $error_query->where(['agent_id' => $agent->getId()]);
-
-            $result['msg'] = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $agent->getId(), 'updatetime' => 0])) ? 1 : 0; //是否有未读消息
             $result['low'] = $low_query->count();
             $result['error'] = $error_query->count();
+
+            $result['msg'] = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $agent->getId(), 'updatetime' => 0])) ? 1 : 0; //是否有未读消息
 
             //今日出货
             $data = Stats::getDayTotal($agent);

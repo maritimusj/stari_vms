@@ -65,7 +65,7 @@ class common
         return request::str('token');
     }
 
-    public static function getUser($token = null): userModelObj
+    public static function getUser(): userModelObj
     {
         static $user = null;
 
@@ -118,13 +118,12 @@ class common
     /**
      * 获取当前已登录的用户.
      *
-     * @param $token
      *
      * @return agentModelObj
      */
-    public static function getAgent($token = null): agentModelObj
+    public static function getAgent(): agentModelObj
     {
-        $user = self::getUser($token);
+        $user = self::getUser();
 
         if (!$user->isAgent() && !$user->isPartner()) {
             JSON::fail('您还不是我们的代理商，请联系我们！');

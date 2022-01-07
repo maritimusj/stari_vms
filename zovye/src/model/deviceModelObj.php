@@ -2767,7 +2767,7 @@ class deviceModelObj extends modelObj
         return $this->save();
     }
 
-    public function openDoor($index)
+    public function openDoor($index): bool
     {
         return $this->mcbNotify('run', '', [
             'ser' => Util::random(16, true),

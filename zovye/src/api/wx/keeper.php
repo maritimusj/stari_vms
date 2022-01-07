@@ -37,18 +37,17 @@ use function zovye\settings;
 class keeper
 {
     /**
-     * @param null $token
      *
      * @return keeperModelObj
      */
-    public static function getKeeper($token = null): keeperModelObj
+    public static function getKeeper(): keeperModelObj
     {
         static $keeper = null;
         if ($keeper) {
             return $keeper;
         }
 
-        $user = common::getUser($token);
+        $user = common::getUser();
         if (!$user->isKeeper()) {
             JSON::fail(['msg' => '不是营运人员！']);
         }
@@ -792,6 +791,10 @@ class keeper
             $result['cargo_lanes'] = $payload['cargo_lanes'];
         } else {
             $result['cargo_lanes'] = [];
+        }
+
+        if (App::isDeviceWithDoorEnabled()) {
+            $result['doorNum'] = $device->getDoorNum();
         }
 
         return $result;

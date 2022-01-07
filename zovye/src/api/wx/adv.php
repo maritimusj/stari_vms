@@ -283,9 +283,10 @@ class adv
         $guid = request::trim('id');
 
         /** @var advertisingModelObj $adv */
-        $adv = Advertising::query(['state' => Advertising::NORMAL])->where(
-            "SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'"
-        )->findAll()->current();
+        $adv = Advertising::query([
+            'state' => Advertising::NORMAL,
+            "SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'",
+        ])->findOne();
 
         if (empty($adv)) {
             return error(State::ERROR, '找不到这条广告！');
@@ -387,7 +388,7 @@ class adv
                     $group_arr[] = $one->getId();
                 }
 
-                $devices = Device::query(We7::uniacid($query_arr))->findAll();
+                $devices = Device::query($query_arr)->findAll();
                 foreach ($devices as $device) {
                     $device_arr[] = $device->getId();
                 }

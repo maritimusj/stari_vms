@@ -101,7 +101,7 @@ class order
         if ($order_no) {
             $query->whereOr([
                 'order_id LIKE' => "%$order_no%",
-                'extra REGEXP' => "\"transaction_id\":\"[0-9]*{$order_no}[0-9]*\"",
+                'extra REGEXP' => "\"transaction_id\":\"[0-9]*$order_no[0-9]*\"",
             ]);
         }
 

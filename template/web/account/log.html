@@ -21,6 +21,9 @@
     #list td i.success {
         color: #4caf50;
     }
+    #list .order {
+        white-space: nowrap;
+    }
     #navbar img {
         width: 16px;
         height: 16px;
@@ -136,10 +139,10 @@
                         {/if}
                     </td>
                     <td>
-                        {if !$e['cb']['order_uid']}
-                        <span> <img src="{MODULE_URL}static/img/yen.svg" class="yen">{$e['cb']['order_uid']}</span>
-                        {else}
-                        <span><img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">{$e['cb']['serial']}</span>
+                        {if $e['cb']['order_uid']}
+                        <span class="order"> <img src="{MODULE_URL}static/img/yen.svg" class="yen">{$e['cb']['order_uid']}</span>
+                        {elseif $e['cb']['serial']}
+                        <span class="order"><img src="{MODULE_URL}static/img/coin.svg" class="balance" title="{$e['cb']['serial']}">{$e['balance']}</span>
                         {/if}
                     </td>
                     <td>

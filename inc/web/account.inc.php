@@ -992,6 +992,12 @@ if ($op == 'default') {
             $data['request'] = $entry->getRequest();
             $data['result'] = $entry->getResult();
             $data['cb'] = $entry->getExtraData('cb');
+            if ($data['cb']['serial']) {
+                $log = BalanceLog::findOne(['s2' => $data['cb']['serial']]);
+                if ($log) {
+                    $data['balance'] = $log->getExtraData('bonus', 0);
+                }
+            }
             $data['createtime'] = $entry->getCreatetime();
 
             $list[] = $data;

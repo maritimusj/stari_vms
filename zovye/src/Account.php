@@ -10,6 +10,7 @@ namespace zovye;
 use zovye\base\modelObjFinder;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
+use zovye\model\balance_logsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -1194,7 +1195,13 @@ class Account extends State
             ->where($condition);
     }
 
-    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device = null)
+    /**
+     * @param accountModelObj $account
+     * @param userModelObj $user
+     * @param deviceModelObj|null $device
+     * @return balance_logsModelObj|null
+     */
+    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device = null): ?balance_logsModelObj
     {
         $condition = [
             'user_id' => $user->getId()
@@ -1214,6 +1221,12 @@ class Account extends State
         if (App::isAccountLogEnabled()) {
             $log = Account::getLastQueryLog($acc, $user, $device);
             if ($log) {
+                $last = $log->getExtraData('cb');
+                if ($last) {
+                    $arr = $log->getExtraData('last_cb', []);
+                    $arr[] = $last;
+                    $log->setExtraData('last_cb', $arr);
+                }
                 $log->setExtraData('cb', array_merge(['time' => time()], $data));
                 $log->save();
             }

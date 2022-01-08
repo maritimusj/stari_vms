@@ -998,6 +998,10 @@ if ($op == 'default') {
                     $data['balance'] = $log->getExtraData('bonus', 0);
                 }
             }
+            $last_cb = $entry->getExtraData('last_cb');
+            if ($last_cb) {
+                $data['last_cb'] = count($last_cb);
+            }
             $data['createtime'] = $entry->getCreatetime();
 
             $list[] = $data;

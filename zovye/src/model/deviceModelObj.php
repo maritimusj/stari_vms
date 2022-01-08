@@ -1643,6 +1643,7 @@ class deviceModelObj extends modelObj
         }
 
         $query = Account::query(['state <>' => Account::BANNED]);
+        $query->orderBy('order_no DESC');
 
         $balance_enabled = App::isBalanceEnabled();
 

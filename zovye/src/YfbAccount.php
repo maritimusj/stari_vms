@@ -238,7 +238,7 @@ class YfbAccount
 
             if ($acc) {
                 $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['mpAppId']}");
-                $result = Balance::give($user, $acc, $serial);
+                $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $params);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
                 }

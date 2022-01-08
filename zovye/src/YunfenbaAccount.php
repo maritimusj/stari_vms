@@ -273,7 +273,7 @@ class YunfenbaAccount
                 //todo 暂时没有文档说明返回数据中的唯一标识值
                 $uid = $params['order_id'] ?? time();
                 $serial = sha1("{$user->getId()}{$acc->getUid()}$uid");
-                $result = Balance::give($user, $acc, $serial);
+                $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $params);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
                 }

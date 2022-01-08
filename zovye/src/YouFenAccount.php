@@ -181,7 +181,7 @@ class YouFenAccount
 
             if ($acc->getBonusType() == Account::BALANCE) {
                 $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['request_id']}");
-                $result = Balance::give($user, $acc, $serial);
+                $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $params);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
                 }

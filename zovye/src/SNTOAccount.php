@@ -211,7 +211,7 @@ class SNTOAccount
 
             if ($acc->getBonusType() == Account::BALANCE) {
                 $serial = sha1("{$user->getId()}{$acc->getUid()}{$data['order_id']}");
-                $result = Balance::give($user, $acc, $serial);
+                $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $data);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
                 }

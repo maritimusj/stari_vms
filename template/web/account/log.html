@@ -75,7 +75,7 @@
                 <th class="center">请求数据</th>
                 <th class="center">API响应</th>
                 <th class="center">通知</th>
-                <th style="width: 300px;">订单</th>
+                <th style="width: 300px;">订单{if \zovye\App::isBalanceEnabled()}/积分{/if}</th>
                 <th style="width: 200px;">时间</th>
             </thead>
             <tbody>
@@ -136,7 +136,11 @@
                         {/if}
                     </td>
                     <td>
-                        <span>{$e['cb']['order_uid']}</span>
+                        {if !$e['cb']['order_uid']}
+                        <span> <img src="{MODULE_URL}static/img/yen.svg" class="yen">{$e['cb']['order_uid']}</span>
+                        {else}
+                        <span><img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">{$e['cb']['serial']}</span>
+                        {/if}
                     </td>
                     <td>
                         {php echo date('Y-m-d H:i:s', $e['createtime'])}

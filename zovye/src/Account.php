@@ -265,7 +265,7 @@ class Account extends State
                 $result[] = $name;
             }
         }
-        
+
         return $result;
     }
 
@@ -378,9 +378,9 @@ class Account extends State
             //准粉吧
             Account::JFB => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isJfbEnabled() 
-                    && in_array(Account::JFB, $third_party_platform_includes) 
-                    && !in_array(JfbAccount::getUid(), $exclude);
+                    return App::isJfbEnabled()
+                        && in_array(Account::JFB, $third_party_platform_includes)
+                        && !in_array(JfbAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return JfbAccount::fetch($device, $user);
@@ -389,9 +389,9 @@ class Account extends State
             //公锤
             Account::MOSCALE => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isMoscaleEnabled() 
-                    && in_array(Account::MOSCALE, $third_party_platform_includes)
-                    && !in_array(MoscaleAccount::getUid(), $exclude);
+                    return App::isMoscaleEnabled()
+                        && in_array(Account::MOSCALE, $third_party_platform_includes)
+                        && !in_array(MoscaleAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return MoscaleAccount::fetch($device, $user);
@@ -400,9 +400,9 @@ class Account extends State
             //云粉
             Account::YUNFENBA => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYunfenbaEnabled() 
-                    && in_array(Account::YUNFENBA, $third_party_platform_includes)
-                    && !in_array(YunfenbaAccount::getUid(), $exclude);
+                    return App::isYunfenbaEnabled()
+                        && in_array(Account::YUNFENBA, $third_party_platform_includes)
+                        && !in_array(YunfenbaAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return YunfenbaAccount::fetch($device, $user);
@@ -411,9 +411,9 @@ class Account extends State
             //阿旗
             Account::AQIINFO => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isAQiinfoEnabled() 
-                    && in_array(Account::AQIINFO, $third_party_platform_includes)
-                    && !in_array(AQIInfoAccount::getUid(), $exclude);
+                    return App::isAQiinfoEnabled()
+                        && in_array(Account::AQIINFO, $third_party_platform_includes)
+                        && !in_array(AQIInfoAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return AQIInfoAccount::fetch($device, $user);
@@ -423,9 +423,9 @@ class Account extends State
             //纸巾宝
             Account::ZJBAO => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isZJBaoEnabled() 
-                    && in_array(Account::ZJBAO, $third_party_platform_includes)
-                    && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
+                    return App::isZJBaoEnabled()
+                        && in_array(Account::ZJBAO, $third_party_platform_includes)
+                        && !in_array(ZhiJinBaoAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return ZhiJinBaoAccount::fetch($device, $user);
@@ -435,9 +435,9 @@ class Account extends State
             //美葩
             Account::MEIPA => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isMeiPaEnabled() 
-                    && in_array(Account::MEIPA, $third_party_platform_includes)
-                    && !in_array(MeiPaAccount::getUid(), $exclude);
+                    return App::isMeiPaEnabled()
+                        && in_array(Account::MEIPA, $third_party_platform_includes)
+                        && !in_array(MeiPaAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return MeiPaAccount::fetch($device, $user);
@@ -447,9 +447,9 @@ class Account extends State
             //金粉吧
             Account::KINGFANS => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isKingFansEnabled() 
-                    && in_array(Account::KINGFANS, $third_party_platform_includes)
-                    && !in_array(KingFansAccount::getUid(), $exclude);
+                    return App::isKingFansEnabled()
+                        && in_array(Account::KINGFANS, $third_party_platform_includes)
+                        && !in_array(KingFansAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return KingFansAccount::fetch($device, $user);
@@ -459,9 +459,9 @@ class Account extends State
             //史莱姆
             Account::SNTO => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isSNTOEnabled() 
-                    && in_array(Account::SNTO, $third_party_platform_includes)
-                    && !in_array(SNTOAccount::getUid(), $exclude);
+                    return App::isSNTOEnabled()
+                        && in_array(Account::SNTO, $third_party_platform_includes)
+                        && !in_array(SNTOAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return SNTOAccount::fetch($device, $user);
@@ -471,9 +471,9 @@ class Account extends State
             //粉丝宝
             Account::YFB => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYFBEnabled() 
-                    && in_array(Account::YFB, $third_party_platform_includes)
-                    && !in_array(YfbAccount::getUid(), $exclude);
+                    return App::isYFBEnabled()
+                        && in_array(Account::YFB, $third_party_platform_includes)
+                        && !in_array(YfbAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return YfbAccount::fetch($device, $user);
@@ -483,9 +483,9 @@ class Account extends State
             //企业微信拉新（阿旗）
             Account::WxWORK => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isWxWorkEnabled() 
-                    && in_array(Account::WxWORK, $third_party_platform_includes)
-                    && !in_array(WxWorkAccount::getUid(), $exclude);
+                    return App::isWxWorkEnabled()
+                        && in_array(Account::WxWORK, $third_party_platform_includes)
+                        && !in_array(WxWorkAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return WxWorkAccount::fetch($device, $user);
@@ -495,9 +495,9 @@ class Account extends State
             //友粉
             Account::YOUFEN => [
                 function () use ($third_party_platform_includes, $exclude) {
-                    return App::isYouFenEnabled() 
-                    && in_array(Account::YOUFEN, $third_party_platform_includes)
-                    && !in_array(YouFenAccount::getUid(), $exclude);
+                    return App::isYouFenEnabled()
+                        && in_array(Account::YOUFEN, $third_party_platform_includes)
+                        && !in_array(YouFenAccount::getUid(), $exclude);
                 },
                 function () use ($device, $user) {
                     return YouFenAccount::fetch($device, $user);
@@ -1194,29 +1194,51 @@ class Account extends State
             ->where($condition);
     }
 
-    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device)
+    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device = null)
     {
-        $query = self::logQuery($account, [
-            'device_id' => $device->getId(),
+        $condition = [
             'user_id' => $user->getId()
-        ]);
+        ];
+
+        if ($device) {
+            $condition['device_id'] = $device->getId();
+        }
+
+        $query = self::logQuery($account, $condition);
         $query->orderBy('id DESC');
         return $query->findOne();
     }
 
-    public static function createThirdPartyPlatformOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
+    public static function updateQueryLogCBData(accountModelObj $acc, userModelObj $user, deviceModelObj $device = null, $data = [])
     {
         if (App::isAccountLogEnabled()) {
             $log = Account::getLastQueryLog($acc, $user, $device);
             if ($log) {
-                $log->setExtraData('cb', [
-                    'time' => time(),
-                    'order_uid' => $order_uid,
-                    'data' => $cb_params,
-                ]);
+                $log->setExtraData('cb', array_merge(['time' => time()], $data));
                 $log->save();
             }
         }
+    }
+
+    public static function createThirdPartyPlatformBalance(accountModelObj $acc, userModelObj $user, $serial = '', $params = [])
+    {
+        $result = Balance::give($user, $acc, $serial);
+
+        Account::updateQueryLogCBData($acc, $user, null, [
+            'serial' => $serial,
+            'data' => $params,
+            'result' => $result,
+        ]);
+
+        return $result;
+    }
+
+    public static function createThirdPartyPlatformOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
+    {
+        self::updateQueryLogCBData($acc, $user, $device, [
+            'order_uid' => $order_uid,
+            'data' => $cb_params,
+        ]);
 
         Job::createThirdPartyPlatformOrder([
             'device' => $device->getId(),

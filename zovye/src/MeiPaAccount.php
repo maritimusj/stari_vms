@@ -81,7 +81,7 @@ class MeiPaAccount
                     'device' => $device->profile(),
                     'error' => $result,
                 ]);
-            } elseif ($result['status'] == 1) {
+            } elseif ($result['status'] == 1 && $result['data']['qrcodeurl']) {
                 $data = $acc->format();
 
                 $data['title'] = $result['data']['wechat_name'] ?: Account::MEIPA_NAME;

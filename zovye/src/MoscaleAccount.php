@@ -74,6 +74,10 @@ class MoscaleAccount
                         throw new RuntimeException('失败，错误代码：' . $result['code']);
                     }
 
+                    if (empty($result['data']['qrcode_url'])) {
+                        throw new RuntimeException('二维码网址为空！');
+                    }
+
                     $data = $acc->format();
 
                     $data['name'] = $result['data']['name'] ?: Account::MOSCALE_NAME;

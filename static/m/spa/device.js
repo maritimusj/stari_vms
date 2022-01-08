@@ -76,7 +76,15 @@ const app = new Vue({
 
         this.loading = true
         zovye_fn.getAccounts([], res => {
-            this.accounts = res.data
+            if (res.status && res.data) {
+                res.data.forEach(e => {
+                    if (e.redirect_url) {
+                        window.location.replace(e.redirect_url);
+                    } else {
+                        this.accounts.push(e);
+                    }
+                });
+            }
             if (this.wechatState === false && this.accounts.findIndex(e => e.username) !== -1) {
                 alert('当前微信版本过低，建议升级微信后再试！')
             }

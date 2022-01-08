@@ -206,6 +206,10 @@ class YunfenbaAccount
                         throw new RuntimeException('失败，错误代码：' . $result['errcode']);
                     }
 
+                    if (empty($result['data']['qrcode_url'])) {
+                        throw new RuntimeException('二维码网址为空！');
+                    }
+
                     $data = $acc->format();
 
                     $data['title'] = $result['data']['wechat_name'] ?: Account::YUNFENBA_NAME;

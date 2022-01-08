@@ -159,7 +159,15 @@ const app = new Vue({
         },
         getAccountList() {
             zovye_fn.getAccounts([], res => {
-                this.free.accounts = res.data
+                if (res.status && res.data) {
+                    res.data.forEach(e => {
+                        if (e.redirect_url) {
+                            window.location.replace(e.redirect_url);
+                        } else {
+                            this.free.accounts.push(e);
+                        }
+                    });
+                }
                 if (this.free.accounts.length > 0) {
                     this.free.desc = '还有' + this.free.accounts.length + '个未领取';
                     if (typeof zovye_fn.saveUserProfile === 'function') {

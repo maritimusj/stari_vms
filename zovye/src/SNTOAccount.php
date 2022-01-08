@@ -130,13 +130,13 @@ class SNTOAccount
                 $data['title'] = $result['data']['app_name'] ?: Account::SNTO_NAME;
                 $data['qrcode'] = $result['data']['qr_code_url'];
 
-                if ($result['data']['keyword']) {
-                    $keyword = $result['data']['keyword'];
-                    if (strpos($data['descr'], '{key}') !== false) {
-                        $data['descr'] = PlaceHolder::replace($data['descr'], [
-                            'key' => "<span data-key=\"$keyword\">$keyword</span>",
-                        ]);
-                    } else {
+                $keyword = strval($result['data']['keyword']);
+                if (strpos($data['descr'], '{key}') !== false) {
+                    $data['descr'] = PlaceHolder::replace($data['descr'], [
+                        'key' => "<span data-key=\"$keyword\">$keyword</span>",
+                    ]);
+                } else {
+                    if ($keyword) {
                         $data['descr'] = "回复<span data-key=\"$keyword\">$keyword</span>免费领取！";
                     }
                 }

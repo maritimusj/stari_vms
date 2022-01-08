@@ -91,17 +91,16 @@ class MeiPaAccount
                     $data['redirect_url'] = $result['data']['joburl'];
                 }
 
-                if ($result['data']['code_words']) {
-                    $code = $result['data']['code_words'];
-                    if (strpos($data['descr'], '{code}') !== false) {
-                        $data['descr'] = PlaceHolder::replace($data['descr'], [
-                            'code' => "<span data-key=\"$code\">$code</span>",
-                        ]);
-                    } else {
+                $code = strval($result['data']['code_words']);
+                if (strpos($data['descr'], '{code}') !== false) {
+                    $data['descr'] = PlaceHolder::replace($data['descr'], [
+                        'code' => "<span data-key=\"$code\">$code</span>",
+                    ]);
+                } else {
+                    if ($code) {
                         $data['descr'] = "回复<span data-key=\"$code\">$code</span>免费领取！";
                     }
                 }
-
                 $v[] = $data;
             }
         });

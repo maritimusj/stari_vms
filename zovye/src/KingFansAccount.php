@@ -72,6 +72,10 @@ class KingFansAccount
                     throw new RuntimeException("请求失败，错误代码：{$result['error']}");
                 }
 
+                if (empty($result['list']['qrcode_url'])) {
+                    throw new RuntimeException('二维码为空！');
+                }
+
                 $data = $acc->format();
 
                 $data['name'] = $result['list']['ghname'] ?: Account::KINGFANS_NAME;

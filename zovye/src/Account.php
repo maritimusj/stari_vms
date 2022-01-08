@@ -1199,9 +1199,9 @@ class Account extends State
      * @param accountModelObj $account
      * @param userModelObj $user
      * @param deviceModelObj|null $device
-     * @return balance_logsModelObj|null
+     * @return account_queryModelObj|null
      */
-    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device = null): ?balance_logsModelObj
+    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device = null): ?account_queryModelObj
     {
         $condition = [
             'user_id' => $user->getId()

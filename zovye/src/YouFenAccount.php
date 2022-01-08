@@ -142,18 +142,18 @@ class YouFenAccount
             return err('请求数据为空！');
         }
 
-        $account = Account::findOneFromType(Account::YOUFEN);
-        if (empty($account)) {
+        $acc = Account::findOneFromType(Account::YOUFEN);
+        if (empty($acc)) {
             return err('找不到指定公众号！');
         }
 
-        $config = $account->settings('config', []);
+        $config = $acc->settings('config', []);
 
         if (empty($config)) {
             return err('没有配置！');
         }
 
-        return ['account' => $account];
+        return ['account' => $acc];
     }
 
     public static function cb($params = [])
@@ -176,17 +176,25 @@ class YouFenAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $device_uid]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['params']);
+            /** @var accountModelObj $acc */
+            $acc = $res['account'];
+
+            if ($acc->getBonusType() == Account::BALANCE) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['request_id']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $device_uid]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $params['params']);
+                }
+
+                $order_uid = Order::makeUID($user, $device, sha1($params['request_id']));
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
             }
-
-            $account = $res['account'];
-
-            $order_uid = Order::makeUID($user, $device, sha1($params['request_id'] ?? ''));
-
-            Account::createThirdPartyPlatformOrder($account, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Log::error('youfen', [

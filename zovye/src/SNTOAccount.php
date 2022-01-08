@@ -8,6 +8,7 @@ namespace zovye;
 
 use Exception;
 use RuntimeException;
+use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -205,17 +206,25 @@ class SNTOAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用！');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $device_uid]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $device_uid);
-            }
-
+            /** @var accountModelObj $acc */
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, sha1($data['order_id']));
+            if ($acc->getBonusType() == Account::BALANCE) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$data['order_id']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $device_uid]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $device_uid);
+                }
 
-            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
+                $order_uid = Order::makeUID($user, $device, sha1($data['order_id']));
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
+            }
         } catch (Exception $e) {
             Log::error('snto', [
                 'error' => '回调处理发生错误! ',

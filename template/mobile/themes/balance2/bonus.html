@@ -749,6 +749,11 @@
 						if (res.status) {
 							const data = res.data || [];
 							if (data.length > 0) {
+								data.forEach(e => {
+									if (e.redirect_url) {
+										window.location.replace(e.redirect_url);
+									}
+								});
 								this.follow.data = data[0];
 								this.follow.visible = true;
 							} else {

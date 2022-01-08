@@ -4,6 +4,7 @@ namespace zovye;
 
 use Exception;
 use RuntimeException;
+use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -25,6 +26,7 @@ class AQIInfo
             'params' => $params,
             'config' => $config,
         ]);
+
         //暂时无法确定验签算法
         // if ($config['key'] !== $params['appKey'] || self::sign($params, $config['secret']) !== $params['ufsign']) {
         //     return err('签名校验失败！');
@@ -49,17 +51,25 @@ class AQIInfo
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $shadow_id]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $shadow_id);
-            }
-
+            /** @var accountModelObj $acc */
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, strval($params['tradeNo']));
+            if ($acc->getBonusType() == Account::BALANCE) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['tradeNo']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $shadow_id]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $shadow_id);
+                }
 
-            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+                $order_uid = Order::makeUID($user, $device, sha1($params['tradeNo']));
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+            }
 
         } catch (Exception $e) {
             Log::error('AQIInfo', [

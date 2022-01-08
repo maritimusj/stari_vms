@@ -194,17 +194,25 @@ class MoscaleAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findByMoscaleKey($params['state']);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['state']);
-            }
-
+            /** @var accountModelObj $acc */
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, $params['signature']);
+            if ($acc->getBonusType() == Account::BALANCE) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['appid']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findByMoscaleKey($params['state']);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $params['state']);
+                }
 
-            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+                $order_uid = Order::makeUID($user, $device, $params['appid']);
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+            }
 
         } catch (Exception $e) {
             Log::error('moscale', [

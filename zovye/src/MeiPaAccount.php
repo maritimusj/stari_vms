@@ -104,7 +104,7 @@ class MeiPaAccount
                 $v[] = $data;
             }
         });
-        
+
         return $v;
     }
 
@@ -148,17 +148,25 @@ class MeiPaAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用！');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $data['carry_data']]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备！');
-            }
-
+            /** @var accountModelObj $acc */
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, $data['order_sn']);
+            if ($acc->getBonusType() == Account::BALANCE) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$data['order_sn']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $data['carry_data']]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备！');
+                }
 
-            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
+                $order_uid = Order::makeUID($user, $device, $data['order_sn']);
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $data);
+            }
 
         } catch (Exception $e) {
             Log::error('meipa', [

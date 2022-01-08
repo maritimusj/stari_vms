@@ -28,6 +28,9 @@ class balance_logsModelObj extends modelObj
     /** @var int */
 	protected $s1;
 
+    /** @var string */
+    protected $s2;
+
 	protected $extra;
 
     /** @var int */

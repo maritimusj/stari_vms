@@ -8,6 +8,7 @@ namespace zovye;
 
 use Exception;
 use RuntimeException;
+use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
 
@@ -250,7 +251,6 @@ class YunfenbaAccount
         return ['account' => $acc];
     }
 
-
     public static function cb($params = [])
     {
         //出货流程
@@ -266,17 +266,27 @@ class YunfenbaAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $params['device']]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['device']);
-            }
-
+            /** @var accountModelObj $acc */
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device);
+            if ($acc->getBonusType() == Account::BALANCE) {
+                //todo 暂时没有文档说明返回数据中的唯一标识值
+                $uid = $params['order_id'] ?? time();
+                $serial = sha1("{$user->getId()}{$acc->getUid()}$uid");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $params['device']]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $params['device']);
+                }
 
-            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+                $order_uid = Order::makeUID($user, $device);
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+            }
 
         } catch (Exception $e) {
             Log::error('yunfenba', [

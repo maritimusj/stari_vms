@@ -32,7 +32,7 @@ if ($op == 'default') {
     if ($device_shadow_id) {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
-    
+
     app()->bonusPage($user, $device ?? null);
 
 } elseif ($op == 'home') {
@@ -60,12 +60,19 @@ if ($op == 'default') {
     $type = request::int('type', Account::NORMAL);
     $max = request::int('max', 10);
 
-    $result = Account::getAvailableList(Device::getDummyDevice(), $user, [
-        'type' => [$type],
-        's_type' => [],
+    $params = [
         'include' => [Account::BALANCE],
         'max' => $max,
-    ]);
+    ];
+
+    if ($type == Account::NORMAL) {
+        $params['type'] = [Account::BALANCE];
+    } else {
+        $params['type'] = [$type];
+        $params['s_type'] = []; //请求视频或者其它类型的公众号时，忽略第三方平台任务
+    }
+
+    $result = Account::getAvailableList(Device::getDummyDevice(), $user, $params);
 
     JSON::success($result);
 
@@ -85,7 +92,7 @@ if ($op == 'default') {
         'redirect' => Util::murl('payresult', ['orderNO' => $res, 'balance' => 1]),
     ]);
 
-}  elseif ($op == 'logs') {
+} elseif ($op == 'logs') {
 
     $query = $user->getBalance()->log();
     if (request::has('lastId')) {
@@ -96,7 +103,7 @@ if ($op == 'default') {
     $query->orderBy('createtime DESC');
 
     $result = [];
-    foreach($query->findAll() as $entry) {
+    foreach ($query->findAll() as $entry) {
         $result[] = Balance::format($entry);
     }
 

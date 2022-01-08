@@ -327,10 +327,10 @@ TEXT;
     /**
      * @param userModelObj $user
      * @param accountModelObj $account
-     * @param string $reason
+     * @param string $serial 做为唯一记录UID，存在时返回错误
      * @return array|balanceModelObj|bool
      */
-    public static function give(userModelObj $user, accountModelObj $account, string $reason = '')
+    public static function give(userModelObj $user, accountModelObj $account, string $serial = '')
     {
         if (!$user->acquireLocker(User::BALANCE_GIVE_LOCKER)) {
             return err('无法锁定用户！');
@@ -340,7 +340,12 @@ TEXT;
             return err('没有设置积分奖励！');
         }
 
-        return Util::transactionDo(function () use ($user, $account, $reason) {
+        return Util::transactionDo(function () use ($user, $account, $serial) {
+            if ($serial) {
+                if (BalanceLog::query()->exists(['s2' => $serial])) {
+                    return err('记录已经存在！');
+                }
+            }
 
             $bonus = $account->getBalancePrice();
 
@@ -349,25 +354,26 @@ TEXT;
                 if (is_error($result)) {
                     return $result;
                 }
-
-                if (!BalanceLog::create([
+                $data = [
                     'user_id' => $user->getId(),
                     'account_id' => $account->getId(),
                     'extra' => [
-                        'reason' => $reason,
+                        'reason' => '',
                         'user' => $user->profile(),
                         'account' => $account->profile(),
                         'bonus' => $bonus,
                     ]
-                ])) {
+                ];
+                if ($serial) {
+                    $data['s2'] = $serial;
+                }
+                if (!BalanceLog::create($data)) {
                     return err('创建领取记录失败！');
                 }
             }
 
             if ($bonus > 0) {
-                $result = $user->getBalance()->change(
-                    $account->getBalancePrice(),
-                    $account->isTask() ? Balance::TASK_BONUS : Balance::ACCOUNT_BONUS,
+                $result = $user->getBalance()->change($account->getBalancePrice(), $account->isTask() ? Balance::TASK_BONUS : Balance::ACCOUNT_BONUS,
                     [
                         'account' => $account->profile(),
                     ]);

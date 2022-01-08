@@ -8,6 +8,7 @@ namespace zovye;
 
 use Exception;
 use RuntimeException;
+use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
 
@@ -185,17 +186,25 @@ class JfbAccount
                     throw new RuntimeException('用户已被禁用！');
                 }
 
-                /** @var deviceModelObj $device */
-                $device = Device::get($params['device'], true);
-                if (empty($device)) {
-                    throw new RuntimeException('找不对这个设备:' . $params['device']);
-                }
-
+                /** @var accountModelObj $acc */
                 $acc = $res['account'];
 
-                $order_uid = Order::makeUID($user, $device, $params['ad_code_no']);
+                if ($acc->getBonusType() == Account::BALANCE) {
+                    $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['ad_code_no']}");
+                    $result = Balance::give($user, $acc, $serial);
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                    }
+                } else {
+                    /** @var deviceModelObj $device */
+                    $device = Device::get($params['device'], true);
+                    if (empty($device)) {
+                        throw new RuntimeException('找不对这个设备:' . $params['device']);
+                    }
 
-                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+                    $order_uid = Order::makeUID($user, $device, sha1($params['ad_code_no']));
+                    Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+                }
 
             } catch (Exception $e) {
                 Log::error('jfb', [

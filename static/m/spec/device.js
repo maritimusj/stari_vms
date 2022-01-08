@@ -130,7 +130,7 @@ const app = new Vue({
         getAccountList() {
             this.loading = true;
             zovye_fn.getAccounts([], res => {
-                if (res.status && res.data) {
+                if (res && res.status && res.data) {
                     res.data.forEach(e => {
                         if (e.redirect_url) {
                             window.location.replace(e.redirect_url);

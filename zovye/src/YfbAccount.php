@@ -233,17 +233,25 @@ class YfbAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $params['params']]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $params['params']);
+            /** @var accountModelObj $acc */
+            $acc = $res['account'];
+
+            if ($acc) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['mpAppId']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $params['params']]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $params['params']);
+                }
+
+                $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId']));
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
             }
-
-            $account = $res['account'];
-
-            $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId'] ?? ''));
-
-            Account::createThirdPartyPlatformOrder($account, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
             Log::error('yfb', [

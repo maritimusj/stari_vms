@@ -8,6 +8,7 @@ namespace zovye;
 
 use Exception;
 use RuntimeException;
+use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -145,17 +146,25 @@ class KingFansAccount
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
 
-            /** @var deviceModelObj $device */
-            $device = Device::findOne(['shadow_id' => $device_shadow_uid]);
-            if (empty($device)) {
-                throw new RuntimeException('找不到指定的设备:' . $device_shadow_uid);
-            }
-
+            /** @var accountModelObj $acc */
             $acc = $res['account'];
 
-            $order_uid = Order::makeUID($user, $device, sha1($params['oid'] . $user_openid));
+            if ($acc->getBonusType() == Account::BALANCE) {
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['oid']}");
+                $result = Balance::give($user, $acc, $serial);
+                if (is_error($result)) {
+                    throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
+                }
+            } else {
+                /** @var deviceModelObj $device */
+                $device = Device::findOne(['shadow_id' => $device_shadow_uid]);
+                if (empty($device)) {
+                    throw new RuntimeException('找不到指定的设备:' . $device_shadow_uid);
+                }
 
-            Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+                $order_uid = Order::makeUID($user, $device, sha1($params['oid']));
+                Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
+            }
 
         } catch (Exception $e) {
             Log::error('kingfans', [
@@ -185,7 +194,7 @@ class KingFansAccount
         $result = Util::get(self::API_URL . '?' . http_build_query($data));
         if (!empty($result) && is_string($result)) {
             $result = json_decode($result, true);
-        }        
+        }
         if ($cb) {
             $cb($data, $result);
         }

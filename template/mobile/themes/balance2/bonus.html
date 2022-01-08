@@ -402,6 +402,25 @@
 				transform: rotate(360deg);
 			}
 		}
+		[data-key] {
+			font-weight: 600;
+			color: red;
+			white-space: nowrap;
+		}
+
+		[data-key]::after{
+			display: inline-flex;
+			content: '';
+			background-image: url({MODULE_URL}static/img/copy.svg);
+			background-repeat: no-repeat;
+			background-size: 14px, 14px;
+			background-position: center;
+			width: 14px;
+			height: 14px;
+			background-color: white;
+			padding: 2px;
+			border-radius: 50%;
+		}
 	</style>
 </head>
 
@@ -496,7 +515,7 @@
 					<span>{{follow.data.title}}</span>
 				</div>
 				<img class="qrcode" :src="follow.data.qrcode">
-				<span class="desc" v-html="follow.data.descr"></span>
+				<span class="desc" v-html="follow.data.descr" @click="parseCode(follow.data)"></span>
 				<img class="close-icon" src="{MODULE_URL}static/m/balance2/img/close_black.svg" @click="follow.visible = false">
 			</div>
 		</div>
@@ -542,6 +561,7 @@
 	{php \zovye\url(true, JS_VUE_URL);}
 	<script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
 	<script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
+	<script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
 	<script type="text/javascript">
 		new Vue({
 			el: '#app',
@@ -823,7 +843,15 @@
 				},
 				jumpToProfile() {
 					zovye_fn.redirectToUserPage();
-				}
+				},
+				parseCode(item) {
+					const res = (item.desc || item.descr || "").match(/data-key=\"(.*)\"/);
+						if (res && res[1]) {
+							this.$copyText(res[1]).then(() => {
+							this.showToast('出货口令已复制');
+						})
+					}
+				},
 			}
 		})
 	</script>

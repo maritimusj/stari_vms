@@ -316,6 +316,7 @@
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetIDCardVerify"><i class="fa fa-bookmark fa-fw"></i> 清除实名认证</a></li>
             {/if} 
+            <li><a href="#" data-op="resetThirdPartyData"><i class="fa fa-comments-o fa-fw"></i> 清除第三方平台信息</a></li>
         </ul>
     </div>
 </td>
@@ -417,6 +418,10 @@
             api.showResult({op: 'reset_idcard_verify', id: userid});
         }
     }
+
+    api.resetThirdPartyData = function(userid) {
+        api.showResult({op: 'reset_thirdparty_data', id: userid});
+    }    
 
     api.viewInventory = function(userid) {
         window.location.href = "{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => '__id__']);}".replace('__id__', userid);

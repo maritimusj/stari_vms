@@ -86,7 +86,7 @@ class MoscaleAccount
                     $rand_key = strval($result['data']['rand_key']);
                     if (strpos($data['descr'], '{key}') !== false) {
                         $data['descr'] = PlaceHolder::replace($data['descr'], [
-                            'key' => "<span data-key=\"$rand_key\">$rand_key</span>",
+                            'key' => $rand_key ? "<span data-key=\"$rand_key\">$rand_key</span>" : '',
                         ]);
                     } else {
                         if ($rand_key) {

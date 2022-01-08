@@ -133,7 +133,7 @@ class SNTOAccount
                 $keyword = strval($result['data']['keyword']);
                 if (strpos($data['descr'], '{key}') !== false) {
                     $data['descr'] = PlaceHolder::replace($data['descr'], [
-                        'key' => "<span data-key=\"$keyword\">$keyword</span>",
+                        'key' => $keyword ? "<span data-key=\"$keyword\">$keyword</span>" : '',
                     ]);
                 } else {
                     if ($keyword) {

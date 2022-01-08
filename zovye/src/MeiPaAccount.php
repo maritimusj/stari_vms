@@ -94,7 +94,7 @@ class MeiPaAccount
                 $code = strval($result['data']['code_words']);
                 if (strpos($data['descr'], '{code}') !== false) {
                     $data['descr'] = PlaceHolder::replace($data['descr'], [
-                        'code' => "<span data-key=\"$code\">$code</span>",
+                        'code' => $code ? "<span data-key=\"$code\">$code</span>" : '',
                     ]);
                 } else {
                     if ($code) {

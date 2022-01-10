@@ -235,6 +235,7 @@ class Order extends State
         if ($order) {
             $user->updateSettings('extra.first.order', [
                 'id' => $order->getId(),
+                'createtime' => $order->getCreatetime(),
             ]);
             return $order;
         }

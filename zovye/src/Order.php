@@ -157,7 +157,7 @@ class Order extends State
     public static function getLastOrderOfDevice(deviceModelObj $device): ?orderModelObj
     {
         $query = self::query(['device_id' => $device->getId()]);
-        return $query->orderBy('id desc')->findOne();
+        return $query->orderBy('createtime DESC')->findOne();
     }
 
     public static function getFirstOrderOfDevice(deviceModelObj $device): ?orderModelObj
@@ -167,7 +167,7 @@ class Order extends State
             return Order::get($id);
         }
         $query = self::query(['device_id' => $device->getId()]);
-        $order = $query->orderBy('id ASC')->findOne();
+        $order = $query->orderBy('createtime ASC')->findOne();
         if ($order) {
             $device->updateSettings('stats.first_order', [
                 'id' => $order->getId(),
@@ -185,7 +185,7 @@ class Order extends State
             return Order::get($data['id']);
         }
         $query = self::query(['agent_id' => $agent->getId()]);
-        $order = $query->orderBy('id ASC')->findOne();
+        $order = $query->orderBy('createtime ASC')->findOne();
         if ($order) {
             $agent->setFirstOrderData($order);
             return $order;
@@ -200,7 +200,7 @@ class Order extends State
             return Order::get($data['id']);
         }
         $query = self::query(['account' => $account->getName()]);
-        $order = $query->orderBy('id ASC')->findOne();
+        $order = $query->orderBy('createtime ASC')->findOne();
         if ($order) {
             $account->setFirstOrderData($order);
             return $order;
@@ -211,7 +211,7 @@ class Order extends State
     public static function getLastOrderOfAgent(agentModelObj $agent): ?orderModelObj
     {
         $query = self::query(['agent_id' => $agent->getId()]);
-        return $query->orderBy('id desc')->findOne();
+        return $query->orderBy('createtime DESC')->findOne();
     }
 
     /**
@@ -221,7 +221,7 @@ class Order extends State
     public static function getLastOrderOfUser(userModelObj $user): ?orderModelObj
     {
         $query = self::query(['openid' => $user->getOpenid()]);
-        return $query->orderBy('id desc')->findOne();
+        return $query->orderBy('createtime DESC')->findOne();
     }
 
     public static function getFirstOrderOfUser(userModelObj $user): ?orderModelObj
@@ -231,7 +231,7 @@ class Order extends State
             return Order::get($id);
         }
         $query = self::query(['openid' => $user->getOpenid()]);
-        $order = $query->orderBy('id ASC')->findOne();
+        $order = $query->orderBy('createtime ASC')->findOne();
         if ($order) {
             $user->updateSettings('extra.first.order', [
                 'id' => $order->getId(),

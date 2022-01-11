@@ -154,6 +154,7 @@
         </span>
     </div>
     <div class="panel-body">
+        {if !empty($data)}
         <table class="table" id="devicelist">
             <thead>
             <tr>
@@ -183,7 +184,7 @@
         <div style="float:right;">
             {$pager}
         </div>
-        {if empty($data)}
+        {else}
         <div class="text-center text-muted">
             <i class="fa fa-question-circle"></i> 暂时还没有数据！
         </div>

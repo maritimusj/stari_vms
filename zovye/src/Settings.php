@@ -18,9 +18,6 @@ class Settings implements ISettings
     public function __construct($classname = null, $title = null, $use_cache = false)
     {
         $this->use_cache = (bool)$use_cache;
-        if ($this->use_cache) {
-            We7::load()->func('cache');
-        }
 
         $app_name = APP_NAME;
 

@@ -159,8 +159,6 @@ class modelFactory
      */
     protected function getCacheData($obj): array
     {
-        We7::load()->func('cache');
-
         $cache_data = We7::cache_read($this->getCacheKey($obj));
         if (is_error($cache_data) || empty($cache_data)) {
             $cache_data = [];
@@ -186,7 +184,6 @@ class modelFactory
      */
     protected function writeCacheData($obj, $data)
     {
-        We7::load()->func('cache');
         if ($data) {
             return We7::cache_write($this->getCacheKey($obj), $data);
         } else {
@@ -218,7 +215,6 @@ class modelFactory
      */
     protected function removeCacheData($id)
     {
-        We7::load()->func('cache');
         We7::cache_delete($this->getCacheKey($id));
     }
 

@@ -545,17 +545,19 @@ class Device extends State
             $data = We7::uniacid([
                 'event' => $result->getCode(),
                 'device_uid' => $device->getUid(),
-                'extra' => json_encode([
+                'extra' => [
                     'raw' => base64_encode($result->getRawData()),
                     'code' => $result->getCode(),
                     'message' => $result->getMessage(),
-                ]),
+                ],
             ]);
 
             $serial = $result->getSerial();
             if ($serial) {
-                $data['extra'] = json_encode(['serial' => $serial]);
+                $data['extra']['serial'] = $serial;
             }
+
+            $data['extra'] = json_encode($data['extra']);
 
             if (!m('device_events')->create($data)) {
                 Log::error('events', [

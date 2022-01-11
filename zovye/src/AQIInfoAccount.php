@@ -87,7 +87,7 @@ class AQIInfoAccount extends AQIInfo
                         $data['name'] = $result['data']['name'];
                     }
 
-                    $res = Util::createQrcodeFile("aqiinfo{$result['data']['ticket']}", $result['data']['url']);
+                    $res = Util::createQrcodeFile("aqiinfo.{$result['data']['ticket']}", $result['data']['url']);
                     if (is_error($res)) {
                         Log::error('AQIInfo', [
                             'error' => 'fail to createQrcode file',

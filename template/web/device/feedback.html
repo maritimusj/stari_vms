@@ -199,6 +199,7 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
+        {if !empty($data)}
         <table class="table" id="list">
             <thead>
                 <tr>
@@ -272,7 +273,7 @@
         <div class="pull-right">
             {$pager}
         </div>
-        {if empty($data)}
+        {else}
         <div class="text-center text-muted">
             <i class="fa fa-question-circle"></i> 暂时还没有任何记录！
         </div>

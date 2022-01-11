@@ -86,11 +86,11 @@ class db
      */
     public function query($sql, $params = array())
     {
-        $sqlsafe = SqlParser::checkquery($sql);
-        if (is_error($sqlsafe)) {
-            trigger_error($sqlsafe['message'], E_USER_ERROR);
-        }
         if (empty($params)) {
+            $sqlsafe = SqlParser::checkquery($sql);
+            if (is_error($sqlsafe)) {
+                trigger_error($sqlsafe['message'], E_USER_ERROR);
+            }
             $result = $this->pdo->exec($sql);
             $error_info = $this->pdo->errorInfo();
             if (in_array($error_info[1], array(1317, 2013))) {

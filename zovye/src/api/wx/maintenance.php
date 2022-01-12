@@ -140,9 +140,6 @@ class maintenance
         }
 
         $total = $query->count();
-        if ($page > ceil($total / $page_size)) {
-            $page = 1;
-        }
 
         /** @var device_recordModelObj $res */
         $res = $query->page($page, $page_size)->orderBy('createtime DESC')->findAll();

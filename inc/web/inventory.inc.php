@@ -42,9 +42,6 @@ if ($op == 'default') {
 
     if ($total > 0) {
         $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
 
         $pager = We7::pagination($total, $page, $page_size);
 
@@ -228,11 +225,6 @@ if ($op == 'default') {
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
-
         $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
         $query->page($page, $page_size);
@@ -301,11 +293,6 @@ if ($op == 'default') {
     if ($total > 0) {
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
-
-        $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
 
         $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 

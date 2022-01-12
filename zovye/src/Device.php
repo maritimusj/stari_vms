@@ -888,9 +888,6 @@ class Device extends State
 
             $total = $query->count();
             $total_page = ceil($total / $page_size);
-            if ($page > $total_page) {
-                $page = 1;
-            }
 
             $devices = [
                 'total' => $total,

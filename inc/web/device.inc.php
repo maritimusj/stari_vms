@@ -116,11 +116,6 @@ if ($op == 'list') {
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        $total = $query->count();
-        $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
         $query->page($page, $page_size);
     } else {
         $query->limit(20);
@@ -1631,10 +1626,6 @@ if ($op == 'list') {
     $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     //列表数据
     $data = [];
@@ -1698,9 +1689,6 @@ if ($op == 'list') {
 
     $total = $query->count();
     $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $query->page($page, $page_size);
 
@@ -1797,12 +1785,7 @@ if ($op == 'list') {
         }
     }
 
-
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     //列表数据
     $query->page($page, $page_size);
@@ -2003,9 +1986,7 @@ if ($op == 'list') {
         $res = $query->findAll();
     } else {
         $total = $query->count();
-        if ($page > ceil($total / $page_size)) {
-            $page = 1;
-        }
+
         $query->orderBy('id DESC');
         $res = $query->page($page, $page_size)->findAll();
     }
@@ -2144,9 +2125,6 @@ if ($op == 'list') {
     $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $total = $query->count();
-    if ($page > ceil($total / $page_size)) {
-        $page = 1;
-    }
 
     $query->orderBy('id DESC');
     $query->page($page, $page_size);

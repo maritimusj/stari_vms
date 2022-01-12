@@ -56,15 +56,13 @@ if ($op == 'default') {
 
     if ($total > 0) {
         $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
 
         $tags['total'] = $total;
         $tags['page'] = $page;
         $tags['totalpage'] = $total_page;
 
-        $query->page($page, $page_size)->orderBy('id ASC');
+        $query->page($page, $page_size);
+        $query->orderBy('id ASC');
 
         /** @var  tagsModelObj $entry */
         foreach ($query->findAll() as $entry) {

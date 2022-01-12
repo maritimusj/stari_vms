@@ -931,7 +931,7 @@ if ($op == 'account') {
             ];
         }
     }
-
+    $tpl_data['goods'] = $goods ?? [];
     $tpl_data['agreement'] = Config::agent('agreement', []);
 
 } elseif ($op == 'wxapp') {
@@ -952,10 +952,6 @@ if ($op == 'account') {
 
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
-
-        if ($page > ceil($total / $page_size)) {
-            $page = 1;
-        }
 
         $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 

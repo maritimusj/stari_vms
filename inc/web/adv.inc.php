@@ -157,14 +157,10 @@ if ($op == 'default') {
     }
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
-    $advs = [];
+    $list = [];
     if ($total > 0) {
         $query->page($page, $page_size);
         $query->orderBy('createtime DESC');
@@ -258,11 +254,11 @@ if ($op == 'default') {
 
             }
 
-            $advs[] = $data;
+            $list[] = $data;
         }
     }
 
-    $tpl_data['advs'] = $advs;
+    $tpl_data['advs'] = $list;
 
     $url_params['type'] = $type;
     $tpl_data['search_url'] = $this->createWebUrl('adv', $url_params);
@@ -335,7 +331,7 @@ if ($op == 'default') {
         'save_url' => $this->createWebUrl('adv', array('op' => 'saveAssignData')),
         'back_url' => $this->createWebUrl('adv', ['type' => $res->getType()]),
     ]);
-    
+
 } elseif ($op == 'saveAssignData') {
 
     $id = request::int('id');
@@ -588,7 +584,7 @@ if ($op == 'default') {
 
     $id = request::int('id');
     $type = request::int('type');
-    
+
     if (Advertising::pass($id, _W('username'))) {
         Util::itoast('广告已经通过审核！', $this->createWebUrl('adv', ['type' => $type]), 'success');
     }
@@ -622,7 +618,7 @@ if ($op == 'default') {
     ]);
 
 } elseif ($op == 'saveAliTicketAssignData') {
-    
+
     $data = request::is_string('data') ? json_decode(htmlspecialchars_decode(request::str('data')), true) : request('data');
     if (Config::aliTicket('assign', $data, true)) {
         JSON::success('保存成功！');

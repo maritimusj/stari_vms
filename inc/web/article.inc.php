@@ -32,13 +32,9 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
     $query = m('article')->where(We7::uniacid(['type' => 'article']));
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
     $query->page($page, $page_size);
     $query->orderBy('id desc');
 
@@ -136,11 +132,6 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
     $query = m('files')->where(We7::uniacid([]));
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
@@ -237,13 +228,9 @@ if ($op == 'art' || $op == 'default' || $op == 'article') {
     $query = m('article')->where(We7::uniacid(['type' => 'faq']));
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
     $query->page($page, $page_size);
     $query->orderBy('id desc');
 

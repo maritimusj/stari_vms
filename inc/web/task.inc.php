@@ -46,11 +46,6 @@ if ($op == 'view') {
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', 10);
 
-        $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
-
         $query->page($page, $page_size);
         $query->orderBy('id desc');
 

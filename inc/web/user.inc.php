@@ -118,10 +118,6 @@ if ($op == 'default') {
 
     $total = $query->count();
 
-    if ($page > ceil($total / $page_size)) {
-        $page = 1;
-    }
-
     $query->page($page, $page_size);
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
@@ -373,9 +369,6 @@ if ($op == 'default') {
 
     $total = $query->count();
     $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $result = [
         'page' => $page,
@@ -660,12 +653,8 @@ if ($op == 'default') {
         $query = $user->getCommissionBalance()->log();
 
         $total = $query->count();
-        $total_page = ceil($total / $page_size);
-        $pager = '';
 
-        if ($page > $total_page) {
-            $page = 1;
-        }
+        $pager = '';
 
         $logs = [];
         if ($total > 0) {
@@ -706,12 +695,8 @@ if ($op == 'default') {
         $query = $user->getBalance()->log();
 
         $total = $query->count();
-        $total_page = ceil($total / $page_size);
-        $pager = '';
 
-        if ($page > $total_page) {
-            $page = 1;
-        }
+        $pager = '';
 
         $logs = [];
         if ($total > 0) {

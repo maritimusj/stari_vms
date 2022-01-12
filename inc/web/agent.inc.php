@@ -97,9 +97,6 @@ if ($op == 'default') {
 
     if ($total > 0) {
         $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
 
         $agents['total'] = $total;
         $agents['totalpage'] = $total_page;
@@ -193,11 +190,6 @@ if ($op == 'default') {
         $total = $query->count();
 
         if ($total > 0) {
-            $total_page = ceil($total / $page_size);
-            if ($page > $total_page) {
-                $page = 1;
-            }
-
             $query->page($page, $page_size);
             $query->orderBy('id desc');
 
@@ -895,11 +887,6 @@ if ($op == 'default') {
     $messages = [];
 
     if ($total > 0) {
-        $total_page = ceil($total / $page_size);
-        if ($page > $total_page) {
-            $page = 1;
-        }
-
         $pager = We7::pagination($total, $page, $page_size);
 
         $query->page($page, $page_size);
@@ -1127,11 +1114,6 @@ if ($op == 'default') {
     $query = m('agent_app')->where(We7::uniacid([]));
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $pager = We7::pagination($total, $page, $page_size);
 
@@ -1212,10 +1194,6 @@ if ($op == 'default') {
     $query = m('msg')->where(We7::uniacid([]));
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $pager = We7::pagination($total, $page, $page_size);
 
@@ -1331,11 +1309,6 @@ if ($op == 'default') {
     $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $id]));
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $messages = [];
 
@@ -2052,11 +2025,6 @@ if ($op == 'default') {
         $query->where($cond);
 
         $total = $query->count();
-        $total_page = ceil($total / $page_size);
-
-        if ($page > $total_page) {
-            $page = 1;
-        }
 
         if ($total > 0) {
             $pager = We7::pagination($total, $page, $page_size);
@@ -2134,10 +2102,7 @@ if ($op == 'default') {
     $query = Device::query(['agent_id' => $agent->getId()]);
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-    if ($page > $total_page) {
-        $page = 1;
-    }
+    $total_page =  ceil($total / $page_size);
 
     $query->page($page, $page_size);
 

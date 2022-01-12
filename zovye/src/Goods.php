@@ -184,20 +184,14 @@ class Goods
         $total = $query->count();
         $total_page = ceil($total / $page_size);
 
-        if ($page > $total_page) {
-            $page = 1;
-        }
-
         $goods_list = [];
 
-        if ($total > 0) {
-            $query->page($page, $page_size);
-            $query->orderBy('id DESC');
+        $query->page($page, $page_size);
+        $query->orderBy('id DESC');
 
-            /** @var goodsModelObj $entry */
-            foreach ($query->findAll() as $entry) {
-                $goods_list[] = self::format($entry, true, true);
-            }
+        /** @var goodsModelObj $entry */
+        foreach ($query->findAll() as $entry) {
+            $goods_list[] = self::format($entry, true, true);
         }
 
         return [

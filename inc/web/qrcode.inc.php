@@ -41,13 +41,9 @@ if ($op == 'default') {
     $query = Advertising::query(['type' => Advertising::ACTIVE_QRCODE, 'state !=' => Advertising::DELETED]);
 
     $total = $query->count();
-    $total_page = ceil($total / $page_size);
-
-    if ($page > $total_page) {
-        $page = 1;
-    }
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+
     $query->page($page, $page_size);
     $query->orderBy('id desc');
 

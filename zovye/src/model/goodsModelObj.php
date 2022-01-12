@@ -25,11 +25,14 @@ use zovye\traits\ExtraDataGettersAndSetters;
  * @method getCreatetime()
  * @method setDeleted(int $int)
  * @method isDeleted()
+ * @method setS1(int $v)
+ * @method getS1()
  */
 class goodsModelObj extends modelObj
 {
     /** @var int */
     protected $id;
+    /** @var int */
     protected $uniacid;
     /** @var int */
     protected $agent_id;
@@ -41,6 +44,10 @@ class goodsModelObj extends modelObj
     protected $price;
     /** @var bool */
     protected $sync;
+
+    /** @var int */
+    protected $s1;
+
     /** @var bool */
     protected $deleted;
 

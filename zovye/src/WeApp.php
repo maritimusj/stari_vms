@@ -607,6 +607,7 @@ JSCODE;
 
         if (App::isBalanceEnabled()) {
             $bonus_url = Util::murl('bonus', ['serial' => REQUEST_ID, 'device' => $device->getShadowId()]);
+            $mall_url = Util::murl('mall');
             $user_data = [
                 'status' => true,
                 'data' => $user->profile(),
@@ -621,6 +622,9 @@ JSCODE;
 zovye_fn.wxapp_username = "$wxapp_username";
 zovye_fn.redirectToBonusPage = function() {
     window.location.href = "$bonus_url";
+}
+zovye_fn.redirectToMallPage = function() {
+    window.location.href = "$mall_url";
 }
 zovye_fn.user = JSON.parse(`$user_json_str`);
 zovye_fn.getUserInfo = function (cb) {
@@ -1414,6 +1418,7 @@ JSCODE;
         $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
         $api_url = Util::murl('bonus');
+        $mall_url = Util::murl('mall');
         $balance_logs_url = Util::murl('bonus', ['op' => 'logsPage']);
         $order_jump_url = Util::murl('order', ['op' => 'jump']);
         $jquery_url = JS_JQUERY_URL;
@@ -1451,6 +1456,9 @@ $js_sdk
     }    
     zovye_fn.redirectToBonusPage = function() {
         window.location.replace("$api_url");
+    }
+    zovye_fn.redirectToMallPage = function() {
+        window.location.href = "$mall_url";
     }
 </script>
 JSCODE;
@@ -1500,6 +1508,56 @@ $js_sdk
 </script>
 JSCODE;
         $this->showTemplate(Theme::file('balance_log'), ['tpl' => $tpl_data]);
+    }
+
+    public function mallPage(userModelObj $user)
+    {
+        $tpl_data = Util::getTplData([$user]);
+
+        $user_data = [
+            'status' => true,
+            'data' => $user->profile(),
+        ];
+
+        $user_data['data']['balance'] = $user->getBalance()->total();
+        $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
+
+        $api_url = Util::murl('mall');
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_sdk = Util::fetchJSSDK();
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+$js_sdk
+<script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+    const zovye_fn = {
+        api_url: "$api_url",
+        user: JSON.parse(`$user_json_str`),
+    }
+    zovye_fn.getUserInfo = function (cb) {
+        if (typeof cb === 'function') {
+            return cb(zovye_fn.user)
+        }
+        return new Promise((resolve, reject) => {
+            resolve(zovye_fn.user);
+        });
+    }
+    zovye_fn.getLog = function(lastId, pagesize) {
+        return $.getJSON(zovye_fn.api_url, {op: 'logs', lastId, pagesize});
+    }
+    zovye_fn.getRecipient = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'recipient'});
+    }
+    zovye_fn.updateRecipient = function(name, phoneNum, address) {
+        return $.getJSON(zovye_fn.api_url, {op: 'update_recipient', name, phoneNum, address});
+    }    
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('mall'), ['tpl' => $tpl_data]);
     }
 
 }

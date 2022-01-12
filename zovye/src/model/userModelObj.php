@@ -695,4 +695,18 @@ class userModelObj extends modelObj
         }
         return $appID === settings('agentWxapp.key', '');
     }
+
+    public function getRecipientData()
+    {
+        return $this->get('recipient', []);
+    }
+
+    public function updateRecipientData($name, $phone_num, $address)
+    {
+        return $this->get('recipient', [
+            'name' => $name,
+            'phoneNum' => $phone_num,
+            'address' => $address,
+        ]);
+    }
 }

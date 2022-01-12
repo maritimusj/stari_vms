@@ -57,9 +57,6 @@ const app = new Vue({
                 }
             })
         }
-        if (typeof zovye_fn.saveUserProfile === 'function' && this.accounts.length > 0) {
-            this.saveUserProfile = true;
-        }
         zovye_fn.getAdvs(10, 10, (data) => {
             this.sales = data;
         });
@@ -138,6 +135,9 @@ const app = new Vue({
                             this.accounts.push(e);
                         }
                     });
+                }
+                if (typeof zovye_fn.saveUserProfile === 'function' && this.accounts.length > 0) {
+                    this.saveUserProfile = true;
                 }
                 if (this.wechatState === false && this.accounts.findIndex(e => e.username) !== -1) {
                     alert('当前微信版本过低，建议升级微信后再试！')

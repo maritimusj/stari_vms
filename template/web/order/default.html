@@ -23,6 +23,11 @@
         {else}
         <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">积分</a></li>
         {/if}
+        {if $s_way=='delivery'}
+        <li role="presentation" class="active"><a href="#">商城订单</a></li>
+        {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('mall', array('way' => 'delivery'));}">商城订单</a></li>
+        {/if}        
     {/if}
     {if \zovye\App::isCustomAliTicketEnabled()}
         {if $s_way=='aliTicket'}

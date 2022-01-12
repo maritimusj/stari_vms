@@ -370,7 +370,7 @@ const app = new Vue({
             this.passwd.visible = false;
         },
         parseCode(item) {
-            const res = (item.desc || item.descr || "").match(/data-key=\"(.*?)\"/);
+            const res = (item.desc || item.descr || "").match(/data-key="(.*?)"/);
             if (res && res[1]) {
                 this.$copyText(res[1]).then(() => {
                     this.showToast('出货口令已复制');

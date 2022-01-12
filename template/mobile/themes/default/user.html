@@ -145,102 +145,34 @@
 			.menu .desc {
 				color: #9d9d9d;
 			}
-
-			/* .mask {
-				width: 100vw;
-				height: 100vh;
-				background-color: rgba(0, 0, 0, 0.5);
-				position: fixed;
-				top: 0;
-				left: 0;
-				z-index: 999;
-			}
-
-			.mobile-view {
-				width: 100%;
-				height: 300px;
-				background-color: white;
-				border-top-left-radius: 20px;
-				border-top-right-radius: 20px;
-				position: absolute;
-				bottom: 0;
-				left: 0;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				animation: mobileUp .5s;
-			}
-
-			.mobile-view .header {
-				font-size: 16px;
-				font-weight: bold;
-				margin-top: 20px;
-			}
-
-			.mobile-view .close-icon {
-				width: 20px;
-				height: 20px;
-				position: absolute;
-				top: 20px;
-				right: 20px;
-			}
-
-			.mobile-view .row {
-				width: calc(100% - 40px);
-				height: 40px;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				margin-top: 20px;
-				border: 1px solid #ccc;
-				border-radius: 20px;
-				overflow: hidden;
-			}
-
-			.mobile-view .row input {
-				border: none;
-				outline: none;
-				padding: 0 10px;
+			
+			.sub-menu {
 				flex: 1;
-				height: 100%;
-				font-size: 14px;
-			}
-
-			.mobile-view .row img {
-				width: 25px;
-				height: 25px;
-				margin-left: 20px;
-			}
-
-			.mobile-view .row span {
-				margin-right: 20px;
-				font-size: 12px;
-				color: #555;
-			}
-
-			.mobile-view .btn {
-				width: calc(100% - 40px);
-				height: 40px;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
 				justify-content: center;
-				margin-top: 20px;
-				background-image: linear-gradient(to right, #64ABF4, #6064FE);
-				color: white;
-				border-radius: 20px;
-				font-weight: 500;
 			}
 
-			@keyframes mobileUp {
-				from {
-					transform: translateY(300px);
-				}
+			.sub-menu:active {
+				opacity: 0.7;
+			}
 
-				to {
-					transform: translateY(0);
-				}
-			} */
+			.sub-menu img {
+				width: 30px;
+				height: 30px;
+			}
+
+			.sub-menu span {
+				font-size: 16px;
+				margin-left: 10px;
+			}
+
+			.line {
+				width: 1px;
+				height: 20px;
+				background-color: #eee;
+			}
 
 			.copyrights {
 				margin-top: 30px;
@@ -257,6 +189,27 @@
 					<span>当前积分：{{userInfo.balance}}</span>
 					<img src="{MODULE_URL}static/m/balance/img/coin.svg">
 				</div>
+			</div>
+			<!-- <div class="menu" style="margin-top: 10px;">
+				<div class="sub-menu">
+					<img src="{MODULE_URL}static/m/balance/img/mall.svg">
+					<span>积分商城</span>
+				</div>
+				<div class="line"></div>
+				<div class="sub-menu">
+					<img src="{MODULE_URL}static/m/balance/img/address.svg">
+					<span>收货地址</span>
+				</div>
+			</div> -->
+			<div class="menu clickable" style="margin-top: 10px;">
+				<img class="icon" src="{MODULE_URL}static/m/balance/img/mall.svg">
+				<span class="title">积分商城</span>
+				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
+			</div>
+			<div class="menu clickable" style="margin-top: 1px;">
+				<img class="icon" src="{MODULE_URL}static/m/balance/img/address.svg">
+				<span class="title">收货地址</span>
+				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
 			</div>
 			<div class="menu clickable" style="margin-top: 10px;" @click="balanceLogClick">
 				<img class="icon" src="{MODULE_URL}static/m/balance/img/coin_icon.svg">
@@ -286,12 +239,6 @@
 					</wx-open-launch-weapp>
 				</div>
 			</div>
-			<!-- <div class="menu clickable" style="margin-top: 1px;">
-				<img class="icon" src="{MODULE_URL}static/m/balance/img/sync_icon.svg">
-				<span class="title">同步信息</span>
-				<span class="desc">未同步</span>
-				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
-			</div> -->
 			<span class="copyrights">{$tpl['site']['copyrights']}</span>
 			<div class="tabbar">
 				<div class="tab-item" @click="jumpToMission">
@@ -303,22 +250,6 @@
 					<span class="selected">个人中心</span>
 				</div>
 			</div>
-			<!-- <div class="mask" v-if="mobile.visible" @click="mobile.visible = false">
-				<div class="mobile-view" @click.stop>
-					<div class="header">绑定手机号</div>
-					<img class="close-icon" src="{MODULE_URL}static/m/balance/img/close_black.svg" @click="mobile.visible = false">
-					<div class="row">
-						<img src="{MODULE_URL}static/m/balance/img/handphone_icon.svg">
-						<input type="tel" v-model="mobile.number" />
-					</div>
-					<div class="row">
-						<img src="{MODULE_URL}static/m/balance/img/msg_icon.svg">
-						<input type="text" v-model="mobile.code" />
-						<span @click="getCodeClick">{{mobile.desc}}</span>
-					</div>
-					<div class="btn">立即绑定</div>
-				</div>
-			</div> -->
 		</div>
 		{$tpl['js']['code']}
 		{php \zovye\url(true, JS_VUE_URL);}
@@ -329,13 +260,6 @@
 					userInfo: null,
 					wxapp_username: zovye_fn.wxapp_username,
 					reload: false
-					// mobile: {
-					// 	number: '',
-					// 	code: '',
-					// 	visible: false,
-					// 	desc: '获取验证码',
-					// 	countdown: 60
-					// }
 				},
 				created() {
 					this.getUserInfo();
@@ -373,23 +297,6 @@
 					orderClick() {
 						zovye_fn.redirectToOrderPage();
 					}
-					// mobileClick() {
-					// 	this.mobile.visible = true;
-					// },
-					// getCodeClick() {
-					// 	if (this.mobile.desc === '获取验证码' || this.mobile.desc === '重新获取') {
-					// 		const interval = setInterval(() => {
-					// 			this.mobile.desc = this.mobile.countdown + '秒';
-					// 			if (this.mobile.countdown > 0) {
-					// 				this.mobile.countdown--;
-					// 			} else {
-					// 				clearInterval(interval);
-					// 				this.mobile.desc = '重新获取';
-					// 				this.mobile.countdown = 60;
-					// 			}
-					// 		}, 1000);
-					// 	}
-					// }
 				}
 			})
 		</script>

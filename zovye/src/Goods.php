@@ -11,6 +11,11 @@ use zovye\model\goodsModelObj;
 
 class Goods
 {
+    const ALLOW_PAY = 0b01;
+    const ALLOW_FREE = 0b10;
+    const ALLOW_EXCHANGE = 0b100;
+    const ALLOW_DELIVERY = 0b1000;
+
     /**
      * @param array $data
      * @return goodsModelObj|null
@@ -191,7 +196,17 @@ class Goods
 
         /** @var goodsModelObj $entry */
         foreach ($query->findAll() as $entry) {
-            $goods_list[] = self::format($entry, true, true);
+            $goods_data = self::format($entry, true, true);
+            if ((!empty($params['allowPay']) || in_array('allowPay', $params)) && empty($goods_data['allowPay'])) {
+                continue;
+            }
+            if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
+                continue;
+            }
+            if ((!empty($params['balance']) || in_array('balance', $params)) && empty($goods_data['balance'])) {
+                continue;
+            }
+            $goods_list[] = $goods_data;
         }
 
         return [

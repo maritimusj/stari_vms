@@ -12,6 +12,17 @@ use zovye\model\goodsModelObj;
 
 class Delivery
 {
+    const UNPAID = 0; //未支付
+    const PAYED = 1; //已支付
+    const REFUND = 2; //已退款
+
+    const SHIPPING = 3; //已发货
+    const CONFIRMED = 4; //已确认收货
+    const RETURNING = 5;//退货中
+    const RETURNED = 6; //已确认退货
+
+    const FINISHED = 100; //已完成
+
     public static function create($data = []): ?deliveryModelObj
     {
         /** @var goodsModelObj $classname */
@@ -40,6 +51,17 @@ class Delivery
 
         if (isset($params['user_id'])) {
             $query->where(['user_id' => intval($params['user_id'])]);
+        }
+
+        if (isset($params['status'])) {
+            $query->where(['status' => intval($params['status'])]);
+        }
+
+        if ($params['keyword']) {
+            $query->whereOr([
+                'phone_num LIKE' => "%{$params['keyword']}",
+                'address LIKE' => "%{$params['keyword']}",
+            ]);
         }
 
         $total = $query->count();

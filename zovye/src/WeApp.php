@@ -1546,6 +1546,9 @@ $js_sdk
             resolve(zovye_fn.user);
         });
     }
+    zovye_fn.createOrder = function(goods, num, name, phoneNum, address) {
+        return $.getJSON(zovye_fn.api_url, {op: 'create_order', goods, num, name, phoneNum, address});
+    }     
     zovye_fn.getLog = function(lastId, pagesize) {
         return $.getJSON(zovye_fn.api_url, {op: 'logs', lastId, pagesize});
     }
@@ -1554,7 +1557,7 @@ $js_sdk
     }
     zovye_fn.updateRecipient = function(name, phoneNum, address) {
         return $.getJSON(zovye_fn.api_url, {op: 'update_recipient', name, phoneNum, address});
-    }    
+    }
 </script>
 JSCODE;
         $this->showTemplate(Theme::file('mall'), ['tpl' => $tpl_data]);

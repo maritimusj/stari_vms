@@ -10,6 +10,9 @@ use zovye\traits\ExtraDataGettersAndSetters;
 
 use function zovye\tb;
 
+/**
+ * @method int getUserId()
+ */
 class deliveryModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

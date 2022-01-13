@@ -26,6 +26,7 @@ class Balance
     const API_UPDATE = 8; // 第三方通过api接口修改
     const PROMOTE_BONUS = 9; // 任务奖励
     const TASK_BONUS = 10; // 任务奖励
+    const DELIVERY_ORDER = 11; // 商城订单
 
     private $user;
 

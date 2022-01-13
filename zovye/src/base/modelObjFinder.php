@@ -139,6 +139,16 @@ class modelObjFinder extends SqlParser
     }
 
     /**
+     * @param mixed $field
+     * @return int
+     */
+    public function sum($field): int
+    {
+        $res = $this->get("SUM($field)");
+        return intval($res);
+    }
+
+    /**
      * @param $m
      * @return mixed
      */

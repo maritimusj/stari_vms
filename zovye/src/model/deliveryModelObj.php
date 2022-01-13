@@ -24,6 +24,9 @@ class deliveryModelObj extends modelObj
      /** @var int */
 	protected $id;
 
+     /** @var string */
+	protected $order_no;
+
      /** @var int */
 	protected $user_id;
 

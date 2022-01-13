@@ -178,14 +178,14 @@ class Goods
             $data['discountPrice_formatted'] = '￥' . number_format($discountPrice / 100, 2) . '元';
         }
 
-        $detail = $entry->getDetailImg();
-        if ($detail) {
+        $detailImg = $entry->getDetailImg();
+        if ($detailImg) {
             $data['detailImg'] = $imageUrlFN($entry->getDetailImg());
         }
 
         $gallery = $entry->getGallery();
-        if ($detail && (empty($gallery) || $gallery[0] != $detail)) {
-            $gallery[] = $detail;
+        if ($detailImg && (empty($gallery) || $gallery[0] != $detailImg)) {
+            $gallery[] = $detailImg;
         }
 
         if ($gallery) {

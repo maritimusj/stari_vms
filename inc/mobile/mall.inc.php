@@ -87,6 +87,7 @@ if ($op == 'default') {
         }
 
         $order = Delivery::create([
+            'order_no' => Delivery::makeUID($user, time()), 
             'user_id' => $user->getId(),
             'goods_id' => $goods->getId(),
             'num' => $num,

@@ -9,6 +9,7 @@ namespace zovye;
 use zovye\base\modelObjFinder;
 use zovye\model\deliveryModelObj;
 use zovye\model\goodsModelObj;
+use zovye\model\userModelObj;
 
 class Delivery
 {
@@ -36,10 +37,20 @@ class Delivery
     {
         return m('delivery')->query();
     }
+    
+    public static function get($id): ?deliveryModelObj
+    {
+        return self::query()->findOne(['id' => $id]);
+    }
 
     public static function findOne($condition = []): ?deliveryModelObj
     {
         return self::query()->findOne($condition);
+    }
+
+    public static function makeUID(userModelObj $user, $nonce = ''): string
+    {
+        return substr("U{$user->getId()}P$nonce" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
     public static function getList($params = []): array
@@ -59,6 +70,7 @@ class Delivery
 
         if ($params['keyword']) {
             $query->whereOr([
+                'order_no LIKE' => "%{$params['keyword']}",
                 'name LIKE' => "%{$params['keyword']}",
                 'phone_num LIKE' => "%{$params['keyword']}",
                 'address LIKE' => "%{$params['keyword']}",
@@ -78,6 +90,7 @@ class Delivery
             $user = $entry->getUser();
             $list[] = [
                 'id' => $entry->getId(),
+                'orderNO' => $entry->getOrderNo(),
                 'user' => $user ? $user->profile() : [],
                 'name' => $entry->getName(),
                 'phoneNum' => $entry->getPhoneNum(),

@@ -320,6 +320,28 @@ $text
 <dt>说明</dt><dd class="event">用户完成指定任务，系统奖励积分</dd>
 </dl>
 TEXT;
+        } elseif ($entry->getSrc() == Balance::DELIVERY_ORDER) {
+            $order_id = $entry->getExtraData('order.id');
+            $order = Delivery::get($order_id);
+            if ($order) {
+                $order_desc = "<dt>订单号</dt><dd>{$order->getOrderNo()}</dd>";
+
+                $num = $order->getNum();
+                $goods = $order->getExtraData('goods', []);
+                $goods_desc = "{$goods['name']}x$num";
+            } else {
+                $order_desc = "<dt>订单号</dt><dd>未知订单</dd>";;
+                $goods_desc = '<未知商品>';
+            }
+
+            $data['memo'] = <<<TEXT
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">商城订单</dd>
+$order_desc
+<dt>说明</dt><dd class="event">用户在商城兑换{$goods_desc}</dd>
+</dl>
+TEXT;
         }
 
         return $data;

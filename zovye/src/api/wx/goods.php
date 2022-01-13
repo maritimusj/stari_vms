@@ -91,12 +91,28 @@ class goods
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
+        $s1 = 0;
+        if (request::bool('allowFree')) {
+            $s1 = \zovye\Goods::setAllowFree($s1);
+        }
+        if (request::bool('allowPay')) {
+            $s1 = \zovye\Goods::setAllowPay($s1);
+        }
+        if (request::bool('allowExchange')) {
+            $s1 = \zovye\Goods::setAllowExchange($s1);
+        }
+        if (request::bool('allowDelivery')) {
+            $s1 = \zovye\Goods::setAllowDelivery($s1);
+        }
+
         $goods_id = request::int('goodsId');
         if ($goods_id > 0) {
             $goods = \zovye\Goods::get($goods_id);
             if (empty($goods)) {
                 return error(State::ERROR, '找不到这个商品！');
             }
+
+            $goods->setS1($s1);
 
             if ($goods->getAgentId() !== $agent->getId()) {
                 return error(State::ERROR, '没有权限管理这个商品');
@@ -144,14 +160,6 @@ class goods
                 $goods->setPrice($price);
             }
 
-            if (request::bool('allowFree') != $goods->allowFree()) {
-                $goods->setAllowFree(request::bool('allowFree'));
-            }
-
-            if (request::bool('allowPay') != $goods->allowPay()) {
-                $goods->setAllowPay(request::bool('allowPay'));
-            }
-
             if (request::str('goodsUnitTitle') != $goods->getUnitTitle()) {
                 $goods->setUnitTitle(request::str('goodsUnitTitle'));
             }
@@ -159,7 +167,7 @@ class goods
             $goods_data = [
                 'name' => request::trim('goodsName'),
                 'img' => request::trim('goodsImg'),
-
+                's1' => $s1,
                 'price' => request::bool('allowPay') ? request::float('goodsPrice', 0, 2) * 100 : 0,
                 'extra' => [
                     'detailImg' => request::trim('detailImg'),

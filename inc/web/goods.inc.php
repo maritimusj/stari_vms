@@ -224,14 +224,6 @@ if ($op == 'default' || $op == 'goods') {
             $goods->setSync($params['syncAll']);
         }
 
-        if ((bool)$params['allowFree'] != $goods->allowFree()) {
-            $goods->setAllowFree($params['allowFree']);
-        }
-
-        if ((bool)$params['allowPay'] != $goods->allowPay()) {
-            $goods->setAllowPay($params['allowPay']);
-        }
-
         if ($params['goodsUnitTitle'] != $goods->getUnitTitle()) {
             $goods->setUnitTitle($params['goodsUnitTitle']);
         }

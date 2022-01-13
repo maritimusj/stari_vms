@@ -241,8 +241,13 @@ class Goods
         if ((!empty($params['allowDelivery']) || in_array('allowDelivery', $params, true))) {
             $s1 = Goods::setAllowDelivery($s1);
         }
+
         if ($s1) {
-            $query->where("s1&$s1");
+            if ($params['matchAny'] || in_array('matchAny', $params, true)) {
+                $query->where("s1&$s1>1");
+            } else {
+                $query->where("s1&$s1=$s1");
+            }
         }
 
         $total = $query->count();

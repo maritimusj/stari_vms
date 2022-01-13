@@ -16,44 +16,44 @@ class Goods
     const ALLOW_EXCHANGE = 0b100;
     const ALLOW_DELIVERY = 0b1000;
 
-    public static function setAllowPay($s1, $allow = true) 
+    public static function setAllowPay($s1, $allow = true): int
     {
-        return $allow ? $s1 |= self::ALLOW_PAY : $s1 ^= self::ALLOW_PAY;
+        return $allow ? $s1 | self::ALLOW_PAY : $s1 ^ self::ALLOW_PAY;
     }
 
     public static function isAllowPay($s1): bool
     {
-        return $s1 &= self::ALLOW_PAY;
+        return $s1 & self::ALLOW_PAY;
     }
 
-    public static function setAllowFree($s1, $allow = true) 
+    public static function setAllowFree($s1, $allow = true): int
     {
-        return $allow ? $s1 |= self::ALLOW_FREE : $s1 ^= self::ALLOW_FREE;
+        return $allow ? $s1 | self::ALLOW_FREE : $s1 ^ self::ALLOW_FREE;
     }
 
-    public static function isAllowFree($s1) 
+    public static function isAllowFree($s1): bool
     {
-        return $s1 &= self::ALLOW_FREE;
-    }
-    
-    public static function setAllowExchange($s1, $allow = true) 
-    {
-        return $allow ? $s1 |= self::ALLOW_EXCHANGE :  $s1 ^= self::ALLOW_EXCHANGE;
+        return $s1 & self::ALLOW_FREE;
     }
 
-    public static function isAllowExchange($s1) 
+    public static function setAllowExchange($s1, $allow = true): int
     {
-        return $s1 &= self::ALLOW_EXCHANGE;
+        return $allow ? $s1 | self::ALLOW_EXCHANGE : $s1 ^ self::ALLOW_EXCHANGE;
     }
 
-    public static function setAllowDelivery($s1, $allow = true) 
+    public static function isAllowExchange($s1): bool
     {
-        return $allow ? $s1 |= self::ALLOW_DELIVERY :  $s1 ^= self::ALLOW_DELIVERY;
+        return $s1 & self::ALLOW_EXCHANGE;
     }
 
-    public static function isAllowDelivery($s1) 
+    public static function setAllowDelivery($s1, $allow = true): int
     {
-        return $s1 &= self::ALLOW_DELIVERY;
+        return $allow ? $s1 | self::ALLOW_DELIVERY : $s1 ^ self::ALLOW_DELIVERY;
+    }
+
+    public static function isAllowDelivery($s1): bool
+    {
+        return $s1 & self::ALLOW_DELIVERY;
     }
 
     /**
@@ -140,7 +140,7 @@ class Goods
             'allowFree' => $entry->allowFree(),
             'allowPay' => $entry->allowPay(),
             'allowExchange' => $entry->allowExchange(),
-            'allowDelivery' => $entry->allowDelivery(),            
+            'allowDelivery' => $entry->allowDelivery(),
             'price' => intval($entry->getPrice()),
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
@@ -260,7 +260,7 @@ class Goods
 
         /** @var goodsModelObj $entry */
         foreach ($query->findAll() as $entry) {
-            $goods_data = self::format($entry, true, true);                 
+            $goods_data = self::format($entry, true, true);
             $goods_list[] = $goods_data;
         }
 

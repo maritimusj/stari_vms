@@ -382,11 +382,11 @@ JSCODE;
                 }
             } else {
                 $goods_list_FN = true;
-                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
+                $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, [Goods::AllowPay])]);
             }
         } else {
             $goods_list_FN = true;
-            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, ['allowPay'])]);
+            $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, [Goods::AllowPay])]);
         }
 
         //如果无法领取，则清除访问记录
@@ -402,7 +402,7 @@ JSCODE;
                 $tpl['accounts'] = [];
             }
         } elseif ($lanesNum > 1) {
-            $free_goods_list = $device->getGoodsList($user, ['allowFree']);
+            $free_goods_list = $device->getGoodsList($user, [Goods::AllowFree]);
             if (empty($free_goods_list)) {
                 $tpl['accounts'] = [];
             }

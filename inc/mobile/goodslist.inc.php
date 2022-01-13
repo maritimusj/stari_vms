@@ -38,8 +38,8 @@ $result = $payload['cargo_lanes'];
 
 $goods = [];
 foreach ($result as $entry) {
-    if (request::bool('free') && $entry['allowFree'] or
-        request::bool('pay') && $entry['allowPay'] or
+    if (request::bool('free') && $entry[Goods::AllowFree] or
+        request::bool('pay') && $entry[Goods::AllowPay] or
         empty(request('free')) &&
         empty(request('pay'))) {
 
@@ -52,8 +52,8 @@ foreach ($result as $entry) {
                 'name' => $entry['goods_name'],
                 'img' => Util::toMedia($entry['goods_img'], true),
                 'num' => intval($entry['num']),
-                'allow_free' => $entry['allowFree'],
-                'allow_pay' => $entry['allowPay'],
+                'allow_free' => $entry[Goods::AllowFree],
+                'allow_pay' => $entry[Goods::AllowPay],
             ];
         }
     }

@@ -379,7 +379,7 @@ class Helper
 
         } else {
             $goods = $device->getGoods($goodsOrPackageId);
-            if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
+            if (empty($goods) || empty($goods[Goods::AllowPay]) || $goods['price'] < 1) {
                 return err('无法购买这个商品，请联系管理员！');
             }
 

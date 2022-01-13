@@ -492,9 +492,9 @@ if ($op == 'default') {
     $type = request::str('type'); //free or pay or balance
 
     if ($type == 'exchange') {
-        $result =  $device->getGoodsList($user, ['allowExchange']);
+        $result = $device->getGoodsList($user, [Goods::AllowExchange]);
     } else {
-        $result = $device->getGoodsAndPackages($user, ['allowPay']);
+        $result = $device->getGoodsAndPackages($user, [Goods::AllowPay]);
     }
 
     JSON::success($result);

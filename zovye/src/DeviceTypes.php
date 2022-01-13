@@ -29,7 +29,7 @@ class DeviceTypes
             if ($cache[$id]) {
                 return $cache[$id];
             }
-            $res =self::findOne(['id' => $id]);
+            $res = self::findOne(['id' => $id]);
             if ($res) {
                 $cache[$res->getId()] = $res;
                 return $res;
@@ -52,10 +52,10 @@ class DeviceTypes
                 'title' => '<自定义>',
                 'extra' => [
                     'cargo_lanes' => [
-                       [
-                           'goods' => 0,
-                           'capacity' => 0,
-                       ]
+                        [
+                            'goods' => 0,
+                            'capacity' => 0,
+                        ]
                     ],
                 ]
             ]);
@@ -199,9 +199,9 @@ class DeviceTypes
                     $lane['goods_img'] = $goods_data['img'];
                     $lane['goods_price'] = $goods_data['price'];
                     $lane['goods_price_formatted'] = $goods_data['price_formatted'];
-                    $lane['allowPay'] = $goods_data['allowPay'];
-                    $lane['allowFree'] = $goods_data['allowFree'];
-                    $lane['allowExchange'] = $goods_data['allowExchange'];
+                    $lane[Goods::AllowPay] = $goods_data[Goods::AllowPay];
+                    $lane[Goods::AllowFree] = $goods_data[Goods::AllowFree];
+                    $lane[Goods::AllowExchange] = $goods_data[Goods::AllowExchange];
                 } else {
                     $lane['goods_id'] = 0;
                     $lane['goods_unit_title'] = '';

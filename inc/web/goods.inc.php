@@ -29,16 +29,16 @@ if ($op == 'default' || $op == 'goods') {
 
     $w = request::str('w', 'all');
     if ($w == 'pay') {
-        $params[] = 'allowPay';
+        $params[] = Goods::AllowPay;
     }
     if ($w == 'free') {
-        $params[] = 'allowFree';
+        $params[] = Goods::AllowFree;
     }
     if ($w == 'exchange') {
-        $params[] = 'allowExchange';
+        $params[] = Goods::AllowExchange;
     }
     if ($w == 'mall') {
-        $params[] = 'allowDelivery';
+        $params[] = Goods::AllowDelivery;
     }
 
     $tpl_data['w'] = $w;
@@ -146,18 +146,18 @@ if ($op == 'default' || $op == 'goods') {
     if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || $params['discountPrice'] >= $params['goodsPrice']) {
         Util::itoast('优惠价不能高于或者等于单价！', '', 'error');
     }
-    
+
     $s1 = 0;
-    if ($params['allowFree']) {
+    if ($params[Goods::AllowFree]) {
         $s1 = Goods::setFreeBitMask($s1);
     }
-    if ($params['allowPay']) {
+    if ($params[Goods::AllowPay]) {
         $s1 = Goods::setPayBitMask($s1);
     }
-    if ($params['allowExchange']) {
+    if ($params[Goods::AllowExchange]) {
         $s1 = Goods::setExchangeBitMask($s1);
-    }        
-    if ($params['allowDelivery']) {
+    }
+    if ($params[Goods::AllowDelivery]) {
         $s1 = Goods::setDeliveryBitMask($s1);
     }
 
@@ -233,14 +233,12 @@ if ($op == 'default' || $op == 'goods') {
             'name' => trim($params['goodsName']),
             'img' => trim($params['goodsImg']),
             'sync' => $params['syncAll'] ? 1 : 0,
-            'price' => $params['allowPay'] ? intval(round($params['goodsPrice'] * 100)) : 0,
+            'price' => intval(round($params['goodsPrice'] * 100)),
             's1' => $s1,
             'extra' => [
                 'detailImg' => trim($params['detailImg']),
                 'unitTitle' => trim($params['goodsUnitTitle']),
-                'allowFree' => $params['allowFree'] ? 1 : 0,
-                'allowPay' => $params['allowPay'] ? 1 : 0,
-                'balance' => $params['allowFree'] ? intval($params['goodsBalance']) : 0,
+                'balance' => intval($params['goodsBalance']),
             ],
         ];
         if (isset($params['goodsSize'])) {
@@ -256,7 +254,7 @@ if ($op == 'default' || $op == 'goods') {
 
         $data['extra']['cw'] = empty($params['goodsCW']) ? 0 : 1;
 
-        if (App::isBalanceEnabled() && $params['allowFree']) {
+        if (App::isBalanceEnabled()) {
             $data['extra']['balance'] = max(0, intval($params['balance']));
         }
 
@@ -327,7 +325,7 @@ if ($op == 'default' || $op == 'goods') {
             $goods->delete();
             $goods->save();
         } else {
-           $goods->destroy();
+            $goods->destroy();
         }
         JSON::success('商品删除成功！');
     }

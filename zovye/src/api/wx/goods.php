@@ -92,16 +92,16 @@ class goods
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $s1 = 0;
-        if (request::bool('allowFree')) {
+        if (request::bool(\zovye\Goods::AllowFree)) {
             $s1 = \zovye\Goods::setFreeBitMask($s1);
         }
-        if (request::bool('allowPay')) {
+        if (request::bool(\zovye\Goods::AllowPay)) {
             $s1 = \zovye\Goods::setPayBitMask($s1);
         }
-        if (request::bool('allowExchange')) {
+        if (request::bool(\zovye\Goods::AllowExchange)) {
             $s1 = \zovye\Goods::setExchangeBitMask($s1);
         }
-        if (request::bool('allowDelivery')) {
+        if (request::bool(\zovye\Goods::AllowDelivery)) {
             $s1 = \zovye\Goods::setDeliveryBitMask($s1);
         }
 
@@ -168,12 +168,10 @@ class goods
                 'name' => request::trim('goodsName'),
                 'img' => request::trim('goodsImg'),
                 's1' => $s1,
-                'price' => request::bool('allowPay') ? request::float('goodsPrice', 0, 2) * 100 : 0,
+                'price' =>  request::float('goodsPrice', 0, 2) * 100,
                 'extra' => [
                     'detailImg' => request::trim('detailImg'),
                     'unitTitle' => request::trim('goodsUnitTitle'),
-                    'allowFree' => request::bool('allowFree') ? 1 : 0,
-                    'allowPay' => request::bool('allowPay') ? 1 : 0,
                 ],
             ];
 

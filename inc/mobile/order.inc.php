@@ -51,7 +51,7 @@ if ($op === 'create') {
         }
 
         $goods = $device->getGoods($goods_id);
-        if (empty($goods) || empty($goods['allowPay']) || $goods['price'] < 1) {
+        if (empty($goods) || empty($goods[Goods::AllowPay]) || $goods['price'] < 1) {
             JSON::fail('无法购买这个商品，请联系管理员！');
         }
 

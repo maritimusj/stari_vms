@@ -9,6 +9,7 @@ namespace zovye\api\wxweb;
 
 use DateTime;
 use zovye\Account;
+use zovye\Goods;
 use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
@@ -124,12 +125,12 @@ class api
 
         $type = request::str('type'); //free or pay or balance
 
-        if ($type == 'balance') {
-            $result = $device->getGoodsList($user, ['balance']);
+        if ($type == 'balance' || $type == 'exchange') {
+            $result = $device->getGoodsList($user, [Goods::AllowExchange]);
         } elseif ($type == 'free') {
-            $result = $device->getGoodsList($user, ['allowFree']);
+            $result = $device->getGoodsList($user, [Goods::AllowFree]);
         } else {
-            $result = $device->getGoodsAndPackages($user, ['allowPay']);
+            $result = $device->getGoodsAndPackages($user, [Goods::AllowPay]);
         }
 
         return $result;

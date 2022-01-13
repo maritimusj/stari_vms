@@ -310,7 +310,7 @@ if ($op == 'list') {
 
                 foreach ((array)$payload['cargo_lanes'] as $lane) {
                     $goods_data = Goods::data($lane['goods'], ['useImageProxy' => true]);
-                    if ($goods_data && $goods_data['allowPay']) {
+                    if ($goods_data && $goods_data[Goods::AllowPay]) {
                         if ($low_price === 0 || $low_price > $goods_data['price']) {
                             $low_price = $goods_data['price'];
                         }

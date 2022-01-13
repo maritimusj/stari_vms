@@ -2620,13 +2620,13 @@ class deviceModelObj extends modelObj
                 }
 
                 if ($params) {
-                    if ((!empty($params['allowPay']) || in_array('allowPay', $params)) && empty($goods_data['allowPay'])) {
+                    if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) && empty($goods_data[Goods::AllowPay])) {
                         continue;
                     }
-                    if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
+                    if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) && empty($goods_data[Goods::AllowFree])) {
                         continue;
                     }
-                    if ((!empty($params['allowExchange']) || in_array('allowExchange', $params)) && empty($goods_data['allowExchange'])) {
+                    if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params)) && empty($goods_data[Goods::AllowExchange])) {
                         continue;
                     }
                 }
@@ -2656,8 +2656,9 @@ class deviceModelObj extends modelObj
                         'price' => $goods_data['price'],
                         'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2) . '元',
                         'num' => intval($goods_data['num']),
-                        'allowFree' => $goods_data['allowFree'],
-                        'allowPay' => $goods_data['allowPay'],
+                        Goods::AllowFree => $goods_data[Goods::AllowFree],
+                        Goods::AllowPay => $goods_data[Goods::AllowPay],
+                        Goods::AllowExchange => $goods_data[Goods::AllowExchange],
                     ];
 
                     if ($goods_data['balance']) {

@@ -11,6 +11,11 @@ use zovye\model\goodsModelObj;
 
 class Goods
 {
+    const AllowPay = 'allowPay';
+    const AllowFree = 'allowFree';
+    const AllowExchange = 'allowExchange';
+    const AllowDelivery = 'allowDelivery';
+
     const ALLOW_PAY = 0b01;
     const ALLOW_FREE = 0b10;
     const ALLOW_EXCHANGE = 0b100;
@@ -137,10 +142,10 @@ class Goods
             'img' => $imageUrlFN($entry->getImg()),
             'detailImg' => $imageUrlFN($entry->getDetailImg()),
             'sync' => boolval($entry->getSync()),
-            'allowFree' => $entry->allowFree(),
-            'allowPay' => $entry->allowPay(),
-            'allowExchange' => $entry->allowExchange(),
-            'allowDelivery' => $entry->allowDelivery(),
+            Goods::AllowFree => $entry->allowFree(),
+            Goods::AllowPay => $entry->allowPay(),
+            Goods::AllowExchange => $entry->allowExchange(),
+            Goods::AllowDelivery => $entry->allowDelivery(),
             'price' => intval($entry->getPrice()),
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
@@ -229,16 +234,16 @@ class Goods
         }
 
         $s1 = 0;
-        if ((!empty($params['allowPay']) || in_array('allowPay', $params, true))) {
+        if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params, true))) {
             $s1 = Goods::setPayBitMask($s1);
         }
-        if ((!empty($params['allowFree']) || in_array('allowFree', $params, true))) {
+        if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params, true))) {
             $s1 = Goods::setFreeBitMask($s1);
         }
-        if ((!empty($params['allowExchange']) || in_array('allowExchange', $params, true))) {
+        if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params, true))) {
             $s1 = Goods::setExchangeBitMask($s1);
         }
-        if ((!empty($params['allowDelivery']) || in_array('allowDelivery', $params, true))) {
+        if ((!empty($params[Goods::AllowDelivery]) || in_array(Goods::AllowDelivery, $params, true))) {
             $s1 = Goods::setDeliveryBitMask($s1);
         }
 

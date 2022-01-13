@@ -17,6 +17,7 @@ use zovye\App;
 use zovye\Balance;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
 use zovye\Device;
+use zovye\Goods;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;
@@ -1311,6 +1312,6 @@ class common
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        return ['goods' => $device->getGoodsList(null, ['allowPay'])];
+        return ['goods' => $device->getGoodsList(null, [Goods::AllowPay])];
     }
 }

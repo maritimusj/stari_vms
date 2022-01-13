@@ -16,7 +16,7 @@ class Goods
     const ALLOW_EXCHANGE = 0b100;
     const ALLOW_DELIVERY = 0b1000;
 
-    public static function setAllowPay($s1, $allow = true): int
+    public static function setPayBitMask($s1, $allow = true): int
     {
         return $allow ? $s1 | self::ALLOW_PAY : $s1 ^ self::ALLOW_PAY;
     }
@@ -26,7 +26,7 @@ class Goods
         return $s1 & self::ALLOW_PAY;
     }
 
-    public static function setAllowFree($s1, $allow = true): int
+    public static function setFreeBitMask($s1, $allow = true): int
     {
         return $allow ? $s1 | self::ALLOW_FREE : $s1 ^ self::ALLOW_FREE;
     }
@@ -36,7 +36,7 @@ class Goods
         return $s1 & self::ALLOW_FREE;
     }
 
-    public static function setAllowExchange($s1, $allow = true): int
+    public static function setExchangeBitMask($s1, $allow = true): int
     {
         return $allow ? $s1 | self::ALLOW_EXCHANGE : $s1 ^ self::ALLOW_EXCHANGE;
     }
@@ -46,7 +46,7 @@ class Goods
         return $s1 & self::ALLOW_EXCHANGE;
     }
 
-    public static function setAllowDelivery($s1, $allow = true): int
+    public static function setDeliveryBitMask($s1, $allow = true): int
     {
         return $allow ? $s1 | self::ALLOW_DELIVERY : $s1 ^ self::ALLOW_DELIVERY;
     }
@@ -230,16 +230,16 @@ class Goods
 
         $s1 = 0;
         if ((!empty($params['allowPay']) || in_array('allowPay', $params, true))) {
-            $s1 = Goods::setAllowPay($s1);
+            $s1 = Goods::setPayBitMask($s1);
         }
         if ((!empty($params['allowFree']) || in_array('allowFree', $params, true))) {
-            $s1 = Goods::setAllowFree($s1);
+            $s1 = Goods::setFreeBitMask($s1);
         }
         if ((!empty($params['allowExchange']) || in_array('allowExchange', $params, true))) {
-            $s1 = Goods::setAllowExchange($s1);
+            $s1 = Goods::setExchangeBitMask($s1);
         }
         if ((!empty($params['allowDelivery']) || in_array('allowDelivery', $params, true))) {
-            $s1 = Goods::setAllowDelivery($s1);
+            $s1 = Goods::setDeliveryBitMask($s1);
         }
 
         if ($s1) {

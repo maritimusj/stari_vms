@@ -149,16 +149,16 @@ if ($op == 'default' || $op == 'goods') {
     
     $s1 = 0;
     if ($params['allowFree']) {
-        $s1 = Goods::setAllowFree($s1);
+        $s1 = Goods::setFreeBitMask($s1);
     }
     if ($params['allowPay']) {
-        $s1 = Goods::setAllowPay($s1);
+        $s1 = Goods::setPayBitMask($s1);
     }
     if ($params['allowExchange']) {
-        $s1 = Goods::setAllowExchange($s1);
+        $s1 = Goods::setExchangeBitMask($s1);
     }        
     if ($params['allowDelivery']) {
-        $s1 = Goods::setAllowDelivery($s1);
+        $s1 = Goods::setDeliveryBitMask($s1);
     }
 
     if (isset($params['goodsId'])) {

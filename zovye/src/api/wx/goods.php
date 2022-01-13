@@ -93,16 +93,16 @@ class goods
 
         $s1 = 0;
         if (request::bool('allowFree')) {
-            $s1 = \zovye\Goods::setAllowFree($s1);
+            $s1 = \zovye\Goods::setFreeBitMask($s1);
         }
         if (request::bool('allowPay')) {
-            $s1 = \zovye\Goods::setAllowPay($s1);
+            $s1 = \zovye\Goods::setPayBitMask($s1);
         }
         if (request::bool('allowExchange')) {
-            $s1 = \zovye\Goods::setAllowExchange($s1);
+            $s1 = \zovye\Goods::setExchangeBitMask($s1);
         }
         if (request::bool('allowDelivery')) {
-            $s1 = \zovye\Goods::setAllowDelivery($s1);
+            $s1 = \zovye\Goods::setDeliveryBitMask($s1);
         }
 
         $goods_id = request::int('goodsId');

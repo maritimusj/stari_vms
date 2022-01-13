@@ -90,22 +90,22 @@ class goodsModelObj extends modelObj
 
     public function setAllowFree($allowed = true)
     {
-        $this->setS1(Goods::setAllowFree($this->s1, $allowed));
+        $this->setS1(Goods::setFreeBitMask($this->s1, $allowed));
     }
 
     public function setAllowPay($allowed = true)
     {
-        $this->setS1(Goods::setAllowPay($this->s1, $allowed));
+        $this->setS1(Goods::setPayBitMask($this->s1, $allowed));
     }
 
     public function setAllowExchange($allowed = true)
     {
-        $this->setS1(Goods::setAllowExchange($this->s1, $allowed));
+        $this->setS1(Goods::setExchangeBitMask($this->s1, $allowed));
     }
     
     public function setAllowDelivery($allowed = true)
     {
-        $this->setS1(Goods::setAllowDelivery($this->s1, $allowed));
+        $this->setS1(Goods::setDeliveryBitMask($this->s1, $allowed));
     }
     
     public function getUnitTitle()

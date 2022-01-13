@@ -32,32 +32,35 @@ if ($op == 'default') {
         Goods::AllowDelivery,
     ]);
 
+    foreach($result['list'] as &$goods) {
+        $goods['total'] = (int)Delivery::query()->where(['goods_id' => $goods['id']])->sum('num');
+    }
+
     JSON::success($result);
 
 } elseif ($op == 'create_order') {
 
     $goods_id = request::int('goods');
+
     $goods = Goods::get($goods_id);
     if (empty($goods)) {
         JSON::fail('找不到这个商品！');
     }
+
     if (!$goods->allowDelivery()) {
         JSON::fail('无法兑换这个商品！');
     }
 
     $num = request::int('num', 1);
-    $num = min(App::orderMaxGoodsNum(), max($num, 1));
     if ($num < 1) {
-        JSON::fail('对不起，商品数量不正确！');
+        JSON::fail('商品数量为零！');
     }
 
-    if ($goods['num'] < $num) {
-        JSON::fail('对不起，商品数量不足！');
-    }
-
-    $name = request::trim('name');
-    $phone_num = request::trim('phone_num');
-    $address = request::trim('address');
+    $recipient = $user->getRecipientData();
+    
+    $name = request::trim('name', $recipient['name']);
+    $phone_num = request::trim('phoneNum', $recipient['phoneNum']);
+    $address = request::trim('address', $recipient['address']);
 
     if (empty($phone_num) || empty($address)) {
         JSON::fail('没有收件人的手机号码或地址！');
@@ -70,11 +73,13 @@ if ($op == 'default') {
     $balance = $user->getBalance();
 
     $result = Util::transactionDo(function () use ($user, $balance, $goods, $num, $phone_num, $address, $name) {
-        if ($goods['balance'] * $num > $balance->total()) {
+        $total_balance = $goods->getBalance() * $num;
+        if ($total_balance > $balance->total()) {
             return err('您的积分不够！');
         }
-        $x = $balance->change(-$goods['balance'] * $num, Balance::DELIVERY_ORDER, [
-            'goods' => $goods['goods_id'],
+        
+        $x = $balance->change(-$total_balance, Balance::DELIVERY_ORDER, [
+            'goods' => $goods->getId(),
             'num' => $num,
         ]);
         if (empty($x)) {
@@ -83,15 +88,14 @@ if ($op == 'default') {
 
         $order = Delivery::create([
             'user_id' => $user->getId(),
+            'goods_id' => $goods->getId(),
+            'num' => $num,
+            'name' => $name,
             'phone_num' => $phone_num,
             'address' => $address,
             'status' => Delivery::PAYED,
             'extra' => [
-                'recipient' => [
-                    'name' => $name,
-                ],
-                'goods' => $goods,
-                'num' => $num,
+                'goods' => Goods::format($goods),
                 'balance' => [
                     'id' => $x->getId(),
                     'xval' => $x->getXVal(),
@@ -142,6 +146,7 @@ if ($op == 'default') {
     JSON::success($user->getRecipientData());
 
 } elseif ($op == 'update_recipient') {
+
     $name = request::trim('name');
     $phone_num = request::trim('phoneNum');
     $address = request::trim('address');

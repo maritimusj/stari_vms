@@ -7,6 +7,7 @@ namespace zovye\model;
 
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\User;
 
 use function zovye\tb;
 
@@ -26,6 +27,15 @@ class deliveryModelObj extends modelObj
      /** @var int */
 	protected $user_id;
 
+     /** @var int */
+	protected $goods_id;
+
+     /** @var int */
+	protected $num;
+
+     /** @var string */
+	protected $name;
+
      /** @var string */
 	protected $phone_num;
 
@@ -42,4 +52,8 @@ class deliveryModelObj extends modelObj
 
     use ExtraDataGettersAndSetters;
 
+    public function getUser():? userModelObj 
+    {
+          return User::get($this->user_id);
+    }
 }

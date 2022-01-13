@@ -59,6 +59,7 @@ class Delivery
 
         if ($params['keyword']) {
             $query->whereOr([
+                'name LIKE' => "%{$params['keyword']}",
                 'phone_num LIKE' => "%{$params['keyword']}",
                 'address LIKE' => "%{$params['keyword']}",
             ]);
@@ -74,9 +75,17 @@ class Delivery
         $list = [];
         /** @var deliveryModelObj $entry */
         foreach ($query->findAll() as $entry) {
+            $user = $entry->getUser();
             $list[] = [
                 'id' => $entry->getId(),
-                'user' => $entry->getUserId(),
+                'user' => $user ? $user->profile() : [],
+                'name' => $entry->getName(),
+                'phoneNum' => $entry->getPhoneNum(),
+                'address' => $entry->getAddress(),
+                'goods' => $entry->getExtraData('goods', []),
+                'num' => $entry->getNum(),
+                'createtime' => $entry->getCreatetime(),
+                'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];
         }
 

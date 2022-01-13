@@ -53,6 +53,21 @@ class Delivery
         return substr("U{$user->getId()}P$nonce" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
+    public static function formatStatus($status)
+    {
+        static $status_title = [
+            self::UNPAID => '未支付',
+            self::PAYED => '已支付',
+            self::REFUND => '已退款',
+            self::SHIPPING => '已发货',
+            self::CONFIRMED => '已确认',
+            self::RETURNING => '退货中',
+            self::RETURNED => '已退货',
+            self::FINISHED => '已完成',
+        ];
+        return $status_title[$status] ?? '未知状态';
+    }
+
     public static function getList($params = []): array
     {
         $page = max(1, intval($params['page']));
@@ -97,6 +112,8 @@ class Delivery
                 'address' => $entry->getAddress(),
                 'goods' => $entry->getExtraData('goods', []),
                 'num' => $entry->getNum(),
+                'status' => $entry->getStatus(),
+                'status_formatted' => self::formatStatus($entry->getStatus()),
                 'createtime' => $entry->getCreatetime(),
                 'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];

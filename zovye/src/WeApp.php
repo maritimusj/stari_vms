@@ -1546,8 +1546,8 @@ $js_sdk
             resolve(zovye_fn.user);
         });
     }
-    zovye_fn.createOrder = function(goods) {
-        return $.getJSON(zovye_fn.api_url, {op: 'create_order', goods});
+    zovye_fn.createOrder = function(goods, num) {
+        return $.getJSON(zovye_fn.api_url, {op: 'create_order', goods, num});
     }
     zovye_fn.getGoodsList = function(page, pagesize) {
         return $.getJSON(zovye_fn.api_url, {op: 'goods_list', page, pagesize});

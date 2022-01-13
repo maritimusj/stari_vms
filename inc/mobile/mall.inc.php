@@ -53,7 +53,7 @@ if ($op == 'default') {
 
     $num = request::int('num', 1);
     if ($num < 1) {
-        JSON::fail('商品数量为零！');
+        JSON::fail('商品数量不能为零！');
     }
 
     $recipient = $user->getRecipientData();
@@ -123,7 +123,7 @@ if ($op == 'default') {
 
     JSON::success([
         'total' => $balance->total(),
-        'xval' => $result instanceof balanceModelObj ? $result->getXval() : 0,
+        'xval' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
     ]);
 
 } elseif ($op == 'logs') {
@@ -144,7 +144,11 @@ if ($op == 'default') {
 
 } elseif ($op == 'recipient') {
 
-    JSON::success($user->getRecipientData());
+    $recipient = $user->getRecipientData();
+    if (empty($recipient)) {
+        $recipient = null;
+    }
+    JSON::success($recipient);
 
 } elseif ($op == 'update_recipient') {
 
@@ -155,7 +159,7 @@ if ($op == 'default') {
     $result = $user->updateRecipientData($name, $phone_num, $address);
 
     if ($result) {
-        JSON::fail('保存失败！');
+        JSON::success('已保存！');
     }
-    JSON::fail('已保存！');
+    JSON::fail('保存失败！');
 }

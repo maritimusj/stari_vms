@@ -703,7 +703,7 @@ class userModelObj extends modelObj
 
     public function updateRecipientData($name, $phone_num, $address)
     {
-        return $this->get('recipient', [
+        return $this->set('recipient', [
             'name' => $name,
             'phoneNum' => $phone_num,
             'address' => $address,

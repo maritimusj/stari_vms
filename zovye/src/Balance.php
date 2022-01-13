@@ -328,7 +328,7 @@ TEXT;
 
                 $num = $order->getNum();
                 $goods = $order->getExtraData('goods', []);
-                $goods_desc = "{$goods['name']}x$num";
+                $goods_desc = "<b>{$goods['name']}</b>x$num";
             } else {
                 $order_desc = "<dt>订单号</dt><dd>未知订单</dd>";;
                 $goods_desc = '<未知商品>';

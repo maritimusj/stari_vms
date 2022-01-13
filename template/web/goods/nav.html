@@ -1,9 +1,9 @@
 <ul class="nav nav-tabs" id="navbar">
 {loop $navs $nav_op $nav_title}
-{if $op == $nav_op}
+{if $w == $nav_op}
 <li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
 {else}
-<li role="presentation"><a href="{php echo $this->createWebUrl('goods', array('op' => $nav_op));}">{$nav_title}</a></li>
+<li role="presentation"><a href="{php echo $this->createWebUrl('goods', array('w' => $nav_op));}">{$nav_title}</a></li>
 {/if}
 {/loop}
 </ul>

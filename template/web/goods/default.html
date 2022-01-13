@@ -12,9 +12,7 @@
         color: #fff;
         padding: 3px 6px;
         cursor: default;
-        width: 70px;
         display: inline-block;
-        margin: 1px;
     }
     #goodslist .way span:not(.allowed) {
         background-color: #ccc;
@@ -25,6 +23,12 @@
     }
     #goodslist .way span.pay.allowed {
         background-color: #FF5722;
+    }
+    #goodslist .way span.balance.allowed {
+        background-color: #ff9800;
+    }
+    #goodslist .way span.mall.allowed {
+        background-color: #2196f3;
     }
     #goodslist th:not(:nth-child(2)), #goodslist td:not(:nth-child(2)) {
         text-align: center;
@@ -52,7 +56,7 @@
     }
 </style>
 {template "web/goods/nav"}
-    <div class="panel panel-default nav-tab-item">
+    <div class="panel panel-default nav-tab-item{if empty($w) || $w == 'all'} panel-first{/if}">
         <div class="heading">
             <span class="operate">
                 <a href="{php echo $this->createWebUrl('goods', ['op' => 'addGoods']);}">
@@ -153,8 +157,10 @@
                         <img src="{$item['img']}" />
                     </td>
                     <td class="way">
-                        <span class="free{if $item['allowFree']} allowed{/if}">免费领取</span>
-                        <span class="pay{if $item['allowPay']} allowed{/if}">支付购买</span>
+                        <span class="free{if $item['allowFree']} allowed{/if}">免费</span>
+                        <span class="pay{if $item['allowPay']} allowed{/if}">支付</span>
+                        <span class="balance{if $item['allowExchange']} allowed{/if}">积分</span>
+                        <span class="mall{if $item['allowDelivery']} allowed{/if}">商城</span>                        
                     </td>
                     <td>
                         <div>
@@ -309,6 +315,7 @@
     $(function(){
         //搜索
         const backer = "{$backer}";
+        const way = "{$w}";
         const agentId = "{$s_agent['id']}";
 
         $('#search-bar').click(function () {
@@ -369,7 +376,9 @@
 
         function reloadPageWithFilter(fn) {
             const params = new URLSearchParams();
-
+            if (way) {
+                params.append('w', way);
+            }
             const form = $("#search-form form");
             const s_keywords = $.trim(form.find('input[name=s_keywords]').val());
             if (s_keywords) {

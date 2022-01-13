@@ -9,6 +9,7 @@ namespace zovye\model;
 use function zovye\tb;
 
 use zovye\base\modelObj;
+use zovye\Goods;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 /**
@@ -69,19 +70,44 @@ class goodsModelObj extends modelObj
 
     public function allowFree(): bool
     {
-        return (bool)$this->getExtraData('allowFree');
+        return Goods::isAllowFree($this->s1);
     }
+
+    public function allowPay(): bool
+    {
+        return Goods::isAllowPay($this->s1);
+    }
+
+    public function allowExchange(): bool
+    {
+        return Goods::isAllowExchange($this->s1);
+    }
+
+    public function allowDelivery(): bool
+    {
+        return Goods::isAllowDelivery($this->s1);
+    }    
 
     public function setAllowFree($allowed = true)
     {
-        $this->setExtraData('allowFree', $allowed ? 1 : 0);
+        $this->setS1(Goods::setAllowFree($this->s1, $allowed));
     }
 
     public function setAllowPay($allowed = true)
     {
-        $this->setExtraData('allowPay', $allowed ? 1 : 0);
+        $this->setS1(Goods::setAllowPay($this->s1, $allowed));
     }
 
+    public function setAllowExchange($allowed = true)
+    {
+        $this->setS1(Goods::setAllowExchange($this->s1, $allowed));
+    }
+    
+    public function setAllowDelivery($allowed = true)
+    {
+        $this->setS1(Goods::setAllowDelivery($this->s1, $allowed));
+    }
+    
     public function getUnitTitle()
     {
         return $this->getExtraData('unitTitle', '');
@@ -90,11 +116,6 @@ class goodsModelObj extends modelObj
     public function setUnitTitle($title)
     {
         return $this->setExtraData('unitTitle', $title);
-    }
-
-    public function allowPay(): bool
-    {
-        return (bool)$this->getExtraData('allowPay');
     }
 
     public function getDetailImg()

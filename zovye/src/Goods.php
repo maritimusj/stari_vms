@@ -16,6 +16,46 @@ class Goods
     const ALLOW_EXCHANGE = 0b100;
     const ALLOW_DELIVERY = 0b1000;
 
+    public static function setAllowPay($s1, $allow = true) 
+    {
+        return $allow ? $s1 |= self::ALLOW_PAY : $s1 ^= self::ALLOW_PAY;
+    }
+
+    public static function isAllowPay($s1): bool
+    {
+        return $s1 &= self::ALLOW_PAY;
+    }
+
+    public static function setAllowFree($s1, $allow = true) 
+    {
+        return $allow ? $s1 |= self::ALLOW_FREE : $s1 ^= self::ALLOW_FREE;
+    }
+
+    public static function isAllowFree($s1) 
+    {
+        return $s1 &= self::ALLOW_FREE;
+    }
+    
+    public static function setAllowExchange($s1, $allow = true) 
+    {
+        return $allow ? $s1 |= self::ALLOW_EXCHANGE :  $s1 ^= self::ALLOW_EXCHANGE;
+    }
+
+    public static function isAllowExchange($s1) 
+    {
+        return $s1 &= self::ALLOW_EXCHANGE;
+    }
+
+    public static function setAllowDelivery($s1, $allow = true) 
+    {
+        return $allow ? $s1 |= self::ALLOW_DELIVERY :  $s1 ^= self::ALLOW_DELIVERY;
+    }
+
+    public static function isAllowDelivery($s1) 
+    {
+        return $s1 &= self::ALLOW_DELIVERY;
+    }
+
     /**
      * @param array $data
      * @return goodsModelObj|null
@@ -99,6 +139,8 @@ class Goods
             'sync' => boolval($entry->getSync()),
             'allowFree' => $entry->allowFree(),
             'allowPay' => $entry->allowPay(),
+            'allowExchange' => $entry->allowExchange(),
+            'allowDelivery' => $entry->allowDelivery(),            
             'price' => intval($entry->getPrice()),
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
@@ -186,6 +228,23 @@ class Goods
             $query->where(['name LIKE' => "%$keywords%"]);
         }
 
+        $s1 = 0;
+        if ((!empty($params['allowPay']) || in_array('allowPay', $params, true))) {
+            $s1 = Goods::setAllowPay($s1);
+        }
+        if ((!empty($params['allowFree']) || in_array('allowFree', $params, true))) {
+            $s1 = Goods::setAllowFree($s1);
+        }
+        if ((!empty($params['allowExchange']) || in_array('allowExchange', $params, true))) {
+            $s1 = Goods::setAllowExchange($s1);
+        }
+        if ((!empty($params['allowDelivery']) || in_array('allowDelivery', $params, true))) {
+            $s1 = Goods::setAllowDelivery($s1);
+        }
+        if ($s1) {
+            $query->where("s1&$s1");
+        }
+
         $total = $query->count();
         $total_page = ceil($total / $page_size);
 
@@ -196,16 +255,7 @@ class Goods
 
         /** @var goodsModelObj $entry */
         foreach ($query->findAll() as $entry) {
-            $goods_data = self::format($entry, true, true);
-            if ((!empty($params['allowPay']) || in_array('allowPay', $params)) && empty($goods_data['allowPay'])) {
-                continue;
-            }
-            if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
-                continue;
-            }
-            if ((!empty($params['balance']) || in_array('balance', $params)) && empty($goods_data['balance'])) {
-                continue;
-            }
+            $goods_data = self::format($entry, true, true);                 
             $goods_list[] = $goods_data;
         }
 

@@ -27,6 +27,22 @@ if ($op == 'default' || $op == 'goods') {
         $tpl_data['s_keywords'] = $keywords;
     }
 
+    $w = request::str('w', 'all');
+    if ($w == 'pay') {
+        $params[] = 'allowPay';
+    }
+    if ($w == 'free') {
+        $params[] = 'allowFree';
+    }
+    if ($w == 'exchange') {
+        $params[] = 'allowExchange';
+    }
+    if ($w == 'mall') {
+        $params[] = 'allowDelivery';
+    }
+
+    $tpl_data['w'] = $w;
+
     $agent_id = request::int('agentId');
     if ($agent_id > 0) {
         $agent = Agent::get($agent_id);
@@ -45,7 +61,7 @@ if ($op == 'default' || $op == 'goods') {
 
     $tpl_data['goods_list'] = $result['list'];
     $tpl_data['pager'] = We7::pagination($result['total'], $result['page'], $result['pagesize']);
-    $tpl_data['backer'] = $keywords || $agent_id != 0;
+    $tpl_data['backer'] = $keywords || $agent_id != 0 || $s_way;
 
     if (request::is_ajax()) {
         $content = app()->fetchTemplate('web/goods/choose', $tpl_data);
@@ -55,6 +71,18 @@ if ($op == 'default' || $op == 'goods') {
             'content' => $content,
         ]);
     }
+
+    $tpl_data['navs'] = [
+        'all' => '全部',
+        'free' => '免费',
+        'pay' => '支付',
+    ];
+
+    if (App::isBalanceEnabled()) {
+        $tpl_data['navs']['exchange'] = '积分';
+        $tpl_data['navs']['mall'] = '商城';
+    }
+
     app()->showTemplate('web/goods/default', $tpl_data);
 
 } elseif ($op == 'search') {
@@ -111,14 +139,26 @@ if ($op == 'default' || $op == 'goods') {
         }
     }
 
-    if ($params['allowPay']) {
-        if ($params['costPrice'] < 0 || $params['goodsPrice'] < 0 || $params['costPrice'] > $params['goodsPrice']) {
-            Util::itoast('成本价不能高于单价！', '', 'error');
-        }
+    if ($params['costPrice'] < 0 || $params['goodsPrice'] < 0 || $params['costPrice'] > $params['goodsPrice']) {
+        Util::itoast('成本价不能高于单价！', '', 'error');
+    }
 
-        if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || $params['discountPrice'] >= $params['goodsPrice']) {
-            Util::itoast('优惠价不能高于或者等于单价！', '', 'error');
-        }        
+    if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || $params['discountPrice'] >= $params['goodsPrice']) {
+        Util::itoast('优惠价不能高于或者等于单价！', '', 'error');
+    }
+    
+    $s1 = 0;
+    if ($params['allowFree']) {
+        $s1 = Goods::setAllowFree($s1);
+    }
+    if ($params['allowPay']) {
+        $s1 = Goods::setAllowPay($s1);
+    }
+    if ($params['allowExchange']) {
+        $s1 = Goods::setAllowExchange($s1);
+    }        
+    if ($params['allowDelivery']) {
+        $s1 = Goods::setAllowDelivery($s1);
     }
 
     if (isset($params['goodsId'])) {
@@ -126,6 +166,8 @@ if ($op == 'default' || $op == 'goods') {
         if (empty($goods)) {
             Util::itoast('找不到这个商品！', '', 'error');
         }
+
+        $goods->setS1($s1);
 
         if (isset($params['goodsSize'])) {
             if ($params['goodsSize'] != $goods->getExtraData('lottery.size')) {
@@ -139,29 +181,25 @@ if ($op == 'default' || $op == 'goods') {
             }
         }
 
-        if ($params['allowFree']) {
-            if (App::isBalanceEnabled()) {
-                if (isset($params['balance'])) {
-                    $goods->setExtraData('balance', max(0, intval($params['balance'])));
-                }            
+        if (App::isBalanceEnabled()) {
+            if (isset($params['balance'])) {
+                $goods->setExtraData('balance', max(0, intval($params['balance'])));
             }
         }
 
-        if ($params['allowPay']) {
-            $price = intval(round($params['goodsPrice'] * 100));
-            if ($price != $goods->getPrice()) {
-                $goods->setPrice($price);
-            }
+        $price = intval(round($params['goodsPrice'] * 100));
+        if ($price != $goods->getPrice()) {
+            $goods->setPrice($price);
+        }
 
-            if (isset($params['costPrice'])) {
-                $goods->setExtraData('costPrice', floatval($params['costPrice'] * 100));
-            }
+        if (isset($params['costPrice'])) {
+            $goods->setExtraData('costPrice', floatval($params['costPrice'] * 100));
+        }
 
-            $goods->setExtraData('cw', empty($params['goodsCW']) ? 0 : 1);
+        $goods->setExtraData('cw', empty($params['goodsCW']) ? 0 : 1);
 
-            if (isset($params['discountPrice'])) {
-                $goods->setExtraData('discountPrice', floatval($params['discountPrice'] * 100));
-            }
+        if (isset($params['discountPrice'])) {
+            $goods->setExtraData('discountPrice', floatval($params['discountPrice'] * 100));
         }
 
         if ($params['agentId'] != $goods->getAgentId()) {
@@ -204,6 +242,7 @@ if ($op == 'default' || $op == 'goods') {
             'img' => trim($params['goodsImg']),
             'sync' => $params['syncAll'] ? 1 : 0,
             'price' => $params['allowPay'] ? intval(round($params['goodsPrice'] * 100)) : 0,
+            's1' => $s1,
             'extra' => [
                 'detailImg' => trim($params['detailImg']),
                 'unitTitle' => trim($params['goodsUnitTitle']),

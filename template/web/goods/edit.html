@@ -73,16 +73,24 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">领取方式</label>
                     <div class="col-md-10">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="allowFree" value="_balance" {if empty($goods) || $goods['allowFree']}checked{/if}> 免费领取
+                        <label class="checkbox-inline" title="关注公众号免费领取">
+                            <input type="checkbox" name="allowFree" value="_free" {if empty($goods) || $goods['allowFree']}checked{/if}> 免费领取
                         </label>
-                        <label class="checkbox-inline">
-                            <input type="checkbox" name="allowPay" value="_price" {if empty($goods) || $goods['allowPay']}checked{/if}> 支付购买
+                        <label class="checkbox-inline" title="支付购买">
+                            <input type="checkbox" name="allowPay" value="_pay" {if empty($goods) || $goods['allowPay']}checked{/if}> 支付购买
                         </label>
+                        {if \zovye\App::isBalanceEnabled()}
+                        <label class="checkbox-inline" title="使用积分兑换领取">
+                            <input type="checkbox" name="allowExchange" value="_balance" {if empty($goods) || $goods['allowExchange']}checked{/if}> 积分兑换
+                        </label>
+                        <label class="checkbox-inline" title="商城使用积分兑换">
+                            <input type="checkbox" name="allowDelivery" value="_delivery" {if empty($goods) || $goods['allowDelivery']}checked{/if}> 商城
+                        </label>                        
+                        {/if}
                     </div>
                 </div>
                 {if \zovye\App::isBalanceEnabled()}
-                <fieldset {if $goods && !$goods['allowFree']}disabled{/if} id="_balance">
+                <fieldset>
                     <div class="form-group">
                         <label for="balance" class="col-md-2 control-label">积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
                         <div class="col-md-10">
@@ -92,7 +100,7 @@
                     </div>
                 </fieldset>
                 {/if}
-                <fieldset {if $goods && !$goods['allowPay']}disabled{/if} id="_price">
+                <fieldset>
                 <div class="form-group">
                     <label for="goodsPrice" class="col-md-2 control-label">单价（元）</label>
                     <div class="col-md-10">
@@ -178,23 +186,6 @@
                 util.loaded();
             })
         })
-        function check(e) {
-            const val = $(e).val();
-            if (val) {
-                if ($(e).is(':checked')) {
-                    $('#' + val).removeAttr('disabled');
-                } else {
-                    $('#' + val).attr('disabled', true);
-                }
-            }            
-        }
-
-        $('body').on('click', '#addGoodsForm input[type=checkbox]', function(){
-            check(this);
-        })
-
-        check('#addGoodsForm input[name=allowFree]');
-        check('#addGoodsForm input[name=allowPay]');
     })
 </script>
 {template 'common/footer'}

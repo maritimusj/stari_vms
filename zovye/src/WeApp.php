@@ -539,7 +539,7 @@ $.get("$device_api_url", {op: 'goods', type:'pay'}).then(function(res) {
     });
 }
 zovye_fn.getBalanceGoodsList = function(cb) {
-    $.get("$device_api_url", {op: 'goods', type:'balance'}).then(function(res) {
+    $.get("$device_api_url", {op: 'goods', type:'exchange'}).then(function(res) {
         if (typeof cb === 'function') {
             cb(res);
         }

@@ -2626,7 +2626,7 @@ class deviceModelObj extends modelObj
                     if ((!empty($params['allowFree']) || in_array('allowFree', $params)) && empty($goods_data['allowFree'])) {
                         continue;
                     }
-                    if ((!empty($params['balance']) || in_array('balance', $params)) && empty($goods_data['balance'])) {
+                    if ((!empty($params['allowExchange']) || in_array('allowExchange', $params)) && empty($goods_data['allowExchange'])) {
                         continue;
                     }
                 }

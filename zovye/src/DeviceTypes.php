@@ -199,8 +199,9 @@ class DeviceTypes
                     $lane['goods_img'] = $goods_data['img'];
                     $lane['goods_price'] = $goods_data['price'];
                     $lane['goods_price_formatted'] = $goods_data['price_formatted'];
-                    $lane['allow_pay'] = $goods_data['allowPay'];
-                    $lane['allow_free'] = $goods_data['allowFree'];
+                    $lane['allowPay'] = $goods_data['allowPay'];
+                    $lane['allowFree'] = $goods_data['allowFree'];
+                    $lane['allowExchange'] = $goods_data['allowExchange'];
                 } else {
                     $lane['goods_id'] = 0;
                     $lane['goods_unit_title'] = '';

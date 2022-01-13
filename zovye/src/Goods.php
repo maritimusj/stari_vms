@@ -140,17 +140,16 @@ class Goods
             'id' => $entry->getId(),
             'name' => strval($entry->getName()),
             'img' => $imageUrlFN($entry->getImg()),
-            'detailImg' => $imageUrlFN($entry->getDetailImg()),
             'sync' => boolval($entry->getSync()),
-            Goods::AllowFree => $entry->allowFree(),
-            Goods::AllowPay => $entry->allowPay(),
-            Goods::AllowExchange => $entry->allowExchange(),
-            Goods::AllowDelivery => $entry->allowDelivery(),
             'price' => intval($entry->getPrice()),
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'cw' => $entry->getExtraData('cw', 0),
+            Goods::AllowFree => $entry->allowFree(),
+            Goods::AllowPay => $entry->allowPay(),
+            Goods::AllowExchange => $entry->allowExchange(),
+            Goods::AllowDelivery => $entry->allowDelivery(),
         ];
 
         if ($entry->isDeleted()) {
@@ -177,6 +176,22 @@ class Goods
         if (!empty($discountPrice)) {
             $data['discountPrice'] = $discountPrice;
             $data['discountPrice_formatted'] = '￥' . number_format($discountPrice / 100, 2) . '元';
+        }
+
+        $detail = $entry->getDetailImg();
+        if ($detail) {
+            $data['detailImg'] = $imageUrlFN($entry->getDetailImg());
+        }
+
+        $gallery = $entry->getGallery();
+        if ($detail && (empty($gallery) || $gallery[0] != $detail)) {
+            $gallery[] = $detail;
+        }
+
+        if ($gallery) {
+            foreach($gallery as $url) {
+                $data['gallery'][] = $imageUrlFN($url);
+            }
         }
 
         if ($detail) {

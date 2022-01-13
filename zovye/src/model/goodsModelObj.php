@@ -127,6 +127,16 @@ class goodsModelObj extends modelObj
     {
         return $this->setExtraData('detailImg', $url);
     }
+
+    public function getGallery()
+    {
+        return $this->getExtraData('gallery', []);
+    }
+
+    public function setGallery($images = [])
+    {
+        return $this->setExtraData('gallery', $images);
+    }   
     
     public function getAppendage(): array
     {

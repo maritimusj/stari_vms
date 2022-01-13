@@ -143,16 +143,18 @@ class goods
                 $goods->setImg(request::str('goodsImg'));
             }
 
-            if (request::str('detailImg') != $goods->getDetailImg()) {
-                $goods->setDetailImg(request::str('detailImg'));
-            }
-
-            if (request::str('detailImg') != $goods->getDetailImg()) {
-                $goods->setDetailImg(request::str('detailImg'));
-            }
-
-            if (request::str('detailImg') != $goods->getDetailImg()) {
-                $goods->setDetailImg(request::str('detailImg'));
+            if (request::has('detailImg')) {
+                $detailImg = request::trim('detailImg');
+                if ($detailImg != $goods->getDetailImg()) {
+                    $goods->setDetailImg($detailImg);
+                    $goods->setGallery([$detailImg]);
+                }                
+            } elseif (request::is_array('gallery')) {
+                $gallery = request::array('gallery');
+                if ($gallery) {
+                    $goods->setDetailImg($gallery[0]);
+                    $goods->setGallery($gallery);                    
+                }
             }
 
             $price = request::float('goodsPrice', 0, 2) * 100;
@@ -170,12 +172,25 @@ class goods
                 's1' => $s1,
                 'price' =>  request::float('goodsPrice', 0, 2) * 100,
                 'extra' => [
-                    'detailImg' => request::trim('detailImg'),
                     'unitTitle' => request::trim('goodsUnitTitle'),
                 ],
             ];
 
             $goods_data['agent_id'] = $agent->getId();
+
+            if (request::has('detailImg')) {
+                $detailImg = request::trim('detailImg');
+                $goods_data['extra']['detailImg'] = $detailImg;
+                $goods_data['extra']['gallery'] = [$detailImg];                
+            }
+            
+            if (request::is_array('gallery')) {
+                $gallery = request::array('gallery');
+                if ($gallery) {
+                    $goods_data['extra']['detailImg'] = $gallery[0];
+                    $goods_data['extra']['gallery'] = $gallery;                  
+                }
+            }
 
             //固定货道商品商品指定货道
             if (request::is_string('goodsLaneID')) {

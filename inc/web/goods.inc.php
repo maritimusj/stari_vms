@@ -143,7 +143,7 @@ if ($op == 'default' || $op == 'goods') {
         Util::itoast('成本价不能高于单价！', '', 'error');
     }
 
-    if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || $params['discountPrice'] >= $params['goodsPrice']) {
+    if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || ($params['discountPrice'] > 0 && $params['discountPrice'] >= $params['goodsPrice'])) {
         Util::itoast('优惠价不能高于或者等于单价！', '', 'error');
     }
 
@@ -215,9 +215,10 @@ if ($op == 'default' || $op == 'goods') {
             $goods->setImg($img);
         }
 
-        $img = trim($params['detailImg']);
-        if ($img != $goods->getDetailImg()) {
-            $goods->setDetailImg($img);
+        $images = $params['gallery'];
+        if ($images) {
+            $goods->setDetailImg($images[0]);
+            $goods->setGallery($images);
         }
 
         if ($params['syncAll'] != $goods->getSync()) {
@@ -236,11 +237,17 @@ if ($op == 'default' || $op == 'goods') {
             'price' => intval(round($params['goodsPrice'] * 100)),
             's1' => $s1,
             'extra' => [
-                'detailImg' => trim($params['detailImg']),
                 'unitTitle' => trim($params['goodsUnitTitle']),
                 'balance' => intval($params['goodsBalance']),
             ],
         ];
+        
+        $images = $params['gallery'];
+        if ($images) {
+            $data['extra']['detailImg'] = $images[0];
+            $data['extra']['gallery'] = $images;
+        }
+
         if (isset($params['goodsSize'])) {
             $data['extra']['lottery'] = [
                 'size' => intval($params['goodsSize']),

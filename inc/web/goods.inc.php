@@ -61,7 +61,7 @@ if ($op == 'default' || $op == 'goods') {
 
     $tpl_data['goods_list'] = $result['list'];
     $tpl_data['pager'] = We7::pagination($result['total'], $result['page'], $result['pagesize']);
-    $tpl_data['backer'] = $keywords || $agent_id != 0 || $s_way;
+    $tpl_data['backer'] = $keywords || $agent_id != 0;
 
     if (request::is_ajax()) {
         $content = app()->fetchTemplate('web/goods/choose', $tpl_data);

@@ -1223,6 +1223,7 @@ JSCODE;
         $adv_api_url = Util::murl('adv');
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
         $task_page = Util::murl('task', ['serial' => REQUEST_ID, 'device' => $device ? $device->getShadowId() : '']);
+        $mall_url = Util::murl('mall');
 
         $jquery_url = JS_JQUERY_URL;
 
@@ -1282,6 +1283,9 @@ $js_sdk
     }
     zovye_fn.redirectToTaskPage = function() {
         window.location.href = "$task_page";
+    }
+    zovye_fn.redirectToMallPage = function() {
+        window.location.replace("$mall_url");
     }
 JSCODE;
 
@@ -1419,6 +1423,7 @@ JSCODE;
 
         $api_url = Util::murl('bonus');
         $mall_url = Util::murl('mall');
+        $mall_order_url = Util::murl('mall', ['op' => 'order']);        
         $balance_logs_url = Util::murl('bonus', ['op' => 'logsPage']);
         $order_jump_url = Util::murl('order', ['op' => 'jump']);
         $jquery_url = JS_JQUERY_URL;
@@ -1458,8 +1463,11 @@ $js_sdk
         window.location.replace("$api_url");
     }
     zovye_fn.redirectToMallPage = function() {
-        window.location.href = "$mall_url";
+        window.location.replace("$mall_url");
     }
+    zovye_fn.redirectToMallOrderPage = function() {
+        window.location.href = "$mall_order_url";
+    }    
 </script>
 JSCODE;
         $this->showTemplate(Theme::file('user'), ['tpl' => $tpl_data]);
@@ -1523,6 +1531,9 @@ JSCODE;
         $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
         $api_url = Util::murl('mall');
+        $user_home_page = Util::murl('bonus', ['op' => 'home']);
+        $bonus_url = Util::murl('bonus');
+
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
@@ -1552,19 +1563,48 @@ $js_sdk
     zovye_fn.getGoodsList = function(page, pagesize) {
         return $.getJSON(zovye_fn.api_url, {op: 'goods_list', page, pagesize});
     }
-    zovye_fn.getLog = function(lastId, pagesize) {
-        return $.getJSON(zovye_fn.api_url, {op: 'logs', lastId, pagesize});
-    }
     zovye_fn.getRecipient = function() {
         return $.getJSON(zovye_fn.api_url, {op: 'recipient'});
     }
     zovye_fn.updateRecipient = function(name, phoneNum, address) {
         return $.getJSON(zovye_fn.api_url, {op: 'update_recipient', name, phoneNum, address});
     }
+    zovye_fn.redirectToBonusPage = function() {
+        window.location.replace("$bonus_url");
+    }
+    zovye_fn.redirectToUserPage = function() {
+        window.location.replace("$user_home_page");
+    }
 </script>
 JSCODE;
         $this->showTemplate(Theme::file('mall'), ['tpl' => $tpl_data]);
     }
 
+    public function mallOrderPage(userModelObj $user)
+    {
+        $tpl_data = Util::getTplData([$user]);
+
+        $api_url = Util::murl('mall');
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_sdk = Util::fetchJSSDK();
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+$js_sdk
+<script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+    zovye_fn.getOrderList = function(lastId, pagesize) {
+        return $.getJSON(zovye_fn.api_url, {op: 'logs', lastId, pagesize});
+    }
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
+    }
 }
 

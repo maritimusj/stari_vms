@@ -70,9 +70,6 @@ class Delivery
 
     public static function getList($params = []): array
     {
-        $page = max(1, intval($params['page']));
-        $page_size = empty($params['pagesize']) ? DEFAULT_PAGE_SIZE : intval($params['pagesize']);
-
         $query = self::query();
 
         if (isset($params['user_id'])) {
@@ -92,11 +89,30 @@ class Delivery
             ]);
         }
 
+        $result = [];
+
         $total = $query->count();
+        $result['total'] = $total;
 
-        $total_page = ceil($total / $page_size);
+        $page_size = empty($params['pagesize']) ? DEFAULT_PAGE_SIZE : intval($params['pagesize']);
+        
+        if (request::has('page')) {
+            $page = max(1, intval($params['page']));
+            $query->page($page, $page_size);
 
-        $query->page($page, $page_size);
+            $result['page'] = $page;
+            $result['total_page'] = ceil($total / $page_size);
+
+        } else {
+            if (request::isset('last_id')) {
+                $last_id = request::int('last_id');
+                $query->where(['id <' => $last_id]);                
+            }
+
+            $query->limit($page_size);
+            $result['list_id'] = $last_id ?? 0;
+        }
+       
         $query->orderBy('id DESC');
 
         $list = [];
@@ -119,12 +135,9 @@ class Delivery
             ];
         }
 
-        return [
-            'list' => $list,
-            'page' => $page,
-            'pagesize' => $page_size,
-            'total' => $total,
-            'totalpage' => $total_page,
-        ];
+        $result['list'] = $list;
+        $result['pagesize'] = $page_size;
+
+        return $result;
     }
 }

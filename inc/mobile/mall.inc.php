@@ -24,6 +24,10 @@ if ($op == 'default') {
 
     app()->mallPage($user);
 
+} elseif ($op == 'order') {
+
+    app()->mallOrderPage($user);
+
 } elseif ($op == 'goods_list') {
 
     $result = Goods::getList([
@@ -129,7 +133,7 @@ if ($op == 'default') {
 } elseif ($op == 'logs') {
 
     $params = [
-        'page' => request::int('page'),
+        'last_id' => request::int('lastId'),
         'pagesize' => request::int('pagesize'),
         'user_id' => $user->getId(),
     ];

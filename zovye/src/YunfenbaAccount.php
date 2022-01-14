@@ -284,7 +284,7 @@ class YunfenbaAccount
                     throw new RuntimeException('找不到指定的设备:' . $params['device']);
                 }
 
-                $order_uid = Order::makeUID($user, $device);
+                $order_uid = Order::makeUID($user, $device, sha1($params['wxid'] ?? REQUEST_ID));
                 Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
             }
 

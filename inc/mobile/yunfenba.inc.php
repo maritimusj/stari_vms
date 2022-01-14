@@ -12,12 +12,14 @@ Log::debug('yunfenba', [
     'raw' => request::raw(),
     'user' => request::str('user'),
     'device' => request::str('device'),
+    'wxid' => request::str('wxid'),
 ]);
 
 if (App::isYunfenbaEnabled()) {
     YunfenbaAccount::cb([
         'user' => request::str('user'),
         'device' => request::str('device'),
+        'wxid' => request::str('wxid'),
     ]);
 } else {
     Log::debug('yunfenba', [

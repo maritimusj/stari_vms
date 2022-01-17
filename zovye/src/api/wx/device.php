@@ -374,7 +374,7 @@ class device
          * @return array
          */
         $locationFN = function (deviceModelObj $device) {
-            return Util::cachedCall(300, function() use ($device) {
+            return Util::cachedCall(300, function () use ($device) {
                 $extra = $device->get('extra', []);
                 //位置
                 if ($extra['location']['tencent']['area']) {
@@ -390,7 +390,7 @@ class device
                     //else 获取定位地址？
                 }
 
-                return [];                
+                return [];
             }, $device->getId());
         };
 
@@ -481,7 +481,7 @@ class device
                                 'area' => $locationFN($item),
                             ];
                         }
-                    }                    
+                    }
                 }
 
                 $result['list'][] = [
@@ -546,6 +546,7 @@ class device
 
         return $result;
     }
+
     /**
      * 获取统计信息.
      *
@@ -562,7 +563,7 @@ class device
 
         return Util::cachedCall(6, function () use ($user, $params) {
             return self::getStatisticsData($user, $params);
-        }, $user->getId(),  http_build_query($params));
+        }, $user->getId(), http_build_query($params));
     }
 
     public static function getDeviceOnline(): array
@@ -714,14 +715,10 @@ class device
                     }
                 }
                 if ($date) {
-                    $data['stats']['day'] = Util::cachedCall(10, function () use ($device, $date) {
-                        return intval($device->getDTotal(['total'], $date));
-                    }, $device->getId(), $date);
+                    $data['stats']['day'] = $device->getDTotal(['total'], $date);
                 }
                 if ($month) {
-                    $data['stats']['month'] = Util::cachedCall(10, function () use ($device, $month) {
-                        return intval($device->getMTotal(['total'], $month));
-                    }, $device->getId(), $month);
+                    $data['stats']['month'] = $device->getMTotal(['total'], $month);
                 }
                 $result['list'][] = $data;
             }

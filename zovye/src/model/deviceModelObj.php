@@ -1400,7 +1400,7 @@ class deviceModelObj extends modelObj
         if ($agent) {
             $day_limits = $agent->settings('agentData.misc.limits.day', 0);
         } else {
-             $day_limits = settings('device.limits.day', 0);
+            $day_limits = settings('device.limits.day', 0);
         }
 
         if ($day_limits > 0) {
@@ -1943,7 +1943,7 @@ class deviceModelObj extends modelObj
         return $result[$way[0]] ?? 0;
     }
 
-        /**
+    /**
      * 获取设备今日出货数据
      * @param array $way
      * @param string $day
@@ -1967,68 +1967,6 @@ class deviceModelObj extends modelObj
         }
 
         return $result[$way[0]] ?? 0;
-    }
-
-    public function getTotal($way, $begin, $end): array
-    {
-        $total = [];
-
-        if (!is_numeric($begin)) {
-            $begin = strtotime($begin);
-        }
-
-        if (!is_numeric($end)) {
-            $end = strtotime($end);
-        }
-
-        if (empty($way) || in_array('free', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $freeOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::ACCOUNT, Order::BALANCE] : Order::ACCOUNT;
-            $query->where(['src' => $freeOrder]);
-
-            $total['free'] = (int)$query->get('sum(num)');
-        }
-
-        if (empty($way) || in_array('pay', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $payOrder = App::isBalanceEnabled() && Balance::isPayOrder() ? [Order::PAY, Order::BALANCE] : Order::PAY;
-            $query->where(['src' => $payOrder]);
-
-            $total['pay'] = (int)$query->get('sum(num)');
-        }
-
-        if (empty($way) || in_array('total', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $total['total'] = (int)$query->get('sum(num)');
-        }
-
-        return $total;
     }
 
     /**

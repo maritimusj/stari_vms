@@ -290,9 +290,9 @@ if ($op == 'list') {
             }
 
             if (Util::isSysLoadAverageOk()) {
-                $data['total'] =  [
-                    'month' => Util::isSysLoadAverageOk() ? intval($entry->getMTotal(['total'])) : '',
-                    'today' => Util::isSysLoadAverageOk() ? intval($entry->getDTotal(['total'])) : '',
+                $data['total'] = [
+                    'month' => $entry->getMTotal(['total']),
+                    'today' => $entry->getDTotal(['total']),
                 ];
 
                 $data['gettype']['freeLimitsReached'] = $entry->isFreeLimitsReached();
@@ -1482,7 +1482,7 @@ if ($op == 'list') {
 
         return [];
     }, $device->getId());
-    
+
     $content = app()->fetchTemplate(
         'web/device/all_stats',
         [
@@ -2509,7 +2509,7 @@ if ($op == 'list') {
     if (empty($iccid)) {
         JSON::fail('错误：iccid 为空！');
     }
- 
+
     $result = CtrlServ::v2_query("iccid/$iccid");
     if (is_error($result)) {
         JSON::fail($result);

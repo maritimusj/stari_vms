@@ -50,6 +50,7 @@ use zovye\BlueToothProtocol;
 use zovye\base\modelObjFinder;
 use function zovye\isEmptyArray;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
+use zovye\OrderCounter;
 
 /**
  * @method getGroupId()
@@ -1398,13 +1399,20 @@ class deviceModelObj extends modelObj
         $agent = $this->getAgent();
         if ($agent) {
             $day_limits = $agent->settings('agentData.misc.limits.day', 0);
-
-            return $day_limits > 0 && $this->getDTotal(['free']) >= $day_limits;
+        } else {
+             $day_limits = settings('device.limits.day', 0);
         }
 
-        $day_limits = settings('device.limits.day', 0);
+        if ($day_limits > 0) {
+            $data = $this->getDTotal();
+            $free = $data['free'];
+            if (Balance::isFreeOrder()) {
+                $free += $data['balance'];
+            }
+            return $free >= $day_limits;
+        }
 
-        return $day_limits > 0 && $this->getDTotal(['free']) >= $day_limits;
+        return false;
     }
 
     /**
@@ -1428,96 +1436,6 @@ class deviceModelObj extends modelObj
     {
         $agent_id = is_object($agent) ? $agent->getAgentId() : intval($agent);
         $this->setAgentId($agent_id);
-    }
-
-    /**
-     * 获取设备今日出货数据
-     * @param array $way
-     * @param string $day
-     * @return int|array
-     */
-    public function getDTotal(array $way = [], string $day = 'today')
-    {
-        try {
-            $v = new DateTime($day);
-            $begin = $v->format('Y-m-d 00:00:00');
-
-            $v->modify('+1 day');
-            $end = $v->format('Y-m-d 00:00:00');
-
-            $total = $this->getTotal($way, $begin, $end);
-
-            if (empty($way) || count($way) > 1) {
-                return $total;
-            } else {
-                return $total[$way[0]];
-            }
-        } catch (Exception $e) {
-        }
-
-        return 0;
-    }
-
-    public function getTotal($way, $begin, $end): array
-    {
-        $total = [];
-
-        if (!is_numeric($begin)) {
-            $begin = strtotime($begin);
-        }
-
-        if (!is_numeric($end)) {
-            $end = strtotime($end);
-        }
-
-        if (empty($way) || in_array('free', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $freeOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::ACCOUNT, Order::BALANCE] : Order::ACCOUNT;
-            $query->where(['src' => $freeOrder]);
-
-            $total['free'] = (int)$query->get('sum(num)');
-        }
-
-        if (empty($way) || in_array('pay', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $payOrder = App::isBalanceEnabled() && Balance::isPayOrder() ? [Order::PAY, Order::BALANCE] : Order::PAY;
-            $query->where(['src' => $payOrder]);
-
-            $total['pay'] = (int)$query->get('sum(num)');
-        }
-
-        if (empty($way) || in_array('total', $way)) {
-
-            $query = Order::query(['device_id' => $this->id]);
-            $query->where(
-                [
-                    'createtime >=' => $begin,
-                    'createtime <' => $end,
-                ]
-            );
-
-            $total['total'] = (int)$query->get('sum(num)');
-        }
-
-        return $total;
     }
 
     /**
@@ -1985,54 +1903,6 @@ class deviceModelObj extends modelObj
         return $this->shadow_id;
     }
 
-    /**
-     * 获取设备本月统计数据
-     * @param array $way
-     * @param string $month
-     * @return int|array
-     */
-    public function getMTotal(array $way = [], string $month = 'this month')
-    {
-        $ts = strtotime($month);
-        if ($ts <= time()) {
-
-            $m_label = date('Ym', $ts);
-            $cache = $this->get('M_total', []);
-
-            if ($cache && $cache[$m_label]) {
-                $result = $cache[$m_label];
-            } else {
-                $begin = new DateTimeImmutable("first day of $month");
-                $end = $begin->modify('+1 month');
-
-                if ($m_label != date('Ym')) {
-                    $result = $this->getTotal([], $begin->format('Y-m-d 00:00:00'), $end->format('Y-m-d 00:00:00'));
-
-                    $M_total[$m_label] = $result;
-                    $this->set('M_total', $M_total);
-                } else {
-                    $result = $this->getTotal($way, $begin->format('Y-m-d 00:00:00'), $end->format('Y-m-d 00:00:00'));
-                }
-            }
-
-            if (empty($way)) {
-                return $result;
-            } elseif (count($way) > 1) {
-                return array_filter(
-                    $result,
-                    function ($key) use ($way) {
-                        return in_array($key, $way);
-                    },
-                    ARRAY_FILTER_USE_KEY
-                );
-            } else {
-                return $result[$way[0]];
-            }
-        }
-
-        return 0;
-    }
-
     protected function checkLockerExpired(): bool
     {
         $wait_timeout = intval(settings('device.waitTimeout'));
@@ -2045,6 +1915,120 @@ class deviceModelObj extends modelObj
             }
         }
         return false;
+    }
+
+    /**
+     * 获取设备本月统计数据
+     * @param array $way
+     * @param string $month
+     * @return int|array
+     */
+    public function getMTotal(array $way = [], string $month = 'this month')
+    {
+        $counter = new OrderCounter();
+        try {
+            $result = $counter->getMonthAll($this, new DateTime($month));
+        } catch (Exception $e) {
+            $result = [];
+        }
+
+        if (empty($way)) {
+            return $result;
+        }
+
+        if (count($way) > 1) {
+            return array_intersect_key($result, array_flip($way));
+        }
+
+        return $result[$way[0]] ?? 0;
+    }
+
+        /**
+     * 获取设备今日出货数据
+     * @param array $way
+     * @param string $day
+     * @return int|array
+     */
+    public function getDTotal(array $way = [], string $day = 'today')
+    {
+        $counter = new OrderCounter();
+        try {
+            $result = $counter->getDayAll($this, new DateTime($day));
+        } catch (Exception $e) {
+            $result = [];
+        }
+
+        if (empty($way)) {
+            return $result;
+        }
+
+        if (count($way) > 1) {
+            return array_intersect_key($result, array_flip($way));
+        }
+
+        return $result[$way[0]] ?? 0;
+    }
+
+    public function getTotal($way, $begin, $end): array
+    {
+        $total = [];
+
+        if (!is_numeric($begin)) {
+            $begin = strtotime($begin);
+        }
+
+        if (!is_numeric($end)) {
+            $end = strtotime($end);
+        }
+
+        if (empty($way) || in_array('free', $way)) {
+
+            $query = Order::query(['device_id' => $this->id]);
+
+            $query->where(
+                [
+                    'createtime >=' => $begin,
+                    'createtime <' => $end,
+                ]
+            );
+
+            $freeOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::ACCOUNT, Order::BALANCE] : Order::ACCOUNT;
+            $query->where(['src' => $freeOrder]);
+
+            $total['free'] = (int)$query->get('sum(num)');
+        }
+
+        if (empty($way) || in_array('pay', $way)) {
+
+            $query = Order::query(['device_id' => $this->id]);
+
+            $query->where(
+                [
+                    'createtime >=' => $begin,
+                    'createtime <' => $end,
+                ]
+            );
+
+            $payOrder = App::isBalanceEnabled() && Balance::isPayOrder() ? [Order::PAY, Order::BALANCE] : Order::PAY;
+            $query->where(['src' => $payOrder]);
+
+            $total['pay'] = (int)$query->get('sum(num)');
+        }
+
+        if (empty($way) || in_array('total', $way)) {
+
+            $query = Order::query(['device_id' => $this->id]);
+            $query->where(
+                [
+                    'createtime >=' => $begin,
+                    'createtime <' => $end,
+                ]
+            );
+
+            $total['total'] = (int)$query->get('sum(num)');
+        }
+
+        return $total;
     }
 
     /**

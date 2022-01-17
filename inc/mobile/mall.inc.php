@@ -8,6 +8,7 @@
 namespace zovye;
 
 use zovye\model\balanceModelObj;
+use zovye\model\goodsModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -30,13 +31,54 @@ if ($op == 'default') {
 
 } elseif ($op == 'goods_list') {
 
-    $result = Goods::getList([
+    $formatter = function (goodsModelObj $goods) {
+        $data = [
+            'id' => $goods->getId(),
+            'name' => strval($goods->getName()),
+            'img' => Util::toMedia($goods->getImg(), true),
+            'price' => intval($goods->getPrice()),
+            'price_formatted' => '￥' . number_format($goods->getPrice() / 100, 2) . '元',
+            'unit_title' => $goods->getUnitTitle(),
+            'createtime_formatted' => date('Y-m-d H:i:s', $goods->getCreatetime()),
+        ];
+
+        $cost_price = $goods->getCostPrice();
+
+        if (!empty($cost_price)) {
+            $data['costPrice'] = $cost_price;
+            $data['costPrice_formatted'] = '￥' . number_format($cost_price / 100, 2) . '元';
+        }
+        $discountPrice = $goods->getExtraData('discountPrice', 0);
+        if (!empty($discountPrice)) {
+            $data['discountPrice'] = $discountPrice;
+            $data['discountPrice_formatted'] = '￥' . number_format($discountPrice / 100, 2) . '元';
+        }
+        $detailImg = $goods->getDetailImg();
+        if ($detailImg) {
+            $data['detailImg'] = Util::toMedia($goods->getDetailImg(), true);
+        }
+        $gallery = $goods->getGallery();
+        if ($detailImg && (empty($gallery) || $gallery[0] != $detailImg)) {
+            $gallery[] = $detailImg;
+        }
+
+        if ($gallery) {
+            foreach ($gallery as $url) {
+                $data['gallery'][] = Util::toMedia($url, true);
+            }
+        }
+        return $data;
+    };
+
+    $params = [
         'page' => request::int('page'),
         'pagesize' => request::int('pagesize'),
         Goods::AllowDelivery,
-    ]);
+    ];
 
-    foreach($result['list'] as &$goods) {
+    $result = Goods::getList($params, $formatter);
+
+    foreach ($result['list'] as &$goods) {
         $goods['total'] = (int)Delivery::query()->where(['goods_id' => $goods['id']])->sum('num');
     }
 
@@ -61,7 +103,7 @@ if ($op == 'default') {
     }
 
     $recipient = $user->getRecipientData();
-    
+
     $name = request::trim('name', $recipient['name']);
     $phone_num = request::trim('phoneNum', $recipient['phoneNum']);
     $address = request::trim('address', $recipient['address']);
@@ -81,7 +123,7 @@ if ($op == 'default') {
         if ($total_balance > $balance->total()) {
             return err('您的积分不够！');
         }
-        
+
         $x = $balance->change(-$total_balance, Balance::DELIVERY_ORDER, [
             'goods' => $goods->getId(),
             'num' => $num,
@@ -91,7 +133,7 @@ if ($op == 'default') {
         }
 
         $order = Delivery::create([
-            'order_no' => Delivery::makeUID($user, time()), 
+            'order_no' => Delivery::makeUID($user, time()),
             'user_id' => $user->getId(),
             'goods_id' => $goods->getId(),
             'num' => $num,

@@ -259,6 +259,7 @@ if ($op == 'default' || $op == 'goods') {
             $data['extra']['costPrice'] = floatval($params['costPrice'] * 100);
         }
 
+        //成本是否参与分佣
         $data['extra']['cw'] = empty($params['goodsCW']) ? 0 : 1;
 
         if (App::isBalanceEnabled()) {

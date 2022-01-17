@@ -145,7 +145,7 @@ class Goods
             'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-            'cw' => $entry->getExtraData('cw', 0),
+            'cw' => $entry->getExtraData('cw', 0), //成本是否参与分佣
             Goods::AllowFree => $entry->allowFree(),
             Goods::AllowPay => $entry->allowPay(),
             Goods::AllowExchange => $entry->allowExchange(),
@@ -189,7 +189,7 @@ class Goods
         }
 
         if ($gallery) {
-            foreach($gallery as $url) {
+            foreach ($gallery as $url) {
                 $data['gallery'][] = $imageUrlFN($url);
             }
         }
@@ -208,9 +208,10 @@ class Goods
 
     /**
      * @param array $params
+     * @param callable|null $formatter
      * @return array
      */
-    public static function getList(array $params = []): array
+    public static function getList(array $params = [], callable $formatter = null): array
     {
         $page = max(1, intval($params['page']));
         $page_size = empty($params['pagesize']) ? DEFAULT_PAGE_SIZE : intval($params['pagesize']);
@@ -278,10 +279,12 @@ class Goods
         $query->page($page, $page_size);
         $query->orderBy('id DESC');
 
+        $formatter = $formatter ?? function ($goods) {
+                return self::format($goods, true, true);
+            };
         /** @var goodsModelObj $entry */
         foreach ($query->findAll() as $entry) {
-            $goods_data = self::format($entry, true, true);
-            $goods_list[] = $goods_data;
+            $goods_list[] = $formatter($entry);
         }
 
         return [

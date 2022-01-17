@@ -291,8 +291,8 @@ if ($op == 'list') {
 
             if (Util::isSysLoadAverageOk()) {
                 $data['total'] = [
-                    'month' => Stats::getMonthTotal($entry)['total'],
-                    'today' => Stats::getDayTotal($entry)['total'],
+                    'month' => intval(Stats::getMonthTotal($entry)['total']),
+                    'today' => intval(Stats::getDayTotal($entry)['total']),
                 ];
 
                 $data['gettype']['freeLimitsReached'] = $entry->isFreeLimitsReached();

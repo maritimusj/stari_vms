@@ -135,7 +135,12 @@ if ($op == 'default') {
                 $data['partners'] = $agent_data['partners'] ? count($agent_data['partners']) : 0;
                 $data['superior'] = $entry->getSuperior();
                 $data['createtime'] = date('Y-m-d H:i:s', $entry->getCreatetime());
-                $data['m'] = Stats::getMonthTotal($entry); //$entry->getMTotal('today');
+                $total = Stats::getMonthTotal($entry);
+                $data['m'] = [
+                    'free' => intval($total['free']),
+                    'pay' =>  intval($total['pay']),
+                    'total' =>  intval($total['total']),
+                ];
                 if ($data['commission_enabled']) {
                     $data['commission'] = [
                         'total' => $entry->getCommissionBalance()->total(),
@@ -213,7 +218,12 @@ if ($op == 'default') {
                 $data['partners'] = $agent_data['partners'] ? count($agent_data['partners']) : 0;
                 $data['superior'] = $entry->getSuperior();
                 $data['createtime'] = date('Y-m-d H:i:s', $entry->getCreatetime());
-                $data['m'] = Stats::getMonthTotal($entry); //$entry->getMTotal('today');
+                $total = Stats::getMonthTotal($entry);
+                $data['m'] = [
+                    'free' => intval($total['free']),
+                    'pay' =>  intval($total['pay']),
+                    'total' =>  intval($total['total']),
+                ];
                 if ($data['commission_enabled']) {
                     $data['commission'] = [
                         'total' => $entry->getCommissionBalance()->total(),

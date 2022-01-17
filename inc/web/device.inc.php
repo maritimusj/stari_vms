@@ -1421,65 +1421,18 @@ if ($op == 'list') {
 
             $end = $end->modify('last day of this month 00:00');
 
+            $counter = new OrderCounter();
+
             while ($begin < $end) {
-                $result = [
-                    'total' => 0,
-                    'free' => 0,
-                    'pay' => 0,
-                    'balance' => 0,
-                ];
-
-                $begin->modify('first day of this month 00:00');
-                $result['begin'] = $begin->format("Y-m-d H:i:s");
-
-                $t_begin = $begin->getTimestamp();
-
-                $month = $begin->format('Y-m-d');
-                $title = $begin->format('Y年m月');
-
-                $begin->modify('first day of next month 00:00');
-                $t_end = $begin->getTimestamp();
-                $result['end'] = $begin->format("Y-m-d H:i:s");
-
-                $free = Order::query()->where([
-                    'device_id' => $device->getId(),
-                    'src' => Order::ACCOUNT,
-                    'createtime >=' => $t_begin,
-                    'createtime <' => $t_end
-                ])->get('sum(num)');
-
-                $result['free'] = intval($free);
-
-                $pay = Order::query()->where([
-                    'device_id' => $device->getId(),
-                    'src' => Order::PAY,
-                    'createtime >=' => $t_begin,
-                    'createtime <' => $t_end,
-                ])->get('sum(num)');
-
-                $result['pay'] = intval($pay);
-
-                $balance = Order::query()->where([
-                    'device_id' => $device->getId(),
-                    'src' => Order::BALANCE,
-                    'createtime >=' => $t_begin,
-                    'createtime <' => $t_end,
-                ])->get('sum(num)');
-
-                $result['balance'] = intval($balance);
-
-                $result['total'] = $result['pay'] + $result['free'] + $result['balance'];
+                $result = $counter->getMonthAll($device, $begin);
                 $total_num += $result['total'];
-
-                $result['month'] = $month;
-
-                $months[$title] = $result;
+                $months[$begin->format('Y年m月')] = $result;
+                $begin->modify('first day of next month 00:00');
             }
 
             return [$months, $total_num];
 
         } catch (Exception $e) {
-
         }
 
         return [];

@@ -2032,7 +2032,6 @@ class agent
         }, $user->getId());
     }
 
-
     public static function repair()
     {
         $user = common::getAgent();
@@ -2072,4 +2071,5 @@ class agent
 
         return error(State::ERROR, '无法启动刷新任务，请联系管理员！');
     }
+
 }

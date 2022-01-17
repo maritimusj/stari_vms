@@ -1132,24 +1132,6 @@ if ($op == 'default') {
 
     JSON::fail('设置失败！');
 
-} elseif ($op == 'repair') {
-
-    $account = Account::get(request::int('id'));
-    if (empty($account)) {
-        JSON::fail('找不到这个公众号或任务！');
-    }
-
-    $month = strtotime(request::str('month'));
-    if (empty($month)) {
-        $month = time();
-    }
-
-    if (Stats::repairMonthData($account, $month)) {
-        JSON::success('修复完成！');
-    }
-
-    JSON::success('修复失败！');
-    
 } elseif ($op == 'commission_stats_view') {
     $account_id = request::int('id');
     $account = Account::get($account_id);

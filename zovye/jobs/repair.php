@@ -34,20 +34,6 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
         writeLogAndExit($log);
     }
 
-    $start = microtime(true);
-
-    $result = Stats::repairMonthData($agent, $data['month']);
-    if (is_error($result)) {
-        $agent->updateSettings('repair', [
-            'error' => $result,
-        ]);
-        $log['error'] = $result;
-    } else {
-        $used = microtime(true) - $start;
-        $log['used'] = $used;
-        $log['save result'] = $agent->save();
-    }
-
     $counter = new OrderCounter();
     try {
         $begin = new DateTime($data['month']);
@@ -68,7 +54,6 @@ if ($op == 'repair' && CtrlServ::checkJobSign($data)) {
         'time' => time(),
         'used' => $used ?? 0,
     ]);
-
 
 } else {
     $log['error'] = '参数或签名错误！';

@@ -56,13 +56,13 @@ class Job
     public static function createBalanceOrder($order_no, userModelObj $user, deviceModelObj $device, $goods_id, $num, $ip): bool
     {
         return CtrlServ::scheduleJob('create_order_balance', [
-            'order_no' => $order_no,
-            'user' => $user->getId(),
-            'device' => $device->getId(),
-            'goods' => $goods_id,
-            'num' => $num,
-            'ip' => $ip,
-        ], LEVEL_HIGH) !== false;
+                'order_no' => $order_no,
+                'user' => $user->getId(),
+                'device' => $device->getId(),
+                'goods' => $goods_id,
+                'num' => $num,
+                'ip' => $ip,
+            ], LEVEL_HIGH) !== false;
     }
 
     /**
@@ -135,16 +135,6 @@ class Job
             CtrlServ::scheduleDelayJob('account_msg', $msg, $delay);
         }
         return CtrlServ::scheduleJob('account_msg', $msg);
-    }
-
-    public static function orderStats($order_id): bool
-    {
-        return CtrlServ::scheduleJob('order_stats', ['id' => $order_id]);
-    }
-
-    public static function orderStatsRepair(): bool
-    {
-        return CtrlServ::scheduleJob('order_stats', ['id' => 0]);
     }
 
     public static function order($order_id): bool
@@ -275,7 +265,7 @@ class Job
         return true;
     }
 
-    public static function uploadDevieInfo($lastId = 0)
+    public static function uploadDevieInfo($lastId = 0): bool
     {
         if (CtrlServ::scheduleJob('upload_device_info', ['lastId' => $lastId]) !== false) {
             return true;
@@ -283,7 +273,7 @@ class Job
         return false;
     }
 
-    public static function refreshSettings()
+    public static function refreshSettings(): bool
     {
         if (CtrlServ::scheduleJob('refresh_settings') !== false) {
             return true;

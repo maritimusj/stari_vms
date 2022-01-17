@@ -79,13 +79,7 @@ abstract class StatsCounter
                     $end->setTimestamp(time());
                 }
 
-                $time_arr = [];
-                while ($begin < $end) {
-                    $time_arr[] = DateTimeImmutable::createFromMutable($begin);
-                    $begin->modify('+1 hour');
-                }
-
-                $num = $this->getHour($params, ...$time_arr);
+                $num = $this->initFN($begin, $end, $params);
 
                 if ($day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
                     Counter::create([
@@ -128,13 +122,7 @@ abstract class StatsCounter
                     $end->setTimestamp(time());
                 }
 
-                $time_arr = [];
-                while ($begin < $end) {
-                    $time_arr[] = DateTimeImmutable::createFromMutable($begin);
-                    $begin->modify('next day');
-                }
-
-                $num = $this->getDay($params, ...$time_arr);
+                $num = $this->initFN($begin, $end, $params);
 
                 if ($month->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
                     Counter::create([
@@ -173,23 +161,17 @@ abstract class StatsCounter
                 $end->setTimestamp(time());
             }
 
-            $time_arr = [];
-            while ($begin < $end) {
-                $time_arr[] = DateTimeImmutable::createFromMutable($begin);
-                $begin->modify('next month');
-            }
-
-            $total = $this->getMonth($params, ...$time_arr);
+            $num = $this->initFN($begin, $end, $params);
 
             if ($year->format('Y') != date('Y') && Locker::try("counter:init:$uid")) {
                 Counter::create([
                     'uid' => $uid,
-                    'num' => $total,
+                    'num' => $num,
                     'createtime' => time(),
                     'updatetime' => 0,
                 ]);
             }
-            return $total;
+            return $num;
 
         } catch (Exception $e) {
         }

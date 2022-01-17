@@ -6,11 +6,13 @@
 
 namespace zovye;
 
+use DateTimeInterface;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 use zovye\base\model;
 use zovye\base\modelFactory;
+use zovye\base\modelObj;
 
 /**
  * 返回全局唯一的APP
@@ -371,7 +373,13 @@ function hashFN(callable $fn, ...$val): string
             $ref->getName(),
         ];
         foreach ($val as $v) {
-            $data[] = strval($v);
+            if ($v instanceof DateTimeInterface) {
+                $data[] = $v->getTimestamp();
+            } elseif ($v instanceof modelObj) {
+                $data[] = get_class($v) . ':' . $v->getId();
+            } else {
+                $data[] = strval($v);
+            }
         }
         return md5(implode(':', $data));
     }

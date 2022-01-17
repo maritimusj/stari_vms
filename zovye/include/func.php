@@ -374,7 +374,7 @@ function hashFN(callable $fn, ...$val): string
         ];
         foreach ($val as $v) {
             if ($v instanceof DateTimeInterface) {
-                $data[] = $v->getTimestamp();
+                $data[] = 'datetime:' . $v->getTimestamp();
             } elseif ($v instanceof modelObj) {
                 $data[] = get_class($v) . ':' . $v->getId();
             } else {

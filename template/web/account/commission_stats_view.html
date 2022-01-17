@@ -99,10 +99,12 @@
                     <table class="table" v-show="year_view=='form' && year_data && year_data.length > 0">
                         <thead>
                             <th>#</th>
+                            <th>月份</th>
                             <th>出货数量</th>
                         </thead>
                         <tbody>
                             <tr v-for="(e, i) in year_data">
+                                <td v-text="i+1"></td>
                                 <td v-text="e.m"></td>
                                 <td v-text="e.order.total"></td>
                             </tr>
@@ -141,10 +143,12 @@
                     <table class="table"  v-show="month_view=='form' && month_data && month_data.length > 0">
                         <thead>
                             <th>#</th>
+                            <th>日期</th>
                             <th>出货数量</th>
                         </thead>
                         <tbody>
                             <tr v-for="(e, i) in month_data">
+                                <td v-text="i+1"></td>
                                 <td v-text="e.title"></td>
                                 <td v-text="e.order.total"></td>
                             </tr>

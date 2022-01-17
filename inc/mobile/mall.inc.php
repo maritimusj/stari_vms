@@ -39,6 +39,7 @@ if ($op == 'default') {
             'price' => intval($goods->getPrice()),
             'price_formatted' => '￥' . number_format($goods->getPrice() / 100, 2) . '元',
             'unit_title' => $goods->getUnitTitle(),
+            'balance' => $goods->getBalance(),
             'createtime_formatted' => date('Y-m-d H:i:s', $goods->getCreatetime()),
         ];
 

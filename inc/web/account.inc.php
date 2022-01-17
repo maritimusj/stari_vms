@@ -872,24 +872,6 @@ if ($op == 'default') {
 
     JSON::success(['title' => '', 'content' => $content]);
 
-} elseif ($op == 'repairMonthStats') {
-
-    $account = Account::get(request::int('id'));
-    if (empty($account)) {
-        JSON::fail('找不到这个公众号！');
-    }
-
-    $month = strtotime(request::str('month'));
-    if (empty($month)) {
-        $month = time();
-    }
-
-    if (Stats::repairMonthData($account, $month)) {
-        JSON::success('修复完成！');
-    }
-
-    JSON::success('修复失败！');
-
 } elseif ($op == 'viewQueryLog') {
 
     $id = request::int('id');

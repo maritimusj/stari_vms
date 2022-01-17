@@ -545,19 +545,6 @@
             window.location.href = "{php echo $this->createWebUrl('account', ['op' => 'commission_stats_view', 'id' => '__id__'])}".replace('__id__', id);
         }
 
-        api.repairMonthStats = function(id, self) {
-            self.toggleClass('fa-wrench fa-spinner fa-pulse').removeAttr('data-op');
-            self.closest('td').removeClass('operate');
-            self.closest('table').addClass('busy');
-            
-            const month = self.closest('tr').data('month');
-            api.showResult({op: 'repairMonthStats', id, month}, undefined, false, function() {
-                self.toggleClass('fa-wrench fa-spinner fa-pulse').attr('data-op', 'repair');
-                self.closest('td').addClass('operate');
-                self.closest('table').removeClass('busy');
-            });
-        }
-
         api.showMonthStats = function(id, self) {
             const month = self.closest('tr').data('month');
             api.viewStats(id, self);

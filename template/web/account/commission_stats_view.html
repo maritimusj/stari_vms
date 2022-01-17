@@ -106,16 +106,6 @@
                             <tr v-for="(e, i) in year_data">
                                 <td v-text="e.m"></td>
                                 <td v-text="e.order.total"></td>
-                                <td :class="{operate: !repairing, 'text-muted': repairing}">
-                                    <template v-if="repairing && repairing === e.m">
-                                        <i class="fa fa-spin fa-spinner"></i>
-                                    </template>
-                                    <template v-else>
-                                        <i class="fa fa-wrench fa-fw"  title="修复出货统计" 
-                                        :class="{disabled: repairing}"
-                                        @click="repair(e.m)"></i>
-                                    </template>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -290,7 +280,6 @@
                     year_loading: false,
                     month: (new Date()).getMonth() + 1,
                     year: (new Date()).getFullYear(),
-                    repairing: false,
                 },
                 mounted() {
                     this.getMonthData();
@@ -363,23 +352,6 @@
                 methods: {
                     back() {
                         window.location.href = back_url;
-                    },
-                    repair(m) {
-                        if (!this.repairing) {
-                            this.repairing = m;
-                            $.get(api_url, { op: 'repair', month: m }).then(res => {
-                                this.repairing = false;
-                                if (res.status) {
-                                    return res.data;
-                                } else {
-                                    if (res.data.message) {
-                                        util.message(res.data.msg, '', 'error');
-                                    }
-                                }
-                            }).then(data => {
-                                console.log(data);
-                            })
-                        }
                     },
                     toggleChartView($w) {
                         if ($w === 'month') {

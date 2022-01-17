@@ -544,7 +544,7 @@ class api
         return ['msg' => '提交成功！'];
     }
 
-    public static function getRcipient()
+    public static function getRecipient()
     {
         $user = \zovye\api\wx\common::getUser();
 
@@ -555,7 +555,7 @@ class api
         return $recipient;
     }
 
-    public static function updateRecipient()
+    public static function updateRecipient(): array
     {
         $user = \zovye\api\wx\common::getUser();
 
@@ -572,7 +572,7 @@ class api
         return err('保存失败！');
     }
 
-    public static function getMallOrderList()
+    public static function getMallOrderList(): array
     {
         $user = \zovye\api\wx\common::getUser();
 
@@ -589,7 +589,7 @@ class api
         return Delivery::getList($params);
     }
 
-    public static function getMallGoodsList()
+    public static function getMallGoodsList(): array
     {
         return Mall::getGoodsList([
             'page' => request::int('page'),

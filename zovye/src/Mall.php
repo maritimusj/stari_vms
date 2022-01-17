@@ -12,7 +12,7 @@ use zovye\model\userModelObj;
 
 class Mall
 {
-    public static function getGoodsList()
+    public static function getGoodsList($params = [])
     {
         $formatter = function (goodsModelObj $goods) {
             $data = [

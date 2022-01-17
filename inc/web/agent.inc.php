@@ -821,7 +821,7 @@ if ($op == 'default') {
             $end = $end->modify('first day of next month');
             $end->modify('-1 day');
             do {
-                $months[$begin->format('Y年m月')] = $agent->getMTotal($begin->format('Y-m'));
+                $months[$begin->format('Y年m月')] = Stats::getMonthTotal($agent, $begin->format('Y-m'));
                 $begin->modify('first day of next month');
             } while ($begin < $end);
         } catch (Exception $e) {
@@ -2102,7 +2102,7 @@ if ($op == 'default') {
     $query = Device::query(['agent_id' => $agent->getId()]);
 
     $total = $query->count();
-    $total_page =  ceil($total / $page_size);
+    $total_page = ceil($total / $page_size);
 
     $query->page($page, $page_size);
 
@@ -2168,7 +2168,7 @@ if ($op == 'default') {
             $order_date_obj = new DateTime(date('Y-m-01', $first_order->getCreatetime()));
             $date = new DateTime("$year_str-$month-01 00:00");
             if ($date < $order_date_obj) {
-                $result['title'] .=  '*';
+                $result['title'] .= '*';
                 JSON::success($result);
             }
         } catch (Exception $e) {
@@ -2206,7 +2206,7 @@ if ($op == 'default') {
         'list' => [],
         'summary' => [],
     ];
-    
+
     $first_order = Order::getFirstOrderOf($agent);
     if ($first_order) {
         try {

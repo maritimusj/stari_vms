@@ -7,15 +7,14 @@
 
 namespace zovye\model;
 
-use Exception;
 use zovye\App;
-use zovye\Balance;
 use zovye\Job;
 
 use zovye\Locker;
 use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
+use zovye\Stats;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -23,7 +22,6 @@ use zovye\Agent;
 use zovye\Goods;
 use zovye\Group;
 
-use zovye\Order;
 use zovye\State;
 use zovye\Topic;
 use zovye\Device;
@@ -40,8 +38,6 @@ use zovye\Advertising;
 use zovye\DeviceTypes;
 use zovye\base\modelObj;
 use function zovye\error;
-use DateTime;
-use DateTimeImmutable;
 
 use function zovye\is_error;
 use function zovye\settings;
@@ -50,7 +46,6 @@ use zovye\BlueToothProtocol;
 use zovye\base\modelObjFinder;
 use function zovye\isEmptyArray;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
-use zovye\OrderCounter;
 
 /**
  * @method getGroupId()
@@ -1404,12 +1399,8 @@ class deviceModelObj extends modelObj
         }
 
         if ($day_limits > 0) {
-            $data = $this->getDTotal();
-            $free = $data['free'];
-            if (Balance::isFreeOrder()) {
-                $free += $data['balance'];
-            }
-            return $free >= $day_limits;
+            $data = Stats::getDayTotal($this);
+            return $data['free'] >= $day_limits;
         }
 
         return false;
@@ -1915,58 +1906,6 @@ class deviceModelObj extends modelObj
             }
         }
         return false;
-    }
-
-    /**
-     * 获取设备本月统计数据
-     * @param array $way
-     * @param string $month
-     * @return int|array
-     */
-    public function getMTotal(array $way = [], string $month = 'this month')
-    {
-        $counter = new OrderCounter();
-        try {
-            $result = $counter->getMonthAll($this, new DateTime($month));
-        } catch (Exception $e) {
-            $result = [];
-        }
-
-        if (empty($way)) {
-            return $result;
-        }
-
-        if (count($way) > 1) {
-            return array_intersect_key($result, array_flip($way));
-        }
-
-        return $result[$way[0]] ?? 0;
-    }
-
-    /**
-     * 获取设备今日出货数据
-     * @param array $way
-     * @param string $day
-     * @return int|array
-     */
-    public function getDTotal(array $way = [], string $day = 'today')
-    {
-        $counter = new OrderCounter();
-        try {
-            $result = $counter->getDayAll($this, new DateTime($day));
-        } catch (Exception $e) {
-            $result = [];
-        }
-
-        if (empty($way)) {
-            return $result;
-        }
-
-        if (count($way) > 1) {
-            return array_intersect_key($result, array_flip($way));
-        }
-
-        return $result[$way[0]] ?? 0;
     }
 
     /**

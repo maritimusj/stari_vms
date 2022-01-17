@@ -6,10 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\App;
-use zovye\Balance;
 use zovye\GSP;
-use zovye\Order;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -279,69 +276,6 @@ class agentModelObj extends userModelObj
         }
 
         return [];
-    }
-
-    /**
-     * @param string $month
-     * @return array
-     * @throws
-     */
-    public function getMTotal(string $month = ''): array
-    {
-        $result = [
-            'total' => 0,
-            'free' => 0,
-            'pay' => 0,
-        ];
-
-        if (!($this->isAgent() || $this->isPartner())) {
-            return $result;
-        }
-
-        if (empty($month)) {
-            $month = 'first day of this month';
-        }
-
-        $M_total = $this->get('M_total', []);
-
-        $date = date_create(date('Y-m-01 00:00:00', strtotime($month)));
-
-        $begin = $date->getTimestamp();
-        $m_label = $date->format('Ym');
-
-        $date->modify('first day of next month');
-        $end = $date->getTimestamp();
-
-        if ($M_total && $M_total[$m_label]) {
-            return $M_total[$m_label];
-        }
-
-        $result['begin'] = date('Y-m-d', $begin);
-        $result['end'] = date('Y-m-d', $end - 1);
-
-        $agent_id = $this->getAgentId();
-        if ($agent_id) {
-            $freeOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::ACCOUNT, Order::BALANCE] : Order::ACCOUNT;
-            $result['free'] = (int)Order::query()
-                ->where(['agent_id' => $agent_id, 'src' => $freeOrder])
-                ->where(['createtime >=' => $begin, 'createtime <' => $end])
-                ->get('sum(num)');
-
-            $payOrder = App::isBalanceEnabled() && Balance::isFreeOrder() ? [Order::PAY, Order::BALANCE] : Order::PAY;
-            $result['pay'] = (int)Order::query()
-                ->where(['agent_id' => $agent_id, 'src' => $payOrder])
-                ->where(['createtime >=' => $begin, 'createtime <' => $end])
-                ->get('sum(num)');
-
-            $result['total'] = $result['pay'] + $result['free'];
-
-            if ($m_label != date('Ym')) {
-                $M_total[$m_label] = $result;
-                $this->set('M_total', $M_total);
-            }
-        }
-
-        return $result;
     }
 
     /**

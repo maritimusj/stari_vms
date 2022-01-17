@@ -715,10 +715,10 @@ class device
                     }
                 }
                 if ($date) {
-                    $data['stats']['day'] = $device->getDTotal(['total'], $date);
+                    $data['stats']['day'] = Stats::getDayTotal($device, $date)['total'];
                 }
                 if ($month) {
-                    $data['stats']['month'] = $device->getMTotal(['total'], $month);
+                    $data['stats']['month'] = Stats::getMonthTotal($device, $month)['total'];
                 }
                 $result['list'][] = $data;
             }

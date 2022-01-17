@@ -65,10 +65,12 @@ class Statistics
 
         $balance = (int)Order::query($condition)->where(['src' => Order::BALANCE])->get('sum(num)');
 
-        if (Balance::isPayOrder()) {
-            $result['pay'] += $balance;
-        } elseif (Balance::isFreeOrder()) {
-            $result['free'] += $balance;
+        if (App::isBalanceEnabled()) {
+            if (Balance::isPayOrder()) {
+                $result['pay'] += $balance;
+            } elseif (Balance::isFreeOrder()) {
+                $result['free'] += $balance;
+            }
         }
 
         $result['total'] = $result['pay'] + $result['free'];
@@ -114,10 +116,13 @@ class Statistics
         $begin = DateTimeImmutable::createFromMutable($date);
 
         $data = (new OrderCounter())->getMonthAll([$device, 'goods'], $begin);
-        if (Balance::isPayOrder()) {
-            $data['pay'] += $data['balance'];
-        } elseif (Balance::isFreeOrder()) {
-            $data['free'] += $data['balance'];
+
+        if (App::isBalanceEnabled()) {
+            if (Balance::isPayOrder()) {
+                $data['pay'] += $data['balance'];
+            } elseif (Balance::isFreeOrder()) {
+                $data['free'] += $data['balance'];
+            }
         }
 
         return $data;
@@ -195,10 +200,12 @@ class Statistics
                 return [];
             }
 
-            if (Balance::isPayOrder()) {
-                $result['order']['pay'] += $result['order']['balance'];
-            } elseif (Balance::isFreeOrder()) {
-                $result['order']['free'] += $result['order']['balance'];
+            if (App::isBalanceEnabled()) {
+                if (Balance::isPayOrder()) {
+                    $result['order']['pay'] += $result['order']['balance'];
+                } elseif (Balance::isFreeOrder()) {
+                    $result['order']['free'] += $result['order']['balance'];
+                }
             }
 
             if ($obj instanceof agentModelObj) {

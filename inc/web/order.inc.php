@@ -81,7 +81,7 @@ if ($op == 'default') {
         $query->where(['src' => Order::BALANCE]);
     } elseif ($way == 'refund') {
         $query->where(['refund' => 1]);
-        if (!Balance::isPayOrder()) {
+        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
             $query->where(['src' => Order::PAY]);
         }
     } elseif ($way == 'except') {

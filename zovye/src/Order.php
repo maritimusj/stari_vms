@@ -749,13 +749,13 @@ class Order extends State
         $condition['openid'] = $user->getOpenid();
 
         if ($way == 'free') {
-            if (Balance::isFreeOrder()) {
+            if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
                 $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
             } else {
                 $condition['src'] = Order::ACCOUNT;
             }
         } elseif ($way == 'pay') {
-            if (Balance::isPayOrder()) {
+            if (App::isBalanceEnabled() && Balance::isPayOrder()) {
                 $condition['src'] = [Order::PAY, Order::BALANCE];
             } else {
                 $condition['src'] = Order::PAY;

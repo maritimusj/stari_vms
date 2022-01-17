@@ -91,10 +91,12 @@ class Stats
         $counter = new OrderCounter();
         $result = $counter->getDayAll([$obj, 'goods'], $begin);
 
-        if (Balance::isPayOrder()) {
-            $result['pay'] += intval($result['balance']);
-        } elseif (Balance::isFreeOrder()) {
-            $result['free'] += intval($result['balance']);
+        if (App::isBalanceEnabled()) {
+            if (Balance::isPayOrder()) {
+                $result['pay'] += intval($result['balance']);
+            } elseif (Balance::isFreeOrder()) {
+                $result['free'] += intval($result['balance']);
+            }
         }
 
         return $result;
@@ -121,10 +123,12 @@ class Stats
         $counter = new OrderCounter();
         $result = $counter->getMonthAll([$obj, 'goods'], $begin);
 
-        if (Balance::isPayOrder()) {
-            $result['pay'] += intval($result['balance']);
-        } elseif (Balance::isFreeOrder()) {
-            $result['free'] += intval($result['balance']);
+        if (App::isBalanceEnabled()) {
+            if (Balance::isPayOrder()) {
+                $result['pay'] += intval($result['balance']);
+            } elseif (Balance::isFreeOrder()) {
+                $result['free'] += intval($result['balance']);
+            }
         }
 
         return $result;
@@ -145,10 +149,12 @@ class Stats
             'pay' => intval($stats['total']['p']),
         ];
 
-        if (Balance::isPayOrder()) {
-            $result['pay'] += intval($stats['b']);
-        } elseif (Balance::isFreeOrder()) {
-            $result['free'] += intval($stats['b']);
+        if (App::isBalanceEnabled()) {
+            if (Balance::isPayOrder()) {
+                $result['pay'] += intval($stats['b']);
+            } elseif (Balance::isFreeOrder()) {
+                $result['free'] += intval($stats['b']);
+            }
         }
 
         $result['total'] = $result['free'] + $result['pay'];
@@ -858,11 +864,15 @@ class Stats
         $counter = new OrderCounter();
         while ($begin < $end) {
             $data = $counter->getDayAll([$obj, 'goods'], $begin);
-            if (Balance::isFreeOrder()) {
-                $data['free'] += intval($data['balance']);
-            } elseif (Balance::isPayOrder()) {
-                $data['pay'] += intval($data['balance']);
+
+            if (App::isBalanceEnabled()) {
+                if (Balance::isFreeOrder()) {
+                    $data['free'] += intval($data['balance']);
+                } elseif (Balance::isPayOrder()) {
+                    $data['pay'] += intval($data['balance']);
+                }
             }
+
             $result[$begin->format('m-d')] = [
                 'free' => $data['free'],
                 'fee' => $data['pay'],
@@ -914,11 +924,15 @@ class Stats
         $counter = new OrderCounter();
         while ($begin < $end) {
             $data = $counter->getHourAll([$obj, 'goods'], $begin);
-            if (Balance::isFreeOrder()) {
-                $data['free'] += intval($data['balance']);
-            } elseif (Balance::isPayOrder()) {
-                $data['pay'] += intval($data['balance']);
+
+            if (App::isBalanceEnabled()) {
+                if (Balance::isFreeOrder()) {
+                    $data['free'] += intval($data['balance']);
+                } elseif (Balance::isPayOrder()) {
+                    $data['pay'] += intval($data['balance']);
+                }
             }
+
             $result[intval($begin->format('H'))] = [
                 'free' => $data['free'],
                 'fee' => $data['pay'],

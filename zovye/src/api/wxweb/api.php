@@ -550,7 +550,7 @@ class api
 
         $recipient = $user->getRecipientData();
         if (empty($recipient)) {
-            $recipient = null;
+            $recipient = ['name' => null];
         }
         return $recipient;
     }

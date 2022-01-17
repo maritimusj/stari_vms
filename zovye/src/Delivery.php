@@ -96,7 +96,7 @@ class Delivery
 
         $page_size = empty($params['pagesize']) ? DEFAULT_PAGE_SIZE : intval($params['pagesize']);
         
-        if (request::has('page')) {
+        if ($params['page']) {
             $page = max(1, intval($params['page']));
             $query->page($page, $page_size);
 
@@ -104,13 +104,13 @@ class Delivery
             $result['total_page'] = ceil($total / $page_size);
 
         } else {
-            if (request::isset('last_id')) {
-                $last_id = request::int('last_id');
-                $query->where(['id <' => $last_id]);                
+            if ($params['last_id']) {
+                $last_id = $params['last_id'];
+                $result['list_id'] = $last_id ?? 0;
+                $query->where(['id <' => $last_id]);  
             }
 
             $query->limit($page_size);
-            $result['list_id'] = $last_id ?? 0;
         }
        
         $query->orderBy('id DESC');

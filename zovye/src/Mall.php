@@ -71,7 +71,7 @@ class Mall
 
     public static function createOrder(userModelObj $user, $params = [])
     {
-        $goods = Goods::get($$params['goods_id']);
+        $goods = Goods::get($params['goods_id']);
         if (empty($goods)) {
             return err('找不到这个商品！');
         }

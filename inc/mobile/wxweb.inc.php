@@ -37,4 +37,9 @@ router::exec($op, [
     'detail' => '\zovye\api\wxweb\api::detail',
     'submit' => '\zovye\api\wxweb\api::submit',
     'upload' => '\zovye\api\wxx\common::FBPic',
+    'recipient' => '\zovye\api\wxweb\api::getRcipient',
+    'updateRecipient' => '\zovye\api\wxweb\api::updateRecipient',
+    'mallOrderList' => '\zovye\api\wxweb\api::getMallOrderList',
+    'mallGoodsList' => '\zovye\api\wxweb\api::getMallGoodsList',
+    'createMallOrder' => '\zovye\api\wxweb\api::createMallOrder',
 ]);

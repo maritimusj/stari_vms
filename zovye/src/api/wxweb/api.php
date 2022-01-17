@@ -25,7 +25,9 @@ use zovye\api\wxx\common;
 use zovye\App;
 use zovye\Balance;
 use zovye\Config;
+use zovye\Delivery;
 use zovye\Log;
+use zovye\Mall;
 
 use function zovye\err;
 use function zovye\is_error;
@@ -540,5 +542,67 @@ class api
         }
 
         return ['msg' => '提交成功！'];
+    }
+
+    public static function getRcipient()
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        $recipient = $user->getRecipientData();
+        if (empty($recipient)) {
+            $recipient = null;
+        }
+        return $recipient;
+    }
+
+    public static function updateRecipient()
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        $name = request::trim('name');
+        $phone_num = request::trim('phoneNum');
+        $address = request::trim('address');
+    
+        $result = $user->updateRecipientData($name, $phone_num, $address);
+    
+        if ($result) {
+           return ['msg' => '已保存！'];
+        }
+
+        return err('保存失败！');
+    }
+
+    public static function getMallOrderList()
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        $params = [
+            'last_id' => request::int('lastId'),
+            'pagesize' => request::int('pagesize'),
+            'user_id' => $user->getId(),
+        ];
+    
+        if (request::isset('status')) {
+            $params['status'] = request::int('status');
+        }
+    
+        return Delivery::getList($params);
+    }
+
+    public static function getMallGoodsList()
+    {
+        return Mall::getGoodsList([
+            'page' => request::int('page'),
+            'pagesize' => request::int('pagesize'),
+        ]);
+    }
+
+    public static function createMallOrder()
+    {
+        $user = \zovye\api\wx\common::getUser();
+        return Mall::createOrder($user, [
+            'goods_id' => request::int('goods'),
+            'num' => request::int('num'),
+        ]);
     }
 }

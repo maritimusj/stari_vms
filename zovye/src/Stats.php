@@ -85,6 +85,8 @@ class Stats
             } catch (Exception $e) {
                 return [];
             }
+        } elseif ($day instanceof DateTimeInterface) {
+            $begin = new DateTime($day->format('Y-m-d 00:00'));
         } else {
             $begin = new DateTime();
         }
@@ -127,6 +129,8 @@ class Stats
             } catch (Exception $e) {
                 return [];
             }
+        } elseif ($month instanceof DateTimeInterface) {
+            $begin = new DateTime($month->format('Y-m-01 00:00'));
         } else {
             $begin = new DateTime();
         }

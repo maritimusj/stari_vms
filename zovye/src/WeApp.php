@@ -1533,6 +1533,7 @@ JSCODE;
         $api_url = Util::murl('mall');
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
         $bonus_url = Util::murl('bonus');
+        $order_page = Util::murl('mall', ['op' => 'order']);
 
         $jquery_url = JS_JQUERY_URL;
 
@@ -1575,6 +1576,9 @@ $js_sdk
     zovye_fn.redirectToUserPage = function() {
         window.location.replace("$user_home_page");
     }
+    zovye_fn.redirectToOrderPage = function() {
+        window.location.href = "$order_page";
+    }    
 </script>
 JSCODE;
         $this->showTemplate(Theme::file('mall'), ['tpl' => $tpl_data]);

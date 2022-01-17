@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use DateTime;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
@@ -348,7 +350,7 @@ if ($op == 'default' || $op == 'goods') {
     }
 
     $title = date('n月d日');
-    $data = Stats::chartDataOfDay($goods, time(), "商品：{$goods->getName()}($title)");
+    $data = Stats::chartDataOfDay($goods, new DateTime(), "商品：{$goods->getName()}($title)");
 
     $content = app()->fetchTemplate(
         'web/goods/stats',

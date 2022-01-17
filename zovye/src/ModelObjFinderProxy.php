@@ -20,7 +20,7 @@ use zovye\model\userModelObj;
  * @method count()
  * @method page(int|mixed $page, int $page_size)
  * @method orderBy(string $string)
- * @method groupBy($group_by)
+ * @method groupBy($group_by) base\modelObjFinder
  * @method findAll($cond = [], $lazy = false)
  * @method findOne($lazy = false)
  * @method exists($condition = [])

@@ -444,17 +444,17 @@ class device
                 $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
             }
 
-            $first_order = Order::getFirstOrderOf($agent);
+            $first_order = Order::getFirstOrderOfAgent($agent);
             if ($first_order) {
                 try {
                     $date_obj = new DateTime($date_str);
-                    $order_date_obj = new DateTime(date('Y-m', $first_order->getCreatetime()));
+                    $order_date_obj = new DateTime(date('Y-m', $first_order['createtime']));
                     if ($date_obj < $order_date_obj) {
                         return $result;
                     }
                 } catch (Exception $e) {
                 }
-                $result['date_limit'] = date('Y-m-d', $first_order->getCreatetime());
+                $result['date_limit'] = date('Y-m-d', $first_order['createtime']);
             } else {
                 return $result;
             }

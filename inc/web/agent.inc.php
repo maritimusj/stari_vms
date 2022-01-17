@@ -779,19 +779,19 @@ if ($op == 'default') {
         JSON::fail('找不到这个代理商！');
     }
 
-    $datetime = DateTime::createFromFormat('Y年m月', request::trim('month'));
-    if (!$datetime) {
-        $datetime = new DateTime();
+    $day = DateTime::createFromFormat('Y年m月', request::trim('month'));
+    if (!$day) {
+        $day = new DateTime();
     }
 
-    $title = $datetime->format('Y年n月');
+    $title = $day->format('Y年n月');
     $content = app()->fetchTemplate(
         'web/agent/stats',
         [
             'chartid' => Util::random(10),
             'title' => $title,
-            'chart' => Util::cachedCall(30, function () use ($agent, $datetime, $title) {
-                return Stats::chartDataOfMonth($agent, $datetime, "代理商：{$agent->getName()}($title)");
+            'chart' => Util::cachedCall(30, function () use ($agent, $day, $title) {
+                return Stats::chartDataOfMonth($agent, $day, "代理商：{$agent->getName()}($title)");
             }, $agent->getId(), $title),
         ]
     );
@@ -815,7 +815,7 @@ if ($op == 'default') {
         $months = [];
 
         try {
-            $begin = new DateTime(date('Y-m-d H:i:s', $first_order->getCreatetime()));
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
             $end = new DateTime(date('Y-m-d H:i:s', $last_order->getCreatetime()));
 
             $end = $end->modify('first day of next month');
@@ -2154,7 +2154,7 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOfAgent($agent);
     if ($first_order) {
         try {
-            $begin = new DateTime(date('Y-m-d H:i:s', $first_order->getCreatetime()));
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
         } catch (Exception $e) {
             $begin = new DateTime();
         }
@@ -2165,7 +2165,7 @@ if ($op == 'default') {
         }
 
         try {
-            $order_date_obj = new DateTime(date('Y-m-01', $first_order->getCreatetime()));
+            $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
             $date = new DateTime("$year_str-$month-01 00:00");
             if ($date < $order_date_obj) {
                 $result['title'] .= '*';
@@ -2210,7 +2210,7 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOf($agent);
     if ($first_order) {
         try {
-            $order_date_obj = new DateTime(date('Y-m-d', $first_order->getCreatetime()));
+            $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
             $date = new DateTime("$month_str-$day");
             if ($date < $order_date_obj) {
                 $result['title'] .= '*';

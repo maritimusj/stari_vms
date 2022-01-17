@@ -10,6 +10,7 @@ use DateTime;
 use Exception;
 use DateTimeImmutable;
 use DateTimeInterface;
+use zovye\base\modelObj;
 use zovye\Contract\ISettings;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
@@ -72,11 +73,11 @@ class Stats
 
     /**
      * 获取对象某天的统计数据
-     * @param ISettings $obj
+     * @param modelObj $obj
      * @param mixed $day
      * @return array
      */
-    public static function getDayTotal(ISettings $obj, $day = null): array
+    public static function getDayTotal(modelObj $obj, $day = null): array
     {
         if (is_string($day)) {
             try {
@@ -86,6 +87,16 @@ class Stats
             }
         } else {
             $begin = new DateTime();
+        }
+
+        $first_order = Order::getFirstOrderOf($obj);
+        if (!$first_order) {
+            return [];
+        }
+
+        $begin->modify('00:00');
+        if ($begin->getTimestamp() < $first_order['createtime']) {
+            return [];
         }
 
         $counter = new OrderCounter();
@@ -104,11 +115,11 @@ class Stats
 
     /**
      * 获取对象某月的统计数据
-     * @param ISettings $obj
+     * @param modelObj $obj
      * @param mixed $month
      * @return array
      */
-    public static function getMonthTotal(ISettings $obj, $month = null): array
+    public static function getMonthTotal(modelObj $obj, $month = null): array
     {
         if (is_string($month)) {
             try {
@@ -118,6 +129,16 @@ class Stats
             }
         } else {
             $begin = new DateTime();
+        }
+
+        $first_order = Order::getFirstOrderOf($obj);
+        if (!$first_order) {
+            return [];
+        }
+
+        $begin->modify('first day of this month 00:00');
+        if ($begin->getTimestamp() < $first_order['createtime']) {
+            return [];
         }
 
         $counter = new OrderCounter();
@@ -162,159 +183,145 @@ class Stats
         return $result;
     }
 
-    /**
-     * 按月获取对象的统计数据
-     * @param ISettings $obj
-     * @param mixed $year
-     * @return array
-     */
-    public static function months(ISettings $obj, $year = null): array
-    {
-        if (empty($year)) {
-            $year = time();
-        } elseif (is_string($year)) {
-            $year = strtotime($year);
-        }
-
-        $stats = $obj->get('statsData', []);
-
-        $y = date('Y', $year); //年
-
-        $data = $stats['data'][$y]['total'] ?: [];
-
-        if ($data) {
-            unset($data['f'], $data['p']);
-
-            uksort(
-                $data,
-                function ($a, $b) {
-                    return $b - $a;
-                }
-            );
-        }
-
-        return $data;
-    }
 
     /**
      * 返回指定日期的日统计数据
-     * @param ISettings $obj
+     * @param modelObj $obj
      * @param mixed $day
      * @param string $title
      * @return array
      */
-    public static function chartDataOfDay(ISettings $obj, $day, string $title = ''): array
+    public static function chartDataOfDay(modelObj $obj, DateTimeInterface $day, string $title = ''): array
     {
-        if (empty($day)) {
-            $day = time();
-        } elseif (is_string($day)) {
-            $day = strtotime($day);
-        } elseif ($day instanceof DateTimeInterface) {
-            $day = $day->getTimestamp();
-        }
-
-        $chart = [];
-
-        $stats = $obj->get('statsData', [])['data'][date('Y', $day)]['hours'][date('z', $day)];
-        if ($stats) {
-            $chart = [
-                'tooltip' => ['trigger' => 'axis'],
-                'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
-                'xAxis' => ['type' => 'category'],
-                'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
-                'series' => [
-                    [
-                        'type' => 'line',
-                        'color' => '#00CC33',
-                        'name' => '免费',
-                        'data' => [],
-                    ],
-                    [
-                        'type' => 'line',
-                        'color' => '#FF3300',
-                        'name' => '支付',
-                        'data' => [],
-                    ],
+        $chart = [
+            'tooltip' => ['trigger' => 'axis'],
+            'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
+            'xAxis' => ['type' => 'category'],
+            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
+            'series' => [
+                [
+                    'type' => 'line',
+                    'color' => '#00CC33',
+                    'name' => '免费',
+                    'data' => [],
                 ],
-            ];
+                [
+                    'type' => 'line',
+                    'color' => '#FF3300',
+                    'name' => '支付',
+                    'data' => [],
+                ],
+            ],
+        ];
 
-            if ($title) {
-                $chart['title'] = ['text' => $title];
-            }
-
-            ksort($stats);
-
-            $i = key($stats);
-            $g = date('G', $day);
-            for (; $i <= $g; $i++) {
-                $chart['xAxis']['data'][] = "$i:00";
-                $chart['series'][0]['data'][] = intval($stats[$i]['f']);
-                $chart['series'][1]['data'][] = intval($stats[$i]['p']);
-            }
+        if ($title) {
+            $chart['title'] = ['text' => $title];
         }
 
-        return $chart ?: [];
+        try {
+            $begin = new DateTime($day->format('Y-m-d 00:00'));
+            $first_order = Order::getFirstOrderOf($obj);
+            if (!$first_order || $begin->getTimestamp() < $first_order['createtime']) {
+                return $chart;
+            }
+
+            $end = new DateTime($begin->format('Y-m-d 00:00'));
+            $end->modify('next day');
+
+            $counter = new OrderCounter();
+
+            while ($begin < $end) {
+                $data = $counter->getHourAll([$obj, 'goods'], $begin);
+                if (App::isBalanceEnabled()) {
+                    if (Balance::isFreeOrder()) {
+                        $data['free'] += $data['balance'];
+                    } elseif (Balance::isPayOrder()) {
+                        $data['pay'] += $data['balance'];
+                    }
+                }
+
+                $chart['series'][0]['data'][] = $data['free'];
+                $chart['series'][1]['data'][] = $data['pay'];
+
+                $chart['xAxis']['data'][] = $begin->format('i:00');
+
+                $begin->modify('+1 hour');
+            }
+
+        } catch (Exception $e) {
+        }
+
+        return $chart;
     }
 
     /**
      * 返回指定月份的月统计数据
-     * @param ISettings $obj
-     * @param $day
+     * @param modelObj $obj
+     * @param DateTimeInterface $month
      * @param string $title
      * @return array
      */
-    public static function chartDataOfMonth(ISettings $obj, $day, string $title = ''): array
+    public static function chartDataOfMonth(modelObj $obj, DateTimeInterface $month, string $title = ''): array
     {
-        if (empty($day)) {
-            $day = time();
-        } elseif (is_string($day)) {
-            $day = strtotime($day);
-        } elseif ($day instanceof DateTimeInterface) {
-            $day = $day->getTimestamp();
-        }
-
-        $chart = [];
-        $stats = $obj->get('statsData', [])['data'][date('Y', $day)]['days'][date('n', $day)];
-        if ($stats) {
-            $month = date('n月', $day);
-            $chart = [
-                'tooltip' => ['trigger' => 'axis'],
-                'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
-                'xAxis' => ['type' => 'category'],
-                'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
-                'series' => [
-                    [
-                        'type' => 'line',
-                        'color' => '#00CC33',
-                        'name' => '免费',
-                        'data' => [],
-                    ],
-                    [
-                        'type' => 'line',
-                        'color' => '#FF3300',
-                        'name' => '支付',
-                        'data' => [],
-                    ],
+        $chart = [
+            'tooltip' => ['trigger' => 'axis'],
+            'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
+            'xAxis' => ['type' => 'category'],
+            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
+            'series' => [
+                [
+                    'type' => 'line',
+                    'color' => '#00CC33',
+                    'name' => '免费',
+                    'data' => [],
                 ],
-            ];
-            if ($title) {
-                $chart['title'] = ['text' => $title];
-            }
-
-            ksort($stats);
-
-            $i = key($stats) ?: 1;
-            $keys = array_keys($stats);
-            $end = end($keys);
-
-            for (; $i <= $end; $i++) {
-                $chart['series'][0]['data'][] = intval($stats[$i]['f']);
-                $chart['series'][1]['data'][] = intval($stats[$i]['p']);
-                $chart['xAxis']['data'][] = "$month{$i}日";
-            }
+                [
+                    'type' => 'line',
+                    'color' => '#FF3300',
+                    'name' => '支付',
+                    'data' => [],
+                ],
+            ],
+        ];
+        if ($title) {
+            $chart['title'] = ['text' => $title];
         }
 
-        return $chart ?: [];
+        try {
+            $begin = new DateTime($month->format('Y-m-01 00:00'));
+
+            $first_order = Order::getFirstOrderOf($obj);
+            if (!$first_order || $begin->getTimestamp() < $first_order['createtime']) {
+                return $chart;
+            }
+
+            $end = new DateTime($month->format('Y-m-01'));
+            $end->modify('first day of next month 00:00');
+
+            $counter = new OrderCounter();
+
+            while ($begin < $end) {
+                $data = $counter->getDayAll([$obj, 'goods'], $begin);
+                if (App::isBalanceEnabled()) {
+                    if (Balance::isFreeOrder()) {
+                        $data['free'] += $data['balance'];
+                    } elseif (Balance::isPayOrder()) {
+                        $data['pay'] += $data['balance'];
+                    }
+                }
+
+                $chart['series'][0]['data'][] = $data['free'];
+                $chart['series'][1]['data'][] = $data['pay'];
+
+                $chart['xAxis']['data'][] = $begin->format('m月d日');
+
+                $begin->modify('+1 day');
+            }
+
+        } catch (Exception $e) {
+        }
+
+        return $chart;
     }
 
     /**
@@ -325,7 +332,7 @@ class Stats
     public static function chartDataOfAgents(int $len = 7, int $max = 15): array
     {
         $chart = [
-            'title' => ['text' => "代理商最近{$len}日订单统计"],
+            'title' => ['text' => "代理商最近{$len}日出货统计"],
             'tooltip' => ['trigger' => 'axis'],
             'grid' => ['height' => '50%', 'left' => 60, 'right' => 30],
             'xAxis' => ['type' => 'category', 'boundaryGap' => false],
@@ -334,21 +341,24 @@ class Stats
             'series' => [],
         ];
 
-        for ($days = $len; $days >= 0; $days--) {
-            $l = strtotime("-$days days");
-            $chart['xAxis']['data'][] = date('m-d', $l);
-        }
+        $first_day = new DateTime("-$len days 00:00");
+        $last_day = new DateTime('next day 00:00');
 
-        $agents = Agent::query()->findAll();
-        $index = 0;
+        $stats = Order::query()
+            ->where(['createtime >=' => $first_day->getTimestamp()])
+            ->groupBy('agent_id')
+            ->orderBy('total ASC')
+            ->limit($max)
+            ->getAll(['agent_id', 'count(*) AS total']);
 
-        /** @var agentModelObj $agent */
-        foreach ($agents as $agent) {
-            $stats = $agent->get('statsData', []);
-            if (isEmptyArray($stats)) {
+        foreach ($stats as $index => $stat) {
+            if (empty($stat['agent_id'])) {
                 continue;
             }
-
+            $agent = Agent::get($stat['agent_id']);
+            if (!$agent) {
+                continue;
+            }
             $chart['series'][$index] = [
                 'type' => 'line',
                 'smooth' => true,
@@ -358,29 +368,22 @@ class Stats
                 'name' => $agent->getName(),
                 'data' => [],
             ];
-
-            for ($days = $len; $days >= 0; $days--) {
-
-                $l = strtotime("-$days days");
-                $y = date('Y', $l);
-                $n = date('n', $l);
-                $j = date('j', $l);
-
-                $data = $stats['data'][$y]['days'][$n][$j];
-                $total = $data['p'] + $data['f'];
-                $chart['series'][$index]['total'] += $total;
-                $chart['series'][$index]['data'][] = $total;
+            try {
+                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
+                while ($begin < $last_day) {
+                    $data = Stats::getDayTotal($agent, $begin);
+                    $chart['series'][$index]['total'] += $data['total'];
+                    $chart['series'][$index]['data'][] = $data['total'];
+                    $begin->modify('next day');
+                }
+            } catch (Exception $e) {
             }
-
-            $index++;
         }
 
-        usort(
-            $chart['series'],
-            function ($a, $b) {
-                return $b['total'] - $a['total'];
-            }
-        );
+        while ($first_day < $last_day) {
+            $chart['xAxis']['data'][] = $first_day->format('m-d');
+            $first_day->modify('next day');
+        }
 
         $chart['series'] = array_slice($chart['series'], 0, $max);
         foreach ($chart['series'] as $item) {
@@ -398,7 +401,7 @@ class Stats
     public static function chartDataOfAccounts(int $len = 7, int $max = 15): array
     {
         $chart = [
-            'title' => ['text' => "公众号最近{$len}日订单统计"],
+            'title' => ['text' => "公众号最近{$len}日出货统计"],
             'tooltip' => ['trigger' => 'axis'],
             'grid' => ['height' => '50%', 'left' => 60, 'right' => 30],
             'xAxis' => ['type' => 'category', 'boundaryGap' => false],
@@ -407,18 +410,24 @@ class Stats
             'series' => [],
         ];
 
-        for ($days = $len; $days >= 0; $days--) {
-            $l = strtotime("-$days days");
-            $chart['xAxis']['data'][] = date('m-d', $l);
-        }
 
-        $accounts = Account::query(['state <>' => 0])->findAll();
+        $first_day = new DateTime("-$len days 00:00");
+        $last_day = new DateTime('next day 00:00');
 
-        $index = 0;
-        foreach ($accounts as $acc) {
+        $stats = Order::query()
+            ->where(['createtime >=' => $first_day->getTimestamp()])
+            ->groupBy('account')
+            ->orderBy('total ASC')
+            ->limit($max)
+            ->getAll(['account', 'count(*) AS total']);
 
-            $stats = $acc->get('statsData');
-            if (isEmptyArray($stats)) {
+        foreach ($stats as $index => $stat) {
+            if (empty($stat['account'])) {
+                continue;
+            }
+
+            $account = Account::findOneFromName($stat['account']);
+            if (empty($account)) {
                 continue;
             }
 
@@ -428,32 +437,21 @@ class Stats
                 'stack' => '总量',
                 'areaStyle' => ['normal' => []],
                 'color' => Util::randColor(),
-                'name' => $acc->getTitle(),
+                'name' => $account->getTitle(),
                 'data' => [],
             ];
 
-            for ($days = $len; $days >= 0; $days--) {
-
-                $l = strtotime("-$days days");
-                $y = date('Y', $l);
-                $n = date('n', $l);
-                $j = date('j', $l);
-
-                $data = $stats['data'][$y]['days'][$n][$j];
-                $total = $data['p'] + $data['f'];
-                $chart['series'][$index]['total'] += $total;
-                $chart['series'][$index]['data'][] = $total;
+            try {
+                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
+                while ($begin < $last_day) {
+                    $data = Stats::getDayTotal($account, $begin);
+                    $chart['series'][$index]['total'] += $data['total'];
+                    $chart['series'][$index]['data'][] = $data['total'];
+                    $begin->modify('next day');
+                }
+            } catch (Exception $e) {
             }
-
-            $index++;
         }
-
-        usort(
-            $chart['series'],
-            function ($a, $b) {
-                return $b['total'] - $a['total'];
-            }
-        );
 
         $chart['series'] = array_slice($chart['series'], 0, $max);
         foreach ($chart['series'] as $item) {
@@ -471,7 +469,7 @@ class Stats
     public static function chartDataOfDevices(int $len = 7, int $max = 15): array
     {
         $chart = [
-            'title' => ['text' => "设备最近{$len}日订单统计"],
+            'title' => ['text' => "设备最近{$len}日出货统计"],
             'tooltip' => ['trigger' => 'axis'],
             'grid' => ['height' => '50%', 'left' => 60, 'right' => 30],
             'xAxis' => ['type' => 'category', 'boundaryGap' => false],
@@ -480,20 +478,23 @@ class Stats
             'series' => [],
         ];
 
-        for ($days = $len; $days >= 0; $days--) {
-            $l = strtotime("-$days days");
-            $chart['xAxis']['data'][] = date('m-d', $l);
-        }
+        $first_day = new DateTime("-$len days 00:00");
+        $last_day = new DateTime('next day 00:00');
 
-        $devices = Device::query()->findAll();
+        $stats = Order::query()
+            ->where(['createtime >=' => $first_day->getTimestamp()])
+            ->groupBy('device_id')
+            ->orderBy('total ASC')
+            ->limit($max)
+            ->getAll(['device_id', 'count(*) AS total']);
 
-        $index = 0;
+        foreach ($stats as $index => $stat) {
+            if (empty($stat['device_id'])) {
+                continue;
+            }
 
-        /** @var deviceModelObj $device */
-        foreach ($devices as $device) {
-
-            $stats = $device->get('statsData');
-            if (isEmptyArray($stats)) {
+            $device = Device::get($stat['device_id']);
+            if (empty($device)) {
                 continue;
             }
 
@@ -507,25 +508,17 @@ class Stats
                 'data' => [],
             ];
 
-            for ($days = $len; $days >= 0; $days--) {
-
-                $l = strtotime("-$days days");
-                $y = date('Y', $l);
-                $n = date('n', $l);
-                $j = date('j', $l);
-
-                $data = $stats['data'][$y]['days'][$n][$j];
-                $total = $data['p'] + $data['f'];
-                $chart['series'][$index]['total'] += $total;
-                $chart['series'][$index]['data'][] = $total;
+            try {
+                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
+                while ($begin < $last_day) {
+                    $data = Stats::getDayTotal($device, $begin);
+                    $chart['series'][$index]['total'] += $data['total'];
+                    $chart['series'][$index]['data'][] = $data['total'];
+                    $begin->modify('next day');
+                }
+            } catch (Exception $e) {
             }
-
-            $index++;
         }
-
-        usort($chart['series'], function ($a, $b) {
-            return $b['total'] - $a['total'];
-        });
 
         $chart['series'] = array_slice($chart['series'], 0, $max);
         foreach ($chart['series'] as $item) {
@@ -833,11 +826,11 @@ class Stats
     }
 
     /**
-     * @param ISettings $obj
+     * @param modelObj $obj
      * @param mixed $day
      * @return array
      */
-    public static function daysOfMonth(ISettings $obj, $day = null): array
+    public static function daysOfMonth(modelObj $obj, $day = null): array
     {
         if (is_string($day)) {
             try {
@@ -850,6 +843,12 @@ class Stats
         }
 
         $begin->modify('first day of this month 00:00');
+
+        $first_order = Order::getFirstOrderOf($obj);
+        if (empty($first_order) || $begin->getTimestamp() < $first_order['createtime']) {
+            return [];
+        }
+
         try {
             $end = new DateTime($begin->format('Y-m-d 00:00:00'));
             $end->modify('first day of next month');
@@ -893,11 +892,11 @@ class Stats
 
 
     /**
-     * @param ISettings $obj
+     * @param modelObj $obj
      * @param mixed $day
      * @return array
      */
-    public static function hoursOfDay(ISettings $obj, $day = null): array
+    public static function hoursOfDay(modelObj $obj, $day = null): array
     {
         if (is_string($day)) {
             try {
@@ -910,6 +909,12 @@ class Stats
         }
 
         $begin->modify('00:00:00');
+
+        $first_order = Order::getFirstOrderOf($obj);
+        if (empty($first_order) || $begin->getTimestamp() < $first_order['createtime']) {
+            return [];
+        }
+
         try {
             $end = new DateTime($begin->format('Y-m-d 00:00'));
             $end->modify('next day 00:00');

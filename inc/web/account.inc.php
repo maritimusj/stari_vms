@@ -853,43 +853,24 @@ if ($op == 'default') {
     }
 
     $title = $acc->getTitle();
+    $time_str = request::has('month') ? date('Y-') . request::int('month') . date('-01 00:00:00') : 'today';
 
-    $time = request::has('month') ? date('Y-') . request::int('month') . date('-01 00:00:00') : 'today';
-
-    $caption = date('Y年n月', strtotime($time));
-    $data = Stats::chartDataOfMonth($acc, $time, "公众号：$title($caption)");
+    try {
+        $month = new DateTime($time_str);
+        $caption = $month->format('Y年n月');
+        $data = Stats::chartDataOfMonth($acc, $month, "公众号：$title($caption)");
+    } catch (Exception $e) {
+    }
 
     $content = app()->fetchTemplate(
         'web/account/stats',
         [
             'chartid' => 'chart-' . Util::random(10),
-            'chart' => $data,
+            'chart' => $data ?? [],
         ]
     );
 
     JSON::success(['title' => '', 'content' => $content]);
-
-} elseif ($op == 'viewHistoryStats') {
-
-    $id = request::int('id');
-
-    $acc = Account::get($id);
-    if (empty($acc)) {
-        JSON::fail('找不到这个公众号！');
-    }
-
-    $title = $acc->getTitle();
-
-    $content = app()->fetchTemplate(
-        'web/account/stats_history',
-        [
-            'id' => $id,
-            'title' => $title,
-            'm_all' => Stats::months($acc),
-        ]
-    );
-
-    JSON::success(['title' => "<b>$title</b>的出货统计", 'content' => $content]);
 
 } elseif ($op == 'repairMonthStats') {
 
@@ -1232,7 +1213,7 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOf($account);
     if ($first_order) {
         try {
-            $begin = new DateTime(date('Y-m-d H:i:s', $first_order->getCreatetime()));
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
         } catch (Exception $e) {
             $begin = new DateTime();
         }
@@ -1242,7 +1223,7 @@ if ($op == 'default') {
             $begin->modify('next year');
         }
         try {
-            $order_date_obj = new DateTime(date('Y-m-01', $first_order->getCreatetime()));
+            $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
             $date = new DateTime("$year_str-$month-01 00:00");
             if ($date < $order_date_obj) {
                 $result['title'] .= '*';
@@ -1286,7 +1267,7 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOf($account);
     if ($first_order) {
         try {
-            $order_date_obj = new DateTime(date('Y-m-d', $first_order->getCreatetime()));
+            $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
             $date = new DateTime("$month_str-$day");
             if ($date < $order_date_obj) {
                 $result['title'] .= '*';

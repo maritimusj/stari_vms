@@ -1053,7 +1053,7 @@ if ($op == 'list') {
         [
             'chartid' => Util::random(10),
             'chart' => Util::cachedCall(30, function () use ($device) {
-                return Stats::chartDataOfDay($device, time());
+                return Stats::chartDataOfDay($device, new DateTime());
             }, $device->getId()),
         ]
     );
@@ -1063,7 +1063,7 @@ if ($op == 'list') {
         [
             'chartid' => Util::random(10),
             'chart' => Util::cachedCall(30, function () use ($device) {
-                return Stats::chartDataOfMonth($device, time());
+                return Stats::chartDataOfMonth($device, new DateTime());
             }, $device->getId()),
         ]
     );
@@ -1340,7 +1340,7 @@ if ($op == 'list') {
             'chartid' => Util::random(10),
             'title' => $title,
             'chart' => Util::cachedCall(30, function () use ($device, $title) {
-                return Stats::chartDataOfDay($device, time(), "设备：{$device->getName()}($title)");
+                return Stats::chartDataOfDay($device, new DateTime(), "设备：{$device->getName()}($title)");
             }, $device->getId()),
         ]
     );
@@ -1353,12 +1353,14 @@ if ($op == 'list') {
         JSON::fail('找不到这个设备！');
     }
 
-    $month = strtotime(request::str('month'));
-    if (empty($month)) {
-        $month = time();
+    $month_str = request::str('month');
+    try {
+        $month = new DateTime($month_str);
+    } catch (Exception $e) {
+        JSON::fail('时间不正确！');
     }
 
-    $title = date('Y年n月', $month);
+    $title = $month->format('Y年n月');
 
     $content = app()->fetchTemplate(
         'web/device/stats',
@@ -1401,7 +1403,7 @@ if ($op == 'list') {
         $first_order = Order::getFirstOrderOfDevice($device);
         $last_order = Order::getLastOrderOfDevice($device);
         if ($first_order) {
-            $first_order_datetime = intval($first_order->getCreatetime());
+            $first_order_datetime = intval($first_order['createtime']);
         } else {
             $first_order_datetime = time();
         }

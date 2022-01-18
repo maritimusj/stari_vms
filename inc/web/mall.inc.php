@@ -37,7 +37,6 @@ if ($op == 'default') {
             'address LIKE' => "%$keyword%",
         ]);
         $tpl_data['s_keyword'] = $keyword;
-
     }
 
     if (request::isset('status')) {
@@ -110,6 +109,16 @@ if ($op == 'default') {
             $data['user'] = $user->profile(false);
         }
 
+        $balance = $entry->getExtraData('balance', []);
+        if ($balance) {
+            $data['balance'] = abs($balance['xval']);
+        }
+
+        $shipping = $entry->getExtraData('shipping', []);
+        if (!isEmptyArray($shipping)) {
+            $data['shipping'] = $shipping;
+        }
+
         $orders[] = $data;
     }
 
@@ -133,7 +142,6 @@ if ($op == 'default') {
         $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
     }
 
-
     $tpl_data['backer'] = $keyword || $limit['start'] || $limit['end'] || $tpl_data['s_user_id'] || isset($tpl_data['s_status']);
     $tpl_data['pager'] = $pager;
     $tpl_data['orders'] = $orders;
@@ -146,7 +154,7 @@ if ($op == 'default') {
 
     $delivery = Delivery::get($id);
     if (!$delivery) {
-        JSON::fail('找不到这个商品订单！');
+        JSON::fail('找不到这个商城订单！');
     }
 
     $status = request::int('status');
@@ -157,5 +165,54 @@ if ($op == 'default') {
             'status' => $status,
         ]);
     }
+
     JSON::fail('操作失败！');
+
+} elseif ($op == 'shipping_edit') {
+
+    $id = request::int('id');
+    $delivery = Delivery::get($id);
+    if (!$delivery) {
+        JSON::fail('找不到这个商城订单！');
+    }
+
+    $shipping = $delivery->getExtraData('shipping', []);
+
+    $content = app()->fetchTemplate('web/mall/shipping_edit', [
+        'id' => $delivery->getId(),
+        'shipping' => $shipping,
+    ]);
+
+    JSON::success(['title' => "发货信息[ {$delivery->getOrderNo()} ]", 'content' => $content]);
+
+} elseif ($op == 'save_shipping') {
+
+    $id = request::int('id');
+    $delivery = Delivery::get($id);
+    if (!$delivery) {
+        JSON::fail('找不到这个商城订单！');
+    }
+
+    $carrier = request::trim('carrier');
+    $uid = request::trim('uid');
+    $memo = request::trim('memo');
+
+    $shipping = [
+        'uid' => $uid,
+        'carrier' => $carrier,
+        'memo' => $memo,
+    ];
+
+    $delivery->setExtraData('shipping', $shipping);
+
+    $delivery->setStatus(Delivery::SHIPPING);
+
+    if ($delivery->save()) {
+        JSON::success([
+            'msg' => isEmptyArray($shipping) ? Delivery::formatStatus(Delivery::SHIPPING) : '已保存！',
+            'title' => Delivery::formatStatus(Delivery::SHIPPING),
+            'status' => Delivery::SHIPPING,
+        ]);
+    }
+    JSON::fail('保存失败！');
 }

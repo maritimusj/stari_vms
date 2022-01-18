@@ -5,6 +5,7 @@
     .order {
         display: flex;
         flex-direction: column;
+        position: relative;
     }
     .order .text {
 
@@ -51,6 +52,25 @@
     }
     .recipient .address {
         font-weight: lighter;
+    }
+    .order:hover .shipping {
+        display: flex;
+    }
+    .shipping {
+        cursor: default;
+        border: 1px solid #eee;
+        padding: 6px 10px;
+        position: absolute;
+        background: #fff;
+        top: 20px;
+        flex-direction: column;
+        white-space: nowrap;
+        z-index: 99;
+        box-shadow: 4px 3px rgb(158 158 158 / 14%);
+        display: none;
+    }
+    .shipping .title {
+        font-weight: bolder;
     }
 </style>
 <ul class="nav nav-tabs" id="navbar">
@@ -142,6 +162,7 @@
                 <tr>
                     <th>#</th>
                     <th>订单号</th>
+                    <th>订单状态</th>
                     <th>商品图片</th>                
                     <th>商品名称/数量</th>
                     <th>收件人</th>
@@ -163,11 +184,48 @@
                             <span class="text">
                                 {$order['order_no']}
                             </span>
+                            <span>
+                                {if $order['balance']}
+                                积分兑换：
+                                <span class="balance">
+                                    {$order['balance']}
+                                    <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                                </span>
+                                {/if}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="order">
+                            {if $order['status'] == \zovye\Delivery::SHIPPING}
+                            <span class="status s{$order['status']}" data-op="shipping">
+                                {$order['status_formatted']}
+                            </span>
+                            {if $order['shipping']}
+                            <div class="shipping">
+                                {if $order['shipping']['carrier']}
+                                <div>
+                                    <span class="title">快递公司：</span><span>{$order['shipping']['carrier']}</span>
+                                </div>
+                                {/if}
+                                {if $order['shipping']['uid']}
+                                <div>
+                                    <span class="title">快递单号：</span><span>{$order['shipping']['uid']}</span>
+                                </div>
+                                {/if}
+                                {if $order['shipping']['memo']}
+                                <div>
+                                    <span class="title">备注信息：</span><span>{$order['shipping']['memo']}</span>
+                                </div>
+                                {/if}
+                            </div>
+                            {/if}
+                            {else}
                             <span class="status s{$order['status']}">
                                 {$order['status_formatted']}
                             </span>
+                            {/if}
                         </div>
-                        
                     </td>
                     <td>
                         <div class="goods">
@@ -175,7 +233,9 @@
                         </div>
                     </td>
                     <td>
-                        {$order['goods']['name']}x{$order['num']}
+                        <div class="goods">
+                            {$order['goods']['name']}x<span class="num">{$order['num']}</span>
+                        </div>
                     </td>
                     <td class="recipient">
                         <div>
@@ -206,9 +266,9 @@
                         {$order['createtime_formatted']}
                     </td>
                     <td class="operate">
-                        {if $order['status'] == 1}
+                        {if $order['status'] == \zovye\Delivery::PAYED}
                         <button type="button" class="btn btn-success btn-sm" data-op="shipping" title="标记为已发货状态">发货</button>
-                        {elseif $order['status'] == 3}
+                        {elseif $order['status'] == \zovye\Delivery::SHIPPING}
                         <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
                         {/if}
                     </td>
@@ -270,17 +330,24 @@
     }
 
     api.shipping = function(id) {
-        if (confirm('确定要设置该订单为已发货状态吗？')) {
-            api.showResult({ op: 'setStatus', id, status: 3 }, null, true, function(res) {
-                if (res && res.status) {
-                    $("tr[data-id=" + id + "]").find('.order .status').removeClass('s1').addClass('s3');
-                    $("tr[data-id=" + id + "]").find('.order .status').text(res.data.msg);
-                    $("tr[data-id=" + id + "]").find('td.operate').html(`
-                    <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
-                    `);
-                }
-            });
-        }
+        api.showResult({ op: 'shipping_edit', id });
+    }
+
+    api.saveShippingData = function(id) {
+        const carrier = $('#editShippingDataForm input[name=carrier]').val();
+        const uid = $('#editShippingDataForm input[name=uid]').val();
+        const memo = $('#editShippingDataForm input[name=memo]').val();
+        api.showResult({ op: 'save_shipping', id, carrier, uid, memo }, null, true, function(res) {
+            if (res && res.status) {
+                $("tr[data-id=" + id + "]").find('.order .status').removeClass('s1').addClass('s3');
+                $("tr[data-id=" + id + "]").find('.order .status').text(res.data.title);
+                $("tr[data-id=" + id + "]").find('td.operate').html(`
+                <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
+                `);
+
+                $('#modal-message').modal('hide');
+            }
+        });
     }
 
     api.finished = function(id) {

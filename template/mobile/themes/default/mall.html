@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>积分商城</title>
+    <style type="text/css">
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #101010;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: calc(44px + constant(safe-area-inset-bottom));
+            padding-bottom: calc(44px + env(safe-area-inset-bottom));
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .tabbar {
+            width: 100%;
+            height: 44px;
+            background-color: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            flex-direction: row;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -1px 5px #eee;
+            z-index: 99;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-item img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .tab-item span {
+            font-size: 11px;
+            margin-top: 2px;
+            color: #9d9d9d;
+        }
+
+        .tab-item .selected {
+            color: #FA639B;
+        }
+
+        .list {
+            width: 100vw;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+        }
+
+        .goods {
+            width: calc((100vw - 30px) / 2);
+            background-color: white;
+            margin-left: 10px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 5px #ccc;
+            border-radius: 5px;
+        }
+
+        .goods .img {
+            width: calc((100vw - 30px) / 2 - 16px);
+            height: calc((100vw - 30px) / 2 - 16px);
+            margin: 8px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .goods .title {
+            margin: 0 8px;
+        }
+
+        .goods .row {
+            margin: 5px 8px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .goods .balance {
+            flex: 1;
+            color: #FA639B;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .remain {
+            font-size: 12px;
+            color: #9d9d9d;
+        }
+
+        .detail-view {
+            width: 100vw;
+            height: calc(100vh - 74px - constant(safe-area-inset-bottom));
+            height: calc(100vh - 74px - env(safe-area-inset-bottom));
+            overflow-y: auto;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: #f0f0f0;
+            animation: rise .5s;
+            z-index: 99;
+            padding-bottom: calc(74px + constant(safe-area-inset-bottom));
+            padding-bottom: calc(74px + env(safe-area-inset-bottom));
+        }
+
+        @keyframes rise {
+            from {
+                transform: translateY(100vh);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes dismiss {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        #swiper-container {
+            width: 100%;
+            height: 180px;
+            --swiper-theme-color: #FA639B;
+        }
+
+        .swiper-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .back {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.3);
+            position: absolute;
+            z-index: 100;
+            left: 10px;
+            top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 5px white;
+        }
+
+        .back img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .detail-view .column-view {
+            width: calc(100% - 50px);
+            background-color: white;
+            margin-top: 10px;
+            margin-left: 10px;
+            border-radius: 10px;
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-view .column-view .title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 5px 0;
+        }
+
+        .detail-view .column-view .row {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .detail-view .column-view .row .balance {
+            font-size: 16px;
+            color: #FA639B;
+            font-weight: bold;
+        }
+
+        .usage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #9d9d9d;
+            font-size: 12px;
+        }
+
+        .usage img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .usage span {
+            margin-top: 5px;
+        }
+
+        .dotted {
+            flex: 1;
+            height: 1px;
+            border-top: 1px dotted #ccc;
+            margin: 0 10px;
+        }
+
+        .detail-view .column-view .row .sub-title {
+            width: 70px;
+            color: #666;
+        }
+
+        .detail-view .column-view .row .content {
+            flex: 1;
+        }
+
+        .detail-view .footer {
+            width: 100%;
+            height: 64px;
+            background-color: white;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            box-shadow: 0 -1px 3px #eee;
+        }
+
+        .detail-view .footer .btn {
+            width: calc(100% - 30px);
+            height: 44px;
+            background-color: #FA639B;
+            margin-left: 15px;
+            margin-top: 10px;
+            text-align: center;
+            line-height: 44px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .address-view {
+            width: 100%;
+            background-color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+            animation: rise .3s;
+        }
+
+        .address-view .header {
+            width: 100%;
+            display: flex;
+            padding: 15px 0;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .address-view .header span {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .address-view .header img {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            right: 15px;
+        }
+
+        .address-view .row {
+            width: calc(100% - 30px);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .address-view .row .sub-title {
+            width: 70px;
+            color: #666;
+        }
+
+        .address-view .row .content {
+            flex: 1;
+        }
+
+        .clickable:active {
+            opacity: 0.7;
+        }
+
+        .address-footer {
+            width: 100%;
+            padding: 15px 0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .address-footer .btn {
+            width: 100px;
+            height: 36px;
+            background-color: #eee;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm {
+            margin-left: 30px;
+            color: white;
+            background-color: #FA639B !important;
+        }
+
+        .save {
+            width: 150px !important;
+            color: white;
+            background-color: #FA639B !important;
+        }
+
+        .address-view .row input {
+            flex: 1;
+            height: 30px;
+            padding: 0 10px;
+            background-color: #eee;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .address-view .row textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px;
+            background-color: #eee;
+            font-size: 14px;
+        }
+
+        .address-view .row input::placeholder,
+        .address-view .row textarea::placeholder {
+            color: #9d9d9d;
+        }
+
+        .loading-view {
+            width: 120px;
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 0 5px lightgray;
+        }
+
+        .loading-view img {
+            width: 50px;
+            height: 50px;
+            animation: loading 1s infinite;
+        }
+
+        .loading-view span {
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        @keyframes loading {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toast {
+            padding: 5px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            position: fixed;
+            bottom: 10vh;
+            border-radius: 5px;
+            z-index: 1000;
+            animation: showToast .7s;
+        }
+
+        @keyframes showToast {
+            from {
+                opacity: 0;
+                transform: translateY(5vh);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .no-data-view {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15vh;
+        }
+
+        .no-data-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .no-data-desc {
+            margin-top: 10px;
+            color: #bbb;
+        }
+
+        .num-view {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .circle-btn {
+            width: 14px;
+            height: 14px;
+            background-color: #eee;
+            border-radius: 50%;
+            padding: 3px;
+        }
+
+        .circle-btn:not(.circle-btn-disabled):active {
+            background-color: #ccc;
+        }
+
+        .circle-btn-disabled {
+            opacity: 0.3;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="list">
+            <div class="goods clickable" v-for="item in goods.list" @click="goodsClick(item)">
+                <img class="img" :src="item.img">
+                <span class="title">{{item.name}}</span>
+                <div class="row">
+                    <span class="balance">{{item.balance}}积分</span>
+                    <span class="remain">已兑：{{item.total}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="no-data-view" v-if="goods.list && goods.list.length === 0">
+            <img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
+            <span class="no-data-desc">暂无数据</span>
+        </div>
+        <div class="tabbar">
+            <div class="tab-item" @click="jumpToMission">
+                <img src="{MODULE_URL}static/m/balance/img/mission_icon.svg">
+                <span>任务大厅</span>
+            </div>
+            <div class="tab-item">
+                <img src="{MODULE_URL}static/m/balance/img/mall_icon_se.svg">
+                <span class="selected">积分商城</span>
+            </div>
+            <div class="tab-item" @click="jumpToProfile">
+                <img src="{MODULE_URL}static/m/balance/img/profile_icon.svg">
+                <span>个人中心</span>
+            </div>
+        </div>
+        <div class="detail-view" ref="detail" v-if="detail.visible">
+            <div class="back clickable" @click="backClick">
+                <img src="{MODULE_URL}static/m/balance/img/back.svg">
+            </div>
+            <img style="width: 100%;" :src="detail.data.detailImg" v-if="detail.data.detailImg" />
+            <div class="column-view">
+                <span class="title">{{detail.data.name}}</span>
+                <div class="row" style="font-size: 12px;color: #9d9d9d;">
+                    <span style="flex: 1;">已兑：{{detail.data.total}}</span>
+                    <span class="balance">{{detail.data.balance}}积分</span>
+                </div>
+            </div>
+            <div class="column-view" style="flex-direction: row;align-items: center;">
+                <span class="title" style="flex: 1;">兑换数量</span>
+                <div class="num-view">
+                    <img :class="['circle-btn', detail.num === 1 ? 'circle-btn-disabled' : '' ]" src="{MODULE_URL}static/m/balance/img/minus.svg" @click="minusClick">
+                    <span style="margin: 0 10px;">{{detail.num}}</span>
+                    <img :class="['circle-btn', detail.num === max ? 'circle-btn-disabled' : '' ]" src="{MODULE_URL}static/m/balance/img/plus.svg" @click="plusClick">
+                </div>
+            </div>
+            <div class="column-view">
+                <span class="title">兑换方法</span>
+                <div class="row">
+                    <div class="usage">
+                        <img src="{MODULE_URL}static/m/balance/img/goods.svg">
+                        <span>兑换商品</span>
+                    </div>
+                    <div class="dotted"></div>
+                    <div class="usage">
+                        <img src="{MODULE_URL}static/m/balance/img/address.svg">
+                        <span>填写收货地址</span>
+                    </div>
+                    <div class="dotted"></div>
+                    <div class="usage">
+                        <img src="{MODULE_URL}static/m/balance/img/sign.svg">
+                        <span>签收成功</span>
+                    </div>
+                </div>
+            </div>
+            <div class="column-view">
+                <span class="title">兑换条件</span>
+                <div class="row">
+                    <span class="sub-title">兑后须知</span>
+                    <span class="content">虚拟权益兑换后不可退换</span>
+                </div>
+                <div class="row" style="margin-top: 3px;align-items: flex-start;">
+                    <span class="sub-title">城市</span>
+                    <span class="content">港澳台海外及受疫情影响地区不发货，疫情突发地区也将暂停发货，可联系客服确认情况</span>
+                </div>
+            </div>
+            <div class="column-view" v-if="detail.data.gallery && detail.data.gallery.length > 0">
+                <span class="title">商品详情</span>
+                <img :src="item" v-for="item in detail.data.gallery" style="width: 100%;">
+            </div>
+            <div class="footer">
+                <div class="btn clickable" @click="exchangeClick">立即兑换</div>
+            </div>
+        </div>
+        <div class="mask" v-if="address.visible" @click="address.visible = false">
+            <div class="address-view" @click.stop>
+                <div class="header">
+                    <span>收货地址</span>
+                    <img class="clickable" src="{MODULE_URL}static/m/balance/img/close_black.svg"
+                        @click="address.visible = false">
+                </div>
+                <div class="row">
+                    <span class="sub-title">收货人：</span>
+                    <input v-model="address.data.name" type="text" placeholder="请输入收货人" v-if="address.editable">
+                    <span class="content" v-else>{{address.data.name}}</span>
+                </div>
+                <div class="row">
+                    <span class="sub-title">手机号码：</span>
+                    <input v-model="address.data.mobile" type="text" placeholder="请输入手机号码" v-if="address.editable">
+                    <span class="content" v-else>{{address.data.mobile}}</span>
+                </div>
+                <div class="row" style="align-items: flex-start;">
+                    <span class="sub-title">详细地址：</span>
+                    <textarea v-model="address.data.address" rows="4" placeholder="请输入详细地址"
+                        v-if="address.editable"></textarea>
+                    <span class="content" v-else>{{address.data.address}}</span>
+                </div>
+                <div class="address-footer" v-if="address.editable">
+                    <div class="btn save clickable" @click="saveClick">保存</div>
+                </div>
+                <div class="address-footer" v-else>
+                    <div class="btn clickable" @click="address.editable = true">修改</div>
+                    <div class="btn confirm clickable" @click="confirmClick">确定</div>
+                </div>
+            </div>
+        </div>
+        <div class="toast" v-if="toast.visible">{{toast.text}}</div>
+        <div class="mask" style="justify-content: center;background-color: rgba(0, 0, 0, 0);" v-if="loading">
+            <div class="loading-view">
+                <img src="{MODULE_URL}static/m/balance/img/loading.svg">
+                <span>正在加载中...</span>
+            </div>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script type="text/javascript">
+        new Vue({
+            el: '#app',
+            data: {
+                loading: false,
+                toast: {
+                    visible: false,
+                    text: '',
+                    timeout: null
+                },
+                goods: {
+                    list: null,
+                    page: 1,
+                    pagesize: 20,
+                    total: 0
+                },
+                detail: {
+                    visible: false,
+                    data: null,
+                    num: 1
+                },
+                address: {
+                    visible: false,
+                    editable: false,
+                    data: {
+                        name: '',
+                        mobile: '',
+                        address: ''
+                    }
+                },
+                max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
+            },
+            created() {
+                this.getGoodsList();
+                window.addEventListener('scroll', this.scrollBottom);
+            },
+            destroyed() {
+                window.removeEventListener('scroll', this.scrollBottom);
+            },
+            methods: {
+                getGoodsList() {
+                    this.loading = true;
+                    const page = this.goods.page;
+                    const pagesize = this.goods.pagesize;
+                    zovye_fn.getGoodsList(page, pagesize).then(res => {
+                        this.loading = false;
+                        if (res.status) {
+                            const list = res.data.list || [];
+                            if (page === 1) {
+                                this.goods.list = list;
+                            } else {
+                                this.goods.list = this.goods.list.concat(list);
+                            }
+                            this.goods.total = res.data.total;
+                        } else {
+                            this.showToast(res.data.msg);
+                        }
+                    })
+                },
+                goodsClick(item) {
+                    this.detail.visible = true;
+                    this.detail.data = item;
+                    this.detail.num = 1;
+                },
+                backClick() {
+                    this.$refs.detail.style.animation = 'dismiss .3s';
+                    setTimeout(() => {
+                        this.detail.visible = false;
+                    }, 300)
+                },
+                scrollBottom() {
+                    let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+                    let clientHeight = document.documentElement.clientHeight;
+                    let scrollHeight = document.documentElement.scrollHeight;
+                    if (scrollTop + clientHeight >= scrollHeight && !this.loading && this.goods.list.length < this.goods.total) {
+                        this.goods.page++;
+                        this.getGoodsList();
+                    }
+                },
+                showToast(text) {
+                    if (this.toast.visible) {
+                        clearTimeout(this.toast.timeout);
+                        this.toast.timeout = null;
+                    }
+                    this.toast.text = text;
+                    this.toast.visible = true;
+                    this.toast.timeout = setTimeout(() => {
+                        this.toast.visible = false;
+                    }, 2000);
+                },
+                exchangeClick() {
+                    this.address.editable = false;
+                    this.loading = true;
+                    zovye_fn.getRecipient().then(res => {
+                        this.loading = false;
+                        if (res.status) {
+                            if (res.data && res.data.name && res.data.phoneNum && res.data.address) {
+                                this.address.data = {
+                                    name: res.data.name,
+                                    mobile: res.data.phoneNum,
+                                    address: res.data.address
+                                }
+                            } else {
+                                this.address.editable = true;
+                            }
+                            this.address.visible = true;
+                        } else {
+                            this.showToast(res.data.msg);
+                        }
+                    })
+                },
+                saveClick() {
+                    const data = this.address.data;
+                    if (data.name === '') {
+                        this.showToast('请输入收货人');
+                    } else if (data.mobile === '') {
+                        this.showToast('请输入手机号码');
+                    } else if (data.address === '') {
+                        this.showToast('请输入收货地址');
+                    } else {
+                        this.loading = true;
+                        zovye_fn.updateRecipient(data.name, data.mobile, data.address).then(res => {
+                            this.loading = false;
+                            if (res.status) {
+                                this.address.editable = false;
+                            } else {
+                                this.showToast(res.data.msg);
+                            }
+                        })
+                    }
+                },
+                confirmClick() {
+                    this.loading = true;
+                    zovye_fn.createOrder(this.detail.data.id, this.detail.num).then(res => {
+                        this.loading = false;
+                        if (res.status) {
+                            zovye_fn.redirectToOrderPage();
+                        } else {
+                            this.showToast(res.data.msg);
+                        }
+                    })
+                },
+                jumpToMission() {
+                    zovye_fn.redirectToBonusPage();
+                },
+                jumpToProfile() {
+                    zovye_fn.redirectToUserPage();
+                },
+                minusClick() {
+                    if (this.detail.num > 1) {
+                        this.detail.num--;
+                    } else {
+                        this.showToast('不能再减啦～');
+                    }
+                },
+                plusClick() {
+                    if (this.detail.num < this.max) {
+                        this.detail.num++;
+                    } else {
+                        this.showToast('不能再加啦～');
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

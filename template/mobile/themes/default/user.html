@@ -28,8 +28,8 @@
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
-				padding-bottom: calc(54px + constant(safe-area-inset-bottom));
-				padding-bottom: calc(54px + env(safe-area-inset-bottom));
+				padding-bottom: calc(74px + constant(safe-area-inset-bottom));
+				padding-bottom: calc(74px + env(safe-area-inset-bottom));
 			}
 
 			[v-cloak] {
@@ -65,7 +65,7 @@
 			}
 
 			.tab-item span {
-				font-size: 12px;
+				font-size: 11px;
 				margin-top: 2px;
 				color: #9d9d9d;
 			}
@@ -190,27 +190,6 @@
 					<img src="{MODULE_URL}static/m/balance/img/coin.svg">
 				</div>
 			</div>
-			<!-- <div class="menu" style="margin-top: 10px;">
-				<div class="sub-menu">
-					<img src="{MODULE_URL}static/m/balance/img/mall.svg">
-					<span>积分商城</span>
-				</div>
-				<div class="line"></div>
-				<div class="sub-menu">
-					<img src="{MODULE_URL}static/m/balance/img/address.svg">
-					<span>收货地址</span>
-				</div>
-			</div> -->
-			<div class="menu clickable" style="margin-top: 10px;">
-				<img class="icon" src="{MODULE_URL}static/m/balance/img/mall.svg">
-				<span class="title">积分商城</span>
-				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
-			</div>
-			<div class="menu clickable" style="margin-top: 1px;">
-				<img class="icon" src="{MODULE_URL}static/m/balance/img/address.svg">
-				<span class="title">收货地址</span>
-				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
-			</div>
 			<div class="menu clickable" style="margin-top: 10px;" @click="balanceLogClick">
 				<img class="icon" src="{MODULE_URL}static/m/balance/img/coin_icon.svg">
 				<span class="title">积分记录</span>
@@ -219,6 +198,11 @@
 			<div class="menu clickable" style="margin-top: 1px;" @click="orderClick">
 				<img class="icon" src="{MODULE_URL}static/m/balance/img/order_icon.svg">
 				<span class="title">订单记录</span>
+				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
+			</div>
+			<div class="menu clickable" style="margin-top: 1px;" @click="mallLogClick">
+				<img class="icon" src="{MODULE_URL}static/m/balance/img/mall_order.svg">
+				<span class="title">商城订单</span>
 				<img class="arrow" src="{MODULE_URL}static/m/balance/img/arrow.svg">
 			</div>
 			<div class="menu clickable" style="margin-top: 10px;position: relative;">
@@ -244,6 +228,10 @@
 				<div class="tab-item" @click="jumpToMission">
 					<img src="{MODULE_URL}static/m/balance/img/mission_icon.svg">
 					<span>任务大厅</span>
+				</div>
+				<div class="tab-item" @click="jumpToMall">
+					<img src="{MODULE_URL}static/m/balance/img/mall_icon.svg">
+					<span>积分商城</span>
 				</div>
 				<div class="tab-item">
 					<img src="{MODULE_URL}static/m/balance/img/profile_icon_se.svg">
@@ -277,7 +265,6 @@
 					},
 					getUserInfo() {
 						zovye_fn.getUserInfo().then(res => {
-							console.log(res)
 							if (res.status) {
 								const data = res.data;
 								if (data.mobile) {
@@ -291,11 +278,17 @@
 					jumpToMission() {
 						zovye_fn.redirectToBonusPage();
 					},
+					jumpToMall() {
+						zovye_fn.redirectToMallPage();
+					},
 					balanceLogClick() {
 						zovye_fn.redirectToBalanceLogPage();
 					},
 					orderClick() {
 						zovye_fn.redirectToOrderPage();
+					},
+					mallLogClick() {
+						zovye_fn.redirectToMallOrderPage();
 					}
 				}
 			})

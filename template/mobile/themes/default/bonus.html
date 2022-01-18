@@ -68,7 +68,7 @@
 		}
 
 		.tab-item span {
-			font-size: 12px;
+			font-size: 11px;
 			margin-top: 2px;
 			color: #9d9d9d;
 		}
@@ -481,6 +481,10 @@
 				<img src="{MODULE_URL}static/m/balance/img/mission_icon_se.svg">
 				<span class="selected">任务大厅</span>
 			</div>
+			<div class="tab-item" @click="jumpToMall">
+				<img src="{MODULE_URL}static/m/balance/img/mall_icon.svg">
+				<span>积分商城</span>
+			</div>
 			<div class="tab-item" @click="jumpToProfile">
 				<img src="{MODULE_URL}static/m/balance/img/profile_icon.svg">
 				<span>个人中心</span>
@@ -831,6 +835,9 @@
 					this.toast.timeout = setTimeout(() => {
 						this.toast.visible = false;
 					}, 2000);
+				},
+				jumpToMall() {
+					zovye_fn.redirectToMallPage();
 				},
 				jumpToProfile() {
 					zovye_fn.redirectToUserPage();

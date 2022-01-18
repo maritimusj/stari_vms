@@ -325,7 +325,6 @@ const app = new Vue({
             } else if (!this.balance.loading) {
                 this.balance.loading = true;
                 zovye_fn.balancePay(item.id, item.count).then(res => {
-                    console.log(res)
                     this.balance.loading = false;
                     if (res.status) {
                         res.data.redirect && window.location.replace(res.data.redirect);

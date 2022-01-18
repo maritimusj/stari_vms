@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"
+		content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+	<title>商城订单</title>
+	<style type="text/css">
+		html,
+		body {
+			position: relative;
+			width: 100vw;
+		}
+
+		body {
+			background-color: #f0f0f0;
+			font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+			font-size: 14px;
+			color: #101010;
+			margin: 0;
+			padding: 0;
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+
+		#app {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding-bottom: calc(10px + constant(safe-area-inset-bottom));
+			padding-bottom: calc(10px + env(safe-area-inset-bottom));
+		}
+
+		[v-cloak] {
+			display: none !important;
+		}
+
+		.section {
+			width: calc(100% - 40px);
+			background-color: white;
+			margin-top: 10px;
+			border-radius: 10px;
+			padding: 10px;
+			display: flex;
+			flex-direction: row;
+		}
+
+		.section img {
+			width: 75px;
+			height: 75px;
+			border-radius: 10px;
+			object-fit: cover;
+		}
+
+		.info-view {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			margin-left: 10px;
+		}
+
+		.row {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
+
+		.name {
+			font-weight: bold;
+			flex: 1;
+		}
+
+		.status {
+			font-size: 12px;
+		}
+
+		.desc {
+			font-size: 12px;
+			margin-top: 5px;
+			color: #9d9d9d;
+			word-break: break-all;
+		}
+
+		.success {
+			color: #67C23A;
+		}
+
+		.fail {
+			color: #F56C6C;
+		}
+
+		.underway {
+			color: #f80;
+		}
+
+		.finish {
+			color: #9d9d9d;
+		}
+
+		.mask {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+		.loading-view {
+            width: 120px;
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 0 5px lightgray;
+        }
+
+        .loading-view img {
+            width: 50px;
+            height: 50px;
+            animation: loading 1s infinite;
+        }
+
+        .loading-view span {
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        @keyframes loading {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+		.no-data-view {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15vh;
+        }
+
+        .no-data-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .no-data-desc {
+            margin-top: 10px;
+            color: #bbb;
+        }
+	</style>
+</head>
+
+<body ontouchstart>
+	<div id="app" v-cloak>
+		<div class="section" v-for="item in list">
+			<img :src="item.goods.img">
+			<div class="info-view">
+				<div class="row">
+					<span class="name">{{item.goods.name}}</span>
+					<span>x{{item.num}}</span>
+				</div>
+				<span class="desc">订单编号：{{item.orderNO}}</span>
+				<span class="desc">收货信息：{{item.name}}, {{item.phoneNum}}, {{item.address}}</span>
+				<div class="row">
+					<span class="desc" style="flex: 1;">订单时间：{{item.createtime_formatted}}</span>
+					<span :class="{'status': true, 'success': item.status === 1 || item.status === 4, 'fail': item.status === 0 || item.status === 2 || item.status === 6, 'underway': item.status === 3 || item.status === 5, 'finish': item.status === 100}" style="margin-top: 5px;">{{item.status_formatted}}</span>
+				</div>
+			</div>
+		</div>
+		<div class="no-data-view" v-if="list && list.length === 0">
+            <img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
+            <span class="no-data-desc">暂无数据</span>
+        </div>
+		<div class="mask" v-if="loading">
+            <div class="loading-view">
+                <img src="{MODULE_URL}static/m/balance/img/loading.svg">
+                <span>正在加载中...</span>
+            </div>
+        </div>
+	</div>
+	{$tpl['js']['code']}
+	{php \zovye\url(true, JS_VUE_URL);}
+	<script type="text/javascript">
+		new Vue({
+			el: '#app',
+			data: {
+				list: null,
+				pagesize: 20,
+				total: 0,
+				loading: false
+			},
+			created() {
+				this.getList();
+				window.addEventListener('scroll', this.scrollBottom);
+			},
+			destroyed() {
+				window.removeEventListener('scroll', this.scrollBottom);
+			},
+			methods: {
+				getList(lastId) {
+					this.loading = true;
+					zovye_fn.getOrderList(lastId, this.pagesize).then(res => {
+						this.loading = false;
+						if (res.status) {
+							const list = res.data.list || [];
+							if (!lastId) {
+								this.list = list;
+							} else {
+								this.list = this.list.concat(list);
+							}
+							this.total = res.data.total;
+						} else {
+							alert(res.data.msg);
+						}
+					})
+				},
+				scrollBottom() {
+					let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+					let clientHeight = document.documentElement.clientHeight;
+					let scrollHeight = document.documentElement.scrollHeight;
+					if (scrollTop + clientHeight >= scrollHeight && !this.loading && this.list.length < this.total) {
+						this.getList(this.list[this.list.length - 1].id);
+					}
+				}
+			}
+		})
+	</script>
+</body>
+
+</html>

@@ -201,6 +201,11 @@
                             <span class="status s{$order['status']}" data-op="shipping">
                                 {$order['status_formatted']}
                             </span>
+                            {else}
+                            <span class="status s{$order['status']}">
+                                {$order['status_formatted']}
+                            </span>
+                            {/if}
                             {if $order['shipping']}
                             <div class="shipping">
                                 {if $order['shipping']['carrier']}
@@ -219,11 +224,6 @@
                                 </div>
                                 {/if}
                             </div>
-                            {/if}
-                            {else}
-                            <span class="status s{$order['status']}">
-                                {$order['status_formatted']}
-                            </span>
                             {/if}
                         </div>
                     </td>
@@ -339,8 +339,14 @@
         const memo = $('#editShippingDataForm input[name=memo]').val();
         api.showResult({ op: 'save_shipping', id, carrier, uid, memo }, null, true, function(res) {
             if (res && res.status) {
-                $("tr[data-id=" + id + "]").find('.order .status').removeClass('s1').addClass('s3');
-                $("tr[data-id=" + id + "]").find('.order .status').text(res.data.title);
+                $e = $("tr[data-id=" + id + "]").find('.order .status');
+                if ($e) {
+                    $e.removeAttr('data-op');
+                    $e.removeClass('s1');
+                    $e.addClass('s3');
+                    $e.text(res.data.title);                    
+                }
+
                 $("tr[data-id=" + id + "]").find('td.operate').html(`
                 <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
                 `);

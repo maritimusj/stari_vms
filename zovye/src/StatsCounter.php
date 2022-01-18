@@ -75,9 +75,6 @@ abstract class StatsCounter
                 $end = new DateTime($day->format('Y-m-d 00:00'));
 
                 $end->modify('next day 00:00');
-                if ($end->getTimestamp() > time()) {
-                    $end->setTimestamp(time());
-                }
 
                 $num = $this->initFN($begin, $end, $params);
 
@@ -118,9 +115,6 @@ abstract class StatsCounter
                 $end = new DateTime($month->format('Y-m 00:00'));
 
                 $end->modify("first day of next month 00:00");
-                if ($end->getTimestamp() > time()) {
-                    $end->setTimestamp(time());
-                }
 
                 $num = $this->initFN($begin, $end, $params);
 
@@ -157,9 +151,6 @@ abstract class StatsCounter
             $end = new DateTime($year->format('Y-01-01 00:00'));
 
             $end->modify("first day of January next year 00:00");
-            if ($end->getTimestamp() > time()) {
-                $end->setTimestamp(time());
-            }
 
             $num = $this->initFN($begin, $end, $params);
 

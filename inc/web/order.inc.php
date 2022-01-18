@@ -141,11 +141,7 @@ if ($op == 'default') {
     } else {
         $total = $page * $page_size * 100;
     }
-
-    if (ceil($total / $page_size) < $page) {
-        $page = 1;
-    }
-
+    
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 

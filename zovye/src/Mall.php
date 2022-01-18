@@ -115,7 +115,7 @@ class Mall
                 return err('积分操作失败！');
             }
     
-            $order = Delivery::create([
+            $order = Delivery::create(We7::uniacid([
                 'order_no' => Delivery::makeUID($user, time()),
                 'user_id' => $user->getId(),
                 'goods_id' => $goods->getId(),
@@ -131,7 +131,7 @@ class Mall
                         'xval' => $x->getXVal(),
                     ],
                 ]
-            ]);
+            ]));
     
             if (empty($order)) {
                 return err('创建订单出错！');

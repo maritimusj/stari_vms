@@ -33,9 +33,9 @@ class Delivery
         return m('delivery')->create($data);
     }
 
-    public static function query(): modelObjFinder
+    public static function query($condition = []): modelObjFinder
     {
-        return m('delivery')->query();
+        return m('delivery')->query(We7::uniacid([]))->where($condition);
     }
     
     public static function get($id): ?deliveryModelObj

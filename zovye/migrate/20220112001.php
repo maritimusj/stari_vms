@@ -10,6 +10,7 @@ if (!We7::pdo_tableexists($tb_name . '_delivery')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_delivery` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
+    `uniacid` INT NOT NULL , 
     `order_no` VARCHAR(64) NOT NULL , 
     `user_id` INT NOT NULL , 
     `goods_id` INT NOT NULL , 
@@ -22,8 +23,10 @@ CREATE TABLE `ims_zovye_vms_delivery` (
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     UNIQUE (`order_no`), 
-    INDEX `user` (`user_id`, `status`),
-    INDEX `goods` (`goods_id`, `status`)
+    INDEX `user` (`uniacid`, `user_id`, `status`),
+    INDEX `goods` (`uniacid`, `goods_id`, `status`),
+    INDEX `createtime` (`uniacid`, `createtime`, `status`),
+    INDEX `status` (`uniacid`, `status`)
     ) ENGINE = InnoDB;
 SQL;
     Migrate::execSQL($sql);

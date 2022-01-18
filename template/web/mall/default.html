@@ -1,0 +1,398 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20211127');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20201239');}
+<style>
+    .order {
+        display: flex;
+        flex-direction: column;
+    }
+    .order .text {
+
+    }
+    .order .status {
+        width: fit-content;
+        padding: 1px 6px;
+        cursor: default;
+        user-select: none;
+    }
+    .order .status.s0 {
+        border: 1px solid #9e9e9e;
+    }
+    .order .status.s1 {
+        border: 1px solid #4caf50;
+        color: #4caf50;
+    }
+    .order .status.s2 {
+        background-color: #ff5722;
+        color: #fff;
+    }
+    .order .status.s3 {
+        border: 1px solid #2196f3;
+        color: #2196f3;
+    }
+    .order .status.s4 {
+        border: 1px solid #ff9800;
+        color: #ff9800;
+    }
+    .order .status.s5 {
+        background-color: #a52450;
+        color: #fff;
+    }
+    .order .status.s6 {
+        background-color: #4caf50;
+        color: #fff;
+    }
+    .order .status.s100 {
+        border: 1px solid #607d8b;
+        color: #607d8b;
+    }
+    .recipient .name {
+        font-weight: bolder;
+    }
+    .recipient .address {
+        font-weight: lighter;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'pay'));}">支付</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
+    {if \zovye\App::isBalanceEnabled()}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">积分</a></li>
+        <li role="presentation" class="active"><a href="#">商城订单</a></li>     
+    {/if}
+    {if \zovye\App::isCustomAliTicketEnabled()}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'aliTicket'));}">天猫拉新</a></li>
+    {/if}
+    {if \zovye\App::isSQMPayEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'sqm'));}">省钱码</a></li>
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款订单</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常订单</a></li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="panel-body">
+        <div id="search-bar">
+            <div class="text-input">
+                <span>根据条件搜索订单 ...</span>
+                <span class="button"><i class="fa fa-search"></i>&nbsp;搜索</span>
+            </div>
+        </div>
+        <!-- 搜索框开始 -->
+        <div id="search-form">
+            <form action="{php echo $this->createWebUrl('mall');}" method="post">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">关键字</label>
+                    <div class="col-md-8">
+                        <input name="keyword"  class="form-control" type="text" value="{php echo $s_keyword}" style="width: 100%;"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="status" class="col-md-2 control-label">订单状态</label>
+                    <div class="col-md-8">
+                        <select name="status" style="width:8em">
+                            <option value="-1" {if $s_status === -1 }selected="selected"{/if}>全部</option>
+                            {loop $status_arr $v $title}
+                            <option value="{$v}" {if $s_status === $v} selected="selected"{/if}>{$title}</option>
+                            {/loop}
+                        </select>
+                    </div>
+                </div>
+                {if $user_res}
+                <div class="form-group">
+                    <label class="col-md-2 control-label">用户</label>
+                    <div class="col-md-8">
+                        <div class="profile">
+                            <img src="{$user_res['headimgurl']}" />
+                            <span class="nickname operate">
+                                {$user_res['nickname']} <i class="fa fa-times" style="color: gray;" data-op="searchNoUserFilter" title="清除"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="user_id" value="{$s_user_id}">
+                {/if}              
+                <div class="form-group">
+                    <label class="col-md-2 control-label">日期</label>
+                    <div class="col-md-4">
+                        <input name="datelimit[start]" type="hidden" value="{php echo $s_start_date}"/>
+                        <input name="datelimit[end]" type="hidden" value="{php echo $s_end_date}"/>
+                        <button class="btn btn-default daterange daterange-date" type="button">
+                        <span class="date-title">
+                            {if empty($s_start_date) && empty($s_end_date)}
+                            不限时间
+                            {else}
+                            {$s_start_date} 至 {$s_end_date}
+                            {/if}
+                        </span> <i class="fa fa-calendar"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+                        <button class="btn btn-default btn-close" title="清除搜索"><i class="fa fa-ban" style="color: gray;"></i></button>
+                    </div>
+                    <div class="col-md-6"></div>
+                </div>
+            </form>
+        </div>
+        <!-- 搜索框结束 -->
+        {if $orders}
+        <table class="table" id="orderlist">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>订单号</th>
+                    <th>商品图片</th>                
+                    <th>商品名称/数量</th>
+                    <th>收件人</th>
+                    <th>用户</th>
+                    <th>
+                        创建时间
+                    </th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            {loop $orders $index $order}
+                <tr data-id="{$order['id']}">
+                    <td>
+                        {php echo $index + 1}
+                    </td>
+                    <td>
+                        <div class="order">
+                            <span class="text">
+                                {$order['order_no']}
+                            </span>
+                            <span class="status s{$order['status']}">
+                                {$order['status_formatted']}
+                            </span>
+                        </div>
+                        
+                    </td>
+                    <td>
+                        <div class="goods">
+                            <img src="{$order['goods']['img']}">
+                        </div>
+                    </td>
+                    <td>
+                        {$order['goods']['name']}x{$order['num']}
+                    </td>
+                    <td class="recipient">
+                        <div>
+                            <span class="name">{$order['recipient']['name']}</span>
+                            <span class="phone">
+                                {$order['recipient']['phoneNum']}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="address">{$order['recipient']['address']}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="profile">
+                            <img src="{$order['user']['headimgurl']}" />
+                            <span class="nickname">
+                                    {if $user_res && $user_res['id'] == $order['user']['id']}
+                                    {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                                    {else}
+                                    <a filter data-name="user_id" data-val="{$order['user']['id']}" href="{php echo $this->createWebUrl('mall', array('user_id' => $order['user']['id']));}" title="点击查看{php echo $order['user']['nickname']?:'&lt;匿名用户&gt;'}的订单">
+                                        {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                                    </a>
+                                    {/if}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        {$order['createtime_formatted']}
+                    </td>
+                    <td class="operate">
+                        {if $order['status'] == 1}
+                        <button type="button" class="btn btn-success btn-sm" data-op="shipping" title="标记为已发货状态">发货</button>
+                        {elseif $order['status'] == 3}
+                        <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
+                        {/if}
+                    </td>
+                </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何订单！
+        </div>
+        {/if}
+    </div>
+</div>
+<script>
+    const open_id = '{php echo $open_id}' || 0;
+    const device_id = '{php echo $device_id}' || 0;
+
+    const api = {
+        url: "{php echo $this->createWebUrl('mall');}",
+    };
+
+    api.showResult = function (params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function (res) {
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if (cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function () {
+            loading && util.loaded();
+        })
+    }
+
+    api.searchNoUserFilter = function() {
+        reloadPageWithFilter(params => {
+            params.delete('user_id');
+            params.set('page', 1);
+        });
+    }
+
+    api.shipping = function(id) {
+        if (confirm('确定要设置该订单为已发货状态吗？')) {
+            api.showResult({ op: 'setStatus', id, status: 3 }, null, true, function(res) {
+                if (res && res.status) {
+                    $("tr[data-id=" + id + "]").find('.order .status').removeClass('s1').addClass('s3');
+                    $("tr[data-id=" + id + "]").find('.order .status').text(res.data.msg);
+                    $("tr[data-id=" + id + "]").find('td.operate').html(`
+                    <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
+                    `);
+                }
+            });
+        }
+    }
+
+    api.finished = function(id) {
+        if (confirm('确定要设置该订单为已完成状态吗？')) {
+            api.showResult({ op: 'setStatus', id, status: 100 }, null, true, function(res) {
+                if (res && res.status) {
+                    $("tr[data-id=" + id + "]").find('.order .status').removeClass('s3').addClass('s100');
+                    $("tr[data-id=" + id + "]").find('.order .status').text(res.data.msg);
+                    $("tr[data-id=" + id + "]").find('td.operate').html(``);
+                }
+            });
+        }
+    }
+
+    function reloadPageWithFilter(fn) {
+        const url = location.href;
+        const index = url.indexOf('?');
+
+        const params = new URLSearchParams(index === -1 ? null : url.substr(index));
+        const keyword = $('input[name=keyword]').val();
+        if (keyword) {
+            params.set('keyword', keyword);
+        }
+        const start = $('input[name="datelimit[start]"]').val();
+        if (start) {
+            params.set('datelimit[start]', start);
+        }
+        const end = $('input[name="datelimit[end]"]').val();
+        if (end) {
+            params.set('datelimit[end]', end);
+        }
+        if (typeof fn === 'function') {
+            fn(params);
+        }
+
+        const api_url = url.substr(0, index !== -1 ? index : url.length);
+        location.href = api_url + "?" + params.toString();
+    }
+
+    $(function () {
+        const backer = "{$backer}";
+        $('#search-bar').click(function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=order]').focus();
+        })
+
+        if (backer) {
+            $('#search-bar').trigger('click');
+        }
+
+        $('#search-form .btn-close').click(function (e) {
+            if (backer) {
+                location.href = $('#search-form form').attr('action');    
+                setTimeout(function(){util.loading()}, 1000);               
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }
+            e.preventDefault();
+         })
+
+        $('#orderlist').on('click', 'a[filter]', function (e) {
+            const self = this;
+            reloadPageWithFilter(function (params) {
+                const name = $(self).data('name');
+                const val = $(self).data('val');
+                if (name) {
+                    params.set(name, val);
+                    params.set('page', 1);
+                }
+            });
+            e.preventDefault();
+        })
+
+        $('.pagination li:not(.active) a').click(function () {
+            setTimeout(function () { util.loading() }, 1000);
+        })
+
+        $('.panel').on('click', '[data-op]', function (e) {
+            const op = $(this).data('op');
+            if (op && api[op]) {
+                const id = $(this).closest('tr').data('id');
+                api[op](id);
+            }
+            e.preventDefault();
+        })
+
+        $('[data-mobile]').each(function () {
+            util.clip(this, $(this).data('mobile'));
+        })
+
+        require(["daterangepicker"], function () {
+            $(function () {
+                $(".daterange.daterange-date").each(function () {
+                    const elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至 " + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+            })
+        })
+    })
+</script>
+{template 'common/footer'}

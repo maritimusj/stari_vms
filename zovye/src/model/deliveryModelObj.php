@@ -6,6 +6,7 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\Delivery;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 
@@ -23,6 +24,9 @@ class deliveryModelObj extends modelObj
     
      /** @var int */
 	protected $id;
+
+     /** @var int */
+	protected $uniacid;     
 
      /** @var string */
 	protected $order_no;
@@ -58,5 +62,15 @@ class deliveryModelObj extends modelObj
     public function getUser():? userModelObj 
     {
           return User::get($this->user_id);
+    }
+
+    public function getRawGoodsData(): array
+    {
+         return $this->getExtraData('goods', []);
+    }
+
+    public function getFormattedStatus()
+    {
+         return Delivery::formatStatus($this->status);
     }
 }

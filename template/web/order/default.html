@@ -26,7 +26,7 @@
         {if $s_way=='delivery'}
         <li role="presentation" class="active"><a href="#">商城订单</a></li>
         {else}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('mall', array('way' => 'delivery'));}">商城订单</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('mall');}">商城订单</a></li>
         {/if}        
     {/if}
     {if \zovye\App::isCustomAliTicketEnabled()}
@@ -511,7 +511,10 @@
     }
 
     api.searchNoUserFilter = function() {
-        reloadPageWithFilter(params => params.delete('user_id'));
+        reloadPageWithFilter(params => {
+            params.delete('user_id');
+            params.set('page', 1);
+        });
     }
 
     function reloadPageWithFilter(fn) {
@@ -577,6 +580,7 @@
                 const val = $(self).data('val');
                 if (name) {
                     params.set(name, val);
+                    params.set('page', 1);
                 }
             });
             e.preventDefault();

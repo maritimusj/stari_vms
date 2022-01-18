@@ -16,8 +16,8 @@ if ($op == 'stats') {
 
     $data = Util::cachedCall(30, function () {
         $rows = [
-            'n' => ['title' => '订单数量', 'unit' => '单'],
-            'f' => ['title' => '净增用户', 'unit' => '人'],
+            'n' => ['title' => '出货数量', 'unit' => ''],
+            'f' => ['title' => '净增用户', 'unit' => ''],
         ];
 
         $stats_titles = [

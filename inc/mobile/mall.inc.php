@@ -7,9 +7,6 @@
 
 namespace zovye;
 
-use zovye\model\balanceModelObj;
-use zovye\model\goodsModelObj;
-
 defined('IN_IA') or exit('Access Denied');
 
 $user = Util::getCurrentUser();
@@ -43,7 +40,7 @@ if ($op == 'default') {
         'goods_id' => request::int('goods'),
         'num' => request::int('num'),
     ]);
-   
+
     JSON::result($result);
 
 } elseif ($op == 'logs') {

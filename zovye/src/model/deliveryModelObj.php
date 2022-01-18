@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -13,7 +14,13 @@ use zovye\User;
 use function zovye\tb;
 
 /**
- * @method int getUserId()
+ * @method getNum()
+ * @method getOrderNo()
+ * @method getName()
+ * @method getPhoneNum()
+ * @method getAddress()
+ * @method getStatus()
+ * @method setStatus($status)
  */
 class deliveryModelObj extends modelObj
 {
@@ -21,56 +28,56 @@ class deliveryModelObj extends modelObj
     {
         return tb('delivery');
     }
-    
-     /** @var int */
-	protected $id;
 
-     /** @var int */
-	protected $uniacid;     
+    /** @var int */
+    protected $id;
 
-     /** @var string */
-	protected $order_no;
+    /** @var int */
+    protected $uniacid;
 
-     /** @var int */
-	protected $user_id;
+    /** @var string */
+    protected $order_no;
 
-     /** @var int */
-	protected $goods_id;
+    /** @var int */
+    protected $user_id;
 
-     /** @var int */
-	protected $num;
+    /** @var int */
+    protected $goods_id;
 
-     /** @var string */
-	protected $name;
+    /** @var int */
+    protected $num;
 
-     /** @var string */
-	protected $phone_num;
+    /** @var string */
+    protected $name;
 
-     /** @var string */
-	protected $address;
+    /** @var string */
+    protected $phone_num;
 
-     /** @var int */
-	protected $status;
+    /** @var string */
+    protected $address;
 
-	protected $extra;
+    /** @var int */
+    protected $status;
 
-     /** @var int */
-	protected $createtime;
+    protected $extra;
+
+    /** @var int */
+    protected $createtime;
 
     use ExtraDataGettersAndSetters;
 
-    public function getUser():? userModelObj 
+    public function getUser(): ?userModelObj
     {
-          return User::get($this->user_id);
+        return User::get($this->user_id);
     }
 
     public function getRawGoodsData(): array
     {
-         return $this->getExtraData('goods', []);
+        return $this->getExtraData('goods', []);
     }
 
-    public function getFormattedStatus()
+    public function getFormattedStatus(): string
     {
-         return Delivery::formatStatus($this->status);
+        return Delivery::formatStatus($this->status);
     }
 }

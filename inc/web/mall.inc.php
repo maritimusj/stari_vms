@@ -7,6 +7,7 @@
 namespace zovye;
 
 use DateTime;
+use zovye\model\deliveryModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -43,8 +44,8 @@ if ($op == 'default') {
         $status = request::int('status');
         if ($status >= 0) {
             $query->where(['status' => $status]);
-        }     
-        $tpl_data['s_status'] = $status;   
+        }
+        $tpl_data['s_status'] = $status;
     }
 
     if (request::has('user_id')) {
@@ -125,9 +126,9 @@ if ($op == 'default') {
     $pager = We7::pagination($total, $page, $page_size);
     if (stripos($pager, '&filter=1') === false) {
         $filter = [
-            'user_id' => $user_id,
-            'status' => $status,
-            'keyword' => $keyword,
+            'user_id' => $user_id ?? '',
+            'status' => $status ?? '',
+            'keyword' => $keyword ?? '',
             'datelimit[start]' => isset($start) ? $start->format('Y-m-d') : '',
             'datelimit[end]' => isset($end) ? $end->format('Y-m-d') : '',
             'filter' => 1,
@@ -142,7 +143,7 @@ if ($op == 'default') {
         $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
     }
 
-    $tpl_data['backer'] = $keyword || $limit['start'] || $limit['end'] || $tpl_data['s_user_id'] || isset($tpl_data['s_status']);
+    $tpl_data['backer'] = isset($keyword) || $limit['start'] || $limit['end'] || $tpl_data['s_user_id'] || isset($tpl_data['s_status']);
     $tpl_data['pager'] = $pager;
     $tpl_data['orders'] = $orders;
 

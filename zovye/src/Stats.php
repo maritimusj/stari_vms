@@ -537,7 +537,6 @@ class Stats
      */
     public static function brief(): array
     {
-        $entry = app();
         $data = [
             'all' => [
                 'n' => 0, //全部交易数量
@@ -565,79 +564,81 @@ class Stats
             ],
         ];
 
-        $stats = $entry->get('statsData', []);
-        if ($stats) {
-            $y = date('Y'); //年
-            $n = date('n'); //月
-            //$z = date('z'); //一年中的第几天
-            $j = date('j'); //月份中的第几天
+        $counter = new OrderCounter();
+        $first_order = Order::getFirstOrder();
+        $total = 0;
+        if ($first_order) {
+            $e = [app(), 'goods'];
 
-            $data['all']['n'] = $stats['total']['p'] + $stats['total']['f'];
-            $today_total = $stats['data'][$y]['days'][$n][$j];
-            $data['today']['n'] = $today_total['p'] + $today_total['f'];
-
-            $month_total = $stats['data'][$y]['total'][$n];
-            $data['month']['n'] = $month_total['p'] + $month_total['f'];
-
-            for ($index = 0; $index < 7; $index++) {
-
-                $l = strtotime("-$index days");
-
-                $y1 = date('Y', $l);
-                $n1 = date('n', $l);
-                $j1 = date('j', $l);
-
-                $total = $stats['data'][$y1]['days'][$n1][$j1];
-                $data['last7days']['n'] += ($total['p'] + $total['f']);
-                if ($index == 1) {
-                    $data['yesterday']['n'] = ($total['p'] + $total['f']);
-                }
+            $begin = new DateTime();
+            $begin->setTimestamp($first_order['createtime']);
+            $end = new DateTime();
+            
+            while($begin < $end) {
+                $total += (int)$counter->getYearAll($e, $begin)['total'];
+                $begin->modify('+1 year');
             }
 
-            $l = strtotime('-1 month');
-            $y2 = date('Y', $l);
-            $n2 = date('n', $l);
+            $data['all']['n'] = $total;
+            $data['today']['n'] = (int)$counter->getDayAll($e, new DateTime('today'))['total'];
+            $data['yesterday']['n'] = (int)$counter->getDayAll($e, new DateTime('yesterday 00:00'))['total'];
 
-            $total = $stats['data'][$y2]['total'][$n2];
-            $data['lastmonth']['n'] = $total['p'] + $total['f'];
+            $today = new DateTime('today');
+            $last7days = new DateTime('-7 days 00:00');
+            $total = 0;
+            while($today > $last7days) {
+                $total += (int)$counter->getDayAll($e, $today)['total'];
+                $today->modify('-1 day');
+            }
+
+            $data['last7days']['n'] = $total;
+            
+            $data['month']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of this month 00:00'))['total']; 
+            $data['lastmonth']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of last month 00:00'))['total']; 
         }
 
         $query = User::query();
 
-        $lastUser = $query->orderBy('id desc')->findOne();
-        $data['all']['f'] = $lastUser ? $lastUser->getId() : 0;
+        $data['all']['f'] = $query->count();
 
-        $today = strtotime('today');
-        $data['today']['f'] = $query->resetAll()->where(['createtime >=' => $today])->count();
+        $today = new DateTime('today');
+        $data['today']['f'] = $query->resetAll()->where([
+            'createtime >=' => $today->getTimestamp(),
+        ])->count();
 
         $data['yesterday']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $today) {
-            $yesterday = strtotime('yesterday');
+            $yesterday = new DateTime('-1 day 00:00');
             return $query->resetAll()->where([
-                'createtime >=' => $yesterday,
-                'createtime <' => $today,
+                'createtime >=' => $yesterday->getTimestamp(),
+                'createtime <' => $today->getTimestamp(),
             ])->count();
         });
 
         $data['last7days']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query) {
-            $last7days = strtotime(date('Y-m-d 00:00:00', strtotime('-7 days')));
-            return $query->resetAll()->where(['createtime >=' => $last7days])->count();
+            $last7days = new DateTime('-7 days 00:00');
+            return $query->resetAll()->where([
+                'createtime >=' => $last7days->getTimestamp(),
+            ])->count();
         });
 
-        $month = strtotime(date('Y-m-01 00:00:00'));
+        $month = new DateTime('first day of this month 00:00');
         $data['month']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $month) {
-            return $query->resetAll()->where(['createtime >=' => $month])->count();
+            return $query->resetAll()->where(['createtime >=' => $month->getTimestamp()])->count();
         });
 
         $data['lastmonth']['f'] = Util::cachedCallUtil(new DateTime('first day of next month 00:00:00'), function () use ($query, $month) {
-            $lastmonth = strtotime(date('Y-m-01 00:00:00', strtotime('-1 month')));
-            return $query->resetAll()->where(['createtime >=' => $lastmonth, 'createtime <' => $month])->count();
+            $lastmonth = new DateTime('first day of last month 00:00');
+            return $query->resetAll()->where([
+                'createtime >=' => $lastmonth->getTimestamp(), 
+                'createtime <' => $month->getTimestamp()
+            ])->count();
         });
 
         $total = [
             'device' => Device::query()->count(),
             'agent' => Agent::query()->count(),
             'advs' => Account::query(['state' => 1])->count() + Advertising::query(['state <>' => Advertising::DELETED])->count(),
-            'user' => intval($data['all']['f']),
+            'user' => $data['all']['f'],
         ];
 
         return [

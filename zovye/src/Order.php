@@ -152,6 +152,28 @@ class Order extends State
             return self::getFirstOrderOfAccount($obj, $fetch_order_obj);
         }
 
+        if ($obj instanceof WeApp) {
+            return self::getFirstOrder($fetch_order_obj);
+        }
+
+        return null;
+    }
+
+    public static function getFirstOrder($fetch_order_obj = false)
+    {
+        $data = settings('stats.first_order');
+        if ($data && $data['id']) {
+            return $fetch_order_obj ? Order::get($data['id']) : $data;
+        }
+        $order = self::query()->orderBy('id ASC')->findOne();
+        if ($order) {
+            $data = [
+                'id' => $order->getId(),
+                'createtime' => $order->getCreatetime(),
+            ];
+            updateSettings('stats.first_order', $data);
+            return $fetch_order_obj ? $order : $data; 
+        }
         return null;
     }
 

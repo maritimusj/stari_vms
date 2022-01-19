@@ -65,6 +65,7 @@ if ($op == 'default') {
     if (empty($recipient)) {
         $recipient = null;
     }
+
     JSON::success($recipient);
 
 } elseif ($op == 'update_recipient') {
@@ -78,5 +79,6 @@ if ($op == 'default') {
     if ($result) {
         JSON::success('已保存！');
     }
+
     JSON::fail('保存失败！');
 }

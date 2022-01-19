@@ -53,7 +53,7 @@ class Delivery
         return substr("U{$user->getId()}P$nonce" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
-    public static function formatStatus($status)
+    public static function formatStatus($status): string
     {
         static $status_title = [
             self::UNPAID => '未支付',
@@ -106,7 +106,7 @@ class Delivery
         } else {
             if ($params['last_id']) {
                 $last_id = $params['last_id'];
-                $result['list_id'] = $last_id ?? 0;
+                $result['list_id'] = $last_id;
                 $query->where(['id <' => $last_id]);  
             }
 

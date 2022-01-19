@@ -253,15 +253,10 @@ class Stats
         return $chart;
     }
 
-    /**
-     * @param int $len
-     * @param int $max
-     * @return array
-     */
-    public static function chartDataOfAgents(int $len = 7, int $max = 15): array
+    private static function fillChartData($params = []): array
     {
         $chart = [
-            'title' => ['text' => "代理商最近{$len}日出货统计"],
+            'title' => ['text' => "{$params['title']}最近{$params['len']}日出货统计"],
             'tooltip' => ['trigger' => 'axis'],
             'grid' => ['height' => '50%', 'left' => 60, 'right' => 30],
             'xAxis' => ['type' => 'category', 'boundaryGap' => false],
@@ -270,25 +265,30 @@ class Stats
             'series' => [],
         ];
 
-        $first_day = new DateTime("-$len days 00:00");
+        $first_day = new DateTime("-{$params['len']} days 00:00");
         $last_day = new DateTime('next day 00:00');
 
-        $stats = Order::query()
-            ->where(['createtime >=' => $first_day->getTimestamp()])
-            ->groupBy('agent_id')
-            ->orderBy('total ASC')
-            ->limit($max)
-            ->getAll(['agent_id', 'count(*) AS total']);
+        foreach ($params['data'] as $index => $item) {
+            $chart['series'][$index] = [
+                'type' => 'line',
+                'smooth' => true,
+                'stack' => '总量',
+                'areaStyle' => ['normal' => []],
+                'color' => Util::randColor(),
+                'name' => $item['name'],
+                'data' => [],
+            ];
 
-        foreach ($stats as $index => $stat) {
-            if (empty($stat['agent_id'])) {
-                continue;
+            try {
+                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
+                while ($begin < $last_day) {
+                    $data = Stats::getDayTotal($item['obj'], $begin);
+                    $chart['series'][$index]['total'] += $data['total'];
+                    $chart['series'][$index]['data'][] = $data['total'];
+                    $begin->modify('next day');
+                }
+            } catch (Exception $e) {
             }
-            $agent = Agent::get($stat['agent_id']);
-            if (!$agent) {
-                continue;
-            }
-            $chart = self::updateChartData($agent, $chart, $index, $first_day, $last_day);
         }
 
         while ($first_day < $last_day) {
@@ -296,12 +296,51 @@ class Stats
             $first_day->modify('next day');
         }
 
-        $chart['series'] = array_slice($chart['series'], 0, $max);
         foreach ($chart['series'] as $item) {
             $chart['legend']['data'][] = $item['name'];
         }
 
         return $chart;
+    }
+
+    /**
+     * @param int $len
+     * @param int $max
+     * @return array
+     */
+    public static function chartDataOfAgents(int $len = 7, int $max = 15): array
+    {
+        $first_day = new DateTime("-$len days 00:00");
+
+        $res = Order::query()
+            ->where(['createtime >=' => $first_day->getTimestamp()])
+            ->groupBy('agent_id')
+            ->orderBy('total ASC')
+            ->limit($max)
+            ->getAll(['agent_id', 'count(*) AS total']);
+
+        $data = [];
+        foreach ($res as $item) {
+            if (empty($item['agent_id'])) {
+                continue;
+            }
+
+            $agent = Agent::get($item['agent_id']);
+            if (!$agent) {
+                continue;
+            }
+
+            $data[] = [
+                'obj' => $agent,
+                'name' => $agent->getName(),
+            ];
+        }
+
+        return self::fillChartData([
+            'title' => '代理商',
+            'len' => $len,
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -311,67 +350,37 @@ class Stats
      */
     public static function chartDataOfAccounts(int $len = 7, int $max = 15): array
     {
-        $chart = [
-            'title' => ['text' => "公众号最近{$len}日出货统计"],
-            'tooltip' => ['trigger' => 'axis'],
-            'grid' => ['height' => '50%', 'left' => 60, 'right' => 30],
-            'xAxis' => ['type' => 'category', 'boundaryGap' => false],
-            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
-            'legend' => ['data' => [], 'bottom' => 0, 'top' => 300],
-            'series' => [],
-        ];
-
-
         $first_day = new DateTime("-$len days 00:00");
-        $last_day = new DateTime('next day 00:00');
 
-        $stats = Order::query()
+        $res = Order::query()
             ->where(['createtime >=' => $first_day->getTimestamp()])
             ->groupBy('account')
             ->orderBy('total ASC')
             ->limit($max)
             ->getAll(['account', 'count(*) AS total']);
 
-        foreach ($stats as $index => $stat) {
-            if (empty($stat['account'])) {
+        $data = [];
+        foreach ($res as $item) {
+            if (empty($item['account'])) {
                 continue;
             }
 
-            $account = Account::findOneFromName($stat['account']);
+            $account = Account::findOneFromName($item['account']);
             if (empty($account)) {
                 continue;
             }
 
-            $chart['series'][$index] = [
-                'type' => 'line',
-                'smooth' => true,
-                'stack' => '总量',
-                'areaStyle' => ['normal' => []],
-                'color' => Util::randColor(),
+            $data[] = [
+                'obj' => $account,
                 'name' => $account->getTitle(),
-                'data' => [],
             ];
-
-            try {
-                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
-            } catch (Exception $e) {
-                continue;
-            }
-
-            while ($begin < $last_day) {
-                $data = Stats::getDayTotal($account, $begin);
-                $chart['series'][$index]['total'] += $data['total'];
-                $chart['series'][$index]['data'][] = $data['total'];
-                $begin->modify('next day');
-            }
         }
 
-        $chart['series'] = array_slice($chart['series'], 0, $max);
-        foreach ($chart['series'] as $item) {
-            $chart['legend']['data'][] = $item['name'];
-        }
-
-        return $chart;
+        return self::fillChartData([
+            'title' => '公众号',
+            'len' => $len,
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -381,45 +390,37 @@ class Stats
      */
     public static function chartDataOfDevices(int $len = 7, int $max = 15): array
     {
-        $chart = [
-            'title' => ['text' => "设备最近{$len}日出货统计"],
-            'tooltip' => ['trigger' => 'axis'],
-            'grid' => ['height' => '50%', 'left' => 60, 'right' => 30],
-            'xAxis' => ['type' => 'category', 'boundaryGap' => false],
-            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
-            'legend' => ['data' => [], 'bottom' => 0, 'top' => 300],
-            'series' => [],
-        ];
-
         $first_day = new DateTime("-$len days 00:00");
-        $last_day = new DateTime('next day 00:00');
 
-        $stats = Order::query()
+        $res = Order::query()
             ->where(['createtime >=' => $first_day->getTimestamp()])
             ->groupBy('device_id')
             ->orderBy('total ASC')
             ->limit($max)
             ->getAll(['device_id', 'count(*) AS total']);
 
-        foreach ($stats as $index => $stat) {
-            if (empty($stat['device_id'])) {
+        $data = [];
+        foreach ($res as $item) {
+            if (empty($item['device_id'])) {
                 continue;
             }
 
-            $device = Device::get($stat['device_id']);
+            $device = Device::get($item['device_id']);
             if (empty($device)) {
                 continue;
             }
 
-            $chart = self::updateChartData($device, $chart, $index, $first_day, $last_day);
+            $data[] = [
+                'obj' => $device,
+                'name' => $device->getName(),
+            ];
         }
 
-        $chart['series'] = array_slice($chart['series'], 0, $max);
-        foreach ($chart['series'] as $item) {
-            $chart['legend']['data'][] = $item['name'];
-        }
-
-        return $chart;
+        return self::fillChartData([
+            'title' => '设备',
+            'len' => $len,
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -862,40 +863,6 @@ class Stats
         if ($title) {
             $chart['title'] = ['text' => $title];
         }
-        return $chart;
-    }
-
-    /**
-     * @param $obj
-     * @param array $chart
-     * @param $index
-     * @param DateTime $first_day
-     * @param DateTime $last_day
-     * @return array
-     */
-    private static function updateChartData($obj, array $chart, $index, DateTime $first_day, DateTime $last_day): array
-    {
-        $chart['series'][$index] = [
-            'type' => 'line',
-            'smooth' => true,
-            'stack' => '总量',
-            'areaStyle' => ['normal' => []],
-            'color' => Util::randColor(),
-            'name' => $obj->getName(),
-            'data' => [],
-        ];
-
-        try {
-            $begin = new DateTime($first_day->format('Y-m-d 00:00'));
-            while ($begin < $last_day) {
-                $data = Stats::getDayTotal($obj, $begin);
-                $chart['series'][$index]['total'] += $data['total'];
-                $chart['series'][$index]['data'][] = $data['total'];
-                $begin->modify('next day');
-            }
-        } catch (Exception $e) {
-        }
-
         return $chart;
     }
 

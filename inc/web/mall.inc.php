@@ -92,7 +92,7 @@ if ($op == 'default') {
     foreach ($query->findAll() as $entry) {
         $data = [
             'id' => $entry->getId(),
-            'order_no' => $entry->getOrderNo(),
+            'orderNO' => $entry->getOrderNo(),
             'num' => $entry->getNum(),
             'recipient' => [
                 'name' => $entry->getName(),

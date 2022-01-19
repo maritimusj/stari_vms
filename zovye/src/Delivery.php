@@ -119,13 +119,15 @@ class Delivery
         /** @var deliveryModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $user = $entry->getUser();
-            $list[] = [
+            $data = [
                 'id' => $entry->getId(),
                 'orderNO' => $entry->getOrderNo(),
-                'user' => $user ? $user->profile() : [],
-                'name' => $entry->getName(),
-                'phoneNum' => $entry->getPhoneNum(),
-                'address' => $entry->getAddress(),
+                'user' => $user ? $user->profile(false) : [],
+                'recipient' => [
+                    'name' => $entry->getName(),
+                    'phoneNum' => $entry->getPhoneNum(),
+                    'address' => $entry->getAddress(),
+                ],
                 'goods' => $entry->getExtraData('goods', []),
                 'num' => $entry->getNum(),
                 'status' => $entry->getStatus(),
@@ -133,6 +135,18 @@ class Delivery
                 'createtime' => $entry->getCreatetime(),
                 'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];
+
+            $balance = $entry->getExtraData('balance', []);
+            if ($balance) {
+                $data['balance'] = abs($balance['xval']);
+            }
+    
+            $shipping = $entry->getExtraData('shipping', []);
+            if (!isEmptyArray($shipping)) {
+                $data['shipping'] = $shipping;
+            }
+
+            $list[] = $data;
         }
 
         $result['list'] = $list;

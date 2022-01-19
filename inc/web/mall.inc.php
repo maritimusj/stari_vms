@@ -115,9 +115,9 @@ if ($op == 'default') {
             $data['balance'] = abs($balance['xval']);
         }
 
-        $shipping = $entry->getExtraData('shipping', []);
-        if (!isEmptyArray($shipping)) {
-            $data['shipping'] = $shipping;
+        $package = $entry->getExtraData('package', []);
+        if (!isEmptyArray($package)) {
+            $data['package'] = $package;
         }
 
         $orders[] = $data;
@@ -169,7 +169,7 @@ if ($op == 'default') {
 
     JSON::fail('操作失败！');
 
-} elseif ($op == 'shipping_edit') {
+} elseif ($op == 'package_edit') {
 
     $id = request::int('id');
     $delivery = Delivery::get($id);
@@ -177,16 +177,16 @@ if ($op == 'default') {
         JSON::fail('找不到这个商城订单！');
     }
 
-    $shipping = $delivery->getExtraData('shipping', []);
+    $package = $delivery->getExtraData('package', []);
 
-    $content = app()->fetchTemplate('web/mall/shipping_edit', [
+    $content = app()->fetchTemplate('web/mall/package_edit', [
         'id' => $delivery->getId(),
-        'shipping' => $shipping,
+        'package' => $package,
     ]);
 
     JSON::success(['title' => "发货信息[ {$delivery->getOrderNo()} ]", 'content' => $content]);
 
-} elseif ($op == 'save_shipping') {
+} elseif ($op == 'save_package') {
 
     $id = request::int('id');
     $delivery = Delivery::get($id);
@@ -194,25 +194,26 @@ if ($op == 'default') {
         JSON::fail('找不到这个商城订单！');
     }
 
-    $carrier = request::trim('carrier');
     $uid = request::trim('uid');
+    $carrier = request::trim('carrier');
     $memo = request::trim('memo');
 
-    $shipping = [
+    $package = [
         'uid' => $uid,
         'carrier' => $carrier,
         'memo' => $memo,
     ];
 
-    $delivery->setExtraData('shipping', $shipping);
+    $delivery->setExtraData('package', $package);
 
     $delivery->setStatus(Delivery::SHIPPING);
 
     if ($delivery->save()) {
         JSON::success([
-            'msg' => isEmptyArray($shipping) ? Delivery::formatStatus(Delivery::SHIPPING) : '已保存！',
+            'msg' => isEmptyArray($package) ? Delivery::formatStatus(Delivery::SHIPPING) : '已保存！',
             'title' => Delivery::formatStatus(Delivery::SHIPPING),
             'status' => Delivery::SHIPPING,
+            'package' => $package,
         ]);
     }
     JSON::fail('保存失败！');

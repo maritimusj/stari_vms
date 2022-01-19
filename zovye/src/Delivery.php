@@ -141,9 +141,9 @@ class Delivery
                 $data['balance'] = abs($balance['xval']);
             }
     
-            $shipping = $entry->getExtraData('shipping', []);
-            if (!isEmptyArray($shipping)) {
-                $data['shipping'] = $shipping;
+            $package = $entry->getExtraData('package', []);
+            if (!isEmptyArray($package)) {
+                $data['package'] = $package;
             }
 
             $list[] = $data;

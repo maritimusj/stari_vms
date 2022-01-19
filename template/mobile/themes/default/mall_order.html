@@ -175,7 +175,12 @@
 					<span>x{{item.num}}</span>
 				</div>
 				<span class="desc">订单编号：{{item.orderNO}}</span>
-				<span class="desc">收货信息：{{item.name}}, {{item.phoneNum}}, {{item.address}}</span>
+				<template v-if="item.package">
+					<span class="desc" v-if="item.package.uid">快递单号：{{item.package.uid}}</span>
+					<span class="desc" v-if="item.package.carrier">快递公司：{{item.package.carrier}}</span>
+					<span class="desc" v-if="item.package.memo">备注信息：{{item.package.memo}}</span>
+				</template>
+				<span class="desc">收货信息：{{item.recipient.name}}, {{item.recipient.phoneNum}}, {{item.recipient.address}}</span>
 				<div class="row">
 					<span class="desc" style="flex: 1;">订单时间：{{item.createtime_formatted}}</span>
 					<span :class="{'status': true, 'success': item.status === 1 || item.status === 4, 'fail': item.status === 0 || item.status === 2 || item.status === 6, 'underway': item.status === 3 || item.status === 5, 'finish': item.status === 100}" style="margin-top: 5px;">{{item.status_formatted}}</span>

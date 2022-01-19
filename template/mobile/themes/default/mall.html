@@ -6,6 +6,7 @@
     <meta name="viewport"
         content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
     <title>积分商城</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
     <style type="text/css">
         html,
         body {
@@ -74,6 +75,15 @@
         .tab-item .selected {
             color: #FA639B;
         }
+
+        #adv-swiper-container {
+			width: 100%;
+			--swiper-theme-color: #FA639B;
+		}
+
+		.swiper-img {
+			width: 100%;
+		}
 
         .list {
             width: 100vw;
@@ -507,6 +517,14 @@
 
 <body ontouchstart>
     <div id="app" v-cloak>
+        <div class="swiper" id="adv-swiper-container" v-if="slides.length > 0">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide" v-for="(item,index) in slides" @click="slideClick(item)">
+					<img class="swiper-img" :src="item.image" />
+				</div>
+			</div>
+			<div class="swiper-pagination"></div>
+		</div>
         <div class="list">
             <div class="goods clickable" v-for="item in goods.list" @click="goodsClick(item)">
                 <img class="img" :src="item.img">
@@ -635,6 +653,7 @@
     </div>
     {$tpl['js']['code']}
     {php \zovye\url(true, JS_VUE_URL);}
+    <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
     <script type="text/javascript">
         new Vue({
             el: '#app',
@@ -645,6 +664,7 @@
                     text: '',
                     timeout: null
                 },
+                slides: [],
                 goods: {
                     list: null,
                     page: 1,
@@ -668,6 +688,7 @@
                 max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
             },
             created() {
+                this.getSlideList();
                 this.getGoodsList();
                 window.addEventListener('scroll', this.scrollBottom);
             },
@@ -675,6 +696,38 @@
                 window.removeEventListener('scroll', this.scrollBottom);
             },
             methods: {
+                getSlideList() {
+                    zovye_fn.getAdvs(4, 10, (data) => {
+                        let array = [];
+                        data.forEach(e => {
+                            e.data.images.forEach(img => {
+                                let obj = {
+                                    image: img,
+                                    url: e.data.link,
+                                    id: e.id
+                                };
+                                array.push(obj);
+                            })
+                        });
+                        this.slides = array;
+                        this.$nextTick(() => {
+                            new Swiper('#adv-swiper-container', {
+                                autoplay: {
+                                    delay: 3000,
+                                    disableOnInteraction: false
+                                },
+                                pagination: {
+                                    el: '.swiper-pagination'
+                                }
+                            });
+                        });
+                    });
+                },
+                slideClick(item) {
+					if (item.url) {
+						window.location.href = item.url;
+					}
+				},
                 getGoodsList() {
                     this.loading = true;
                     const page = this.goods.page;

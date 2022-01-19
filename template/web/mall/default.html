@@ -53,10 +53,10 @@
     .recipient .address {
         font-weight: lighter;
     }
-    .order:hover .shipping {
+    .order:hover .package {
         display: flex;
     }
-    .shipping {
+    .package {
         cursor: default;
         border: 1px solid #eee;
         padding: 6px 10px;
@@ -69,7 +69,7 @@
         box-shadow: 4px 3px rgb(158 158 158 / 14%);
         display: none;
     }
-    .shipping .title {
+    .package .title {
         font-weight: bolder;
     }
 </style>
@@ -198,7 +198,7 @@
                     <td>
                         <div class="order">
                             {if $order['status'] == \zovye\Delivery::SHIPPING}
-                            <span class="status s{$order['status']}" data-op="shipping">
+                            <span class="status s{$order['status']}" data-op="package">
                                 {$order['status_formatted']}
                             </span>
                             {else}
@@ -206,21 +206,21 @@
                                 {$order['status_formatted']}
                             </span>
                             {/if}
-                            {if $order['shipping']}
-                            <div class="shipping">
-                                {if $order['shipping']['carrier']}
+                            {if $order['package']}
+                            <div class="package">
+                                {if $order['package']['carrier']}
                                 <div>
-                                    <span class="title">快递公司：</span><span>{$order['shipping']['carrier']}</span>
+                                    <span class="title">快递公司：</span><span>{$order['package']['carrier']}</span>
                                 </div>
                                 {/if}
-                                {if $order['shipping']['uid']}
+                                {if $order['package']['uid']}
                                 <div>
-                                    <span class="title">快递单号：</span><span>{$order['shipping']['uid']}</span>
+                                    <span class="title">快递单号：</span><span>{$order['package']['uid']}</span>
                                 </div>
                                 {/if}
-                                {if $order['shipping']['memo']}
+                                {if $order['package']['memo']}
                                 <div>
-                                    <span class="title">备注信息：</span><span>{$order['shipping']['memo']}</span>
+                                    <span class="title">备注信息：</span><span>{$order['package']['memo']}</span>
                                 </div>
                                 {/if}
                             </div>
@@ -267,7 +267,7 @@
                     </td>
                     <td class="operate">
                         {if $order['status'] == \zovye\Delivery::PAYED}
-                        <button type="button" class="btn btn-success btn-sm" data-op="shipping" title="标记为已发货状态">发货</button>
+                        <button type="button" class="btn btn-success btn-sm" data-op="package" title="标记为已发货状态">发货</button>
                         {elseif $order['status'] == \zovye\Delivery::SHIPPING}
                         <button type="button" class="btn btn-warning btn-sm" data-op="finished" title="标记订单已完成">完成</button> 
                         {/if}
@@ -329,15 +329,15 @@
         });
     }
 
-    api.shipping = function(id) {
-        api.showResult({ op: 'shipping_edit', id });
+    api.package = function(id) {
+        api.showResult({ op: 'package_edit', id });
     }
 
     api.saveShippingData = function(id) {
         const carrier = $('#editShippingDataForm input[name=carrier]').val();
         const uid = $('#editShippingDataForm input[name=uid]').val();
         const memo = $('#editShippingDataForm input[name=memo]').val();
-        api.showResult({ op: 'save_shipping', id, carrier, uid, memo }, null, true, function(res) {
+        api.showResult({ op: 'save_package', id, carrier, uid, memo }, null, true, function(res) {
             if (res && res.status) {
                 $e = $("tr[data-id=" + id + "]").find('.order .status');
                 if ($e) {

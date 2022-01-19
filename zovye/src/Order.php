@@ -189,7 +189,7 @@ class Order extends State
             return $fetch_order_obj ? Order::get($data['id']) : $data;
         }
         $query = self::query(['device_id' => $device->getId()]);
-        $order = $query->orderBy('createtime ASC')->findOne();
+        $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $data = [
                 'id' => $order->getId(),
@@ -208,7 +208,7 @@ class Order extends State
     public static function getLastOrderOfDevice(deviceModelObj $device): ?orderModelObj
     {
         $query = self::query(['device_id' => $device->getId()]);
-        return $query->orderBy('createtime DESC')->findOne();
+        return $query->orderBy('id DESC')->findOne();
     }
 
     /**
@@ -224,7 +224,7 @@ class Order extends State
         }
         $query = self::query(['agent_id' => $agent->getId()]);
         /** @var orderModelObj $order */
-        $order = $query->orderBy('createtime ASC')->findOne();
+        $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $agent->setFirstOrderData($order);
             return $fetch_order_obj ? $order : [
@@ -238,7 +238,7 @@ class Order extends State
     public static function getLastOrderOfAgent(agentModelObj $agent): ?orderModelObj
     {
         $query = self::query(['agent_id' => $agent->getId()]);
-        return $query->orderBy('createtime DESC')->findOne();
+        return $query->orderBy('id DESC')->findOne();
     }
 
     /**
@@ -254,7 +254,7 @@ class Order extends State
         }
         $query = self::query(['account' => $account->getName()]);
         /** @var orderModelObj $order */
-        $order = $query->orderBy('createtime ASC')->findOne();
+        $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $account->setFirstOrderData($order);
             return $fetch_order_obj ? $order : [
@@ -278,7 +278,7 @@ class Order extends State
         }
         $query = self::query(['openid' => $user->getOpenid()]);
         /** @var orderModelObj $order */
-        $order = $query->orderBy('createtime ASC')->findOne();
+        $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $data = [
                 'id' => $order->getId(),
@@ -297,7 +297,7 @@ class Order extends State
     public static function getLastOrderOfUser(userModelObj $user): ?orderModelObj
     {
         $query = self::query(['openid' => $user->getOpenid()]);
-        return $query->orderBy('createtime DESC')->findOne();
+        return $query->orderBy('id DESC')->findOne();
     }
 
     public static function getCommissionDetail($id): array

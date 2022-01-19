@@ -361,7 +361,6 @@ if ($op == 'list') {
 
             $data['device_type'] = $entry->getDeviceType();
 
-
             $statistic = $entry->get('firstMsgStatistic', []);
             if ($statistic) {
                 $data['firstMsgTotal'] = intval($statistic[date('Ym')][date('d')]['total']);

@@ -79,16 +79,16 @@ class Stats
      */
     public static function getDayTotal(modelObj $obj, $day = null): array
     {
-        if (is_string($day)) {
-            try {
+        try {
+            if (is_string($day)) {
                 $begin = new DateTime($day);
-            } catch (Exception $e) {
-                return [];
+            } elseif ($day instanceof DateTimeInterface) {
+                $begin = new DateTime($day->format('Y-m-d 00:00'));
+            } else {
+                $begin = new DateTime();
             }
-        } elseif ($day instanceof DateTimeInterface) {
-            $begin = new DateTime($day->format('Y-m-d 00:00'));
-        } else {
-            $begin = new DateTime();
+        } catch (Exception $e) {
+            return [];
         }
 
         $first_order = Order::getFirstOrderOf($obj);
@@ -96,7 +96,6 @@ class Stats
             return [];
         }
 
-        $begin->modify('00:00');
         if ($begin->getTimestamp() < $first_order['createtime']) {
             return [];
         }
@@ -104,13 +103,7 @@ class Stats
         $counter = new OrderCounter();
         $result = $counter->getDayAll([$obj, 'goods'], $begin);
 
-        if (App::isBalanceEnabled()) {
-            if (Balance::isPayOrder()) {
-                $result['pay'] += intval($result['balance']);
-            } elseif (Balance::isFreeOrder()) {
-                $result['free'] += intval($result['balance']);
-            }
-        }
+        self::calcBalanceOrder($result);
 
         return $result;
     }
@@ -123,16 +116,16 @@ class Stats
      */
     public static function getMonthTotal(modelObj $obj, $month = null): array
     {
-        if (is_string($month)) {
-            try {
+        try {
+            if (is_string($month)) {
                 $begin = new DateTime($month);
-            } catch (Exception $e) {
-                return [];
+            } elseif ($month instanceof DateTimeInterface) {
+                $begin = new DateTime($month->format('Y-m-01 00:00'));
+            } else {
+                $begin = new DateTime();
             }
-        } elseif ($month instanceof DateTimeInterface) {
-            $begin = new DateTime($month->format('Y-m-01 00:00'));
-        } else {
-            $begin = new DateTime();
+        } catch (Exception $e) {
+            return [];
         }
 
         $first_order = Order::getFirstOrderOf($obj);
@@ -140,7 +133,6 @@ class Stats
             return [];
         }
 
-        $begin->modify('first day of this month 00:00');
         if ($begin->getTimestamp() < $first_order['createtime']) {
             return [];
         }
@@ -148,13 +140,7 @@ class Stats
         $counter = new OrderCounter();
         $result = $counter->getMonthAll([$obj, 'goods'], $begin);
 
-        if (App::isBalanceEnabled()) {
-            if (Balance::isPayOrder()) {
-                $result['pay'] += intval($result['balance']);
-            } elseif (Balance::isFreeOrder()) {
-                $result['free'] += intval($result['balance']);
-            }
-        }
+        self::calcBalanceOrder($result);
 
         return $result;
     }
@@ -174,13 +160,7 @@ class Stats
             'pay' => intval($stats['total']['p']),
         ];
 
-        if (App::isBalanceEnabled()) {
-            if (Balance::isPayOrder()) {
-                $result['pay'] += intval($stats['b']);
-            } elseif (Balance::isFreeOrder()) {
-                $result['free'] += intval($stats['b']);
-            }
-        }
+        self::calcBalanceOrder($result);
 
         $result['total'] = $result['free'] + $result['pay'];
 
@@ -197,30 +177,7 @@ class Stats
      */
     public static function chartDataOfDay(modelObj $obj, DateTimeInterface $day, string $title = ''): array
     {
-        $chart = [
-            'tooltip' => ['trigger' => 'axis'],
-            'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
-            'xAxis' => ['type' => 'category'],
-            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
-            'series' => [
-                [
-                    'type' => 'line',
-                    'color' => '#00CC33',
-                    'name' => '免费',
-                    'data' => [],
-                ],
-                [
-                    'type' => 'line',
-                    'color' => '#FF3300',
-                    'name' => '支付',
-                    'data' => [],
-                ],
-            ],
-        ];
-
-        if ($title) {
-            $chart['title'] = ['text' => $title];
-        }
+        $chart = self::getChartInitData($title);
 
         try {
             $begin = new DateTime($day->format('Y-m-d 00:00'));
@@ -236,13 +193,8 @@ class Stats
 
             while ($begin < $end) {
                 $data = $counter->getHourAll([$obj, 'goods'], $begin);
-                if (App::isBalanceEnabled()) {
-                    if (Balance::isFreeOrder()) {
-                        $data['free'] += $data['balance'];
-                    } elseif (Balance::isPayOrder()) {
-                        $data['pay'] += $data['balance'];
-                    }
-                }
+
+                self::calcBalanceOrder($data);
 
                 $chart['series'][0]['data'][] = $data['free'];
                 $chart['series'][1]['data'][] = $data['pay'];
@@ -267,29 +219,7 @@ class Stats
      */
     public static function chartDataOfMonth(modelObj $obj, DateTimeInterface $month, string $title = ''): array
     {
-        $chart = [
-            'tooltip' => ['trigger' => 'axis'],
-            'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
-            'xAxis' => ['type' => 'category'],
-            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
-            'series' => [
-                [
-                    'type' => 'line',
-                    'color' => '#00CC33',
-                    'name' => '免费',
-                    'data' => [],
-                ],
-                [
-                    'type' => 'line',
-                    'color' => '#FF3300',
-                    'name' => '支付',
-                    'data' => [],
-                ],
-            ],
-        ];
-        if ($title) {
-            $chart['title'] = ['text' => $title];
-        }
+        $chart = self::getChartInitData($title);
 
         try {
             $begin = new DateTime($month->format('Y-m-01 00:00'));
@@ -306,13 +236,8 @@ class Stats
 
             while ($begin < $end) {
                 $data = $counter->getDayAll([$obj, 'goods'], $begin);
-                if (App::isBalanceEnabled()) {
-                    if (Balance::isFreeOrder()) {
-                        $data['free'] += $data['balance'];
-                    } elseif (Balance::isPayOrder()) {
-                        $data['pay'] += $data['balance'];
-                    }
-                }
+
+                self::calcBalanceOrder($data);
 
                 $chart['series'][0]['data'][] = $data['free'];
                 $chart['series'][1]['data'][] = $data['pay'];
@@ -363,25 +288,7 @@ class Stats
             if (!$agent) {
                 continue;
             }
-            $chart['series'][$index] = [
-                'type' => 'line',
-                'smooth' => true,
-                'stack' => '总量',
-                'areaStyle' => ['normal' => []],
-                'color' => Util::randColor(),
-                'name' => $agent->getName(),
-                'data' => [],
-            ];
-            try {
-                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
-                while ($begin < $last_day) {
-                    $data = Stats::getDayTotal($agent, $begin);
-                    $chart['series'][$index]['total'] += $data['total'];
-                    $chart['series'][$index]['data'][] = $data['total'];
-                    $begin->modify('next day');
-                }
-            } catch (Exception $e) {
-            }
+            $chart = self::updateChartData($agent, $chart, $index, $first_day, $last_day);
         }
 
         while ($first_day < $last_day) {
@@ -447,13 +354,15 @@ class Stats
 
             try {
                 $begin = new DateTime($first_day->format('Y-m-d 00:00'));
-                while ($begin < $last_day) {
-                    $data = Stats::getDayTotal($account, $begin);
-                    $chart['series'][$index]['total'] += $data['total'];
-                    $chart['series'][$index]['data'][] = $data['total'];
-                    $begin->modify('next day');
-                }
             } catch (Exception $e) {
+                continue;
+            }
+
+            while ($begin < $last_day) {
+                $data = Stats::getDayTotal($account, $begin);
+                $chart['series'][$index]['total'] += $data['total'];
+                $chart['series'][$index]['data'][] = $data['total'];
+                $begin->modify('next day');
             }
         }
 
@@ -502,26 +411,7 @@ class Stats
                 continue;
             }
 
-            $chart['series'][$index] = [
-                'type' => 'line',
-                'smooth' => true,
-                'stack' => '总量',
-                'areaStyle' => ['normal' => []],
-                'color' => Util::randColor(),
-                'name' => $device->getName(),
-                'data' => [],
-            ];
-
-            try {
-                $begin = new DateTime($first_day->format('Y-m-d 00:00'));
-                while ($begin < $last_day) {
-                    $data = Stats::getDayTotal($device, $begin);
-                    $chart['series'][$index]['total'] += $data['total'];
-                    $chart['series'][$index]['data'][] = $data['total'];
-                    $begin->modify('next day');
-                }
-            } catch (Exception $e) {
-            }
+            $chart = self::updateChartData($device, $chart, $index, $first_day, $last_day);
         }
 
         $chart['series'] = array_slice($chart['series'], 0, $max);
@@ -573,8 +463,8 @@ class Stats
             $begin = new DateTime();
             $begin->setTimestamp($first_order['createtime']);
             $end = new DateTime();
-            
-            while($begin < $end) {
+
+            while ($begin < $end) {
                 $total += (int)$counter->getYearAll($e, $begin)['total'];
                 $begin->modify('+1 year');
             }
@@ -586,15 +476,15 @@ class Stats
             $today = new DateTime('today');
             $last7days = new DateTime('-7 days 00:00');
             $total = 0;
-            while($today > $last7days) {
+            while ($today > $last7days) {
                 $total += (int)$counter->getDayAll($e, $today)['total'];
                 $today->modify('-1 day');
             }
 
             $data['last7days']['n'] = $total;
-            
-            $data['month']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of this month 00:00'))['total']; 
-            $data['lastmonth']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of last month 00:00'))['total']; 
+
+            $data['month']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of this month 00:00'))['total'];
+            $data['lastmonth']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of last month 00:00'))['total'];
         }
 
         $query = User::query();
@@ -627,9 +517,9 @@ class Stats
         });
 
         $data['lastmonth']['f'] = Util::cachedCallUtil(new DateTime('first day of next month 00:00:00'), function () use ($query, $month) {
-            $lastmonth = new DateTime('first day of last month 00:00');
+            $last_month = new DateTime('first day of last month 00:00');
             return $query->resetAll()->where([
-                'createtime >=' => $lastmonth->getTimestamp(), 
+                'createtime >=' => $last_month->getTimestamp(),
                 'createtime <' => $month->getTimestamp()
             ])->count();
         });
@@ -869,13 +759,7 @@ class Stats
         while ($begin < $end) {
             $data = $counter->getDayAll([$obj, 'goods'], $begin);
 
-            if (App::isBalanceEnabled()) {
-                if (Balance::isFreeOrder()) {
-                    $data['free'] += intval($data['balance']);
-                } elseif (Balance::isPayOrder()) {
-                    $data['pay'] += intval($data['balance']);
-                }
-            }
+            self::calcBalanceOrder($data);
 
             $result[$begin->format('m-d')] = [
                 'free' => $data['free'],
@@ -903,14 +787,14 @@ class Stats
      */
     public static function hoursOfDay(modelObj $obj, $day = null): array
     {
-        if (is_string($day)) {
-            try {
+        try {
+            if (is_string($day)) {
                 $begin = new DateTime($day);
-            } catch (Exception $e) {
-                return [];
+            } else {
+                $begin = new DateTime();
             }
-        } else {
-            $begin = new DateTime();
+        } catch (Exception $e) {
+            return [];
         }
 
         $begin->modify('00:00:00');
@@ -935,21 +819,94 @@ class Stats
         while ($begin < $end) {
             $data = $counter->getHourAll([$obj, 'goods'], $begin);
 
-            if (App::isBalanceEnabled()) {
-                if (Balance::isFreeOrder()) {
-                    $data['free'] += intval($data['balance']);
-                } elseif (Balance::isPayOrder()) {
-                    $data['pay'] += intval($data['balance']);
-                }
-            }
+            self::calcBalanceOrder($data);
 
             $result[intval($begin->format('H'))] = [
                 'free' => $data['free'],
                 'fee' => $data['pay'],
             ];
+
             $begin->modify('+1 hour');
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $title
+     * @return array
+     */
+    public static function getChartInitData(string $title): array
+    {
+        $chart = [
+            'tooltip' => ['trigger' => 'axis'],
+            'legend' => ['data' => ['免费', '支付'], 'bottom' => 0],
+            'xAxis' => ['type' => 'category'],
+            'yAxis' => ['type' => 'value', 'axisLabel' => ['formatter' => '{value}'], 'minInterval' => 1],
+            'series' => [
+                [
+                    'type' => 'line',
+                    'color' => '#00CC33',
+                    'name' => '免费',
+                    'data' => [],
+                ],
+                [
+                    'type' => 'line',
+                    'color' => '#FF3300',
+                    'name' => '支付',
+                    'data' => [],
+                ],
+            ],
+        ];
+
+        if ($title) {
+            $chart['title'] = ['text' => $title];
+        }
+        return $chart;
+    }
+
+    /**
+     * @param $obj
+     * @param array $chart
+     * @param $index
+     * @param DateTime $first_day
+     * @param DateTime $last_day
+     * @return array
+     */
+    private static function updateChartData($obj, array $chart, $index, DateTime $first_day, DateTime $last_day): array
+    {
+        $chart['series'][$index] = [
+            'type' => 'line',
+            'smooth' => true,
+            'stack' => '总量',
+            'areaStyle' => ['normal' => []],
+            'color' => Util::randColor(),
+            'name' => $obj->getName(),
+            'data' => [],
+        ];
+
+        try {
+            $begin = new DateTime($first_day->format('Y-m-d 00:00'));
+            while ($begin < $last_day) {
+                $data = Stats::getDayTotal($obj, $begin);
+                $chart['series'][$index]['total'] += $data['total'];
+                $chart['series'][$index]['data'][] = $data['total'];
+                $begin->modify('next day');
+            }
+        } catch (Exception $e) {
+        }
+
+        return $chart;
+    }
+
+    private static function calcBalanceOrder(array &$data)
+    {
+        if (App::isBalanceEnabled()) {
+            if (Balance::isFreeOrder()) {
+                $data['free'] += $data['balance'];
+            } elseif (Balance::isPayOrder()) {
+                $data['pay'] += $data['balance'];
+            }
+        }
     }
 }

@@ -2073,7 +2073,7 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOfAgent($agent);
     if ($first_order) {
         try {
-            $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
+            $begin = new DateTime(date('Y-m-d 00:00:00', $first_order['createtime']));
         } catch (Exception $e) {
             JSON::fail('订单数据不正确！');
         }
@@ -2088,7 +2088,7 @@ if ($op == 'default') {
         while ($begin < $nextYear) {
             $year = $begin->format('Y');
             $result[$year][] = $begin->format('m');
-            $begin->modify('+1 month');
+            $begin->modify('first day of next month');
         }
 
         JSON::success($result);

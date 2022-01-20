@@ -91,12 +91,15 @@ class Stats
             return [];
         }
 
+        $begin->modify('00:00');
+
         $first_order = Order::getFirstOrderOf($obj);
         if (!$first_order) {
             return [];
         }
 
-        if ($begin->getTimestamp() < $first_order['createtime']) {
+        $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
+        if ($begin < $order_date_obj) {
             return [];
         }
 
@@ -128,12 +131,15 @@ class Stats
             return [];
         }
 
+        $begin->modify('first day of this month 00:00');
+
         $first_order = Order::getFirstOrderOf($obj);
         if (!$first_order) {
             return [];
         }
 
-        if ($begin->getTimestamp() < $first_order['createtime']) {
+        $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
+        if ($begin < $order_date_obj) {
             return [];
         }
 
@@ -180,10 +186,15 @@ class Stats
         $chart = self::getChartInitData($title);
 
         try {
-            $begin = new DateTime($day->format('Y-m-d 00:00'));
             $first_order = Order::getFirstOrderOf($obj);
-            if (!$first_order || $begin->getTimestamp() < $first_order['createtime']) {
+            if (!$first_order) {
                 return $chart;
+            }     
+
+            $begin = new DateTime($day->format('Y-m-d 00:00'));
+            $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
+            if ($begin < $order_date_obj) {
+                return [];
             }
 
             $end = new DateTime($begin->format('Y-m-d 00:00'));
@@ -222,15 +233,28 @@ class Stats
         $chart = self::getChartInitData($title);
 
         try {
-            $begin = new DateTime($month->format('Y-m-01 00:00'));
-
             $first_order = Order::getFirstOrderOf($obj);
-            if (!$first_order || $begin->getTimestamp() < $first_order['createtime']) {
+            if (!$first_order) {
                 return $chart;
+            }
+
+            $begin = new DateTime($month->format('Y-m-01 00:00')); 
+            
+            $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
+            if ($begin < $order_date_obj) {
+                return [];
+            }
+
+            if ($begin->getTimestamp() < $first_order['createtime']) {
+                $begin->setTimestamp($first_order['createtime']);
             }
 
             $end = new DateTime($month->format('Y-m-01'));
             $end->modify('first day of next month 00:00');
+            $today = new DateTime();
+            if ($end > $today) {
+                $end = $today;
+            }
 
             $counter = new OrderCounter();
 

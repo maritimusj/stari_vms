@@ -57,7 +57,7 @@ if ($op == 'default') {
         }
         if (!App::isBalanceEnabled()) {
             $query->where(['type <>' => Account::TASK]);
-        }        
+        }
     }
 
     if (request::has('agentId')) {
@@ -160,7 +160,7 @@ if ($op == 'default') {
                     $data['balance'] = $entry->getBalancePrice();
                 }
             }
-            
+
             $accounts[] = $data;
         }
     }
@@ -360,8 +360,7 @@ if ($op == 'default') {
                     'followed_title' => request::trim('followed_title'),
                     'followed_description' => request::trim('followed_description'),
                 ]);
-            }
-            elseif ($account->isMengMo()) {
+            } elseif ($account->isMengMo()) {
                 $data['name'] = Account::MENGMO_NAME;
                 $data['img'] = Account::MENGMO_HEAD_IMG;
                 $data['url'] = Util::murl('mengmo');
@@ -406,7 +405,7 @@ if ($op == 'default') {
             } else {
                 $data['img'] = request::trim('img');
                 //如果网站更换域名后，需要更新url
-                $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);                
+                $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);
             }
 
             foreach ($data as $key => $val) {
@@ -537,7 +536,7 @@ if ($op == 'default') {
                     'path' => request::trim('path'),
                     'delay' => request::int('delay'),
                 ]);
-            }  elseif ($account->isTask()) {
+            } elseif ($account->isTask()) {
                 $account->set('config', [
                     'type' => Account::TASK,
                     'url' => request::trim('task_url'),
@@ -553,32 +552,32 @@ if ($op == 'default') {
 
             if (App::isCommissionEnabled()) {
                 if (request::isset('commission_money')) {
-                    $commission_data['money'] =  request::float('commission_money', 0, 2) * 100;
+                    $commission_data['money'] = request::float('commission_money', 0, 2) * 100;
                 } elseif (request::str('bonus_type') == Account::COMMISSION) {
-                    $commission_data['money'] =  request::float('amount', 0, 2) * 100;
+                    $commission_data['money'] = request::float('amount', 0, 2) * 100;
                 }
             }
-            
+
             // 积分
             if (App::isBalanceEnabled()) {
                 if (request::isset('balance')) {
-                    $commission_data['balance'] =  request::int('balance');
+                    $commission_data['balance'] = request::int('balance');
                 } elseif (request::str('bonus_type') == Account::BALANCE) {
-                    $commission_data['balance'] =  request::int('amount');
+                    $commission_data['balance'] = request::int('amount');
                 }
             }
 
             //设置奖励
             $account->set('commission', $commission_data);
-            
+
             //处理分配数据
             if ($account->getBonusType() != $original_bonus_type) {
                 if ($original_bonus_type == Account::COMMISSION) {
                     //备份设置
                     $account->set('assigned_commission', $account->getAssignData());
                 } else {
-                  //备份设置
-                  $account->setAssignData($account->get('assigned_commission', []));
+                    //备份设置
+                    $account->setAssignData($account->get('assigned_commission', []));
                 }
             }
 
@@ -1145,7 +1144,7 @@ if ($op == 'default') {
         'account' => $account,
     ]);
 
-}  elseif ($op == 'statistics_brief') {
+} elseif ($op == 'statistics_brief') {
 
     $account_id = request::int('id');
     $account = Account::get($account_id);
@@ -1211,9 +1210,8 @@ if ($op == 'default') {
     $first_order = Order::getFirstOrderOfAccount($account);
     if ($first_order) {
         try {
-            $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
             $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
-            $date = new DateTime("$year_str-$month-01 00:00");
+            $date = new DateTime("$year_str-$month_str-01 00:00");
             if ($date < $order_date_obj) {
                 $result['title'] .= '*';
                 JSON::success($result);

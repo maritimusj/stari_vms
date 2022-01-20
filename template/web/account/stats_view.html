@@ -65,7 +65,7 @@
         <div class="heading">
             <span class="operate">
                 <div  class="pull-right">
-                    <template v-for="y in year_list" v-if="year_list.length > 1">
+                    <template v-for="y in year_list" v-if="year_list.length > 0">
                         <span v-text="y + '年'" class="year_label" :class="{'current': year == y}" @click="changeYear(y)"></span>
                     </template>
                     <i :class="{'fa': true,'fa-list': year_view == 'chart', 'fa-area-chart': year_view == 'form'}" @click="toggleChartView('year')" :title="year_view=='chart'?'切换到表格':'切换到图表'"></i>
@@ -106,7 +106,7 @@
             <span class="operate">
                 <div class="pull-right">
                     <span class="month_title" v-text="month_title"></span>
-                    <template v-for="m in month_list" v-if="month_list.length > 1">
+                    <template v-for="m in month_list" v-if="month_list.length > 0">
                         <span v-text="m + '月'" class="month_label" :class="{'current': month == m}" @click="changeMonth(m)"></span>
                     </template>
                     <i :class="{'fa': true,'fa-list': month_view == 'chart', 'fa-area-chart': month_view == 'form'}" @click="toggleChartView('month')" :title="month_view=='chart'?'切换到表格':'切换到图表'"></i>

@@ -1408,6 +1408,7 @@ if ($op == 'list') {
 
             while ($begin < $end) {
                 $result = $counter->getMonthAll([$device, 'goods'], $begin);
+                $result['month'] = $begin->format('Y-m');
                 $total_num += $result['total'];
                 $months[$begin->format('Y年m月')] = $result;
                 $begin->modify('first day of next month 00:00');

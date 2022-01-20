@@ -1132,7 +1132,8 @@ if ($op == 'default') {
 
     JSON::fail('设置失败！');
 
-} elseif ($op == 'commission_stats_view') {
+} elseif ($op == 'stats_view') {
+
     $account_id = request::int('id');
     $account = Account::get($account_id);
 
@@ -1140,11 +1141,11 @@ if ($op == 'default') {
         Util::itoast('找不到这个公众号或任务！', '', 'error');
     }
 
-    app()->showTemplate('web/account/commission_stats_view', [
+    app()->showTemplate('web/account/stats_view', [
         'account' => $account,
     ]);
 
-} elseif ($op == 'year_commission_statistics') {
+}  elseif ($op == 'statistics_brief') {
 
     $account_id = request::int('id');
     $account = Account::get($account_id);
@@ -1153,12 +1154,46 @@ if ($op == 'default') {
         JSON::fail('找不到这个公众号或任务！');
     }
 
-    $year_str = request::str('year');
-    $month = request::int('month');
+    $first_order = Order::getFirstOrderOfAccount($account);
+    if ($first_order) {
+        try {
+            $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
+        } catch (Exception $e) {
+            JSON::fail('订单数据不正确！');
+        }
 
-    $year = null;
+        $nextYear = new DateTime('first day of jan next year 00:00');
+        $today = new DateTime();
+        if ($nextYear > $today) {
+            $nextYear = $today;
+        }
+
+        $result = [];
+        while ($begin < $nextYear) {
+            $year = $begin->format('Y');
+            $result[$year][] = $begin->format('m');
+            $begin->modify('+1 month');
+        }
+
+        JSON::success($result);
+    }
+
+    JSON::fail('暂时没有任务出货数据！');
+
+} elseif ($op == 'statistics_year') {
+
+    $account_id = request::int('id');
+    $account = Account::get($account_id);
+
+    if (empty($account)) {
+        JSON::fail('找不到这个公众号或任务！');
+    }
+
+    $year_str = request::int('year');
+    $month_str = request::int('month');
+
     try {
-        $year = new DateTimeImmutable(sprintf("%s-%02d-01", (new DateTime("$year_str-01-01"))->format('Y'), $month));
+        $year = new DateTime(sprintf("%d-%02d-01", $year_str, $month_str));
     } catch (Exception $e) {
         JSON::fail('时间格式不正确！');
     }
@@ -1171,22 +1206,12 @@ if ($op == 'default') {
         'title' => $year->format('Y年'),
         'list' => [],
         'summary' => [],
-        'year' => [],
     ];
 
-    $first_order = Order::getFirstOrderOf($account);
+    $first_order = Order::getFirstOrderOfAccount($account);
     if ($first_order) {
         try {
             $begin = new DateTime(date('Y-m-d H:i:s', $first_order['createtime']));
-        } catch (Exception $e) {
-            $begin = new DateTime();
-        }
-        $nextYear = new DateTime('first day of jan next year 00:00');
-        while ($begin < $nextYear) {
-            $result['year'][] = $begin->format('Y');
-            $begin->modify('next year');
-        }
-        try {
             $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
             $date = new DateTime("$year_str-$month-01 00:00");
             if ($date < $order_date_obj) {
@@ -1195,16 +1220,18 @@ if ($op == 'default') {
             }
         } catch (Exception $e) {
         }
+
     } else {
         $result['year'][] = (new DateTime())->format('Y');
         JSON::success($result);
     }
 
-    $data = Statistics::accountYear($account, $year, $month);
+    $data = Statistics::accountYear($account, $year, $month_str);
     $result = array_merge($result, $data);
 
     JSON::success($result);
-} elseif ($op == 'month_commission_statistics') {
+
+} elseif ($op == 'statistics_month') {
     $account_id = request::int('id');
     $account = Account::get($account_id);
 
@@ -1212,12 +1239,12 @@ if ($op == 'default') {
         JSON::fail('找不到这个公众号或任务！');
     }
 
-    $month_str = request::str('month');
-    $day = request::int('day');
+    $year_str = request::int('year');
+    $month_str = request::int('month');
+    $day_str = request::int('day');
 
-    $month = null;
     try {
-        $month = new DateTimeImmutable($month_str);
+        $month = new DateTimeImmutable(sprintf("%d-%02d-%02d", $year_str, $month_str, $day_str));
     } catch (Exception $e) {
         JSON::fail('时间格式不正确！');
     }
@@ -1225,14 +1252,15 @@ if ($op == 'default') {
     $result = [
         'title' => $month->format('Y年m月'),
         'list' => [],
+        'day' => [],
         'summary' => [],
     ];
 
-    $first_order = Order::getFirstOrderOf($account);
+    $first_order = Order::getFirstOrderOfAccount($account);
     if ($first_order) {
         try {
             $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
-            $date = new DateTime("$month_str-$day");
+            $date = new DateTime(sprintf("%d-%02d-%02d 00:00", $year_str, $month_str, $day_str));
             if ($date < $order_date_obj) {
                 $result['title'] .= '*';
                 JSON::success($result);
@@ -1243,8 +1271,7 @@ if ($op == 'default') {
         JSON::success($result);
     }
 
-    $data = Statistics::accountMonth($account, $month, $day);
+    $data = Statistics::accountMonth($account, $month, $day_str);
     $result = array_merge($result, $data);
-
     JSON::success($result);
 }

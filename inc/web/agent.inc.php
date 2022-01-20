@@ -1997,14 +1997,14 @@ if ($op == 'default') {
     app()->showTemplate('web/agent/device_stats_view', [
         'agent' => $agent,
     ]);
-} elseif ($op == 'commission_stats_view') {
+} elseif ($op == 'stats_view') {
     $agent_id = request::int('id');
     $agent = Agent::get($agent_id);
 
     if (empty($agent)) {
         Util::itoast('找不到这个代理商！', '', 'error');
     }
-    app()->showTemplate('web/agent/commission_stats_view', [
+    app()->showTemplate('web/agent/stats_view', [
         'agent' => $agent,
     ]);
 } elseif ($op == 'device_order_statistics') {

@@ -1985,8 +1985,17 @@ class deviceModelObj extends modelObj
             if (empty($protocol)) {
                 return error(State::ERROR, '未知的蓝牙协议！');
             }
+            
             $motorNum = $this->getMotor();
-            $option = $mcb_channel <= $motorNum ? ['motor' => $mcb_channel] : ['locker' => $mcb_channel - $motorNum];
+            if ($motorNum > 0) {
+                if ($motorNum >= $mcb_channel) {
+                    $option = ['motor' => $mcb_channel];
+                } else {
+                    $option = ['locker' => $mcb_channel - $motorNum];
+                }
+            } else {
+                $option = ['locker' => $mcb_channel];
+            }
 
             $msg = $protocol->Open($this->getBUID(), $option);
             if ($msg) {

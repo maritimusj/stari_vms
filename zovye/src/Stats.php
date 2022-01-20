@@ -210,7 +210,7 @@ class Stats
                 $chart['series'][0]['data'][] = $data['free'];
                 $chart['series'][1]['data'][] = $data['pay'];
 
-                $chart['xAxis']['data'][] = $begin->format('i:00');
+                $chart['xAxis']['data'][] = $begin->format('H:00');
 
                 $begin->modify('+1 hour');
             }

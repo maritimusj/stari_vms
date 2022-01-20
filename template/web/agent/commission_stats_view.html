@@ -79,11 +79,6 @@
         <div class="heading">
             <span class="operate">
                 <div  class="pull-right">
-                    <span class="arrow-pre" @click="preYear" v-if="isPreYearButtonEnabled">&lt;&lt;</span>
-                    <span class="gray" v-else>&lt;&lt;</span>
-                    <span class="year_title" v-text="year_title"></span>
-                    <span  class="arrow-next" @click="nextYear" v-if="isNextYearButtonEnabled">&gt;&gt;</span>
-                    <span class="gray" v-else>&gt;&gt;</span>
                     <template v-for="y in year_list" v-if="year_list.length > 1">
                         <span v-text="y + '年'" class="year_label" :class="{'current': year == y}" @click="changeYear(y)"></span>
                     </template>
@@ -126,11 +121,7 @@
         <div class="heading">
             <span class="operate">
                 <div class="pull-right">
-                    <span  class="arrow-pre" @click="preMonth" v-if="isPreMonthButtonEnabled">&lt;&lt;</span>
-                    <span class="gray" v-else>&lt;&lt;</span>
                     <span class="month_title" v-text="month_title"></span>
-                    <span  class="arrow-next" @click="nextMonth" v-if="isNextMonthButtonEnabled">&gt;&gt;</span>
-                    <span class="gray" v-else>&gt;&gt;</span>
                     <template v-for="m in month_list" v-if="month_list.length > 1">
                         <span v-text="m + '月'" class="month_label" :class="{'current': month == m}" @click="changeMonth(m)"></span>
                     </template>
@@ -355,14 +346,13 @@
                     year_chart: null,
                     year_title: '',
                     year_data: [],
-                    year_list: [],
+                    datetime: null,
                     year_loading: false,
-                    month: (new Date()).getMonth() + 1,
-                    year: (new Date()).getFullYear(),
+                    month: null,
+                    year: null,
                 },
                 mounted() {
-                    this.getMonthData();
-                    this.getYearData();
+                    this.getBriefData();
                     this.month_chart = EChart.init(document.getElementById("month_stats_chart"));
                     this.month_chart.setOption(month_option);
                     this.year_chart = EChart.init(document.getElementById("year_stats_chart"));
@@ -373,38 +363,20 @@
                     })
                 },
                 computed: {
-                    isPreMonthButtonEnabled() {
-                        return !(this.month === 1 && !this.isValidateYear(this.year - 1));
-                    },
-                    isNextMonthButtonEnabled() {
-                        return this.isValidateMonth(this.month);
-                    },
-                    isPreYearButtonEnabled() {
-                        return this.isValidateYear(this.year - 1);
-                    },
-                    isNextYearButtonEnabled() {
-                        const year = (new Date()).getFullYear();
-                        return this.year < year;
+                    year_list() {
+                        if (this.datetime) {
+                            return Object.keys(this.datetime);
+                        }
+                        return [];
                     },
                     month_list() {
-                        const months = [];
-                        for (i = 0; i < 12; i++) {
-                            if (this.isValidateMonth(i)) months.push(i + 1);
+                        if (this.datetime && this.year) {
+                            return this.datetime[this.year] || [];
                         }
-                        return months;
+                        return [];
                     }
                 },
                 watch: {
-                    month(v) {
-                        this.getMonthData(this.year + "-" + this.month)
-                    },
-                    year() {
-                        if (!this.isValidateMonth(this.month)) {
-                            this.month = 1;
-                        }
-                        this.getYearData(this.year);
-                        this.getMonthData(this.year + "-" + this.month)
-                    },
                     year_loading(v) {
                         if (this.year_chart) {
                             setTimeout(() => {
@@ -449,65 +421,40 @@
                     },
                     changeMonth(m) {
                         if (!this.month_loading) {
-                            this.month = m;
+                            this.month = parseInt(m);
+                            this.getMonthData(this.month);
                         }
                     },
                     changeYear(y) {
                         if (!this.year_loading) {
-                            this.year = y;
-                        }
-                    },
-                    isValidateMonth(m) {
-                        const year = (new Date()).getFullYear();
-                        const month = (new Date()).getMonth() + 1;
-                        return this.year < year || (this.year === year && m < month);
-                    },
-                    isValidateYear(y) {
-                        y += '';
-                        return (this.year_list || []).indexOf(y) !== -1;
-                    },
-                    isValidateDay(m, d) {
-                        if (m > 12 || d > 31) {
-                            return false;
-                        }
-                        const year = (new Date()).getFullYear();
-                        const month = (new Date()).getMonth() + 1;
-                        const day = (new Date()).getDay() + 1;
-                        return this.year < year || (this.year === year && m <= month && d <= day);
-                    }, 
-                    preMonth() {
-                        if (this.month > 1 || this.isValidateYear(this.year - 1)) {
-                            if (--this.month < 1) {
-                                this.month = 12;
-                                this.year--;
-                            }
-                        }
-                    },
-                    nextMonth() {
-                        if (this.isValidateMonth(this.month)) {
-                            if (++this.month > 12) {
-                                this.month = 1;
-                                this.year++;
-                            }
-                        }
-                    },
-                    getMonthOfYear(year, month = 1) {
-                        $.get(api_url, { op: 'year_commission_statistics', year, month }).then(res => {
-                            this.year_loading = new Date();
-                            if (res.status) {
-                                return res.data || [];
+                            this.year = parseInt(y);
+                            this.getYearData(this.year);
+                            if (this.month_list.length > 0) {
+                                this.month = this.month_list[this.month_list.length - 1];
+                                this.getMonthData(this.month);
                             } else {
-                                this.year_loading = false;
-                                return [];
+                                this.month = null;
                             }
-                        }).then(data => {
-                            this.initYearChart(data);
-                            if (month++ < 12) {
-                                this.getMonthOfYear(year, month);
-                            } else {
-                                this.year_loading = false;
-                            }
-                        });
+                        }
+                    },
+                    getMonthOfYear(year, index = 0) {
+                        if (index < this.month_list.length) {
+                            const month = this.month_list[index];
+                            $.get(api_url, { op: 'statistics_year', year, month }).then(res => {
+                                this.year_loading = new Date();
+                                if (res.status) {
+                                    return res.data || [];
+                                } else {
+                                    this.year_loading = false;
+                                    return [];
+                                }
+                            }).then(data => {
+                                this.initYearChart(data);
+                                this.getMonthOfYear(year, index + 1);
+                            });
+                        } else {
+                            this.year_loading = false;
+                        }
                     },
                     getYearData(year = '') {
                         if (!this.year_loading) {
@@ -516,23 +463,23 @@
                             this.getMonthOfYear(year);
                         }
                     },
-                    getDayOfMonth(month, day = 1) {
-                        $.get(api_url, { op: 'month_commission_statistics', month, day }).then(res => {
-                            this.month_loading = new Date();
-                            if (res.status) {
-                                return res.data || [];
-                            } else {
-                                this.month_loading = false;
-                                return [];
-                            }
-                        }).then(data => {
-                            this.initMonthChart(data);
-                            if (this.isValidateDay(month, day++)) {
-                                this.getDayOfMonth(month, day);
-                            } else {
-                                this.month_loading = false;
-                            }
-                        });
+                    getDayOfMonth(month, index = 1) {
+                        if (index < 31) {
+                            $.get(api_url, { op: 'statistics_month', year: this.year, month, day:index }).then(res => {
+                                this.month_loading = new Date();
+                                if (res.status) {
+                                    return res.data || [];
+                                } else {
+                                    this.month_loading = false;
+                                    return [];
+                                }
+                            }).then(data => {
+                                this.initMonthChart(data);
+                                this.getDayOfMonth(month, index + 1);
+                            });
+                        } else {
+                            this.month_loading = false;
+                        }
                     },
                     getMonthData(month = '') {
                         if (!this.month_loading) {
@@ -541,16 +488,18 @@
                             this.getDayOfMonth(month);
                         }
                     },
-                    preYear() {
-                        if (this.isValidateYear(this.year - 1)) {
-                            this.month = 12;
-                            this.year--;
-                        }
-                    },
-                    nextYear() {
-                        this.month = 1;
-                        const year = (new Date()).getFullYear();
-                        if (this.year < year) this.year++;
+                    getBriefData() {
+                        $.get(api_url, { op: 'statistics_brief' }).then(res => {
+                            if (res && res.status) {
+                                return res.data || [];
+                            }
+                            return [];
+                        }).then(data => {
+                            this.datetime = data;
+                            if (!this.year && this.year_list.length > 0) {
+                                this.changeYear(this.year_list[this.year_list.length - 1]);
+                            }
+                        })
                     },
                     resetYearChart() {
                         this.year_data = [];

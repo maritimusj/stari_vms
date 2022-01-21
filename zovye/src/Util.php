@@ -767,6 +767,23 @@ include './index.php';
         return true;
     }
 
+    public static function getFreeOrderLimits(userModelObj $user, deviceModelObj $device)
+    {
+        //每日免费额度限制
+        $today = Util::getUserTodayFreeNum($user, $device);
+        if ($today < 1) {
+            return 0;
+        }
+
+        //全部免费额度限制
+        $all = Util::getUserFreeNum($user, $device);
+        if ($all < 1) {
+            return 0;
+        }
+
+        return min($today, $all);
+    }
+
     /**
      * 获取用户今日免费可领取的数量.
      *
@@ -792,7 +809,7 @@ include './index.php';
             if ($max_free > 0) {
                 $remain = max(0, $max_free - $user->getTodayFreeTotal());
             } else {
-                $remain = 1;
+                $remain = App::orderMaxGoodsNum();
             }
         }
 
@@ -816,7 +833,7 @@ include './index.php';
             if ($max_free > 0) {
                 $remain = max(0, $max_free - $user->getFreeTotal());
             } else {
-                $remain = 1;
+                $remain = App::orderMaxGoodsNum();
             }
         }
 

@@ -200,7 +200,6 @@ class Helper
         return false;
     }
 
-
     public static function preparePullData(orderModelObj $order, deviceModelObj $device, userModelObj $user): array
     {
         $pull_data = [
@@ -317,16 +316,20 @@ class Helper
             return err('找不到这个设备！');
         }
 
+        $goods = $device->getGoods($goods_id);
+        if (empty($goods) || empty($goods[Goods::AllowExchange])) {
+            return err('无法兑换这个商品，请联系管理员！');
+        }
+
         if (Balance::isFreeOrder()) {
-            $res = Util::checkFreeOrderLimits($user, $device);
-            if (is_error($res)) {
+            $free_limits = Util::getFreeOrderLimits($user, $device);
+            if ($free_limits < $num) {
                 return err('今天的免费兑换额度已用完，请明天再来吧！');
             }
         }
 
-        $goods = $device->getGoods($goods_id);
-        if (empty($goods) || empty($goods[Goods::AllowExchange])) {
-            return err('无法兑换这个商品，请联系管理员！');
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
         }
 
         $num = min(App::orderMaxGoodsNum(), max($num, 1));
@@ -336,10 +339,6 @@ class Helper
 
         if ($goods['num'] < $num) {
             return err('对不起，商品数量不足！');
-        }
-
-        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-            return err('无法锁定用户，请稍后再试！');
         }
 
         $balance = $user->getBalance();

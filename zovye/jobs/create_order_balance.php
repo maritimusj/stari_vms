@@ -86,6 +86,17 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
             throw new RuntimeException('找不到这个设备！');
         }
 
+        if ($num < 1) {
+            throw new RuntimeException('对不起，商品数量不正确！');
+        }
+
+        if (Balance::isFreeOrder()) {
+            $quota = Util::getFreeOrderLimits($user, $device);
+            if ($num > $quota) {
+                throw new RuntimeException('超过可用的免费额度！');
+            }
+        }
+
         $log['device'] = $device->profile();
 
         //锁定设备
@@ -108,10 +119,6 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
         }
 
         $log['goods'] = $goods;
-
-        if ($num < 1) {
-            throw new RuntimeException('对不起，商品数量不正确！');
-        }
 
         if ($goods['num'] < $num) {
             throw new RuntimeException('对不起，商品数量不足！');

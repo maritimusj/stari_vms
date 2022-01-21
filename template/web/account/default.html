@@ -121,6 +121,26 @@
     .busy i {
         color: #ccc;
     }
+    .task-stats .item {
+        margin-top: 1px;
+        overflow: hidden;
+    }
+    .task-stats .item.init .title {
+        background: #607d8b;
+    }
+    .task-stats .item.accept .title {
+        background: #4caf50;
+    }
+    .task-stats .item.reject .title {
+        background: #f44336;
+    }
+    .task-stats .item .title {
+        background: #009688;
+        text-align: center;
+        padding: 1px 6px;
+        margin-right: 6px;
+        color: #fff;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -322,7 +342,25 @@
                         </div>
                     </td>
                     {elseif $a['type'] == \zovye\Account::TASK}
-                    <td></td>
+                    <td>
+                        <div class="task-stats">
+                            <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $a['id'], 'status' => \zovye\Task::INIT]);}"  title="查看记录">
+                                <div class="item init">
+                                    <span class="title">未审核</span><span class="num">{php echo intval($a['stats'][\zovye\Task::INIT])}</span>
+                                </div>                                
+                            </a>
+                            <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $a['id'], 'status' => \zovye\Task::ACCEPT]);}"  title="查看记录">
+                            <div class="item accept">
+                                <span class="title">已通过</span><span class="num">{php echo intval($a['stats'][\zovye\Task::ACCEPT])}</span>
+                            </div>
+                            </a>
+                            <a href="{php echo $this->createWebUrl('task', ['op' => 'view', 'account' => $a['id'], 'status' => \zovye\Task::REJECT]);}"  title="查看记录">
+                            <div class="item reject">
+                                <span class="title">已拒绝</span><span class="num">{php echo intval($a['stats'][\zovye\Task::REJECT])}</span>
+                            </div>
+                            </a>
+                        </div>
+                    </td>
                     <td></td>
                     {elseif $a['is_third_party_platform']}
                     <td>

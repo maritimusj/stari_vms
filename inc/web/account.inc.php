@@ -122,6 +122,8 @@ if ($op == 'default') {
                 $data['openid'] = $entry->settings('config.openid', '');
             } elseif ($entry->isWxApp()) {
                 $data['username'] = $entry->settings('config.username', '');
+            } elseif ($entry->isTask()) {
+                $data['stats'] = Task::brief($entry);
             }
 
             if (App::useAccountQRCode()) {

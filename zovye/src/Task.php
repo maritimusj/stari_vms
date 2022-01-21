@@ -58,6 +58,19 @@ class Task
         return self::query($condition)->findOne();
     }
 
+    public static function brief(accountModelObj $account)
+    {
+        $res = self::query(['account_id' => $account->getId()])->groupBy('s1')->getAll(['s1', 'count(*) AS n']);
+        if (empty($res)) {
+            return [];
+        }
+        $result = [];
+        foreach($res as $item) {
+            $result[$item['s1']] = $item['n'];
+        }
+        return $result;
+    }
+
     public static function getList(userModelObj $user, int $limit = 0): array
     {
         $result = [];

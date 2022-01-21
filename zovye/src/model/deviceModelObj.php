@@ -2513,9 +2513,6 @@ class deviceModelObj extends modelObj
                     if ($result['goods'][$key]['price'] < $goods_data['price']) {
                         $result['goods'][$key]['price'] = $goods_data['price'];
                         $result['goods'][$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
-                        if ($goods_data['balance']) {
-                            $result['goods'][$key]['balance'] = $goods_data['balance'];
-                        }
                     }
                 } else {
                     $result['goods'][$key] = [
@@ -2531,15 +2528,14 @@ class deviceModelObj extends modelObj
                         Goods::AllowExchange => $goods_data[Goods::AllowExchange],
                     ];
 
-                    if ($goods_data['balance']) {
-                        $result['goods'][$key]['balance'] = $goods_data['balance'];
-                    }
-
                     if (!empty($user)) {
                         $discount = User::getUserDiscount($user, $goods_data);
                         $result['goods'][$key]['discount'] = $discount;
                         $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
                     }
+                }
+                if (isset($goods_data['balance'])) {
+                    $result['goods'][$key]['balance'] = (int)$goods_data['balance'];
                 }
             }
 

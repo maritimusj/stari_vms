@@ -36,6 +36,7 @@ if ($op == 'default') {
     JSON::success($result);
 
 } elseif ($op == 'create_order') {
+    
     $result = Mall::createOrder($user, [
         'goods_id' => request::int('goods'),
         'num' => request::int('num'),

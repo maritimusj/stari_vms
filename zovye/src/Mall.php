@@ -79,6 +79,10 @@ class Mall
         if (!$goods->allowDelivery()) {
             return err('无法兑换这个商品！');
         }
+
+        if ($goods->getBalance() == 0) {
+            return err('暂时不能兑换这个商品！');
+        }
     
         $num = $params['num'] ?? 1;
         if ($num < 1) {
@@ -103,6 +107,7 @@ class Mall
     
         $result = Util::transactionDo(function () use ($user, $balance, $goods, $num, $phone_num, $address, $name) {
             $total_balance = $goods->getBalance() * $num;
+
             if ($total_balance > $balance->total()) {
                 return err('您的积分不够！');
             }

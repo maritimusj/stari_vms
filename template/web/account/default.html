@@ -125,21 +125,35 @@
         margin-top: 1px;
         overflow: hidden;
     }
+    .task-stats .item .num {
+        border-bottom: 1px solid;
+        width: 60px;
+        padding: 0px 10px;
+    }
     .task-stats .item.init .title {
         background: #607d8b;
+    }
+    .task-stats .item.init .num {
+        border-bottom-color: #607d8b;
     }
     .task-stats .item.accept .title {
         background: #4caf50;
     }
+    .task-stats .item.accept .num {
+        border-bottom-color: #4caf50;
+    }
     .task-stats .item.reject .title {
         background: #f44336;
+    }
+    .task-stats .item.reject .num {
+        border-bottom-color: #f44336;
     }
     .task-stats .item .title {
         background: #009688;
         text-align: center;
         padding: 1px 6px;
-        margin-right: 6px;
         color: #fff;
+        border-top-left-radius: 10px;
     }
 </style>
 <div class="panel panel-default">

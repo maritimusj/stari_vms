@@ -48,10 +48,10 @@
     {else}
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款订单</a></li>
     {/if}
-    {if $s_way=='except'}
+    {if $s_way=='unexpected'}
     <li role="presentation" class="active"><a href="#">异常订单</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常订单</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'unexpected'));}">异常订单</a></li>
     {/if}
     {if $device || $user}
     <li role="presentation"  class="active"><a href="#">{php echo $user?$user->getName():''}{if $user && $device} <i class="fa fa-sign-in" style="color:#CCC;"></i> {/if}{php echo $device ? $device->getName() : '';}</a></li>

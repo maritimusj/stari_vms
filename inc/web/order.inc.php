@@ -84,7 +84,7 @@ if ($op == 'default') {
         if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
             $query->where(['src' => Order::PAY]);
         }
-    } elseif ($way == 'except') {
+    } elseif ($way == 'unexpected') {
         $query->where(['result_code >' => 0]);
     } else if ($way == 'sqm') {
         $query->where(['src' => Order::SQM]);

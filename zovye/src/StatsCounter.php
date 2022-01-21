@@ -38,7 +38,7 @@ abstract class StatsCounter
 
                 $v = $this->initFN($begin, $end, $params);
 
-                if ($hour->format('YmdH') != date('YmdH') && Locker::try("counter:init:$uid")) {
+                if ((int)$hour->format('YmdH') < (int)date('YmdH') && Locker::try("counter:init:$uid")) {
                     Counter::create([
                         'uid' => $uid,
                         'num' => $v,
@@ -78,7 +78,7 @@ abstract class StatsCounter
 
                 $num = $this->initFN($begin, $end, $params);
 
-                if ($day->format('Ymd') != date('Ymd') && Locker::try("counter:init:$uid")) {
+                if ((int)$day->format('Ymd') < (int)date('Ymd') && Locker::try("counter:init:$uid")) {
                     Counter::create([
                         'uid' => $uid,
                         'num' => $num,
@@ -118,7 +118,7 @@ abstract class StatsCounter
 
                 $num = $this->initFN($begin, $end, $params);
 
-                if ($month->format('Ym') != date('Ym') && Locker::try("counter:init:$uid")) {
+                if ((int)$month->format('Ym') < (int)date('Ym') && Locker::try("counter:init:$uid")) {
                     Counter::create([
                         'uid' => $uid,
                         'num' => $num,
@@ -154,7 +154,7 @@ abstract class StatsCounter
 
             $num = $this->initFN($begin, $end, $params);
 
-            if ($year->format('Y') != date('Y') && Locker::try("counter:init:$uid")) {
+            if ((int)$year->format('Y') < (int)date('Y') && Locker::try("counter:init:$uid")) {
                 Counter::create([
                     'uid' => $uid,
                     'num' => $num,

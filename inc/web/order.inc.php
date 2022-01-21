@@ -86,7 +86,7 @@ if ($op == 'default') {
         }
     } elseif ($way == 'unexpected') {
         $query->where(['result_code >' => 0]);
-    } else if ($way == 'sqm') {
+    } elseif ($way == 'sqm') {
         $query->where(['src' => Order::SQM]);
     } elseif ($way == 'aliTicket') {
         $query->where(['src' => Order::ALI_TICKET]);

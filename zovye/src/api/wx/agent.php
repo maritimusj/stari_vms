@@ -1823,36 +1823,24 @@ class agent
         }
 
         $device_id = request::int('deviceid');
+        if ($device_id > 0) {
+            $device = Device::get($device_id);
+            if (empty($device) || $device->getAgentId() != $agent_id) {
+                return err('找不到这个设备！');
+            }
+        }
 
         return Util::cachedCall(30, function () use ($agent_id, $s_date, $e_date, $device_id) {
 
             $condition = [
                 'agent_id' => $agent_id,
+                'src' => Order::PAY,
                 'createtime >=' => $s_date->getTimestamp(),
                 'createtime <' => $e_date->getTimestamp(),
             ];
 
-            $res = Device::query(['agent_id' => $agent_id])->findAll();
-            $devices = [];
-            $device_keys = [];
-
-            /** @var deviceModelObj $item */
-            foreach ($res as $item) {
-                $devices[] = [
-                    'id' => $item->getId(),
-                    'name' => $item->getName(),
-                    'imei' => $item->getImei(),
-                ];
-                $device_keys[] = $item->getId();
-            }
-
-            if ($device_id != 0) {
-                $d_id = request::int('deviceid');
-                if (in_array($d_id, $device_keys)) {
-                    $condition['device_id'] = $d_id;
-                } else {
-                    $condition['device_id'] = -1;
-                }
+            if ($device_id > 0) {
+                $condition['device_id'] = $device_id;
             }
 
             $data = [];
@@ -1868,71 +1856,88 @@ class agent
                 'ali_receipt' => 0,
             ];
 
-            $res = Order::query($condition)->orderBy('createtime DESC')->findAll();
+            $res = Order::query($condition)->findAll();
 
             /** @var orderModelObj $item */
             foreach ($res as $item) {
                 $amount = $item->getCommissionPrice();
 
-                $create_date = date('Y-m-d', $item->getCreatetime());
-                if (!isset($data[$create_date])) {
-                    $data[$create_date]['income'] = 0;
-                    $data[$create_date]['refund'] = 0;
-                    $data[$create_date]['receipt'] = 0;
-                    $data[$create_date]['wx_income'] = 0;
-                    $data[$create_date]['wx_refund'] = 0;
-                    $data[$create_date]['wx_receipt'] = 0;
-                    $data[$create_date]['ali_income'] = 0;
-                    $data[$create_date]['ali_refund'] = 0;
-                    $data[$create_date]['ali_receipt'] = 0;
+                $create_at = date('Y-m-d', $item->getCreatetime());
+                if (!isset($data[$create_at])) {
+                    $data[$create_at]['income'] = 0;
+                    $data[$create_at]['refund'] = 0;
+                    $data[$create_at]['receipt'] = 0;
+                    $data[$create_at]['wx_income'] = 0;
+                    $data[$create_at]['wx_refund'] = 0;
+                    $data[$create_at]['wx_receipt'] = 0;
+                    $data[$create_at]['ali_income'] = 0;
+                    $data[$create_at]['ali_refund'] = 0;
+                    $data[$create_at]['ali_receipt'] = 0;
                 }
 
                 $is_alipay = User::isAliUser($item->getOpenid());
 
-                $data[$create_date]['income'] += $amount;
+                $data[$create_at]['income'] += $amount;
                 $total['income'] += $amount;
                 if ($is_alipay) {
-                    $data[$create_date]['ali_income'] += $amount;
+                    $data[$create_at]['ali_income'] += $amount;
                     $total['ali_income'] += $amount;
                 } else {
-                    $data[$create_date]['wx_income'] += $amount;
+                    $data[$create_at]['wx_income'] += $amount;
                     $total['wx_income'] += $amount;
                 }
                 if ($item->getExtraData('refund')) {
                     //如果是退款
-                    $data[$create_date]['refund'] += $amount;
+                    $data[$create_at]['refund'] += $amount;
                     $total['refund'] += $amount;
                     if ($is_alipay) {
-                        $data[$create_date]['ali_refund'] += $amount;
+                        $data[$create_at]['ali_refund'] += $amount;
                         $total['ali_refund'] += $amount;
                     } else {
-                        $data[$create_date]['wx_refund'] += $amount;
+                        $data[$create_at]['wx_refund'] += $amount;
                         $total['wx_refund'] += $amount;
                     }
                 } else {
-                    $data[$create_date]['receipt'] += $amount;
+                    $data[$create_at]['receipt'] += $amount;
                     $total['receipt'] += $amount;
                     if ($is_alipay) {
-                        $data[$create_date]['ali_receipt'] += $amount;
+                        $data[$create_at]['ali_receipt'] += $amount;
                         $total['ali_receipt'] += $amount;
                     } else {
-                        $data[$create_date]['wx_receipt'] += $amount;
+                        $data[$create_at]['wx_receipt'] += $amount;
                         $total['wx_receipt'] += $amount;
                     }
                 }
             }
+
+            krsort($data);
+
             $format_data = [];
             foreach ($data as $k => $v) {
                 $v['date'] = $k;
                 $format_data[] = $v;
             }
 
+            $devices = Util::cachedCall(300, function () use($agent_id) {
+                $devices = [];
+                $query = Device::query(['agent_id' => $agent_id]);
+                /** @var deviceModelObj $device */
+                foreach ($query->findAll() as $device) {
+                    $devices[] = [
+                        'id' => $device->getId(),
+                        'name' => $device->getName(),
+                        'imei' => $device->getImei(),
+                    ];
+                }
+                return $devices;
+            });
+
             return [
                 'data' => $format_data,
                 'total' => $total,
                 'devices' => $devices,
-                's_date' => $s_date,
-                'e_date' => $e_date,
+                's_date' => $s_date->format('Y-m-d'),
+                'e_date' => $e_date->format('Y-m-d'),
                 'deviceid' => $device_id,
             ];
         }, $agent_id, $s_date->getTimestamp(), $e_date->getTimestamp(), $device_id);

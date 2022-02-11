@@ -247,7 +247,7 @@
     .busy i {
         color: #ccc;
     }
-    .operate [data-op="showMonthStats"],.operate [data-op="setNormal"]  {
+    .operate [data-op="showMonthStats"],[data-op=setNormal]  {
         cursor: pointer;
     }
     span.card_status {
@@ -556,10 +556,14 @@
                             <div class="devicename">
                                 {{o.name}}
                                 <template v-if="o.isVD">
-                                    <sup class="vdevice" title="虚拟设备">[ 虚拟 ]</sup>
+                                    <sup class="vdevice" title="虚拟设备">
+                                        <img src="{MODULE_URL}static/img/vdevice.svg" class="icon">
+                                    </sup>
                                 </template>                            
                                 <template v-if="o.isBluetooth">
-                                    <sup class="bluetooth" :title="'蓝牙设备 ' + o.BUID">[ 蓝牙 ]
+                                    <sup class="bluetooth" :title="'蓝牙设备 ' + o.BUID">
+                                        <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon">
+                                    </sup>
                                 </template>
                                 <template v-if="o.isDown">
                                     <img src="{MODULE_URL}static/img/wrench.svg" data-op="setNormal" title="设备维护中，点击取消">

@@ -98,9 +98,12 @@ class Stats
             return [];
         }
 
-        $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
-        if ($begin < $order_date_obj) {
-            return [];
+        try {
+            $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
+            if ($begin < $order_date_obj) {
+                return [];
+            }
+        } catch (Exception $e) {
         }
 
         $counter = new OrderCounter();
@@ -138,9 +141,12 @@ class Stats
             return [];
         }
 
-        $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
-        if ($begin < $order_date_obj) {
-            return [];
+        try {
+            $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
+            if ($begin < $order_date_obj) {
+                return [];
+            }
+        } catch (Exception $e) {
         }
 
         $counter = new OrderCounter();
@@ -192,9 +198,12 @@ class Stats
             }     
 
             $begin = new DateTime($day->format('Y-m-d 00:00'));
-            $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
-            if ($begin < $order_date_obj) {
-                return [];
+            try {
+                $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
+                if ($begin < $order_date_obj) {
+                    return [];
+                }
+            }catch (Exception $e) {
             }
 
             $end = new DateTime($begin->format('Y-m-d 00:00'));
@@ -239,10 +248,13 @@ class Stats
             }
 
             $begin = new DateTime($month->format('Y-m-01 00:00')); 
-            
-            $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
-            if ($begin < $order_date_obj) {
-                return [];
+
+            try {
+                $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
+                if ($begin < $order_date_obj) {
+                    return [];
+                }
+            }catch (Exception $e) {
             }
 
             if ($begin->getTimestamp() < $first_order['createtime']) {
@@ -765,8 +777,16 @@ class Stats
         $begin->modify('first day of this month 00:00');
 
         $first_order = Order::getFirstOrderOf($obj);
-        if (empty($first_order) || $begin->getTimestamp() < $first_order['createtime']) {
+        if (!$first_order) {
             return [];
+        }
+
+        try {
+            $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
+            if ($begin < $order_date_obj) {
+                return [];
+            }
+        } catch (Exception $e) {
         }
 
         try {
@@ -825,8 +845,16 @@ class Stats
         $begin->modify('00:00:00');
 
         $first_order = Order::getFirstOrderOf($obj);
-        if (empty($first_order) || $begin->getTimestamp() < $first_order['createtime']) {
+        if (!$first_order) {
             return [];
+        }
+
+        try {
+            $order_date_obj = new DateTime(date('Y-m-d', $first_order['createtime']));
+            if ($begin < $order_date_obj) {
+                return [];
+            }
+        } catch (Exception $e) {
         }
 
         try {

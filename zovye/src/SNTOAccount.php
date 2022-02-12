@@ -83,10 +83,6 @@ class SNTOAccount
                     'channel' => $config['channel'],
                     'mac' => $user->getOpenid(),
                 ]);
-            $data['extraFN'] = function () use ($config) {
-                header("Auth: {$config['data']['token']}");
-            };
-
             return [$data];
         }
 

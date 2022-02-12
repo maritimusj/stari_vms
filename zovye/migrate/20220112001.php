@@ -43,14 +43,14 @@ SQL;
     /** @var goodsModelObj $goods */
     foreach ($query->findAll() as $goods) {
         $s1 = 0;
-        if ($goods->allowPay()) {
-            $s1 |= Goods::ALLOW_PAY;
+        if ($goods->getExtraData('allowPay')) {
+            $s1 = Goods::setPayBitMask($s1);
         }
-        if ($goods->allowFree()) {
-            $s1 |= Goods::ALLOW_FREE;
+        if ($goods->getExtraData('allowFree')) {
+            $s1 = Goods::setFreeBitMask($s1);
         }
         if ($goods->getBalance() > 0) {
-            $s1 |= Goods::ALLOW_EXCHANGE;
+            $s1 = Goods::setExchangeBitMask($s1);
         }
         $goods->setS1($s1);
         $goods->save();

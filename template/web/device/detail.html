@@ -147,7 +147,15 @@
                 <div class="advlist">
                     <div class="adv_title">{$item['title']}</div>
                     <div class="adv_type {$item['type']}">{$media[$item['type']]['title']}</div>
-                    <div class="adv_url">{$item['url']}</div>
+                    <div class="adv_url operate">
+                        {$item['url']}
+                        <a href="{php echo $this->createWebUrl('adv', ['op' => 'assign', 'id' => $item['id']])}" target="_blank">
+                            <i class="fa fa-wrench" title="分配"></i>
+                        </a>
+                        <a href="{php echo $this->createWebUrl('adv', ['op' => 'edit', 'id' => $item['id']])}" target="_blank">
+                            <i class="fa fa-edit" title="编辑"></i>
+                        </a>
+                    </div>
                 </div>
                 {/loop}
             </div>

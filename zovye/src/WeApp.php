@@ -1229,6 +1229,14 @@ $js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
+        wx.showMenuItems({
+            menuList: [
+                "menuItem:share:appMessage",
+                "menuItem:share:timeline",
+                "menuItem:favorite",
+                "menuItem:copyUrl",
+            ] // 要显示的菜单项，所有menu项见附录3
+        });
     });
     const zovye_fn = {
         api_url: "$api_url",
@@ -1326,6 +1334,14 @@ $js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
+        wx.showMenuItems({
+            menuList: [
+                "menuItem:share:appMessage",
+                "menuItem:share:timeline",
+                "menuItem:favorite",
+                "menuItem:copyUrl",
+            ] // 要显示的菜单项，所有menu项见附录3
+        });
     });
     const zovye_fn = {
         api_url: "$task_url",
@@ -1539,6 +1555,14 @@ $js_sdk
 <script>
     wx.ready(function(){
         wx.hideAllNonBaseMenuItem();
+        wx.showMenuItems({
+            menuList: [
+                "menuItem:share:appMessage",
+                "menuItem:share:timeline",
+                "menuItem:favorite",
+                "menuItem:copyUrl",
+            ] // 要显示的菜单项，所有menu项见附录3
+        });
     });
     const zovye_fn = {
         api_url: "$api_url",

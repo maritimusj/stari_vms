@@ -1022,6 +1022,18 @@ if ($op == 'list') {
     if (is_error($res)) {
         $tpl_data['config'] = false;
     } else {
+        if ($res['data']['srt']['subs']) {
+            unset($res['data']['srt']['subs']);
+            $ads = $device->getAdvs(Advertising::SCREEN);
+            foreach ($ads as $ad) {
+                if ($ad['extra']['media'] == 'srt') {
+                    $res['data']['srt']['subs'][] = [
+                        'id' => $ad['id'],
+                        'text' => strval($ad['extra']['text']),
+                    ];
+                }
+            }
+        }
         $tpl_data['config'] = $res;
     }
 

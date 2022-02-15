@@ -68,6 +68,28 @@
     .package tr {
         text-align: center;
     }
+    .adv_url {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: baseline;
+        position: relative;
+    }
+    .adv_url .operate {
+        display: none;
+    }
+    .adv_url:hover .operate {
+        display: inline-block;
+        position: absolute;
+        top: -10px;
+        right: -16px;
+        background: #f9f9f9;
+        border: 1px solid #9e9e9e;
+        padding: 1px 6px;
+        border-radius: 6px;
+        z-index: 99;
+        box-shadow: 3px 2px 1px 0px rgb(204 204 204 / 30%);
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
 {loop $navs $nav_op $nav_title}
@@ -147,14 +169,16 @@
                 <div class="advlist">
                     <div class="adv_title">{$item['title']}</div>
                     <div class="adv_type {$item['type']}">{$media[$item['type']]['title']}</div>
-                    <div class="adv_url operate">
+                    <div class="adv_url">
                         {$item['url']}
-                        <a href="{php echo $this->createWebUrl('adv', ['op' => 'assign', 'id' => $item['id']])}" target="_blank">
-                            <i class="fa fa-wrench" title="分配"></i>
-                        </a>
-                        <a href="{php echo $this->createWebUrl('adv', ['op' => 'edit', 'id' => $item['id']])}" target="_blank">
-                            <i class="fa fa-edit" title="编辑"></i>
-                        </a>
+                        <div class="operate">
+                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'assign', 'id' => $item['id']])}" target="_blank">
+                                <i class="fa fa-wrench" title="分配"></i>
+                            </a>
+                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'edit', 'id' => $item['id']])}" target="_blank">
+                                <i class="fa fa-edit" title="编辑"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 {/loop}
@@ -164,9 +188,19 @@
             <div class="seg">
                 <div class="title">屏幕字幕</div>
                 <div  style="display:flex;">
-                {loop $config['data']['srt']['subs'] $text}
+                {loop $config['data']['srt']['subs'] $srt}
                 <div class="advlist">
-                    <div class="adv_url}"><pre>{$text}</pre></div>
+                    <div class="adv_url">
+                        <pre>{php echo strval($srt['text'])}</pre>
+                        <div class="operate">
+                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'assign', 'id' => $srt['id']])}" target="_blank">
+                                <i class="fa fa-wrench" title="分配"></i>
+                            </a>
+                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'edit', 'id' => $srt['id']])}" target="_blank">
+                                <i class="fa fa-edit" title="编辑"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 {/loop}
                 </div>

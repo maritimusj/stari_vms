@@ -6,6 +6,27 @@
         height: 16px;
         border-radius: 50%;
     }
+    #moscaleLabelList {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #moscaleLabelList span {
+        background-color: #9E9E9E;
+        padding: 2px 8px;
+        color: #fff;
+        border-radius: 6px;
+        margin: 3px 1px;
+        cursor: pointer
+    }
+    #moscaleLabelList span.selected{
+        background-color: #FF9800;
+    }
+    #moscale-area select {
+        margin-right: 10px;
+    }
+    [v-cloak] {
+        display: none;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active">
@@ -83,6 +104,8 @@
                         <span class="help-block"></span>
                     </div>
                 </div>
+                <template id="moscale">
+                </template>
             </div>
             <!-- 平台设置 结束 -->
             <!-- 用户限制 开始 -->
@@ -208,6 +231,18 @@
         <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
     </div>
 </form>
+<script> 
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
 
+    require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210418"], function(moscale) {          
+        moscale.init("#moscale", {
+            moscaleMachineKey: "{$moscaleMachineKey}",
+            label: JSON.parse('{php echo json_encode($moscaleLabelList);}'),
+            savedLabel: JSON.parse('{php echo json_encode($moscaleAreaListSaved);}'),
+            region: JSON.parse('{php echo json_encode($moscaleRegionData);}'),
+            savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
+        })
+    })
+</script>
 {template 'web/account/edit_footer'}
 {template 'common/footer'}

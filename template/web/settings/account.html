@@ -6,27 +6,6 @@
         margin-right: 10px;
         margin-left: 0;
     }
-    #moscaleLabelList {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    #moscaleLabelList span {
-        background-color: #9E9E9E;
-        padding: 2px 8px;
-        color: #fff;
-        border-radius: 6px;
-        margin: 3px 1px;
-        cursor: pointer
-    }
-    #moscaleLabelList span.selected{
-        background-color: #FF9800;
-    }
-    [v-cloak] {
-        display: none;
-    }
-    #moscale-area select {
-        margin-right: 10px;
-    }
 </style>
 {template "web/settings/nav"}
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
@@ -106,10 +85,6 @@
                         <span class="help-block">* 抖音开放平台 应用的Client Secret</span>
                     </div>
                 </div>
-            </div>
-            {/if}
-            {if \zovye\App::isMoscaleEnabled()}
-            <div id="moscale">
             </div>
             {/if}
             <div class="seg">
@@ -213,19 +188,5 @@
         zovye.enableCopy('text');
         zovye.enableInputMask();
     })
-
-    {if \zovye\App::isMoscaleEnabled()}
-    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
-
-    require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
-        moscale.init("#moscale", {
-            moscaleMachineKey: "{$moscaleMachineKey}",
-            label: JSON.parse('{php echo json_encode($moscaleLabelList);}'),
-            savedLabel: JSON.parse('{php echo json_encode($moscaleAreaListSaved);}'),
-            region: JSON.parse('{php echo json_encode($moscaleRegionData);}'),
-            savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
-        })
-    })
-    {/if}
 </script>
 {template 'common/footer'}

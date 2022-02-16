@@ -534,18 +534,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['order']['retry']['last'] = request::int('orderRetryLastTime');
         $settings['order']['retry']['max'] = request::int('orderRetryMaxCount');
 
-        if (App::isMoscaleEnabled()) {
-            $settings['moscale']['fan']['key'] = request::trim('moscaleMachineKey');
-            $settings['moscale']['fan']['label'] = array_map(function ($e) {
-                return intval($e);
-            }, explode(',', request::trim('moscaleLabel')));
-            $settings['moscale']['fan']['region'] = [
-                'province' => request::int('province_code'),
-                'city' => request::int('city_code'),
-                'area' => request::int('area_code'),
-            ];
-        }
-
     } elseif ($save_type == 'notice') {
         $settings['notice'] = [
             'sms' => [
@@ -822,15 +810,6 @@ if ($op == 'account') {
 
         $tpl_data['auth_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTH_NOTIFY]);
         $tpl_data['msg_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTHORIZER_EVENT]) . '&appid=/$APPID$';
-    }
-
-    if (App::isMoscaleEnabled()) {
-        $tpl_data['moscaleMachineKey'] = strval($settings['moscale']['fan']['key']);
-        $tpl_data['moscaleLabelList'] = MoscaleAccount::getLabelList();
-        $tpl_data['moscaleAreaListSaved'] = is_array($settings['moscale']['fan']['label']) ? $settings['moscale']['fan']['label'] : [];
-
-        $tpl_data['moscaleRegionData'] = MoscaleAccount::getRegionData();
-        $tpl_data['moscaleRegionSaved'] = is_array($settings['moscale']['fan']['region']) ? $settings['moscale']['fan']['region'] : [];
     }
 
     if (App::isDouyinEnabled()) {

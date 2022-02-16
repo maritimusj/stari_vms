@@ -273,6 +273,16 @@ if ($op == 'default') {
                     'appid' => request::trim('appid'),
                     'appsecret' => request::trim('appsecret'),
                 ]);
+
+                updateSettings('moscale.fan.key', request::trim('moscaleMachineKey'));
+                updateSettings('moscale.fan.label', array_map(function ($e) {
+                    return intval($e);
+                }, explode(',', request::trim('moscaleLabel'))));
+                updateSettings('moscale.fan.region', [
+                    'province' => request::int('province_code'),
+                    'city' => request::int('city_code'),
+                    'area' => request::int('area_code'),
+                ]);
             } elseif ($account->isYunfenba()) {
                 $data['name'] = Account::YUNFENBA_NAME;
                 $data['img'] = Account::YUNFENBA_HEAD_IMG;
@@ -662,7 +672,7 @@ if ($op == 'default') {
         $bonus_type = Account::COMMISSION;
     }
 
-    app()->showTemplate('web/account/edit_' . $type, [
+    $tpl_data =  [
         'op' => $op,
         'type' => $type,
         'id' => $id,
@@ -676,7 +686,24 @@ if ($op == 'default') {
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,
         'config' => $config,
-    ]);
+    ];
+
+    if (App::isMoscaleEnabled()) {
+        $tpl_data['moscaleMachineKey'] = settings('moscale.fan.key', '');
+        $tpl_data['moscaleLabelList'] = MoscaleAccount::getLabelList();
+        $tpl_data['moscaleAreaListSaved'] = settings('moscale.fan.label', []);
+        if (!is_array($tpl_data['moscaleAreaListSaved'])) {
+            $tpl_data['moscaleAreaListSaved'] = [];
+        }
+
+        $tpl_data['moscaleRegionData'] = MoscaleAccount::getRegionData();
+        $tpl_data['moscaleRegionSaved'] = settings('moscale.fan.region', []);
+        if (!is_array($tpl_data['moscaleRegionSaved'])) {
+            $tpl_data['moscaleRegionSaved'] = [];
+        }
+    }
+
+    app()->showTemplate('web/account/edit_' . $type, $tpl_data);
 
 } elseif ($op == 'add') {
 

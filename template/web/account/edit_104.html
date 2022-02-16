@@ -15,7 +15,7 @@
         </a>
     </li>
 </ul>
-<form action="{php echo $this->createWebUrl('account');}" method="post">
+<form action="{php echo $this->createWebUrl('account');}" method="post" id="editForm">
     <div class="panel panel-default panel-first">
         <div class="heading">
             <span class="operate">
@@ -83,6 +83,14 @@
                         <span class="help-block"></span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="appkey" class="col-md-2 control-label">设备区域（可选）</label>
+                    <div class="col-md-10" style="display: flex;">
+                        <input type="text" class="form-control" name="province" value="{$config['region']['code']['province']}">
+                        <input type="text" class="form-control" name="city" value="{$config['region']['code']['city']}">
+                        <input type="text" class="form-control" name="area" value="{$config['region']['code']['area']}">
+                    </div>
+                </div>                
                 <div class="form-group">
                     <label class="col-md-2 control-label">美葩平台 回调网址</label>
                     <div class="col-md-10">
@@ -214,6 +222,5 @@
         <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
     </div>
 </form>
-
 {template 'web/account/edit_footer'}
 {template 'common/footer'}

@@ -320,6 +320,13 @@ if ($op == 'default') {
                     'type' => Account::MEIPA,
                     'apiid' => request::trim('apiid'),
                     'appkey' => request::trim('appkey'),
+                    'region' => [
+                        'code' => [
+                            'province' => request::trim('province'),
+                            'city' => request::trim('city'),
+                            'area' => request::trim('area'),
+                        ],
+                    ],
                 ]);
             } elseif ($account->isKingFans()) {
                 $data['name'] = Account::KINGFANS_NAME;

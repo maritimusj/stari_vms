@@ -62,6 +62,9 @@ class MeiPaAccount
         $params = [
             'meipaopenid' => $meipa_openid,
             'apiversion' => 'v2.1',
+            'provincecode' => $config['region']['code']['province'] ?? '',
+            'citycode' => $config['region']['code']['city'] ?? '',
+            'areacode' => $config['region']['code']['area'] ?? '',
         ];
         $MeiPa->fetchOne($device, $user, $params, function ($request, $result) use ($acc, $device, $user, &$v) {
             if (App::isAccountLogEnabled()) {

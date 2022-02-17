@@ -409,7 +409,7 @@ class Pay
             return [];
         }
 
-        $fn = function($name) {
+        $fn = function($name) use ($params) {
             $data = $params[$name] ?? [];
             if ($data['enable']) {
                 if ((App::isWxUser() &&  (!isset($data['wx']) || $data['wx'])) ||

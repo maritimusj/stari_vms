@@ -503,6 +503,15 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             ], true);
         }
 
+        Config::app('wxapp.message-push', [
+            'token' => request::trim('WxAppPushMsgEncodingToken'),
+            'encodingAESkey' => request::trim('WxAppPushMsgEncodingAESKey'),
+            'msgEncodingType' => request::int('WxAppPushMsgEncodingType'),
+            'msgTitle' => request::trim('WxAppPushMsgTitle'),
+            'msgDesc' => request::trim('WxAppPushMsgDesc'),
+            'msgThumb' => request::trim('WxAppPushMsgThumb'),
+        ], true);
+
     } elseif ($save_type == 'account') {
 
         $settings['misc']['account']['priority'] = request::trim('accountPriority');
@@ -978,6 +987,14 @@ if ($op == 'account') {
         ];
 
         $tpl_data['advsID'] = Config::app('wxapp.advs', []);
+
+        $tpl_data['notify_url'] = Util::murl('wxnotify');
+        $config = Config::app('wxapp.message-push', []);
+        if (empty($config['token'])) {
+            $config['token'] = Util::random(32);
+        }
+        
+        $tpl_data['config'] = $config;
     }
 } elseif ($op == 'user') {
 

@@ -42,4 +42,5 @@ router::exec($op, [
     'mallOrderList' => '\zovye\api\wxweb\api::getMallOrderList',
     'mallGoodsList' => '\zovye\api\wxweb\api::getMallGoodsList',
     'createMallOrder' => '\zovye\api\wxweb\api::createMallOrder',
+    'pageInfo' => '\zovye\api\wxx\common::pageInfo',
 ]);

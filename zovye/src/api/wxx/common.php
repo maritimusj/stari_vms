@@ -1197,7 +1197,7 @@ class common
         return $user;
     }
 
-    public static function doUserLogin($res, $user_info, $h5_openid = ''): array
+    public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = ''): array
     {
         $openid = strval($res['openId']);
         $user = User::get($openid, true);
@@ -1227,6 +1227,16 @@ class common
         }
 
         $user->set('fansData', $user_info);
+
+        if ($device_uid) {
+            $device = Device::get($device_uid, true);
+            if ($device) {
+                $user->setLastActiveData([
+                    'device' => $device->getId(),
+                    'time' => time(),
+                ]);
+            }
+        }
 
         if ($h5_openid) {
             $user->updateSettings('customData.wx.openid', $h5_openid);

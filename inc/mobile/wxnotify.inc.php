@@ -20,11 +20,6 @@ if (request::is_get()) {
 $json_data = request::json();
 $result = WxAppMessagePush::handle($json_data);
 
-Log::debug('notify', [
-    'message' => $json_data,
-    'response' => $result,
-]);
-
 if (is_error($result)) {
     Log::error('notify', $result);
 } else {

@@ -1234,6 +1234,7 @@ class common
                 $user->setLastActiveData([
                     'device' => $device->getId(),
                     'time' => time(),
+                    'from' => 'wxapp',
                 ]);
             }
         }

@@ -47,7 +47,7 @@ class WxAppMessagePush
             $msg = json_decode($decrypted, true);
         }
 
-        if ($msg['Event'] == 'user_enter_tempsession') {
+        if ($msg['MsgType'] == 'text') {
             $openid = $msg['FromUserName'] ?? '';
             if (empty($openid)) {
                 return err('FromUserName is empty!');
@@ -59,12 +59,8 @@ class WxAppMessagePush
             }
 
             $data = $user->getLastActiveData();
-            if (empty($data) || empty($data['device'])) {
+            if (empty($data) || $data['from'] != 'wxapp' || empty($data['device']) || time() - $data['time'] > 600) {
                 return err('请重新登录小程序！');
-            }
-
-            if (!empty($data['last_msg']) && time() - $data['last_msg'] < 300) {
-                return err('服务消息已经发送！');
             }
 
             $device = Device::get($data['device']);
@@ -99,12 +95,6 @@ class WxAppMessagePush
             if ($result['errcode']) {
                 return err($result['errmsg']);
             }
-
-            $user->setLastActiveData([
-                'device' => $device->getId(),
-                'time' => time(),
-                'last_msg' => time(),
-            ]);
 
             return $welcome_msg;
         }

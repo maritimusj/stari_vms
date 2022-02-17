@@ -95,7 +95,7 @@ class WxAppMessagePush
             }
 
             if ($result['errcode']) {
-                return err($result['errmsg']);
+                return err($result['errmsg'] ?? 'unknown error');
             }
 
             return $welcome_msg;

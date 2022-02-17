@@ -407,25 +407,30 @@ class Pay
                 return $data;
             }
             return [];
-        } 
-        
-        $lcsw = $params[PAY::LCSW] ?? [];
-        if ($lcsw['enable']) {
-            if ((App::isWxUser() &&  (!isset($lcsw['wx']) || $lcsw['wx'])) ||
-                (App::isAliUser() && (!isset($lcsw['ali']) || $lcsw['ali']))) {
-                $lcsw['name'] = PAY::LCSW;
-                return $lcsw;
-            }
         }
 
-        $SQB = $params[PAY::SQB] ?? [];
-        if ($SQB['enable']) {
-            if ((App::isWxUser() &&  (!isset($SQB['wx']) || $SQB['wx'])) ||
-                (App::isAliUser() && (!isset($SQB['ali']) || $SQB['ali']))) {
-                $SQB['name'] = PAY::SQB;
-                return $SQB;
+        $fn = function($name) {
+            $data = $params[$name] ?? [];
+            if ($data['enable']) {
+                if ((App::isWxUser() &&  (!isset($data['wx']) || $data['wx'])) ||
+                    (App::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
+                    $data['name'] = $name;
+                    unset($data['wx'], $data['ali']);
+                    return $data;
+                }
             }
-        } 
+            return [];
+        };
+
+        $lcsw = $fn(Pay::LCSW);
+        if ($lcsw) {
+            return $lcsw;
+        }
+
+        $SQB = $fn(Pay::SQB);
+        if ($SQB) {
+            return $SQB;
+        }
         
         $wx = $params[Pay::WX] ?? [];
         if ($wx['enable']) {

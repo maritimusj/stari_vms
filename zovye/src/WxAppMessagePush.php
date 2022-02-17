@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use wx\ErrorCode;
+use wx\Prpcrypt;
+
 class WxAppMessagePush
 {
     const RESPONSE = 'success';
@@ -37,10 +40,9 @@ class WxAppMessagePush
 
         $config = Config::app('wxapp.message-push', []);
         if (!empty($msg['Encrypt'])) {
-            $appid = settings('agentWxapp.key');
-            list($ret, $decrypted) = (new \wx\Prpcrypt($config['encodingAESkey']))->decrypt($appid, $msg['Encrypt']);
+            list($ret, $decrypted) = (new Prpcrypt($config['encodingAESkey']))->decrypt($wx_config['key'], $msg['Encrypt']);
 
-            if ($ret != \wx\ErrorCode::OK) {
+            if ($ret != ErrorCode::OK) {
                 return err('消息解密失败！');
             }
 
@@ -98,5 +100,7 @@ class WxAppMessagePush
 
             return $welcome_msg;
         }
+
+        return true;
     }
 }

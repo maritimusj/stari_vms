@@ -189,7 +189,7 @@ if (empty($device)) {
 }
 
 //检查用户定位
-if (App::isWxUser() && Util::mustValidateLocation($user, $device)) {
+if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
     
     $user->updateSettings('last.deviceId', '');
 

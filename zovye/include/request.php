@@ -23,7 +23,7 @@ function request(string $name, $default = null)
 
 class request
 {
-    public static function json(string $key = '', $default = null)
+    public static function json(string $key = '', $default = [])
     {
         static $data = null;
         if (!isset($data)) {

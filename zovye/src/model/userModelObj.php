@@ -635,7 +635,7 @@ class userModelObj extends modelObj
     public function MCHPay($n, $trade_no, string $desc = ''): array
     {
         if ($trade_no && $n > 0) {
-            $params = Pay::getDefaultPayParams('wx');
+            $params = Pay::getDefaultPayParams(Pay::WX);
             if (empty($params)) {
                 return error(State::ERROR, '没有配置微信打款信息！');
             }

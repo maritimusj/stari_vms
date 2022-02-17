@@ -50,12 +50,7 @@ class WxAppMessagePush
         }
 
         if ($msg['MsgType'] == 'text') {
-            $openid = $msg['FromUserName'] ?? '';
-            if (empty($openid)) {
-                return err('FromUserName is empty!');
-            }
-
-            $user = User::get($openid, true, User::WxAPP);
+            $user = User::get($msg['FromUserName'], true, User::WxAPP);
             if (empty($user)) {
                 return err('找不到指定用户！');
             }

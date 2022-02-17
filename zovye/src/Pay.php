@@ -400,28 +400,46 @@ class Pay
 
     public static function selectPayParams(array $params, string $name): array
     {
-        $data = [];
         if ($name) {
             $data = $params[$name];
             if ($data) {
                 $data['name'] = $name;
+                return $data;
             }
-        } else {
-            if ($params['lcsw']['enable']) {
-                $data = $params['lcsw'];
-                $data['name'] = 'lcsw';
-            } elseif ($params['SQB']['enable']) {
-                $data = $params['SQB'];
-                $data['name'] = 'SQB';
-            } elseif ($params['wx']['enable']) {
-                $data = $params['wx'];
-                $data['name'] = 'wx';
-            } elseif ($params['ali']['enable']) {
-                $data = $params['ali'];
-                $data['name'] = 'ali';
+            return [];
+        } 
+        
+        $lcsw = $params[PAY::LCSW] ?? [];
+        if ($lcsw['enable']) {
+            if ((App::isWxUser() &&  (!isset($lcsw['wx']) || $lcsw['wx'])) ||
+                (App::isAliUser() && (!isset($lcsw['ali']) || $lcsw['ali']))) {
+                $lcsw['name'] = PAY::LCSW;
+                return $lcsw;
             }
         }
-        return is_array($data) ? $data : [];
+
+        $SQB = $params[PAY::SQB] ?? [];
+        if ($SQB['enable']) {
+            if ((App::isWxUser() &&  (!isset($SQB['wx']) || $SQB['wx'])) ||
+                (App::isAliUser() && (!isset($SQB['ali']) || $SQB['ali']))) {
+                $SQB['name'] = PAY::SQB;
+                return $SQB;
+            }
+        } 
+        
+        $wx = $params[Pay::WX] ?? [];
+        if ($wx['enable']) {
+            $wx['name'] = Pay::WX;
+            return $wx;
+        }
+        
+        $ali = $params[Pay::ALI] ?? [];
+        if ($ali['enable']) {
+            $ali['name'] = Pay::ALI;
+            return $ali;
+        }
+
+        return [];
     }
 
     /******************************************************************************************************************/

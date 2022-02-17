@@ -441,7 +441,7 @@ class App
     {
         if ($user->isAliUser()) {
             $_SESSION['ali_user_id'] = $user->getOpenid();
-        } elseif ($user->isWxUser()) {
+        } elseif ($user->isWxUser() || $user->isWXAppUser()) {
             $_SESSION['wx_user_id'] = $user->getOpenid();
         } elseif ($user->isDouYinUser()) {
             $_SESSION['douyin_user_id'] = $user->getOpenid();

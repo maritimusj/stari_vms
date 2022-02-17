@@ -679,6 +679,8 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['pay']['lcsw']['enable'] = $lcsw_enabled;
 
         if ($lcsw_enabled) {
+            $settings['pay']['lcsw']['wx'] = request::bool('lcsw_weixin');
+            $settings['pay']['lcsw']['ali'] = request::bool('lcsw_ali');
             $settings['pay']['lcsw']['merchant_no'] = request::trim('merchant_no');
             $settings['pay']['lcsw']['terminal_id'] = request::trim('terminal_id');
             $settings['pay']['lcsw']['access_token'] = request::trim('access_token');
@@ -719,7 +721,9 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             }
         }
 
-        if ($settings['SQB']['enable']) {
+        if ($settings['pay']['SQB']['enable']) {
+            $settings['pay']['SQB']['wx'] = request::bool('SQB_weixin');
+            $settings['pay']['SQB']['ali'] = request::bool('SQB_ali');
             Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
                 'headers' => [
                     'HTTP_USER_AGENT' => 'SQB_notify',
@@ -1137,9 +1141,11 @@ if ($op == 'account') {
 
     if (updateSettings('pay.SQB', [
         'enable' => 1,
+        'wx' => request::bool('wx'),
+        'ali' => request::bool('ali'),
         'sn' => $result['terminal_sn'],
         'key' => $result['terminal_key'],
-        'title' => $result['store_name']
+        'title' => $result['store_name'],
     ])) {
         JSON::success('成功！');
     }

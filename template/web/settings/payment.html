@@ -25,6 +25,19 @@
                 </div>
                 <fieldset {if empty($settings['pay']['lcsw']['enable'])}disabled{/if} name="lcsw">
                 <div class="form-group">
+                    <label class="col-md-2 control-label">客户端</label>
+                    <div class="col-md-10">
+                        <label>
+                            <input type="checkbox" name="lcsw_weixin" value="1" {if !isset($settings['pay']['lcsw']['wx']) || $settings['pay']['lcsw']['wx']}checked{/if}>
+                            微信APP
+                        </label>                              
+                        <label>
+                            <input type="checkbox" name="lcsw_ali" value="1" {if !isset($settings['pay']['lcsw']['ali']) || $settings['pay']['lcsw']['ali']}checked{/if}>
+                            支付宝APP
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="merchant_no" class="col-md-2 control-label">商户号</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="merchant_no" id="merchant_no" value="{$settings['pay']['lcsw']['merchant_no']}">
@@ -44,7 +57,7 @@
                 </div>
                 </fieldset>
             </div>
-            <div class="seg">                
+            <div class="seg">       
                 {if $settings['pay']['SQB']}
                 <div class="title">收钱吧（已激活）</div>
                 <div class="form-group">
@@ -63,6 +76,19 @@
                     <label for="code" class="col-md-2 control-label">终端密钥</label>
                     <div class="col-md-10">
                         <span class="form-control inputMask">{$settings['pay']['SQB']['key']}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">客户端</label>
+                    <div class="col-md-10">
+                        <label>
+                            <input type="checkbox" name="SQB_weixin" value="1" {if !isset($settings['pay']['SQB']['wx']) || $settings['pay']['SQB']['wx']}checked{/if}>
+                            微信APP
+                        </label>                              
+                        <label>
+                            <input type="checkbox" name="SQB_ali" value="1" {if !isset($settings['pay']['SQB']['ali']) || $settings['pay']['SQB']['ali']}checked{/if}>
+                            支付宝APP
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -95,6 +121,19 @@
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="code" id="code">
                         <span class="help-block">* 终端激活码，服务商后台生成</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">客户端</label>
+                    <div class="col-md-10">
+                        <label>
+                            <input type="checkbox" name="SQB_weixin" value="1">
+                            微信APP
+                        </label>                              
+                        <label>
+                            <input type="checkbox" name="SQB_ali" value="1">
+                            支付宝APP
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -277,6 +316,8 @@
                     'vendor_sn': $.trim($('input[name=vendor_sn]').val()),
                     'vendor_key': $.trim($('input[name=vendor_key').val()),
                     'code': $.trim($('input[name=code]').val()),
+                    'wx': $('input[name=SQB_weixin]').is(':checked') ? 1 : 0,
+                    'ali': $('input[name=SQB_ali]').is(':checked') ? 1 : 0,
                 }
                 if (params['vendor_key'] === '') {
                     $('input[name=vendor_key').siblings('.inputMask').click()

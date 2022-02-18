@@ -404,6 +404,7 @@ class Pay
             $data = $params[$name];
             if ($data) {
                 $data['name'] = $name;
+                unset($data['wx'], $data['ali']);
                 return $data;
             }
             return [];

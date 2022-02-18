@@ -27,11 +27,11 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">客户端</label>
                     <div class="col-md-10">
-                        <label>
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用扫呗收款">
                             <input type="checkbox" name="lcsw_weixin" value="1" {if !isset($settings['pay']['lcsw']['wx']) || $settings['pay']['lcsw']['wx']}checked{/if}>
                             微信APP
-                        </label>                              
-                        <label>
+                        </label>
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用扫呗收款">
                             <input type="checkbox" name="lcsw_ali" value="1" {if !isset($settings['pay']['lcsw']['ali']) || $settings['pay']['lcsw']['ali']}checked{/if}>
                             支付宝APP
                         </label>
@@ -81,11 +81,11 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">客户端</label>
                     <div class="col-md-10">
-                        <label>
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
                             <input type="checkbox" name="SQB_weixin" value="1" {if !isset($settings['pay']['SQB']['wx']) || $settings['pay']['SQB']['wx']}checked{/if}>
                             微信APP
                         </label>                              
-                        <label>
+                        <label class="checkbox-inline" title="用户使用支付宝扫一扫支付时，是否使用收钱吧收款">
                             <input type="checkbox" name="SQB_ali" value="1" {if !isset($settings['pay']['SQB']['ali']) || $settings['pay']['SQB']['ali']}checked{/if}>
                             支付宝APP
                         </label>
@@ -126,11 +126,11 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">客户端</label>
                     <div class="col-md-10">
-                        <label>
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
                             <input type="checkbox" name="SQB_weixin" value="1">
                             微信APP
                         </label>                              
-                        <label>
+                        <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
                             <input type="checkbox" name="SQB_ali" value="1">
                             支付宝APP
                         </label>

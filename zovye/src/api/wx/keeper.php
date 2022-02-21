@@ -938,6 +938,7 @@ class keeper
                     'error' => '创建营运人员补货佣金失败:' . $err['message'],
                     'total' => $total,
                 ]);
+                return $err;
             }
         }
 

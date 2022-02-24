@@ -404,19 +404,20 @@ class Pay
             $data = $params[$name];
             if ($data) {
                 $data['name'] = $name;
-                unset($data['wx'], $data['ali']);
+                unset($data['wx'], $data['ali'], $data['wxapp']);
                 return $data;
             }
             return [];
         }
 
-        $fn = function($name) use ($params) {
+        $fn = function ($name) use ($params) {
             $data = $params[$name] ?? [];
             if ($data['enable']) {
-                if ((App::isWxUser() &&  (!isset($data['wx']) || $data['wx'])) ||
+                if ((App::isWxAppUser() && (!isset($data['wxapp']) || $data['wxapp'])) ||
+                    (App::isWxUser() && !App::isWxAppUser() && (!isset($data['wx']) || $data['wx'])) ||
                     (App::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
                     $data['name'] = $name;
-                    unset($data['wx'], $data['ali']);
+                    unset($data['wx'], $data['ali'], $data['wxapp']);
                     return $data;
                 }
             }
@@ -432,13 +433,13 @@ class Pay
         if ($SQB) {
             return $SQB;
         }
-        
+
         $wx = $params[Pay::WX] ?? [];
         if ($wx['enable']) {
             $wx['name'] = Pay::WX;
             return $wx;
         }
-        
+
         $ali = $params[Pay::ALI] ?? [];
         if ($ali['enable']) {
             $ali['name'] = Pay::ALI;

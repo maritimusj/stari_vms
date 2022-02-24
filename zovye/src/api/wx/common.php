@@ -65,6 +65,21 @@ class common
         return request::str('token');
     }
 
+    public static function getWXAppUser(): ?userModelObj
+    {
+        $token = common::getToken();
+        if (empty($token)) {
+            JSON::fail('请先登录后再请求数据！[101]');
+        }
+
+        $login_data = LoginData::get($token);
+        if (empty($login_data)) {
+            JSON::fail('请先登录后再请求数据！[102]');
+        }
+
+        return User::get($login_data->getOpenidX(), true);
+    }
+
     public static function getUser(): userModelObj
     {
         static $user = null;
@@ -111,8 +126,6 @@ class common
             $login_data->destroy();
             JSON::fail('暂时无法使用，请联系管理员！');
         }
-
-        App::setContainer($user);
 
         return $user;
     }

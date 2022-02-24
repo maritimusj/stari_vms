@@ -681,6 +681,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         if ($lcsw_enabled) {
             $settings['pay']['lcsw']['wx'] = request::bool('lcsw_weixin');
             $settings['pay']['lcsw']['ali'] = request::bool('lcsw_ali');
+            $settings['pay']['lcsw']['wxapp'] = request::bool('lcsw_wxapp');
             $settings['pay']['lcsw']['merchant_no'] = request::trim('merchant_no');
             $settings['pay']['lcsw']['terminal_id'] = request::trim('terminal_id');
             $settings['pay']['lcsw']['access_token'] = request::trim('access_token');
@@ -724,6 +725,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         if ($settings['pay']['SQB']['enable']) {
             $settings['pay']['SQB']['wx'] = request::bool('SQB_weixin');
             $settings['pay']['SQB']['ali'] = request::bool('SQB_ali');
+            $settings['pay']['SQB']['wxapp'] = request::bool('SQB_wxapp');
             Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
                 'headers' => [
                     'HTTP_USER_AGENT' => 'SQB_notify',

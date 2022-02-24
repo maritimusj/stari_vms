@@ -212,7 +212,7 @@ class api
 
     public static function pay(): array
     {
-        $user = \zovye\api\wx\common::getUser();
+        $user = \zovye\api\wx\common::getWXAppUser();
 
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
@@ -248,6 +248,8 @@ class api
             }
             $is_package = true;
         }
+
+        App::setContainer($user);
 
         return Helper::createWxAppOrder($user, $device, $goods_or_package_id, $num ?? 1, $is_package);
     }

@@ -29,7 +29,6 @@ use zovye\LoginData;
 use zovye\model\goods_voucher_logsModelObj;
 use zovye\Order;
 use zovye\model\orderModelObj;
-use zovye\Pay;
 use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
@@ -408,7 +407,7 @@ class common
      */
     public static function orderCreate(): array
     {
-        $user = self::getUser();
+        $user = \zovye\api\wx\common::getWXAppUser();
 
         if ($user->isBanned()) {
             return err('用户暂时无法使用！');
@@ -417,8 +416,6 @@ class common
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
-
-        App::setContainer($user);
 
         $imei = request::str('device');
 
@@ -443,6 +440,8 @@ class common
         if (empty($goods_id)) {
             return err('没有指定商品！');
         }
+
+        App::setContainer($user);
 
         return Helper::createWxAppOrder($user, $device, $goods_id);
     }
@@ -1157,6 +1156,7 @@ class common
         ];
     }
 
+
     /**
      * 获取当前已登录的用户.
      *
@@ -1193,8 +1193,6 @@ class common
             }
             JSON::fail('暂时无法使用，请联系管理员！');
         }
-
-        App::setContainer($user);
 
         return $user;
     }

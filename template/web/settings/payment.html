@@ -35,6 +35,10 @@
                             <input type="checkbox" name="lcsw_ali" value="1" {if !isset($settings['pay']['lcsw']['ali']) || $settings['pay']['lcsw']['ali']}checked{/if}>
                             支付宝APP
                         </label>
+                        <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用扫呗收款">
+                            <input type="checkbox" name="lcsw_wxapp" value="1" {if !isset($settings['pay']['lcsw']['wxapp']) || $settings['pay']['lcsw']['wxapp']}checked{/if}>
+                            微信小程序
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -89,6 +93,10 @@
                             <input type="checkbox" name="SQB_ali" value="1" {if !isset($settings['pay']['SQB']['ali']) || $settings['pay']['SQB']['ali']}checked{/if}>
                             支付宝APP
                         </label>
+                        <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用收钱吧收款">
+                            <input type="checkbox" name="SQB_wxapp" value="1" {if !isset($settings['pay']['SQB']['wxapp']) || $settings['pay']['SQB']['wxapp']}checked{/if}>
+                            微信小程序
+                        </label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -133,6 +141,10 @@
                         <label class="checkbox-inline" title="用户使用微信扫一扫支付时，是否使用收钱吧收款">
                             <input type="checkbox" name="SQB_ali" value="1">
                             支付宝APP
+                        </label>
+                        <label class="checkbox-inline" title="用户使用微信小程序支付时，是否使用收钱吧收款">
+                            <input type="checkbox" name="SQB_wxapp" value="1">
+                            微信小程序
                         </label>
                     </div>
                 </div>

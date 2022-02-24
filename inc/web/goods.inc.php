@@ -221,6 +221,9 @@ if ($op == 'default' || $op == 'goods') {
         if ($images) {
             $goods->setDetailImg($images[0]);
             $goods->setGallery($images);
+        } else {
+            $goods->setDetailImg('');
+            $goods->setGallery([]);
         }
 
         if ($params['syncAll'] != $goods->getSync()) {

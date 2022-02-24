@@ -1194,6 +1194,8 @@ class common
             JSON::fail('暂时无法使用，请联系管理员！');
         }
 
+        App::setContainer($user);
+
         return $user;
     }
 

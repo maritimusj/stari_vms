@@ -441,8 +441,11 @@ class App
     {
         if ($user->isAliUser()) {
             $_SESSION['ali_user_id'] = $user->getOpenid();
-        } elseif ($user->isWxUser() || $user->isWXAppUser()) {
+        } elseif ($user->isWxUser()) {
             $_SESSION['wx_user_id'] = $user->getOpenid();
+        } elseif ($user->isWXAppUser()) {
+            $_SESSION['wx_user_id'] = $user->getOpenid();
+            $_SESSION['wxapp_user_id'] = $user->getOpenid();
         } elseif ($user->isDouYinUser()) {
             $_SESSION['douyin_user_id'] = $user->getOpenid();
         }
@@ -470,6 +473,11 @@ class App
     public static function isWxUser(): bool
     {
         return !empty($_SESSION['wx_user_id']);
+    }
+
+    public static function isWxAppUser(): bool
+    {
+        return !empty($_SESSION['wxapp_user_id']);
     }
 
     public static function isDouYinUser(): bool

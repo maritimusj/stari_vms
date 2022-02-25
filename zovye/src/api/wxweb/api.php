@@ -117,7 +117,7 @@ class api
         if (request::is_array('s_type')) {
             $s_types = request::array('s_type');
         } else {
-            if (request::str('s_types') == 'all') {
+            if (request::str('s_type') == 'all') {
                 $s_types = null;
             } else {
                 $s_types = [];

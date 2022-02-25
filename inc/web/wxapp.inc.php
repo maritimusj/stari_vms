@@ -108,25 +108,29 @@ if ($op == 'add' || $op == 'edit') {
         ]
     );
 
-    JSON::success(['title' => '激励广告设置', 'content' => $content]);
+    JSON::success(['content' => $content]);
 
 } elseif ($op == 'saveRewardConfig') {
+
     Config::app('wxapp.advs.reward.bonus', [
         'level0' => [
-            'max' => request::int('numLevel0'),
-            'v' => request::int('bonusLevel0'),
+            'max' => max(0, request::int('numLevel0')),
+            'v' => max(0, request::int('bonusLevel0')),
         ],
         'level1' => [
-            'max' => request::int('numLevel1'),
-            'v' => request::int('bonusLevel1'),
+            'max' => max(0, request::int('numLevel1')),
+            'v' => max(0, request::int('bonusLevel1')),
         ],
         'level2' => [
-            'max' => request::int('numLevel2'),
-            'v' => request::int('bonusLevel2'),
+            'max' => max(0, request::int('numLevel2')),
+            'v' => max(0, request::int('bonusLevel2')),
         ],
     ], true);
 
     Config::app('wxapp.advs.reward.w', request::str('way'), true);
-    Config::app('wxapp.advs.reward.limit', request::str('limit'), true);
-    Config::app('wxapp.advs.reward.max', request::str('max'), true);
+    Config::app('wxapp.advs.reward.limit', max(0, request::str('limit')), true);
+    Config::app('wxapp.advs.reward.max', max(0, request::str('max')), true);
+    Config::app('wxapp.advs.reward.allowFree', request::bool('allowFree') ? 1 : 0, true);   
+    Config::app('wxapp.advs.reward.freeLimit', max(0, request::int('freeLimit')), true);
+    Config::app('wxapp.advs.reward.freeCommission', max(0, intval(request::float('freeCommission', 0, 2) * 100)), true);
 }

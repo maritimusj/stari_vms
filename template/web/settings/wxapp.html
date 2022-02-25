@@ -225,7 +225,10 @@
                 'numLevel2': form.find('input[name=rewardAdsNumLevel2]').val(),
                 'bonusLevel2': form.find('input[name=rewardBonusLevel2]').val(),
                 'limit': form.find('input[name=rewardBonusLimit]').val(),
-                'max': form.find('input[name=rewardBonusMax]').val(),                
+                'max': form.find('input[name=rewardBonusMax]').val(),
+                'allowFree': form.find('input[name=allowFree]').is(':checked') ? 1 : 0,  
+                'freeLimit': form.find('input[name=freeLimit]').val(),  
+                'freeCommission': form.find('input[name=freeCommission]').val(),  
             });
             $('#modal-message').modal('hide');
         })

@@ -1,46 +1,81 @@
-<form class="form-horizontal seg" id="rewardConfigForm">
-    <div class="form-group">
-        <label class="col-xs-12 col-md-2 col-md-2 control-label">分级奖励方式</label>
-        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-            <div class="radio">
-              <label>
-                <input type="radio" name="rewardWay" id="rewardWay0" value="day" {if $config['w'] == 'day'}checked{/if}>
-                每天 <span style="color:gray;">（按用户每天观看的广告数量计算）</span>
-              </label>
+<form class="form-horizontal" id="rewardConfigForm">
+    <ul class="nav nav-tabs" id="navbar">
+        <li role="presentation" :class="{'active': active == 'balance'}" @click="active='balance'"><a href="#">积分奖励</a></li>
+        <li role="presentation" :class="{'active': active == 'commission'}" @click="active='commission'"><a href="#">免费领取</a></li>
+    </ul>
+    <div class="panel panel-default nav-tab-item" :class="{'panel-first': active == 'balance'}">
+        <div class="panel-body" v-show="active == 'balance'">
+            <div class="form-group">
+                <label class="col-xs-12 col-md-2 col-md-2 control-label">分级奖励方式</label>
+                <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                    <div class="radio">
+                    <label>
+                        <input type="radio" name="rewardWay" id="rewardWay0" value="day" {if $config['w'] == 'day'}checked{/if}>
+                        每天 <span style="color:gray;">（按用户每天观看的广告数量计算）</span>
+                    </label>
+                    </div>
+                    <div class="radio">
+                    <label>
+                        <input type="radio" name="rewardWay" id="rewardWay1" value="all"  {if empty($config['w']) || $config['w'] == 'all'}checked{/if}>
+                    累计 <span style="color:gray;">（按用户观看的全部广告数量计算）</span>
+                    </label>
+                    </div>
+                </div>
             </div>
-            <div class="radio">
-              <label>
-                <input type="radio" name="rewardWay" id="rewardWay1" value="all"  {if empty($config['w']) || $config['w'] == 'all'}checked{/if}>
-               累计 <span style="color:gray;">（按用户观看的全部广告数量计算）</span>
-              </label>
+            <div class="form-group" v-for="(level, i) in levels">
+                <label for="rewardAdsNum0" class="col-md-2 control-label">
+                    <span class="level-title">{{i+1}}级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                </label>
+                <div class="col-md-5">
+                    <input type="number" class="form-control" :name="'rewardAdsNumLevel'+i" :id="'rewardAdsNumLevel'+i" :min="0" v-model.number="level['advs']" title="广告数量">
+                    <span class="help-block" v-text="'* ' + getHelpText(i)"></span>
+                </div>
+                <div class="col-md-5">
+                    <input type="number" class="form-control" :name="'rewardBonusLevel'+i" :id="'rewardBonusLevel'+i" :min="0" v-model.number="level['bonus']" title="奖励积分数量">
+                    <span class="help-block">* 奖励积分数量</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rewardBonusLimit" class="col-md-2 control-label">每日限额（次）</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="rewardBonusLimit" id="rewardBonusLimit" value="{php echo intval($config['limit'])}" min="0">
+                    <span class="help-block">* 限制每天可以获得奖励的最大次数，０表示不限制</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rewardBonusMax" class="col-md-2 control-label">全部限额（次）</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="rewardBonusMax" id="rewardBonusMax" value="{php echo intval($config['max'])}" min="0">
+                    <span class="help-block">* 限制单个用户最多可以获得奖励的次数，０表示不限制</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="form-group" v-for="(level, i) in levels">
-        <label for="rewardAdsNum0" class="col-md-2 control-label">
-            <span class="level-title">{{i+1}}级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
-        </label>
-        <div class="col-md-5">
-            <input type="number" class="form-control" :name="'rewardAdsNumLevel'+i" :id="'rewardAdsNumLevel'+i" :min="0" v-model.number="level['advs']" title="广告数量">
-            <span class="help-block" v-text="'* ' + getHelpText(i)"></span>
-        </div>
-        <div class="col-md-5">
-            <input type="number" class="form-control" :name="'rewardBonusLevel'+i" :id="'rewardBonusLevel'+i" :min="0" v-model.number="level['bonus']" title="奖励积分数量">
-            <span class="help-block">* 奖励积分数量</span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="rewardBonusLimit" class="col-md-2 control-label">每日限额（次）</label>
-        <div class="col-md-10">
-            <input type="number" class="form-control" name="rewardBonusLimit" id="rewardBonusLimit" value="{php echo intval($config['limit'])}" min="0">
-            <span class="help-block">* 限制每天可以获得奖励的最大次数，０表示不限制</span>
-        </div>
-    </div>
-    <div class="form-group">
-        <label for="rewardBonusMax" class="col-md-2 control-label">全部限额（次）</label>
-        <div class="col-md-10">
-            <input type="number" class="form-control" name="rewardBonusMax" id="rewardBonusMax" value="{php echo intval($config['max'])}" min="0">
-            <span class="help-block">* 限制单个用户最多可以获得奖励的次数，０表示不限制</span>
+        <div class="panel-body" v-show="active == 'commission'">
+            <div class="form-group">
+                <label for="allowFree" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="allowFree" id="allowFree" value="1" {if $config['allowFree']}checked{/if}>
+                            启用<span class="text-muted">（允许用户看完激励广告后免费领取商品）</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="freeLimit" class="col-md-2 control-label">每日限额（次）</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="freeLimit" id="freeLimit" value="{php echo intval($config['freeLimit'])}" min="0">
+                    <span class="help-block">* 限制单个用户每天可以领取的最大次数，０表示不限制</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="freeCommission" class="col-md-2 control-label">代理商佣金（元）</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="freeCommission" id="freeCommission" value="{php echo number_format($config['freeCommission'] / 100, 2, '.', '')}" min="0.0">
+                    <span class="help-block">* 用户领取成功后，代理商获得的佣金</span>
+                </div>
+            </div>
         </div>
     </div>
     <div class="form-group">
@@ -55,6 +90,7 @@
         new Vue({
             el: "#rewardConfigForm",
             data: {
+                active: 'balance',
                 levels: [
                     {
                         advs: parseInt("{php echo intval($config['bonus']['level0']['max'])}"),

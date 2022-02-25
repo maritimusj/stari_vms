@@ -1,6 +1,6 @@
-<form class="form-horizontal">
+<form class="form-horizontal" id="rewardConfigForm">
     <div class="form-group">
-        <label class="col-xs-12 col-md-2 col-md-2 control-label">分级奖励</label>
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">分级奖励方式</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
             <div class="radio">
               <label>
@@ -11,7 +11,7 @@
             <div class="radio">
               <label>
                 <input type="radio" name="rewardWay" id="rewardWay1" value="all"  {if empty($config['w']) || $config['w'] == 'all'}checked{/if}>
-               全部 <span style="color:gray;">（按用户观看的全部广告数量计算）</span>
+               累计 <span style="color:gray;">（按用户观看的全部广告数量计算）</span>
               </label>
             </div>
         </div>
@@ -21,11 +21,11 @@
             <span class="level-title">1级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
         </label>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardAdsNumLevel0" id="rewardAdsNumLevel0" value="{$config['bonus']['level0']['max']}">
-            <span class="help-block">* 广告数量</span>
+            <input type="number" class="form-control" name="rewardAdsNumLevel0" id="rewardAdsNumLevel0" v-model.number="level0.advs" title="广告数量">
+            <span class="help-block" v-text="'* ' + getHelpText(0)"></span>
         </div>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardBonusLevel0" id="rewardBonusLevel0" value="{$config['bonus']['level0']['v']}">
+            <input type="number" class="form-control" name="rewardBonusLevel0" id="rewardBonusLevel0" v-model.number="level0.bonus" title="奖励积分数量">
             <span class="help-block">* 奖励积分数量</span>
         </div>
     </div>
@@ -34,11 +34,11 @@
             <span class="level-title">2级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
         </label>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardAdsNumLevel1" id="rewardAdsNumLevel1" value="{$config['bonus']['level1']['max']}">
-            <span class="help-block">* 广告数量</span>
+            <input type="number" class="form-control" name="rewardAdsNumLevel1" id="rewardAdsNumLevel1" v-model.number="level1.advs" title="广告数量">
+            <span class="help-block" v-text="'* ' + getHelpText(1)"></span>
         </div>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardBonusLevel1" id="rewardBonusLevel1" value="{$config['bonus']['level1']['v']}">
+            <input type="number" class="form-control" name="rewardBonusLevel1" id="rewardBonusLevel1" v-model.number="level1.bonus" title="奖励积分数量">
             <span class="help-block">* 奖励积分数量</span>
         </div>
     </div>
@@ -47,11 +47,11 @@
             <span class="level-title">3级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
         </label>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardAdsNumLevel2" id="rewardAdsNumLevel2" value="{$config['bonus']['level2']['max']}">
-            <span class="help-block">* 广告数量</span>
+            <input type="number" class="form-control" name="rewardAdsNumLevel2" id="rewardAdsNumLevel2" v-model.number="level2.advs" title="广告数量">
+            <span class="help-block" v-text="'* ' + getHelpText(2)"></span>
         </div>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardBonusLevel2" id="rewardBonusLevel2" value="{$config['bonus']['level2']['v']}">
+            <input type="number" class="form-control" name="rewardBonusLevel2" id="rewardBonusLevel2" v-model.number="level2.bonus" title="奖励积分数量">
             <span class="help-block">* 奖励积分数量</span>
         </div>
     </div>
@@ -76,3 +76,51 @@
         </div>
     </div>
 </form>
+<script>
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el: "#rewardConfigForm",
+            data: {
+                level0: {
+                    advs: parseInt("{$config['bonus']['level0']['max']}"),
+                    bonus: parseInt("{$config['bonus']['level0']['v']}"),
+                },
+                level1: {
+                    advs: parseInt("{$config['bonus']['level1']['max']}"),
+                    bonus: parseInt("{$config['bonus']['level1']['v']}"),
+                },
+                level2: {
+                    advs: parseInt("{$config['bonus']['level2']['max']}"),
+                    bonus: parseInt("{$config['bonus']['level2']['v']}"),
+                },
+            },
+            methods: {
+                getHelpText(level) {
+                    let s_advs = 0;
+                    if (level > 0) {
+                        for(let i = 0; i < level; i ++) {
+                            s_advs += this['level' + i]['advs'];
+                        }
+                        s_advs += 1;
+                    } else {
+                        s_advs = 1;
+                    }
+                    
+                    if (!this['level' + level]['advs']) {
+                        return '忽略';
+                    }
+
+                    const advs = level > 0 ? s_advs + this['level' + level]['advs'] -  1: this['level' + level]['advs'];
+                    const bonus = this['level' + level]['bonus'];
+                    if (advs > 0 && bonus > 0) {
+                        return advs == s_advs ? `第${s_advs}个广告，用户获得${bonus}个积分奖励`:`第${s_advs} - ${advs}个广告，用户获得${bonus}个积分奖励`;
+                    }
+                    if (advs <= 0) {
+                        return '';
+                    }
+                    return s_advs == advs ? `第${s_advs}个广告没有积分奖励`:`第${s_advs} -  ${advs}个广告没有积分奖励`;
+                }
+            }
+        })
+    })
+</script>

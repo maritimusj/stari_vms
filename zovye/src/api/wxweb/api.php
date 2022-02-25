@@ -103,9 +103,30 @@ class api
             return [];
         }
 
+        if (request::is_array('type')) {
+            $types = request::array('type');
+        } else {
+            if (request::str('type') == 'all') {
+                $types = null;
+            } else {
+                $type = request::int('type', Account::VIDEO);
+                $types = [$type];                
+            }
+        }
+
+        if (request::is_array('s_type')) {
+            $s_types = request::array('s_type');
+        } else {
+            if (request::str('s_types') == 'all') {
+                $s_types = null;
+            } else {
+                $s_types = [];
+            }
+        }
+
         $params = [
-            'type' => [Account::VIDEO],
-            's_type' => [],
+            'type' => $types,
+            's_type' => $s_types,
             'include' => $include,
         ];
 

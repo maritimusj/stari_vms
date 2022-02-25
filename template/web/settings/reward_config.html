@@ -21,11 +21,11 @@
             <span class="level-title">1级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
         </label>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardAdsNumLevel0" id="rewardAdsNumLevel0" v-model.number="level0.advs" title="广告数量">
+            <input type="number" class="form-control" name="rewardAdsNumLevel0" id="rewardAdsNumLevel0" :min="0" v-model.number="level0.advs" title="广告数量">
             <span class="help-block" v-text="'* ' + getHelpText(0)"></span>
         </div>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardBonusLevel0" id="rewardBonusLevel0" v-model.number="level0.bonus" title="奖励积分数量">
+            <input type="number" class="form-control" name="rewardBonusLevel0" id="rewardBonusLevel0" :min="0" v-model.number="level0.bonus" title="奖励积分数量">
             <span class="help-block">* 奖励积分数量</span>
         </div>
     </div>
@@ -34,11 +34,11 @@
             <span class="level-title">2级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
         </label>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardAdsNumLevel1" id="rewardAdsNumLevel1" v-model.number="level1.advs" title="广告数量">
+            <input type="number" class="form-control" name="rewardAdsNumLevel1" id="rewardAdsNumLevel1" :min="0" v-model.number="level1.advs" title="广告数量">
             <span class="help-block" v-text="'* ' + getHelpText(1)"></span>
         </div>
         <div class="col-md-5">
-            <input type="number" class="form-control" name="rewardBonusLevel1" id="rewardBonusLevel1" v-model.number="level1.bonus" title="奖励积分数量">
+            <input type="number" class="form-control" name="rewardBonusLevel1" id="rewardBonusLevel1" :min="0"  v-model.number="level1.bonus" title="奖励积分数量">
             <span class="help-block">* 奖励积分数量</span>
         </div>
     </div>
@@ -92,6 +92,26 @@
                 level2: {
                     advs: parseInt("{$config['bonus']['level2']['max']}"),
                     bonus: parseInt("{$config['bonus']['level2']['v']}"),
+                },
+            },
+            watch: {
+                ['level0.advs'](v, o) {
+                    if (typeof v != 'number') {
+                        v = 0;
+                    }
+                    this.level0.advs = v < 0 ? o : v;
+                },
+                ['level1.advs'](v, o) {
+                    if (typeof v != 'number') {
+                        v = 0;
+                    }
+                    this.level1.advs = v < 0 ? o : v;
+                },
+                ['level2.advs'](v, o) {
+                    if (typeof v != 'number') {
+                        v = 0;
+                    }
+                    this.level2.advs = v < 0 ? o : v;
                 },
             },
             methods: {

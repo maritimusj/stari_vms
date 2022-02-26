@@ -35,7 +35,7 @@ $user_id = request::int('user');
 $goods_id = request::int('goods');
 $num = request::int('num');
 $ip = request::str('ip');
-$serial = request::str('serial');
+$code = request::str('code');
 
 $log = [
     'op' => $op,
@@ -45,7 +45,7 @@ $log = [
     'goods' => $goods_id,
     'num' => $num,
     'ip' => $ip,
-    'serial' => $serial
+    'code' => $code
 ];
 
 $writeLog = function () use (&$log) {
@@ -59,7 +59,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
         'goods' => $goods_id,
         'num' => $num,
         'ip' => $ip,
-        'serial' => $serial,
+        'code' => $code,
     ])) {
 
     try {
@@ -88,7 +88,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
             throw new RuntimeException('找不到这个设备！');
         }
 
-        if ($serial != sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid())) {
+        if ($code != sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid())) {
             throw new RuntimeException('不正确的请求！');
         }
 
@@ -111,7 +111,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
                     'goods' => $goods_id,
                     'num' => $num,
                     'ip' => $ip,
-                    'serial' => $serial,
+                    'code' => $code,
                 ])) {
                     throw new RuntimeException('启动排队任务失败！');
                 }
@@ -146,8 +146,8 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
             throw new RuntimeException($res['message']);
         }
 
-        $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $goods, $num, $ip, $serial) {
-            return createOrder($order_no, $device, $user, $goods, $num, $ip, $serial);
+        $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $goods, $num, $ip, $code) {
+            return createOrder($order_no, $device, $user, $goods, $num, $ip, $code);
         });
 
         if (is_error($orderResult)) {
@@ -220,7 +220,7 @@ function createOrder(string         $order_no,
                      array          $goods,
                      int            $num,
                      string         $ip,
-                     string         $serial): orderModelObj
+                     string         $code): orderModelObj
 {
     $order_data = [
         'name' => $goods['name'],
@@ -242,7 +242,7 @@ function createOrder(string         $order_no,
             ],
             'user' => $user->profile(),
             'reward' => [
-                'serial' => $serial,
+                'code' => $code,
             ],
             'goods' => $goods,
         ],

@@ -213,9 +213,9 @@ class api
             }
         } else {
             $orderUID = request::str('orderUID');
-            $serial = request::str('serial');
+            $code = request::str('code');
 
-            if (empty($orderNO) || empty($serial)) {
+            if (empty($orderNO) || empty($code)) {
                 return err('缺少必要的参数！');
             }
 
@@ -226,7 +226,7 @@ class api
                 'goods' => $goods['id'],
                 'num' => 1,
                 'ip' => Util::getClientIp(),
-                'serial' => $serial,
+                'code' => $code,
             ])) {
                 return ['orderUID' => $orderUID];
             }
@@ -261,7 +261,7 @@ class api
         $order_no = Order::makeUID($user, $device, time());
         return [
             'orderUID' => $order_no,
-            'serial' => sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid()),
+            'code' => sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid()),
         ];
     }
 

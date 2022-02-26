@@ -419,6 +419,7 @@ class CtrlServ
         if (!is_error($result) && $result !== false) {
             return $result['queued'] ?? true;
         }
+        
         return false;
     }
 

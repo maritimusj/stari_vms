@@ -212,6 +212,11 @@ class api
                 return ['orderUID' => $orderUID];
             }
         } else {
+            $reward =  Config::app('wxapp.advs.reward', []);
+            if (empty($reward['allowFree']) || empty($reward['id'])) {
+                return err('没有设置激励广告！');
+            }
+            
             $orderUID = request::str('orderUID');
             $code = request::str('code');
 
@@ -239,6 +244,11 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
+        $reward =  Config::app('wxapp.advs.reward', []);
+        if (empty($reward['allowFree']) || empty($reward['id'])) {
+            return err('没有设置激励广告！');
+        }
+
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
             JSON::fail('无法锁定用户，请稍后再试！');
         }
@@ -253,15 +263,10 @@ class api
             return $res;
         }
 
-        $reward_id = Config::app('wxapp.advs.reward.id');
-        if (empty($reward_id)) {
-            return err('没有设置激励广告！');
-        }
-
         $order_no = Order::makeUID($user, $device, time());
         return [
             'orderUID' => $order_no,
-            'code' => sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid()),
+            'code' => sha1($order_no . $reward['id'] . $device->getShadowId() . $user->getOpenid()),
         ];
     }
 

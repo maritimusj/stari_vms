@@ -293,6 +293,11 @@ class accountModelObj extends modelObj
         return $this->getType() == Account::WXAPP;
     }
 
+    public function isQuestionnaire(): bool
+    {
+        return $this->getType() == Account::QUESTIONNAIRE;
+    }
+
     public function isJFB(): bool
     {
         return $this->getType() == Account::JFB;

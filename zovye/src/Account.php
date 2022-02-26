@@ -37,6 +37,9 @@ class Account extends State
     //小程序
     const WXAPP = 30;
 
+    //问卷
+    const QUESTIONNAIRE = 40;
+
     //授权接入公众号
     const AUTH = 98;
 
@@ -323,6 +326,7 @@ class Account extends State
                 Account::VIDEO,
                 Account::AUTH,
                 Account::WXAPP,
+                Account::QUESTIONNAIRE,
             ];
 
         $third_party_platform_includes = $params['s_type'] ?? [
@@ -1268,6 +1272,7 @@ class Account extends State
             self::VIDEO => '视频',
             self::DOUYIN => '抖音',
             self::WXAPP => '小程序',
+            self::QUESTIONNAIRE => '问卷',
             self::AUTH => '公众号',
             self::JFB => '准粉吧',
             self::MOSCALE => '公锤',

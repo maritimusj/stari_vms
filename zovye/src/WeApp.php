@@ -363,6 +363,7 @@ JSCODE;
                             Account::NORMAL,
                             Account::VIDEO,
                             Account::AUTH,
+                            Account::QUESTIONNAIRE,
                         ],
                         'include' => [Account::COMMISSION],
                     ]);

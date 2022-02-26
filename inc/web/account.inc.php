@@ -251,7 +251,7 @@ if ($op == 'default') {
         if ($id) {
             $account = Account::get($id);
             if (empty($account)) {
-                return err('找不到这个公众号！');
+                return err('找不到这个任务！');
             }
             //特殊吸粉
             if ($account->isJFB()) {
@@ -465,12 +465,12 @@ if ($op == 'default') {
             }
 
             if (Account::findOneFromName($name)) {
-                return err('公众号帐号已经存在！');
+                return err('任务帐号已经存在！');
             }
 
             $uid = Account::makeUID($name);
             if (Account::findOneFromUID($uid)) {
-                return err('公众号UID已经存在！');
+                return err('任务UID已经存在！');
             }
 
             $data['uid'] = $uid;
@@ -482,7 +482,7 @@ if ($op == 'default') {
 
             $account = Account::create($data);
             if (empty($account)) {
-                return err('创建公众号失败！');
+                return err('创建任务失败！');
             }
         }
 
@@ -563,6 +563,8 @@ if ($op == 'default') {
                     'images' => request::array('task_images'),
                     'desc' => request::str('task_desc'),
                 ]);
+            } elseif ($account->isQuestionnaire()) {
+
             }
 
             $commission_data = [];
@@ -642,7 +644,7 @@ if ($op == 'default') {
     if ($id) {
         $account = Account::get($id);
         if (empty($account)) {
-            Util::itoast('公众号不存在！', $this->createWebUrl('account'), 'error');
+            Util::itoast('任务不存在！', $this->createWebUrl('account'), 'error');
         }
 
         $type = $account->getType();
@@ -733,7 +735,7 @@ if ($op == 'default') {
             $title = $account->getTitle();
             $account->destroy();
             Account::updateAccountData();
-            Util::itoast("删除公众号{$title}成功！", $this->createWebUrl('account'), 'success');
+            Util::itoast("删除任务{$title}成功！", $this->createWebUrl('account'), 'success');
         }
     }
 
@@ -766,11 +768,11 @@ if ($op == 'default') {
     $id = request::int('id');
     $account = Account::get($id);
     if (empty($account)) {
-        Util::itoast('这个公众号不存在！', $this->createWebUrl('account'), 'error');
+        Util::itoast('这个任务不存在！', $this->createWebUrl('account'), 'error');
     }
 
     // if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
-    //     Util::itoast('积分奖励的公众号无法分配到指定设备！', $this->createWebUrl('account'), 'error');
+    //     Util::itoast('积分奖励的任务无法分配到指定设备！', $this->createWebUrl('account'), 'error');
     // }
 
     $data = [
@@ -884,7 +886,7 @@ if ($op == 'default') {
 
     $acc = Account::get($id);
     if (empty($acc)) {
-        JSON::fail('找不到这个公众号！');
+        JSON::fail('找不到这个任务！');
     }
 
     $title = $acc->getTitle();
@@ -893,7 +895,7 @@ if ($op == 'default') {
     try {
         $month = new DateTime($time_str);
         $caption = $month->format('Y年n月');
-        $data = Stats::chartDataOfMonth($acc, $month, "公众号：$title($caption)");
+        $data = Stats::chartDataOfMonth($acc, $month, "任务：$title($caption)");
     } catch (Exception $e) {
     }
 
@@ -913,7 +915,7 @@ if ($op == 'default') {
     $acc = Account::get($id);
 
     if (empty($acc)) {
-        JSON::fail('找不到这个公众号！');
+        JSON::fail('找不到这个任务！');
     }
 
     $tpl_data = [
@@ -1007,7 +1009,7 @@ if ($op == 'default') {
     $acc = Account::get($id);
 
     if (empty($acc)) {
-        JSON::fail('找不到这个公众号！');
+        JSON::fail('找不到这个任务！');
     }
 
     $query = Order::query(['account' => $acc->getName()]);
@@ -1022,7 +1024,7 @@ if ($op == 'default') {
 
     $account = Account::get($id);
     if (empty($account)) {
-        JSON::fail('找不到这个公众号！');
+        JSON::fail('找不到这个任务！');
     }
 
     $title = $account->getTitle();
@@ -1152,7 +1154,7 @@ if ($op == 'default') {
 
     $account = Account::get(request::int('id'));
     if (empty($account)) {
-        JSON::fail('找不到这个公众号！');
+        JSON::fail('找不到这个任务！');
     }
 
     if (!$account->isAuth() || !$account->isServiceAccount()) {
@@ -1173,7 +1175,7 @@ if ($op == 'default') {
     $account = Account::get($account_id);
 
     if (empty($account)) {
-        Util::itoast('找不到这个公众号或任务！', '', 'error');
+        Util::itoast('找不到这个任务！', '', 'error');
     }
 
     app()->showTemplate('web/account/stats_view', [
@@ -1186,7 +1188,7 @@ if ($op == 'default') {
     $account = Account::get($account_id);
 
     if (empty($account)) {
-        JSON::fail('找不到这个公众号或任务！');
+        JSON::fail('找不到这个任务！');
     }
 
     $first_order = Order::getFirstOrderOfAccount($account);
@@ -1221,7 +1223,7 @@ if ($op == 'default') {
     $account = Account::get($account_id);
 
     if (empty($account)) {
-        JSON::fail('找不到这个公众号或任务！');
+        JSON::fail('找不到这个任务！');
     }
 
     $year_str = request::int('year');
@@ -1270,7 +1272,7 @@ if ($op == 'default') {
     $account = Account::get($account_id);
 
     if (empty($account)) {
-        JSON::fail('找不到这个公众号或任务！');
+        JSON::fail('找不到这个任务！');
     }
 
     $year_str = request::int('year');

@@ -21,7 +21,7 @@ $op = request::op('default');
 
 if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
 
-    $query = Account::query(['type' => [Account::NORMAL, Account::AUTH, Account::VIDEO]]);
+    $query = Account::query(['type' => [Account::NORMAL, Account::AUTH, Account::VIDEO, Account::QUESTIONNAIRE]]);
 
     /** @var accountModelObj $acc */
     foreach ($query->findAll() as $acc) {

@@ -44,6 +44,11 @@ class CommissionEventHandler
             return self::balance($device, $order);
         }
 
+        //小程序激励广告出货
+        if ($order->getExtraData('reward')) {
+            return self::reward($device, $order);
+        }
+
         if ($order->getPrice() > 0) {
             return self::pay($device, $order);
         }
@@ -57,10 +62,21 @@ class CommissionEventHandler
      * @return bool
      * @throws Exception
      */
+    protected static function reward(deviceModelObj $device, orderModelObj $order): bool
+    {
+        $commission_price = Config::app('wxapp.advs.reward.freeCommission') * $order->getNum();
+        return self::processCommissions($device, $order, $commission_price);
+    }
+
+    /**
+     * @param deviceModelObj $device
+     * @param orderModelObj $order
+     * @return bool
+     * @throws Exception
+     */
     protected static function balance(deviceModelObj $device, orderModelObj $order): bool
     {
         $commission_price = Config::balance('order.commission.val', 0) * $order->getNum();
-
         return self::processCommissions($device, $order, $commission_price);
     }
 

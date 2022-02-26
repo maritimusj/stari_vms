@@ -187,6 +187,10 @@
                             积分兑换：<span class="balance">{$order['balance']}</span>
                             <img src="{MODULE_URL}static/img/coin.svg" class="balance">                            
                         </div>
+                        {elseif $order['reward']}
+                        <div class="orderSrc">
+                            小程序激励视频 <img src="{MODULE_URL}static/img/wxapp.jpg" class="balance">
+                        </div>
                         {else}
                         <div class="orderSrc">
                             {if $order['account']}

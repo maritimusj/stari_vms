@@ -816,7 +816,6 @@ class deviceModelObj extends modelObj
     public function resetShadowId(): bool
     {
         $i = 6;
-        $shadow_id = '';
         do {
             $shadow_id = Util::random($i++);
         } while (Device::find($shadow_id, ['id', 'imei', 'shadow_id', 'app_id']));

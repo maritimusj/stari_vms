@@ -110,7 +110,7 @@ class api
                 $types = null;
             } else {
                 $type = request::int('type', Account::VIDEO);
-                $types = [$type];                
+                $types = [$type];
             }
         }
 
@@ -176,11 +176,6 @@ class api
             return err('设备不在线！');
         }
 
-        $account = Account::findOneFromUID(request::str('uid'));
-        if (empty($account)) {
-            return err('找不到指定任务！');
-        }
-
         $goods_id = request::int('goodsId');
         if (empty($goods_id)) {
             $goods = $device->getGoodsByLane(0);
@@ -199,20 +194,75 @@ class api
             return err('商品数量不足！');
         }
 
-        $orderUID = Order::makeUID($user, $device);
+        if (request::has('uid')) {
+            $account = Account::findOneFromUID(request::str('uid'));
+            if (empty($account)) {
+                return err('找不到指定任务！');
+            }
+            $orderUID = Order::makeUID($user, $device);
 
-        if (Job::createAccountOrder([
-            'device' => $device->getId(),
-            'user' => $user->getId(),
-            'account' => $account->getId(),
-            'goods' => $goods['id'],
-            'orderUID' => $orderUID,
-            'ip' => Util::getClientIp(),
-        ])) {
-            return ['orderUID' => $orderUID];
+            if (Job::createAccountOrder([
+                'device' => $device->getId(),
+                'user' => $user->getId(),
+                'account' => $account->getId(),
+                'goods' => $goods['id'],
+                'orderUID' => $orderUID,
+                'ip' => Util::getClientIp(),
+            ])) {
+                return ['orderUID' => $orderUID];
+            }
+        } else {
+            $orderUID = request::str('orderUID');
+            $serial = request::str('serial');
+
+            if (empty($orderNO) || empty($serial)) {
+                return err('缺少必要的参数！');
+            }
+
+            if (!Job::createRewardOrder([
+                'order_no' => $orderUID,
+                'user' => $user->getId(),
+                'device' => $device->getId(),
+                'goods' => $goods['id'],
+                'num' => 1,
+                'ip' => Util::getClientIp(),
+                'serial' => $serial,
+            ])) {
+                return ['orderUID' => $orderUID];
+            }
         }
 
         return err('请求出货失败！');
+    }
+
+    public static function rewardOrderData(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            JSON::fail('无法锁定用户，请稍后再试！');
+        }
+
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        $res = Util::checkFreeOrderLimits($user, $device);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        $reward_id = Config::app('wxapp.advs.reward.id');
+        if (empty($reward_id)) {
+            return err('没有设置激励广告！');
+        }
+
+        $order_no = Order::makeUID($user, $device, time());
+        return [
+            'orderUID' => $order_no,
+            'serial' => sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid()),
+        ];
     }
 
     public static function exchange(): array
@@ -589,11 +639,11 @@ class api
         $name = request::trim('name');
         $phone_num = request::trim('phoneNum');
         $address = request::trim('address');
-    
+
         $result = $user->updateRecipientData($name, $phone_num, $address);
-    
+
         if ($result) {
-           return ['msg' => '已保存！'];
+            return ['msg' => '已保存！'];
         }
 
         return err('保存失败！');
@@ -608,11 +658,11 @@ class api
             'pagesize' => request::int('pagesize'),
             'user_id' => $user->getId(),
         ];
-    
+
         if (request::isset('status')) {
             $params['status'] = request::int('status');
         }
-    
+
         return Delivery::getList($params);
     }
 

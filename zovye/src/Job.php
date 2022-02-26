@@ -188,6 +188,11 @@ class Job
         return CtrlServ::scheduleJob('create_order_account', $params);
     }
 
+    public static function createRewardOrder($params = []): bool
+    {
+        return CtrlServ::scheduleJob('create_order_reward', $params);
+    }
+
     public static function authAccount($agent_id, $accountUID, $total = 0): bool
     {
         return CtrlServ::scheduleDelayJob('auth_account', ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total], 3);

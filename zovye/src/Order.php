@@ -792,6 +792,11 @@ class Order extends State
                     'reason' => $refund['message'] ?? '未知',
                 ];
             }
+
+            $reward = $order->getExtraData('reward');
+            if ($reward) {
+                $data['reward'] = $reward;
+            }
         }
 
         return $data;

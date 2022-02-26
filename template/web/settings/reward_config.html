@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="form-group" v-for="(level, i) in levels">
-                <label for="rewardAdsNum0" class="col-md-2 control-label">
+                <label :for="'rewardAdsNum'+i" class="col-md-2 control-label">
                     <span class="level-title">{{i+1}}级</span>积分奖励 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
                 </label>
                 <div class="col-md-5">
@@ -60,13 +60,6 @@
                             启用<span class="text-muted">（允许用户看完激励广告后免费领取商品）</span>
                         </label>
                     </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="freeLimit" class="col-md-2 control-label">每日限额（次）</label>
-                <div class="col-md-10">
-                    <input type="number" class="form-control" name="freeLimit" id="freeLimit" value="{php echo intval($config['freeLimit'])}" min="0">
-                    <span class="help-block">* 限制单个用户每天可以领取的最大次数，０表示不限制</span>
                 </div>
             </div>
             <div class="form-group">

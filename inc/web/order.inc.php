@@ -188,7 +188,6 @@ if ($op == 'default') {
             } else {
                 $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'];
             }
-
             $data['clr'] = $accounts[$data['account']]['clr'];
         } else {
             if ($data['balance']) {

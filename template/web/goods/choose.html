@@ -16,13 +16,19 @@
     }
     #goodslist .way span:not(.allowed) {
         background-color: #ccc;
-        cursor: not-allowed;
+        cursor: default;
     }
     #goodslist .way span.free.allowed {
         background-color: #4CAF50;
     }
     #goodslist .way span.pay.allowed {
         background-color: #FF5722;
+    }
+    #goodslist .way span.balance.allowed {
+        background-color: #ff9800;
+    }
+    #goodslist .way span.mall.allowed {
+        background-color: #2196f3;
     }
     #goodslist th:not(:nth-child(2)), #goodslist td:not(:nth-child(2)) {
         text-align: center;
@@ -144,8 +150,10 @@
                         <img src="{$item['img']}" />
                     </td>
                     <td class="way">
-                        <span class="free{if $item['allowFree']} allowed{/if}">关注</span>
+                        <span class="free{if $item['allowFree']} allowed{/if}">免费</span>
                         <span class="pay{if $item['allowPay']} allowed{/if}">支付</span>
+                        <span class="balance{if $item['allowExchange']} allowed{/if}">积分</span>
+                        <span class="mall{if $item['allowDelivery']} allowed{/if}">商城</span> 
                     </td>
                     <td>
                         <span{if !$item['allowPay']} style="color:#666;"{/if}>

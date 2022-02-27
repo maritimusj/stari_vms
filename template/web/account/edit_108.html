@@ -7,206 +7,215 @@
         border-radius: 50%;
     }
 </style>
-<ul class="nav nav-tabs" id="navbar">
-    <li role="presentation" class="active">
-        <a href="#">
-            <img src="{php echo \zovye\Account::WxWORK_HEAD_IMG;}">
-            企业微信拉新（阿旗）
-        </a>
-    </li>
-</ul>
-<form action="{php echo $this->createWebUrl('account');}" method="post">
-    <div class="panel panel-default panel-first">
-        <div class="heading">
-            <span class="operate">
-                <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>
-            </span>
-        </div>
-        <div class="panel-body">
-            <!-- 基本信息 开始 -->
-            <div class="seg">
-                <div class="title">基本信息</div>
-                <div class="form-group">
-                    <label for="select_agent" class="col-md-2 control-label">代理商</label>
-                    <div class="col-md-5">
-                        <select name="agentId" id="select_agent" style="width:100%;">
-                            {if $agent_openid}
-                            <option value="{$agent_openid}">{php echo $agent_name . "，手机号码：" . $agent_mobile}</option>
-                            {/if}
-                            <option value="0">&lt;无&gt;</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-default" type="button" id="find_agent">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="title" class="col-md-2 control-label">名称</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="descr" class="col-md-2 control-label">引导关注文字</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">边框颜色</label>
-                    <div class="col-md-10">
-                        {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
-                    </div>
-                </div>
-            </div>
-            <!-- 基本信息 结束 -->
-            <!-- 平台设置 开始 -->
-            <div class="seg">
-                <div class="title">平台设置</div>
-                <div class="form-group">
-                    <label for="key" class="col-md-2 control-label">阿旗平台 app key</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="key" id="key" value="{$config['key']}">
-                        <span class="help-block"></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="secret" class="col-md-2 control-label">阿旗平台 app secret</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="secret" id="secret" value="{$config['secret']}">
-                        <span class="help-block"></span>
-                    </div>
-                </div>
-            </div>
-            <!-- 平台设置 结束 -->
-            <!-- 用户限制 开始 -->
-            <div class="seg">
-                <div class="title">用户限制</div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="sexCheckbox1" name="limits[]" value="male" {if $limits && $limits['male'] or empty($limits)}checked{/if}> 男
-                        </label>
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="sexCheckbox2" name="limits[]" value="female" {if $limits && $limits['female'] or empty($limits)}checked{/if}> 女
-                        </label>
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="sexCheckbox0" name="limits[]" value="unknown_sex" {if $limits && $limits['unknown_sex'] or empty($limits)}checked{/if}> 未知
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">手机系统</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="phoneCheckbox1" name="limits[]" value="ios" {if $limits && $limits['ios'] or empty($limits)}checked{/if}> iPhone手机
-                        </label>
-                        <label class="checkbox-inline">
-                        <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- 用户限制 结束 -->
-            <!-- 其它设置 开始 -->
-            <div class="seg">
-                <div class="title">其它设置</div>
-                <div class="form-group">
-                    <label for="groupname" class="col-md-2 control-label">分组名称</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="groupname" id="groupname" value="{php echo $account?$account->getGroupName():''}">
-                        <span class="help-block">* 可选，同一分组的公众号只有排序值最大的才会显示在公众号关注页面中</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="orderno" class="col-md-2 control-label">排序</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
-                        <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
-                    </div>
-                </div>
-            </div>
-            <!-- 其它设置 结束 -->
-            <!-- 佣金设置 开始 -->
-            {if \zovye\App::isCommissionEnabled() && !\zovye\App::isBalanceEnabled()}
-            <div class="seg">
-                <div class="title">佣金</div>
-                <div class="form-group">
-                    <label for="commission_money" class="col-md-2 control-label">佣金（元）<img src="{MODULE_URL}static/img/yen.svg" class="yen"></label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="commission_money" id="commission_money" value="{$amount}" min="0" step="0.01">
-                        <span class="help-block">* 用户通过这个公众号领取成功后，设备代理商会获得指定佣金</span>
-                    </div>
-                </div>
-            </div>
-            {/if}
-            <!-- 佣金设置 结束 -->
-            {if \zovye\App::isBalanceEnabled() && !\zovye\App::isCommissionEnabled()}
-            <!-- 积分设置 开始 -->
-            <div class="seg">
-                <div class="title">积分</div>
-                <div class="form-group">
-                    <label for="balance" class="col-md-2 control-label">获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="balance" id="balance" value="{$balance}" min="0" step="1">
-                        <span class="help-block">* 用户关注这个公众号后，会获得指定积分</span>
-                    </div>
-                </div>
-            </div>
-            <!-- 积分设置 结束 -->
-            {/if}
-            {if \zovye\App::isBalanceEnabled() && \zovye\App::isCommissionEnabled()}
-            <!-- 佣金和积分同时存在时设置 开始 -->
-            <div class="seg" id="bonus" {if $bonus_type == \zovye\Account::COMMISSION}data-commission="{$amount}"{else}data-balance="{$amount}"{/if}>
-                <div class="title">奖励</div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">方式</label>
-                    <div class="col-md-10">
-                        <label class="radio-inline">
-                            <input type="radio" name="bonus_type" value="commission"
-                            {if $bonus_type == \zovye\Account::COMMISSION}checked{/if}
-                            onclick="changeBonus('commission')">
-                            代理商获得佣金 <img src="{MODULE_URL}static/img/yen.svg" class="yen">
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" name="bonus_type" value="balance"
-                            {if $bonus_type == \zovye\Account::BALANCE}checked{/if}
-                             onclick="changeBonus('balance')">
-                            用户获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="amount" class="col-md-2 control-label"><span class="name"></span></label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="amount" id="amount" value="{$amount}" min="0">
-                        <span class="help-block">* 用户关注这个公众号后，<span class="desc"></span></span>
-                    </div>
-                </div>
-            </div>
-            <!-- 佣金和积分同时存在时设置 结束 -->
-            {/if}
-        </div>
-    </div>
-  
-    <div class="form-btn">
-        <input type="hidden" name="op" value="save">
-        {if $op=='edit' && $id}
-        <input type="hidden" name="id" value="{$id}">
-        <button type="submit" class="btn btn-primary">保存</button>
-        {else}
-        <button type="submit" class="btn btn-primary">创建</button>
-        {/if}
-        <input type="hidden" name="type" value="{$type}">
-        <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
-    </div>
-</form>
 
+<div id="app">
+    <ul class="nav nav-tabs" id="navbar">
+        <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
+            <a href="#" v-html="nav.content">
+            </a>
+        </li>  
+    </ul>
+    <form action="{php echo $this->createWebUrl('account');}" method="post">
+        <div class="panel panel-default panel-first">
+            <div class="heading">
+                <span class="operate">
+                    <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>
+                </span>
+            </div>
+            <div class="panel-body">
+                <!-- 基本信息 开始 -->
+                <div v-show="active ==='base'">
+                    <div class="form-group">
+                        <label for="title" class="col-md-2 control-label">名称</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="descr" class="col-md-2 control-label">引导关注文字</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">边框颜色</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
+                        </div>
+                    </div>
+                </div>
+                <!-- 基本信息 结束 -->
+                <!-- 平台设置 开始 -->
+                <div v-show="active ==='config'">
+                    <div class="form-group">
+                        <label for="key" class="col-md-2 control-label">阿旗平台 app key</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="key" id="key" value="{$config['key']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="secret" class="col-md-2 control-label">阿旗平台 app secret</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control inputMask" name="secret" id="secret" value="{$config['secret']}">
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 平台设置 结束 -->
+                <!-- 用户限制 开始 -->
+                <div v-show="active ==='limits'">
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="sexCheckbox1" name="limits[]" value="male" {if $limits && $limits['male'] or empty($limits)}checked{/if}> 男
+                            </label>
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="sexCheckbox2" name="limits[]" value="female" {if $limits && $limits['female'] or empty($limits)}checked{/if}> 女
+                            </label>
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="sexCheckbox0" name="limits[]" value="unknown_sex" {if $limits && $limits['unknown_sex'] or empty($limits)}checked{/if}> 未知
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">手机系统</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="phoneCheckbox1" name="limits[]" value="ios" {if $limits && $limits['ios'] or empty($limits)}checked{/if}> iPhone手机
+                            </label>
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- 用户限制 结束 -->
+                <!-- 其它设置 开始 -->
+                <div v-show="active ==='misc'">
+                    <div class="form-group">
+                        <label for="groupname" class="col-md-2 control-label">分组名称</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="groupname" id="groupname" value="{php echo $account?$account->getGroupName():''}">
+                            <span class="help-block">* 可选，同一分组的公众号只有排序值最大的才会显示在公众号关注页面中</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderno" class="col-md-2 control-label">排序</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
+                            <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 其它设置 结束 -->
+                <div v-show="active ==='reward'">
+                    <!-- 佣金设置 开始 -->
+                    {if \zovye\App::isCommissionEnabled() && !\zovye\App::isBalanceEnabled()}
+                    <div>
+                        <div class="form-group">
+                            <label for="commission_money" class="col-md-2 control-label">佣金（元）<img src="{MODULE_URL}static/img/yen.svg" class="yen"></label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="commission_money" id="commission_money" value="{$amount}" min="0" step="0.01">
+                                <span class="help-block">* 用户通过这个公众号领取成功后，设备代理商会获得指定佣金</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                    <!-- 佣金设置 结束 -->
+                    {if \zovye\App::isBalanceEnabled() && !\zovye\App::isCommissionEnabled()}
+                    <!-- 积分设置 开始 -->
+                    <div>
+                        <div class="form-group">
+                            <label for="balance" class="col-md-2 control-label">获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="balance" id="balance" value="{$balance}" min="0" step="1">
+                                <span class="help-block">* 用户关注这个公众号后，会获得指定积分</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 积分设置 结束 -->
+                    {/if}
+                    {if \zovye\App::isBalanceEnabled() && \zovye\App::isCommissionEnabled()}
+                    <!-- 佣金和积分同时存在时设置 开始 -->
+                    <div id="bonus" {if $bonus_type == \zovye\Account::COMMISSION}data-commission="{$amount}"{else}data-balance="{$amount}"{/if}>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">方式</label>
+                            <div class="col-md-10">
+                                <label class="radio-inline">
+                                    <input type="radio" name="bonus_type" value="commission"
+                                    {if $bonus_type == \zovye\Account::COMMISSION}checked{/if}
+                                    onclick="changeBonus('commission')">
+                                    代理商获得佣金 <img src="{MODULE_URL}static/img/yen.svg" class="yen">
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="bonus_type" value="balance"
+                                    {if $bonus_type == \zovye\Account::BALANCE}checked{/if}
+                                    onclick="changeBonus('balance')">
+                                    用户获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount" class="col-md-2 control-label"><span class="name"></span></label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="amount" id="amount" value="{$amount}" min="0">
+                                <span class="help-block">* 用户关注这个公众号后，<span class="desc">&lt;请选择奖励方式&gt;</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 佣金和积分同时存在时设置 结束 -->
+                    {/if}
+                </div>
+
+            </div>
+        </div>
+      
+        <div class="form-btn">
+            <input type="hidden" name="op" value="save">
+            {if $op=='edit' && $id}
+            <input type="hidden" name="id" value="{$id}">
+            <button type="submit" class="btn btn-primary">保存</button>
+            {else}
+            <button type="submit" class="btn btn-primary">创建</button>
+            {/if}
+            <input type="hidden" name="type" value="{$type}">
+            <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
+        </div>
+    </form>
+</div>
+<script>
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el: "#app",
+            data: {
+                navs:[
+                    {
+                        'op': 'base',
+                        'content': `<img src="{php echo \zovye\Account::WxWORK_HEAD_IMG;}"> 基本设置`,
+                    },
+                    {
+                        'op': 'config',
+                        'content': `平台设置`,
+                    },                    
+                    {
+                        'op': 'limits',
+                        'content': `用户限制`,
+                    },
+                    {
+                        'op': 'misc',
+                        'content': `其它设置`,
+                    },
+                    {
+                        'op': 'reward',
+                        'content': `奖励设置`,
+                    },
+                ],
+                active: 'base',
+            },
+        })
+    })
+</script>
 {template 'web/account/edit_footer'}
 {template 'common/footer'}

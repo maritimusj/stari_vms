@@ -6,13 +6,13 @@
         height: 16px;
         border-radius: 50%;
     }
-    label:hover .fa-times {
+    .question:hover .remove-question .fa-times, .question .option:hover .fa-times {
         visibility: visible;
     }
-    label .fa-times {
+    .question .fa-times {
         visibility: hidden;
     }
-    .question .fa-plus{
+    .question .fa-plus {
         visibility: hidden;
     }    
     .question:hover .fa-plus{
@@ -109,7 +109,7 @@
                             <div class="form-group">
                                 <label :for="'question'+i" class="col-md-2 control-label">
                                     <span v-html="typeDesc(i, q)"></span>
-                                    <span class="operate" v-if="i>0">
+                                    <span class="operate remove-question" v-if="questions.length>1">
                                         <i class="fa fa-times" title="删除问题" @click="removeQuestion(i)"></i>
                                     </span>
                                 </label>
@@ -121,7 +121,7 @@
                             <div class="form-group option" v-for="(o, j) in q.options">
                                 <label :for="'o' + i + '_' + j" class="col-md-2 control-label">
                                     选项{{j+1}}
-                                    <span class="operate" v-if="j>1">
+                                    <span class="operate" v-if="q.options.length>2">
                                         <i class="fa fa-times" title="删除选项" @click="removeOption(q,j)"></i>
                                     </span>
                                 </label>

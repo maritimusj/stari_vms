@@ -575,6 +575,7 @@ if ($op == 'default') {
                     return err('二维码生成失败！');
                 }
                 $account->setQrcode($qrcode_url);
+                $account->save();
             }
 
             $commission_data = [];

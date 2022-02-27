@@ -570,6 +570,11 @@ if ($op == 'default') {
                     'questions' => $questions,
                     'score' => request::int('score'),
                 ]);
+                $qrcode_url = Util::createQrcodeFile("question.{$account->getUid()}", $account->getUrl());
+                if (is_error($qrcode_url)) {
+                    return err('二维码生成失败！');
+                }
+                $account->setQrcode($qrcode_url);
             }
 
             $commission_data = [];

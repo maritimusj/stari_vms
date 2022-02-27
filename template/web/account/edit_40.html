@@ -1,0 +1,445 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20211127');}
+<style>
+    #navbar img {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+    }
+    label:hover .fa-times {
+        visibility: visible;
+    }
+    label .fa-times {
+        visibility: hidden;
+    }
+    .question .fa-plus{
+        visibility: hidden;
+    }    
+    .question:hover .fa-plus{
+        visibility: visible;
+    }
+    .question .index {
+        font-size: x-large;
+        color: #079200;
+        font-style: italic;
+        font-weight: 900;
+    }
+    .question.filling .index {
+        color: #3296fa;
+    }
+    .choice .option label {
+        padding-left: 1.5em;
+    }
+    .form-group.option {
+        display: flex;
+        align-items: baseline;
+    }
+</style>
+<div  id="app">
+    <ul class="nav nav-tabs" id="navbar">
+        <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
+            <a href="#" v-html="nav.content">
+            </a>
+        </li>  
+    </ul>
+    <form action="{php echo $this->createWebUrl('account');}" method="post">
+        <div class="panel panel-default panel-first">
+            <div class="heading">
+                <span class="operate">
+                    <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>
+                </span>
+            </div>
+            <div class="panel-body">
+                <!-- 基本信息 开始 -->
+                <div v-show="active === 'base'">
+                    <div class="form-group">
+                        <label for="select_agent" class="col-md-2 control-label">代理商</label>
+                        <div class="col-md-5">
+                            <select name="agentId" id="select_agent" style="width:100%;">
+                                {if $agent_openid}
+                                <option value="{$agent_openid}">{php echo $agent_name . "，手机号码：" . $agent_mobile}</option>
+                                {/if}
+                                <option value="0">&lt;无&gt;</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" id="find_agent">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="title" class="col-md-2 control-label">名称</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            头像
+                        </label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="descr" class="col-md-2 control-label">引导文字</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">边框颜色</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
+                        </div>
+                    </div>
+                </div>
+                <!-- 基本信息 结束 -->
+                <div v-show="active === 'quesetion'">
+                <!-- 任务信息 开始 -->
+                <div class="seg">
+                    <div class="title">问题</div>
+                    <input type="hidden" name="questionsJSON" :value="questionsJSON">
+                    <template v-for="(q, i) in questions">
+                        <div :class="['question', q.type]">
+                            <div class="form-group">
+                                <label :for="'question'+i" class="col-md-2 control-label">
+                                    <span v-html="typeDesc(i, q)"></span>
+                                    <span class="operate" v-if="i>0">
+                                        <i class="fa fa-times" title="删除问题" @click="removeQuestion(i)"></i>
+                                    </span>
+                                </label>
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" :id="'question'+i" v-model="q.title">
+                                </div>
+                            </div>
+                            <template  v-if="q.type === 'choice'">
+                            <div class="form-group option" v-for="(o, j) in q.options">
+                                <label :for="'o' + i + '_' + j" class="col-md-2 control-label">
+                                    选项{{j+1}}
+                                    <span class="operate" v-if="j>1">
+                                        <i class="fa fa-times" title="删除选项" @click="removeOption(q,j)"></i>
+                                    </span>
+                                </label>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" :id="'o' + i + '_' + j" v-model="o.text">
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" :checked="o.answer" v-model="o.answer"> 正确选项
+                                    </label>
+                                </div>                            
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"></label>
+                                <div class="col-md-10 operate">
+                                    <i class="fa fa-plus" @click="addOption(q)" title="增加选项"></i>
+                                </div>
+                            </div>                        
+                            </template>
+                            <template v-if="q.type === 'filling'">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"></label>
+                                    <div class="col-md-10">
+                                        <label class="radio-inline">
+                                            <input type="radio" :name="'constraints' + i" value="normal" v-model="q.constraints" :checked="q.constraints=='normal'">
+                                            普通文本
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" :name="'constraints' + i" value="mobile" v-model="q.constraints" :checked="q.constraints=='mobile'">
+                                            手机号码
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" :name="'constraints' + i" value="email" v-model="q.constraints" :checked="q.constraints=='email'">
+                                            邮箱地址
+                                        </label>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="seg-divider"></div>
+                    </template>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label"></label>
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-success" @click="addChoice">
+                                <i class="fa fa-plus"></i> 选择题
+                            </button>
+                            <button type="button" class="btn btn-primary"  @click="addFilling">
+                                <i class="fa fa-plus"></i> 填空题
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 任务信息 结束 -->
+                <div class="seg">
+                    <div class="title">评分</div> 
+                    <div class="form-group">
+                        <label for="" class="col-md-2 control-label">通过分数</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="score" id="score" value="{php echo $config['score']?? 0}">
+                            <span class="help-block">* 符合标准的答案数量超过指定的数量，则表示用户完成了本问卷</span>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+   
+                <!-- 高级设置 开始 -->
+                <div v-show="active === 'advance'">
+                    <div class="form-group">
+                        <label for="scname" class="col-md-2 control-label">领取周期</label>
+                        <div class="col-md-10">
+                            <select  class="form-control" name="scname" id="scname">
+                                <option value="{php echo zovye\Schema::DAY}" {if $account && $account->getScname() == zovye\Schema::DAY}selected{/if}>每天</option>
+                                <option value="{php echo zovye\Schema::WEEK}" {if $account && $account->getScname() == zovye\Schema::WEEK}selected{/if}>每周</option>
+                                <option value="{php echo zovye\Schema::MONTH}" {if $account && $account->getScname() == zovye\Schema::MONTH}selected{/if}>每月</option>
+                            </select>
+                            <span class="help-block">* 每天/每周/每月可领取一次奖励</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="count" class="col-md-2 control-label">一个周期内<br/><b>单个用户</b>可领取数量</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="count" id="count" value="{php echo $account?$account->getCount():'1'}">
+                            <span class="help-block">* 每个用户通过这个任务<b>每个周期</b>最多可领取的奖励数量，0表示不限制数量</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sccount" class="col-md-2 control-label">一个周期内<br/><b>全部用户</b>可领取总数</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="sccount" id="sccount" value="{php echo $account?$account->getSccount():'0'}">
+                            <span class="help-block">* 全部用户在一个周期内领取总数量的最大值，0表示不限制数量</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="total" class="col-md-2 control-label"><b>单个用户</b><br/>累计最多领取数量</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="total" id="total" value="{php echo $account?$account->getTotal():'0'}">
+                            <span class="help-block">* 每个用户通过这个任务累计最多可领取的奖励数量，0表示不限制数量</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderlimits" class="col-md-2 control-label"><b>所有用户</b><br/>累计最多领取总数</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="orderlimits" id="orderlimits" value="{php echo $account?$account->getOrderLimits():'0'}">
+                            <span class="help-block">* 所有用户通过这个任务领取的奖励总数量，0表示不限制数量，<b>超过后，系统会自动隐藏任务！</b></span>
+                        </div>
+                    </div> 
+                </div>
+                <!-- 高级设置 结束 -->
+                <!-- 用户限制 开始 -->
+                <div v-show="active === 'limit'">
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="sexCheckbox1" name="limits[]" value="male" {if $limits && $limits['male'] or empty($limits)}checked{/if}> 男
+                            </label>
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="sexCheckbox2" name="limits[]" value="female" {if $limits && $limits['female'] or empty($limits)}checked{/if}> 女
+                            </label>
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="sexCheckbox0" name="limits[]" value="unknown_sex" {if $limits && $limits['unknown_sex'] or empty($limits)}checked{/if}> 未知
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">手机系统</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="phoneCheckbox1" name="limits[]" value="ios" {if $limits && $limits['ios'] or empty($limits)}checked{/if}> iPhone手机
+                            </label>
+                            <label class="checkbox-inline">
+                            <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- 用户限制 结束 -->
+                <!-- 其它设置 开始 -->
+                <div v-show="active === 'misc'">
+                    <div class="form-group">
+                        <label for="groupname" class="col-md-2 control-label">分组名称</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="groupname" id="groupname" value="{php echo $account?$account->getGroupName():''}">
+                            <span class="help-block">* 可选，同一分组的任务只有排序值最大的才会显示在关注页面中</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderno" class="col-md-2 control-label">排序</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="orderno" id="orderno" value="{php echo $account?$account->getOrderNo():0}">
+                            <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 其它设置 结束 -->
+                <!-- 佣金设置 开始 -->
+                <div v-show="active === 'reward'">
+                    {if \zovye\App::isCommissionEnabled() && !\zovye\App::isBalanceEnabled()}
+                    <div >
+                        <div class="form-group">
+                            <label for="commission_money" class="col-md-2 control-label">佣金（元）<img src="{MODULE_URL}static/img/yen.svg" class="yen"></label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="commission_money" id="commission_money" value="{$amount}" min="0" step="0.01">
+                                <span class="help-block">* 用户成功领取后，设备代理商会获得指定佣金</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                    <!-- 佣金设置 结束 -->
+                    {if \zovye\App::isBalanceEnabled() && !\zovye\App::isCommissionEnabled()}
+                    <!-- 积分设置 开始 -->
+                    <div>
+                        <div class="form-group">
+                            <label for="balance" class="col-md-2 control-label">获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="balance" id="balance" value="{$balance}" min="0" step="1">
+                                <span class="help-block">* 用户完成后，会获得指定积分</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 积分设置 结束 -->
+                    {/if}
+                    {if \zovye\App::isBalanceEnabled() && \zovye\App::isCommissionEnabled()}
+                    <!-- 佣金和积分同时存在时设置 开始 -->
+                    <div id="bonus" {if $bonus_type == \zovye\Account::COMMISSION}data-commission="{$amount}"{else}data-balance="{$amount}"{/if}>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">奖励方式</label>
+                            <div class="col-md-10">
+                                <label class="radio-inline">
+                                    <input type="radio" name="bonus_type" value="commission"
+                                    {if $bonus_type == \zovye\Account::COMMISSION}checked{/if}
+                                    onclick="changeBonus('commission')">
+                                    代理商获得佣金 <img src="{MODULE_URL}static/img/yen.svg" class="yen">
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="bonus_type" value="balance"
+                                    {if $bonus_type == \zovye\Account::BALANCE}checked{/if}
+                                     onclick="changeBonus('balance')">
+                                    用户获得积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount" class="col-md-2 control-label"><span class="name"></span></label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="amount" id="amount" value="{$amount}">
+                                <span class="help-block">* 用户关注完成后，<span class="desc">&lt;请设置奖励&gt;</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 佣金和积分同时存在时设置 结束 -->
+                    {/if}
+                </div>
+            </div>
+        </div>
+      
+        <div class="form-btn">
+            <input type="hidden" name="op" value="save">
+            {if $op=='edit' && $id}
+            <input type="hidden" name="id" value="{$id}">
+            <button type="submit" class="btn btn-primary">保存</button>
+            {else}
+            <button type="submit" class="btn btn-primary">创建</button>
+            {/if}
+            <input type="hidden" name="type" value="{$type}">
+            <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el: "#app",
+            data: {
+                navs:[
+                    {
+                        'op': 'base',
+                        'content': `<img src="{MODULE_URL}static/img/questionnaire.svg"> 基本设置`,
+                    },
+                    {
+                        'op': 'quesetion',
+                        'content': `问卷内容`,
+                    },
+                    {
+                        'op': 'limit',
+                        'content': `用户限制`,
+                    },
+                    {
+                        'op': 'advance',
+                        'content': `高级设置`,
+                    },
+                    {
+                        'op': 'misc',
+                        'content': `其它设置`,
+                    },
+                    {
+                        'op': 'reward',
+                        'content': `奖励设置`,
+                    },
+                ],
+                active: 'base',
+                questions: JSON.parse(`{php echo json_encode($config['questions'] ?? [])}`),
+            },
+            computed: {
+                questionsJSON: function () {
+                    return encodeURI(JSON.stringify(this.questions));
+                }
+            },
+            mounted() {
+                if (this.questions.length == 0) {
+                    this.addChoice();
+                }
+            },
+            methods: {
+                typeDesc(i, q) {
+                    switch(q.type) {
+                        case 'choice':
+                            const total = q.options.reduce((total, o) => { return o.answer? total+1: total}, 0);
+                            return `<span class="index">${i + 1}</span> 选择题（` + (total > 1 ? '多选' : '单选') + '）';
+                        case 'filling':
+                            return `<span class="index">${i + 1}</span> 填空题`;
+                    }
+                },
+                addChoice() {
+                    const q = {
+                        type: "choice",
+                        title: "",
+                        options: [],
+                    };
+                    this.questions.push(q);
+                    this.addOption(q, '', true);
+                    this.addOption(q);
+                },
+                addOption(q, text = "", answer = false) {
+                    q.options.push({
+                        text,
+                        answer,
+                    })
+                },
+                removeOption(q, i) {
+                    q.options.splice(i,1);
+                },
+                addFilling() {
+                    this.questions.push({
+                        type: "filling",
+                        title: "",
+                        constraints: 'normal',
+                    })
+                },
+                removeQuestion(i) {
+                    this.questions.splice(i, 1);
+                }
+            }
+        })
+    })
+</script>
+
+{template 'web/account/edit_footer'}
+{template 'common/footer'}

@@ -564,7 +564,12 @@ if ($op == 'default') {
                     'desc' => request::str('task_desc'),
                 ]);
             } elseif ($account->isQuestionnaire()) {
-
+                $questions = json_decode(request::str('questionsJSON', '', true), true);
+                $account->set('config', [
+                    'type' => Account::QUESTIONNAIRE,
+                    'questions' => $questions,
+                    'score' => request::int('score'),
+                ]);
             }
 
             $commission_data = [];
@@ -697,7 +702,7 @@ if ($op == 'default') {
         'config' => $config,
     ];
 
-    if (App::isMoscaleEnabled()) {
+    if (App::isMoscaleEnabled() && $type == Account::MOSCALE) {
         $tpl_data['moscaleMachineKey'] = settings('moscale.fan.key', '');
         $tpl_data['moscaleLabelList'] = MoscaleAccount::getLabelList();
         $tpl_data['moscaleAreaListSaved'] = settings('moscale.fan.label', []);

@@ -24,7 +24,7 @@
         font-style: italic;
         font-weight: 900;
     }
-    .question.filling .index {
+    .question.text .index {
         color: #3296fa;
     }
     .choice .option label {
@@ -99,7 +99,7 @@
                     </div>
                 </div>
                 <!-- 基本信息 结束 -->
-                <div v-show="active === 'quesetion'">
+                <div v-show="active === 'question'">
                 <!-- 任务信息 开始 -->
                 <div class="seg">
                     <div class="title">问题</div>
@@ -141,7 +141,7 @@
                                 </div>
                             </div>                        
                             </template>
-                            <template v-if="q.type === 'filling'">
+                            <template v-if="q.type === 'text'">
                                 <div class="form-group">
                                     <label class="col-md-2 control-label"></label>
                                     <div class="col-md-10">
@@ -232,7 +232,7 @@
                 </div>
                 <!-- 高级设置 结束 -->
                 <!-- 用户限制 开始 -->
-                <div v-show="active === 'limit'">
+                <div v-show="active === 'limits'">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -364,11 +364,11 @@
                         'content': `<img src="{MODULE_URL}static/img/questionnaire.svg"> 基本设置`,
                     },
                     {
-                        'op': 'quesetion',
+                        'op': 'question',
                         'content': `问卷内容`,
                     },
                     {
-                        'op': 'limit',
+                        'op': 'limits',
                         'content': `用户限制`,
                     },
                     {
@@ -403,7 +403,7 @@
                         case 'choice':
                             const total = q.options.reduce((total, o) => { return o.answer? total+1: total}, 0);
                             return `<span class="index">${i + 1}</span> 选择题（` + (total > 1 ? '多选' : '单选') + '）';
-                        case 'filling':
+                        case 'text':
                             return `<span class="index">${i + 1}</span> 填空题`;
                     }
                 },
@@ -428,7 +428,7 @@
                 },
                 addFilling() {
                     this.questions.push({
-                        type: "filling",
+                        type: "text",
                         title: "",
                         constraints: 'normal',
                     })

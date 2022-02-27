@@ -570,7 +570,8 @@ if ($op == 'default') {
                     'questions' => $questions,
                     'score' => request::int('score'),
                 ]);
-                $qrcode_url = Util::createQrcodeFile("question.{$account->getUid()}", $account->getUrl());
+                $url = Util::murl('account', ['op' => 'fill', 'uid' => $account->getUid()]);
+                $qrcode_url = Util::createQrcodeFile("question.{$account->getUid()}", $url);
                 if (is_error($qrcode_url)) {
                     return err('二维码生成失败！');
                 }

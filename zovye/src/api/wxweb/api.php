@@ -220,11 +220,11 @@ class api
             $orderUID = request::str('orderUID');
             $code = request::str('code');
 
-            if (empty($orderNO) || empty($code)) {
+            if (empty($orderUID) || empty($code)) {
                 return err('缺少必要的参数！');
             }
 
-            if (!Job::createRewardOrder([
+            if (Job::createRewardOrder([
                 'order_no' => $orderUID,
                 'user' => $user->getId(),
                 'device' => $device->getId(),

@@ -247,9 +247,9 @@ class accountModelObj extends modelObj
         return App::isCommissionEnabled() ? $this->settings('commission.money', 0) : 0;
     }
 
-    public function format(): array
+    public function format(bool $detail = true): array
     {
-        return Account::format($this);
+        return Account::format($this, $detail);
     }
 
     public function isThirdPartyPlatform(): bool

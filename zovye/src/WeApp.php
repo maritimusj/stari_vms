@@ -1646,5 +1646,36 @@ $js_sdk
 JSCODE;
         $this->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
     }
+
+    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account)
+    {
+        $tpl_data = Util::getTplData([$user, $account]);
+
+        $api_url = Util::murl('account');
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_sdk = Util::fetchJSSDK();
+
+        $tpl_data['questions'] = $account->getConfig('questions', []);
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+$js_sdk
+<script>
+    wx.ready(function(){
+        wx.hideAllNonBaseMenuItem();
+    });
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+    zovye_fn.preCheck = function(data) {
+        return $.getJSON(zovye_fn.api_url, {op: 'check', uid:$account->getUid(), data});
+    }    
+    zovye_fn.getResult = function(data) {
+        return $.getJSON(zovye_fn.api_url, {op: 'result', uid:$account->getUid(), data});
+    }
+</script>
+JSCODE;
+        $this->showTemplate(Theme::file('questionnaire'), ['tpl' => $tpl_data]);
+    }
 }
 

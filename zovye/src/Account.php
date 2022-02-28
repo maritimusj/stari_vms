@@ -7,10 +7,10 @@
 namespace zovye;
 
 //公众号状态
+
 use zovye\base\modelObjFinder;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
-use zovye\model\balance_logsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
@@ -191,7 +191,7 @@ class Account extends State
         return self::findOne(['uid' => $uid]);
     }
 
-    public static function format(accountModelObj $entry): array
+    public static function format(accountModelObj $entry, bool $detail = true): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
@@ -234,6 +234,37 @@ class Account extends State
             $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
             if ($appid) {
                 $data['appid'] = $appid;
+            }
+        }
+
+        if ($detail && $entry->isQuestionnaire()) {
+            $data['questions'] = $entry->getConfig('questions', []);
+            foreach((array)$data['questions'] as $index => $question) {
+                if (empty($question['title'])) {
+                    unset($data['question'][$index]);
+                    continue;
+                }
+                if ($question['type'] == 'text') {
+                    continue;
+                }
+                if ($question['type'] == 'choice') {
+                    $options = [];
+                    $answer = 0;
+                    foreach((array)$question['options'] as $option) {
+                        if (empty($option['text'])) {
+                            continue;
+                        }
+                        $options[] = $option['text'];
+                        if ($option['answer']) {
+                            $answer++;
+                        }
+                    }
+                    if (empty($options)) {
+                        continue;
+                    }
+                    $data['questions'][$index]['options'] = $options;
+                    $data['questions'][$index]['multi'] = $answer > 1;
+                }
             }
         }
 
@@ -1028,6 +1059,24 @@ class Account extends State
         return ['message' => '找不到公众号！'];
     }
 
+    protected static function isReady(array $account): bool
+    {
+        if ($account['type'] == Account::WXAPP && empty($account['username'])) {
+            return false;
+        }
+        if ($account['type'] == Account::AUTH) {
+            if (App::useAccountQRCode()) {
+                $obj = Account::get($account['id']);
+                if (empty($obj) || $obj->useAccountQRCode()) {
+                    return false;
+                }
+            }
+        }
+        if ($account['type'] == Account::QUESTIONNAIRE && isEmptyArray($account['questions'])) {
+            return false;
+        }
+        return true;
+    }
 
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
@@ -1035,18 +1084,12 @@ class Account extends State
         $accounts = Account::match($device, $user, array_merge(['max' => settings('misc.maxAccounts', 0)], $params));
         if (!empty($accounts)) {
             foreach ($accounts as $index => &$account) {
-                if ($account['type'] == Account::WXAPP && empty($account['username'])) {
+                if (!self::isReady($account)) {
                     unset($accounts[$index]);
                     continue;
                 }
+
                 if ($account['type'] == Account::AUTH) {
-                    if (App::useAccountQRCode()) {
-                        $obj = Account::get($account['id']);
-                        if (empty($obj) || $obj->useAccountQRCode()) {
-                            unset($accounts[$index]);
-                            continue;
-                        }
-                    }
                     if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
                         //如果是授权服务号，需要使用场景二维码替换原二维码
                         self::updateAuthAccountQRCode($account, [App::uid(6), $user->getId(), $device->getId()]);
@@ -1060,6 +1103,7 @@ class Account extends State
                         $account['qrcode'] = './resource/images/nopic.jpg';
                     }
                 }
+
                 if (isset($account['media'])) {
                     if ($account['media']) {
                         $account['media'] = Util::toMedia($account['media']);

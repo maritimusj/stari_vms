@@ -8,7 +8,7 @@
     }
 </style>
 
-<div id="app">
+<div id="app" v-cloak>
     <ul class="nav nav-tabs" id="navbar">
         <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
             <a href="#" v-html="nav.content">
@@ -214,6 +214,19 @@
     </form>
 </div>
 <script>
+    function initColorPicker() {
+        $(".colorpicker").each(function(){
+            var elm = this;
+            util.colorpicker(elm, function(color){
+                $(elm).parent().prev().prev().val(color.toHexString());
+                $(elm).parent().prev().css("background-color", color.toHexString());
+            });
+        });
+        $(".colorclean").click(function(){
+            $(this).parent().prev().prev().val("");
+            $(this).parent().prev().css("background-color", "#FFF");
+        });
+    }
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         new Vue({
             el: "#app",
@@ -242,6 +255,9 @@
                 ],
                 active: 'base',
             },
+            mounted() {
+                initColorPicker();
+            }
         })
     })
 </script>

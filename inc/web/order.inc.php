@@ -155,6 +155,7 @@ if ($op == 'default') {
             $account = Account::findOneFromName($entry->getAccount());
             if ($account) {
                 $profile = [
+                    'type' => $account->getType(),
                     'name' => $account->getName(),
                     'clr' => $account->getClr(),
                     'title' => $account->getTitle(),
@@ -166,7 +167,9 @@ if ($op == 'default') {
                     $profile['douyin'] = true;
                 } elseif ($account->isWxApp()) {
                     $profile['wxapp'] = true;
-                } else if ($account->isThirdPartyPlatform()) {
+                } elseif ($account->isQuestionnaire()) {
+                    $profile['questionnaire'] = true;
+                } elseif ($account->isThirdPartyPlatform()) {
                     $profile['third-party-platform'] = true;
                 } else {
                     $profile['qrcode'] = $account->getQrcode();
@@ -183,6 +186,8 @@ if ($op == 'default') {
                 $data['account_title'] = '抖音 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['wxapp']) {
                 $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
+            } elseif ($accounts[$data['account']]['questionnaire']) {
+                $data['account_title'] = '问卷 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['third-party-platform']) {
                 $data['account_title'] = '第三方平台 ' . $accounts[$data['account']]['title'];
             } else {

@@ -169,7 +169,7 @@
                             <button type="button" class="btn btn-success" @click="addChoice">
                                 <i class="fa fa-plus"></i> 选择题
                             </button>
-                            <button type="button" class="btn btn-primary"  @click="addFilling">
+                            <button type="button" class="btn btn-primary"  @click="addText">
                                 <i class="fa fa-plus"></i> 填空题
                             </button>
                         </div>
@@ -426,7 +426,7 @@
                 removeOption(q, i) {
                     q.options.splice(i,1);
                 },
-                addFilling() {
+                addText() {
                     this.questions.push({
                         type: "text",
                         title: "",

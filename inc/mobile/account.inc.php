@@ -312,6 +312,10 @@ if ($op == 'default') {
     $answer = request::array('data');
 
     $result = $account->checkAnswer($user, $answer);
+    
+    if ($result['error']) {
+        JSON::fail($result['error']);
+    }
 
     if (!$account->log($account->getId(), REQUEST_ID, [
         'questions' => $account->getQuestions($user, true),
@@ -319,10 +323,6 @@ if ($op == 'default') {
         'result' => $result,
     ])) {
         JSON::fail('系统出错，无法保存数据！');
-    }
-    
-    if ($result['error']) {
-        JSON::fail($result['error']);
     }
 
     $ticket_data = [

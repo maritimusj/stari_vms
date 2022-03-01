@@ -174,7 +174,7 @@ class WeApp extends Settings
         }
 
         if ($this->logger && isset($level) && isset($title) && isset($data)) {
-            $this->logger->create($level, $title, $data);
+            $this->logger->create(intval($level), strval($title), $data);
         }
     }
 

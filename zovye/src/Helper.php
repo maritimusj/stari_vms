@@ -228,11 +228,11 @@ class Helper
      * @param orderModelObj $order
      * @param deviceModelObj $device
      * @param userModelObj $user
-     * @param $level
+     * @param int $level
      * @param $data
      * @return array
      */
-    public static function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, $level, $data): array
+    public static function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, int $level, $data): array
     {
         //todo 处理优惠券
         //$voucher = $pay_log->getVoucher();

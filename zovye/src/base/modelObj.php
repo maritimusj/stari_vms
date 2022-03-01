@@ -18,6 +18,7 @@ use zovye\traits\GettersAndSetters;
 use zovye\Util;
 use function zovye\getArray;
 use function zovye\ifEmpty;
+use function zovye\m;
 use function zovye\setArray;
 
 /**
@@ -86,7 +87,12 @@ class modelObj implements ISettings
         trigger_error('tb_name() must be implemented or constant TB_NAME must be defined by ' . get_called_class(), E_USER_ERROR);
     }
 
-    public function log($level, $title, $data): bool
+    public function logQuery($cond = []): modelObjFinder
+    {
+        return m('account_logs')->where($cond);
+    }
+
+    public function log(int $level, string $title, $data): bool
     {
         if ($level && $title) {
             if (!isset($this->logger)) {

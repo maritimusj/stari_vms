@@ -62,7 +62,14 @@ try {
     }
 
     //出货流程，EventBus会抛出异常
-    $result = Util::openDevice(['level' => LOG_GOODS_GET, $device, $user, $account, 'goodsId' => $goods_id, 'online' => false]);
+    $result = Util::openDevice([
+        'level' => LOG_GOODS_GET,
+        $device,
+        $user,
+        $account,
+        'goodsId' => $goods_id,
+        'online' => false,
+    ]);
     if (is_error($result)) {
         if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
             $params = [
@@ -94,10 +101,16 @@ try {
         }
     }
 
+    $order = Order::get($result['orderId']);
+    if ($order) {
+        $order->setExtraData('ticket', $ticket_data_saved);
+        $order->save();
+    }
+
     $device->appShowMessage('领取成功，欢迎下次使用！');
 
     $response = [
-        'ok' => $result['orderid'] ? 1 : 0,
+        'ok' => $result['orderId'] ? 1 : 0,
         'text' => $result['title'],
         'msg' => $result['msg'],
     ];

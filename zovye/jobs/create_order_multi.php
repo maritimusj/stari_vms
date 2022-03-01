@@ -134,7 +134,7 @@ function process($order_no): bool
         $success = 0;
         $is_pull_result_updated = false;
 
-        $level = $pay_log->getData('level');
+        $level = intval($pay_log->getData('level'));
         $goods_list = $pay_log->getGoodsList();
 
         foreach ($goods_list as $goods) {

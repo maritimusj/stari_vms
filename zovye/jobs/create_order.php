@@ -195,7 +195,8 @@ function prepare(string $order_no)
 
     $device->updateRemain();
 
-    $device->goodsLog($pay_log->getData('level'), $log_data);
+    $level = intval($pay_log->getData('level'));
+    $device->goodsLog($level, $log_data);
 
     if (is_error($log_data['result'])) {
         ExceptionNeedsRefund::throwWith($device, $result['message']);

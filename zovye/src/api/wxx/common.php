@@ -379,7 +379,7 @@ class common
                 return $result;
             }
 
-            $order = Order::get($result['orderid']);
+            $order = Order::get($result['orderId']);
             if (empty($order)) {
                 return error(State::ERROR, '出货失败：找不到订单！');
             }

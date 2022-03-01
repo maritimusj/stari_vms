@@ -175,11 +175,11 @@ class deviceModelObj extends modelObj
 
     /**
      * 出货记录
-     * @param $level
+     * @param int $level
      * @param array $data
      * @return bool
      */
-    public function goodsLog($level, array $data = []): bool
+    public function goodsLog(int $level, array $data = []): bool
     {
         return $this->log($level, $this->getImei(), $data);
     }
@@ -190,7 +190,7 @@ class deviceModelObj extends modelObj
      */
     public function getGoodsLog($keywords)
     {
-        return m('device_logs')->findOne("LOCATE('{$keywords}', data) > 0");
+        return m('device_logs')->findOne("LOCATE('$keywords', data) > 0");
     }
 
     public function setProtocolV1Code($code): bool

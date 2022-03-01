@@ -2016,7 +2016,7 @@ HTML_CONTENT;
 
         return [
             'result' => $result,
-            'orderid' => isset($order) ? $order->getId() : 0,
+            'orderId' => isset($order) ? $order->getId() : 0,
             'change' => isset($order) ? -$order->getBalance() : 0,
             'title' => '出货完成',
             'msg' => '请注意，出货完成。如未领取到商品，请扫码重试！',

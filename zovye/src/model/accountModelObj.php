@@ -290,8 +290,9 @@ class accountModelObj extends modelObj
 
         foreach($questions as $question) {
             $uid = $question['id'];
-            if (empty($answer[$uid])) {
-                continue;
+            if ($question['necessary'] && empty($answer[$uid])) {
+                $num = -1;
+                break;
             }
     
             if ($question['type'] == 'choice') {
@@ -303,23 +304,32 @@ class accountModelObj extends modelObj
                     $num ++;
                 }
             } elseif ($question['type'] == 'text') {
-                if (empty($answer[$uid])) {
-                    continue;
-                }
+                $text = trim($answer[$uid]);
                 if ($question['constraints'] == 'tel') {
-                    if (!preg_match(REGULAR_TEL, trim($answer[$uid]))) {
-                        $err = '请填写正确的手机号码！';
+                    if (preg_match(REGULAR_TEL, $text)) {
+                        $num ++;
+                        $stats[] = $uid;
                         continue;
                     }
-                    $num ++;
-                    $stats[] = $uid;
+
+                    if ($question['necessary']) {
+                        $err = '请填写正确的手机号码，谢谢！';
+                        $num = -1;
+                        break;
+                    }
+
                 } elseif ($question['constraints'] == 'email') {
-                    if (!preg_match(REGULAR_EMAIL, trim($answer[$uid]))) {
-                        $err = '请填写正确的邮箱地址！';
+                    if (preg_match(REGULAR_EMAIL, $text)) {
+                        $num ++;
+                        $stats[] = $uid;
                         continue;
                     }
-                    $stats[] = $uid;
-                    $num ++;
+
+                    if ($question['necessary']) {
+                        $err = '请填写正确的邮箱地址，谢谢！';
+                        $num = -1;
+                        break;
+                    }
                 }
             }      
         }
@@ -330,7 +340,7 @@ class accountModelObj extends modelObj
             'stats' => $stats,
         ];
 
-        if ($num < $this->getScore()) {
+        if ($num < max(0, $this->getScore())) {
             $result['error'] = $err ?? '您提交的答案未通过，请检查后再提交，谢谢！';
         }
 

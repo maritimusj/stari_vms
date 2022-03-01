@@ -30,7 +30,7 @@
     .choice .option label {
         padding-left: 1.5em;
     }
-    .form-group.option {
+    .form-group.option, .question.text .form-group {
         display: flex;
         align-items: baseline;
     }
@@ -113,8 +113,13 @@
                                         <i class="fa fa-times" title="删除问题" @click="removeQuestion(i)"></i>
                                     </span>
                                 </label>
-                                <div class="col-md-10">
+                                <div class="col-md-8">
                                     <input type="text" class="form-control" :id="'question'+i" v-model="q.title">
+                                </div>
+                                <div class="col-md-2" v-if="q.type === 'text'">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" value="1" :checked="q.necessary" v-model="q.necessary"> 必填
+                                    </label>
                                 </div>
                             </div>
                             <template  v-if="q.type === 'choice'">
@@ -125,10 +130,10 @@
                                         <i class="fa fa-times" title="删除选项" @click="removeOption(q,j)"></i>
                                     </span>
                                 </label>
-                                <div class="col-md-5">
+                                <div class="col-md-8">
                                     <input type="text" class="form-control" :id="'o' + i + '_' + j" v-model="o.text">
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-2">
                                     <label class="checkbox-inline">
                                         <input type="checkbox" value="1" :checked="o.answer" v-model="o.answer"> 正确选项
                                     </label>

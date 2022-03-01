@@ -330,6 +330,17 @@ class accountModelObj extends modelObj
                         $num = -1;
                         break;
                     }
+                } elseif ($question['constraints'] == 'normal') {
+                    if ($text) {
+                        $num ++;
+                        $stats[] = $uid;
+                        continue;
+                    }
+
+                    if ($question['necessary']) {
+                        $num = -1;
+                        break;
+                    }
                 }
             }      
         }

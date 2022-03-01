@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20220301');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20220302');}
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -202,7 +202,7 @@
                                 {/if}
                                 {$order['account_title']}
                                 {if $order['questionnaire_log']}
-                                <span class="operate" data-uid="{$order['questionnaire_log']}" title="查看问卷提交详情">
+                                <span data-uid="{$order['questionnaire_log']}" title="查看问卷提交详情">
                                     <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}" class="icon" data-op="viewQuestionnaireDetail">
                                 </span>
                                 {/if}

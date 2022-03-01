@@ -328,20 +328,6 @@
     vertical-align: super;
     cursor: default;
 }
-img.icon {
-    width: 16px;
-    height: 16px;
-    filter: grayscale(100%);
-    opacity: 0.3;
-}
-img.icon:hover {
-    filter: grayscale(0);
-    opacity: 1;
-}
-img.icon:active {
-    opacity: 0.3;
-    transform: translate3d(0, 1px, 0);
-}
 
 #orderlist img.icon {
     width: 16px;

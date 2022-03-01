@@ -16,7 +16,7 @@ $account_id = request::str('account');
 $xid = request::str('xid');
 
 if (Util::isAliAppContainer()) {
-    $ali_entry_url = Util::murl('ali', [ 
+    $ali_entry_url = Util::murl('ali', [
         'from' => $from,
         'device' => $device_id,
     ]);
@@ -40,6 +40,7 @@ $device = null;
 $account = null;
 
 if ($device_id) {
+
     $device = Device::find($device_id, ['imei', 'shadow_id']);
     if (empty($device)) {
         Util::resultAlert('请重新扫描设备上的二维码！', 'error');
@@ -94,20 +95,20 @@ if ($device_id) {
 
     //显示问卷填写页面
     if ($account->isQuestionnaire()) {
-        $cb = function(userModelObj $user) use($account) {
+        $cb = function (userModelObj $user) use ($account) {
             $user->setLastActiveData($account);
-            
+
             $device = $user->getLastActiveDevice();
             if ($device) {
                 return ['device' => $device];
             }
-            
+
             return [];
         };
     } else {
         //如果公众号奖励为积分，显示获取积分页面
         if (App::isBalanceEnabled() && $account && $account->getBonusType() == Account::BALANCE) {
-            $cb = function(userModelObj $user) use ($account) {
+            $cb = function (userModelObj $user) use ($account) {
                 app()->getBalanceBonusPage($user, $account);
             };
         } else {
@@ -163,7 +164,7 @@ if ($user->isBanned()) {
 }
 
 if (App::isUserVerify18Enabled()) {
-    if(!$user->isIDCardVerified()) {
+    if (!$user->isIDCardVerified()) {
         app()->showTemplate(Theme::file('verify_18'), [
             'verify18' => settings('user.verify_18', []),
             'entry_url' => Util::murl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
@@ -191,7 +192,6 @@ if ($from == 'device') {
     $user->setLastActiveData('ticket', []);
 }
 
-
 if (empty($device)) {
     //设备扫描页面
     $tpl_data = Util::getTplData([$user, $account]);
@@ -200,7 +200,7 @@ if (empty($device)) {
 
 //检查用户定位
 if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
-    
+
     $user->setLastActiveData('deviceId');
 
     //定位匹配成功后转跳网址
@@ -227,7 +227,7 @@ if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
     app()->locationPage($tpl_data);
 }
 
-if ($account)  {
+if ($account) {
     $res = Util::checkAvailable($user, $account, $device);
     if (is_error($res)) {
         $user->setLastActiveData();

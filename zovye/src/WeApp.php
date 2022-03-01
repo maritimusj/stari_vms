@@ -265,7 +265,7 @@ JSCODE;
      * 设备状态准备页面
      * @param array $params
      */
-    public function devicePreparePage($params = [])
+    public function devicePreparePage(array $params = [])
     {
         $tpl = is_array($params) ? $params : [];
 
@@ -1433,7 +1433,7 @@ JSCODE;
 
         $api_url = Util::murl('bonus');
         $mall_url = Util::murl('mall');
-        $mall_order_url = Util::murl('mall', ['op' => 'order']);        
+        $mall_order_url = Util::murl('mall', ['op' => 'order']);
         $balance_logs_url = Util::murl('bonus', ['op' => 'logsPage']);
         $order_jump_url = Util::murl('order', ['op' => 'jump']);
         $jquery_url = JS_JQUERY_URL;

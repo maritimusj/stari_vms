@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use Exception;
+use RuntimeException;
 
 $user = Util::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
@@ -29,88 +30,100 @@ try {
     if (empty($ticket_data_saved) ||
         $ticket !== $ticket_data_saved['id'] ||
         time() - $ticket_data_saved['time'] > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
-        throw new Exception('请重新扫描设备二维码 [601]');
+        throw new RuntimeException('请重新扫描设备二维码 [601]');
     }
 
     $account = Account::get($ticket_data_saved['accountId']);
     if (empty($account)) {
-        throw new Exception('请重新扫描设备二维码 [602]');
+        throw new RuntimeException('请重新扫描设备二维码 [602]');
     }
 
     $device = Device::get($ticket_data_saved['deviceId']);
     if (empty($device)) {
-        throw new Exception('请重新扫描设备二维码 [603]');
+        throw new RuntimeException('请重新扫描设备二维码 [603]');
     }
 
     //开启了shadowId的设备，只能通过shadowId找到
     if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $ticket_data_saved['shadowId']) {
-        throw new Exception('请重新扫描设备二维码 [604]！');
+        throw new RuntimeException('请重新扫描设备二维码 [604]！');
     }
 
     if (!$device->isMcbOnline()) {
-        throw new Exception('设备不在线！');
+        throw new RuntimeException('设备不在线！');
     }
 
     //检查用户定位
     if (Util::mustValidateLocation($user, $device)) {
-        throw new Exception('定位超时，请重新扫描设备二维码 [605]');
+        throw new RuntimeException('定位超时，请重新扫描设备二维码 [605]');
     }
 
     $goods_id = request::int('goodsid');
     if (empty($goods_id)) {
-        throw new Exception('请指定要出货的商品 [605]');
+        throw new RuntimeException('请指定要出货的商品 [605]');
     }
 
-    //出货流程，EventBus会抛出异常
-    $result = Util::openDevice([
-        'level' => LOG_GOODS_GET,
-        $device,
-        $user,
-        $account,
-        'goodsId' => $goods_id,
-        'online' => false,
-    ]);
-    if (is_error($result)) {
-        if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
-            $params = [
-                'account' => $account->getId(),
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'goods' => $goods_id,
-                'ip' => $user->getLastActiveData('ip', CLIENT_IP),
-            ];
-            if (!Job::createAccountOrder($params)) {
-                throw new Exception('启动排队任务失败！');
-            }
-            $device->appShowMessage('正在排除出货，请稍等！');
-        } else {
-            $response = [
-                'text' => $result['errno'] > 0 ? '请重试' : '领取失败',
-                'msg' => $result['message'],
-            ];
-
-            $device->appShowMessage('出货失败，请稍后再试！', 'error');
-
-            //失败转跳
-            $url = $device->getRedirectUrl('fail')['url'];
-            if (!empty($url)) {
-                $response['url'] = $url;
+    $result = Util::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
+        //出货流程，EventBus会抛出异常
+        $result = Util::openDevice([$device, $user, $account,
+            'level' => LOG_GOODS_GET,
+            'goodsId' => $goods_id,
+            'online' => false,
+        ]);
+        if (is_error($result)) {
+            if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
+                $params = [
+                    'account' => $account->getId(),
+                    'device' => $device->getId(),
+                    'user' => $user->getId(),
+                    'goods' => $goods_id,
+                    'ip' => $user->getLastActiveData('ip', CLIENT_IP),
+                ];
+                if (!Job::createAccountOrder($params)) {
+                    throw new RuntimeException('启动排队任务失败！');
+                }
+                return ['message' => '正在排队出货，请稍等！'];
             }
 
-            JSON::fail($response);            
+            return $result;
         }
+
+        $order = Order::get($result['orderId']);
+        if ($order) {
+            $order->setExtraData('ticket', $ticket_data_saved);
+            if (!$order->save()) {
+                throw new RuntimeException('保存订单数据失败！');
+            }
+
+            if ($account->isQuestionnaire()) {
+                $log = $account->logQuery(['level' => $account->getId(), 'title' => $ticket_data_saved['id']])->findOne();
+                if ($log) {
+                    $log->setData('order', $order->profile());
+                    if (!$log->save()) {
+                        throw new RuntimeException('保存订单数据失败！');
+                    }
+                }
+            }
+
+            return [
+                'message' => '领取成功，欢迎下次使用！',
+                'orderId' => $order->getId(),
+            ];
+        }
+
+        return err('创建订单失败！');
+    });
+
+    if (is_error($result)) {
+        $device->appShowMessage('出货失败，请稍后再试！', 'error');
+        throw new RuntimeException($result['message']);
     }
 
-    $order = Order::get($result['orderId']);
-    if ($order) {
-        $order->setExtraData('ticket', $ticket_data_saved);
-        $order->save();
+    if ($result['message']) {
+        $device->appShowMessage($result['message']);
     }
-
-    $device->appShowMessage('领取成功，欢迎下次使用！');
-
+    
     $response = [
-        'ok' => $result['orderId'] ? 1 : 0,
+        'ok' => empty($result['orderId']) ? 0 : 1,
         'text' => $result['title'],
         'msg' => $result['msg'],
     ];
@@ -129,9 +142,6 @@ try {
 
     $response = ['text' => '领取失败', 'msg' => $e->getMessage()];
     if (isset($device)) {
-
-        $device->appShowMessage('出货失败，请稍后再试！', 'error');
-
         //失败转跳
         $url = $device->getRedirectUrl('fail')['url'];
         if (!empty($url)) {

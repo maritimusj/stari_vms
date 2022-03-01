@@ -2187,8 +2187,8 @@ HTML_CONTENT;
             return false;
         }
 
-        if (time() - $user->settings('last.location.time') < settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
-            if ($user->settings('last.location.validated')) {
+        if (time() - $user->getLastActiveData('location.time', 0) < settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
+            if ($user->getLastActiveData('location.validated')) {
                 return false;
             }
         }
@@ -2235,7 +2235,7 @@ HTML_CONTENT;
         unset($accounts[$account->getUid()]);
 
         //去掉已经关注过的号
-        $visited_accounts = $user->settings('last.accounts', []);
+        $visited_accounts = $user->getLastActiveData('accounts', []);
         $visited_accounts = is_array($visited_accounts) ? $visited_accounts : [];
 
         //排除
@@ -2247,7 +2247,7 @@ HTML_CONTENT;
                 }
             }
 
-            $user->updateSettings('last.accounts', $visited_accounts);
+            $user->setLastActiveData('accounts', $visited_accounts);
         }
 
         $accounts = array_diff_key($accounts, $visited_accounts);

@@ -30,8 +30,7 @@ if ($op == 'default') {
             throw new Exception('用户无法使用该功能！');
         }
         
-        $device_id = $user->getLastActiveData('device', 0);
-        $device = Device::get($device_id);
+        $device = $user->getLastActiveDevice();
         if (empty($device)) {
             throw new Exception('找不到这个设备！');
         }

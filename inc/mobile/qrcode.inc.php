@@ -107,12 +107,9 @@ foreach ($query->findAll() as $entry) {
 }
 
 $params = [ $user, new DateTime() ];
-$device_id = $user->getLastActiveData('device', 0);
-if ($device_id > 0) {
-    $device = Device::get($device_id);
-    if ($device) {
-        $params[] = $device;
-    }
+$device = $user->getLastActiveDevice();
+if ($device) {
+    $params[] = $device;
 }
 
 if ($qr_codes->count() > 0) {

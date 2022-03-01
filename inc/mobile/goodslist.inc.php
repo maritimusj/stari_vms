@@ -18,7 +18,7 @@ if (empty($ticket)) {
     JSON::fail('请重新扫描设备二维码 [701]');
 }
 
-$ticket_data_saved = $user->settings('last.ticket', []);
+$ticket_data_saved = $user->getLastActiveData('ticket', []);
 if (empty($ticket_data_saved) || $ticket !== $ticket_data_saved['id'] ||
     time() - $ticket_data_saved['time'] > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
     JSON::fail('请重新扫描设备二维码 [702]');

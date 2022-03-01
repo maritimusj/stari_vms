@@ -99,7 +99,7 @@ if ($from == 'device') {
 
 //设置用户最后活动数据
 $user->setLastActiveData([
-    'device' => $device->getId(),
+    'deviceId' => $device->getId(),
     'ip' => CLIENT_IP,
     'time' => TIMESTAMP,
 ]);

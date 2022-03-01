@@ -1232,7 +1232,7 @@ class common
             $device = Device::get($device_uid, true);
             if ($device) {
                 $user->setLastActiveData([
-                    'device' => $device->getId(),
+                    'deviceId' => $device->getId(),
                     'time' => time(),
                     'from' => 'wxapp',
                 ]);

@@ -25,7 +25,7 @@ if (empty($ticket)) {
 }
 
 try {
-    $ticket_data_saved = $user->settings('last.ticket', []);
+    $ticket_data_saved = $user->getLastActiveData('ticket', []);
     if (empty($ticket_data_saved) ||
         $ticket !== $ticket_data_saved['id'] ||
         time() - $ticket_data_saved['time'] > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
@@ -112,7 +112,7 @@ try {
 
 } catch (Exception $e) {
 
-    $user->updateSettings('last.ticket', []);
+    $user->setLastActiveData('ticket', []);
 
     $response = ['text' => '领取失败', 'msg' => $e->getMessage()];
     if (isset($device)) {

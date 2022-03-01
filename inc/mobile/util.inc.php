@@ -65,7 +65,7 @@ if ($op == 'default') {
         'lat' => $lat,
     ];
 
-    $user->updateSettings('last.location', $data);
+    $user->setLastActiveData('location', $data);
 
     //用户扫描设备后的定位信息
     $location = $device->settings('extra.location.tencent', $device->settings('extra.location'));
@@ -86,12 +86,12 @@ if ($op == 'default') {
         }
 
         if ($res > $distance) {
-            $user->updateSettings('last.deviceId', '');
+            $user->setLastActiveData('deviceId', 0);
             JSON::fail('哎呀，设备太远了');
         }
     }
 
-    $user->updateSettings('last.location.validated', true);
+    $user->setLastActiveData('location.validated', true);
     JSON::success('成功！');
 } elseif ($op == 'adv_review') {
 

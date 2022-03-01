@@ -1,8 +1,18 @@
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
-        zovye.enableInputMask();
-        zovye.enableCopy();
-    })
+    function initColorPicker() {
+        $(".colorpicker").each(function(){
+            var elm = this;
+            util.colorpicker(elm, function(color){
+                $(elm).parent().prev().prev().val(color.toHexString());
+                $(elm).parent().prev().css("background-color", color.toHexString());
+            });
+        });
+        $(".colorclean").click(function(){
+            $(this).parent().prev().prev().val("");
+            $(this).parent().prev().css("background-color", "#FFF");
+        });
+    }    
+
     function changeBonus(w)
     {
         if (w == 'commission') {
@@ -22,59 +32,71 @@
             }
         }
     }
-    $(function(){
-        changeBonus();
 
-        const open_id = 0;
-        $('#find_agent').click(function () {
-            const keyword = $('input[name=keyword_agent]').val();
-            util.loading();
-            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
-                op: 'search',
-                keyword: keyword
-            }, function (res) {
-                let html = '';
-                if (res.status) {
-                    const list = res.data || [];
-                    let isSelected = '';
-                    list.forEach(function (e) {
-                        isSelected = '';
-                        if (e.openid == open_id) {
-                            isSelected = 'selected = "selected"';
-                        }
-                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
-                            .replace('_1*', e.openid)
-                            .replace('_2*', e.name)
-                            .replace('_3*', e.mobile)
-                            .replace('_4*', isSelected);
-                    })
-                }
-                isSelected = '';
-                if (0 == open_id) {
-                    isSelected = 'selected = "selected"';
-                }
-                html += '<option value="0" ' + isSelected + '><不限></option>';
-                $('#select_agent').html(html);
+    function change(v) 
+    {            
+        ['text', 'news'].forEach(e => {
+            if (e == v) {
+                $('#' + e + '-config').show();
+            } else {
+                $('#' + e + '-config').hide();
+            }
+        })  
+    }
 
-            }, 'json').complete(function () {
-                util.loaded();
+    function initPage() {
+        initColorPicker();
+
+        require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+            zovye.enableInputMask();
+            zovye.enableCopy();
+        })
+
+        $(function(){
+            changeBonus();
+
+            const open_id = 0;
+            $('#find_agent').click(function () {
+                const keyword = $('input[name=keyword_agent]').val();
+                util.loading();
+                $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+                    op: 'search',
+                    keyword: keyword
+                }, function (res) {
+                    let html = '';
+                    if (res.status) {
+                        const list = res.data || [];
+                        let isSelected = '';
+                        list.forEach(function (e) {
+                            isSelected = '';
+                            if (e.openid == open_id) {
+                                isSelected = 'selected = "selected"';
+                            }
+                            html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                                .replace('_1*', e.openid)
+                                .replace('_2*', e.name)
+                                .replace('_3*', e.mobile)
+                                .replace('_4*', isSelected);
+                        })
+                    }
+                    isSelected = '';
+                    if (0 == open_id) {
+                        isSelected = 'selected = "selected"';
+                    }
+                    html += '<option value="0" ' + isSelected + '><不限></option>';
+                    $('#select_agent').html(html);
+
+                }, 'json').complete(function () {
+                    util.loaded();
+                })
             })
         })
-    })
 
-    $(function() {        
-        function change(v) {            
-            ['text', 'news'].forEach(e => {
-                if (e == v) {
-                    $('#' + e + '-config').show();
-                } else {
-                    $('#' + e + '-config').hide();
-                }
-            })  
-        }
-        change("{php echo isset($config['open']['msg']) ? 'text':'news'}");
-        $('#openMsgType').change(function() {
-            change($(this).val());
+        $(function() {
+            change("{php echo isset($config['open']['msg']) ? 'text':'news'}");
+            $('#openMsgType').change(function() {
+                change($(this).val());
+            })
         })
-    })
+    }
 </script>

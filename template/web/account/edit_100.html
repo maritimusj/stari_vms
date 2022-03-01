@@ -209,33 +209,20 @@
         </div>
     </form>
 </div>
-<script> 
-    function initColorPicker() {
-        $(".colorpicker").each(function(){
-            var elm = this;
-            util.colorpicker(elm, function(color){
-                $(elm).parent().prev().prev().val(color.toHexString());
-                $(elm).parent().prev().css("background-color", color.toHexString());
-            });
-        });
-        $(".colorclean").click(function(){
-            $(this).parent().prev().prev().val("");
-            $(this).parent().prev().css("background-color", "#FFF");
-        });
-    }
-    
-    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
-
-    require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210418"], function(moscale) {          
-        moscale.init("#moscale", {
-            moscaleMachineKey: "{$moscaleMachineKey}",
-            label: JSON.parse('{php echo json_encode($moscaleLabelList);}'),
-            savedLabel: JSON.parse('{php echo json_encode($moscaleAreaListSaved);}'),
-            region: JSON.parse('{php echo json_encode($moscaleRegionData);}'),
-            savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
+{template 'web/account/edit_footer'}
+<script>
+    function initMoscale() {  
+        require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210418"], function(moscale) {          
+            moscale.init("#moscale", {
+                moscaleMachineKey: "{$moscaleMachineKey}",
+                label: JSON.parse('{php echo json_encode($moscaleLabelList);}'),
+                savedLabel: JSON.parse('{php echo json_encode($moscaleAreaListSaved);}'),
+                region: JSON.parse('{php echo json_encode($moscaleRegionData);}'),
+                savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
+            })
         })
-    })
-
+    }
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
     require(['jquery', vuejsUrl], function($, Vue) {
         new Vue({
             el: "#app",
@@ -265,10 +252,10 @@
                 active: 'base',
             },
             mounted() {
-                initColorPicker();
+                initPage();
+                initMoscale();
             }
         })
     })
 </script>
-{template 'web/account/edit_footer'}
 {template 'common/footer'}

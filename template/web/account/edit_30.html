@@ -255,20 +255,8 @@
         </div>
     </form>
 </div>
+{template 'web/account/edit_footer'}
 <script>
-    function initColorPicker() {
-        $(".colorpicker").each(function(){
-            var elm = this;
-            util.colorpicker(elm, function(color){
-                $(elm).parent().prev().prev().val(color.toHexString());
-                $(elm).parent().prev().css("background-color", color.toHexString());
-            });
-        });
-        $(".colorclean").click(function(){
-            $(this).parent().prev().prev().val("");
-            $(this).parent().prev().css("background-color", "#FFF");
-        });
-    }
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         new Vue({
             el: "#app",
@@ -298,10 +286,9 @@
                 active: 'base',
             },
             mounted() {
-                initColorPicker();
+                initPage();
             }
         })
     })
 </script>
-{template 'web/account/edit_footer'}
 {template 'common/footer'}

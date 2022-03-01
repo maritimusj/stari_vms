@@ -757,7 +757,7 @@ class userModelObj extends modelObj
         return $this->get('recipient', []);
     }
 
-    public function updateRecipientData($name, $phone_num, $address)
+    public function updateRecipientData($name, $phone_num, $address): bool
     {
         return $this->set('recipient', [
             'name' => $name,

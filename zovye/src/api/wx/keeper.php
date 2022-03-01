@@ -1130,7 +1130,7 @@ class keeper
         $id = request::int('id');
         if ($id) {
             /** @var keeperModelObj $keeper */
-            $keeper = m('keeper')->findOne(We7::uniacid(['id' => $id]));
+            $keeper = \zovye\Keeper::get($id);
             if (empty($keeper)) {
                 return error(State::ERROR, '找不到这个营运人员！');
             }

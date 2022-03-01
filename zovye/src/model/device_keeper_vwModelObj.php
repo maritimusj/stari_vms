@@ -6,6 +6,8 @@
 
 namespace zovye\model;
 
+use zovye\Keeper;
+
 use function zovye\tb;
 use function zovye\m;
 
@@ -41,7 +43,7 @@ class device_keeper_vwModelObj extends deviceModelObj
 
     function getKeeper(): ?keeperModelObj
     {
-        return m('keeper')->findOne(['id' => $this->keeper_id]);
+        return Keeper::get($this->keeper_id);
     }
 }
 

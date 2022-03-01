@@ -29,7 +29,7 @@ $op = request::op('default');
 if ($op == 'save') {
 
     $mobile = trim(request::str('mobile'));
-    if (empty($mobile) || !preg_match(REGULAR_MOBILE, $mobile)) {
+    if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
         JSON::fail('请输入正确的手机号码！');
     }
 
@@ -55,10 +55,10 @@ if ($op == 'save') {
         JSON::fail('保存手机号码失败！');
     }
 
-    if (!m('keeper')->findOne(We7::uniacid(['mobile' => $mobile]))) {
+    if (!Keeper::findOne(['mobile' => $mobile])) {
         JSON::fail('对不起，您不是我们的营运人员，无法注册！');
     }
-
+    
     if (!$user->setKeeper()) {
         JSON::fail('手机绑定失败！');
     }

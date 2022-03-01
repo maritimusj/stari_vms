@@ -8,6 +8,7 @@
 namespace zovye\model;
 
 use DateTime;
+use zovye\Account;
 use zovye\Balance;
 use zovye\Locker;
 use zovye\Pay;
@@ -20,10 +21,11 @@ use zovye\Order;
 use zovye\State;
 use zovye\WxMCHPay;
 use zovye\LoginData;
-use zovye\RowLocker;
 use zovye\We7credit;
 use zovye\base\modelObj;
 use zovye\CommissionBalance;
+use zovye\Device;
+use zovye\Keeper;
 use zovye\Principal;
 
 use function zovye\m;
@@ -663,17 +665,71 @@ class userModelObj extends modelObj
         return error(State::ERROR, '参数不正确！');
     }
 
-    public function setLastActiveData($data = []): bool
+    public function setLastActiveData(): bool
     {
-        return $this->updateSettings('last.active', $data);
+        switch(func_num_args()) {
+            case 0:
+                return $this->remove('last');
+            case 1:
+                $v = func_get_arg(0);
+                if (is_string($v)) {
+                    $data = [$v => null];
+                } elseif (is_array($v)) {
+                    $data = $v;
+                } elseif ($v instanceof userModelObj) {
+                    $data = ['userId' => $v->getId()];
+                } elseif ($v instanceof deviceModelObj) {
+                    $data = ['deviceId' => $v->getId()];
+                } elseif ($v instanceof accountModelObj) {
+                    $data = ['accountId' => $v->getId()];
+                } else {
+                    return false;
+                }
+                break;
+            case 2:
+                $name = func_get_arg(0);
+                if (!is_string($name)) {
+                    return false;
+                }
+                $data = [
+                    $name => func_get_arg(1),
+                ];
+                break;
+            default:
+                return false;
+        }
+        foreach($data as $name => $val) {
+            if (!$this->updateSettings("last.$name", $val)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public function getLastActiveData($name = '', $default = null)
     {
         if (empty($name)) {
-            return $this->settings('last.active', $default);
+            return $this->settings('last', $default);
         }
-        return $this->settings("last.active.$name", $default);
+        return $this->settings("last.$name", $default);
+    }
+
+    public function getLastActiveDevice(): ?deviceModelObj 
+    {
+        $deviceId = $this->getLastActiveData('deviceId', 0);
+        if ($deviceId > 0) {
+            return Device::get($deviceId);
+        }
+        return null;
+    }
+
+    public function getLastActiveAccount(): ?accountModelObj 
+    {
+        $accountId = $this->getLastActiveData('accountId', 0);
+        if ($accountId > 0) {
+            return Account::get($accountId);
+        }
+        return null;        
     }
 
     public function isWxAppAllowed($appID): bool

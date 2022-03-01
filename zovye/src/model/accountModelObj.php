@@ -13,6 +13,7 @@ use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
 use zovye\WxPlatform;
+
 use function zovye\tb;
 
 /**
@@ -247,9 +248,9 @@ class accountModelObj extends modelObj
         return App::isCommissionEnabled() ? $this->settings('commission.money', 0) : 0;
     }
 
-    public function format(bool $detail = true): array
+    public function format(): array
     {
-        return Account::format($this, $detail);
+        return Account::format($this);
     }
 
     public function isThirdPartyPlatform(): bool
@@ -275,7 +276,116 @@ class accountModelObj extends modelObj
         if (empty($path)) {
             return $this->get('config', $default);
         }
+     
         return $this->settings('config.' . $path, $default);
+    }
+
+    public function checkAnswer(userModelObj $user, array $answer = [])
+    {
+        $num = 0;
+        $err = null;
+        $stats = [];
+
+        $questions = $this->getQuestions($user, true);
+
+        foreach($questions as $question) {
+            $uid = $question['id'];
+            if (empty($answer[$uid])) {
+                continue;
+            }
+    
+            if ($question['type'] == 'choice') {
+                if (!is_array($answer[$uid])) {
+                    continue;
+                }
+                if ((array)$question['answer'] == $answer[$uid]) {
+                    $stats[] = $uid;
+                    $num ++;
+                }
+            } elseif ($question['type'] == 'text') {
+                if (empty($answer[$uid])) {
+                    continue;
+                }
+                if ($question['constraints'] == 'tel') {
+                    if (!preg_match(REGULAR_TEL, trim($answer[$uid]))) {
+                        $err = '请填写正确的手机号码！';
+                        continue;
+                    }
+                    $num ++;
+                    $stats[] = $uid;
+                } elseif ($question['constraints'] == 'email') {
+                    if (!preg_match(REGULAR_EMAIL, trim($answer[$uid]))) {
+                        $err = '请填写正确的邮箱地址！';
+                        continue;
+                    }
+                    $stats[] = $uid;
+                    $num ++;
+                }
+            }      
+        }
+
+        $result = [
+            'score' => $this->getScore(),
+            'num' => $num,
+            'stats' => $stats,
+        ];
+
+        if ($num < $this->getScore()) {
+            $result['error'] = $err ?? '您提交的答案未通过！';
+        }
+
+        return $result;
+    }
+
+    public function getScore()
+    {
+        return $this->getConfig('score', 0);
+    }
+
+    public function getQuestions(userModelObj $user = null, bool $get_answer = false)
+    {
+        if (!$this->isQuestionnaire()) {
+            return [];
+        }
+
+        $questions = [];
+        foreach((array)$this->getConfig('questions', []) as $index => $question) {
+            if (empty($question['title'])) {
+                continue;
+            }
+            $question['id'] = $user ? sha1($user->getOpenid() . $index) : $index;
+            if ($question['type'] == 'text') {
+                $questions[] = $question;
+                continue;
+            }
+            if ($question['type'] == 'choice') {
+                $options = [];
+                $answer = [];
+                foreach((array)$question['options'] as $j => $o) {
+                    if (empty($o['text'])) {
+                        continue;
+                    }
+                    $e = [
+                        'text' => $o['text'],
+                        'val' => $j,
+                    ];
+                    if ($o['answer']) {
+                        $answer[] = $j;
+                    }
+                    $options[] = $e;
+                }
+                if (empty($options)) {
+                    continue;
+                }
+                if ($get_answer) {
+                    $question['answer'] = $answer;
+                }
+                $question['options'] = $options;
+                $question['multi'] = count($answer) > 1;
+                $questions[] = $question;
+            }
+        }
+        return $questions;
     }
 
     public function isVideo(): bool

@@ -191,7 +191,7 @@ class Account extends State
         return self::findOne(['uid' => $uid]);
     }
 
-    public static function format(accountModelObj $entry, bool $detail = true): array
+    public static function format(accountModelObj $entry): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
@@ -234,37 +234,6 @@ class Account extends State
             $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
             if ($appid) {
                 $data['appid'] = $appid;
-            }
-        }
-
-        if ($detail && $entry->isQuestionnaire()) {
-            $data['questions'] = $entry->getConfig('questions', []);
-            foreach((array)$data['questions'] as $index => $question) {
-                if (empty($question['title'])) {
-                    unset($data['question'][$index]);
-                    continue;
-                }
-                if ($question['type'] == 'text') {
-                    continue;
-                }
-                if ($question['type'] == 'choice') {
-                    $options = [];
-                    $answer = 0;
-                    foreach((array)$question['options'] as $option) {
-                        if (empty($option['text'])) {
-                            continue;
-                        }
-                        $options[] = $option['text'];
-                        if ($option['answer']) {
-                            $answer++;
-                        }
-                    }
-                    if (empty($options)) {
-                        continue;
-                    }
-                    $data['questions'][$index]['options'] = $options;
-                    $data['questions'][$index]['multi'] = $answer > 1;
-                }
             }
         }
 

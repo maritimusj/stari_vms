@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+		<title></title>
+		<style type="text/css">
+			html,
+			body {
+				width: 100vw;
+			}
+
+			body {
+				background-color: white;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 14px;
+				color: #101010;
+				margin: 0;
+				padding: 0;
+				background-color: #f0f0f0;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			}
+
+			#app {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+
+			.question-view {
+				width: calc(100% - 40px);
+				padding: 10px;
+				background-color: white;
+				margin-top: 10px;
+			}
+
+			.row {
+				width: 100%;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			.index-view {
+				width: 20px;
+				height: 20px;
+				color: white;
+				text-align: center;
+				line-height: 20px;
+				border-radius: 5px;
+			}
+
+			.title {
+				font-size: 16px;
+				font-weight: bold;
+				flex: 1;
+				margin: 0 10px;
+			}
+
+			.options {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.option:active {
+				opacity: 0.7;
+			}
+
+			.radio {
+				width: 15px;
+				height: 15px;
+				background-color: white;
+				border-radius: 50%;
+				box-shadow: 0 0 2px #aaa;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.white-circle {
+				width: 5px;
+				height: 5px;
+				background-color: white;
+				border-radius: 50%;
+			}
+
+			.checkbox {
+				width: 15px;
+				height: 15px;
+				background-color: white;
+				box-shadow: 0 0 2px #aaa;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+
+			input {
+				width: calc(100% - 20px);
+				height: 40px;
+				outline: none;
+				border: none;
+                border-radius: 0;
+				margin-top: 10px;
+				font-size: 14px;
+				padding: 0 10px;
+				background-color: #f0f0f0;
+			}
+			
+			.btn {
+				padding: 0 80px;
+				height: 44px;
+				font-size: 18px;
+				margin: 30px 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				border-radius: 25px;
+				color: white;
+			}
+			
+			.btn:active {
+				opacity: 0.7;
+			}
+
+            .mask {
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                position: fixed;
+                left: 0;
+                top: 0;
+                z-index: 999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .loading-view {
+                width: 120px;
+                height: 120px;
+                background-color: rgba(255, 255, 255, 0.9);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                box-shadow: 0 0 5px lightgray;
+            }
+
+            .loading-view img {
+                width: 50px;
+                height: 50px;
+                animation: loading 1s infinite;
+            }
+
+            .loading-view span {
+                font-size: 13px;
+                margin-top: 10px;
+            }
+
+            @keyframes loading {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app" v-cloak>
+			<template v-if="list.length > 0">
+                <div class="question-view" v-for="(item, index) in list" :key="index">
+                    <div class="row">
+                        <span class="index-view" :style="{'background-color': clr}">{{index + 1}}</span>
+                        <span class="title">{{item.title}}</span>
+                        <span style="color: #9d9d9d;" v-if="item.type === 'choice'">{{item.multi ? '多选' : '单选'}}</span>
+                    </div>
+                    <div class="options" v-if="item.type === 'choice'">
+                        <div class="row option" style="margin-top: 10px;" v-for="(option, i) in item.options" :key="i"
+                            @click="select(item, i)">
+                            <div class="radio" :style="{'margin-left': '30px', 'background-color': item.check == i ? clr + 'bb' : 'white'}" v-if="!item.multi">
+                                <div class="white-circle"></div>
+                            </div>
+                            <div class="checkbox" :style="{'margin-left': '30px', 'background-color': option.check ? clr + 'bb' : 'white'}" v-else>
+                                <svg viewBox="0 0 1024 1024" width="13" height="13"><path d="M1002.81 144.43a64 64 0 0 0-90.38 4.76L381.56 739l-272.3-272.3a64 64 0 0 0-90.51 90.51l320 320A64 64 0 0 0 384 896h1.68a64 64 0 0 0 45.89-21.16l576-640a64 64 0 0 0-4.76-90.41z" fill="#ffffff"></path></svg>
+                            </div>
+                            <span style="margin: 0 10px;">{{option.text}}</span>
+                        </div>
+                    </div>
+                    <input v-else-if="item.type === 'text'" v-model="item.text" placeholder="请输入..." :type="item.constraints" />
+                </div>
+                <div class="btn" :style="{'background-color': clr}" @click="submitClick">提交</div>
+            </template>
+            <div class="mask" v-if="loading">
+                <div class="loading-view">
+                    <img src="{MODULE_URL}static/m/balance/img/loading.svg">
+                    <span>请稍等...</span>
+                </div>
+            </div>
+		</div>
+		{$tpl['js']['code']}
+        {php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+			new Vue({
+				el: '#app',
+				data: {
+                    loading: false,
+					list: [],
+                    clr: ''
+				},
+				created() {
+                    this.getData();
+				},
+				methods: {
+                    getData() {
+                        this.loading = true;
+                        zovye_fn.getData().then(res => {
+                            this.loading = false;
+                            if (res.status) {
+                                document.getElementsByTagName("title")[0].innerText = res.data.title || '';
+                                const list = res.data.questions || [];
+                                this.list = list.map(e => {
+                                    if (e.type === 'choice') {
+                                        if (e.multi) {
+                                            e.options.forEach(el => {
+                                                el.check = false;
+                                            });
+                                        } else {
+                                            e.check = null;
+                                        }
+                                    } else if (e.type === 'text') {
+                                        e.text = '';
+                                    }
+                                    return e;
+                                });
+                                this.clr = res.data.clr || '#1358FB';
+                            } else {
+                                alert(res.data.msg);
+                            }
+                        })
+                    },
+					select(item, i) {
+						if (!item.multi) {
+							item.check = i;
+						} else {
+							item.options[i].check = !item.options[i].check;
+						}
+					},
+                    submitClick() {
+                        const data = {};
+                        this.list.forEach(e => {
+                            if (e.type === 'choice') {
+                                const array = [];
+                                if (!e.multi) {
+                                    e.check !== null && array.push(e.options[e.check].val);
+                                } else {
+                                    e.options.forEach(el => {
+                                        if (el.check) {
+                                            array.push(el.val);
+                                        }
+                                    });
+                                }
+                                data[e.id] = array;
+                            } else if (e.type === 'text') {
+                                data[e.id] = e.text;
+                            }
+                        });
+                        this.submitAnswer(data);
+                    },
+                    submitAnswer(data) {
+                        this.loading = true;
+                        zovye_fn.submitAnswer(data).then(res => {
+                            this.loading = false;
+                            if (res.status) {
+								if (res.data.redirect) {
+									window.location.replace(res.data.redirect);
+								} else {
+									alert('请求失败，请重试！');
+								}
+                            } else {
+                                alert(res.data.msg);
+                            }
+                        })
+                    }
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -59,17 +59,15 @@ if ($device_id) {
      */
     $cb = function (userModelObj $user) use ($device) {
         //记录设备ID
-        $user->updateSettings('last.deviceId', $device->getId());
-        $user->updateSettings('last.time', time());
+        $user->setLastActiveData([
+            'deviceId' => $device->getId(),
+            'time' => time(),
+        ]);
 
-        $last_visited_accountId = $user->settings('last.accountId');
-        if ($last_visited_accountId) {
-            $account = Account::get($last_visited_accountId);
-            if ($account) {
-                return ['account' => $account];
-            }
+        $account = $user->getLastActiveAccount();
+        if ($account) {
+            return ['account' => $account];
         }
-
         return [];
     };
 
@@ -91,44 +89,51 @@ if ($device_id) {
 
     $account = Account::findOneFromUID($account_id);
     if (empty($account) || $account->isBanned()) {
-        Util::resultAlert('公众号没有开通免费领取！', 'error');
+        Util::resultAlert('找不到这个任务或者任务已停用！', 'error');
     }
 
-
-    //如果公众号奖励为积分，显示获取积分页面
-    if (App::isBalanceEnabled() && $account && $account->getBonusType() == Account::BALANCE) {
-        $cb = function(userModelObj $user) use ($account) {
-            app()->getBalanceBonusPage($user, $account);
+    //显示问卷填写页面
+    if ($account->isQuestionnaire()) {
+        $cb = function(userModelObj $user) {
+            $device = $user->getLastActiveDevice();
+            if ($device) {
+                return ['device' => $device];
+            }
+            return [];
         };
     } else {
-        /**
-         * @param userModelObj $user
-         * @return array
-         */
-        $cb = function (userModelObj $user) use ($account) {
-            //用户从公众号链接进入的话，检查超时
-            if ($user->settings('last.deviceId') && time() - $user->settings('last.time') > settings(
-                    'user.scanAlive',
-                    VISIT_DATA_TIMEOUT
-                )) {
-                //设备扫描页面
-                $tpl_data = Util::getTplData([$user, $account]);
-                app()->scanPage($tpl_data);
-            }
+        //如果公众号奖励为积分，显示获取积分页面
+        if (App::isBalanceEnabled() && $account && $account->getBonusType() == Account::BALANCE) {
+            $cb = function(userModelObj $user) use ($account) {
+                app()->getBalanceBonusPage($user, $account);
+            };
+        } else {
+            /**
+             * @param userModelObj $user
+             * @return array
+             */
+            $cb = function (userModelObj $user) use ($account) {
+                //用户从公众号链接进入的话，检查超时
+                if ($user->getLastActiveData('deviceId') && time() - $user->getLastActiveData('time') > settings(
+                        'user.scanAlive',
+                        VISIT_DATA_TIMEOUT
+                    )) {
+                    //设备扫描页面
+                    $tpl_data = Util::getTplData([$user, $account]);
+                    app()->scanPage($tpl_data);
+                }
 
-            //记录公众号ID
-            $user->updateSettings('last.accountId', $account->getId());
+                //记录公众号ID
+                $user->setLastActiveData($account);
 
-            $last_deviceId = $user->settings('last.deviceId');
-            if ($last_deviceId) {
-                $device = Device::get($last_deviceId);
+                $device = $user->getLastActiveDevice();
                 if ($device) {
                     return ['device' => $device];
                 }
-            }
 
-            return [];
-        };        
+                return [];
+            };
+        }
     }
 
     $params['from'] = [
@@ -163,17 +168,6 @@ if (App::isUserVerify18Enabled()) {
     }
 }
 
-if ($from == 'device') {
-    if ($device && time() - $device->settings('last.online', 0) > 60) {
-        //设备准备页面，检测设备是否在线等等
-        $tpl_data = Util::getTplData([$device, $user]);
-        app()->devicePreparePage($tpl_data);
-    }
-    $user->remove('last');
-} else {
-    //清除上次的ticket
-    $user->updateSettings('last.ticket', []);
-}
 
 if (is_callable($cb)) {
     $res = $cb($user);
@@ -181,6 +175,19 @@ if (is_callable($cb)) {
         extract($res);
     }
 }
+
+if ($from == 'device') {
+    if ($device && time() - $device->settings('last.online', 0) > 60) {
+        //设备准备页面，检测设备是否在线等等
+        $tpl_data = Util::getTplData([$device, $user]);
+        app()->devicePreparePage($tpl_data);
+    }
+    $user->setLastActiveData();
+} else {
+    //清除上次的ticket
+    $user->setLastActiveData('ticket', []);
+}
+
 
 if (empty($device)) {
     //设备扫描页面
@@ -191,7 +198,7 @@ if (empty($device)) {
 //检查用户定位
 if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
     
-    $user->updateSettings('last.deviceId', '');
+    $user->setLastActiveData('deviceId');
 
     //定位匹配成功后转跳网址
     $redirect = Util::murl(
@@ -220,7 +227,7 @@ if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
 if ($account)  {
     $res = Util::checkAvailable($user, $account, $device);
     if (is_error($res)) {
-        $user->remove('last');
+        $user->setLastActiveData();
         $account = null;
     }
 }
@@ -228,7 +235,7 @@ if ($account)  {
 if (empty($account)) {
     //设置用户最后活动数据
     $user->setLastActiveData([
-        'device' => $device->getId(),
+        'deviceId' => $device->getId(),
         'ip' => CLIENT_IP,
         'time' => TIMESTAMP,
     ]);
@@ -252,8 +259,12 @@ if ($more_accounts) {
     app()->moreAccountsPage($tpl_data);
 }
 
+if ($account->isQuestionnaire()) {
+    app()->fillQuestionnairePage($user, $account, $device);
+}
+
 $ticket_data = [
-    'id' => Util::random(16),
+    'id' => REQUEST_ID,
     'time' => time(),
     'deviceId' => $device->getId(),
     'shadowId' => $device->getShadowId(),
@@ -261,7 +272,7 @@ $ticket_data = [
 ];
 
 //准备领取商品的ticket
-$user->updateSettings('last.ticket', $ticket_data);
+$user->setLastActiveData('ticket', $ticket_data);
 
 $tpl_data = Util::getTplData(
     [

@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use zovye\model\balance_logsModelObj;
 use zovye\model\balanceModelObj;
 
 defined('IN_IA') or exit('Access Denied');
@@ -33,6 +32,7 @@ if ($op == 'default') {
     header('location:' . Util::murl('entry', ['from' => 'account', 'account' => $tid, 'xid' => $xid]));
 
 } elseif ($op == 'play') {
+
     $user = Util::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         JSON::fail(['text' => '领取失败', 'msg' => '找不到用户或者用户无法领取']);
@@ -113,24 +113,25 @@ if ($op == 'default') {
     ];
 
     //准备领取商品的ticket
-    $user->updateSettings('last.ticket', $ticket_data);
+    $user->setLastActiveData('ticket', $ticket_data);
 
     JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 
 } elseif ($op == 'get') {
+
     $user = Util::getCurrentUser();
     if (empty($user) || $user->isBanned()) {
         Util::resultAlert('找不到用户或者用户无法领取', 'error');
     }
 
-    $ticket_data = $user->settings('last.ticket', []);
+    $ticket_data = $user->getLastActiveData('ticket', []);
     if (empty($ticket_data)) {
         Util::resultAlert('请重新扫描设备二维码！', 'error');
     }
 
     $account = Account::get($ticket_data['accountId']);
     if (empty($account)) {
-        Util::resultAlert('找不到指定的视频广告！', 'error');
+        Util::resultAlert('找不到指定的任务！', 'error');
     }
 
     $device = Device::get($ticket_data['deviceId']);
@@ -154,6 +155,7 @@ if ($op == 'default') {
     app()->getPage($tpl_data);
 
 } elseif ($op == 'get_list') {
+
     $user = Util::getCurrentUser();
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
@@ -223,7 +225,7 @@ if ($op == 'default') {
     ];
 
     //准备领取商品的ticket
-    $user->updateSettings('last.ticket', $ticket_data);
+    $user->setLastActiveData('ticket', $ticket_data);
 
     JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 
@@ -254,4 +256,77 @@ if ($op == 'default') {
     ];
 
     JSON::success($data);
+
+} elseif ($op == 'detail') {
+
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('无法获取用户信息！');
+    }
+
+    $uid = request::str('uid');
+    $account = Account::findOneFromUID($uid);
+    if (empty($account) || $account->isBanned()) {
+        JSON::fail('任务不存在！');
+    }
+
+    if (!$account->isQuestionnaire()) {
+        JSON::fail('任务类型不正确！');
+    }
+
+    $data = $account->format();
+    $data['questions'] = $account->getQuestions($user);
+    
+    JSON::success([
+        'uid' => $data['uid'],
+        'clr' => $data['clr'],
+        'title' => $data['title'],
+        'descr' => $data['descr'],
+        'img' => $data['img'],
+        'qrcode' => $data['qrcode'],
+        'questions' => $data['questions'],
+    ]);
+
+} elseif ($op == 'result') {
+
+    $user = Util::getCurrentUser();
+    if (empty($user)) {
+        JSON::fail('无法获取用户信息！');
+    }
+
+    $device = Device::get(request::int('device'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+    
+    $uid = request::str('uid');
+    $account = Account::findOneFromUID($uid);
+    if (empty($account) || $account->isBanned()) {
+        JSON::fail('任务不存在！');
+    }
+
+    if (!$account->isQuestionnaire()) {
+        JSON::fail('任务类型不正确！');
+    }
+
+    $answer = request::array('data');
+
+    $result = $account->checkAnswer($user, $answer);
+    
+    if ($result['error']) {
+        JSON::fail($result['error']);
+    }
+
+    $ticket_data = [
+        'id' => REQUEST_ID,
+        'time' => time(),
+        'deviceId' => $device->getId(),
+        'shadowId' => $device->getShadowId(),
+        'accountId' => $account->getId(),
+    ];
+
+    //准备领取商品的ticket
+    $user->setLastActiveData('ticket', $ticket_data);
+
+    JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
 }

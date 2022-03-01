@@ -1647,7 +1647,7 @@ JSCODE;
         $this->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
     }
 
-    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account)
+    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account, deviceModelObj $device)
     {
         $tpl_data = Util::getTplData([$user, $account]);
 
@@ -1656,7 +1656,6 @@ JSCODE;
 
         $js_sdk = Util::fetchJSSDK();
 
-        $tpl_data['questions'] = $account->getConfig('questions', []);
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 $js_sdk
@@ -1666,12 +1665,16 @@ $js_sdk
     });
     const zovye_fn = {
         api_url: "$api_url",
+        answer: {},
     }
-    zovye_fn.preCheck = function(data) {
-        return $.getJSON(zovye_fn.api_url, {op: 'check', uid:$account->getUid(), data});
-    }    
-    zovye_fn.getResult = function(data) {
-        return $.getJSON(zovye_fn.api_url, {op: 'result', uid:$account->getUid(), data});
+    zovye_fn.getData = function() {
+        return $.getJSON(zovye_fn.api_url, {op: 'detail', uid: "{$account->getUid()}"});
+    }
+    zovye_fn.setAnswer = function(uid, data) {
+        zovye_fn.answer[uid] = data;
+    }
+    zovye_fn.submitAnswer = function(data) {
+        return $.getJSON(zovye_fn.api_url, {op: 'result', uid: "{$account->getUid()}", device: {$device->getId()}, data: data || zovye_fn.answer});
     }
 </script>
 JSCODE;

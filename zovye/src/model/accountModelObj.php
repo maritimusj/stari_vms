@@ -331,7 +331,7 @@ class accountModelObj extends modelObj
         ];
 
         if ($num < $this->getScore()) {
-            $result['error'] = $err ?? '您提交的答案未通过！';
+            $result['error'] = $err ?? '您提交的答案未通过，请检查后再提交，谢谢！';
         }
 
         return $result;

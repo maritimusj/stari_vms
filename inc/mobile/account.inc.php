@@ -318,6 +318,9 @@ if ($op == 'default') {
     }
 
     if (!$account->log($account->getId(), REQUEST_ID, [
+        'user' => $user->profile(),
+        'device' => $device->profile(),
+        'account' => $account->profile(),
         'questions' => $account->getQuestions($user, true),
         'answer' => $answer,
         'result' => $result,

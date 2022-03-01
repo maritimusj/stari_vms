@@ -290,7 +290,7 @@ class Account extends State
 
         $join = function ($cond, $getter_fn) use ($device, $user, &$list, $include_balance, $include_commission) {
             $acc = Account::findOne($cond);
-            if (empty($acc)) {
+            if (empty($acc) || $acc->isBanned()) {
                 return false;
             }
             if (!$include_balance && $acc->getBonusType() == Account::BALANCE) {
@@ -586,6 +586,9 @@ class Account extends State
      */
     public static function findOne($cond): ?accountModelObj
     {
+        if (count($cond) == 1 && $cond['id']) {
+            return self::get($cond['id']);
+        }
         $cond = $cond['id'] || $cond['uid'] ? $cond : We7::uniacid($cond);
         $query = self::query($cond);
         return $query->findOne();
@@ -1041,8 +1044,13 @@ class Account extends State
                 }
             }
         }
-        if ($account['type'] == Account::QUESTIONNAIRE && isEmptyArray($account['questions'])) {
-            return false;
+        if ($account['type'] == Account::QUESTIONNAIRE) {
+            $obj = Account::get($account['id']);
+            if (empty($obj)) {
+                return false;
+            }
+            $questions = $obj->getQuestions();
+            return !isEmptyArray($questions);
         }
         return true;
     }

@@ -94,11 +94,14 @@ if ($device_id) {
 
     //显示问卷填写页面
     if ($account->isQuestionnaire()) {
-        $cb = function(userModelObj $user) {
+        $cb = function(userModelObj $user) use($account) {
+            $user->setLastActiveData($account);
+            
             $device = $user->getLastActiveDevice();
             if ($device) {
                 return ['device' => $device];
             }
+            
             return [];
         };
     } else {

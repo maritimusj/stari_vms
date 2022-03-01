@@ -389,7 +389,7 @@ if ($op == 'default') {
     if (request::bool('agent_base')) {
 
         $mobile = request::trim('mobile');
-        if (empty($mobile) || !preg_match(REGULAR_MOBILE, $mobile)) {
+        if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
             Util::itoast('手机号码无效！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
         }
 

@@ -1322,4 +1322,72 @@ if ($op == 'default') {
     $data = Statistics::accountMonth($account, $month, $day_str);
     $result = array_merge($result, $data);
     JSON::success($result);
+
+} elseif ($op == 'qestionnaire_logs') {
+
+    $id = request::int('account');
+    $account = Account::get($id);
+    if (empty($account) || !$account->isQuestionnaire()) {
+        Util::resultAlert('找不到这个问卷！', 'error');
+    }
+
+    $query = $account->logQuery();
+    $total = $query->count();
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+    $pager = We7::pagination($total, $page, $page_size);
+
+    $answers = [];
+    if ($total > 0) {
+        $query->page($page, $page_size);
+        $query->orderBy('id DESC');
+        foreach($query->findAll() as $entry) {
+            $data = [
+                'id' => $entry->getId(),
+                'user' => $entry->getData('user', []),
+                'result' => $entry->getData('result', []),
+                'device' => $entry->getData('device', []),
+                'order' => $entry->getData('order'),
+                'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+            ];
+            $total = count($entry->getData('questions', []));
+            if ($total > 0) {
+                $data['percent'] = (floatval($data['result']['num']) / floatval($total)) * 100;
+            }
+            $answers[] = $data;
+        }
+    }
+
+    app()->showTemplate('web/account/questionnaire_logs', [
+        'account' => $account->profile(),
+        'list' => $answers,
+        'pager' => $pager,
+    ]);
+
+} elseif ($op == 'viewDetail') {
+
+    $id = request::int('id');
+
+    $log = Questionnaire::log(['id' => $id])->findOne();
+    if (empty($log)) {
+        JSON::fail('找不到这个记录！');
+    }
+
+    $questions = $log->getData('questions', []);
+    $answer = $log->getData('answer', []);
+    $result = $log->getData('result.stats', []);
+
+    $content = app()->fetchTemplate(
+        'web/account/questionnaire_detail',
+        [
+            'questions' => $questions,
+            'answer' => $answer,
+            'result' => $result,
+        ]
+    );
+
+    JSON::success(['title' => '问卷提交详情', 'content' => $content]);
 }
+

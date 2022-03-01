@@ -306,7 +306,9 @@
                             </span>
                             {elseif $a['type'] == \zovye\Account::QUESTIONNAIRE}
                              <span class="state auth" title="问卷">
-                                <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}">
+                                <a href="{php echo $this->createWebUrl('account', ['op' => 'qestionnaire_logs', 'account' => $a['id']]);}"  title="查看用户提交记录">
+                                    <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}">
+                                </a>
                             </span>                           
                             {elseif $a['type'] == \zovye\Account::TASK}
                             <span class="state auth">

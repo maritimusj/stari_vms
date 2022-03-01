@@ -403,7 +403,7 @@ class userModelObj extends modelObj
      */
     public function getKeeper()
     {
-        return m('keeper')->findOne(['mobile' => $this->getMobile()]);
+        return Keeper::findOne(['mobile' => $this->getMobile()]);
     }
 
     /**

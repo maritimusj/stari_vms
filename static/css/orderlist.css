@@ -342,3 +342,8 @@ img.icon:active {
     opacity: 0.3;
     transform: translate3d(0, 1px, 0);
 }
+
+#orderlist img.icon {
+    width: 16px;
+    height: 16px;
+}

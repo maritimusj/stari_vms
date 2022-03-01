@@ -188,6 +188,7 @@ if ($op == 'default') {
                 $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['questionnaire']) {
                 $data['account_title'] = '问卷 ' . $accounts[$data['account']]['title'];
+                $data['questionnaire_log'] = $entry->getExtraData('ticket.id', '');
             } elseif ($accounts[$data['account']]['third-party-platform']) {
                 $data['account_title'] = '第三方平台 ' . $accounts[$data['account']]['title'];
             } else {

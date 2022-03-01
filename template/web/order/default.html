@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20201239');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20220301');}
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -201,6 +201,11 @@
                                 <img src="{media $accounts[$order['account']]['img']}" alt=""/>
                                 {/if}
                                 {$order['account_title']}
+                                {if $order['questionnaire_log']}
+                                <span class="operate" data-uid="{$order['questionnaire_log']}" title="查看问卷提交详情">
+                                    <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}" class="icon" data-op="viewQuestionnaireDetail">
+                                </span>
+                                {/if}
                             </div>
                             {elseif $order['voucher']}
                             提货码：{$order['voucher']['code']}
@@ -442,6 +447,7 @@
 
     const api = {
         url: "{php echo $this->createWebUrl('order');}",
+        account_url: "{php echo $this->createWebUrl('account');}",
     };
 
     api.showResult = function (params, url, loading, cb) {
@@ -514,6 +520,11 @@
 
     api.pullsDetail = function (id) {
         api.showResult({ op: 'pullsDetail', id: id });
+    }
+
+    api.viewQuestionnaireDetail = function(id, self) {
+        const uid = self.closest('[data-uid]').data('uid');
+        api.showResult({ op: 'viewDetail', uid }, api.account_url);
     }
 
     api.searchNoUserFilter = function() {
@@ -600,7 +611,7 @@
             const op = $(this).data('op');
             if (op && api[op]) {
                 const id = $(this).closest('tr').data('id');
-                api[op](id);
+                api[op](id, $(this));
             }
             e.preventDefault();
         })

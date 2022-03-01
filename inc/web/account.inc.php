@@ -1368,11 +1368,16 @@ if ($op == 'default') {
 
 } elseif ($op == 'viewDetail') {
 
-    $id = request::int('id');
+    if (request::has('id')) {
+        $id = request::int('id');
+        $log = Questionnaire::log(['id' => $id])->findOne();        
+    } else {
+        $uid = request::str('uid');
+        $log = Questionnaire::log(['title' => $uid])->findOne();          
+    }
 
-    $log = Questionnaire::log(['id' => $id])->findOne();
     if (empty($log)) {
-        JSON::fail('找不到这个记录！');
+        JSON::fail('找不到这个问卷提交记录！');
     }
 
     $questions = $log->getData('questions', []);

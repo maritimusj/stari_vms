@@ -111,6 +111,12 @@ if ($op == 'default') {
         $tpl_data['s_order'] = $order_no;
     }
 
+    $order_no = request::str('orderNO');
+    if ($order_no) {
+        $query->where(['order_id' => $order_no]);
+        $tpl_data['s_order'] = $order_no;
+    }
+
     $limit = request::array('datelimit');
     if ($limit['start']) {
         $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'] . ' 00:00:00');

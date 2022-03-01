@@ -1354,6 +1354,7 @@ if ($op == 'default') {
             ];
             $total = count($entry->getData('questions', []));
             if ($total > 0) {
+                $data['total'] = $total;
                 $data['percent'] = (floatval($data['result']['num']) / floatval($total)) * 100;
             }
             $answers[] = $data;
@@ -1383,6 +1384,7 @@ if ($op == 'default') {
     $questions = $log->getData('questions', []);
     $answer = $log->getData('answer', []);
     $result = $log->getData('result.stats', []);
+    $account = $log->getData('account', []);
 
     $content = app()->fetchTemplate(
         'web/account/questionnaire_detail',
@@ -1390,6 +1392,7 @@ if ($op == 'default') {
             'questions' => $questions,
             'answer' => $answer,
             'result' => $result,
+            'account' => $account,
         ]
     );
 

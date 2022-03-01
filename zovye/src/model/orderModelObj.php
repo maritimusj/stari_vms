@@ -249,4 +249,13 @@ class orderModelObj extends modelObj
     {
         return $this->getExtraData('custom.zero_bonus', false);
     }
+
+    public function profile()
+    {
+        return [
+            'id' => $this->getId(),
+            'orderNO' => $this->getOrderNO(),
+            'createtime' => $this->getCreatetime(),
+        ];
+    }
 }

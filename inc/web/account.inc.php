@@ -550,13 +550,17 @@ if ($op == 'default') {
 
             $account->set('limits', $limits);
 
-            if (request::has('questionnaire')) {
+            if (request::isset('questionnaire')) {
                 $questoinnaire_uid = request::trim('questionnaire');
-                $questionnaire = Account::findOneFromUID($questoinnaire_uid);
-                if ($questionnaire) {
-                    $account->setConfig('questionnaire', [
-                        'uid' => $questionnaire->getUid(),
-                    ]);
+                if ($questoinnaire_uid) {
+                    $questionnaire = Account::findOneFromUID($questoinnaire_uid);
+                    if ($questionnaire) {
+                        $account->setConfig('questionnaire', [
+                            'uid' => $questionnaire->getUid(),
+                        ]);
+                    }                    
+                } else {
+                    $account->setConfig('questionnaire', []);
                 }
             }
 

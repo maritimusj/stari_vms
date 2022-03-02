@@ -179,7 +179,7 @@
                         <div class="col-md-5">
                             <!-- <input type="text" class="form-control" name="questionnaire" id="questionnaire" value="{php echo $account?$account->getConfig('questionnaire.uid'):''}"> -->
                             <select name="questionnaire" id="questionnaire" style="width:100%;">
-                                <option v-for="q in questionnaires" :value="q.uid" :selected="q.selected">
+                                <option v-for="q in questionnaires" :value="q.uid" :selected="q.selected || savedUID == q.uid">
                                     {{q.title}}
                                 </option>
                             </select>
@@ -309,6 +309,8 @@
                 initPage();
                 if (this.savedUID) {
                     this.getAccountProfile(this.savedUID);
+                } else {
+                    this.searchAccounts();
                 }
             },
             methods: {
@@ -341,6 +343,10 @@
                         });
 
                         self.questionnaires = data;
+                        self.questionnaires.unshift({
+                            title: '<请选择>',
+                            uid: '',
+                        })
                     })
                 }
             }

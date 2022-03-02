@@ -180,6 +180,15 @@ if ($op == 'default') {
                 } else {
                     $profile['qrcode'] = $account->getQrcode();
                 }
+                if ($entry->getExtraData('ticket.questionnaireAccountId')) {
+                    $profile['questionnaire+1'] = '问卷 ';
+                    $account = Account::get($entry->getExtraData('ticket.questionnaireAccountId'));
+                    if ($account) {
+                        $profile['questionnaire+1'] .= $account->getTitle();
+                    } else {
+                        $profile['questionnaire+1'] .= 'n/a';
+                    }
+                }
                 $accounts[$entry->getAccount()] = $profile;
             }
         }
@@ -194,6 +203,9 @@ if ($op == 'default') {
                 $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['questionnaire']) {
                 $data['account_title'] = '问卷 ' . $accounts[$data['account']]['title'];
+                $data['questionnaire_log'] = $entry->getExtraData('ticket.id', '');
+            } elseif ($accounts[$data['account']]['questionnaire+1']) {
+                $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'] . ' + ' . $accounts[$data['account']]['questionnaire+1'];
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.id', '');
             } elseif ($accounts[$data['account']]['third-party-platform']) {
                 $data['account_title'] = '第三方平台 ' . $accounts[$data['account']]['title'];

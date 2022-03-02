@@ -94,8 +94,14 @@ try {
                 throw new RuntimeException('保存订单数据失败！');
             }
 
-            if ($account->isQuestionnaire()) {
-                $log = $account->logQuery(['level' => $account->getId(), 'title' => $ticket_data_saved['id']])->findOne();
+            if ($ticket_data_saved['questionnaireAccountId']) {
+                $questionnaire = Account::get($ticket_data_saved['questionnaireAccountId']);
+            } elseif ($account->isQuestionnaire()) {
+                $questionnaire = $account;
+            }
+
+            if ($questionnaire) {
+                $log = $questionnaire->logQuery(['level' => $questionnaire->getId(), 'title' => $ticket_data_saved['id']])->findOne();
                 if ($log) {
                     $log->setData('order', $order->profile());
                     if (!$log->save()) {

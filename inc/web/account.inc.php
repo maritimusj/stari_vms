@@ -91,6 +91,7 @@ if ($op == 'default') {
             if ($entry->isThirdPartyPlatform() && $entry->isBanned()) {
                 continue;
             }
+            $questionnaire = $entry->getConfig('questionnaire', []);
             $data = [
                 'id' => $entry->getId(),
                 'type' => $entry->getType(),
@@ -110,7 +111,7 @@ if ($op == 'default') {
                 'sccount' => $entry->getSccount(),
                 'total' => $entry->getTotal(),
                 'orderlimits' => $entry->getOrderLimits(),
-                'url' => $entry->getUrl(),
+                'url' => $questionnaire['url'] ? $questionnaire['url'] : $entry->getUrl(),
                 'assigned' => !isEmptyArray($entry->get('assigned')),
                 'is_third_party_platform' => $entry->isThirdPartyPlatform(),
             ];
@@ -263,7 +264,8 @@ if ($op == 'default') {
 
         //是否退出推广
         $commission_share_closed = false;
-
+        //是否关联了问卷任务
+        $questionnaire_attached = null;        
         if ($id) {
             $account = Account::get($id);
             if (empty($account)) {
@@ -557,10 +559,16 @@ if ($op == 'default') {
                     if ($questionnaire) {
                         $account->setConfig('questionnaire', [
                             'uid' => $questionnaire->getUid(),
+                            'url' => Account::createUrl($questionnaire->getUid(), ['tid' => $account->getUid()]),
                         ]);
-                    }                    
+                    }
+                }
+
+                if ($questionnaire) {
+                    $questionnaire_attached = true;
                 } else {
                     $account->setConfig('questionnaire', []);
+                    $questionnaire_attached = false;
                 }
             }
 
@@ -654,10 +662,15 @@ if ($op == 'default') {
                 Account::removeAllAgents($account);
             }
 
-            return [
-                'message' => $commission_share_closed ? '保存成功！注意：所有平台代理商关联已被移除！' : '保存成功！',
-                'commissionShareClosed' => $commission_share_closed,
-            ];
+            $message = '保存成功！';
+            if ($commission_share_closed) {
+                $message .= '注意：所有平台代理商关联已被移除！' ;
+            }
+
+            if (isset($questionnaire_attached)) {
+                $message .= ($questionnaire_attached ? '注意：已关联问卷，请重新设置取货链接！' : '注意：已移除问卷，请重新设置取货链接！');
+            }
+            return ['message' => $message];
         }
 
         return err('操作失败！');
@@ -667,11 +680,7 @@ if ($op == 'default') {
         Util::itoast($res['message'], We7::referer(), 'error');
     } else {
         $back_url = request::has('id') ? $this->createWebUrl('account', ['op' => 'edit', 'id' => request::int('id')]) : $this->createWebUrl('account');
-        if ($res['commissionShareClosed']) {
-            Util::message($res['message'], $back_url, 'success');
-        } else {
-            Util::itoast($res['message'], $back_url, 'success');
-        }
+        Util::itoast($res['message'], $back_url, 'success');
     }
 
 } elseif ($op == 'edit') {
@@ -1361,7 +1370,7 @@ if ($op == 'default') {
         Util::resultAlert('找不到这个问卷！', 'error');
     }
 
-    $query = $account->logQuery();
+    $query = $account->logQuery(['level' => $account->getId()]);
     $total = $query->count();
 
     $page = max(1, request::int('page'));
@@ -1385,7 +1394,7 @@ if ($op == 'default') {
             $total = count($entry->getData('questions', []));
             if ($total > 0) {
                 $data['total'] = $total;
-                $data['percent'] = (floatval($data['result']['num']) / floatval($total)) * 100;
+                $data['percent'] = intval((floatval($data['result']['num']) / floatval($total)) * 100);
             }
             $answers[] = $data;
         }

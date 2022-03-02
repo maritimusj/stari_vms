@@ -1647,11 +1647,11 @@ JSCODE;
         $this->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
     }
 
-    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account, deviceModelObj $device)
+    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account, deviceModelObj $device, $tid = '')
     {
         $tpl_data = Util::getTplData([$user, $account]);
 
-        $api_url = Util::murl('account');
+        $api_url = Util::murl('account', $tid ? ['tid' => $tid] : []);
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();

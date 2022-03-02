@@ -317,6 +317,14 @@ if ($op == 'default') {
         JSON::fail($result['error']);
     }
 
+    if (request::has('tid')) {
+        $tid = request::str('tid');
+        $acc = Account::findOneFromUID($tid);
+        if (empty($acc) || $acc->getConfig('questionnaire.uid') !== $uid) {
+            JSON::fail('没有允许从这个公众号访问这个问卷！');
+        }
+    }
+
     if (!$account->log($account->getId(), REQUEST_ID, [
         'user' => $user->profile(),
         'device' => $device->profile(),
@@ -335,6 +343,11 @@ if ($op == 'default') {
         'shadowId' => $device->getShadowId(),
         'accountId' => $account->getId(),
     ];
+    
+    if (isset($acc)) {
+        $ticket_data['accountId'] = $acc->getId();
+        $ticket_data['questionnaireAccountId'] = $account->getId();
+    }
 
     //准备领取商品的ticket
     $user->setLastActiveData('ticket', $ticket_data);

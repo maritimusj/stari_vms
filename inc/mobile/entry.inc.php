@@ -172,7 +172,6 @@ if (App::isUserVerify18Enabled()) {
     }
 }
 
-
 if (is_callable($cb)) {
     $res = $cb($user);
     if ($res) {
@@ -228,8 +227,25 @@ if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
 }
 
 if ($account) {
-    $res = Util::checkAvailable($user, $account, $device);
-    if (is_error($res)) {
+    $isOk = true;
+    if ($account->isQuestionnaire() && request::has('tid')) {
+        $acc = Account::findOneFromUID(request::trim('tid'));
+        if (empty($acc)) {
+            $isOk = false;
+        } else {
+            $res = Util::checkAvailable($user, $acc, $device);
+            if (is_error($res)) {
+                $isOk = false;
+            }            
+        }
+    } else {
+        $res = Util::checkAvailable($user, $account, $device);
+        if (is_error($res)) {
+            $isOk = false;
+        }        
+    }
+
+    if (!$isOk) {
         $user->setLastActiveData();
         $account = null;
     }
@@ -262,8 +278,10 @@ if ($more_accounts) {
     app()->moreAccountsPage($tpl_data);
 }
 
+$user->setLastActiveData();
+
 if ($account->isQuestionnaire()) {
-    app()->fillQuestionnairePage($user, $account, $device);
+    app()->fillQuestionnairePage($user, $account, $device, request::trim('tid'));
 }
 
 $ticket_data = [
@@ -277,17 +295,11 @@ $ticket_data = [
 //准备领取商品的ticket
 $user->setLastActiveData('ticket', $ticket_data);
 
-$tpl_data = Util::getTplData(
-    [
-        $user,
-        $account,
-        $device,
-        [
-            'timeout' => App::deviceWaitTimeout(),
-            'user.ticket' => $ticket_data['id'],
-        ],
-    ]
-);
+$tpl_data = Util::getTplData([$user, $account, $device, [
+        'timeout' => App::deviceWaitTimeout(),
+        'user.ticket' => $ticket_data['id'],
+    ],
+]);
 
 //领取页面
 app()->getPage($tpl_data);

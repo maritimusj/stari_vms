@@ -271,6 +271,14 @@ class accountModelObj extends modelObj
         ]);
     }
 
+    public function setConfig(string $path = '', $data)
+    {
+        if (empty($path)) {
+            return $this->set('config', $data);
+        }
+        return $this->updateSettings('config.' . $path, $data);
+    }
+
     public function getConfig($path = '', $default = null)
     {
         if (empty($path)) {

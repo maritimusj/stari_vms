@@ -174,6 +174,26 @@
                             <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="questionnaire" class="col-md-2 control-label">问卷调查</label>
+                        <div class="col-md-5">
+                            <!-- <input type="text" class="form-control" name="questionnaire" id="questionnaire" value="{php echo $account?$account->getConfig('questionnaire.uid'):''}"> -->
+                            <select name="questionnaire" id="questionnaire" style="width:100%;">
+                                <option v-for="q in questionnaires" :value="q.uid" :selected="q.selected">
+                                    {{q.title}}
+                                </option>
+                            </select>
+                            <span class="help-block">* 可选，出货前要求用户填写指定的问卷调查，请复制指定问卷调查任务UID。</span>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="请输入名称查找.." v-model="keyword">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" @click="searchAccounts">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <!-- 其它设置 结束 -->
                 <div v-show="active === 'reward'">
@@ -253,36 +273,76 @@
 
 {template 'web/account/edit_footer'}
 <script>
+    const api_url = "{php echo $this->createWebUrl('account');}";
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         new Vue({
             el: "#app",
             data: {
                 navs:[
-                    {
-                        'op': 'base',
-                        'content': `<i class="fa fa-fw fa-weixin"></i> 基本设置`,
-                    },
-                    {
-                        'op': 'limits',
-                        'content': `用户限制`,
-                    },
-                    {
-                        'op': 'advance',
-                        'content': `高级设置`,
-                    },
-                    {
-                        'op': 'misc',
-                        'content': `其它设置`,
-                    },
-                    {
-                        'op': 'reward',
-                        'content': `奖励设置`,
-                    },
+                        {
+                            'op': 'base',
+                            'content': `<i class="fa fa-fw fa-weixin"></i> 基本设置`,
+                        },
+                        {
+                            'op': 'limits',
+                            'content': `用户限制`,
+                        },
+                        {
+                            'op': 'advance',
+                            'content': `高级设置`,
+                        },
+                        {
+                            'op': 'misc',
+                            'content': `其它设置`,
+                        },
+                        {
+                            'op': 'reward',
+                            'content': `奖励设置`,
+                        },
                 ],
                 active: 'base',
+                savedUID: "{php echo $account? $account->getConfig('questionnaire.uid','') : ''}",
+                keyword: '',
+                questionnaires: [],
             },
             mounted() {
                 initPage();
+                if (this.savedUID) {
+                    this.getAccountProfile(this.savedUID);
+                }
+            },
+            methods: {
+                getAccountProfile(uid) {
+                    const self = this;
+                    $.getJSON(api_url, {op: 'profile', uid}).then(res => {
+                        if (res.status) {
+                            return res.data;
+                        }
+                        util.message(res.data.msg, '', 'error');
+                    }).then(data => {
+                        if (data) {
+                            self.questionnaires.push(data);
+                            self.searchAccounts();
+                        }
+                    })
+                },
+                searchAccounts() {
+                    const self = this;
+                    $.getJSON(api_url, {op: 'search', type: 40, keyword: this.keyword, limit: 10}).then(res => {
+                        if (res.status) {
+                            return res.data;
+                        }
+                        util.message(res.data.msg, '', 'error');
+                    }).then(data => {
+                        data.forEach(e => {
+                            if (e.uid == self.savedUID) {
+                                Vue.set(e, 'selected', true);
+                            }
+                        });
+
+                        self.questionnaires = data;
+                    })
+                }
             }
         })
     })

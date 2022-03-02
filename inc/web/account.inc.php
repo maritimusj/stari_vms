@@ -177,11 +177,31 @@ if ($op == 'default') {
         'search_url' => $this->createWebUrl('account', ['banned' => $banned]),
     ]);
 
+} elseif ($op == 'profile') {
+
+    if (request::has('uid')) {
+        $uid = request::str('uid');
+        $acc = Account::findOneFromUID($uid);
+    } else {
+        $id = request::int('id');
+        $acc = Account::get($id);
+    }
+
+    if (empty($acc)) {
+        JSON::fail('找不到这个任务！');
+    }
+
+    JSON::success($acc->profile());
+
 } elseif ($op == 'search') {
 
     $result = [];
 
     $query = Account::query();
+
+    if (request::isset('type')) {
+        $query->where(['type' => request::int('type')]);
+    }
 
     $keyword = request::trim('keyword', '', true);
     if ($keyword) {
@@ -191,15 +211,11 @@ if ($op == 'default') {
         ]);
     }
 
-    $query->limit(100);
+    $query->limit(request::int('limit', 100));
 
     /** @var accountModelObj $entry */
     foreach ($query->findAll() as $entry) {
-        $result[] = [
-            'id' => $entry->getId(),
-            'name' => $entry->getName(),
-            'title' => $entry->getTitle(),
-        ];
+        $result[] = $entry->profile();
     }
 
     JSON::success($result);
@@ -533,6 +549,16 @@ if ($op == 'default') {
             }
 
             $account->set('limits', $limits);
+
+            if (request::has('questionnaire')) {
+                $questoinnaire_uid = request::trim('questionnaire');
+                $questionnaire = Account::findOneFromUID($questoinnaire_uid);
+                if ($questionnaire) {
+                    $account->setConfig('questionnaire', [
+                        'uid' => $questionnaire->getUid(),
+                    ]);
+                }
+            }
 
             if ($account->isVideo()) {
                 $account->set('config', [
@@ -1397,5 +1423,5 @@ if ($op == 'default') {
     );
 
     JSON::success(['title' => '问卷提交详情', 'content' => $content]);
-}
+} 
 

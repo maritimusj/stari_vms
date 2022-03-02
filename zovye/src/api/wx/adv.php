@@ -283,10 +283,9 @@ class adv
         $guid = request::trim('id');
 
         /** @var advertisingModelObj $adv */
-        $adv = Advertising::query([
-            'state' => Advertising::NORMAL,
-            "SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'",
-        ])->findOne();
+        $adv = Advertising::query(['state' => Advertising::NORMAL])
+                ->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'")
+                ->findOne();
 
         if (empty($adv)) {
             return error(State::ERROR, '找不到这条广告！');

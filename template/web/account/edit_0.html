@@ -177,7 +177,6 @@
                     <div class="form-group">
                         <label for="questionnaire" class="col-md-2 control-label">问卷任务</label>
                         <div class="col-md-5">
-                            <!-- <input type="text" class="form-control" name="questionnaire" id="questionnaire" value="{php echo $account?$account->getConfig('questionnaire.uid'):''}"> -->
                             <select name="questionnaire" id="questionnaire" style="width:100%;">
                                 <option v-for="q in questionnaires" :value="q.uid" :selected="q.selected || savedUID == q.uid">
                                     {{q.title}}

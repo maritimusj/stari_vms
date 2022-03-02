@@ -224,29 +224,29 @@
 
             {if (!isset($type) || $type ==\zovye\Account::DOUYIN) && \zovye\App::isDouyinEnabled()}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
-                <span class="state auth" title="抖音">
-                    <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}" title="添加抖音号">
+                <span class="state auth" title="添加抖音号">
+                    <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
                 </span>
             </a>
             {/if}
             {if (!isset($type) || $type ==\zovye\Account::WXAPP)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::WXAPP));}">
-                <span class="state auth" title="小程序">
-                    <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}" title="添加小程序">
+                <span class="state auth" title="添加小程序">
+                    <img src="{php echo MODULE_URL . 'static/img/wxapp.jpg'}">
                 </span>
             </a>
             {/if}
             {if (!isset($type) || $type ==\zovye\Account::QUESTIONNAIRE)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::QUESTIONNAIRE));}">
-                <span class="state auth" title="问卷">
-                    <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}" title="添加问卷">
+                <span class="state auth" title="添加问卷">
+                    <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}">
                 </span>
             </a>
             {/if}
             {if (!isset($type) || $type ==\zovye\Account::TASK) && \zovye\App::isBalanceEnabled()}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::TASK));}">
-                <span class="state auth" title="自定义任务">
-                    <img src="{php echo MODULE_URL . 'static/img/task.svg'}" title="添加自定义任务">
+                <span class="state auth" title="添加自定义任务">
+                    <img src="{php echo MODULE_URL . 'static/img/task.svg'}">
                 </span>
             </a>
             {/if}
@@ -442,7 +442,6 @@
                             {else}
                                 {if $a['type'] == \zovye\Account::QUESTIONNAIRE}
                                 <li><a href="{php echo $this->createWebUrl('account', ['op' => 'qestionnaire_logs', 'account' => $a['id']]);}"><i class="fa fa-list fa-fw"></i> 用户提交记录</a></li>
-                                <li><a href="#"  data-url="{$a['uid']}"><i class="fa fa-copy fa-fw"></i> 复制任务UID</a></li>
                                 <li role="separator" class="divider"></li>
                                 {/if}
                                 <li>

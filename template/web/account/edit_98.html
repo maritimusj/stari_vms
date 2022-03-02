@@ -163,8 +163,10 @@
                             <span class="help-block">* 可选，范围0 - 999，默认为0。数字越大，优先级越高。</span>
                         </div>
                     </div>
+                </div>
+                <!-- 其它设置 结束 -->
+                <div v-show="active === 'spec'">
                     <!-- 授权接入公众号特殊设置 开始 -->
-                    <div class="seg-divider"></div>
                     <div class="form-group">
                         <label class="col-md-2 control-label">出货时机</label>
                         <div class="col-md-8">
@@ -173,12 +175,18 @@
                                 <input name="OpenTiming" id="scan" type="radio" value="0"{if empty($config['open']['timing'])} checked="checked"{/if}>
                                 扫码进入公众号
                             </label>
-                            {/if}
                             <label for="link" class="radio-inline">
                                 <input name="OpenTiming" id="link" type="radio" value="1"{if $config['open']['timing'] == 1} checked="checked"{/if}>
                                 打开取货链接
                             </label>
                             <span class="help-block">* 请选择出货时机，用户扫码进入公众号后立即出货或用户打开取货页面后出货</span>
+                            {else}
+                            <label for="link" class="radio-inline">
+                                <input name="OpenTiming" id="link" type="radio" value="1"{if $config['open']['timing'] == 1} checked="checked"{/if} disabled>
+                                打开取货链接
+                            </label>
+                            <span class="help-block">* 请选择出货时机，用户扫码进入公众号后立即出货或用户打开取货页面后出货</span>                                                
+                            {/if}
                         </div>
                     </div>
                     <div class="form-group">
@@ -221,9 +229,7 @@
                         </div>
                     </div>
                     <!-- 授权接入公众号特殊设置 结束  -->
-    
                 </div>
-                <!-- 其它设置 结束 -->
                 <div v-show="active === 'reward'">
                     <!-- 佣金设置 开始 -->
                     {if \zovye\App::isCommissionEnabled() && !\zovye\App::isBalanceEnabled()}
@@ -321,6 +327,10 @@
                         'op': 'misc',
                         'content': `其它设置`,
                     },
+                    {
+                        'op': 'spec',
+                        'content': `出货设置`,
+                    },                   
                     {
                         'op': 'reward',
                         'content': `奖励设置`,

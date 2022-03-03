@@ -192,11 +192,11 @@
                     <div class="options" v-if="item.type === 'choice'">
                         <div class="row option" style="margin-top: 10px;" v-for="(option, i) in item.options" :key="i"
                             @click="select(item, i)">
-                            <div class="radio" :style="{'margin-left': '30px', 'background-color': item.check == i ? clr + 'bb' : 'white'}" v-if="!item.multi">
-                                <div class="white-circle"></div>
+                            <div class="radio" :style="{'margin-left': '30px', 'background-color': item.check === i ? clr + 'bb' : 'white'}" v-if="!item.multi">
+                                <div class="white-circle" v-if="item.check === i"></div>
                             </div>
                             <div class="checkbox" :style="{'margin-left': '30px', 'background-color': option.check ? clr + 'bb' : 'white'}" v-else>
-                                <svg viewBox="0 0 1024 1024" width="13" height="13"><path d="M1002.81 144.43a64 64 0 0 0-90.38 4.76L381.56 739l-272.3-272.3a64 64 0 0 0-90.51 90.51l320 320A64 64 0 0 0 384 896h1.68a64 64 0 0 0 45.89-21.16l576-640a64 64 0 0 0-4.76-90.41z" fill="#ffffff"></path></svg>
+                                <svg v-if="option.check" viewBox="0 0 1024 1024" width="13" height="13"><path d="M1002.81 144.43a64 64 0 0 0-90.38 4.76L381.56 739l-272.3-272.3a64 64 0 0 0-90.51 90.51l320 320A64 64 0 0 0 384 896h1.68a64 64 0 0 0 45.89-21.16l576-640a64 64 0 0 0-4.76-90.41z" fill="#ffffff"></path></svg>
                             </div>
                             <span style="margin: 0 10px;">{{option.text}}</span>
                         </div>
@@ -232,21 +232,21 @@
                             this.loading = false;
                             if (res.status) {
                                 document.getElementsByTagName("title")[0].innerText = res.data.title || '';
-                                const list = res.data.questions || [];
-                                this.list = list.map(e => {
-                                    if (e.type === 'choice') {
-                                        if (e.multi) {
-                                            e.options.forEach(el => {
-                                                el.check = false;
-                                            });
-                                        } else {
-                                            e.check = null;
-                                        }
-                                    } else if (e.type === 'text') {
-                                        e.text = '';
-                                    }
-                                    return e;
-                                });
+                                let list = res.data.questions || [];
+								list.forEach(e => {
+									if (e.type === 'choice') {
+										if (e.multi) {
+											e.options.forEach(el => {
+												el.check = false;
+											});
+										} else {
+											e.check = null;
+										}
+									} else if (e.type === 'text') {
+										e.text = '';
+									}
+								});
+								this.list = list;
                                 this.clr = res.data.clr || '#1358FB';
                             } else {
                                 alert(res.data.msg);
@@ -261,6 +261,7 @@
 						}
 					},
                     submitClick() {
+                        this.loading = true;
                         const data = {};
                         this.list.forEach(e => {
                             if (e.type === 'choice') {
@@ -279,10 +280,6 @@
                                 data[e.id] = e.text;
                             }
                         });
-                        this.submitAnswer(data);
-                    },
-                    submitAnswer(data) {
-                        this.loading = true;
                         zovye_fn.submitAnswer(data).then(res => {
                             this.loading = false;
                             if (res.status) {

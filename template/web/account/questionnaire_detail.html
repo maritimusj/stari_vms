@@ -117,12 +117,12 @@
         <div class="subject">
             <div class="index">{php echo $index + 1}</div>
             <span class="title">{$question['title']}</span>
-            <span class="tag">回答正确</span>
+            <span class="tag" title="用户提供的答案为正确答案">回答正确</span>
         </div>
         {if $question['type'] == 'choice'}
         <div class="options{php echo $question['multi'] ? ' multi':' single'}">
             {loop $question['options'] $i $option}
-            <div class="option{php echo in_array($i, $question['answer']) ? ' answer':''}{php echo in_array($option['val'], (array)$answer[$question['id']]) ? ' checked':''}">
+            <div class="option{php echo in_array($i, $question['answer']) ? ' answer':''}{php echo in_array($option['val'], (array)$answer[$question['id']]) ? ' checked':''}" title="{php echo in_array($option['val'], (array)$answer[$question['id']]) ? (in_array($i, $question['answer']) ? '回答正确':'回答错误'):(in_array($i, $question['answer']) ? '正确答案，但用户未选择！':'')}"">
                 <div class="box">
                     {if $question['multi']}
                     <svg t="1646121351169" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2049" width="16" height="16"><path d="M369.792 704.32L930.304 128 1024 223.616 369.984 896l-20.288-20.864-0.128 0.128L0 516.8 96.128 423.68l273.664 280.64z" fill="#ffffff" p-id="2050"></path></svg>

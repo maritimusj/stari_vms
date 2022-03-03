@@ -118,10 +118,8 @@ if ($device_id) {
              */
             $cb = function (userModelObj $user) use ($account) {
                 //用户从公众号链接进入的话，检查超时
-                if ($user->getLastActiveData('deviceId') && time() - $user->getLastActiveData('time') > settings(
-                        'user.scanAlive',
-                        VISIT_DATA_TIMEOUT
-                    )) {
+                if ($user->getLastActiveData('deviceId') && time() - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
+                    $user->setLastActiveData();
                     //设备扫描页面
                     $tpl_data = Util::getTplData([$user, $account]);
                     app()->scanPage($tpl_data);
@@ -278,11 +276,18 @@ if ($more_accounts) {
     app()->moreAccountsPage($tpl_data);
 }
 
-$user->setLastActiveData();
-
 if ($account->isQuestionnaire()) {
+    if (time() - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
+        $user->setLastActiveData();
+        //设备扫描页面
+        $tpl_data = Util::getTplData([$user, $account]);
+        app()->scanPage($tpl_data);
+    }
+
     app()->fillQuestionnairePage($user, $account, $device, request::trim('tid'));
 }
+
+$user->setLastActiveData();
 
 $ticket_data = [
     'id' => REQUEST_ID,

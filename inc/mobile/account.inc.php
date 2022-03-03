@@ -180,6 +180,20 @@ if ($op == 'default') {
         'include' => [Account::COMMISSION],
     ]);
 
+    foreach ($result as &$acc) {
+        unset($acc['id']);
+        unset($acc['name']);
+        if ($acc['type'] !== Account::DOUYIN && $acc['type'] !== Account::QUESTIONNAIRE) {
+            unset($acc['url']);
+        }
+        unset($acc['banned']);
+        unset($acc['scname']);
+        unset($acc['total']);
+        unset($acc['count']);
+        unset($acc['groupname']);
+        unset($acc['orderno']);
+    }
+
     JSON::success($result);
 
 } elseif ($op == 'get_url') {
@@ -334,6 +348,8 @@ if ($op == 'default') {
         $ticket_data['questionnaireAccountId'] = $account->getId();
     }
 
+    $user->setLastActiveData();
+    
     //准备领取商品的ticket
     $user->setLastActiveData('ticket', $ticket_data);
 

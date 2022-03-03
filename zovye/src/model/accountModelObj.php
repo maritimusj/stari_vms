@@ -277,7 +277,7 @@ class accountModelObj extends modelObj
         ]);
     }
 
-    public function setConfig(string $path = '', $data)
+    public function setConfig(string $path = '', $data = []): bool
     {
         if (empty($path)) {
             return $this->set('config', $data);
@@ -294,7 +294,7 @@ class accountModelObj extends modelObj
         return $this->settings('config.' . $path, $default);
     }
 
-    public function checkAnswer(userModelObj $user, array $answer = [])
+    public function checkAnswer(userModelObj $user, array $answer = []): array
     {
         $num = 0;
         $err = null;
@@ -377,7 +377,7 @@ class accountModelObj extends modelObj
         return $this->getConfig('score', 0);
     }
 
-    public function getQuestions(userModelObj $user = null, bool $get_answer = false)
+    public function getQuestions(userModelObj $user = null, bool $get_answer = false): array
     {
         if (!$this->isQuestionnaire()) {
             return [];

@@ -500,6 +500,7 @@ JSCODE;
         })
     }
     zovye_fn.getAccounts = function(type, cb) {
+        type = (type || []).length == 0 ? 'all' : type;
         $.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true}).then(function(res){
             if (cb) cb(res);
         })

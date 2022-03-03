@@ -285,8 +285,12 @@
                             if (res.status) {
 								if (res.data.redirect) {
 									window.location.replace(res.data.redirect);
+								} else if (res.data.msg) {
+									alert(res.data.msg)
+									window.history.back();
 								} else {
-									alert('请求失败，请重试！');
+									alert("提交成功")
+									window.history.back();
 								}
                             } else {
                                 alert(res.data.msg);

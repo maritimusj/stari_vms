@@ -576,7 +576,22 @@
 				<div class="btn clickable">去完成</div>
 			</div>
 		</div>
-		<div class="no-data-view" v-if="newList && participatedList && newList.length === 0 && participatedList.length === 0">
+		<div class="list-view"  v-if="questionnaireList && questionnaireList.length > 0">
+			<span class="title">问卷调查</span>
+			<div class="row" v-for="item in questionnaireList" @click="questionnaireClick(item)">
+				<img class="icon" :src="item.img ? item.img : '{MODULE_URL}static/m/balance/img/mission.svg'">
+				<div class="info">
+					<div class="title-row">
+						<span class="title">{{item.title}}</span>
+						<img class="coin" src="{MODULE_URL}static/m/balance/img/coin.svg">
+						<span class="bonus">+{{item.balance}}</span>
+					</div>
+					<span class="desc">{{item.descr}}</span>
+				</div>
+				<div class="btn clickable">去完成</div>
+			</div>
+		</div>
+		<div class="no-data-view" v-if="newList && participatedList && questionnaireList && newList.length === 0 && participatedList.length === 0 && questionnaireList.length === 0">
 			<img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
 			<span class="no-data-desc">暂无数据</span>
 		</div>
@@ -671,6 +686,7 @@
 				userInfo: null,
 				newList: null,
 				participatedList: null,
+				questionnaireList: null,
 				detail: {
 					visible: false,
 					data: null
@@ -697,6 +713,7 @@
 				this.getUserInfo();
 				this.getSlideList();
 				this.getTask();
+				this.getAccounts();
 			},
 			methods: {
 				getUserInfo() {
@@ -746,6 +763,14 @@
 						}
 					})
 				},
+				getAccounts() {
+					zovye_fn.getAccounts().then(res => {
+						console.log(res)
+						if (res.status) {
+							this.questionnaireList = res.data || [];
+						}
+					})
+				},
 				detailClick(item) {
 					this.loading = true;
 					zovye_fn.getDetail(item.uid).then(res => {
@@ -759,6 +784,11 @@
 							alert(res.data.msg);
 						}
 					})
+				},
+				questionnaireClick(item) {
+					if (item.url) {
+						this.openUrl(item.url);
+					}
 				},
 				openUrl(url) {
 					window.location.href = url;

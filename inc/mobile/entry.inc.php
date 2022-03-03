@@ -62,7 +62,7 @@ if ($device_id) {
         //记录设备ID
         $user->setLastActiveData([
             'deviceId' => $device->getId(),
-            'time' => time(),
+            'time' => TIMESTAMP,
         ]);
 
         $account = $user->getLastActiveAccount();
@@ -118,7 +118,7 @@ if ($device_id) {
              */
             $cb = function (userModelObj $user) use ($account) {
                 //用户从公众号链接进入的话，检查超时
-                if ($user->getLastActiveData('deviceId') && time() - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
+                if ($user->getLastActiveData('deviceId') && TIMESTAMP - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
                     $user->setLastActiveData();
                     //设备扫描页面
                     $tpl_data = Util::getTplData([$user, $account]);
@@ -178,7 +178,7 @@ if (is_callable($cb)) {
 }
 
 if ($from == 'device') {
-    if ($device && time() - $device->settings('last.online', 0) > 60) {
+    if ($device && TIMESTAMP - $device->settings('last.online', 0) > 60) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = Util::getTplData([$device, $user]);
         app()->devicePreparePage($tpl_data);
@@ -253,7 +253,6 @@ if (empty($account)) {
     //设置用户最后活动数据
     $user->setLastActiveData([
         'deviceId' => $device->getId(),
-        'ip' => CLIENT_IP,
         'time' => TIMESTAMP,
     ]);
 
@@ -277,7 +276,7 @@ if ($more_accounts) {
 }
 
 if ($account->isQuestionnaire()) {
-    if (time() - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
+    if (TIMESTAMP - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
         $user->setLastActiveData();
         //设备扫描页面
         $tpl_data = Util::getTplData([$user, $account]);
@@ -291,7 +290,7 @@ $user->setLastActiveData();
 
 $ticket_data = [
     'id' => REQUEST_ID,
-    'time' => time(),
+    'time' => TIMESTAMP,
     'deviceId' => $device->getId(),
     'shadowId' => $device->getShadowId(),
     'accountId' => $account->getId(),

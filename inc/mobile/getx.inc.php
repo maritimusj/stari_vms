@@ -98,6 +98,8 @@ try {
                 $questionnaire = Account::get($ticket_data_saved['questionnaireAccountId']);
             } elseif ($account->isQuestionnaire()) {
                 $questionnaire = $account;
+            } else {
+                $questionnaire = null;
             }
 
             if ($questionnaire) {

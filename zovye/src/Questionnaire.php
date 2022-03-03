@@ -14,7 +14,7 @@ use zovye\model\userModelObj;
 
 class Questionnaire 
 {
-    public static function log($cond = [])
+    public static function log($cond = []): base\modelObjFinder
     {
         return m('account_logs')->where($cond);
     }
@@ -62,7 +62,7 @@ class Questionnaire
         return err('保存数据失败！');
     }
 
-    public static function exportLogs(accountModelObj $account, $s_date, $e_date)
+    public static function exportLogs(accountModelObj $account, $s_date, $e_date): array
     {
         $query = self::log(['level' => $account->getId()]);
         if ($s_date) {

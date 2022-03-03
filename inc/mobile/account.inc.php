@@ -169,16 +169,60 @@ if ($op == 'default') {
         JSON::success([]);
     }
 
-    $device = Device::get(request::str('device'), true);
-    if (empty($device)) {
-        JSON::fail('找不到这个设备！');
+    if (request::has('deviceId')) {
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+    } else {
+        $device = Device::getDummyDevice();
     }
 
-    $types = request::array('types');
-    $result = Account::getAvailableList($device, $user, [
-        'type' => $types ?: null,
-        'include' => [Account::COMMISSION],
-    ]);
+    $include = [];
+    if (request::bool('balance')) {
+        $include[] = Account::BALANCE;
+    }
+
+    if (request::bool('commission')) {
+        $include[] = Account::COMMISSION;
+    }
+
+    if (empty($include)) {
+        $include = [];
+    }
+
+    if (request::is_array('type')) {
+        $types = request::array('type');
+    } else {
+        if (request::str('type') == 'all') {
+            $types = null;
+        } else {
+            $type = request::int('type', Account::NORMAL);
+            $types = [$type];
+        }
+    }
+
+    if (request::is_array('s_type')) {
+        $s_types = request::array('s_type');
+    } else {
+        if (request::str('s_type') == 'all') {
+            $s_types = null;
+        } else {
+            $s_types = [];
+        }
+    }
+
+    $params = [
+        'type' => $types,
+        's_type' => $s_types,
+        'include' => $include,
+    ];
+
+    if (request::has('max')) {
+        $params['max'] = request::int('max');
+    }
+
+    $result = Account::getAvailableList($device, $user, $params);
 
     foreach ($result as &$acc) {
         unset($acc['id']);
@@ -308,11 +352,15 @@ if ($op == 'default') {
         JSON::fail('无法获取用户信息！');
     }
 
-    $device = Device::get(request::int('device'));
-    if (empty($device)) {
-        JSON::fail('找不到这个设备！');
+    $device = null;
+    $device_uid = request::trim('device');
+    if ($device_uid) {
+        $device = Device::find($device_uid, ['imei', 'shadow_id']);
+        if (empty($device)) {
+            JSON::fail('找不到这个设备！');
+        }        
     }
-    
+
     $uid = request::str('uid');
     $account = Account::findOneFromUID($uid);
     if (empty($account) || $account->isBanned()) {
@@ -334,24 +382,43 @@ if ($op == 'default') {
         JSON::fail($result);
     }
 
-    $ticket_data = [
-        'id' => REQUEST_ID,
-        'logId' => $result->getId(),
-        'time' => time(),
-        'deviceId' => $device->getId(),
-        'shadowId' => $device->getShadowId(),
-        'accountId' => $account->getId(),
-    ];
+    if ($account->getBonusType() == Account::BALANCE) {
+
+        $result = Balance::give($user, $account);
+        if (is_error($result)) {
+            JSON::fail($result);
+        }
+
+        $data = [
+            'balance' => $user->getBalance()->total(),
+            'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
+        ];
     
-    if (isset($acc)) {
-        $ticket_data['accountId'] = $acc->getId();
-        $ticket_data['questionnaireAccountId'] = $account->getId();
+        JSON::success($data);
+
+    } elseif ($account->getBonusType() == Account::COMMISSION) {
+
+        $ticket_data = [
+            'id' => REQUEST_ID,
+            'logId' => $result->getId(),
+            'time' => time(),
+            'deviceId' => $device->getId(),
+            'shadowId' => $device->getShadowId(),
+            'accountId' => $account->getId(),
+        ];
+        
+        if (isset($acc)) {
+            $ticket_data['accountId'] = $acc->getId();
+            $ticket_data['questionnaireAccountId'] = $account->getId();
+        }
+
+        $user->setLastActiveData();
+        
+        //准备领取商品的ticket
+        $user->setLastActiveData('ticket', $ticket_data);
+
+        JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
     }
 
-    $user->setLastActiveData();
-    
-    //准备领取商品的ticket
-    $user->setLastActiveData('ticket', $ticket_data);
-
-    JSON::success(['redirect' => Util::murl('account', ['op' => 'get'])]);
+    JSON::success(['msg' => '完成！']);
 }

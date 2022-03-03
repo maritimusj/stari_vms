@@ -499,8 +499,8 @@ JSCODE;
             }
         })
     }
-    zovye_fn.getAccounts = function(types, cb) {
-        $.get(account_api_url, {op:'get_list', device:'$device_imei', types: types}).then(function(res){
+    zovye_fn.getAccounts = function(type, cb) {
+        $.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true}).then(function(res){
             if (cb) cb(res);
         })
     }
@@ -1317,7 +1317,8 @@ JSCODE;
         $user_data['data']['balance'] = $user->getBalance()->total();
         $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
-        $task_url = Util::murl('task');
+        $task_api_url = Util::murl('task');
+        $account_api_url = Util::murl('account');
         $adv_api_url = Util::murl('adv');
         $user_home_page = Util::murl('bonus', ['op' => 'home']);
         $upload_api_url = Util::murl('util', ['op' => 'upload_pic']);
@@ -1345,7 +1346,7 @@ $js_sdk
         });
     });
     const zovye_fn = {
-        api_url: "$task_url",
+        api_url: "$task_api_url",
         user: JSON.parse(`$user_json_str`),
         wxapp_username: "$wxapp_username",
     }
@@ -1377,6 +1378,9 @@ $js_sdk
     zovye_fn.getTask = function(max) {
         return $.getJSON(zovye_fn.api_url, {op: 'get_list', max});
     }
+    zovye_fn.getAccounts = function(max) {
+        return $.getJSON("$account_api_url", {op: 'get_list', type: 40, max, balance: true});
+    }    
     zovye_fn.getDetail = function(uid) {
         return $.getJSON(zovye_fn.api_url, {op: 'detail', uid});
     }
@@ -1647,7 +1651,7 @@ JSCODE;
         $this->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
     }
 
-    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account, deviceModelObj $device, $tid = '')
+    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account, deviceModelObj $device = null, $tid = '')
     {
         $tpl_data = Util::getTplData([$user, $account]);
 
@@ -1655,6 +1659,8 @@ JSCODE;
         $jquery_url = JS_JQUERY_URL;
 
         $js_sdk = Util::fetchJSSDK();
+        $serial = REQUEST_ID;
+        $device_uid = $device ? $device->getShadowId() : '';
 
         $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
@@ -1674,7 +1680,13 @@ $js_sdk
         zovye_fn.answer[uid] = data;
     }
     zovye_fn.submitAnswer = function(data) {
-        return $.getJSON(zovye_fn.api_url, {op: 'result', uid: "{$account->getUid()}", device: {$device->getId()}, data: data || zovye_fn.answer});
+        return $.getJSON(zovye_fn.api_url, {
+            op: 'result', 
+            uid: "{$account->getUid()}", 
+            device: "{$device_uid}",
+            serial: "$serial",
+            data: data || zovye_fn.answer,
+        });
     }
 </script>
 JSCODE;

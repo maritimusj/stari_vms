@@ -189,6 +189,11 @@ if ($from == 'device') {
     $user->setLastActiveData('ticket', []);
 }
 
+if ($account && $account->isQuestionnaire() && $account->getBonusType() == Account::BALANCE) {
+    $user->setLastActiveData();
+    app()->fillQuestionnairePage($user, $account);
+}
+
 if (empty($device)) {
     //设备扫描页面
     $tpl_data = Util::getTplData([$user, $account]);

@@ -38,6 +38,11 @@
 <div class="panel panel-default panel-first nav-tab-item">
     <div class="heading">
         <span class="operate">
+            <a href="#" data-op="questionnaireLogsExportDialog">
+                <span class="state auth" title="导出">
+                    <i class="fa fa-filter"></i>
+                </span>
+            </a>
             <a href="{php echo $this->createWebUrl('account');}"><i class="fa fa-reply" title="返回"></i></a>
         </span>
     </div>
@@ -115,5 +120,18 @@
             const id = tr.data('id');
             next({id});
         })
+        zovye.op('questionnaireLogsExportDialog', function(self, next) {
+            next({id: "{php echo $account['id']}"});
+        })
+        zovye.op('questionnaireLogsExport', function(self, next) {
+            const s_date = $('input[name=s_date]').val();
+            const e_date = $('input[name=e_date]').val();
+            next({
+                id: "{php echo $account['id']}",
+                s_date,
+                e_date,
+            });
+        })        
     });
 </script>
+{template 'common/footer'}

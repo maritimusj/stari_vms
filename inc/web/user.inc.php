@@ -71,11 +71,13 @@ if ($op == 'default') {
                 'name LIKE' => "%$s_keywords%",
                 'nickname LIKE' => "%$s_keywords%",
                 'mobile LIKE' => "%$s_keywords%",
+                'openid LIKE' => "%$s_keywords%",
             ]);
         } else {
             $query->whereOr([
                 'nickname LIKE' => "%$s_keywords%",
                 'mobile LIKE' => "%$s_keywords%",
+                'openid LIKE' => "%$s_keywords%",
             ]);
         }
     }

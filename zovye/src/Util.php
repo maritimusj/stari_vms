@@ -2509,7 +2509,7 @@ HTML_CONTENT;
         foreach ($data as $row) {
             $str_export .= implode(",", $row) . "\r\n";
         }
-
+        
         return file_put_contents($filename, $str_export, FILE_APPEND);
     }
 

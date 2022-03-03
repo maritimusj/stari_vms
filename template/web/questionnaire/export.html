@@ -1,0 +1,40 @@
+<form>
+    <div class="form-group">
+        <label class="col-md-2 control-label">日期</label>
+        <div class="col-md-3">
+            <input name="s_date" type="hidden"/>
+            <input name="e_date" type="hidden"/>
+            <button class="btn btn-default daterange daterange-date" type="button">
+            <span class="date-title">
+                不限时间
+            </span> <i class="fa fa-calendar"></i>
+            </button>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="op" value="save">
+        <button type="button" class="btn btn-primary" data-op="questionnaireLogsExport"><i class="fa fa-sign-out"></i>&nbsp;导出</button>
+    </div>
+</form>
+<script>
+    $(function() {
+        require(["daterangepicker"], function () {
+            $(".daterange.daterange-date").each(function () {
+                    var elm = this;
+                    $(this).daterangepicker({
+                        startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                        endDate: $(elm).prev().val() || moment("不限", "Y"),
+                        format: "YYYY-MM-DD",
+                        clear: 1
+                    }, function (start, end) {
+                        start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                        end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至" + end))
+                        $(elm).find(".date-title").html(html);
+                        $(elm).prev().prev().val(start);
+                        $(elm).prev().val(end);
+                    })
+                })
+        })
+    })
+</script>

@@ -300,22 +300,7 @@ if ($op == 'default') {
     }
     
     $uid = request::str('uid');
-    $account = Account::findOneFromUID($uid);
-    if (empty($account) || $account->isBanned()) {
-        JSON::fail('任务不存在！');
-    }
-
-    if (!$account->isQuestionnaire()) {
-        JSON::fail('任务类型不正确！');
-    }
-
     $answer = request::array('data');
-
-    $result = $account->checkAnswer($user, $answer);
-    
-    if ($result['error']) {
-        JSON::fail($result['error']);
-    }
 
     if (request::has('tid')) {
         $tid = request::str('tid');
@@ -325,15 +310,9 @@ if ($op == 'default') {
         }
     }
 
-    if (!$account->log($account->getId(), REQUEST_ID, [
-        'user' => $user->profile(),
-        'device' => $device->profile(),
-        'account' => $account->profile(),
-        'questions' => $account->getQuestions($user, true),
-        'answer' => $answer,
-        'result' => $result,
-    ])) {
-        JSON::fail('系统出错，无法保存数据！');
+    $result = Questionnaire::submitAnswer($uid, $answer, $user, $device);
+    if (is_error($result)) {
+        JSON::fail($result);
     }
 
     $ticket_data = [

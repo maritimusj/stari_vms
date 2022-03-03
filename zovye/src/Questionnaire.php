@@ -9,12 +9,47 @@ namespace zovye;
 use DateTime;
 use Exception;
 use zovye\model\accountModelObj;
+use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 
 class Questionnaire 
 {
     public static function log($cond = [])
     {
         return m('account_logs')->where($cond);
+    }
+
+    public static function submitAnswer($uid, array $answer, userModelObj $user, deviceModelObj $device = null)
+    {
+        $uid = request::str('uid');
+        $account = Account::findOneFromUID($uid);
+        if (empty($account) || $account->isBanned()) {
+            return err('任务不存在！');
+        }
+    
+        if (!$account->isQuestionnaire()) {
+            return err('任务类型不正确！');
+        }
+    
+        $result = $account->checkAnswer($user, $answer);
+        
+        if ($result['error']) {
+            return err($result['error']);
+        }
+    
+        $log = $account->log($account->getId(), REQUEST_ID, [
+            'user' => $user->profile(),
+            'device' => $device ? $device->profile() : [],
+            'account' => $account->profile(),
+            'questions' => $account->getQuestions($user, true),
+            'answer' => $answer,
+            'result' => $result,
+        ]);
+        if (!$log) {
+            return err('系统出错，无法保存数据！');
+        }
+        
+        return $log;
     }
 
     public static function exportLogs(accountModelObj $account, $s_date, $e_date)

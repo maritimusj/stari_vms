@@ -185,15 +185,15 @@ class Task
         return $data;
     }
 
-    public static function submit(userModelObj $user, string $uid, array $data = [])
+    public static function submit($uid, array $data, userModelObj $user)
     {
-        return Util::transactionDo(function () use ($user, $uid, $data) {
+        $account = $uid instanceof accountModelObj ? $uid : Account::findOneFromUID(strval($uid));
+
+        return Util::transactionDo(function () use ($uid, $data, $user, $account) {
 
             $task = null;
-
-            $account = Account::findOneFromUID($uid);
             if (empty($account)) {
-                $task = Task::get($uid, true);
+                $task = Task::get(strval($uid), true);
                 if (empty($task)) {
                     return err('任务不存在！');
                 }

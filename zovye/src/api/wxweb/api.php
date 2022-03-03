@@ -28,6 +28,7 @@ use zovye\Config;
 use zovye\Delivery;
 use zovye\Log;
 use zovye\Mall;
+use zovye\Questionnaire;
 
 use function zovye\err;
 use function zovye\is_error;
@@ -598,16 +599,16 @@ class api
     public static function detail(): array
     {
         $uid = request::str('uid');
-        $account = Account::findOneFromUID($uid);
-        if ($account->isQuestionnaire()) {
-            $user = \zovye\api\wx\common::getUser();
 
+        $account = Account::findOneFromUID($uid);
+        if ($account && $account->isQuestionnaire()) {
+            $user = \zovye\api\wx\common::getUser();
             $data = $account->format();
             $data['questions'] = $account->getQuestions($user);
             return $data;
         }
 
-        return Task::detail($account);
+        return Task::detail($account ?? $uid);
     }
 
     public static function submit(): array
@@ -623,7 +624,13 @@ class api
             return err('提交的数据为空！');
         }
 
-        $res = Task::submit($user, $uid, $data);
+        $account = Account::findOneFromUID($uid);
+        if ($account && $account->isQuestionnaire()) {
+            $res = Questionnaire::submitAnswer($uid, $data, $user);
+        } else {
+            $res = Task::submit($account ?? $uid, $data, $user);
+        }
+
         if (is_error($res)) {
             return $res;
         }

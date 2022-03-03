@@ -68,7 +68,7 @@ if ($op == 'default') {
         return err('提交的数据为空！');
     }
 
-    $result = Task::submit($user, $uid, $data);
+    $result = Task::submit($uid, $data, $user);
 
     if (is_error($result)) {
         JSON::fail($result);

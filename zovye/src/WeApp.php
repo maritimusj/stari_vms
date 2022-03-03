@@ -210,7 +210,7 @@ class WeApp extends Settings
         $tpl = is_array($params) ? $params : [];
 
         $token = Util::random(16);
-        $redirect_url = Util::murl('entry', ['from' => 'device', 'device' => $token]);
+        $redirect_url = Util::murl('entry', ['from' => 'scan', 'device' => $token]);
         $js_sdk = Util::fetchJSSDK();
         $jquery_url = JS_JQUERY_URL;
         $tpl['js']['code'] = <<<JSCODE
@@ -351,10 +351,9 @@ JSCODE;
             }
         } else {
             if (Helper::needsTplAccountsData($device)) {
-                $last_account = $user->getLastActiveData('account');
+                $last_account = $user->getLastActiveData('accountId');
                 if ($last_account) {
                     $tpl['accounts'] = [$last_account];
-                    $user->setLastActiveData();
                 } else {
                     $tpl['accounts'] = Account::getAvailableList($device, $user, [
                         'exclude' => $params['exclude'],
@@ -388,11 +387,6 @@ JSCODE;
         } else {
             $goods_list_FN = true;
             $tpl = array_merge($tpl, ['goods' => $device->getGoodsList($user, [Goods::AllowPay])]);
-        }
-
-        //如果无法领取，则清除访问记录
-        if (empty($tpl['accounts']) && empty($tpl['goods'])) {
-            $user->remove('last');
         }
 
         //如果没有货道，或只有一个货道，并且商品数量不足，或所有商品都没有允许免费领取，则无法免费领取

@@ -183,15 +183,16 @@ if ($from == 'device') {
         $tpl_data = Util::getTplData([$device, $user]);
         app()->devicePreparePage($tpl_data);
     }
-    $user->setLastActiveData();
+    $user->setLastActiveData('accountId');
+    $account = null;
 } else {
     //清除上次的ticket
     $user->setLastActiveData('ticket', []);
-}
 
-if ($account && $account->isQuestionnaire() && $account->getBonusType() == Account::BALANCE) {
-    $user->setLastActiveData();
-    app()->fillQuestionnairePage($user, $account);
+    if ($account && $account->isQuestionnaire() && $account->getBonusType() == Account::BALANCE) {
+        $user->setLastActiveData();
+        app()->fillQuestionnairePage($user, $account);
+    }
 }
 
 if (empty($device)) {
@@ -256,13 +257,9 @@ if ($account) {
 
 if (empty($account)) {
     //设置用户最后活动数据
-    $user->setLastActiveData([
-        'deviceId' => $device->getId(),
-        'time' => TIMESTAMP,
-    ]);
-
     $tpl_data = Util::getTplData([$user, $device]);
     $tpl_data['from'] = $from;
+   
     //设备首页
     app()->devicePage($tpl_data);
     //调试使用

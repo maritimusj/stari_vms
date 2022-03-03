@@ -598,7 +598,16 @@ class api
     public static function detail(): array
     {
         $uid = request::str('uid');
-        return Task::detail($uid);
+        $account = Account::findOneFromUID($uid);
+        if ($account->isQuestionnaire()) {
+            $user = \zovye\api\wx\common::getUser();
+
+            $data = $account->format();
+            $data['questions'] = $account->getQuestions($user);
+            return $data;
+        }
+
+        return Task::detail($account);
     }
 
     public static function submit(): array

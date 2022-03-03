@@ -113,13 +113,13 @@ class Task
         return $result;
     }
 
-    public static function detail(string $uid): array
+    public static function detail($uid): array
     {
-        $account = Account::findOneFromUID($uid);
+        $account = $uid instanceof accountModelObj ? $uid : Account::findOneFromUID(strval($uid));
         if ($account) {
             $data = $account->format();
         } else {
-            $task = Task::get($uid, true);
+            $task = Task::get(strval($uid), true);
             if (empty($task)) {
                 return err('任务不存在！');
             }

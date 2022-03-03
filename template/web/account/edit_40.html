@@ -115,6 +115,7 @@
                                 </label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" :id="'question'+i" v-model="q.title">
+                                    <span class="help-block">* 请输入题目，如果没有填写则不会显示给用户<span v-if="q.type=='text'">。如果勾选了“必填”，则用户必须按格式要求填写内容</span></span>
                                 </div>
                                 <div class="col-md-2" v-if="q.type === 'text'">
                                     <label class="checkbox-inline">

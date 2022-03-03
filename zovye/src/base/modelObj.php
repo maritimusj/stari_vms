@@ -24,7 +24,6 @@ use function zovye\setArray;
 /**
  * @method getQrcode()
  * @method setData($data)
- * @method getData()
  * @method getCreatetime()
  * @method hasCreatetime()
  */

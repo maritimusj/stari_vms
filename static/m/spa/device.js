@@ -199,6 +199,9 @@ const app = new Vue({
                 } else if (this.goods.length || this.packages.length) {
                     this.categoryIndex = 1;
                 }
+                if (this.accounts.length === 1 && this.accounts[0].type === 40 && this.goods.length === 0 && this.packages.length == 0) {
+                    window.location.replace(this.accounts[0].url);
+                }
             })
         },
         visibilitychange() {

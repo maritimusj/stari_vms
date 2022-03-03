@@ -203,7 +203,7 @@ if ($op == 'default') {
                 $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['questionnaire']) {
                 $data['account_title'] = '问卷 ' . $accounts[$data['account']]['title'];
-                $data['questionnaire_log'] = $entry->getExtraData('ticket.id', '');
+                $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', '');
             } elseif ($accounts[$data['account']]['questionnaire+1']) {
                 $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'] . ' + ' . $accounts[$data['account']]['questionnaire+1'];
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', 0);

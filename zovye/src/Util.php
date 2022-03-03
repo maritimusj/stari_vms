@@ -617,7 +617,7 @@ include './index.php';
                     'user_id' => $user->getId(),
                     'account_id' => $account->getId(),
                 ])) {
-                return error(State::ERROR, '您已经关注过这个公众号！');
+                return error(State::ERROR, '您已经完成了该任务！');
             }
         }
 
@@ -630,33 +630,40 @@ include './index.php';
         } elseif ($sc_name == Schema::MONTH) {
             $time = strtotime('first day of this month 00:00');
         } else {
-            return error(State::ERROR, '公众号设置不正确！');
+            return error(State::ERROR, '任务设置不正确！');
         }
 
         //count，单个用户在每个周期内可领取数量
         $count = $account->getCount();
         if ($count > 0) {
-            $n1 = Order::query([
-                'account' => $account->getName(),
-                'openid' => $user->getOpenid(),
-                'createtime >=' => $time,
-                'createtime <' => time(),
-            ])->limit($count)->count();
             $desc = [
                 Schema::DAY => '今天已经领过了，明天再来吧！',
                 Schema::WEEK => '下个星期再来试试吧！',
                 Schema::MONTH => '这个月的免费额度已经用完啦！',
             ];
-            if ($n1 >= $count) {
-                return error(State::ERROR, $desc[$sc_name]);
+            if ($account->isTask()) {
+                $n = BalanceLog::query([
+                    'user_id' => $user->getId(),
+                    'account_id' => $account->getId(),
+                    'createtime >=' => $time,
+                    'createtime <' => time(),
+                ])->limit($count)->count();
+            } elseif ($account->isQuestionnaire()) {
+                $n = Questionnaire::log([
+                    'level' => $account->getId(),
+                    'title' => $user->getOpenid(),
+                    'createtime >=' => $time,
+                    'createtime <' => time(),
+                ])->limit($count)->count();
+            } else {
+                $n = Order::query([
+                    'account' => $account->getName(),
+                    'openid' => $user->getOpenid(),
+                    'createtime >=' => $time,
+                    'createtime <' => time(),
+                ])->limit($count)->count();              
             }
-            $n2 = BalanceLog::query([
-                'user_id' => $user->getId(),
-                'account_id' => $account->getId(),
-                'createtime >=' => $time,
-                'createtime <' => time(),
-            ])->limit($count - $n1)->count();
-            if ($n1 + $n2 >= $count) {
+            if ($n >= $count) {
                 return error(State::ERROR, $desc[$sc_name]);
             }
         }
@@ -664,52 +671,67 @@ include './index.php';
         //scCount, 所有用户在每个周期内总数量
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
-            $n1 = Order::query([
-                'account' => $account->getName(),
-                'createtime >=' => $time,
-                'createtime <' => time(),
-            ])->limit($sc_count)->count();
-            if ($n1 >= $sc_count) {
-                return error(State::ERROR, '公众号免费额度已用完！');
+            if ($account->isTask()) {
+                $n = BalanceLog::query([
+                    'account_id' => $account->getId(),
+                    'createtime >=' => $time,
+                    'createtime <' => time(),
+                ])->limit($sc_count)->count();
+            } elseif ($account->isQuestionnaire()) {
+                $n = Questionnaire::log([
+                    'level' => $account->getId(),
+                    'createtime >=' => $time,
+                    'createtime <' => time(),
+                ])->limit($sc_count)->count();
+            } else {
+                $n = Order::query([
+                    'account' => $account->getName(),
+                    'createtime >=' => $time,
+                    'createtime <' => time(),
+                ])->limit($sc_count)->count();
             }
-            $n2 = BalanceLog::query([
-                'account_id' => $account->getId(),
-                'createtime >=' => $time,
-                'createtime <' => time(),
-            ])->limit($sc_count - $n1)->count();
-            if ($n1 + $n2 >= $sc_count) {
-                return error(State::ERROR, '公众号免费额度已用完！');
+            if ($n >= $sc_count) {
+                return error(State::ERROR, '任务免费额度已用完！');
             }
         }
 
         //total，单个用户累计可领取数量
         $total = $account->getTotal();
         if ($total > 0) {
-            $n1 = Order::query([
-                'account' => $account->getName(),
-                'openid' => $user->getOpenid(),
-            ])->limit($total)->count();
-            if ($n1 >= $total) {
-                return error(State::ERROR, '您已经领过了！');
+            if ($account->isTask()) {
+                $n = BalanceLog::query([
+                    'user_id' => $user->getId(),
+                    'account_id' => $account->getId(),
+                ])->limit($total)->count();
+            } elseif ($account->isQuestionnaire()) {
+                $n = Questionnaire::log([
+                    'level' => $account->getId(),
+                    'title' => $user->getOpenid(),
+                ])->limit($total)->count();
+            } else {
+                $n = Order::query([
+                    'account' => $account->getName(),
+                    'openid' => $user->getOpenid(),
+                ])->limit($total)->count();
             }
-            $n2 = BalanceLog::query([
-                'user_id' => $user->getId(),
-                'account_id' => $account->getId(),
-            ])->limit($total - $n1)->count();
-            if ($n1 + $n2 >= $total) {
-                return error(State::ERROR, '您已经领过了！');
+
+            if ($n >= $total) {
+                return error(State::ERROR, '您已经完成这个任务了！');
             }
         }
 
-        //$orderLimits，公众号最大订单数量
+        //$orderLimits，最大订单数量
         $order_limits = $account->getOrderLimits();
         if ($order_limits > 0) {
-            $n1 = Order::query(['account' => $account->getName()])->limit($order_limits)->count();
-            if ($n1 >= $order_limits) {
-                return error(State::ERROR, '公众号免费额度已用完！！');
+            if ($account->isTask()) {
+                $n = BalanceLog::query(['account_id' => $account->getId()])->limit($order_limits)->count();
+            } elseif ($account->isQuestionnaire()) {
+                $n = Questionnaire::log(['level' => $account->getId()])->limit($total)->count();
+            } else {
+                $n = Order::query(['account' => $account->getName()])->limit($order_limits)->count();
             }
-            $n2 = BalanceLog::query(['account_id' => $account->getId()])->limit($order_limits - $n1)->count();
-            if ($n1 + $n2 >= $order_limits) {
+
+            if ($n >= $order_limits) {
                 return error(State::ERROR, '公众号免费额度已用完！！');
             }
         }

@@ -206,7 +206,7 @@ if ($op == 'default') {
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.id', '');
             } elseif ($accounts[$data['account']]['questionnaire+1']) {
                 $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'] . ' + ' . $accounts[$data['account']]['questionnaire+1'];
-                $data['questionnaire_log'] = $entry->getExtraData('ticket.id', '');
+                $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', 0);
             } elseif ($accounts[$data['account']]['third-party-platform']) {
                 $data['account_title'] = '第三方平台 ' . $accounts[$data['account']]['title'];
             } else {

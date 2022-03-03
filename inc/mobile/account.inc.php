@@ -300,7 +300,10 @@ if ($op == 'default') {
     }
     
     $uid = request::str('uid');
-    $answer = request::array('data');
+    $account = Account::findOneFromUID($uid);
+    if (empty($account) || $account->isBanned()) {
+        return err('任务不存在！');
+    }
 
     if (request::has('tid')) {
         $tid = request::str('tid');
@@ -310,13 +313,16 @@ if ($op == 'default') {
         }
     }
 
-    $result = Questionnaire::submitAnswer($uid, $answer, $user, $device);
+    $answer = request::array('data');
+
+    $result = Questionnaire::submitAnswer($account, $answer, $user, $device);
     if (is_error($result)) {
         JSON::fail($result);
     }
 
     $ticket_data = [
         'id' => REQUEST_ID,
+        'logId' => $result->getId(),
         'time' => time(),
         'deviceId' => $device->getId(),
         'shadowId' => $device->getShadowId(),

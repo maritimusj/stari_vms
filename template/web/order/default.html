@@ -202,7 +202,7 @@
                                 {/if}
                                 {$order['account_title']}
                                 {if $order['questionnaire_log']}
-                                <span data-uid="{$order['questionnaire_log']}" title="查看问卷提交详情">
+                                <span data-id="{$order['questionnaire_log']}" title="查看问卷提交详情">
                                     <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}" class="icon" data-op="viewQuestionnaireDetail">
                                 </span>
                                 {/if}
@@ -523,8 +523,8 @@
     }
 
     api.viewQuestionnaireDetail = function(id, self) {
-        const uid = self.closest('[data-uid]').data('uid');
-        api.showResult({ op: 'viewDetail', uid }, api.account_url);
+        const logId = self.closest('[data-id]').data('id');
+        api.showResult({ op: 'viewDetail', id:logId }, api.account_url);
     }
 
     api.searchNoUserFilter = function() {

@@ -101,7 +101,7 @@ try {
             }
 
             if ($questionnaire) {
-                $log = $questionnaire->logQuery(['level' => $questionnaire->getId(), 'title' => $ticket_data_saved['id']])->findOne();
+                $log = $questionnaire->logQuery(['id' => $ticket_data_saved['logId']])->findOne();
                 if ($log) {
                     $log->setData('order', $order->profile());
                     if (!$log->save()) {

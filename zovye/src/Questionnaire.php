@@ -21,8 +21,7 @@ class Questionnaire
 
     public static function submitAnswer($uid, array $answer, userModelObj $user, deviceModelObj $device = null)
     {
-        $uid = request::str('uid');
-        $account = Account::findOneFromUID($uid);
+        $account = $uid instanceof accountModelObj ? $uid : Account::findOneFromUID($uid);
         if (empty($account) || $account->isBanned()) {
             return err('任务不存在！');
         }
@@ -37,7 +36,8 @@ class Questionnaire
             return err($result['error']);
         }
     
-        $log = $account->log($account->getId(), REQUEST_ID, [
+        $res = $account->log($account->getId(), REQUEST_ID, [
+            'uid' => REQUEST_ID,
             'user' => $user->profile(),
             'device' => $device ? $device->profile() : [],
             'account' => $account->profile(),
@@ -45,11 +45,21 @@ class Questionnaire
             'answer' => $answer,
             'result' => $result,
         ]);
-        if (!$log) {
+
+        if (!$res) {
             return err('系统出错，无法保存数据！');
         }
-        
-        return $log;
+
+        //使用title保存user openid，Util::checkAccountLimits(..)用来统计
+        $log = Questionnaire::log(['level' => $account->getId(), 'title' => REQUEST_ID])->findOne();
+        if ($log) {
+            $log->setTitle($user->getOpenid());
+            if ($log->save()) {
+                return $log;
+            }
+        }
+
+        return err('保存数据失败！');
     }
 
     public static function exportLogs(accountModelObj $account, $s_date, $e_date)

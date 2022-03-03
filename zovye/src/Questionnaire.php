@@ -36,30 +36,31 @@ class Questionnaire
             return err($result['error']);
         }
     
-        $res = $account->log($account->getId(), REQUEST_ID, [
-            'uid' => REQUEST_ID,
-            'user' => $user->profile(),
-            'device' => $device ? $device->profile() : [],
-            'account' => $account->profile(),
-            'questions' => $account->getQuestions($user, true),
-            'answer' => $answer,
-            'result' => $result,
-        ]);
+        return Util::transactionDo(function() use ($account, $user, $device, $answer, $result) {
+            $res = $account->log($account->getId(), REQUEST_ID, [
+                'uid' => REQUEST_ID,
+                'user' => $user->profile(),
+                'device' => $device ? $device->profile() : [],
+                'account' => $account->profile(),
+                'questions' => $account->getQuestions($user, true),
+                'answer' => $answer,
+                'result' => $result,
+            ]);
 
-        if (!$res) {
-            return err('系统出错，无法保存数据！');
-        }
-
-        //使用title保存user openid，Util::checkAccountLimits(..)用来统计
-        $log = Questionnaire::log(['level' => $account->getId(), 'title' => REQUEST_ID])->findOne();
-        if ($log) {
-            $log->setTitle($user->getOpenid());
-            if ($log->save()) {
-                return $log;
+            if (!$res) {
+                return err('系统出错，无法保存数据！');
             }
-        }
 
-        return err('保存数据失败！');
+            //使用title保存user openid，Util::checkAccountLimits(..)用来统计
+            $log = Questionnaire::log(['level' => $account->getId(), 'title' => REQUEST_ID])->findOne();
+            if ($log) {
+                $log->setTitle($user->getOpenid());
+                if ($log->save()) {
+                    return $log;
+                }
+            } 
+            return err('保存数据失败！');          
+        });
     }
 
     public static function exportLogs(accountModelObj $account, $s_date, $e_date): array

@@ -9,11 +9,12 @@ namespace zovye\model;
 use zovye\Account;
 use zovye\App;
 use zovye\base\modelObj;
-
+use zovye\base\modelObjFinder;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
 use zovye\WxPlatform;
 
+use function zovye\m;
 use function zovye\tb;
 
 /**
@@ -224,6 +225,11 @@ class accountModelObj extends modelObj
     public function name(): string
     {
         return $this->getName();
+    }
+
+    public function logQuery($cond = []): modelObjFinder
+    {
+        return m('account_logs')->where($cond);
     }
 
     public function getBonusType(): string

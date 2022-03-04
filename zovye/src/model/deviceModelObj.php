@@ -2077,6 +2077,16 @@ class deviceModelObj extends modelObj
         return false;
     }
 
+    public function setReady($scene = 'online', $is_ready = true)
+    {
+        return $this->updateSettings("last.$scene", $is_ready ? time() : 0);
+    }
+
+    public function isReadyTimeout($scene = 'online'): bool
+    {
+        return TIMESTAMP -  $this->settings("last.$scene", 0) > 60;
+    }
+
     /**
      * 出货操作
      * @param array $extra

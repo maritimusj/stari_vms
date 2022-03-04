@@ -4,6 +4,9 @@
     .gray {
         color: gray;
     }
+    #logs .gray {
+        cursor: default;
+    }
     input.num {
         width: 10em;
         border: 0;
@@ -79,8 +82,7 @@
                     <thead>
                         <th style="width: 100px;">#</th>
                         <th style="width: 260px;">来源</th>
-                        <th>商品图片</th>
-                        <th>商品名称</th>
+                        <th>商品</th>
                         <th>库存数量</th>
                         <th>入库数量</th>
                     </thead>
@@ -105,19 +107,12 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="goods">
-                                    <template v-if="e.goods">
-                                        <img :src="e.goods.img"  @click="chooseGoods(e)">
+                                <div class="goods" @click="chooseGoods(e)">
+                                    <template v-if="e.goods" >
+                                        <img :src="e.goods.img"  >
+                                        <span class="name" >{{e.goods.name}}</span>
                                     </template>
-                                    <span class="gray" @click="chooseGoods(e)" v-else>&lt;请选择商品&gt;</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="goods">
-                                    <template v-if="e.goods">
-                                        <span class="name" @click="chooseGoods(e)">{{e.goods.name}}</span>
-                                    </template>
-                                    <span class="name gray" @click="chooseGoods(e)" v-else>&lt;请选择商品&gt;</span>
+                                    <span class="gray" v-else>&lt;请选择商品&gt;</span>
                                 </div>
                             </td>
                             <td>
@@ -153,10 +148,6 @@
         </li>
     </ul>
     <div class="panel panel-default panel-first nav-tab-item" v-if="logs.length > 0">
-        <div class="heading">
-            <span class="operate">
-            </span>                
-        </div>
         <div class="panel-body">
             <div>
                 <table class="table table-bordered" id="logs">
@@ -178,11 +169,7 @@
                             </td>
                             <td class="goods">
                                 <img :src="log.goods.img">
-                            </td>
-                            <td>
-                                <span>
-                                    {{log.goods.name}}
-                                </span>
+                                <span>{{log.goods.name}}</span>
                             </td>
                             <td>
                                 <span>

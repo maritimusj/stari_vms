@@ -185,6 +185,12 @@ class order
                 ];
             }
 
+            $account_obj = $entry->getAccount(true);
+            if ($account_obj) {
+                $data['accountId'] = $account_obj->getId();
+                $data['account'] = $account_obj->profile();
+            }
+
             if ($entry->isRefund() && $entry->getExtraData('refund')) {
                 $time = $entry->getExtraData('refund.createtime');
                 $time_formatted = date('Y-m-d H:i:s', $time);

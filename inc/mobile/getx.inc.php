@@ -110,6 +110,7 @@ try {
                 }
 
                 unset($ticket_data_saved['answer']);
+                $ticket_data_saved['logId'] = $result->getId();
             }
 
             $order->setExtraData('ticket', $ticket_data_saved);

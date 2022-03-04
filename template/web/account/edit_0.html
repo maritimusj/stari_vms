@@ -323,25 +323,29 @@
                     }).then(data => {
                         if (data) {
                             self.questionnaires.push(data);
-                            self.searchAccounts();
+                            self.searchAccounts(false);
                         }
                     })
                 },
-                searchAccounts() {
+                searchAccounts(reset = true) {
                     const self = this;
-                    $.getJSON(api_url, {op: 'search', type: 40, keyword: this.keyword, limit: 10}).then(res => {
+                    $.getJSON(api_url, {op: 'search', type: 40, keyword: this.keyword, limit: 20}).then(res => {
                         if (res.status) {
                             return res.data;
                         }
                         util.message(res.data.msg, '', 'error');
                     }).then(data => {
+                        if (reset) {
+                            self.questionnaires = [];
+                        }
+
                         data.forEach(e => {
                             if (e.uid == self.savedUID) {
                                 Vue.set(e, 'selected', true);
                             }
+                            self.questionnaires.push(e);
                         });
 
-                        self.questionnaires = data;
                         self.questionnaires.unshift({
                             title: '<请选择>',
                             uid: '',

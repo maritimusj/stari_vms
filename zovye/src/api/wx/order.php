@@ -80,12 +80,21 @@ class order
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
+        } elseif (request::has('device')) {
+            $device_uid = request::str('device');
+            $device = Device::get($device_uid, true);
+            if (empty($device)) {
+                return err('找不到这个设备！');
+            }
+        }
+
+        if ($device) {
             if ($device->getAgentId() != $agent->getId()) {
                 return err('没有权限管理这个设备！');
             }
             $query->where(['device_id' => $device->getId()]);
         }
-
+        
         if (request::has('start')) {
             $begin = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
             $query->where(['createtime >=' => $begin->getTimestamp()]);

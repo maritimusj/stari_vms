@@ -403,8 +403,8 @@ if ($op == 'default') {
     } elseif (($acc ?? $account)->getBonusType() == Account::COMMISSION) {
 
         $result = $account->checkAnswer($user, $answer);
-        if (is_error($result)) {
-            JSON::fail($result);
+        if ($result['error']) {
+            return JSON::fail($result['error']);
         }
 
         $ticket_data = [

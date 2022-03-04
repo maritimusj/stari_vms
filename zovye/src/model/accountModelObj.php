@@ -10,6 +10,7 @@ use zovye\Account;
 use zovye\App;
 use zovye\base\modelObj;
 use zovye\base\modelObjFinder;
+use zovye\State;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
 use zovye\WxPlatform;
@@ -366,7 +367,8 @@ class accountModelObj extends modelObj
         ];
 
         if ($num < max(0, $this->getScore())) {
-            $result['error'] = $err ?? '您提交的答案未通过审核，请检查后再提交，谢谢！';
+            $result['errno'] = State::FAIL;
+            $result['message'] = $err ?? '您提交的答案未通过审核，请检查后再提交，谢谢！';
         }
 
         return $result;

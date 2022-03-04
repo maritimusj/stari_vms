@@ -32,8 +32,8 @@ class Questionnaire
     
         $result = $account->checkAnswer($user, $answer);
         
-        if ($result['error']) {
-            return err($result['error']);
+        if (is_error($result)) {
+            return $result;
         }
     
         return Util::transactionDo(function() use ($account, $user, $device, $answer, $result) {

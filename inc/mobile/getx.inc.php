@@ -69,6 +69,7 @@ try {
             'goodsId' => $goods_id,
             'online' => false,
         ]);
+        
         if (is_error($result)) {
             if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
                 $params = [
@@ -89,11 +90,6 @@ try {
 
         $order = Order::get($result['orderId']);
         if ($order) {
-            $order->setExtraData('ticket', $ticket_data_saved);
-            if (!$order->save()) {
-                throw new RuntimeException('保存订单数据失败！');
-            }
-
             if ($ticket_data_saved['questionnaireAccountId']) {
                 $questionnaire = Account::get($ticket_data_saved['questionnaireAccountId']);
             } elseif ($account->isQuestionnaire()) {
@@ -103,13 +99,22 @@ try {
             }
 
             if ($questionnaire) {
-                $log = Questionnaire::log(['id' => $ticket_data_saved['logId']])->findOne();
-                if ($log) {
-                    $log->setData('order', $order->profile());
-                    if (!$log->save()) {
-                        throw new RuntimeException('保存订单数据失败！');
-                    }
+                $result = Questionnaire::submitAnswer($questionnaire, $ticket_data_saved['answer'] ?? [], $user, $device);
+                if (is_error($result)) {
+                    throw new RuntimeException('问卷答案没通过审核！');
                 }
+
+                $result->setData('order', $order->profile());
+                if (!$result->save()) {
+                    throw new RuntimeException('保存订单数据失败！');
+                }
+
+                unset($ticket_data_saved['answer']);
+            }
+
+            $order->setExtraData('ticket', $ticket_data_saved);
+            if (!$order->save()) {
+                throw new RuntimeException('保存订单数据失败！');
             }
 
             return [
@@ -145,6 +150,11 @@ try {
     JSON::success($response);
 
 } catch (Exception $e) {
+
+    Log::debug('get', [
+        'ticket' => $ticket_data_saved,
+        'error' => $e->getMessage(),
+    ]);
 
     $user->setLastActiveData('ticket', []);
 

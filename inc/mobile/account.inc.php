@@ -377,14 +377,18 @@ if ($op == 'default') {
 
     $answer = request::array('data');
 
-    $result = Questionnaire::submitAnswer($account, $answer, $user, $device);
-    if (is_error($result)) {
-        JSON::fail($result);
-    }
+    if (($acc ?? $account)->getBonusType() == Account::BALANCE)  {
 
-    if (($acc ?? $account)->getBonusType() == Account::BALANCE) {
+        $result = Util::transactionDo(function () use($user, $device, $account, $answer) {
 
-        $result = Balance::give($user, ($acc ?? $account));
+            $res = Questionnaire::submitAnswer($account, $answer, $user, $device);
+            if (is_error($res)) {
+                return $res;
+            }
+            
+            return Balance::give($user, ($acc ?? $account));
+        });
+
         if (is_error($result)) {
             JSON::fail($result);
         }
@@ -393,18 +397,23 @@ if ($op == 'default') {
             'balance' => $user->getBalance()->total(),
             'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
         ];
-    
+        
         JSON::success($data);
 
     } elseif (($acc ?? $account)->getBonusType() == Account::COMMISSION) {
 
+        $result = $account->checkAnswer($user, $answer);
+        if (is_error($result)) {
+            JSON::fail($result);
+        }
+
         $ticket_data = [
             'id' => REQUEST_ID,
-            'logId' => $result->getId(),
             'time' => time(),
             'deviceId' => $device->getId(),
             'shadowId' => $device->getShadowId(),
             'accountId' => ($acc ?? $account)->getId(),
+            'answer' => $answer,
         ];
         
         if (isset($acc)) {

@@ -350,7 +350,7 @@ class Helper
             $order_no = Order::makeUID($user, $device, sha1(REQUEST_ID));
         }
 
-        $ip = $user->getLastActiveData('ip') ?: Util::getClientIp();
+        $ip = $user->getLastActiveIp();
 
         if (Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
             return $order_no;

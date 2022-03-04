@@ -183,7 +183,7 @@ class KingFansAccount
             'uuid' => $fans['openid'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'nickname' => $fans['nickname'],
-            'ip' => $user->getLastActiveData('ip', ''),
+            'ip' => $user->getLastActiveIp(),
             'os' => 0,
             'param' => "{$device->getShadowId()}:{$user->getOpenid()}",
             't' => TIMESTAMP,

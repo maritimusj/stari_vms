@@ -81,7 +81,7 @@ class SQM
         }
 
         //清除用户最后活动记录
-        $user->setLastActiveData();
+        $user->cleanLastActiveData();
 
         return Job::createOrder($order_no, $device);
     }

@@ -351,7 +351,7 @@ JSCODE;
             }
         } else {
             if (Helper::needsTplAccountsData($device)) {
-                $last_account = $user->getLastActiveData('accountId');
+                $last_account = $user->getLastActiveAccount();
                 if ($last_account) {
                     $tpl['accounts'] = [$last_account];
                 } else {

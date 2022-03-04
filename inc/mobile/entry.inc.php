@@ -90,7 +90,7 @@ if ($device_id) {
     //显示问卷填写页面
     if ($account->isQuestionnaire()) {
         $cb = function (userModelObj $user) use ($account) {
-            $user->setLastActiveAcccount($account);
+            $user->setLastActiveAccount($account);
 
             $device = $user->getLastActiveDevice();
             if ($device) {
@@ -112,7 +112,7 @@ if ($device_id) {
              */
             $cb = function (userModelObj $user) use ($account) {
                 //记录公众号ID
-                $user->setLastActiveAcccount($account);
+                $user->setLastActiveAccount($account);
 
                 $device = $user->getLastActiveDevice();
                 if ($device) {
@@ -162,7 +162,7 @@ if (is_callable($cb)) {
 }
 
 if ($from == 'device') {
-    $user->setLastActiveAcccount();
+    $user->setLastActiveAccount();
     $account = null;
 
     if ($device->isReadyTimeout()) {
@@ -190,7 +190,7 @@ if (empty($device)) {
 //检查用户定位
 if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
 
-    $user->setLastActiveDevice();
+    $user->cleanLastActiveData();
     $tpl_data = Util::getTplData(
         [
             $user,

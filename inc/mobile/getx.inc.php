@@ -76,7 +76,7 @@ try {
                     'device' => $device->getId(),
                     'user' => $user->getId(),
                     'goods' => $goods_id,
-                    'ip' => $user->getLastActiveData('ip', CLIENT_IP),
+                    'ip' => $user->getLastActiveIp(),
                 ];
                 if (!Job::createAccountOrder($params)) {
                     throw new RuntimeException('启动排队任务失败！');

@@ -538,7 +538,7 @@ class userModelObj extends modelObj
         $res = $this->getBalance()->change($val, Balance::SIGN_IN_BONUS, [
             'date' => date('Y-m-d'),
             'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-            'ip' => $this->getLastActiveData('ip') ?: Util::getClientIp(),
+            'ip' => $this->getLastActiveIp(),
         ]);
         if (empty($res)) {
             return false;
@@ -719,8 +719,16 @@ class userModelObj extends modelObj
         return $this->settings("last.$name", $default);
     }
 
+    public function getLastActiveIp(): string
+    {
+        return $this->getLastActiveData('ip', Util::getClientIp());
+    }
+
     public function setLastActiveDevice(deviceModelObj $device = null): bool
     {
+        if ($device) {
+            $this->setLastActiveData('ip', Util::getClientIp());
+        }
         return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
     }
 
@@ -733,8 +741,11 @@ class userModelObj extends modelObj
         return null;
     }
 
-    public function setLastActiveAcccount(accountModelObj $account = null): bool
+    public function setLastActiveAccount(accountModelObj $account = null): bool
     {
+        if ($account) {
+            $this->setLastActiveData('ip', Util::getClientIp());
+        }
         return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);
     }
     

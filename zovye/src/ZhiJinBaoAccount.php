@@ -186,7 +186,7 @@ class ZhiJinBaoAccount
             'nonceStr' => Util::random(16, true),
             'timeStamp' => time(),
             'deviceSn' => $device->getImei(),
-            'ipAddress' => $user->getLastActiveData('ip', CLIENT_IP),
+            'ipAddress' => $user->getLastActiveIp(),
             'userAgent' => $user->settings('from.user-agent', $_SERVER['HTTP_USER_AGENT']),
         ]);
 

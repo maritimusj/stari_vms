@@ -59,7 +59,7 @@ class YfbAccount
             'appId' => $this->app_id,
             'gender' => empty($fans['sex']) ? 0 : $fans['sex'],
             'openid' => $user->getOpenid(),
-            'ip' => $user->getLastActiveData('ip', CLIENT_IP),
+            'ip' => $user->getLastActiveIp(),
             'macheNumber' => $key,
             'scene' => $scene,
             'params' => $device->getShadowId(),

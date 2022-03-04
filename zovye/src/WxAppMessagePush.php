@@ -55,12 +55,12 @@ class WxAppMessagePush
                 return err('找不到指定用户！');
             }
 
-            $data = $user->getLastActiveData();
-            if (empty($data) || $data['from'] != 'wxapp' || empty($data['device']) || time() - $data['time'] > 600) {
+            if ($user->getLastActiveData('from') != 'wxapp') {
                 return err('请重新登录小程序！');
             }
 
-            $device = Device::get($data['device']);
+            $device = $user->getLastActiveDevice();
+
             if (empty($device)) {
                 return err('找不到这个设备！');
             }

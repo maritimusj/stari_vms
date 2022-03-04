@@ -108,7 +108,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             'online' => false,
             'level' => empty($order) ? LOG_GOODS_CB : LOG_GOODS_RETRY,
             'goodsId' => $goods['id'],
-            'ip' => empty($ip) ? $user->getLastActiveData('ip', '') : $ip,
+            'ip' => empty($ip) ? $user->getLastActiveIp() : $ip,
             $device,
             $user,
             $account,

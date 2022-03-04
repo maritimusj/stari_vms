@@ -112,7 +112,7 @@ class YouFenAccount
         $data = [
             'app_number' => $this->app_number,
             'app_key' => $this->app_key,
-            'ip_address' => $user->getLastActiveData('ip', Util::getClientIp()),
+            'ip_address' => $user->getLastActiveIp(),
             'user_id' => $user->getOpenid(),
             'wx_openid' => $yf_openid,
             'wx_nickname' => $fans['nickname'],

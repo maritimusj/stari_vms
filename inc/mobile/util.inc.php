@@ -86,7 +86,7 @@ if ($op == 'default') {
         }
 
         if ($res > $distance) {
-            $user->setLastActiveData('deviceId', 0);
+            $user->setLastActiveDevice();
             JSON::fail('哎呀，设备太远了');
         }
     }

@@ -665,23 +665,28 @@ class userModelObj extends modelObj
         return error(State::ERROR, '参数不正确！');
     }
 
+    public function cleanLastActiveData(): bool {
+        return $this->remove('last');
+    }
+
     public function setLastActiveData(): bool
     {
         switch(func_num_args()) {
             case 0:
-                return $this->remove('last');
+                return $this->cleanLastActiveData();
             case 1:
                 $v = func_get_arg(0);
                 if (is_string($v)) {
                     $data = [$v => null];
                 } elseif (is_array($v)) {
                     $data = $v;
-                } elseif ($v instanceof userModelObj) {
-                    $data = ['userId' => $v->getId()];
-                } elseif ($v instanceof deviceModelObj) {
-                    $data = ['deviceId' => $v->getId()];
-                } elseif ($v instanceof accountModelObj) {
-                    $data = ['accountId' => $v->getId()];
+                } elseif ($v instanceof modelObj) {
+                    $data = [
+                        get_class($v) => [
+                            'id' => $v->getId(),
+                            'time' => TIMESTAMP,
+                        ],
+                    ];
                 } else {
                     return false;
                 }
@@ -714,22 +719,32 @@ class userModelObj extends modelObj
         return $this->settings("last.$name", $default);
     }
 
-    public function getLastActiveDevice(): ?deviceModelObj 
+    public function setLastActiveDevice(deviceModelObj $device = null): bool
     {
-        $deviceId = $this->getLastActiveData('deviceId', 0);
-        if ($deviceId > 0) {
-            return Device::get($deviceId);
+        return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
+    }
+
+    public function getLastActiveDevice($timeout = VISIT_DATA_TIMEOUT): ?deviceModelObj 
+    {
+        $data = $this->getLastActiveData(deviceModelObj::class, []);
+        if ($data && $data['id'] > 0 && TIMESTAMP - $data['time'] < $timeout) {
+            return Device::get($data['id']);
         }
         return null;
     }
 
-    public function getLastActiveAccount(): ?accountModelObj 
+    public function setLastActiveAcccount(accountModelObj $account = null): bool
     {
-        $accountId = $this->getLastActiveData('accountId', 0);
-        if ($accountId > 0) {
-            return Account::get($accountId);
+        return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);
+    }
+    
+    public function getLastActiveAccount($timeout = VISIT_DATA_TIMEOUT): ?accountModelObj 
+    {
+        $data = $this->getLastActiveData(accountModelObj::class, []);
+        if ($data && $data['id'] > 0 && TIMESTAMP - $data['time'] < $timeout) {
+            return Account::get($data['id']);
         }
-        return null;        
+        return null;      
     }
 
     public function isWxAppAllowed($appID): bool

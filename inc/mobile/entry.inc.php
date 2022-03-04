@@ -14,6 +14,7 @@ $from = request::str('from');
 $device_id = request::str('device');
 $account_id = request::str('account');
 $xid = request::str('xid');
+$tid = request::str('tid');
 
 if (Util::isAliAppContainer()) {
     $ali_entry_url = Util::murl('ali', [
@@ -60,10 +61,7 @@ if ($device_id) {
      */
     $cb = function (userModelObj $user) use ($device) {
         //记录设备ID
-        $user->setLastActiveData([
-            'deviceId' => $device->getId(),
-            'time' => TIMESTAMP,
-        ]);
+        $user->setLastActiveDevice($device);
 
         $account = $user->getLastActiveAccount();
         if ($account) {
@@ -71,10 +69,6 @@ if ($device_id) {
         }
         return [];
     };
-
-    $params['yzshop'] = [
-        'agent' => $device->getAgent(),
-    ];
 
     $params['from'] = [
         'src' => 'device',
@@ -96,7 +90,7 @@ if ($device_id) {
     //显示问卷填写页面
     if ($account->isQuestionnaire()) {
         $cb = function (userModelObj $user) use ($account) {
-            $user->setLastActiveData($account);
+            $user->setLastActiveAcccount($account);
 
             $device = $user->getLastActiveDevice();
             if ($device) {
@@ -107,7 +101,7 @@ if ($device_id) {
         };
     } else {
         //如果公众号奖励为积分，显示获取积分页面
-        if (App::isBalanceEnabled() && $account && $account->getBonusType() == Account::BALANCE) {
+        if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
             $cb = function (userModelObj $user) use ($account) {
                 app()->getBalanceBonusPage($user, $account);
             };
@@ -117,16 +111,8 @@ if ($device_id) {
              * @return array
              */
             $cb = function (userModelObj $user) use ($account) {
-                //用户从公众号链接进入的话，检查超时
-                if ($user->getLastActiveData('deviceId') && TIMESTAMP - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
-                    $user->setLastActiveData();
-                    //设备扫描页面
-                    $tpl_data = Util::getTplData([$user, $account]);
-                    app()->scanPage($tpl_data);
-                }
-
                 //记录公众号ID
-                $user->setLastActiveData($account);
+                $user->setLastActiveAcccount($account);
 
                 $device = $user->getLastActiveDevice();
                 if ($device) {
@@ -161,13 +147,11 @@ if ($user->isBanned()) {
     Util::resultAlert('用户帐户暂时无法使用该功能，请联系管理员！', 'error');
 }
 
-if (App::isUserVerify18Enabled()) {
-    if (!$user->isIDCardVerified()) {
-        app()->showTemplate(Theme::file('verify_18'), [
-            'verify18' => settings('user.verify_18', []),
-            'entry_url' => Util::murl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
-        ]);
-    }
+if (App::isUserVerify18Enabled() && !$user->isIDCardVerified()) {
+    app()->showTemplate(Theme::file('verify_18'), [
+        'verify18' => settings('user.verify_18', []),
+        'entry_url' => Util::murl('entry', ['from' => $from, 'device' => $device_id, 'account' => $account_id]),
+    ]);
 }
 
 if (is_callable($cb)) {
@@ -178,10 +162,10 @@ if (is_callable($cb)) {
 }
 
 if ($from == 'device') {
-    $user->setLastActiveData('accountId');
+    $user->setLastActiveAcccount();
     $account = null;
 
-    if ($device && TIMESTAMP - $device->settings('last.online', 0) > 60) {
+    if ($device->isReadyTimeout()) {
         //设备准备页面，检测设备是否在线等等
         $tpl_data = Util::getTplData([$device, $user]);
         app()->devicePreparePage($tpl_data);
@@ -192,7 +176,7 @@ if ($from == 'device') {
     $user->setLastActiveData('ticket', []);
 
     if ($account && $account->isQuestionnaire() && $account->getBonusType() == Account::BALANCE) {
-        $user->setLastActiveData();
+        $user->cleanLastActiveData();
         app()->fillQuestionnairePage($user, $account);
     }
 }
@@ -206,24 +190,14 @@ if (empty($device)) {
 //检查用户定位
 if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
 
-    $user->setLastActiveData('deviceId');
-
-    //定位匹配成功后转跳网址
-    $redirect = Util::murl(
-        'entry',
-        [
-            'from' => 'location',
-            'device' => $device->getShadowId(),
-        ]
-    );
-
+    $user->setLastActiveDevice();
     $tpl_data = Util::getTplData(
         [
             $user,
             $device,
             [
                 'page.title' => '查找设备',
-                'redirect' => $redirect,
+                'redirect' => Util::murl( 'entry', ['from' => 'location', 'device' => $device->getShadowId()]),
             ],
         ]
     );
@@ -233,26 +207,18 @@ if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
 }
 
 if ($account) {
-    $isOk = true;
-    if ($account->isQuestionnaire() && request::has('tid')) {
-        $acc = Account::findOneFromUID(request::trim('tid'));
-        if (empty($acc)) {
-            $isOk = false;
-        } else {
+    if ($account->isQuestionnaire() && $tid) {
+        $acc = Account::findOneFromUID($tid);
+        if ($acc) {
             $res = Util::checkAvailable($user, $acc, $device);
-            if (is_error($res)) {
-                $isOk = false;
-            }            
+        } else {
+            $res = err('找不到这个任务！');
         }
     } else {
         $res = Util::checkAvailable($user, $account, $device);
-        if (is_error($res)) {
-            $isOk = false;
-        }        
     }
-
-    if (!$isOk) {
-        $user->setLastActiveData();
+    if (is_error($res)) {
+        $user->cleanLastActiveData();
         $account = null;
     }
 }
@@ -280,17 +246,10 @@ if ($more_accounts) {
 }
 
 if ($account->isQuestionnaire()) {
-    if (TIMESTAMP - $user->getLastActiveData('time') > settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
-        $user->setLastActiveData();
-        //设备扫描页面
-        $tpl_data = Util::getTplData([$user, $account]);
-        app()->scanPage($tpl_data);
-    }
-
-    app()->fillQuestionnairePage($user, $account, $device, request::trim('tid'));
+    app()->fillQuestionnairePage($user, $account, $device, $tid);
 }
 
-$user->setLastActiveData();
+$user->cleanLastActiveData();
 
 $ticket_data = [
     'id' => REQUEST_ID,

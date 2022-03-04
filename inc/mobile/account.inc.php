@@ -382,9 +382,9 @@ if ($op == 'default') {
         JSON::fail($result);
     }
 
-    if ($account->getBonusType() == Account::BALANCE) {
+    if (($acc ?? $account)->getBonusType() == Account::BALANCE) {
 
-        $result = Balance::give($user, $account);
+        $result = Balance::give($user, ($acc ?? $account));
         if (is_error($result)) {
             JSON::fail($result);
         }
@@ -396,7 +396,7 @@ if ($op == 'default') {
     
         JSON::success($data);
 
-    } elseif ($account->getBonusType() == Account::COMMISSION) {
+    } elseif (($acc ?? $account)->getBonusType() == Account::COMMISSION) {
 
         $ticket_data = [
             'id' => REQUEST_ID,
@@ -404,15 +404,14 @@ if ($op == 'default') {
             'time' => time(),
             'deviceId' => $device->getId(),
             'shadowId' => $device->getShadowId(),
-            'accountId' => $account->getId(),
+            'accountId' => ($acc ?? $account)->getId(),
         ];
         
         if (isset($acc)) {
-            $ticket_data['accountId'] = $acc->getId();
             $ticket_data['questionnaireAccountId'] = $account->getId();
         }
 
-        $user->setLastActiveData();
+        $user->cleanLastActiveData();
         
         //准备领取商品的ticket
         $user->setLastActiveData('ticket', $ticket_data);

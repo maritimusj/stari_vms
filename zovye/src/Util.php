@@ -485,15 +485,21 @@ include './index.php';
 
     public static function cachedCallWhen($interval_seconds, callable $fn, ...$params)
     {
-        $x = function () use ($fn) {
-            list($result, $v) = $fn();
-            if ($v) {
-                return $result;
-            }
-            throw new RuntimeException('no cache');
-        };
+        $key = 'delay' . hashFN($fn, ...$params);
+        $data = We7::cache_read($key);
+        if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval($data['time']) < $interval_seconds)) {
+            return $data['v'];
+        }
 
-        return self::expiredCall('delay' . hashFN($fn, ...$params), $interval_seconds, $x);
+        list($result, $v) = $fn();
+        if ($v) {
+            We7::cache_write($key, [
+                'time' => time(),
+                'v' => $result,
+            ]);
+        }
+        
+        return $result;
     }
 
     public static function expiredCallUtil($uid, $expired, $fn)

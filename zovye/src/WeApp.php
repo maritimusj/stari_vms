@@ -575,7 +575,7 @@ JSCODE;
                 'openid' => $user->getOpenid(),
                 'device_id' => $device->getId(),
                 'result_code <>' => 0,
-                'price' => 0,
+                'src' => Order::ACCOUNT,
                 'createtime >' => strtotime("-{$retry['last']} minute"),
             ])->orderBy('id desc')->findOne();
             if ($order) {

@@ -203,6 +203,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
         if (date('Ymd', $stats['time']) != date('Ymd', TIMESTAMP)) {
             $stats['total'] = 0;
         }
+        
         $stats['time'] = time();
         $stats['total'] += $success;
 

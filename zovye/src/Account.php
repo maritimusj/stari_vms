@@ -210,6 +210,7 @@ class Account extends State
             'count' => $entry->getCount(),
             'groupname' => $entry->getGroupName(),
             'orderno' => $entry->getOrderNo(),
+            'thirdparty_platform' => $entry->isThirdPartyPlatform() ? 1 : 0,
         ];
 
         if ($entry->isVideo()) {

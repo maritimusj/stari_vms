@@ -493,9 +493,9 @@ JSCODE;
             }
         })
     }
-    zovye_fn.getAccounts = function(type, cb) {
+    zovye_fn.getAccounts = function(type, cb, max = 0) {
         type = (type || []).length === 0 ? 'all' : type;
-        $.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true}).then(function(res){
+        $.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true, max}).then(function(res){
             if (cb) cb(res);
         })
     }
@@ -521,7 +521,7 @@ JSCODE;
         if ($goods_list_FN) {
             $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.getGoodsList = function(cb, type = 'pay') {
-$.get("$device_api_url", {op: 'goods'}).then(function(res) {
+$.get("$device_api_url", {op: 'goods', type}).then(function(res) {
         if (typeof cb === 'function') {
             cb(res);
         }

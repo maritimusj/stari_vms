@@ -483,6 +483,19 @@ include './index.php';
         return self::expiredCall('delay' . hashFN($fn, ...$params), $interval_seconds, $fn);
     }
 
+    public static function cachedCallWhen($interval_seconds, callable $fn, ...$params)
+    {
+        $x = function () use ($fn) {
+            list($result, $v) = $fn();
+            if ($v) {
+                return $result;
+            }
+            throw new RuntimeException('no cache');
+        };
+
+        return self::expiredCall('delay' . hashFN($fn, ...$params), $interval_seconds, $x);
+    }
+
     public static function expiredCallUtil($uid, $expired, $fn)
     {
         $key = App::uid(6) . $uid;

@@ -63,6 +63,13 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="freeLimit" class="col-md-2 control-label">每日限额（次）</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="rewardBonusLimit" id="freeLimit" value="{php echo intval($config['freeLimit'])}" min="0">
+                    <span class="help-block">* 限制每天可以获得奖励的最大次数，０表示不限制</span>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="freeCommission" class="col-md-2 control-label">代理商佣金（元）</label>
                 <div class="col-md-10">
                     <input type="number" class="form-control" name="freeCommission" id="freeCommission" value="{php echo number_format($config['freeCommission'] / 100, 2, '.', '')}" min="0.0">
@@ -138,12 +145,12 @@
                     const advs = level > 0 ? s_advs + this.levels[level]['advs'] -  1: this.levels[level]['advs'];
                     const bonus = this.levels[level]['bonus'];
                     if (advs > 0 && bonus > 0) {
-                        return advs == s_advs ? `第${s_advs}个广告，用户获得${bonus}个积分奖励`:`第${s_advs} - ${advs}个广告，用户获得${bonus}个积分奖励`;
+                        return advs === s_advs ? `第${s_advs}个广告，用户获得${bonus}个积分奖励`:`第${s_advs} - ${advs}个广告，用户获得${bonus}个积分奖励`;
                     }
                     if (advs <= 0) {
                         return '';
                     }
-                    return s_advs == advs ? `第${s_advs}个广告没有积分奖励`:`第${s_advs} -  ${advs}个广告没有积分奖励`;
+                    return s_advs === advs ? `第${s_advs}个广告没有积分奖励`:`第${s_advs} -  ${advs}个广告没有积分奖励`;
                 }
             }
         })

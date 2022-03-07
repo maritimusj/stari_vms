@@ -251,7 +251,13 @@ class api
         }
 
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-            JSON::fail('无法锁定用户，请稍后再试！');
+            return err('无法锁定用户，请稍后再试！');
+        }
+
+        $limit = $reward['freeLimit'] ?? 0;
+        $stats = $user->settings('wxapp.reward.order', []);
+        if (date('Ymd', $stats['time']) == date('Ymd', TIMESTAMP) && $stats['total'] > $limit) {
+            return err('今日免费额度已用完！');
         }
 
         $device = Device::get(request::str('deviceId'), true);

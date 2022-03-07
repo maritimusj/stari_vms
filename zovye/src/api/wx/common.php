@@ -23,6 +23,8 @@ use function zovye\settings;
 
 class common
 {
+    static $user = null;
+
     public static function getDecryptedWxUserData(): array
     {
         $code = request::str('code');
@@ -82,10 +84,8 @@ class common
 
     public static function getUser(): userModelObj
     {
-        static $user = null;
-
-        if ($user) {
-            return $user;
+        if (self::$user) {
+            return self::$user;
         }
 
         if (empty($token)) {
@@ -112,22 +112,22 @@ class common
             if (empty($keeper)) {
                 JSON::fail('请先登录后再请求数据！[103]');
             }
-            $user = $keeper->getUser();
+            self::$user = $keeper->getUser();
 
         } else {
-            $user = User::get($login_data->getUserId());
+            self::$user = User::get($login_data->getUserId());
         }
 
-        if (empty($user)) {
+        if (empty(self::$user)) {
             JSON::fail('请先登录后再请求数据！[104]');
         }
 
-        if ($user->isBanned()) {
+        if (self::$user->isBanned()) {
             $login_data->destroy();
             JSON::fail('暂时无法使用，请联系管理员！');
         }
 
-        return $user;
+        return self::$user;
     }
 
     /**

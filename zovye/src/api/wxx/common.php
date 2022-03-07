@@ -43,6 +43,7 @@ use function zovye\settings;
 
 class common
 {
+    static $user;
     /**
      * 用户登录，小程序必须提交code,encryptedData和iv值
      *
@@ -1164,10 +1165,8 @@ class common
      */
     public static function getUser(): userModelObj
     {
-        static $user = null;
-
-        if ($user) {
-            return $user;
+        if (self::$user) {
+            return self::$user;
         }
 
         if (request::has('token')) {
@@ -1175,26 +1174,26 @@ class common
             if (empty($login_data)) {
                 JSON::fail('请先登录后再请求数据！[101]');
             }
-            $user = User::get($login_data->getUserId());
+            self::$user = User::get($login_data->getUserId());
         } elseif (request::has('user_id')) {
             $user_id = request('user_id');
-            $user = User::get($user_id, true, User::ALI);
+            self::$user = User::get($user_id, true, User::ALI);
         } else {
             JSON::fail('请先登录后再请求数据！[102]');
         }
 
-        if (empty($user)) {
+        if (empty(self::$user)) {
             JSON::fail('请先登录后再请求数据！[103]');
         }
 
-        if ($user->isBanned()) {
+        if (self::$user->isBanned()) {
             if (isset($login_data)) {
                 $login_data->destroy();
             }
             JSON::fail('暂时无法使用，请联系管理员！');
         }
 
-        return $user;
+        return self::$user;
     }
 
     public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = ''): array

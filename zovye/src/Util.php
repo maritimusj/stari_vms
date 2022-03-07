@@ -641,7 +641,7 @@ include './index.php';
                 Schema::WEEK => '下个星期再来试试吧！',
                 Schema::MONTH => '这个月的免费额度已经用完啦！',
             ];
-            if ($account->isTask() || $account->getBonusType() == Account::BALANCE) {
+            if ($account->getBonusType() == Account::BALANCE) {
                 $n = BalanceLog::query([
                     'user_id' => $user->getId(),
                     'account_id' => $account->getId(),
@@ -671,7 +671,7 @@ include './index.php';
         //scCount, 所有用户在每个周期内总数量
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
-            if ($account->isTask() || $account->getBonusType() == Account::BALANCE) {
+            if ($account->getBonusType() == Account::BALANCE) {
                 $n = BalanceLog::query([
                     'account_id' => $account->getId(),
                     'createtime >=' => $time,
@@ -698,7 +698,7 @@ include './index.php';
         //total，单个用户累计可领取数量
         $total = $account->getTotal();
         if ($total > 0) {
-            if ($account->isTask() || $account->getBonusType() == Account::BALANCE) {
+            if ($account->getBonusType() == Account::BALANCE) {
                 $n = BalanceLog::query([
                     'user_id' => $user->getId(),
                     'account_id' => $account->getId(),
@@ -723,7 +723,7 @@ include './index.php';
         //$orderLimits，最大订单数量
         $order_limits = $account->getOrderLimits();
         if ($order_limits > 0) {
-            if ($account->isTask() || $account->getBonusType() == Account::BALANCE) {
+            if ($account->getBonusType() == Account::BALANCE) {
                 $n = BalanceLog::query(['account_id' => $account->getId()])->limit($order_limits)->count();
             } elseif ($account->isQuestionnaire()) {
                 $n = Questionnaire::log(['level' => $account->getId()])->limit($total)->count();

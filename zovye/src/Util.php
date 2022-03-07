@@ -498,7 +498,7 @@ include './index.php';
                 'v' => $result,
             ]);
         }
-        
+
         return $result;
     }
 
@@ -569,6 +569,54 @@ include './index.php';
         return false;
     }
 
+    public static function checkLimit(accountModelObj $account, userModelObj $user = null, $params = [], $limit = 0): bool
+    {
+        $arr = [];
+        if ($account->isTask()) {
+            $cond = array_merge($params, [
+                'account_id' => $account->getId(),
+            ]);
+            if ($user) {
+                $cond['user_id'] = $user->getId();
+            }
+            $arr[] = BalanceLog::query($cond);
+        } elseif ($account->isQuestionnaire()) {
+            $cond = array_merge($params, [
+                'level' => $account->getId(),
+            ]);
+            if ($user) {
+                $cond['title'] = $user->getOpenid();
+            }
+            $arr[] = Questionnaire::log($cond);
+        } else {
+            $cond = array_merge($params, [
+                'account_id' => $account->getId(),
+            ]);
+            if ($user) {
+                $cond['user_id'] = $user->getId();
+            }
+            $arr[] = BalanceLog::query($cond);
+
+            $cond2 = array_merge($params, [
+                'account' => $account->getName(),
+            ]);
+            if ($user) {
+                $cond2['openid'] = $user->getOpenid();
+            }
+            $arr[] = Order::query($cond2);
+        }
+
+        foreach ($arr as $query) {
+            $query->limit($limit);
+            $count = $query->count();
+            if ($count >= $limit) {
+                return true;
+            }
+            $limit -= $count;
+        }
+        return false;
+    }
+
     /**
      * 检查用户是否符合公众号设置的限制条件
      * @param userModelObj $user
@@ -629,13 +677,7 @@ include './index.php';
         }
 
         if ($params['unfollow'] || in_array('unfollow', $params, true)) {
-            if (Order::query()->exists([
-                    'account' => $account->getName(),
-                    'openid' => $user->getOpenid(),
-                ]) || BalanceLog::query()->exists([
-                    'user_id' => $user->getId(),
-                    'account_id' => $account->getId(),
-                ])) {
+            if (self::checkLimit($account, $user, [], 1)) {
                 return error(State::ERROR, '您已经完成了该任务！');
             }
         }
@@ -660,29 +702,11 @@ include './index.php';
                 Schema::WEEK => '下个星期再来试试吧！',
                 Schema::MONTH => '这个月的免费额度已经用完啦！',
             ];
-            if ($account->getBonusType() == Account::BALANCE) {
-                $n = BalanceLog::query([
-                    'user_id' => $user->getId(),
-                    'account_id' => $account->getId(),
-                    'createtime >=' => $time,
-                    'createtime <' => time(),
-                ])->limit($count)->count();
-            } elseif ($account->isQuestionnaire()) {
-                $n = Questionnaire::log([
-                    'level' => $account->getId(),
-                    'title' => $user->getOpenid(),
-                    'createtime >=' => $time,
-                    'createtime <' => time(),
-                ])->limit($count)->count();
-            } else {
-                $n = Order::query([
-                    'account' => $account->getName(),
-                    'openid' => $user->getOpenid(),
-                    'createtime >=' => $time,
-                    'createtime <' => time(),
-                ])->limit($count)->count();
-            }
-            if ($n >= $count) {
+
+            if (self::checkLimit($account, $user, [
+                'createtime >=' => $time,
+                'createtime <' => time(),
+            ], $count)) {
                 return error(State::ERROR, $desc[$sc_name]);
             }
         }
@@ -690,26 +714,10 @@ include './index.php';
         //scCount, 所有用户在每个周期内总数量
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
-            if ($account->getBonusType() == Account::BALANCE) {
-                $n = BalanceLog::query([
-                    'account_id' => $account->getId(),
-                    'createtime >=' => $time,
-                    'createtime <' => time(),
-                ])->limit($sc_count)->count();
-            } elseif ($account->isQuestionnaire()) {
-                $n = Questionnaire::log([
-                    'level' => $account->getId(),
-                    'createtime >=' => $time,
-                    'createtime <' => time(),
-                ])->limit($sc_count)->count();
-            } else {
-                $n = Order::query([
-                    'account' => $account->getName(),
-                    'createtime >=' => $time,
-                    'createtime <' => time(),
-                ])->limit($sc_count)->count();
-            }
-            if ($n >= $sc_count) {
+            if (self::checkLimit($account, null, [
+                'createtime >=' => $time,
+                'createtime <' => time(),
+            ], $sc_count)) {
                 return error(State::ERROR, '任务免费额度已用完！');
             }
         }
@@ -717,24 +725,7 @@ include './index.php';
         //total，单个用户累计可领取数量
         $total = $account->getTotal();
         if ($total > 0) {
-            if ($account->getBonusType() == Account::BALANCE) {
-                $n = BalanceLog::query([
-                    'user_id' => $user->getId(),
-                    'account_id' => $account->getId(),
-                ])->limit($total)->count();
-            } elseif ($account->isQuestionnaire()) {
-                $n = Questionnaire::log([
-                    'level' => $account->getId(),
-                    'title' => $user->getOpenid(),
-                ])->limit($total)->count();
-            } else {
-                $n = Order::query([
-                    'account' => $account->getName(),
-                    'openid' => $user->getOpenid(),
-                ])->limit($total)->count();
-            }
-
-            if ($n >= $total) {
+            if (self::checkLimit($account, $user, [], $total)) {
                 return error(State::ERROR, '您已经完成这个任务了！');
             }
         }
@@ -742,15 +733,7 @@ include './index.php';
         //$orderLimits，最大订单数量
         $order_limits = $account->getOrderLimits();
         if ($order_limits > 0) {
-            if ($account->getBonusType() == Account::BALANCE) {
-                $n = BalanceLog::query(['account_id' => $account->getId()])->limit($order_limits)->count();
-            } elseif ($account->isQuestionnaire()) {
-                $n = Questionnaire::log(['level' => $account->getId()])->limit($total)->count();
-            } else {
-                $n = Order::query(['account' => $account->getName()])->limit($order_limits)->count();
-            }
-
-            if ($n >= $order_limits) {
+            if (self::checkLimit($account, null, [], $order_limits)) {
                 return error(State::ERROR, '公众号免费额度已用完！！');
             }
         }
@@ -2550,7 +2533,7 @@ HTML_CONTENT;
         foreach ($data as $row) {
             $str_export .= implode(",", $row) . "\r\n";
         }
-        
+
         return file_put_contents($filename, $str_export, FILE_APPEND);
     }
 

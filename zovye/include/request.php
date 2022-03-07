@@ -23,6 +23,11 @@ function request(string $name, $default = null)
 
 class request
 {
+    public static function set(string $key, $data)
+    {
+        setArray($GLOBALS['_GPC'], $key, $data);
+    }
+
     public static function json(string $key = '', $default = [])
     {
         static $data = null;

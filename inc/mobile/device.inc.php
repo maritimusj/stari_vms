@@ -472,7 +472,7 @@ if ($op == 'default') {
     }
 
     $device->setReady($scene, $is_ready);
-    
+
     JSON::success([
         'is_ready' => $is_ready,
     ]);
@@ -493,9 +493,43 @@ if ($op == 'default') {
 
     if ($type == 'exchange') {
         $result = $device->getGoodsList($user, [Goods::AllowExchange]);
-    } else {
+    } elseif ($type == 'free') {
+        $result = $device->getGoodsList($user, [Goods::AllowFree]);
+    } elseif ($type == 'pay') {
         $result = $device->getGoodsAndPackages($user, [Goods::AllowPay]);
+    } else {
+        $result = [];
     }
 
     JSON::success($result);
+
+} elseif ($op == 'choose_goods') {
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户！');
+    }
+
+    $id = request::int('goods');
+    $num = request::int('num', 1);
+
+    $goods = $device->getGoods($id);
+    if (empty($goods)) {
+        JSON::fail('商品不存在！');
+    }
+
+    if ($goods['num'] < $num) {
+        JSON::fail('商品库存不足！');
+    }
+
+    if (!$goods[Goods::AllowFree]) {
+        JSON::fail('商品不允许免费领取！');
+    }
+
+    $user->setLastActiveData('goods', $goods['id']);
+    JSON::success('已保存用户选择！');
 }

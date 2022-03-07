@@ -494,7 +494,7 @@ JSCODE;
         })
     }
     zovye_fn.getAccounts = function(type, cb) {
-        type = (type || []).length == 0 ? 'all' : type;
+        type = (type || []).length === 0 ? 'all' : type;
         $.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true}).then(function(res){
             if (cb) cb(res);
         })
@@ -520,13 +520,14 @@ JSCODE;
 JSCODE;
         if ($goods_list_FN) {
             $tpl['js']['code'] .= <<<JSCODE
-\r\nzovye_fn.getGoodsList = function(cb) {
-$.get("$device_api_url", {op: 'goods', type:'pay'}).then(function(res) {
+\r\nzovye_fn.getGoodsList = function(cb, type = 'pay') {
+$.get("$device_api_url", {op: 'goods'}).then(function(res) {
         if (typeof cb === 'function') {
             cb(res);
         }
     });
 }
+
 zovye_fn.getBalanceGoodsList = function(cb) {
     $.get("$device_api_url", {op: 'goods', type:'exchange'}).then(function(res) {
         if (typeof cb === 'function') {
@@ -534,6 +535,15 @@ zovye_fn.getBalanceGoodsList = function(cb) {
         }
     });
 }
+
+zovye_fn.chooseGoods = function(goods, num, cb) {
+    $.get("$device_api_url", {op: 'choose_goods', goods, num}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
+}
+
 JSCODE;
         }
         if (!App::isAliUser() && App::isChannelPayEnabled()) {

@@ -1283,6 +1283,7 @@ class Account extends State
             'user' => $user->getId(),
             'account' => $acc->getId(),
             'orderUID' => $order_uid,
+            'goods' => $user->getLastActiveData('goods', 0),
         ]);
     }
 

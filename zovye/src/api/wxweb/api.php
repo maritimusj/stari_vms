@@ -256,7 +256,7 @@ class api
 
         $limit = $reward['freeLimit'] ?? 0;
         if ($limit > 0) {
-            $stats = $user->settings('wxapp.reward.order', []);
+            $stats = $user->settings('extra.wxapp.reward.order', []);
             if (date('Ymd', $stats['time']) == date('Ymd', TIMESTAMP) && $stats['total'] > $limit) {
                 return err('今日免费额度已用完！');
             }

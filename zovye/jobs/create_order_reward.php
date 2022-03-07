@@ -199,14 +199,14 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
             $order->setExtraData('pull.result', $success > 0 ? err('部分商品出货失败！') : err('出货失败！'));
         }
 
-        $stats = $user->settings('wxapp.reward.order', []);
+        $stats = $user->settings('extra.wxapp.reward.order', []);
         if (date('Ymd', $stats['time']) != date('Ymd', TIMESTAMP)) {
             $stats['total'] = 0;
         }
         $stats['time'] = time();
         $stats['total'] += $success;
 
-        if (!$user->updateSettings('wxapp.reward.order', $stats)) {
+        if (!$user->updateSettings('extra.wxapp.reward.order', $stats)) {
             $log['error'] = '更新用户免费记录失败！';
         }
 

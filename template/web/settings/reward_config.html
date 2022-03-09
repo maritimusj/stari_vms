@@ -93,16 +93,16 @@
                 active: 'balance',
                 levels: [
                     {
-                        advs: parseInt("{php echo intval($config['bonus']['level0']['max'])}"),
-                        bonus: parseInt("{php echo intval($config['bonus']['level0']['v'])}"),
+                        advs: parseInt("{php echo intval($config['bonus']['level0']['max'] ?? 0)}"),
+                        bonus: parseInt("{php echo intval($config['bonus']['level0']['v'] ?? 0)}"),
                     },
                     {
-                        advs: parseInt("{php echo intval($config['bonus']['level1']['max'])}"),
-                        bonus: parseInt("{php echo intval($config['bonus']['level1']['v'])}"),
+                        advs: parseInt("{php echo intval($config['bonus']['level1']['max'] ?? 0)}"),
+                        bonus: parseInt("{php echo intval($config['bonus']['level1']['v'] ?? 0)}"),
                     },
                     {
-                        advs: parseInt("{php echo intval($config['bonus']['level2']['max'])}"),
-                        bonus: parseInt("{php echo intval($config['bonus']['level2']['v'])}"),
+                        advs: parseInt("{php echo intval($config['bonus']['level2']['max'] ?? 0)}"),
+                        bonus: parseInt("{php echo intval($config['bonus']['level2']['v'] ?? 0)}"),
                     },
                 ],
             },

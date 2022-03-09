@@ -34,7 +34,7 @@ if (empty($device)) {
 }
 
 $payload = $device->getPayload(true);
-$result = $payload['cargo_lanes'];
+$result = $payload['cargo_lanes'] ?? [];
 
 $goods = [];
 foreach ($result as $entry) {

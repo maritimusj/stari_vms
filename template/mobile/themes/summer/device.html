@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>{$tpl['site']['title']}</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css">
+    <link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100%;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px !important;
+            color: #101010;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: calc(15px + constant(safe-area-inset-bottom));
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .header {
+            width: 100%;
+            height: 44px;
+            background-color: white;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 0 1px 5px #eee;
+            z-index: 99;
+        }
+
+        .imei {
+            margin: 0 10px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .header img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .wechat-view {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: fixed;
+            right: 5px;
+            bottom: 25vh;
+            background-color: #04BE02;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 0 5px white;
+            animation: shine 1.2s infinite;
+            z-index: 99;
+        }
+
+        .wechat-view img {
+            width: 25px;
+            height: 25px;
+        }
+
+        @keyframes shine {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            25%,
+            75% {
+                transform: translateY(-5px);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: translateY(10px);
+            }
+        }
+
+        .main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 44px;
+        }
+
+        .marquee-container {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .marquee-text {
+            color: white;
+            min-width: 100%;
+            position: absolute;
+            left: 0;
+            animation: marqueeAnimation 10s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes marqueeAnimation {
+            from {
+                transform: translate(100%, 0);
+            }
+
+            to {
+                transform: translate(-100%, 0);
+            }
+        }
+
+        #adv-swiper-container {
+            width: 100vw;
+            margin-top: 10px;
+            --swiper-theme-color: #F07057;
+        }
+
+        .swiper-img {
+            width: calc(100% - 20px);
+            border-radius: 10px;
+            margin: 0 10px;
+            box-shadow: 0 3px 5px #ccc;
+        }
+
+        .swiper-pagination {
+            margin-bottom: 15px;
+        }
+
+        .scroll-view {
+            width: 100%;
+        }
+
+        .group-view {
+            width: 100%;
+            margin-top: 10px;
+            background-color: white;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .group-view::-webkit-scrollbar {
+            display: none;
+        }
+
+        .group-view span {
+            display: inline-block;
+            padding: 14px 14px 11px;
+        }
+
+        .group-view span:first-child {
+            color: #F07057;
+            border-bottom: 3px solid #F07057;
+            font-weight: bold;
+        }
+
+        .category-view {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .category-item {
+            width: 25%;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            background-color: white;
+            color: #9d9d9d;
+            border-radius: 15px;
+        }
+
+        .category-item:not(:first-child) {
+            margin-left: 15px;
+        }
+
+        .category-se {
+            background-color: #F07057;
+            color: white;
+        }
+
+        .goods-list {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .goods-view {
+            width: calc((100vw - 45px) / 2);
+            margin-left: 15px;
+            margin-top: 15px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pic-view {
+            width: calc((100vw - 45px) / 2 - 20px);
+            height: calc((100vw - 45px) / 2 - 20px);
+            margin: 10px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pic-view img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .pic-view .sold-out {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .goods-name {
+            width: calc(100% - 20px);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .goods-row {
+            width: calc(100% - 20px);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .goods-row .price {
+            flex: 1;
+            color: #F07057;
+            font-weight: 500;
+        }
+
+        .circle-btn {
+            width: 14px;
+            height: 14px;
+            background-color: #eee;
+            border-radius: 50%;
+            padding: 3px;
+        }
+
+        .circle-btn:active {
+            background-color: #ccc;
+        }
+
+        .circle-btn-disabled {
+            opacity: 0.3;
+        }
+
+        .choose-btn {
+            padding: 0 25px;
+            height: 24px;
+            background-image: linear-gradient(to right, #eebd89, #f9957f);
+            color: white;
+            text-align: center;
+            line-height: 24px;
+            margin: 10px 0;
+            border-radius: 12px;
+        }
+
+        .choose-btn.disabled {
+            background-color: #ccc;
+            background-image: none;
+        }
+
+        .clickable:active {
+            opacity: 0.7;
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .account-view {
+            width: 230px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .account-view .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            border: 5px solid;
+            background-color: white;
+        }
+
+        .account-view .title {
+            margin-top: 35px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .account-view .container {
+            width: 200px;
+            height: 200px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .account-view .container .weapp-cover {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .account-view .desc {
+            font-size: 12px;
+            color: white;
+        }
+
+        .sales-view {
+            width: calc(100% - 50px);
+            padding: 10px;
+            background-color: white;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        .sales-view .title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #F07057;
+        }
+
+        .sales-view .list {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .sale-item {
+            width: calc((100% - 20px) / 3);
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sale-item:not(:nth-child(3n + 1)) {
+            margin-left: 10px;
+        }
+
+        .sale-item .pic {
+            width: 100%;
+            height: calc((100vw - 20px - 50px) / 3);
+        }
+
+        .sale-item .name {
+            margin-top: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sale-item .discount-price {
+            color: #F07057;
+        }
+
+        .sale-item .price {
+            color: #9d9d9d;
+            text-decoration: line-through;
+        }
+
+        .mask .close {
+            width: 25px;
+            height: 25px;
+            margin-top: 50px;
+        }
+
+        .toast {
+            padding: 5px 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            position: fixed;
+            bottom: 10vh;
+            border-radius: 5px;
+            z-index: 100;
+            animation: showToast .7s;
+        }
+
+        @keyframes showToast {
+            from {
+                opacity: 0;
+                transform: translateY(5vh);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .countdown {
+            width: 150px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            position: absolute;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .loading-view {
+            width: 120px;
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 0 5px lightgray;
+        }
+
+        .loading-view img {
+            width: 50px;
+            height: 50px;
+            animation: loading 1s infinite;
+        }
+
+        .loading-view span {
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        @keyframes loading {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .wechat-qrcode {
+            padding: 20px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .wechat-qrcode img {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+
+        .alert-view {
+            width: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            animation: showAlert .7s;
+            font-size: 16px;
+        }
+
+        .alert-view .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .alert-view .text {
+            margin: 20px 0;
+            color: #555;
+            text-align: center;
+        }
+
+        .alert-view .confirm {
+            width: 150px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #F07057;
+            color: white;
+            border-radius: 20px;
+        }
+
+        .alert-view .confirm:active {
+            opacity: 0.7;
+        }
+
+        @keyframes showAlert {
+            from {
+                opacity: 0;
+                transform: scale(0);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .sex-view {
+            width: 100%;
+            padding: 20px 0;
+            background-color: white;
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .sex-item {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sex-item img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .sex-item span {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="header">
+            <span class="imei">No.{{imei}}</span>
+            <img class="clickable" src="{MODULE_URL}static/m/balance/img/profile_icon.svg" @click="orderClick">
+            <img class="clickable" src="{MODULE_URL}static/m/balance/img/feedback_icon.svg" @click="feedbackClick">
+        </div>
+        <div class="wechat-view" v-if="wechat.qrcode" @click="wechat.visible = true">
+            <img src="{MODULE_URL}static/m/balance/img/wechat_icon.svg">
+        </div>
+        <div class="main">
+            {if !empty($tpl['site']['warning'])}
+            <div class="marquee-container">
+                <span class="marquee-text">{$tpl['site']['warning']}</span>
+            </div>
+            {/if}
+            <div class="swiper" id="adv-swiper-container" v-if="slides.length > 0">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" v-for="(item, index) in slides" :key="index" @click="slideClick(item)">
+                        <img class="swiper-img" :src="item.image" />
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+            <div class="scroll-view" v-if="groups.length > 0">
+                <div class="group-view">
+                    <span>售货机商品</span>
+                    <span v-for="group in groups" @click="groupClick(group)">{{group.title}}</span>
+                </div>
+            </div>
+            <div class="category-view"
+                v-if="(account.data && account.data.thirdparty_platform && free.length > 0 || account.data && !account.data.thirdparty_platform) && (pay.length > 0 || packages.length  > 0)">
+                <div :class="['category-item', item.val === categories.val ? 'category-se' : '']"
+                    v-for="(item, index) in categories.list" :key="index" @click="categories.val = item.val">
+                    {{item.text}}</div>
+            </div>
+            <template v-if="categories.val === 'free'">
+                <div class="goods-list" v-if="account.data && account.data.thirdparty_platform && free.length > 1">
+                    <div class="goods-view" v-for="(item, index) in free" :key="index">
+                        <div class="pic-view">
+                            <img :src="item.img">
+                            <img class="sold-out" src="{MODULE_URL}static/m/balance/img/sold_out.svg"
+                                v-if="item.num === 0">
+                        </div>
+                        <span class="goods-name">{{item.name}}</span>
+                        <div :class="['choose-btn', item.num === 0 ? 'disabled' : 'clickable']"
+                            @click="chooseGoods(item)">选择</div>
+                    </div>
+                </div>
+                <div class="account-view" style="margin-top: 50px;"
+                    :style="{'background-image': 'linear-gradient(to bottom right, ' + account.data.clr + '77,' + account.data.clr + ')'}"
+                    v-else-if="account.data && account.data.thirdparty_platform && free.length === 1 || account.data && !account.data.thirdparty_platform">
+                    <img class="avatar" :style="{'border-color': account.data.clr + '77'}" :src="account.data.img">
+                    <span class="title">{{account.data.title}}</span>
+                    <img class="container" :src="account.data.qrcode" v-if="account.data.qrcode">
+                    <div class="container media" style="background-color: black;" v-else-if="account.data.media"
+                        @click="playClick">
+                        <img src="{MODULE_URL}static/m/balance/img/play_icon.svg">
+                    </div>
+                    <div class="container" v-else-if="account.data.username">
+                        <img :src="account.data.img" style="width: 100%;height: 100%;object-fit: cover;">
+                        <div class="weapp-cover">
+                            <wx-open-launch-weapp :id="account.data.uid" :username="account.data.username"
+                                :path="account.data.path">
+                                <script type="text/wxtag-template">
+                                    <style>.play-icon { width: 40px }</style>
+                                    <img class="play-icon" src="{MODULE_URL}static/m/balance/img/click.svg">
+                                </script>
+                            </wx-open-launch-weapp>
+                        </div>
+                    </div>
+                    <span class="desc" v-html="account.data.descr"></span>
+                </div>
+            </template>
+            <template v-else-if="categories.val === 'pay'">
+                <div class="goods-list">
+                    <div class="goods-view" v-for="(item, index) in pay" :key="index">
+                        <div class="pic-view">
+                            <img :src="item.img">
+                            <img class="sold-out" src="{MODULE_URL}static/m/balance/img/sold_out.svg"
+                                v-if="item.num === 0">
+                        </div>
+                        <span class="goods-name" style="text-align: left;">{{item.name}}</span>
+                        <div class="goods-row">
+                            <span class="price">¥ {{(parseFloat(item.price * item.count) / 100).toFixed(2)}}</span>
+                            <div :class="['choose-btn', item.num === 0 ? 'disabled' : 'clickable']"
+                                @click="buyClick(item)">购买</div>
+                        </div>
+                        <div class="goods-row" style="margin-bottom: 5px;">
+                            <img :class="['circle-btn', item.count === 1 ? 'circle-btn-disabled' : '' ]"
+                                style="margin-right: 10px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
+                                @click="minusClick(item, 'goods')">
+                            <span>{{item.count}}</span>
+                            <img :class="['circle-btn', (item.count === item.num || item.count === max || item.num === 0) ? 'circle-btn-disabled' : '' ]"
+                                style="margin-left: 10px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
+                                @click="plusClick(item, 'goods')">
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <div class="sales-view" v-if="sales.length > 0">
+                <div class="title">我要秒杀</div>
+                <div class="list">
+                    <div class="sale-item clickable" v-for="(item, index) in sales" :key="index"
+                        @click="saleClick(item)">
+                        <img class="pic" :src="item.data.image">
+                        <span class="name">{{item.title}}</span>
+                        <span class="discount-price">{{item.data.discount_price}}</span>
+                        <span class="price">{{item.data.price}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mask" v-if="wechat.visible">
+            <div class="wechat-qrcode">
+                <img :src="wechat.qrcode">
+                <span>{{wechat.desc}}</span>
+            </div>
+            <img class="close clickable" src="{MODULE_URL}static/m/balance/img/close.svg"
+                @click="wechat.visible = false">
+        </div>
+        <div class="mask" v-if="account.visible">
+            <div class="account-view"
+                :style="{'background-image': 'linear-gradient(to bottom right, ' + account.data.clr + '77,' + account.data.clr + ')'}">
+                <img class="avatar" :style="{'border-color': account.data.clr + '77'}" :src="account.data.img">
+                <span class="title">{{account.data.title}}</span>
+                <img class="container" :src="account.data.qrcode">
+                <span class="desc" v-html="account.data.descr"></span>
+            </div>
+            <img class="close clickable" src="{MODULE_URL}static/m/balance/img/close.svg"
+                @click="account.visible = false">
+        </div>
+        <div class="mask" style="background-color: #000000;" v-show="video.visible">
+            <div class="countdown">出货倒计时：{{video.countdown}}秒</div>
+            <video id="player" class="video-js" width="100%" height="100%" x5-video-player-type="h5-page" playsinline>
+            </video>
+        </div>
+        <div class="mask" v-if="passwd.visible">
+            <div class="alert-view">
+                <span class="title">提示</span>
+                <span class="text">{{passwd.data.text}}</span>
+                <div class="confirm" v-clipboard:copy="passwd.data.code" v-clipboard:success="onCopy"
+                    v-clipboard:error="onError">确定</div>
+            </div>
+        </div>
+        <div class="mask" v-if="retry.visible">
+            <div class="alert-view">
+                <span class="title">提示</span>
+                <span class="text">{{retry.text}}</span>
+                <div class="confirm" @click="retryClick">确定</div>
+            </div>
+        </div>
+        <div class="mask" v-if="saveUserProfile">
+            <div class="sex-view">
+                <span style="font-size: 18px;">完善信息获取更多服务</span>
+                <span style="margin-top: 10px;color: orchid;">您的性别</span>
+                <div style="width: 100%;display: flex;margin-top: 20px;">
+                    <div class="sex-item clickable" @click="sexClick(1)">
+                        <img src="{MODULE_URL}static/m/balance/img/male_avatar.png">
+                        <span style="color: lightblue;">男</span>
+                    </div>
+                    <div class="sex-item clickable" @click="sexClick(2)">
+                        <img src="{MODULE_URL}static/m/balance/img/female_avatar.png">
+                        <span style="color: pink;">女</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="toast" v-if="toast.visible">{{toast.text}}</div>
+        <div class="mask" v-if="loading">
+            <div class="loading-view">
+                <img src="{MODULE_URL}static/m/balance/img/loading.svg">
+                <span>请稍等...</span>
+            </div>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"> </script>
+    <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
+    <script src="https://cdn.staticfile.org/vue-clipboard2/0.3.1/vue-clipboard.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                loading: false,
+                imei: "{$tpl['device']['imei']}",
+                max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}'),
+                wechat: {
+                    qrcode: '',
+                    desc: '',
+                    visible: false
+                },
+                slides: [],
+                groups: [],
+                categories: {
+                    list: [{
+                        text: '免费',
+                        val: 'free'
+                    }, {
+                        text: '付费',
+                        val: 'pay'
+                    }],
+                    val: 'free'
+                },
+                account: {
+                    data: null,
+                    visible: false,
+                    timeout: null
+                },
+                free: [],
+                pay: [],
+                packages: [],
+                sales: [],
+                toast: {
+                    text: '',
+                    visible: false,
+                    timeout: null
+                },
+                video: {
+                    data: null,
+                    visible: false,
+                    countdown: 0,
+                    interval: null,
+                    player: null
+                },
+                isHidden: null,
+                wechatState: null,
+                saveUserProfile: false,
+                passwd: {
+                    visible: false,
+                    data: null
+                },
+                retry: {
+                    visible: false,
+                    text: ''
+                }
+            },
+            created () {
+                this.imei = this.imei.substring(this.imei.length - 6);
+
+                if (typeof zovye_fn.retryOrder === 'function') {
+                    this.retryOrder();
+                }
+
+                this.judgeWechat();
+                this.visibilitychange();
+
+                this.getSlideList();
+                this.getGroupList();
+                this.getAccount();
+                this.getSaleList();
+                this.getWechat();
+                this.getPasswd();
+            },
+            methods: {
+                judgeWechat () {
+                    let wechat = navigator.userAgent.match(/MicroMessenger\/([\d\.]+)/i);
+                    let judgewechat = wechat[1].split('.');
+                    if (judgewechat[0] > 7 || judgewechat[0] == 7 && (judgewechat[1] > 0 || judgewechat[1] == 0 && judgewechat[2] >= 12)) {
+                        this.wechatState = true;
+                    } else {
+                        this.wechatState = false;
+                    }
+                },
+                visibilitychange () {
+                    document.addEventListener('visibilitychange', () => {
+                        this.isHidden = document.hidden;
+                        if (this.isHidden === true && this.video.interval) {
+                            this.video.player.pause();
+                            clearInterval(this.video.interval);
+                        } else if (this.isHidden === false && this.video.countdown > 0) {
+                            this.video.player.play();
+                            this.playVideo();
+                        }
+                    });
+                },
+                orderClick () {
+                    if (zovye_fn.redirectToBonusPage) {
+                        zovye_fn.redirectToUserPage();
+                    } else {
+                        zovye_fn.redirectToOrderPage();
+                    }
+                },
+                feedbackClick () {
+                    zovye_fn.redirectToFeedBack();
+                },
+                showToast (text) {
+                    if (this.toast.visible) {
+                        clearTimeout(this.toast.timeout);
+                        this.toast.timeout = null;
+                    }
+                    this.toast.text = text;
+                    this.toast.visible = true;
+                    this.toast.timeout = setTimeout(() => {
+                        this.toast.visible = false;
+                    }, 2000);
+                },
+                getSlideList () {
+                    zovye_fn.getAdvs(4, 10, (data) => {
+                        data.forEach(e => {
+                            e.data.images.forEach(img => {
+                                let obj = {
+                                    image: img,
+                                    url: e.data.link,
+                                    id: e.id
+                                };
+                                this.slides.push(obj);
+                            })
+                        });
+                        this.$nextTick(() => {
+                            new Swiper('#adv-swiper-container', {
+                                autoplay: {
+                                    delay: 3000,
+                                    disableOnInteraction: false
+                                },
+                                pagination: {
+                                    el: '.swiper-pagination'
+                                }
+                            });
+                        });
+                    });
+                },
+                slideClick (item) {
+                    if (item.url) {
+                        window.location.href = item.url;
+                    }
+                },
+                getGroupList () {
+                    zovye_fn.getAdvs(9, 10, (data) => {
+                        this.groups = data;
+                    });
+                },
+                getAccount () {
+                    this.loading = true;
+                    zovye_fn.getAccounts(null, (res) => {
+                        if (res.status) {
+                            const array = res.data || [];
+                            this.account.data = array.pop() || null;
+                            if (this.account.data) {
+                                if (typeof zovye_fn.saveUserProfile === 'function') {
+                                    this.saveUserProfile = true;
+                                }
+                            }
+                            if (this.account.data && this.account.data.thirdparty_platform) {
+                                this.getFreeGoodsList();
+                            } else {
+                                this.getPayGoodsList();
+                            }
+                            if (this.account.data && this.account.data.username) {
+                                if (this.wechatState) {
+                                    this.$nextTick(() => {
+                                        var btn = document.getElementById(this.account.data.uid);
+                                        btn.addEventListener('launch', (e) => {
+                                            if (this.account.timeout) {
+                                                clearTimeout(this.account.timeout);
+                                                this.account.timeout = null;
+                                            }
+                                            this.account.timeout = setTimeout(() => {
+                                                if (document.hidden) {
+                                                    zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(this.account.data.uid);
+                                                }
+                                            }, this.account.data.delay * 1000);
+                                        });
+                                        btn.addEventListener('error', function (e) {
+                                            console.log('fail', e.detail);
+                                        });
+                                    })
+                                } else {
+                                    alert('当前微信版本过低，建议升级微信后再试！');
+                                }
+                            }
+                        } else {
+                            this.loading = false;
+                            alert(res.data.msg);
+                        }
+                    }, 1);
+                },
+                getFreeGoodsList () {
+                    zovye_fn.getGoodsList(res => {
+                        if (res.status) {
+                            this.free = res.data || [];
+                        } else {
+                            alert(res.data.msg);
+                        }
+                        this.getPayGoodsList();
+                    }, 'free')
+                },
+                getPayGoodsList () {
+                    zovye_fn.getGoodsList(res => {
+                        this.loading = false;
+                        if (res.status) {
+                            const goods = res.data.goods || [];
+                            goods.forEach(e => {
+                                e.count = 1;
+                            })
+                            this.pay = goods;
+                            this.packages = res.data.packages || [];
+                            if (this.account.data && this.account.data.thirdparty_platform && this.free.length > 0 || this.account.data && !this.account.data.thirdparty_platform) {
+                                this.categories.val = 'free';
+                            } else if (this.pay.length > 0 || this.packages.length > 0) {
+                                this.categories.val = 'pay';
+                            }
+                        } else {
+                            alert(res.data.msg);
+                        }
+                    })
+                },
+                getSaleList () {
+                    zovye_fn.getAdvs(10, 10, (data) => {
+                        this.sales = data;
+                    });
+                },
+                saleClick (item) {
+                    if (item.data.url) {
+                        window.location.href = item.data.url;
+                    }
+                },
+                getWechat () {
+                    zovye_fn.getAdvs(11, 1, (data) => {
+                        if (data.length > 0) {
+                            this.wechat.qrcode = data[0].data.image;
+                            this.wechat.desc = data[0].data.text;
+                        }
+                    });
+                },
+                chooseGoods (goods) {
+                    if (goods.num > 0) {
+                        this.loading = true;
+                        zovye_fn.chooseGoods(goods.id, 1, res => {
+                            this.loading = false;
+                            if (res.status) {
+                                this.account.visible = true;
+                            } else {
+                                alert(res.data.msg);
+                            }
+                        })
+                    } else {
+                        this.showToast('商品已售罄');
+                    }
+                },
+                playClick () {
+                    const that = this;
+                    if (!that.video.player) {
+                        that.video.countdown = that.account.data.duration;
+                        const options = {
+                            autoplay: true,
+                            sources: [{
+                                type: "video/mp4",
+                                src: that.account.data.media
+                            }]
+                        };
+
+                        that.video.player = videojs('player', options, function onPlayerReady () {
+                            this.play();
+                            that.video.visible = true;
+                            that.playVideo();
+                        });
+                    }
+                },
+                playVideo () {
+                    this.playRequest();
+                    this.video.interval = setInterval(() => {
+                        this.video.countdown--;
+                        if (this.video.countdown === 0) {
+                            clearInterval(this.video.interval);
+                        }
+                    }, 1000);
+                },
+                playRequest () {
+                    zovye_fn.play(this.account.data.uid, this.account.data.duration - this.video.countdown, (res) => {
+                        if (res) {
+                            if (!res.status) {
+                                this.video.player.pause();
+                                clearInterval(this.video.interval);
+                                this.video.visible = false;
+                                this.isHidden = true;
+                                alert(res.data.msg || '播放出错！');
+                            }
+                            if (res.data && res.data.redirect) {
+                                window.location.replace(res.data.redirect);
+                            } else if (res.status) {
+                                setTimeout(() => {
+                                    if (this.isHidden !== true) {
+                                        this.playRequest();
+                                    }
+                                }, 1000)
+                            }
+                        }
+                    });
+                },
+                minusClick (item) {
+                    if (item.num === 0) {
+                        this.showToast('商品已售罄');
+                    } else {
+                        if (item.count > 1) {
+                            item.count--;
+                        } else {
+                            this.showToast('不能再减啦');
+                        }
+                    }
+                },
+                plusClick (item) {
+                    if (item.num === 0) {
+                        this.showToast('商品已售罄');
+                    } else {
+                        if (item.count < item.num && item.count < this.max) {
+                            item.count++;
+                        } else {
+                            this.showToast('不能再加啦');
+                        }
+                    }
+                },
+                buyClick (item) {
+                    if (item.num === 0) {
+                        this.showToast('商品已售罄');
+                    } else if (!this.loading) {
+                        this.loading = true;
+                        const data = {
+                            goodsID: item.id,
+                            total: item.count
+                        }
+                        zovye_fn.goods_wxpay(data).then(() => {
+                            this.loading = false;
+                        }).catch(() => {
+                            this.loading = false;
+                        });
+                    }
+                },
+                retryOrder () {
+                    zovye_fn.retryOrder((res) => {
+                        if (res.status) {
+                            this.retry.text = res.data.message;
+                            this.retry.visible = true;
+                        }
+                    })
+                },
+                retryClick () {
+                    zovye_fn.closeWindow && zovye_fn.closeWindow();
+                },
+                getPasswd () {
+                    zovye_fn.getAdvs('passwd', 1, (data) => {
+                        if (data.length > 0) {
+                            this.passwd = {
+                                visible: true,
+                                data: data[0].data
+                            };
+                        }
+                    })
+                },
+                onCopy () {
+                    this.passwd.visible = false;
+                },
+                onError () {
+                    this.passwd.visible = false;
+                },
+                sexClick (value) {
+                    zovye_fn.saveUserProfile({ sex: value });
+                    this.saveUserProfile = false;
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

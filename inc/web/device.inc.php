@@ -1053,7 +1053,7 @@ if ($op == 'list') {
         foreach ($accounts as &$entry) {
             $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);
             if (empty($entry['qrcode'])) {
-                $entry['qrcode'] = MODULE_URL . 'static/img/qrcode.svg';
+                $entry['qrcode'] = MODULE_URL . 'static/img/qrcode_blank.svg';
             }
         }
     }

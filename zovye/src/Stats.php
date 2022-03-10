@@ -351,9 +351,9 @@ class Stats
         $res = Order::query()
             ->where(['createtime >=' => $first_day->getTimestamp()])
             ->groupBy('agent_id')
-            ->orderBy('total ASC')
+            ->orderBy('total DESC')
             ->limit($max)
-            ->getAll(['agent_id', 'count(*) AS total']);
+            ->getAll(['agent_id', 'SUM(num) AS total']);
 
         $data = [];
         foreach ($res as $item) {
@@ -391,9 +391,9 @@ class Stats
         $res = Order::query()
             ->where(['createtime >=' => $first_day->getTimestamp()])
             ->groupBy('account')
-            ->orderBy('total ASC')
+            ->orderBy('total DESC')
             ->limit($max)
-            ->getAll(['account', 'count(*) AS total']);
+            ->getAll(['account', 'SUM(num) AS total']);
 
         $data = [];
         foreach ($res as $item) {
@@ -431,9 +431,9 @@ class Stats
         $res = Order::query()
             ->where(['createtime >=' => $first_day->getTimestamp()])
             ->groupBy('device_id')
-            ->orderBy('total ASC')
+            ->orderBy('total DESC')
             ->limit($max)
-            ->getAll(['device_id', 'count(*) AS total']);
+            ->getAll(['device_id', 'SUM(num) AS total']);
 
         $data = [];
         foreach ($res as $item) {

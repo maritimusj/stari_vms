@@ -3,7 +3,7 @@
     <application setting="false">
         <name><![CDATA[新零售saas系统]]></name>
         <identifie><![CDATA[zovye_vms]]></identifie>
-        <version><![CDATA[6.2.8]]></version>
+        <version><![CDATA[6.2.9]]></version>
         <type><![CDATA[business]]></type>
         <ability><![CDATA[新零售saas系统]]></ability>
         <description><![CDATA[新零售saas系统]]></description>

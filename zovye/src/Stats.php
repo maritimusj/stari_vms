@@ -498,7 +498,7 @@ class Stats
             if (Config::app('order.total', 0) > 100000) {
                 $last_order = Order::getLastOrder();
                 if ($last_order) {
-                    $total = $last_order['id'];
+                    $total = $last_order['id'] . '（订单）';
                 }
             } else {
                 $e = [app(), 'goods'];

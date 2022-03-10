@@ -35,6 +35,6 @@ if (is_error($result)) {
         'data' => $json_data,
         'error' => $result,
     ]);
-} else {
-    echo WxAppMessagePush::RESPONSE;
 }
+
+echo WxAppMessagePush::RESPONSE;

@@ -159,6 +159,17 @@ class Order extends State
         return null;
     }
 
+    public static function getLastOrder($fetch_order_obj = false)
+    {
+        $query = Order::query();
+        $query->orderBy('id DESC');
+        $last_order = $query->findOne();
+        return $fetch_order_obj ? $last_order : [
+            'id' => $last_order->getId(),
+            'createtime' => $last_order->getCreatetime(),
+        ];
+    }
+
     public static function getFirstOrder($fetch_order_obj = false)
     {
         $data = settings('stats.first_order');

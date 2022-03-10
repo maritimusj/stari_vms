@@ -624,7 +624,7 @@ include './index.php';
      * @param array $params
      * @return array|bool|mixed
      */
-    protected static function checkAccountLimits(userModelObj $user, accountModelObj $account, array $params = [])
+    public static function checkAccountLimits(userModelObj $user, accountModelObj $account, array $params = [])
     {
         //检查性别，手机限制
         $limits = $account->get('limits');

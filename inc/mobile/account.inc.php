@@ -381,12 +381,17 @@ if ($op == 'default') {
 
         $result = Util::transactionDo(function () use($user, $device, $account, $answer) {
 
+            $log = Balance::give($user, ($acc ?? $account));
+            if (is_error($log)) {
+                return $log;
+            }
+
             $res = Questionnaire::submitAnswer($account, $answer, $user, $device);
             if (is_error($res)) {
                 return $res;
             }
             
-            return Balance::give($user, ($acc ?? $account));
+            return $log;
         });
 
         if (is_error($result)) {
@@ -404,7 +409,7 @@ if ($op == 'default') {
 
         $result = $account->checkAnswer($user, $answer);
         if (is_error($result)) {
-            return JSON::fail($result);
+            JSON::fail($result);
         }
 
         $ticket_data = [

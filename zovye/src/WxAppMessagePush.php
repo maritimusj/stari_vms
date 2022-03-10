@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use RuntimeException;
 use wx\ErrorCode;
 use wx\Prpcrypt;
 
@@ -25,7 +26,7 @@ class WxAppMessagePush
             $params['nonce'],
             Config::app('wxapp.message-push.token'),
         ];
-    
+
         sort($data, SORT_STRING);
 
         return $params['signature'] === sha1(implode($data));
@@ -36,6 +37,12 @@ class WxAppMessagePush
         $wx_config = settings('agentWxapp', []);
         if (isEmptyArray($wx_config)) {
             return err('没有配置小程序！');
+        }
+
+        $wx = Wx::getWxApp($wx_config);
+        $access_token = $wx->getAccessToken();
+        if (empty($access_token)) {
+            return err('暂时无法提供服务，请稍后再试！');
         }
 
         $config = Config::app('wxapp.message-push', []);
@@ -49,41 +56,47 @@ class WxAppMessagePush
             $msg = json_decode($decrypted, true);
         }
 
+        $user = User::get($msg['FromUserName'], true, User::WxAPP);
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
         if ($msg['MsgType'] == 'text') {
-            $user = User::get($msg['FromUserName'], true, User::WxAPP);
-            if (empty($user)) {
-                return err('找不到指定用户！');
+            try {
+
+                if ($user->getLastActiveData('from') != 'wxapp') {
+                    throw new RuntimeException('请从小程序进入服务，谢谢！');
+                }
+
+                $device = $user->getLastActiveDevice();
+
+                if (empty($device)) {
+                    throw new RuntimeException('请重新扫描设备二维码，谢谢！');
+                }
+
+                $response_msg = [
+                    'touser' => $user->getOpenid(),
+                    'msgtype' => 'link',
+                    'link' => [
+                        'title' => $config['msgTitle'] ?? '欢迎使用',
+                        'description' => $config['msgDesc'] ?? '点击打开领取页面...',
+                        'url' => $device->getUrl(),
+                        'thumb_url' => $config['msgThumb'] ? Util::toMedia($config['msgThumb'], true) : '',
+                    ]
+                ];
+
+            } catch (RuntimeException $e) {
+                $response_msg = [
+                    'touser' => $user->getOpenid(),
+                    'msgtype' => 'text',
+                    'text' => [
+                        'content' => $e->getMessage(),
+                    ]
+                ];
             }
-
-            if ($user->getLastActiveData('from') != 'wxapp') {
-                return err('请重新登录小程序！');
-            }
-
-            $device = $user->getLastActiveDevice();
-
-            if (empty($device)) {
-                return err('找不到这个设备！');
-            }
-
-            $wx = Wx::getWxApp($wx_config);
-            $access_token = $wx->getAccessToken();
-            if (empty($access_token)) {
-                return err('无法获取access_token');
-            }
-
-            $welcome_msg = [
-                'touser' => $user->getOpenid(),
-                'msgtype' => 'link',
-                'link' => [
-                    'title' => $config['msgTitle'] ?? '欢迎使用',
-                    'description' => $config['msgDesc'] ?? '点击打开领取页面...',
-                    'url' => $device->getUrl(),
-                    'thumb_url' => $config['msgThumb'] ? Util::toMedia($config['msgThumb'], true) : '',
-                ]
-            ];
 
             $url = str_replace('{ACCESS_TOKEN}', $access_token, self::API_CUSTOMER_SERVICE_MESSAGE_SEND_URL);
-            $result = Util::post($url, $welcome_msg);
+            $result = Util::post($url, $response_msg);
 
             if (is_error($result)) {
                 return $result;
@@ -93,7 +106,7 @@ class WxAppMessagePush
                 return err($result['errmsg'] ?? 'unknown error');
             }
 
-            return $welcome_msg;
+            return $response_msg;
         }
 
         return true;

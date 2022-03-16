@@ -379,7 +379,7 @@ if ($op == 'default') {
 
     if (($acc ?? $account)->getBonusType() == Account::BALANCE)  {
 
-        $result = Util::transactionDo(function () use($user, $device, $account, $answer) {
+        $result = Util::transactionDo(function () use($user, $device, $acc, $account, $answer) {
 
             $log = Balance::give($user, ($acc ?? $account));
             if (is_error($log)) {

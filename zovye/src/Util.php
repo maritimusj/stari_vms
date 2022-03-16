@@ -768,9 +768,11 @@ include './index.php';
             return $res;
         }
 
-        $assign_data = $account->settings('assigned', []);
-        if (!Util::isAssigned($assign_data, $device)) {
-            return error(State::ERROR, '没有允许从这个设备访问该公众号！');
+        if (empty($params['ignore_assigned'])) {
+            $assign_data = $account->settings('assigned', []);
+            if (!Util::isAssigned($assign_data, $device)) {
+                return error(State::ERROR, '没有允许从这个设备访问该公众号！');
+            }
         }
 
         return self::checkAccountLimits($user, $account, $params);

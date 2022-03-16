@@ -26,7 +26,11 @@ class AccountEventHandler
     {
         if ($account && empty($order)) {
             //检查用户是否允许
-            $res = Util::checkAvailable($user, $account, $device);
+            $params = [];
+            if (settings('api.account', 'n/a') == $account->getUid()) {
+                $params['ignore_assigned'] = true;
+            }
+            $res = Util::checkAvailable($user, $account, $device, $params);
             if (is_error($res)) {
                 ZovyeException::throwWith($res['message'], -1, $device);
             }

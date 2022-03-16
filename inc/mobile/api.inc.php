@@ -11,10 +11,7 @@ if ($app_key !== settings('app.key')) {
     JSON::fail('appkey不正确！');
 }
 
-$account_uid = request::str('account');
-if (empty($account_uid)) {
-    $account_uid = settings('api.account');
-}
+$account_uid = settings('api.account');
 if (empty($account_uid)) {
     JSON::fail('没有指定公众号！');
 }

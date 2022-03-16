@@ -11,15 +11,15 @@ if ($app_key !== settings('app.key')) {
     JSON::fail('appkey不正确！');
 }
 
-$account_name = request::str('account');
-if (empty($account_name)) {
-    $account_name = settings('api.account');
+$account_uid = request::str('account');
+if (empty($account_uid)) {
+    $account_uid = settings('api.account');
 }
-if (empty($account_name)) {
+if (empty($account_uid)) {
     JSON::fail('没有指定公众号！');
 }
 
-$account = Account::findOneFromName($account_name);
+$account = Account::findOneFromUID($account_uid);
 if (empty($account)) {
     JSON::fail('找不到指定的公众号！');
 }

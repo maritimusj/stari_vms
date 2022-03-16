@@ -52,7 +52,7 @@ if ($user->isBanned()) {
 }
 
 $device_imei = request::str('device');
-$device = Device::get($device_imei, true);
+$device = Device::find($device_imei, ['imei', 'shadow_id']);
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }

@@ -161,8 +161,8 @@ class Util
                             $customData = $user->get('customData', []);
                             $user->set('fansData', array_merge($fans, $customData));
                             $user->save();
-                            App::setContainer($user);
                         }
+                        App::setContainer($user);
                     }
                 }
             }

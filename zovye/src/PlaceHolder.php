@@ -19,6 +19,7 @@ class PlaceHolder
                 $url = str_ireplace(is_string($index) ? '{'. $index . '}' : '{user_uid}', $o->getOpenid(), $url);
             } elseif ($o instanceof deviceModelObj) {
                 $url = str_ireplace(is_string($index) ? '{'. $index . '}' : '{device_uid}', $o->getShadowId(), $url);
+                $url = str_ireplace(is_string($index) ? '{'. $index . '}' : '{device_imei}', $o->getImei(), $url);
             } elseif ($o instanceof DateTimeInterface) {
                 $url = str_ireplace(is_string($index) ? '{'. $index . '}' : '{timestamp}', $o->getTimestamp(), $url);
             } elseif (is_string($index) && is_string($o)) {

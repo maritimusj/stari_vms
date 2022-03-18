@@ -172,7 +172,7 @@ if ($op == 'default') {
     if (request::has('deviceId')) {
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
-            return err('找不到这个设备！');
+            JSON::fail('找不到这个设备！');
         }
     } else {
         $device = Device::getDummyDevice();
@@ -184,6 +184,10 @@ if ($op == 'default') {
     }
 
     if (request::bool('commission')) {
+        $free_goods_list = $device->getGoodsList($user, [Goods::AllowFree]);
+        if (empty($free_goods_list)) {
+            JSON::success([]);
+        }
         $include[] = Account::COMMISSION;
     }
 

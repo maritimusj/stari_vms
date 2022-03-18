@@ -185,7 +185,14 @@ if ($op == 'default') {
 
     if (request::bool('commission')) {
         $free_goods_list = $device->getGoodsList($user, [Goods::AllowFree]);
-        if (empty($free_goods_list)) {
+        $ok = false;
+        foreach ($free_goods_list as $goods) {
+            if ($goods['num'] > 0) {
+                $ok = true;
+                break;
+            }
+        }
+        if (!$ok) {
             JSON::success([]);
         }
         $include[] = Account::COMMISSION;

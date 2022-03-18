@@ -36,13 +36,12 @@ if (empty($device)) {
 $payload = $device->getPayload(true);
 $result = $payload['cargo_lanes'] ?? [];
 
+$allow_free = request::bool('free');
+$allow_pay = request::bool('pay');
+
 $goods = [];
 foreach ($result as $entry) {
-    if (request::bool('free') && $entry[Goods::AllowFree] or
-        request::bool('pay') && $entry[Goods::AllowPay] or
-        empty(request('free')) &&
-        empty(request('pay'))) {
-
+    if ($allow_free && $entry[Goods::AllowFree] or $allow_pay && $entry[Goods::AllowPay] or !$allow_free && !$allow_pay) {
         $key = "goods{$entry['goods_id']}";
         if ($goods[$key]) {
             $goods[$key]['num'] += intval($entry['num']);

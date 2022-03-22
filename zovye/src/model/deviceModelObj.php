@@ -873,7 +873,7 @@ class deviceModelObj extends modelObj
 
     /**
      * 创建二维码文件
-     * @return mixed
+     * @return bool
      */
     public function createQrcodeFile(): bool
     {
@@ -884,15 +884,12 @@ class deviceModelObj extends modelObj
         });
 
         if (is_error($qrcode_file)) {
-            return $qrcode_file;
+            return false;
         }
 
         $this->setQrcode($qrcode_file);
 
-        if (!$this->save()) {
-            return error(State::ERROR, '创建二维码文件失败！');
-        }
-        return true;
+        return $this->save();
     }
 
     /**

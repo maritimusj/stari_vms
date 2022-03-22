@@ -195,7 +195,7 @@ class Stats
             $first_order = Order::getFirstOrderOf($obj);
             if (!$first_order) {
                 return $chart;
-            }     
+            }
 
             $begin = new DateTime($day->format('Y-m-d 00:00'));
             try {
@@ -203,7 +203,7 @@ class Stats
                 if ($begin < $order_date_obj) {
                     return [];
                 }
-            }catch (Exception $e) {
+            } catch (Exception $e) {
             }
 
             $end = new DateTime($begin->format('Y-m-d 00:00'));
@@ -247,14 +247,14 @@ class Stats
                 return $chart;
             }
 
-            $begin = new DateTime($month->format('Y-m-01 00:00')); 
+            $begin = new DateTime($month->format('Y-m-01 00:00'));
 
             try {
                 $order_date_obj = new DateTime(date('Y-m-01', $first_order['createtime']));
                 if ($begin < $order_date_obj) {
                     return [];
                 }
-            }catch (Exception $e) {
+            } catch (Exception $e) {
             }
 
             if ($begin->getTimestamp() < $first_order['createtime']) {
@@ -356,20 +356,23 @@ class Stats
             ->getAll(['agent_id', 'SUM(num) AS total']);
 
         $data = [];
-        foreach ($res as $item) {
-            if (empty($item['agent_id'])) {
-                continue;
-            }
 
-            $agent = Agent::get($item['agent_id']);
-            if (!$agent) {
-                continue;
-            }
+        if ($res) {
+            foreach ($res as $item) {
+                if (empty($item['agent_id'])) {
+                    continue;
+                }
 
-            $data[] = [
-                'obj' => $agent,
-                'name' => $agent->getName(),
-            ];
+                $agent = Agent::get($item['agent_id']);
+                if (!$agent) {
+                    continue;
+                }
+
+                $data[] = [
+                    'obj' => $agent,
+                    'name' => $agent->getName(),
+                ];
+            }
         }
 
         return self::fillChartData([
@@ -396,20 +399,23 @@ class Stats
             ->getAll(['account', 'SUM(num) AS total']);
 
         $data = [];
-        foreach ($res as $item) {
-            if (empty($item['account'])) {
-                continue;
-            }
 
-            $account = Account::findOneFromName($item['account']);
-            if (empty($account)) {
-                continue;
-            }
+        if ($res) {
+            foreach ($res as $item) {
+                if (empty($item['account'])) {
+                    continue;
+                }
 
-            $data[] = [
-                'obj' => $account,
-                'name' => $account->getTitle(),
-            ];
+                $account = Account::findOneFromName($item['account']);
+                if (empty($account)) {
+                    continue;
+                }
+
+                $data[] = [
+                    'obj' => $account,
+                    'name' => $account->getTitle(),
+                ];
+            }
         }
 
         return self::fillChartData([
@@ -436,20 +442,23 @@ class Stats
             ->getAll(['device_id', 'SUM(num) AS total']);
 
         $data = [];
-        foreach ($res as $item) {
-            if (empty($item['device_id'])) {
-                continue;
-            }
 
-            $device = Device::get($item['device_id']);
-            if (empty($device)) {
-                continue;
-            }
+        if ($res) {
+            foreach ($res as $item) {
+                if (empty($item['device_id'])) {
+                    continue;
+                }
 
-            $data[] = [
-                'obj' => $device,
-                'name' => $device->getName(),
-            ];
+                $device = Device::get($item['device_id']);
+                if (empty($device)) {
+                    continue;
+                }
+
+                $data[] = [
+                    'obj' => $device,
+                    'name' => $device->getName(),
+                ];
+            }
         }
 
         return self::fillChartData([

@@ -104,25 +104,13 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['user']['verify18']['enabled'] = request::bool('userVerify18') ? 1 : 0;
         $settings['user']['verify18']['Title'] = request::trim('userVerify18Title');
+        
+        $settings['user']['discountPrice'] = request::float('discountPrice', 0, 2) * 100;
 
-        if (App::isBalanceEnabled()) {
-            Config::balance('sign.bonus', [
-                'enabled' => request::bool('dailySignInEnabled') ? 1 : 0,
-                'min' => request::int('dailySignInBonusMin'),
-                'max' => request::int('dailySignInBonusMax'),
-            ], true);
-
-            Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
-            Config::balance('order.as', request::str('balanceOrderAs'), true);
-            Config::balance('order.auto_rb', request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
-
-            $promote_opts = request::array('accountPromoteBonusOption', []);
-            foreach (['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
-                Config::balance("account.promote_bonus.$name", in_array($name, $promote_opts) ? 1 : 0, true);
-            }
-
-            Config::balance('account.promote_bonus.min', request::int('accountPromoteBonusMin'), true);
-            Config::balance('account.promote_bonus.max', request::int('accountPromoteBonusMax'), true);
+        if (App::isMustFollowAccountEnabled()) {
+            $settings['mfa'] = [
+                'enable' => request::bool('mustFollow') ? 1 : 0,
+            ];
         }
 
     } elseif ($save_type == 'ctrl') {
@@ -617,13 +605,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         ];
 
         $settings['misc']['qrcode']['default_url'] = request::trim('default_url');
-        $settings['user']['discountPrice'] = request::float('discountPrice', 0, 2) * 100;
-
-        if (App::isMustFollowAccountEnabled()) {
-            $settings['mfa'] = [
-                'enable' => request::bool('mustFollow') ? 1 : 0,
-            ];
-        }
 
         $settings['api'] = [
             'account' => request::trim('account'),
@@ -779,6 +760,27 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         foreach ($need_inserted_arr as $key => $val) {
             $query->create(['k' => $key, 'v' => $val, 'createtime' => time()]);
         }
+    } elseif ($save_type == 'balance') {
+
+        if (App::isBalanceEnabled()) {
+            Config::balance('sign.bonus', [
+                'enabled' => request::bool('dailySignInEnabled') ? 1 : 0,
+                'min' => request::int('dailySignInBonusMin'),
+                'max' => request::int('dailySignInBonusMax'),
+            ], true);
+
+            Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
+            Config::balance('order.as', request::str('balanceOrderAs'), true);
+            Config::balance('order.auto_rb', request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
+
+            $promote_opts = request::array('accountPromoteBonusOption', []);
+            foreach (['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
+                Config::balance("account.promote_bonus.$name", in_array($name, $promote_opts) ? 1 : 0, true);
+            }
+
+            Config::balance('account.promote_bonus.min', request::int('accountPromoteBonusMin'), true);
+            Config::balance('account.promote_bonus.max', request::int('accountPromoteBonusMax'), true);
+        }
     }
 
     if (app()->saveSettings($settings)) {
@@ -797,6 +799,7 @@ $tpl_data['navs'] = [
     'agent' => '代理商',
     'wxapp' => '小程序',
     'commission' => '佣金',
+    'balance' => '积分',
     'advs' => '广告',
     'account' => '任务',
     'notice' => '通知',
@@ -804,6 +807,10 @@ $tpl_data['navs'] = [
     'misc' => '其它',
     'upgrade' => '系统升级',
 ];
+
+if (!App::isBalanceEnabled()) {
+    unset($tpl_data['navs']['balance']);
+}
 
 if (!$settings['custom']['SQMPay']['enabled']) {
     unset($tpl_data['navs']['advs']);
@@ -867,7 +874,9 @@ if ($op == 'account') {
         }
         $tpl_data['queue'] = Config::app('queue', []);
     }
+
     $tpl_data['migrate'] = Migrate::detect();
+
 } elseif ($op == 'unlock') {
 
     app()->resetLock();
@@ -1004,18 +1013,15 @@ if ($op == 'account') {
     }
 } elseif ($op == 'user') {
 
-    $res = CtrlServ::v2_query('idcard/balance');
+    if (App::isIDCardVerifyEnabled()) {
+        $res = CtrlServ::v2_query('idcard/balance');
 
-    if (!empty($res) && $res['status']) {
-        $tpl_data['idcard_balance'] = $res['data']['balance'];
-    } else {
-        $tpl_data['idcard_balance'] = $res['data']['msg'];
+        if (!empty($res) && $res['status']) {
+            $tpl_data['idcard_balance'] = $res['data']['balance'];
+        } else {
+            $tpl_data['idcard_balance'] = $res['data']['msg'];
+        }        
     }
-
-    $tpl_data['bonus_url'] = Util::murl('bonus');
-    $tpl_data['api_url'] = Util::murl('user');
-    $tpl_data['app_key'] = Config::balance('app.key');
-    $tpl_data['notify_url'] = Config::balance('app.notify_url');
 
 } elseif ($op == 'advs') {
 
@@ -1323,6 +1329,13 @@ if ($op == 'account') {
         'title' => '代理商注册页面',
         'content' => $content,
     ]);
+} elseif ($op == 'balance') {
+
+    $tpl_data['bonus_url'] = Util::murl('bonus');
+    $tpl_data['api_url'] = Util::murl('user');
+    $tpl_data['app_key'] = Config::balance('app.key');
+    $tpl_data['notify_url'] = Config::balance('app.notify_url');
+
 }
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {

@@ -1,0 +1,180 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20211127');}
+<style>
+    .radio-inline+.radio-inline, .checkbox-inline+.checkbox-inline {
+        margin-top: 0;
+        margin-right: 10px;
+        margin-left: 0;
+    }
+</style>
+{template "web/settings/nav"}
+<form action="{php echo $this->createWebUrl('settings');}" method="post">
+    <div class="panel panel-default nav-tab-item">
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">积分</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">任务中心网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$bonus_url}"></i> {$bonus_url}</span>
+                        <span class="help-block">* 直接进入积分任务中心的网址链接</span>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="dailySignInEnabled" class="col-md-2 control-label">每日签到</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="dailySignInEnabled" id="dailySignInEnabled" value="1" {if \zovye\Config::balance('sign.bonus.enabled', false)}checked{/if}>
+                                启用后，用户可以通过每日签到获得指定积分
+                                <span class="help-block">* 用户签到后，会获得指定范围<b>随机数量</b>的积分</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dailySignInBonusMin" class="col-md-2 control-label">奖励积分
+                        <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                    </label>
+                    <div class="col-md-10">
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="dailySignInBonusMin" id="dailySignInBonusMin" value="{php echo \zovye\Config::balance('sign.bonus.min', 0)}" min="0" step="1" title="最小值">
+                            <span class="help-block">* 随机积分的最小值</span>
+                        </div>
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="dailySignInBonusMax" id="dailySignInBonusMax" value="{php echo \zovye\Config::balance('sign.bonus.max', 0)}" min="0" step="1" title="最大值">
+                            <span class="help-block">* 随机积分的最大值</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">积分订单</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="balanceOrderAsBalance" class="radio-inline">
+                            <input name="balanceOrderAs" id="balanceOrderAsBalance" type="radio" value="balance"  {if \zovye\Config::balance('order.as', 'balance') == 'balance'}checked="checked"{/if}>
+                            忽略
+                        </label>
+                        <label for="balanceOrderAsFree" class="radio-inline">
+                            <input name="balanceOrderAs" id="balanceOrderAsFree" type="radio" value="free" {if \zovye\Config::balance('order.as') == 'free'}checked="checked"{/if}>
+                            免费订单
+                        </label>
+                        <label for="balanceOrderAsPay" class="radio-inline">
+                            <input name="balanceOrderAs" id="balanceOrderAsPay" type="radio" value="pay"  {if \zovye\Config::balance('order.as') == 'pay'}checked="checked"{/if}>
+                            支付订单
+                        </label>
+                        <span class="help-block">* 积分订单的归属将影响用户订单统计、佣金计算等，比如用户每天可以免费领取的次数</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="autoRollbackOrderBalance" class="col-md-2 control-label">出货失败</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="checkbox col-md-7">
+                                <label>
+                                    <input type="checkbox" name="autoRollbackOrderBalance" id="autoRollbackOrderBalance" value="1" {if \zovye\Config::balance('order.auto_rb', 0)}checked{/if}>
+                                    设备故障或者超时，出货失败后自动返还积分、佣金以及奖励
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="agentRegMode" class="col-md-2 control-label">任务激励</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="third_platform" {if \zovye\Config::balance('account.promote_bonus.third_platform', 0)}checked{/if}> 第三方平台
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="account" {if \zovye\Config::balance('account.promote_bonus.account', 0)}checked{/if}> 公众号
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="video" {if \zovye\Config::balance('account.promote_bonus.video', 0)}checked{/if}> 视频
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="wxapp" {if \zovye\Config::balance('account.promote_bonus.wxapp', 0)}checked{/if}> 小程序
+                        </label>
+                        {if \zovye\App::isDouyinEnabled()}
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="accountPromoteBonusOption[]" value="douyin" {if \zovye\Config::balance('account.promote_bonus.douyin', 0)}checked{/if}> 抖音号
+                        </label>
+                        {/if}
+                        <span class="help-block">* 用户完成指定任务后，会额外获得指定范围<b>随机数量</b>的积分（不包括已设置积分奖励的任务）</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="accountPromoteBonus" class="col-md-2 control-label">奖励积分
+                        <img src="{MODULE_URL}static/img/coin.svg" class="balance">
+                    </label>
+                    <div class="col-md-10">
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="accountPromoteBonusMin" id="accountPromoteBonusMin" value="{php echo \zovye\Config::balance('account.promote_bonus.min', 0)}" min="0" step="1" title="最小值">
+                            <span class="help-block">* 随机积分的最小值</span>
+                        </div>
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" name="accountPromoteBonusMax" id="accountPromoteBonusMin" value="{php echo \zovye\Config::balance('account.promote_bonus.max', 0)}" min="0" step="1" title="最大值">
+                            <span class="help-block">* 随机积分的最大值</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
+                <div class="title">第三方接口</div>
+                <div class="form-group">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">API Key</label>
+                        <div class="col-md-10">
+                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$app_key}"></i> {$app_key}</span>
+                            <span class="help-block">* 用户第三方接口鉴别身份，详情请参考<a href="https://www.stariata.com/upload/file/20211129.pdf" target="_blank"><b>文档</b></a></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">API网址</label>
+                        <div class="col-md-10">
+                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$api_url}"></i> {$api_url}</span>
+                            <span class="help-block">* 该接口用于获取积分用户列表，操作用户积分</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="balanceNotifyUrl" class="col-md-2 control-label">变动通知URL</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="balanceNotifyUrl" id="balanceNotifyUrl" value="{$notify_url}">
+                            <span class="help-block">* 由第三方提供，当用户积分发生变动时，调用此接口</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="balance">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+    </div>
+</form>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('settings');}");
+        zovye.result('refreshWxPlatformToken', function(res){
+            if (res.status && res.data.token) {
+                $('#wxtoken').find('[data-text]').attr('data-text', res.data.token);
+                $('#wxtoken').find('span').text(res.data.token);
+                $('#wxtoken').find('input[name=wxPlatformToken]').val(res.data.token);
+            }
+        })
+        zovye.result('refreshWxPlatformKey', function(res){
+            if (res.status && res.data.key) {
+                $('#wxkey').find('[data-text]').attr('data-text', res.data.key);
+                $('#wxkey').find('span').text(res.data.key);
+                $('#wxkey').find('input[name=wxPlatformKey]').val(res.data.key);
+            }
+        })
+        zovye.enableCopy();
+        zovye.enableCopy('text');
+        zovye.enableInputMask();
+    })
+</script>
+{template 'common/footer'}

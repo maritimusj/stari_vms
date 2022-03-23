@@ -147,6 +147,10 @@ class Util
                             if (isset($params['update'])) {
                                 $update = false;
                             }
+
+                            if (App::isBalanceEnabled()) {
+                                Balance::onUserCreated($user);
+                            }
                         }
                     }
 

@@ -56,7 +56,13 @@ class api
             $h5_openid = request::str('openId');
         }
 
-        return common::doUserLogin($res, request::array('userInfo', []), $h5_openid, request::str('device'));
+        return common::doUserLogin(
+            $res, 
+            request::array('userInfo', []), 
+            $h5_openid, 
+            request::str('device'),
+            request::str('from')
+        );
     }
 
     /**

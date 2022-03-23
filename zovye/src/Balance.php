@@ -27,6 +27,8 @@ class Balance
     const PROMOTE_BONUS = 9; // 任务奖励
     const TASK_BONUS = 10; // 任务奖励
     const DELIVERY_ORDER = 11; // 商城订单
+    const USER_NEW = 12; // 新用户奖励
+    const USER_REF = 13; // 推荐新用户奖励
 
     private $user;
 
@@ -343,7 +345,25 @@ $order_desc
 <dt>说明</dt><dd class="event">用户在商城兑换{$goods_desc}</dd>
 </dl>
 TEXT;
-        }
+        } elseif ($entry->getSrc() == Balance::USER_NEW) {
+            $data['memo'] = <<<TEXT
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">新用户首次登录，赠送积分</dd>
+</dl>
+TEXT;
+        } elseif ($entry->getSrc() == Balance::USER_REF) {
+            $user_profile  = $entry->getExtraData('user', []);
+            $type_title = '用户';
+            $text = $user_profile ? "<dt>$type_title</dt><dd><img src=\"{$user_profile['headimgurl']}\">{$user_profile['nickname']}</dd>" : '';
+            $data['memo'] = <<<TEXT
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">推荐新用户奖励</dd>
+$text
+</dl>
+TEXT;
+        } 
 
         return $data;
     }
@@ -466,5 +486,29 @@ TEXT;
             $result = Config::balance('order.as', 'free') == 'pay';
         }
         return $result;
+    }
+
+    public static function onUserCreated(userModelObj $user, userModelObj $ref = null)
+    {
+        $bonus = Config::balance('user', []);
+        if (empty($bonus)) {
+            return true;
+        }
+
+        if ($bonus['new'] > 0) {
+            $result = $user->getBalance()->change((int)$bonus['new'], Balance::USER_NEW);
+            if (!$result) {
+                return err('创建用户积分记录失败！');
+            }
+        }
+        if ($bonus['ref'] > 0 && $ref != null) {
+            $result = $ref->getBalance()->change((int)$bonus['ref'], Balance::USER_REF, [
+                'user' => $user->profile(false),
+            ]);
+            if (!$result) {
+                return err('创建用户积分记录失败！');
+            }
+        }
+        return true;
     }
 }

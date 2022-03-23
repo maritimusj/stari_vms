@@ -58,11 +58,18 @@ class common
         }
 
         //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
+        $h5_openid = '';
         if (request::has('openId')) {
-            $res['openId'] = request::str('openId');
+            $h5_openid = request::str('openId');
         }
 
-        return self::doUserLogin($res, request::array('userInfo', []));
+        return self::doUserLogin(
+            $res, 
+            request::array('userInfo', []),
+            $h5_openid,
+            '',
+            request::str('from')
+        );
     }
 
     public static function getDeviceInfo(): array
@@ -1196,7 +1203,7 @@ class common
         return self::$user;
     }
 
-    public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = ''): array
+    public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = '', $ref_user = ''): array
     {
         $openid = strval($res['openId']);
         $user = User::get($openid, true);
@@ -1213,6 +1220,15 @@ class common
             if (empty($user)) {
                 return error(State::ERROR, '创建用户失败！');
             }
+
+            if ($ref_user) {
+                $ref_user  = User::get($ref_user, true);
+            }
+
+            if (App::isBalanceEnabled()) {
+                Balance::onUserCreated($user, $ref_user ?? null);
+            }
+            
         } else {
             if ($user_info['nickName']) {
                 $user->setNickname($user_info['nickName']);
@@ -1272,7 +1288,9 @@ class common
         ];
 
         if (LoginData::create($data)) {
-            return ['token' => $token];
+            return [
+                'token' => $token, 
+            ];
         }
 
         return error(State::ERROR, '登录失败，请稍后再试！');

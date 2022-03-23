@@ -202,6 +202,8 @@ class agent
             'wxapp' => [
                 'debug' => false,
                 'config' => Config::app('wxapp.advs', []),
+                'title' => settings('agentWxapp.title', ''),
+                'name' => settings('agentWxapp.name', ''),
             ],
             'balance' => [
                 'config' => [

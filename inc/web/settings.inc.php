@@ -285,6 +285,8 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         }
     } elseif ($save_type == 'agent') {
         $settings['agentWxapp'] = [
+            'title' => request::trim('WxAppTitle'),
+            'name' => request::trim('WxAppName'),
             'key' => request::trim('WxAppKey'),
             'secret' => request::trim('WxAppSecret'),
             'username' => request::trim('WxAppUsername'),

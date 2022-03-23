@@ -113,6 +113,13 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             ];
         }
 
+        if (App::isBalanceEnabled()) {
+            Config::balance('user', [
+                'new' => request::int('newUser'),
+                'ref' => request::int('newUserRef'),
+            ], true);
+        }
+
     } elseif ($save_type == 'ctrl') {
         $url = request::trim('controlAddr');
         if (empty($url)) {

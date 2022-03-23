@@ -97,6 +97,25 @@
                 </div>
                 {/if}
             </div>
+            {if \zovye\App::isBalanceEnabled()}
+            <div class="seg">
+                <div class="title">积分奖励</div>
+                <div class="form-group">
+                    <label for="newUser" class="col-md-2 control-label">新用户首次赠送积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="newUser" id="newUser" value="{php echo \zovye\Config::balance('user.new', 0)}" min="0" step="1">
+                        <span class="help-block">* 新用户首次登录时，赠送指定积分</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newUserRef" class="col-md-2 control-label">推荐新用户奖励积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="newUserRef" id="newUserRef" value="{php echo \zovye\Config::balance('user.ref', 0)}" min="0" step="1">
+                        <span class="help-block">* 通过转发等方式推荐新用户成功后，获取积分奖励</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
     </div>
     <div class="form-btn">

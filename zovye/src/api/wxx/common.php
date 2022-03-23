@@ -1203,7 +1203,7 @@ class common
         return self::$user;
     }
 
-    public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = '', $ref_user = ''): array
+    public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = '', $ref_user_openid = ''): array
     {
         $openid = strval($res['openId']);
         $user = User::get($openid, true);
@@ -1221,8 +1221,8 @@ class common
                 return error(State::ERROR, '创建用户失败！');
             }
 
-            if ($ref_user) {
-                $ref_user  = User::get($ref_user, true);
+            if ($ref_user_openid) {
+                $ref_user  = User::get($ref_user_openid, true);
             }
 
             if (App::isBalanceEnabled()) {

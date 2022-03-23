@@ -488,7 +488,7 @@ TEXT;
         return $result;
     }
 
-    public static function onUserCreated(userModelObj $user, userModelObj $ref = null)
+    public static function onUserCreated(userModelObj $user, userModelObj $ref_user = null)
     {
         $bonus = Config::balance('user', []);
         if (empty($bonus)) {
@@ -501,8 +501,8 @@ TEXT;
                 return err('创建用户积分记录失败！');
             }
         }
-        if ($bonus['ref'] > 0 && $ref != null) {
-            $result = $ref->getBalance()->change((int)$bonus['ref'], Balance::USER_REF, [
+        if ($bonus['ref'] > 0 && $ref_user != null) {
+            $result = $ref_user->getBalance()->change((int)$bonus['ref'], Balance::USER_REF, [
                 'user' => $user->profile(false),
             ]);
             if (!$result) {

@@ -197,10 +197,17 @@ class agent
             'plugin' => [
                 'wxplatform' => App::isWxPlatformEnabled(),
                 'douyin' => App::isDouyinEnabled(),
+                'balance' => App::isBalanceEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,
                 'config' => Config::app('wxapp.advs', []),
+            ],
+            'balance' => [
+                'config' => [
+                    'user' => Config::balance('user', []),
+                    'sign' => Config::balance('sign.bonus', []),
+                ],
             ],
         ];
 

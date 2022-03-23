@@ -18,7 +18,7 @@
         body {
             background-color: #f4f4f4;
             font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-            font-size: 14px !important;
+            font-size: 15px !important;
             color: #101010;
             margin: 0;
             padding: 0;
@@ -106,6 +106,10 @@
             }
         }
 
+        .clickable:active {
+            opacity: 0.7;
+        }
+
         .main {
             width: 100%;
             display: flex;
@@ -144,14 +148,14 @@
 
         #adv-swiper-container {
             width: 100vw;
-            margin-top: 10px;
+            margin-top: 50px;
             --swiper-theme-color: #F07057;
         }
 
         .swiper-img {
-            width: calc(100% - 20px);
+            width: calc(100% - 30px);
             border-radius: 10px;
-            margin: 0 10px;
+            margin: 0 15px;
             box-shadow: 0 3px 5px #ccc;
         }
 
@@ -186,34 +190,6 @@
             font-weight: bold;
         }
 
-        .category-view {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .category-item {
-            width: 25%;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            background-color: white;
-            color: #9d9d9d;
-            border-radius: 15px;
-        }
-
-        .category-item:not(:first-child) {
-            margin-left: 15px;
-        }
-
-        .category-se {
-            background-color: #F07057;
-            color: white;
-        }
-
         .package-item {
             width: calc(100vw - 50px);
             background-color: #fff;
@@ -246,12 +222,13 @@
             margin-left: 5px;
         }
 
-        .goods-img {
+        .package-row-item .pic {
             width: 75px;
             height: 75px;
+            border-radius: 10px;
         }
 
-        .package-line {
+        .line {
             width: 100%;
             height: 1px;
             background-color: #eee;
@@ -269,67 +246,37 @@
             flex: 1;
             color: #F07057;
             font-weight: 500;
+            font-size: 18px;
         }
 
-        .goods-list {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-
-        .goods-view {
-            width: calc((100vw - 45px) / 2);
-            margin-left: 15px;
-            margin-top: 15px;
+        .goods-item {
+            width: calc(100% - 50px);
+            padding: 10px;
             background-color: white;
+            margin-top: 15px;
             border-radius: 10px;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        .pic-view {
-            width: calc((100vw - 45px) / 2 - 20px);
-            height: calc((100vw - 45px) / 2 - 20px);
-            margin: 10px 0;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .pic-view img {
+        .goods-item .row {
             width: 100%;
-            height: 100%;
-        }
-
-        .pic-view .sold-out {
-            position: absolute;
-            left: 0;
-            top: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .goods-name {
-            width: calc(100% - 20px);
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .goods-row {
-            width: calc(100% - 20px);
             display: flex;
             flex-direction: row;
             align-items: center;
         }
 
-        .goods-row .price {
+        .goods-item .pic {
+            width: 75px;
+            height: 75px;
+            border-radius: 10px;
+        }
+
+        .goods-item .name {
+            font-weight: bold;
             flex: 1;
-            color: #F07057;
-            font-weight: 500;
+            margin: 0 15px;
+            font-size: 16px;
         }
 
         .circle-btn {
@@ -348,24 +295,74 @@
             opacity: 0.3;
         }
 
+        .goods-item .price {
+            flex: 1;
+            color: #F07057;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
         .choose-btn {
-            padding: 0 25px;
-            height: 24px;
+            padding: 0 30px;
+            height: 36px;
             background-image: linear-gradient(to right, #eebd89, #f9957f);
             color: white;
             text-align: center;
-            line-height: 24px;
-            margin: 10px 0;
-            border-radius: 12px;
+            line-height: 36px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 500;
         }
 
-        .choose-btn.disabled {
-            background-color: #ccc;
-            background-image: none;
+        .free-btn {
+            width: calc(100% - 30px);
+            padding: 25px 0;
+            background-image: linear-gradient(to right, #ff9569, #e92758);
+            border-radius: 10px;
+            margin-top: 15px;
+            color: white;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
-        .clickable:active {
-            opacity: 0.7;
+        .free-btn svg {
+            margin-left: -30px;
+        }
+
+        .free-btn span {
+            margin-left: 10px;
+            font-size: 18px;
+            font-weight: bolder;
+        }
+
+        .click-icon {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: calc(50% - 90px);
+            bottom: calc(50% - 30px);
+            animation: click 2s infinite;
+        }
+
+        @keyframes click {
+            0% {
+                opacity: 0.5;
+                bottom: 0;
+            }
+            50% {
+                opacity: 1;
+                bottom: calc(50% - 30px);
+            }
+            75% {
+                bottom: calc(50% - 32px);
+                opacity: 0.5;
+            }
+            100% {
+                bottom: calc(50% - 30px);
+            }
         }
 
         .mask {
@@ -438,16 +435,22 @@
             color: white;
         }
 
+        .change {
+            margin-top: 15px;
+            color: white;
+            text-decoration: underline;
+        }
+
         .none-view {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 30px 0;
+            padding: 50px 0;
         }
 
         .none-view span {
-            margin-left: 10px;
+            margin-top: 20px;
             color: #666;
             text-shadow: 2px 2px 5px #ccc;
         }
@@ -692,6 +695,60 @@
                 <span class="marquee-text">{$tpl['site']['warning']}</span>
             </div>
             {/if}
+            <div class="free-btn clickable" v-if="account.list.length > 0" @click="freeClick">
+                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="25271" width="64"
+                    height="64">
+                    <path
+                        d="M894.86848 358.31808a119.71072 119.71072 0 0 0-16.07168-59.9552 120.40192 120.40192 0 0 0-40.88832-42.1888l-274.94912-158.65856a119.808 119.808 0 0 0-58.01472-14.95552c-22.11328 0-42.74688 6.10304-60.54912 16.55296l-0.06656-0.08192L176.64 253.5936c-18.42688 10.38336-34.176 25.50272-45.0816 44.32384a119.168 119.168 0 0 0-16.06144 60.22144H115.2v312.44288h0.09728a119.18336 119.18336 0 0 0 15.99488 59.33056c2.45248 4.2496 5.16608 8.35072 8.12544 12.27776 1.152 1.53088 2.49856 2.88768 3.71712 4.36224 1.90976 2.29888 3.76832 4.6592 5.85728 6.83008 1.46432 1.5104 3.12832 2.86208 4.67456 4.32128 2.03776 1.89952 3.99872 3.85024 6.15424 5.60128 1.71008 1.3824 3.584 2.57024 5.38112 3.87072 2.0224 1.4592 3.97824 3.04128 6.10304 4.38784l0.78848 0.4608c0.0512 0.0512 0.1024 0.08192 0.16384 0.128h0.03072l0.65536 0.39936c1.4848 0.88064 2.97984 1.76128 4.49024 2.59072l267.66336 154.5216 0.08192-0.14848a119.38816 119.38816 0 0 0 59.88864 16.18944h0.08192c21.07904 0 40.88832-5.50912 58.112-15.08864l0.02048 0.04096 272.43008-157.10208a120.13568 120.13568 0 0 0 42.81856-43.20768 118.80448 118.80448 0 0 0 16.11776-59.76064h0.2304v-312.2688h-0.01024zM396.88192 305.80224c44.27264 0 84.71552 20.96128 119.13728 58.99776 34.44224-38.0416 74.88-58.99776 119.1424-58.99776 46.79168 0 86.99904 18.78016 114.2784 56.00768 24.71936 33.82784 29.6192 81.62304 15.51872 130.67264-14.82752-1.30048-34.24256-1.87904-54.81984 0.21504 21.43232-40.25856 15.55968-75.22304-2.46784-100.77696-15.16032-21.51936-42.27072-34.33984-72.50944-34.33984-43.97056 0-92.72832 34.5856-119.1424 92.0576-25.71776-56.69888-73.56416-92.0576-119.13728-92.0576-30.208 0-65.55136 11.22304-82.432 54.03136-19.03616-10.0864-38.272-21.76512-42.28608-31.37536 22.84032-47.65696 73.2672-74.43456 124.71808-74.43456z m305.23904 279.00928c-21.78048 22.02112-41.49248 36.62848-66.66752 54.2976-35.82976 25.1392-78.79168 51.50208-119.42912 111.83104-25.1904-38.5792-55.00416-64.83968-82.8416-85.73952-56.23808-42.19904-134.75328-58.50112-175.24736-120.28928-26.63936-40.71936-38.13888-139.37152-10.9056-178.26816-18.06848 55.808 107.27424 78.73024 136.06912 118.51264-0.39424-11.38688 2.50368-24.61696 2.02752-36.0192 17.48992 26.17856 41.77408 53.8368 62.80192 80.56832 29.15328 37.12 66.06336 105.37984 76.16 169.53856 40.88832-53.20192 45.85984-132.41856 115.38944-169.33888-6.71232 8.75008-6.71232 17.8688-7.45984 29.10208 23.0912-57.10336 124.9024-46.0288 146.65216-42.9056-41.29792 3.87072-51.51232 43.40736-76.54912 68.7104z"
+                        p-id="25272" fill="#ffffff"></path>
+                </svg>
+                <span>关注广告<br>免费领取</span>
+                <img class="click-icon" src="{MODULE_URL}static/m/balance/img/click.svg">
+            </div>
+            <div class="scroll-view" v-if="groups.length > 0">
+                <div class="group-view">
+                    <span>售货机商品</span>
+                    <span v-for="group in groups" @click="groupClick(group)">{{group.title}}</span>
+                </div>
+            </div>
+            <div class="package-item" v-for="(item, index) in packages">
+                <span>{{item.title}}</span>
+                <div class="package-row">
+                    <div class="package-row-item" v-for="(goods, i) in item.list">
+                        <img class="pic" :src="goods.image">
+                        <span
+                            style="width: 100%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;text-align: center;margin-top: 5px;">{{goods.name}}</span>
+                        <span>x{{goods.num}}</span>
+                    </div>
+                </div>
+                <div class="line"></div>
+                <div class="package-footer">
+                    <span>价格：</span>
+                    <span class="price">¥{{item.price}}</span>
+                    <div v-if="item.isOk" class="choose-btn clickable" @click="buyPackageClick(item)">购买</div>
+                    <span v-else style="color: #9d9d9d;">暂时无法购买</span>
+                </div>
+            </div>
+            <div class="goods-item" v-for="(item, index) in pay" :key="index">
+                <div class="row">
+                    <img class="pic" :src="item.img">
+                    <span class="name">{{item.name}}</span>
+                    <img :class="['circle-btn', item.count === 1 ? 'circle-btn-disabled' : '' ]"
+                        style="margin-right: 15px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
+                        @click="minusClick(item, 'goods')">
+                    <span style="font-weight: 500;">{{item.count}}</span>
+                    <img :class="['circle-btn', (item.count === item.num || item.count === max || item.num === 0) ? 'circle-btn-disabled' : '' ]"
+                        style="margin-left: 15px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
+                        @click="plusClick(item, 'goods')">
+                </div>
+                <div class="line" style="margin: 10px 0;"></div>
+                <div class="row">
+                    <span>价格：</span>
+                    <span class="price">¥ {{(parseFloat(item.price * item.count) / 100).toFixed(2)}}</span>
+                    <div v-if="item.num > 0" class="choose-btn clickable" @click="buyClick(item)">购买</div>
+                    <span v-else style="color: #9d9d9d;">已售罄</span>
+                </div>
+            </div>
             <div class="swiper" id="adv-swiper-container" v-if="slides.length > 0">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(item, index) in slides" :key="index" @click="slideClick(item)">
@@ -700,104 +757,10 @@
                 </div>
                 <div class="swiper-pagination"></div>
             </div>
-            <div class="scroll-view" v-if="groups.length > 0">
-                <div class="group-view">
-                    <span>售货机商品</span>
-                    <span v-for="group in groups" @click="groupClick(group)">{{group.title}}</span>
-                </div>
-            </div>
-            <div class="category-view"
-                v-if="(account.data && account.data.thirdparty_platform && free.length > 0 || account.data && !account.data.thirdparty_platform) && (pay.length > 0 || packages.length  > 0)">
-                <div :class="['category-item', item.val === categories.val ? 'category-se' : '']"
-                    v-for="(item, index) in categories.list" :key="index" @click="categories.val = item.val">
-                    {{item.text}}</div>
-            </div>
-            <template v-if="categories.val === 'free'">
-                <div class="goods-list" v-if="account.data && account.data.thirdparty_platform && free.length > 1">
-                    <div class="goods-view" v-for="(item, index) in free" :key="index">
-                        <div class="pic-view">
-                            <img :src="item.img">
-                            <img class="sold-out" src="{MODULE_URL}static/m/balance/img/sold_out.svg"
-                                v-if="item.num === 0">
-                        </div>
-                        <span class="goods-name">{{item.name}}</span>
-                        <div :class="['choose-btn', item.num === 0 ? 'disabled' : 'clickable']"
-                            @click="chooseGoods(item)">选择</div>
-                    </div>
-                </div>
-                <div class="account-view" style="margin-top: 50px;"
-                    :style="{'background-image': 'linear-gradient(to bottom right, ' + account.data.clr + '77,' + account.data.clr + ')'}"
-                    v-else-if="account.data && account.data.thirdparty_platform && free.length === 1 || account.data && !account.data.thirdparty_platform">
-                    <img class="avatar" :style="{'border-color': account.data.clr + '77'}" :src="account.data.img">
-                    <span class="title">{{account.data.title}}</span>
-                    <img class="container" :src="account.data.qrcode" v-if="account.data.qrcode">
-                    <div class="container media" style="background-color: black;" v-else-if="account.data.media"
-                        @click="playClick">
-                        <img src="{MODULE_URL}static/m/balance/img/play_icon.svg">
-                    </div>
-                    <div class="container" v-else-if="account.data.username">
-                        <img :src="account.data.img" style="width: 100%;height: 100%;object-fit: cover;">
-                        <div class="weapp-cover">
-                            <wx-open-launch-weapp :id="account.data.uid" :username="account.data.username"
-                                :path="account.data.path">
-                                <script type="text/wxtag-template">
-                                    <style>.play-icon { width: 40px }</style>
-                                    <img class="play-icon" src="{MODULE_URL}static/m/balance/img/click.svg">
-                                </script>
-                            </wx-open-launch-weapp>
-                        </div>
-                    </div>
-                    <span class="desc" v-html="account.data.descr"></span>
-                </div>
-            </template>
-            <template v-else-if="categories.val === 'pay'">
-                <div class="package-item" v-for="(item, index) in packages">
-                    <span>{{item.title}}</span>
-                    <div class="package-row">
-                        <div class="package-row-item" v-for="(goods, i) in item.list">
-                            <img class="goods-img" :src="goods.image">
-                            <span
-                                style="width: 100%;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;text-align: center;">{{goods.name}}</span>
-                            <span>x{{goods.num}}</span>
-                        </div>
-                    </div>
-                    <div class="package-line"></div>
-                    <div class="package-footer">
-                        <span>售价：</span>
-                        <span class="price">¥{{item.price}}</span>
-                        <div v-if="item.isOk" class="choose-btn" @click="buyPackageClick(item)">购买</div>
-                        <span v-else style="color: #9d9d9d;">暂时无法购买</span>
-                    </div>
-                </div>
-                <div class="goods-list">
-                    <div class="goods-view" v-for="(item, index) in pay" :key="index">
-                        <div class="pic-view">
-                            <img :src="item.img">
-                            <img class="sold-out" src="{MODULE_URL}static/m/balance/img/sold_out.svg"
-                                v-if="item.num === 0">
-                        </div>
-                        <span class="goods-name" style="text-align: left;">{{item.name}}</span>
-                        <div class="goods-row">
-                            <span class="price">¥ {{(parseFloat(item.price * item.count) / 100).toFixed(2)}}</span>
-                            <div :class="['choose-btn', item.num === 0 ? 'disabled' : 'clickable']"
-                                @click="buyClick(item)">购买</div>
-                        </div>
-                        <div class="goods-row" style="margin-bottom: 5px;">
-                            <img :class="['circle-btn', item.count === 1 ? 'circle-btn-disabled' : '' ]"
-                                style="margin-right: 10px;" src="{MODULE_URL}static/m/balance/img/minus.svg"
-                                @click="minusClick(item, 'goods')">
-                            <span>{{item.count}}</span>
-                            <img :class="['circle-btn', (item.count === item.num || item.count === max || item.num === 0) ? 'circle-btn-disabled' : '' ]"
-                                style="margin-left: 10px;" src="{MODULE_URL}static/m/balance/img/plus.svg"
-                                @click="plusClick(item, 'goods')">
-                        </div>
-                    </div>
-                </div>
-            </template>
             <div class="none-view"
-                v-if="!loading && (!account.data || account.data && account.data.thirdparty_platform && free.length === 0) && pay.length === 0 && packages.length === 0">
+                v-if="!loading && account.list.length === 0 && pay.length === 0 && packages.length === 0">
                 <svg t="1647324768311" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                    xmlns="http://www.w3.org/2000/svg" p-id="10822" width="30" height="30">
+                    xmlns="http://www.w3.org/2000/svg" p-id="10822" width="48" height="48">
                     <path
                         d="M0 512c0 282.816 229.184 512 512 512 282.784 0 512-229.184 512-512 0-282.784-229.216-512-512-512C229.184 0 0 229.216 0 512z"
                         fill="#FFC60A" p-id="10823"></path>
@@ -833,9 +796,26 @@
                 :style="{'background-image': 'linear-gradient(to bottom right, ' + account.data.clr + '77,' + account.data.clr + ')'}">
                 <img class="avatar" :style="{'border-color': account.data.clr + '77'}" :src="account.data.img">
                 <span class="title">{{account.data.title}}</span>
-                <img class="container" :src="account.data.qrcode">
+                <img class="container" :src="account.data.qrcode" v-if="account.data.qrcode">
+                <div class="container media" style="background-color: black;" v-else-if="account.data.media"
+                    @click="playClick">
+                    <img src="{MODULE_URL}static/m/balance/img/play_icon.svg">
+                </div>
+                <div class="container" v-else-if="account.data.username">
+                    <img :src="account.data.img" style="width: 100%;height: 100%;object-fit: cover;">
+                    <div class="weapp-cover">
+                        <wx-open-launch-weapp :id="account.data.uid" :username="account.data.username"
+                            :path="account.data.path">
+                            <script type="text/wxtag-template">
+                                    <style>.play-icon { width: 40px }</style>
+                                    <img class="play-icon" src="{MODULE_URL}static/m/balance/img/click.svg">
+                                </script>
+                        </wx-open-launch-weapp>
+                    </div>
+                </div>
                 <span class="desc" v-html="account.data.descr"></span>
             </div>
+            <span v-if="account.list.length > 1" class="change clickable" @click="changeClick">不出货？点击换一个</span>
             <img class="close clickable" src="{MODULE_URL}static/m/balance/img/close.svg"
                 @click="account.visible = false">
         </div>
@@ -902,22 +882,13 @@
                 },
                 slides: [],
                 groups: [],
-                categories: {
-                    list: [{
-                        text: '免费',
-                        val: 'free'
-                    }, {
-                        text: '付费',
-                        val: 'pay'
-                    }],
-                    val: 'free'
-                },
                 account: {
+                    list: [],
+                    index: 0,
                     data: null,
                     visible: false,
                     timeout: null
                 },
-                free: [],
                 pay: [],
                 packages: [],
                 sales: [],
@@ -957,7 +928,7 @@
 
                 this.getSlideList();
                 this.getGroupList();
-                this.getAccount();
+                this.getAccountList();
                 this.getSaleList();
                 this.getWechat();
                 this.getPasswd();
@@ -1043,62 +1014,25 @@
                 groupClick (item) {
                     window.location.href = item.data.url;
                 },
-                getAccount () {
+                getAccountList () {
                     this.loading = true;
-                    zovye_fn.getAccounts(null, (res) => {
+                    zovye_fn.getAccounts([], res => {
+                        this.getGoodsList();
                         if (res.status) {
-                            const array = res.data || [];
-                            this.account.data = array.pop() || null;
-                            if (this.account.data) {
+                            this.account.list = res.data || [];
+                            if (this.account.list.length > 0) {
+                                this.account.data = this.account.list[0];
                                 if (typeof zovye_fn.saveUserProfile === 'function') {
                                     this.saveUserProfile = true;
-                                }
-                            }
-                            if (this.account.data && this.account.data.thirdparty_platform) {
-                                this.getFreeGoodsList();
-                            } else {
-                                this.getPayGoodsList();
-                            }
-                            if (this.account.data && this.account.data.username) {
-                                if (this.wechatState) {
-                                    this.$nextTick(() => {
-                                        var btn = document.getElementById(this.account.data.uid);
-                                        btn.addEventListener('launch', (e) => {
-                                            if (this.account.timeout) {
-                                                clearTimeout(this.account.timeout);
-                                                this.account.timeout = null;
-                                            }
-                                            this.account.timeout = setTimeout(() => {
-                                                if (document.hidden) {
-                                                    zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(this.account.data.uid);
-                                                }
-                                            }, this.account.data.delay * 1000);
-                                        });
-                                        btn.addEventListener('error', function (e) {
-                                            console.log('fail', e.detail);
-                                        });
-                                    })
-                                } else {
-                                    alert('当前微信版本过低，建议升级微信后再试！');
                                 }
                             }
                         } else {
                             this.loading = false;
                             alert(res.data.msg);
                         }
-                    }, 1);
+                    });
                 },
-                getFreeGoodsList () {
-                    zovye_fn.getGoodsList(res => {
-                        if (res.status) {
-                            this.free = res.data || [];
-                        } else {
-                            alert(res.data.msg);
-                        }
-                        this.getPayGoodsList();
-                    }, 'free')
-                },
-                getPayGoodsList () {
+                getGoodsList () {
                     zovye_fn.getGoodsList(res => {
                         this.loading = false;
                         if (res.status) {
@@ -1108,11 +1042,6 @@
                             })
                             this.pay = goods;
                             this.packages = res.data.packages || [];
-                            if (this.account.data && this.account.data.thirdparty_platform && this.free.length > 0 || this.account.data && !this.account.data.thirdparty_platform) {
-                                this.categories.val = 'free';
-                            } else if (this.pay.length > 0 || this.packages.length > 0) {
-                                this.categories.val = 'pay';
-                            }
                         } else {
                             alert(res.data.msg);
                         }
@@ -1272,6 +1201,46 @@
                 sexClick (value) {
                     zovye_fn.saveUserProfile({ sex: value });
                     this.saveUserProfile = false;
+                },
+                freeClick() {
+                    this.account.visible = true;
+                    if (this.account.data.username) {
+                        this.addWeappListener();
+                    }
+                },
+                changeClick () {
+                    const len = this.account.list.length;
+                    this.account.index++;
+                    if (this.account.index == len) {
+                        this.account.index = 0;
+                    }
+                    this.account.data = this.account.list[this.account.index];
+                    if (this.account.data.username) {
+                        this.addWeappListener();
+                    }
+                },
+                addWeappListener () {
+                    if (this.wechatState) {
+                        this.$nextTick(() => {
+                            var btn = document.getElementById(this.account.data.uid);
+                            btn.addEventListener('launch', (e) => {
+                                if (this.account.timeout) {
+                                    clearTimeout(this.account.timeout);
+                                    this.account.timeout = null;
+                                }
+                                this.account.timeout = setTimeout(() => {
+                                    if (document.hidden) {
+                                        zovye_fn.redirectToAccountGetPage && zovye_fn.redirectToAccountGetPage(this.account.data.uid);
+                                    }
+                                }, this.account.data.delay * 1000);
+                            });
+                            btn.addEventListener('error', function (e) {
+                                console.log('fail', e.detail);
+                            });
+                        })
+                    } else {
+                        alert('当前微信版本过低，建议升级微信后再试！');
+                    }
                 }
             }
         })

@@ -103,8 +103,13 @@
                     <div>（已退款）</div>
                     {/if}
                     {else}
-                    <img src="{media $accounts[$order['account']]['img']}" />
-                    <div>{php echo $accounts[$order['account']]['title'] ?:'&lt;未知&gt&gt;'}</div>
+                        {if $order['account']}
+                        <img src="{media $accounts[$order['account']]['img']}"  title="{$accounts[$order['account']]['title']}"/>
+                        {elseif $order['voucher'] > 0}
+                            <i class="fa fa-ticket"></i>
+                        {else}
+                        <img src="{$order['from']['icon']}" title="{$order['from']['title']}" />
+                        {/if}
                     {/if}
                 </aside>
                 {if empty($device)}

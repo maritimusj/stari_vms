@@ -18,7 +18,6 @@ use zovye\traits\GettersAndSetters;
 use zovye\Util;
 use function zovye\getArray;
 use function zovye\ifEmpty;
-use function zovye\m;
 use function zovye\setArray;
 
 /**
@@ -47,7 +46,7 @@ class modelObj implements ISettings
     use DirtyChecker;
     use GettersAndSetters;
 
-    public function __construct($id, modelFactory $factory, $settingsUseCache = false)
+    public function __construct($id, modelFactory $factory, $settingsUseCache = SETTINGS_CACHE)
     {
         $this->configFilter('set', ['id', 'factory']);
 

@@ -251,10 +251,6 @@ if ($op == 'default') {
         $orders[] = $data;
     }
 
-    if (count($orders) < $page_size) {
-        $total = count($orders);
-    }
-
     $pager = We7::pagination($total, $page, $page_size);
     if (stripos($pager, '&filter=1') === false) {
         $filter = [

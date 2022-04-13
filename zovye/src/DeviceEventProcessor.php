@@ -452,20 +452,25 @@ class DeviceEventProcessor
     {
         $app_id = $data['id'];
         $device = Device::getFromAppId($app_id);
+        if ($device) {
 
-        if ($device && $data['data']) {
-            $data = $data['data'];
-            //记录设备定位信息
-            if ($data['lng'] && $data['lat']) {
-                $device->set(
-                    'location',
-                    [
-                        'lng' => "{$data['lng']}",
-                        'lat' => "{$data['lat']}",
-                    ]
-                );
-                $device->save();
+            $device->setAppLastOnline(TIMESTAMP);
+
+            if ($data['data']) {
+                $data = $data['data'];
+                //记录设备定位信息
+                if ($data['lng'] && $data['lat']) {
+                    $device->set(
+                        'location',
+                        [
+                            'lng' => "{$data['lng']}",
+                            'lat' => "{$data['lat']}",
+                        ]
+                    );
+                }
             }
+
+            $device->save();
         }
     }
 

@@ -785,6 +785,10 @@ class agent
             }
         }
 
+        $device->resetShadowId();
+        $device->createQrcodeFile();
+        $device->appNotify('init');
+
         return error(State::ERROR, '操作失败，请稍后再试！');
     }
 

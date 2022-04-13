@@ -7,25 +7,26 @@
 namespace zovye\job\createOrderReward;
 
 use Exception;
-use RuntimeException;
-use zovye\Config;
-use zovye\CtrlServ;
-use zovye\Device;
-use zovye\EventBus;
-use zovye\Goods;
-use zovye\Helper;
 use zovye\Job;
 use zovye\Log;
-use zovye\model\deviceModelObj;
-use zovye\model\orderModelObj;
-use zovye\model\userModelObj;
-use zovye\Order;
-use zovye\request;
 use zovye\User;
 use zovye\Util;
-use function zovye\err;
+use zovye\Goods;
+use zovye\Order;
+use zovye\State;
+use zovye\Config;
+use zovye\Device;
+use zovye\Helper;
+use zovye\request;
+use zovye\CtrlServ;
+use zovye\EventBus;
+use RuntimeException;
+use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
+use zovye\model\userModelObj;
+use zovye\model\orderModelObj;
+use zovye\model\deviceModelObj;
 
 $op = request::op('default');
 
@@ -196,7 +197,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
                 'message' => '出货完成！',
             ]);
         } else {
-            $order->setExtraData('pull.result', $success > 0 ? err('部分商品出货失败！') : err('出货失败！'));
+            $order->setExtraData('pull.result', $success > 0 ? error(State::FAIL, '部分商品出货失败！') : error( State::FAIL, '出货失败！'));
         }
 
         $stats = $user->settings('extra.wxapp.reward.order', []);

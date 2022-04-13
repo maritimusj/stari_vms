@@ -2160,6 +2160,9 @@ if ($op == 'default') {
 
     try {
         $month = new DateTimeImmutable(sprintf("%d-%02d-%02d", $year_str, $month_str, $day_str));
+        if ($month->format('m') != $month_str) {
+            JSON::fail('时间格式不正确！');
+        }
     } catch (Exception $e) {
         JSON::fail('时间格式不正确！');
     }

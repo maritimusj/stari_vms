@@ -355,7 +355,7 @@ class api
             ];
         }
 
-        $errno = $order->getExtraData('pull.result.errno', -1);
+        $errno = $order->getExtraData('pull.result.errno', 'n/a');
 
         if ($errno == 0) {
             return [
@@ -367,7 +367,7 @@ class api
                 'code' => 100,
                 'msg' => '订单正在处理中，请稍等！',
             ];
-        } elseif ($errno == -1) {
+        } elseif ($errno == 'n/a') {
             return [
                 'msg' => '订单正在处理中',
                 'code' => 100,

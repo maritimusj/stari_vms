@@ -388,7 +388,7 @@
                         }
                     },
                     getDayOfMonth(month, index = 1) {
-                        if (index < 31) {
+                        if (index < 32) {
                             $.get(api_url, { op: 'statistics_month', year: this.year, month, day:index }).then(res => {
                                 this.month_loading = new Date();
                                 if (res.status) {

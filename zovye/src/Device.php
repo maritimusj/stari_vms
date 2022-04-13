@@ -693,7 +693,12 @@ class Device extends State
             }
         }
 
-        return self::reset($device, $agent ? '绑定设备' : '解绑设备');
+        if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
+            $device->appNotify('init');
+            return true;
+        }
+
+        return false;
     }
 
     /**

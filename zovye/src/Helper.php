@@ -419,4 +419,42 @@ class Helper
         $data['orderNO'] = $order_no;
         return $data;
     }
+
+    public static function validateLocation(userModelObj  $user, deviceModelObj $device, $lat, $lng) {
+        $data = [
+            'validated' => false,
+            'time' => time(),
+            'lng' => $lng,
+            'lat' => $lat,
+        ];
+
+        $user->setLastActiveData('location', $data);
+
+        //用户扫描设备后的定位信息
+        $location = $device->settings('extra.location.tencent', $device->settings('extra.location'));
+        if ($location && $location['lng'] && $location['lat']) {
+
+            $distance = App::userLocationValidateDistance(1);
+            $agent = $device->getAgent();
+            if ($agent) {
+                if ($agent->settings('agentData.location.validate.enabled')) {
+                    $distance = $agent->settings('agentData.location.validate.distance', $distance);
+                }
+            }
+
+            $res = Util::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
+            if (is_error($res)) {
+                Log::error('location', $res);
+                return err('哎呀，出错了');
+            }
+
+            if ($res > $distance) {
+                $user->setLastActiveDevice();
+                return err('哎呀，设备太远了');
+            }
+        }
+
+        $user->setLastActiveData('location.validated', true);
+        return true;
+    }
 }

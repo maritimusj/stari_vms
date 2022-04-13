@@ -44,4 +44,5 @@ router::exec($op, [
     'createMallOrder' => '\zovye\api\wxweb\api::createMallOrder',
     'pageInfo' => '\zovye\api\wxx\common::pageInfo',
     'rewardOrderData' => '\zovye\api\wxweb\api::rewardOrderData',
+    'validateLocation' => '\zovye\api\wxweb\api::validateLocation',
 ]);

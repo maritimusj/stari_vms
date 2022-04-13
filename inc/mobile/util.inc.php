@@ -41,8 +41,8 @@ if ($op == 'default') {
     //请求定位
 
     $id = request::trim('id');
-    $lng = request::float('lng');
     $lat = request::float('lat');
+    $lng = request::float('lng');
 
     if (empty($id) || empty($lng) || empty($lat)) {
         JSON::fail('无效的参数！');
@@ -58,41 +58,14 @@ if ($op == 'default') {
         JSON::fail('找不到这个设备！');
     }
 
-    $data = [
-        'validated' => false,
-        'time' => time(),
-        'lng' => $lng,
-        'lat' => $lat,
-    ];
+    $result = Helper::validateLocation($user, $device, $lat, $lng);
 
-    $user->setLastActiveData('location', $data);
-
-    //用户扫描设备后的定位信息
-    $location = $device->settings('extra.location.tencent', $device->settings('extra.location'));
-    if ($location && $location['lng'] && $location['lat']) {
-
-        $distance = App::userLocationValidateDistance(1);
-        $agent = $device->getAgent();
-        if ($agent) {
-            if ($agent->settings('agentData.location.validate.enabled')) {
-                $distance = $agent->settings('agentData.location.validate.distance', $distance);
-            }
-        }
-
-        $res = Util::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
-        if (is_error($res)) {
-            Log::error('location', $res);
-            JSON::fail('哎呀，出错了');
-        }
-
-        if ($res > $distance) {
-            $user->setLastActiveDevice();
-            JSON::fail('哎呀，设备太远了');
-        }
+    if (is_error($result)) {
+        JSON::fail($result['message']);
     }
 
-    $user->setLastActiveData('location.validated', true);
-    JSON::success('成功！');
+    JSON::success("成功！");
+
 } elseif ($op == 'adv_review') {
 
     $user = Util::getCurrentUser();

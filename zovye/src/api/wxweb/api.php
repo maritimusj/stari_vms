@@ -57,9 +57,9 @@ class api
         }
 
         return common::doUserLogin(
-            $res, 
-            request::array('userInfo', []), 
-            $h5_openid, 
+            $res,
+            request::array('userInfo', []),
+            $h5_openid,
             request::str('device'),
             request::str('from')
         );
@@ -219,11 +219,11 @@ class api
                 return ['orderUID' => $orderUID];
             }
         } else {
-            $reward =  Config::app('wxapp.advs.reward', []);
+            $reward = Config::app('wxapp.advs.reward', []);
             if (empty($reward['allowFree']) || empty($reward['id'])) {
                 return err('没有设置激励广告！');
             }
-            
+
             $orderUID = request::str('orderUID');
             $code = request::str('code');
 
@@ -251,7 +251,7 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $reward =  Config::app('wxapp.advs.reward', []);
+        $reward = Config::app('wxapp.advs.reward', []);
         if (empty($reward['allowFree']) || empty($reward['id'])) {
             return err('没有设置激励广告！');
         }
@@ -716,5 +716,19 @@ class api
             'goods_id' => request::int('goods'),
             'num' => request::int('num'),
         ]);
+    }
+
+    public static function validateLocation()
+    {
+        $user = \zovye\api\wx\common::getUser();
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+        $res = Helper::validateLocation($user, $device, request::float('lat'), request::float('lng'));
+        if (is_error($res)) {
+            return $res;
+        }
+        return '成功！';
     }
 }

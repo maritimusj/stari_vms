@@ -85,6 +85,8 @@ class Account extends State
 
     const MENGMO = 111;
 
+    const YIDAO = 112;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -126,6 +128,9 @@ class Account extends State
 
     const MENGMO_NAME = '涨啊';
     const MENGMO_HEAD_IMG = MODULE_URL . 'static/img/mengmo.jpg';
+
+    const YIDAO_NAME = '壹道';
+    const YIDAO_HEAD_IMG = MODULE_URL . 'static/img/yidao.jpg';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -262,6 +267,7 @@ class Account extends State
             Account::WxWORK => App::isWxWorkEnabled(),
             Account::YOUFEN => App::isYouFenEnabled(),
             Account::MENGMO => App::isMengMoEnabled(),
+            Account::YIDAO => App::isYiDaoEnabled(),
         ];
 
         $result = [];
@@ -343,6 +349,7 @@ class Account extends State
                 Account::WxWORK,
                 Account::YOUFEN,
                 Account::MENGMO,
+                Account::YIDAO,
             ];
 
         $include = is_array($include) ? $include : [$include];
@@ -519,6 +526,18 @@ class Account extends State
                 },
                 function () use ($device, $user) {
                     return MengMoAccount::fetch($device, $user);
+                },
+            ],
+
+            //壹道
+            Account::YIDAO => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    return App::isYiDaoEnabled()
+                        && in_array(Account::YIDAO, $third_party_platform_includes)
+                        && !in_array(YiDaoAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return YiDaoAccount::fetch($device, $user);
                 },
             ],
         ];
@@ -883,6 +902,12 @@ class Account extends State
     {
         $url = Util::murl('mengmo');
         return self::createThirdPartyPlatform(Account::MENGMO, Account::MENGMO_NAME, Account::MENGMO_HEAD_IMG, $url);
+    }
+
+    public static function createYiDaoAccount(): ?accountModelObj
+    {
+        $url = Util::murl('yidao');
+        return self::createThirdPartyPlatform(Account::YIDAO, Account::YIDAO_NAME, Account::YIDAO_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -1309,7 +1334,22 @@ class Account extends State
             self::WxWORK => '阿旗（企业微信）',
             self::YOUFEN => '友粉',
             self::MENGMO => '涨啊',
+            self::YIDAO => '壹道',
         ];
         return $titles[$type] ?? '未知';
+    }
+
+    public static function ReplaceCode($desc, $placeholder, $code)
+    {
+        if (strpos($desc, '{' . $placeholder . '}') !== false) {
+            $desc = PlaceHolder::replace($desc, [
+                $placeholder => $code ? "<span data-key=\"$code\">$code</span>" : '',
+            ]);
+        } else {
+            if ($code) {
+                $desc = "回复<span data-key=\"$code\">$code</span>免费领取！";
+            }
+        }
+        return $desc;
     }
 }

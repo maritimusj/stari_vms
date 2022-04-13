@@ -126,17 +126,7 @@ class SNTOAccount
                 $data['name'] = $result['data']['app_name'] ?: Account::SNTO_NAME;
                 $data['title'] = $result['data']['app_name'] ?: Account::SNTO_NAME;
                 $data['qrcode'] = $result['data']['qr_code_url'];
-
-                $keyword = strval($result['data']['keyword']);
-                if (strpos($data['descr'], '{key}') !== false) {
-                    $data['descr'] = PlaceHolder::replace($data['descr'], [
-                        'key' => $keyword ? "<span data-key=\"$keyword\">$keyword</span>" : '',
-                    ]);
-                } else {
-                    if ($keyword) {
-                        $data['descr'] = "回复<span data-key=\"$keyword\">$keyword</span>免费领取！";
-                    }
-                }
+                $data['descr'] = Account::ReplaceCode($data['descr'], 'key', strval($result['data']['keyword']));
 
                 $v[] = $data;
 

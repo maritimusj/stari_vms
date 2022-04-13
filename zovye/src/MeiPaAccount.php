@@ -94,16 +94,8 @@ class MeiPaAccount
                     $data['redirect_url'] = $result['data']['joburl'];
                 }
 
-                $code = strval($result['data']['code_words']);
-                if (strpos($data['descr'], '{code}') !== false) {
-                    $data['descr'] = PlaceHolder::replace($data['descr'], [
-                        'code' => $code ? "<span data-key=\"$code\">$code</span>" : '',
-                    ]);
-                } else {
-                    if ($code) {
-                        $data['descr'] = "回复<span data-key=\"$code\">$code</span>免费领取！";
-                    }
-                }
+                $data['descr'] = Account::ReplaceCode($data['descr'], 'code', strval($result['data']['code_words']));
+
                 $v[] = $data;
             }
         });

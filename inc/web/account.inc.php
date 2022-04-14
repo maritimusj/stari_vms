@@ -690,7 +690,7 @@ if ($op == 'default') {
     if (is_error($res)) {
         Util::itoast($res['message'], We7::referer(), 'error');
     } else {
-        $back_url = request::has('id') ? $this->createWebUrl('account', ['op' => 'edit', 'id' => request::int('id')]) : $this->createWebUrl('account');
+        $back_url = request::has('id') ? $this->createWebUrl('account', ['op' => 'edit', 'id' => request::int('id'), 'from' => request::str('from')]) : $this->createWebUrl('account');
         Util::itoast($res['message'], $back_url, 'success');
     }
 
@@ -757,6 +757,7 @@ if ($op == 'default') {
         'agent_mobile' => $agent_mobile,
         'agent_openid' => $agent_openid,
         'config' => $config,
+        'from' => request::str('from', 'base'),
     ];
 
     if (App::isMoscaleEnabled() && $type == Account::MOSCALE) {

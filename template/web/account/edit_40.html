@@ -347,6 +347,7 @@
       
         <div class="form-btn">
             <input type="hidden" name="op" value="save">
+            <input type="hidden" name="from" :value="active">
             {if $op=='edit' && $id}
             <input type="hidden" name="id" value="{$id}">
             <button type="submit" class="btn btn-primary">保存</button>
@@ -390,7 +391,7 @@
                         'content': `奖励设置`,
                     },
                 ],
-                active: 'base',
+                active: '{$from}',
                 questions: JSON.parse(`{php echo json_encode($config['questions'] ?? [])}`),
             },
             computed: {

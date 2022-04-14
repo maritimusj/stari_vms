@@ -37,7 +37,7 @@ class YiDaoAccount
         }
 
         $config = $acc->get('config', []);
-        if (empty($config['app_no'])) {
+        if (empty($config['appid'])) {
             return [];
         }
 
@@ -46,7 +46,7 @@ class YiDaoAccount
         $data = [
             'key' => strval($config['device_key']),
             'develop_appid' => strval($config['appid']),
-            'label' => strval($config['scene']),
+            'label' => intval($config['scene']),
             'ip' => Util::getClientIp(),
             'auth_open_id' => $fans['openid'],
             'nickname' => $fans['nickname'],

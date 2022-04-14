@@ -406,6 +406,17 @@ if ($op == 'default') {
                     'app_no' => request::trim('app_no'),
                     'scene' => request::trim('scene'),
                 ]);
+            }  elseif ($account->isYiDao()) {
+                $data['name'] = Account::YIDAO_NAME;
+                $data['img'] = Account::YIDAO_HEAD_IMG;
+                $data['url'] = Util::murl('yidao');
+                $account->set('config', [
+                    'type' => Account::YIDAO,
+                    'appid' => request::trim('appid'),
+                    'app_secret' => request::trim('app_secret'),
+                    'device_key' => request::trim('device_key'),
+                    'scene' => request::trim('scene'),
+                ]);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');
                 $account->set('config', [

@@ -86,9 +86,9 @@ class MengMoAccount
                 throw new RuntimeException('没有数据！');
             }
 
-            $data = $acc->format();
-
             foreach ($list as $item) {
+                $data = $acc->format();
+
                 if ($item['qrPicUrl']) {
                     $data['title'] = $item['nickName'] ?: Account::MENGMO_NAME;
                     $data['img'] = $item['headImgUrl'] ?: Account::MENGMO_HEAD_IMG;
@@ -96,6 +96,7 @@ class MengMoAccount
                 } else {
                     continue;
                 }
+
                 $v[] = $data;
             }
 
@@ -184,7 +185,7 @@ class MengMoAccount
                     /** @var deviceModelObj $device */
                     $device = Device::get($params['facility_id'], true);
                     if (empty($device)) {
-                        throw new RuntimeException('找不对这个设备:' . $params['device']);
+                        throw new RuntimeException('找不对这个设备:' . $params['facility_id']);
                     }
 
                     $order_uid = Order::makeUID($user, $device, sha1($params['ad_code_no']));

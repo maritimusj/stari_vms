@@ -237,6 +237,17 @@ class App
         });
     }
 
+    /**
+     * 是否开启 壹道
+     *
+     */
+    public static function isYiDaoEnabled(): bool
+    {
+        return onceCall(function () {
+            return !empty(settings('yidao.fan.enabled'));
+        });
+    }
+
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function () {

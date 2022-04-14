@@ -784,6 +784,7 @@ if ($op == 'default') {
         'clr' => Util::randColor(),
         'op' => $op,
         'type' => $type,
+        'from' => 'base',
     ]);
 
 } elseif ($op == 'remove') {

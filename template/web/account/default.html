@@ -285,8 +285,8 @@
                         {/if}
                     </td>
                     <td>
-                        <div class="profile"  title="点击复制UID [ {$a['uid']} ]" data-url="{$a['uid']}">
-                            <img src="{media $a['img']}">
+                        <div class="profile">
+                            <img src="{media $a['img']}" title="点击复制UID [ {$a['uid']} ]" data-url="{$a['uid']}">
                             <span>{$a['title']}{if $a['more_url']} <sup title="需要关注多个公众号">{php echo '+'.count($a['more_url']);}</sup>{/if}</span>
                             {if $a['type'] == \zovye\Account::AUTH}
                             {if $a['service'] == 2}

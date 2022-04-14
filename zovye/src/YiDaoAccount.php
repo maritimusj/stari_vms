@@ -81,7 +81,8 @@ class YiDaoAccount
                 throw new RuntimeException($result['message']);
             }
 
-            if ($result['code'] != 20000) {
+            if ($result['code'] == 20000) {
+
                 $data = $result['result']['data'];
                 if (isEmptyArray($data)) {
                     throw new RuntimeException('没有数据！');
@@ -94,9 +95,13 @@ class YiDaoAccount
                 $data['descr'] = Account::ReplaceCode($data['descr'], 'code', strval($data['code']));
 
                 $v[] = $data;
+
+            } elseif ($result['code'] != 50000) {
+                throw new RuntimeException($result['message']);
             }
 
         } catch (Exception $e) {
+            
             if (App::isAccountLogEnabled() && isset($log)) {
                 $log->setExtraData('error_msg', $e->getMessage());
                 $log->save();
@@ -112,7 +117,7 @@ class YiDaoAccount
 
     public static function verifyData($params): array
     {
-        if (!App::isMengMoEnabled()) {
+        if (!App::isYiDaoEnabled()) {
             return err('没有启用！');
         }
 

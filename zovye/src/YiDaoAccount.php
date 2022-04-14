@@ -21,11 +21,9 @@ class YiDaoAccount
         return Account::makeThirdPartyPlatformUID(Account::YIDAO, Account::YIDAO_NAME);
     }
 
-    public static function makeSign($nonce, $secret): string
+    public static function makeSign($arr = []): string
     {
-        $arr = [$nonce, $secret];
         sort($arr, SORT_STRING);
-
         return md5(implode($arr));
     }
 
@@ -56,7 +54,11 @@ class YiDaoAccount
             'state' => $device->getImei(),
         ];
 
-        $data['signature'] = self::makeSign($data['nonce'], $config['app_secret']);
+        $data['signature'] = self::makeSign([
+            $data['timestamp'], 
+            $data['nonce'], 
+            $config['app_secret'],
+        ]);
 
         $result = Util::post(self::API_URL, $data);
 

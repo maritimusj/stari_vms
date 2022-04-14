@@ -620,7 +620,7 @@ if ($op == 'default') {
         JSON::fail('没有找到这个用户！');
     }
 
-    $total = request::float('total', 0, 2) * 100;
+    $total = intval(request::float('total', 0, 2) * 100);
     if ($total == 0) {
         JSON::fail('金额不能为零！');
     }

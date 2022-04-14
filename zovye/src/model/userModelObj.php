@@ -480,13 +480,13 @@ class userModelObj extends modelObj
     /**
      * 增加或者减少用户佣金.
      *
-     * @param $price
-     * @param $src
+     * @param int $price
+     * @param int $src
      * @param array $extra
      *
      * @return commission_balanceModelObj
      */
-    public function commission_change($price, $src, array $extra = []): ?commission_balanceModelObj
+    public function commission_change(int $price, int $src, array $extra = []): ?commission_balanceModelObj
     {
         $balance = $this->getCommissionBalance();
 

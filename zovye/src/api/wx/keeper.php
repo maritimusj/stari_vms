@@ -847,7 +847,7 @@ class keeper
                 };
             } else {
                 $commission_price_calc = function ($num) use ($v) {
-                    return $v * $num;
+                    return intval($v * $num);
                 };
             }
         }

@@ -130,7 +130,7 @@ class Account extends State
     const MENGMO_HEAD_IMG = MODULE_URL . 'static/img/mengmo.jpg';
 
     const YIDAO_NAME = '壹道';
-    const YIDAO_HEAD_IMG = MODULE_URL . 'static/img/yidao.jpg';
+    const YIDAO_HEAD_IMG = MODULE_URL . 'static/img/yidao.png';
 
     protected static $title = [
         self::BANNED => '已禁用',

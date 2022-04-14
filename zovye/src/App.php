@@ -244,7 +244,7 @@ class App
     public static function isYiDaoEnabled(): bool
     {
         return onceCall(function () {
-            return !empty(settings('yidao.fan.enabled'));
+            return !empty(settings('YiDao.fan.enabled'));
         });
     }
 

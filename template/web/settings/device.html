@@ -10,7 +10,8 @@
     .fa-info-circle {
         position: relative;
     }
-    .limits {
+    i .limits {
+        color: gray;
         position: absolute;
         z-index: 99;
         background-color: #ffffff;
@@ -19,8 +20,17 @@
         white-space: nowrap;
         display: none;
     }
-    .fa-info-circle:hover .limits {
+    i.fa-info-circle:hover .limits {
         display: block;
+    }
+    i.limits-ok {
+        color: gray;
+    }
+    i.limits-warn {
+        color: #f44336;
+    }
+    i.limits-warn .pv {
+        color: #f44336;
     }
 </style>
 {template "web/settings/nav"}
@@ -97,12 +107,12 @@
                         <div>
                             腾讯LBS key 
                             {if $lbs_limits}
-                            <i class="fa fa-info-circle" style="color:gray;">
+                            <i class="fa fa-info-circle{if $lbs_limits['limit_pv'] - $lbs_limits['current_pv'] > 1000} limits-ok{else} limits-warn{/if}">
                                 <div class="limits">
                                     <div>
                                          <span>当前并发量（次/秒）</span> : <span>{$lbs_limits['current_qps']} / {$lbs_limits['limit_qps']}</span>
                                     </div>
-                                   <div>
+                                   <div class="pv">
                                        <span>剩余调用量（次/日）</span> : <span>{php echo $lbs_limits['limit_pv'] - $lbs_limits['current_pv']}</span>
                                    </div>
                                    {if !empty($lbs_limits['updatetime'])}

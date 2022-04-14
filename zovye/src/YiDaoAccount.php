@@ -85,16 +85,16 @@ class YiDaoAccount
 
             if ($result['code'] == 20000) {
 
-                $data = $result['result']['data'];
-                if (isEmptyArray($data)) {
+                $res = $result['data'];
+                if (isEmptyArray($res) || empty($res['qrcode_url'])) {
                     throw new RuntimeException('没有数据！');
                 }
 
                 $data = $acc->format();
 
-                $data['title'] = $data['appname'] ?: Account::MENGMO_NAME;
-                $data['qrcode'] = $data['qrcode_url'];
-                $data['descr'] = Account::ReplaceCode($data['descr'], 'code', strval($data['code']));
+                $data['title'] = $res['appname'] ?: Account::YIDAO_NAME;
+                $data['qrcode'] = $res['qrcode_url'];
+                $data['descr'] = Account::ReplaceCode($data['descr'], 'code', strval($res['code']));
 
                 $v[] = $data;
 
@@ -103,7 +103,7 @@ class YiDaoAccount
             }
 
         } catch (Exception $e) {
-            
+
             if (App::isAccountLogEnabled() && isset($log)) {
                 $log->setExtraData('error_msg', $e->getMessage());
                 $log->save();
@@ -126,6 +126,11 @@ class YiDaoAccount
         $acc = Account::findOneFromType(Account::YIDAO);
         if (empty($acc)) {
             return err('找不到指定公众号！');
+        }
+
+        $config = $acc->get('config', []);
+        if (isEmptyArray($config) || $params['develop_appid'] !== $config['appid'] || $params['key'] !== $config['device_key']) {
+            return err('数据检验失败！');
         }
 
         return ['account' => $acc];

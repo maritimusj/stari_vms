@@ -1,6 +1,19 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20211127');}
 {php \zovye\url(true, 'static/css/orderlist.css?v=20220302');}
+<style>
+    #orderlist .transactionId {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+    #orderlist .transactionId img {
+        width: 16px;
+        height: 16px;
+        margin-right: 3px;
+    }
+</style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
@@ -180,7 +193,8 @@
                     <td>
                         {if $order['price']>0}                      
                         <div class="transactionId">
-                           <i class="wi wi-money {$order['src']}" title="{$order['pay_name']}"></i> {$order['transaction_id']}
+                            <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{$order['pay_name']}">
+                            {$order['transaction_id']}
                         </div>
                         {elseif $order['balance'] > 0}
                         <div class="orderSrc">

@@ -415,7 +415,7 @@ class common
      */
     public static function orderCreate(): array
     {
-        $user = \zovye\api\wx\common::getWXAppUser();
+        $user = self::getUser();
 
         if ($user->isBanned()) {
             return err('用户暂时无法使用！');
@@ -1177,14 +1177,17 @@ class common
         }
 
         if (request::has('token')) {
-            $login_data = LoginData::get(request('token'));
+            $login_data = LoginData::get(request::str('token'));
             if (empty($login_data)) {
                 JSON::fail('请先登录后再请求数据！[101]');
             }
             self::$user = User::get($login_data->getUserId());
+
         } elseif (request::has('user_id')) {
-            $user_id = request('user_id');
+
+            $user_id = request::str('user_id');
             self::$user = User::get($user_id, true, User::ALI);
+
         } else {
             JSON::fail('请先登录后再请求数据！[102]');
         }

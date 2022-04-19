@@ -193,7 +193,7 @@
                     <td>
                         {if $order['price']>0}                      
                         <div class="transactionId">
-                            <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{$order['pay_name']}">
+                            <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{php echo \zovye\Pay::getTitle($order['pay_name'])}">
                             {$order['transaction_id']}
                         </div>
                         {elseif $order['balance'] > 0}

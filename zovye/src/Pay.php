@@ -35,6 +35,19 @@ class Pay
     //省钱码
     const SQM = 'SQM';
 
+    static $names = [
+        self::WX => '微信支付',
+        self::WxAPP => '微信小程序支付',
+        self::ALI => '支付宝',
+        self::LCSW => '扫呗',
+        self::SQB => '收钱吧',
+        self::SQM => '省钱码',
+    ];
+
+    public static function getTitle($name) {
+        return self::$names[$name] ?? '未知';
+    }
+
     /**
      * 获取支付需要的Js，函数会根据指定的设备和用户，获取特定的支付配置
      * @param deviceModelObj $device

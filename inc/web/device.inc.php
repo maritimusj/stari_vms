@@ -2155,7 +2155,7 @@ if ($op == 'list') {
     $res = m('device_feedback')->findOne(['id' => $id]);
     if ($res) {
         if ($res->getRemark() != '') {
-            JSON::fail('已处理该故障！');
+            JSON::fail('已处理该反馈！');
         }
     } else {
         JSON::fail('找不到该记录！');

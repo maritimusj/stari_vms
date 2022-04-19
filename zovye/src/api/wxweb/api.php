@@ -418,10 +418,10 @@ class api
         ];
 
         if (m('device_feedback')->create($data)) {
-            return ['msg' => '反馈成功！'];
+            return ['msg' => '感谢您的反馈，我们会及时核实并处理！'];
         }
 
-        return err('反馈失败！');
+        return err('反馈失败，请稍后重试！');
     }
 
     public static function signIn(): array

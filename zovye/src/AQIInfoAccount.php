@@ -129,6 +129,7 @@ class AQIInfoAccount extends AQIInfo
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'extra' => "{$device->getShadowId()}:{$fans['openid']}",
             'time' => time(),
+            'ip' => $user->getLastActiveIp(),
         ];
 
         $data['ufsign'] = self::sign($data, $this->app_secret);

@@ -13,6 +13,9 @@
         height: 16px;
         margin-right: 3px;
     }
+    #orderlist .transactionId.query img {
+        filter: grayscale(1);
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
@@ -192,7 +195,7 @@
                     <td>{php echo $index + 1}</td>
                     <td>
                         {if $order['price']>0}                      
-                        <div class="transactionId">
+                        <div class="transactionId {$order['src']}">
                             <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{php echo \zovye\Pay::getTitle($order['pay_name'])}">
                             {$order['transaction_id']}
                         </div>

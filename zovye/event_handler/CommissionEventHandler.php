@@ -272,9 +272,9 @@ class CommissionEventHandler
             }
 
             if ($is_percent) {
-                $price = intval(round($commission_price * intval($v) / 100));
+                $price = intval(round($commission_price * intval($v) / 100) *  $order->getNum());
             } else {
-                $price = intval($v);
+                $price = intval($v * $order->getNum());
             }
 
             if ($price > $available_price) {

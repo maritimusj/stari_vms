@@ -249,8 +249,6 @@ if ($account->isQuestionnaire()) {
     app()->fillQuestionnairePage($user, $account, $device, $tid);
 }
 
-$user->cleanLastActiveData();
-
 $ticket_data = [
     'id' => REQUEST_ID,
     'time' => TIMESTAMP,

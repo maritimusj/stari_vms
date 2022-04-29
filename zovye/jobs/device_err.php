@@ -52,17 +52,16 @@ if ($op == 'device_err' && CtrlServ::checkJobSign($data)) {
                 foreach (Util::getNotifyOpenIds($agent, 'deviceError') as $openid) {
                     $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $data);
                 }
-            }
 
-            foreach ($device->getKeepers() as $keeper) {
-                $user = $keeper->getUser();
-                if ($user) {
-                    $openid = $user->getOpenid();
-                    $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $data);
+                foreach ($device->getKeepers() as $keeper) {
+                    $user = $keeper->getUser();
+                    if ($user) {
+                        $openid = $user->getOpenid();
+                        $log['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $data);
+                    }
                 }
+                $device->updateLastDeviceNotify();
             }
-
-            $device->updateLastDeviceNotify();
         }
     }
 }

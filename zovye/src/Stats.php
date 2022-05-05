@@ -958,7 +958,7 @@ class Stats
         $begin = new DateTime("@{$l->getCreatetime()}");
         $begin->modify('first day of this month 00:00');
 
-        $now = new DateTime('next day');
+        $now = new DateTime();
 
         $data = [];
 

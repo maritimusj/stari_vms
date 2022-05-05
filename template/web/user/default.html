@@ -285,11 +285,9 @@
             <li><a href="{php echo $this->createWebUrl('user', array('op'=>'keeper', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的运营人员身份吗？')){return false;}"><i class="fa fa-user-times fa-fw"></i> 取消运营人员</a></li>
             <li><a href="#" data-op="keeperDevices" ><i class="fa fa-hdd-o fa-fw"></i> 运营的设备</a></li>
             <li><a href="#" data-op="keeperReplenish" ><i class="fa fa-sign-in fa-fw"></i> 补货记录</a></li>
-            <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>
             {/if}
             {if $item['isAgent']}
                 <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'agent_remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的代理商身份吗？')){return false;}"><i class="fa fa-diamond fa-fw"></i> 取消代理商身份</a></li>
-                <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>
             {else}
                 {if empty($item['isPartner'])}
                 <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'create', 'id'=>$item['id']));}"><i class="fa fa-diamond fa-fw"></i> 设置代理商</a></li>
@@ -297,12 +295,17 @@
                 <li><a href="{php echo $this->createWebUrl('agent', array('op'=>'partner_remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消合伙人身份吗？')){return false;}"><i class="fa fa-users fa-fw"></i> 取消合伙人身份</a></li>
                 {/if}
             {/if}
+            <li role="separator" class="divider"></li>
             {if $item['isTester']}
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'remove', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的测试员身份吗？')){return false;}"><i class="wi wi-system-info fa-fw"></i> 取消测试员身份</a></li>
             {else}
                 <li><a href="{php echo $this->createWebUrl('tester', array('op'=>'create', 'id'=>$item['id']));}"><i class="wi wi-system-info fa-fw"></i> 设置测试员</a></li>
             {/if}          
             <li role="separator" class="divider"></li>
+            {if $item['isKeeper'] || $item['isAgent']}
+            <li><a href="#" data-op="monthStat" ><i class="fa fa-money fa-fw"></i> 收提统计</a></li>
+            <li role="separator" class="divider"></li>
+            {/if}
             {if \zovye\App::isInventoryEnabled()}
             <li><a href="#" data-op="viewInventory"><i class="fa fa-archive fa-fw"></i> 查看库存</a></li>
             <li role="separator" class="divider"></li>

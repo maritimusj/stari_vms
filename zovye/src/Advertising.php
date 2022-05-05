@@ -248,7 +248,7 @@ class Advertising extends State
             $extra['images'] = $images;
             $extra['link'] = trim($params['link']);
 
-            if ($type == Advertising::WELCOME_PAGE) {
+            if ($type == Advertising::GET_PAGE) {
                 $extra['app_id'] = trim($params['app_id']);
                 $extra['app_path'] = trim($params['app_path']);
             }

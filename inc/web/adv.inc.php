@@ -404,7 +404,8 @@ if ($op == 'default') {
 
             $tpl_data['images'] = $adv->getExtraData('images');
             $tpl_data['link'] = $adv->getExtraData('link');
-            if ($type == Advertising::WELCOME_PAGE) {
+            
+            if ($type == Advertising::GET_PAGE) {
                 $tpl_data['app_id'] = $adv->getExtraData('app_id');
                 $tpl_data['app_path'] = $adv->getExtraData('app_path');
             }

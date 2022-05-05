@@ -195,15 +195,20 @@ class Device extends State
                         $num = $lane;
                     }
 
+                    $max_capacity = intval($cargo_lanes[$index]['capacity']);
+
                     if (We7::starts_with($num, '@')) {
                         $lanes_data[$lane_id]['num'] = max(0, intval(ltrim($num, '@')));
                     } else {
                         if ($num == 0) {
-                            $lanes_data[$lane_id]['num'] = intval($cargo_lanes[$index]['capacity']);
+                            $lanes_data[$lane_id]['num'] = $max_capacity;
                         } else {
                             $lanes_data[$lane_id]['num'] = max(0, $old + intval($num));
                         }
                     }
+
+                    //不能超过最大容量
+                    $lanes_data[$lane_id]['num'] = min($max_capacity, $lanes_data[$lane_id]['num']);
 
                     if (is_null($lowest) || $lanes_data[$lane_id]['num'] < $lowest) {
                         $lowest = $lanes_data[$lane_id]['num'];

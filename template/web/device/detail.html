@@ -185,19 +185,19 @@
                 {/loop}
             </div>
             {/if}
-            {if $config['data']['srt']}
+            {if $srt}
             <div class="seg">
                 <div class="title">屏幕字幕</div>
                 <div  style="display:flex;">
-                {loop $config['data']['srt']['subs'] $srt}
+                {loop $srt $i}
                 <div class="advlist">
                     <div class="adv_url">
-                        <pre>{php echo strval($srt['text'])}</pre>
+                        <pre>{php echo strval($i['text'])}</pre>
                         <div class="operate">
-                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'assign', 'id' => $srt['id']])}" target="_blank">
+                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'assign', 'id' => $i['id']])}" target="_blank">
                                 <i class="fa fa-wrench" title="分配"></i>
                             </a>
-                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'edit', 'id' => $srt['id']])}" target="_blank">
+                            <a href="{php echo $this->createWebUrl('adv', ['op' => 'edit', 'id' => $i['id']])}" target="_blank">
                                 <i class="fa fa-edit" title="编辑"></i>
                             </a>
                         </div>
@@ -339,7 +339,7 @@
             <div class="seg">
                 <div class="title">设备配置</div>
                     <pre>
-{php echo json_encode($config['data'], JSON_PRETTY_PRINT);}
+{php echo json_encode($config['data'], JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);}
                     </pre>
             </div>
         </div>

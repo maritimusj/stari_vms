@@ -1023,16 +1023,17 @@ if ($op == 'list') {
         $tpl_data['config'] = false;
     } else {
         if ($res['data']['srt']['subs']) {
-            unset($res['data']['srt']['subs']);
+            $srt = [];
             $ads = $device->getAdvs(Advertising::SCREEN);
             foreach ($ads as $ad) {
                 if ($ad['extra']['media'] == 'srt') {
-                    $res['data']['srt']['subs'][] = [
+                    $srt[] = [
                         'id' => $ad['id'],
                         'text' => strval($ad['extra']['text']),
                     ];
                 }
             }
+            $tpl_data['srt'] = $srt;
         }
         $tpl_data['config'] = $res;
     }

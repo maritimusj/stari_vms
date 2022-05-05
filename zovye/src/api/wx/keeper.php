@@ -1093,19 +1093,16 @@ class keeper
 
                 $title = $day->format('m-d');
 
-                $n = (int)m('replenish')->where(
-                    We7::uniacid(
-                        [
-                            'keeper_id' => $keeper->getId(),
-                            'agent_id' => $keeper->getAgentId(),
-                            'createtime >=' => $ts_start,
-                            'createtime <' => $ts_end,
-                        ]
-                    )
-                )->get('sum(num)');
+                $cond = We7::uniacid([
+                        'keeper_id' => $keeper->getId(),
+                        'agent_id' => $keeper->getAgentId(),
+                        'createtime >=' => $ts_start,
+                        'createtime <' => $ts_end,
+                    ]);
 
-                if ($n > 0) {
-                    $result['list'][$title] = $n;
+                if (m('replenish')->where($cond)->count() > 0) {
+                    $total = (int)m('replenish')->where($cond)->get('sum(num)');
+                    $result['list'][$title] = $total;
                 }
             }
 

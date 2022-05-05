@@ -14,8 +14,10 @@ use zovye\base\modelObj;
 use zovye\Contract\ISettings;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
+use zovye\model\commission_balanceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 
 class Stats
 {
@@ -944,5 +946,133 @@ class Stats
                 $data['pay'] += $data['balance'];
             }
         }
+    }
+
+    public static function getUserMonthCommissionStats($user): array
+    {
+        $l = CommissionBalance::getFirstCommissionBalance($user);
+        if (empty($l)) {
+            return [];
+        }
+
+        $begin = new DateTime("@{$l->getCreatetime()}");
+        $now = new DateTime();
+
+        $data = [];
+
+        while ($begin <= $now) {
+            $month_str = $begin->format('Y年m月');
+
+            $uid = Cache::makeUID([
+                'api' => 'monthStats',
+                'user' => $user->getOpenid(),
+                'month' => $month_str,
+            ]);
+
+            $params = [];
+
+            if ($month_str == date('Y-m')) {
+                $params[] = Cache::ResultExpiredAfter(10);
+            }
+
+            $res = Cache::fetch($uid, function () use ($user, $begin) {
+                return Stats::getMonthCommissionStatsData($user, $begin);
+            }, ...$params);
+
+            if (is_error($res)) {
+                return $res;
+            }
+
+            $data[$month_str] = $res;
+
+            $begin->modify('next month');
+        }
+
+        $last_month_balance = 0;
+        foreach ($data as $key => $item) {
+            $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
+            $last_month_balance = $data[$key]['balance'];
+        }
+
+        krsort($data);
+        return $data;
+    }
+
+    public static function getMonthCommissionStatsData(userModelObj $user, $month): array
+    {
+        $cond = [
+            'openid' => $user->getOpenid(),
+        ];
+
+        try {
+            if (is_string($month)) {
+                $time = new DateTime($month);
+            } elseif ($month instanceof DateTimeInterface) {
+                $time = new DateTime($month->format('Y-m-d 00:00'));
+            } else {
+                $time = new DateTime();
+            }
+            $time->modify('first day of this month 00:00');
+            $cond['createtime >='] = $time->getTimestamp();
+
+            $time->modify('first day of next month 00:00');
+            $cond['createtime <'] = $time->getTimestamp();
+
+        } catch (Exception $e) {
+            return [];
+        }
+
+        $res = CommissionBalance::query($cond)->findAll();
+
+        $c_arr = [
+            CommissionBalance::ORDER_FREE,
+            CommissionBalance::ORDER_BALANCE,
+            CommissionBalance::ORDER_WX_PAY,
+            CommissionBalance::ORDER_REFUND,
+            CommissionBalance::REFUND,
+            CommissionBalance::GSP,
+            CommissionBalance::BONUS,
+        ];
+
+        $data = [
+            'income' => 0,
+            'withdraw' => 0,
+            'fee' => 0,
+        ];
+        /** @var commission_balanceModelObj $item */
+        foreach ($res as $item) {
+
+            $src = $item->getSrc();
+            $x_val = $item->getXVal();
+
+            if (in_array($src, $c_arr)) {
+
+                $data['income'] += $x_val;
+
+            } elseif ($src == CommissionBalance::ADJUST) {
+
+                if ($x_val > 0) {
+                    $data['income'] += $x_val;
+                } else {
+                    $data['withdraw'] += $x_val;
+                }
+
+            } elseif ($src == CommissionBalance::WITHDRAW) {
+
+                $data['withdraw'] += $x_val;
+
+            } elseif ($src == CommissionBalance::FEE) {
+
+                $data['fee'] += $x_val;
+
+            } else {
+                if ($x_val > 0) {
+                    $data['income'] += $x_val;
+                } else {
+                    $data['fee'] += $x_val;
+                }
+            }
+        }
+        return $data;
     }
 }

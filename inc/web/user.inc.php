@@ -8,7 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\model\commission_balanceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeper_devicesModelObj;
 use zovye\model\keeperModelObj;
@@ -520,64 +519,7 @@ if ($op == 'default') {
 } elseif ($op == 'month_stat') {
 
     $user = User::get(request('id'));
-    $data = [];
-    if ($user) {
-        $openid = $user->getOpenid();
-
-        $res = CommissionBalance::query(['openid' => $openid])->findAll();
-        $c_arr = [
-            CommissionBalance::ORDER_FREE,
-            CommissionBalance::ORDER_BALANCE,
-            CommissionBalance::ORDER_WX_PAY,
-            CommissionBalance::REFUND,
-            CommissionBalance::ORDER_REFUND,
-            CommissionBalance::GSP,
-            CommissionBalance::BONUS,
-        ];
-        /** @var commission_balanceModelObj $item */
-        foreach ($res as $item) {
-            $month_date = date('Y-m', $item->getCreatetime());
-            if (!isset($data[$month_date])) {
-                $data[$month_date]['income'] = 0;
-                $data[$month_date]['withdraw'] = 0;
-                $data[$month_date]['fee'] = 0;
-            }
-
-            $src = $item->getSrc();
-            $x_val = $item->getXVal();
-
-            if (in_array($src, $c_arr)) {
-                $data[$month_date]['income'] += $x_val;
-            } elseif ($src == CommissionBalance::ADJUST) {
-                if ($x_val > 0) {
-                    $data[$month_date]['income'] += $x_val;
-                } else {
-                    $data[$month_date]['withdraw'] += $x_val;
-                }
-            } elseif ($src == CommissionBalance::WITHDRAW) {
-                $data[$month_date]['withdraw'] += $x_val;
-            } elseif ($src == CommissionBalance::FEE) {
-                $data[$month_date]['fee'] += $x_val;
-            } else {
-                if ($x_val > 0) {
-                    $data[$month_date]['income'] += $x_val;
-                } else {
-                    $data[$month_date]['fee'] += $x_val;
-                }
-            }
-        }
-    }
-
-    ksort($data);
-
-    $last_month_balance = 0;
-
-    foreach ($data as $key => $item) {
-        $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
-        $last_month_balance = $data[$key]['balance'];
-    }
-
-    krsort($data);
+    $data = Stats::getUserMonthCommissionStats($user);
 
     $content = app()->fetchTemplate(
         'web/user/month_stat',

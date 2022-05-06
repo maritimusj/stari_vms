@@ -261,6 +261,7 @@ class device
             return err('无法锁定用户，请稍后再试！');
         }
 
+        $reason = '??';
         if ($user->isAgent() || $user->isPartner()) {
             common::checkCurrentUserPrivileges('F_sb');
             $device = self::getDevice(request('id'), $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent());
@@ -270,6 +271,7 @@ class device
             if (!$device->isOwnerOrSuperior($user)) {
                 return error(State::ERROR, '没有权限执行这个操作！');
             }
+            $reason = '代理商补货';
         } elseif ($user->isKeeper()) {
             $device = \zovye\Device::find(request('id'), ['imei', 'shadow_id']);
             if (empty($device)) {
@@ -284,6 +286,7 @@ class device
             ) {
                 return error(State::ERROR, '没有权限执行这个操作！');
             }
+            $reason = '运营人员补货';
         }
 
         if ($device) {
@@ -298,14 +301,14 @@ class device
             }
 
             $num = request::int('num');
-            $res = $device->resetPayload([$lane => '@' . $num], '代理商补货');
+            $res = $device->resetPayload([$lane => '@' . $num], $reason);
             if (is_error($res)) {
                 return error(State::ERROR, '保存库存失败！');
             }
 
             if (App::isInventoryEnabled()) {
                 $user = $user->isPartner() ? $user->getPartnerAgent() : $user;
-                $v = Inventory::syncDevicePayloadLog($user, $device, $res, $user->isKeeper() ? '营运人员补货' : '代理商补货');
+                $v = Inventory::syncDevicePayloadLog($user, $device, $res, $reason);
                 if (is_error($v)) {
                     return $v;
                 }

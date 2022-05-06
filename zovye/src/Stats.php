@@ -948,21 +948,71 @@ class Stats
         }
     }
 
-    public static function getUserMonthCommissionStats($user): array
+    public static function getUserCommissionStats(userModelObj $user): array
     {
-        $l = CommissionBalance::getFirstCommissionBalance($user);
-        if (empty($l)) {
+        list($years, $result) = self::getUserMonthCommissionStatsOfYear($user, '');
+        array_pop($years);
+        foreach ($years as $year) {
+            list(, $data) = self::getUserMonthCommissionStatsOfYear($user, $year);
+            $result = array_merge($result, $data);
+        }
+        return $result;
+    }
+
+    public static function getUserMonthCommissionStatsOfYear(userModelObj $user, $year): array
+    {
+        $first = CommissionBalance::getFirstCommissionBalance($user);
+        if (empty($first)) {
             return [];
         }
 
-        $begin = new DateTime("@{$l->getCreatetime()}");
-        $begin->modify('first day of this month 00:00');
+        $first_datetime = new DateTime("@{$first->getCreatetime()}");
+
+        try {
+            if (empty($year)) {
+                $time = new DateTime();
+            } elseif (is_string($year)) {
+                $time = new DateTime($year);
+            } elseif ($year instanceof DateTimeInterface) {
+                $time = new DateTime($year->format('Y-01-01 00:00'));
+            } else {
+                return [];
+            }
+
+            $time->modify('first day of jan 00:00');
+
+            if ($time < $first_datetime) {
+                if ($time->format('Y') == $first_datetime->format('Y')) {
+                    $time = $first_datetime;
+                } else {
+                    return [];
+                }
+            }
+        } catch (Exception $e) {
+            return [];
+        }
 
         $now = new DateTime();
 
-        $data = [];
+        $begin = new DateTime("@{$time->getTimestamp()}");
+        $begin->modify('first day of this month 00:00');
 
-        while ($begin <= $now) {
+        $end = new DateTime("@{$time->getTimestamp()}");
+        $end->modify('first day of jan next year 00:00');
+
+        if ($end > $now) {
+            $end = $now;
+        }
+
+        $data = [];
+        $years = [];
+
+        while ($first_datetime < $now) {
+            $years[] = $first_datetime->format('Y');
+            $first_datetime->modify('next year');
+        }
+
+        while ($begin < $end) {
             $month_str = $begin->format('Y年m月');
 
             $uid = Cache::makeUID([
@@ -996,7 +1046,7 @@ class Stats
         }
 
         krsort($data);
-        return $data;
+        return array($years, $data);
     }
 
     public static function getMonthCommissionStatsData(userModelObj $user, $month): array

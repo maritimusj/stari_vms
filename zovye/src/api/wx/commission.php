@@ -231,6 +231,6 @@ class commission
             $user = $user->getPartnerAgent();
         }
 
-        return ['data' => Stats::getUserMonthCommissionStats($user)];
+        return ['data' => Stats::getUserCommissionStats($user)];
     }
 }

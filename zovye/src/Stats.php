@@ -1042,9 +1042,11 @@ class Stats
             $begin->modify('next month');
         }
 
-        //原留在不再计算，直接设置为0
-        foreach ($data as &$item) {
-            $item['balance'] = 0;
+        $last_month_balance = 0;
+
+        foreach ($data as $key => $item) {
+            $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
+            $last_month_balance = $data[$key]['balance'];
         }
 
         krsort($data);

@@ -227,10 +227,16 @@ class commission
             return err('找不到这个用户！');
         }
 
-        if ($user->isPartner()) {
-            $user = $user->getPartnerAgent();
+        if (request::has('keeper')) {
+            if (!$user->isKeeper()) {
+                return err('用户不是运营人员！');
+            }
+        } else {
+            if ($user->isPartner()) {
+                $user = $user->getPartnerAgent();
+            }            
         }
 
         return ['data' => Stats::getUserCommissionStats($user)];
-    }
+    } 
 }

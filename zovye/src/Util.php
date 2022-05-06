@@ -1408,10 +1408,9 @@ HTML_CONTENT;
     public static function getIpInfo($ip): string
     {
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
-        $url = 'https://apis.map.qq.com/ws/location/v1/ip';
-        $params = urlencode("?ip=$ip&key=$lbs_key");
+        $url = "https://apis.map.qq.com/ws/location/v1/ip?ip=$ip&key=$lbs_key";
 
-        $resp = ihttp::get($url . $params);
+        $resp = ihttp::get($url);
 
         if (!is_error($resp)) {
             $res = json_decode($resp['content'], true);

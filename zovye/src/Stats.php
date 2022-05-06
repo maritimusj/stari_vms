@@ -952,10 +952,12 @@ class Stats
     {
         list($years, $result) = self::getUserMonthCommissionStatsOfYear($user, '');
         array_pop($years);
+
         foreach ($years as $year) {
             list(, $data) = self::getUserMonthCommissionStatsOfYear($user, $year);
             $result = array_merge($result, $data);
         }
+        
         return $result;
     }
 
@@ -988,14 +990,15 @@ class Stats
                     return [];
                 }
             }
+
+            $begin = new DateTime($time->format('Y-m-d 00:00'));
+
+            $end = new DateTime($time->format('Y-m-d 00:00'));
+            $end->modify('first day of jan next year 00:00');
+
         } catch (Exception $e) {
             return [];
         }
-
-        $begin = new DateTime($time->format('Y-m-d 00:00'));
-
-        $end = new DateTime($time->format('Y-m-d 00:00'));
-        $end->modify('first day of jan next year 00:00');
 
         $now = new DateTime();
         if ($end > $now) {

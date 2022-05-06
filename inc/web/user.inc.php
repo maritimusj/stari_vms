@@ -528,7 +528,7 @@ if ($op == 'default') {
         'web/user/month_stat',
         [
             'data' => $data,
-            'years' => count($years) > 1 ? $years : [],
+            'years' => $years && count($years) > 1 ? $years : [],
             'current' => $year,
             'user_id' => $user->getId(),
         ]

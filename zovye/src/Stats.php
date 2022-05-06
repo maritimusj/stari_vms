@@ -1008,6 +1008,7 @@ class Stats
         $data = [];
         $years = [];
 
+        $first_datetime->modify('first day of jan');
         while ($first_datetime < $now) {
             $years[] = $first_datetime->format('Y');
             $first_datetime->modify('next year');

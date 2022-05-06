@@ -523,9 +523,8 @@
     }
 
     api.monthStatOfYear = function (_, _, self) {
-        console.log(self);
         const year = self.data('year');
-        const userid = self.data('user');
+        const userid = self.closest('.year').data('user');
         api.showResult({op: 'month_stat', id: userid, year});
     }
 

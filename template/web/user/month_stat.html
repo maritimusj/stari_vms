@@ -1,7 +1,7 @@
 {if $data}
-<div class="year">
+<div class="year" data-user="{$user_id}">
     {loop $years $year}
-    <span {if $year === $current}class="current"{else} class="item" data-year="{$year}" data-op="monthStatOfYear" data-user="{$user_id}"{/if}>{$year}</span>
+    <span {if $year === $current}class="current"{else} class="item" data-year="{$year}" data-op="monthStatOfYear"{/if}>{$year}</span>
     {/loop}
 </div>
 <table class="table table-bordered table-hover" style="margin-top:1em;text-align:center;">

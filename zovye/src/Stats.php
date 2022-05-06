@@ -958,13 +958,15 @@ class Stats
             $result = array_merge($result, $data);
         }
         
-        krsort($result);
+        ksort($result);
 
         $last_month_balance = 0;
         foreach ($result as $key => $item) {
-            $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
-            $last_month_balance = $data[$key]['balance'];
+            $result[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
+            $last_month_balance = $result[$key]['balance'];
         }
+
+        krsort($result);
 
         return $result;
     }
@@ -1050,6 +1052,7 @@ class Stats
         }
 
         krsort($data);
+        
         return array($years, $data);
     }
 

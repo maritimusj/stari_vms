@@ -950,20 +950,26 @@ class Stats
 
     public static function getUserCommissionStats(userModelObj $user): array
     {
-        list($years, $result,  $last_month_balance) = self::getUserMonthCommissionStatsOfYear($user, '');
+        list($years, $result) = self::getUserMonthCommissionStatsOfYear($user, '');
         array_shift($years);
 
         foreach ($years as $year) {
-            list(, $data, $last_month_balance) = self::getUserMonthCommissionStatsOfYear($user, $year, $last_month_balance);
+            list(, $data) = self::getUserMonthCommissionStatsOfYear($user, $year);
             $result = array_merge($result, $data);
         }
         
         krsort($result);
 
+        $last_month_balance = 0;
+        foreach ($result as $key => $item) {
+            $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
+            $last_month_balance = $data[$key]['balance'];
+        }
+
         return $result;
     }
 
-    public static function getUserMonthCommissionStatsOfYear(userModelObj $user, $year, $last_month_balance = 0): array
+    public static function getUserMonthCommissionStatsOfYear(userModelObj $user, $year): array
     {
         $first = CommissionBalance::getFirstCommissionBalance($user);
         if (empty($first)) {
@@ -1043,13 +1049,8 @@ class Stats
             $begin->modify('next month');
         }
 
-        foreach ($data as $key => $item) {
-            $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
-            $last_month_balance = $data[$key]['balance'];
-        }
-
         krsort($data);
-        return array($years, $data, $last_month_balance);
+        return array($years, $data);
     }
 
     public static function getMonthCommissionStatsData(userModelObj $user, $month): array

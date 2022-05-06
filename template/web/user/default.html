@@ -54,6 +54,13 @@
     [data-url] {
         cursor: pointer;
     }
+    .year {
+        color: #2196f3;
+        cursor: pointer;
+    }
+    .year .current {
+        text-decoration: underline;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_principal)}
@@ -515,6 +522,13 @@
         api.showResult({op: 'month_stat', id: userid});
     }
 
+    api.monthStatOfYear = function (_, _, self) {
+        console.log(self);
+        const year = self.data('year');
+        const userid = self.data('user');
+        api.showResult({op: 'month_stat', id: userid, year});
+    }
+
     $(function(){
         $('[data-url]').each(function(){
             util.clip(this, $(this).data('url'));
@@ -575,11 +589,11 @@
             e.preventDefault();
         })
          
-        $('#userlist').on('click', '[data-op]', function(e){
+        $('body').on('click', '[data-op]', function(e){
             const op = $(this).data('op');
             if(api[op]) {
                 const userid = $(this).closest('tr').data('id');
-                api[op](userid, e);
+                api[op](userid, e, $(this));
             }
             e.preventDefault();
         })

@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use Exception;
+use DateTime;
 use zovye\model\goodsModelObj;
 use zovye\model\keeper_devicesModelObj;
 use zovye\model\keeperModelObj;
@@ -519,15 +519,18 @@ if ($op == 'default') {
 
 } elseif ($op == 'month_stat') {
 
-    $user = User::get(request('id'));
+    $user = User::get(request::int('id'));
+    $year = request::str('year', (new DateTime())->format('Y'));
 
-    list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, '');
+    list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, $year);
 
     $content = app()->fetchTemplate(
         'web/user/month_stat',
         [
             'data' => $data,
-            'years' => $years,
+            'years' => count($years) > 1 ? $years : [],
+            'current' => $year,
+            'user_id' => $user->getId(),
         ]
     );
 

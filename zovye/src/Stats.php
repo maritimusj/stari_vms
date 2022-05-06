@@ -972,7 +972,7 @@ class Stats
             if (empty($year)) {
                 $time = new DateTime();
             } elseif (is_string($year)) {
-                $time = new DateTime($year);
+                $time = new DateTime("$year-01-01");
             } elseif ($year instanceof DateTimeInterface) {
                 $time = new DateTime($year->format('Y-01-01 00:00'));
             } else {
@@ -992,14 +992,12 @@ class Stats
             return [];
         }
 
-        $now = new DateTime();
+        $begin = new DateTime($time->format('Y-m-d 00:00'));
 
-        $begin = new DateTime("@{$time->getTimestamp()}");
-        $begin->modify('first day of this month 00:00');
-
-        $end = new DateTime("@{$time->getTimestamp()}");
+        $end = new DateTime($time->format('Y-m-d 00:00'));
         $end->modify('first day of jan next year 00:00');
 
+        $now = new DateTime();
         if ($end > $now) {
             $end = $now;
         }

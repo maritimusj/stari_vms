@@ -992,6 +992,7 @@ class Stats
             }
 
             $begin = new DateTime($time->format('Y-m-d 00:00'));
+            $begin->modify('first day of this month');
 
             $end = new DateTime($time->format('Y-m-d 00:00'));
             $end->modify('first day of jan next year 00:00');

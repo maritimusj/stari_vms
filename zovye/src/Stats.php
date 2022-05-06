@@ -950,18 +950,20 @@ class Stats
 
     public static function getUserCommissionStats(userModelObj $user): array
     {
-        list($years, $result) = self::getUserMonthCommissionStatsOfYear($user, '');
-        array_pop($years);
+        list($years, $result,  $last_month_balance) = self::getUserMonthCommissionStatsOfYear($user, '');
+        array_shift($years);
 
         foreach ($years as $year) {
-            list(, $data) = self::getUserMonthCommissionStatsOfYear($user, $year);
+            list(, $data, $last_month_balance) = self::getUserMonthCommissionStatsOfYear($user, $year, $last_month_balance);
             $result = array_merge($result, $data);
         }
         
+        krsort($result);
+
         return $result;
     }
 
-    public static function getUserMonthCommissionStatsOfYear(userModelObj $user, $year): array
+    public static function getUserMonthCommissionStatsOfYear(userModelObj $user, $year, $last_month_balance = 0): array
     {
         $first = CommissionBalance::getFirstCommissionBalance($user);
         if (empty($first)) {
@@ -972,16 +974,14 @@ class Stats
 
         try {
             if (empty($year)) {
-                $time = new DateTime();
+                $time = $first_datetime;
             } elseif (is_string($year)) {
-                $time = new DateTime("$year-01-01");
+                $time = new DateTime("$year-01-01 00:00");
             } elseif ($year instanceof DateTimeInterface) {
                 $time = new DateTime($year->format('Y-01-01 00:00'));
             } else {
                 return [];
             }
-
-            $time->modify('first day of jan 00:00');
 
             if ($time < $first_datetime) {
                 if ($time->format('Y') == $first_datetime->format('Y')) {
@@ -1043,15 +1043,13 @@ class Stats
             $begin->modify('next month');
         }
 
-        $last_month_balance = 0;
-
         foreach ($data as $key => $item) {
             $data[$key]['balance'] = $item['income'] + $item['withdraw'] + $item['fee'] + $last_month_balance;
             $last_month_balance = $data[$key]['balance'];
         }
 
         krsort($data);
-        return array($years, $data);
+        return array($years, $data, $last_month_balance);
     }
 
     public static function getMonthCommissionStatsData(userModelObj $user, $month): array

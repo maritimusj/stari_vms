@@ -832,6 +832,11 @@ class keeper
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
+        $agent = $device->getAgent();
+        if (empty($agent)) {
+            return err('找不到设备代理商！');
+        }
+
         //补货佣金计算函数
         $commission_price_calc = function () {
             return 0;
@@ -853,12 +858,7 @@ class keeper
         }
 
         //创建佣金记录
-        $create_commission_fn = function ($total) use ($device, $keeper) {
-            $agent = $device->getAgent();
-            if (empty($agent)) {
-                return err('找不到设备代理商！');
-            }
-
+        $create_commission_fn = function ($total) use ($agent, $device, $keeper) {
             if (!$agent->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
                 return err('无法锁定代理商！');
             }
@@ -886,11 +886,20 @@ class keeper
             }
             return true;
         };
-
+ 
         if (request::isset('lane')) {
+            $lane = request::int('lane');
             $num = request::int('num');
+
+            if ($num != 0 && !$agent->allowReductGoodsNum()) {
+               $laneData = $device->getLane($lane);
+               if ($laneData && $num < $laneData['num']) {
+                    return err('不允许减少商品库存！');
+               }
+            }
+
             $data = [
-                request::int('lane') => $num != 0 ? '@' . $num : 0,
+                $lane => $num != 0 ? '@' . $num : 0,
             ];
         } else {
             $data = [];

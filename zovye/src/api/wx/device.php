@@ -301,6 +301,16 @@ class device
             }
 
             $num = request::int('num');
+
+            if ($user->isKeeper()) {
+                $agent = $device->getAgent();
+                if ($agent && !$agent->allowReductGoodsNum()) {
+                    if ($num < $laneData['num']) {
+                         return err('不允许减少商品库存！');
+                    }
+                 }
+            }
+
             $res = $device->resetPayload([$lane => '@' . $num], $reason);
             if (is_error($res)) {
                 return error(State::ERROR, '保存库存失败！');

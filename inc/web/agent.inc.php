@@ -597,6 +597,10 @@ if ($op == 'default') {
                 ]);
             }
 
+            $user->updateSettings('agentData.keeper.reductGoodsNum', [
+                'enabled' => request::int('reductGoodsNum'),
+            ]);            
+
             if (App::isZeroBonusEnabled()) {
                 $user->updateSettings('agentData.custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
             }

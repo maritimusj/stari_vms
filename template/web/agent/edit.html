@@ -1159,6 +1159,20 @@
                 </div>
                 {/if}
             </div>
+            <div class="seg">
+                <div class="title">运营人员</div>
+                <div class="form-group">
+                    <label for="reductGoodsNum" class="col-md-2 control-label">减少库存</label>
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="reductGoodsNum" id="reductGoodsNum" value="1" {if !isset($agent_data['keeper']['reductGoodsNum']) || $agent_data['keeper']['reductGoodsNum']['enabled']}checked{/if}>
+                                允许运营人员补货时，减少设备商品库存
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {if \zovye\App::isZeroBonusEnabled()}
             <div class="seg">
                 <div class="title">佣金</div>

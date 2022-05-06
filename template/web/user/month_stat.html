@@ -10,7 +10,8 @@
         <th style="text-align:center;">月份</th>
         <th style="text-align:center;">收入金额</th>
         <th style="text-align:center;">提现金额</th>
-        <th style="text-align:center;">提现手续费</th>
+        <th style="text-align:center;">支出费用</th>
+        <th style="text-align:center;">留存</th>
     </tr>
     </thead>
     {loop $data $i $item}
@@ -19,6 +20,7 @@
         <td>{php echo number_format(abs($item['income'])/100, 2)} 元</td>
         <td>{php echo number_format(abs($item['withdraw'])/100, 2)} 元</td>
         <td>{php echo number_format(abs($item['fee'])/100, 2)} 元</td>
+        <td>{php echo number_format(abs($item['balance'])/100, 2)} 元</td>
     </tr>
     {/loop}
 

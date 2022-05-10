@@ -12,7 +12,6 @@ use zovye\Balance;
 use zovye\Job;
 
 use zovye\Locker;
-use zovye\Order;
 use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
@@ -32,7 +31,6 @@ use zovye\DeviceLocker;
 use zovye\Account;
 use zovye\CtrlServ;
 
-use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\getArray;
 use function zovye\m;
@@ -2486,44 +2484,73 @@ class deviceModelObj extends modelObj
         return $result;
     }
 
-    public static function checkGoodsQuota(userModelObj $user, array &$goodsData)
+    public static function disableFree(array &$goodsData) {
+        $goodsData[Goods::AllowFree] = false;
+
+        if (Balance::isFreeOrder()) {
+            $goodsData[Goods::AllowExchange] = false;
+            $goodsData[Goods::AllowDelivery] = false;
+        }        
+    }
+    
+    public static function disablePay(array &$goodsData) {
+        $goodsData[Goods::AllowPay] = false;
+                        
+        if (Balance::isPayOrder()) {
+            $goodsData[Goods::AllowExchange] = false;
+            $goodsData[Goods::AllowDelivery] = false;
+        }
+    }
+
+    public static function checkGoodsQuota(userModelObj $user, array &$goodsData, $params)
     {
         $goods = Goods::get($goodsData['id']);
         if ($goods) {
             $quota = $goods->getQuota();
+            
             if (!isEmptyArray($quota)) {
                 if ($goods->allowFree() || (Balance::isFreeOrder() && $goods->allowExchange()) || (Balance::isFreeOrder() && $goods->allowDelivery())) {
                     $day_limit = $quota['free']['day'];
-                    if (!empty($day_limit) && $day_limit >= $user->getTodayFreeTotal($goods->getId())) {
-                        $goodsData[Goods::AllowFree] = false;
-                        if (Balance::isFreeOrder()) {
-                            $goodsData[Goods::AllowExchange] = false;
-                            $goodsData[Goods::AllowDelivery] = false;
-                        }
-                    }
                     $all_limit = $quota['free']['all'];
-                    if (!empty($all_limit) && $all_limit >= $user->getFreeTotal($goods->getId())) {
-                        $goodsData[Goods::AllowFree] = false;
-                        if (Balance::isFreeOrder()) {
-                            $goodsData[Goods::AllowExchange] = false;
-                            $goodsData[Goods::AllowDelivery] = false;
+
+                    if (!empty($day_limit)) {
+                        $day_total = $user->getTodayFreeTotal($goods->getId());
+                        if ($day_limit <= $day_total) {
+                            self::disableFree($goodsData);
+                        } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
+                            $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                         }
                     }
-                } else {
+
+                    if (!empty($all_limit)) {
+                        $all_total = $user->getFreeTotal($goods->getId());
+                        if ($all_limit <= $all_total) {
+                            self::disableFree($goodsData);
+                        } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
+                            $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
+                        }
+                    }
+                }
+                
+                if ($goods->allowPay()) {
                     $day_limit = $quota['pay']['day'];
-                    if (!empty($day_limit) && $day_limit >= $user->getTodayPayTotal($goods->getId())) {
-                        $goodsData[Goods::AllowPay] = false;
-                        if (Balance::isPayOrder()) {
-                            $goodsData[Goods::AllowExchange] = false;
-                            $goodsData[Goods::AllowDelivery] = false;
+                    $all_limit = $quota['pay']['all'];
+                    
+                    if (!empty($day_limit)) {
+                        $day_total = $user->getTodayPayTotal($goods->getId());
+                        if ($day_limit <= $day_total) {
+                            self::disablePay($goodsData);
+                        } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
+                            $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                         }
                     }
-                    $all_limit = $quota['pay']['all'];
-                    if (!empty($all_limit) && $all_limit >= $user->getPayTotal($goods->getId())) {
-                        $goodsData[Goods::AllowFree] = false;
-                        if (Balance::isPayOrder()) {
-                            $goodsData[Goods::AllowExchange] = false;
-                            $goodsData[Goods::AllowDelivery] = false;
+
+                    if (!empty($all_limit)) {
+                        $all_total = $user->getPayTotal($goods->getId());
+                        if ($all_limit <= $all_total) {
+                            self::disablePay($goodsData);
+                        } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
+                            $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
                         }
                     }
                 }
@@ -2536,6 +2563,22 @@ class deviceModelObj extends modelObj
         $result = [];
 
         $payload = $this->getPayload();
+        $checkFN = function($goods_data) use ($params) {
+            if ($params) {
+                if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) && empty($goods_data[Goods::AllowPay])) {
+                    return false;
+                }
+                if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) && empty($goods_data[Goods::AllowFree])) {
+                    return false;
+                }
+                if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params))) {
+                    if (empty($goods_data[Goods::AllowExchange]) || empty($goods_data['balance'])) {
+                        return false;
+                    }
+                }
+            }  
+            return true;          
+        };
 
         if ($payload && $payload['cargo_lanes']) {
             foreach ($payload['cargo_lanes'] as $entry) {
@@ -2544,18 +2587,8 @@ class deviceModelObj extends modelObj
                     continue;
                 }
 
-                if ($params) {
-                    if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) && empty($goods_data[Goods::AllowPay])) {
-                        continue;
-                    }
-                    if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) && empty($goods_data[Goods::AllowFree])) {
-                        continue;
-                    }
-                    if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params))) {
-                        if (empty($goods_data[Goods::AllowExchange]) || empty($goods_data['balance'])) {
-                            continue;
-                        }
-                    }
+                if (!$checkFN($goods_data )) {
+                    continue;
                 }
 
                 $goods_data['num'] = $entry['num'];
@@ -2590,7 +2623,11 @@ class deviceModelObj extends modelObj
                         $result['goods'][$key]['discount'] = $discount;
                         $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
 
-                        self::checkGoodsQuota($user, $result['goods'][$key]);
+                        self::checkGoodsQuota($user, $result['goods'][$key], $params);
+                        if (!$checkFN($result['goods'][$key])) {
+                            unset($result['goods'][$key]);
+                            continue;
+                        }
                     }
                 }
                 if (isset($goods_data['balance'])) {

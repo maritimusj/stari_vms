@@ -1,4 +1,5 @@
 <?php
+namespace zovye;
 
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
@@ -22,20 +23,20 @@ class GoodsQuotaEventHandler
             if (!isEmptyArray($quota)) {
                 if ($order->isFree()) {
                     $day_limit = $quota['free']['day'];
-                    if (!empty($day_limit) && $day_limit > $user->getTodayFreeTotal($goods->getId())) {
+                    if (!empty($day_limit) && $day_limit < $user->getTodayFreeTotal($goods->getId())) {
                         ZovyeException::throwWith('对不起，该商品免费今日额度已用完！', -1, $device);
                     }
                     $all_limit = $quota['free']['all'];
-                    if (!empty($all_limit) && $all_limit > $user->getFreeTotal($goods->getId())) {
+                    if (!empty($all_limit) && $all_limit < $user->getFreeTotal($goods->getId())) {
                         ZovyeException::throwWith('对不起，该商品免费额度已用完！', -1, $device);
                     }
                 } else {
                     $day_limit = $quota['pay']['day'];
-                    if (!empty($day_limit) && $day_limit > $user->getTodayPayTotal($goods->getId())) {
+                    if (!empty($day_limit) && $day_limit < $user->getTodayPayTotal($goods->getId())) {
                         ZovyeException::throwWith('对不起，该商品今日可用额度已用完！', -1, $device);
                     }
                     $all_limit = $quota['pay']['all'];
-                    if (!empty($all_limit) && $all_limit > $user->getPayTotal($goods->getId())) {
+                    if (!empty($all_limit) && $all_limit < $user->getPayTotal($goods->getId())) {
                         ZovyeException::throwWith('对不起，该商品可用额度已用完！', -1, $device);
                     }
                 }

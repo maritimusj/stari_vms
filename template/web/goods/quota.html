@@ -8,14 +8,14 @@
             <div class="form-group">
                 <label for="free-day" class="col-md-2 control-label">每日限额</label>
                 <div class="col-md-10">
-                    <input type="text" class="form-control" id="free-day" name="free-day" v-model="quota.free.day">
+                    <input type="number" class="form-control" id="free-day" name="free-day" v-model="quota.free.day">
                     <span class="help-block">* 每个用户每天领取的数量不能超过指定的值，0表示不限制</span>
                 </div>
             </div>
             <div class="form-group">
                 <label for="free-all" class="col-md-2 control-label">全部限额</label>
                 <div class="col-md-10">
-                    <input type="text" class="form-control" id="free-all" name="free-all" v-model="quota.free.all">
+                    <input type="number" class="form-control" id="free-all" name="free-all" v-model="quota.free.all">
                     <span class="help-block">* 单个用户全部领取的数量不能超过指定的值，0表示不限制</span>
                 </div>
             </div>
@@ -26,14 +26,14 @@
              <div class="form-group">
                  <label for="pay-day" class="col-md-2 control-label">每日限额</label>
                  <div class="col-md-10">
-                     <input type="text" class="form-control" id="pay-day" name="pay-day" v-model="quota.pay.day">
+                     <input type="number" class="form-control" id="pay-day" name="pay-day" v-model="quota.pay.day">
                      <span class="help-block">* 每个用户每天购买的数量不能超过指定的值，0表示不限制</span>
                  </div>
              </div>
              <div class="form-group">
                  <label for="pay-all" class="col-md-2 control-label">全部限额</label>
                  <div class="col-md-10">
-                     <input type="text" class="form-control" id="pay-all" name="pay-all" v-model="quota.pay.all">
+                     <input type="number" class="form-control" id="pay-all" name="pay-all" v-model="quota.pay.all">
                      <span class="help-block">* 单个用户全部购买的数量不能超过指定的值，0表示不限制</span>
                  </div>
              </div>

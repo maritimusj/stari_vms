@@ -63,6 +63,15 @@ class goodsModelObj extends modelObj
         return tb('goods');
     }
 
+    public function profile(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'image' => $this->getDetailImg(),
+        ];
+    }
+
     public function delete()
     {
         $this->setDeleted(1);
@@ -146,6 +155,44 @@ class goodsModelObj extends modelObj
     public function setAppendage(array $data = [])
     {
         return $this->setExtraData('appendage', $data);
+    }
+
+    public function getQuota(string $w = ''): array
+    {
+        if (empty($w)) {
+            $res = $this->getExtraData('quota');
+            if (empty($res)) {
+                $res = [
+                    'free' => [
+                        'day' => 0,
+                        'all' => 0,
+                    ],
+                    'pay' => [
+                        'day' => 0,
+                        'all' => 0,
+                    ],
+                    'balance' => [
+                        'day' => 0,
+                        'all' => 0,
+                    ],
+                    'mall' => [
+                        'day' => 0,
+                        'all' => 0,
+                    ],
+                ];
+            }
+            return $res;
+        }
+
+        return $this->getExtraData("quota.{$w}", [
+            'day' => 0,
+            'all' => 0,
+        ]);
+    }
+
+    public function setQuota(array $quota = [])
+    {
+        return $this->setExtraData('quota', $quota);
     }
 
     public function getBalance(): int

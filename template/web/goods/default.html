@@ -223,6 +223,8 @@
                                 <li><a href="#" data-op="editAppendage"><i class="fa fa-external-link fa=fw"></i> 附加信息</li>
                                 <li><a href="#" data-op="viewStats"><i class="fa fa-line-chart fa=fw"></i> 查看统计</li>
                                 <li role="separator" class="divider"></li>
+                                <li><a href="#" data-op="editQuota"><i class="fa fa-gear fa=fw"></i> 设置限额</li>
+                                <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="removeGoods"><i class="fa fa-trash-o fa-fw"></i> 删除</li>
                             </ul>
                         </div>
@@ -284,6 +286,13 @@
             api.showResult({op: 'editAppendage', id: id});
         }
     }
+    api.editQuota = function(target) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        if (id !== undefined) {
+            api.showResult({op: 'editQuota', id: id});
+        }
+    }
     api.viewStats = function(target) {
         const tr = target.closest('tr');
         const id = tr.data('id');
@@ -311,7 +320,15 @@
                 }
             })
     }
-
+    api.saveGoodsQuota = function() {
+        const data = $('form#editQuotaForm').serialize();
+            $('#modal-message').modal('hide');
+            $.post(api.url, {op: 'saveQuota', params: data}).then(function(res){
+                if (res && res.data.msg) {
+                    util.message(res.data.msg, "", res.status ? 'success':'error');
+                }
+            })
+    }
     $(function(){
         //搜索
         const backer = "{$backer}";

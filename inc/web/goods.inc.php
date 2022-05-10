@@ -303,7 +303,7 @@ if ($op == 'default' || $op == 'goods') {
     );
 
     JSON::success([
-        'title' => "附加信息",
+        'title' => '附加信息',
         'content' => $content,
     ]);
 
@@ -329,6 +329,60 @@ if ($op == 'default' || $op == 'goods') {
     $goods->save();
 
     JSON::success('保存成功！');
+
+} elseif ($op == 'editQuota') {
+
+    $goods = Goods::get(request('id'));
+    if (empty($goods)) {
+        JSON::fail('找不到这个商品！');
+    }
+
+    $content = app()->fetchTemplate(
+        'web/goods/quota',
+        [
+            'goods' => Goods::format($goods),
+            'quota_str' => json_encode($goods->getQuota()),
+        ]
+    );
+
+    JSON::success([
+        'title' => '设置限额',
+        'content' => $content,
+    ]);
+
+} elseif ($op == 'saveQuota') {
+      $params = [];
+      parse_str(request('params'), $params);
+
+      $goods = Goods::get($params['goodsId']);
+      if (empty($goods)) {
+          JSON::fail('找不到这个商品！');
+      }
+
+      $data = [
+          'free' => [
+              'day' => intval($params['free-day']),
+              'all' => intval($params['free-all']),
+          ],
+          'pay' => [
+              'day' => intval($params['pay-day']),
+              'all' => intval($params['pay-all']),
+          ],
+          'balance' => [
+              'day' => intval($params['balance-day']),
+              'all' => intval($params['balance-all']),
+          ],
+          'mall' => [
+              'day' => intval($params['mall-day']),
+              'all' => intval($params['mall-all']),
+          ],
+      ];
+
+
+      $goods->setQuota($data);
+      $goods->save();
+
+      JSON::success('保存成功！');
 
 } elseif ($op == 'removeGoods') {
 

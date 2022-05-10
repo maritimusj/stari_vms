@@ -1,0 +1,120 @@
+<form class="form-horizontal" id="editQuotaForm">
+    <ul class="nav nav-tabs" id="navbar">
+        <li role="presentation" :class="{'active': active == 'free'}" @click="active='free'"><a href="#">免费</a></li>
+        <li role="presentation" :class="{'active': active == 'pay'}" @click="active='pay'"><a href="#">支付</a></li>
+        <li role="presentation" :class="{'active': active == 'balance'}" @click="active='balance'"><a href="#">积分</a></li>
+        <li role="presentation" :class="{'active': active == 'mall'}" @click="active='mall'"><a href="#">商城</a></li>
+    </ul>
+    <div class="panel panel-default nav-tab-item" :class="{'panel-first': active == 'free'}" v-show="active == 'free'">
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="free-day" class="col-md-2 control-label">每日限额</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="free-day" name="free-day" v-model="quota.free.day">
+                    <span class="help-block">* 每天领取的数量不能超过指定的值，0表示不限制</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="free-all" class="col-md-2 control-label">全部限额</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="free-all" name="free-all" v-model="quota.free.all">
+                    <span class="help-block">* 全部领取的数量不能超过指定的值，0表示不限制</span>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="panel panel-default nav-tab-item" :class="{'panel-first': active == 'pay'}" v-show="active == 'pay'">
+         <div class="panel-body">
+             <div class="form-group">
+                 <label for="pay-day" class="col-md-2 control-label">每日限额</label>
+                 <div class="col-md-10">
+                     <input type="text" class="form-control" id="pay-day" name="pay-day" v-model="quota.pay.day">
+                     <span class="help-block">* 每天购买的数量不能超过指定的值，0表示不限制</span>
+                 </div>
+             </div>
+             <div class="form-group">
+                 <label for="pay-all" class="col-md-2 control-label">全部限额</label>
+                 <div class="col-md-10">
+                     <input type="text" class="form-control" id="pay-all" name="pay-all" v-model="quota.pay.all">
+                     <span class="help-block">* 全部购买的数量不能超过指定的值，0表示不限制</span>
+                 </div>
+             </div>
+         </div>
+     </div>
+     <div class="panel panel-default nav-tab-item" :class="{'panel-first': active == 'balance'}" v-show="active == 'balance'">
+          <div class="panel-body">
+              <div class="form-group">
+                  <label for="pay-day" class="col-md-2 control-label">每日限额</label>
+                  <div class="col-md-10">
+                      <input type="text" class="form-control" id="balance-day" name="balance-day" v-model="quota.balance.day">
+                      <span class="help-block">* 每天兑换的数量不能超过指定的值，0表示不限制</span>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label for="pay-all" class="col-md-2 control-label">全部限额</label>
+                  <div class="col-md-10">
+                      <input type="text" class="form-control" id="balance-all" name="balance-all" v-model="quota.balance.all">
+                      <span class="help-block">* 全部兑换的数量不能超过指定的值，0表示不限制</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+    <div class="panel panel-default nav-tab-item" :class="{'panel-first': active == 'mall'}" v-show="active == 'mall'">
+          <div class="panel-body">
+              <div class="form-group">
+                  <label for="pay-day" class="col-md-2 control-label">每日限额</label>
+                  <div class="col-md-10">
+                      <input type="text" class="form-control" id="mall-day" name="mall-day" v-model="quota.mall.day">
+                      <span class="help-block">* 每天购买/兑换的数量不能超过指定的值，0表示不限制</span>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label for="pay-all" class="col-md-2 control-label">全部限额</label>
+                  <div class="col-md-10">
+                      <input type="text" class="form-control" id="mall-all" name="mall-all" v-model="quota.mall.all">
+                      <span class="help-block">* 全部购买/兑换的数量不能超过指定的值，0表示不限制</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <input type="hidden" name="goodsId" value="{$goods['id']}">
+            <button type="button" class="btn btn-primary" data-op="saveGoodsQuota">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el: "#editQuotaForm",
+            data: {
+                active: "free",
+                quota: {
+                    "free":{
+                        "day":0,
+                        "all":0,
+                    },
+                    "pay":{
+                        "day":0,
+                        "all":0,
+                    },
+                    "balance":{
+                        "day":0,
+                        "all":0,
+                    },
+                    "mall":{
+                        "day":0,
+                        "all":0,
+                    }
+                },
+            },
+            mounted() {
+                this.quota = JSON.parse(`{$quota_str}`);
+                console.log(this.quota);
+            },
+        })
+    })
+</script>

@@ -14,9 +14,9 @@ class GoodsQuotaEventHandler
      * @param deviceModelObj $device
      * @param userModelObj $user
      * @param orderModelObj $order
-     * @return bool
      */
-    public static function onDeviceOrderCreated(deviceModelObj $device, userModelObj $user, orderModelObj $order) {
+    public static function onDeviceOrderCreated(deviceModelObj $device, userModelObj $user, orderModelObj $order)
+    {
         $goods = $order->getGoods();
         if ($goods) {
             $quota = $goods->getQuota();
@@ -42,7 +42,5 @@ class GoodsQuotaEventHandler
                 }
             }
         }
-
-        return true;
     }
 }

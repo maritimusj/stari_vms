@@ -88,7 +88,7 @@ class order
             }
         }
 
-        if ($device) {
+        if (isset($device)) {
             if ($device->getAgentId() != $agent->getId()) {
                 return err('没有权限管理这个设备！');
             }

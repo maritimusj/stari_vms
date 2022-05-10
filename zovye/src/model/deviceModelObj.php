@@ -8,9 +8,11 @@
 namespace zovye\model;
 
 use zovye\App;
+use zovye\Balance;
 use zovye\Job;
 
 use zovye\Locker;
+use zovye\Order;
 use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
@@ -30,6 +32,7 @@ use zovye\DeviceLocker;
 use zovye\Account;
 use zovye\CtrlServ;
 
+use zovye\ZovyeException;
 use function zovye\err;
 use function zovye\getArray;
 use function zovye\m;
@@ -2483,6 +2486,51 @@ class deviceModelObj extends modelObj
         return $result;
     }
 
+    public static function checkGoodsQuota(userModelObj $user, array &$goodsData)
+    {
+        $goods = Goods::get($goodsData['id']);
+        if ($goods) {
+            $quota = $goods->getQuota();
+            if (!isEmptyArray($quota)) {
+                if ($goods->allowFree() || (Balance::isFreeOrder() && $goods->allowExchange()) || (Balance::isFreeOrder() && $goods->allowDelivery())) {
+                    $day_limit = $quota['free']['day'];
+                    if (!empty($day_limit) && $day_limit >= $user->getTodayFreeTotal($goods->getId())) {
+                        $goodsData[Goods::AllowFree] = false;
+                        if (Balance::isFreeOrder()) {
+                            $goodsData[Goods::AllowExchange] = false;
+                            $goodsData[Goods::AllowDelivery] = false;
+                        }
+                    }
+                    $all_limit = $quota['free']['all'];
+                    if (!empty($all_limit) && $all_limit >= $user->getFreeTotal($goods->getId())) {
+                        $goodsData[Goods::AllowFree] = false;
+                        if (Balance::isFreeOrder()) {
+                            $goodsData[Goods::AllowExchange] = false;
+                            $goodsData[Goods::AllowDelivery] = false;
+                        }
+                    }
+                } else {
+                    $day_limit = $quota['pay']['day'];
+                    if (!empty($day_limit) && $day_limit >= $user->getTodayPayTotal($goods->getId())) {
+                        $goodsData[Goods::AllowPay] = false;
+                        if (Balance::isPayOrder()) {
+                            $goodsData[Goods::AllowExchange] = false;
+                            $goodsData[Goods::AllowDelivery] = false;
+                        }
+                    }
+                    $all_limit = $quota['pay']['all'];
+                    if (!empty($all_limit) && $all_limit >= $user->getPayTotal($goods->getId())) {
+                        $goodsData[Goods::AllowFree] = false;
+                        if (Balance::isPayOrder()) {
+                            $goodsData[Goods::AllowExchange] = false;
+                            $goodsData[Goods::AllowDelivery] = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public function getGoodsList(userModelObj $user = null, $params = []): array
     {
         $result = [];
@@ -2541,6 +2589,8 @@ class deviceModelObj extends modelObj
                         $discount = User::getUserDiscount($user, $goods_data);
                         $result['goods'][$key]['discount'] = $discount;
                         $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
+
+                        self::checkGoodsQuota($user, $result['goods'][$key]);
                     }
                 }
                 if (isset($goods_data['balance'])) {

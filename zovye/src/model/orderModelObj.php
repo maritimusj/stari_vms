@@ -8,6 +8,8 @@ namespace zovye\model;
 
 use zovye\Account;
 use zovye\App;
+use zovye\Balance;
+use zovye\Order;
 use zovye\User;
 use zovye\Util;
 use zovye\Agent;
@@ -99,6 +101,16 @@ class orderModelObj extends modelObj
         return $this->account;
     }
 
+    public function isFree(): bool
+    {
+        if ($this->getSrc() == Order::ACCOUNT) {
+            return true;
+        }
+        if ($this->getSrc() == Order::BALANCE) {
+            return App::isBalanceEnabled() && Balance::isFreeOrder();
+        }
+        return false;
+    }
     /**
      * @return deviceModelObj
      */
@@ -250,7 +262,7 @@ class orderModelObj extends modelObj
         return $this->getExtraData('custom.zero_bonus', false);
     }
 
-    public function profile()
+    public function profile(): array
     {
         return [
             'id' => $this->getId(),

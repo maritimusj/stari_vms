@@ -1795,9 +1795,6 @@ HTML_CONTENT;
             return error(State::ERROR_LOCK_FAILED, '设备被占用，请重新扫描设备二维码');
         }
 
-        //事件：设备已锁定
-        EventBus::on('device.locked', $params);
-
         $goods = $device->getGoods($goods_id);
         if (empty($goods)) {
             return error(State::ERROR, '找不到对应的商品');
@@ -1806,6 +1803,9 @@ HTML_CONTENT;
         if ($goods['num'] < 1) {
             return error(State::ERROR, '对不起，已经被领完了');
         }
+
+        //事件：设备已锁定
+        EventBus::on('device.locked', $params);
 
         $mcb_index = '';
         if ($goods['lottery']) {

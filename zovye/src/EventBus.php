@@ -32,6 +32,7 @@ class EventBus
                         'We7CreditEventHandler', //处理微擎积分
                         'JobEventHandler', //订单后续处理Job
                         'VoucherEventHandler', //提货券
+                        'GoodsQuotaEventHandler',//商品限额
                     ],
             ]
         );

@@ -368,16 +368,7 @@ if ($op == 'default' || $op == 'goods') {
               'day' => intval($params['pay-day']),
               'all' => intval($params['pay-all']),
           ],
-          'balance' => [
-              'day' => intval($params['balance-day']),
-              'all' => intval($params['balance-all']),
-          ],
-          'mall' => [
-              'day' => intval($params['mall-day']),
-              'all' => intval($params['mall-all']),
-          ],
       ];
-
 
       $goods->setQuota($data);
       $goods->save();

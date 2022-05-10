@@ -137,7 +137,7 @@ class userModelObj extends modelObj
     public function isDouYinUser(): bool
     {
         return $this->app == User::DouYin;
-    }    
+    }
 
     public function profile($detail = true): array
     {
@@ -225,6 +225,7 @@ class userModelObj extends modelObj
     public function is($principal): bool
     {
         $names = is_array($principal) ? $principal : explode(',', $principal);
+
         return array_intersect($names, $this->getPrincipals()) === $names;
     }
 
@@ -493,6 +494,7 @@ class userModelObj extends modelObj
         $r = $balance->change($price, $src, $extra);
         if ($r) {
             $this->setPrincipal(User::GSPOR);
+
             return $r;
         }
 
@@ -521,14 +523,15 @@ class userModelObj extends modelObj
 
     public function isSigned(): bool
     {
-        return Util::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function() {
+        return Util::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function () {
             if ($this->getBalance()->log()->where([
-                'src' => Balance::SIGN_IN_BONUS,
-                'createtime >=' => strtotime('today 00:00'),
-                'createtime <' => strtotime('next day 00:00'),
-            ])->count() > 0) {
+                    'src' => Balance::SIGN_IN_BONUS,
+                    'createtime >=' => strtotime('today 00:00'),
+                    'createtime <' => strtotime('next day 00:00'),
+                ])->count() > 0) {
                 return true;
             }
+
             return false;
         });
     }
@@ -540,79 +543,90 @@ class userModelObj extends modelObj
             'user-agent' => $_SERVER['HTTP_USER_AGENT'],
             'ip' => $this->getLastActiveIp(),
         ]);
+
         if (empty($res)) {
             return false;
         }
+
         Util::expire("daily:sign_in:{$this->getId()}");
+
         return true;
+    }
+
+    protected function getOrderGoodsTotal(int $start, int $end, string $way, int $goods_id = 0): int
+    {
+        $condition = [
+            'openid' => $this->openid,
+        ];
+
+        if ($start > 0) {
+            $condition['createtime >='] = $start;
+        }
+
+        if ($end > 0) {
+            $condition['createtime <'] = $end;
+        }
+
+        if ($goods_id > 0) {
+            $condition['goods_id'] = $goods_id;
+        }
+
+        if ($way == Order::FREE_STR) {
+            if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
+                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::ACCOUNT;
+            }
+        } elseif ($way == Order::PAY_STR) {
+            if (App::isBalanceEnabled() && Balance::isPayOrder()) {
+                $condition['src'] = [Order::PAY, Order::BALANCE];
+            } else {
+                $condition['src'] = Order::PAY;
+            }
+        }
+
+        $query = Order::query($condition);
+        $res = $query->get('sum(num)');
+
+        return intval($res);
     }
 
     /**
      * 用户今日免费领取数.
      *
+     * @param int $goods_id 指定商品
      * @return int
      */
-    public function getTodayFreeTotal(): int
+    public function getTodayFreeTotal(int $goods_id = 0): int
     {
-        $condition = [
-            'openid' => $this->openid,
-            'createtime >=' => strtotime('today'),
-        ];
-
-        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-            $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
-        } else {
-            $condition['src'] = Order::ACCOUNT;
-        }
-
-        $query = Order::query($condition);
-        $res = $query->get('sum(num)');
-
-        return intval($res);
+        return $this->getOrderGoodsTotal(strtotime('today'), 0, Order::FREE_STR, $goods_id);
     }
 
     /**
      * 统计用户免费领取的数量.
      *
+     * @param int $goods_id 指定商品
      * @return int
      */
-    public function getFreeTotal(): int
+    public function getFreeTotal(int $goods_id = 0): int
     {
-        $condition = [
-            'openid' => $this->openid,
-        ];
-
-        if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-            $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
-        } else {
-            $condition['src'] = Order::ACCOUNT;
-        }
-        
-        $query = Order::query($condition);
-        $res = $query->get('sum(num)');
-
-        return intval($res);
+        return $this->getOrderGoodsTotal(0, 0, Order::FREE_STR, $goods_id);
     }
 
     /**
-     * 统计用户支付领取的数量.
+     * 统计用户今日支付领取的数量.
      *
+     * @param int $goods_id 指定商品
      * @return int
      */
-    public function getPayTotal(): int
+    public function getTodayPayTotal(int $goods_id = 0): int
     {
-        $condition = ['openid' => $this->openid];
-        
-        if (App::isBalanceEnabled() && Balance::isPayOrder()) {
-            $condition['src'] = [Order::PAY, Order::BALANCE];
-        } else {
-            $condition['src'] = Order::PAY;
-        }
+        return $this->getOrderGoodsTotal(strtotime('today'), 0, Order::PAY_STR, $goods_id);
+    }
 
-        $query = Order::query($condition);
-        $res = $query->get('sum(num)');
-
-        return intval($res);
+    public function getPayTotal(int $goods_id = 0): int
+    {
+        return $this->getOrderGoodsTotal(0, 0, Order::PAY_STR, $goods_id);
     }
 
     /**
@@ -665,13 +679,14 @@ class userModelObj extends modelObj
         return error(State::ERROR, '参数不正确！');
     }
 
-    public function cleanLastActiveData(): bool {
+    public function cleanLastActiveData(): bool
+    {
         return $this->remove('last');
     }
 
     public function setLastActiveData(): bool
     {
-        switch(func_num_args()) {
+        switch (func_num_args()) {
             case 0:
                 return $this->cleanLastActiveData();
             case 1:
@@ -703,11 +718,12 @@ class userModelObj extends modelObj
             default:
                 return false;
         }
-        foreach($data as $name => $val) {
+        foreach ($data as $name => $val) {
             if (!$this->updateSettings("last.$name", $val)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -716,6 +732,7 @@ class userModelObj extends modelObj
         if (empty($name)) {
             return $this->get('last', $default);
         }
+
         return $this->settings("last.$name", $default);
     }
 
@@ -729,15 +746,17 @@ class userModelObj extends modelObj
         if ($device) {
             $this->setLastActiveData('ip', Util::getClientIp());
         }
+
         return $device ? $this->setLastActiveData($device) : $this->setLastActiveData(deviceModelObj::class);
     }
 
-    public function getLastActiveDevice($timeout = VISIT_DATA_TIMEOUT): ?deviceModelObj 
+    public function getLastActiveDevice($timeout = VISIT_DATA_TIMEOUT): ?deviceModelObj
     {
         $data = $this->getLastActiveData(deviceModelObj::class, []);
         if ($data && $data['id'] > 0 && TIMESTAMP - $data['time'] < $timeout) {
             return Device::get($data['id']);
         }
+
         return null;
     }
 
@@ -746,16 +765,18 @@ class userModelObj extends modelObj
         if ($account) {
             $this->setLastActiveData('ip', Util::getClientIp());
         }
+
         return $account ? $this->setLastActiveData($account) : $this->setLastActiveData(accountModelObj::class);
     }
-    
-    public function getLastActiveAccount($timeout = VISIT_DATA_TIMEOUT): ?accountModelObj 
+
+    public function getLastActiveAccount($timeout = VISIT_DATA_TIMEOUT): ?accountModelObj
     {
         $data = $this->getLastActiveData(accountModelObj::class, []);
         if ($data && $data['id'] > 0 && TIMESTAMP - $data['time'] < $timeout) {
             return Account::get($data['id']);
         }
-        return null;      
+
+        return null;
     }
 
     public function isWxAppAllowed($appID): bool
@@ -773,8 +794,10 @@ class userModelObj extends modelObj
         }
         if ($agent) {
             $config = $agent->agentData('wx.app', []);
+
             return empty($config) || empty($config['key']) || $config['key'] === $appID;
         }
+
         return $appID === settings('agentWxapp.key', '');
     }
 

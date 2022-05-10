@@ -171,14 +171,6 @@ class goodsModelObj extends modelObj
                         'day' => 0,
                         'all' => 0,
                     ],
-                    'balance' => [
-                        'day' => 0,
-                        'all' => 0,
-                    ],
-                    'mall' => [
-                        'day' => 0,
-                        'all' => 0,
-                    ],
                 ];
             }
             return $res;

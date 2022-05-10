@@ -8,6 +8,7 @@
 namespace zovye;
 
 use zovye\model\device_logsModelObj;
+use zovye\model\goodsModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;

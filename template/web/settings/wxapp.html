@@ -102,11 +102,11 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="WxAppPushMsgToken" class="col-md-2 control-label">Token（令牌）</label>
+                    <label for="WxAppPushMsgEncodingToken" class="col-md-2 control-label">Token（令牌）</label>
                     <div class="col-md-10">
                         <span class="form-control operate text-url">
                             <i class="fa fa-paste" title="复制令牌" data-text="{$config['token']}"></i> {$config['token']}
-                            <input type="hidden" name="WxAppPushMsgEncodingToken" value="{$config['token']}">
+                            <input type="hidden" id="WxAppPushMsgEncodingToken" name="WxAppPushMsgEncodingToken" value="{$config['token']}">
                         </span>
                         <span class="help-block">* 微信小程序消息推送Token（令牌）</span>
                     </div>

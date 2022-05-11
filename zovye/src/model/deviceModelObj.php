@@ -2561,16 +2561,16 @@ class deviceModelObj extends modelObj
         $result = [];
 
         $payload = $this->getPayload();
-        $checkFN = function($goods_data) use ($params) {
+        $checkFN = function($data) use ($params) {
             if ($params) {
-                if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) && empty($goods_data[Goods::AllowPay])) {
+                if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) && empty($data[Goods::AllowPay])) {
                     return false;
                 }
-                if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) && empty($goods_data[Goods::AllowFree])) {
+                if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) && empty($data[Goods::AllowFree])) {
                     return false;
                 }
                 if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params))) {
-                    if (empty($goods_data[Goods::AllowExchange]) || empty($goods_data['balance'])) {
+                    if (empty($data[Goods::AllowExchange]) || empty($data['balance'])) {
                         return false;
                     }
                 }
@@ -2616,10 +2616,14 @@ class deviceModelObj extends modelObj
                         Goods::AllowExchange => $goods_data[Goods::AllowExchange],
                     ];
 
+                    if (isset($goods_data['balance'])) {
+                        $data['balance'] = (int)$goods_data['balance'];
+                    }
+
                     if (!empty($user)) {
                         self::checkGoodsQuota($user, $data, $params);
                         if (!$checkFN($data)) {
-                            continue;
+                           continue;
                         }
 
                         $discount = User::getUserDiscount($user, $goods_data);
@@ -2628,9 +2632,6 @@ class deviceModelObj extends modelObj
                     }
 
                     $result[$key] = $data;
-                }
-                if (isset($goods_data['balance'])) {
-                    $result[$key]['balance'] = (int)$goods_data['balance'];
                 }
             }
 

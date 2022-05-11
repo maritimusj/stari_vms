@@ -150,669 +150,596 @@
         display: none;
     }
 </style>
-<ul class="nav nav-tabs" id="navbar">
-    <li role="presentation" class="active">
-        <a href="#">
-            {if $op=='edit'}
-            <i class="fa fa-gears"></i> 编辑设备
-            {else}
-            <i class="fa fa-cube"></i> 新建{if $op == 'add_vd'}虚拟{elseif $op == 'add_bluetooth_device'}蓝牙{/if}设备
-            {/if}
-        </a>
-    </li>
-</ul>
-<form action="{php echo $this->createWebUrl('device');}" method="post" id="device_edit_form">
-    <div class="panel panel-default panel-first">
-        <div class="heading">
-            <span class="operate">
-                <i class="fa fa-reply" title="返回"  onclick="backToList();"></i>
-            </span>
-        </div>
-        <div class="panel-body">
-            <div class="seg">
-                <div class="title">基本设置</div>
-                <div class="form-group">
-                    <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
-                    <div class="col-md-5">
-                        <select name="agent_id" id="select_agent" style="width:100%;">
-                            {if $agent}
-                            <option value="{php echo $agent->getId()}">{php echo $agent->getName() . "，手机号码：" . $agent->getMobile()}</option>
-                            {/if}
-                            <option value="0">&lt;无&gt;</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-default" type="button" id="find_agent">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="name" class="col-md-2 control-label">名称</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="name" id="name" value="{php echo $device ? $device->getName() : ''}" required>
-                    </div>
-                </div>
-                {if \zovye\App::isVDeviceSupported() && $op=="add_vd"}
-                <div class="form-group">
-                    <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : $vd_imei}" readonly>
-                        {if empty($device)}
-                        <span class="help-block">* 虚拟设备的硬件IMEI自动生成！</span>
-                        {/if}
-                    </div>
-                </div>
-                {else}
-                <div class="form-group">
-                    <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" {if !empty($device)}readonly{else}required{/if}>
-                        {if empty($device)}
-                        <span class="help-block">* 以后无法修改！</span>
-                        {/if}
-                    </div>
-                </div>
-
-                {if \zovye\App::isBluetoothDeviceSupported() && ($op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice()))}
-                <div class="form-group">
-                    <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="BUID" id="BUID" value="{php echo $device ? $device->getBUID() : ''}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="select_protocols" class="col-md-2 control-label">蓝牙协议</label>
-                    <div class="col-md-10">
-                        <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
-                            {if empty($device)}
-                            <option value="{php echo  \zovye\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
-                                &lt;请选择蓝牙协议&gt;
-                            </option>
-                            {/if}
-                            {loop $bluetooth['protocols'] $index $item}
-                            <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
-                                {$item['name']} - {$item['title']}
-                            </option>
-                            {/loop}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="MAC" class="col-md-2 control-label">硬件MAC地址</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="MAC" id="MAC" value="{php echo $device ? $device->getMAC() : ''}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="Motor" class="col-md-2 control-label">电机数量</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="Motor" id="Motor" value="{php echo $device ? $device->getMotor() : ''}">
-                    </div>
-                </div>
-                {/if}
-                {/if}
-                <div id="device_types" v-cloak>
+<div id="app" v-cloak>
+    <ul class="nav nav-tabs" id="navbar">
+        <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
+            <a href="#" v-html="nav.content">
+            </a>
+        </li>  
+    </ul>
+    <form action="{php echo $this->createWebUrl('device');}" method="post" id="device_edit_form">
+        <div class="panel panel-default panel-first">
+            <div class="heading">
+                <span class="operate">
+                    <i class="fa fa-reply" title="返回"  onclick="backToList();"></i>
+                </span>
+            </div>
+            <div class="panel-body">
+                <div v-show="active === 'base'">
                     <div class="form-group">
-                        <label for="select_device_types" class="col-md-2 control-label">设备型号</label>
+                        <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
                         <div class="col-md-5">
-                            <select name="deviceType" id="select_device_types" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}"
-                            :disabled="loading"
-                            v-model="currentTypeID">
-                                <option v-for="item in list" :value="item['id']" :selected="item['id']==currentTypeID" v-if="list.length>0">
-                                    {{item['title']}}（{{item['lanes_total']}}货道）
-                                </option>
-                                <option value="0">
-                                    &lt;自定义&gt;
-                                </option>
+                            <select name="agent_id" id="select_agent" style="width:100%;">
+                                {if $agent}
+                                <option value="{php echo $agent->getId()}">{php echo $agent->getName() . "，手机号码：" . $agent->getMobile()}</option>
+                                {/if}
+                                <option value="0">&lt;无&gt;</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <input type="text" class="form-control"  placeholder="请输入关键字搜索" v-model="keywords">
+                            <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-default" type="button" :disabled="loading" @click="search()">
-                                <i :class="{'fa': true, 'fa-search': !searching, 'fa-spinner fa-pulse': searching}"></i>
+                            <button class="btn btn-default" type="button" id="find_agent">
+                                <i class="fa fa-search"></i>
                             </button>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label"></label>
-                        <div class="col-md-10" id="lane_detail">
-                            <table  class="table table-bordered cargo_lanes" v-if="currentType && currentType.cargo_lanes">
-                                <thead>
-                                    <th>货道</th>
-                                    <th>商品名称</th>
-                                    <th class="fixed">价格</th>
-                                    <th class="fixed">容量</th>
-                                    <th class="fixed">当前数量</th>
-                                    <th>操作</th>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
-                                        <td>
-                                            <div class="lane">
-                                                <span>
-                                                    {{i + 1}}
-                                                    <sup title="电机货道" v-if="lane.is_motor">[ 电机 ]</sup>   
-                                                </span>                                                
-                                            </div>
-                                        </td>
-                                        <td :class="{operate: isCustomType}">
-                                            <span :class="{'goods_name': isCustomType}"  @click="chooseGoods(lane)" title="点击选择商品">{{lane.goods_name}}</span>
-                                            <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span>                                     
-                                        </td>
-                                        <td>
-                                            <div v-show="currentLane == lane">
-                                                <input class="form-control goods" type="number" 
-                                                :name="'price' + i" 
-                                                min="0" 
-                                                step="0.01"
-                                                ref="price"
-                                                v-model="lane.goods_price"
-                                                @blur="editPriceDone(lane)"
-                                                @keydown.enter.self.prevent="editPriceDone(lane)"
-                                                >
-                                            </div>
-                                            <span 
-                                            :class="{price:isCustomType}" 
-                                            @click="editPrice(lane, i)" 
-                                            v-show="currentLane!=lane"
-                                            title="点击修改价格">¥{{lane.goods_price}}元</span>
-                                        </td>
-                                        <td>
-                                            <template v-if="isCustomType">
-                                                <input type="number" class="form-control goods" 
-                                                :name="'capacities[' + i + ']'" 
-                                                v-model="lane.capacity" 
-                                                min="0">
-                                                <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
-                                            </template>
-                                            <template v-else>
-                                                {{lane.capacity}} 
-                                            </template>
-                                        <td>
-                                            <input type="number" class="form-control goods" :name="'lane' + i + '_num'" v-model="lane.num" min="0" :max="lane.capacity">
-                                        </td>
-                                        <td class="operate">                                          
-                                            <i class="fa fa-gift" 
-                                            v-if="currentPackage"
-                                            :class="{disabled: lane.goods_id===0,flash:currentPackage}" 
-                                            title="加入套餐" 
-                                            @click="addPackage(lane)"></i>
-                                            <i class="fa fa-trash" title="删除" 
-                                            @click="removeLane(lane)" v-if="isCustomType && !currentPackage"></i>                                            
-                                        </td>
-                                    </tr>
-                                    <tr v-if="isCustomType">
-                                        <td class="operate">
-                                            <i class="fa fa-plus" title="添加货道"  @click.prevent="addCargoLane" :disabled="loading"></i>
-                                        </td>
-                                        <td colspan="5">
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            {if $op != 'add_bluetooth_device' && (empty($device) || !$device->isBlueToothDevice())}
-                            <div>
-                                <button class="btn btn-success" 
-                                @click.prevent="newPackage" 
-                                :disabled="loading"
-                                v-if="!currentPackage">
-                                    <i class="fa fa-gift"></i> 创建套餐
-                                </button> 
-                                <button class="btn btn-success" 
-                                @click.prevent="createPackage" 
-                                :disabled="loading || currentPackage.list.length === 0"
-                                v-if="currentPackage"
-                                >
-                                    <i class="fa fa-save"></i> 保存套餐
-                                </button>
-                            </div>
-                            {/if}
-                            <div class="package operate" v-if="currentPackage">
-                                <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>                           
-                                <table class="table cargo_lanes">
-                                    <thead>
-                                        <th>#</th>
-                                        <th>商品名称</th>
-                                        <th class="fixed">单价</th>
-                                        <th class="fixed">数量</th>
-                                        <th style="width: 60px;">操作</th>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(goods,index) in currentPackage.list">
-                                            <td>
-                                                {{index +1}}
-                                            </td>
-                                            <td>
-                                                {{goods.name}}
-                                                <span v-if="goods.unit_title">({{goods.unit_title}})</span>
-                                            </td>
-                                            <td>
-                                                <div v-show="goods.edit">
-                                                    <input type="number" class="form-control goods" 
-                                                    v-model="goods.price"
-                                                    ref="packageGoodsPrice"
-                                                    @blur="editPackageGoodsPriceDone(goods,index)"
-                                                    @keydown.enter.self.prevent="editPackageGoodsPriceDone(goods,index)"
-                                                    step="0.01" 
-                                                    min="0">
-                                                </div>
-                                                <span class="editable-price" @click="editPackageGoodsPrice(goods,index)" v-show="!goods.edit">
-                                                    ¥{{goods.price}}元
-                                                </span>                                                
-                                            </td>
-                                            <td>
-                                                <input type="number" class="form-control goods" 
-                                                v-model="goods.num"
-                                                @blur="editPackageGoodsNumDone(goods, index)"
-                                                min="1">
-                                            </td>
-                                            <td class="operate">
-                                                <i class="fa fa-trash" title="删除" @click="removeGoodsFromPackage(index)"></i>
-                                            </td>
-                                        </tr>
-                                        <tr v-if="currentPackage.list.length === 0">
-                                            <td colspan="5" class="center text-muted">
-                                                &lt;请从设备商品列表中选择商品&gt;
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="5" style="text-align: left;">
-                                                <div class="total-price">
-                                                    <div>
-                                                        <b>套餐名称：</b><input type="text" style="text-align: left;" class="form-control goods" v-model="currentPackage.title">
-                                                    </div>
-                                                    <div>
-                                                        <b>商品总价：</b>
-                                                        <span style="padding-left: 12px;">¥{{currentPackage.price}}元</span>
-                                                    </div>                                                    
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div v-for="(p, index) in packages" class="package-list">
-                                <table class="table table-bordered cargo_lanes">
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="4" style="text-align: left;">
-                                                <div>
-                                                    <b>套餐名称：</b>{{p.title}}
-                                                </div>
-                                                <div>
-                                                    <b>商品总价：</b>¥{{p.price}}元
-                                                </div>
-                                                <div class="package-delete operate">
-                                                    <i class="fa fa-ban" :class="{disabled: loading}" title="删除" @click="removePackage(p,index)"></i>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr v-for="(goods,index) in p.list" :class="{invalid:!isPackageGoodsValid(goods)}">
-                                            <td class="index">
-                                                {{index +1}}
-                                            </td>
-                                            <td>
-                                                {{goods.name}}<span class="text-muted" v-if="goods.deleted">&lt;已删除&gt;</span>
-                                            </td>
-                                            <td>
-                                                ¥{{goods.price}}元
-                                            </td>
-                                            <td>
-                                                {{goods.num}}
-                                                <span v-if="goods.unit_title">({{goods.unit_title}})</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>                         
-                </div>
-              </div>
-            {if \zovye\App::isBluetoothDeviceSupported() }
-            {if $op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice())}
-            <div class="seg">
-                <div class="title">功能</div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label for="blueToothScreen1" class="radio-inline">
-                            <input name="blueToothScreen" id="blueToothScreen1" type="radio" value="1" {if $bluetooth['screen'] == 1}checked="checked"{/if}>
-                            有
-                        </label>
-                        <label for="blueToothScreen0" class="radio-inline">
-                            <input name="blueToothScreen" id="blueToothScreen0" type="radio" value="0"  {if $bluetooth['screen'] == 0}checked="checked"{/if} >
-                            无
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">消毒功能</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label for="blueToothDisinfectant1" class="radio-inline">
-                            <input name="blueToothDisinfectant" id="blueToothDisinfectant1" type="radio" value="1" {if $bluetooth['disinfectant'] == 1}checked="checked"{/if}>
-                            有
-                        </label>
-                        <label for="blueToothDisinfectant0" class="radio-inline">
-                            <input name="blueToothDisinfectant" id="blueToothDisinfectant0" type="radio" value="0"  {if $bluetooth['disinfectant'] == 0}checked="checked"{/if} >
-                            无
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">供电</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label for="blueToothPowerSupply1" class="radio-inline">
-                            <input name="blueToothPowerSupply" id="blueToothPowerSupply1" type="radio" value="1" {if $bluetooth['power'] == 1}checked="checked"{/if}>
-                            电池供电
-                        </label>
-                        <label for="blueToothPowerSupply0" class="radio-inline">
-                            <input name="blueToothPowerSupply" id="blueToothPowerSupply0" type="radio" value="0"  {if $bluetooth['power'] == 0}checked="checked"{/if} >
-                            外接电源
-                        </label>
-                    </div>
-                </div>
-            </div>
-            {/if}
-            {/if}
-            <div class="seg">
-                <div class="title">扩展设置</div>
-                <!--
-                    <div class="form-group">
-                        <label for="pushAccountMsg" class="col-md-2 control-label">领取后推送公众号消息</label>
+                        <label for="name" class="col-md-2 control-label">名称</label>
                         <div class="col-md-10">
-                            <select id="pushAccountMsg" name="pushAccountMsg" class="col-md-9">
-                                <option value="none" {if 'none' == $extra['pushAccountMsg']}selected{/if}>&lt;不推送&gt;</option>
-                                <option value="settings" {if empty($extra['pushAccountMsg']) || 'settings' == $extra['pushAccountMsg']}selected{/if}>&lt;全局设置&gt;</option>
-                                {loop $news $item}
-                                <option value="{$item['media_id']}" {if $item['media_id'] ==$extra['pushAccountMsg']}selected{/if}>{$item['items']['0']['title']}</option>
+                            <input type="text" class="form-control" name="name" id="name" value="{php echo $device ? $device->getName() : ''}" required>
+                        </div>
+                    </div>
+                    {if \zovye\App::isVDeviceSupported() && $op=="add_vd"}
+                    <div class="form-group">
+                        <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : $vd_imei}" readonly>
+                            {if empty($device)}
+                            <span class="help-block">* 虚拟设备的硬件IMEI自动生成！</span>
+                            {/if}
+                        </div>
+                    </div>
+                    {else}
+                    <div class="form-group">
+                        <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" {if !empty($device)}readonly{else}required{/if}>
+                            {if empty($device)}
+                            <span class="help-block">* 以后无法修改！</span>
+                            {/if}
+                        </div>
+                    </div>
+
+                    {if \zovye\App::isBluetoothDeviceSupported() && ($op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice()))}
+                    <div class="form-group">
+                        <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="BUID" id="BUID" value="{php echo $device ? $device->getBUID() : ''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="select_protocols" class="col-md-2 control-label">蓝牙协议</label>
+                        <div class="col-md-10">
+                            <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
+                                {if empty($device)}
+                                <option value="{php echo  \zovye\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
+                                    &lt;请选择蓝牙协议&gt;
+                                </option>
+                                {/if}
+                                {loop $bluetooth['protocols'] $index $item}
+                                <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
+                                    {$item['name']} - {$item['title']}
+                                </option>
                                 {/loop}
                             </select>
-                            <span class="col-md-2"><a href="{php echo wurl('platform/material');}" class="btn btn-default" role="button">消息管理</a></span>
                         </div>
                     </div>
-                -->
-                <div class="form-group">
-                    <label for="theme" class="col-md-2 control-label">手机端界面</label>
-                    <div class="col-md-10">
-                        <select name="theme" class="form-control" id="theme">
-                            <option value=""{if empty($extra['theme'])} selected{/if}> 系统默认界面 </option>
-                            {loop $themes $index $item}
-                            <option value="{$item}"{if $extra['theme'] == $item} selected{/if}> {$item} </option>
-                            {/loop}
-                        </select>
+                    <div class="form-group">
+                        <label for="MAC" class="col-md-2 control-label">硬件MAC地址</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="MAC" id="MAC" value="{php echo $device ? $device->getMAC() : ''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Motor" class="col-md-2 control-label">电机数量</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="Motor" id="Motor" value="{php echo $device ? $device->getMotor() : ''}">
+                        </div>
+                    </div>
+                    {/if}
+                    {/if}
+                    <div id="device_types">
+                        <div class="form-group">
+                            <label for="select_device_types" class="col-md-2 control-label">设备型号</label>
+                            <div class="col-md-5">
+                                <select name="deviceType" id="select_device_types" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}"
+                                :disabled="loading"
+                                v-model="currentTypeID">
+                                    <option v-for="item in list" :value="item['id']" :selected="item['id']==currentTypeID" v-if="list.length>0">
+                                        {{item['title']}}（{{item['lanes_total']}}货道）
+                                    </option>
+                                    <option value="0">
+                                        &lt;自定义&gt;
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control"  placeholder="请输入关键字搜索" v-model="keywords">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-default" type="button" :disabled="loading" @click="search()">
+                                    <i :class="{'fa': true, 'fa-search': !searching, 'fa-spinner fa-pulse': searching}"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-10" id="lane_detail">
+                                <table  class="table table-bordered cargo_lanes" v-if="currentType && currentType.cargo_lanes">
+                                    <thead>
+                                        <th>货道</th>
+                                        <th>商品名称</th>
+                                        <th class="fixed">价格</th>
+                                        <th class="fixed">容量</th>
+                                        <th class="fixed">当前数量</th>
+                                        <th>操作</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(lane, i) in currentType.cargo_lanes" :class="{unknown: lane.goods_id==0}" :key="currentTypeID+':'+i">
+                                            <td>
+                                                <div class="lane">
+                                                    <span>
+                                                        {{i + 1}}
+                                                        <sup title="电机货道" v-if="lane.is_motor">[ 电机 ]</sup>   
+                                                    </span>                                                
+                                                </div>
+                                            </td>
+                                            <td :class="{operate: isCustomType}">
+                                                <span :class="{'goods_name': isCustomType}"  @click="chooseGoods(lane)" title="点击选择商品">{{lane.goods_name}}</span>
+                                                <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span>                                     
+                                            </td>
+                                            <td>
+                                                <div v-show="currentLane == lane">
+                                                    <input class="form-control goods" type="number" 
+                                                    :name="'price' + i" 
+                                                    min="0" 
+                                                    step="0.01"
+                                                    ref="price"
+                                                    v-model="lane.goods_price"
+                                                    @blur="editPriceDone(lane)"
+                                                    @keydown.enter.self.prevent="editPriceDone(lane)"
+                                                    >
+                                                </div>
+                                                <span 
+                                                :class="{price:isCustomType}" 
+                                                @click="editPrice(lane, i)" 
+                                                v-show="currentLane!=lane"
+                                                title="点击修改价格">¥{{lane.goods_price}}元</span>
+                                            </td>
+                                            <td>
+                                                <template v-if="isCustomType">
+                                                    <input type="number" class="form-control goods" 
+                                                    :name="'capacities[' + i + ']'" 
+                                                    v-model="lane.capacity" 
+                                                    min="0">
+                                                    <input type="hidden" :name="'goods['+i+']'" :value="lane.goods_id">
+                                                </template>
+                                                <template v-else>
+                                                    {{lane.capacity}} 
+                                                </template>
+                                            <td>
+                                                <input type="number" class="form-control goods" :name="'lane' + i + '_num'" v-model="lane.num" min="0" :max="lane.capacity">
+                                            </td>
+                                            <td class="operate">                                          
+                                                <i class="fa fa-gift" 
+                                                v-if="currentPackage"
+                                                :class="{disabled: lane.goods_id===0,flash:currentPackage}" 
+                                                title="加入套餐" 
+                                                @click="addPackage(lane)"></i>
+                                                <i class="fa fa-trash" title="删除" 
+                                                @click="removeLane(lane)" v-if="isCustomType && !currentPackage"></i>                                            
+                                            </td>
+                                        </tr>
+                                        <tr v-if="isCustomType">
+                                            <td class="operate">
+                                                <i class="fa fa-plus" title="添加货道"  @click.prevent="addCargoLane" :disabled="loading"></i>
+                                            </td>
+                                            <td colspan="5">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                {if $op != 'add_bluetooth_device' && (empty($device) || !$device->isBlueToothDevice())}
+                                <div>
+                                    <button class="btn btn-success" 
+                                    @click.prevent="newPackage" 
+                                    :disabled="loading"
+                                    v-if="!currentPackage">
+                                        <i class="fa fa-gift"></i> 创建套餐
+                                    </button> 
+                                    <button class="btn btn-success" 
+                                    @click.prevent="createPackage" 
+                                    :disabled="loading || currentPackage.list.length === 0"
+                                    v-if="currentPackage"
+                                    >
+                                        <i class="fa fa-save"></i> 保存套餐
+                                    </button>
+                                </div>
+                                {/if}
+                                <div class="package operate" v-if="currentPackage">
+                                    <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>                           
+                                    <table class="table cargo_lanes">
+                                        <thead>
+                                            <th>#</th>
+                                            <th>商品名称</th>
+                                            <th class="fixed">单价</th>
+                                            <th class="fixed">数量</th>
+                                            <th style="width: 60px;">操作</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(goods,index) in currentPackage.list">
+                                                <td>
+                                                    {{index +1}}
+                                                </td>
+                                                <td>
+                                                    {{goods.name}}
+                                                    <span v-if="goods.unit_title">({{goods.unit_title}})</span>
+                                                </td>
+                                                <td>
+                                                    <div v-show="goods.edit">
+                                                        <input type="number" class="form-control goods" 
+                                                        v-model="goods.price"
+                                                        ref="packageGoodsPrice"
+                                                        @blur="editPackageGoodsPriceDone(goods,index)"
+                                                        @keydown.enter.self.prevent="editPackageGoodsPriceDone(goods,index)"
+                                                        step="0.01" 
+                                                        min="0">
+                                                    </div>
+                                                    <span class="editable-price" @click="editPackageGoodsPrice(goods,index)" v-show="!goods.edit">
+                                                        ¥{{goods.price}}元
+                                                    </span>                                                
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control goods" 
+                                                    v-model="goods.num"
+                                                    @blur="editPackageGoodsNumDone(goods, index)"
+                                                    min="1">
+                                                </td>
+                                                <td class="operate">
+                                                    <i class="fa fa-trash" title="删除" @click="removeGoodsFromPackage(index)"></i>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="currentPackage.list.length === 0">
+                                                <td colspan="5" class="center text-muted">
+                                                    &lt;请从设备商品列表中选择商品&gt;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="5" style="text-align: left;">
+                                                    <div class="total-price">
+                                                        <div>
+                                                            <b>套餐名称：</b><input type="text" style="text-align: left;" class="form-control goods" v-model="currentPackage.title">
+                                                        </div>
+                                                        <div>
+                                                            <b>商品总价：</b>
+                                                            <span style="padding-left: 12px;">¥{{currentPackage.price}}元</span>
+                                                        </div>                                                    
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div v-for="(p, index) in packages" class="package-list">
+                                    <table class="table table-bordered cargo_lanes">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="4" style="text-align: left;">
+                                                    <div>
+                                                        <b>套餐名称：</b>{{p.title}}
+                                                    </div>
+                                                    <div>
+                                                        <b>商品总价：</b>¥{{p.price}}元
+                                                    </div>
+                                                    <div class="package-delete operate">
+                                                        <i class="fa fa-ban" :class="{disabled: loading}" title="删除" @click="removePackage(p,index)"></i>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(goods,index) in p.list" :class="{invalid:!isPackageGoodsValid(goods)}">
+                                                <td class="index">
+                                                    {{index +1}}
+                                                </td>
+                                                <td>
+                                                    {{goods.name}}<span class="text-muted" v-if="goods.deleted">&lt;已删除&gt;</span>
+                                                </td>
+                                                <td>
+                                                    ¥{{goods.price}}元
+                                                </td>
+                                                <td>
+                                                    {{goods.num}}
+                                                    <span v-if="goods.unit_title">({{goods.unit_title}})</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>                         
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="group" class="col-md-2 control-label">商品列表</label>
-                    <div class="col-md-10">
-                        <select name="goodsList" id="group" style="width:100%;">
-                            <option value="goods" {if $extra['goodsList'] == 'goods'}selected{/if}>只显示商品，不显示套餐</option>
-                            <option value="packages" {if $extra['goodsList'] == 'packages'}selected{/if}>只显示套餐，不显示商品</option>
-                            <option value="all" {if $extra['goodsList'] == 'all'}selected{/if}>商品和套餐都显示</option>
-                        </select>
+                {if \zovye\App::isBluetoothDeviceSupported() }
+                {if $op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice())}
+                <div v-if="active === 'func'">
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="blueToothScreen1" class="radio-inline">
+                                <input name="blueToothScreen" id="blueToothScreen1" type="radio" value="1" {if $bluetooth['screen'] == 1}checked="checked"{/if}>
+                                有
+                            </label>
+                            <label for="blueToothScreen0" class="radio-inline">
+                                <input name="blueToothScreen" id="blueToothScreen0" type="radio" value="0"  {if $bluetooth['screen'] == 0}checked="checked"{/if} >
+                                无
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="group" class="col-md-2 control-label">分组</label>
-                    <div class="col-md-10">
-                        {if $groups}
-                        <select name="group" id="group" style="width:100%;">
-                            {loop $groups $index $group}
-                            <option value="{$index}" {if $device && $device->getGroupId() == $index}selected{/if}>{$group['title']}</option>
-                            {/loop}
-                            <option value="0" {if empty($device) || ($device && $device->getGroupId() == 0)}selected{/if}>&lt;暂无分组&gt;</option>
-                        </select>
-                        {else}
-                        <div style="color:#ccc;">&lt;暂无分组&gt;</div>
-                        {/if}
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">消毒功能</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="blueToothDisinfectant1" class="radio-inline">
+                                <input name="blueToothDisinfectant" id="blueToothDisinfectant1" type="radio" value="1" {if $bluetooth['disinfectant'] == 1}checked="checked"{/if}>
+                                有
+                            </label>
+                            <label for="blueToothDisinfectant0" class="radio-inline">
+                                <input name="blueToothDisinfectant" id="blueToothDisinfectant0" type="radio" value="0"  {if $bluetooth['disinfectant'] == 0}checked="checked"{/if} >
+                                无
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="address" class="col-md-2 control-label">地址</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="address" id="address" value="{php echo strval($extra['address'])}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">位置</label>
-                    <div class="col-md-10">
-                        {php echo tpl_form_field_coordinate('location', $loc);}
-                        <span class="help-block">* {php echo empty($loc['address']) ? '&lt;暂无位置&gt;' : $loc['address']}</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <input type="hidden" class="form-control" name="tags" value="{php echo $device ? $device->getTagsAsText() : ''}">
-                    <label for="tagslist" class="col-md-2 control-label">标签列表</label>
-                    <div class="tag" id="tag_tpl" title="点击取消这个标签">
-                        {{title}}
-                    </div>
-                    <div class="col-md-10" id="tagslist">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="newtags" class="col-md-2 control-label"></label>
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" name="newtags" id="newtags" enter-key="#addTagBtn">
-                        <span class="help-block">* 用英文逗号分隔可以同时添加多个标签！</span>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-default" type="button" id="addTagBtn" title="添加标签">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                {if \zovye\App::isMustFollowAccountEnabled()}
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">购买商品</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label for="mustFollow0" class="radio-inline">
-                            <input name="mustFollow" id="mustFollow0" type="radio" value="1" {if $extra['mfa']['enable'] == 1}checked="checked"{/if} >
-                            关注公众号后购买
-                        </label>
-                        <label for="mustFollow1" class="radio-inline">
-                            <input name="mustFollow" id="mustFollow1" type="radio" value="0"  {if isset($extra['mfa']['enable']) && $extra['mfa']['enable'] == 0}checked="checked"{/if} >
-                            直接购买
-                        </label>
-                        <label for="mustFollow2" class="radio-inline">
-                            <input name="mustFollow" id="mustFollow2" type="radio" value="-1"  {if !isset($extra['mfa']['enable']) || $extra['mfa']['enable'] == -1}checked="checked"{/if} >
-                            跟随系统设置
-                        </label>
-                        <span class="help-block">* 用户扫描设备二维码后，引导用户关注公众号后通过公众号进入商品购买页面</span>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">供电</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="blueToothPowerSupply1" class="radio-inline">
+                                <input name="blueToothPowerSupply" id="blueToothPowerSupply1" type="radio" value="1" {if $bluetooth['power'] == 1}checked="checked"{/if}>
+                                电池供电
+                            </label>
+                            <label for="blueToothPowerSupply0" class="radio-inline">
+                                <input name="blueToothPowerSupply" id="blueToothPowerSupply0" type="radio" value="0"  {if $bluetooth['power'] == 0}checked="checked"{/if} >
+                                外接电源
+                            </label>
+                        </div>
                     </div>
                 </div>
                 {/if}
-                <!-- 目前默认门锁为 1，无需自定义门锁数量
-                {if \zovye\App::isDeviceWithDoorEnabled()}
-                <div class="form-group">
-                    <label for="doorNum" class="col-md-2 control-label">门锁（数量）</label>
-                    <div class="col-md-10">
-                        <input type="number" class="form-control" name="doorNum" id="doorNum" value="{php echo $device ? $device->getDoorNum() : 0}" min="0">
-                        <span class="help-block">* 指定设备门锁数量，默认为零</span>
-                    </div>
-                </div>
-                {/if} 
-                -->
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">设备状态</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label for="isDown0" class="radio-inline">
-                            <input name="isDown" id="isDown0" type="radio" value="0" {if !isset($extra['isDown']) || $extra['isDown'] == 0}checked="checked"{/if} >
-                            运行
-                        </label>
-                        <label for="isDown1" class="radio-inline">
-                            <input name="isDown" id="isDown1" type="radio" value="1"  {if $extra['isDown'] == 1}checked="checked"{/if} >
-                            停用
-                        </label>
-                        <span class="help-block">* 选择停用的设备，用户扫码后无法使用相关功能</span>
-                    </div>
-                </div>
-            </div>
-            {if $device && $device->getAppId()}
-            <div class="seg" id="special">
-                <div class="title">APP设置</div>
-                <div class="form-group">
-                    <label class="col-xs-12 col-md-2 col-md-2 control-label">动态二维码</label>
-                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                        <label for="activeQrcode1" class="radio-inline">
-                            <input name="activeQrcode" id="activeQrcode1" type="radio" value="1" {if $extra['activeQrcode'] == 1}checked="checked"{/if} title="开启防刷功能后，二维码领取成功后动刷新！">
-                            开启
-                        </label>
-                        <label for="activeQrcode0" class="radio-inline">
-                            <input name="activeQrcode" id="activeQrcode0" type="radio" value="0"  {if $extra['activeQrcode'] == 0}checked="checked"{/if} >
-                            关闭
-                        </label>
-                        <span class="help-block">* 开启此功能后，用户每次扫码领取成功后，二维码都会重新生成！</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="volume" class="col-md-2 control-label">音量(百分比)</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="volume" id="volume" value="{php echo intval($extra['volume'])}">
-                    </div>
-                </div>
-            </div>
-            {/if}
-            {if $disp}
-            <div class="seg" id="special">
-                <div class="title">小屏设置</div>
-                <div class="form-group">
-                    <label for="first" class="col-md-2 control-label">第一行文字</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="first_txt" id="first" value="{php echo $extra['txt'][0]}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="second" class="col-md-2 control-label">第二行文字</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="second_txt" id="second" value="{php echo $extra['txt'][1]}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="third" class="col-md-2 control-label">第三行文字</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="third_txt" id="third" value="{php echo $extra['txt'][2]}">
-                    </div>
-                </div>
-            </div>
-            {/if}
-            {if \zovye\App::isZJBaoEnabled()}
-            <div class="seg"  id="ZJBao">
-                <div class="title">纸巾宝设置</div>
-                <div class="form-group">
-                    <label for="ZJBao_Scene" class="col-md-2 control-label">场景</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="ZJBao_Scene" id="ZJBao_Scene" value="{php echo strval($zjbao['scene'])}">
-                    </div>
-                </div>
-            </div>
-            {/if}
-            {if \zovye\App::isMoscaleEnabled()}
-            <div class="seg">
-                <div class="title">公锤平台设置</div>
-                <div id="moscale">
-                </div>
-            </div>
-            {/if}
-            {if \zovye\App::isCustomAliTicketEnabled()}
-            <div class="seg"  id="aliTicket" v-cloak>
-                <div class="title">天猫拉新设置</div>
-                <template v-if="loading">
-                    <div class="text-center text-muted">正在加载中...</div>
-                </template>
-                <template v-else>
-                    <div class="form-group">
-                        <label for="JoinAliTicket" class="col-md-2 control-label">是否参与</label>
-                        <div class="col-md-10">
-                            <div class="row">
-                                <div class="checkbox col-md-7">
-                                    <label>
-                                        <input type="checkbox" name="JoinAliTicket" id="JoinAliTicket" v-model="join">
-                                        该设备参与天猫拉新活动<span :class="[regStatus? 'regOk' : 'unReg']" v-if="join && regStatus !== undefined"> ({{regInfo}})</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div> 
-                    <div v-show="join">
+                {/if}
+                <div v-show="active === 'extra'">
+                    <!--
                         <div class="form-group">
-                            <label class="col-md-2 control-label">设备类型</label>
+                            <label for="pushAccountMsg" class="col-md-2 control-label">领取后推送公众号消息</label>
                             <div class="col-md-10">
-                                <select name="aliTicketDeviceType" v-model="deviceType">
-                                    <option v-for="v in deviceTypes">{{v}}</option>
+                                <select id="pushAccountMsg" name="pushAccountMsg" class="col-md-9">
+                                    <option value="none" {if 'none' == $extra['pushAccountMsg']}selected{/if}>&lt;不推送&gt;</option>
+                                    <option value="settings" {if empty($extra['pushAccountMsg']) || 'settings' == $extra['pushAccountMsg']}selected{/if}>&lt;全局设置&gt;</option>
+                                    {loop $news $item}
+                                    <option value="{$item['media_id']}" {if $item['media_id'] ==$extra['pushAccountMsg']}selected{/if}>{$item['items']['0']['title']}</option>
+                                    {/loop}
                                 </select>
+                                <span class="col-md-2"><a href="{php echo wurl('platform/material');}" class="btn btn-default" role="button">消息管理</a></span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="second" class="col-md-2 control-label">第一场景</label>
-                            <div class="col-md-10 scene_list">
-                                <span :class="{'scene':true, 'selected': scene.first == e}" v-for="e in firstSceneList" @click="setFirstScene(e);">{{e}}</span>
-                                <input type="hidden" name="aliTicketFirstScene" v-model="scene.first">
-                            </div>
+                    -->
+                    <div class="form-group">
+                        <label for="theme" class="col-md-2 control-label">手机端界面</label>
+                        <div class="col-md-10">
+                            <select name="theme" class="form-control" id="theme">
+                                <option value=""{if empty($extra['theme'])} selected{/if}> 系统默认界面 </option>
+                                {loop $themes $index $item}
+                                <option value="{$item}"{if $extra['theme'] == $item} selected{/if}> {$item} </option>
+                                {/loop}
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label for="second" class="col-md-2 control-label">第二场景</label>
-                            <div class="col-md-10 scene_list">
-                                <span :class="{'scene':true, 'selected': scene.second == e}" v-for="e in secondSceneList" @click="setSecondScene(e)">{{e}}</span>
-                                <input type="hidden" name="aliTicketSecondScene" v-model="scene.second">
-                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group" class="col-md-2 control-label">商品列表</label>
+                        <div class="col-md-10">
+                            <select name="goodsList" id="group" style="width:100%;">
+                                <option value="goods" {if $extra['goodsList'] == 'goods'}selected{/if}>只显示商品，不显示套餐</option>
+                                <option value="packages" {if $extra['goodsList'] == 'packages'}selected{/if}>只显示套餐，不显示商品</option>
+                                <option value="all" {if $extra['goodsList'] == 'all'}selected{/if}>商品和套餐都显示</option>
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label class="col-md-2 control-label">所在区域</label>
-                            <div class="col-md-10" v-once>
-                                {php echo tpl_form_field_district('aliTicketArea', $agent_data['area']);}
-                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="group" class="col-md-2 control-label">分组</label>
+                        <div class="col-md-10">
+                            {if $groups}
+                            <select name="group" id="group" style="width:100%;">
+                                {loop $groups $index $group}
+                                <option value="{$index}" {if $device && $device->getGroupId() == $index}selected{/if}>{$group['title']}</option>
+                                {/loop}
+                                <option value="0" {if empty($device) || ($device && $device->getGroupId() == 0)}selected{/if}>&lt;暂无分组&gt;</option>
+                            </select>
+                            {else}
+                            <div style="color:#ccc;">&lt;暂无分组&gt;</div>
+                            {/if}
                         </div>
-                        <div class="form-group">
-                            <label for="addressDetail" class="col-md-2 control-label">具体地址</label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" name="aliTicketAddress" id="addressDetail" v-model="addressDetail">
-                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" class="col-md-2 control-label">地址</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="address" id="address" value="{php echo strval($extra['address'])}">
                         </div>
-                        <div class="form-group">
-                            <label for="floor" class="col-md-2 control-label">所在楼层</label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" name="aliTicketFloor" id="floor" v-model="floor">
-                            </div>
-                        </div>                          
-                    </div>                  
-                </template>
-
-            </div>
-            {/if}
-            {if \zovye\App::isZeroBonusEnabled()}
-            <div class="seg">
-                <div class="title">佣金</div>
-                <div class="form-group">
-                    <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
-                    <div class="col-md-10">
-                        <input type="number" step="0.01" class="form-control" name="zeroBonus" id="zeroBonus" value="{php echo $extra['custom']['bonus']['zero']['v'] ?? -1}">
-                        <span class="help-block">* -1 默认， 0 表示概率０</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">位置</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_coordinate('location', $loc);}
+                            <span class="help-block">* {php echo empty($loc['address']) ? '&lt;暂无位置&gt;' : $loc['address']}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" class="form-control" name="tags" value="{php echo $device ? $device->getTagsAsText() : ''}">
+                        <label for="tagslist" class="col-md-2 control-label">标签列表</label>
+                        <div class="tag" id="tag_tpl" title="点击取消这个标签">
+                            #{title}#
+                        </div>
+                        <div class="col-md-10" id="tagslist">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newtags" class="col-md-2 control-label"></label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="newtags" id="newtags" enter-key="#addTagBtn">
+                            <span class="help-block">* 用英文逗号分隔可以同时添加多个标签！</span>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-default" type="button" id="addTagBtn" title="添加标签">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {if \zovye\App::isMustFollowAccountEnabled()}
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">购买商品</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="mustFollow0" class="radio-inline">
+                                <input name="mustFollow" id="mustFollow0" type="radio" value="1" {if $extra['mfa']['enable'] == 1}checked="checked"{/if} >
+                                关注公众号后购买
+                            </label>
+                            <label for="mustFollow1" class="radio-inline">
+                                <input name="mustFollow" id="mustFollow1" type="radio" value="0"  {if isset($extra['mfa']['enable']) && $extra['mfa']['enable'] == 0}checked="checked"{/if} >
+                                直接购买
+                            </label>
+                            <label for="mustFollow2" class="radio-inline">
+                                <input name="mustFollow" id="mustFollow2" type="radio" value="-1"  {if !isset($extra['mfa']['enable']) || $extra['mfa']['enable'] == -1}checked="checked"{/if} >
+                                跟随系统设置
+                            </label>
+                            <span class="help-block">* 用户扫描设备二维码后，引导用户关注公众号后通过公众号进入商品购买页面</span>
+                        </div>
+                    </div>
+                    {/if}
+                    <!-- 目前默认门锁为 1，无需自定义门锁数量
+                    {if \zovye\App::isDeviceWithDoorEnabled()}
+                    <div class="form-group">
+                        <label for="doorNum" class="col-md-2 control-label">门锁（数量）</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="doorNum" id="doorNum" value="{php echo $device ? $device->getDoorNum() : 0}" min="0">
+                            <span class="help-block">* 指定设备门锁数量，默认为零</span>
+                        </div>
+                    </div>
+                    {/if} 
+                    -->
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">设备状态</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="isDown0" class="radio-inline">
+                                <input name="isDown" id="isDown0" type="radio" value="0" {if !isset($extra['isDown']) || $extra['isDown'] == 0}checked="checked"{/if} >
+                                运行
+                            </label>
+                            <label for="isDown1" class="radio-inline">
+                                <input name="isDown" id="isDown1" type="radio" value="1"  {if $extra['isDown'] == 1}checked="checked"{/if} >
+                                停用
+                            </label>
+                            <span class="help-block">* 选择停用的设备，用户扫码后无法使用相关功能</span>
+                        </div>
                     </div>
                 </div>
+                {if $device && $device->getAppId()}
+                <div class="seg" id="special">
+                    <div class="title">APP设置</div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">动态二维码</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="activeQrcode1" class="radio-inline">
+                                <input name="activeQrcode" id="activeQrcode1" type="radio" value="1" {if $extra['activeQrcode'] == 1}checked="checked"{/if} title="开启防刷功能后，二维码领取成功后动刷新！">
+                                开启
+                            </label>
+                            <label for="activeQrcode0" class="radio-inline">
+                                <input name="activeQrcode" id="activeQrcode0" type="radio" value="0"  {if $extra['activeQrcode'] == 0}checked="checked"{/if} >
+                                关闭
+                            </label>
+                            <span class="help-block">* 开启此功能后，用户每次扫码领取成功后，二维码都会重新生成！</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="volume" class="col-md-2 control-label">音量(百分比)</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="volume" id="volume" value="{php echo intval($extra['volume'])}">
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                {if $disp}
+                <div class="seg" id="special">
+                    <div class="title">小屏设置</div>
+                    <div class="form-group">
+                        <label for="first" class="col-md-2 control-label">第一行文字</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="first_txt" id="first" value="{php echo $extra['txt'][0]}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="second" class="col-md-2 control-label">第二行文字</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="second_txt" id="second" value="{php echo $extra['txt'][1]}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="third" class="col-md-2 control-label">第三行文字</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="third_txt" id="third" value="{php echo $extra['txt'][2]}">
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                {if \zovye\App::isZJBaoEnabled()}
+                <div v-show="active === 'zjb'">
+                    <div class="form-group">
+                        <label for="ZJBao_Scene" class="col-md-2 control-label">场景</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="ZJBao_Scene" id="ZJBao_Scene" value="{php echo strval($zjbao['scene'])}">
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                {if \zovye\App::isMoscaleEnabled()}
+                <div v-show="active === 'moscale'">
+                    <div id="moscale">
+                    </div>
+                </div>
+                {/if}
+                {if \zovye\App::isZeroBonusEnabled()}
+                <div v-show="active === 'zeroBonus'">
+                    <div class="form-group">
+                        <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
+                        <div class="col-md-10">
+                            <input type="number" step="0.01" class="form-control" name="zeroBonus" id="zeroBonus" value="{php echo $extra['custom']['bonus']['zero']['v'] ?? -1}">
+                            <span class="help-block">* -1 默认， 0 表示概率０</span>
+                        </div>
+                    </div>
+                </div>
+                {/if}
             </div>
-            {/if}
         </div>
-    </div>
-    <div class="form-btn">
-        <input type="hidden" name="op" value="save">
-        <input type="hidden" name="device_model" value="{$device_model}">
-        {if $op=='edit' && $id}
-        <input type="hidden" name="id" value="{$id}">
-        <button type="submit" class="btn btn-primary">保存</button>
-        {else}
-        <button type="submit" class="btn btn-primary">创建</button>
-        {/if}
-        <button type="button" class="btn btn-default" onclick="backToList();">返回</button>
-    </div>
-</form>
+        <div class="form-btn">
+            <input type="hidden" name="op" value="save">
+            <input type="hidden" name="from" :value="active">
+            <input type="hidden" name="device_model" value="{$device_model}">
+            {if $op=='edit' && $id}
+            <input type="hidden" name="id" value="{$id}">
+            <button type="submit" class="btn btn-primary">保存</button>
+            {else}
+            <button type="submit" class="btn btn-primary">创建</button>
+            {/if}
+            <button type="button" class="btn btn-default" onclick="backToList();">返回</button>
+        </div>
+    </form>
+</div>
+
 <script>
     const api = {
         url: "{php echo $this->createWebUrl('goods');}",
@@ -857,133 +784,12 @@
         api.showResult({op: 'goods', pagesize: 10});
     }
 
-    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}', 'district'], function($, Vue, dis) {
-        const api_url = "{php echo $this->createWebUrl('device', ['op' => 'aliTicket'])}";
-        const app = new Vue({
-            el: "#aliTicket",
-            data: {
-                deviceId: parseInt("{php echo $device? $device->getId() : 0}"),
-                loading: true,
-                join: false,
-                deviceTypes: [],
-                deviceType: '',
-                scene: {
-                    list: {},
-                    first: '',
-                    second: '',
-                },
-                addressDetail: '',
-                floor: '',
-                area: {
-                    province: undefined,
-                    city: undefined,
-                    district: undefined,
-                },
-                regStatus: undefined,
-                regMsg: undefined,
-            },
-            computed: {
-                firstSceneList() {
-                    return [...Object.keys(this.scene.list)];
-                },
-                secondSceneList() {
-                    if (this.scene.first != '') {
-                        return this.scene.list[this.scene.first] || [];
-                    }
-                    return [];
-                },
-                regInfo() {
-                    let msg = this.regStatus ? '已注册成功' : '未注册成功';
-                    if (this.regMsg) {
-                        msg = msg + "：" + this.regMsg;
-                    }
-                    return msg;
-                }
-            },
-            watch: {
-                loading: function(val, old) {
-                    if (!val) {
-                        const self = this;
-                        this.$nextTick(function() {
-                            $(".tpl-district-container").each(function(){               
-                                const elms = {};
-                                elms.province = $(this).find(".tpl-province")[0];
-                                elms.city = $(this).find(".tpl-city")[0];
-                                elms.district = $(this).find(".tpl-district")[0];
-                                dis.render(elms, {
-                                    province: self.area.province,
-                                    city: self.area.city,
-                                    district: self.area.district,
-                                }, {withTitle: true});
-                            })                              
-                        })
-                        
-                    }
-                }
-            },
-            mounted() {
-                const self = this;
-                this.getDetail()
-            },
-            methods: {
-                getDetail() {
-                    const self = this;
-                    self.loading = true;
-                    $.get(api_url, {fn: 'detail', id: this.deviceId}).then(res => {
-                        self.loading = false;
-                        if (res && res.status) {
-                            const data = res.data || {};
-                            self.deviceTypes = data.device_types || [];
-                            self.scene.list = data.scenes || [];
-                            self.regStatus = data.status;
-                            self.regMsg = data.error || '';
-                            if (data.config && data.config.deviceType != undefined) {
-                                self.join = data.config['join'];
-                                self.deviceType = data.config['deviceType'];
-                                self.setFirstScene(data.config['firstScene']);
-                                self.setSecondScene(data.config['secondScene']);
-                                self.addressDetail = data.config['addressDetail'];
-                                self.floor = data.config['floor'];
-                                self.area.province = data.config['province'] || '';
-                                self.area.city = data.config['city'] || '';
-                                self.area.district = data.config['district'] || '';
-                            } else {
-                                if (self.deviceTypes.length > 0) {
-                                    self.deviceType = self.deviceTypes[0];
-                                }                      
-                                if (self.firstSceneList.length > 0) {
-                                    self.setFirstScene(self.firstSceneList[0]);
-                                }
-                            }
-                        }
-                    })
-                },
-                setFirstScene(scene) {
-                    if (scene != this.scene.first) {
-                        this.scene.first = scene;
-                        if (this.secondSceneList.length > 0) {
-                            this.setSecondScene(this.secondSceneList[0]);
-                        }
-                    }                    
-                },
-                setSecondScene(scene) {
-                    if (scene != this.scene.second) {
-                        this.scene.second = scene;
-                    }  
-                },
-                regionChange (data) {
-                    console.log(data)
-                },
-            }
-        });
-    });
-
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         const api_url = "{php echo $this->createWebUrl('devicetypes');}";
         const device_api_url = "{php echo $this->createWebUrl('device')}";
         const package_api_url = "{php echo $this->createWebUrl('package')}";
         const app = new Vue({
-            el: "#device_types",
+            el: "#app",
             data: {
                 deviceId: parseInt("{php echo $device? $device->getId() : 0}"),
                 currentTypeID: parseInt("{php echo $device? $device->getDeviceType() : 0}"),
@@ -999,6 +805,42 @@
                 creating: false,
                 packages: [],
                 currentPackage: null,
+                navs:[
+                        {
+                            'op': 'base',
+                            'content': `{$icon} 基本设置`,
+                        },
+                        {if $is_bluetooth_device }
+                        {
+                            'op': 'func',
+                            'content': `功能设置`,
+                        },                        
+                        {/if}
+                        {
+                            'op': 'extra',
+                            'content': `高级设置`,
+                        },
+                        {if \zovye\App::isMoscaleEnabled()}
+                        {
+                            'op': 'moscale',
+                            'content': `公锤平台设置`,
+                        },
+                        {/if}
+                        {if \zovye\App::isZeroBonusEnabled()}
+                        {
+                            'op': 'zjb',
+                            'content': `纸巾平台宝设置`,
+                        },                        
+                        {/if}
+                        {if \zovye\App::isZeroBonusEnabled()}
+                        {
+                            'op': 'zeroBonus',
+                            'content': `零佣金`,
+                        },                             
+                        {/if}
+
+                ],
+                active: '{$from}',
             },
             watch: {
                 currentTypeID() {
@@ -1255,7 +1097,7 @@
         const tpl = $('#tag_tpl').clone().removeAttr('id').prop('outerHTML');
         let html = '';
         tags.forEach(function(title){
-            html += tpl.replace(/{{title}}/g, title);
+            html += tpl.replace(/#{title}#/g, title);
         })
         $('#tagslist').html(html || '<span style="color:gray;">&lt;暂无标签&gt;</span>');
         $('input[name=tags]').val(tags.join(','));
@@ -1274,9 +1116,7 @@
         })
     })
     {/if}
-    {if \zovye\App::isCustomAliTicketEnabled()}
-
-    {/if}
+    
     $(function(){
         let tags = [];
         $('input[name=tags]').val().split(',').forEach(function(title){

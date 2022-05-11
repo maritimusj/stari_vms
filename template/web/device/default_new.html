@@ -750,7 +750,7 @@
                         </td>
                         <td class="operate">
                             <div class="btn-group">
-                                <a class="btn btn-default" href="#" title="设备出货测试" data-op="deviceTestAll">
+                                <a class="btn btn-default" href="#" title="查看货道" data-op="deviceTestAll">
                                     <i class="fa fa-sign-out"></i>
                                 </a>
                                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
@@ -773,21 +773,15 @@
                                         <li role="separator" class="divider"></li>
                                         <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量</a></li>
                                         <li role="separator" class="divider"></li>
-                                        
-                                        <li v-for="(lane, index) in o.cargo_lanes">
-                                            <a href="#" data-op="deviceReset" :data-params="index">
-                                                <i class="fa fa-level-up fa-fw"></i> 重置货道{{index + 1}}（{{lane.goods_name}}）
-                                            </a>
-                                        </li>
                                     </template>
-                                    <li role="separator" class="divider"></li>
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li v-if="o.appId"><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>
-                                    <li class="disabled" v-else><a href="#"><i class="fa fa-cloud-download fa-fw disabled"></i> 推送版本更新</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已绑定的AppID</a></li>
-                                    <li role="separator" class="divider"></li>
+                                    <template v-if="o.appId">
+                                        <li ><a href="#" data-op="showVersions"><i class="fa fa-cloud-download fa-fw"></i> 推送版本更新</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="#" data-op="deviceCleanAppId"><i class="fa fa-dot-circle-o fa-fw"></i> 清除已绑定的AppID</a></li>
+                                        <li role="separator" class="divider"></li>                                                                  
+                                    </template>
                                     <li><a href="#" data-op="deviceRevertPrompt"><i class="fa fa-plug fa-fw"></i> 重置设备</a></li>
                                     <li><a href="#" data-op="deviceRemove"><i class="fa fa-trash fa-fw"></i> 删除</a></li>
                                 </ul>
@@ -834,5 +828,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20211224001"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20211224002"></script>
 {template 'common/footer'}

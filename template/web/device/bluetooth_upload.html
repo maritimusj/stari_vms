@@ -32,6 +32,11 @@
 </style>
 <div id="app" v-cloak>
     <div class="panel panel-default">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-reply" title="返回"  onclick="backToList();"></i>
+            </span>
+        </div>
         <div class="panel-body">
             <div class="seg">
                 <div class="form-group">
@@ -104,6 +109,9 @@
 </form>
 {php \zovye\url(true, JS_XLSX_SHIM_URL);}
 <script>
+    function backToList() {
+        window.location.href = "{php echo $this->createWebUrl('device');}";
+    }
     const apiURL = "{php echo $this->createWebUrl('device', ['op' => 'create_bluetooth_device']);}";
 
     require(["{php \zovye\url(false, JS_VUE_URL);}", "{php \zovye\url(false, JS_XLSX_URL);}"], function (Vue, XLSX) {

@@ -448,6 +448,24 @@ if ($op == 'list') {
         ];
     }
 
+    $module_url = MODULE_URL;
+    if ($op == 'add_vd') {
+        $icon_html = <<<HTML
+        <img src="{$module_url}static/img/vdevice.svg" class="icon" title="虚拟设备">
+HTML;
+    } elseif ($op == 'add_bluetooth_device') {
+        $icon_html = <<<HTML
+        <img src="{$module_url}static/img/bluetooth.svg" class="icon" title="蓝牙设备">
+HTML;
+    } else {
+        $icon_html = <<<HTML
+        <img src="{$module_url}static/img/machine.svg" class="icon">
+HTML;
+    }
+
+    $tpl_data['icon'] = $icon_html;
+    $tpl_data['from'] = request::str('from', 'base');
+    $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice());
     $tpl_data['themes'] = Theme::all();
     app()->showTemplate('web/device/edit_new', $tpl_data);
 
@@ -470,7 +488,7 @@ if ($op == 'list') {
     );
 
     JSON::success([
-        'title' => "设备测试 [ {$device->getName()} ]",
+        'title' => "设备货道 [ {$device->getName()} ]",
         'content' => $content,
     ]);
 } elseif ($op == 'deviceTestLaneN') {
@@ -633,7 +651,8 @@ if ($op == 'list') {
 } elseif ($op == 'save') {
     $id = request::int('id');
 
-    $result = Util::transactionDo(function () use ($id) {
+    $device = null;
+    $result = Util::transactionDo(function () use ($id, &$device) {
         $data = [
             'agent_id' => 0,
             'name' => request::trim('name'),
@@ -942,7 +961,11 @@ if ($op == 'list') {
         Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), 'error');
     }
 
-    Util::itoast($result['message'], $id ? We7::referer() : $this->createWebUrl('device'), $result['error'] ? 'warning' : 'success');
+    Util::itoast(
+        $result['message'], 
+        $this->createWebUrl('device', ['op' => 'edit', 'id' => $device ? $device->getId() : $id, 'from' => request::str('from')]), 
+        $result['error'] ? 'warning' : 'success'
+    );
 } elseif ($op == 'online') {
 
     $device = Device::get(request::int('id'));
@@ -1864,15 +1887,15 @@ if ($op == 'list') {
 
     $date_limit = request::array('datelimit');
     if ($date_limit['start']) {
-        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
+        $s_date = new DateTime($date_limit['start'] . '00:00');
     } else {
-        $s_date = new DateTime('first day of this month 00:00:00');
+        $s_date = new DateTime('first day of this month 00:00');
     }
 
     if ($date_limit['end']) {
-        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
+        $e_date = new DateTime($date_limit['end'] . ' 00:00');
     } else {
-        $e_date = new DateTime('first day of next month 00:00:00');
+        $e_date = new DateTime('first day of next month 00:00');
     }
 
     $agent_openid = request::str('agent_openid');
@@ -2533,4 +2556,5 @@ if ($op == 'list') {
     }
 
     JSON::fail('设备信息上传任务启动失败！');
+
 }

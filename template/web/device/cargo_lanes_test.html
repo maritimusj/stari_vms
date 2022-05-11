@@ -23,7 +23,8 @@
                 <td>{$item['num']} {$item['goods_unit_title']}</td>
                 {if empty($item['is_vd'])}
                 <td class="test_btn">
-                    <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="点击测试"></i>
+                    <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="测试出货"></i>
+                    <i class="fa fa-level-up" data-op="deviceReset" data-params="{$index}" title="重置商品数量"></i>
                 </td>
                 {/if}
             </tr>

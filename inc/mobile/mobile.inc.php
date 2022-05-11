@@ -53,6 +53,7 @@ if ($op == 'save') {
             'mobile' => $mobile, 
             'app' => User::WX,
         ]);
+
         if (!empty($res)) {
             throw new RuntimeException('手机号码已经被其它用户使用！');
         }

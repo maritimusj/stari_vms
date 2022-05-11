@@ -380,11 +380,16 @@ if ($op == 'default') {
         Util::itoast('找不到这个用户！', $this->createWebUrl('agent'), 'error');
     }
 
-    if ($user->isPartner()) {
-        Util::itoast('用户已经是其他代理商的合伙人！', $this->createWebUrl('agent'), 'error');
-    }
+    $is_edit = $user->isAgent();
+    if (!$is_edit) {
+        if ($user->isPartner()) {
+            Util::itoast('用户已经是其他代理商的合伙人！', $this->createWebUrl('agent'), 'error');
+        }
 
-    $agentEdit = $user->isAgent();
+        if ($user->isKeeper()) {
+            Util::itoast('用户已经是运营人员！', $this->createWebUrl('agent'), 'error');
+        }
+    }
 
     if (request::bool('agent_base')) {
 
@@ -465,6 +470,7 @@ if ($op == 'default') {
 
         $user->setAgent($level);
         $user->setMobile($mobile);
+
     } elseif (request::has('agent_notice')) {
 
         if ($user->isAgent()) {
@@ -644,7 +650,7 @@ if ($op == 'default') {
     }
 
     if ($user->save()) {
-        if ($agentEdit) {
+        if ($is_edit) {
             Util::itoast('保存成功！', $this->createWebUrl('agent', ['op' => request('from'), 'id' => $id]), 'success');
         } else {
             //使用控制中心推送通知
@@ -1024,7 +1030,7 @@ if ($op == 'default') {
         );
     }
 
-    $res = User::findOne(['id <>' => $user_id, 'mobile' => $mobile]);
+    $res = User::findOne(['id <>' => $user_id, 'mobile' => $mobile, 'app' => User::WX]);
     if ($res) {
         Util::itoast(
             '手机号码已经被其它用户使用！',

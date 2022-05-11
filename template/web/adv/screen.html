@@ -214,7 +214,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">{php echo $media_data[$media]['title']}</label>
+                <label class="col-md-2 control-label">{php echo $media_data[$media]['title']}{if $media == 'srt'}内容{else}网址{/if}</label>
                 <div class="col-md-10">
                     {if $media == 'image'}
                         {php echo tpl_form_field_image('url', $url)}
@@ -234,6 +234,35 @@
                     <input type="number" class="form-control" name="duration" id="duration" value="{php echo $duration ?: 10}" min="1" required>
                 </div>
             </div>
+            {elseif $media == 'srt'}
+            <div class="form-group">
+                <label class="col-md-2 control-label">字体颜色</label>
+                <div class="col-md-10">
+                    {php echo tpl_form_field_color('clr', $clr);}
+                    <span class="help-block">* 默认颜色值#FFFFFF</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">背景颜色</label>
+                <div class="col-md-10">
+                    {php echo tpl_form_field_color('background-clr', $background);}
+                    <span class="help-block">* 默认颜色值#000000</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="size" class="col-md-2 control-label">字体大小</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="size" id="size" value="{php echo $size}" min="1">
+                    <span class="help-block">* 默认大小 36</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="speed" class="col-md-2 control-label">滚动速度</label>
+                <div class="col-md-10">
+                    <input type="number" class="form-control" name="speed" id="speed" value="{php echo $speed}" min="1" max="5">
+                    <span class="help-block">* 默认速度 1，范围1 ～ 5</span>
+                </div>
+            </div>            
             {/if}
             {if in_array($media, ['image', 'video', 'srt'])}
             <div class="form-group">

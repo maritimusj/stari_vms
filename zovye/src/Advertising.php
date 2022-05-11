@@ -216,6 +216,10 @@ class Advertising extends State
                 if (empty($extra['text'])) {
                     return err('请指定字幕文字内容！');
                 }
+                $extra['size'] = intval($params['size']);
+                $extra['clr'] = trim($params['clr']);
+                $extra['background-clr'] = trim($params['background-clr']);                
+                $extra['speed'] = trim($params['speed']);
             } else {
                 $url = $params['url'];
                 if (empty($url)) {

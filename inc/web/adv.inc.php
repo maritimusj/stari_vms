@@ -385,7 +385,13 @@ if ($op == 'default') {
         if ($type == Advertising::SCREEN) {
             $media = $adv->getExtraData('media');
             if ($media == 'srt') {
+
                 $tpl_data['text'] = $adv->getExtraData('text');
+                $tpl_data['size'] = $adv->getExtraData('size');
+                $tpl_data['clr'] = $adv->getExtraData('clr');
+                $tpl_data['background'] = $adv->getExtraData('background-clr');
+                $tpl_data['speed'] = $adv->getExtraData('speed');
+
             } else {
                 $tpl_data['url'] = $adv->getExtraData('url');
                 if ($media == 'image') {

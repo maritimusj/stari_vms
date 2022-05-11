@@ -1222,6 +1222,18 @@ class deviceModelObj extends modelObj
             if ($adv['extra']['media'] == 'srt') {
                 if (!empty($adv['extra']['text'])) {
                     $srt['subs'][] = strval($adv['extra']['text']);
+                    if (!empty($adv['extra']['speed']) && $srt['speed'] != $adv['extra']['speed']) {
+                        $srt['speed'] = intval($adv['extra']['speed']);
+                    }
+                    if (!empty($adv['extra']['clr']) && $srt['color'] != $adv['extra']['clr']) {
+                        $srt['color'] = strval($adv['extra']['clr']);
+                    }
+                    if (!empty($adv['extra']['background-clr']) && $srt['background-color'] != $adv['extra']['background-clr']) {
+                        $srt['background-color'] = strval($adv['extra']['background-clr']);
+                    }
+                    if (!empty($adv['extra']['size']) && $srt['size'] < $adv['extra']['size']) {
+                        $srt['size'] = intval($adv['extra']['size']);
+                    }                  
                 }
             } else {
                 $data = [

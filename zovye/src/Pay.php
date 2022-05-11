@@ -32,19 +32,16 @@ class Pay
     //收钱吧
     const SQB = 'SQB';
 
-    //省钱码
-    const SQM = 'SQM';
-
     static $names = [
         self::WX => '微信支付',
         self::WxAPP => '微信小程序支付',
         self::ALI => '支付宝',
         self::LCSW => '扫呗',
         self::SQB => '收钱吧',
-        self::SQM => '省钱码',
     ];
 
-    public static function getTitle($name) {
+    public static function getTitle($name): string
+    {
         return self::$names[$name] ?? '未知';
     }
 
@@ -190,46 +187,6 @@ class Pay
     public static function createJsPay(deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
     {
         return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
-    }
-
-    public static function notifyChannel($json): string
-    {
-        try {
-            if (!ChannelPay::checkSign($json)) {
-                throw new Exception('签名检验失败！');
-            }
-
-            $out_trade_no = $json['outTradeNo'];
-
-            $pay_log = self::getPayLog($out_trade_no);
-            if (empty($pay_log)) {
-                throw new Exception('找不对支付记录！');
-            }
-
-            $pay_log->setData('payResult', $json);
-            $pay_log->setData('create_order.createtime', time());
-
-            if (!$pay_log->save()) {
-                throw new Exception('保存支付记录失败！');
-            }
-
-            $device = Device::get($pay_log->getDeviceId());
-            if (empty($device)) {
-                throw new Exception('找不到这个设备！');
-            }
-
-            //创建一个回调执行创建订单，出货任务
-            $res = Job::createOrder($out_trade_no, $device);
-            if (empty($res) || is_error($res)) {
-                throw new Exception('创建订单任务失败！');
-            }
-        } catch (Exception $e) {
-            Log::error('notifyChannel', [
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        return '{"code":200}';
     }
 
     /**

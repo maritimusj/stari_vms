@@ -7,29 +7,11 @@
 namespace zovye;
 
 $op = request::op('default');
-//天猫拉新活动
-if ($op == 'ticket') {
-    if (request::has('appResult')) {
-        if (request::str('appResult') == 'success') {
-            Util::resultAlert('成功，谢谢参与活动！');
-        }
-        Util::resultAlert('失败，请扫码重试，谢谢！', 'error');
-    }
-    $res = AliTicket::cb();
-    if (is_error($res)) {
-        Log::error('ali_ticket', [
-            'request' => request::raw(),
-            'result' => $res,
-        ]);
-    }
-    exit(AliTicket::RESPONSE);
-}
-
 $from = request::str('from');
 $device_id = request::str('device');
 
 //获取支付宝用户信息
-if (request::op() == 'auth') {
+if ($op == 'auth') {
     $code = request::str('auth_code');
     if (empty($code)) {
         Util::resultAlert('获取用户auth_code失败！', 'error');

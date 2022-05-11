@@ -264,36 +264,6 @@
                     </div>
                 </div>
             </div>
-            {if \zovye\App::isChannelPayEnabled()}
-            <div class="seg">
-                <div class="title">阿旗（京东）</div>
-
-                <div class="form-group">
-                    <label for="channelPayKey" class="col-md-2 control-label">app key</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="channelPayKey" id="channelPayKey" value="{$settings['pay']['channel']['key']}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="channelPaySecret" class="col-md-2 control-label">app secret</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="channelPaySecret" id="channelPaySecret" value="{$settings['pay']['channel']['secret']}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">回调网址</label>
-                    <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$channel_cb_url}"></i> {$channel_cb_url}</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">转跳网址</label>
-                    <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$channel_forward_url}"></i> {$channel_forward_url}</span>
-                    </div>
-                </div>                
-            </div>
-            {/if}
         </div>
     </div>
     <div class="form-btn">

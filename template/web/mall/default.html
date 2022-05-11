@@ -81,12 +81,6 @@
         <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">积分</a></li>
         <li role="presentation" class="active"><a href="#">商城订单</a></li>     
     {/if}
-    {if \zovye\App::isCustomAliTicketEnabled()}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'aliTicket'));}">天猫拉新</a></li>
-    {/if}
-    {if \zovye\App::isSQMPayEnabled()}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'sqm'));}">省钱码</a></li>
-    {/if}
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款订单</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常订单</a></li>
 </ul>
@@ -108,7 +102,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="status" class="col-md-2 control-label">订单状态</label>
+                    <label class="col-md-2 control-label">订单状态</label>
                     <div class="col-md-8">
                         <select name="status" style="width:8em">
                             <option value="-1" {if $s_status === -1 }selected="selected"{/if}>全部</option>

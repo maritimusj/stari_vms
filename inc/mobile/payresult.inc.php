@@ -79,11 +79,7 @@ if ($op == 'default') {
         'raw' => request::raw(),
     ]);
 
-    if ($_GET['from'] == 'channel') {
-        $res = Pay::notifyChannel(request::json());
-    } else {
-        $res = Pay::notify($_GET['from'], request::raw()); 
-    }
+    $res = Pay::notify($_GET['from'], request::raw());
 
     exit($res);
 }

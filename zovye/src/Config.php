@@ -14,22 +14,6 @@ namespace zovye;
 class Config
 {
     /**
-     * 天猫拉新相关配置
-     * @param $key
-     * @param null $v
-     * @param bool $update
-     * @return mixed
-     */
-    public static function aliTicket($key, $v = null, bool $update = false)
-    {
-        if ($update) {
-            return updateGlobalConfig('ali_ticket', $key, $v);
-        }
-
-        return globalConfig('ali_ticket', $key, $v);
-    }
-
-    /**
      * 代理商相关配置
      * @param $key
      * @param null $v

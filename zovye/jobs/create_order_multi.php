@@ -261,14 +261,6 @@ function createOrder(string $order_no, deviceModelObj $device, userModelObj $use
         $order_data['extra']['voucher'] = [
             'id' => $voucher->getId(),
         ];
-    } else {
-        $pay_type = getArray($order_data, 'extra.payResult.type');
-        switch ($pay_type) {
-            case Pay::SQM:
-                $order_data['src'] = Order::SQM;
-                break;
-            default:
-        }
     }
 
     $agent = $device->getAgent();

@@ -170,25 +170,9 @@ const app = new Vue({
             } else {
                 if (!this.buyFlag) {
                     this.buyFlag = true;
-                    if(zovye_fn.channelPay) {
-                        this.channelPay(item);
-                    } else {
-                        this.wxpay(item);
-                    }
-                }
-            }
-        },
-        channelPay(item) {
-            zovye_fn.channelPay(item.id, item.count,(res) => {
-                if(res.status && res.data && res.data.url) {
-                    this.buyFlag = false;
-                    this.jd.visible = true;
-                    this.jd.url = res.data.url;
-                    this.jd.goods = item;
-                } else {
                     this.wxpay(item);
                 }
-            })
+            }
         },
         wxpay(item) {
             const data = {

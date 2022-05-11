@@ -905,28 +905,6 @@ HTML;
             throw new RuntimeException('保存数据失败！');
         }
 
-        //保存其它广告需要的配置
-        if (App::isCustomAliTicketEnabled()) {
-            $join = request::bool('JoinAliTicket');
-            $device->updateSettings('aliTicket', [
-                'join' => $join,
-                'province' => request::trim('aliTicketArea.province'),
-                'city' => request::trim('aliTicketArea.city'),
-                'district' => request::trim('aliTicketArea.district'),
-                'name' => $device->getName(),
-                'addressDetail' => request::trim('aliTicketAddress'),
-                'floor' => request::trim('aliTicketFloor'),
-                'firstScene' => request::trim('aliTicketFirstScene'),
-                'secondScene' => request::trim('aliTicketSecondScene'),
-                'deviceType' => request::trim('aliTicketDeviceType'),
-            ]);
-            if ($join) {
-                AliTicket::registerDevice($device);
-            } else {
-                AliTicket::unregisterDevice($device);
-            }
-        }
-
         if (App::isZJBaoEnabled()) {
             $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
         }
@@ -2425,32 +2403,6 @@ HTML;
         }
         echo json_encode($events);
     }
-} elseif ($op == 'aliTicket') {
-
-    $result = [];
-
-    $id = request::int('id');
-    if ($id > 0) {
-        $device = Device::get($id);
-        if (empty($device)) {
-            JSON::fail('找不到这个设备！');
-        }
-
-        $result['config'] = $device->settings('aliTicket', []);
-    }
-
-    $fn = request::trim('fn');
-    if ($fn == 'detail') {
-        $result['device_types'] = AliTicket::getDeviceTypes();
-        $result['scenes'] = AliTicket::getSceneList();
-        if (isset($device) && $result['config']['join']) {
-            $status = AliTicket::getDeviceJoinStatus($device);
-            $result['status'] = is_error($status) ? 0 : 1;
-            $result['error'] = is_error($status) ? $status['message'] : '';
-        }
-    }
-
-    JSON::success($result);
 } elseif ($op == 'qrcode_download') {
 
     //简单的二维码导出功能

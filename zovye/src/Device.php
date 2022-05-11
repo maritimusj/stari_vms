@@ -640,7 +640,6 @@ class Device extends State
         $device->remove('assigned');
         $device->remove('weight');
         $device->remove('last');
-        $device->remove('aliTicket');
         $device->remove('zjbao');
         $device->remove('wx9se');
 

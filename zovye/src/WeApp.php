@@ -343,13 +343,6 @@ JSCODE;
 
         if (App::isAliUser()) {
             $tpl['accounts'] = [];
-            //天猫拉新活动
-            if (App::isCustomAliTicketEnabled()) {
-                $result = AliTicket::fetchAsAccount($user, $device, true);
-                if (!is_error($result)) {
-                    $tpl['accounts'][] = $result;
-                }
-            }
         } else {
             if (Helper::needsTplAccountsData($device)) {
                 $last_account = $user->getLastActiveAccount();
@@ -547,18 +540,6 @@ zovye_fn.chooseGoods = function(goods, num, cb) {
 
 JSCODE;
         }
-        if (!App::isAliUser() && App::isChannelPayEnabled()) {
-            $pay_url = Util::murl('channel', ['device' => $device->getShadowId()]);
-            $tpl['js']['code'] .= <<<JSCODE
-\r\nzovye_fn.channelPay = function(goods, num, cb) {
-    $.get("$pay_url", {goods, num}).then(function(res){
-        if (typeof cb === 'function') {
-            cb(res);
-        }
-    });
-}
-JSCODE;
-        }
         if (App::isDonatePayEnabled()) {
             $donate_url = Util::murl('donate', ['device' => $device->getShadowId()]);
             $tpl['js']['code'] .= <<<JSCODE
@@ -642,11 +623,6 @@ JSCODE;
         }
 
         $tpl['js']['code'] .= "\r\n</script>";
-
-        if (App::isSQMPayEnabled()) {
-            $js = htmlspecialchars_decode(SQM::getJs(), ENT_QUOTES);
-            $tpl['js']['code'] .= "\r\n$js\r\n";
-        }
 
         $file = Theme::getThemeFile($device, 'device');
         $this->showTemplate($file, ['tpl' => $tpl]);

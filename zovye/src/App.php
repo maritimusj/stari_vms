@@ -496,30 +496,11 @@ class App
         return !empty($_SESSION['douyin_user_id']);
     }
 
-    public static function isChannelPayEnabled(): bool
-    {
-        return onceCall(function () {
-            return boolval(settings('custom.channelPay.enabled'));
-        });
-    }
-
-    public static function isSQMPayEnabled(): bool
-    {
-        return onceCall(function () {
-            return boolval(settings('custom.SQMPay.enabled'));
-        });
-    }
-
     public static function isCustomWxAppEnabled(): bool
     {
         return onceCall(function () {
             return boolval(settings('agent.wx.app.enabled'));
         });
-    }
-
-    public static function isCustomAliTicketEnabled(): bool
-    {
-        return boolval(settings('custom.aliTicket.enabled'));
     }
 
     public static function getDefaultDeviceType(): ?device_typesModelObj

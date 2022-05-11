@@ -150,7 +150,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
-        $settings['custom']['aliTicket']['enabled'] = request::bool('aliTicket') ? 1 : 0;
         $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
@@ -239,8 +238,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             setArray($settings, 'accounts.lastupdate', '' . microtime(true));
         }
 
-        $settings['custom']['channelPay']['enabled'] = request::bool('channelPay') ? 1 : 0;
-        $settings['custom']['SQMPay']['enabled'] = request::bool('SQMPay') ? 1 : 0;
         $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;
         $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;
         $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
@@ -460,31 +457,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             Config::balance('order.commission.val', (int)(request::float('balanceOrderPrice', 0, 2) * 100), true);
         }
 
-    } elseif ($save_type == 'advs') {
-
-        if ($settings['custom']['SQMPay']['enabled']) {
-            $settings['custom']['SQMPay']['appSecret'] = request::trim('appSecret');
-            $settings['custom']['SQMPay']['js'] = request::str('js');
-
-            $settings['custom']['SQMPay']['goodsNum'] = request::int('goodsNum', 1);
-            if (empty($settings['custom']['SQMPay']['goodsNum'])) {
-                $settings['custom']['SQMPay']['goodsNum'] = 1;
-            }
-            $settings['custom']['SQMPay']['bonus'] = max(0, request::float('bonus', 0, 2)) * 100;
-        }
-
-        if ($settings['custom']['aliTicket']['enabled']) {
-            $settings['custom']['aliTicket']['key'] = request::trim('aliTicketAppKey');
-            $settings['custom']['aliTicket']['secret'] = request::trim('aliTicketAppSecret');
-            $settings['custom']['aliTicket']['goodsNum'] = request::int('aliTicketGoodsNum', 1);
-            if (empty($settings['custom']['aliTicket']['goodsNum'])) {
-                $settings['custom']['aliTicket']['goodsNum'] = 1;
-            }
-            $settings['custom']['aliTicket']['bonus'] = max(0, request::float('aliTicketBonus', 0, 2)) * 100;
-            $settings['custom']['aliTicket']['title'] = request::trim('aliTicketTitle');
-            $settings['custom']['aliTicket']['no'] = request::int('aliTicketNo');
-        }
-
     } elseif ($save_type == 'wxapp') {
 
         if (App::isBalanceEnabled()) {
@@ -699,23 +671,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['alixapp']['pubkey'] = request::trim('alixapp_pubkey');
         $settings['alixapp']['prikey'] = request::trim('alixapp_prikey');
 
-        $settings['pay']['channel'] = [
-            'key' => request::trim('channelPayKey'),
-            'secret' => request::trim('channelPaySecret'),
-        ];
-
-        if (!isEmptyArray($settings['pay']['channel'])) {
-            if (false === Util::createApiRedirectFile('payment/channel.php', 'payresult', [
-                    'headers' => [
-                        'HTTP_USER_AGENT' => 'channel_notify',
-                    ],
-                    'op' => 'notify',
-                    'from' => 'channel',
-                ])) {
-                Util::itoast('创建阿旗（京东）支付入口文件失败！');
-            }
-        }
-
         if ($settings['pay']['SQB']['enable']) {
             $settings['pay']['SQB']['wx'] = request::bool('SQB_weixin');
             $settings['pay']['SQB']['ali'] = request::bool('SQB_ali');
@@ -813,7 +768,7 @@ $tpl_data['navs'] = [
     'wxapp' => '小程序',
     'commission' => '佣金',
     'balance' => '积分',
-    'advs' => '广告',
+    //'advs' => '广告',
     'account' => '任务',
     'notice' => '通知',
     'payment' => '支付',
@@ -823,10 +778,6 @@ $tpl_data['navs'] = [
 
 if (!App::isBalanceEnabled()) {
     unset($tpl_data['navs']['balance']);
-}
-
-if (!$settings['custom']['SQMPay']['enabled']) {
-    unset($tpl_data['navs']['advs']);
 }
 
 if (!$settings['agent']['wx']['app']['enabled'] && !App::isBalanceEnabled()) {
@@ -1036,14 +987,6 @@ if ($op == 'account') {
         }        
     }
 
-} elseif ($op == 'advs') {
-
-    if ($settings['custom']['SQMPay']['enabled']) {
-        $tpl_data['cbURL'] = SQM::getCallbackUrl();
-    }
-
-    $tpl_data['aliTicketURL'] = AliTicket::getCallbackUrl();
-
 } elseif ($op == 'notice') {
 
     if ($settings['notice']['reviewAdminUserId']) {
@@ -1079,18 +1022,6 @@ if ($op == 'account') {
     $settings['commission']['withdraw']['max'] = $settings['commission']['withdraw']['max'] / 100;
 
     $tpl_data['withdraw_url'] = Util::murl('withdraw');
-
-} elseif ($op == 'payment') {
-
-    $channel_cb_url = _W('siteroot');
-    $path = 'addons/' . APP_NAME . '/';
-
-    if (mb_strpos($channel_cb_url, $path) === false) {
-        $channel_cb_url .= $path;
-    }
-
-    $tpl_data['channel_cb_url'] = $channel_cb_url . 'payment/channel.php';
-    $tpl_data['channel_forward_url'] = Util::murl('channel', ['op' => 'result']);
 
 } elseif ($op == 'misc') {
 

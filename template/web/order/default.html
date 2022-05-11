@@ -45,20 +45,6 @@
         <li role="presentation"><a href="{php echo $this->createWebUrl('mall');}">商城订单</a></li>
         {/if}        
     {/if}
-    {if \zovye\App::isCustomAliTicketEnabled()}
-        {if $s_way=='aliTicket'}
-        <li role="presentation" class="active"><a href="#">天猫拉新</a></li>
-        {else}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'aliTicket'));}">天猫拉新</a></li>
-        {/if}
-    {/if}
-    {if \zovye\App::isSQMPayEnabled()}
-    {if $s_way=='sqm'}
-    <li role="presentation" class="active"><a href="#">省钱码</a></li>
-    {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'sqm'));}">省钱码</a></li>
-    {/if}
-    {/if}
     {if $s_way=='refund'}
     <li role="presentation" class="active"><a href="#">退款订单</a></li>
     {else}

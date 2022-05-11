@@ -10,6 +10,7 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use ali\aop\request\AlipayUserInfoShareRequest;
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use QRcode;
@@ -689,11 +690,11 @@ include './index.php';
         $sc_name = $account->getScname();
 
         if ($sc_name == Schema::DAY) {
-            $time = strtotime('today 00:00');
+            $time = new DateTimeImmutable('00:00');
         } elseif ($sc_name == Schema::WEEK) {
-            $time = date('D') == 'Mon' ? strtotime('today 00:00') : strtotime('last Mon 00:00');
+            $time = date('D') == 'Mon' ? new DateTimeImmutable('00:00') : new DateTimeImmutable('last Mon 00:00');
         } elseif ($sc_name == Schema::MONTH) {
-            $time = strtotime('first day of this month 00:00');
+            $time = new DateTimeImmutable('first day of this month 00:00');
         } else {
             return error(State::ERROR, '任务设置不正确！');
         }
@@ -708,8 +709,7 @@ include './index.php';
             ];
 
             if (self::checkLimit($account, $user, [
-                'createtime >=' => $time,
-                'createtime <' => time(),
+                'createtime >=' => $time->getTimestamp(),
             ], $count)) {
                 return error(State::ERROR, $desc[$sc_name]);
             }
@@ -719,8 +719,7 @@ include './index.php';
         $sc_count = $account->getSccount();
         if ($sc_count > 0) {
             if (self::checkLimit($account, null, [
-                'createtime >=' => $time,
-                'createtime <' => time(),
+                'createtime >=' => $time->getTimestamp(),
             ], $sc_count)) {
                 return error(State::ERROR, '任务免费额度已用完！');
             }

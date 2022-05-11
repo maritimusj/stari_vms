@@ -1698,15 +1698,8 @@ class agent
         //one month
         $user = agent::getUserByGUID(request('guid'));
         if ($user) {
-
-            $dt = new DateTime('next day');
-            $end_date = $dt->format('Y-m-d 00:00:00');
-            $dt->modify('-1 month');
-            $start_date = $dt->format('Y-m-d 23:59:59');
-
             $condition['agent_id'] = $user->getId();
-            $condition['createtime >='] = strtotime($start_date);
-            $condition['createtime <='] = strtotime($end_date);
+            $condition['createtime >='] = (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp();
 
             $data = [];
             $total = [

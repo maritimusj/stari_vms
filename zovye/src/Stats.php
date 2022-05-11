@@ -629,17 +629,16 @@ class Stats
      */
     public static function repair($obj, $day = null): bool
     {
-        if (empty($day)) {
-            $day = time();
-        } elseif (is_string($day)) {
-            $day = strtotime($day);
-        } elseif ($day instanceof DateTimeInterface) {
-            $day = $day->getTimestamp();
-        }
-
         try {
-            $begin = new DateTimeImmutable(date('Y-m-d', $day));
+            if (empty($day)) {
+                $day = new DateTimeImmutable();
+            } elseif (is_string($day)) {
+                $day = new DateTimeImmutable($day);
+            } elseif ($day instanceof DateTimeInterface) {
+                $day = new DateTimeImmutable($day);
+            }
 
+            $begin = $day->modify('00:00');
             $end = $begin->modify('+1 day');
 
             $query = Order::query([

@@ -8,6 +8,7 @@
 namespace zovye\model;
 
 use DateTime;
+use DateTimeImmutable;
 use zovye\Account;
 use zovye\Balance;
 use zovye\Locker;
@@ -526,8 +527,8 @@ class userModelObj extends modelObj
         return Util::expiredCallUtil("daily:sign_in:{$this->getId()}", new DateTime('next day 00:00'), function () {
             if ($this->getBalance()->log()->where([
                     'src' => Balance::SIGN_IN_BONUS,
-                    'createtime >=' => strtotime('today 00:00'),
-                    'createtime <' => strtotime('next day 00:00'),
+                    'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp(),
+                    'createtime <' => (new DateTimeImmutable('next day 00:00'))->getTimestamp(),
                 ])->count() > 0) {
                 return true;
             }
@@ -599,7 +600,7 @@ class userModelObj extends modelObj
      */
     public function getTodayFreeTotal(int $goods_id = 0): int
     {
-        return $this->getOrderGoodsTotal(strtotime('today'), 0, Order::FREE_STR, $goods_id);
+        return $this->getOrderGoodsTotal((new DateTimeImmutable('00:00'))->getTimestamp(), 0, Order::FREE_STR, $goods_id);
     }
 
     /**
@@ -621,7 +622,7 @@ class userModelObj extends modelObj
      */
     public function getTodayPayTotal(int $goods_id = 0): int
     {
-        return $this->getOrderGoodsTotal(strtotime('today'), 0, Order::PAY_STR, $goods_id);
+        return $this->getOrderGoodsTotal((new DateTimeImmutable('00:00'))->getTimestamp(), 0, Order::PAY_STR, $goods_id);
     }
 
     public function getPayTotal(int $goods_id = 0): int

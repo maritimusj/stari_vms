@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use DateTimeImmutable;
 use zovye\Account;
 use zovye\App;
 use zovye\model\commission_balanceModelObj;
@@ -67,7 +68,7 @@ class balance
                     ''
                 );
                 //今日收入
-                $condition['createtime >='] = strtotime('today');
+                $condition['createtime >='] = (new DateTimeImmutable('00:00'))->getTimestamp();
                 $result['balance']['today'] = number_format(
                     CommissionBalance::query($condition)->get('sum(x_val)') / 100,
                     2,
@@ -75,7 +76,7 @@ class balance
                     ''
                 );
                 //本月收入
-                $condition['createtime >='] = strtotime(date('Y-m'));
+                $condition['createtime >='] = (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp();
                 $result['balance']['month'] = number_format(
                     CommissionBalance::query($condition)->get('sum(x_val)') / 100,
                     2,
@@ -120,7 +121,7 @@ class balance
                 [
                     'src' => CommissionBalance::WITHDRAW,
                     'openid' => $user->getOpenid(),
-                    'createtime >=' => strtotime(date('Y-m')),
+                    'createtime >=' => (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp(),
                 ]
             )->count();
 

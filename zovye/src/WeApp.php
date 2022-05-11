@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use DateTimeImmutable;
 use Exception;
 use we7\template;
 use zovye\base\modelObj;
@@ -586,7 +587,7 @@ JSCODE;
                 'device_id' => $device->getId(),
                 'result_code <>' => 0,
                 'src' => Order::ACCOUNT,
-                'createtime >' => strtotime("-{$retry['last']} minute"),
+                'createtime >' => (new DateTimeImmutable("-{$retry['last']} minute"))->getTimestamp(),
             ])->orderBy('id desc')->findOne();
             if ($order) {
                 if (empty($retry['max']) || $order->getExtraData('retry.total', 0) < $retry['max']) {

@@ -7,6 +7,7 @@
 namespace zovye\api\wx;
 
 use DateTime;
+use DateTimeImmutable;
 use Exception;
 use stdClass;
 use zovye\App;
@@ -565,11 +566,11 @@ class keeper
         }
 
         $result['stats']['today'] = (int)m('replenish')->where(
-            We7::uniacid(['keeper_id' => $keeper->getId(), 'createtime >=' => strtotime('today')])
+            We7::uniacid(['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp()])
         )->get('sum(num)');
 
         $result['stats']['this_month'] = (int)m('replenish')->where(
-            We7::uniacid(['keeper_id' => $keeper->getId(), 'createtime >=' => strtotime(date('Y-m-01 00:00:00'))])
+            We7::uniacid(['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp()])
         )->get('sum(num)');
 
         $result['stats']['all'] = (int)m('replenish')->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->get(

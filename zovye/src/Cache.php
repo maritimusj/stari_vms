@@ -7,6 +7,7 @@
 namespace zovye;
 
 use Closure;
+use DateTimeImmutable;
 use Exception;
 use zovye\base\modelObj;
 use zovye\model\cacheModelObj;
@@ -50,7 +51,7 @@ class Cache
     public static function ResultExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['expiration_time'] = is_int($time) ? $time : strtotime($time);
+            $data['expiration_time'] = is_int($time) ? $time : (new DateTimeImmutable($time))->getTimestamp();
         };
     }
 
@@ -64,7 +65,7 @@ class Cache
     public static function ErrorExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
-            $data['error_expiration'] = is_int($time) ? $time : strtotime($time);
+            $data['error_expiration'] = is_int($time) ? $time : (new DateTimeImmutable($time))->getTimestamp();
         };
     }
 

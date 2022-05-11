@@ -34,6 +34,7 @@ $tpl_data = [
 if ($op == 'list') {
 
     JSON::result(Device::search());
+    
 } else if ($op == 'default') {
 
     if (request::is_ajax()) {

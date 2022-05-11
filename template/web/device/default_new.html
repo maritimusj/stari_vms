@@ -499,12 +499,12 @@
                         </th>
                         <th>
                         <div>出货数量</div>
-                            <div><span data-orderby="d_total" {if $orderby=='d_total'}class="fa {$order}"{/if}>今日</span>
+                            <div><span {if $orderby=='d_total'}class="fa {$order}"{/if}>今日</span>
                             /
-                            <span data-orderby="m_total" {if $orderby=='m_total'}class="fa {$order}"{/if}>本月</span></div>
+                            <span {if $orderby=='m_total'}class="fa {$order}"{/if}>本月</span></div>
                         </th>
                         <th>
-                            <div data-orderby="groupId" {if $orderby=='groupId'}class="fa {$order}"{/if}>分组</div>
+                            <div {if $orderby=='groupId'}class="fa {$order}"{/if}>分组</div>
                         </th>
                         <th style="width: 60px;">
                             标签
@@ -657,7 +657,7 @@
                                                 <div>
                                                     <span class="title">ICCID：</span>
                                                     <span>{{o.ICCID ? o.ICCID : 'n/a'}}
-                                                        {if $gate['build'] >= '20211204'}
+                                                        {if $gate['build'] >= 20211204}
                                                         <span class="card_status" v-if="o.ICCID" :data-uid="o.ICCID">
                                                             <i class="fa fa-info-circle" title="查询流量卡状态" data-op="viewCardStatus"></i>
                                                         </span>

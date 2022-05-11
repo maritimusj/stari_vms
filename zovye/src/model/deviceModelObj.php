@@ -2509,22 +2509,21 @@ class deviceModelObj extends modelObj
             $quota = $goods->getQuota();
             
             if (!isEmptyArray($quota)) {
-                if ($goods->allowFree() || (Balance::isFreeOrder() && $goods->allowExchange()) || (Balance::isFreeOrder() && $goods->allowDelivery())) {
+                if ($goods->allowFree() || (($goods->allowExchange() || $goods->allowDelivery()) && Balance::isFreeOrder())) {
                     $day_limit = $quota['free']['day'];
-                    $all_limit = $quota['free']['all'];
-
-                    if (!empty($day_limit)) {
+                    if ($day_limit > 0) {
                         $day_total = $user->getTodayFreeTotal($goods->getId());
-                        if ($day_limit <= $day_total) {
+                        if ($day_total >= $day_limit) {
                             self::disableFree($goodsData);
                         } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
                             $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                         }
                     }
 
-                    if (!empty($all_limit)) {
+                    $all_limit = $quota['free']['all'];
+                    if ($all_limit > 0) {
                         $all_total = $user->getFreeTotal($goods->getId());
-                        if ($all_limit <= $all_total) {
+                        if ($all_total >= $all_limit) {
                             self::disableFree($goodsData);
                         } elseif (!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) {
                             $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
@@ -2534,20 +2533,19 @@ class deviceModelObj extends modelObj
                 
                 if ($goods->allowPay()) {
                     $day_limit = $quota['pay']['day'];
-                    $all_limit = $quota['pay']['all'];
-                    
-                    if (!empty($day_limit)) {
+                    if ($day_limit > 0) {
                         $day_total = $user->getTodayPayTotal($goods->getId());
-                        if ($day_limit <= $day_total) {
+                        if ($day_total >= $day_limit) {
                             self::disablePay($goodsData);
                         } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
                             $goodsData['num'] = min($goodsData['num'], $day_limit - $day_total);
                         }
                     }
 
-                    if (!empty($all_limit)) {
+                    $all_limit = $quota['pay']['all'];
+                    if ($all_limit > 0) {
                         $all_total = $user->getPayTotal($goods->getId());
-                        if ($all_limit <= $all_total) {
+                        if ($all_total >= $all_limit) {
                             self::disablePay($goodsData);
                         } elseif (!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) {
                             $goodsData['num'] = min($goodsData['num'], $all_limit - $all_total);
@@ -2597,15 +2595,15 @@ class deviceModelObj extends modelObj
                 }
 
                 $key = "goods{$goods_data['id']}";
-                if ($result['goods'][$key]) {
-                    $result['goods'][$key]['num'] += intval($goods_data['num']);
+                if ($result[$key]) {
+                    $result[$key]['num'] += intval($goods_data['num']);
                     //如果相同商品设置了不同价格，则使用更高的价格
-                    if ($result['goods'][$key]['price'] < $goods_data['price']) {
-                        $result['goods'][$key]['price'] = $goods_data['price'];
-                        $result['goods'][$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
+                    if ($result[$key]['price'] < $goods_data['price']) {
+                        $result[$key]['price'] = $goods_data['price'];
+                        $result[$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
                     }
                 } else {
-                    $result['goods'][$key] = [
+                    $data = [
                         'id' => $goods_data['id'],
                         'name' => $goods_data['name'],
                         'img' => $goods_data['img'],
@@ -2619,23 +2617,24 @@ class deviceModelObj extends modelObj
                     ];
 
                     if (!empty($user)) {
-                        $discount = User::getUserDiscount($user, $goods_data);
-                        $result['goods'][$key]['discount'] = $discount;
-                        $result['goods'][$key]['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
-
-                        self::checkGoodsQuota($user, $result['goods'][$key], $params);
-                        if (!$checkFN($result['goods'][$key])) {
-                            unset($result['goods'][$key]);
+                        self::checkGoodsQuota($user, $data, $params);
+                        if (!$checkFN($data)) {
                             continue;
                         }
+
+                        $discount = User::getUserDiscount($user, $goods_data);
+                        $data['discount'] = $discount;
+                        $data['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
                     }
+
+                    $result[$key] = $data;
                 }
                 if (isset($goods_data['balance'])) {
-                    $result['goods'][$key]['balance'] = (int)$goods_data['balance'];
+                    $result[$key]['balance'] = (int)$goods_data['balance'];
                 }
             }
 
-            $result = array_values((array)$result['goods']);
+            $result = array_values($result);
         }
 
         return $result;

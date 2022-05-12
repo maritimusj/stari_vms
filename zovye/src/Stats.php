@@ -972,9 +972,10 @@ class Stats
 
     public static function getUserMonthCommissionStatsOfYear(userModelObj $user, $year): array
     {
+        $result = [[], []];
         $first = CommissionBalance::getFirstCommissionBalance($user);
         if (empty($first)) {
-            return [];
+            return $result;
         }
 
         $first_datetime = new DateTime("@{$first->getCreatetime()}");
@@ -987,14 +988,14 @@ class Stats
             } elseif ($year instanceof DateTimeInterface) {
                 $time = new DateTime($year->format('Y-01-01 00:00'));
             } else {
-                return [];
+                return $result;
             }
 
             if ($time < $first_datetime) {
                 if ($time->format('Y') == $first_datetime->format('Y')) {
                     $time = $first_datetime;
                 } else {
-                    return [];
+                    return $result;
                 }
             }
 
@@ -1005,7 +1006,7 @@ class Stats
             $end->modify('first day of jan next year 00:00');
 
         } catch (Exception $e) {
-            return [];
+            return $result;
         }
 
         $now = new DateTime();
@@ -1053,8 +1054,11 @@ class Stats
         }
 
         krsort($data);
+
+        $result[0] = $years;
+        $result[1] = $data;
         
-        return array($years, $data);
+        return $result;
     }
 
     public static function getMonthCommissionStatsData(userModelObj $user, $month): array

@@ -366,7 +366,7 @@
                                     v-if="!currentPackage">
                                         <i class="fa fa-gift"></i> 创建套餐
                                     </button> 
-                                    <button class="btn btn-success" 
+                                    <button class="btn btn-danger" 
                                     @click.prevent="createPackage" 
                                     :disabled="loading || currentPackage.list.length === 0"
                                     v-if="currentPackage"
@@ -849,10 +849,12 @@
                             'content': `功能设置`,
                         },                        
                         {/if}
+                        {if $app}
                         {
                             'op': 'app',
                             'content': `APP设置`,
                         },
+                        {/if}
                         {if $disp}
                         {
                             'op': 'disp',
@@ -917,11 +919,11 @@
                 }
             },
             created() {
-                            {if $id}
-                                const nav = this.navs.shift();
-                                this.navs = [];
-                                this.push(nav);
-                            {/if}
+                {if !$id}
+                    const nav = this.navs.shift();
+                    this.navs = [];
+                    this.navs.push(nav);
+                {/if}
             },
             mounted() {
                 if (this.deviceId > 0) {                    

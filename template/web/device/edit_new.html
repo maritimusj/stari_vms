@@ -697,13 +697,13 @@
                     <div class="form-group">
                         <label for="volume" class="col-md-2 control-label">重启时间</label>
                         <div class="col-md-4">
-                            {php echo tpl_form_field_clock('start', $extra['schedule']['screen']['on'])}
+                            {php echo tpl_form_field_clock('start', $extra['schedule']['screen']['on'] ?? '00:00')}
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="volume" class="col-md-2 control-label">关闭时间</label>
                         <div class="col-md-4">
-                            {php echo tpl_form_field_clock('end', $extra['schedule']['screen']['off'])}
+                            {php echo tpl_form_field_clock('end', $extra['schedule']['screen']['off'] ?? '00:00')}
                         </div>
                     </div>
                 </div>

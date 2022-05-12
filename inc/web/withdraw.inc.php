@@ -340,7 +340,7 @@ if ($op == 'withdraw_pay') {
         $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
         $e_date->modify('next day');
     } else {
-        $e_date = new DateTime('next day');
+        $e_date = new DateTime('next day 00:00');
     }
 
     $query->where([

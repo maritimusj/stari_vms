@@ -24,7 +24,7 @@ class Statistics
             } elseif (is_string($month)) {
                 $date = new DateTime($month);
             } elseif ($month instanceof DateTimeInterface) {
-                $date = DateTime::createFromFormat('Y-m-d', $month->format('Y-m-d'));
+                $date = new DateTime($month->format('Y-m-d'));
             }
         } catch (Exception $e) {
             return null;

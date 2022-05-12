@@ -1258,6 +1258,22 @@ class deviceModelObj extends modelObj
             'advs' => $advs,
         ];
 
+        //自动开关机
+        $config = $this->settings('extra.schedule.screen', []);
+        if ($config['enabled']) {
+            $on = $config['on'] ?? '';
+            $off = $config['off'] ?? '';
+            $cfg['schedule'] = [
+                'enabled' => true,
+                'on' => $on,
+                'off' => $off,
+            ];
+        } else {
+            $cfg['schedule'] = [
+                'enabled' => false,
+            ];
+        }
+
         $qrcode = $this->getAccountQRCode();
 
         if ($qrcode) {

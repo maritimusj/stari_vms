@@ -146,6 +146,13 @@
     span.unReg {
         color: gray;
     }
+    .row.clock {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        align-content: stretch;
+    }
     [v-cloak] {
         display: none;
     }
@@ -649,8 +656,7 @@
                     </div>
                 </div>
                 {if $device && $device->getAppId()}
-                <div class="seg" id="special">
-                    <div class="title">APP设置</div>
+                <div v-show="active === 'app'">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">动态二维码</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -673,9 +679,36 @@
                     </div>
                 </div>
                 {/if}
+                <div v-show="active === 'schedule'">
+                    <div class="form-group">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">是否启用</label>
+                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                            <label for="screenSchedule1" class="radio-inline">
+                                <input name="screenSchedule" id="screenSchedule1" type="radio" value="1" {if $extra['schedule']['screen']['enabled'] == 1}checked="checked"{/if} title="开启防刷功能后，二维码领取成功后动刷新！">
+                                启用
+                            </label>
+                            <label for="screenSchedule0" class="radio-inline">
+                                <input name="screenSchedule" id="screenSchedule0" type="radio" value="0"  {if $extra['schedule']['screen']['enabled'] == 0}checked="checked"{/if} >
+                                关闭
+                            </label>
+                            <span class="help-block">* 启用后，会在指定时间自动关闭屏幕或重启设备</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="volume" class="col-md-2 control-label">重启时间</label>
+                        <div class="col-md-4">
+                            {php echo tpl_form_field_clock('start', $extra['schedule']['screen']['on'])}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="volume" class="col-md-2 control-label">关闭时间</label>
+                        <div class="col-md-4">
+                            {php echo tpl_form_field_clock('end', $extra['schedule']['screen']['off'])}
+                        </div>
+                    </div>
+                </div>
                 {if $disp}
-                <div class="seg" id="special">
-                    <div class="title">小屏设置</div>
+                <div v-show="active === 'disp'">
                     <div class="form-group">
                         <label for="first" class="col-md-2 control-label">第一行文字</label>
                         <div class="col-md-10">
@@ -816,6 +849,20 @@
                             'content': `功能设置`,
                         },                        
                         {/if}
+                        {
+                            'op': 'app',
+                            'content': `APP设置`,
+                        },
+                        {if $disp}
+                        {
+                            'op': 'disp',
+                            'content': `小屏设置`,
+                        }, 
+                        {/if}                       
+                        {
+                            'op': 'schedule',
+                            'content': `定时任务`,
+                        },
                         {
                             'op': 'extra',
                             'content': `高级设置`,

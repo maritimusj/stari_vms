@@ -675,6 +675,13 @@ HTML;
             ],
             'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
             'theme' => request::str('theme'),
+            'schedule' => [
+                'screen' => [
+                    'enabled' => request::bool('screenSchedule') ? 1 : 0,
+                    'on' => request::str('start'),
+                    'off' => request::str('end'),
+                ]
+            ]
         ];
 
         if (App::isDeviceWithDoorEnabled()) {

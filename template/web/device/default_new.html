@@ -490,33 +490,33 @@
                             <i :class="{'fa':true, 'fa-sign-out': showSelectInputCtrl, 'fa-square-o':!showSelectInputCtrl}" title="选择" @click="showSelectInputCtrl=!showSelectInputCtrl" v-else></i>
                         </th>
                         <th>                    
-                            <div data-orderby="imei" {if $orderby=='imei'}class="fa {$order}"{/if}>设备名称</div>
+                            <div data-orderby="imei" @click="getListBy('imei')" :class="['fa', sort.by === 'imei' ? sort.dir: '']">设备名称</div>
                         </th>
                         <th>
-                            <div data-orderby="agentId" {if $orderby=='agentId'}class="fa {$order}"{/if}>所属代理商</div>
+                            <div data-orderby="agentId" @click="getListBy('agent_id')" :class="['fa', sort.by === 'agent_id' ? sort.dir: '']">所属代理商</div>
                         </th>
                         <th style="min-width:3em;">
                         </th>
                         <th>
                         <div>出货数量</div>
-                            <div><span {if $orderby=='d_total'}class="fa {$order}"{/if}>今日</span>
+                            <div><span>今日</span>
                             /
-                            <span {if $orderby=='m_total'}class="fa {$order}"{/if}>本月</span></div>
+                            <span>本月</span></div>
                         </th>
                         <th>
-                            <div {if $orderby=='groupId'}class="fa {$order}"{/if}>分组</div>
+                            <div data-orderby="groupId"  @click="getListBy('group_id')" :class="['fa', sort.by === 'group_id' ? sort.dir: '']">分组</div>
                         </th>
                         <th style="width: 60px;">
                             标签
                         </th>
                         <th class="center">
-                            设备状态
+                            <div data-orderby="online" @click="getListBy('mcb_online')" :class="['fa', sort.by === 'mcb_online' ? sort.dir: '']">设备状态</div>
                         </th>
                         <th style="width: 165px;">
                             出货用时
                         </th>
                         <th>
-                            创建时间
+                            <div data-orderby="createtime" @click="getListBy('createtime')" :class="['fa', sort.by === 'createtime' ? sort.dir: '']">创建时间</div>
                         </th>
                         <th>操作</th>
                     </tr>
@@ -657,7 +657,7 @@
                                                 <div>
                                                     <span class="title">ICCID：</span>
                                                     <span>{{o.ICCID ? o.ICCID : 'n/a'}}
-                                                        {if $gate['build'] >= 20211204}
+                                                        {if $gate['build'] >= '20211204'}
                                                         <span class="card_status" v-if="o.ICCID" :data-uid="o.ICCID">
                                                             <i class="fa fa-info-circle" title="查询流量卡状态" data-op="viewCardStatus"></i>
                                                         </span>
@@ -828,5 +828,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20211224002"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20211224003"></script>
 {template 'common/footer'}

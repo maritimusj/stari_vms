@@ -906,8 +906,13 @@ class Device extends State
             ];
 
             $query->page($page, $page_size);
-            $query->orderBy('id desc');
 
+            $sort_by = request::str('by', 'id');
+            $sort_dir = request::str('dir', 'desc');
+            if ($sort_by && $sort_dir) {
+                $query->orderBy("$sort_by $sort_dir");
+            }
+            
             /** @var deviceModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $data = [

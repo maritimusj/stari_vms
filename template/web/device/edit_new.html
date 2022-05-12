@@ -366,7 +366,7 @@
                                     v-if="!currentPackage">
                                         <i class="fa fa-gift"></i> 创建套餐
                                     </button> 
-                                    <button class="btn btn-success" 
+                                    <button class="btn btn-danger" 
                                     @click.prevent="createPackage" 
                                     :disabled="loading || currentPackage.list.length === 0"
                                     v-if="currentPackage"

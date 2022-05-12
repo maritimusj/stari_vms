@@ -400,6 +400,7 @@ if ($op == 'list') {
         }
 
         $tpl_data['disp'] = $device->hasMcbDisp();
+        $tpl_data['app'] = $device->getAppId();
 
         $extra = $device->get('extra');
 
@@ -470,6 +471,7 @@ HTML;
     $tpl_data['from'] = request::str('from', 'base');
     $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice());
     $tpl_data['themes'] = Theme::all();
+
     app()->showTemplate('web/device/edit_new', $tpl_data);
 
 } elseif ($op == 'deviceTestAll') {

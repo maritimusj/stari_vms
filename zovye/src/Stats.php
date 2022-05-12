@@ -1022,6 +1022,8 @@ class Stats
             $first_datetime->modify('next year');
         }
 
+        $now_str = $now->format('Y年m月');
+
         while ($begin < $end) {
             $month_str = $begin->format('Y年m月');
 
@@ -1033,7 +1035,7 @@ class Stats
 
             $params = [];
 
-            if ($month_str == date('Y-m')) {
+            if ($month_str == $now_str) {
                 $params[] = Cache::ResultExpiredAfter(10);
             }
 

@@ -435,17 +435,19 @@ if ($op == 'list') {
     $tpl_data['id'] = $id;
     $tpl_data['device_types'] = $device_types;
 
-    if (App::isMoscaleEnabled()) {
-        $tpl_data['moscaleMachineKey'] = isset($extra) && is_array($extra) ? strval($extra['moscale']['key']) : '';
-        $tpl_data['moscaleLabelList'] = MoscaleAccount::getLabelList();
-        $tpl_data['moscaleAreaListSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['label'] : [];
-        $tpl_data['moscaleRegionData'] = MoscaleAccount::getRegionData();
-        $tpl_data['moscaleRegionSaved'] = isset($extra) && is_array($extra) ? $extra['moscale']['region'] : [];
+    if (isset($device) && App::isMoscaleEnabled() && MoscaleAccount::isAssigned($device)) {
+        $tpl_data['moscale'] = [
+            'MachineKey' => isset($extra) && is_array($extra) ? strval($extra['moscale']['key']) : '',
+            'LabelList' => MoscaleAccount::getLabelList(),
+            'AreaListSaved' => isset($extra) && is_array($extra) ? $extra['moscale']['label'] : [],
+            'RegionData' => MoscaleAccount::getRegionData(),
+            'RegionSaved' => isset($extra) && is_array($extra) ? $extra['moscale']['region'] : [],
+        ];
     }
 
-    if (App::isZJBaoEnabled()) {
+    if (isset($device) && App::isZJBaoEnabled() && ZhiJinBaoAccount::isAssigned($device)) {
         $tpl_data['zjbao'] = [
-            'scene' => isset($device) ? $device->settings('zjbao.scene', '') : '',
+            'scene' => $device->settings('zjbao.scene', ''),
         ];
     }
 

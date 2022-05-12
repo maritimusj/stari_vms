@@ -867,13 +867,13 @@
                             'op': 'extra',
                             'content': `高级设置`,
                         },
-                        {if \zovye\App::isMoscaleEnabled()}
+                        {if $moscale}
                         {
                             'op': 'moscale',
                             'content': `公锤平台设置`,
                         },
                         {/if}
-                        {if \zovye\App::isZeroBonusEnabled()}
+                        {if $zjb}
                         {
                             'op': 'zjb',
                             'content': `纸巾平台宝设置`,
@@ -894,10 +894,10 @@
                     this.change();
                 },
                 currentType(e) {
-                    if (!e || e.id == 0) {
+                    if (!e || e.id === 0) {
                         this.addCargoLane();
                     } else {
-                        if (e && (!e.cargo_lanes || e.cargo_lanes.length == 0)) {
+                        if (e && (!e.cargo_lanes || e.cargo_lanes.length === 0)) {
                             this.addCargoLane();
                         }
                     }
@@ -915,6 +915,13 @@
                 loading() {
                     return this.changing || this.searching || this.creating;
                 }
+            },
+            created() {
+                            {if $id}
+                                const nav = this.navs.shift();
+                                this.navs = [];
+                                this.push(nav);
+                            {/if}
             },
             mounted() {
                 if (this.deviceId > 0) {                    
@@ -1155,11 +1162,11 @@
 
     require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
         moscale.init("#moscale", {
-            moscaleMachineKey: "{$moscaleMachineKey}",
-            label: JSON.parse('{php echo json_encode($moscaleLabelList);}'),
-            savedLabel: JSON.parse('{php echo json_encode($moscaleAreaListSaved);}'),
-            region: JSON.parse('{php echo json_encode($moscaleRegionData);}'),
-            savedRegion: JSON.parse('{php echo json_encode($moscaleRegionSaved);}'),
+            moscaleMachineKey: "{$moscale['MachineKey']}",
+            label: JSON.parse('{php echo json_encode($moscale['LabelList']);}'),
+            savedLabel: JSON.parse('{php echo json_encode($moscale['AreaListSaved']);}'),
+            region: JSON.parse('{php echo json_encode($moscale['RegionData']);}'),
+            savedRegion: JSON.parse('{php echo json_encode($moscale['RegionSaved']);}'),
         })
     })
     {/if}

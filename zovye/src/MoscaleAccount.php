@@ -32,6 +32,15 @@ class MoscaleAccount
         $this->app_secret = strval($app_secret);
     }
 
+    public static function isAssigned(deviceModelObj $device): bool
+    {
+        $acc = Account::findOneFromType(Account::MOSCALE);
+        if (empty($acc)) {
+            return false;
+        }
+        return Util::isAssigned($acc->getAssignData(), $device);
+    }
+
     public static function getUid(): string
     {
         return Account::makeThirdPartyPlatformUID(Account::MOSCALE, Account::MOSCALE_NAME);

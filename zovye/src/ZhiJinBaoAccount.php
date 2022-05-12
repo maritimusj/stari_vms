@@ -37,6 +37,15 @@ class ZhiJinBaoAccount
         return Account::makeThirdPartyPlatformUID(Account::ZJBAO, Account::ZJBAO_NAME);
     }
 
+    public static function isAssigned(deviceModelObj $device): bool
+    {
+        $acc = Account::findOneFromType(Account::ZJBAO);
+        if (empty($acc)) {
+            return false;
+        }
+        return Util::isAssigned($acc->getAssignData(), $device);
+    }
+
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
         $v = [];

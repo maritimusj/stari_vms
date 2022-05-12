@@ -234,7 +234,7 @@ class order
         return \zovye\Order::getExportIDS([
             'agent_openid' => $agent->getOpenid(),
             'account_id' => request::int('accountId'),
-            'device_id' => request::int('deviceId'),
+            'device_id' => request::str('deviceId'),//deviceId is imei
             'last_id' => request::int('lastId'),
             'start' => request::str('start'),
             'end' => request::str('end'),

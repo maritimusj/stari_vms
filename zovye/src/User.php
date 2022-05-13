@@ -197,6 +197,23 @@ class User
         return null;
     }
 
+    public static function getOrCreate($openid, $app = null): ?userModelObj
+    {
+        $user = self::get($openid, true, $app);
+        if ($user) {
+            return $user;
+        }
+
+        $data = [
+            'openid' => $openid,
+        ];
+        if (isset($app)) {
+            $data['app'] = $app;
+        }
+
+        return self::create($data);
+    }
+
     /**
      * @param mixed $condition
      * @return userModelObj|null

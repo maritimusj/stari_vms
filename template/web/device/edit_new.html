@@ -860,11 +860,13 @@
                             'op': 'disp',
                             'content': `小屏设置`,
                         }, 
-                        {/if}                       
+                        {/if}
+                        {if $app}                    
                         {
                             'op': 'schedule',
                             'content': `定时任务`,
                         },
+                        {/if}
                         {
                             'op': 'extra',
                             'content': `高级设置`,

@@ -10,6 +10,8 @@ use Exception;
 use RuntimeException;
 use wx\Platform;
 use zovye\model\accountModelObj;
+use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 
 class WxPlatform
 {
@@ -590,6 +592,36 @@ class WxPlatform
         return [];
     }
 
+    public static function createOrder(deviceModelObj $device, userModelObj $user, accountModelObj  $acc): bool
+    {
+        //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
+        $goods = $device->getGoodsByLane(0);
+        if ($goods && $goods['num'] < 1) {
+            $goods = $device->getGoods($goods['id']);
+        }
+
+        if (empty($goods) || $goods['num'] < 1) {
+            ZovyeException::throwWith('指定的商品库存不足！', -1, $device);
+        }
+
+        Log::debug('wxplatform', [
+            'account' => $acc->format(),
+            'user' => $user->profile(),
+            'device' => $device->profile(),
+        ]);
+
+        $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
+        $order_uid = Order::makeUID($user, $device, $uid);
+
+        return Job::createThirdPartyPlatformOrder([
+            'device' => $device->getId(),
+            'user' => $user->getId(),
+            'account' => $acc->getId(),
+            'orderUID' => $order_uid,
+            'extra' => [],
+        ]);
+    }
+
     public static function open($msg)
     {
         try {
@@ -598,25 +630,16 @@ class WxPlatform
                 throw new RuntimeException('发生错误：' . $res['message']);
             }
 
-            $account_name = $msg['ToUserName'];
-            $acc = Account::findOneFromName($account_name);
-            if (empty($acc)) {
-                throw new RuntimeException('找不到指定的公众号：' . $account_name);
-            }
-
-            //出货时机是用户点击链连后，直接返回推送的消息
-            if (!empty($acc->settings('config.open.timing'))) {
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
-            }
-
-            if ($acc->isSubscriptionAccount() || !$acc->isVerified()) {
-                throw new RuntimeException('订阅号或者未认证服务号无法自动出货，请联系管理员！');
-            }
-
             $event_key = str_replace('qrscene_', '', strval($msg['EventKey']));
             list($prefix, $first, $second) = explode(':', $event_key, 3);
             if ($prefix != App::uid(6)) {
                 return [];
+            }
+
+            $account_name = $msg['ToUserName'];
+            $acc = Account::findOneFromName($account_name);
+            if (empty($acc)) {
+                throw new RuntimeException('找不到指定的公众号：' . $account_name);
             }
 
             $device = Device::get($second);
@@ -627,16 +650,24 @@ class WxPlatform
 
             //如果是来自屏幕二维码
             if ($first == 'device') {
-                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                $user = User::getOrCreate($msg['FromUserName'], User::WX);
+                if (empty($user)) {
+                    throw new RuntimeException('找不到这个用户！');
+                }
+
+                if ($user->isBanned()) {
+                    throw new RuntimeException('用户已被禁用！');
+                }
+
+                $res = Util::checkAvailable($user, $acc, $device, ['ignore_assigned' => true]);
+                if (!is_error($res)) {
+                    self::createOrder($device, $user, $acc);
+                } else {
+                    return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $device->getUrl());
+                }
             }
 
-            //公众号屏幕推广二维码自2021年12月27日后失效
-            if ($first == 'app') {
-                throw new RuntimeException('屏幕公众号二维码功能已失效，请联系管理员！');
-            } else {
-                $user = User::get($first);
-            }
-
+            $user = User::get($first);
             if (empty($user)) {
                 throw new RuntimeException('找不到这个用户！');
             }
@@ -645,32 +676,19 @@ class WxPlatform
                 throw new RuntimeException('用户已被禁用！');
             }
 
-            //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
-            $goods = $device->getGoodsByLane(0);
-            if ($goods && $goods['num'] < 1) {
-                $goods = $device->getGoods($goods['id']);
+            if ($user->getOpenid() != $msg['FromUserName']) {
+                throw new RuntimeException('用户已不匹配！');
             }
 
-            if (empty($goods) || $goods['num'] < 1) {
-                ZovyeException::throwWith('指定的商品库存不足！', -1, $device);
+            //出货时机是用户点击链连后，直接返回推送的消息
+            if (!empty($acc->settings('config.open.timing'))) {
+
+                $user->setLastActiveDevice($device);
+
+                return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
             }
 
-            Log::debug('wxplatform', [
-                'account' => $acc->format(),
-                'user' => $user->profile(),
-                'device' => $device->profile(),
-            ]);
-
-            $uid = empty($msg['Ticket']) ? sha1(time()) : sha1($msg['Ticket']);
-            $order_uid = Order::makeUID($user, $device, $uid);
-
-            Job::createThirdPartyPlatformOrder([
-                'device' => $device->getId(),
-                'user' => $user->getId(),
-                'account' => $acc->getId(),
-                'orderUID' => $order_uid,
-                'extra' => [],
-            ]);
+            self::createOrder($device, $user, $acc);
 
             return $acc->getOpenMsg($msg['ToUserName'], $msg['FromUserName'], $acc->getUrl());
 

@@ -66,11 +66,11 @@ if ($op == 'default') {
 
 } elseif ($op == 'SQB') {
 
-    if (request::trim('is_success') == 'T') {
+    if (request::trim('is_success') == 'T' && request::str('status') == 'SUCCESS') {
         Util::resultAlert('支付成功！');
     }
 
-    Util::resultAlert(request::trim('error_message'), 'error');
+    Util::resultAlert(request::trim('error_message', '支付失败！'), 'error');
     
 } elseif ($op == 'notify') {
 

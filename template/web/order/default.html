@@ -16,28 +16,31 @@
     #orderlist .transactionId.query img {
         filter: grayscale(1);
     }
+    a[filter] {
+        cursor: pointer;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
     <li role="presentation" class="active"><a href="#">全部</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order');}">全部</a></li>
+    <li role="presentation"><a filter data-name="way" data-val="">全部</a></li>
     {/if}
     {if $s_way=='pay'}
     <li role="presentation" class="active"><a href="#">支付</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'pay'));}">支付</a></li>
+    <li role="presentation" ><a filter data-name="way" data-val="pay">支付</a></li>
     {/if}
     {if $s_way=='free'}
     <li role="presentation" class="active"><a href="#">免费</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
+    <li role="presentation"><a filter data-name="way" data-val="free">免费</a></li>
     {/if}
     {if \zovye\App::isBalanceEnabled()}
         {if $s_way=='balance'}
         <li role="presentation" class="active"><a href="#">积分</a></li>
         {else}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">积分</a></li>
+        <li role="presentation"><a filter data-name="way" data-val="balance">积分</a></li>
         {/if}
         {if $s_way=='delivery'}
         <li role="presentation" class="active"><a href="#">商城订单</a></li>
@@ -48,12 +51,12 @@
     {if $s_way=='refund'}
     <li role="presentation" class="active"><a href="#">退款订单</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款订单</a></li>
+    <li role="presentation"><a filter data-name="way" data-val="refund">退款订单</a></li>
     {/if}
     {if $s_way=='unexpected'}
     <li role="presentation" class="active"><a href="#">异常订单</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'unexpected'));}">异常订单</a></li>
+    <li role="presentation"><a filter data-name="way" data-val="unexpected">异常订单</a></li>
     {/if}
     {if $device || $user}
     <li role="presentation"  class="active"><a href="#">{php echo $user?$user->getName():''}{if $user && $device} <i class="fa fa-sign-in" style="color:#CCC;"></i> {/if}{php echo $device ? $device->getName() : '';}</a></li>
@@ -62,7 +65,7 @@
 <div class="panel panel-default{if empty($s_way)} panel-first{/if} nav-tab-item">
     <div class="heading">
         <span class="operate">
-            {if $s_way=='fee' || empty($s_way)}
+            {if $s_way=='pay' || empty($s_way)}
             <a href="{php echo $this->createWebUrl('order', array('op'=>'log'));}"><i class="fa fa-fw fa-sliders" title="支付记录"></i></a>
             {/if}
             <a href="{php echo $this->createWebUrl('order', array('op'=>'export'));}"><i class="fa fa-fw fa-filter" title="导出订单"></i></a>
@@ -77,7 +80,7 @@
             </div>
         </div>
         <div id="search-form">
-            <form action="{php echo $this->createWebUrl('order', array('op'=>'default'));}" method="post">
+            <form action="{$url}" method="post">
                 <div class="form-group">
                     <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
                     <div class="col-md-5">
@@ -562,6 +565,10 @@
         if (end) {
             params.set('datelimit[end]', end);
         }
+        const way = $('input[name=way]').val();
+        if (way) {
+            params.set('way', way);
+        }
         if (typeof fn === 'function') {
             fn(params);
         }
@@ -593,7 +600,7 @@
             e.preventDefault();
          })
 
-        $('#orderlist').on('click', 'a[filter]', function (e) {
+        $('body').on('click', 'a[filter]', function (e) {
             const self = this;
             reloadPageWithFilter(function (params) {
                 const name = $(self).data('name');

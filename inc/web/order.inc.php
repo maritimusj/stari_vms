@@ -290,6 +290,7 @@ if ($op == 'default') {
     }
 
     $tpl_data['s_way'] = $way;
+    $tpl_data['url'] = Util::url('order', ['way' => $way]);
     $tpl_data['backer'] = $keyword || $agent_openid || $user_id || $device_id || $order_no || $limit['start'] || $limit['end'];
     $tpl_data['pager'] = $pager;
     $tpl_data['orders'] = $orders;

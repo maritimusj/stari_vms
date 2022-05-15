@@ -903,7 +903,7 @@ HTML;
         ];
 
         $original_extra = $device->get('extra', []);
-        if ($original_extra['schedule']['screen']['enabled'] !== $extra['schedule']['screen']['enabled']) {
+        if ($original_extra['schedule']['screen'] !== $extra['schedule']['screen']) {
             $device->appNotify('config', $extra['schedule']);
         }
 

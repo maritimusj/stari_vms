@@ -432,8 +432,6 @@ if ($op == 'list') {
     }
 
     $tpl_data['bluetooth']['protocols'] = BlueToothProtocol::all();
-
-    $tpl_data['id'] = $id;
     $tpl_data['device_types'] = $device_types;
 
     if (isset($device) && App::isMoscaleEnabled() && MoscaleAccount::isAssigned($device)) {
@@ -453,11 +451,11 @@ if ($op == 'list') {
     }
 
     $module_url = MODULE_URL;
-    if ($op == 'add_vd') {
+    if ($op == 'add_vd' || ($device && $device->isVDevice())) {
         $icon_html = <<<HTML
         <img src="{$module_url}static/img/vdevice.svg" class="icon" title="虚拟设备">
 HTML;
-    } elseif ($op == 'add_bluetooth_device') {
+    } elseif ($op == 'add_bluetooth_device' || ($device && $device->isBlueToothDevice())) {
         $icon_html = <<<HTML
         <img src="{$module_url}static/img/bluetooth.svg" class="icon" title="蓝牙设备">
 HTML;

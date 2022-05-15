@@ -212,50 +212,48 @@
                     <div class="form-group">
                         <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" {if !empty($device)}readonly{else}required{/if}>
-                            {if empty($device)}
-                            <span class="help-block">* 以后无法修改！</span>
-                            {/if}
+                            <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" :readonly="deviceId > 0" :required="deviceId === 0">
+                            <span class="help-block" v-if="deviceId === 0">* 以后无法修改！</span>
                         </div>
                     </div>
 
-                    {if \zovye\App::isBluetoothDeviceSupported() && ($op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice()))}
-                    <div class="form-group">
-                        <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="BUID" id="BUID" value="{php echo $device ? $device->getBUID() : ''}">
+                    <template v-if="config.is_bluetooth_device">
+                        <div class="form-group">
+                            <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="BUID" id="BUID" value="{php echo $device ? $device->getBUID() : ''}">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="select_protocols" class="col-md-2 control-label">蓝牙协议</label>
-                        <div class="col-md-10">
-                            <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
-                                {if empty($device)}
-                                <option value="{php echo  \zovye\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
-                                    &lt;请选择蓝牙协议&gt;
-                                </option>
-                                {/if}
-                                {loop $bluetooth['protocols'] $index $item}
-                                <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
-                                    {$item['name']} - {$item['title']}
-                                </option>
-                                {/loop}
-                            </select>
+                        <div class="form-group">
+                            <label for="select_protocols" class="col-md-2 control-label">蓝牙协议</label>
+                            <div class="col-md-10">
+                                <select name="blueToothProtocol" id="select_protocols" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}">
+                                    {if empty($device)}
+                                    <option value="{php echo  \zovye\DeviceTypes::UNKNOWN_TYPE}" selected disabled>
+                                        &lt;请选择蓝牙协议&gt;
+                                    </option>
+                                    {/if}
+                                    {loop $bluetooth['protocols'] $index $item}
+                                    <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
+                                        {$item['name']} - {$item['title']}
+                                    </option>
+                                    {/loop}
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="MAC" class="col-md-2 control-label">硬件MAC地址</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="MAC" id="MAC" value="{php echo $device ? $device->getMAC() : ''}">
+                        <div class="form-group">
+                            <label for="MAC" class="col-md-2 control-label">硬件MAC地址</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="MAC" id="MAC" value="{php echo $device ? $device->getMAC() : ''}">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="Motor" class="col-md-2 control-label">电机数量</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="Motor" id="Motor" value="{php echo $device ? $device->getMotor() : ''}">
-                        </div>
-                    </div>
-                    {/if}
+                        <div class="form-group">
+                            <label for="Motor" class="col-md-2 control-label">电机数量</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="Motor" id="Motor" value="{php echo $device ? $device->getMotor() : ''}">
+                            </div>
+                        </div>                        
+                    </template>
                     {/if}
                     <div id="device_types">
                         <div class="form-group">
@@ -358,8 +356,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                {if $op != 'add_bluetooth_device' && (empty($device) || !$device->isBlueToothDevice())}
-                                <div>
+                                <div v-if="!config.is_bluetooth_device">
                                     <button class="btn btn-success" 
                                     @click.prevent="newPackage" 
                                     :disabled="loading"
@@ -374,7 +371,6 @@
                                         <i class="fa fa-save"></i> 保存套餐
                                     </button>
                                 </div>
-                                {/if}
                                 <div class="package operate" v-if="currentPackage">
                                     <i class="fa fa-ban close-btn" title="退出" @click="closePackage"></i>                           
                                     <table class="table cargo_lanes">
@@ -478,8 +474,6 @@
                         </div>                         
                     </div>
                 </div>
-                {if \zovye\App::isBluetoothDeviceSupported() }
-                {if $op == 'add_bluetooth_device' || (!empty($device) && $device->isBlueToothDevice())}
                 <div v-if="active === 'func'">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">屏幕</label>
@@ -521,8 +515,6 @@
                         </div>
                     </div>
                 </div>
-                {/if}
-                {/if}
                 <div v-show="active === 'extra'">
                     <!--
                         <div class="form-group">
@@ -655,8 +647,7 @@
                         </div>
                     </div>
                 </div>
-                {if $device && $device->getAppId()}
-                <div v-show="active === 'app'">
+                <div v-show="active === 'app'" v-if="deviceId > 0&& config.app">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">动态二维码</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -678,7 +669,6 @@
                         </div>
                     </div>
                 </div>
-                {/if}
                 <div v-show="active === 'schedule'">
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">是否启用</label>
@@ -707,7 +697,6 @@
                         </div>
                     </div>
                 </div>
-                {if $disp}
                 <div v-show="active === 'disp'">
                     <div class="form-group">
                         <label for="first" class="col-md-2 control-label">第一行文字</label>
@@ -728,8 +717,6 @@
                         </div>
                     </div>
                 </div>
-                {/if}
-                {if \zovye\App::isZJBaoEnabled()}
                 <div v-show="active === 'zjb'">
                     <div class="form-group">
                         <label for="ZJBao_Scene" class="col-md-2 control-label">场景</label>
@@ -738,14 +725,10 @@
                         </div>
                     </div>
                 </div>
-                {/if}
-                {if \zovye\App::isMoscaleEnabled()}
                 <div v-show="active === 'moscale'">
                     <div id="moscale">
                     </div>
                 </div>
-                {/if}
-                {if \zovye\App::isZeroBonusEnabled()}
                 <div v-show="active === 'zeroBonus'">
                     <div class="form-group">
                         <label for="zeroBonus" class="col-md-2 control-label">零佣金概率(%)</label>
@@ -755,19 +738,19 @@
                         </div>
                     </div>
                 </div>
-                {/if}
             </div>
         </div>
         <div class="form-btn">
             <input type="hidden" name="op" value="save">
             <input type="hidden" name="from" :value="active">
             <input type="hidden" name="device_model" value="{$device_model}">
-            {if $op=='edit' && $id}
-            <input type="hidden" name="id" value="{$id}">
-            <button type="submit" class="btn btn-primary">保存</button>
-            {else}
-            <button type="submit" class="btn btn-primary">创建</button>
-            {/if}
+            <template v-if="deviceId > 0">
+                <input type="hidden" name="id" :value="deviceId">
+                <button type="submit" class="btn btn-primary">保存</button>                
+            </template>
+            <template v-else>
+                <button type="submit" class="btn btn-primary">创建</button>
+            </template>
             <button type="button" class="btn btn-default" onclick="backToList();">返回</button>
         </div>
     </form>
@@ -838,58 +821,51 @@
                 creating: false,
                 packages: [],
                 currentPackage: null,
+                config: {
+                    is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
+                    app: `{php echo $app? 1 :''}`,
+                    disp: `{php echo $disp ? 1 :''}`,
+                    zero_bonus_enabled: `{php echo \zovye\App::isZeroBonusEnabled()? 1 : ''}`,
+                    moscale_enabled: `{php echo $moscale ? 1 : ''}`,
+                    zjb_enabled: `{php echo $zjb ? 1 : ''}`,
+                },
                 navs:[
                         {
                             'op': 'base',
                             'content': `{$icon} 基本设置`,
                         },
-                        {if $is_bluetooth_device }
                         {
                             'op': 'func',
                             'content': `功能设置`,
-                        },                        
-                        {/if}
-                        {if $app}
+                        },
                         {
                             'op': 'app',
                             'content': `APP设置`,
                         },
-                        {/if}
-                        {if $disp}
                         {
                             'op': 'disp',
                             'content': `小屏设置`,
-                        }, 
-                        {/if}
-                        {if $app}                    
+                        },                
                         {
                             'op': 'schedule',
                             'content': `定时任务`,
                         },
-                        {/if}
                         {
                             'op': 'extra',
                             'content': `高级设置`,
                         },
-                        {if $moscale}
                         {
                             'op': 'moscale',
                             'content': `公锤平台设置`,
                         },
-                        {/if}
-                        {if $zjb}
                         {
                             'op': 'zjb',
                             'content': `纸巾平台宝设置`,
                         },                        
-                        {/if}
-                        {if \zovye\App::isZeroBonusEnabled()}
                         {
                             'op': 'zeroBonus',
                             'content': `零佣金`,
-                        },                             
-                        {/if}
-
+                        },
                 ],
                 active: '{$from}',
             },
@@ -921,11 +897,33 @@
                 }
             },
             created() {
-                {if !$id}
+                if (this.deviceId === 0) {
                     const nav = this.navs.shift();
                     this.navs = [];
                     this.navs.push(nav);
-                {/if}
+                } else {
+                    let ops_reomved = [];
+                    if (!this.config.is_bluetooth_device) {
+                        ops_reomved.push('func');
+                    }
+                    if (!this.config.app) {
+                        ops_reomved.push('app', 'schedule');
+                    }
+                    if (!this.config.disp) {
+                        ops_reomved.push('disp');
+                    }
+                    if (!this.config.moscale_enabled) {
+                        ops_reomved.push('moscale');
+                    }
+                    if (!this.config.zjb_enabled) {
+                        ops_reomved.push('zjb');
+                    }
+                    if (!this.config.zero_bonus_enabled) {
+                        ops_reomved.push('zeroBonus');
+                    }
+                    this.navs = this.navs.filter(nav => nav && ops_reomved.indexOf(nav.op) === -1);
+                    console.log(this.navs);                    
+                }
             },
             mounted() {
                 if (this.deviceId > 0) {                    
@@ -939,6 +937,7 @@
                         this.packages = res.data;
                     }
                 })
+                initLegacyJs();
             },
 
             methods: {
@@ -1141,8 +1140,7 @@
             })
         })
     })
-</script>
-<script>
+
     function backToList() {
         setTimeout(function(){
             util.loading();
@@ -1161,21 +1159,23 @@
         $('input[name=tags]').val(tags.join(','));
     }
 
-    {if \zovye\App::isMoscaleEnabled()}
+    const moscale_enabled = "{php echo $moscale ? 1 : ''}";
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
 
-    require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
-        moscale.init("#moscale", {
-            moscaleMachineKey: "{$moscale['MachineKey']}",
-            label: JSON.parse('{php echo json_encode($moscale['LabelList']);}'),
-            savedLabel: JSON.parse('{php echo json_encode($moscale['AreaListSaved']);}'),
-            region: JSON.parse('{php echo json_encode($moscale['RegionData']);}'),
-            savedRegion: JSON.parse('{php echo json_encode($moscale['RegionSaved']);}'),
-        })
-    })
-    {/if}
-    
-    $(function(){
+    function initLegacyJs() {
+
+        if (moscale_enabled) { 
+            require(["{php echo MODULE_URL}static/js/moscale.min.js?v=20210417"], function(moscale) {          
+                moscale.init("#moscale", {
+                    moscaleMachineKey: "{$moscale['MachineKey']}",
+                    label: JSON.parse(`{php echo json_encode($moscale['LabelList']);}`),
+                    savedLabel: JSON.parse(`{php echo json_encode($moscale['AreaListSaved']);}`),
+                    region: JSON.parse(`{php echo json_encode($moscale['RegionData']);}`),
+                    savedRegion: JSON.parse(`{php echo json_encode($moscale['RegionSaved']);}`),
+                })
+            })
+        }
+
         let tags = [];
         $('input[name=tags]').val().split(',').forEach(function(title){
             if (title !== "") {
@@ -1245,7 +1245,7 @@
         $('#special input[name=spec]').click(function(){
             $('#special fieldset').attr('disabled', !$(this).is(':checked'));
         })
-    })
+    }
 </script>
 <!-- 以下js用于商品搜索对话框 -->
 <script>
@@ -1273,8 +1273,8 @@
          })
 
         $('body').on('click', '#search_agent', function () {
-            const keyword = $('#search-form input[name=keyword_agent]').val();console.log(keyword);
-            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {
+            const keyword = $('#search-form input[name=keyword_agent]').val();
+            $.get("{php echo $this->createWebUrl('agent');}", {
                 op: 'search',
                 keyword: keyword,
             }, function (res) {

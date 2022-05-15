@@ -17,6 +17,8 @@ class CtrlServ
      */
     static $http_client = null;
 
+    static $app = [];
+
     private function __construct()
     {
     }
@@ -224,14 +226,23 @@ class CtrlServ
      * @param array $payload
      * @return bool
      */
-    public static function appNotify($app_id, string $op = 'update', array $payload = []): bool
+    public static function appNotify($app_id, string $op = 'config', array $payload = []): bool
     {
-        static $app = null;
-        if (!isset($app)) {
-            $app = [];
-            register_shutdown_function(function () use ($app) {
-                foreach ($app as $topic => $data) {
-                    $body = json_encode(['topics' => [$topic], 'data' => json_encode($data)]);
+        if (empty(self::$app)) {
+            register_shutdown_function(function (){
+                foreach (self::$app as $data) {
+                    $topic = "app/{$data['app']}";
+
+                    $json = [
+                        'op' => $data['op'],
+                        'serial' => microtime(true) . '',
+                    ];
+
+                    if ($data['data']) {
+                        $json['data'] = $data['data'];
+                    }
+
+                    $body = json_encode(['topics' => [$topic], 'data' => json_encode($json)]);
 
                     $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
                     if (is_error($res)) {
@@ -246,25 +257,23 @@ class CtrlServ
         }
 
         if ($app_id) {
-            $topic = "app/$app_id";
-
-            $data = [
-                'op' => $op,
-                'serial' => microtime(true) . '',
-            ];
-
-            if ($payload) {
-                $data['data'] = $payload;
-            }
-
-            if ($app[$topic]) {
-                if ($op == 'init') {
-                    $app[$topic] = $data;
-                } else {
-                    $app[$topic] = array_merge_recursive($app[$topic], $data);
-                }
+            $key = sha1("$app_id:$op");
+            if ($op == 'init') {
+                self::$app[$key] = [
+                    'app' => $app_id,
+                    'op' => 'init',
+                ];
             } else {
-                $app[$topic] = $data;
+                if (self::$app[$key]) {
+                    $data = self::$app[$key]['data'] ?? [];
+                    self::$app[$key]['data'] = array_merge_recursive($data, $payload);
+                } else {
+                    self::$app[$key] = [
+                        'app' => $app_id,
+                        'op' => $op,
+                        'data' => $payload,
+                    ];
+                }
             }
         }
 

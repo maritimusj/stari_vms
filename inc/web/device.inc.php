@@ -555,7 +555,7 @@ HTML;
 
                 //通知app更新配置
                 if ($app_id) {
-                    CtrlServ::appNotify($app_id);
+                    CtrlServ::appNotify($app_id, 'init');
                 }
 
                 Util::itoast('清除AppId成功！', $this->createWebUrl('device'), 'success');
@@ -593,7 +593,7 @@ HTML;
     }
 
     //通知实体设备
-    $device->appNotify();
+    $device->appNotify('init');
 
     $device->destroy();
 
@@ -676,13 +676,6 @@ HTML;
             ],
             'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
             'theme' => request::str('theme'),
-            'schedule' => [
-                'screen' => [
-                    'enabled' => request::bool('screenSchedule') ? 1 : 0,
-                    'on' => request::str('start'),
-                    'off' => request::str('end'),
-                ]
-            ]
         ];
 
         if (App::isDeviceWithDoorEnabled()) {
@@ -901,8 +894,21 @@ HTML;
         $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
         $extra['goodsList'] = request::trim('goodsList');
 
+        $extra['schedule'] = [
+            'screen' => [
+                'enabled' => request::bool('screenSchedule') ? 1 : 0,
+                'on' => request::str('start'),
+                'off' => request::str('end'),
+            ]
+        ];
+
+        $original_extra = $device->get('extra', []);
+        if ($original_extra['schedule']['screen']['enabled'] !== $extra['schedule']['screen']['enabled']) {
+            $device->appNotify('config', $extra['schedule']);
+        }
+
         //合并extra
-        $extra = array_merge($device->get('extra', []), $extra);
+        $extra = array_merge($original_extra, $extra);
 
         if (!$device->set('extra', $extra)) {
             throw new RuntimeException('保存扩展数据失败！');
@@ -924,20 +930,18 @@ HTML;
         $msg = '保存成功';
         $error = false;
 
-        if (!$device->updateScreenAdvsData()) {
+        $device->updateScreenAdvsData();
 
-            $device->updateAppVolume();
+        $device->updateAppVolume();
 
-            $device->updateAppRemain();
+        $device->updateAppRemain();
 
-            $res = $device->updateQrcode(true);
+        $res = $device->updateQrcode(true);
 
-            if (is_error($res)) {
-                $msg .= ', 发生错误：' . $res['message'];
-                $error = true;
-            }
+        if (is_error($res)) {
+            $msg .= ', 发生错误：' . $res['message'];
+            $error = true;
         }
-
         if (isset($activeRes) && is_error($activeRes)) {
             $msg .= '，发生错误：无法激活设备';
             $error = true;

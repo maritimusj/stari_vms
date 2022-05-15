@@ -595,7 +595,7 @@ class Device extends State
         $device->resetShadowId();
 
         $device->set('refresh', time());
-        $device->appNotify();
+        $device->appNotify('init');
 
         $code = $device->getProtocolV1Code();
         if ($code) {

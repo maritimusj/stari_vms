@@ -961,7 +961,7 @@ class deviceModelObj extends modelObj
      * @param array $data
      * @return bool
      */
-    public function appNotify(string $op = 'update', array $data = []): bool
+    public function appNotify(string $op = 'config', array $data = []): bool
     {
         if ($this->app_id) {
             return CtrlServ::appNotify($this->app_id, $op, $data);
@@ -1485,7 +1485,7 @@ class deviceModelObj extends modelObj
     public function updateScreenAdvsData(): bool
     {
         if ($this->isAdvsUpdated(Advertising::SCREEN)) {
-            return $this->appNotify();
+            return $this->appNotify('init');
         }
 
         return false;

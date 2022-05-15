@@ -135,6 +135,7 @@ class Log
                             file_put_contents($filename, $data, FILE_APPEND);
                         }
                     }
+                    self::$log_cache = [];
                     if (rand(0, 10) == 10) {
                         self::deleteExpiredLogFiles($name, LOG_MAX_DAY);
                     }

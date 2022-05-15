@@ -226,8 +226,27 @@ class CtrlServ
      */
     public static function appNotify($app_id, string $op = 'update', array $payload = []): bool
     {
+        static $app = null;
+        if (!isset($app)) {
+            $app = [];
+            register_shutdown_function(function () use ($app) {
+                foreach ($app as $topic => $data) {
+                    $body = json_encode(['topics' => [$topic], 'data' => json_encode($data)]);
+
+                    $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
+                    if (is_error($res)) {
+                        Log::error('app_notify', [
+                            'topic' => $topic,
+                            'data' => $data,
+                            'error' => $res,
+                        ]);
+                    }
+                }
+            });
+        }
+
         if ($app_id) {
-            $topic = ["app/$app_id"];
+            $topic = "app/$app_id";
 
             $data = [
                 'op' => $op,
@@ -238,14 +257,18 @@ class CtrlServ
                 $data['data'] = $payload;
             }
 
-            $body = json_encode(['topics' => $topic, 'data' => json_encode($data)]);
-
-            $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
-
-            return !is_error($res);
+            if ($app[$topic]) {
+                if ($op == 'init') {
+                    $app[$topic] = $data;
+                } else {
+                    $app[$topic] = array_merge_recursive($app[$topic], $data);
+                }
+            } else {
+                $app[$topic] = $data;
+            }
         }
 
-        return false;
+        return true;
     }
 
     /**

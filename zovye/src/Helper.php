@@ -300,7 +300,7 @@ class Helper
         $device->goodsLog($level, $log_data);
 
         if (!is_error($result)) {
-            $device->updateRemain();
+            $device->updateAppRemain();
         }
 
         return $result;

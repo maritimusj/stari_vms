@@ -952,7 +952,7 @@ class keeper
             }
         }
 
-        $device->updateRemain();
+        $device->updateAppRemain();
         $device->save();
 
         return ['msg' => '设置成功！'];

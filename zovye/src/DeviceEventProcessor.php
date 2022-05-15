@@ -408,7 +408,7 @@ class DeviceEventProcessor
             if ($device) {
                 if ($device->payloadLockAcquire(3)) {
                     $device->resetPayload([], 'reset重置');
-                    $device->updateRemain();
+                    $device->updateAppRemain();
                 }
             }
         }
@@ -581,10 +581,6 @@ class DeviceEventProcessor
 
             if ($device->isMcbStatusExpired()) {
                 $device->reportMcbStatus($data['code']);
-            } else {
-                if ($device->hasMcbDisp()) {
-                    $device->updateMcbParams($data['code']);
-                }
             }
 
             $device->firstMsgStatistic();
@@ -696,18 +692,7 @@ class DeviceEventProcessor
                 $device->setV0Status(Device::V0_STATUS_ERROR, $data['extra']['error']);
             }
 
-            $LED_status = $device->hasMcbDisp();
             $device->updateMcbStatus($data['extra']);
-
-            if ($data['extra']['disp']) {
-                if (settings('device.v1.activecode.enabled')) {
-                    $device->enableActiveQrcode(true);
-                }
-
-                if (!$LED_status) {
-                    $device->updateMcbParams($data['code']);
-                }
-            }
 
             $device->save();
         }

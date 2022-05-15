@@ -462,14 +462,6 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.v0.status.reset', $n);
     }
 
-    /**
-     * 主板是否带有液晶屏
-     */
-    public function hasMcbDisp()
-    {
-        return $this->settings('extra.v1.status.disp', false);
-    }
-
     public function getArea($default = []): array
     {
         $address = $this->settings('extra.location.tencent.area', []);
@@ -1661,25 +1653,9 @@ class deviceModelObj extends modelObj
         }
 
         $data = ['volume' => $vol];
+
         $res = $this->appNotify('config', $data);
-
         return !is_error($res);
-    }
-
-    /**
-     * 通知app更新剩余数量
-     * @return void
-     */
-    public function updateRemain()
-    {
-        $this->updateAppRemain();
-
-        if ($this->hasMcbDisp()) {
-            $code = $this->getProtocolV1Code();
-            if ($code) {
-                $this->updateMcbParams($code);
-            }
-        }
     }
 
     /**
@@ -1697,7 +1673,6 @@ class deviceModelObj extends modelObj
         }
 
         $res = $this->appNotify('config', $data);
-
         return !is_error($res);
     }
 

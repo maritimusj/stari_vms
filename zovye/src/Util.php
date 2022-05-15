@@ -1698,7 +1698,7 @@ HTML_CONTENT;
                 return error(State::ERROR, '保存库存失败！');
             }
             $locker->unlock();
-            $device->updateRemain();
+            $device->updateAppRemain();
         }
 
         $device->cleanError();
@@ -2035,7 +2035,7 @@ HTML_CONTENT;
             return $result;
         }
 
-        $device->updateRemain();
+        $device->updateAppRemain();
 
         //事件：出货成功
         EventBus::on('device.openSuccess', $params);
@@ -2509,7 +2509,7 @@ HTML_CONTENT;
             }
 
             $device->updateQrcode(true);
-            $device->updateRemain();
+            $device->updateAppRemain();
 
             //更新公众号缓存
             $device->updateAccountData();

@@ -697,26 +697,6 @@
                         </div>
                     </div>
                 </div>
-                <div v-show="active === 'disp'">
-                    <div class="form-group">
-                        <label for="first" class="col-md-2 control-label">第一行文字</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="first_txt" id="first" value="{php echo $extra['txt'][0]}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="second" class="col-md-2 control-label">第二行文字</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="second_txt" id="second" value="{php echo $extra['txt'][1]}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="third" class="col-md-2 control-label">第三行文字</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="third_txt" id="third" value="{php echo $extra['txt'][2]}">
-                        </div>
-                    </div>
-                </div>
                 <div v-show="active === 'zjb'">
                     <div class="form-group">
                         <label for="ZJBao_Scene" class="col-md-2 control-label">场景</label>
@@ -824,7 +804,6 @@
                 config: {
                     is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
                     app: `{php echo $app? 1 :''}`,
-                    disp: `{php echo $disp ? 1 :''}`,
                     zero_bonus_enabled: `{php echo \zovye\App::isZeroBonusEnabled()? 1 : ''}`,
                     moscale_enabled: `{php echo $moscale ? 1 : ''}`,
                     zjb_enabled: `{php echo $zjb ? 1 : ''}`,
@@ -842,10 +821,6 @@
                             'op': 'app',
                             'content': `APP设置`,
                         },
-                        {
-                            'op': 'disp',
-                            'content': `小屏设置`,
-                        },                
                         {
                             'op': 'schedule',
                             'content': `定时任务`,
@@ -908,9 +883,6 @@
                     }
                     if (!this.config.app) {
                         ops_reomved.push('app', 'schedule');
-                    }
-                    if (!this.config.disp) {
-                        ops_reomved.push('disp');
                     }
                     if (!this.config.moscale_enabled) {
                         ops_reomved.push('moscale');

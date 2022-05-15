@@ -399,7 +399,6 @@ if ($op == 'list') {
             $device_types[] = DeviceTypes::format($x);
         }
 
-        $tpl_data['disp'] = $device->hasMcbDisp();
         $tpl_data['app'] = $device->getAppId();
 
         $extra = $device->get('extra');
@@ -540,7 +539,7 @@ HTML;
         Util::itoast($result['message'], $this->createWebUrl('device'), 'error');
     }
 
-    $device->updateRemain();
+    $device->updateAppRemain();
     Util::itoast('商品数量重置成功！', $this->createWebUrl('device'), 'success');
 } elseif ($op == 'unreg') {
 
@@ -883,14 +882,14 @@ HTML;
             strval($saved_baidu_loc['lng']) != strval($location['lng'])
             || strval($saved_baidu_loc['lat']) != strval($location['lat'])
         ) {
-            $addr = Util::getLocation($location['lng'], $location['lat']);
-            if ($addr) {
+            $address = Util::getLocation($location['lng'], $location['lat']);
+            if ($address) {
                 $extra['location']['baidu']['area'] = [
-                    $addr['province'],
-                    $addr['city'],
-                    $addr['district'],
+                    $address['province'],
+                    $address['city'],
+                    $address['district'],
                 ];
-                $extra['location']['baidu']['address'] = $addr['address'];
+                $extra['location']['baidu']['address'] = $address['address'];
             } else {
                 $extra['location']['area'] = [];
                 $extra['location']['address'] = [];
@@ -921,18 +920,22 @@ HTML;
 
         //更新公众号缓存
         $device->updateAccountData();
-        $device->updateScreenAdvsData();
-
-        $device->updateAppVolume();
-        $device->updateRemain();
 
         $msg = '保存成功';
         $error = false;
 
-        $res = $device->updateQrcode(true);
-        if (is_error($res)) {
-            $msg .= ', 发生错误：' . $res['message'];
-            $error = true;
+        if (!$device->updateScreenAdvsData()) {
+
+            $device->updateAppVolume();
+
+            $device->updateAppRemain();
+
+            $res = $device->updateQrcode(true);
+
+            if (is_error($res)) {
+                $msg .= ', 发生错误：' . $res['message'];
+                $error = true;
+            }
         }
 
         if (isset($activeRes) && is_error($activeRes)) {

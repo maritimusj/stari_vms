@@ -193,7 +193,7 @@ function prepare(string $order_no)
     //事件：出货成功
     EventBus::on('device.openSuccess', $params);
 
-    $device->updateRemain();
+    $device->updateAppRemain();
 
     $level = intval($pay_log->getData('level'));
     $device->goodsLog($level, $log_data);

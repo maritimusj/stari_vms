@@ -881,7 +881,7 @@ class agent
 
         $locker->unlock();
 
-        $device->updateRemain();
+        $device->updateAppRemain();
         $device->save();
 
         return $device->getPayload(true);

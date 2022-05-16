@@ -260,10 +260,10 @@ class CtrlServ
 
         if ($app_id) {
             $key = sha1("$app_id:$op");
-            if ($op == 'init') {
+            if ($op == 'init' || $op == 'update') {
                 self::$app[$key] = [
                     'app' => $app_id,
-                    'op' => 'init',
+                    'op' => $op,
                 ];
             } else {
                 if (self::$app[$key]) {

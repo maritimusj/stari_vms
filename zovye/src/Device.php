@@ -595,7 +595,7 @@ class Device extends State
         $device->resetShadowId();
 
         $device->set('refresh', time());
-        $device->appNotify('init');
+        $device->appNotify('update');
 
         $code = $device->getProtocolV1Code();
         if ($code) {
@@ -698,7 +698,7 @@ class Device extends State
         }
 
         if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
-            $device->appNotify('init');
+            $device->appNotify('update');
             return true;
         }
 

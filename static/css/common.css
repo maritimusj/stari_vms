@@ -707,7 +707,7 @@ tr.banned td:not(:last-child):not(.not-gray) {
     padding: 3px 10px;
     color: #fff;
     font-size: .9em;
-    box-shadow: 1px 1px 1px rgb(128 128 128 / 30%);
+    box-shadow: 2px 2px 1px rgb(128 128 128 / 30%);
     user-select: none;
     -moz-user-select: none;
 }

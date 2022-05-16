@@ -555,7 +555,7 @@ HTML;
 
                 //通知app更新配置
                 if ($app_id) {
-                    CtrlServ::appNotify($app_id, 'init');
+                    CtrlServ::appNotify($app_id, 'update');
                 }
 
                 Util::itoast('清除AppId成功！', $this->createWebUrl('device'), 'success');
@@ -593,7 +593,7 @@ HTML;
     }
 
     //通知实体设备
-    $device->appNotify('init');
+    $device->appNotify('update');
 
     $device->destroy();
 

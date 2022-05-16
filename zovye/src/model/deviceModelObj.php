@@ -1485,7 +1485,7 @@ class deviceModelObj extends modelObj
     public function updateScreenAdvsData(): bool
     {
         if ($this->isAdvsUpdated(Advertising::SCREEN)) {
-            return $this->appNotify('init');
+            return $this->appNotify('update');
         }
 
         return false;

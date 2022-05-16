@@ -228,7 +228,7 @@ JS_CODE;
             ];
         }
 
-        return err('异常数据！');
+        return err('异常数据（未完成支付或者出错）！');
     }
 
     public function checkResult(array $data = []): bool

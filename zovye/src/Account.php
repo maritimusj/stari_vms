@@ -590,7 +590,11 @@ class Account extends State
             if (empty($res) || is_error($res)) {
                 continue;
             }
-            $result = array_merge($result, $res);
+            foreach ($res as $account) {
+                if (self::isReady($account)) {
+                    $result[] = $account;
+                }
+            }
             if ($max > 0 && count($result) >= $max) {
                 $result = array_slice($result, 0, $max, true);
                 return $shuffle_accounts($result);
@@ -1078,6 +1082,9 @@ class Account extends State
             $questions = $obj->getQuestions();
             return !isEmptyArray($questions);
         }
+        if (empty($account['qrcode'])) {
+            return false;
+        }
         return true;
     }
 
@@ -1087,11 +1094,6 @@ class Account extends State
         $accounts = Account::match($device, $user, array_merge(['max' => settings('misc.maxAccounts', 0)], $params));
         if (!empty($accounts)) {
             foreach ($accounts as $index => &$account) {
-                if (!self::isReady($account)) {
-                    unset($accounts[$index]);
-                    continue;
-                }
-
                 if ($account['type'] == Account::AUTH) {
                     if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
                         //如果是授权服务号，需要使用场景二维码替换原二维码

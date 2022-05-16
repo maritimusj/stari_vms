@@ -1587,7 +1587,7 @@ class deviceModelObj extends modelObj
 
             $assign_data = $entry->settings('assigned');
             if ($this->isMatched($assign_data)) {
-                $accounts[$entry->getUid()] = $entry->format(false);
+                $accounts[$entry->getUid()] = $entry->format();
             }
         }
 

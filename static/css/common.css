@@ -152,7 +152,7 @@ span.form-control {
 }
 
 .panel-body .seg .title {
-    background-color: #607D8B;
+    background-color: #4681bd;
     padding: 3px;
     color: #fff;
     width: 10em;
@@ -211,10 +211,6 @@ a .profile {
     position: relative;
     width: 200px;
     padding: 0.3em 1em;
-    background-color: #009688;
-    border-top: 2px solid #009688;
-    color: #fff;
-    box-shadow: 2px 2px 0 #FFC107;
 }
 
 .profile.agent img {
@@ -232,9 +228,11 @@ a .profile {
     font-size: .9em;
     color: #fff;
     background-color: #009689;
-    text-shadow: 1px 1px #000;
     user-select: none;
     -moz-user-select: none;
+    padding: 1px 6px;
+    z-index: 99;
+    box-shadow: 2px 2px 1px rgb(128 128 128 / 30%);
 }
 
 #accountlist i.fa-qrcode {
@@ -650,8 +648,7 @@ a .profile {
     font-size: .9em;
     background-color: #9E9E9E;
     padding: 0 10px 0 0;
-    border: 3px solid rgba(128, 128, 128, 0.5);
-    box-shadow: 1px 1px 1px grey;
+    box-shadow: 2px 2px 1px rgb(128 128 128 / 30%);
 }
 
 .agent img {
@@ -710,8 +707,7 @@ tr.banned td:not(:last-child):not(.not-gray) {
     padding: 3px 10px;
     color: #fff;
     font-size: .9em;
-    box-shadow: 1px 1px 1px grey;
-    border: 3px solid rgba(128, 128, 128, 0.5);
+    box-shadow: 1px 1px 1px rgb(128 128 128 / 30%);
     user-select: none;
     -moz-user-select: none;
 }

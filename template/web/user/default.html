@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20211127');}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
 <style>
     #userlist td div.stats{
         text-align: center;
@@ -16,13 +16,9 @@
         width: 100%;
     }
     {loop $agent_levels $index $data}
-    .profile.agent.{$index} {
-    border-top-color: {$data['clr']};
-    border-bottom-color: {$data['clr']};
-    background-color: {$data['clr']};
-    }
+
     .profile.agent.{$index} .agent-user{
-    background-color: {$data['clr']};
+        background-color: {$data['clr']};
     }
     .partner-user {
         margin-left: 10px;
@@ -204,7 +200,7 @@
                         {/if}
                     </span>
                     {if $item['agent']}
-                    <span class="agent-user">[ {php echo $item['agent']['title']} ]</span>
+                    <span class="agent-user"> {php echo $item['agent']['title']} </span>
                     {/if}
                     {if $item['isPartner']}
                     <a href="{php echo $this->createWebUrl('agent', array('op'=>'partner', 'id'=>$item['co_agent']['id']));}">

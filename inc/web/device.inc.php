@@ -942,6 +942,7 @@ HTML;
             $msg .= ', 发生错误：' . $res['message'];
             $error = true;
         }
+
         if (isset($activeRes) && is_error($activeRes)) {
             $msg .= '，发生错误：无法激活设备';
             $error = true;

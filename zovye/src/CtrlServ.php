@@ -245,6 +245,7 @@ class CtrlServ
                     $body = json_encode(['topics' => [$topic], 'data' => json_encode($json)]);
 
                     $res = self::query('misc/publish', ['nostr' => sha1($body),], $body, 'application/json');
+
                     if (is_error($res)) {
                         Log::error('app_notify', [
                             'topic' => $topic,
@@ -253,6 +254,7 @@ class CtrlServ
                         ]);
                     }
                 }
+                self::$app = [];
             });
         }
 

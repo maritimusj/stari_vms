@@ -960,7 +960,7 @@ a .groupname {
 .groupname {
     color: #fff;
     padding: 3px 1em;
-    box-shadow: 2px 2px 0 1px rgba(158, 158, 158, 0.7);
+    box-shadow: 2px 2px 0 1px rgba(158, 158, 158, 0.3);
     white-space: nowrap;
     cursor: default;
 }

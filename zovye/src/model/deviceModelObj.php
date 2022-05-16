@@ -1562,7 +1562,7 @@ class deviceModelObj extends modelObj
         $accounts = [];
 
         $last_update = settings('accounts.lastupdate');
-        if ($ignore_cache == false) {
+        if (!$ignore_cache) {
             $accounts_data = $this->get('accountsData', []);
             if ($accounts_data && $accounts_data['lastupdate'] == $last_update) {
                 return $accounts_data['data'] ?: [];

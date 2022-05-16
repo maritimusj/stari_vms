@@ -904,7 +904,9 @@ HTML;
 
         $original_extra = $device->get('extra', []);
         if ($original_extra['schedule']['screen'] !== $extra['schedule']['screen']) {
-            $device->appNotify('config', $extra['schedule']);
+            $device->appNotify('config', [
+                'schedule' => $extra['schedule']['screen'],
+            ]);
         }
 
         //合并extra

@@ -692,6 +692,13 @@ class DeviceEventProcessor
                 $device->setV0Status(Device::V0_STATUS_ERROR, $data['extra']['error']);
             }
 
+            if (isset($data['extra']['sensor'])) {
+                $sensors = isset($data['extra']['sensor']['type']) ? [$data['extra']['sensor']] : $data['extra']['sensor'];
+                foreach($sensors as $sensor) {
+                    $device->setSensorData($sensor['type'], $sensor['data']);
+                }
+            }
+
             $device->updateMcbStatus($data['extra']);
 
             $device->save();

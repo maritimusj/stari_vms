@@ -414,6 +414,21 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("extra.v0.status.$name", $val);
     }
 
+    public function setSensorData($type, $data)
+    {
+        return $this->updateSettings("extra.sensor.{$type}", $data);
+    }
+
+    public function getSensorData($type, $default = null)
+    {
+        return $this->settings("extra.sensor.{$type}", $default);
+    }
+
+    public function getWaterLevel()
+    {
+        return $this->getSensorData(Device::SENSOR_WATER_LEVEL);
+    }
+
     public function getV0ErrorDescription(): string
     {
         $error = $this->getV0Status(Device::V0_STATUS_ERROR);

@@ -53,6 +53,9 @@ class Device extends State
 
     const DUMMY_DEVICE_PREFIX = 'B#';
 
+    const SENSOR_WATER_LEVEL = 'waterLevel';
+    const SENSOR_INFRARED = 'infrared';
+
     private static $cache = [];
 
     public static function objClassname(): string

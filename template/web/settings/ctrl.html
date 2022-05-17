@@ -10,7 +10,7 @@
     <div class="panel panel-default nav-tab-item">
         <div class="panel-body">
             <div class="seg" id="ctrlserv" style="padding-top: 3em;">
-                <div class="title">远程服务器</div>
+                <div class="title">远程服务</div>
                 <div class="form-group">
                     <div class="page_item">
                         <span>程序版本</span>
@@ -39,7 +39,7 @@
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="controlAddr" id="controlAddr"
                             value="{$settings['ctrl']['url']}">
-                        <span class="help-block">* 授权服务器地址</span>
+                        <span class="help-block">* 服务器地址</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -68,14 +68,14 @@
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="checkSign" id="checkSign" value="1" {if $settings['ctrl']['checkSign']}checked{/if}>
-                                检查控制中心签名是否正确<span style="color:gray;">（签名错误则忽略通知消息）</span>
+                                检查消息签名是否正确<span style="color:gray;">（签名错误则忽略通知消息）</span>
                             </label>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="seg">
-                <div class="title">本地服务器</div>
+                <div class="title">本地服务</div>
                 <div class="form-group">
                     {if $migrate}
                     <div class="page_item">

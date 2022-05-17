@@ -204,7 +204,7 @@
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : $vd_imei}" readonly>
                             {if empty($device)}
-                            <span class="help-block">* 虚拟设备的硬件IMEI自动生成！</span>
+                            <span class="help-block">* 虚拟设备的硬件IMEI自动生成</span>
                             {/if}
                         </div>
                     </div>
@@ -577,7 +577,7 @@
                         <label class="col-md-2 control-label">位置</label>
                         <div class="col-md-10">
                             {php echo tpl_form_field_coordinate('location', $loc);}
-                            <span class="help-block">* {php echo empty($loc['address']) ? '&lt;暂无位置&gt;' : $loc['address']}</span>
+                            <span class="help-block">* {php echo empty($loc['address']) ? '暂无位置' : $loc['address']}</span>
                         </div>
                     </div>
                     <div class="form-group">

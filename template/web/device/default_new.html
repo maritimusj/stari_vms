@@ -712,12 +712,6 @@
                                                 </div>
                                             </div>
                                             </template>
-                                            <div class="detail-seg" v-if="o.cargo_lanes && o.cargo_lanes.length > 0">
-                                                <div v-for="(lane,index) in o.cargo_lanes">
-                                                    <span class="title">{{index + 1}}，<span :class="{'text-gray': lane.goods_id === 0}">{{lane.goods_name}}</span>：</span>
-                                                    <span>{{lane.num}} / {{lane.capacity}} {{lane.goods_unit_title}}</span>
-                                                </div>
-                                            </div>
                                             <div class="detail-seg" v-if="(o.lastError && o.lastError.errno) || o.firstMsgTotal || o.lastPing || o.lastOnline">
                                                 <div v-if="o.lastError && o.lastError.errno">
                                                     <span class="title">最近错误：</span>

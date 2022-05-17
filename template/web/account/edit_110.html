@@ -181,12 +181,11 @@
         <div class="form-btn">
             <input type="hidden" name="op" value="save">
             <input type="hidden" name="from" :value="active">
-            {if $op=='edit' && $id}
-            <input type="hidden" name="id" value="{$id}">
-            <button type="submit" class="btn btn-primary">保存</button>
-            {else}
-            <button type="submit" class="btn btn-primary">创建</button>
-            {/if}
+            <template v-if="id && id > 0">
+                <input type="hidden" name="id" value="{$id}">
+                <button type="submit" class="btn btn-primary">保存</button>
+                </template>
+                <button type="submit" class="btn btn-primary" v-else>创建</button>
             <input type="hidden" name="type" value="{$type}">
             <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
         </div>
@@ -198,6 +197,7 @@
         new Vue({
             el: "#app",
             data: {
+                id: parseInt(`{$id}`),
                 navs:[
                     {
                         'op': 'base',

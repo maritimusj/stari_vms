@@ -578,8 +578,10 @@ if ($op == 'default') {
                 if ($questionnaire) {
                     $questionnaire_attached = true;
                 } else {
-                    $account->setConfig('questionnaire', []);
-                    $questionnaire_attached = false;
+                    if ($account->getConfig('questionnaire')) {
+                        $questionnaire_attached = false;
+                        $account->setConfig('questionnaire', []);                        
+                    }
                 }
             }
 
@@ -681,7 +683,7 @@ if ($op == 'default') {
             if (isset($questionnaire_attached)) {
                 $message .= ($questionnaire_attached ? '注意：已关联问卷，请重新设置取货链接！' : '注意：已移除问卷，请重新设置取货链接！');
             }
-            return ['message' => $message];
+            return ['message' => $message, 'id' => $account->getId()];
         }
 
         return err('操作失败！');
@@ -690,7 +692,8 @@ if ($op == 'default') {
     if (is_error($res)) {
         Util::itoast($res['message'], We7::referer(), 'error');
     } else {
-        $back_url = request::has('id') ? $this->createWebUrl('account', ['op' => 'edit', 'id' => request::int('id'), 'from' => request::str('from')]) : $this->createWebUrl('account');
+        $id = request::int('id', $res['id']);
+        $back_url = $this->createWebUrl('account', ['op' => 'edit', 'id' => $id, 'from' => request::str('from')]);
         Util::itoast($res['message'], $back_url, 'success');
     }
 

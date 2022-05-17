@@ -234,7 +234,7 @@
                                     {/if}
                                     {loop $bluetooth['protocols'] $index $item}
                                     <option value="{$item['name']}" {if $item['name'] == $bluetooth['protocol'] } selected{/if}>
-                                        {$item['name']} - {$item['title']}
+                                        {$item['title']}
                                     </option>
                                     {/loop}
                                 </select>

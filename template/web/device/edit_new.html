@@ -213,10 +213,9 @@
                         <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" :readonly="deviceId > 0" :required="deviceId === 0">
-                            <span class="help-block" v-if="deviceId === 0">* 以后无法修改！</span>
+                            <span class="help-block" v-if="deviceId === 0">* 以后无法修改</span>
                         </div>
                     </div>
-
                     <template v-if="config.is_bluetooth_device">
                         <div class="form-group">
                             <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>

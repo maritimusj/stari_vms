@@ -119,7 +119,7 @@ try {
             }
 
             return [
-                'message' => '领取成功，欢迎下次使用！',
+                'message' => '谢谢，欢迎下次使用！',
                 'orderId' => $order->getId(),
             ];
         }

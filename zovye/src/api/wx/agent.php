@@ -211,6 +211,9 @@ class agent
                     'sign' => Config::balance('sign.bonus', []),
                 ],
             ],
+            'goods' => [
+                'max' => App::orderMaxGoodsNum(),
+            ],
         ];
 
         //是否为微信审核模式

@@ -1063,28 +1063,46 @@ class Account extends State
 
     protected static function isReady(array $account): bool
     {
-        if ($account['type'] == Account::WXAPP && empty($account['username'])) {
-            return false;
-        }
-        if ($account['type'] == Account::AUTH) {
-            if (App::useAccountQRCode()) {
-                $obj = Account::get($account['id']);
-                if (empty($obj) || $obj->useAccountQRCode()) {
+        switch($account['type']) {
+            case Account::VIDEO:
+                if (empty($account['media'])) {
                     return false;
                 }
-            }
+                break;
+            case Account::DOUYIN:
+                if (empty($account['url'])) {
+                    return false;
+                }
+                break;
+            case Account::WXAPP:
+                if (empty($account['username'])) {
+                    return false;
+                }
+                break;
+            case Account::AUTH:
+                if (App::useAccountQRCode()) {
+                    $obj = Account::get($account['id']);
+                    if (empty($obj) || $obj->useAccountQRCode()) {
+                        return false;
+                    }
+                }
+                break;
+            case Account::QUESTIONNAIRE:
+                $obj = Account::get($account['id']);
+                if (empty($obj)) {
+                    return false;
+                }
+                $questions = $obj->getQuestions();
+                if (isEmptyArray($questions)) {
+                    return false;
+                }
+                break;
+            default:
+                if (empty($account['qrcode'])) {
+                    return false;
+                }
         }
-        if ($account['type'] == Account::QUESTIONNAIRE) {
-            $obj = Account::get($account['id']);
-            if (empty($obj)) {
-                return false;
-            }
-            $questions = $obj->getQuestions();
-            return !isEmptyArray($questions);
-        }
-        if (empty($account['qrcode'])) {
-            return false;
-        }
+
         return true;
     }
 

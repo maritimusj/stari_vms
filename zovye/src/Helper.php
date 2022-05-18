@@ -317,6 +317,10 @@ class Helper
             return err('找不到这个设备！');
         }
 
+        if (Util::mustValidateLocation($user, $device)) {
+            return err('设备位置不在允许的范围内！');
+        }
+
         $goods = $device->getGoods($goods_id);
         if (empty($goods) || empty($goods[Goods::AllowExchange])) {
             return err('无法兑换这个商品，请联系管理员！');

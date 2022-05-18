@@ -183,6 +183,10 @@ class api
             return err('设备不在线！');
         }
 
+        if (Util::mustValidateLocation($user, $device)) {
+            return err('设备位置不在允许的范围内！');
+        }
+
         $goods_id = request::int('goodsId');
         if (empty($goods_id)) {
             $goods = $device->getGoodsByLane(0);

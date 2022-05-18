@@ -2208,9 +2208,10 @@ HTML_CONTENT;
      */
     public static function mustValidateLocation(userModelObj $user, deviceModelObj $device): bool
     {
-        if (!$user->isWxUser()) {
+        if (!$user->isWxUser() && !$user->isWXAppUser()) {
             return false;
         }
+
         if (!$device->needValidateLocation()) {
             return false;
         }

@@ -188,7 +188,7 @@ if (empty($device)) {
 }
 
 //检查用户定位
-if ($user->isWxUser() && Util::mustValidateLocation($user, $device)) {
+if (Util::mustValidateLocation($user, $device)) {
 
     $user->cleanLastActiveData();
     $tpl_data = Util::getTplData(

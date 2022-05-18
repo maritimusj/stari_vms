@@ -153,7 +153,7 @@ try {
 } catch (Exception $e) {
 
     Log::debug('get', [
-        'ticket' => $ticket_data_saved,
+        'ticket' => $ticket_data_saved ?? null,
         'error' => $e->getMessage(),
     ]);
 

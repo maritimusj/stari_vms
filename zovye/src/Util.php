@@ -1661,6 +1661,7 @@ HTML_CONTENT;
             $data['channel'] = $goods['lottery']['size'];
             if ($goods['lottery']['index']) {
                 $data['index'] = intval($goods['lottery']['index']);
+                $data['unit'] = 1;//1 表示以inch为单位
             }
         } else {
             $data['channel'] = Device::cargoLane2Channel($device, $lane);
@@ -1807,11 +1808,13 @@ HTML_CONTENT;
         EventBus::on('device.locked', $params);
 
         $mcb_index = '';
+        $mcb_unit = 0;
         if ($goods['lottery']) {
             $mcb_channel = intval($goods['lottery']['size']);
             if ($goods['lottery']['index']) {
                 $mcb_channel = intval($goods['lottery']['index']);
                 $mcb_index = intval($goods['lottery']['size']);
+                $mcb_unit = 1; // 1表示inch单位
             }
         } else {
             $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);
@@ -1839,7 +1842,7 @@ HTML_CONTENT;
         }
 
         //开启事务
-        $result = Util::transactionDo(function () use (&$params, $goods, $mcb_index, $mcb_channel, &$log_data, $args) {
+        $result = Util::transactionDo(function () use (&$params, $goods, $mcb_index, $mcb_channel, &$mcb_unit,  &$log_data, $args) {
             /** @var deviceModelObj $device */
             $device = $params['device'];
 
@@ -1952,6 +1955,7 @@ HTML_CONTENT;
                 'online' => !($args['online'] === false),
                 'index' => $mcb_index,
                 'channel' => $mcb_channel,
+                'unit' => $mcb_unit,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
                 'userid' => $user->getOpenid(),
                 'num' => $order->getNum(),

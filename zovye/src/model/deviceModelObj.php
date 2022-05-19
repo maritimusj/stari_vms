@@ -2124,6 +2124,7 @@ class deviceModelObj extends modelObj
 
         if ($extra['index']) {
             $params['index'] = $extra['index'];
+            $params['unit'] = $extra['unit'];
         }
 
         $content = http_build_query($params);

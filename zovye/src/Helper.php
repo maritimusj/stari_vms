@@ -253,6 +253,7 @@ class Helper
             $mcb_channel = intval($goods['lottery']['size']);
             if ($goods['lottery']['index']) {
                 $pull_data['index'] = intval($goods['lottery']['index']);
+                $pull_data['unit'] = 1;//1 表示以inch为单位
             }
         } else {
             $mcb_channel = Device::cargoLane2Channel($device, $goods['cargo_lane']);

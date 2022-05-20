@@ -58,7 +58,7 @@ class AQIInfoAccount extends AQIInfo
                     if (empty($result)) {
                         throw new RuntimeException('返回数据为空！');
                     }
-                    
+
                     if (is_error($result)) {
                         throw new RuntimeException($result['message']);
                     }
@@ -106,7 +106,7 @@ class AQIInfoAccount extends AQIInfo
                         $log->save();
                     } else {
                         Log::error('AQIInfo', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }

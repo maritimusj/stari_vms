@@ -48,7 +48,7 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
     if ($total > 0) {
         /** @var deviceModelObj $device */
         $device = null;
-        foreach($query->findAll() as $device) {
+        foreach ($query->findAll() as $device) {
             $extra = $device->get('extra', []);
 
             $data = [
@@ -57,7 +57,9 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
                 'iccid' => $device->getIccid() ?? '',
                 'app_id' => $device->getAppId() ?? '',
                 'model' => $device->getDeviceModel(),
-                'location' =>  isEmptyArray($extra['location']['tencent']) ? $extra['location'] : $extra['location']['tencent'],
+                'location' => isEmptyArray(
+                    $extra['location']['tencent']
+                ) ? $extra['location'] : $extra['location']['tencent'],
                 'createtime' => $device->getCreatetime(),
             ];
 
@@ -98,5 +100,6 @@ function sign(array $data, string $secret): string
 {
     ksort($data);
     $str = http_build_query($data);
-    return md5($str . $secret);
+
+    return md5($str.$secret);
 }

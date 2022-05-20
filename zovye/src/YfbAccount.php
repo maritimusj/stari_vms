@@ -89,7 +89,7 @@ class YfbAccount
 
         ksort($arr);
 
-        $str = implode('&', array_values($arr)) . $this->app_secret;
+        $str = implode('&', array_values($arr)).$this->app_secret;
 
         Log::debug('yfb', [
             'str' => $str,
@@ -131,6 +131,7 @@ class YfbAccount
             $yfb = self::getYFB($account);
             if (is_error($yfb)) {
                 Log::warning('yfb_query', $yfb);
+
                 return $v;
             }
 
@@ -158,7 +159,7 @@ class YfbAccount
                         if ($result['code'] == 6007) {
                             throw new RuntimeException('暂时没有公众号！');
                         }
-                        throw new RuntimeException('失败，错误代码：' . $result['code']);
+                        throw new RuntimeException('失败，错误代码：'.$result['code']);
                     }
 
                     $qrcode = json_decode($result['data'], true);
@@ -177,7 +178,7 @@ class YfbAccount
                         $log->save();
                     } else {
                         Log::error('yfb', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }
@@ -224,7 +225,7 @@ class YfbAccount
         try {
             $res = self::verifyData($params);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             /** @var userModelObj $user */
@@ -246,7 +247,7 @@ class YfbAccount
                 /** @var deviceModelObj $device */
                 $device = Device::findOne(['shadow_id' => $params['params']]);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $params['params']);
+                    throw new RuntimeException('找不到指定的设备:'.$params['params']);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($params['mpAppId']));

@@ -26,7 +26,7 @@ if ($op == 'list') {
     $result = [];
 
     /** @var packageModelObj $entry */
-    foreach($query->findAll() as $entry) {
+    foreach ($query->findAll() as $entry) {
         $result[] = $entry->format(true);
     }
 
@@ -44,7 +44,7 @@ if ($op == 'list') {
         }
     }
 
-    $result = Util::transactionDo(function() use ($device_id) {
+    $result = Util::transactionDo(function () use ($device_id) {
         $title = request::trim('title');
         $price = request::float('price', 0, 2);
 
@@ -60,7 +60,7 @@ if ($op == 'list') {
             throw new RuntimeException('创建套餐失败！');
         }
 
-        foreach($goods_list as $entry) {
+        foreach ($goods_list as $entry) {
             $goods = Goods::get($entry['id']);
             if (empty($goods)) {
                 throw new RuntimeException('找不到这个商品！');
@@ -75,6 +75,7 @@ if ($op == 'list') {
                 throw new RuntimeException('创建套餐商品失败！');
             }
         }
+
         return [
             'id' => $package->getId(),
             'msg' => '创建成功！',

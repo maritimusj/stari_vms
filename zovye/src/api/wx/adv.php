@@ -69,6 +69,7 @@ class adv
             if (Advertising::notifyAll($origin_data, $data)) {
                 return ['msg' => '保存成功！！'];
             }
+
             return ['msg' => '保存成功！？'];
         }
 
@@ -135,7 +136,7 @@ class adv
                 $reviewResult = $adv->getReviewResult() ?: 0;
 
                 $data = [
-                    'id' => sha1($adv->getId() . $user->getOpenid()),
+                    'id' => sha1($adv->getId().$user->getOpenid()),
                     'type' => intval($adv->getType()),
                     'state' => intval($adv->getState()),
                     'type_formatted' => Advertising::desc(intval($adv->getType())),
@@ -284,8 +285,8 @@ class adv
 
         /** @var advertisingModelObj $adv */
         $adv = Advertising::query(['state' => Advertising::NORMAL])
-                ->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'")
-                ->findOne();
+            ->where("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'")
+            ->findOne();
 
         if (empty($adv)) {
             return error(State::ERROR, '找不到这条广告！');
@@ -300,6 +301,7 @@ class adv
 
         if (Advertising::update($adv) && $adv->destroy()) {
             Advertising::notifyAll($assign_data, []);
+
             return ['msg' => "{$title}删除成功！"];
         }
 
@@ -337,8 +339,10 @@ class adv
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
                     Log::error('doPageUploadFile', $e->getMessage());
+
                     return error(State::ERROR, $e->getMessage());
                 }
+
                 return [
                     'filename' => $filename,
                     'url' => Util::toMedia($filename),

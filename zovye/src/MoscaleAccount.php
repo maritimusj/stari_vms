@@ -38,6 +38,7 @@ class MoscaleAccount
         if (empty($acc)) {
             return false;
         }
+
         return Util::isAssigned($acc->getAssignData(), $device);
     }
 
@@ -80,7 +81,7 @@ class MoscaleAccount
                     }
 
                     if ($result['code'] != 200) {
-                        throw new RuntimeException('失败，错误代码：' . $result['code']);
+                        throw new RuntimeException('失败，错误代码：'.$result['code']);
                     }
 
                     if (empty($result['data']['qrcode_url'])) {
@@ -101,7 +102,7 @@ class MoscaleAccount
                         $log->save();
                     } else {
                         Log::error('moscale', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }
@@ -206,7 +207,7 @@ class MoscaleAccount
                 /** @var deviceModelObj $device */
                 $device = Device::findByMoscaleKey($params['state']);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $params['state']);
+                    throw new RuntimeException('找不到指定的设备:'.$params['state']);
                 }
 
                 $order_uid = Order::makeUID($user, $device, $params['appid']);

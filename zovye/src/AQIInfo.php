@@ -14,7 +14,7 @@ class AQIInfo
     {
         $acc = Account::findOneFromType($type);
         if (empty($acc)) {
-            return err('找不到指定公众号！[' . $type . ']');
+            return err('找不到指定公众号！['.$type.']');
         }
 
         $config = $acc->settings('config', []);
@@ -40,7 +40,7 @@ class AQIInfo
         try {
             $res = self::verifyData($type, $params);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             list($shadow_id, $openid) = explode(':', $params['extra'], 2);
@@ -64,7 +64,7 @@ class AQIInfo
                 /** @var deviceModelObj $device */
                 $device = Device::findOne(['shadow_id' => $shadow_id]);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $shadow_id);
+                    throw new RuntimeException('找不到指定的设备:'.$shadow_id);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($params['tradeNo']));

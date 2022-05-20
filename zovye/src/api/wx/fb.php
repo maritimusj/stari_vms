@@ -44,6 +44,7 @@ class fb
 
             }
             $url = $filename;
+
             return ['data' => $url];
         } else {
             return error(State::ERROR, '上传失败！');

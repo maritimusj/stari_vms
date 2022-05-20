@@ -4,7 +4,7 @@ namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_locker')) {
+if (!We7::pdo_tableexists($tb_name.'_locker')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_locker` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 

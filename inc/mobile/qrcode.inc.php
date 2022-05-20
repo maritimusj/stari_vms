@@ -37,6 +37,7 @@ $profile = $user->profile();
 $phone_os = Util::getUserPhoneOS();
 
 $query = Advertising::query(['type' => Advertising::ACTIVE_QRCODE, 'state' => Advertising::NORMAL]);
+
 /**
  * Class priorityQRCodes
  */
@@ -106,7 +107,7 @@ foreach ($query->findAll() as $entry) {
     );
 }
 
-$params = [ $user, new DateTime() ];
+$params = [$user, new DateTime()];
 $device = $user->getLastActiveDevice();
 if ($device) {
     $params[] = $device;

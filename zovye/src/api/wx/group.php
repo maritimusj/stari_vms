@@ -107,6 +107,7 @@ class group
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
         }
+
         return [
             'id' => $one->getId(),
             'title' => $one->getTitle(),

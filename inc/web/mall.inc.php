@@ -63,7 +63,7 @@ if ($op == 'default') {
 
     $limit = request::array('datelimit');
     if ($limit['start']) {
-        $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'] . ' 00:00:00');
+        $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'].' 00:00:00');
         if ($start) {
             $tpl_data['s_start_date'] = $start->format('Y-m-d');
             $query->where(['createtime >=' => $start->getTimestamp()]);
@@ -71,7 +71,7 @@ if ($op == 'default') {
     }
 
     if ($limit['end']) {
-        $end = DateTime::createFromFormat('Y-m-d H:i:s', $limit['end'] . ' 00:00:00');
+        $end = DateTime::createFromFormat('Y-m-d H:i:s', $limit['end'].' 00:00:00');
         if ($end) {
             $tpl_data['s_end_date'] = $end->format('Y-m-d');
             $end->modify('next day');
@@ -140,7 +140,7 @@ if ($op == 'default') {
             }
         }
         $params_str = http_build_query($filter);
-        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
+        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&'.$params_str.'"', $pager);
     }
 
     $tpl_data['backer'] = isset($keyword) || $limit['start'] || $limit['end'] || $tpl_data['s_user_id'] || isset($tpl_data['s_status']);

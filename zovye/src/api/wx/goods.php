@@ -148,12 +148,12 @@ class goods
                 if ($detailImg != $goods->getDetailImg()) {
                     $goods->setDetailImg($detailImg);
                     $goods->setGallery([$detailImg]);
-                }                
+                }
             } elseif (request::is_array('gallery')) {
                 $gallery = request::array('gallery');
                 if ($gallery) {
                     $goods->setDetailImg($gallery[0]);
-                    $goods->setGallery($gallery);                    
+                    $goods->setGallery($gallery);
                 }
             }
 
@@ -170,7 +170,7 @@ class goods
                 'name' => request::trim('goodsName'),
                 'img' => request::trim('goodsImg'),
                 's1' => $s1,
-                'price' =>  request::float('goodsPrice', 0, 2) * 100,
+                'price' => request::float('goodsPrice', 0, 2) * 100,
                 'extra' => [
                     'unitTitle' => request::trim('goodsUnitTitle'),
                 ],
@@ -181,14 +181,14 @@ class goods
             if (request::has('detailImg')) {
                 $detailImg = request::trim('detailImg');
                 $goods_data['extra']['detailImg'] = $detailImg;
-                $goods_data['extra']['gallery'] = [$detailImg];                
+                $goods_data['extra']['gallery'] = [$detailImg];
             }
-            
+
             if (request::is_array('gallery')) {
                 $gallery = request::array('gallery');
                 if ($gallery) {
                     $goods_data['extra']['detailImg'] = $gallery[0];
-                    $goods_data['extra']['gallery'] = $gallery;                  
+                    $goods_data['extra']['gallery'] = $gallery;
                 }
             }
 

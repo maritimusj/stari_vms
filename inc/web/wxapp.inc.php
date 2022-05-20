@@ -13,14 +13,14 @@ $op = request::op('default');
 if ($op == 'add' || $op == 'edit') {
 
     $tpl_data = [];
-    
+
     if (request::has('id')) {
         $wxapp = WxApp::get(request::int('id'));
         if (empty($wxapp)) {
             JSON::fail('找不到这个小程序！');
         }
         $tpl_data['wxapp'] = $wxapp;
-    }  
+    }
 
     $content = app()->fetchTemplate('web/wxapp/edit_new', $tpl_data);
     JSON::success([
@@ -56,7 +56,7 @@ if ($op == 'add' || $op == 'edit') {
         if (empty($wxapp)) {
             JSON::fail('找不到这个小程序！');
         }
-        
+
         $wxapp->setName($data['name']);
         $wxapp->setKey($data['key']);
         $wxapp->setSecret($data['secret']);
@@ -66,7 +66,7 @@ if ($op == 'add' || $op == 'edit') {
         }
 
         JSON::success('保存成功！');
-    } else {    
+    } else {
         if (WxApp::exists(['key' => $data['key']])) {
             JSON::fail('小程序AppID已经存在！');
         }
@@ -130,7 +130,7 @@ if ($op == 'add' || $op == 'edit') {
     Config::app('wxapp.advs.reward.w', request::str('way'), true);
     Config::app('wxapp.advs.reward.limit', max(0, request::str('limit')), true);
     Config::app('wxapp.advs.reward.max', max(0, request::str('max')), true);
-    Config::app('wxapp.advs.reward.allowFree', request::bool('allowFree') ? 1 : 0, true);   
+    Config::app('wxapp.advs.reward.allowFree', request::bool('allowFree') ? 1 : 0, true);
     Config::app('wxapp.advs.reward.freeLimit', max(0, request::int('freeLimit')), true);
     Config::app('wxapp.advs.reward.freeCommission', max(0, intval(request::float('freeCommission', 0, 2) * 100)), true);
 }

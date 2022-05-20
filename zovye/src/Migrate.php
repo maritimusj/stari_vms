@@ -31,7 +31,7 @@ class Migrate
     {
         static $task = [];
         if (empty($task)) {
-            foreach (glob(ZOVYE_CORE_ROOT . 'migrate/*.php') as $filename) {
+            foreach (glob(ZOVYE_CORE_ROOT.'migrate/*.php') as $filename) {
                 $task[basename($filename, '.php')] = $filename;
             }
         }
@@ -41,7 +41,7 @@ class Migrate
 
     public static function getNewTask(): array
     {
-        if (!We7::pdo_tableexists(APP_NAME . '_migration')) {
+        if (!We7::pdo_tableexists(APP_NAME.'_migration')) {
             return [];
         }
 
@@ -74,10 +74,12 @@ class Migrate
                 }
 
                 Util::redirect($url);
-                exit(); 
+                exit();
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -102,7 +104,7 @@ class Migrate
         $result = Util::transactionDo(function () use ($name, $filename) {
             try {
                 //加载文件
-                include_once $filename;     
+                include_once $filename;
 
             } catch (Exception $e) {
                 Log::error('migrate', [
@@ -111,8 +113,10 @@ class Migrate
                     'err' => $e->getMessage(),
                     'trace' => $e->getTrace(),
                 ]);
+
                 return err($e->getMessage());
             }
+
             return true;
         });
 
@@ -123,11 +127,11 @@ class Migrate
             $data['error'] = $result['message'];
         }
 
-        if(!self::create($data)) {
+        if (!self::create($data)) {
             Log::error('migrate', [
                 'error' => '无法保存migrate记录！',
             ]);
-        }        
+        }
 
         return !is_error($result);
     }

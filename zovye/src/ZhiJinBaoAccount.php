@@ -43,6 +43,7 @@ class ZhiJinBaoAccount
         if (empty($acc)) {
             return false;
         }
+
         return Util::isAssigned($acc->getAssignData(), $device);
     }
 
@@ -80,7 +81,7 @@ class ZhiJinBaoAccount
                     }
 
                     if ($result['code'] != 0) {
-                        throw new RuntimeException('失败，发生错误：' . $result['code']);
+                        throw new RuntimeException('失败，发生错误：'.$result['code']);
                     }
 
                     if (empty($result['data']) || empty($result['data']['qrcodeUrl'])) {
@@ -100,7 +101,7 @@ class ZhiJinBaoAccount
                         $log->save();
                     } else {
                         Log::error('zjbao', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }
@@ -164,7 +165,7 @@ class ZhiJinBaoAccount
                 /** @var deviceModelObj $device */
                 $device = Device::get($data['deviceSn'], true);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $data['deviceSn']);
+                    throw new RuntimeException('找不到指定的设备:'.$data['deviceSn']);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($data['appId']));
@@ -179,8 +180,12 @@ class ZhiJinBaoAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = [], callable $cb = null): array
-    {
+    public function fetchOne(
+        deviceModelObj $device,
+        userModelObj $user = null,
+        $params = [],
+        callable $cb = null
+    ): array {
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
         $params = array_merge($params, [

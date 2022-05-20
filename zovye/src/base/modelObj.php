@@ -75,14 +75,17 @@ class modelObj implements ISettings
 
     public static function getTableName($readOrWrite): string
     {
-        $tb_name = get_called_class() . '::TB_NAME';
+        $tb_name = get_called_class().'::TB_NAME';
         if (defined($tb_name)) {
             return constant($tb_name);
         }
 
         unset($readOrWrite);
 
-        trigger_error('tb_name() must be implemented or constant TB_NAME must be defined by ' . get_called_class(), E_USER_ERROR);
+        trigger_error(
+            'tb_name() must be implemented or constant TB_NAME must be defined by '.get_called_class(),
+            E_USER_ERROR
+        );
     }
 
     public function log(int $level, string $title, $data): bool
@@ -108,6 +111,7 @@ class modelObj implements ISettings
             $res = $this->factory->__loadFromDb($this, $name, true);
             if ($res) {
                 $this->$name = $res[$name];
+
                 return $this->$name;
             }
         }
@@ -168,6 +172,7 @@ class modelObj implements ISettings
             $settings_key = $this->getSettingsKey($key);
             $data = $this->createSettings()->get($settings_key);
             $this->settings_container[$key] = $data;
+
             return ifEmpty($data, $default);
         }
 
@@ -185,13 +190,18 @@ class modelObj implements ISettings
         if (empty($classname)) {
             $classname = get_called_class();
         }
+
         return sha1("$classname:$this->id:$key");
     }
 
     public function createSettings(): Settings
     {
         if (!isset($this->settingsObj)) {
-            $this->settingsObj = new Settings('settings', $this->getSettingsBindClassName() ?: $this->factory->shortName(), $this->settingsUseCache);
+            $this->settingsObj = new Settings(
+                'settings',
+                $this->getSettingsBindClassName() ?: $this->factory->shortName(),
+                $this->settingsUseCache
+            );
         }
 
         return $this->settingsObj;
@@ -231,6 +241,7 @@ class modelObj implements ISettings
             $settings_key = $this->getSettingsKey($key);
             if ($this->createSettings()->set($settings_key, $val)) {
                 $this->settings_container[$key] = $val;
+
                 return true;
             }
         }
@@ -242,6 +253,7 @@ class modelObj implements ISettings
     {
         if ($this->id && $key) {
             $settings_key = $this->getSettingsKey($key);
+
             return $this->createSettings()->has($settings_key);
         }
 
@@ -272,6 +284,7 @@ class modelObj implements ISettings
         if ($this->id && $key) {
             unset($this->settings_container[$key]);
             $settings_key = $this->getSettingsKey($key);
+
             return $this->createSettings()->pop($settings_key, $default);
         }
 
@@ -316,6 +329,7 @@ class modelObj implements ISettings
                 return true;
             }
         }
+
         return false;
     }
 
@@ -349,6 +363,7 @@ class modelObj implements ISettings
         if (preg_match('/@var\s+(\w+)[\s|*]+/', $doc, $matches)) {
             return $matches[1];
         }
+
         return '';
     }
 
@@ -361,6 +376,7 @@ class modelObj implements ISettings
         foreach (self::getProps(true) as $prop => $type_hints) {
             $this->$prop = self::convert($data[$prop], $type_hints);
         }
+
         return $this;
     }
 
@@ -377,7 +393,9 @@ class modelObj implements ISettings
 
             try {
                 $ref = new ReflectionClass($classname);
-                foreach ($ref->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED) as $prop) {
+                foreach ($ref->getProperties(
+                    ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED
+                ) as $prop) {
                     $props_cache[$classname][$prop->getName()] = self::parseType($prop->getDocComment());
                 }
             } catch (Exception $e) {
@@ -408,7 +426,9 @@ class modelObj implements ISettings
                     return $seg($key);
                 };
             } elseif ($seg == 'all') {
-                $isOk = function() { return true; };
+                $isOk = function () {
+                    return true;
+                };
             }
         } else {
             if ($seg === null) {
@@ -426,6 +446,7 @@ class modelObj implements ISettings
                 $data[$prop] = $this->$prop;
             }
         }
+
         return $data;
     }
 }

@@ -1,11 +1,12 @@
 <?php
+
 namespace zovye;
 
 use zovye\We7;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_principal')) {
+if (!We7::pdo_tableexists($tb_name.'_principal')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_principal` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

@@ -509,7 +509,7 @@ class Stats
             if (Config::app('order.total', 0) > 100000) {
                 $last_order = Order::getLastOrder();
                 if ($last_order) {
-                    $total = $last_order['id'] . '（订单）';
+                    $total = $last_order['id'].'（订单）';
                 }
             } else {
                 $e = [app(), 'goods'];
@@ -539,8 +539,14 @@ class Stats
 
             $data['last7days']['n'] = $total;
 
-            $data['month']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of this month 00:00'))['total'];
-            $data['lastmonth']['n'] = (int)$counter->getMonthAll($e, new DateTime('first day of last month 00:00'))['total'];
+            $data['month']['n'] = (int)$counter->getMonthAll(
+                $e,
+                new DateTime('first day of this month 00:00')
+            )['total'];
+            $data['lastmonth']['n'] = (int)$counter->getMonthAll(
+                $e,
+                new DateTime('first day of last month 00:00')
+            )['total'];
         }
 
         $query = User::query();
@@ -552,16 +558,21 @@ class Stats
             'createtime >=' => $today->getTimestamp(),
         ])->count();
 
-        $data['yesterday']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query, $today) {
-            $yesterday = new DateTime('-1 day 00:00');
-            return $query->resetAll()->where([
-                'createtime >=' => $yesterday->getTimestamp(),
-                'createtime <' => $today->getTimestamp(),
-            ])->count();
-        });
+        $data['yesterday']['f'] = Util::cachedCallUtil(
+            new DateTime('next day 00:00:00'),
+            function () use ($query, $today) {
+                $yesterday = new DateTime('-1 day 00:00');
+
+                return $query->resetAll()->where([
+                    'createtime >=' => $yesterday->getTimestamp(),
+                    'createtime <' => $today->getTimestamp(),
+                ])->count();
+            }
+        );
 
         $data['last7days']['f'] = Util::cachedCallUtil(new DateTime('next day 00:00:00'), function () use ($query) {
             $last7days = new DateTime('-7 days 00:00');
+
             return $query->resetAll()->where([
                 'createtime >=' => $last7days->getTimestamp(),
             ])->count();
@@ -572,18 +583,23 @@ class Stats
             return $query->resetAll()->where(['createtime >=' => $month->getTimestamp()])->count();
         });
 
-        $data['lastmonth']['f'] = Util::cachedCallUtil(new DateTime('first day of next month 00:00:00'), function () use ($query, $month) {
-            $last_month = new DateTime('first day of last month 00:00');
-            return $query->resetAll()->where([
-                'createtime >=' => $last_month->getTimestamp(),
-                'createtime <' => $month->getTimestamp()
-            ])->count();
-        });
+        $data['lastmonth']['f'] = Util::cachedCallUtil(
+            new DateTime('first day of next month 00:00:00'),
+            function () use ($query, $month) {
+                $last_month = new DateTime('first day of last month 00:00');
+
+                return $query->resetAll()->where([
+                    'createtime >=' => $last_month->getTimestamp(),
+                    'createtime <' => $month->getTimestamp(),
+                ])->count();
+            }
+        );
 
         $total = [
             'device' => Device::query()->count(),
             'agent' => Agent::query()->count(),
-            'advs' => Account::query(['state' => 1])->count() + Advertising::query(['state <>' => Advertising::DELETED])->count(),
+            'advs' => Account::query(['state' => 1])->count() + Advertising::query(['state <>' => Advertising::DELETED]
+                )->count(),
             'user' => $data['all']['f'],
         ];
 
@@ -765,6 +781,7 @@ class Stats
                 if (!Stats::repair($obj, $day)) {
                     return err('修复失败：{$day}！');
                 }
+
                 return true;
             });
             if (is_error($result)) {
@@ -772,6 +789,7 @@ class Stats
             }
             $begin = $begin->modify('next day');
         }
+
         return true;
     }
 
@@ -933,6 +951,7 @@ class Stats
         if ($title) {
             $chart['title'] = ['text' => $title];
         }
+
         return $chart;
     }
 
@@ -956,7 +975,7 @@ class Stats
             list(, $data) = self::getUserMonthCommissionStatsOfYear($user, $year);
             $result = array_merge($result, $data);
         }
-        
+
         ksort($result);
 
         $last_month_balance = 0;
@@ -1057,7 +1076,7 @@ class Stats
 
         $result[0] = $years;
         $result[1] = $data;
-        
+
         return $result;
     }
 
@@ -1136,6 +1155,7 @@ class Stats
                 }
             }
         }
+
         return $data;
     }
 }

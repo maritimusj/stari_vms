@@ -70,11 +70,13 @@ class ModelObjFinderProxy
 
             if ($this->finder->isPropertyExists('user_id')) {
                 $this->finder->where(['user_id' => $condition->getId()]);
-            } else if ($this->finder->isPropertyExists('openid')) {
-                $this->finder->where(['openid' => $condition->getOpenid()]);
             } else {
-                trigger_error('property not exists', E_USER_ERROR);
-            }            
+                if ($this->finder->isPropertyExists('openid')) {
+                    $this->finder->where(['openid' => $condition->getOpenid()]);
+                } else {
+                    trigger_error('property not exists', E_USER_ERROR);
+                }
+            }
 
         } elseif ($condition instanceof deviceModelObj) {
 
@@ -84,7 +86,7 @@ class ModelObjFinderProxy
                 $this->finder->where(['device_uid' => $condition->getUid()]);
             } else {
                 trigger_error('property not exists', E_USER_ERROR);
-            }            
+            }
 
         } elseif ($condition instanceof orderModelObj) {
 
@@ -92,7 +94,7 @@ class ModelObjFinderProxy
                 $this->finder->where(['order_id' => $condition->getId()]);
             } else {
                 trigger_error('property not exists', E_USER_ERROR);
-            }            
+            }
 
         } elseif ($condition instanceof device_groupsModelObj) {
 
@@ -100,7 +102,7 @@ class ModelObjFinderProxy
                 $this->finder->where(['group_id' => $condition->getId()]);
             } else {
                 trigger_error('property not exists', E_USER_ERROR);
-            }            
+            }
 
         } elseif ($condition instanceof goodsModelObj) {
 
@@ -108,7 +110,7 @@ class ModelObjFinderProxy
                 $this->finder->where(['goods_id' => $condition->getId()]);
             } else {
                 trigger_error('property not exists', E_USER_ERROR);
-            }            
+            }
 
         } else {
             $this->finder->where($condition);

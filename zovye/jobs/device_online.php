@@ -33,7 +33,7 @@ if ($op == 'device_online' && CtrlServ::checkJobSign($data)) {
         $tpl_id = settings('notice.deviceOnline_tplid');
         if (!empty($tpl_id)) {
             $data = [
-                'first' => ['value' => '注意，设备已' . $data['event'] . '!'],
+                'first' => ['value' => '注意，设备已'.$data['event'].'!'],
                 'keyword1' => ['value' => $device->getName()],
                 'keyword2' => ['value' => $data['event']],
                 'keyword3' => ['value' => date('Y-m-d H:i:s')],

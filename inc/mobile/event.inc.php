@@ -4,6 +4,6 @@
  * @url www.stariture.com
  */
 
-namespace  zovye;
+namespace zovye;
 
 Log::debug('event', request::raw());

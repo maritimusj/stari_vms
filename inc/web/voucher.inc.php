@@ -251,10 +251,11 @@ if ($op == 'default') {
     $voucher = GoodsVoucher::get($id);
     if ($voucher) {
         $res = Util::transactionDo(function () use ($voucher) {
-            if($voucher->destroy()) {
-                 return true;
+            if ($voucher->destroy()) {
+                return true;
             }
-           return error(State::ERROR, 'fail');
+
+            return error(State::ERROR, 'fail');
         });
         if (!is_error($res)) {
             JSON::success('操作成功 ！');
@@ -288,7 +289,9 @@ if ($op == 'default') {
     $id = request::int('id');
     $voucher = GoodsVoucher::get($id);
     if ($voucher) {
-        $data = is_string(request('data')) ? json_decode(htmlspecialchars_decode(request('data')), true) : request('data');
+        $data = is_string(request('data')) ? json_decode(htmlspecialchars_decode(request('data')), true) : request(
+            'data'
+        );
         if ($voucher->setExtraData('assigned', $data) && $voucher->save()) {
             JSON::success('保存成功 ！');
         }

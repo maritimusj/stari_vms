@@ -55,7 +55,7 @@ function m(string $name): modelFactory
 
 function tb(string $name): string
 {
-    return APP_NAME . '_' . $name;
+    return APP_NAME.'_'.$name;
 }
 
 /**
@@ -81,6 +81,7 @@ function settings(string $key = '', $default = null)
 function updateSettings(string $key, $val): bool
 {
     unset(__ZOVYE_SETTINGS__::$cache[$key]);
+
     return app()->updateSettings($key, $val);
 }
 
@@ -146,8 +147,9 @@ function toSnakeCase($str): string
 {
     $str = str_replace('_', '', $str);
     $str = preg_replace_callback('/([A-Z])/', function ($matches) {
-        return '_' . strtolower($matches[0]);
+        return '_'.strtolower($matches[0]);
     }, $str);
+
     return ltrim($str, '_');
 }
 
@@ -330,7 +332,7 @@ function url($tag, ...$names)
     $module_url = App::isHttpsWebsite() ? str_replace('http://', 'https://', MODULE_URL) : MODULE_URL;
     foreach ($names as $name) {
         if (substr($name, 0, 4) !== 'http') {
-            $name = $module_url . $name;
+            $name = $module_url.$name;
         }
         if ($tag) {
             if (substr($name, strpos($name, '?') - 4, 4) === '.css') {
@@ -350,7 +352,8 @@ if (!function_exists('array_key_first')) {
         foreach ($arr as $key => $unused) {
             return $key;
         }
-        return NULL;
+
+        return null;
     }
 }
 
@@ -358,7 +361,7 @@ function hashFN(callable $fn, ...$val): string
 {
     try {
         $ref = new ReflectionFunction($fn);
-    }catch (ReflectionException $e) {
+    } catch (ReflectionException $e) {
         try {
             $ref = new ReflectionMethod($fn);
         } catch (ReflectionException $e) {
@@ -374,17 +377,19 @@ function hashFN(callable $fn, ...$val): string
         ];
         foreach ($val as $v) {
             if ($v instanceof DateTimeInterface) {
-                $data[] = 'datetime:' . $v->getTimestamp();
+                $data[] = 'datetime:'.$v->getTimestamp();
             } elseif ($v instanceof modelObj) {
-                $data[] = get_class($v) . ':' . $v->getId();
+                $data[] = get_class($v).':'.$v->getId();
             } else {
                 $data[] = strval($v);
             }
         }
+
         return md5(implode(':', $data));
     }
 
     trigger_error('无法识别的函数或方法!');
+
     return '';
 }
 
@@ -395,7 +400,9 @@ function onceCall(callable $fn, ...$params)
     if (!isset($cache[$v])) {
         $result = $fn(...$params);
         $cache[$v] = $result;
+
         return $result;
     }
+
     return $cache[$v];
 }

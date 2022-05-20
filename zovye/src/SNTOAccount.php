@@ -70,19 +70,21 @@ class SNTOAccount
 
         if (empty($config['data']['token'])) {
             Log::error('snto', '无法获取token！');
+
             return [];
         }
 
         $snto_openid = $user->settings('customData.snto.openid', '');
         if (empty($snto_openid)) {
-            $auth_url = self::API_URL . '/v3/qrcode/userAuth.json?';
+            $auth_url = self::API_URL.'/v3/qrcode/userAuth.json?';
 
             $data = $acc->format();
-            $data['redirect_url'] = $auth_url . http_build_query([
+            $data['redirect_url'] = $auth_url.http_build_query([
                     'redirectUrl' => Util::murl('snto', ['op' => 'snto_auth', 'device' => $device->getShadowId()]),
                     'channel' => $config['channel'],
                     'mac' => $user->getOpenid(),
                 ]);
+
             return [$data];
         }
 
@@ -136,7 +138,7 @@ class SNTOAccount
                     $log->save();
                 } else {
                     Log::error('snto', [
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -205,7 +207,7 @@ class SNTOAccount
                 /** @var deviceModelObj $device */
                 $device = Device::findOne(['shadow_id' => $device_uid]);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $device_uid);
+                    throw new RuntimeException('找不到指定的设备:'.$device_uid);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($data['order_id']));
@@ -221,16 +223,17 @@ class SNTOAccount
 
     public function fetchToken()
     {
-        $url = self::API_URL . '/token/scanQr.json?' . http_build_query([
+        $url = self::API_URL.'/token/scanQr.json?'.http_build_query([
                 'app_id' => $this->id,
                 'app_key' => $this->key,
             ]);
+
         return Util::getJSON($url);
     }
 
     public function fetchOne(deviceModelObj $device, userModelObj $user, $snto_openid, callable $cb = null)
     {
-        $url = self::API_URL . '/v3/qrcode.json';
+        $url = self::API_URL.'/v3/qrcode.json';
 
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
         $uid = App::uid(6);
@@ -255,6 +258,6 @@ class SNTOAccount
 
     public function sign($data = []): string
     {
-        return sha1($data['app_id'] . $data['order_id'] . $data['params'] . $this->key);
+        return sha1($data['app_id'].$data['order_id'].$data['params'].$this->key);
     }
 }

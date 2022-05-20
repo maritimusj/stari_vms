@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -20,7 +21,7 @@ class counterModelObj extends modelObj
 
     /** @var int */
     protected $id;
-    
+
     /** @var string */
     protected $uid;
 

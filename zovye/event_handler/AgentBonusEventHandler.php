@@ -61,7 +61,7 @@ class AgentBonusEventHandler
         $superior = $agent->getSuperior();
         while ($superior && $level <= 3) {
             if ($superior->isCommissionEnabled()) {
-                $agents['level' . $level] = $superior;
+                $agents['level'.$level] = $superior;
             }
             $superior = $superior->getSuperior();
             $level++;

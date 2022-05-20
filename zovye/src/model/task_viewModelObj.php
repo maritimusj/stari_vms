@@ -41,7 +41,7 @@ class task_viewModelObj extends modelObj
     /** @var int */
     protected $s1;
 
-     /** @var string */
+    /** @var string */
     protected $s2;
 
     /** @var int */
@@ -83,6 +83,7 @@ class task_viewModelObj extends modelObj
             $result['status'] = $this->s1;
             $result['createtime'] = $this->createtime;
         }
+
         return $result;
     }
 }

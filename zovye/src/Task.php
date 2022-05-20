@@ -23,7 +23,7 @@ class Task
             'user_id' => $user->getId(),
             'account_id' => $account->getId(),
             's1' => self::INIT,
-            's2' => sha1("{$user->getId()}{$account->getId()}" . Util::random(16)),
+            's2' => sha1("{$user->getId()}{$account->getId()}".Util::random(16)),
             'extra' => [
                 'data' => $data,
             ],
@@ -50,6 +50,7 @@ class Task
         if ($is_uid) {
             return self::findOne(['s2' => $id]);
         }
+
         return self::findOne(['id' => $id]);
     }
 
@@ -65,9 +66,10 @@ class Task
             return [];
         }
         $result = [];
-        foreach($res as $item) {
+        foreach ($res as $item) {
             $result[$item['s1']] = $item['n'];
         }
+
         return $result;
     }
 

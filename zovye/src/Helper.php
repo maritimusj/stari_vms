@@ -30,6 +30,7 @@ class Helper
                 }
             }
         }
+
         return settings('device.get.theme', 'default');
     }
 
@@ -41,6 +42,7 @@ class Helper
     public static function needsTplAccountsData(deviceModelObj $device = null): bool
     {
         $theme = self::getTheme($device);
+
         return !in_array($theme, ['balance', 'balance2', 'spa', 'spec']);
     }
 
@@ -97,6 +99,7 @@ class Helper
         }
 
         $enabled = settings('mfa.enable');
+
         return boolval($enabled);
     }
 
@@ -194,6 +197,7 @@ class Helper
                         $v = $zero['v'];
                     }
                 }
+
                 return $v > 0 && mt_rand(1, 10000) <= intval($v * 100);
             }
         }
@@ -233,8 +237,13 @@ class Helper
      * @param $data
      * @return array
      */
-    public static function pullGoods(orderModelObj $order, deviceModelObj $device, userModelObj $user, int $level, $data): array
-    {
+    public static function pullGoods(
+        orderModelObj $order,
+        deviceModelObj $device,
+        userModelObj $user,
+        int $level,
+        $data
+    ): array {
         //todo 处理优惠券
         //$voucher = $pay_log->getVoucher();
 
@@ -365,8 +374,14 @@ class Helper
         return err('失败，请稍后再试！');
     }
 
-    public static function createWxAppOrder(userModelObj $user, deviceModelObj $device, $goodsOrPackageId, $num = 1, $is_package = false, $order_no = '')
-    {
+    public static function createWxAppOrder(
+        userModelObj $user,
+        deviceModelObj $device,
+        $goodsOrPackageId,
+        $num = 1,
+        $is_package = false,
+        $order_no = ''
+    ) {
         if ($is_package) {
             $package = $device->getPackage($goodsOrPackageId);
             if (empty($package)) {
@@ -410,7 +425,7 @@ class Helper
         ]);
 
         if (is_error($data)) {
-            return err('创建支付失败: ' . $data['message']);
+            return err('创建支付失败: '.$data['message']);
         }
 
         //加入一个支付结果检查
@@ -423,10 +438,12 @@ class Helper
         }
 
         $data['orderNO'] = $order_no;
+
         return $data;
     }
 
-    public static function validateLocation(userModelObj  $user, deviceModelObj $device, $lat, $lng) {
+    public static function validateLocation(userModelObj $user, deviceModelObj $device, $lat, $lng)
+    {
         $data = [
             'validated' => false,
             'time' => time(),
@@ -451,16 +468,19 @@ class Helper
             $res = Util::getDistance($location, ['lng' => $lng, 'lat' => $lat]);
             if (is_error($res)) {
                 Log::error('location', $res);
+
                 return err('哎呀，出错了');
             }
 
             if ($res > $distance) {
                 $user->setLastActiveDevice();
+
                 return err('哎呀，设备太远了');
             }
         }
 
         $user->setLastActiveData('location.validated', true);
+
         return true;
     }
 }

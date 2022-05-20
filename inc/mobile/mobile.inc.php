@@ -49,8 +49,8 @@ if ($op == 'save') {
         }
 
         $res = User::findOne([
-            'id <>' => $user->getId(), 
-            'mobile' => $mobile, 
+            'id <>' => $user->getId(),
+            'mobile' => $mobile,
             'app' => User::WX,
         ]);
 
@@ -148,9 +148,11 @@ if ($op == 'save') {
             if ($user->save()) {
                 //使用控制中心推送通知
                 Job::newAgent($user->getId());
+
                 return ['message' => '恭喜您已经成功注册为代理商！'];
             }
         }
+
         return ['message' => '手机号码保存成功,请联系客服为您授权！'];
     });
 

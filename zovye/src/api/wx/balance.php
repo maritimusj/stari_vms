@@ -292,8 +292,12 @@ class balance
      *
      * @return array
      */
-    public static function getUserBalanceLog(userModelObj $user, string $type, int $page = 0, int $page_size = DEFAULT_PAGE_SIZE): array
-    {
+    public static function getUserBalanceLog(
+        userModelObj $user,
+        string $type,
+        int $page = 0,
+        int $page_size = DEFAULT_PAGE_SIZE
+    ): array {
         $page = max(1, $page);
         $page_size = !empty($page_size) ? max(1, $page_size) : DEFAULT_PAGE_SIZE;
 
@@ -328,7 +332,7 @@ class balance
                     'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 ];
                 if ($entry->getXVal() > 0) {
-                    $data['xval'] = '+' . $data['xval'];
+                    $data['xval'] = '+'.$data['xval'];
                 }
                 if ($entry->getSrc() == CommissionBalance::WITHDRAW) {
                     $status = $entry->getState();
@@ -418,7 +422,12 @@ class balance
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if ($agent) {
-            return balance::getUserBalanceLog($agent, request::str('type'), request::int('page'), request::int('pagesize'));
+            return balance::getUserBalanceLog(
+                $agent,
+                request::str('type'),
+                request::int('page'),
+                request::int('pagesize')
+            );
         }
 
         return error(State::ERROR, '获取列表失败！');
@@ -440,6 +449,7 @@ class balance
 
 
         }
+
         return error(State::ERROR, '获取列表失败！');
     }
 }

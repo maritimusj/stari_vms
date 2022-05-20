@@ -162,6 +162,7 @@ abstract class StatsCounter
                     'updatetime' => 0,
                 ]);
             }
+
             return $num;
 
         } catch (Exception $e) {
@@ -192,7 +193,7 @@ abstract class StatsCounter
         }
     }
 
-    public function removeYears(array $params, DateTimeInterface... $years)
+    public function removeYears(array $params, DateTimeInterface...$years)
     {
         foreach ($years as $year) {
             $uid = $this->makeUID(array_merge(['datetime' => $year->format('Y')], $params));

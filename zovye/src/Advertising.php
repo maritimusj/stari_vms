@@ -99,6 +99,7 @@ class Advertising extends State
     public static function remove($id, $type = null): bool
     {
         $entry = self::get($id, $type);
+
         return $entry->destroy();
     }
 
@@ -122,8 +123,9 @@ class Advertising extends State
             $res = self::query()->findOne($cond);
             if ($res) {
                 $cache[$res->getId()] = $res;
+
                 return $res;
-            }            
+            }
         }
 
         return null;
@@ -154,6 +156,7 @@ class Advertising extends State
     public static function setAdvsLastUpdate($type, $ts = null): bool
     {
         $ts = $ts ?? time();
+
         return updateSettings("advs.version.type$type", $ts);
     }
 
@@ -165,6 +168,7 @@ class Advertising extends State
     public static function version($obj)
     {
         $type = $obj instanceof advertisingModelObj ? $obj->getType() : intval($obj);
+
         return settings("advs.version.type$type", 0);
     }
 
@@ -186,8 +190,11 @@ class Advertising extends State
         ];
     }
 
-    public static function createOrUpdate(agentModelObj $agent = null, advertisingModelObj $adv = null, $params = []): array
-    {
+    public static function createOrUpdate(
+        agentModelObj $agent = null,
+        advertisingModelObj $adv = null,
+        $params = []
+    ): array {
         $type = intval($params['type']);
         if (!Advertising::has($type)) {
             return err('广告类型不正确！');
@@ -218,7 +225,7 @@ class Advertising extends State
                 }
                 $extra['size'] = intval($params['size']);
                 $extra['clr'] = trim($params['clr']);
-                $extra['background-clr'] = trim($params['background-clr']);                
+                $extra['background-clr'] = trim($params['background-clr']);
                 $extra['speed'] = trim($params['speed']);
             } else {
                 $url = $params['url'];
@@ -393,11 +400,12 @@ class Advertising extends State
                 }
             }
         }
+
         return $slides;
     }
 
     public static function pass($id, $admin = ''): bool
-    {  
+    {
         if ($id > 0) {
             $adv = Advertising::get($id);
             if ($adv) {
@@ -410,21 +418,23 @@ class Advertising extends State
                         'ip' => CLIENT_IP,
                         'time' => TIMESTAMP,
                     ];
-    
+
                     if ($adv->updateSettings("reviewData.$current", $data) && Advertising::update($adv)) {
-    
+
                         if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
                             //通知设备更新屏幕广告
                             $assign_data = $adv->settings('assigned', []);
                             Advertising::notifyAll($assign_data, []);
                         }
-    
+
                         Job::advReviewResult($adv->getId());
+
                         return true;
                     }
                 }
             }
-        }    
+        }
+
         return false;
     }
 
@@ -439,14 +449,18 @@ class Advertising extends State
                     if ($current == $unknown) {
                         $adv->updateSettings('reviewData.current', $unknown);
                     }
-                    if ($adv->updateSettings("reviewData.$current.result", ReviewResult::REJECTED) && Advertising::update($adv)) {
+                    if ($adv->updateSettings(
+                            "reviewData.$current.result",
+                            ReviewResult::REJECTED
+                        ) && Advertising::update($adv)) {
                         Job::advReviewResult($adv->getId());
+
                         return true;
                     }
                 }
             }
         }
-    
+
         return false;
     }
 

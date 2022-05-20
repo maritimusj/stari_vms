@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -22,27 +23,27 @@ class payload_logsModelObj extends modelObj
     }
 
     /** @var int */
-	protected $id;
+    protected $id;
 
-     /** @var int */
-	protected $uniacid;
+    /** @var int */
+    protected $uniacid;
 
-     /** @var int */
-	protected $device_id;
+    /** @var int */
+    protected $device_id;
 
-     /** @var int */
-	protected $goods_id;
+    /** @var int */
+    protected $goods_id;
 
-     /** @var int */
-	protected $org;
+    /** @var int */
+    protected $org;
 
-     /** @var int */
-	protected $num;
+    /** @var int */
+    protected $num;
 
-	protected $extra;
+    protected $extra;
 
-     /** @var int */
-	protected $createtime;
+    /** @var int */
+    protected $createtime;
 
-	use ExtraDataGettersAndSetters;
+    use ExtraDataGettersAndSetters;
 }

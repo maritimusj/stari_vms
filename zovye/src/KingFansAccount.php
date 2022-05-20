@@ -49,55 +49,59 @@ class KingFansAccount
 
         $v = [];
 
-        (new KingFansAccount($config['bid'], $config['key']))->fetchOne($device, $user, function ($request, $result) use ($acc, $device, $user, &$v) {
-            if (App::isAccountLogEnabled()) {
-                $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                if (empty($log)) {
-                    Log::error('kingfans_query', [
-                        'query' => $request,
-                        'result' => $result,
-                    ]);
+        (new KingFansAccount($config['bid'], $config['key']))->fetchOne(
+            $device,
+            $user,
+            function ($request, $result) use ($acc, $device, $user, &$v) {
+                if (App::isAccountLogEnabled()) {
+                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                    if (empty($log)) {
+                        Log::error('kingfans_query', [
+                            'query' => $request,
+                            'result' => $result,
+                        ]);
+                    }
+                }
+
+                try {
+                    if (empty($result) || empty($result['list'])) {
+                        throw new RuntimeException('返回数据为空！');
+                    }
+
+                    if (is_error($result)) {
+                        throw new RuntimeException($result['message']);
+                    }
+
+                    if ($result['error']) {
+                        throw new RuntimeException("请求失败，错误代码：{$result['error']}");
+                    }
+
+                    if (empty($result['list']['qrcode_url'])) {
+                        throw new RuntimeException('二维码为空！');
+                    }
+
+                    $data = $acc->format();
+
+                    $data['name'] = $result['list']['ghname'] ?: Account::KINGFANS_NAME;
+                    $data['qrcode'] = $result['list']['qrcode_url'];
+                    if ($result['list']['head_img']) {
+                        $data['img'] = $result['list']['head_img'];
+                    }
+
+                    $v[] = $data;
+
+                } catch (Exception $e) {
+                    if (App::isAccountLogEnabled() && isset($log)) {
+                        $log->setExtraData('error_msg', $e->getMessage());
+                        $log->save();
+                    } else {
+                        Log::error('kingfans', [
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
             }
-
-            try {
-                if (empty($result) || empty($result['list'])) {
-                    throw new RuntimeException('返回数据为空！');
-                }
-
-                if (is_error($result)) {
-                    throw new RuntimeException($result['message']);
-                }
-
-                if ($result['error']) {
-                    throw new RuntimeException("请求失败，错误代码：{$result['error']}");
-                }
-
-                if (empty($result['list']['qrcode_url'])) {
-                    throw new RuntimeException('二维码为空！');
-                }
-
-                $data = $acc->format();
-
-                $data['name'] = $result['list']['ghname'] ?: Account::KINGFANS_NAME;
-                $data['qrcode'] = $result['list']['qrcode_url'];
-                if ($result['list']['head_img']) {
-                    $data['img'] = $result['list']['head_img'];
-                }
-
-                $v[] = $data;
-
-            } catch (Exception $e) {
-                if (App::isAccountLogEnabled() && isset($log)) {
-                    $log->setExtraData('error_msg', $e->getMessage());
-                    $log->save();
-                } else {
-                    Log::error('kingfans', [
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        });
+        );
 
         return $v;
     }
@@ -118,7 +122,7 @@ class KingFansAccount
             return err('没有配置！');
         }
 
-        if (md5($params['oid'] . $params['uid'] . $params['timestamp'] . $config['key']) !== $params['sign']) {
+        if (md5($params['oid'].$params['uid'].$params['timestamp'].$config['key']) !== $params['sign']) {
             return err('签名错误！');
         }
 
@@ -131,7 +135,7 @@ class KingFansAccount
         try {
             $res = self::verifyData($params);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             list($device_shadow_uid, $user_openid) = explode(':', $params['param']);
@@ -159,7 +163,7 @@ class KingFansAccount
                 /** @var deviceModelObj $device */
                 $device = Device::findOne(['shadow_id' => $device_shadow_uid]);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $device_shadow_uid);
+                    throw new RuntimeException('找不到指定的设备:'.$device_shadow_uid);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($params['oid']));
@@ -189,9 +193,9 @@ class KingFansAccount
             't' => TIMESTAMP,
         ];
 
-        $data['sign'] = md5($this->key . $data['uuid'] . $data['t']);
+        $data['sign'] = md5($this->key.$data['uuid'].$data['t']);
 
-        $result = Util::get(self::API_URL . '?' . http_build_query($data));
+        $result = Util::get(self::API_URL.'?'.http_build_query($data));
         if (!empty($result) && is_string($result)) {
             $result = json_decode($result, true);
         }

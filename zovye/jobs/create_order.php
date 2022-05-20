@@ -44,7 +44,7 @@ if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
             $res = Job::refund($order_no, $e->getMessage());
             if (!$res) {
                 $device->appShowMessage('退款失败，请联系客服，谢谢！');
-                 Log::fatal('order_create', [
+                Log::fatal('order_create', [
                     'orderNO' => $order_no,
                     'msg' => '启动退款任务！',
                 ]);
@@ -108,7 +108,7 @@ function prepare(string $order_no)
         ExceptionNeedsRefund::throwWith($device, '找不到指定的用户！');
     }
 
-    if(!$user->acquireLocker('create::order')) {
+    if (!$user->acquireLocker('create::order')) {
         throw new Exception('用户无法锁定！');
     }
 

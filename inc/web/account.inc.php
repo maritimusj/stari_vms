@@ -43,10 +43,12 @@ if ($op == 'default') {
             }
         } else {
             if (empty($type)) {
-                $query->where(['type' => [
-                    Account::NORMAL,
-                    Account::AUTH,
-                ]]);
+                $query->where([
+                    'type' => [
+                        Account::NORMAL,
+                        Account::AUTH,
+                    ],
+                ]);
             } else {
                 $query->where(['type' => request::int('type')]);
             }
@@ -111,7 +113,7 @@ if ($op == 'default') {
                 'sccount' => $entry->getSccount(),
                 'total' => $entry->getTotal(),
                 'orderlimits' => $entry->getOrderLimits(),
-                'url' => $questionnaire['url'] ? $questionnaire['url'] : $entry->getUrl(),
+                'url' => $questionnaire['url'] ?: $entry->getUrl(),
                 'assigned' => !isEmptyArray($entry->get('assigned')),
                 'is_third_party_platform' => $entry->isThirdPartyPlatform(),
             ];
@@ -265,7 +267,7 @@ if ($op == 'default') {
         //是否退出推广
         $commission_share_closed = false;
         //是否关联了问卷任务
-        $questionnaire_attached = null;        
+        $questionnaire_attached = null;
         if ($id) {
             $account = Account::get($id);
             if (empty($account)) {
@@ -293,9 +295,12 @@ if ($op == 'default') {
                 ]);
 
                 updateSettings('moscale.fan.key', request::trim('moscaleMachineKey'));
-                updateSettings('moscale.fan.label', array_map(function ($e) {
-                    return intval($e);
-                }, explode(',', request::trim('moscaleLabel'))));
+                updateSettings(
+                    'moscale.fan.label',
+                    array_map(function ($e) {
+                        return intval($e);
+                    }, explode(',', request::trim('moscaleLabel')))
+                );
                 updateSettings('moscale.fan.region', [
                     'province' => request::int('province_code'),
                     'city' => request::int('city_code'),
@@ -310,7 +315,7 @@ if ($op == 'default') {
                     'vendor' => [
                         'uid' => request::trim('vendorUID'),
                         'sid' => request::trim('vendorSubUID'),
-                    ]
+                    ],
                 ]);
             } elseif ($account->isAQiinfo()) {
                 $data['name'] = Account::AQIINFO_NAME;
@@ -406,7 +411,7 @@ if ($op == 'default') {
                     'app_no' => request::trim('app_no'),
                     'scene' => request::trim('scene'),
                 ]);
-            }  elseif ($account->isYiDao()) {
+            } elseif ($account->isYiDao()) {
                 $data['name'] = Account::YIDAO_NAME;
                 $data['img'] = Account::YIDAO_HEAD_IMG;
                 $data['url'] = Util::murl('yidao');
@@ -457,9 +462,9 @@ if ($op == 'default') {
             }
 
             foreach ($data as $key => $val) {
-                $key_name = 'get' . ucfirst(toCamelCase($key));
+                $key_name = 'get'.ucfirst(toCamelCase($key));
                 if ($val != $account->$key_name()) {
-                    $set_name = 'set' . ucfirst(toCamelCase($key));
+                    $set_name = 'set'.ucfirst(toCamelCase($key));
                     $account->$set_name($val);
                 }
             }
@@ -490,7 +495,7 @@ if ($op == 'default') {
                 Account::MENGMO_NAME,
                 Account::TASK_NAME,
             ])) {
-                return err('名称 "' . $name . '" 是系统保留名称，无法使用！');
+                return err('名称 "'.$name.'" 是系统保留名称，无法使用！');
             }
 
             if (Account::findOneFromName($name)) {
@@ -530,7 +535,7 @@ if ($op == 'default') {
             if ($qr_codes) {
                 $qrcode_data = [];
                 foreach ($qr_codes as $qr) {
-                    $xid = sha1($qr . Util::random(8));
+                    $xid = sha1($qr.Util::random(8));
                     $url = Account::createUrl($account->getUid(), ['xid' => $xid]);
                     $qrcode_data[$xid] = [
                         'img' => $qr,
@@ -564,9 +569,9 @@ if ($op == 'default') {
             $account->set('limits', $limits);
 
             if (request::isset('questionnaire')) {
-                $questoinnaire_uid = request::trim('questionnaire');
-                if ($questoinnaire_uid) {
-                    $questionnaire = Account::findOneFromUID($questoinnaire_uid);
+                $questionnaire_uid = request::trim('questionnaire');
+                if ($questionnaire_uid) {
+                    $questionnaire = Account::findOneFromUID($questionnaire_uid);
                     if ($questionnaire) {
                         $account->setConfig('questionnaire', [
                             'uid' => $questionnaire->getUid(),
@@ -575,12 +580,12 @@ if ($op == 'default') {
                     }
                 }
 
-                if ($questionnaire) {
+                if (isset($questionnaire)) {
                     $questionnaire_attached = true;
                 } else {
                     if ($account->getConfig('questionnaire')) {
                         $questionnaire_attached = false;
-                        $account->setConfig('questionnaire', []);                        
+                        $account->setConfig('questionnaire', []);
                     }
                 }
             }
@@ -591,7 +596,7 @@ if ($op == 'default') {
                     'video' => [
                         'duration' => request::int('duration', 1),
                         'exclusive' => request::int('exclusive'),
-                    ]
+                    ],
                 ]);
             } elseif ($account->isDouyin()) {
                 $account->set('config', [
@@ -621,7 +626,7 @@ if ($op == 'default') {
                     'questions' => $questions,
                     'score' => request::int('score'),
                 ]);
-                
+
                 $qrcode_url = Util::createQrcodeFile("question.{$account->getUid()}", $account->getUrl());
                 if (is_error($qrcode_url)) {
                     return err('二维码生成失败！');
@@ -677,12 +682,13 @@ if ($op == 'default') {
 
             $message = '保存成功！';
             if ($commission_share_closed) {
-                $message .= '注意：所有平台代理商关联已被移除！' ;
+                $message .= '注意：所有平台代理商关联已被移除！';
             }
 
             if (isset($questionnaire_attached)) {
                 $message .= ($questionnaire_attached ? '注意：已关联问卷，请重新设置取货链接！' : '注意：已移除问卷，请重新设置取货链接！');
             }
+
             return ['message' => $message, 'id' => $account->getId()];
         }
 
@@ -746,7 +752,7 @@ if ($op == 'default') {
         $bonus_type = Account::COMMISSION;
     }
 
-    $tpl_data =  [
+    $tpl_data = [
         'op' => $op,
         'type' => $type,
         'id' => $id,
@@ -778,12 +784,12 @@ if ($op == 'default') {
         }
     }
 
-    app()->showTemplate('web/account/edit_' . $type, $tpl_data);
+    app()->showTemplate('web/account/edit_'.$type, $tpl_data);
 
 } elseif ($op == 'add') {
 
     $type = request::int('type', Account::NORMAL);
-    app()->showTemplate('web/account/edit_' . $type, [
+    app()->showTemplate('web/account/edit_'.$type, [
         'clr' => Util::randColor(),
         'op' => $op,
         'type' => $type,
@@ -957,7 +963,7 @@ if ($op == 'default') {
     }
 
     $title = $acc->getTitle();
-    $time_str = request::has('month') ? date('Y-') . request::int('month') . date('-01 00:00:00') : 'today';
+    $time_str = request::has('month') ? date('Y-').request::int('month').date('-01 00:00:00') : 'today';
 
     try {
         $month = new DateTime($time_str);
@@ -969,7 +975,7 @@ if ($op == 'default') {
     $content = app()->fetchTemplate(
         'web/account/stats',
         [
-            'chartid' => 'chart-' . Util::random(10),
+            'chartid' => 'chart-'.Util::random(10),
             'chart' => $data ?? [],
         ]
     );
@@ -1122,13 +1128,13 @@ if ($op == 'default') {
     //平台 统计
     $date_limit = request::array('datelimit');
     if ($date_limit['start']) {
-        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
+        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
     } else {
         $s_date = new DateTime('00:00:00');
     }
 
     if ($date_limit['end']) {
-        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
+        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'].' 00:00:00');
         $e_date->modify('next day');
     } else {
         $e_date = new DateTime('next day 00:00:00');
@@ -1401,7 +1407,7 @@ if ($op == 'default') {
     if ($total > 0) {
         $query->page($page, $page_size);
         $query->orderBy('id DESC');
-        foreach($query->findAll() as $entry) {
+        foreach ($query->findAll() as $entry) {
             $data = [
                 'id' => $entry->getId(),
                 'user' => $entry->getData('user', []),
@@ -1428,8 +1434,8 @@ if ($op == 'default') {
 } elseif ($op == 'viewDetail') {
 
     $id = request::int('id');
-    $log = Questionnaire::log(['id' => $id])->findOne();   
-    
+    $log = Questionnaire::log(['id' => $id])->findOne();
+
     if (empty($log)) {
         JSON::fail('找不到这个问卷提交记录！');
     }
@@ -1451,9 +1457,9 @@ if ($op == 'default') {
 
     JSON::success(['title' => '问卷提交详情', 'content' => $content]);
 
-}  elseif ($op == 'questionnaireLogsExportDialog') {
+} elseif ($op == 'questionnaireLogsExportDialog') {
 
-   $account = Account::get(request::int('id'));
+    $account = Account::get(request::int('id'));
     if (empty($account) || !$account->isQuestionnaire()) {
         JSON::fail('找不到这个问卷任务！');
     }

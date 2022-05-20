@@ -32,6 +32,7 @@ class DeviceTypes
             $res = self::findOne(['id' => $id]);
             if ($res) {
                 $cache[$res->getId()] = $res;
+
                 return $res;
             }
         }
@@ -55,9 +56,9 @@ class DeviceTypes
                         [
                             'goods' => 0,
                             'capacity' => 0,
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ]);
         }
 

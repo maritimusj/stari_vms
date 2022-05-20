@@ -246,7 +246,7 @@ if ($op == 'default' || $op == 'goods') {
                 'balance' => intval($params['goodsBalance']),
             ],
         ];
-        
+
         $images = $params['gallery'];
         if ($images) {
             $data['extra']['detailImg'] = $images[0];
@@ -351,29 +351,29 @@ if ($op == 'default' || $op == 'goods') {
     ]);
 
 } elseif ($op == 'saveQuota') {
-      $params = [];
-      parse_str(request('params'), $params);
+    $params = [];
+    parse_str(request('params'), $params);
 
-      $goods = Goods::get($params['goodsId']);
-      if (empty($goods)) {
-          JSON::fail('找不到这个商品！');
-      }
+    $goods = Goods::get($params['goodsId']);
+    if (empty($goods)) {
+        JSON::fail('找不到这个商品！');
+    }
 
-      $data = [
-          'free' => [
-              'day' => intval($params['free-day']),
-              'all' => intval($params['free-all']),
-          ],
-          'pay' => [
-              'day' => intval($params['pay-day']),
-              'all' => intval($params['pay-all']),
-          ],
-      ];
+    $data = [
+        'free' => [
+            'day' => intval($params['free-day']),
+            'all' => intval($params['free-all']),
+        ],
+        'pay' => [
+            'day' => intval($params['pay-day']),
+            'all' => intval($params['pay-all']),
+        ],
+    ];
 
-      $goods->setQuota($data);
-      $goods->save();
+    $goods->setQuota($data);
+    $goods->save();
 
-      JSON::success('保存成功！');
+    JSON::success('保存成功！');
 
 } elseif ($op == 'removeGoods') {
 

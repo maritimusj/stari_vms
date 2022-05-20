@@ -13,9 +13,9 @@ defined('IN_IA') or exit('Access Denied');
 $op = request::op('default');
 
 if ($op == 'search') {
-    $s_keyword = request::trim('keyword');
-
     $query = Principal::gspsor();
+
+    $s_keyword = request::trim('keyword');
     if ($s_keyword) {
         $query->whereOr([
             'name REGEXP' => $s_keyword,

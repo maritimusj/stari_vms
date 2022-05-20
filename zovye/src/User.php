@@ -40,7 +40,7 @@ class User
     const DAILY_SIGN_IN_LOCKER = 'balance:daily:sign_in';
     const BALANCE_GIVE_LOCKER = 'balance:give';
 
-    const API_USER_HEAD_IMG = MODULE_URL . "static/img/api.svg";
+    const API_USER_HEAD_IMG = MODULE_URL."static/img/api.svg";
 
     public static function getTableName(): string
     {
@@ -59,38 +59,38 @@ class User
                 'name' => 'ali',
                 'title' => '支付宝',
                 'color' => '#1296DB',
-                'icon' => MODULE_URL . "static/img/alipay.jpg",
+                'icon' => MODULE_URL."static/img/alipay.jpg",
             ],
             'wxapp' => [
                 'name' => 'wxapp',
                 'title' => '小程序',
                 'color' => '#00d410',
-                'icon' => MODULE_URL . "static/img/wxapp.jpg",
+                'icon' => MODULE_URL."static/img/wxapp.jpg",
             ],
             'wx' => [
                 'name' => 'wx',
                 'title' => '微信',
                 'color' => '#4CAF50',
-                'icon' => MODULE_URL . "static/img/wxpay.jpg",
+                'icon' => MODULE_URL."static/img/wxpay.jpg",
             ],
             'api' => [
                 'name' => 'api',
                 'title' => '第三方API用户',
                 'color' => '#4CAF50',
-                'icon' => MODULE_URL . "static/img/api.svg",
+                'icon' => MODULE_URL."static/img/api.svg",
             ],
             'third' => [
                 'name' => 'api',
                 'title' => '第三方公众号授权用户',
                 'color' => '#4CAF50',
-                'icon' => MODULE_URL . "static/img/third.svg",
+                'icon' => MODULE_URL."static/img/third.svg",
             ],
             'douyin' => [
                 'name' => 'douyin',
                 'title' => '抖音',
                 'color' => '#4CAF50',
-                'icon' => MODULE_URL . "static/img/douyin.svg",
-            ]
+                'icon' => MODULE_URL."static/img/douyin.svg",
+            ],
         ];
 
         if (self::isAliUser($obj)) {
@@ -115,6 +115,7 @@ class User
         }
 
         $user = User::get($obj, is_string($obj));
+
         return $user && $user->isAliUser();
     }
 
@@ -124,6 +125,7 @@ class User
             return $obj->isWxUser();
         }
         $user = User::get($obj, is_string($obj));
+
         return $user && $user->isWxUser();
     }
 
@@ -133,6 +135,7 @@ class User
             return $obj->isWXAppUser();
         }
         $user = User::get($obj, is_string($obj));
+
         return $user && $user->isWXAppUser();
     }
 
@@ -142,6 +145,7 @@ class User
             return $obj->isApiUser();
         }
         $user = User::get($obj, is_string($obj));
+
         return $user && $user->isApiUser();
     }
 
@@ -151,6 +155,7 @@ class User
             return $obj->isThirdAccountUser();
         }
         $user = User::get($obj, is_string($obj));
+
         return $user && $user->isThirdAccountUser();
     }
 
@@ -160,6 +165,7 @@ class User
             return $obj->isDouYinUser();
         }
         $user = User::get($obj, is_string($obj));
+
         return $user && $user->isDouYinUser();
     }
 
@@ -190,6 +196,7 @@ class User
             if ($user) {
                 $cache[$user->getId()] = $user;
                 $cache[$user->getOpenid()] = $user;
+
                 return $user;
             }
         }

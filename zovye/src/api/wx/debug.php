@@ -17,7 +17,7 @@ class debug
 {
     public static function mode(): array
     {
-        $data = include ZOVYE_ROOT . DIRECTORY_SEPARATOR . 'debug.php';
+        $data = include ZOVYE_ROOT.DIRECTORY_SEPARATOR.'debug.php';
         if ($data) {
             return [
                 'debug' => intval($data['debug']),
@@ -29,7 +29,7 @@ class debug
 
     public static function login(): array
     {
-        $data = include ZOVYE_ROOT . DIRECTORY_SEPARATOR . 'debug.php';
+        $data = include ZOVYE_ROOT.DIRECTORY_SEPARATOR.'debug.php';
         if (!empty($data) && !empty($data['debug']) && $data['password'] === request::str('password')) {
             $mobile = $data['phoneNumber'];
             $user = User::findOne(['mobile' => $mobile]);

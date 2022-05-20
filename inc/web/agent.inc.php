@@ -158,7 +158,7 @@ if ($op == 'default') {
     }
 
     if ($is_ajax) {
-        $agents['serial'] = request::str('serial') ?: microtime(true) . '';
+        $agents['serial'] = request::str('serial') ?: microtime(true).'';
         JSON::success($agents);
     }
 
@@ -248,7 +248,10 @@ if ($op == 'default') {
     $tpl_data['sup'] = $sup_agent->profile();
 
     app()->showTemplate('web/agent/agent_sub', $tpl_data);
-} elseif (in_array($op, ['create', 'edit', 'agent_base', 'agent_funcs', 'agent_notice', 'agent_commission', 'agent_misc', 'agent_payment'])) {
+} elseif (in_array(
+    $op,
+    ['create', 'edit', 'agent_base', 'agent_funcs', 'agent_notice', 'agent_commission', 'agent_misc', 'agent_payment']
+)) {
 
     $id = request::int('id');
     $agent = null;
@@ -308,10 +311,15 @@ if ($op == 'default') {
                         'p' => 1,
                     ];
                     if ($res->isGSPor()) {
-                        $data['commission_balance_formatted'] = number_format($res->getCommissionBalance()->total() / 100, 2);
+                        $data['commission_balance_formatted'] = number_format(
+                            $res->getCommissionBalance()->total() / 100,
+                            2
+                        );
                     }
+
                     return $data;
                 }
+
                 return [];
             },
             array_keys($data),
@@ -399,7 +407,11 @@ if ($op == 'default') {
         }
 
         if (User::findOne(['mobile' => $mobile, 'id <>' => $user->getId(), 'app' => User::WX])) {
-            Util::itoast('手机号码已经被其它用户使用！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
+            Util::itoast(
+                '手机号码已经被其它用户使用！',
+                $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]),
+                'error'
+            );
         }
 
         $name = request::trim('name');
@@ -415,7 +427,11 @@ if ($op == 'default') {
         if ($openid_s) {
             $superior = Agent::get($openid_s, true);
             if (empty($superior) || !$superior->isAgent() || $superior->getId() == $user->getId()) {
-                Util::itoast('请选择正确的上级用户！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'error');
+                Util::itoast(
+                    '请选择正确的上级用户！',
+                    $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]),
+                    'error'
+                );
             }
 
             if ($superior->getId() != $user->getSuperiorId()) {
@@ -462,7 +478,7 @@ if ($op == 'default') {
                 ],
                 'commission' => [
                     'fee_type' => 1,
-                ]
+                ],
             ];
 
             $user->updateSettings('agentData', $agent_data);
@@ -514,7 +530,9 @@ if ($op == 'default') {
             $gsp_enabled = request::bool('gsp_enabled');
             $user->updateSettings('agentData.gsp.enabled', $gsp_enabled);
             if ($gsp_enabled) {
-                $gsp_mode = in_array(request::str('gsp_mode'), ['rel', 'free', 'mixed']) ? request::str('gsp_mode') : 'rel';
+                $gsp_mode = in_array(request::str('gsp_mode'), ['rel', 'free', 'mixed']) ? request::str(
+                    'gsp_mode'
+                ) : 'rel';
                 $gsp_mode_type = request::str('gsp_mode_type', 'percent');
                 $user->updateSettings('agentData.gsp.mode', $gsp_mode);
                 $user->updateSettings('agentData.gsp.mode_type', $gsp_mode_type);
@@ -576,7 +594,7 @@ if ($op == 'default') {
                     'siteTitle' => request::trim('siteTitle'),
                     'siteLogo' => request::trim('image'),
                     'power' => request::int('power'),
-                    'auto_ref' => request::int('auto_ref')
+                    'auto_ref' => request::int('auto_ref'),
                 ]
             );
 
@@ -587,7 +605,7 @@ if ($op == 'default') {
                     'remainWarning' => request::int('remainWarning'),
                     'shipment' => [
                         'balanced' => request::bool('shipmentBalance') ? 1 : 0,
-                    ]
+                    ],
                 ]
             );
 
@@ -605,7 +623,7 @@ if ($op == 'default') {
 
             $user->updateSettings('agentData.keeper.reductGoodsNum', [
                 'enabled' => request::int('reductGoodsNum'),
-            ]);            
+            ]);
 
             if (App::isZeroBonusEnabled()) {
                 $user->updateSettings('agentData.custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
@@ -655,7 +673,11 @@ if ($op == 'default') {
         } else {
             //使用控制中心推送通知
             Job::newAgent($user->getId());
-            Util::itoast('代理商设置成功！', $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), 'success');
+            Util::itoast(
+                '代理商设置成功！',
+                $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]),
+                'success'
+            );
         }
     }
 
@@ -682,7 +704,7 @@ if ($op == 'default') {
         'enable' => 1,
         'sn' => $result['terminal_sn'],
         'key' => $result['terminal_key'],
-        'title' => $result['store_name']
+        'title' => $result['store_name'],
     ])) {
         JSON::success('成功！');
     }
@@ -712,6 +734,7 @@ if ($op == 'default') {
                 if ($agent) {
                     return Agent::remove($agent);
                 }
+
                 return err('找不到这个代理商！');
             }
         );
@@ -1506,7 +1529,8 @@ if ($op == 'default') {
                 $data['val_type'] = $entry['val_type'];
                 $data['val'] = $entry['val'];
                 $data['order_types'] = $order_type;
-                GSP::update(['agent_id' => $agent->getId(), 'uid' => $user->getOpenid(), 'order_types' => $order_type], $data);
+                GSP::update(['agent_id' => $agent->getId(), 'uid' => $user->getOpenid(), 'order_types' => $order_type],
+                    $data);
             }
             $agent->updateSettings('agentData.gsp.enabled', 1);
             $agent->updateSettings('agentData.gsp.mode', 'mixed');
@@ -1778,13 +1802,13 @@ if ($op == 'default') {
     ];
 
     if ($date_limit['start']) {
-        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
+        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
     } else {
         $s_date = new DateTime('first day of this month 00:00:00');
     }
 
     if ($date_limit['end']) {
-        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
+        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'].' 00:00:00');
         $e_date->modify('next day');
     } else {
         $e_date = new DateTime('first day of next month 00:00:00');
@@ -1822,7 +1846,7 @@ if ($op == 'default') {
             '公众号',
         ];
 
-        $file_name = $user->getName() . '的数据';
+        $file_name = $user->getName().'的数据';
         $query = $user->getCommissionBalance()->log();
         $query->where($cond);
         $query->orderBy('createtime DESC');
@@ -1838,12 +1862,12 @@ if ($op == 'default') {
                 'wx_account' => '', //公众号
             ];
             if ($entry->getXVal() > 0) {
-                $data['xval'] = '+' . $data['xval'];
+                $data['xval'] = '+'.$data['xval'];
             }
 
             if ($entry->getSrc() == CommissionBalance::WITHDRAW) {
                 $status = $entry->getState();
-                $data['event'] = '佣金提现' . $status;
+                $data['event'] = '佣金提现'.$status;
             } elseif ($entry->getSrc() == CommissionBalance::REFUND) {
                 $data['event'] = '退款';
             } elseif (in_array(
@@ -1861,13 +1885,17 @@ if ($op == 'default') {
                     $goods = Goods::data($order->getGoodsId());
                     if ($order->getPrice() > 0) {
                         $pay_type = User::getUserCharacter($order->getOpenid())['title'];
-                        $spec = $pay_type . "：￥" . number_format($order->getPrice() / 100, 2) . "元 购买：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = $pay_type."：￥".number_format(
+                                $order->getPrice() / 100,
+                                2
+                            )."元 购买：".$goods['name']."x".$order->getNum();
                     } elseif ($order->getBalance() > 0) {
                         $balance_title = settings('user.balance.title', DEFAULT_BALANCE_TITLE);
                         $unit_title = settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME);
-                        $spec = "使用" . $order->getBalance() . $unit_title . $balance_title . "购买：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = "使用".$order->getBalance(
+                            ).$unit_title.$balance_title."购买：".$goods['name']."x".$order->getNum();
                     } else {
-                        $spec = "免费领取：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = "免费领取：".$goods['name']."x".$order->getNum();
                     }
                     $account_name = $order->getAccount();
                     if ($account_name) {
@@ -1897,13 +1925,17 @@ if ($op == 'default') {
                     $goods = Goods::data($order->getGoodsId());
                     if ($order->getPrice() > 0) {
                         $pay_type = User::getUserCharacter($order->getOpenid())['title'];
-                        $spec = $pay_type . "：￥" . number_format($order->getPrice() / 100, 2) . "元 购买：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = $pay_type."：￥".number_format(
+                                $order->getPrice() / 100,
+                                2
+                            )."元 购买：".$goods['name']."x".$order->getNum();
                     } elseif ($order->getBalance() > 0) {
                         $balance_title = settings('user.balance.title', DEFAULT_BALANCE_TITLE);
                         $unit_title = settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME);
-                        $spec = "使用" . $order->getBalance() . $unit_title . $balance_title . "购买：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = "使用".$order->getBalance(
+                            ).$unit_title.$balance_title."购买：".$goods['name']."x".$order->getNum();
                     } else {
-                        $spec = "免费领取：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = "免费领取：".$goods['name']."x".$order->getNum();
                     }
                     $account_name = $order->getAccount();
                     if ($account_name) {
@@ -1924,13 +1956,17 @@ if ($op == 'default') {
                     $goods = Goods::data($order->getGoodsId());
                     if ($order->getPrice() > 0) {
                         $pay_type = User::getUserCharacter($order->getOpenid())['title'];
-                        $spec = $pay_type . "：￥" . number_format($order->getPrice() / 100, 2) . "元 购买：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = $pay_type."：￥".number_format(
+                                $order->getPrice() / 100,
+                                2
+                            )."元 购买：".$goods['name']."x".$order->getNum();
                     } elseif ($order->getBalance() > 0) {
                         $balance_title = settings('user.balance.title', DEFAULT_BALANCE_TITLE);
                         $unit_title = settings('user.balance.unit', DEFAULT_BALANCE_UNIT_NAME);
-                        $spec = "使用" . $order->getBalance() . $unit_title . $balance_title . "购买：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = "使用".$order->getBalance(
+                            ).$unit_title.$balance_title."购买：".$goods['name']."x".$order->getNum();
                     } else {
-                        $spec = "免费领取：" . $goods['name'] . "x" . $order->getNum();
+                        $spec = "免费领取：".$goods['name']."x".$order->getNum();
                     }
                     $account = $order->getAccount(true);
                     if ($account) {
@@ -1950,7 +1986,7 @@ if ($op == 'default') {
                 if ($entry->getExtraData('refund')) {
                     $title = '（已退回）';
                 }
-                $data['event'] = '提现手续费' . $title;
+                $data['event'] = '提现手续费'.$title;
             } elseif ($entry->getSrc() == CommissionBalance::ADJUST) {
                 $data['event'] = '管理员调整';
             }

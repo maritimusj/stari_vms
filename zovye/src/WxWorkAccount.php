@@ -133,7 +133,7 @@ class WxWorkAccount extends AQIInfo
                         $log->save();
                     } else {
                         Log::error('wxWork', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }

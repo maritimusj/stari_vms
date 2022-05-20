@@ -59,6 +59,7 @@ class common
         }
 
         $result['config'] = $config;
+
         return $result;
     }
 

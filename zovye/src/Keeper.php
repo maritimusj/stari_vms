@@ -58,9 +58,10 @@ class Keeper
         $keeper = m('keeper')->findOne(['id' => $id]);
         if ($keeper) {
             self::cache($keeper);
+
             return $keeper;
         }
-        
+
         return null;
     }
 
@@ -74,9 +75,10 @@ class Keeper
         if (!isset($data['uniacid'])) {
             $data = We7::uniacid($data);
         }
+
         return m('keeper')->create($data);
     }
-    
+
     /**
      * @param keeperModelObj $keeper
      * @param deviceModelObj $device
@@ -86,10 +88,14 @@ class Keeper
      * @param array $extra
      * @return replenishModelObj|null
      */
-    public static function createReplenish(keeperModelObj $keeper, deviceModelObj $device,
-                                           int $goods_id, int $original, int $num,
-                                           array $extra = []): ?replenishModelObj
-    {
+    public static function createReplenish(
+        keeperModelObj $keeper,
+        deviceModelObj $device,
+        int $goods_id,
+        int $original,
+        int $num,
+        array $extra = []
+    ): ?replenishModelObj {
         return m('replenish')->create(
             We7::uniacid(
                 [

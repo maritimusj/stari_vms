@@ -65,7 +65,7 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
                 if (empty($lanes)) {
                     $lanes_title = '全部货道';
                 } else {
-                    $lanes_title = '货道：' . implode(',', $lanes);
+                    $lanes_title = '货道：'.implode(',', $lanes);
                 }
 
                 $notify_data = [
@@ -74,7 +74,7 @@ if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) 
                     'keyword2' => ['value' => $lanes_title],
                     'keyword3' => ['value' => $device->getRemainNum()],
                     'keyword4' => ['value' => $address],
-                    'remark' => ['value' => "设备ID:{$device->getImei()}，" . date('事件时间：Y-m-d H:i:s')],
+                    'remark' => ['value' => "设备ID:{$device->getImei()}，".date('事件时间：Y-m-d H:i:s')],
                 ];
 
                 $log['data'] = $notify_data;

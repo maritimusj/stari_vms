@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 if (request::is_get()) {
     $data = [
-        'signature' =>  request::str('signature'),
+        'signature' => request::str('signature'),
         'nonce' => request::str('nonce'),
         'timestamp' => request::str('timestamp'),
     ];

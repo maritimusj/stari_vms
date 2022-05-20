@@ -77,6 +77,7 @@ class pay_logsModelObj extends BaseLogsModelObj
                 $result = $package['list'];
             }
         }
+
         return $result;
     }
 
@@ -88,12 +89,14 @@ class pay_logsModelObj extends BaseLogsModelObj
     public function getTotal(): int
     {
         $total = intval($this->getData('total'));
+
         return empty($total) ? 1 : $total;
     }
 
     public function getPrice(): int
     {
         $price = intval($this->getData('price'));
+
         return empty($price) ? intval($this->getData('orderData.price')) : $price;
     }
 

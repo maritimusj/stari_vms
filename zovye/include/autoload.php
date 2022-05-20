@@ -17,7 +17,7 @@ spl_autoload_register(function ($class) {
         return;
     }
 
-    $file = ZOVYE_CORE_ROOT . 'src' . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, $len)) . '.php';
+    $file = ZOVYE_CORE_ROOT.'src'.str_replace('\\', DIRECTORY_SEPARATOR, substr($class, $len)).'.php';
     if (file_exists($file)) {
         include_once $file;
     }
@@ -27,7 +27,7 @@ spl_autoload_register(function ($class) {
  * lib 加载
  */
 spl_autoload_register(function ($class) {
-    $file = ZOVYE_ROOT . 'lib' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+    $file = ZOVYE_ROOT.'lib'.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
     if (file_exists($file)) {
         include_once $file;
     }

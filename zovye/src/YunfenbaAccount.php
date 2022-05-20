@@ -40,83 +40,83 @@ class YunfenbaAccount
         return [
             [
                 'title' => '购物商圈',
-                'val' => 'scene_1'
+                'val' => 'scene_1',
             ],
             [
                 'title' => '亲子',
-                'val' => 'scene_2'
+                'val' => 'scene_2',
             ],
             [
                 'title' => '休闲娱乐',
-                'val' => 'scene_3'
+                'val' => 'scene_3',
             ],
             [
                 'title' => '房产小区',
-                'val' => 'scene_4'
+                'val' => 'scene_4',
             ],
             [
                 'title' => '教育学校',
-                'val' => 'scene_5'
+                'val' => 'scene_5',
             ],
             [
                 'title' => '旅游景点',
-                'val' => 'scene_6'
+                'val' => 'scene_6',
             ],
             [
                 'title' => '机构团体',
-                'val' => 'scene_7'
+                'val' => 'scene_7',
             ],
             [
                 'title' => '汽车服务',
-                'val' => 'scene_8'
+                'val' => 'scene_8',
             ],
             [
                 'title' => '餐饮美食',
-                'val' => 'scene_9'
+                'val' => 'scene_9',
             ],
 
             [
                 'title' => '运动健身',
-                'val' => 'scene_10'
+                'val' => 'scene_10',
             ],
 
             [
                 'title' => '商务办公',
-                'val' => 'scene_11'
+                'val' => 'scene_11',
             ],
 
             [
                 'title' => '银行金融',
-                'val' => 'scene_12'
+                'val' => 'scene_12',
             ],
             [
                 'title' => '飞机场',
-                'val' => 'scene_13'
+                'val' => 'scene_13',
             ],
             [
                 'title' => '医疗保健',
-                'val' => 'scene_14'
+                'val' => 'scene_14',
             ],
             [
                 'title' => '高铁站',
-                'val' => 'scene_15'
+                'val' => 'scene_15',
             ],
             [
                 'title' => '工厂',
-                'val' => 'scene_16'
+                'val' => 'scene_16',
             ],
 
             [
                 'title' => '列车',
-                'val' => 'scene_17'
+                'val' => 'scene_17',
             ],
             [
                 'title' => '大巴',
-                'val' => 'scene_18'
+                'val' => 'scene_18',
             ],
             [
                 'title' => '商务酒店',
-                'val' => 'scene_19'
+                'val' => 'scene_19',
             ],
         ];
     }
@@ -204,7 +204,7 @@ class YunfenbaAccount
                         if ($result['errcode'] == 203) {
                             throw new RuntimeException('暂时没有公众号！');
                         }
-                        throw new RuntimeException('失败，错误代码：' . $result['errcode']);
+                        throw new RuntimeException('失败，错误代码：'.$result['errcode']);
                     }
 
                     if (empty($result['data']['qrcode_url'])) {
@@ -225,7 +225,7 @@ class YunfenbaAccount
                         $log->save();
                     } else {
                         Log::error('yunfenba', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
                     }
                 }
@@ -257,7 +257,7 @@ class YunfenbaAccount
         try {
             $res = self::verifyData($params);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             /** @var userModelObj $user */
@@ -281,7 +281,7 @@ class YunfenbaAccount
                 /** @var deviceModelObj $device */
                 $device = Device::findOne(['shadow_id' => $params['device']]);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $params['device']);
+                    throw new RuntimeException('找不到指定的设备:'.$params['device']);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($params['wxid'] ?? REQUEST_ID));

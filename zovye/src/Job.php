@@ -40,6 +40,7 @@ class Job
                 'message' => urlencode($message),
             ], $delay);
         }
+
         return CtrlServ::scheduleJob('refund', [
             'orderNO' => $order_no,
             'num' => $num,
@@ -53,8 +54,14 @@ class Job
         return CtrlServ::scheduleJob('device_online', ['id' => $device->getId(), 'event' => $msg]);
     }
 
-    public static function createBalanceOrder($order_no, userModelObj $user, deviceModelObj $device, $goods_id, $num, $ip): bool
-    {
+    public static function createBalanceOrder(
+        $order_no,
+        userModelObj $user,
+        deviceModelObj $device,
+        $goods_id,
+        $num,
+        $ip
+    ): bool {
         return CtrlServ::scheduleJob('create_order_balance', [
                 'order_no' => $order_no,
                 'user' => $user->getId(),
@@ -75,12 +82,17 @@ class Job
         if ($device && $device->isBlueToothDevice()) {
             return CtrlServ::scheduleJob('create_order', ['orderNO' => $order_no], LEVEL_HIGH);
         }
+
         return CtrlServ::scheduleJob('create_order_multi', ['orderNO' => $order_no], LEVEL_HIGH);
     }
 
     public static function orderPayResult($order_no, $start = 0, $timeout = 3)
     {
-        return CtrlServ::scheduleDelayJob('order_pay_result', ['orderNO' => $order_no, 'start' => $start ?: time()], $timeout);
+        return CtrlServ::scheduleDelayJob(
+            'order_pay_result',
+            ['orderNO' => $order_no, 'start' => $start ?: time()],
+            $timeout
+        );
     }
 
     public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT)
@@ -134,6 +146,7 @@ class Job
         if ($delay > 0) {
             CtrlServ::scheduleDelayJob('account_msg', $msg, $delay);
         }
+
         return CtrlServ::scheduleJob('account_msg', $msg);
     }
 
@@ -144,8 +157,10 @@ class Job
             $queue['size'] = CtrlServ::scheduleJob('order', ['id' => $order_id]);
             $queue['updatetime'] = time();
             Config::app('queue', $queue, true);
+
             return $queue['size'] !== false;
         }
+
         return false;
     }
 
@@ -195,7 +210,11 @@ class Job
 
     public static function authAccount($agent_id, $accountUID, $total = 0): bool
     {
-        return CtrlServ::scheduleDelayJob('auth_account', ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total], 3);
+        return CtrlServ::scheduleDelayJob(
+            'auth_account',
+            ['agent' => $agent_id, 'account' => $accountUID, 'total' => $total],
+            3
+        );
     }
 
     public static function repairAgentMonthStats($agent_id, $month): bool
@@ -206,8 +225,10 @@ class Job
         }
         if (CtrlServ::scheduleJob('repair', ['agent' => $agent_id, 'month' => $month]) !== false) {
             Config::agent($key, time(), true);
+
             return true;
         }
+
         return false;
     }
 
@@ -226,6 +247,7 @@ class Job
         if ($agent->acquireLocker("update_counter")) {
             if (time() - $agent->settings('extra.counter.last', 0) > 300) {
                 $agent->updateSettings('extra.counter.last', time());
+
                 return CtrlServ::scheduleJob('update_counter', [
                     'agent' => $agent->getId(),
                     'device' => 0,
@@ -242,6 +264,7 @@ class Job
         if (Locker::try("device:{$device->getId()}:update_counter", REQUEST_ID, 3)) {
             if (time() - $device->settings('extra.counter.last', 0) > 400) {
                 $device->updateSettings('extra.counter.last', time());
+
                 return CtrlServ::scheduleJob('update_counter', [
                     'agent' => 0,
                     'device' => $device->getId(),
@@ -259,6 +282,7 @@ class Job
         if (Locker::try("app:$uid:update_counter", REQUEST_ID, 3)) {
             if (time() - Config::app('order.counter.last', 0) > 600) {
                 Config::app('order.counter.last', time(), true);
+
                 return CtrlServ::scheduleJob('update_counter', [
                     'agent' => 0,
                     'device' => 0,
@@ -275,6 +299,7 @@ class Job
         if (CtrlServ::scheduleJob('upload_device_info', ['lastId' => $lastId]) !== false) {
             return true;
         }
+
         return false;
     }
 
@@ -283,6 +308,7 @@ class Job
         if (CtrlServ::scheduleJob('refresh_settings') !== false) {
             return true;
         }
+
         return false;
     }
 }

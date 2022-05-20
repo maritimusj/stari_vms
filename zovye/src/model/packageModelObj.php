@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\Util;
@@ -21,21 +22,21 @@ class packageModelObj extends modelObj
     {
         return tb('package');
     }
-    
-    /** @var int */
-	protected $id;
 
     /** @var int */
-	protected $device_id;
+    protected $id;
+
+    /** @var int */
+    protected $device_id;
 
     /** @var string */
-	protected $title;
+    protected $title;
 
     /** @var int */
-	protected $price;
+    protected $price;
 
     /** @var int */
-	protected $createtime;
+    protected $createtime;
 
     public function format($detail = false, $format_price = true): array
     {
@@ -49,14 +50,14 @@ class packageModelObj extends modelObj
         if ($detail) {
             $result['list'] = [];
             /** @var package_goodsModelObj $entry */
-            foreach(PackageGoods::queryFor($this)->findAll() as $entry) {
+            foreach (PackageGoods::queryFor($this)->findAll() as $entry) {
                 $data = [
                     'id' => $entry->getId(),
                     'price' => $format_price ? number_format($entry->getPrice() / 100, 2) : $entry->getPrice(),
                     'num' => $entry->getNum(),
                 ];
                 $goods = $entry->getGoods();
-                if ($goods) {    
+                if ($goods) {
                     $data['goods_id'] = $goods->getId();
                     $data['name'] = $goods->getName();
                     $data['image'] = Util::toMedia($goods->getImg(), true);

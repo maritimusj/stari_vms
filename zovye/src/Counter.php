@@ -30,6 +30,7 @@ class Counter
         if ($is_uid) {
             return self::query(['uid' => $id])->findOne();
         }
+
         return self::query(['id' => $id])->findOne();
     }
 
@@ -89,11 +90,14 @@ class Counter
                             return err('failed to create db item!');
                         }
                     }
+
                     return err('lock failed');
                 }
             }
+
             return true;
         });
+
         return !is_error($result);
     }
 

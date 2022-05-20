@@ -37,7 +37,7 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
     if ($tpl_id) {
         $agent = $adv->getOwner();
         if (empty($agent)) {
-             Log::fatal('adv_review', [
+            Log::fatal('adv_review', [
                 'error' => 'adv\'s agent is empty!',
             ]);
         }
@@ -56,11 +56,17 @@ if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
         if (settings('notice.reviewAdminUserId')) {
             $user = User::findOne(['id' => settings('notice.reviewAdminUserId')]);
             if ($user) {
-                $url = Util::murl('util', ['op' => 'adv_review', 'id' => $adv->getId(), 'sign' => sha1(App::uid() . $user->getOpenid() . $adv->getId())]);
+                $url = Util::murl('util',
+                    [
+                        'op' => 'adv_review',
+                        'id' => $adv->getId(),
+                        'sign' => sha1(App::uid().$user->getOpenid().$adv->getId()),
+                    ]
+                );
                 if (!is_error(Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data, $url))) {
-                    $res[] = "[ {$user->getNickname()} ]=> Ok" . PHP_EOL;
+                    $res[] = "[ {$user->getNickname()} ]=> Ok".PHP_EOL;
                 } else {
-                    $res[] = "[ {$user->getNickname()} ]=> fail" . PHP_EOL;
+                    $res[] = "[ {$user->getNickname()} ]=> fail".PHP_EOL;
                 }
             } else {
                 $res = '找不到指定用户！';

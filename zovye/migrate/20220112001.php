@@ -6,7 +6,7 @@ use zovye\model\goodsModelObj;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_delivery')) {
+if (!We7::pdo_tableexists($tb_name.'_delivery')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_delivery` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
@@ -32,7 +32,7 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name . '_goods', 's1')) {
+if (!We7::pdo_fieldexists($tb_name.'_goods', 's1')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_goods` ADD `s1` INT NOT NULL DEFAULT '0' AFTER `deleted`, ADD INDEX (`s1`);
 SQL;

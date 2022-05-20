@@ -47,14 +47,14 @@ class EventBus
             }
 
             foreach ($classes as $classname) {
-                include_once ZOVYE_CORE_ROOT . 'event_handler' . DIRECTORY_SEPARATOR . $classname . '.php';
+                include_once ZOVYE_CORE_ROOT.'event_handler'.DIRECTORY_SEPARATOR.$classname.'.php';
 
-                $classname = __NAMESPACE__ . '\\' . $classname;
+                $classname = __NAMESPACE__.'\\'.$classname;
                 if (class_exists($classname)) {
 
                     $reflection = new ReflectionClass($classname);
                     $methods = $reflection->getMethods(ReflectionMethod::IS_STATIC | ReflectionMethod::IS_PUBLIC);
-                    $prefix = 'on' . ucfirst($type);
+                    $prefix = 'on'.ucfirst($type);
                     $n = strlen($prefix);
 
                     foreach ($methods as $m) {
@@ -78,7 +78,7 @@ class EventBus
         list($type, $event) = explode('.', strval($name), 2);
 
         if ($type && $event) {
-            $method_name = 'on' . ucfirst($type) . ucfirst($event);
+            $method_name = 'on'.ucfirst($type).ucfirst($event);
             $handlers = getArray(self::$events_data, "$type.$method_name");
             if ($handlers && is_array($handlers)) {
                 foreach ($handlers as $clazz) {

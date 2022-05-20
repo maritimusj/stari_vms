@@ -67,7 +67,7 @@ class Log
      */
     public static function logDir(string $name): string
     {
-        $log_dir = LOG_DIR . App::uid(8) . DIRECTORY_SEPARATOR . $name;
+        $log_dir = LOG_DIR.App::uid(8).DIRECTORY_SEPARATOR.$name;
 
         We7::mkDirs($log_dir);
 
@@ -83,18 +83,19 @@ class Log
     public static function logFileName(string $name, string $suffix = ''): string
     {
         $log_dir = self::logDir($name);
-        $filename = $log_dir . DIRECTORY_SEPARATOR . date('Ymd');
+        $filename = $log_dir.DIRECTORY_SEPARATOR.date('Ymd');
         if ($suffix) {
             $filename .= ".$suffix";
         }
         $filename .= '.log';
+
         return $filename;
     }
 
     public static function deleteExpiredLogFiles(string $name, int $keep_days): void
     {
         $files = [];
-        $patten = self::logDir($name) . '/*.log';
+        $patten = self::logDir($name).'/*.log';
         foreach (glob($patten) as $filename) {
             if (is_file($filename)) {
                 $files[basename($filename, '.log')] = $filename;
@@ -148,7 +149,9 @@ class Log
 
             ob_start();
 
-            echo PHP_EOL . "-----------------------------" . date('Y-m-d H:i:s') . ' [ ' . REQUEST_ID . " ]---------------------------------------" . PHP_EOL;
+            echo PHP_EOL."-----------------------------".date(
+                    'Y-m-d H:i:s'
+                ).' [ '.REQUEST_ID." ]---------------------------------------".PHP_EOL;
 
             print_r($data);
 

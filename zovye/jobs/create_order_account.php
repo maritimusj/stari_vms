@@ -46,7 +46,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
         /** @var deviceModelObj $device */
         $device = Device::get($device_id);
         if (empty($device)) {
-            ZovyeException::throwWith('找不到指定的设备:' . $device_id, -1);
+            ZovyeException::throwWith('找不到指定的设备:'.$device_id, -1);
         }
 
         /** @var userModelObj $user */
@@ -132,6 +132,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
                     if (!Job::createAccountOrder($params)) {
                         throw new Exception('启动排队任务失败！');
                     }
+
                     return true;
                 }
                 throw new Exception($result['message']);

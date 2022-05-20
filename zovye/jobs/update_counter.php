@@ -29,7 +29,7 @@ $log = [
 
 if ($op == 'update_counter' && CtrlServ::checkJobSign($data)) {
 
-    $counter =  new OrderCounter();
+    $counter = new OrderCounter();
     try {
         $datetime = new DateTimeImmutable($data['datetime']);
         $str = $datetime->format('Y-m-d H:i:s');

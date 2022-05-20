@@ -35,6 +35,7 @@ class request
             $res = json_decode(self::raw(), true);
             $data = $res ?: [];
         }
+
         return getArray($data, $key, $default);
     }
 
@@ -78,7 +79,7 @@ class request
                 $result = '';
             }
         }
-        
+
         return $result;
     }
 
@@ -110,6 +111,7 @@ class request
     public static function float(string $name, float $default = 0, int $precision = -1): float
     {
         $v = floatval(request($name, $default));
+
         return $precision > -1 ? round($v, $precision) : $v;
     }
 
@@ -124,6 +126,7 @@ class request
         if ($url_decode) {
             $str = urldecode($str);
         }
+
         return $str;
     }
 

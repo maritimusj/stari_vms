@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\Goods;
@@ -20,24 +21,24 @@ class package_goodsModelObj extends modelObj
     {
         return tb('package_goods');
     }
-    
-    /** @var int */
-	protected $id;
 
     /** @var int */
-	protected $package_id;
+    protected $id;
 
     /** @var int */
-	protected $goods_id;
+    protected $package_id;
 
     /** @var int */
-	protected $price;
+    protected $goods_id;
 
     /** @var int */
-	protected $num;
+    protected $price;
 
     /** @var int */
-	protected $createtime;
+    protected $num;
+
+    /** @var int */
+    protected $createtime;
 
     public function getGoods(): ?goodsModelObj
     {

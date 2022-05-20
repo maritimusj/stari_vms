@@ -37,7 +37,7 @@ if ($op == 'withdraw' && CtrlServ::checkJobSign($data)) {
                 'first' => ['value' => '有一笔提现待审批，请尽快审核！'],
                 'keyword1' => ['value' => $apply_user->getNickname()],
                 'keyword2' => ['value' => date('Y-m-d H:i:s')],
-                'keyword3' => ['value' => ($data['amount'] / 100) . '元'],
+                'keyword3' => ['value' => ($data['amount'] / 100).'元'],
             ];
 
             $query = User::query();
@@ -52,7 +52,7 @@ if ($op == 'withdraw' && CtrlServ::checkJobSign($data)) {
             foreach ($query->findAll() as $user) {
                 $res = Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data);
                 if (!is_error($res)) {
-                    $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> Ok " . PHP_EOL;
+                    $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> Ok ".PHP_EOL;
                 } else {
                     $log['result'][$user->getOpenid()] = $res;
                 }

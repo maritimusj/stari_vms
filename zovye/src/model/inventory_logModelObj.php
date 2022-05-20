@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\Goods;
@@ -20,37 +21,37 @@ class inventory_logModelObj extends modelObj
     {
         return tb('inventory_log');
     }
-    
-	/** @var int */
-	protected $id;
 
-	/** @var int */
-	protected $src_inventory_id;	
+    /** @var int */
+    protected $id;
 
-	/** @var int */
-	protected $inventory_id;
+    /** @var int */
+    protected $src_inventory_id;
 
-	/** @var int */
-	protected $goods_id;
+    /** @var int */
+    protected $inventory_id;
 
-	/** @var int */
-	protected $num;
+    /** @var int */
+    protected $goods_id;
 
-	protected $extra;
+    /** @var int */
+    protected $num;
 
-	/** @var int */
-	protected $createtime;
+    protected $extra;
 
-	use ExtraDataGettersAndSetters;
+    /** @var int */
+    protected $createtime;
 
-	public function getGoods()
-	{
-		return Goods::get($this->goods_id, true);
-	}
+    use ExtraDataGettersAndSetters;
 
-	public function getSrcInventory()
-	{
-		return Inventory::get($this->src_inventory_id);
-	}
-	
+    public function getGoods()
+    {
+        return Goods::get($this->goods_id, true);
+    }
+
+    public function getSrcInventory()
+    {
+        return Inventory::get($this->src_inventory_id);
+    }
+
 }

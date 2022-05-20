@@ -45,8 +45,8 @@ if ($op == 'default') {
 
     if (empty($name) || strlen($num) != 18) {
         JSON::fail('请输入有效的姓名和身份证号码！');
-    }   
-    
+    }
+
     $order_no = request::str('orderNO');
 
     $log = $user->settings('idcard.log', []);
@@ -123,16 +123,16 @@ if ($op == 'default') {
     if ($num == '') {
         JSON::fail('请输入身份证号码！');
     }
-    
+
     $birth = '';
     if (strlen($num) == 15) {
         $input_year = substr($num, 6, 2);
         if ($input_year < 10) {
-            $input_year = '20' . $input_year;
+            $input_year = '20'.$input_year;
         } else {
-            $input_year = '19' . $input_year;
+            $input_year = '19'.$input_year;
         }
-        $birth = $input_year . substr($num, 8, 4);
+        $birth = $input_year.substr($num, 8, 4);
     }
 
     if (strlen($num) == 18) {
@@ -140,8 +140,8 @@ if ($op == 'default') {
     }
 
     if (strlen($birth) != 8) {
-        JSON::fail('身份证信息有误！'. $birth);
-    } 
+        JSON::fail('身份证信息有误！'.$birth);
+    }
 
     $the_current_year = date('Y');
     $the_current_month = date('m');
@@ -154,12 +154,16 @@ if ($op == 'default') {
     $isOver18 = false;
     if ($the_current_year - $input_year > 18) {
         $isOver18 = true;
-    } else if ($the_current_year - $input_year == 18) {
-        if ($the_current_month - $input_month > 0) {
-            $isOver18 = true;
-        } else if ($the_current_month - $input_month == 0) {
-            if ($the_current_day - $input_day >= 0) {
+    } else {
+        if ($the_current_year - $input_year == 18) {
+            if ($the_current_month - $input_month > 0) {
                 $isOver18 = true;
+            } else {
+                if ($the_current_month - $input_month == 0) {
+                    if ($the_current_day - $input_day >= 0) {
+                        $isOver18 = true;
+                    }
+                }
             }
         }
     }

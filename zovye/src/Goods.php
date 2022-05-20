@@ -90,6 +90,7 @@ class Goods
             $detail = in_array('detail', $params) || $params['detail'];
             $use_image_proxy = in_array('useImageProxy', $params) || $params['useImageProxy'];
             $fullPath = in_array('fullPath', $params) || $params['fullPath'];
+
             return self::format($goods, $detail, $use_image_proxy, $fullPath);
         }
 
@@ -111,9 +112,12 @@ class Goods
             if ($cache[$id]) {
                 return $cache[$id];
             }
-            $goods = $deleted ? m('goods')->where(We7::uniacid([]))->findOne(['id' => $id]) : self::query()->findOne(['id' => $id]);
+            $goods = $deleted ? m('goods')->where(We7::uniacid([]))->findOne(['id' => $id]) : self::query()->findOne(
+                ['id' => $id]
+            );
             if ($goods) {
                 $cache[$goods->getId()] = $goods;
+
                 return $goods;
             }
         }
@@ -128,12 +132,17 @@ class Goods
      * @param bool $full_path
      * @return array
      */
-    public static function format(goodsModelObj $entry, bool $detail = false, bool $use_image_proxy = false, bool $full_path = true): array
-    {
+    public static function format(
+        goodsModelObj $entry,
+        bool $detail = false,
+        bool $use_image_proxy = false,
+        bool $full_path = true
+    ): array {
         $imageUrlFN = function ($url) use ($use_image_proxy, $full_path) {
             if ($full_path) {
                 $url = Util::toMedia($url, $use_image_proxy);
             }
+
             return $url;
         };
         $data = [
@@ -142,7 +151,7 @@ class Goods
             'img' => $imageUrlFN($entry->getImg()),
             'sync' => boolval($entry->getSync()),
             'price' => intval($entry->getPrice()),
-            'price_formatted' => '￥' . number_format($entry->getPrice() / 100, 2) . '元',
+            'price_formatted' => '￥'.number_format($entry->getPrice() / 100, 2).'元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             'cw' => $entry->getExtraData('cw', 0), //成本是否参与分佣
@@ -165,7 +174,7 @@ class Goods
 
         if (!empty($cost_price)) {
             $data['costPrice'] = $cost_price;
-            $data['costPrice_formatted'] = '￥' . number_format($cost_price / 100, 2) . '元';
+            $data['costPrice_formatted'] = '￥'.number_format($cost_price / 100, 2).'元';
         }
 
         if (App::isBalanceEnabled()) {
@@ -175,7 +184,7 @@ class Goods
         $discountPrice = $entry->getExtraData('discountPrice', 0);
         if (!empty($discountPrice)) {
             $data['discountPrice'] = $discountPrice;
-            $data['discountPrice_formatted'] = '￥' . number_format($discountPrice / 100, 2) . '元';
+            $data['discountPrice_formatted'] = '￥'.number_format($discountPrice / 100, 2).'元';
         }
 
         $detailImg = $entry->getDetailImg();
@@ -311,6 +320,7 @@ class Goods
 
         if (!empty($goods)) {
             $goods->updateSettings('extra.clone.original', $entry->getId());
+
             return true;
         }
 

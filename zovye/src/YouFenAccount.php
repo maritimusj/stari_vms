@@ -50,38 +50,44 @@ class YouFenAccount
         if ($yf_openid) {
             //请求API
             $youFen = new YouFenAccount($config['app_number'], $config['app_key']);
-            $youFen->fetchOne($device, $user, $acc, $yf_openid, function ($request, $result) use ($acc, $device, $user, &$v) {
-                if (App::isAccountLogEnabled()) {
-                    $log = Account::createQueryLog($acc, $user, $device, $request, $result);
-                    if (empty($log)) {
-                        Log::error('youfen_query', [
-                            'query' => $request,
-                            'result' => $result,
-                        ]);
+            $youFen->fetchOne(
+                $device,
+                $user,
+                $acc,
+                $yf_openid,
+                function ($request, $result) use ($acc, $device, $user, &$v) {
+                    if (App::isAccountLogEnabled()) {
+                        $log = Account::createQueryLog($acc, $user, $device, $request, $result);
+                        if (empty($log)) {
+                            Log::error('youfen_query', [
+                                'query' => $request,
+                                'result' => $result,
+                            ]);
+                        }
                     }
-                }
 
-                if (empty($result) || is_error($result) || !$result['success']) {
-                    Log::error('youfen', [
-                        'user' => $user->profile(),
-                        'acc' => $acc->getName(),
-                        'device' => $device->profile(),
-                        'error' => $result,
-                    ]);
-                } else {
-                    $list = $result['result'];
-                    if (!isEmptyArray($list)) {
-                        $data = $acc->format();
-                        foreach ($list as $item) {
-                            if ($item && $item['qr_url']) {
-                                $data['title'] = $item['wx_nickname'] ?? Account::YOUFEN_NAME;
-                                $data['qrcode'] = $item['qr_url'];
-                                $v[] = $data;
+                    if (empty($result) || is_error($result) || !$result['success']) {
+                        Log::error('youfen', [
+                            'user' => $user->profile(),
+                            'acc' => $acc->getName(),
+                            'device' => $device->profile(),
+                            'error' => $result,
+                        ]);
+                    } else {
+                        $list = $result['result'];
+                        if (!isEmptyArray($list)) {
+                            $data = $acc->format();
+                            foreach ($list as $item) {
+                                if ($item && $item['qr_url']) {
+                                    $data['title'] = $item['wx_nickname'] ?? Account::YOUFEN_NAME;
+                                    $data['qrcode'] = $item['qr_url'];
+                                    $v[] = $data;
+                                }
                             }
                         }
                     }
                 }
-            });
+            );
         } else {
             $data = $acc->format();
             $params = [
@@ -90,7 +96,7 @@ class YouFenAccount
                 're_url' => Util::murl('youfen', ['op' => 'yf_auth', 'device' => $device->getShadowId()]),
             ];
 
-            $data['redirect_url'] = self::REDIRECT_URL . '?' . http_build_query($params);
+            $data['redirect_url'] = self::REDIRECT_URL.'?'.http_build_query($params);
             $v[] = $data;
         }
 
@@ -102,11 +108,17 @@ class YouFenAccount
     {
         ksort($data);
         $str = urldecode(http_build_query($data, '', '&amp;'));
+
         return md5($str);
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user, accountModelObj $acc, string $yf_openid, callable $cb = null)
-    {
+    public function fetchOne(
+        deviceModelObj $device,
+        userModelObj $user,
+        accountModelObj $acc,
+        string $yf_openid,
+        callable $cb = null
+    ) {
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
         $uid = App::uid(6);
         $data = [
@@ -162,7 +174,7 @@ class YouFenAccount
         try {
             $res = self::verifyData($params);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             list($uid, $device_uid, $user_uid) = explode(':', $params['notify_data']);
@@ -189,7 +201,7 @@ class YouFenAccount
                 /** @var deviceModelObj $device */
                 $device = Device::findOne(['shadow_id' => $device_uid]);
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:' . $params['params']);
+                    throw new RuntimeException('找不到指定的设备:'.$params['params']);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($params['request_id']));

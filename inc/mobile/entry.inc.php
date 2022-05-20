@@ -67,6 +67,7 @@ if ($device_id) {
         if ($account) {
             return ['account' => $account];
         }
+
         return [];
     };
 
@@ -170,7 +171,7 @@ if ($from == 'device') {
         $tpl_data = Util::getTplData([$device, $user]);
         app()->devicePreparePage($tpl_data);
     }
-    
+
 } else {
     //清除上次的ticket
     $user->setLastActiveData('ticket', []);
@@ -197,7 +198,7 @@ if (Util::mustValidateLocation($user, $device)) {
             $device,
             [
                 'page.title' => '查找设备',
-                'redirect' => Util::murl( 'entry', ['from' => 'location', 'device' => $device->getShadowId()]),
+                'redirect' => Util::murl('entry', ['from' => 'location', 'device' => $device->getShadowId()]),
             ],
         ]
     );
@@ -227,7 +228,7 @@ if (empty($account)) {
     //设置用户最后活动数据
     $tpl_data = Util::getTplData([$user, $device]);
     $tpl_data['from'] = $from;
-   
+
     //设备首页
     app()->devicePage($tpl_data);
     //调试使用
@@ -260,7 +261,11 @@ $ticket_data = [
 //准备领取商品的ticket
 $user->setLastActiveData('ticket', $ticket_data);
 
-$tpl_data = Util::getTplData([$user, $account, $device, [
+$tpl_data = Util::getTplData([
+    $user,
+    $account,
+    $device,
+    [
         'timeout' => App::deviceWaitTimeout(),
         'user.ticket' => $ticket_data['id'],
     ],

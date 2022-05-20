@@ -335,7 +335,9 @@ if ($op == 'default') {
 } elseif ($op == 'saveAssignData') {
 
     $id = request::int('id');
-    $data = request::is_string('data') ? json_decode(htmlspecialchars_decode(request::str('data')), true) : request('data');
+    $data = request::is_string('data') ? json_decode(htmlspecialchars_decode(request::str('data')), true) : request(
+        'data'
+    );
 
     $adv = Advertising::get($id);
     if (empty($adv)) {
@@ -410,7 +412,7 @@ if ($op == 'default') {
 
             $tpl_data['images'] = $adv->getExtraData('images');
             $tpl_data['link'] = $adv->getExtraData('link');
-            
+
             if ($type == Advertising::GET_PAGE) {
                 $tpl_data['app_id'] = $adv->getExtraData('app_id');
                 $tpl_data['app_path'] = $adv->getExtraData('app_path');

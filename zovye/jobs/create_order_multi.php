@@ -93,6 +93,7 @@ function process($order_no): bool
             if (!Job::createOrder($order_no, $device)) {
                 throw new Exception('启动排队任务失败！');
             }
+
             return true;
         }
         ExceptionNeedsRefund::throwWith($device, '设备被占用！');
@@ -171,7 +172,7 @@ function process($order_no): bool
 
         $order->setExtraData('pull.result', [
             'errno' => 0,
-            'message' => '出货完成！'
+            'message' => '出货完成！',
         ]);
         $order->save();
 
@@ -189,8 +190,12 @@ function process($order_no): bool
  * @return orderModelObj
  * @throws Exception
  */
-function createOrder(string $order_no, deviceModelObj $device, userModelObj $user, pay_logsModelObj $pay_log): orderModelObj
-{
+function createOrder(
+    string $order_no,
+    deviceModelObj $device,
+    userModelObj $user,
+    pay_logsModelObj $pay_log
+): orderModelObj {
     $order_data = [
         'src' => intval($pay_log->getData('src', Order::PAY)),
         'order_id' => $order_no,

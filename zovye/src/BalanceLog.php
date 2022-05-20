@@ -16,6 +16,7 @@ class BalanceLog
         if ($data['extra']) {
             $data['extra'] = balance_logsModelObj::serializeExtra($data['extra']);
         }
+
         return m('balance_logs')->create($data);
     }
 

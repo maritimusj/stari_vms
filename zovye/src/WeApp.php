@@ -54,18 +54,18 @@ class WeApp extends Settings
     {
         global $_W;
         if (defined('IN_SYS')) {
-            $source = ZOVYE_ROOT . "template/$filename.html";
-            $compile = ZOVYE_ROOT . "data/tpl/$filename.tpl.php";
+            $source = ZOVYE_ROOT."template/$filename.html";
+            $compile = ZOVYE_ROOT."data/tpl/$filename.tpl.php";
         } else {
-            $source = ZOVYE_ROOT . "template/mobile/$filename.html";
-            $compile = ZOVYE_ROOT . "data/tpl/mobile/$filename.tpl.php";
+            $source = ZOVYE_ROOT."template/mobile/$filename.html";
+            $compile = ZOVYE_ROOT."data/tpl/mobile/$filename.tpl.php";
         }
 
         if (!is_file($source)) {
             exit("Error: template source '$filename' is not exist!");
         }
         $paths = pathinfo($compile);
-        $compile = str_replace($paths['filename'], $_W['uniacid'] . '_' . $paths['filename'], $compile);
+        $compile = str_replace($paths['filename'], $_W['uniacid'].'_'.$paths['filename'], $compile);
         if (DEVELOPMENT || !is_file($compile) || filemtime($source) > filemtime($compile)) {
             template::compile($source, $compile, true);
         }
@@ -75,7 +75,8 @@ class WeApp extends Settings
 
     public function forceUnlock(): bool
     {
-        return We7::pdo_update(weapp_configModelObj::getTableName(modelObj::OP_WRITE),
+        return We7::pdo_update(
+            weapp_configModelObj::getTableName(modelObj::OP_WRITE),
             [
                 OBJ_LOCKED_UID => UNLOCKED,
             ],
@@ -102,6 +103,7 @@ class WeApp extends Settings
     {
         /** @var weapp_configModelObj $global */
         $global = m('weapp_config')->findOne(['name' => 'settings']);
+
         return $global && $global->getLockedUid() != UNLOCKED;
     }
 
@@ -117,7 +119,7 @@ class WeApp extends Settings
 
     public function isSite(): bool
     {
-        return class_exists(__NAMESPACE__ . '\Site');
+        return class_exists(__NAMESPACE__.'\Site');
     }
 
     /**
@@ -126,7 +128,8 @@ class WeApp extends Settings
      */
     public function run(): WeApp
     {
-        class_alias(__NAMESPACE__ . '\Site', lcfirst(APP_NAME) . 'ModuleSite');
+        class_alias(__NAMESPACE__.'\Site', lcfirst(APP_NAME).'ModuleSite');
+
         return $this;
     }
 
@@ -157,7 +160,7 @@ class WeApp extends Settings
         if (is_null(self::$app_settings)) {
             self::$app_settings = $this->get('settings', []);
             if (empty(self::$app_settings)) {
-                $filename = ZOVYE_CORE_ROOT . 'include/settings_default.php';
+                $filename = ZOVYE_CORE_ROOT.'include/settings_default.php';
                 if (file_exists($filename)) {
                     self::$app_settings = include $filename;
                 }
@@ -276,7 +279,9 @@ JSCODE;
         /** @var userModelObj $user */
         //$user = $tpl['user']['_obj'];
 
-        $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getShadowId()]) : strval($params['redirect']);
+        $device_url = empty($params['redirect']) ? Util::murl('entry', ['device' => $device->getShadowId()]) : strval(
+            $params['redirect']
+        );
         $device_api_url = Util::murl('device', ['id' => $device->getId()]);
         $jquery_url = JS_JQUERY_URL;
 
@@ -286,9 +291,9 @@ JSCODE;
         $tpl['err_msg'] = empty($params['err_msg']) ? '设备不在线，请稍后再试！' : $params['err_msg'];
 
         $tpl['icon'] = [
-            'loading' => empty($params['icon']['loading']) ? MODULE_URL . 'static/img/loading-puff.svg' : $params['icon']['loading'],
-            'success' => empty($params['icon']['success']) ? MODULE_URL . 'static/img/smile.svg' : $params['icon']['success'],
-            'error' => empty($params['icon']['error']) ? MODULE_URL . 'static/img/offline.svg' : $params['icon']['error'],
+            'loading' => empty($params['icon']['loading']) ? MODULE_URL.'static/img/loading-puff.svg' : $params['icon']['loading'],
+            'success' => empty($params['icon']['success']) ? MODULE_URL.'static/img/smile.svg' : $params['icon']['success'],
+            'error' => empty($params['icon']['error']) ? MODULE_URL.'static/img/offline.svg' : $params['icon']['error'],
         ];
 
         $scene = empty($params['scene']) ? 'online' : $params['scene'];
@@ -572,7 +577,10 @@ JSCODE;
             ])->orderBy('id desc')->findOne();
             if ($order) {
                 if (empty($retry['max']) || $order->getExtraData('retry.total', 0) < $retry['max']) {
-                    $order_retry_url = Util::murl('order', ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]);
+                    $order_retry_url = Util::murl(
+                        'order',
+                        ['op' => 'retry', 'device' => $device->getShadowId(), 'uid' => $order->getOrderNO()]
+                    );
                     $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.retryOrder = function (cb) {
     $.get("$order_retry_url").then(function (res) {
@@ -1073,10 +1081,12 @@ HTML;
         api_url: "$api_url",
     }
     zovye_fn.getAccounts = function() {
-        return $.getJSON(zovye_fn.api_url, {op: 'account', 'device': '{$device->getShadowId()}', 'user': '{$user->getOpenid()}'});
+        return $.getJSON(zovye_fn.api_url, {op: 'account', 'device': '{$device->getShadowId(
+        )}', 'user': '{$user->getOpenid()}'});
     }
     zovye_fn.redirect = function(uid) {
-        return $.getJSON(zovye_fn.api_url, {op: 'detail', 'uid': uid, 'device': '{$device->getShadowId()}', 'user': '{$user->getOpenid()}'});
+        return $.getJSON(zovye_fn.api_url, {op: 'detail', 'uid': uid, 'device': '{$device->getShadowId(
+        )}', 'user': '{$user->getOpenid()}'});
     }
 </script>
 JSCODE;
@@ -1633,8 +1643,12 @@ JSCODE;
         $this->showTemplate(Theme::file('mall_order'), ['tpl' => $tpl_data]);
     }
 
-    public function fillQuestionnairePage(userModelObj $user, accountModelObj $account, deviceModelObj $device = null, $tid = '')
-    {
+    public function fillQuestionnairePage(
+        userModelObj $user,
+        accountModelObj $account,
+        deviceModelObj $device = null,
+        $tid = ''
+    ) {
         $tpl_data = Util::getTplData([$user, $account]);
 
         $api_url = Util::murl('account', $tid ? ['tid' => $tid] : []);

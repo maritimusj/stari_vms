@@ -115,7 +115,7 @@ if ($op == 'default') {
 
     $limit = request::array('datelimit');
     if ($limit['start']) {
-        $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'] . ' 00:00:00');
+        $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'].' 00:00:00');
         if ($start) {
             $tpl_data['s_start_date'] = $start->format('Y-m-d');
             $query->where(['createtime >=' => $start->getTimestamp()]);
@@ -123,7 +123,7 @@ if ($op == 'default') {
     }
 
     if ($limit['end']) {
-        $end = DateTime::createFromFormat('Y-m-d H:i:s', $limit['end'] . ' 00:00:00');
+        $end = DateTime::createFromFormat('Y-m-d H:i:s', $limit['end'].' 00:00:00');
         if ($end) {
             $tpl_data['s_end_date'] = $end->format('Y-m-d');
             $end->modify('next day');
@@ -143,7 +143,7 @@ if ($op == 'default') {
     } else {
         $total = $page * $page_size * 100;
     }
-    
+
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 
@@ -192,21 +192,21 @@ if ($op == 'default') {
         $data = Order::format($entry, true);
         if ($accounts[$data['account']]) {
             if (isset($accounts[$data['account']]['media'])) {
-                $data['account_title'] = '视频 ' . $accounts[$data['account']]['title'];
+                $data['account_title'] = '视频 '.$accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['douyin']) {
-                $data['account_title'] = '抖音 ' . $accounts[$data['account']]['title'];
+                $data['account_title'] = '抖音 '.$accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['wxapp']) {
-                $data['account_title'] = '小程序 ' . $accounts[$data['account']]['title'];
+                $data['account_title'] = '小程序 '.$accounts[$data['account']]['title'];
             } elseif ($accounts[$data['account']]['questionnaire']) {
-                $data['account_title'] = '问卷 ' . $accounts[$data['account']]['title'];
+                $data['account_title'] = '问卷 '.$accounts[$data['account']]['title'];
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', '');
             } elseif ($accounts[$data['account']]['questionnaire+1']) {
-                $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'] . ' + ' . $accounts[$data['account']]['questionnaire+1'];
+                $data['account_title'] = '公众号 '.$accounts[$data['account']]['title'].' + '.$accounts[$data['account']]['questionnaire+1'];
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', 0);
             } elseif ($accounts[$data['account']]['third-party-platform']) {
-                $data['account_title'] = '第三方平台 ' . $accounts[$data['account']]['title'];
+                $data['account_title'] = '第三方平台 '.$accounts[$data['account']]['title'];
             } else {
-                $data['account_title'] = '公众号 ' . $accounts[$data['account']]['title'];
+                $data['account_title'] = '公众号 '.$accounts[$data['account']]['title'];
             }
             $data['clr'] = $accounts[$data['account']]['clr'];
         } else {
@@ -265,7 +265,7 @@ if ($op == 'default') {
             }
         }
         $params_str = http_build_query($filter);
-        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
+        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&'.$params_str.'"', $pager);
     }
 
     if ($is_ajax) {
@@ -284,7 +284,7 @@ if ($op == 'default') {
         $content = app()->fetchTemplate('web/order/list', $data);
 
         JSON::success([
-            'title' => isset($user) ? '<b>' . $user->getName() . '</b>的订单列表' : '',
+            'title' => isset($user) ? '<b>'.$user->getName().'</b>的订单列表' : '',
             'content' => $content,
         ]);
     }
@@ -492,8 +492,14 @@ if ($op == 'default') {
     $device_id = request::int('device_id');
 
     $date_limit = request::array('datelimit');
-    $start = empty($date_limit['start']) ? new DateTime('00:00:00') : DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
-    $end = empty($date_limit['end']) ? new DateTime() : DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
+    $start = empty($date_limit['start']) ? new DateTime('00:00:00') : DateTime::createFromFormat(
+        'Y-m-d H:i:s',
+        $date_limit['start'].' 00:00:00'
+    );
+    $end = empty($date_limit['end']) ? new DateTime() : DateTime::createFromFormat(
+        'Y-m-d H:i:s',
+        $date_limit['end'].' 00:00:00'
+    );
 
     if (!($start && $end)) {
         Util::itoast('时间不正确！', $this->createWebUrl('order', ['op' => 'stat']), 'error');
@@ -511,10 +517,6 @@ if ($op == 'default') {
         $start_ts = $start->getTimestamp();
 
         $start->modify('+1 day');
-
-        if ($start > $end) {
-            $start = $end;
-        }
 
         $end_ts = $start->getTimestamp();
 

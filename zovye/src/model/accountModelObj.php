@@ -184,6 +184,7 @@ class accountModelObj extends modelObj
                 return true;
             }
         }
+
         return false;
     }
 
@@ -243,6 +244,7 @@ class accountModelObj extends modelObj
         if (App::isCommissionEnabled() && isset($commission['money'])) {
             return Account::COMMISSION;
         }
+
         return '';
     }
 
@@ -285,7 +287,8 @@ class accountModelObj extends modelObj
         if (empty($path)) {
             return $this->set('config', $data);
         }
-        return $this->updateSettings('config.' . $path, $data);
+
+        return $this->updateSettings('config.'.$path, $data);
     }
 
     public function getConfig($path = '', $default = null)
@@ -293,8 +296,8 @@ class accountModelObj extends modelObj
         if (empty($path)) {
             return $this->get('config', $default);
         }
-     
-        return $this->settings('config.' . $path, $default);
+
+        return $this->settings('config.'.$path, $default);
     }
 
     public function checkAnswer(userModelObj $user, array $answer = []): array
@@ -305,26 +308,26 @@ class accountModelObj extends modelObj
 
         $questions = $this->getQuestions($user, true);
 
-        foreach($questions as $question) {
+        foreach ($questions as $question) {
             $uid = $question['id'];
             if ($question['necessary'] && empty($answer[$uid])) {
                 $num = -1;
                 break;
             }
-    
+
             if ($question['type'] == 'choice') {
                 if (!is_array($answer[$uid])) {
                     continue;
                 }
                 if ((array)$question['answer'] == $answer[$uid]) {
                     $stats[] = $uid;
-                    $num ++;
+                    $num++;
                 }
             } elseif ($question['type'] == 'text') {
                 $text = trim($answer[$uid]);
                 if ($question['constraints'] == 'tel') {
                     if (preg_match(REGULAR_TEL, $text)) {
-                        $num ++;
+                        $num++;
                         $stats[] = $uid;
                         continue;
                     }
@@ -337,7 +340,7 @@ class accountModelObj extends modelObj
 
                 } elseif ($question['constraints'] == 'email') {
                     if (preg_match(REGULAR_EMAIL, $text)) {
-                        $num ++;
+                        $num++;
                         $stats[] = $uid;
                         continue;
                     }
@@ -349,7 +352,7 @@ class accountModelObj extends modelObj
                     }
                 } elseif ($question['constraints'] == 'normal') {
                     if ($text) {
-                        $num ++;
+                        $num++;
                         $stats[] = $uid;
                         continue;
                     }
@@ -359,7 +362,7 @@ class accountModelObj extends modelObj
                         break;
                     }
                 }
-            }      
+            }
         }
 
         $result = [
@@ -388,11 +391,11 @@ class accountModelObj extends modelObj
         }
 
         $questions = [];
-        foreach((array)$this->getConfig('questions', []) as $index => $question) {
+        foreach ((array)$this->getConfig('questions', []) as $index => $question) {
             if (empty($question['title'])) {
                 continue;
             }
-            $question['id'] = $user ? sha1($user->getOpenid() . $index) : $index;
+            $question['id'] = $user ? sha1($user->getOpenid().$index) : $index;
             if ($question['type'] == 'text') {
                 $questions[] = $question;
                 continue;
@@ -400,7 +403,7 @@ class accountModelObj extends modelObj
             if ($question['type'] == 'choice') {
                 $options = [];
                 $answer = [];
-                foreach((array)$question['options'] as $j => $o) {
+                foreach ((array)$question['options'] as $j => $o) {
                     if (empty($o['text'])) {
                         continue;
                     }
@@ -424,6 +427,7 @@ class accountModelObj extends modelObj
                 $questions[] = $question;
             }
         }
+
         return $questions;
     }
 
@@ -525,7 +529,7 @@ class accountModelObj extends modelObj
     public function isTask(): bool
     {
         return $this->getType() == Account::TASK;
-    }    
+    }
 
     public function getAssignData(): array
     {
@@ -579,6 +583,7 @@ class accountModelObj extends modelObj
     {
         return $this->getServiceType() == Account::SUBSCRIPTION_ACCOUNT;
     }
+
     /**
      * 使用这个授权服务号的二维码做为设备二维码，推送到APP上显示
      * @param null $enable
@@ -589,6 +594,7 @@ class accountModelObj extends modelObj
         if (isset($enable)) {
             return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
         }
+
         return App::useAccountQRCode() && $this->settings('misc.useAccountQRCode', 0);
     }
 
@@ -602,7 +608,7 @@ class accountModelObj extends modelObj
                     $arr = explode('{url}', $str, 2);
                     $text = $arr[0];
                     $arr = explode('{/url}', $arr[1], 2);
-                    $text .= '<a href="' . $redirect_url . '">' . $arr[0] . '</a>' . $arr[1];
+                    $text .= '<a href="'.$redirect_url.'">'.$arr[0].'</a>'.$arr[1];
                 } else {
                     $text = str_replace('{url}', "<a href=\"$redirect_url\">这里</a>", $str);
                 }
@@ -621,6 +627,7 @@ class accountModelObj extends modelObj
             if ($redirect_url) {
                 $params['url'] = $redirect_url;
             }
+
             return WxPlatform::createToUserNewsMsg($from, $to, $params);
         }
 

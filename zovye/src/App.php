@@ -21,10 +21,11 @@ class App
     public static function uid(int $len = 0): string
     {
         return onceCall(function () use ($len) {
-            $uid = sha1(_W('config.setting.authkey') . We7::uniacid());
+            $uid = sha1(_W('config.setting.authkey').We7::uniacid());
             if ($len > 0) {
                 return substr($uid, 0, $len);
             }
+
             return $uid;
         }, $len);
     }
@@ -386,6 +387,7 @@ class App
                     }
                 }
             }
+
             return !empty(settings('device.shipment.balanced'));
         }, $device ? $device->getId() : '');
 
@@ -473,6 +475,7 @@ class App
         if (self::isDouYinUser()) {
             return strval($_SESSION['douyin_user_id']);
         }
+
         return '';
     }
 
@@ -509,6 +512,7 @@ class App
         if ($id) {
             return DeviceTypes::get($id);
         }
+
         return null;
     }
 
@@ -550,11 +554,6 @@ class App
     public static function isDouyinEnabled(): bool
     {
         return settings('account.douyin.enabled', false);
-    }
-
-    public static function isMultiQRCodesEnabled(): bool
-    {
-        return false;
     }
 
     public static function isBalanceEnabled(): bool

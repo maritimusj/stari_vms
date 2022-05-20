@@ -63,7 +63,7 @@ class LoginData
     public static function keeper(array $cond = []): modelObjFinder
     {
         return self::query(['src' => LoginData::KEEPER])->where($cond);
-    }  
+    }
 
     public static function user(array $cond = []): modelObjFinder
     {

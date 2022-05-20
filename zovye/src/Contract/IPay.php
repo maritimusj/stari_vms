@@ -32,7 +32,13 @@ interface IPay
      * @param string $body
      * @return mixed
      */
-    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '');
+    public function createXAppPay(
+        string $user_uid,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = ''
+    );
 
 
     /**

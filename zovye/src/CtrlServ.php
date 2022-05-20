@@ -56,7 +56,7 @@ class CtrlServ
             $data = json_encode(
                 [
                     'op' => $op,
-                    'nostr' => microtime(true) . '',
+                    'nostr' => microtime(true).'',
                     'da' => $payloadData,
                 ]
             );
@@ -80,8 +80,13 @@ class CtrlServ
      * @param string $method
      * @return mixed
      */
-    public static function query(string $path = '', array $params = [], $body = '', string $contentType = '', string $method = '')
-    {
+    public static function query(
+        string $path = '',
+        array $params = [],
+        $body = '',
+        string $contentType = '',
+        string $method = ''
+    ) {
         return self::queryData('v1', $path, $params, $body, $contentType, $method);
     }
 
@@ -95,8 +100,14 @@ class CtrlServ
      * @param string $method
      * @return mixed
      */
-    public static function queryData($version, $path, array $params = [], $body = '', string $contentType = '', string $method = '')
-    {
+    public static function queryData(
+        $version,
+        $path,
+        array $params = [],
+        $body = '',
+        string $contentType = '',
+        string $method = ''
+    ) {
         if (self::$http_client) {
             $ctrlServerUrl = settings('ctrl.url');
             $appKey = settings('ctrl.appKey');
@@ -113,7 +124,7 @@ class CtrlServ
             $ctrlServerUrl .= "/$path";
 
             $params['nostr'] = TIMESTAMP;
-            $ctrlServerUrl .= '?' . http_build_query($params);
+            $ctrlServerUrl .= '?'.http_build_query($params);
 
             $headers = [];
 
@@ -153,7 +164,11 @@ class CtrlServ
                 $headers['llt-sign'] = $sign;
             } else {
                 $headers['zovye-key'] = $appKey;
-                $headers['zovye-sign'] = self::makeCtrlServerSign(settings('ctrl.appKey', ''), settings('ctrl.appSecret', ''), $params['nostr']);
+                $headers['zovye-sign'] = self::makeCtrlServerSign(
+                    settings('ctrl.appKey', ''),
+                    settings('ctrl.appSecret', ''),
+                    $params['nostr']
+                );
             }
 
             return self::$http_client->request($ctrlServerUrl, $method, $headers, $body);
@@ -202,6 +217,7 @@ class CtrlServ
                 return $res['data'];
             }
         }
+
         return err('请求失败！');
     }
 
@@ -214,8 +230,13 @@ class CtrlServ
      * @param string $method
      * @return mixed
      */
-    public static function v2_query(string $path = '', array $params = [], $body = '', string $contentType = '', string $method = '')
-    {
+    public static function v2_query(
+        string $path = '',
+        array $params = [],
+        $body = '',
+        string $contentType = '',
+        string $method = ''
+    ) {
         return self::queryData('v2', $path, $params, $body, $contentType, $method);
     }
 
@@ -229,13 +250,13 @@ class CtrlServ
     public static function appNotify($app_id, string $op = 'config', array $payload = []): bool
     {
         if (empty(self::$app)) {
-            register_shutdown_function(function (){
+            register_shutdown_function(function () {
                 foreach (self::$app as $data) {
                     $topic = "app/{$data['app']}";
 
                     $json = [
                         'op' => $data['op'],
-                        'serial' => microtime(true) . '',
+                        'serial' => microtime(true).'',
                     ];
 
                     if ($data['data']) {
@@ -290,24 +311,31 @@ class CtrlServ
      * @param array $payload 数据
      * @return bool
      */
-    public static function appNotifyAll(array $original, array $data = [], string $op = 'update', array $payload = []): bool
-    {
+    public static function appNotifyAll(
+        array $original,
+        array $data = [],
+        string $op = 'update',
+        array $payload = []
+    ): bool {
         $topics = [];
 
         if ($data['all']) {
             if (!$original['all']) {
-                $topics[] = 'tag/' . Topic::encrypt();
+                $topics[] = 'tag/'.Topic::encrypt();
             }
         } else {
             if ($original['all']) {
-                $topics[] = 'tag/' . Topic::encrypt();
+                $topics[] = 'tag/'.Topic::encrypt();
             } else {
                 if (isset($data['all']) && $data['all'] === false) {
                     $all = $original;
                 } else {
                     $all = $data;
                     foreach ($original as $key => $entry) {
-                        $all[$key] = $all[$key] ? array_merge(array_diff($all[$key], $entry), array_diff($entry, $all[$key])) : $entry;
+                        $all[$key] = $all[$key] ? array_merge(
+                            array_diff($all[$key], $entry),
+                            array_diff($entry, $all[$key])
+                        ) : $entry;
                         if (empty($all[$key])) {
                             unset($all[$key]);
                         }
@@ -316,22 +344,22 @@ class CtrlServ
 
                 if ($all['agents']) {
                     foreach ($all['agents'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("agent$id");
+                        $topics[] = 'tag/'.Topic::encrypt("agent$id");
                     }
                 }
                 if ($all['groups']) {
                     foreach ($all['groups'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("group$id");
+                        $topics[] = 'tag/'.Topic::encrypt("group$id");
                     }
                 }
                 if ($all['tags']) {
                     foreach ($all['tags'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("tag$id");
+                        $topics[] = 'tag/'.Topic::encrypt("tag$id");
                     }
                 }
                 if ($all['devices']) {
                     foreach ($all['devices'] as $id) {
-                        $topics[] = 'tag/' . Topic::encrypt("device$id");
+                        $topics[] = 'tag/'.Topic::encrypt("device$id");
                     }
                 }
             }
@@ -340,7 +368,7 @@ class CtrlServ
         if ($topics) {
             $data = [
                 'op' => $op,
-                'serial' => microtime(true) . '',
+                'serial' => microtime(true).'',
             ];
 
             if ($payload) {
@@ -353,6 +381,7 @@ class CtrlServ
             ];
 
             $res = self::query('misc/publish', [], $body);
+
             return !is_error($res);
         }
 
@@ -390,7 +419,7 @@ class CtrlServ
     {
         ksort($params);
 
-        return sha1(http_build_query($params) . settings('ctrl.signature'));
+        return sha1(http_build_query($params).settings('ctrl.signature'));
     }
 
     private static function makeJobUrl($op, array $params = []): string
@@ -398,9 +427,10 @@ class CtrlServ
         $params['do'] = 'job';
         $params['op'] = $op;
         $params['m'] = APP_NAME;
-        $params['serial'] = microtime(true) . '';
+        $params['serial'] = microtime(true).'';
 
         $params['sign'] = self::makeSign($params);
+
         return Util::murl('job', $params);
     }
 
@@ -417,6 +447,7 @@ class CtrlServ
         if (!is_error($result) && $result !== false) {
             return $result['queued'] ?? true;
         }
+
         return false;
     }
 
@@ -453,7 +484,7 @@ class CtrlServ
         if (!is_error($result) && $result !== false) {
             return $result['queued'] ?? true;
         }
-        
+
         return false;
     }
 

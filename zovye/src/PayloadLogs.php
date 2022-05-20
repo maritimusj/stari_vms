@@ -38,6 +38,7 @@ class PayloadLogs
             $log = self::query()->findOne(['id' => $id]);
             if ($log) {
                 $cache[$log->getId()] = $log;
+
                 return $log;
             }
         }

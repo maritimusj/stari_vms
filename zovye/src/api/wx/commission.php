@@ -234,9 +234,9 @@ class commission
         } else {
             if ($user->isPartner()) {
                 $user = $user->getPartnerAgent();
-            }            
+            }
         }
 
         return ['data' => Stats::getUserCommissionStats($user)];
-    } 
+    }
 }

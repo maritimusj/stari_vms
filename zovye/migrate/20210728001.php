@@ -1,9 +1,10 @@
 <?php
+
 namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_package')) {
+if (!We7::pdo_tableexists($tb_name.'_package')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_package` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
@@ -15,10 +16,10 @@ CREATE TABLE `ims_zovye_vms_package` (
     INDEX (`device_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-    Migrate::execSQL($sql);    
+    Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name . '_package_goods')) {
+if (!We7::pdo_tableexists($tb_name.'_package_goods')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_package_goods` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
@@ -32,5 +33,5 @@ CREATE TABLE `ims_zovye_vms_package_goods` (
     INDEX (`goods_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-    Migrate::execSQL($sql);    
+    Migrate::execSQL($sql);
 }

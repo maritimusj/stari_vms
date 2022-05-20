@@ -8,13 +8,16 @@ namespace zovye;
 
 define('ZOVYE', 'v2');
 
-define('ZOVYE_ROOT', str_replace(DIRECTORY_SEPARATOR . 'zovye' . DIRECTORY_SEPARATOR . 'include', '', __DIR__) . DIRECTORY_SEPARATOR);
-define('ZOVYE_CORE_ROOT', ZOVYE_ROOT . 'zovye' . DIRECTORY_SEPARATOR);
-define('DATA_DIR', ZOVYE_ROOT . 'data' . DIRECTORY_SEPARATOR);
-define('LOG_DIR', DATA_DIR . 'logs' . DIRECTORY_SEPARATOR);
-define('MOD_CACHE_DIR', DATA_DIR . 'mod_cache' . DIRECTORY_SEPARATOR);
-define('PEM_DIR', DATA_DIR . 'pem' . DIRECTORY_SEPARATOR); //微信支付企业密钥文件生成目录，最好设置到web目录以外的目录，需要可写权限
-define('LIB_DIR', ZOVYE_ROOT . 'lib' . DIRECTORY_SEPARATOR);
+define(
+    'ZOVYE_ROOT',
+    str_replace(DIRECTORY_SEPARATOR.'zovye'.DIRECTORY_SEPARATOR.'include', '', __DIR__).DIRECTORY_SEPARATOR
+);
+define('ZOVYE_CORE_ROOT', ZOVYE_ROOT.'zovye'.DIRECTORY_SEPARATOR);
+define('DATA_DIR', ZOVYE_ROOT.'data'.DIRECTORY_SEPARATOR);
+define('LOG_DIR', DATA_DIR.'logs'.DIRECTORY_SEPARATOR);
+define('MOD_CACHE_DIR', DATA_DIR.'mod_cache'.DIRECTORY_SEPARATOR);
+define('PEM_DIR', DATA_DIR.'pem'.DIRECTORY_SEPARATOR); //微信支付企业密钥文件生成目录，最好设置到web目录以外的目录，需要可写权限
+define('LIB_DIR', ZOVYE_ROOT.'lib'.DIRECTORY_SEPARATOR);
 
 define('L_ALL', 0);
 define('L_DEBUG', 1);
@@ -41,7 +44,7 @@ define('LOG_MAX_DAY', 3);
 //按主题过滤日志
 define('LOG_TOPIC_INCLUDES', []);
 
-define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'] . $_SERVER['HTTP_HOST'] . '/addons/' . APP_NAME . '/');
+define('ZOVYE_STATIC_URL', $GLOBALS['_W']['sitescheme'].$_SERVER['HTTP_HOST'].'/addons/'.APP_NAME.'/');
 
 define('LEVEL_HIGH', 'order');
 define('LEVEL_NORMAL', 'normal');
@@ -90,7 +93,7 @@ define('FLUSH_DEVICE_FORWARDER_URL', 'https://z.ph6618.cn/cache/flush?id={imei}'
 
 define('DEFAULT_LBS_KEY', 'FNBBZ-DK2C4-3LCUM-DXXIO-GVYQ7-OTBEA');
 
-define('JS_WE7UTIL_URL', $GLOBALS['_W']['siteroot'] . "app/resource/js/app/util.js");
+define('JS_WE7UTIL_URL', $GLOBALS['_W']['siteroot']."app/resource/js/app/util.js");
 define('JS_JQUERY_URL', 'https://cdn.staticfile.org/jquery/1.11.1/jquery.min.js');
 define('JS_AXIOS_URL', 'https://cdn.staticfile.org/axios/0.19.2/axios.min.js');
 define('JS_VUE_URL', 'https://cdn.staticfile.org/vue/2.6.9/vue.min.js');
@@ -115,5 +118,5 @@ defined('MATERIAL_WEXIN') or define('MATERIAL_WEXIN', 'perm'); //微信素材类
 define('REGULAR_EMAIL', '/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i');
 define('REGULAR_TEL', '/^1[3456789][0-9]{9}$/');
 defined('MODULE_URL') or define('MODULE_URL', ZOVYE_STATIC_URL);
-defined('ATTACHMENT_ROOT') or define('ATTACHMENT_ROOT', ZOVYE_ROOT . '/attachment/');
+defined('ATTACHMENT_ROOT') or define('ATTACHMENT_ROOT', ZOVYE_ROOT.'/attachment/');
 defined('MODULE_ROOT') or define('MODULE_ROOT', ZOVYE_ROOT);

@@ -78,7 +78,7 @@ class MengMoAccount
             }
 
             if (!$result['status'] || $result['errorCode'] != '0000') {
-                throw new RuntimeException('错误代码：' . $result['errorCode']);
+                throw new RuntimeException('错误代码：'.$result['errorCode']);
             }
 
             $list = $result['result']['data'];
@@ -106,7 +106,7 @@ class MengMoAccount
                 $log->save();
             } else {
                 Log::error('meng_mo', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -153,6 +153,7 @@ class MengMoAccount
         $publicKey = chunk_split($publicKey, 64, "\n");
         $publicKey = "-----BEGIN PUBLIC KEY-----\n$publicKey-----END PUBLIC KEY-----\n";
         $sign = base64_decode($sign, true);
+
         return openssl_verify($data, $sign, $publicKey, OPENSSL_ALGO_MD5) === 1;
     }
 
@@ -163,7 +164,7 @@ class MengMoAccount
             try {
                 $res = self::verifyData($params);
                 if (is_error($res)) {
-                    throw new RuntimeException('发生错误：' . $res['message']);
+                    throw new RuntimeException('发生错误：'.$res['message']);
                 }
 
                 /** @var userModelObj $user */
@@ -185,7 +186,7 @@ class MengMoAccount
                     /** @var deviceModelObj $device */
                     $device = Device::get($params['facility_id'], true);
                     if (empty($device)) {
-                        throw new RuntimeException('找不对这个设备:' . $params['facility_id']);
+                        throw new RuntimeException('找不对这个设备:'.$params['facility_id']);
                     }
 
                     $order_uid = Order::makeUID($user, $device, sha1($params['ad_code_no']));

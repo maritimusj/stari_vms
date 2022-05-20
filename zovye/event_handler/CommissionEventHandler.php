@@ -26,8 +26,12 @@ class CommissionEventHandler
      * @return bool
      * @throws Exception
      */
-    public static function onDeviceOrderCreated(deviceModelObj $device, orderModelObj $order, accountModelObj $account = null, balanceModelObj $balance = null): bool
-    {
+    public static function onDeviceOrderCreated(
+        deviceModelObj $device,
+        orderModelObj $order,
+        accountModelObj $account = null,
+        balanceModelObj $balance = null
+    ): bool {
         if (!App::isCommissionEnabled()) {
             return true;
         }
@@ -65,6 +69,7 @@ class CommissionEventHandler
     protected static function reward(deviceModelObj $device, orderModelObj $order): bool
     {
         $commission_price = Config::app('wxapp.advs.reward.freeCommission') * $order->getNum();
+
         return self::processCommissions($device, $order, $commission_price);
     }
 
@@ -77,6 +82,7 @@ class CommissionEventHandler
     protected static function balance(deviceModelObj $device, orderModelObj $order): bool
     {
         $commission_price = Config::balance('order.commission.val', 0) * $order->getNum();
+
         return self::processCommissions($device, $order, $commission_price);
     }
 
@@ -185,8 +191,11 @@ class CommissionEventHandler
      * @return bool
      * @throws Exception
      */
-    protected static function processCommissions(deviceModelObj $device, orderModelObj $order, int $commission_price): bool
-    {
+    protected static function processCommissions(
+        deviceModelObj $device,
+        orderModelObj $order,
+        int $commission_price
+    ): bool {
         if ($commission_price < 1) {
             return true;
         }
@@ -242,8 +251,11 @@ class CommissionEventHandler
      * @return int
      * @throws Exception
      */
-    protected static function processKeeperCommissions(int $commission_price, deviceModelObj $device, orderModelObj $order): int
-    {
+    protected static function processKeeperCommissions(
+        int $commission_price,
+        deviceModelObj $device,
+        orderModelObj $order
+    ): int {
         if ($commission_price <= 0) {
             return 0;
         }
@@ -272,7 +284,7 @@ class CommissionEventHandler
             }
 
             if ($is_percent) {
-                $price = intval(round($commission_price * intval($v) / 100) *  $order->getNum());
+                $price = intval(round($commission_price * intval($v) / 100) * $order->getNum());
             } else {
                 $price = intval($v * $order->getNum());
             }
@@ -340,9 +352,10 @@ class CommissionEventHandler
                         return false;
                     }
                 } else {
-                    throw new Exception('创建佣金分享失败！' . $price, State::ERROR);
+                    throw new Exception('创建佣金分享失败！'.$price, State::ERROR);
                 }
             }
+
             return true;
         };
 
@@ -357,7 +370,8 @@ class CommissionEventHandler
                     }
                 }
                 //免费订单
-                if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance() > 0 && Balance::isFreeOrder())) {
+                if (($order->getPrice() == 0 && $order->getBalance() == 0) || ($order->getBalance(
+                        ) > 0 && Balance::isFreeOrder())) {
                     if (!$entry['order']['f']) {
                         continue;
                     }
@@ -440,8 +454,12 @@ class CommissionEventHandler
      * @return int
      * @throws Exception
      */
-    protected static function processProfit(deviceModelObj $device, orderModelObj $order, agentModelObj $agent, int $commission_price): int
-    {
+    protected static function processProfit(
+        deviceModelObj $device,
+        orderModelObj $order,
+        agentModelObj $agent,
+        int $commission_price
+    ): int {
         //处理佣金分享用户
         $commission_price = self::processGSP($commission_price, $agent, $order);
         if ($commission_price < 1) {

@@ -89,6 +89,7 @@ class Cache
                 $arr[$index] = strval($item);
             }
         }
+
         return sha1(http_build_query($arr));
     }
 

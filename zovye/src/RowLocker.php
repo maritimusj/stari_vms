@@ -24,12 +24,13 @@ class RowLocker
 
     public function lock($tb_name, $condition, $seg, $auto_unlock = false, $lock_guid = null): bool
     {
-        if ($this->locked || empty($tb_name) || empty($condition) ||empty($seg) || in_array($seg, ['id', 'uniacid']) || !isset($condition[$seg])) {
+        if ($this->locked || empty($tb_name) || empty($condition) || empty($seg) || in_array($seg, ['id', 'uniacid']
+            ) || !isset($condition[$seg])) {
             return false;
         }
 
         if (empty($lock_guid)) {
-            $lock_guid = We7::uniacid() . Util::random(6, true);
+            $lock_guid = We7::uniacid().Util::random(6, true);
         }
 
         $res = We7::pdo_update($tb_name, [$seg => $lock_guid], $condition);
@@ -66,6 +67,7 @@ class RowLocker
             $res = We7::pdo_update($this->tb_name, [$this->seg => $val], $condition);
             if ($res) {
                 $this->locked = false;
+
                 return true;
             }
         }

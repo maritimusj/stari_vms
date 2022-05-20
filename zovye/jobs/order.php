@@ -119,7 +119,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 $log['statistics'][$order->getId()] = Util::transactionDo(function () use ($order) {
                     return Util::orderStatistics($order);
                 });
-            }            
+            }
         }
 
         if (Util::isSysLoadAverageOk()) {

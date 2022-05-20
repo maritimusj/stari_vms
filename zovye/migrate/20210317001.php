@@ -1,9 +1,10 @@
 <?php
+
 namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_migration')) {
+if (!We7::pdo_tableexists($tb_name.'_migration')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zy_saas_migration` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 

@@ -31,7 +31,8 @@ class DouYin
             'optionalScope' => '',
             'redirect_uri' => $url,
         ];
-        return self::API_URL . $path . http_build_query($data);
+
+        return self::API_URL.$path.http_build_query($data);
     }
 
     public function getSilenceAuthorizeRedirectUrl($url): string
@@ -44,15 +45,16 @@ class DouYin
             'optionalScope' => '',
             'redirect_uri' => $url,
         ];
-        return self::API_URL . $path . http_build_query($data);        
+
+        return self::API_URL.$path.http_build_query($data);
     }
 
     public function getAccessToken($code)
     {
         $path = '/oauth/access_token/';
 
-        $res = Util::post(self::API_URL . $path, [
-            'client_key' => $this->client_key, 
+        $res = Util::post(self::API_URL.$path, [
+            'client_key' => $this->client_key,
             'client_secret' => $this->client_secret,
             'code' => $code,
             'grant_type' => 'authorization_code',
@@ -79,7 +81,7 @@ class DouYin
     {
         $path = '/oauth/renew_refresh_token/';
 
-        $res = Util::post(self::API_URL . $path, [
+        $res = Util::post(self::API_URL.$path, [
             'client_key' => $this->client_key,
             'refresh_token' => $refresh_token,
         ], false);
@@ -102,10 +104,10 @@ class DouYin
 
     public function getUserInfo($access_token, $openid)
     {
-        $url = self::API_URL . '/oauth/userinfo/?' . http_build_query([
-            'open_id' => $openid,
-            'access_token' => $access_token,
-        ]);
+        $url = self::API_URL.'/oauth/userinfo/?'.http_build_query([
+                'open_id' => $openid,
+                'access_token' => $access_token,
+            ]);
 
         $res = Util::get($url, 3, [], true);
         if (is_error($res)) {
@@ -126,12 +128,12 @@ class DouYin
 
     public function getFollowingList($access_token, $openid, $cursor = 0, $count = 10)
     {
-        $url = self::API_URL . '/following/list/?' . http_build_query([
-            'open_id' => $openid,
-            'access_token' => $access_token,
-            'cursor' => $cursor,
-            'count' => $count,
-        ]);
+        $url = self::API_URL.'/following/list/?'.http_build_query([
+                'open_id' => $openid,
+                'access_token' => $access_token,
+                'cursor' => $cursor,
+                'count' => $count,
+            ]);
 
         $res = Util::get($url, 3, [], true);
         if (is_error($res)) {
@@ -157,6 +159,7 @@ class DouYin
             $config = Config::douyin('client', []);
             $instance = new DouYin($config['key'], $config['secret']);
         }
+
         return $instance;
     }
 
@@ -165,15 +168,16 @@ class DouYin
         $o = self::getInstance();
         $res = $o->getAuthorizeRedirectUrl($url, ['user_info', 'following.list']);
         if ($fetch_url) {
-           return $res;
+            return $res;
         }
         Util::redirect($res);
-        exit();  
+        exit();
     }
 
     public static function isTokenExpired(userModelObj $user): bool
     {
         $token = $user->get('douyin_token', []);
+
         return empty($token) || time() - $token['updatetime'] > $token['expires_in'] - 1000;
     }
 
@@ -181,9 +185,10 @@ class DouYin
     {
         $access_token = $user->settings('douyin_token.access_token', '');
         $o = self::getInstance();
+
         return $o->getFollowingList($access_token, $user->getOpenid(), $cursor, $count);
     }
-    
+
     public static function makeHomePageUrl($url)
     {
         $result = [];
@@ -192,10 +197,11 @@ class DouYin
         }
         if (preg_match('/author_id=(\d*)/', $url, $result)) {
             return "snssdk1128://user/profile/$result[1]";
-        }        
+        }
         if (is_numeric($url)) {
             return "snssdk1128://user/profile/$url";
         }
+
         return $url;
     }
 }

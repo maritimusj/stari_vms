@@ -63,6 +63,7 @@ class device_groupsModelObj extends modelObj
         if ($this->agent_id > 0) {
             return Agent::get($this->agent_id);
         }
+
         return null;
     }
 }

@@ -62,6 +62,7 @@ class Order extends State
     public static function query($condition = []): ModelObjFinderProxy
     {
         $finder = m('order')->where(We7::uniacid([]))->where($condition);
+
         return new ModelObjFinderProxy($finder);
     }
 
@@ -77,6 +78,7 @@ class Order extends State
     public static function exists($cond): bool
     {
         $cond = is_array($cond) ? $cond : ['order_id' => strval($cond)];
+
         return m('order')->exists($cond);
     }
 
@@ -99,7 +101,7 @@ class Order extends State
 
     public static function makeUID(userModelObj $user, deviceModelObj $device, $nonce = ''): string
     {
-        return substr("U{$user->getId()}D{$device->getId()}$nonce" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
+        return substr("U{$user->getId()}D{$device->getId()}$nonce".Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
     /**
@@ -162,6 +164,7 @@ class Order extends State
         $query = Order::query();
         $query->orderBy('id DESC');
         $last_order = $query->findOne();
+
         return $fetch_order_obj ? $last_order : [
             'id' => $last_order->getId(),
             'createtime' => $last_order->getCreatetime(),
@@ -181,8 +184,10 @@ class Order extends State
                 'createtime' => $order->getCreatetime(),
             ];
             updateSettings('stats.first_order', $data);
-            return $fetch_order_obj ? $order : $data; 
+
+            return $fetch_order_obj ? $order : $data;
         }
+
         return null;
     }
 
@@ -205,8 +210,10 @@ class Order extends State
                 'createtime' => $order->getCreatetime(),
             ];
             $device->updateSettings('stats.first_order', $data);
+
             return $fetch_order_obj ? $order : $data;
         }
+
         return null;
     }
 
@@ -217,6 +224,7 @@ class Order extends State
     public static function getLastOrderOfDevice(deviceModelObj $device): ?orderModelObj
     {
         $query = self::query(['device_id' => $device->getId()]);
+
         return $query->orderBy('id DESC')->findOne();
     }
 
@@ -236,17 +244,20 @@ class Order extends State
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $agent->setFirstOrderData($order);
+
             return $fetch_order_obj ? $order : [
                 'id' => $order->getId(),
                 'createtime' => $order->getCreatetime(),
             ];
         }
+
         return null;
     }
 
     public static function getLastOrderOfAgent(agentModelObj $agent): ?orderModelObj
     {
         $query = self::query(['agent_id' => $agent->getId()]);
+
         return $query->orderBy('id DESC')->findOne();
     }
 
@@ -266,11 +277,13 @@ class Order extends State
         $order = $query->orderBy('id ASC')->findOne();
         if ($order) {
             $account->setFirstOrderData($order);
+
             return $fetch_order_obj ? $order : [
                 'id' => $order->getId(),
                 'createtime' => $order->getCreatetime(),
             ];
         }
+
         return null;
     }
 
@@ -294,8 +307,10 @@ class Order extends State
                 'createtime' => $order->getCreatetime(),
             ];
             $user->updateSettings('extra.first.order', $data);
+
             return $fetch_order_obj ? $order : $data;
         }
+
         return null;
     }
 
@@ -306,6 +321,7 @@ class Order extends State
     public static function getLastOrderOfUser(userModelObj $user): ?orderModelObj
     {
         $query = self::query(['openid' => $user->getOpenid()]);
+
         return $query->orderBy('id DESC')->findOne();
     }
 
@@ -319,7 +335,7 @@ class Order extends State
         $query = CommissionBalance::query([
             'createtime >=' => $order->getCreatetime(),
             'createtime <' => $order->getCreatetime() + 3600,
-            'extra LIKE' => '%{s:7:\"orderid\";i:' . $id . ';}%',
+            'extra LIKE' => '%{s:7:\"orderid\";i:'.$id.';}%',
         ]);
 
         $result = [];
@@ -332,6 +348,7 @@ class Order extends State
                 'createtime' => date("Y-m-d H:i:s", $entry->getCreatetime()),
             ];
         }
+
         return $result;
     }
 
@@ -658,6 +675,7 @@ class Order extends State
             if ($res) {
                 $cache[$res->getId()] = $res;
                 $cache[$res->getOrderId()] = $res;
+
                 return $res;
             }
         }
@@ -970,6 +988,7 @@ class Order extends State
             'address' => '定位地址',
             'createtime' => '创建时间',
         ];
+
         return $onlyKeys ? array_keys($headers) : $headers;
     }
 
@@ -1007,7 +1026,7 @@ class Order extends State
 
         $date_start = $params['start'] ?? false;
         if ($date_start) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_start . ' 00:00:00');
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_start.' 00:00:00');
         }
 
         if (empty($s_date)) {
@@ -1016,7 +1035,7 @@ class Order extends State
 
         $date_end = $params['end'] ?? false;
         if ($date_end) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_end . ' 00:00:00');
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_end.' 00:00:00');
         }
         if (empty($e_date)) {
             $e_date = new DateTime();
@@ -1082,7 +1101,7 @@ class Order extends State
                         $data[$header] = $entry->getId();
                         break;
                     case 'order_no':
-                        $data[$header] = 'NO.' . $entry->getOrderId();
+                        $data[$header] = 'NO.'.$entry->getOrderId();
                         break;
                     case 'pay_no':
                         $pay_result = $entry->getExtraData('payResult');
@@ -1200,7 +1219,7 @@ class Order extends State
         $column = array_values(array_intersect_key($all_headers, array_flip($headers)));
         $filename = "export/$uid.xls";
 
-        Util::exportExcelFile(ATTACHMENT_ROOT . $filename, $column, $result);
+        Util::exportExcelFile(ATTACHMENT_ROOT.$filename, $column, $result);
 
         return ['filename' => Util::toMedia($filename)];
     }

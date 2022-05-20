@@ -16,7 +16,7 @@ class Theme
     {
         static $themes = [];
         if (empty($themes)) {
-            foreach (glob(MODULE_ROOT . '/template/mobile/themes/*', GLOB_ONLYDIR) as $name) {
+            foreach (glob(MODULE_ROOT.'/template/mobile/themes/*', GLOB_ONLYDIR) as $name) {
                 $themes[] = basename($name);
             }
         }
@@ -41,19 +41,19 @@ class Theme
             $theme = Helper::getTheme();
         }
 
-        $filename = MODULE_ROOT . "/template/mobile/themes/$theme/$name.html";
+        $filename = MODULE_ROOT."/template/mobile/themes/$theme/$name.html";
         if (file_exists($filename)) {
             return "themes/$theme/$name";
         }
 
         if ($theme != 'default') {
-            $filename = MODULE_ROOT . "/template/mobile/themes/default/$name.html";
+            $filename = MODULE_ROOT."/template/mobile/themes/default/$name.html";
             if (file_exists($filename)) {
                 return "themes/default/$name";
             }
         }
 
-        $filename = MODULE_ROOT . "/template/mobile/$name.html";
+        $filename = MODULE_ROOT."/template/mobile/$name.html";
         if (file_exists($filename)) {
             return $name;
         }

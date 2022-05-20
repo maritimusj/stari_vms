@@ -14,6 +14,7 @@ class tester_vwModelObj extends userModelObj
         if ($readOrWrite == modelObj::OP_WRITE) {
             return parent::getTableName($readOrWrite);
         }
+
         return tb('tester_vw');
     }
 }

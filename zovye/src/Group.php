@@ -22,6 +22,7 @@ class Group
         if (empty($data['createtime'])) {
             $data['createtime'] = time();
         }
+
         return m('device_groups')->create($data);
     }
 
@@ -48,9 +49,11 @@ class Group
             $res = self::findOne(['id' => $id]);
             if ($res) {
                 $cache[$res->getId()] = $res;
+
                 return $res;
             }
         }
+
         return null;
     }
 

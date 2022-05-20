@@ -29,6 +29,7 @@ class agent_vwModelObj extends agentModelObj
             return tb('agent_vw');
         }
         trigger_error('user getTableName(...) miss op!');
+
         return '';
     }
 

@@ -42,8 +42,8 @@ if ($op == 'save') {
     }
 
     $res = User::findOne([
-        'id <>' => $user->getId(), 
-        'mobile' => $mobile, 
+        'id <>' => $user->getId(),
+        'mobile' => $mobile,
         'app' => User::WX,
     ]);
     if (!empty($res)) {
@@ -58,7 +58,7 @@ if ($op == 'save') {
     if (!Keeper::findOne(['mobile' => $mobile])) {
         JSON::fail('对不起，您不是我们的营运人员，无法注册！');
     }
-    
+
     if (!$user->setKeeper()) {
         JSON::fail('手机绑定失败！');
     }

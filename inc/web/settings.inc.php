@@ -104,7 +104,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['user']['verify18']['enabled'] = request::bool('userVerify18') ? 1 : 0;
         $settings['user']['verify18']['Title'] = request::trim('userVerify18Title');
-        
+
         $settings['user']['discountPrice'] = request::float('discountPrice', 0, 2) * 100;
 
         if (App::isMustFollowAccountEnabled()) {
@@ -126,7 +126,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             $url = "http://127.0.0.1:8080";
         }
         if (stripos($url, 'http://') === false && stripos($url, 'https://') === false) {
-            $url = 'http://' . $url;
+            $url = 'http://'.$url;
         }
 
         $settings['ctrl']['url'] = $url;
@@ -157,56 +157,56 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $third_party_platform = [
             'jfbFAN' => [
-                __NAMESPACE__ . '\Account::createJFBAccount',
+                __NAMESPACE__.'\Account::createJFBAccount',
                 'jfb.fan.enabled',
             ],
 
             'moscalesFAN' => [
-                __NAMESPACE__ . '\Account::createMoscaleAccount',
+                __NAMESPACE__.'\Account::createMoscaleAccount',
                 'moscale.fan.enabled',
             ],
             'yunfenbaFAN' => [
-                __NAMESPACE__ . '\Account::createYunFenBaAccount',
+                __NAMESPACE__.'\Account::createYunFenBaAccount',
                 'yunfenba.fan.enabled',
             ],
             'ZJBaoFAN' => [
-                __NAMESPACE__ . '\Account::createZJBaoAccount',
+                __NAMESPACE__.'\Account::createZJBaoAccount',
                 'zjbao.fan.enabled',
             ],
             'AQiinfoFAN' => [
-                __NAMESPACE__ . '\Account::createAQiinfoAccount',
+                __NAMESPACE__.'\Account::createAQiinfoAccount',
                 'AQiinfo.fan.enabled',
             ],
             'MeiPaFAN' => [
-                __NAMESPACE__ . '\Account::createMeiPaAccount',
+                __NAMESPACE__.'\Account::createMeiPaAccount',
                 'meipa.fan.enabled',
             ],
             'kingFAN' => [
-                __NAMESPACE__ . '\Account::createKingFansAccount',
+                __NAMESPACE__.'\Account::createKingFansAccount',
                 'king.fan.enabled',
             ],
             'sntoFAN' => [
-                __NAMESPACE__ . '\Account::createSNTOAccount',
+                __NAMESPACE__.'\Account::createSNTOAccount',
                 'snto.fan.enabled',
             ],
             'yfbFAN' => [
-                __NAMESPACE__ . '\Account::createYFBAccount',
+                __NAMESPACE__.'\Account::createYFBAccount',
                 'yfb.fan.enabled',
             ],
             'wxWorkFAN' => [
-                __NAMESPACE__ . '\Account::createWxWorkAccount',
+                __NAMESPACE__.'\Account::createWxWorkAccount',
                 'wxWork.fan.enabled',
             ],
             'youFenFAN' => [
-                __NAMESPACE__ . '\Account::createYouFenAccount',
+                __NAMESPACE__.'\Account::createYouFenAccount',
                 'YouFen.fan.enabled',
             ],
             'mengMoFenFAN' => [
-                __NAMESPACE__ . '\Account::createMengMoAccount',
+                __NAMESPACE__.'\Account::createMengMoAccount',
                 'MengMo.fan.enabled',
             ],
             'yiDaoFAN' => [
-                __NAMESPACE__ . '\Account::createYiDaoAccount',
+                __NAMESPACE__.'\Account::createYiDaoAccount',
                 'YiDao.fan.enabled',
             ],
         ];
@@ -235,7 +235,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         }
 
         if ($accounts_updated) {
-            setArray($settings, 'accounts.lastupdate', '' . microtime(true));
+            setArray($settings, 'accounts.lastupdate', ''.microtime(true));
         }
 
         $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;
@@ -265,16 +265,23 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         }
 
         if ($settings['app']['first']['enabled']) {
-            $module_url = str_replace('./', '/', $GLOBALS['_W']['siteroot'] . 'web' . we7::url('module/welcome/display', ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]));
+            $module_url = str_replace(
+                './',
+                '/',
+                $GLOBALS['_W']['siteroot'].'web'.we7::url(
+                    'module/welcome/display',
+                    ['module_name' => APP_NAME, 'uniacid' => We7::uniacid()]
+                )
+            );
             $files = [
                 [
-                    'filename' => IA_ROOT . '/index.php',
-                    'content' => "<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();"
+                    'filename' => IA_ROOT.'/index.php',
+                    'content' => "<?php\r\nrequire './framework/bootstrap.inc.php';\r\nheader('Location: ' . '{$module_url}');\r\nexit();",
                 ],
                 [
-                    'filename' => IA_ROOT . '/framework/bootstrap.inc.php',
+                    'filename' => IA_ROOT.'/framework/bootstrap.inc.php',
                     'append' => true,
-                    'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '{$module_url}';\r\n}"
+                    'content' => "\r\n\r\nif(\$action == 'login'){\r\n\t\$_GPC['referer'] = '{$module_url}';\r\n}",
                 ],
             ];
             foreach ($files as $file) {
@@ -309,7 +316,9 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             'level5' => ['clr' => request::trim('clr5'), 'title' => request::trim('level5')],
         ];
 
-        $settings['agent']['reg']['mode'] = request::bool('agentRegMode') ? Agent::REG_MODE_AUTO : Agent::REG_MODE_NORMAL;
+        $settings['agent']['reg']['mode'] = request::bool(
+            'agentRegMode'
+        ) ? Agent::REG_MODE_AUTO : Agent::REG_MODE_NORMAL;
         $settings['agent']['reg']['referral'] = request::bool('agentReferral') ? 1 : 0;
 
         $settings['agent']['device']['unbind'] = request::bool('deviceUnbind') ? 1 : 0;
@@ -364,7 +373,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 //佣金奖励
                 $settings['agent']['reg']['bonus']['enabled'] = request::bool('agentBonusEnabled') ? 1 : 0;
                 if ($settings['agent']['reg']['bonus']['enabled']) {
-                    $settings['agent']['reg']['bonus']['principal'] = request::trim('principal', CommissionBalance::PRINCIPAL_ORDER);
+                    $settings['agent']['reg']['bonus']['principal'] = request::trim(
+                        'principal',
+                        CommissionBalance::PRINCIPAL_ORDER
+                    );
                     $settings['agent']['reg']['bonus']['order'] = [
                         'f' => request::bool('freeOrder') ? 1 : 0,
                         'b' => request::bool('balanceOrder') ? 1 : 0,
@@ -442,7 +454,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             if (request::isset('withdraw_fee_percent')) {
                 $settings['commission']['withdraw']['fee']['percent'] = min(100, max(0, request::int('percent')));
             } else {
-                $settings['commission']['withdraw']['fee']['percent'] = min(100, max(0, round(request::int('withdraw_fee_permille') / 10)));
+                $settings['commission']['withdraw']['fee']['percent'] = min(
+                    100,
+                    max(0, round(request::int('withdraw_fee_permille') / 10))
+                );
             }
         }
 
@@ -693,15 +708,67 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $template_keys = [
             'title',
-            'total_sale_init', 'total_sale_freq', 'total_sale_section1', 'total_sale_section2',
-            'today_sale_init', 'today_sale_freq', 'today_sale_section1', 'today_sale_section2',
-            'total_order_init', 'total_order_freq', 'total_order_section1', 'total_order_section2',
-            'today_order_init', 'today_order_freq', 'today_order_section1', 'today_order_section2',
-            'user_man', 'user_woman',
-            'income_wx', 'income_ali',
-            'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10',
-            'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p17', 'p18', 'p19',
-            'p20', 'p21', 'p22', 'p23', 'p24', 'p25', 'p26', 'p27', 'p28', 'p29', 'p30', 'p31',
+            'total_sale_init',
+            'total_sale_freq',
+            'total_sale_section1',
+            'total_sale_section2',
+            'today_sale_init',
+            'today_sale_freq',
+            'today_sale_section1',
+            'today_sale_section2',
+            'total_order_init',
+            'total_order_freq',
+            'total_order_section1',
+            'total_order_section2',
+            'today_order_init',
+            'today_order_freq',
+            'today_order_section1',
+            'today_order_section2',
+            'user_man',
+            'user_woman',
+            'income_wx',
+            'income_ali',
+            'g1',
+            'g2',
+            'g3',
+            'g4',
+            'g5',
+            'g6',
+            'g7',
+            'g8',
+            'g9',
+            'g10',
+            'p1',
+            'p2',
+            'p3',
+            'p4',
+            'p5',
+            'p6',
+            'p7',
+            'p8',
+            'p9',
+            'p10',
+            'p11',
+            'p12',
+            'p13',
+            'p14',
+            'p15',
+            'p16',
+            'p17',
+            'p18',
+            'p19',
+            'p20',
+            'p21',
+            'p22',
+            'p23',
+            'p24',
+            'p25',
+            'p26',
+            'p27',
+            'p28',
+            'p29',
+            'p30',
+            'p31',
         ];
 
         $req_arr = [];
@@ -795,7 +862,8 @@ if ($op == 'account') {
         }
 
         $tpl_data['auth_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTH_NOTIFY]);
-        $tpl_data['msg_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTHORIZER_EVENT]) . '&appid=/$APPID$';
+        $tpl_data['msg_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTHORIZER_EVENT]
+            ).'&appid=/$APPID$';
     }
 
     if (App::isDouyinEnabled()) {
@@ -829,8 +897,10 @@ if ($op == 'account') {
 
         if ($data['start']) {
             $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['start']);
-        } else if ($data['startTime']) {
-            $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['startTime']);
+        } else {
+            if ($data['startTime']) {
+                $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['startTime']);
+            }
         }
 
         if ($data['now']) {
@@ -972,7 +1042,7 @@ if ($op == 'account') {
         if (empty($config['token'])) {
             $config['token'] = Util::random(32);
         }
-        
+
         $tpl_data['config'] = $config;
     }
 } elseif ($op == 'user') {
@@ -984,7 +1054,7 @@ if ($op == 'account') {
             $tpl_data['idcard_balance'] = $res['data']['balance'];
         } else {
             $tpl_data['idcard_balance'] = $res['data']['msg'];
-        }        
+        }
     }
 
 } elseif ($op == 'notice') {
@@ -1015,7 +1085,10 @@ if ($op == 'account') {
     $tpl_data['pem'] = empty($settings['pem']) ? ['key' => '', 'cert' => ''] : unserialize($settings['pem']);
 
     if (!isset($settings['commission']['withdraw']['fee']['permille'])) {
-        $settings['commission']['withdraw']['fee']['permille'] = min(1000, intval($settings['commission']['withdraw']['fee']['percent'] * 10));
+        $settings['commission']['withdraw']['fee']['permille'] = min(
+            1000,
+            intval($settings['commission']['withdraw']['fee']['percent'] * 10)
+        );
     }
 
     $settings['commission']['withdraw']['min'] = $settings['commission']['withdraw']['min'] / 100;
@@ -1117,10 +1190,16 @@ if ($op == 'account') {
     $tpl_data['navs']['data_view'] = '数据大屏';
 
     $goods = [
-        'g1' => '商品一', 'g2' => '商品二', 'g3' => '商品三',
-        'g4' => '商品四', 'g5' => '商品五', 'g6' => '商品六',
-        'g7' => '商品七', 'g8' => '商品八', 'g9' => '商品九',
-        'g10' => '商品十'
+        'g1' => '商品一',
+        'g2' => '商品二',
+        'g3' => '商品三',
+        'g4' => '商品四',
+        'g5' => '商品五',
+        'g6' => '商品六',
+        'g7' => '商品七',
+        'g8' => '商品八',
+        'g9' => '商品九',
+        'g10' => '商品十',
     ];
 
     $provinces = Util::getProvinceList();
@@ -1130,12 +1209,26 @@ if ($op == 'account') {
 
     $keys = [
         'title',
-        'total_sale_init', 'total_sale_freq', 'total_sale_section1', 'total_sale_section2',
-        'today_sale_init', 'today_sale_freq', 'today_sale_section1', 'today_sale_section2',
-        'total_order_init', 'total_order_freq', 'total_order_section1', 'total_order_section2',
-        'today_order_init', 'today_order_freq', 'today_order_section1', 'today_order_section2',
-        'user_man', 'user_woman',
-        'income_wx', 'income_ali',
+        'total_sale_init',
+        'total_sale_freq',
+        'total_sale_section1',
+        'total_sale_section2',
+        'today_sale_init',
+        'today_sale_freq',
+        'today_sale_section1',
+        'today_sale_section2',
+        'total_order_init',
+        'total_order_freq',
+        'total_order_section1',
+        'total_order_section2',
+        'today_order_init',
+        'today_order_freq',
+        'today_order_section1',
+        'today_order_section2',
+        'user_man',
+        'user_woman',
+        'income_wx',
+        'income_ali',
     ];
 
     $keys = array_merge($keys, array_keys($goods), array_keys($provinces));
@@ -1180,7 +1273,7 @@ if ($op == 'account') {
                     if (empty($res['data']['download'])) {
                         Util::itoast('暂时没有任何文件需要更新！', $back_url, 'success');
                     } else {
-                        $data = Util::get(UPGRADE_URL . '/?op=exec');
+                        $data = Util::get(UPGRADE_URL.'/?op=exec');
                         $res = json_decode($data, true);
                         if ($res && $res['status']) {
                             if (!Migrate::detect(true)) {
@@ -1197,7 +1290,7 @@ if ($op == 'account') {
                                 'filename' => $filename,
                                 'dest' => $filename,
                             ];
-                            $local_file = MODULE_ROOT . $filename;
+                            $local_file = MODULE_ROOT.$filename;
                             if (file_exists($local_file)) {
                                 $stats = stat($local_file);
                                 if ($stats) {
@@ -1207,6 +1300,7 @@ if ($op == 'account') {
                             }
                             $result[] = $fi;
                         }
+
                         return $result;
                     };
                     $tpl_data['upgrade']['download'] = $processFile($res['data']['download']);
@@ -1215,7 +1309,9 @@ if ($op == 'account') {
                     $tpl_data['upgrade']['remove'] = $processFile($res['data']['remove']);
                 }
             } else {
-                $tpl_data['upgrade']['error'] = empty($res['data']['message']) ? '暂无无法检查升级！' : strval($res['data']['message']);
+                $tpl_data['upgrade']['error'] = empty($res['data']['message']) ? '暂无无法检查升级！' : strval(
+                    $res['data']['message']
+                );
             }
         } else {
             $tpl_data['upgrade']['error'] = '检查更新失败！';

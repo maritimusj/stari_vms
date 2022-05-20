@@ -9,7 +9,7 @@ namespace zovye;
 class ClassLoader
 {
     static $alias = [
-        'qrcode' => LIB_DIR . 'qrcode' . DIRECTORY_SEPARATOR . 'phpqrcode.php',
+        'qrcode' => LIB_DIR.'qrcode'.DIRECTORY_SEPARATOR.'phpqrcode.php',
     ];
 
     public function library($name)

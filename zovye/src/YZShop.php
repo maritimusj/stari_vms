@@ -44,7 +44,8 @@ class YZShop
 
         $mid = intval(isset($agent) ? We7::mc_openid2uid($agent->getOpenid()) : 0);
 
-        $url = _W('siteroot') . "/addons/yun_shop/api.php?i=" . We7::uniacid() . "&uid=$uid&mid=$mid&type=5&route=member.member.memberFromHXQModule";
+        $url = _W('siteroot')."/addons/yun_shop/api.php?i=".We7::uniacid(
+            )."&uid=$uid&mid=$mid&type=5&route=member.member.memberFromHXQModule";
 
         $res = ihttp::get($url);
         if (is_error($res)) {
@@ -159,14 +160,14 @@ class YZShop
             if ($res && $res['member_id']) {
                 $status = settings('agent.yzshop.goods_limits.order_status', []);
                 if ($status) {
-                    $sql = 'SELECT SUM(g.total) AS total FROM ' . We7::tablename(
+                    $sql = 'SELECT SUM(g.total) AS total FROM '.We7::tablename(
                             self::TB_ORDER_GOODS
-                        ) . ' g LEFT JOIN ' . We7::tablename(
+                        ).' g LEFT JOIN '.We7::tablename(
                             self::TB_ORDER
-                        ) . ' o ON g.order_id=o.id WHERE g.goods_id=:goods_id AND g.uid=:uid AND o.is_deleted=0 AND o.status IN (' . implode(
+                        ).' o ON g.order_id=o.id WHERE g.goods_id=:goods_id AND g.uid=:uid AND o.is_deleted=0 AND o.status IN ('.implode(
                             ',',
                             $status
-                        ) . ')';
+                        ).')';
 
                     $res = We7::pdo_fetch($sql, [':goods_id' => $goods_id, ':uid' => $res['member_id']]);
                     if ($res) {

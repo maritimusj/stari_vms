@@ -48,8 +48,15 @@ class GoodsVoucher
      * @param array $assign
      * @return mixed
      */
-    public static function create($agent, $goods, int $total = 1, int $begin = 0, int $end = 0, array $limit_goods = [], array $assign = [])
-    {
+    public static function create(
+        $agent,
+        $goods,
+        int $total = 1,
+        int $begin = 0,
+        int $end = 0,
+        array $limit_goods = [],
+        array $assign = []
+    ) {
         /** @var ExtraDataGettersAndSetters $classname */
         $classname = m('goods_voucher')->objClassname();
 
@@ -123,6 +130,7 @@ class GoodsVoucher
             }
         }
         $data['limitGoodsNum'] = count($data['limitGoods']);
+
         return $data ?? [];
     }
 
@@ -240,7 +248,7 @@ class GoodsVoucher
      * @param callable|null $fn 检查提货券是否可用
      * @return array
      */
-    public static function give(userModelObj $user,  $voucher_ids, callable $fn = null): array
+    public static function give(userModelObj $user, $voucher_ids, callable $fn = null): array
     {
         $result = [];
         $ids = is_array($voucher_ids) ? $voucher_ids : [$voucher_ids];

@@ -57,7 +57,7 @@ if ($user->isBanned()) {
 }
 
 if (App::isUserVerify18Enabled()) {
-    if(!$user->isIDCardVerified()) {
+    if (!$user->isIDCardVerified()) {
         app()->showTemplate(Theme::file('verify_18'), [
             'verify18' => settings('user.verify_18', []),
             'entry_url' => Util::murl('ali', ['from' => $from, 'device' => $device_id]),

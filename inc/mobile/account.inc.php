@@ -29,7 +29,7 @@ if ($op == 'default') {
         Util::resultAlert('公众号没有开通免费领取！', 'error');
     }
 
-    header('location:' . Util::murl('entry', ['from' => 'account', 'account' => $tid, 'xid' => $xid]));
+    header('location:'.Util::murl('entry', ['from' => 'account', 'account' => $tid, 'xid' => $xid]));
 
 } elseif ($op == 'play') {
 
@@ -345,7 +345,7 @@ if ($op == 'default') {
 
     $data = $account->format();
     $data['questions'] = $account->getQuestions($user);
-    
+
     JSON::success([
         'uid' => $data['uid'],
         'clr' => $data['clr'],
@@ -369,7 +369,7 @@ if ($op == 'default') {
         $device = Device::find($device_uid, ['imei', 'shadow_id']);
         if (empty($device)) {
             JSON::fail('找不到这个设备！');
-        }        
+        }
     }
 
     $uid = request::str('uid');
@@ -388,20 +388,22 @@ if ($op == 'default') {
 
     $answer = request::array('data');
 
-    if (($acc ?? $account)->getBonusType() == Account::BALANCE)  {
+    $v = $acc ?? $account;
 
-        $result = Util::transactionDo(function () use($user, $device, $acc, $account, $answer) {
+    if ($v->getBonusType() == Account::BALANCE) {
 
-            $log = Balance::give($user, ($acc ?? $account));
+        $result = Util::transactionDo(function () use ($user, $device, $v, $answer) {
+
+            $log = Balance::give($user, $v);
             if (is_error($log)) {
                 return $log;
             }
 
-            $res = Questionnaire::submitAnswer($account, $answer, $user, $device);
+            $res = Questionnaire::submitAnswer($v, $answer, $user, $device);
             if (is_error($res)) {
                 return $res;
             }
-            
+
             return $log;
         });
 
@@ -413,10 +415,10 @@ if ($op == 'default') {
             'balance' => $user->getBalance()->total(),
             'bonus' => $result instanceof balanceModelObj ? $result->getXVal() : 0,
         ];
-        
+
         JSON::success($data);
 
-    } elseif (($acc ?? $account)->getBonusType() == Account::COMMISSION) {
+    } elseif ($v->getBonusType() == Account::COMMISSION) {
 
         $result = $account->checkAnswer($user, $answer);
         if (is_error($result)) {
@@ -428,16 +430,16 @@ if ($op == 'default') {
             'time' => time(),
             'deviceId' => $device->getId(),
             'shadowId' => $device->getShadowId(),
-            'accountId' => ($acc ?? $account)->getId(),
+            'accountId' => $v->getId(),
             'answer' => $answer,
         ];
-        
+
         if (isset($acc)) {
             $ticket_data['questionnaireAccountId'] = $account->getId();
         }
 
         $user->cleanLastActiveData();
-        
+
         //准备领取商品的ticket
         $user->setLastActiveData('ticket', $ticket_data);
 

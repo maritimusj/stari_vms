@@ -34,6 +34,7 @@ class modelFactory
     {
         /** @var modelObj $objClassname */
         $objClassname = $this->objClassname;
+
         return $objClassname::getTableName($mode);
     }
 
@@ -67,6 +68,7 @@ class modelFactory
         $res = We7::pdo_insert($objClassname::getTableName(modelObj::OP_WRITE), $data);
         if ($res) {
             $id = intval(We7::pdo_insertid());
+
             return $this->load($id);
         }
 
@@ -174,7 +176,8 @@ class modelFactory
     protected function getCacheKey($obj): string
     {
         $id = is_object($obj) ? $obj->getId() : $obj;
-        return APP_NAME . ":$this->shortName:$id";
+
+        return APP_NAME.":$this->shortName:$id";
     }
 
     /**
@@ -204,6 +207,7 @@ class modelFactory
             if ($src['cache']) {
                 $this->removeCacheData($obj);
             }
+
             return true;
         }
 
@@ -235,6 +239,7 @@ class modelFactory
     public function exists($condition = []): bool
     {
         $res = $this->where($condition);
+
         return !empty($res->get('id'));
     }
 

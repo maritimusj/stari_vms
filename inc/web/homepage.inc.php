@@ -36,9 +36,9 @@ if ($op == 'stats') {
         $time_less_15 = new DateTime('-15 min');
         $ts = $time_less_15->getTimestamp();
 
-        $device_stat['on'] = Device::query('last_online IS NOT NULL AND last_online > ' . $ts)->count();
+        $device_stat['on'] = Device::query('last_online IS NOT NULL AND last_online > '.$ts)->count();
         $device_stat['off'] = $all_device - $device_stat['on'];
-        
+
         return [
             'stats_titles' => $stats_titles,
             'rows' => $rows,
@@ -57,10 +57,11 @@ if ($op == 'stats') {
         'web/home/chart',
         [
             'chartid' => Util::random(10),
-            'data' => Util::cachedCall(30, function() {
-                    $n = request::int('n', 10);
-                    return Stats::chartDataOfAgents($n);
-                }),
+            'data' => Util::cachedCall(30, function () {
+                $n = request::int('n', 10);
+
+                return Stats::chartDataOfAgents($n);
+            }),
         ]
     );
 
@@ -72,8 +73,9 @@ if ($op == 'stats') {
         'web/home/chart',
         [
             'chartid' => Util::random(10),
-            'data' => Util::cachedCall(30, function() {
+            'data' => Util::cachedCall(30, function () {
                 $n = request::int('n', 10);
+
                 return Stats::chartDataOfDevices($n);
             }),
         ]
@@ -87,8 +89,9 @@ if ($op == 'stats') {
         'web/home/chart',
         [
             'chartid' => Util::random(10),
-            'data' => Util::cachedCall(30, function() {
+            'data' => Util::cachedCall(30, function () {
                 $n = request::int('n', 10);
+
                 return Stats::chartDataOfAccounts($n);
             }),
         ]

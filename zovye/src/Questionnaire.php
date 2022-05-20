@@ -12,7 +12,7 @@ use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 
-class Questionnaire 
+class Questionnaire
 {
     public static function log($cond = []): base\modelObjFinder
     {
@@ -25,18 +25,18 @@ class Questionnaire
         if (empty($account) || $account->isBanned()) {
             return err('任务不存在！');
         }
-    
+
         if (!$account->isQuestionnaire()) {
             return err('任务类型不正确！');
         }
-    
+
         $result = $account->checkAnswer($user, $answer);
-        
+
         if (is_error($result)) {
             return $result;
         }
-    
-        return Util::transactionDo(function() use ($account, $user, $device, $answer, $result) {
+
+        return Util::transactionDo(function () use ($account, $user, $device, $answer, $result) {
             $res = $account->log($account->getId(), REQUEST_ID, [
                 'uid' => REQUEST_ID,
                 'user' => $user->profile(),
@@ -58,8 +58,9 @@ class Questionnaire
                 if ($log->save()) {
                     return $log;
                 }
-            } 
-            return err('保存数据失败！');          
+            }
+
+            return err('保存数据失败！');
         });
     }
 
@@ -68,37 +69,36 @@ class Questionnaire
         $query = self::log(['level' => $account->getId()]);
         if ($s_date) {
             try {
-                $begin = new DateTime($s_date . ' 00:00');
+                $begin = new DateTime($s_date.' 00:00');
                 $query->where(['createtime >=' => $begin->getTimestamp()]);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 return err('开始时间不正确！');
             }
         }
 
         if ($e_date) {
             try {
-                $end = new DateTime($e_date . ' 00:00');
+                $end = new DateTime($e_date.' 00:00');
                 $end->modify('next day 00:00');
                 $query->where(['createtime <' => $end->getTimestamp()]);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 return err('结束时间不正确！');
             }
         }
 
         $uid = REQUEST_ID;
         $short_filename = "export/$uid.xls";
-        $filename = ATTACHMENT_ROOT . $short_filename;
+        $filename = ATTACHMENT_ROOT.$short_filename;
         Util::exportExcelFile($filename, ['#', '昵称', 'openid', '设备名称', '设备编号', '订单号', '问卷内容', '创建时间']);
 
-        foreach($query->findAll() as $index => $log)
-        {
+        foreach ($query->findAll() as $index => $log) {
             $user = $log->getData('user', []);
             $device = $log->getData('device', []);
             $questions = $log->getData('questions', []);
             $answer = $log->getData('answer', []);
 
             $content = '';
-            foreach($questions as $j => $question) {
+            foreach ($questions as $j => $question) {
                 if (empty($question['title'])) {
                     continue;
                 }
@@ -111,7 +111,7 @@ class Questionnaire
                     }
                     $ids = $answer[$id] ?? [];
                     $res = array_intersect_key((array)$question['options'], (array)$ids);
-                    $content .= '[' . implode('，', array_column($res, 'text')) . ']';
+                    $content .= '['.implode('，', array_column($res, 'text')).']';
                 } elseif ($question['type'] == 'text') {
                     $text = $answer[$id] ?? '';
                     $content .= "\"$text\"";
@@ -121,8 +121,8 @@ class Questionnaire
             }
 
             $data = [
-                $index, 
-                $user['nickname'] ?? '', 
+                $index,
+                $user['nickname'] ?? '',
                 $user['openid'] ?? '',
                 $device['name'] ?? '',
                 $device['imei'] ?? '',

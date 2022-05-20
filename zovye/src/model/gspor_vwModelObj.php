@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use function zovye\tb;
@@ -17,8 +18,9 @@ class gspor_vwModelObj extends userModelObj
             return tb('gspor_vw');
         }
         trigger_error('user getTableName(...) miss op!');
+
         return '';
     }
 
-	protected $updatetime;
+    protected $updatetime;
 }

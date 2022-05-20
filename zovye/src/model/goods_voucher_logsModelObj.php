@@ -53,6 +53,7 @@ class goods_voucher_logsModelObj extends modelObj
         if (empty($this->begin)) {
             return true;
         }
+
         return $this->begin > 0 && $this->begin < time();
     }
 

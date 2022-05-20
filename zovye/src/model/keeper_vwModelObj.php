@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use function zovye\tb;
@@ -21,6 +22,7 @@ class keeper_vwModelObj extends userModelObj
             return tb('keeper_vw');
         }
         trigger_error('user getTableName(...) miss op!');
+
         return '';
     }
 

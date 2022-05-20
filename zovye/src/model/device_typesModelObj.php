@@ -61,6 +61,7 @@ class device_typesModelObj extends modelObj
     public function getCargoLanesNum(): int
     {
         $cargo_lanes = $this->getExtraData('cargo_lanes', []);
+
         return count($cargo_lanes);
     }
 

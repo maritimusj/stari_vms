@@ -9,9 +9,9 @@ namespace zovye;
 use zovye\model\userModelObj;
 
 $op = request::op('default');
-$appkey = request::str('appkey');
+$app_key = request::str('appkey');
 
-if (empty($appkey) || $appkey !== Config::balance('app.key')) {
+if (empty($app_key) || $app_key !== Config::balance('app.key')) {
     JSON::fail('非法请求！');
 }
 
@@ -29,7 +29,7 @@ if ($op == 'default') {
     $result = [];
 
     /** @var userModelObj $user */
-    foreach($query->findAll() as $user) {
+    foreach ($query->findAll() as $user) {
         $data = $user->profile(true);
         $data['balance'] = $user->getBalance()->total();
         $result[] = $data;
@@ -44,7 +44,7 @@ if ($op == 'default') {
     } elseif (request::has('openid')) {
         $user = User::get(request::str('openid'), true);
     }
-  
+
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
@@ -59,7 +59,7 @@ if ($op == 'default') {
     } elseif (request::has('openid')) {
         $user = User::get(request::str('openid'), true);
     }
-  
+
     $val = request::int('val');
     if (empty($val)) {
         JSON::fail('积分值不能为0！');
@@ -68,9 +68,9 @@ if ($op == 'default') {
     if (empty($user)) {
         JSON::fail('用户不存在！');
     }
-    
+
     $result = $user->getBalance()->change($val, Balance::API_UPDATE, [
-        'appkey' => $appkey,
+        'appkey' => $app_key,
         'reason' => request::str('reason', '', true),
         'ip' => Util::getClientIp(),
     ]);

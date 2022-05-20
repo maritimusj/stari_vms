@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -20,21 +21,21 @@ class balance_logsModelObj extends modelObj
     protected $id;
 
     /** @var int */
-	protected $user_id;
+    protected $user_id;
 
     /** @var int */
-	protected $account_id;
+    protected $account_id;
 
     /** @var int */
-	protected $s1;
+    protected $s1;
 
     /** @var string */
     protected $s2;
 
-	protected $extra;
+    protected $extra;
 
     /** @var int */
-	protected $createtime;
+    protected $createtime;
 
-	use ExtraDataGettersAndSetters;
+    use ExtraDataGettersAndSetters;
 }

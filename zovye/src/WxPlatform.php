@@ -114,8 +114,12 @@ class WxPlatform
      * @param string $state
      * @return string
      */
-    public static function getAuthorizationCodeRedirectUrl(accountModelObj $account, $redirect_url, $scope = self::SCOPE_SNS_API_BASE, $state = ''): string
-    {
+    public static function getAuthorizationCodeRedirectUrl(
+        accountModelObj $account,
+        $redirect_url,
+        $scope = self::SCOPE_SNS_API_BASE,
+        $state = ''
+    ): string {
         $component_appid = settings('account.wx.platform.config.appid');
         $appid = $account->settings('authdata.authorization_info.authorizer_appid');
         if (empty($component_appid) || empty($appid)) {
@@ -148,6 +152,7 @@ class WxPlatform
                 return $res;
             }
         }
+
         return [
             'openid' => $res['openid'],
         ];
@@ -165,12 +170,14 @@ class WxPlatform
             return err('无法获取component access token');
         }
 
-        $data = Util::get(str_replace(['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
-            $appid,
-            $code,
-            $component_appid,
-            $component_access_token,
-        ], self::ACCESS_TOKEN_URL));
+        $data = Util::get(
+            str_replace(['{APPID}', '{CODE}', '{COMPONENT_APPID}', '{COMPONENT_ACCESS_TOKEN}'], [
+                $appid,
+                $code,
+                $component_appid,
+                $component_access_token,
+            ], self::ACCESS_TOKEN_URL)
+        );
 
         if (empty($data)) {
             return err('接口请求失败！');
@@ -190,7 +197,9 @@ class WxPlatform
 
     public static function getUserProfile($access_token, $openid): array
     {
-        $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE));
+        $data = Util::get(
+            str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE)
+        );
 
         $result = json_decode($data, true);
         if (empty($result)) {
@@ -206,7 +215,9 @@ class WxPlatform
 
     public static function getUserProfile2($access_token, $openid, $create_user = false)
     {
-        $data = Util::get(str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2));
+        $data = Util::get(
+            str_replace(['{ACCESS_TOKEN}', '{OPENID}'], [$access_token, $openid], self::GET_USER_PROFILE2)
+        );
 
         $result = json_decode($data, true);
         if (empty($result)) {
@@ -230,6 +241,7 @@ class WxPlatform
                     $user->set('fansData', $result);
                 }
             }
+
             return $user;
         }
 
@@ -268,10 +280,12 @@ class WxPlatform
                     'fn' => 'getComponentAccessToken',
                     'error' => $result,
                 ]);
+
                 return '';
             }
             $result['createtime'] = time();
             Config::wxplatform('token', $result, true);
+
             return $result['component_access_token'];
         }
 
@@ -293,6 +307,7 @@ class WxPlatform
                     'fn' => 'getPreAuthCode',
                     'error' => $result,
                 ]);
+
                 return '';
             }
 
@@ -315,13 +330,14 @@ class WxPlatform
         Util::createApiRedirectFile($filename, 'wxplatform', $params);
 
         $notify_url = _W('siteroot');
-        $path = 'addons/' . APP_NAME . '/';
+        $path = 'addons/'.APP_NAME.'/';
 
         if (mb_strpos($notify_url, $path) === false) {
             $notify_url .= $path;
         }
 
         $notify_url .= $filename;
+
         return $notify_url;
     }
 
@@ -339,6 +355,7 @@ class WxPlatform
                 return $platform->getAuthRedirectUrl($preAuthCode, self::getRedirectUrl($params));
             }
         }
+
         return '';
     }
 
@@ -355,9 +372,11 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+
                 return $result;
             }
         }
+
         return err('暂时无法请求！');
     }
 
@@ -374,9 +393,11 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+
                 return $result;
             }
         }
+
         return err('暂时无法请求！');
     }
 
@@ -393,9 +414,11 @@ class WxPlatform
                 if ($result['errcode'] != 0) {
                     return error(intval($result['errcode']), strval($result['errmsg']));
                 }
+
                 return $result;
             }
         }
+
         return err('暂时无法请求！');
     }
 
@@ -407,8 +430,8 @@ class WxPlatform
             'action_info' => [
                 'scene' => [
                     'scene_str' => $scene,
-                ]
-            ]
+                ],
+            ],
         ];
 
         if ($action == self::TEMP_QRCODE) {
@@ -444,7 +467,11 @@ class WxPlatform
             //授权和授权更新
             if ($result['InfoType'] === 'authorized' || $result['InfoType'] === 'updateauthorized') {
 
-                $res = Account::createOrUpdateFromWxPlatform(request::int('agent'), $result['AuthorizerAppid'], $result);
+                $res = Account::createOrUpdateFromWxPlatform(
+                    request::int('agent'),
+                    $result['AuthorizerAppid'],
+                    $result
+                );
                 if (is_error($res)) {
                     return $res;
                 }
@@ -506,7 +533,11 @@ class WxPlatform
                 ]);
 
                 if (DEBUG) {
-                    $result = self::createToUserTextMsg($msg['ToUserName'], $msg['FromUserName'], '发生错误：' . $result['message']);
+                    $result = self::createToUserTextMsg(
+                        $msg['ToUserName'],
+                        $msg['FromUserName'],
+                        '发生错误：'.$result['message']
+                    );
                 }
             }
 
@@ -518,8 +549,12 @@ class WxPlatform
         return self::SUCCESS_RESPONSE;
     }
 
-    public static function createToUserTextMsg(string $from_user, string $to_user, string $text, int $timestamp = 0): string
-    {
+    public static function createToUserTextMsg(
+        string $from_user,
+        string $to_user,
+        string $text,
+        int $timestamp = 0
+    ): string {
         return We7::array2xml([
             'ToUserName' => $to_user,
             'FromUserName' => $from_user,
@@ -537,8 +572,12 @@ class WxPlatform
      * @param int $timestamp
      * @return string
      */
-    public static function createToUserNewsMsg(string $from_user, string $to_user, array $params = [], int $timestamp = 0): string
-    {
+    public static function createToUserNewsMsg(
+        string $from_user,
+        string $to_user,
+        array $params = [],
+        int $timestamp = 0
+    ): string {
         return We7::array2xml([
             'ToUserName' => $to_user,
             'FromUserName' => $from_user,
@@ -562,6 +601,7 @@ class WxPlatform
         if ($platform) {
             return $platform->encryptMsg($msg);
         }
+
         return '';
     }
 
@@ -578,6 +618,7 @@ class WxPlatform
     public static function unsubscribe(array $msg)
     {
         unset($msg);
+
         return err('unsubscribe unimplemented!');
     }
 
@@ -592,7 +633,7 @@ class WxPlatform
         return [];
     }
 
-    public static function createOrder(deviceModelObj $device, userModelObj $user, accountModelObj  $acc): bool
+    public static function createOrder(deviceModelObj $device, userModelObj $user, accountModelObj $acc): bool
     {
         //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
         $goods = $device->getGoodsByLane(0);
@@ -627,7 +668,7 @@ class WxPlatform
         try {
             $res = self::verifyData($msg);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             $event_key = str_replace('qrscene_', '', strval($msg['EventKey']));
@@ -639,7 +680,7 @@ class WxPlatform
             $account_name = $msg['ToUserName'];
             $acc = Account::findOneFromName($account_name);
             if (empty($acc)) {
-                throw new RuntimeException('找不到指定的公众号：' . $account_name);
+                throw new RuntimeException('找不到指定的公众号：'.$account_name);
             }
 
             $device = Device::get($second);
@@ -694,7 +735,7 @@ class WxPlatform
 
         } catch (ZovyeException $e) {
             Log::error('wxplatform', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             $device = $e->getDevice();
             if ($device) {
@@ -705,8 +746,9 @@ class WxPlatform
 
         } catch (Exception $e) {
             Log::error('wxplatform', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return err($e->getMessage());
         }
     }

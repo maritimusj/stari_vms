@@ -37,9 +37,9 @@ if ($op == 'agent_app' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 $user = $query->findOne();
                 if ($user) {
                     if (!is_error(Wx::sendTplNotice($user->getOpenid(), $tpl_id, $notify_data))) {
-                        $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> Ok " . PHP_EOL;
+                        $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> Ok ".PHP_EOL;
                     } else {
-                        $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> fail " . PHP_EOL;
+                        $log['result'][$user->getOpenid()] = "[ {$user->getNickname()} ]=> fail ".PHP_EOL;
                     }
                 } else {
                     $log['result']['error'] = '找不到指定的用户！';

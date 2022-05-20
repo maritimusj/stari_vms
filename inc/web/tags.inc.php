@@ -76,7 +76,7 @@ if ($op == 'default') {
     }
 
     if (request::is_ajax()) {
-        $tags['serial'] = request('serial') ?: microtime(true) . '';
+        $tags['serial'] = request('serial') ?: microtime(true).'';
         JSON::success($tags);
     } else {
         app()->showTemplate('web/tags/default', [

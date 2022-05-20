@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObjFinder;
@@ -25,78 +26,80 @@ class inventoryModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-		return tb('inventory');
+        return tb('inventory');
     }
-    
-	/** @var int */
-	protected $id;
 
-	/** @var int */
-	protected $uniacid;
+    /** @var int */
+    protected $id;
 
-	/** @var int */
-	protected $parent_id;
+    /** @var int */
+    protected $uniacid;
 
-	/** @var string */
-	protected $uid;
+    /** @var int */
+    protected $parent_id;
 
-	/** @var string */
-	protected $title;
+    /** @var string */
+    protected $uid;
 
-	protected $extra;
+    /** @var string */
+    protected $title;
 
-	/** @var int */
-	protected $createtime;
+    protected $extra;
 
-	use ExtraDataGettersAndSetters;
+    /** @var int */
+    protected $createtime;
 
-	public function format(): array
-	{
-		$data = [
-			'id' => $this->getId(),
-			'title' => $this->getTitle(),
-			'createtime' => $this->getCreatetime(),
-			'createtime_formatted' => date('Y-m-d H:i:s', $this->getCreatetime()),
-		];
+    use ExtraDataGettersAndSetters;
 
-		$parent_id = $this->getParentId();
-		if ($parent_id) {
-			$parent = Inventory::get($parent_id);
-			if ($parent) {
-				$data['parent'] = [
-					'id' => $parent->getId(),
-					'title' => $this->getTitle(),
-				];
-			}
-		}
-
-		$owner = $this->getExtraData('user', []);
-		if ($owner) {
-			$user = User::get($owner['id']);
-			if ($user) {
-				$data['user'] = $user->profile();
-			} else {
-				$data['user'] = $owner;
-			}
-		}
-		return $data;
-	}
-
-	public function query($cond = []): modelObjFinder
+    public function format(): array
     {
-		$cond['inventory_id'] = $this->id;
-		return InventoryGoods::query($cond);
-	}
+        $data = [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'createtime' => $this->getCreatetime(),
+            'createtime_formatted' => date('Y-m-d H:i:s', $this->getCreatetime()),
+        ];
 
-	public function getGoods($goods_id): ?inventory_goodsModelObj
+        $parent_id = $this->getParentId();
+        if ($parent_id) {
+            $parent = Inventory::get($parent_id);
+            if ($parent) {
+                $data['parent'] = [
+                    'id' => $parent->getId(),
+                    'title' => $this->getTitle(),
+                ];
+            }
+        }
+
+        $owner = $this->getExtraData('user', []);
+        if ($owner) {
+            $user = User::get($owner['id']);
+            if ($user) {
+                $data['user'] = $user->profile();
+            } else {
+                $data['user'] = $owner;
+            }
+        }
+
+        return $data;
+    }
+
+    public function query($cond = []): modelObjFinder
+    {
+        $cond['inventory_id'] = $this->id;
+
+        return InventoryGoods::query($cond);
+    }
+
+    public function getGoods($goods_id): ?inventory_goodsModelObj
     {
         return InventoryGoods::findOne(['inventory_id' => $this->id, 'goods_id' => $goods_id]);
     }
 
-	public function logQuery(): modelObjFinder
+    public function logQuery(): modelObjFinder
     {
-		return InventoryLog::query(['inventory_id' => $this->id]);
-	}
+        return InventoryLog::query(['inventory_id' => $this->id]);
+    }
 
     /**
      * 锁定
@@ -107,66 +110,66 @@ class inventoryModelObj extends modelObj
         return Locker::try("inventory:{$this->getId()}:default", REQUEST_ID, 0, 6, 9999);
     }
 
-	public function stock($src_inventory, $goods, int $num, array $extra = []): ?inventory_logModelObj
-	{
-		if ($num == 0) {
-			return null;
-		}
+    public function stock($src_inventory, $goods, int $num, array $extra = []): ?inventory_logModelObj
+    {
+        if ($num == 0) {
+            return null;
+        }
 
-		if ($src_inventory instanceof inventoryModelObj) {
-			$src_inventory_id = $src_inventory->getId();
-		} elseif (is_int($src_inventory)) {
-			$src_inventory_id = $src_inventory;
-		} elseif (empty($src_inventory)) {
-			$src_inventory_id = 0;
-		} else {
-			return null;
-		}
+        if ($src_inventory instanceof inventoryModelObj) {
+            $src_inventory_id = $src_inventory->getId();
+        } elseif (is_int($src_inventory)) {
+            $src_inventory_id = $src_inventory;
+        } elseif (empty($src_inventory)) {
+            $src_inventory_id = 0;
+        } else {
+            return null;
+        }
 
-		if ($goods instanceof goodsModelObj) {
-			$goods_id = $goods->getId();
-		} elseif (is_int($goods)) {
-			$goods_id = $goods;
-		} elseif (is_array($goods) && !empty($goods['id'])) {
-			$goods_id = intval($goods['id']);
-		} else {
-			return null;
-		}
+        if ($goods instanceof goodsModelObj) {
+            $goods_id = $goods->getId();
+        } elseif (is_int($goods)) {
+            $goods_id = $goods;
+        } elseif (is_array($goods) && !empty($goods['id'])) {
+            $goods_id = intval($goods['id']);
+        } else {
+            return null;
+        }
 
-		$inventory_goods = InventoryGoods::findOne([
-			'inventory_id' => $this->id,
-			'goods_id' => $goods_id,			
-		]);
-		
-		if ($inventory_goods) {
-			$extra['before'] = $inventory_goods->getNum();
-			$inventory_goods->setNum($inventory_goods->getNum() + $num);
-			if (!$inventory_goods->save()) {
-				return null;
-			}
-		} else {
-			$extra['before'] = 0;
-			$inventory_goods = InventoryGoods::create([
-				'inventory_id' => $this->id,
-				'goods_id' => $goods_id,
-				'num' => $num,
-			]);
-			if (empty($inventory_goods)) {
-				return null;
-			}
-		}
+        $inventory_goods = InventoryGoods::findOne([
+            'inventory_id' => $this->id,
+            'goods_id' => $goods_id,
+        ]);
 
-		$extra['after'] = $inventory_goods->getNum();
+        if ($inventory_goods) {
+            $extra['before'] = $inventory_goods->getNum();
+            $inventory_goods->setNum($inventory_goods->getNum() + $num);
+            if (!$inventory_goods->save()) {
+                return null;
+            }
+        } else {
+            $extra['before'] = 0;
+            $inventory_goods = InventoryGoods::create([
+                'inventory_id' => $this->id,
+                'goods_id' => $goods_id,
+                'num' => $num,
+            ]);
+            if (empty($inventory_goods)) {
+                return null;
+            }
+        }
 
-		$log_data = [
-			'src_inventory_id' => $src_inventory_id,
-			'inventory_id' => $this->id,
-			'goods_id' => $goods_id,
-			'num' => intval($num),
-			'extra' => $extra,
-		];
+        $extra['after'] = $inventory_goods->getNum();
 
-		return InventoryLog::create($log_data);
-	}
+        $log_data = [
+            'src_inventory_id' => $src_inventory_id,
+            'inventory_id' => $this->id,
+            'goods_id' => $goods_id,
+            'num' => intval($num),
+            'extra' => $extra,
+        ];
+
+        return InventoryLog::create($log_data);
+    }
 
 }

@@ -62,12 +62,14 @@ class Inventory
         } else {
             return false;
         }
+
         return self::query()->exists($cond);
     }
 
     public static function find($obj): ?inventoryModelObj
     {
         $uid = self::getUID($obj);
+
         return self::findOne(['uid' => $uid]);
     }
 
@@ -84,6 +86,7 @@ class Inventory
         if ($obj instanceof deviceModelObj) {
             return "device:{$obj->getImei()}:default";
         }
+
         return "obj:{$obj->getId()}:default";
     }
 
@@ -102,6 +105,7 @@ class Inventory
         } else {
             return null;
         }
+
         return self::create([
             'uid' => Inventory::getUID($obj),
             'title' => $title,
@@ -144,6 +148,7 @@ class Inventory
                 }
             }
         }
+
         return true;
     }
 }

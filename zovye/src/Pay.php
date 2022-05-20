@@ -71,8 +71,12 @@ class Pay
      * @param array $pay_data
      * @return array
      */
-    private static function prepareData(deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
-    {
+    private static function prepareData(
+        deviceModelObj $device,
+        userModelObj $user,
+        array $goods,
+        array $pay_data = []
+    ): array {
         $pay = self::getActivePayObj($device);
         if (is_error($pay)) {
             return $pay;
@@ -86,12 +90,21 @@ class Pay
         return [$pay, $order_no];
     }
 
-    public static function prepareDataWithPay(string $pay_name, deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
-    {
+    public static function prepareDataWithPay(
+        string $pay_name,
+        deviceModelObj $device,
+        userModelObj $user,
+        array $goods,
+        array $pay_data = []
+    ): array {
         if ($pay_data['order_no']) {
             $partial = $pay_data['order_no'];
         } else {
-            $partial = $pay_data['serial'] ? 'E' . strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace('.', '', 'S' . microtime(true));
+            $partial = $pay_data['serial'] ? 'E'.strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace(
+                '.',
+                '',
+                'S'.microtime(true)
+            );
         }
 
         $order_no = Order::makeUID($user, $device, $partial);
@@ -130,8 +143,13 @@ class Pay
         return [$order_no, $pay_log];
     }
 
-    private static function createPay($fn, deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
-    {
+    private static function createPay(
+        $fn,
+        deviceModelObj $device,
+        userModelObj $user,
+        array $goods,
+        array $pay_data = []
+    ): array {
         $result = self::prepareData($device, $user, $goods, $pay_data);
         if (is_error($result)) {
             return ['', $result];
@@ -171,8 +189,12 @@ class Pay
      * @param array $pay_data
      * @return mixed error或者支付数据
      */
-    public static function createXAppPay(deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
-    {
+    public static function createXAppPay(
+        deviceModelObj $device,
+        userModelObj $user,
+        array $goods,
+        array $pay_data = []
+    ): array {
         return self::createPay('createXAppPay', $device, $user, $goods, $pay_data);
     }
 
@@ -184,8 +206,12 @@ class Pay
      * @param array $pay_data
      * @return mixed error或者支付数据
      */
-    public static function createJsPay(deviceModelObj $device, userModelObj $user, array $goods, array $pay_data = []): array
-    {
+    public static function createJsPay(
+        deviceModelObj $device,
+        userModelObj $user,
+        array $goods,
+        array $pay_data = []
+    ): array {
         return self::createPay('createJsPay', $device, $user, $goods, $pay_data);
     }
 
@@ -255,6 +281,7 @@ class Pay
                 'name' => $name,
                 'input' => $input,
             ]);
+
             return isset($pay) ? $pay->getResponse(false) : $e->getMessage();
         }
     }
@@ -297,6 +324,7 @@ class Pay
         if (is_error($res)) {
             $pay_log->setData('refund_fail', ['result' => $res]);
             $pay_log->save();
+
             return $res;
         }
 
@@ -353,6 +381,7 @@ class Pay
         if ($user->payLog($order_no, $data)) {
             return self::getPayLog($order_no);
         }
+
         return null;
     }
 
@@ -365,6 +394,7 @@ class Pay
     public static function getPayLog(string $order_no, int $level = LOG_PAY): ?pay_logsModelObj
     {
         $data = We7::uniacid(['title' => $order_no, 'level' => $level]);
+
         return m('pay_logs')->findOne($data);
     }
 
@@ -375,8 +405,10 @@ class Pay
             if ($data) {
                 $data['name'] = $name;
                 unset($data['wx'], $data['ali'], $data['wxapp']);
+
                 return $data;
             }
+
             return [];
         }
 
@@ -388,9 +420,11 @@ class Pay
                     (App::isAliUser() && (!isset($data['ali']) || $data['ali']))) {
                     $data['name'] = $name;
                     unset($data['wx'], $data['ali'], $data['wxapp']);
+
                     return $data;
                 }
             }
+
             return [];
         };
 
@@ -407,12 +441,14 @@ class Pay
         $wx = $params[Pay::WX] ?? [];
         if ($wx['enable']) {
             $wx['name'] = Pay::WX;
+
             return $wx;
         }
 
         $ali = $params[Pay::ALI] ?? [];
         if ($ali['enable']) {
             $ali['name'] = Pay::ALI;
+
             return $ali;
         }
 
@@ -430,6 +466,7 @@ class Pay
     public static function getDefaultPayParams(string $name = ''): array
     {
         $params = settings('pay', []);
+
         return self::selectPayParams($params, $name);
     }
 
@@ -485,11 +522,11 @@ class Pay
         if ($pem['cert'] && $pem['key']) {
 
             $str = App::uid(8);
-            $dir = PEM_DIR . $str . DIRECTORY_SEPARATOR;
+            $dir = PEM_DIR.$str.DIRECTORY_SEPARATOR;
 
             $pem_file = [
-                'cert_filename' => $dir . sha1($pem['cert']) . '.pem',
-                'key_filename' => $dir . sha1($pem['key']) . '.pem',
+                'cert_filename' => $dir.sha1($pem['cert']).'.pem',
+                'key_filename' => $dir.sha1($pem['key']).'.pem',
             ];
 
             if (!$force && file_exists($pem_file['cert_filename']) && file_exists($pem_file['key_filename'])) {
@@ -565,6 +602,7 @@ class Pay
         }
 
         $pay->setConfig($res);
+
         return $pay;
     }
 }

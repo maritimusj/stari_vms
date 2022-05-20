@@ -44,7 +44,7 @@ if ($op == 'device_err' && CtrlServ::checkJobSign($data)) {
                 'keyword1' => ['value' => $device->getImei()],
                 'keyword2' => ['value' => $device->getName()],
                 'keyword3' => ['value' => date('Y-m-d H:i:s')],
-                'keyword4' => ['value' => '设备出货失败：' . $error_msg],
+                'keyword4' => ['value' => '设备出货失败：'.$error_msg],
             ];
             //通过微信模板消息给代理商推送消息
             $agent = $device->getAgent();

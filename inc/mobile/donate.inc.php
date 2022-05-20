@@ -66,38 +66,38 @@ if ($op == 'default') {
     }
 
     if (Order::exists($order_no)) {
-        Util::resultAlert('已完成爱心捐款，谢谢！', 'success');
+        Util::resultAlert('已完成爱心捐款，谢谢！');
     }
 
-    $paylog = Pay::getPayLog($order_no);
-    if (empty($paylog)) {
+    $pay_log = Pay::getPayLog($order_no);
+    if (empty($pay_log)) {
         Util::resultAlert('找不到支付记录，请联系管理员，谢谢！', 'error');
     }
 
-    if ($paylog->getUserOpenid() !== $user->getOpenid()) {
+    if ($pay_log->getUserOpenid() !== $user->getOpenid()) {
         Util::resultAlert('不正确的调用[103]！', 'error');
     }
 
-    $device = Device::get($paylog->getDeviceId());
+    $device = Device::get($pay_log->getDeviceId());
     if (empty($device)) {
         Util::resultAlert('找不到指定的设备！', 'error');
     }
 
-    $payResult =  [
+    $payResult = [
         'result' => 'success',
         'type' => 'donate',
         'orderNO' => $order_no,
         'transaction_id' => REQUEST_ID,
-        'total' => $paylog->getTotal(),
+        'total' => $pay_log->getTotal(),
         'paytime' => time(),
         'openid' => $user->getOpenid(),
         'deviceUID' => $device->getImei(),
     ];
 
-    $paylog->setData('payResult', $payResult);
+    $pay_log->setData('payResult', $payResult);
 
-    $paylog->setData('create_order.createtime', time());
-    if (!$paylog->save()) {
+    $pay_log->setData('create_order.createtime', time());
+    if (!$pay_log->save()) {
         Util::resultAlert('无法保存数据！', 'error');
     }
 

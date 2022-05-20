@@ -25,7 +25,7 @@ return [
     'goods' => [
         'agent' => [
             'edit' => 1,
-        ]
+        ],
     ],
     //会员设置
     'user' => [
@@ -138,28 +138,28 @@ return [
         'types' => [
             'word' => [
                 'text' => 'WORD文件',
-                'icon' => MODULE_URL . 'static/img/word.png',
+                'icon' => MODULE_URL.'static/img/word.png',
             ],
             'excel' => [
                 'text' => 'EXCEL文件',
-                'icon' => MODULE_URL . 'static/img/excel.png',
+                'icon' => MODULE_URL.'static/img/excel.png',
             ],
             'ppt' => [
                 'text' => 'PPT文件',
-                'icon' => MODULE_URL . 'static/img/ppt.png',
+                'icon' => MODULE_URL.'static/img/ppt.png',
             ],
             'pdf' => [
                 'text' => 'PDF文件',
-                'icon' => MODULE_URL . 'static/img/pdf.png',
+                'icon' => MODULE_URL.'static/img/pdf.png',
             ],
             'zip' => [
                 'text' => 'ZIP文件',
-                'icon' => MODULE_URL . 'static/img/zip.png',
+                'icon' => MODULE_URL.'static/img/zip.png',
             ],
             'unknown' => [
                 'id' => 6,
                 'text' => '未知文件',
-                'icon' => MODULE_URL . 'static/img/unknown.png',
+                'icon' => MODULE_URL.'static/img/unknown.png',
             ],
         ],
     ],

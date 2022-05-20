@@ -24,6 +24,7 @@ class YiDaoAccount
     public static function makeSign($arr = []): string
     {
         sort($arr, SORT_STRING);
+
         return md5(implode($arr));
     }
 
@@ -55,8 +56,8 @@ class YiDaoAccount
         ];
 
         $data['signature'] = self::makeSign([
-            $data['timestamp'], 
-            $data['nonce'], 
+            $data['timestamp'],
+            $data['nonce'],
             $config['app_secret'],
         ]);
 
@@ -109,7 +110,7 @@ class YiDaoAccount
                 $log->save();
             } else {
                 Log::error('yidao', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -129,7 +130,9 @@ class YiDaoAccount
         }
 
         $config = $acc->get('config', []);
-        if (isEmptyArray($config) || $params['develop_appid'] !== $config['appid'] || $params['key'] !== $config['device_key']) {
+        if (isEmptyArray(
+                $config
+            ) || $params['develop_appid'] !== $config['appid'] || $params['key'] !== $config['device_key']) {
             return err('数据检验失败！');
         }
 
@@ -141,7 +144,7 @@ class YiDaoAccount
         try {
             $res = self::verifyData($params);
             if (is_error($res)) {
-                throw new RuntimeException('发生错误：' . $res['message']);
+                throw new RuntimeException('发生错误：'.$res['message']);
             }
 
             /** @var userModelObj $user */
@@ -162,7 +165,7 @@ class YiDaoAccount
                 /** @var deviceModelObj $device */
                 $device = Device::get($params['state'], true);
                 if (empty($device)) {
-                    throw new RuntimeException('找不对这个设备:' . $params['state']);
+                    throw new RuntimeException('找不对这个设备:'.$params['state']);
                 }
 
                 $order_uid = Order::makeUID($user, $device, sha1($params['openid']));

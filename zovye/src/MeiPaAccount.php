@@ -47,7 +47,10 @@ class MeiPaAccount
         $meipa_openid = $user->settings('customData.meipa.openid', '');
         if (empty($meipa_openid)) {
             $data = $acc->format();
-            $data['redirect_url'] = self::AUTH_URL . urlencode(Util::murl('meipa', ['op' => 'meipa_auth', 'device' => $device->getShadowId()]));
+            $data['redirect_url'] = self::AUTH_URL.urlencode(
+                    Util::murl('meipa', ['op' => 'meipa_auth', 'device' => $device->getShadowId()])
+                );
+
             return [$data];
         }
 
@@ -172,8 +175,12 @@ class MeiPaAccount
         }
     }
 
-    public function fetchOne(deviceModelObj $device, userModelObj $user = null, $params = [], callable $cb = null): array
-    {
+    public function fetchOne(
+        deviceModelObj $device,
+        userModelObj $user = null,
+        $params = [],
+        callable $cb = null
+    ): array {
         $profile = empty($user) ? Util::fansInfo() : $user->profile();
 
         $params = array_merge($params, [
@@ -194,11 +201,12 @@ class MeiPaAccount
         if ($cb) {
             $cb($params, $result);
         }
+
         return $result;
     }
 
     public function sign($data): string
     {
-        return md5($data['time'] . $data['apiid'] . $this->app_key . $data['openid'] . $this->app_key . $data['carry_data']);
+        return md5($data['time'].$data['apiid'].$this->app_key.$data['openid'].$this->app_key.$data['carry_data']);
     }
 }

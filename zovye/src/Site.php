@@ -16,7 +16,7 @@ class Site extends WeModuleSite
         $isMobile = stripos($name, 'doMobile') === 0;
 
         if ($isWeb || $isMobile) {
-            $dir = IA_ROOT . '/addons/' . $this->modulename . '/inc/';
+            $dir = IA_ROOT.'/addons/'.$this->modulename.'/inc/';
             $fun = '';
 
             if ($isWeb) {
@@ -29,12 +29,12 @@ class Site extends WeModuleSite
                 $fun = strtolower(substr($name, 8));
             }
 
-            $file = $dir . $fun . '.inc.php';
+            $file = $dir.$fun.'.inc.php';
             if (file_exists($file)) {
                 require $file;
             } else {
                 if (DEBUG) {
-                    die($file . ' not exists!');
+                    die($file.' not exists!');
                 }
             }
         }

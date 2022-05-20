@@ -45,11 +45,13 @@ class GSP
         $one = self::findOne($condition);
         if ($one) {
             foreach ($data as $key => $val) {
-                $setter = 'set' . ucfirst(toCamelCase($key));
+                $setter = 'set'.ucfirst(toCamelCase($key));
                 $one->$setter($val);
             }
+
             return $one->save();
         }
+
         return !empty(self::create($data));
     }
 
@@ -63,6 +65,7 @@ class GSP
                 if ($superior) {
                     return $superior->getSuperior();
                 }
+
                 return null;
             case self::LEVEL3:
                 $superior = $agent->getSuperior();
@@ -72,6 +75,7 @@ class GSP
                         return $superior->getSuperior();
                     }
                 }
+
                 return null;
             default:
                 return User::get($obj->getUid(), true);

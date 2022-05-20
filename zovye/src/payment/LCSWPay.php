@@ -43,12 +43,18 @@ class LCSWPay implements IPay
         ]);
     }
 
-    protected function createPay(callable $fn, string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
-    {
+    protected function createPay(
+        callable $fn,
+        string $user_uid,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = ''
+    ): array {
         $lcsw = $this->getLCSW();
 
         $notify_url = _W('siteroot');
-        $path = 'addons/' . APP_NAME . '/';
+        $path = 'addons/'.APP_NAME.'/';
 
         if (mb_strpos($notify_url, $path) === false) {
             $notify_url .= $path;
@@ -102,8 +108,13 @@ class LCSWPay implements IPay
      * @param string $body
      * @return mixed
      */
-    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
-    {
+    public function createXAppPay(
+        string $user_uid,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = ''
+    ): array {
         return $this->createPay(function ($lcsw, $params) {
             return $lcsw->xAppPay($params);
         }, $user_uid, $device_uid, $order_no, $price, $body);
@@ -118,12 +129,19 @@ class LCSWPay implements IPay
      * @param array $goodsDetail
      * @return mixed
      */
-    public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = '', array $goodsDetail = []): array
-    {
+    public function createJsPay(
+        string $user_uid,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = '',
+        array $goodsDetail = []
+    ): array {
         return $this->createPay(function ($lcsw, $params) use ($goodsDetail) {
             if ($goodsDetail) {
                 $params['goods_detail'] = json_encode($goodsDetail);
             }
+
             return $lcsw->Jspay($params);
         }, $user_uid, $device_uid, $order_no, $price, $body);
     }

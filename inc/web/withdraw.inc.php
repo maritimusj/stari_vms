@@ -53,7 +53,7 @@ if ($op == 'export') {
                     'branch' => $bank['branch'],
                     'realname' => $bank['realname'],
                     'account' => "[{$bank['account']}]",
-                    'address' => $bank['address']['province'] . $bank['address']['city'],
+                    'address' => $bank['address']['province'].$bank['address']['city'],
                     'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 ];
                 $list[] = $data;
@@ -238,6 +238,7 @@ if ($op == 'withdraw_pay') {
         if ($balance_obj->update(['state' => 'confirmed', 'admin' => _W('username')], true)) {
             return true;
         }
+
         return error(State::ERROR, '数据保存失败！');
     });
 
@@ -331,13 +332,13 @@ if ($op == 'withdraw_pay') {
     //统计
     $date_limit = request::array('datelimit');
     if ($date_limit['start']) {
-        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
+        $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
     } else {
         $s_date = new DateTime('first day of this month 00:00:00');
     }
 
     if ($date_limit['end']) {
-        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
+        $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'].' 00:00:00');
         $e_date->modify('next day');
     } else {
         $e_date = new DateTime('next day 00:00');

@@ -59,7 +59,7 @@ if ($device->isDown()) {
 }
 
 if (!$device->isMcbOnline()) {
-   JSON::fail('设备不在线！');
+    JSON::fail('设备不在线！');
 }
 
 $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);

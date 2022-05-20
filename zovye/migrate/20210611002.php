@@ -4,7 +4,7 @@ namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_component_user')) {
+if (!We7::pdo_tableexists($tb_name.'_component_user')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_component_user` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 

@@ -35,7 +35,7 @@ $writeLog = function () use (&$log) {
 };
 
 if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
-    
+
     if (!Locker::try("douyin:{$data['id']}:{$data['uid']}")) {
         $log['error'] = '锁定用户失败！';
         Job::exit($writeLog);
@@ -64,7 +64,7 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
         $log['error'] = '没有指定关注账号的openid';
     }
 
-    for($i = 0; $i < 10; $i ++ ) {
+    for ($i = 0; $i < 10; $i++) {
         //延时一定时间后读取用户关注列表
         usleep((2 + log($i + 1, 2)) * 1000000);
 
@@ -82,7 +82,7 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
                     'device' => $device->getId(),
                     'user' => $user->getId(),
                     'account' => $account->getId(),
-                    'orderUID' => Order::makeUID($user, $device, sha1("douyin:" . $account->getUid())),
+                    'orderUID' => Order::makeUID($user, $device, sha1("douyin:".$account->getUid())),
                 ]);
                 Job::exit($writeLog);
             }

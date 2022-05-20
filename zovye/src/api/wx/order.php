@@ -94,14 +94,14 @@ class order
             }
             $query->where(['device_id' => $device->getId()]);
         }
-        
+
         if (request::has('start')) {
-            $begin = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
+            $begin = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
             $query->where(['createtime >=' => $begin->getTimestamp()]);
         }
 
         if (request::has('end')) {
-            $end = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
+            $end = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end').' 00:00:00');
             $end->modify('next day 00:00');
             $query->where(['createtime <' => $end->getTimestamp()]);
         }
@@ -222,7 +222,7 @@ class order
             'orders' => $orders,
             'page' => $page,
             'pagesize' => $page_size,
-            'total' => $total ?? 0
+            'total' => $total ?? 0,
         ];
     }
 

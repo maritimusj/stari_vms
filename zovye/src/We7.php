@@ -11,7 +11,12 @@ use we7\db;
 /**
  * Class We7
  * @method static string tomedia(string $src, bool $local_path = false)
- * @method static string pagination($total, $pageIndex, $page_size = 15, $url = '', $context = array('before' => 5, 'after' => 4, 'ajaxcallback' => '', 'callbackfuncname' => ''))
+ * @method static string pagination($total, $pageIndex, $page_size = 15, $url = '', $context = array(
+    'before' => 5,
+    'after' => 4,
+    'ajaxcallback' => '',
+    'callbackfuncname' => ''
+))
  * @method static string murl($segment, $params = array(), $noredirect = true, $addhost = false)
  * @method static string wurl($segment, $params = array())
  * @method static mixed load()
@@ -72,6 +77,7 @@ class We7
 
         if (defined('HEADER')) {
             echo '';
+
             return;
         }
 
@@ -81,7 +87,7 @@ class We7
             'siteroot' => $_W['siteroot'],
             'siteurl' => $_W['siteurl'],
             'attachurl' => $_W['attachurl'],
-            'cookie' => array('pre' => $_W['config']['cookie']['pre'])
+            'cookie' => array('pre' => $_W['config']['cookie']['pre']),
         );
         if (!empty($_W['acid'])) {
             $sysinfo['acid'] = $_W['acid'];
@@ -180,8 +186,10 @@ EOF;
     {
         if (is_array($data)) {
             $data['uniacid'] = _W('uniacid');
+
             return $data;
         }
+
         return _W('uniacid');
     }
 
@@ -205,16 +213,18 @@ EOF;
                 if (is_null($value)) {
                     $s .= "<$tag_name></$tag_name>";
                 } else {
-                    $s .= "<$tag_name>" . (!is_numeric($value) ? '<![CDATA[' : '') . $value . (!is_numeric($value) ? ']]>' : '') . "</$tag_name>";
+                    $s .= "<$tag_name>".(!is_numeric($value) ? '<![CDATA[' : '').$value.(!is_numeric(
+                            $value
+                        ) ? ']]>' : '')."</$tag_name>";
                 }
 
             } else {
-                $s .= "<$tag_name>" . We7::array2xml($value, $level + 1) . "</$tag_name>";
+                $s .= "<$tag_name>".We7::array2xml($value, $level + 1)."</$tag_name>";
             }
         }
         $s = preg_replace("/([\x01-\x08\x0b-\x0c\x0e-\x1f])+/", ' ', $s);
 
-        return 1 == $level ? $s . '</xml>' : $s;
+        return 1 == $level ? $s.'</xml>' : $s;
     }
 
     public static function xml2array($xml)
@@ -245,8 +255,8 @@ EOF;
      */
     public static function random(int $length, bool $numeric = false): string
     {
-        $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
-        $seed = $numeric ? (str_replace('0', '', $seed) . '012340567890') : ($seed . 'zZ' . strtoupper($seed));
+        $seed = base_convert(md5(microtime().$_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
+        $seed = $numeric ? (str_replace('0', '', $seed).'012340567890') : ($seed.'zZ'.strtoupper($seed));
         if ($numeric) {
             $hash = '';
         } else {
@@ -276,7 +286,11 @@ EOF;
             $ip = $_SERVER['HTTP_CDN_SRC_IP'];
         } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s', $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all(
+                '#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s',
+                $_SERVER['HTTP_X_FORWARDED_FOR'],
+                $matches
+            )) {
             foreach ($matches[0] as $xip) {
                 if (!preg_match('#^(10|172\.16|192\.168)\.#', $xip)) {
                     $ip = $xip;
@@ -424,7 +438,7 @@ EOF;
         }
         if (false === $result) {
             $temp = preg_replace_callback('!s:(\d+):"(.*?)";!s', function ($matchs) {
-                return 's:' . strlen($matchs[2]) . ':"' . $matchs[2] . '";';
+                return 's:'.strlen($matchs[2]).':"'.$matchs[2].'";';
             }, $value);
 
             return unserialize($temp);
@@ -452,10 +466,10 @@ EOF;
     public static function tablename(string $table): string
     {
         if (empty(Util::config('db.master'))) {
-            return "`" . Util::config('db.tablepre') . $table . "`";
+            return "`".Util::config('db.tablepre').$table."`";
         }
 
-        return "`" . Util::config('db.master.tablepre') . $table . "`";
+        return "`".Util::config('db.master.tablepre').$table."`";
     }
 
     /**
@@ -472,6 +486,7 @@ EOF;
                 $db = new db($config);
             }
         }
+
         return $db;
     }
 
@@ -505,8 +520,14 @@ EOF;
         return self::pdo()->get($tablename, $condition, $fields);
     }
 
-    public static function pdo_getall($tablename, $condition = array(), $fields = array(), $keyfield = '', $orderby = array(), $limit = array())
-    {
+    public static function pdo_getall(
+        $tablename,
+        $condition = array(),
+        $fields = array(),
+        $keyfield = '',
+        $orderby = array(),
+        $limit = array()
+    ) {
         return self::pdo()->getall($tablename, $condition, $fields, $keyfield, $orderby, $limit);
     }
 

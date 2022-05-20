@@ -42,7 +42,9 @@ class JfbAccount
                 $channelId = $result[1];
                 if ($channelId) {
                     $url = PlaceHolder::replace(self::REDIRECT_URL, [
-                        'redirectUri' => urlencode(Util::murl('jfb', ['op' => 'jfb_auth', 'device' => $device->getShadowId()])),
+                        'redirectUri' => urlencode(
+                            Util::murl('jfb', ['op' => 'jfb_auth', 'device' => $device->getShadowId()])
+                        ),
                         'channelId' => $channelId,
                         'userId' => $user,
                     ]);
@@ -107,7 +109,7 @@ class JfbAccount
             }
 
             if (!$result['status'] || $result['errorCode'] != '0000') {
-                throw new RuntimeException('失败，错误代码：' . $result['errorCode']);
+                throw new RuntimeException('失败，错误代码：'.$result['errorCode']);
             }
 
             $list = $result['result']['data'];
@@ -123,7 +125,7 @@ class JfbAccount
                     $data['img'] = $item['headImgUrl'] ?: Account::JFB_HEAD_IMG;
                     $data['qrcode'] = $item['qrPicUrl'];
                 } elseif ($item['link']) {
-                    $res = Util::createQrcodeFile("jfb." . sha1($item['link']), $item['link']);
+                    $res = Util::createQrcodeFile("jfb.".sha1($item['link']), $item['link']);
                     if (is_error($res)) {
                         Log::error('jfb', [
                             'error' => 'fail to createQrcode file',
@@ -146,7 +148,7 @@ class JfbAccount
                 $log->save();
             } else {
                 Log::error('jfb', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -177,7 +179,7 @@ class JfbAccount
             try {
                 $res = self::verifyData($params);
                 if (is_error($res)) {
-                    throw new RuntimeException('发生错误：' . $res['message']);
+                    throw new RuntimeException('发生错误：'.$res['message']);
                 }
 
                 /** @var userModelObj $user */
@@ -199,7 +201,7 @@ class JfbAccount
                     /** @var deviceModelObj $device */
                     $device = Device::get($params['device'], true);
                     if (empty($device)) {
-                        throw new RuntimeException('找不对这个设备:' . $params['device']);
+                        throw new RuntimeException('找不对这个设备:'.$params['device']);
                     }
 
                     $order_uid = Order::makeUID($user, $device, sha1($params['ad_code_no']));

@@ -44,6 +44,7 @@ use function zovye\settings;
 class common
 {
     static $user;
+
     /**
      * 用户登录，小程序必须提交code,encryptedData和iv值
      *
@@ -54,6 +55,7 @@ class common
         $res = \zovye\api\wx\common::getDecryptedWxUserData();
         if (is_error($res)) {
             Log::error('wxapi', $res);
+
             return error(State::ERROR, '用户登录失败，请稍后再试！[103]');
         }
 
@@ -64,7 +66,7 @@ class common
         }
 
         return self::doUserLogin(
-            $res, 
+            $res,
             request::array('userInfo', []),
             $h5_openid,
             '',
@@ -83,12 +85,13 @@ class common
         $data = [
             'id' => $res->getId(),
             'name' => $res->getName(),
-            'mobile' => ''
+            'mobile' => '',
         ];
         $agent = $res->getAgent();
         if ($agent) {
             $data['mobile'] = $agent->getMobile();
         }
+
         return ['data' => $data];
     }
 
@@ -116,11 +119,12 @@ class common
         }
         $agent = $device->getAgent();
         if ($agent) {
-            if ($agent->settings('agentData.misc.siteTitle') || $agent->settings('agentData.misc.siteLogo'))
+            if ($agent->settings('agentData.misc.siteTitle') || $agent->settings('agentData.misc.siteLogo')) {
                 $result['agent'] = [
                     'title' => $agent->settings('agentData.misc.siteTitle'),
-                    'logo' => Util::toMedia($agent->settings('agentData.misc.siteLogo'))
+                    'logo' => Util::toMedia($agent->settings('agentData.misc.siteLogo')),
                 ];
+            }
         }
 
         return $result;
@@ -193,6 +197,7 @@ class common
         $cmd = $proto->onConnected($device->getBUID(), $data);
         if ($cmd) {
             Device::createBluetoothCmdLog($device, $cmd);
+
             return [
                 'data' => $cmd->getEncoded(IBlueToothProtocol::BASE64),
                 'hex' => $cmd->getEncoded(IBlueToothProtocol::HEX),
@@ -378,7 +383,9 @@ class common
         $user = self::getUser();
         if ($device->isBlueToothDevice()) {
             try {
-                $result = Util::openDevice(['level' => LOG_GOODS_VOUCHER, $device, $user, $v, 'goodsId' => $goods_id, 'online' => false]);
+                $result = Util::openDevice(
+                    ['level' => LOG_GOODS_VOUCHER, $device, $user, $v, 'goodsId' => $goods_id, 'online' => false]
+                );
             } catch (Exception $e) {
                 return error(State::ERROR, $e->getMessage());
             }
@@ -407,6 +414,7 @@ class common
                 'data' => $result['result'],
             ];
         }
+
         return error(State::ERROR, '出货失败：不是蓝牙主板！');
     }
 
@@ -552,6 +560,7 @@ class common
 
         if (is_error($res)) {
             Log::error('FBPic', $res);
+
             return error(State::ERROR, '上传失败！');
         }
 
@@ -563,8 +572,9 @@ class common
                 return error(State::ERROR, $e->getMessage());
             }
         }
-        
+
         $url = $filename;
+
         return ['data' => $url];
     }
 
@@ -622,7 +632,7 @@ class common
         $device_keys = [];
         /** @var deviceModelObj $item */
         foreach ($res as $item) {
-            $devices[$item->getId()] = $item->getName() . ' - ' . $item->getImei();
+            $devices[$item->getId()] = $item->getName().' - '.$item->getImei();
             $device_keys[] = $item->getId();
         }
 
@@ -637,7 +647,7 @@ class common
 
         $order_no = request::trim('order');
         if ($order_no) {
-            $condition['order_id LIKE'] = '%' . $order_no . '%';
+            $condition['order_id LIKE'] = '%'.$order_no.'%';
         }
 
         $way = request::trim('way');
@@ -803,7 +813,7 @@ class common
             'devices' => $devices,
             'page' => $page,
             'pagesize' => $page_size,
-            'total' => $total
+            'total' => $total,
         ];
     }
 
@@ -820,7 +830,7 @@ class common
         $time_less_15 = new DateTime('-15 min');
         $power_time = $time_less_15->getTimestamp();
         $device_stat['all'] = Device::query($condition)->count();
-        $device_stat['on'] = Device::query('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
+        $device_stat['on'] = Device::query('last_ping IS NOT NULL AND last_ping > '.$power_time)->count();
         $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
 
         $data = [
@@ -889,13 +899,13 @@ class common
 
         $date_limit = request::array('datelimit');
         if ($date_limit['start']) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'] . ' 00:00:00');
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
         } else {
             $s_date = new DateTime('first day of this month 00:00:00');
         }
 
         if ($date_limit['end']) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'] . ' 00:00:00');
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['end'].' 00:00:00');
             $e_date->modify('next day');
         } else {
             $e_date = new DateTime('first day of next month 00:00:00');
@@ -912,7 +922,7 @@ class common
         $device_keys = [];
         /** @var deviceModelObj $item */
         foreach ($res as $item) {
-            $devices[$item->getId()] = $item->getName() . ' - ' . $item->getImei();
+            $devices[$item->getId()] = $item->getName().' - '.$item->getImei();
             $device_keys[] = $item->getId();
         }
 
@@ -997,7 +1007,7 @@ class common
         return [
             'data' => $data,
             'total' => $total,
-            'devices' => $devices
+            'devices' => $devices,
         ];
     }
 
@@ -1017,7 +1027,7 @@ class common
         try {
             $result = $aop->execute($request);
             if ($result->error_response) {
-                return err('获取用户信息失败：' . $result->error_response->sub_msg);
+                return err('获取用户信息失败：'.$result->error_response->sub_msg);
             }
 
             $user_id = $result->alipay_system_oauth_token_response->user_id;
@@ -1029,7 +1039,7 @@ class common
                 if (!(empty($user->getNickname()) && empty($user->getAvatar()))) {
                     $user_info['user_info'] = [
                         'nickname' => $user->getNickname(),
-                        'avatar' => $user->getAvatar()
+                        'avatar' => $user->getAvatar(),
                     ];
                 }
             } else {
@@ -1043,7 +1053,7 @@ class common
             return $user_info;
 
         } catch (Exception $e) {
-            return err('获取用户信息失败：' . $e->getMessage());
+            return err('获取用户信息失败：'.$e->getMessage());
         }
     }
 
@@ -1076,7 +1086,7 @@ class common
 
         $order_no = request::trim('order');
         if ($order_no) {
-            $condition['order_id LIKE'] = '%' . $order_no . '%';
+            $condition['order_id LIKE'] = '%'.$order_no.'%';
         }
 
         $way = request::trim('way');
@@ -1160,7 +1170,7 @@ class common
             'accounts' => $accounts,
             'page' => $page,
             'pagesize' => $page_size,
-            'total' => $total
+            'total' => $total,
         ];
     }
 
@@ -1206,8 +1216,13 @@ class common
         return self::$user;
     }
 
-    public static function doUserLogin($res, $user_info, $h5_openid = '', $device_uid = '', $ref_user_openid = ''): array
-    {
+    public static function doUserLogin(
+        $res,
+        $user_info,
+        $h5_openid = '',
+        $device_uid = '',
+        $ref_user_openid = ''
+    ): array {
         $openid = strval($res['openId']);
         $user = User::get($openid, true);
         if (empty($user)) {
@@ -1225,13 +1240,13 @@ class common
             }
 
             if ($ref_user_openid) {
-                $ref_user  = User::get($ref_user_openid, true);
+                $ref_user = User::get($ref_user_openid, true);
             }
 
             if (App::isBalanceEnabled()) {
                 Balance::onUserCreated($user, $ref_user ?? null);
             }
-            
+
         } else {
             if ($user_info['nickName']) {
                 $user->setNickname($user_info['nickName']);
@@ -1281,7 +1296,7 @@ class common
             $entry->destroy();
         }
 
-        $token = sha1($openid . Util::random(16));
+        $token = sha1($openid.Util::random(16));
         $data = [
             'src' => LoginData::USER,
             'user_id' => $user->getId(),
@@ -1292,7 +1307,7 @@ class common
 
         if (LoginData::create($data)) {
             return [
-                'token' => $token, 
+                'token' => $token,
             ];
         }
 

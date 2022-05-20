@@ -40,10 +40,16 @@ class WXPay implements IPay
         ]);
     }
 
-    public function createXAppPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
-    {
+    public function createXAppPay(
+        string $user_uid,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = ''
+    ): array {
         //小程序支付，使用小程序appid
         $this->config['appid'] = $this->config['wxappid'];
+
         return $this->createJsPay($user_uid, $device_uid, $order_no, $price, $body);
     }
 
@@ -56,12 +62,17 @@ class WXPay implements IPay
      * @param string $body
      * @return mixed
      */
-    public function createJsPay(string $user_uid, string $device_uid, string $order_no, int $price, string $body = ''): array
-    {
+    public function createJsPay(
+        string $user_uid,
+        string $device_uid,
+        string $order_no,
+        int $price,
+        string $body = ''
+    ): array {
         $wx = $this->getWx();
 
         $notify_url = _W('siteroot');
-        $path = 'addons/' . APP_NAME . '/';
+        $path = 'addons/'.APP_NAME.'/';
 
         if (mb_strpos($notify_url, $path) === false) {
             $notify_url .= $path;
@@ -92,13 +103,14 @@ class WXPay implements IPay
 
         $data = [
             'appId' => $res['appid'],
-            'timeStamp' => time() . '',
+            'timeStamp' => time().'',
             'nonceStr' => $res['nonce_str'],
-            'package' => 'prepay_id=' . $res['prepay_id'],
+            'package' => 'prepay_id='.$res['prepay_id'],
             'signType' => 'MD5',
         ];
 
         $data['paySign'] = $wx->bulidSign($data);
+
         return $data;
     }
 
@@ -224,6 +236,7 @@ JS_CODE;
     public function refund(string $order_no, int $total, bool $is_transaction_id = false)
     {
         $wx = $this->getWx();
+
         return $wx->refund($order_no, $total, $is_transaction_id);
     }
 
@@ -251,6 +264,7 @@ JS_CODE;
     public function decodeData(string $input): array
     {
         $data = We7::xml2array($input);
+
         return [
             'type' => 'wx',
             'deviceUID' => $data['device_info'],
@@ -283,6 +297,7 @@ JS_CODE;
             'return_code' => $ok ? 'SUCCESS' : 'FAIL',
             'return_msg' => $ok ? 'OK' : '',
         );
+
         return We7::array2xml($result);
     }
 }

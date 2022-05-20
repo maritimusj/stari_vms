@@ -64,12 +64,15 @@ try {
 
     $result = Util::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
         //出货流程，EventBus会抛出异常
-        $result = Util::openDevice([$device, $user, $account,
+        $result = Util::openDevice([
+            $device,
+            $user,
+            $account,
             'level' => LOG_GOODS_GET,
             'goodsId' => $goods_id,
             'online' => false,
         ]);
-        
+
         if (is_error($result)) {
             if ($result['errno'] === State::ERROR_LOCK_FAILED && settings('order.waitQueue.enabled', false)) {
                 $params = [
@@ -82,6 +85,7 @@ try {
                 if (!Job::createAccountOrder($params)) {
                     throw new RuntimeException('启动排队任务失败！');
                 }
+
                 return ['message' => '正在排队出货，请稍等！'];
             }
 
@@ -99,7 +103,12 @@ try {
             }
 
             if ($questionnaire) {
-                $result = Questionnaire::submitAnswer($questionnaire, $ticket_data_saved['answer'] ?? [], $user, $device);
+                $result = Questionnaire::submitAnswer(
+                    $questionnaire,
+                    $ticket_data_saved['answer'] ?? [],
+                    $user,
+                    $device
+                );
                 if (is_error($result)) {
                     throw new RuntimeException('问卷答案没通过审核！');
                 }
@@ -135,7 +144,7 @@ try {
     if ($result['message']) {
         $device->appShowMessage($result['message']);
     }
-    
+
     $response = [
         'ok' => empty($result['orderId']) ? 0 : 1,
         'text' => $result['title'],

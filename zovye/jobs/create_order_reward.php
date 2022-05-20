@@ -46,7 +46,7 @@ $log = [
     'goods' => $goods_id,
     'num' => $num,
     'ip' => $ip,
-    'code' => $code
+    'code' => $code,
 ];
 
 $writeLog = function () use (&$log) {
@@ -89,7 +89,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
             throw new RuntimeException('找不到这个设备！');
         }
 
-        if ($code != sha1($order_no . $reward_id . $device->getShadowId() . $user->getOpenid())) {
+        if ($code != sha1($order_no.$reward_id.$device->getShadowId().$user->getOpenid())) {
             throw new RuntimeException('不正确的请求！');
         }
 
@@ -116,6 +116,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
                 ])) {
                     throw new RuntimeException('启动排队任务失败！');
                 }
+
                 return true;
             }
             throw new RuntimeException('设备被占用！');
@@ -197,14 +198,17 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
                 'message' => '出货完成！',
             ]);
         } else {
-            $order->setExtraData('pull.result', $success > 0 ? error(State::FAIL, '部分商品出货失败！') : error( State::FAIL, '出货失败！'));
+            $order->setExtraData(
+                'pull.result',
+                $success > 0 ? error(State::FAIL, '部分商品出货失败！') : error(State::FAIL, '出货失败！')
+            );
         }
 
         $stats = $user->settings('extra.wxapp.reward.order', []);
         if (date('Ymd', $stats['time']) != date('Ymd', TIMESTAMP)) {
             $stats['total'] = 0;
         }
-        
+
         $stats['time'] = time();
         $stats['total'] += $success;
 
@@ -227,14 +231,15 @@ Job::exit($writeLog);
 /**
  * @throws Exception
  */
-function createOrder(string         $order_no,
-                     deviceModelObj $device,
-                     userModelObj   $user,
-                     array          $goods,
-                     int            $num,
-                     string         $ip,
-                     string         $code): orderModelObj
-{
+function createOrder(
+    string $order_no,
+    deviceModelObj $device,
+    userModelObj $user,
+    array $goods,
+    int $num,
+    string $ip,
+    string $code
+): orderModelObj {
     $order_data = [
         'name' => $goods['name'],
         'goods_id' => $goods['id'],

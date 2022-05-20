@@ -35,6 +35,7 @@ class Wx
     {
         $wx = self::getWx();
         $result = $wx->sendTplNotice($openid, $tpl_id, $content, $url);
+
         return !is_error($result);
     }
 
@@ -47,6 +48,7 @@ class Wx
     {
         $wx = self::getWx();
         $result = $wx->sendCustomNotice($msg);
+
         return !is_error($result);
     }
 
@@ -57,6 +59,7 @@ class Wx
             We7::load()->classs('wxapp.account');
             $wxApp = new WxappAccount($config);
         }
+
         return $wxApp;
     }
 
@@ -84,7 +87,7 @@ class Wx
         if (!empty($auth_data['openid'])) {
             $res['openId'] = $auth_data['openid'];
         }
-        
+
         return $res;
     }
 }

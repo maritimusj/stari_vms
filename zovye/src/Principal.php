@@ -22,13 +22,16 @@ class Principal
             $obj = self::findOne($cond);
             if ($obj) {
                 $obj->setName($user->getName());
+
                 return $obj->save();
             }
+
             return false;
         };
 
         $createFN = function ($data, $user) {
             $data['name'] = $user->getName();
+
             return self::create($data);
         };
 

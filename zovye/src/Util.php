@@ -33,13 +33,14 @@ class Util
     {
         static $config = null;
         if (!isset($config)) {
-            $config_filename = ZOVYE_CORE_ROOT . 'config.php';
+            $config_filename = ZOVYE_CORE_ROOT.'config.php';
             if (file_exists($config_filename)) {
                 $config = require_once($config_filename);
             } else {
                 $config = _W('config', []);
             }
         }
+
         return getArray($config, $sub);
     }
 
@@ -58,7 +59,7 @@ class Util
             $traits = array_merge($traits, class_uses($classname));
         }
 
-        return $traits && in_array(__NAMESPACE__ . '\\traits\\' . $traitName, $traits);
+        return $traits && in_array(__NAMESPACE__.'\\traits\\'.$traitName, $traits);
     }
 
     /**
@@ -73,7 +74,7 @@ class Util
         $ret = [];
         $db = We7::pdo();
         if ($db->tableexists($tab_name)) {
-            $result = $db->fetchall('SHOW FULL COLUMNS FROM ' . $db->tablename($tab_name));
+            $result = $db->fetchall('SHOW FULL COLUMNS FROM '.$db->tablename($tab_name));
             foreach ($result as $value) {
                 $temp = [];
                 $type = explode(' ', $value['Type'], 2);
@@ -172,6 +173,7 @@ class Util
                 }
             }
         }
+
         return $user;
     }
 
@@ -192,6 +194,7 @@ class Util
                     $userinfo = $oauth_account->fansQueryInfo($openid);
                     $userinfo['nickname'] = stripcslashes($userinfo['nickname']);
                     $userinfo['avatar'] = $userinfo['headimgurl'];
+
                     return $userinfo;
                 }, $openid);
 
@@ -236,7 +239,7 @@ class Util
             $result = $aop->execute($request);
 
             if ($result->error_response) {
-                throw new RuntimeException('获取用户信息失败：' . $result->error_response->sub_msg);
+                throw new RuntimeException('获取用户信息失败：'.$result->error_response->sub_msg);
             }
 
             //access_token;
@@ -247,7 +250,7 @@ class Util
             $result = $aop->execute($request, $access_token);
 
             if ($result->alipay_user_info_share_response->code !== '10000') {
-                throw new RuntimeException('获取用户信息失败：' . $result->alipay_user_info_share_response->sub_msg);
+                throw new RuntimeException('获取用户信息失败：'.$result->alipay_user_info_share_response->sub_msg);
             }
 
             Log::debug('ali', $result->alipay_user_info_share_response);
@@ -393,7 +396,7 @@ class Util
 
     public static function createApiRedirectFile(string $filename, string $do, array $params = [], callable $fn = null)
     {
-        We7::mkDirs(dirname(ZOVYE_ROOT . $filename));
+        We7::mkDirs(dirname(ZOVYE_ROOT.$filename));
 
         $headers = is_array($params['headers']) ? $params['headers'] : [];
         unset($params['headers']);
@@ -419,7 +422,7 @@ class Util
 
         $appName = APP_NAME;
         $uniacid = We7::uniacid();
-        $appPath = realpath(ZOVYE_ROOT . '../../app');
+        $appPath = realpath(ZOVYE_ROOT.'../../app');
 
         $content = "<?php
 /**
@@ -446,19 +449,22 @@ $header_str
 chdir('$appPath');
 include './index.php';
 ";
-        return file_put_contents(ZOVYE_ROOT . $filename, $content);
+
+        return file_put_contents(ZOVYE_ROOT.$filename, $content);
     }
 
     public static function expire(string $uid)
     {
-        We7::cache_delete(App::uid(6) . $uid);
+        We7::cache_delete(App::uid(6).$uid);
     }
 
     public static function expiredCall(string $uid, $interval_seconds, callable $fn)
     {
-        $key = App::uid(6) . $uid;
+        $key = App::uid(6).$uid;
         $data = We7::cache_read($key);
-        if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval($data['time']) < $interval_seconds)) {
+        if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval(
+                    $data['time']
+                ) < $interval_seconds)) {
             return $data['v'];
         }
 
@@ -485,14 +491,16 @@ include './index.php';
      */
     public static function cachedCall($interval_seconds, callable $fn, ...$params)
     {
-        return self::expiredCall('delay' . hashFN($fn, ...$params), $interval_seconds, $fn);
+        return self::expiredCall('delay'.hashFN($fn, ...$params), $interval_seconds, $fn);
     }
 
     public static function cachedCallWhen($interval_seconds, callable $fn, ...$params)
     {
-        $key = 'delay' . hashFN($fn, ...$params);
+        $key = 'delay'.hashFN($fn, ...$params);
         $data = We7::cache_read($key);
-        if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval($data['time']) < $interval_seconds)) {
+        if ($data && is_array($data) && ($interval_seconds === 0 || time() - intval(
+                    $data['time']
+                ) < $interval_seconds)) {
             return $data['v'];
         }
 
@@ -509,7 +517,7 @@ include './index.php';
 
     public static function expiredCallUtil($uid, $expired, $fn)
     {
-        $key = App::uid(6) . $uid;
+        $key = App::uid(6).$uid;
         $data = We7::cache_read($key);
         if ($data && is_array($data) && time() <= intval($data['time'])) {
             return $data['v'];
@@ -531,7 +539,7 @@ include './index.php';
 
     public static function cachedCallUtil($expired, callable $fn, ...$params)
     {
-        return self::expiredCallUtil('expired' . hashFN($fn, ...$params), $expired, $fn);
+        return self::expiredCallUtil('expired'.hashFN($fn, ...$params), $expired, $fn);
     }
 
     public static function isAssigned($data, deviceModelObj $device): bool
@@ -574,8 +582,12 @@ include './index.php';
         return false;
     }
 
-    public static function checkLimit(accountModelObj $account, userModelObj $user = null, $params = [], $limit = 0): bool
-    {
+    public static function checkLimit(
+        accountModelObj $account,
+        userModelObj $user = null,
+        $params = [],
+        $limit = 0
+    ): bool {
         $arr = [];
         if ($account->isTask()) {
             $cond = array_merge($params, [
@@ -619,6 +631,7 @@ include './index.php';
             }
             $limit -= $count;
         }
+
         return false;
     }
 
@@ -639,24 +652,28 @@ include './index.php';
                     if ($val == 0 && $user->settings('fansData.sex') == 1) {
                         return error(State::FAIL, '不允许男性用户');
                     }
+
                     return true;
                 },
                 'female' => function ($val) use ($user) {
                     if ($val == 0 && $user->settings('fansData.sex') == 2) {
                         return error(State::FAIL, '不允许女性用户');
                     }
+
                     return true;
                 },
                 'unknown_sex' => function ($val) use ($user) {
                     if ($val == 0 && $user->settings('fansData.sex') == 0) {
                         return error(State::FAIL, '不允许未知性别用户');
                     }
+
                     return true;
                 },
                 'ios' => function ($val) {
                     if ($val == 0 && Util::getUserPhoneOS() == 'ios') {
                         return error(State::FAIL, '不允许ios手机');
                     }
+
                     return true;
                 },
                 'android' => function ($val) {
@@ -666,6 +683,7 @@ include './index.php';
                             return error(State::FAIL, '不允许android手机');
                         }
                     }
+
                     return true;
                 },
             ];
@@ -764,8 +782,12 @@ include './index.php';
      *
      * @return bool|array
      */
-    public static function checkAvailable(userModelObj $user, accountModelObj $account, deviceModelObj $device, array $params = [])
-    {
+    public static function checkAvailable(
+        userModelObj $user,
+        accountModelObj $account,
+        deviceModelObj $device,
+        array $params = []
+    ) {
         $res = self::checkFreeOrderLimits($user, $device);
         if (is_error($res)) {
             return $res;
@@ -897,25 +919,27 @@ include './index.php';
         $counters = [
             "$uid:order:all" => function () {
                 return Order::query()->count();
-            }
+            },
         ];
 
         $createtime = $order->getCreatetime();
-        $counters[$uid . ':order:month:' . date('Y-m', $createtime)] = function () use ($createtime) {
+        $counters[$uid.':order:month:'.date('Y-m', $createtime)] = function () use ($createtime) {
             $start = new DateTime("@$createtime");
             $start->modify('first day of this month 00:00');
             $end = new DateTime("@$createtime");
             $end->modify('first day of next month 00:00');
+
             return Order::query([
                 'createtime >=' => $start->getTimestamp(),
                 'createtime <' => $end->getTimestamp(),
             ])->count();
         };
-        $counters[$uid . ':order:day:' . date('Y-m-d', $createtime)] = function () use ($createtime) {
+        $counters[$uid.':order:day:'.date('Y-m-d', $createtime)] = function () use ($createtime) {
             $start = new DateTime("@$createtime");
             $start->modify('00:00');
             $end = new DateTime("@$createtime");
             $end->modify('next day 00:00');
+
             return Order::query([
                 'createtime >=' => $start->getTimestamp(),
                 'createtime <' => $end->getTimestamp(),
@@ -929,22 +953,30 @@ include './index.php';
                     'device_id' => $device->getId(),
                 ])->count();
             };
-            $counters["device:{$device->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($device, $createtime) {
+            $counters["device:{$device->getId()}:order:month:".date('Y-m', $createtime)] = function () use (
+                $device,
+                $createtime
+            ) {
                 $start = new DateTime("@$createtime");
                 $start->modify('first day of this month 00:00');
                 $end = new DateTime("@$createtime");
                 $end->modify('first day of next month 00:00');
+
                 return Order::query([
                     'device_id' => $device->getId(),
                     'createtime >=' => $start->getTimestamp(),
                     'createtime <' => $end->getTimestamp(),
                 ])->count();
             };
-            $counters["device:{$device->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($device, $createtime) {
+            $counters["device:{$device->getId()}:order:day:".date('Y-m-d', $createtime)] = function () use (
+                $device,
+                $createtime
+            ) {
                 $start = new DateTime("@$createtime");
                 $start->modify('00:00');
                 $end = new DateTime("@$createtime");
                 $end->modify('next day 00:00');
+
                 return Order::query([
                     'device_id' => $device->getId(),
                     'createtime >=' => $start->getTimestamp(),
@@ -960,22 +992,30 @@ include './index.php';
                     'agent_id' => $agent->getId(),
                 ])->count();
             };
-            $counters["agent:{$agent->getId()}:order:month:" . date('Y-m', $createtime)] = function () use ($agent, $createtime) {
+            $counters["agent:{$agent->getId()}:order:month:".date('Y-m', $createtime)] = function () use (
+                $agent,
+                $createtime
+            ) {
                 $start = new DateTime("@$createtime");
                 $start->modify('first day of this month 00:00');
                 $end = new DateTime("@$createtime");
                 $end->modify('first day of next month 00:00');
+
                 return Order::query([
                     'agent_id' => $agent->getId(),
                     'createtime >=' => $start->getTimestamp(),
                     'createtime <' => $end->getTimestamp(),
                 ])->count();
             };
-            $counters["agent:{$agent->getId()}:order:day:" . date('Y-m-d', $createtime)] = function () use ($agent, $createtime) {
+            $counters["agent:{$agent->getId()}:order:day:".date('Y-m-d', $createtime)] = function () use (
+                $agent,
+                $createtime
+            ) {
                 $start = new DateTime("@$createtime");
                 $start->modify('00:00');
                 $end = new DateTime("@$createtime");
                 $end->modify('next day 00:00');
+
                 return Order::query([
                     'agent_id' => $agent->getId(),
                     'createtime >=' => $start->getTimestamp(),
@@ -990,6 +1030,7 @@ include './index.php';
                     return err('fail');
                 }
             }
+
             return true;
         });
     }
@@ -1061,9 +1102,9 @@ include './index.php';
             }
             //暂时禁用，客户数据过多的情况下，该函数很难完成
             //$result['counter'] = self::updateOrderCounters($order);
-            $result['order'] = $order->getId() . ' Ok!';
+            $result['order'] = $order->getId().' Ok!';
         } else {
-            $result[] = $order->getId() . ' lock failed!';
+            $result[] = $order->getId().' lock failed!';
         }
 
         return $result;
@@ -1129,10 +1170,10 @@ include './index.php';
      */
     public static function resultJSON(bool $status, $data = [])
     {
-        header('Content-type: application/json; charset=' . _W('charset'));
+        header('Content-type: application/json; charset='._W('charset'));
 
         if (request::has('callback')) {
-            echo request('callback') . '(' . json_encode(['status' => $status, 'data' => $data]) . ')';
+            echo request('callback').'('.json_encode(['status' => $status, 'data' => $data]).')';
         } else {
             echo json_encode(['status' => $status, 'data' => $data]);
         }
@@ -1203,7 +1244,7 @@ JS2;
 JS3;
         }
 
-        $css_url = _W('siteroot') . 'app/resource/css/common.min.css?v=20160906';
+        $css_url = _W('siteroot').'app/resource/css/common.min.css?v=20160906';
         $content = <<<HTML_CONTENT
 <!DOCTYPE html>
 <html lang="zh-hans">
@@ -1251,6 +1292,7 @@ HTML_CONTENT;
     {
         ob_start();
         We7::register_jssdk($debug);
+
         return ob_get_clean();
     }
 
@@ -1478,7 +1520,7 @@ HTML_CONTENT;
         }
         $res = We7::tomedia($src, $local_path);
         if (!$local_path) {
-            $str = ['/addons/' . APP_NAME];
+            $str = ['/addons/'.APP_NAME];
             $replacements = [''];
             if (App::isHttpsWebsite()) {
                 $str[] = 'http://';
@@ -1492,10 +1534,10 @@ HTML_CONTENT;
 
     public static function getAttachmentFileName(string $dirname, string $filename): string
     {
-        $full_path = ATTACHMENT_ROOT . $dirname . $filename;
+        $full_path = ATTACHMENT_ROOT.$dirname.$filename;
 
-        if (!is_dir(ATTACHMENT_ROOT . $dirname)) {
-            We7::mkDirs(ATTACHMENT_ROOT . $dirname);
+        if (!is_dir(ATTACHMENT_ROOT.$dirname)) {
+            We7::mkDirs(ATTACHMENT_ROOT.$dirname);
         }
 
         return $full_path;
@@ -1599,7 +1641,7 @@ HTML_CONTENT;
             } elseif (is_array($msg)) {
                 $arr = [];
                 foreach ($msg as $key => $value) {
-                    $arr[] = "#$key#=" . urlencode($value);
+                    $arr[] = "#$key#=".urlencode($value);
                 }
 
                 $tpl_value = implode('&', $arr);
@@ -1726,9 +1768,11 @@ HTML_CONTENT;
         set_time_limit(0);
 
         //获取设备参数
-        $devices = array_values(array_filter($args, function ($entry) {
-            return $entry instanceof deviceModelObj;
-        }));
+        $devices = array_values(
+            array_filter($args, function ($entry) {
+                return $entry instanceof deviceModelObj;
+            })
+        );
 
         if (empty($devices)) {
             return error(State::ERROR, '设备为空');
@@ -1738,9 +1782,11 @@ HTML_CONTENT;
         $device = $devices[0];
 
         //获取用户参数
-        $users = array_values(array_filter($args, function ($entry) {
-            return $entry instanceof userModelObj;
-        }));
+        $users = array_values(
+            array_filter($args, function ($entry) {
+                return $entry instanceof userModelObj;
+            })
+        );
 
         if (empty($users)) {
             return error(State::ERROR, '用户为空');
@@ -1750,24 +1796,30 @@ HTML_CONTENT;
         $user = $users[0];
 
         //获取订单参数
-        $orders = array_values(array_filter($args, function ($entry) {
-            return $entry instanceof orderModelObj;
-        }));
+        $orders = array_values(
+            array_filter($args, function ($entry) {
+                return $entry instanceof orderModelObj;
+            })
+        );
 
         /** @var orderModelObj $order */
         $order = empty($orders) ? null : $orders[0];
 
         //获取公众号参数
-        $accounts = array_values(array_filter($args, function ($entry) {
-            return $entry instanceof accountModelObj;
-        }));
+        $accounts = array_values(
+            array_filter($args, function ($entry) {
+                return $entry instanceof accountModelObj;
+            })
+        );
 
         $account = empty($accounts) ? null : $accounts[0];
 
         //获取优惠券参数
-        $vouchers = array_values(array_filter($args, function ($entry) {
-            return $entry instanceof goods_voucher_logsModelObj;
-        }));
+        $vouchers = array_values(
+            array_filter($args, function ($entry) {
+                return $entry instanceof goods_voucher_logsModelObj;
+            })
+        );
 
         //获取商品参数
         /** @var goods_voucher_logsModelObj $voucher */
@@ -1842,196 +1894,199 @@ HTML_CONTENT;
         }
 
         //开启事务
-        $result = Util::transactionDo(function () use (&$params, $goods, $mcb_index, $mcb_channel, &$mcb_unit,  &$log_data, $args) {
-            /** @var deviceModelObj $device */
-            $device = $params['device'];
+        $result = Util::transactionDo(
+            function () use (&$params, $goods, $mcb_index, $mcb_channel, &$mcb_unit, &$log_data, $args) {
+                /** @var deviceModelObj $device */
+                $device = $params['device'];
 
-            /** @var userModelObj $user */
-            $user = $params['user'];
+                /** @var userModelObj $user */
+                $user = $params['user'];
 
-            /** @var accountModelObj $acc */
-            $acc = $params['account'];
+                /** @var accountModelObj $acc */
+                $acc = $params['account'];
 
-            /** @var orderModelObj $order */
-            $order = $params['order'];
+                /** @var orderModelObj $order */
+                $order = $params['order'];
 
-            /** @var goods_voucher_logsModelObj $voucher */
-            $voucher = $params['voucher'];
+                /** @var goods_voucher_logsModelObj $voucher */
+                $voucher = $params['voucher'];
 
-            $order_data = [
-                'openid' => $user->getOpenid(),
-                'agent_id' => $device->getAgentId(),
-                'device_id' => $device->getId(),
-                'src' => Order::ACCOUNT,
-                'name' => $goods['name'],
-                'goods_id' => $goods['id'],
-                'num' => 1,
-                'price' => 0,
-                'account' => $acc ? $acc->name() : '',
-                'ip' => empty($args['ip']) ? CLIENT_IP : $args['ip'],
-                'extra' => [
-                    'goods' => $goods,
-                    'device' => [
-                        'imei' => $device->getImei(),
-                        'name' => $device->getName(),
+                $order_data = [
+                    'openid' => $user->getOpenid(),
+                    'agent_id' => $device->getAgentId(),
+                    'device_id' => $device->getId(),
+                    'src' => Order::ACCOUNT,
+                    'name' => $goods['name'],
+                    'goods_id' => $goods['id'],
+                    'num' => 1,
+                    'price' => 0,
+                    'account' => $acc ? $acc->name() : '',
+                    'ip' => empty($args['ip']) ? CLIENT_IP : $args['ip'],
+                    'extra' => [
+                        'goods' => $goods,
+                        'device' => [
+                            'imei' => $device->getImei(),
+                            'name' => $device->getName(),
+                        ],
+                        'user' => $user->profile(),
                     ],
-                    'user' => $user->profile(),
-                ],
-            ];
-
-            //定制功能：零佣金
-            if (Helper::isZeroBonus($device, Order::FREE_STR)) {
-                $order_data['agent_id'] = 0;
-                $order_data['device_id'] = 0;
-                $order_data['extra']['custom'] = [
-                    'zero_bonus' => true,
-                    'device' => $device->getId(),
-                    'agent' => $device->getAgentId(),
                 ];
-            }
 
-            if ($acc) {
-                $order_data['extra']['account'] = [
-                    'name' => $acc->getName(),
-                    'type' => $acc->getType(),
-                    'clr' => $acc->getClr(),
-                    'title' => $acc->getTitle(),
-                    'img' => $acc->getImg(),
-                ];
-            }
-
-            if ($args['orderId']) {
-                $order_data['order_id'] = $args['orderId'];
-            } else {
-                $order_data['order_id'] = Order::makeUID($user, $device);
-            }
-
-            if ($voucher) {
-                $order_data['src'] = Order::VOUCHER;
-                $order_data['extra']['voucher'] = [
-                    'id' => $voucher->getId(),
-                ];
-            }
-
-            $agent = $device->getAgent();
-            if ($agent) {
-                $order_data['extra']['agent'] = $agent->profile();
-            }
-
-            if ($order) {
-                $order_data['extra'] = orderModelObj::serializeExtra($order_data['extra']);
-                foreach ($order_data as $name => $val) {
-                    $setter = 'set' . ucfirst($name);
-                    $order->{$setter}($val);
-                }
-                if (!$order->save()) {
-                    return error(State::ERROR, '领取失败，保存订单失败');
-                }
-            } else {
-                $order = Order::create($order_data);
-                if (empty($order)) {
-                    return error(State::ERROR, '领取失败，创建订单失败');
+                //定制功能：零佣金
+                if (Helper::isZeroBonus($device, Order::FREE_STR)) {
+                    $order_data['agent_id'] = 0;
+                    $order_data['device_id'] = 0;
+                    $order_data['extra']['custom'] = [
+                        'zero_bonus' => true,
+                        'device' => $device->getId(),
+                        'agent' => $device->getAgentId(),
+                    ];
                 }
 
-                $params['order'] = $order;
-
-                try {
-                    //事件：订单已经创建
-                    EventBus::on('device.orderCreated', $params);
-                } catch (Exception $e) {
-                    return error(State::ERROR, $e->getMessage());
+                if ($acc) {
+                    $order_data['extra']['account'] = [
+                        'name' => $acc->getName(),
+                        'type' => $acc->getType(),
+                        'clr' => $acc->getClr(),
+                        'title' => $acc->getTitle(),
+                        'img' => $acc->getImg(),
+                    ];
                 }
-            }
 
-            $user->remove('last');
-
-            foreach ($params as $entry) {
-                if ($entry && !$entry->save()) {
-                    return error(State::ERROR, '无法保存数据，请重试');
-                }
-            }
-
-            $data = [
-                'online' => !($args['online'] === false),
-                'index' => $mcb_index,
-                'channel' => $mcb_channel,
-                'unit' => $mcb_unit,
-                'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
-                'userid' => $user->getOpenid(),
-                'num' => $order->getNum(),
-                'from' => $acc ? $acc->name() : '',
-                'user-agent' => $order->getExtraData('from.user_agent'),
-                'ip' => $order->getExtraData('from.ip'),
-            ];
-
-            $loc = $device->settings('extra.location', []);
-            if ($loc && $loc['lng'] && $loc['lat']) {
-                $data['location']['device'] = [
-                    'lng' => $loc['lng'],
-                    'lat' => $loc['lat'],
-                ];
-            }
-
-            $res = $device->pull($data);
-
-            $log_data['params'] = $data;
-            $log_data['result'] = $res;
-            $log_data['order'] = $order->getId();
-            $log_data['result'] = $res;
-
-            if (is_error($res)) {
-                $order->setResultCode($res['errno']);
-
-                $device->setError($res['errno'], $res['message']);
-                $device->scheduleErrorNotifyJob($res['errno'], $res['message']);
-
-                try {
-                    //事件：出货失败
-                    EventBus::on('device.openFail', $params);
-                } catch (Exception $e) {
-                    //return error($e->getCode(), $e->getMessage());
-                }
-                if (Helper::NeedAutoRefund($device)) {
-                    //退款任务
-                    Job::refund($order->getOrderNO(), $res['message']);
-                }
-            } else {
-                $order->setResultCode(0);
-
-                if (isset($goods['cargo_lane'])) {
-                    $locker = $device->payloadLockAcquire(3);
-                    if (empty($locker)) {
-                        return error(State::ERROR, '设备正忙，请重试！');
-                    }
-                    $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
-                    if (is_error($v)) {
-                        return error(State::ERROR, '保存库存失败！');
-                    }
-                    $locker->unlock();
+                if ($args['orderId']) {
+                    $order_data['order_id'] = $args['orderId'];
+                } else {
+                    $order_data['order_id'] = Order::makeUID($user, $device);
                 }
 
                 if ($voucher) {
-                    $voucher->setUsedUserId($user->getId());
-                    $voucher->setUsedtime(time());
-                    if (!$voucher->save()) {
-                        return error(State::ERROR, '出货失败：使用取货码失败！');
+                    $order_data['src'] = Order::VOUCHER;
+                    $order_data['extra']['voucher'] = [
+                        'id' => $voucher->getId(),
+                    ];
+                }
+
+                $agent = $device->getAgent();
+                if ($agent) {
+                    $order_data['extra']['agent'] = $agent->profile();
+                }
+
+                if ($order) {
+                    $order_data['extra'] = orderModelObj::serializeExtra($order_data['extra']);
+                    foreach ($order_data as $name => $val) {
+                        $setter = 'set'.ucfirst($name);
+                        $order->{$setter}($val);
+                    }
+                    if (!$order->save()) {
+                        return error(State::ERROR, '领取失败，保存订单失败');
+                    }
+                } else {
+                    $order = Order::create($order_data);
+                    if (empty($order)) {
+                        return error(State::ERROR, '领取失败，创建订单失败');
+                    }
+
+                    $params['order'] = $order;
+
+                    try {
+                        //事件：订单已经创建
+                        EventBus::on('device.orderCreated', $params);
+                    } catch (Exception $e) {
+                        return error(State::ERROR, $e->getMessage());
                     }
                 }
+
+                $user->remove('last');
+
+                foreach ($params as $entry) {
+                    if ($entry && !$entry->save()) {
+                        return error(State::ERROR, '无法保存数据，请重试');
+                    }
+                }
+
+                $data = [
+                    'online' => !($args['online'] === false),
+                    'index' => $mcb_index,
+                    'channel' => $mcb_channel,
+                    'unit' => $mcb_unit,
+                    'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
+                    'userid' => $user->getOpenid(),
+                    'num' => $order->getNum(),
+                    'from' => $acc ? $acc->name() : '',
+                    'user-agent' => $order->getExtraData('from.user_agent'),
+                    'ip' => $order->getExtraData('from.ip'),
+                ];
+
+                $loc = $device->settings('extra.location', []);
+                if ($loc && $loc['lng'] && $loc['lat']) {
+                    $data['location']['device'] = [
+                        'lng' => $loc['lng'],
+                        'lat' => $loc['lat'],
+                    ];
+                }
+
+                $res = $device->pull($data);
+
+                $log_data['params'] = $data;
+                $log_data['result'] = $res;
+                $log_data['order'] = $order->getId();
+                $log_data['result'] = $res;
+
+                if (is_error($res)) {
+                    $order->setResultCode($res['errno']);
+
+                    $device->setError($res['errno'], $res['message']);
+                    $device->scheduleErrorNotifyJob($res['errno'], $res['message']);
+
+                    try {
+                        //事件：出货失败
+                        EventBus::on('device.openFail', $params);
+                    } catch (Exception $e) {
+                        //return error($e->getCode(), $e->getMessage());
+                    }
+                    if (Helper::NeedAutoRefund($device)) {
+                        //退款任务
+                        Job::refund($order->getOrderNO(), $res['message']);
+                    }
+                } else {
+                    $order->setResultCode(0);
+
+                    if (isset($goods['cargo_lane'])) {
+                        $locker = $device->payloadLockAcquire(3);
+                        if (empty($locker)) {
+                            return error(State::ERROR, '设备正忙，请重试！');
+                        }
+                        $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
+                        if (is_error($v)) {
+                            return error(State::ERROR, '保存库存失败！');
+                        }
+                        $locker->unlock();
+                    }
+
+                    if ($voucher) {
+                        $voucher->setUsedUserId($user->getId());
+                        $voucher->setUsedtime(time());
+                        if (!$voucher->save()) {
+                            return error(State::ERROR, '出货失败：使用取货码失败！');
+                        }
+                    }
+                }
+
+                //出货失败后，只记录错误，不回退数据
+                $order->setExtraData('pull.result', $res);
+
+                if (!$order->save()) {
+                    return error(State::ERROR, '无法保存订单数据！');
+                }
+
+                $device->save();
+
+                /**
+                 * 始终返回 true，是为了即使失败，仍然创建订单
+                 */
+                return is_error($res) ? true : $res;
             }
-
-            //出货失败后，只记录错误，不回退数据
-            $order->setExtraData('pull.result', $res);
-
-            if (!$order->save()) {
-                return error(State::ERROR, '无法保存订单数据！');
-            }
-
-            $device->save();
-            /**
-             * 始终返回 true，是为了即使失败，仍然创建订单
-             */
-            return is_error($res) ? true : $res;
-        });
+        );
 
         $device->goodsLog($level, $log_data);
 
@@ -2064,7 +2119,7 @@ HTML_CONTENT;
      */
     public static function transactionDo(callable $cb)
     {
-        $key = 'transaction:' . REQUEST_ID;
+        $key = 'transaction:'.REQUEST_ID;
 
         if (We7::cache_read($key)) {
             try {
@@ -2084,9 +2139,11 @@ HTML_CONTENT;
             } else {
                 We7::pdo_commit();
             }
+
             return $ret;
         } catch (Exception $e) {
             We7::pdo_rollback();
+
             return err($e->getMessage());
         } finally {
             We7::cache_delete($key);
@@ -2129,7 +2186,7 @@ HTML_CONTENT;
         $url = 'https://apis.map.qq.com/ws/coord/v1/translate?';
         $params = urlencode("locations=$lat,$lng&type=5&&key=$lbs_key");
 
-        $resp = ihttp::get($url . $params);
+        $resp = ihttp::get($url.$params);
 
         if (!is_error($resp)) {
             $res = json_decode($resp['content'], true);
@@ -2152,7 +2209,7 @@ HTML_CONTENT;
         $url = 'https://apis.map.qq.com/ws/geocoder/v1/?';
         $params = urlencode("location=$lat,$lng&key=$lbs_key&get_poi=0");
 
-        $resp = ihttp::get($url . $params);
+        $resp = ihttp::get($url.$params);
 
         if (!is_error($resp)) {
             $res = json_decode($resp['content'], true);
@@ -2239,8 +2296,12 @@ HTML_CONTENT;
      *
      * @return array
      */
-    public static function getRequireAccounts(deviceModelObj $device, userModelObj $user, accountModelObj $account, array $excepts = []): array
-    {
+    public static function getRequireAccounts(
+        deviceModelObj $device,
+        userModelObj $user,
+        accountModelObj $account,
+        array $excepts = []
+    ): array {
         $accounts = [];
 
         //获取多个关注公众号设置
@@ -2367,7 +2428,7 @@ HTML_CONTENT;
 
     public static function generateUID(): string
     {
-        return getmypid() . '-' . time() . '-' . Util::random(6, true);
+        return getmypid().'-'.time().'-'.Util::random(6, true);
     }
 
     /**
@@ -2393,7 +2454,7 @@ HTML_CONTENT;
             $arr[] = dechex(rand(0, 15));
         }
 
-        return '#' . implode('', $arr);
+        return '#'.implode('', $arr);
     }
 
     /**
@@ -2433,11 +2494,11 @@ HTML_CONTENT;
             $replacements[] = 'https://';
         }
 
-        $str[] = 'addons/' . APP_NAME . '/';
+        $str[] = 'addons/'.APP_NAME.'/';
         $str[] = 'payment/';
 
         if ($full_url) {
-            $url = _W('siteroot') . 'app/' . $url;
+            $url = _W('siteroot').'app/'.$url;
             $str[] = './';
         }
 
@@ -2447,6 +2508,7 @@ HTML_CONTENT;
     public static function shortMobileUrl(string $do, array $params = []): string
     {
         $url = Util::murl($do, $params);
+
         return self::shortUrl($url);
     }
 
@@ -2536,11 +2598,11 @@ HTML_CONTENT;
 
         if (!file_exists($filename)) {
             $tab_header = implode(",", $header);
-            $str_export = chr(0xEF) . chr(0xBB) . chr(0xBF) . $tab_header . "\r\n";
+            $str_export = chr(0xEF).chr(0xBB).chr(0xBF).$tab_header."\r\n";
         }
 
         foreach ($data as $row) {
-            $str_export .= implode(",", $row) . "\r\n";
+            $str_export .= implode(",", $row)."\r\n";
         }
 
         return file_put_contents($filename, $str_export, FILE_APPEND);
@@ -2556,12 +2618,12 @@ HTML_CONTENT;
     public static function exportExcel(string $filename = '', array $header = [], array $data = [])
     {
         header('Content-type:application/vnd.ms-excel');
-        header('Content-Disposition:filename=' . $filename . '.xls');
+        header('Content-Disposition:filename='.$filename.'.xls');
 
         $tab_header = implode(",", $header);
-        $str_export = chr(0xEF) . chr(0xBB) . chr(0xBF) . $tab_header . "\r\n";
+        $str_export = chr(0xEF).chr(0xBB).chr(0xBF).$tab_header."\r\n";
         foreach ($data as $row) {
-            $str_export .= implode(",", $row) . "\r\n";
+            $str_export .= implode(",", $row)."\r\n";
         }
 
         exit($str_export);
@@ -2592,6 +2654,7 @@ HTML_CONTENT;
     public static function getAgentFNs($enable = true): array
     {
         $val = $enable ? 1 : 0;
+
         return [
             'F_tj' => $val, //统计管理
             'F_xj' => $val, //下级管理
@@ -2616,6 +2679,7 @@ HTML_CONTENT;
         foreach ($FNs as $index => &$enable) {
             $enable = empty(request($index)) ? 0 : 1;
         }
+
         return $FNs;
     }
 
@@ -2650,6 +2714,7 @@ HTML_CONTENT;
         } elseif ($assign_data['all']) {
             return '已分配全部设备';
         }
+
         return '已指定部分设备';
     }
 
@@ -2699,7 +2764,7 @@ HTML_CONTENT;
 
         $secret = App::imageProxySecretKey();
         if ($secret) {
-            $signStr = ',s' . strtr(base64_encode(hash_hmac('sha256', $image_url, $secret, true)), '+/', '-_');
+            $signStr = ',s'.strtr(base64_encode(hash_hmac('sha256', $image_url, $secret, true)), '+/', '-_');
             $url = rtrim($url, '\\/');
         }
 
@@ -2722,6 +2787,7 @@ HTML_CONTENT;
                 return true;
             }
         }
+
         return false;
     }
 
@@ -2737,6 +2803,7 @@ HTML_CONTENT;
                 return true;
             }
         }
+
         return false;
     }
 
@@ -2795,8 +2862,13 @@ HTML_CONTENT;
      * @param array $params
      * @return array
      */
-    public static function post(string $url, array $data = [], bool $json = true, int $timeout = 3, array $params = []): array
-    {
+    public static function post(
+        string $url,
+        array $data = [],
+        bool $json = true,
+        int $timeout = 3,
+        array $params = []
+    ): array {
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -2814,7 +2886,7 @@ HTML_CONTENT;
             $json_str = json_encode($data, JSON_UNESCAPED_UNICODE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $json_str);
             $headers[] = 'Content-Type: application/json';
-            $headers[] = 'Content-Length: ' . strlen($json_str);
+            $headers[] = 'Content-Length: '.strlen($json_str);
         } else {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         }
@@ -2913,6 +2985,7 @@ HTML_CONTENT;
     public static function isSysLoadAverageOk(): bool
     {
         $load = sys_getloadavg();
+
         return $load === false || $load[0] < SYS_MAX_LOAD_AVERAGE_VALUE;
     }
 

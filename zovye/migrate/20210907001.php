@@ -4,7 +4,7 @@ namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_counter')) {
+if (!We7::pdo_tableexists($tb_name.'_counter')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_counter` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 

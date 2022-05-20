@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\Goods;
@@ -19,33 +20,34 @@ class inventory_goodsModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-		if ($readOrWrite == self::OP_READ) {
+        if ($readOrWrite == self::OP_READ) {
             return tb('inventory_goods_vw');
         }
 
-		return tb('inventory_goods');
+        return tb('inventory_goods');
     }
-    
-	/** @var int */
-	protected $id;
 
-	/** @var int */
-	protected $inventory_id;
+    /** @var int */
+    protected $id;
 
-	/** @var int */
-	protected $goods_id;
+    /** @var int */
+    protected $inventory_id;
 
-	/** @var int */
-	protected $num;
+    /** @var int */
+    protected $goods_id;
 
-	protected $extra;
+    /** @var int */
+    protected $num;
 
-	/** @var int */
-	protected $createtime;
+    protected $extra;
 
-	use ExtraDataGettersAndSetters;
+    /** @var int */
+    protected $createtime;
 
-	public function getGoods(): ?goodsModelObj {
-		return Goods::get($this->goods_id);
-	}
+    use ExtraDataGettersAndSetters;
+
+    public function getGoods(): ?goodsModelObj
+    {
+        return Goods::get($this->goods_id);
+    }
 }

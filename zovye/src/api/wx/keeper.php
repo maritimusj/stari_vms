@@ -112,7 +112,7 @@ class keeper
             }
 
             if ($keeper_data) {
-                $token = sha1(time() . "$mobile$session_key");
+                $token = sha1(time()."$mobile$session_key");
                 $data = [
                     'src' => LoginData::KEEPER,
                     'user_id' => 0,
@@ -136,6 +136,7 @@ class keeper
                     if ($agreement && $agreement['enabled']) {
                         $result['agreement'] = $agreement['content'];
                     }
+
                     return $result;
                 }
             }
@@ -390,6 +391,7 @@ class keeper
                     $percent = max(0, min(100, intval($commission)));
                     $set_commission = function (&$data) use ($percent) {
                         $data['percent'] = $percent;
+
                         return $data;
                     };
                 } else {
@@ -397,6 +399,7 @@ class keeper
                     $fixed = max(0, intval($commission));
                     $set_commission = function (&$data) use ($fixed) {
                         $data['fixed'] = $fixed;
+
                         return $data;
                     };
                 }
@@ -566,19 +569,30 @@ class keeper
         }
 
         $result['stats']['today'] = (int)m('replenish')->where(
-            We7::uniacid(['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp()])
+            We7::uniacid(
+                ['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('00:00'))->getTimestamp()]
+            )
         )->get('sum(num)');
 
         $result['stats']['this_month'] = (int)m('replenish')->where(
-            We7::uniacid(['keeper_id' => $keeper->getId(), 'createtime >=' => (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp()])
+            We7::uniacid(
+                [
+                    'keeper_id' => $keeper->getId(),
+                    'createtime >=' => (new DateTimeImmutable('first day of this month 00:00'))->getTimestamp(),
+                ]
+            )
         )->get('sum(num)');
 
         $result['stats']['all'] = (int)m('replenish')->where(We7::uniacid(['keeper_id' => $keeper->getId()]))->get(
             'sum(num)'
         );
 
-        $lowQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]);
-        $errorQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(['agent_id' => $keeper->getAgentId(), 'error_code <>' => 0]);
+        $lowQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
+            ['agent_id' => $keeper->getAgentId(), 'remain <' => $remainWarning]
+        );
+        $errorQuery = Device::keeper($keeper, \zovye\Keeper::OP)->where(
+            ['agent_id' => $keeper->getAgentId(), 'error_code <>' => 0]
+        );
         $result['devices']['low'] = $lowQuery->count();
         $result['devices']['error'] = $errorQuery->count();
 
@@ -849,6 +863,7 @@ class keeper
                 $commission_price_calc = function ($num, $goods_id) use ($v) {
                     $goods = Goods::get($goods_id);
                     $price = $goods ? $goods->getPrice() : 0;
+
                     return intval(round($num * $price * $v / 100));
                 };
             } else {
@@ -877,7 +892,11 @@ class keeper
                 if ($r1 && $r1->update([], true)) {
                     $keeperUser = $keeper->getUser();
                     if (!empty($keeperUser)) {
-                        $r2 = $keeperUser->commission_change($total, CommissionBalance::RELOAD_IN, ['device' => $device->getId()]);
+                        $r2 = $keeperUser->commission_change(
+                            $total,
+                            CommissionBalance::RELOAD_IN,
+                            ['device' => $device->getId()]
+                        );
                         if ($r2 && $r2->update([], true)) {
                             return true;
                         }
@@ -885,22 +904,23 @@ class keeper
                 }
                 throw new Exception('创建佣金失败！');
             }
+
             return true;
         };
- 
+
         if (request::isset('lane')) {
             $lane = request::int('lane');
             $num = request::int('num');
 
             if ($num != 0 && !$agent->allowReductGoodsNum()) {
-               $laneData = $device->getLane($lane);
-               if ($laneData && $num < $laneData['num']) {
+                $laneData = $device->getLane($lane);
+                if ($laneData && $num < $laneData['num']) {
                     return err('不允许减少商品库存！');
-               }
+                }
             }
 
             $data = [
-                $lane => $num != 0 ? '@' . $num : 0,
+                $lane => $num != 0 ? '@'.$num : 0,
             ];
         } else {
             $data = [];
@@ -945,9 +965,10 @@ class keeper
             $err = $create_commission_fn($total);
             if (is_error($err)) {
                 Log::error('keeper', [
-                    'error' => '创建营运人员补货佣金失败:' . $err['message'],
+                    'error' => '创建营运人员补货佣金失败:'.$err['message'],
                     'total' => $total,
                 ]);
+
                 return $err;
             }
         }
@@ -1012,6 +1033,7 @@ class keeper
                 ];
             }
         }
+
         return $resp;
     }
 
@@ -1104,11 +1126,11 @@ class keeper
                 $title = $day->format('m-d');
 
                 $cond = We7::uniacid([
-                        'keeper_id' => $keeper->getId(),
-                        'agent_id' => $keeper->getAgentId(),
-                        'createtime >=' => $ts_start,
-                        'createtime <' => $ts_end,
-                    ]);
+                    'keeper_id' => $keeper->getId(),
+                    'agent_id' => $keeper->getAgentId(),
+                    'createtime >=' => $ts_start,
+                    'createtime <' => $ts_end,
+                ]);
 
                 if (m('replenish')->where($cond)->count() > 0) {
                     $total = (int)m('replenish')->where($cond)->get('sum(num)');

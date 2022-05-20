@@ -102,7 +102,7 @@ if ($op === 'create') {
     ]);
 
     if (is_error($data)) {
-        JSON::fail('创建支付失败: ' . $data['message']);
+        JSON::fail('创建支付失败: '.$data['message']);
     }
 
     //加入一个支付结果检查
@@ -210,7 +210,7 @@ if ($op === 'create') {
                     'num' => $order->getNum(),
                     'createtime_formatted' => date('Y-m-d H:i:s', $order->getCreatetime()),
                 ];
-                $response['user'] = $user->profile();                
+                $response['user'] = $user->profile();
             }
         }
         JSON::success($response);
@@ -223,7 +223,7 @@ if ($op === 'create') {
     /** @var pay_logsModelObj $pay_log */
     $pay_log = Pay::getPayLog($order_no);
     if (empty($pay_log)) {
-        JSON::fail(['code' => 400, 'msg' => "找不到支付信息！" . $order_no]);
+        JSON::fail(['code' => 400, 'msg' => "找不到支付信息！".$order_no]);
     }
 
     $url = '';
@@ -232,7 +232,7 @@ if ($op === 'create') {
         $device = Device::get($device_id);
         if ($device) {
             $url = $device->getRedirectUrl('fail')['url'];
-        }      
+        }
     }
 
     //已取消
@@ -326,12 +326,11 @@ if ($op === 'create') {
         JSON::fail('找不到用户！');
     }
 
-    $role_title = '';
     if ($user->isAgent()) {
         $role_title = '代理商';
     } elseif ($user->isPartner()) {
         $role_title = '合伙人';
-    } elseif($user->isKeeper()) {
+    } elseif ($user->isKeeper()) {
         $role_title = '运营人员';
     } elseif ($user->isGSPor()) {
         $role_title = '佣金用户';

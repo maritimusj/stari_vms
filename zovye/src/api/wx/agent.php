@@ -129,7 +129,7 @@ class agent
                 $entry->destroy();
             }
 
-            $token = sha1(time() . "$mobile$session_key");
+            $token = sha1(time()."$mobile$session_key");
             $data = [
                 'src' => LoginData::AGENT,
                 'user_id' => $user->getId(),
@@ -216,7 +216,7 @@ class agent
         ];
 
         //是否为微信审核模式
-        $data = include ZOVYE_ROOT . DIRECTORY_SEPARATOR . 'debug.php';
+        $data = include ZOVYE_ROOT.DIRECTORY_SEPARATOR.'debug.php';
         if ($data) {
             $result['debug'] = intval($data['debug']);
         }
@@ -256,6 +256,7 @@ class agent
         if ($agreement['enabled']) {
             $result['agreement'] = $agreement['content'];
         }
+
         return $result;
     }
 
@@ -286,6 +287,7 @@ class agent
         $app = m('agent_app')->create($data);
         if ($app) {
             Job::agentApplyNotice($app->getId());
+
             return ['msg' => '提交成功，请耐心等待管理员审核！'];
         }
 
@@ -608,7 +610,7 @@ class agent
             $cargo_lanes = [];
             foreach ($type_data['cargo_lanes'] as $index => $lane) {
                 $cargo_lanes[$index] = [
-                    'num' => '@' . max(0, intval($num[$index])),
+                    'num' => '@'.max(0, intval($num[$index])),
                 ];
                 if ($device_type->getDeviceId() == $device->getId()) {
                     $cargo_lanes[$index]['price'] = intval($prices[$index]);
@@ -831,6 +833,7 @@ class agent
                 ];
             }
         }
+
         return $resp;
     }
 
@@ -862,7 +865,7 @@ class agent
         if (request::isset('lane')) {
             $num = request::int('num');
             $data = [
-                request::int('lane') => $num > 0 ? '@' . $num : 0,
+                request::int('lane') => $num > 0 ? '@'.$num : 0,
             ];
         } else {
             $data = [];
@@ -977,7 +980,10 @@ class agent
         if ($total > 0) {
             /** @var deviceModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
-                $address = $entry->settings('extra.location.tencent.address', $entry->settings('extra.location.address')) ?: '<地址未登记>';
+                $address = $entry->settings(
+                    'extra.location.tencent.address',
+                    $entry->settings('extra.location.address')
+                ) ?: '<地址未登记>';
                 $result['list'][] = [
                     'id' => $entry->getImei(),
                     'name' => $entry->getName(),
@@ -1026,7 +1032,10 @@ class agent
         if ($total > 0) {
             /** @var deviceModelObj $entry */
             foreach ($query->page($page, $page_size)->findAll() as $entry) {
-                $address = $entry->settings('extra.location.tencent.address', $entry->settings('extra.location.address')) ?: '<地址未登记>';
+                $address = $entry->settings(
+                    'extra.location.tencent.address',
+                    $entry->settings('extra.location.address')
+                ) ?: '<地址未登记>';
                 $last_error = $entry->getLastError();
                 $result['list'][] = [
                     'id' => $entry->getImei(),
@@ -1062,7 +1071,7 @@ class agent
 
         $num = request::int('num');
 
-        $res = Order::refund($order->getOrderNO(), $num, ['message' => '代理商：' . $agent->getName()]);
+        $res = Order::refund($order->getOrderNO(), $num, ['message' => '代理商：'.$agent->getName()]);
         if (is_error($res)) {
             return error(State::ERROR, $res['message']);
         }
@@ -1267,7 +1276,7 @@ class agent
             'total' => $total,
             'sup_guid' => "$superior_guid",
             'list' => [],
-            'remove' => (bool)$user->settings('agentData.misc.power')
+            'remove' => (bool)$user->settings('agentData.misc.power'),
         ];
 
         if ($total > 0) {
@@ -1343,7 +1352,7 @@ class agent
             if ($user) {
                 $data[] = [
                     'id' => $user->getId(),
-                    'name' => $item->getName()
+                    'name' => $item->getName(),
                 ];
             }
         }
@@ -1365,18 +1374,18 @@ class agent
                 }
             }
         }
-        $user_res = User::query()->where('id IN (' . implode(',', $s_arr) . ')')->findAll();
+        $user_res = User::query()->where('id IN ('.implode(',', $s_arr).')')->findAll();
         /** @var userModelObj $item */
         foreach ($user_res as $item) {
             $data[] = [
                 'id' => $item->getId(),
-                'name' => $item->getNickname()
+                'name' => $item->getNickname(),
             ];
         }
 
         $data[] = [
             'id' => $agent->getId(),
-            'name' => $agent->getName()
+            'name' => $agent->getName(),
         ];
 
         return ['data' => $data];
@@ -1419,7 +1428,11 @@ class agent
             }
 
             if (empty($w) || $w == 'month') {
-                $result[empty($w) ? 'month' : 'w'] = self::getAgentStat($agent, $this_month_first_st, $next_month_first_st);
+                $result[empty($w) ? 'month' : 'w'] = self::getAgentStat(
+                    $agent,
+                    $this_month_first_st,
+                    $next_month_first_st
+                );
             }
 
             return $result;
@@ -1443,6 +1456,7 @@ class agent
                             if ($user) {
                                 return \zovye\Agent::remove($user);
                             }
+
                             return err('找不到个代理商！');
                         }
                     );
@@ -1451,10 +1465,13 @@ class agent
                         return ['message' => '已取消用户代理身份！'];
                     }
                 }
+
                 return error(State::ERROR, empty($res['message']) ? '操作失败！' : $res['message']);
             }
+
             return error(State::ERROR, '没有操作权限！');
         }
+
         return error(State::ERROR, '只有代理商才能保存运营人员信息！');
     }
 
@@ -1473,13 +1490,13 @@ class agent
                 $query = \zovye\Agent::query();
                 $keyword = request::trim('keyword');
 
-                $query->where('id IN(' . implode(',', $agent_ids) . ')');
+                $query->where('id IN('.implode(',', $agent_ids).')');
 
                 $total = $query->count();
                 $result = [
                     'total' => $total,
                     'list' => [],
-                    'remove' => (bool)$agent->settings('agentData.misc.power')
+                    'remove' => (bool)$agent->settings('agentData.misc.power'),
                 ];
 
                 if ($total > 0) {
@@ -1509,7 +1526,10 @@ class agent
                                 'name' => $agent->getName(),
                                 'avatar' => $agent->getAvatar(),
                                 'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
-                                'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
+                                'address' => is_array($agent_data['area']) ? implode(
+                                    '-',
+                                    array_values($agent_data['area'])
+                                ) : '',
                                 'level' => $agent_levels[$agent_data['level']],
                                 'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
                                 'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
@@ -1528,8 +1548,10 @@ class agent
                     }
                 }
             }
+
             return $result;
         }
+
         return error(State::ERROR, '获取列表失败！');
     }
 
@@ -1589,10 +1611,14 @@ class agent
                     CommissionBalance::BONUS,
                 ],
                 'createtime >=' => $s_ts,
-                'createtime <' => $e_ts
+                'createtime <' => $e_ts,
             ])->get('sum(x_val)');
 
-            return ['price_all' => intval($priceTotal), 'order' => intval($orderTotal), 'comm' => intval($commissionTotal)];
+            return [
+                'price_all' => intval($priceTotal),
+                'order' => intval($orderTotal),
+                'comm' => intval($commissionTotal),
+            ];
         }, $agent->getId(), $s_ts, $e_ts);
     }
 
@@ -1602,6 +1628,7 @@ class agent
             'op' => 'login_scan',
             'uniq' => Util::random(32),
         ]);
+
         return [
             'data' => $url,
         ];
@@ -1649,7 +1676,7 @@ class agent
             $entry->destroy();
         }
 
-        $token = sha1(time() . "$mobile$session_key");
+        $token = sha1(time()."$mobile$session_key");
 
         $data = [
             'src' => LoginData::AGENT_WEB,
@@ -1691,7 +1718,7 @@ class agent
             'token' => $res->getToken(),
             'id' => $user->getId(),
             'nickname' => $user->getNickname(),
-            'avatar' => $user->getAvatar()
+            'avatar' => $user->getAvatar(),
         ];
     }
 
@@ -1733,6 +1760,7 @@ class agent
                 if ($a == $b) {
                     return 0;
                 }
+
                 return ($a < $b) ? -1 : 1;
             });
 
@@ -1756,6 +1784,7 @@ class agent
         if (isset($user_qrcode['ali'])) {
             $user_qrcode['ali'] = Util::toMedia($user_qrcode['ali']);
         }
+
         return (array)$user_qrcode;
     }
 
@@ -1803,6 +1832,7 @@ class agent
 
         try {
             $result = $aop->execute($request);
+
             return json_encode($result);
         } catch (Exception $e) {
             return ['msg' => $e->getMessage()];
@@ -1814,13 +1844,13 @@ class agent
         $user = common::getAgent();
         $agent_id = $user->getAgentId();
         if (request::has('start')) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
         } else {
             $s_date = new DateTime('first day of this month 00:00:00');
         }
 
         if (request::has('end')) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end').' 00:00:00');
             $e_date->modify('next day');
         } else {
             $e_date = new DateTime('first day of next month 00:00:00');
@@ -1922,7 +1952,7 @@ class agent
                 $format_data[] = $v;
             }
 
-            $devices = Util::cachedCall(300, function () use($agent_id) {
+            $devices = Util::cachedCall(300, function () use ($agent_id) {
                 $devices = [];
                 $query = Device::query(['agent_id' => $agent_id]);
                 /** @var deviceModelObj $device */
@@ -1933,6 +1963,7 @@ class agent
                         'imei' => $device->getImei(),
                     ];
                 }
+
                 return $devices;
             });
 
@@ -1961,7 +1992,9 @@ class agent
             $time_less_15 = new DateTime('-15 min');
             $power_time = $time_less_15->getTimestamp();
             $device_stat['all'] = Device::query($condition)->count();
-            $device_stat['on'] = Device::query($condition)->where('last_ping IS NOT NULL AND last_ping > ' . $power_time)->count();
+            $device_stat['on'] = Device::query($condition)->where(
+                'last_ping IS NOT NULL AND last_ping > '.$power_time
+            )->count();
             $device_stat['off'] = $device_stat['all'] - $device_stat['on'];
 
             $data['all']['n'] = 0;
@@ -1982,6 +2015,7 @@ class agent
                 if ($end) {
                     $cond['createtime <'] = $end->getTimestamp();
                 }
+
                 return Order::query($cond)->count();
             };
 
@@ -2055,18 +2089,20 @@ class agent
 
         if (is_error($repairData['error'])) {
             $cleanFN();
+
             return $repairData['error'];
         }
 
         if ($repairData['status'] == 'finished') {
             $cleanFN();
+
             return ['state' => '', 'msg' => '刷新已完成！'];
         }
 
         if ($repairData['status'] == 'busy') {
             return [
                 'state' => 'busy',
-                'msg' => '正在刷新缓存中，请稍等！'
+                'msg' => '正在刷新缓存中，请稍等！',
             ];
         }
 
@@ -2075,6 +2111,7 @@ class agent
                 'status' => 'busy',
             ]);
             $agent->save();
+
             return ['state' => 'busy', 'msg' => '已启动后台刷新任务，请耐心等待完成！'];
         }
 

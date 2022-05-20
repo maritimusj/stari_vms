@@ -20,7 +20,7 @@ class Statistics
         $date = null;
         try {
             if (is_int($month)) {
-                $date = new DateTime('@' . $month);
+                $date = new DateTime('@'.$month);
             } elseif (is_string($month)) {
                 $date = new DateTime($month);
             } elseif ($month instanceof DateTimeInterface) {
@@ -30,6 +30,7 @@ class Statistics
             return null;
         }
         $date->modify('first day of this month 00:00');
+
         return $date;
     }
 
@@ -43,7 +44,7 @@ class Statistics
     {
         $condition = [
             'createtime >=' => $begin->getTimestamp(),
-            'createtime <' => $end->getTimestamp()
+            'createtime <' => $end->getTimestamp(),
         ];
 
         if ($obj instanceof deviceModelObj) {
@@ -141,7 +142,7 @@ class Statistics
                     'total' => 0,
                 ],
             ],
-            'list' => []
+            'list' => [],
         ];
 
         $date = self::parseMonth($year);
@@ -221,7 +222,7 @@ class Statistics
                             CommissionBalance::BONUS,
                         ],
                         'createtime >=' => $begin->getTimestamp(),
-                        'createtime <' => $end->getTimestamp()
+                        'createtime <' => $end->getTimestamp(),
                     ])->get('sum(x_val)');
                 }, get_class($obj), $obj->getId(), $begin->getTimestamp(), $end->getTimestamp());
 

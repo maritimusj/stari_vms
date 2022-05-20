@@ -98,6 +98,7 @@ class orderModelObj extends modelObj
         if ($obj) {
             return Account::findOneFromName($this->account);
         }
+
         return $this->account;
     }
 
@@ -109,8 +110,10 @@ class orderModelObj extends modelObj
         if ($this->getSrc() == Order::BALANCE) {
             return App::isBalanceEnabled() && Balance::isFreeOrder();
         }
+
         return false;
     }
+
     /**
      * @return deviceModelObj
      */
@@ -123,6 +126,7 @@ class orderModelObj extends modelObj
         if ($device_id) {
             return Device::get($device_id);
         }
+
         return null;
     }
 
@@ -135,6 +139,7 @@ class orderModelObj extends modelObj
         if ($agent_id) {
             return Agent::get($agent_id);
         }
+
         return null;
     }
 
@@ -143,14 +148,14 @@ class orderModelObj extends modelObj
         return User::get($this->openid, true);
     }
 
-    public function isPackage(): bool 
+    public function isPackage(): bool
     {
         return $this->getPackageId() > 0;
     }
 
     public function getPackageId(): int
     {
-        return intval($this->getExtraData('package.id')); 
+        return intval($this->getExtraData('package.id'));
     }
 
     public function getGoods(): ?goodsModelObj
@@ -202,6 +207,7 @@ class orderModelObj extends modelObj
     public function isBluetoothResultFail(): bool
     {
         $code = $this->getExtraData('bluetooth.result', 0);
+
         return $code === 2 || ($code === 0 && time() - $this->getCreatetime() > App::deviceWaitTimeout());
     }
 
@@ -216,6 +222,7 @@ class orderModelObj extends modelObj
         } else {
             $pull_result = $this->getExtraData('pull.result');
         }
+
         return !empty($pull_result) && !is_error($pull_result);
     }
 

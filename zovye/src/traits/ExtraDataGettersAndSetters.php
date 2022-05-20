@@ -25,6 +25,7 @@ trait ExtraDataGettersAndSetters
     public static function serializeExtra($data): string
     {
         $res = json_encode($data);
+
         return $res === false ? '' : $res;
     }
 

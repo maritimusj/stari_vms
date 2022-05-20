@@ -96,11 +96,11 @@ class mp
         $user = common::getAgent();
 
         if ($more) {
-            $data['img_signatured'] = sha1(App::uid() . CLIENT_IP . $account->getImg()) . '@' . $account->getImg();
+            $data['img_signatured'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
             if ($account->isVideo()) {
-                $data['media_signatured'] = sha1(App::uid() . CLIENT_IP . $account->getQrcode()) . '@' . $account->getMedia();
+                $data['media_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getMedia();
             } else {
-                $data['qrcode_signatured'] = sha1(App::uid() . CLIENT_IP . $account->getQrcode()) . '@' . $account->getQrcode();
+                $data['qrcode_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getQrcode();
             }
 
             $data['assigned'] = [];
@@ -213,10 +213,11 @@ class mp
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
                     Log::error('doPageMpupload', $e->getMessage());
+
                     return error(State::ERROR, $e->getMessage());
                 }
 
-                $x = sha1(App::uid() . CLIENT_IP . $filename);
+                $x = sha1(App::uid().CLIENT_IP.$filename);
 
                 return ['file' => "$x@$filename", 'fullpath' => Util::toMedia($filename)];
             }
@@ -379,13 +380,13 @@ class mp
         if (request::has('qrcode')) {
             $type = Account::NORMAL;
             list($sha1val, $url) = explode('@', request::str('qrcode'), 2);
-            if (empty($sha1val) || empty($url) || sha1(App::uid() . CLIENT_IP . $url) != $sha1val) {
+            if (empty($sha1val) || empty($url) || sha1(App::uid().CLIENT_IP.$url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的二维码文件！');
             }
         } elseif (request::has('media')) {
             $type = Account::VIDEO;
             list($sha1val, $url) = explode('@', request::str('media'), 2);
-            if (empty($sha1val) || empty($url) || sha1(App::uid() . CLIENT_IP . $url) != $sha1val) {
+            if (empty($sha1val) || empty($url) || sha1(App::uid().CLIENT_IP.$url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的视频文件！');
             }
         } elseif (request::has('douyinUrl')) {
@@ -397,7 +398,7 @@ class mp
         }
 
         list($sha1val, $img_url) = explode('@', request::str('img'), 2);
-        if (empty($sha1val) || empty($img_url) || sha1(App::uid() . CLIENT_IP . $img_url) != $sha1val) {
+        if (empty($sha1val) || empty($img_url) || sha1(App::uid().CLIENT_IP.$img_url) != $sha1val) {
             return error(State::ERROR, '请上传正确的头像文件！');
         }
 
@@ -438,9 +439,9 @@ class mp
 
         if (isset($account)) {
             foreach ($data as $key => $val) {
-                $key_name = 'get' . ucfirst(toCamelCase($key));
+                $key_name = 'get'.ucfirst(toCamelCase($key));
                 if ($val != $account->$key_name()) {
-                    $set_name = 'set' . ucfirst(toCamelCase($key));
+                    $set_name = 'set'.ucfirst(toCamelCase($key));
                     $account->$set_name($val);
                 }
             }
@@ -485,7 +486,7 @@ class mp
                     'type' => Account::VIDEO,
                     'video' => [
                         'duration' => request::int('duration', 1),
-                    ]
+                    ],
                 ]);
             } elseif ($account->isDouyin()) {
                 $openid = $account->settings('config.openid', '');
@@ -502,6 +503,7 @@ class mp
                     'delay' => request::int('delay', 1),
                 ]);
             }
+
             return ['msg' => '保存成功！'];
         }
 

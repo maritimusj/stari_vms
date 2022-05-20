@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -16,22 +17,22 @@ class account_logsModelObj extends modelObj
     {
         return tb('account_logs');
     }
-    
-	protected $id;
 
-	protected $uniacid;
+    protected $id;
 
-	protected $level;
+    protected $uniacid;
 
-	protected $title;
+    protected $level;
 
-	protected $data;
+    protected $title;
 
-	protected $createtime;
+    protected $data;
 
-	use DataGetterAndSetter;
+    protected $createtime;
 
-	function getRawData()
+    use DataGetterAndSetter;
+
+    function getRawData()
     {
         return parent::getData();
     }

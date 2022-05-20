@@ -123,7 +123,11 @@ class Device extends State
     public static function cleanAllErrorCode(): bool
     {
         $tb_name = We7::tablename(m('device')->getTableName());
-        $res = We7::pdo_query('update ' . $tb_name . ' SET error_code=0 WHERE uniacid=:uniacid', [':uniacid' => We7::uniacid()]);
+        $res = We7::pdo_query(
+            'update '.$tb_name.' SET error_code=0 WHERE uniacid=:uniacid',
+            [':uniacid' => We7::uniacid()]
+        );
+
         return !is_error($res) && $res !== false;
     }
 
@@ -131,12 +135,13 @@ class Device extends State
     {
         $tb_name = m('device')->getTableName();
         $res = We7::pdo_query(
-            'UPDATE ' . We7::tablename($tb_name) . ' SET `device_type`=:unknown WHERE `device_type`=:type',
+            'UPDATE '.We7::tablename($tb_name).' SET `device_type`=:unknown WHERE `device_type`=:type',
             [
                 ':type' => $type_id,
                 ':unknown' => DeviceTypes::UNKNOWN_TYPE,
             ]
         );
+
         return !is_error($res) && $res !== false;
     }
 
@@ -267,8 +272,10 @@ class Device extends State
                     if (empty($result['num'])) {
                         return true;
                     }
+
                     return $lane['num'] < $result['num'];
                 }
+
                 return false;
             };
         }
@@ -288,12 +295,13 @@ class Device extends State
                 $result['cargo_lane'] = $index;
                 if ($device->isCustomType() && isset($lane['goods_price'])) {
                     $result['price'] = $lane['goods_price'];
-                    $result['price_formatted'] = '¥' . number_format($result['price'] / 100, 2) . '元';
+                    $result['price_formatted'] = '¥'.number_format($result['price'] / 100, 2).'元';
                 }
             }
         }
 
         $result['num'] = $total;
+
         return $result;
     }
 
@@ -324,7 +332,7 @@ class Device extends State
                     $lane['num'] = intval($lanes_data[$laneId]['num']);
                     if ($device->isCustomType() && isset($lanes_data[$laneId]['price'])) {
                         $lane['goods_price'] = $lanes_data[$laneId]['price'];
-                        $lane['goods_price_formatted'] = '¥' . number_format($lane['goods_price'] / 100, 2) . '元';
+                        $lane['goods_price_formatted'] = '¥'.number_format($lane['goods_price'] / 100, 2).'元';
                     }
                 }
                 if ($device->isBlueToothDevice()) {
@@ -387,13 +395,13 @@ class Device extends State
                     $device->updateQrcode(true);
 
                     $extra = [];
-                    
+
                     if (App::isDeviceWithDoorEnabled()) {
                         $extra['door'] = [
                             'num' => 1,
                         ];
                     }
-                   
+
                     $device->set('extra', $extra);
 
                     $data['params'] = $params;
@@ -452,6 +460,7 @@ class Device extends State
             }
             if ($device) {
                 self::cache($device);
+
                 return $device;
             }
         }
@@ -475,6 +484,7 @@ class Device extends State
             $device = self::findOne(['app_id' => strval($id)]);
             if ($device) {
                 self::cache($device);
+
                 return $device;
             }
         }
@@ -517,8 +527,8 @@ class Device extends State
         $deviceClassname = m('device')->objClassname();
 
         $device = new $deviceClassname(0, m('device'));
-        $device->setImei(self::DUMMY_DEVICE_PREFIX . Util::random(16, true));
-        
+        $device->setImei(self::DUMMY_DEVICE_PREFIX.Util::random(16, true));
+
         return $device;
     }
 
@@ -702,6 +712,7 @@ class Device extends State
 
         if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
             $device->appNotify('update');
+
             return true;
         }
 
@@ -755,6 +766,7 @@ class Device extends State
         if (isset($titles[$type])) {
             return $titles[$type];
         }
+
         return '未知';
     }
 
@@ -915,7 +927,7 @@ class Device extends State
             if ($sort_by && $sort_dir) {
                 $query->orderBy("$sort_by $sort_dir");
             }
-            
+
             /** @var deviceModelObj $entry */
             foreach ($query->findAll() as $entry) {
                 $data = [

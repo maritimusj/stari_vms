@@ -30,9 +30,11 @@ class WxApp
             if ($wx_app) {
                 $cache[$wx_app->getId()] = $wx_app;
                 $cache[$wx_app->getKey()] = $wx_app;
+
                 return $wx_app;
-            }            
+            }
         }
+
         return null;
     }
 

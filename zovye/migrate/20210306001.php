@@ -1,4 +1,5 @@
 <?php
+
 namespace zovye;
 
 use zovye\model\agentModelObj;
@@ -6,7 +7,7 @@ use zovye\We7;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . '_gsp_user')) {
+if (!We7::pdo_tableexists($tb_name.'_gsp_user')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_gsp_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -37,7 +38,7 @@ SQL;
                 $data['level3'] = intval(floatval($data['level3']) * 100);
                 $agent->updateSettings('agentData.gsp.rel', $data);
             }
-        } elseif ($mode== GSP::FREE) {
+        } elseif ($mode == GSP::FREE) {
             $gsp_users = $agent->settings('agentData.gsp.users', []);
             foreach ($gsp_users as $openid => &$data) {
                 $data['percent'] = intval(floatval($data['percent']) * 100);

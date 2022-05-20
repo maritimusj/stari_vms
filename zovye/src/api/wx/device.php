@@ -46,8 +46,13 @@ class device
      *
      * @return array
      */
-    public static function formatDeviceInfo(userModelObj $user, deviceModelObj $device, bool $simple = false, int $keeper_id = 0, bool $online = false): array
-    {
+    public static function formatDeviceInfo(
+        userModelObj $user,
+        deviceModelObj $device,
+        bool $simple = false,
+        int $keeper_id = 0,
+        bool $online = false
+    ): array {
         unset($user);
 
         $extra = $device->get('extra', []);
@@ -136,6 +141,7 @@ class device
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
                 $lane['goods_price'] = intval($lane['goods_price']);
+
                 return $lane;
             }, $payload['cargo_lanes']);
         } else {
@@ -306,12 +312,12 @@ class device
                 $agent = $device->getAgent();
                 if ($agent && !$agent->allowReductGoodsNum()) {
                     if ($num < $laneData['num']) {
-                         return err('不允许减少商品库存！');
+                        return err('不允许减少商品库存！');
                     }
-                 }
+                }
             }
 
-            $res = $device->resetPayload([$lane => '@' . $num], $reason);
+            $res = $device->resetPayload([$lane => '@'.$num], $reason);
             if (is_error($res)) {
                 return error(State::ERROR, '保存库存失败！');
             }
@@ -546,7 +552,9 @@ class device
             $result['low'] = $low_query->count();
             $result['error'] = $error_query->count();
 
-            $result['msg'] = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $agent->getId(), 'updatetime' => 0])) ? 1 : 0; //是否有未读消息
+            $result['msg'] = m('agent_msg')->findOne(
+                We7::uniacid(['agent_id' => $agent->getId(), 'updatetime' => 0])
+            ) ? 1 : 0; //是否有未读消息
 
             //今日出货
             $data = Stats::getDayTotal($agent);
@@ -605,6 +613,7 @@ class device
                     'online' => $device->isAppOnline(),
                 ];
             }
+
             return $result;
         }
 
@@ -674,12 +683,17 @@ class device
         ];
 
         if ($total > 0) {
-            if (request::has('orderby') && in_array(strtolower(request::str('orderby')), ['id', 'name', 'sig', 'createtime'])) {
+            if (request::has('orderby') && in_array(
+                    strtolower(request::str('orderby')),
+                    ['id', 'name', 'sig', 'createtime']
+                )) {
                 $order_by = strtolower(request::str('orderby'));
                 if ($order_by == 'id') {
                     $order_by = 'imei';
                 }
-                $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(request::str('order')) : 'ASC';
+                $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(
+                    request::str('order')
+                ) : 'ASC';
                 $query->orderBy("$order_by $order");
             } else {
                 $query->orderBy('rank DESC, id DESC');
@@ -718,12 +732,14 @@ class device
                 if ($online_status) {
                     if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
                         $data['status']['online'] = true;
-                    } else if (App::isVDeviceSupported() && $device->isVDevice()) {
-                        $data['status']['online'] = true;
                     } else {
-                        $data['status']['online'] = (bool)$online_status[$device->getImei()];
-                        if ($device->getAppId()) {
-                            $data['app']['online'] = (bool)$online_status[$device->getAppId()];
+                        if (App::isVDeviceSupported() && $device->isVDevice()) {
+                            $data['status']['online'] = true;
+                        } else {
+                            $data['status']['online'] = (bool)$online_status[$device->getImei()];
+                            if ($device->getAppId()) {
+                                $data['app']['online'] = (bool)$online_status[$device->getAppId()];
+                            }
                         }
                     }
                 }
@@ -736,6 +752,7 @@ class device
                 $result['list'][] = $data;
             }
         }
+
         return $result;
     }
 
@@ -877,12 +894,13 @@ class device
             $data = [
                 'id' => $res->getId(),
                 'name' => $res->getName(),
-                'mobile' => ''
+                'mobile' => '',
             ];
             $agent = $res->getAgent();
             if ($agent) {
                 $data['mobile'] = $agent->getMobile();
             }
+
             return ['data' => $data];
         } else {
             return error(State::ERROR, '没有数据！');
@@ -933,12 +951,17 @@ class device
             $result['total'] = $total;
             $result['totalpage'] = ceil($total / $page_size);
 
-            if (request::has('orderby') && in_array(strtolower(request::str('orderby')), ['id', 'name', 'sig', 'createtime'])) {
+            if (request::has('orderby') && in_array(
+                    strtolower(request::str('orderby')),
+                    ['id', 'name', 'sig', 'createtime']
+                )) {
                 $order_by = strtolower(request::str('orderby'));
                 if ($order_by == 'id') {
                     $order_by = 'imei';
                 }
-                $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(request::str('order')) : 'ASC';
+                $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(
+                    request::str('order')
+                ) : 'ASC';
                 $query->orderBy("$order_by $order");
             } else {
                 $query->orderBy('name ASC');
@@ -974,19 +997,22 @@ class device
                 $data = device::formatDeviceInfo($device->getAgent(), $device, $simple, 0);
                 if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
                     $data['status']['online'] = true;
-                } else if (App::isVDeviceSupported() && $device->isVDevice()) {
-                    $data['status']['online'] = true;
                 } else {
-                    if (!$simple) {
-                        $data['status']['online'] = (bool)$online_status[$device->getImei()];
-                        if ($device->getAppId()) {
-                            $data['app']['online'] = (bool)$online_status[$device->getAppId()];
+                    if (App::isVDeviceSupported() && $device->isVDevice()) {
+                        $data['status']['online'] = true;
+                    } else {
+                        if (!$simple) {
+                            $data['status']['online'] = (bool)$online_status[$device->getImei()];
+                            if ($device->getAppId()) {
+                                $data['app']['online'] = (bool)$online_status[$device->getAppId()];
+                            }
                         }
                     }
                 }
                 $result['list'][] = $data;
             }
         }
+
         return $result;
     }
 

@@ -55,6 +55,7 @@ class maintenance
     public static function record(): array
     {
         $user = common::getAgent();
+
         return maintenance::createMaintainRecord($user);
     }
 
@@ -63,6 +64,7 @@ class maintenance
         $user = \zovye\api\wx\keeper::getKeeper();
         $real_user = $user->getUser();
         $user_id = $real_user->getId();
+
         return maintenance::createMaintainRecord($user, $user_id);
     }
 
@@ -71,6 +73,7 @@ class maintenance
         $user = common::getAgent();
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
+
         return maintenance::getMRList($agent);
     }
 
@@ -79,6 +82,7 @@ class maintenance
         $keeper = \zovye\api\wx\keeper::getKeeper();
 
         $agent = $keeper->getAgent();
+
         return maintenance::getMRList($agent);
     }
 
@@ -92,13 +96,13 @@ class maintenance
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         if (request::has('start')) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start') . ' 00:00:00');
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
         } else {
             $s_date = new DateTime('first day of this month 00:00:00');
         }
 
         if (request::has('end')) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end') . ' 00:00:00');
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end').' 00:00:00');
             $e_date->modify('next day');
         } else {
             $e_date = new DateTime('first day of next month 00:00:00');
@@ -182,7 +186,7 @@ class maintenance
         $rec_type = [
             '1' => '开门记录',
             '2' => '消毒记录',
-            '3' => '换电池记录'
+            '3' => '换电池记录',
         ];
         $device_ids = [];
         $data = [];
@@ -208,7 +212,7 @@ class maintenance
             foreach ($device_res as $item) {
                 $device_assoc[$item->getId()] = [
                     'name' => $item->getName(),
-                    'imei' => $item->getImei()
+                    'imei' => $item->getImei(),
                 ];
             }
         }
@@ -222,7 +226,7 @@ class maintenance
             'start' => $s_date,
             'end' => $e_date,
             'page' => $page,
-            'total' => $total
+            'total' => $total,
         ];
     }
 }

@@ -56,6 +56,7 @@ class modelObjIteratorLazy implements Iterator, Countable, ArrayAccess
     {
         if ($this->container) {
             $id = $this->container[$this->pos]['id'];
+
             return $this->factory->load($id);
         }
 
@@ -64,7 +65,7 @@ class modelObjIteratorLazy implements Iterator, Countable, ArrayAccess
 
     public function offsetExists($offset): bool
     {
-       return isset($this->container[$offset]);
+        return isset($this->container[$offset]);
     }
 
     public function offsetGet($offset)

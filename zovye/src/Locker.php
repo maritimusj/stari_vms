@@ -58,6 +58,7 @@ class Locker
         if ($is_uid) {
             return self::findOne(['uid' => strval($id)]);
         }
+
         return self::findOne(['id' => intval($id)]);
     }
 
@@ -80,24 +81,30 @@ class Locker
      * @param bool $auto_release
      * @return lockerModelObj|null
      */
-    public static function load(string $uid = '', string $requestID = REQUEST_ID, int $available = 0,
-                                int $expired_at = 0, bool $auto_release = true): ?lockerModelObj
-    {
+    public static function load(
+        string $uid = '',
+        string $requestID = REQUEST_ID,
+        int $available = 0,
+        int $expired_at = 0,
+        bool $auto_release = true
+    ): ?lockerModelObj {
         if (empty($uid)) {
             $uid = Util::generateUID();
         }
 
         $locker = self::get($uid, true);
-        if ($locker) {            
+        if ($locker) {
             if ($locker->isExpired()) {
                 $locker->destroy();
             } else {
-                if ($locker->reenter($requestID)) {    
+                if ($locker->reenter($requestID)) {
                     if ($auto_release) {
                         self::registerLockerDestroy($locker);
                     }
+
                     return $locker;
                 }
+
                 return null;
             }
         }
@@ -113,6 +120,7 @@ class Locker
             if ($locker && $auto_release) {
                 self::registerLockerDestroy($locker);
             }
+
             return $locker;
         } catch (Exception $e) {
             Log::error('locker', $e->getMessage());
@@ -121,9 +129,15 @@ class Locker
         return null;
     }
 
-    public static function try(string $uid = '', $requestID = REQUEST_ID,  int $retries = 0, $retry_delay_seconds = 1,
-                               int $available = 0, int $expired_after_seconds = 60, bool $auto_release = true): ?lockerModelObj
-    {
+    public static function try(
+        string $uid = '',
+        $requestID = REQUEST_ID,
+        int $retries = 0,
+        $retry_delay_seconds = 1,
+        int $available = 0,
+        int $expired_after_seconds = 60,
+        bool $auto_release = true
+    ): ?lockerModelObj {
         $i = 0;
         $expired_at = time() + $expired_after_seconds;
         do {
@@ -148,8 +162,10 @@ class Locker
             if ($auto_release) {
                 self::registerLockerDestroy($locker);
             }
+
             return $locker;
         }
+
         return null;
     }
 }

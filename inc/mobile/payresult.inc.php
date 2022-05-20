@@ -57,7 +57,7 @@ if ($op == 'default') {
         $url_params['balance'] = 1;
     }
 
-    $file = Theme::getThemeFile($device,'payresult');
+    $file = Theme::getThemeFile($device, 'payresult');
     app()->showTemplate($file, [
         'tpl' => $tpl,
         'url' => Util::murl('order', $url_params),
@@ -71,7 +71,7 @@ if ($op == 'default') {
     }
 
     Util::resultAlert(request::trim('error_message', '支付失败！'), 'error');
-    
+
 } elseif ($op == 'notify') {
 
     Log::debug('payresult', [

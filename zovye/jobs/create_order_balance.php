@@ -108,6 +108,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
                 if (!Job::createBalanceOrder($order_no, $user, $device, $goods_id, $num, $ip)) {
                     throw new RuntimeException('启动排队任务失败！');
                 }
+
                 return true;
             }
             throw new RuntimeException('设备被占用！');
@@ -124,56 +125,62 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
             throw new RuntimeException('对不起，商品数量不足！');
         }
 
-        $orderResult = Util::transactionDo(function () use ($order_no, $device, $user, $goods, $num, &$balance_id, $ip) {
+        $orderResult = Util::transactionDo(
+            function () use ($order_no, $device, $user, $goods, $num, &$balance_id, $ip) {
 
-            $total = $goods['balance'] * $num;
+                $total = $goods['balance'] * $num;
 
-            $balance = $user->getBalance();
-            if ($balance->total() < $total) {
-                return err('您的积分不够！');
-            }
+                $balance = $user->getBalance();
+                if ($balance->total() < $total) {
+                    return err('您的积分不够！');
+                }
 
-            $balance_log = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
-                'user' => $user->profile(),
-                'device' => $device->profile(),
-                'goods' => $goods,
-                'num' => $num,
-                'ip' => $ip,
-            ]);
+                $balance_log = $user->getBalance()->change(-$total, Balance::GOODS_EXCHANGE, [
+                    'user' => $user->profile(),
+                    'device' => $device->profile(),
+                    'goods' => $goods,
+                    'num' => $num,
+                    'ip' => $ip,
+                ]);
 
-            if (empty($balance_log)) {
-                return err('创建积分记录失败！');
-            }
+                if (empty($balance_log)) {
+                    return err('创建积分记录失败！');
+                }
 
-            if (empty($order_no)) {
-                $order_no = Order::makeUID($user, $device, sha1($balance_log->getId() . $balance_log->getCreatetime()));
-            }
+                if (empty($order_no)) {
+                    $order_no = Order::makeUID(
+                        $user,
+                        $device,
+                        sha1($balance_log->getId().$balance_log->getCreatetime())
+                    );
+                }
 
-            if (Order::exists($order_no)) {
-                return err('订单已存在！');
-            }
+                if (Order::exists($order_no)) {
+                    return err('订单已存在！');
+                }
 
-            //事件：设备已锁定
-            EventBus::on('device.locked', [
-                'device' => $device,
-                'user' => $user,
-            ]);
+                //事件：设备已锁定
+                EventBus::on('device.locked', [
+                    'device' => $device,
+                    'user' => $user,
+                ]);
 
-            $result = createOrder($order_no, $device, $user, $goods, $balance_log);
-            if (is_error($result)) {
+                $result = createOrder($order_no, $device, $user, $goods, $balance_log);
+                if (is_error($result)) {
+                    return $result;
+                }
+
+                $balance_log->setExtraData('order.id', $order_no);
+                if (!$balance_log->save()) {
+                    return err('保存订单数据失败！');
+                }
+
+                //保存balance id，后面出货失败后退积分使用
+                $balance_id = $balance_log->getId();
+
                 return $result;
             }
-
-            $balance_log->setExtraData('order.id', $order_no);
-            if (!$balance_log->save()) {
-                return err('保存订单数据失败！');
-            }
-
-            //保存balance id，后面出货失败后退积分使用
-            $balance_id = $balance_log->getId();
-
-            return $result;
-        });
+        );
 
         if (is_error($orderResult)) {
             throw new RuntimeException($orderResult['message']);
@@ -228,7 +235,7 @@ if ($op == 'create_order_balance' && CtrlServ::checkJobSign([
             'errno' => 0,
             'message' => '出货完成！',
         ]);
-        
+
         $order->save();
 
         $device->appShowMessage('出货完成，欢迎下次使用！');
@@ -256,12 +263,13 @@ Job::exit($writeLog);
 /**
  * @throws Exception
  */
-function createOrder(string          $order_no,
-                     deviceModelObj  $device,
-                     userModelObj    $user,
-                     array           $goods,
-                     balanceModelObj $balance): orderModelObj
-{
+function createOrder(
+    string $order_no,
+    deviceModelObj $device,
+    userModelObj $user,
+    array $goods,
+    balanceModelObj $balance
+): orderModelObj {
     $order_data = [
         'name' => $goods['name'],
         'goods_id' => $goods['id'],
@@ -421,7 +429,7 @@ function refund(int $balance_id, int $num, string $reason)
                     Log::error('create_order_balance', [
                         'error' => '退款，找不到这个用户！',
                         'order' => $order->getOrderNO(),
-                        'data' => $item
+                        'data' => $item,
                     ]);
                     continue;
                 }
@@ -455,6 +463,7 @@ function refund(int $balance_id, int $num, string $reason)
 
     if (is_error($result)) {
         $device->appShowMessage('出货失败，积分退回失败，请联系管理员！', 'error');
+
         return $result;
     } else {
         $device->appShowMessage('出货失败，积分已退回！', 'error');

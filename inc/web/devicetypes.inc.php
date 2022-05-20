@@ -65,7 +65,7 @@ if ($op == 'default' || $op == 'device_types') {
             }
         }
         $params_str = http_build_query($filter);
-        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&' . $params_str . '"', $pager);
+        $pager = preg_replace('#href="(.*?)"#', 'href="${1}&'.$params_str.'"', $pager);
     }
 
     $tpl_data['device_types'] = $result['list'];
@@ -86,7 +86,7 @@ if ($op == 'default' || $op == 'device_types') {
         if ($agent) {
             $agent_data = $agent->getAgentData();
             if ($agent_data) {
-                $tpl_data['agent_name'] = $agent_data['name'] . ' - ' . $agent->getNickname();
+                $tpl_data['agent_name'] = $agent_data['name'].' - '.$agent->getNickname();
             } else {
                 $tpl_data['agent_name'] = $agent->getNickname();
             }
@@ -100,13 +100,13 @@ if ($op == 'default' || $op == 'device_types') {
         $tpl_data['device_type'] = DeviceTypes::format($device_type);
 
         if ($tpl_data['device_type']['cargo_lanes']) {
-            foreach($tpl_data['device_type']['cargo_lanes'] as &$item) {
+            foreach ($tpl_data['device_type']['cargo_lanes'] as &$item) {
                 $goods = Goods::get($item['goods']);
                 if ($goods) {
                     $item['goods_profile'] = Goods::format($goods, true, true);
                 }
             }
-        }        
+        }
     }
 
     $content = app()->fetchTemplate('web/device-types/edit', $tpl_data);
@@ -129,7 +129,7 @@ if ($op == 'default' || $op == 'device_types') {
     if (empty($params['goods']) || empty($params['capacities'])) {
         JSON::fail('至少需要一个默认货道！');
     }
-    
+
     if ($params['agentId']) {
         $agent = Agent::get($params['agentId'], true);
         if (empty($agent)) {
@@ -194,10 +194,11 @@ if ($op == 'default' || $op == 'device_types') {
         function () use ($device_type) {
             $type_id = $device_type->getId();
             if ($device_type->destroy()) {
-                if(Device::removeDeviceType($type_id)) {
+                if (Device::removeDeviceType($type_id)) {
                     return true;
                 }
             }
+
             return error(State::ERROR, '失败');
         }
     );
@@ -250,7 +251,7 @@ if ($op == 'default' || $op == 'device_types') {
     } else {
         $params = [
             'keywords' => $keywords,
-            'page' => 1, 
+            'page' => 1,
             'pagesize' => 100,
         ];
         $res = Goods::getList($params);

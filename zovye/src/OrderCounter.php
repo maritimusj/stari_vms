@@ -39,7 +39,8 @@ class OrderCounter extends StatsCounter
         }
 
         ksort($arr);
-        return sha1('order:counter:' . http_build_query($arr));
+
+        return sha1('order:counter:'.http_build_query($arr));
     }
 
     protected function initFN(DateTimeInterface $begin, DateTimeInterface $end, array $params = []): int
@@ -50,6 +51,7 @@ class OrderCounter extends StatsCounter
         } else {
             $v = Order::query($condition)->count();
         }
+
         return intval($v);
     }
 
@@ -89,6 +91,7 @@ class OrderCounter extends StatsCounter
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+
         return $result;
     }
 
@@ -125,6 +128,7 @@ class OrderCounter extends StatsCounter
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+
         return $result;
     }
 
@@ -161,6 +165,7 @@ class OrderCounter extends StatsCounter
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+
         return $result;
     }
 
@@ -197,6 +202,7 @@ class OrderCounter extends StatsCounter
         ];
 
         $result['total'] = $result['free'] + $result['pay'] + $result['balance'];
+
         return $result;
     }
 

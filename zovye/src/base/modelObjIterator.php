@@ -48,6 +48,7 @@ class modelObjIterator implements Iterator, Countable, ArrayAccess
                 $classname = $this->factory->objClassname();
                 $obj = new $classname($data['id'], $this->factory);
                 $obj->__setData($data);
+
                 return $obj;
             }
         }

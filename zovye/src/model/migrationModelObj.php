@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -19,21 +20,21 @@ class migrationModelObj extends modelObj
     }
 
     /** @var int */
-	protected $id;
-	/** @var int */
-	protected $uniacid;
-	/** @var string */
-	protected $name
-    /** @var string */;
-	protected $filename;
-	/** @var  int*/
-	protected $result;
-	/** @var string */
-	protected $error;
-	/** @var int */
-	protected $begin;
-	/** @var int */
-	protected $end;
-	/** @var int */
-	protected $createtime;
+    protected $id;
+    /** @var int */
+    protected $uniacid;
+    /** @var string */
+    protected $name/** @var string */
+    ;
+    protected $filename;
+    /** @var  int */
+    protected $result;
+    /** @var string */
+    protected $error;
+    /** @var int */
+    protected $begin;
+    /** @var int */
+    protected $end;
+    /** @var int */
+    protected $createtime;
 }

@@ -21,4 +21,4 @@ if (empty($archive)) {
 $archive->setTotal($archive->getTotal() + 1);
 $archive->save();
 
-header('location:' . $archive->getUrl());
+header('location:'.$archive->getUrl());

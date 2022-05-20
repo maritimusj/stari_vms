@@ -38,6 +38,7 @@ class device_keeper_vwModelObj extends deviceModelObj
             return tb('device_keeper_view');
         }
         trigger_error('user getTableName(...) miss op!');
+
         return '';
     }
 

@@ -21,15 +21,15 @@ class tagsModelObj extends modelObj
     /** @var int */
     protected $id;
 
-     /** @var int */
+    /** @var int */
     protected $uniacid;
 
-     /** @var string */
+    /** @var string */
     protected $title;
 
-     /** @var int */
+    /** @var int */
     protected $count;
-    
+
     /** @var int */
     protected $createtime;
 

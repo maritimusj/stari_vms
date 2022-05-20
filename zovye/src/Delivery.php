@@ -37,7 +37,7 @@ class Delivery
     {
         return m('delivery')->query(We7::uniacid([]))->where($condition);
     }
-    
+
     public static function get($id): ?deliveryModelObj
     {
         return self::query()->findOne(['id' => $id]);
@@ -50,7 +50,7 @@ class Delivery
 
     public static function makeUID(userModelObj $user, $nonce = ''): string
     {
-        return substr("U{$user->getId()}P$nonce" . Util::random(32, true), 0, MAX_ORDER_NO_LEN);
+        return substr("U{$user->getId()}P$nonce".Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
     public static function formatStatus($status): string
@@ -65,6 +65,7 @@ class Delivery
             self::RETURNED => '已退货',
             self::FINISHED => '已完成',
         ];
+
         return $status_title[$status] ?? '未知状态';
     }
 
@@ -95,7 +96,7 @@ class Delivery
         $result['total'] = $total;
 
         $page_size = empty($params['pagesize']) ? DEFAULT_PAGE_SIZE : intval($params['pagesize']);
-        
+
         if ($params['page']) {
             $page = max(1, intval($params['page']));
             $query->page($page, $page_size);
@@ -107,12 +108,12 @@ class Delivery
             if ($params['last_id']) {
                 $last_id = $params['last_id'];
                 $result['list_id'] = $last_id;
-                $query->where(['id <' => $last_id]);  
+                $query->where(['id <' => $last_id]);
             }
 
             $query->limit($page_size);
         }
-       
+
         $query->orderBy('id DESC');
 
         $list = [];
@@ -140,7 +141,7 @@ class Delivery
             if ($balance) {
                 $data['balance'] = abs($balance['xval']);
             }
-    
+
             $package = $entry->getExtraData('package', []);
             if (!isEmptyArray($package)) {
                 $data['package'] = $package;

@@ -29,7 +29,7 @@ class WxMCHPay
     public function transferTo($openid, $trade_no, $money, string $desc = ''): array
     {
         if ($money < MCH_PAY_MIN_MONEY) {
-            return error(State::ERROR, '提现金额不能小于' . number_format(MCH_PAY_MIN_MONEY / 100, 2) . '元');
+            return error(State::ERROR, '提现金额不能小于'.number_format(MCH_PAY_MIN_MONEY / 100, 2).'元');
         }
 
         $data = array(
@@ -67,7 +67,7 @@ class WxMCHPay
             $str .= "$key=$val&";
         }
 
-        return strtoupper(md5("{$str}key=" . $this->config['key']));
+        return strtoupper(md5("{$str}key=".$this->config['key']));
     }
 
     public function curlApiUrl($url, $data)
@@ -99,6 +99,7 @@ class WxMCHPay
 
         if ($data) {
             curl_close($ch);
+
             return $data;
         }
 
@@ -112,7 +113,7 @@ class WxMCHPay
     {
         $content = '';
         foreach ($data as $key => $val) {
-            $content .= "<$key>$val</$key>" . PHP_EOL;
+            $content .= "<$key>$val</$key>".PHP_EOL;
         }
 
         return "<xml>$content</xml>";

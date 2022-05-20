@@ -61,6 +61,7 @@ class goods_voucherModelObj extends modelObj
         }
 
         trigger_error('user getTableName(...) miss op!');
+
         return '';
     }
 

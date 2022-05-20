@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -20,12 +21,12 @@ class settings_userModelObj extends modelObj
     }
 
     /** @var int */
-	protected $id;
-	protected $uniacid;
-	protected $name;
-	protected $data;
-	/** @var int */
-	protected $createtime;
-	protected $lock_uid;
+    protected $id;
+    protected $uniacid;
+    protected $name;
+    protected $data;
+    /** @var int */
+    protected $createtime;
+    protected $lock_uid;
 
 }

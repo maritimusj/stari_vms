@@ -18,6 +18,6 @@ class SQB
             'app_id' => $app_id,
         ]);
 
-        return  $pay->activate(Util::random(16, true), $code);
+        return $pay->activate(Util::random(16, true), $code);
     }
 }

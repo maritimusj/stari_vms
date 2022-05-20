@@ -192,7 +192,7 @@ if ($op == 'default') {
     $tpl_data['s_type_wx'] = $s_type_wx;
     $tpl_data['s_type_wxapp'] = $s_type_wxapp;
     $tpl_data['s_type_ali'] = $s_type_ali;
-    $tpl_data['s_type_douyin'] = $s_type_douyin;    
+    $tpl_data['s_type_douyin'] = $s_type_douyin;
     $tpl_data['s_type_api'] = $s_type_api;
     $tpl_data['s_type_third'] = $s_type_third;
     $tpl_data['s_principal'] = $s_principal;
@@ -219,7 +219,7 @@ if ($op == 'default') {
             $data = [
                 'id' => $user->getId(),
             ];
-            
+
             if (Util::isSysLoadAverageOk()) {
                 $data['free'] = $user->getFreeTotal();
                 $data['pay'] = $user->getPayTotal();
@@ -309,12 +309,12 @@ if ($op == 'default') {
 } elseif ($op == 'keeper') {
 
     $id = request::int('id');
-    $result = Util::transactionDo(function() use ($id) {
+    $result = Util::transactionDo(function () use ($id) {
         $user = User::get($id);
         if (empty($user)) {
             return error(State::ERROR, '找不到这个用户！');
         }
-        
+
         if (!$user->isKeeper()) {
             return error(State::ERROR, '用户不是运营人员！');
         }
@@ -331,7 +331,7 @@ if ($op == 'default') {
             }
             if (!$keeper->destroy()) {
                 return error(State::ERROR, '删除数据失败！');
-             }
+            }
         }
 
         return true;
@@ -430,9 +430,9 @@ if ($op == 'default') {
         ];
 
         if ($item->getCommissionFixed() != -1) {
-            $commission_val = number_format(abs($item->getCommissionFixed()) / 100, 2) . '元';
+            $commission_val = number_format(abs($item->getCommissionFixed()) / 100, 2).'元';
         } else {
-            $commission_val = $item->getCommissionPercent() . '%';
+            $commission_val = $item->getCommissionPercent().'%';
         }
 
         $data['commission'] = $commission_val;
@@ -493,7 +493,7 @@ if ($op == 'default') {
 
                 if (!empty($goods_arr)) {
                     $goods_arr = array_unique($goods_arr);
-                    $goods_res = Goods::query()->where('id IN (' . implode(',', $goods_arr) . ')')->findAll();
+                    $goods_res = Goods::query()->where('id IN ('.implode(',', $goods_arr).')')->findAll();
                     /** @var goodsModelObj $item */
                     foreach ($goods_res as $item) {
                         $goods_assoc[$item->getId()] = [
@@ -634,7 +634,7 @@ if ($op == 'default') {
 
         JSON::success(['title' => $title, 'content' => $content]);
     }
-}  elseif ($op == 'balance_log') {
+} elseif ($op == 'balance_log') {
 
     $user = User::get(request::int('id'));
     if ($user) {

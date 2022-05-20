@@ -1,9 +1,10 @@
 <?php
+
 namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . 'payload_logs')) {
+if (!We7::pdo_tableexists($tb_name.'payload_logs')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_payload_logs` (
      `id` INT NOT NULL AUTO_INCREMENT , 
@@ -20,5 +21,5 @@ CREATE TABLE `ims_zovye_vms_payload_logs` (
      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
-    
+
 }

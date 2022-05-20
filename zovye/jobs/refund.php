@@ -124,7 +124,7 @@ function resetPayload(orderModelObj $order, int $num = 0): array
 
         $locker = $device->payloadLockAcquire(10);
         if ($locker) {
-            $device->resetGoodsNum($goods_id, '+' . $total, "订单退款：{$order->getOrderNO()}");
+            $device->resetGoodsNum($goods_id, '+'.$total, "订单退款：{$order->getOrderNO()}");
         } else {
             return error(State::ERROR, '锁定设备库存失败!');
         }
@@ -134,6 +134,7 @@ function resetPayload(orderModelObj $order, int $num = 0): array
             return ['msg' => '库存已重置！'];
         }
     }
+
     return ['msg' => '库存重置失败！'];
 }
 

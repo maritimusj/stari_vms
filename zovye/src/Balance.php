@@ -79,6 +79,7 @@ class Balance
             );
             if ($result) {
                 $this->on_change($result);
+
                 return $result;
             }
         }
@@ -90,13 +91,13 @@ class Balance
     {
         $notify_url = Config::balance('app.notify_url');
         if ($notify_url) {
-            $profile = $this->user->profile(true);
+            $profile = $this->user->profile();
             $profile['balance'] = $this->total();
             $profile['change'] = $item->getXVal();
 
             $data = [
                 'data' => $profile,
-                'serial' => sha1(App::uid(6) . $item->getId()),
+                'serial' => sha1(App::uid(6).$item->getId()),
                 'sign' => hash_hmac('sha1', http_build_query($profile), Config::balance('app.key')),
             ];
 
@@ -179,6 +180,7 @@ class Balance
     {
         if ($this->user) {
             $openid = $this->user->getOpenid();
+
             return Balance::query(['openid' => $openid]);
         }
 
@@ -194,7 +196,7 @@ class Balance
         ];
 
         if ($entry->getXVal() > 0) {
-            $data['xval'] = '+' . $data['xval'];
+            $data['xval'] = '+'.$data['xval'];
         }
 
         if ($entry->getSrc() == Balance::ADJUST) {
@@ -354,7 +356,7 @@ TEXT;
 </dl>
 TEXT;
         } elseif ($entry->getSrc() == Balance::USER_REF) {
-            $user_profile  = $entry->getExtraData('user', []);
+            $user_profile = $entry->getExtraData('user', []);
             $type_title = '用户';
             $text = $user_profile ? "<dt>$type_title</dt><dd><img src=\"{$user_profile['headimgurl']}\">{$user_profile['nickname']}</dd>" : '';
             $data['memo'] = <<<TEXT
@@ -364,7 +366,7 @@ TEXT;
 $text
 </dl>
 TEXT;
-        } 
+        }
 
         return $data;
     }
@@ -407,7 +409,7 @@ TEXT;
                         'user' => $user->profile(),
                         'account' => $account->profile(),
                         'bonus' => $bonus,
-                    ]
+                    ],
                 ];
                 if ($serial) {
                     $data['s2'] = $serial;
@@ -418,13 +420,17 @@ TEXT;
             }
 
             if ($bonus > 0) {
-                $result = $user->getBalance()->change($account->getBalancePrice(), $account->isTask() ? Balance::TASK_BONUS : Balance::ACCOUNT_BONUS,
+                $result = $user->getBalance()->change(
+                    $account->getBalancePrice(),
+                    $account->isTask() ? Balance::TASK_BONUS : Balance::ACCOUNT_BONUS,
                     [
                         'account' => $account->profile(),
-                    ]);
+                    ]
+                );
                 if (!$result) {
                     return err('创建用户积分记录失败！');
                 }
+
                 return $result;
             }
 
@@ -477,6 +483,7 @@ TEXT;
         if (is_null($result)) {
             $result = Config::balance('order.as', 'free') == 'free';
         }
+
         return $result;
     }
 
@@ -486,6 +493,7 @@ TEXT;
         if (is_null($result)) {
             $result = Config::balance('order.as', 'free') == 'pay';
         }
+
         return $result;
     }
 
@@ -510,6 +518,7 @@ TEXT;
                 return err('创建用户积分记录失败！');
             }
         }
+
         return true;
     }
 }

@@ -49,12 +49,14 @@ class balanceModelObj extends modelObj
     public function getUser(): ?userModelObj
     {
         $user_id = $this->getExtraData('user.id');
+
         return User::get($user_id);
     }
 
     public function getDevice(): ?deviceModelObj
     {
         $device_id = $this->getExtraData('device.id');
+
         return Device::get($device_id);
     }
 
@@ -73,12 +75,13 @@ class balanceModelObj extends modelObj
         return $this->getExtraData('goods.balance', 0);
     }
 
-    public function getOrder():?orderModelObj
+    public function getOrder(): ?orderModelObj
     {
         $order_no = $this->getExtraData('order.id');
         if ($order_no) {
             return Order::get($order_no, true);
         }
+
         return null;
     }
 }

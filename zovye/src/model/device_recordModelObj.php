@@ -9,6 +9,7 @@ namespace zovye\model;
 use zovye\base\modelObj;
 
 use function zovye\tb;
+
 /**
  * @method getDeviceId()
  * @method getCate()

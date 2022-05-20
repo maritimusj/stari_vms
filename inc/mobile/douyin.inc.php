@@ -50,7 +50,7 @@ if ($op == 'auth' || $op == 'get_openid') {
 
     $res = Account::match($device, $user, ['type' => Account::DOUYIN]);
     $data = [];
-    foreach($res as $entry) {
+    foreach ($res as $entry) {
         if ($entry['url'] && $entry['openid']) {
             $data[] = [
                 'uid' => $entry['uid'],
@@ -141,7 +141,7 @@ if ($user->isBanned()) {
 }
 
 if (App::isUserVerify18Enabled()) {
-    if(!$user->isIDCardVerified()) {
+    if (!$user->isIDCardVerified()) {
         app()->showTemplate(Theme::file('verify_18'), [
             'verify18' => settings('user.verify_18', []),
             'entry_url' => Util::murl('douyin', ['from' => $from, 'device' => $device_id]),

@@ -95,7 +95,7 @@ class goodsModelObj extends modelObj
     public function allowDelivery(): bool
     {
         return Goods::isAllowDelivery($this->s1);
-    }    
+    }
 
     public function setAllowFree($allowed = true)
     {
@@ -111,12 +111,12 @@ class goodsModelObj extends modelObj
     {
         $this->setS1(Goods::setExchangeBitMask($this->s1, $allowed));
     }
-    
+
     public function setAllowDelivery($allowed = true)
     {
         $this->setS1(Goods::setDeliveryBitMask($this->s1, $allowed));
     }
-    
+
     public function getUnitTitle()
     {
         return $this->getExtraData('unitTitle', '');
@@ -145,8 +145,8 @@ class goodsModelObj extends modelObj
     public function setGallery($images = [])
     {
         return $this->setExtraData('gallery', $images);
-    }   
-    
+    }
+
     public function getAppendage(): array
     {
         return $this->getExtraData('appendage') ?: [];
@@ -173,6 +173,7 @@ class goodsModelObj extends modelObj
                     ],
                 ];
             }
+
             return $res;
         }
 

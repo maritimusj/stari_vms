@@ -14,7 +14,7 @@ class BlueToothProtocol
     {
         static $protocols = [];
         if (empty($protocols)) {
-            foreach (glob(MODULE_ROOT . '/lib/bluetooth/*', GLOB_ONLYDIR) as $name) {
+            foreach (glob(MODULE_ROOT.'/lib/bluetooth/*', GLOB_ONLYDIR) as $name) {
                 $protoName = basename($name);
                 $proto = self::get($protoName);
                 if ($proto) {
@@ -36,6 +36,7 @@ class BlueToothProtocol
         if (class_exists($classname)) {
             return new $classname();
         }
+
         return null;
     }
 }

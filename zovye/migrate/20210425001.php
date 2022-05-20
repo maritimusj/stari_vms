@@ -1,9 +1,10 @@
 <?php
+
 namespace zovye;
 
 $tb_name = APP_NAME;
 
-if (!We7::pdo_tableexists($tb_name . 'zovye_vms')) {
+if (!We7::pdo_tableexists($tb_name.'zovye_vms')) {
     $sql = <<<SQL
 CREATE TABLE `ims_zovye_vms_wx_app` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
@@ -15,10 +16,10 @@ CREATE TABLE `ims_zovye_vms_wx_app` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
-    
+
 }
 
-    $sql = <<<SQL
+$sql = <<<SQL
 CREATE OR REPLACE VIEW `ims_zovye_vms_device_view` AS
 SELECT *,
 (
@@ -31,4 +32,4 @@ SELECT *,
 ) AS d_total
 FROM `ims_zovye_vms_device` d;
 SQL;
-    Migrate::execSQL($sql);
+Migrate::execSQL($sql);

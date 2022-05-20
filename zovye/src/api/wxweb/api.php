@@ -47,6 +47,7 @@ class api
         $res = \zovye\api\wx\common::getDecryptedWxUserData();
         if (is_error($res)) {
             Log::error('wxweb', $res);
+
             return err('用户登录失败，请稍后再试！[103]');
         }
 
@@ -283,9 +284,10 @@ class api
         }
 
         $order_no = Order::makeUID($user, $device, time());
+
         return [
             'orderUID' => $order_no,
-            'code' => sha1($order_no . $reward['id'] . $device->getShadowId() . $user->getOpenid()),
+            'code' => sha1($order_no.$reward['id'].$device->getShadowId().$user->getOpenid()),
         ];
     }
 
@@ -623,6 +625,7 @@ class api
             $user = \zovye\api\wx\common::getUser();
             $data = $account->format();
             $data['questions'] = $account->getQuestions($user);
+
             return $data;
         }
 
@@ -668,6 +671,7 @@ class api
                 'address' => '',
             ];
         }
+
         return $recipient;
     }
 
@@ -716,6 +720,7 @@ class api
     public static function createMallOrder()
     {
         $user = \zovye\api\wx\common::getUser();
+
         return Mall::createOrder($user, [
             'goods_id' => request::int('goods'),
             'num' => request::int('num'),
@@ -733,6 +738,7 @@ class api
         if (is_error($res)) {
             return $res;
         }
+
         return '成功！';
     }
 }

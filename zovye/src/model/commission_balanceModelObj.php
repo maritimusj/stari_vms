@@ -99,6 +99,7 @@ class commission_balanceModelObj extends modelObj
         } else {
             $status = '（未知）';
         }
+
         return $status;
     }
 }

@@ -212,6 +212,7 @@ class deviceModelObj extends modelObj
     {
         $this->last_online = $last_online;
         $this->setDirty('last_online');
+
         return $this->updateSettings('extra.v0.status.lastonline', $last_online);
     }
 
@@ -221,7 +222,8 @@ class deviceModelObj extends modelObj
      */
     public function isVDevice(): bool
     {
-        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
+        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel(
+                ) == Device::VIRTUAL_DEVICE);
     }
 
     /**
@@ -241,8 +243,10 @@ class deviceModelObj extends modelObj
             if ($protocol) {
                 $uid = $protocol->transUID($uid);
             }
+
             return $uid;
         }
+
         return '';
     }
 
@@ -254,8 +258,10 @@ class deviceModelObj extends modelObj
     {
         if ($this->isBlueToothDevice()) {
             $mac = $this->settings('extra.bluetooth.mac', '');
+
             return ltrim($mac);
         }
+
         return '';
     }
 
@@ -264,6 +270,7 @@ class deviceModelObj extends modelObj
         if ($this->isBlueToothDevice()) {
             return intval($this->settings('extra.bluetooth.motor', 0));
         }
+
         return 0;
     }
 
@@ -324,6 +331,7 @@ class deviceModelObj extends modelObj
                     return Device::BLUETOOTH_DEVICE;
                 }
         }
+
         return Device::NORMAL_DEVICE;
     }
 
@@ -438,8 +446,10 @@ class deviceModelObj extends modelObj
                 '2' => '卡膜',
                 '3' => '电量低',
             ];
-            return ($description[$error] ?? '未知') . " [ $error ]";
+
+            return ($description[$error] ?? '未知')." [ $error ]";
         }
+
         return '';
     }
 
@@ -457,6 +467,7 @@ class deviceModelObj extends modelObj
          * -1 表示不支持电量，0为了兼容早期没有电量的版本
          */
         $qoe = $this->getQoe();
+
         return $qoe != -1 && $qoe != 0 && $qoe < 10;
     }
 
@@ -486,6 +497,7 @@ class deviceModelObj extends modelObj
                 $address = $this->settings('extra.location.area', []);
             }
         }
+
         return empty($address) ? $default : $address;
     }
 
@@ -498,6 +510,7 @@ class deviceModelObj extends modelObj
                 $address = $this->settings('extra.location.address', '');
             }
         }
+
         return empty($address) ? $default : $address;
     }
 
@@ -556,6 +569,7 @@ class deviceModelObj extends modelObj
                 return false;
             }
         }
+
         return true;
     }
 
@@ -572,6 +586,7 @@ class deviceModelObj extends modelObj
     public function setCargoLanes(array $lanes_data): bool
     {
         $prefix = $this->migrateLanesData();
+
         return $this->updateSettings("{$prefix}cargo_lanes", $lanes_data);
     }
 
@@ -588,6 +603,7 @@ class deviceModelObj extends modelObj
             $data['bluetooth'] = true;
             $data['buid'] = $this->getBUID();
         }
+
         return $data;
     }
 
@@ -619,8 +635,10 @@ class deviceModelObj extends modelObj
             $msg = $this->settings('lastErrorData.message', Device::desc($this->getErrorCode()));
             $err = error($this->getErrorCode(), $msg);
             $err['createtime'] = $this->settings('lastErrorData.createtime');
+
             return $err;
         }
+
         return [];
     }
 
@@ -668,7 +686,8 @@ class deviceModelObj extends modelObj
         if (empty($last_code)) {
             $last_code = App::uid();
         }
-        return sha1($last_code . $now);
+
+        return sha1($last_code.$now);
     }
 
     /**
@@ -697,7 +716,7 @@ class deviceModelObj extends modelObj
             foreach ($result as $entry) {
                 $code = $this->getPayloadCode($now);
                 if (!empty($entry['reason'])) {
-                    $reason = $reason . "({$entry['reason']})";
+                    $reason = $reason."({$entry['reason']})";
                 }
                 if (!PayloadLogs::create([
                     'device_id' => $this->id,
@@ -721,6 +740,7 @@ class deviceModelObj extends modelObj
                 }
             }
         }
+
         return $result;
     }
 
@@ -739,10 +759,16 @@ class deviceModelObj extends modelObj
      */
     public function resetLock(): bool
     {
-        if (We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId()])) {
+        if (We7::pdo_update(
+            self::getTableName(modelObj::OP_WRITE),
+            [OBJ_LOCKED_UID => UNLOCKED],
+            ['id' => $this->getId()]
+        )) {
             $this->locked_uid = UNLOCKED;
+
             return true;
         }
+
         return false;
     }
 
@@ -867,7 +893,16 @@ class deviceModelObj extends modelObj
 
         imagecopyresized($im2, $im, 22, 0, 0, 0, floor($i_w), floor($i_h), floor($i_w), floor($i_h));
         $black = imagecolorallocate($im2, 0, 0, 0);
-        imagefttext($im2, 24, 0, $x_offset, floor($i_h) + 24, $black, realpath(realpath(ZOVYE_CORE_ROOT . '../static/fonts/arial.ttf')), $text);
+        imagefttext(
+            $im2,
+            24,
+            0,
+            $x_offset,
+            floor($i_h) + 24,
+            $black,
+            realpath(realpath(ZOVYE_CORE_ROOT.'../static/fonts/arial.ttf')),
+            $text
+        );
 
         if (strpos(strtolower($ext), 'jpeg') !== false || strpos(strtolower($ext), 'jpg') !== false) {
             imagejpeg($im2, $file);
@@ -959,7 +994,7 @@ class deviceModelObj extends modelObj
         $f = stripos($url, '?') !== false ? '&' : '?';
         $ts = microtime(true);
 
-        return $url . "{$f}v=$ts";
+        return $url."{$f}v=$ts";
     }
 
     public function getGroup(): ?device_groupsModelObj
@@ -967,6 +1002,7 @@ class deviceModelObj extends modelObj
         if ($this->group_id > 0) {
             return Group::get($this->group_id);
         }
+
         return null;
     }
 
@@ -1005,6 +1041,7 @@ class deviceModelObj extends modelObj
                 'text' => '#FFFFFF',
             ],
         ];
+
         return $this->appNotify('message', [
             'content' => $msg,
             'type' => $type,
@@ -1019,6 +1056,7 @@ class deviceModelObj extends modelObj
     public function isLocked(): bool
     {
         $this->checkLockerExpired();
+
         return $this->locked_uid != UNLOCKED;
     }
 
@@ -1030,10 +1068,15 @@ class deviceModelObj extends modelObj
     public function lock($uid = null): string
     {
         $uid = strval($uid) ?: Util::random(6);
-        $uid = "$uid:" . time();
-        $res = We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => $uid], ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]);
+        $uid = "$uid:".time();
+        $res = We7::pdo_update(
+            self::getTableName(modelObj::OP_WRITE),
+            [OBJ_LOCKED_UID => $uid],
+            ['id' => $this->getId(), OBJ_LOCKED_UID => UNLOCKED]
+        );
         if ($res) {
             $this->locked_uid = $uid;
+
             return $uid;
         }
 
@@ -1048,7 +1091,11 @@ class deviceModelObj extends modelObj
     public function unlock($uid): bool
     {
         if ($uid) {
-            return We7::pdo_update(self::getTableName(modelObj::OP_WRITE), [OBJ_LOCKED_UID => UNLOCKED], ['id' => $this->getId(), OBJ_LOCKED_UID => $uid]);
+            return We7::pdo_update(
+                self::getTableName(modelObj::OP_WRITE),
+                [OBJ_LOCKED_UID => UNLOCKED],
+                ['id' => $this->getId(), OBJ_LOCKED_UID => $uid]
+            );
         }
 
         return false;
@@ -1240,7 +1287,7 @@ class deviceModelObj extends modelObj
                     }
                     if (!empty($adv['extra']['size']) && $srt['size'] < $adv['extra']['size']) {
                         $srt['size'] = intval($adv['extra']['size']);
-                    }                  
+                    }
                 }
             } else {
                 $data = [
@@ -1314,6 +1361,7 @@ class deviceModelObj extends modelObj
             if ($random) {
                 shuffle($advs);
             }
+
             return current($advs);
         }
 
@@ -1433,6 +1481,7 @@ class deviceModelObj extends modelObj
 
         if ($day_limits > 0) {
             $data = Stats::getDayTotal($this);
+
             return $data['free'] >= $day_limits;
         }
 
@@ -1475,19 +1524,19 @@ class deviceModelObj extends modelObj
 
         if ($this->getId()) {
 
-            $tags[] = ['name' => Topic::encrypt('device' . $this->getId())];
+            $tags[] = ['name' => Topic::encrypt('device'.$this->getId())];
 
             if ($this->agent_id) {
-                $tags[] = ['name' => Topic::encrypt('agent' . $this->getAgentId())];
+                $tags[] = ['name' => Topic::encrypt('agent'.$this->getAgentId())];
             }
 
             if ($this->getGroupId()) {
-                $tags[] = ['name' => Topic::encrypt('group' . $this->getGroupId())];
+                $tags[] = ['name' => Topic::encrypt('group'.$this->getGroupId())];
             }
         }
 
         foreach ($this->getTagsAsId() as $id) {
-            $tags[] = ['name' => Topic::encrypt('tag' . $id)];
+            $tags[] = ['name' => Topic::encrypt('tag'.$id)];
         }
 
         return $tags;
@@ -1606,7 +1655,7 @@ class deviceModelObj extends modelObj
             }
         }
 
-        if (!preg_match('/^' . Device::DUMMY_DEVICE_PREFIX . '/', $this->imei)) {
+        if (!preg_match('/^'.Device::DUMMY_DEVICE_PREFIX.'/', $this->imei)) {
             $this->set(
                 'accountsData',
                 [
@@ -1615,6 +1664,7 @@ class deviceModelObj extends modelObj
                 ]
             );
         }
+
         return $accounts;
     }
 
@@ -1642,6 +1692,7 @@ class deviceModelObj extends modelObj
         if ($this->app_id) {
             if ($this->imei) {
                 $res = CtrlServ::v2_query("device/$this->imei/app/online", ['nocache' => false]);
+
                 return $res['status'] === true && $res['data']['app'] === true;
             }
         }
@@ -1670,6 +1721,7 @@ class deviceModelObj extends modelObj
         $data = ['volume' => $vol];
 
         $res = $this->appNotify('config', $data);
+
         return !is_error($res);
     }
 
@@ -1688,6 +1740,7 @@ class deviceModelObj extends modelObj
         }
 
         $res = $this->appNotify('config', $data);
+
         return !is_error($res);
     }
 
@@ -1712,6 +1765,7 @@ class deviceModelObj extends modelObj
     public function getCargoLanesNum(): int
     {
         $device_type = DeviceTypes::from($this);
+
         return $device_type ? $device_type->getCargoLanesNum() : 0;
     }
 
@@ -1766,6 +1820,7 @@ class deviceModelObj extends modelObj
                 strval($txt[2]),
             ];
         }
+
         return $this->mcbNotify('params', $code, $data);
     }
 
@@ -1802,6 +1857,7 @@ class deviceModelObj extends modelObj
             if (empty($code)) {
                 $code = $this->getProtocolV1Code();
             }
+
             return CtrlServ::mcbNotify($this->imei, $code, $op, $data);
         }
 
@@ -1832,6 +1888,7 @@ class deviceModelObj extends modelObj
     public function isMcbStatusExpired(): bool
     {
         $update_time = $this->settings('extra.v1.status.updatetime', 0);
+
         return time() - $update_time > 60 * 60 * 60;
     }
 
@@ -1921,6 +1978,7 @@ class deviceModelObj extends modelObj
                 return $this->resetLock();
             }
         }
+
         return false;
     }
 
@@ -2001,7 +2059,7 @@ class deviceModelObj extends modelObj
             if (empty($protocol)) {
                 return error(State::ERROR, '未知的蓝牙协议！');
             }
-            
+
             $motorNum = $this->getMotor();
             if ($motorNum > 0) {
                 if ($motorNum >= $mcb_channel) {
@@ -2098,7 +2156,7 @@ class deviceModelObj extends modelObj
 
     public function isReadyTimeout($scene = 'online'): bool
     {
-        return TIMESTAMP -  $this->settings("last.$scene", 0) > 60;
+        return TIMESTAMP - $this->settings("last.$scene", 0) > 60;
     }
 
     /**
@@ -2109,10 +2167,14 @@ class deviceModelObj extends modelObj
      * @param int $timeout
      * @return array
      */
-    public function open(int $channel = Device::CHANNEL_DEFAULT, int $num = 1, int $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT, array $extra = []): array
-    {
+    public function open(
+        int $channel = Device::CHANNEL_DEFAULT,
+        int $num = 1,
+        int $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT,
+        array $extra = []
+    ): array {
         $no_str = Util::random(16, true);
-        $order_no = 'P' . We7::uniacid() . "NO$no_str";
+        $order_no = 'P'.We7::uniacid()."NO$no_str";
 
         $params = [
             'deviceGUID' => $this->imei,
@@ -2167,6 +2229,7 @@ class deviceModelObj extends modelObj
                 $res = CtrlServ::query("device/$imei", []);
                 if (!is_error($res) && $res['appUID']) {
                     $this->setAppId($res['appUID']);
+
                     return $this->save();
                 }
             }
@@ -2467,6 +2530,7 @@ class deviceModelObj extends modelObj
     public function isOwnerOrSuperior(userModelObj $user): bool
     {
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
+
         return Device::isOwner($this, $agent);
     }
 
@@ -2500,21 +2564,24 @@ class deviceModelObj extends modelObj
         if ($w == 'all' || $w == 'packages') {
             $result['packages'] = $this->getPackages();
         }
+
         return $result;
     }
 
-    public static function disableFree(array &$goodsData) {
+    public static function disableFree(array &$goodsData)
+    {
         $goodsData[Goods::AllowFree] = false;
 
         if (Balance::isFreeOrder()) {
             $goodsData[Goods::AllowExchange] = false;
             $goodsData[Goods::AllowDelivery] = false;
-        }        
+        }
     }
-    
-    public static function disablePay(array &$goodsData) {
+
+    public static function disablePay(array &$goodsData)
+    {
         $goodsData[Goods::AllowPay] = false;
-                        
+
         if (Balance::isPayOrder()) {
             $goodsData[Goods::AllowExchange] = false;
             $goodsData[Goods::AllowDelivery] = false;
@@ -2526,9 +2593,10 @@ class deviceModelObj extends modelObj
         $goods = Goods::get($goodsData['id']);
         if ($goods) {
             $quota = $goods->getQuota();
-            
+
             if (!isEmptyArray($quota)) {
-                if ($goods->allowFree() || (($goods->allowExchange() || $goods->allowDelivery()) && Balance::isFreeOrder())) {
+                if ($goods->allowFree() || (($goods->allowExchange() || $goods->allowDelivery(
+                            )) && Balance::isFreeOrder())) {
                     $day_limit = $quota['free']['day'];
                     if ($day_limit > 0) {
                         $day_total = $user->getTodayFreeTotal($goods->getId());
@@ -2549,7 +2617,7 @@ class deviceModelObj extends modelObj
                         }
                     }
                 }
-                
+
                 if ($goods->allowPay()) {
                     $day_limit = $quota['pay']['day'];
                     if ($day_limit > 0) {
@@ -2580,12 +2648,18 @@ class deviceModelObj extends modelObj
         $result = [];
 
         $payload = $this->getPayload();
-        $checkFN = function($data) use ($params) {
+        $checkFN = function ($data) use ($params) {
             if ($params) {
-                if ((!empty($params[Goods::AllowPay]) || in_array(Goods::AllowPay, $params)) && empty($data[Goods::AllowPay])) {
+                if ((!empty($params[Goods::AllowPay]) || in_array(
+                            Goods::AllowPay,
+                            $params
+                        )) && empty($data[Goods::AllowPay])) {
                     return false;
                 }
-                if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params)) && empty($data[Goods::AllowFree])) {
+                if ((!empty($params[Goods::AllowFree]) || in_array(
+                            Goods::AllowFree,
+                            $params
+                        )) && empty($data[Goods::AllowFree])) {
                     return false;
                 }
                 if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params))) {
@@ -2593,8 +2667,9 @@ class deviceModelObj extends modelObj
                         return false;
                     }
                 }
-            }  
-            return true;          
+            }
+
+            return true;
         };
 
         if ($payload && $payload['cargo_lanes']) {
@@ -2604,7 +2679,7 @@ class deviceModelObj extends modelObj
                     continue;
                 }
 
-                if (!$checkFN($goods_data )) {
+                if (!$checkFN($goods_data)) {
                     continue;
                 }
 
@@ -2619,7 +2694,7 @@ class deviceModelObj extends modelObj
                     //如果相同商品设置了不同价格，则使用更高的价格
                     if ($result[$key]['price'] < $goods_data['price']) {
                         $result[$key]['price'] = $goods_data['price'];
-                        $result[$key]['price_formatted'] = '￥' . number_format($goods_data['price'] / 100, 2) . '元';
+                        $result[$key]['price_formatted'] = '￥'.number_format($goods_data['price'] / 100, 2).'元';
                     }
                 } else {
                     $data = [
@@ -2628,7 +2703,7 @@ class deviceModelObj extends modelObj
                         'img' => $goods_data['img'],
                         'detail_img' => $goods_data['detailImg'],
                         'price' => $goods_data['price'],
-                        'price_formatted' => '￥' . number_format($goods_data['price'] / 100, 2) . '元',
+                        'price_formatted' => '￥'.number_format($goods_data['price'] / 100, 2).'元',
                         'num' => intval($goods_data['num']),
                         Goods::AllowFree => $goods_data[Goods::AllowFree],
                         Goods::AllowPay => $goods_data[Goods::AllowPay],
@@ -2642,12 +2717,12 @@ class deviceModelObj extends modelObj
                     if (!empty($user)) {
                         self::checkGoodsQuota($user, $data, $params);
                         if (!$checkFN($data)) {
-                           continue;
+                            continue;
                         }
 
                         $discount = User::getUserDiscount($user, $goods_data);
                         $data['discount'] = $discount;
-                        $data['discount_formatted'] = '￥' . number_format($discount / 100, 2) . '元';
+                        $data['discount_formatted'] = '￥'.number_format($discount / 100, 2).'元';
                     }
 
                     $result[$key] = $data;
@@ -2685,6 +2760,7 @@ class deviceModelObj extends modelObj
             $result = $package->format(true, false);
             $result['isOk'] = $this->isPackageOk($result);
         }
+
         return $result;
     }
 
@@ -2747,6 +2823,7 @@ class deviceModelObj extends modelObj
     public function confirmLAC(): bool
     {
         $this->setS1(0);
+
         return $this->save();
     }
 

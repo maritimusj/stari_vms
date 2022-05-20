@@ -41,6 +41,7 @@ class Agent
                 $agent = $user->agent();
                 $cache[$user->getId()] = $agent;
                 $cache[$user->getOpenid()] = $agent;
+
                 return $agent;
             }
         }
@@ -64,6 +65,7 @@ class Agent
         if ($user) {
             return $user->agent();
         }
+
         return null;
     }
 
@@ -86,6 +88,7 @@ class Agent
     public static function getPayParams(agentModelObj $agent, string $name = ''): array
     {
         $params = $agent->settings('agentData.pay', []);
+
         return Pay::selectPayParams($params, $name);
     }
 
@@ -106,7 +109,9 @@ class Agent
             }
         }
 
-        if ($agent->setAgent(false) && $agent->setSuperiorId(0) && $agent->remove('agentData') && $agent->remove('keepers')) {
+        if ($agent->setAgent(false) && $agent->setSuperiorId(0) && $agent->remove('agentData') && $agent->remove(
+                'keepers'
+            )) {
 
             //删除登记会话数据
             $login_data = $agent->getLoginData();
@@ -165,10 +170,11 @@ class Agent
                 $adv->destroy();
             }
 
-            if ($agent->save()) {                
+            if ($agent->save()) {
                 return ['message' => '成功！'];
             }
         }
+
         return err('失败！');
     }
 
@@ -183,6 +189,7 @@ class Agent
                 self::getAllSubordinates($entry, $result, $fetch_obj);
             }
         }
+
         return $result;
     }
 }

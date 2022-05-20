@@ -22,7 +22,7 @@ class Settings implements ISettings
         $app_name = APP_NAME;
 
         if (empty($classname)) {
-            $classname = str_replace(__NAMESPACE__ . '\\', '', get_called_class());
+            $classname = str_replace(__NAMESPACE__.'\\', '', get_called_class());
         }
 
         $this->title = $title ?: 'settings';
@@ -71,7 +71,7 @@ CODE;
 
     protected function cacheKey($name): string
     {
-        return APP_NAME . ":settings:" . We7::uniacid() . ":$this->title:$name";
+        return APP_NAME.":settings:".We7::uniacid().":$this->title:$name";
     }
 
     /**
@@ -146,7 +146,7 @@ CODE;
     {
         $ret = [];
         $keys = is_array($key) ? $key : [$key];
-        
+
 
         foreach ($keys as $entry) {
             if ($this->use_cache) {

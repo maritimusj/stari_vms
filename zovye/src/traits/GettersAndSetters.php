@@ -18,8 +18,10 @@ trait GettersAndSetters
     {
         if (strncasecmp($name, 'has', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'has'));
+
             return property_exists(get_called_class(), $prop);
         }
+
         return false;
     }
 
@@ -41,31 +43,39 @@ trait GettersAndSetters
                 if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
                     return $this->forceReloadPropertyValue($prop, $params);
                 }
+
                 return $this->$prop;
             }
         } elseif (strncasecmp($name, 'set', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'set'));
-            if (!in_array($prop, $this->__setterFilters) && property_exists($this, $prop) && $this->$prop !== $params[0]) {
+            if (!in_array($prop, $this->__setterFilters) && property_exists(
+                    $this,
+                    $prop
+                ) && $this->$prop !== $params[0]) {
                 $this->$prop = $params[0];
                 if (Util::traitUsed($this, 'DirtyChecker')) {
                     $this->setDirty($prop);
                 }
             }
+
             return $this;
         } elseif (strncasecmp($name, 'is', 2) == 0) {
             $prop = toSnakeCase(ltrim($name, 'is'));
             if ($params && $params[0] === true && method_exists($this, 'forceReloadPropertyValue')) {
                 return boolval($this->forceReloadPropertyValue($prop, $params));
             }
+
             return boolval($this->$prop);
         } elseif (strncasecmp($name, 'has', 3) == 0) {
             $prop = toSnakeCase(ltrim($name, 'has'));
+
             return property_exists($this, $prop);
         } else {
             if (DEBUG) {
-                trigger_error("call undefined method $name on " . get_called_class(), E_USER_ERROR);
+                trigger_error("call undefined method $name on ".get_called_class(), E_USER_ERROR);
             }
         }
+
         return null;
     }
 }

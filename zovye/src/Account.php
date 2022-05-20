@@ -91,46 +91,46 @@ class Account extends State
     const SERVICE_ACCOUNT = 2;
 
     const JFB_NAME = '准粉吧';
-    const JFB_HEAD_IMG = MODULE_URL . 'static/img/jfb_pic.png';
+    const JFB_HEAD_IMG = MODULE_URL.'static/img/jfb_pic.png';
 
     const MOSCALE_NAME = '公锤平台';
-    const MOSCALE_HEAD_IMG = MODULE_URL . 'static/img/moscale_pic.jpg';
+    const MOSCALE_HEAD_IMG = MODULE_URL.'static/img/moscale_pic.jpg';
 
     const YUNFENBA_NAME = '云粉吧';
-    const YUNFENBA_HEAD_IMG = MODULE_URL . 'static/img/yunfenba_pic.png';
+    const YUNFENBA_HEAD_IMG = MODULE_URL.'static/img/yunfenba_pic.png';
 
     const AQIINFO_NAME = '阿旗平台';
-    const AQIINFO_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
+    const AQIINFO_HEAD_IMG = MODULE_URL.'static/img/aqi_pic.png';
 
     const ZJBAO_NAME = '纸巾宝';
-    const ZJBAO_HEAD_IMG = MODULE_URL . 'static/img/zjbao_pic.png';
+    const ZJBAO_HEAD_IMG = MODULE_URL.'static/img/zjbao_pic.png';
 
     const MEIPA_NAME = '美葩';
-    const MEIPA_HEAD_IMG = MODULE_URL . 'static/img/meipa_pic.png';
+    const MEIPA_HEAD_IMG = MODULE_URL.'static/img/meipa_pic.png';
 
     const KINGFANS_NAME = '金粉吧';
-    const KINGFANS_HEAD_IMG = MODULE_URL . 'static/img/kingfans_pic.png';
+    const KINGFANS_HEAD_IMG = MODULE_URL.'static/img/kingfans_pic.png';
 
     const SNTO_NAME = '史莱姆';
-    const SNTO_HEAD_IMG = MODULE_URL . 'static/img/snto_pic.png';
+    const SNTO_HEAD_IMG = MODULE_URL.'static/img/snto_pic.png';
 
     const YFB_NAME = '粉丝宝';
-    const YFB_HEAD_IMG = MODULE_URL . 'static/img/yfb_pic.png';
+    const YFB_HEAD_IMG = MODULE_URL.'static/img/yfb_pic.png';
 
     const WxWORK_NAME = '企业微信拉新（阿旗）';
-    const WxWORK_HEAD_IMG = MODULE_URL . 'static/img/aqi_pic.png';
+    const WxWORK_HEAD_IMG = MODULE_URL.'static/img/aqi_pic.png';
 
     const YOUFEN_NAME = '友粉';
-    const YOUFEN_HEAD_IMG = MODULE_URL . 'static/img/youfen.png';
+    const YOUFEN_HEAD_IMG = MODULE_URL.'static/img/youfen.png';
 
     const TASK_NAME = '自定义任务';
-    const TASK_HEAD_IMG = MODULE_URL . 'static/img/task.svg';
+    const TASK_HEAD_IMG = MODULE_URL.'static/img/task.svg';
 
     const MENGMO_NAME = '涨啊';
-    const MENGMO_HEAD_IMG = MODULE_URL . 'static/img/mengmo.jpg';
+    const MENGMO_HEAD_IMG = MODULE_URL.'static/img/mengmo.jpg';
 
     const YIDAO_NAME = '壹道';
-    const YIDAO_HEAD_IMG = MODULE_URL . 'static/img/yidao.png';
+    const YIDAO_HEAD_IMG = MODULE_URL.'static/img/yidao.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -165,6 +165,7 @@ class Account extends State
             $res = self::query()->findOne(['id' => $id]);
             if ($res) {
                 $cache[$res->getId()] = $res;
+
                 return $res;
             }
         }
@@ -209,7 +210,9 @@ class Account extends State
             'descr' => html_entity_decode($entry->getDescription()),
             'url' => $entry->getUrl(),
             'clr' => $entry->getClr(),
-            'img' => $entry->isThirdPartyPlatform() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia($entry->getImg()),
+            'img' => $entry->isThirdPartyPlatform() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia(
+                $entry->getImg()
+            ),
             'scname' => $entry->getScname(),
             'total' => $entry->getTotal(),
             'count' => $entry->getCount(),
@@ -320,8 +323,10 @@ class Account extends State
                 if (is_error($res)) {
                     return $res;
                 }
+
                 return $getter_fn($acc);
             };
+
             return true;
         };
 
@@ -353,7 +358,9 @@ class Account extends State
             ];
 
         $include = is_array($include) ? $include : [$include];
-        $third_party_platform_includes = is_array($third_party_platform_includes) ? $third_party_platform_includes : [$third_party_platform_includes];
+        $third_party_platform_includes = is_array(
+            $third_party_platform_includes
+        ) ? $third_party_platform_includes : [$third_party_platform_includes];
 
         $accounts = $device->getAccounts($include);
         foreach ($accounts as $uid => $entry) {
@@ -559,6 +566,7 @@ class Account extends State
             } elseif ($res > 0) {
                 return -1;
             }
+
             return 0;
         });
 
@@ -578,9 +586,11 @@ class Account extends State
                     foreach ($keys as $key) {
                         $arr[] = $result[$key];
                     }
+
                     return $arr;
                 }
             }
+
             return $result;
         };
 
@@ -597,6 +607,7 @@ class Account extends State
             }
             if ($max > 0 && count($result) >= $max) {
                 $result = array_slice($result, 0, $max, true);
+
                 return $shuffle_accounts($result);
             }
         }
@@ -615,6 +626,7 @@ class Account extends State
         }
         $cond = $cond['id'] || $cond['uid'] ? $cond : We7::uniacid($cond);
         $query = self::query($cond);
+
         return $query->findOne();
     }
 
@@ -624,7 +636,7 @@ class Account extends State
      */
     public static function makeUID(string $name): string
     {
-        return sha1(We7::uniacid() . $name);
+        return sha1(We7::uniacid().$name);
     }
 
     /**
@@ -640,6 +652,7 @@ class Account extends State
         if ($account->updateSettings('assigned', $assign_data)) {
             return self::updateAccountData();
         }
+
         return false;
     }
 
@@ -649,7 +662,7 @@ class Account extends State
      */
     public static function updateAccountData(): bool
     {
-        return updateSettings('accounts.lastupdate', '' . microtime(true));
+        return updateSettings('accounts.lastupdate', ''.microtime(true));
     }
 
     /**
@@ -683,7 +696,8 @@ class Account extends State
                 if (in_array($obj->getId(), $assign_data['agents'])) {
                     continue;
                 } else {
-                    $devices = Device::query(['agent_id' => $obj->getAgentId(), 'id' => $assign_data['devices']])->count();
+                    $devices = Device::query(['agent_id' => $obj->getAgentId(), 'id' => $assign_data['devices']]
+                    )->count();
                     if (empty($devices)) {
                         return false;
                     }
@@ -810,6 +824,7 @@ class Account extends State
             $account->setImg($img);
             $account->setUrl($url);
             $account->save();
+
             return $account;
         }
 
@@ -839,78 +854,101 @@ class Account extends State
     public static function createJFBAccount(): ?accountModelObj
     {
         $url = Util::murl('jfb');
+
         return self::createThirdPartyPlatform(Account::JFB, Account::JFB_NAME, Account::JFB_HEAD_IMG, $url);
     }
 
     public static function createMoscaleAccount(): ?accountModelObj
     {
         $url = Util::murl('moscale');
+
         return self::createThirdPartyPlatform(Account::MOSCALE, Account::MOSCALE_NAME, Account::MOSCALE_HEAD_IMG, $url);
     }
 
     public static function createYunFenBaAccount(): ?accountModelObj
     {
         $url = Util::murl('yunfenba');
-        return self::createThirdPartyPlatform(Account::YUNFENBA, Account::YUNFENBA_NAME, Account::YUNFENBA_HEAD_IMG, $url);
+
+        return self::createThirdPartyPlatform(
+            Account::YUNFENBA,
+            Account::YUNFENBA_NAME,
+            Account::YUNFENBA_HEAD_IMG,
+            $url
+        );
     }
 
     public static function createAQiinfoAccount(): ?accountModelObj
     {
         $url = Util::murl('aqiinfo');
+
         return self::createThirdPartyPlatform(Account::AQIINFO, Account::AQIINFO_NAME, Account::AQIINFO_HEAD_IMG, $url);
     }
 
     public static function createZJBaoAccount(): ?accountModelObj
     {
         $url = Util::murl('zjbao');
+
         return self::createThirdPartyPlatform(Account::ZJBAO, Account::ZJBAO_NAME, Account::ZJBAO_HEAD_IMG, $url);
     }
 
     public static function createMeiPaAccount(): ?accountModelObj
     {
         $url = Util::murl('meipa');
+
         return self::createThirdPartyPlatform(Account::MEIPA, Account::MEIPA_NAME, Account::MEIPA_HEAD_IMG, $url);
     }
 
     public static function createKingFansAccount(): ?accountModelObj
     {
         $url = Util::murl('kingfans');
-        return self::createThirdPartyPlatform(Account::KINGFANS, Account::KINGFANS_NAME, Account::KINGFANS_HEAD_IMG, $url);
+
+        return self::createThirdPartyPlatform(
+            Account::KINGFANS,
+            Account::KINGFANS_NAME,
+            Account::KINGFANS_HEAD_IMG,
+            $url
+        );
     }
 
     public static function createSNTOAccount(): ?accountModelObj
     {
         $url = Util::murl('snto');
+
         return self::createThirdPartyPlatform(Account::SNTO, Account::SNTO_NAME, Account::SNTO_HEAD_IMG, $url);
     }
 
     public static function createYFBAccount(): ?accountModelObj
     {
         $url = Util::murl('yfb');
+
         return self::createThirdPartyPlatform(Account::YFB, Account::YFB_NAME, Account::YFB_HEAD_IMG, $url);
     }
 
     public static function createWxWorkAccount(): ?accountModelObj
     {
         $url = Util::murl('wxwork');
+
         return self::createThirdPartyPlatform(Account::WxWORK, Account::WxWORK_NAME, Account::WxWORK_HEAD_IMG, $url);
     }
 
     public static function createYouFenAccount(): ?accountModelObj
     {
         $url = Util::murl('youfen');
+
         return self::createThirdPartyPlatform(Account::YOUFEN, Account::YOUFEN_NAME, Account::YOUFEN_HEAD_IMG, $url);
     }
 
     public static function createMengMoAccount(): ?accountModelObj
     {
         $url = Util::murl('mengmo');
+
         return self::createThirdPartyPlatform(Account::MENGMO, Account::MENGMO_NAME, Account::MENGMO_HEAD_IMG, $url);
     }
 
     public static function createYiDaoAccount(): ?accountModelObj
     {
         $url = Util::murl('yidao');
+
         return self::createThirdPartyPlatform(Account::YIDAO, Account::YIDAO_NAME, Account::YIDAO_HEAD_IMG, $url);
     }
 
@@ -920,6 +958,7 @@ class Account extends State
         if (empty($account)) {
             return err('找不到这个公众号！');
         }
+
         return self::getAuthorizerQrcode($account, $sceneStr, $temporary);
     }
 
@@ -945,11 +984,19 @@ class Account extends State
 
             if ($result) {
                 if ($result['authorizer_access_token']) {
-                    setArray($auth_data, 'authorization_info.authorizer_access_token', $result['authorizer_access_token']);
+                    setArray(
+                        $auth_data,
+                        'authorization_info.authorizer_access_token',
+                        $result['authorizer_access_token']
+                    );
                 }
 
                 if ($result['authorizer_refresh_token']) {
-                    setArray($auth_data, 'authorization_info.authorizer_refresh_token', $result['authorizer_refresh_token']);
+                    setArray(
+                        $auth_data,
+                        'authorization_info.authorizer_refresh_token',
+                        $result['authorizer_refresh_token']
+                    );
                 }
 
                 setArray($auth_data, 'authorization_info.expires_in', $result['expires_in']);
@@ -969,7 +1016,11 @@ class Account extends State
             return $res;
         }
 
-        return WxPlatform::getAuthQRCode($res, $sceneStr, $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE);
+        return WxPlatform::getAuthQRCode(
+            $res,
+            $sceneStr,
+            $temporary ? WxPlatform::TEMP_QRCODE : WxPlatform::PERM_QRCODE
+        );
     }
 
     public static function createOrUpdateFromWxPlatform(int $agent_id, string $app_id, array $auth_result = [])
@@ -1063,7 +1114,7 @@ class Account extends State
 
     protected static function isReady(array $account): bool
     {
-        switch($account['type']) {
+        switch ($account['type']) {
             case Account::VIDEO:
                 if (empty($account['media'])) {
                     return false;
@@ -1111,7 +1162,7 @@ class Account extends State
         //获取本地可用公众号列表
         $accounts = Account::match($device, $user, array_merge(['max' => settings('misc.maxAccounts', 0)], $params));
         if (!empty($accounts)) {
-            foreach ($accounts as $index => &$account) {
+            foreach ($accounts as &$account) {
                 if ($account['type'] == Account::AUTH) {
                     if (isset($account['service_type']) && $account['service_type'] == Account::SERVICE_ACCOUNT) {
                         //如果是授权服务号，需要使用场景二维码替换原二维码
@@ -1136,6 +1187,7 @@ class Account extends State
                 }
             }
         }
+
         //防止json_encode成对象造成前端代码出错
         return array_values($accounts);
     }
@@ -1157,9 +1209,11 @@ class Account extends State
                     'fn' => 'updateAuthAccountQRCode',
                     'error' => $result,
                 ]);
+
                 return $result;
             } else {
                 $account_data['qrcode'] = $result['url'];
+
                 return strval($result['url']);
             }
         }
@@ -1189,6 +1243,7 @@ class Account extends State
                 'time' => time(),
             ]);
         }
+
         return [];
     }
 
@@ -1228,6 +1283,7 @@ class Account extends State
                 if ($account) {
                     return $account;
                 }
+
                 return $first;
             }
         }
@@ -1244,8 +1300,14 @@ class Account extends State
      * @param null $createtime
      * @return account_queryModelObj|null
      */
-    public static function createQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device, $request, $result, $createtime = null): ?account_queryModelObj
-    {
+    public static function createQueryLog(
+        accountModelObj $account,
+        userModelObj $user,
+        deviceModelObj $device,
+        $request,
+        $result,
+        $createtime = null
+    ): ?account_queryModelObj {
         $data = [
             'request_id' => REQUEST_ID,
             'account_id' => $account->getId(),
@@ -1272,10 +1334,13 @@ class Account extends State
      * @param deviceModelObj|null $device
      * @return account_queryModelObj|null
      */
-    public static function getLastQueryLog(accountModelObj $account, userModelObj $user, deviceModelObj $device = null): ?account_queryModelObj
-    {
+    public static function getLastQueryLog(
+        accountModelObj $account,
+        userModelObj $user,
+        deviceModelObj $device = null
+    ): ?account_queryModelObj {
         $condition = [
-            'user_id' => $user->getId()
+            'user_id' => $user->getId(),
         ];
 
         if ($device) {
@@ -1284,11 +1349,16 @@ class Account extends State
 
         $query = self::logQuery($account, $condition);
         $query->orderBy('id DESC');
+
         return $query->findOne();
     }
 
-    public static function updateQueryLogCBData(accountModelObj $acc, userModelObj $user, deviceModelObj $device = null, $data = [])
-    {
+    public static function updateQueryLogCBData(
+        accountModelObj $acc,
+        userModelObj $user,
+        deviceModelObj $device = null,
+        $data = []
+    ) {
         if (App::isAccountLogEnabled()) {
             $log = Account::getLastQueryLog($acc, $user, $device);
             if ($log) {
@@ -1304,8 +1374,12 @@ class Account extends State
         }
     }
 
-    public static function createThirdPartyPlatformBalance(accountModelObj $acc, userModelObj $user, $serial = '', $params = [])
-    {
+    public static function createThirdPartyPlatformBalance(
+        accountModelObj $acc,
+        userModelObj $user,
+        $serial = '',
+        $params = []
+    ) {
         $result = Balance::give($user, $acc, $serial);
 
         Account::updateQueryLogCBData($acc, $user, null, [
@@ -1317,8 +1391,13 @@ class Account extends State
         return $result;
     }
 
-    public static function createThirdPartyPlatformOrder(accountModelObj $acc, userModelObj $user, deviceModelObj $device, $order_uid = '', $cb_params = [])
-    {
+    public static function createThirdPartyPlatformOrder(
+        accountModelObj $acc,
+        userModelObj $user,
+        deviceModelObj $device,
+        $order_uid = '',
+        $cb_params = []
+    ) {
         self::updateQueryLogCBData($acc, $user, $device, [
             'order_uid' => $order_uid,
             'data' => $cb_params,
@@ -1356,12 +1435,13 @@ class Account extends State
             self::MENGMO => '涨啊',
             self::YIDAO => '壹道',
         ];
+
         return $titles[$type] ?? '未知';
     }
 
     public static function ReplaceCode($desc, $placeholder, $code)
     {
-        if (strpos($desc, '{' . $placeholder . '}') !== false) {
+        if (strpos($desc, '{'.$placeholder.'}') !== false) {
             $desc = PlaceHolder::replace($desc, [
                 $placeholder => $code ? "<span data-key=\"$code\">$code</span>" : '',
             ]);
@@ -1370,6 +1450,7 @@ class Account extends State
                 $desc = "回复<span data-key=\"$code\">$code</span>免费领取！";
             }
         }
+
         return $desc;
     }
 }

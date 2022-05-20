@@ -406,7 +406,7 @@ if ($op == 'default') {
                 'clr' => $clr,
                 'serial' => REQUEST_ID,
             ]);
-            
+
             if (!$log) {
                 throw new RuntimeException('入库失败！');
             }
@@ -489,6 +489,7 @@ if ($op == 'default') {
         if (!$log) {
             throw new RuntimeException('入库失败！');
         }
+
         return $num;
     });
 

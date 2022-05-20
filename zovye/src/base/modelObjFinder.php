@@ -28,6 +28,7 @@ class modelObjFinder extends SqlParser
     public function isPropertyExists($name): bool
     {
         $class_name = $this->factory->objClassname();
+
         return property_exists($class_name, $name);
     }
 
@@ -135,6 +136,7 @@ class modelObjFinder extends SqlParser
     public function count($field = '*'): int
     {
         $res = $this->get("COUNT($field)");
+
         return intval($res);
     }
 
@@ -178,6 +180,7 @@ class modelObjFinder extends SqlParser
     public function delete($condition = []): bool
     {
         $this->where($condition);
+
         return We7::pdo_query($this->makeSQL('', true), $this->params);
     }
 
@@ -192,23 +195,23 @@ class modelObjFinder extends SqlParser
         $objClassname = $this->factory->objClassname();
 
         if ($delete) {
-            $sql = 'DELETE FROM ' . We7::tablename($objClassname::getTableName(modelObj::OP_WRITE));
+            $sql = 'DELETE FROM '.We7::tablename($objClassname::getTableName(modelObj::OP_WRITE));
         } else {
             $select = parent::parseSelect($fields);
-            $sql = "$select FROM " . We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+            $sql = "$select FROM ".We7::tablename($objClassname::getTableName(modelObj::OP_READ));
         }
 
 
         if ($this->condition || $this->conditionOr) {
             if ($this->condition) {
-                $sql .= ' WHERE ' . implode(' AND ', $this->condition);
+                $sql .= ' WHERE '.implode(' AND ', $this->condition);
             }
 
             if ($this->conditionOr) {
                 if ($this->condition) {
-                    $sql .= ' AND (' . implode(' OR ', $this->conditionOr) . ')';
+                    $sql .= ' AND ('.implode(' OR ', $this->conditionOr).')';
                 } else {
-                    $sql .= ' WHERE ' . implode(' OR ', $this->conditionOr);
+                    $sql .= ' WHERE '.implode(' OR ', $this->conditionOr);
                 }
             }
         } else {
@@ -236,6 +239,7 @@ class modelObjFinder extends SqlParser
         if ($condition) {
             $this->where($condition);
         }
+
         return !empty($this->get('id'));
     }
 
@@ -265,9 +269,11 @@ class modelObjFinder extends SqlParser
 
         if ($lazy) {
             $res = We7::pdo_fetchAll($this->makeSQL('id'), $this->params);
+
             return new modelObjIteratorLazy($this->factory, $res);
         } else {
             $res = We7::pdo_fetchAll($this->makeSQL('*'), $this->params);
+
             return new modelObjIterator($this->factory, $res);
         }
     }

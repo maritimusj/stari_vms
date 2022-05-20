@@ -47,7 +47,10 @@ class WxAppMessagePush
 
         $config = Config::app('wxapp.message-push', []);
         if (!empty($msg['Encrypt'])) {
-            list($ret, $decrypted) = (new Prpcrypt($config['encodingAESkey']))->decrypt($wx_config['key'], $msg['Encrypt']);
+            list($ret, $decrypted) = (new Prpcrypt($config['encodingAESkey']))->decrypt(
+                $wx_config['key'],
+                $msg['Encrypt']
+            );
 
             if ($ret != ErrorCode::OK) {
                 return err('消息解密失败！');
@@ -82,7 +85,7 @@ class WxAppMessagePush
                         'description' => $config['msgDesc'] ?? '点击打开领取页面...',
                         'url' => $device->getUrl(),
                         'thumb_url' => $config['msgThumb'] ? Util::toMedia($config['msgThumb'], true) : '',
-                    ]
+                    ],
                 ];
 
             } catch (RuntimeException $e) {
@@ -91,7 +94,7 @@ class WxAppMessagePush
                     'msgtype' => 'text',
                     'text' => [
                         'content' => $e->getMessage(),
-                    ]
+                    ],
                 ];
             }
 

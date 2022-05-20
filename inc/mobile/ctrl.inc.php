@@ -22,15 +22,15 @@ if (request::has('op')) {
 }
 
 $sign = request::header('HTTP_ZOVYE_SIGN');
-$nostr = request::header('HTTP_ZOVYE_NOSTR');
+$no_str = request::header('HTTP_ZOVYE_NOSTR');
 
 //检查回调签名
 if (settings('ctrl.checkSign') && CtrlServ::makeNotifierSign(
-    settings('ctrl.appKey'), 
-    settings('ctrl.appSecret'),
-    $nostr,
-    request::raw()
-) !== $sign) {
+        settings('ctrl.appKey'),
+        settings('ctrl.appSecret'),
+        $no_str,
+        request::raw()
+    ) !== $sign) {
     Log::fatal('ctrl', [
         'error' => '签名检验失败！',
         'op' => $op,

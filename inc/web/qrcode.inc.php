@@ -22,7 +22,7 @@ if ($op == 'default') {
     if (empty($qrcode['url'])) {
 
         $url = Util::shortMobileUrl('qrcode');
-        $qrcode = Util::createQrcodeFile('qrcode.' . time(), $url);
+        $qrcode = Util::createQrcodeFile('qrcode.'.time(), $url);
 
         updateSettings(
             'misc.qrcode',

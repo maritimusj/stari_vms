@@ -56,17 +56,18 @@ class lockerModelObj extends modelObj
 
     public function release(): bool
     {
-        if  (--$this->used > 0) {                
+        if (--$this->used > 0) {
             $tbname = We7::tablename(lockerModelObj::getTableName(true));
-            $res = We7::pdo_query('UPDATE '. $tbname . ' SET used=used-1 WHERE id=:id', [
+            $res = We7::pdo_query('UPDATE '.$tbname.' SET used=used-1 WHERE id=:id', [
                 ':id' => $this->id,
             ]);
-            if ($res > 0) {                    
+            if ($res > 0) {
                 return true;
             }
         } else {
             return $this->destroy();
         }
+
         return false;
     }
 
@@ -78,8 +79,10 @@ class lockerModelObj extends modelObj
                 'used' => $this->used,
             ];
             $this->setUsed($this->used + 1);
+
             return $this->saveWhen($condition);
         }
+
         return false;
     }
 

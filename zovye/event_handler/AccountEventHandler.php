@@ -22,8 +22,12 @@ class AccountEventHandler
      * @param accountModelObj|null $account
      * @param orderModelObj|null $order
      */
-    public static function onDeviceBeforeLock(deviceModelObj $device, userModelObj $user, accountModelObj $account = null, orderModelObj $order = null)
-    {
+    public static function onDeviceBeforeLock(
+        deviceModelObj $device,
+        userModelObj $user,
+        accountModelObj $account = null,
+        orderModelObj $order = null
+    ) {
         if ($account && empty($order)) {
             //检查用户是否允许
             $params = [];
@@ -79,6 +83,7 @@ class AccountEventHandler
                 'bonus_num' => $v,
             ]);
         }
+
         return true;
     }
 }

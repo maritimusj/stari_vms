@@ -3,6 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
@@ -17,24 +18,24 @@ class principalModelObj extends modelObj
     }
 
     /** @var int */
-	protected $id;
+    protected $id;
 
-	/** @var int */
-	protected $user_id;
+    /** @var int */
+    protected $user_id;
 
-	/** @var int */
-	protected $principal_id;
+    /** @var int */
+    protected $principal_id;
 
-	/** @var bool */
-	protected $enable;
+    /** @var bool */
+    protected $enable;
 
-	/** @var string */
-	protected $name;
+    /** @var string */
+    protected $name;
 
-	protected $extra;
+    protected $extra;
 
-	/** @var int */
-	protected $createtime;
+    /** @var int */
+    protected $createtime;
 
-	use ExtraDataGettersAndSetters;
+    use ExtraDataGettersAndSetters;
 }

@@ -111,7 +111,7 @@ class CommissionBalance extends State
         ];
 
         if ($entry->getXVal() > 0) {
-            $data['xval'] = '+' . $data['xval'];
+            $data['xval'] = '+'.$data['xval'];
         }
 
         if ($entry->getSrc() == CommissionBalance::WITHDRAW) {
@@ -245,6 +245,7 @@ $device_info
 </dl>
 REALOD_IN;
         }
+
         return $data;
     }
 
@@ -385,6 +386,7 @@ ORDER;
     {
         if ($this->user) {
             $openid = $this->user->getOpenid();
+
             return CommissionBalance::query(['openid' => $openid]);
         }
 
@@ -439,8 +441,10 @@ ORDER;
             $user->updateSettings('extra.first.commission', [
                 'id' => $log->getId(),
             ]);
+
             return $log;
         }
+
         return null;
     }
 }

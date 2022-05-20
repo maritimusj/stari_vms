@@ -28,6 +28,7 @@ class agentModelObj extends userModelObj
     public function getName(): string
     {
         $name = $this->settings('agentData.name', '');
+
         return empty($name) ? parent::getName() : $name;
     }
 
@@ -146,6 +147,7 @@ class agentModelObj extends userModelObj
             if (!empty($path)) {
                 $key .= ".$path";
             }
+
             return $this->settings($key, $default);
         }
 
@@ -172,6 +174,7 @@ class agentModelObj extends userModelObj
                 return true;
             }
         }
+
         return false;
     }
 
@@ -295,6 +298,7 @@ class agentModelObj extends userModelObj
         if ($agent instanceof $user_classname) {
             return $this->getPartnerAgentId() == $agent->getId();
         }
+
         return $this->getPartnerAgentId() == intval($agent);
     }
 
@@ -305,6 +309,7 @@ class agentModelObj extends userModelObj
             $config = $this->settings('agentData.gsp', []);
             $mode = $config['enabled'] ? strval($config['mode']) : '';
         }
+
         return $mode;
     }
 
@@ -379,9 +384,11 @@ class agentModelObj extends userModelObj
                         if ($entry['percent'] > 0) {
                             $data['percent'] = floatval($entry['percent']);
                             $data['type'] = 'percent';
-                        } else if ($entry['amount'] > 0) {
-                            $data['percent'] = floatval($entry['amount']);
-                            $data['type'] = 'amount';
+                        } else {
+                            if ($entry['amount'] > 0) {
+                                $data['percent'] = floatval($entry['amount']);
+                                $data['type'] = 'amount';
+                            }
                         }
                         $result[] = $data;
                     }

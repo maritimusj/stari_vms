@@ -19,28 +19,15 @@ if ($op == 'default') {
     $device = Device::getFromAppId($app_id);
     if ($device) {
         //设备已完成注册
-        header('location:' . Util::murl('device', ['id' => $device->getImei()]));
+        header('location:'.Util::murl('device', ['id' => $device->getImei()]));
         exit();
     }
 
-    $devices = [];
-    /* 可选设备列表
-    $query = Device::query();
-    foreach ($query->where('ISNULL(app_id) || LENGTH(app_id)=0')->findAll() as $entry) {
-        $device = [
-        'id' => $entry->getId(),
-        'name' => $entry->getName(),
-        'IMEI' => $entry->getImei(),
-        );
-        $devices[] = $device;
-    }
-     */
     app()->showTemplate('app', [
         'js_code' => Util::fetchJSSDK(),
         'op' => $op,
         'appId' => $app_id,
         'device' => $device,
-        'devices' => $devices,
     ]);
 
 } elseif ($op == 'bind') {
@@ -182,7 +169,7 @@ if ($op == 'default') {
         ];
 
         $in_str = array_map(function ($v) {
-            return 'g' . $v;
+            return 'g'.$v;
         }, $arr);
 
         $res = $query->where(['k' => $in_str])->findAll();
@@ -216,7 +203,39 @@ if ($op == 'default') {
         exit(json_encode($res_arr));
     }
 
-    $arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+    $arr = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+    ];
     $arr_assoc = Util::getProvinceList();
 
     //省份
@@ -308,6 +327,7 @@ function handlePCT($x, $y, $xx, $yy): array
 
     if ($total_amount < 100) {
         $o_amount = 100 - $total_amount;
+
         return [$arr1, $arr2, ['x' => '其他', 'y' => $o_amount]];
     } else {
         return [$arr1, $arr2];
@@ -344,5 +364,6 @@ function handleFreq($k_init, $k_freq, $k_s1, $k_s2): int
             $value = $arr[$k_init];
         }
     }
+
     return intval($value);
 }

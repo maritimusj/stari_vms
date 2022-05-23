@@ -506,14 +506,14 @@ class Stats
         $first_order = Order::getFirstOrder();
         $total = 0;
         if ($first_order) {
+            $e = [app(), 'goods'];
+
             if (Config::app('order.total', 0) > 100000) {
                 $last_order = Order::getLastOrder();
                 if ($last_order) {
                     $total = $last_order['id'].'（订单）';
                 }
             } else {
-                $e = [app(), 'goods'];
-
                 $begin = new DateTime();
                 $begin->setTimestamp($first_order['createtime']);
                 $end = new DateTime();

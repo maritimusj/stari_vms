@@ -652,6 +652,8 @@ class Stats
                 $day = new DateTimeImmutable($day);
             } elseif ($day instanceof DateTimeInterface) {
                 $day = new DateTimeImmutable($day);
+            } else {
+                return false;
             }
 
             $begin = $day->modify('00:00');
@@ -674,10 +676,10 @@ class Stats
 
             $stats = $obj->get('statsData', []);
 
-            $y = date('Y', $day); //年
-            $n = date('n', $day); //月
-            $z = date('z', $day); //一年中的第几天
-            $j = date('j', $day); //月份中的第几天
+            $y = $day->format('Y'); //年
+            $n = $day->format('n'); //月
+            $z = $day->format('z'); //一年中的第几天
+            $j = $day->format('j'); //月份中的第几天
 
             unset($stats['data'][$y]['days'][$n][$j]);
             unset($stats['data'][$y]['hours'][$z]);

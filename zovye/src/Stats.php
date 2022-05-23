@@ -529,7 +529,7 @@ class Stats
             $data['today']['n'] = (int)$counter->getDayAll($e, new DateTime('today'))['total'];
             $data['yesterday']['n'] = (int)$counter->getDayAll($e, new DateTime('yesterday 00:00'))['total'];
 
-            $today = new DateTime('today');
+            $today = new DateTime('00:00');
             $last7days = new DateTime('-7 days 00:00');
             $total = 0;
             while ($today > $last7days) {

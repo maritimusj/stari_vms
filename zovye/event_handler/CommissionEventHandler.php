@@ -284,9 +284,9 @@ class CommissionEventHandler
             }
 
             if ($is_percent) {
-                $price = intval(round($commission_price * intval($v) / 100) * $order->getNum());
+                $price = intval(round($commission_price * intval($v) / 100));
             } else {
-                $price = intval($v * $order->getNum());
+                $price = intval($v);
             }
 
             if ($price > $available_price) {
@@ -392,7 +392,6 @@ class CommissionEventHandler
                     //佣金为零，退出循环
                     break;
                 }
-
             }
         } elseif ($agent->getGSPMode() == GSP::MIXED) {
             $query = GSP::from($agent);

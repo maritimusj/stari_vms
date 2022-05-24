@@ -11,12 +11,6 @@ use we7\db;
 /**
  * Class We7
  * @method static string tomedia(string $src, bool $local_path = false)
- * @method static string pagination($total, $pageIndex, $page_size = 15, $url = '', $context = array(
-    'before' => 5,
-    'after' => 4,
-    'ajaxcallback' => '',
-    'callbackfuncname' => ''
-))
  * @method static string murl($segment, $params = array(), $noredirect = true, $addhost = false)
  * @method static string wurl($segment, $params = array())
  * @method static mixed load()

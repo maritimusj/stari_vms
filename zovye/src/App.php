@@ -574,4 +574,9 @@ class App
     {
         return false;
     }
+
+    public static function isDeviceBriefPageEnabled(): bool
+    {
+        return settings('custom.device.brief-page.enabled', false);
+    }
 }

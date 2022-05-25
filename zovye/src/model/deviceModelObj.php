@@ -151,7 +151,10 @@ class deviceModelObj extends modelObj
     protected $error_code;
 
     /** @var int */
-    protected $s1;
+    protected $s1; //位置是否变动
+
+    /** @var int */
+    protected $s2; //是否缺货
 
     protected $last_order;
 
@@ -1161,6 +1164,8 @@ class deviceModelObj extends modelObj
     {
         $remainWarning = App::remainWarningNum($this->getAgent());
 
+        $set_s2_flag = false;
+
         if ($remainWarning > 0 && $this->remain < $remainWarning) {
             $tpl_id = settings('notice.reload_tplid');
             if ($tpl_id) {
@@ -1169,7 +1174,11 @@ class deviceModelObj extends modelObj
                     Job::devicePayloadWarning($this->getId());
                 }
             }
+            $set_s2_flag = true;
         }
+
+        $this->setS2($this->remain < 1 || $set_s2_flag ? 1 : 0);
+        $this->save();
     }
 
     /**

@@ -151,6 +151,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
         $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
+        $settings['custom']['device']['brief-page']['enabled'] = request::bool('deviceBriefPage') ? 1 : 0;
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
         $settings['account']['douyin']['enabled'] = request::bool('douyin') ? 1 : 0;
@@ -1103,6 +1104,7 @@ if ($op == 'account') {
     $tpl_data['credit_types'] = We7::mc_credit_types();
 
     $tpl_data['data_url'] = Util::murl('data');
+    $tpl_data['device_brief_url'] = Util::murl('brief');    
     $tpl_data['api_url'] = Util::murl('api');
 
     $app_key = settings('app.key');

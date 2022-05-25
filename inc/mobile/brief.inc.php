@@ -1,0 +1,60 @@
+<?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
+
+namespace zovye;
+
+$op = request::op('default');
+
+if ($op == 'data') {
+    $query = Device::query();
+
+    $total = $query->count();
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+    $query->page($page, $page_size);
+
+    if (request::isset('online')) {
+        $query->where(['mcb_online' => request::bool('online') ? 1 : 0]);
+    }
+    if (request::isset('error')) {
+        if (request::bool('error')) {
+            $query->where(['error_code !=' => 0]);
+        } else {
+            $query->where(['error_code' => 0]);
+        }
+    }
+
+    if (request::isset('low')) {
+        $query->where(['s2' => request::bool('low') ? 1 : 0]);
+    }
+
+    $list = [];
+    $e = [app(), 'goods'];
+
+    foreach($query->findAll() as $device) {
+        $data = $device->profile();
+        $data['location'] = $device->settings('extra.location.tencent', $device->settings('extra.location.baidu', []));
+
+        $data['stats'] = [
+            'month' => intval(Stats::getMonthTotal($device)['total']),
+            'today' => intval(Stats::getDayTotal($device)['total']),
+        ];
+
+        $list[] = $data;
+    }
+    
+    JSON::success([
+        'list' => $list,
+        'total' => $total,
+        'totalpage' => ceil($total / $page_size),
+    ]);
+}
+
+app()->showTemplate('misc/brief', [
+    'api_url' => Util::murl('brief', ['op' => 'data']),
+]);

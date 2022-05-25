@@ -155,16 +155,28 @@
             <div class="seg">
                 <div class="title">数据大屏</div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label operate">
-                        <a href="{php echo $this->createWebUrl('settings', ['op'=>'data_view'])}">
-                            进入设置 <i class="fa fa-cogs"></i>
-                        </a>
+                    <label class="col-md-2 control-label">
+                        销售数据
                     </label>
                     <div class="col-md-10">
-                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$data_url}"></i> {$data_url}</span>
-                        <span class="help-block">* 大屏数据展示网址</span>
+                        <dev class="input-group">
+                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$data_url}"></i> {$data_url}</span>
+                            <div class="input-group-addon operate" title="进入设置">
+                                <a href="{php echo $this->createWebUrl('settings', ['op'=>'data_view'])}"><i class="fa fa-gears"></i></a>
+                            </div>
+                        </dev>
                     </div>
                 </div>
+                {if \zovye\App::isDeviceBriefPageEnabled()}
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        设备信息
+                    </label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$device_brief_url}"></i> {$device_brief_url}</span>
+                    </div>                    
+                </div>
+                {/if}
             </div>
             <div class="seg">
                 <div class="title">第三方接口</div>

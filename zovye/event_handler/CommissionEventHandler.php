@@ -486,7 +486,7 @@ class CommissionEventHandler
                 $fee_type = intval($agent_data['commission']['fee_type']);
 
                 if ($fee_type == 0) {
-                    $val = $fee;
+                    $val = $fee * $order->getNum();
                 } else {
                     $val = intval(round($commission_price * $fee / 10000));
                 }

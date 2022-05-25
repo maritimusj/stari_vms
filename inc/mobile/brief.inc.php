@@ -10,14 +10,7 @@ $op = request::op('default');
 
 if ($op == 'data') {
     $query = Device::query();
-
-    $total = $query->count();
-
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
-
-    $query->page($page, $page_size);
-
+    
     if (request::isset('online')) {
         $query->where(['mcb_online' => request::bool('online') ? 1 : 0]);
     }
@@ -32,6 +25,14 @@ if ($op == 'data') {
     if (request::isset('low')) {
         $query->where(['s2' => request::bool('low') ? 1 : 0]);
     }
+
+    $total = $query->count();
+
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+    $query->page($page, $page_size);
+
 
     $list = [];
     $e = [app(), 'goods'];

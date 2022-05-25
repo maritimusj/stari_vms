@@ -569,4 +569,9 @@ class App
             return Config::device('door.enable', false);
         });
     }
+
+    public static function isMultiQRCodesEnabled(): bool
+    {
+        return false;
+    }
 }

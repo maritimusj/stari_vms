@@ -54,8 +54,12 @@ if ($op == 'data') {
         'total' => $total,
         'totalpage' => ceil($total / $page_size),
     ]);
+
+} elseif ($op == 'stats') {
+
+    JSON::success(Stats::brief());
 }
 
 app()->showTemplate('misc/brief', [
-    'api_url' => Util::murl('brief', ['op' => 'data']),
+    'api_url' => Util::murl('brief'),
 ]);

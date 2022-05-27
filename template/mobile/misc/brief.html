@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>新零售系统设备监控平台</title>
+	<style>
+		html,
+		body {
+			width: 100vw;
+			height: 100vh;
+		}
+
+		body {
+			font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+			font-size: 18px;
+			color: white;
+			margin: 0;
+			padding: 0;
+			background-image: url({MODULE_URL}static/img/bg.jpeg);
+			background-size: cover;
+			background-position: center;
+		}
+
+		#app {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		[v-cloak] {
+			display: none !important;
+		}
+
+		.nav {
+			width: 100%;
+			height: 60px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background-image: url({MODULE_URL}static/img/bar.png);
+			background-size: cover;
+			background-position: center;
+			color: #00FFFF;
+		}
+
+		.nav img {
+			width: 100%;
+		}
+
+		.header {
+			width: calc(100% - 40px);
+			height: 140px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			background-color: #00FFFF22;
+			position: relative;
+			margin-top: 10px;
+		}
+
+		.stats-view {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			box-sizing: border-box;
+			padding: 0 50px;
+		}
+
+		.stats-view .title {
+			font-weight: bold;
+			color: #00FFFF;
+		}
+
+		.stats-view .value {
+			font-size: 35px;
+			margin-top: 10px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
+
+		.stats-view .add {
+			font-size: 22px;
+			margin-left: 10px;
+			color: #00FF7F;
+		}
+
+		.line {
+			width: 1px;
+			height: 80px;
+			background-color: #00FFFF33;
+		}
+
+		.main {
+			width: calc(100% - 40px);
+			height: calc(100% - 210px);
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 20px;
+			padding: 20px 0;
+			overflow: hidden;
+		}
+
+		.card {
+			width: calc((100% - 20px)/2);
+			height: calc((100% - 20px)/2);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			background-color: #00FFFF22;
+			position: relative;
+		}
+
+		.horn {
+			width: 10px;
+			height: 10px;
+			position: absolute;
+		}
+
+		.lt {
+			border-top: 2px solid #00FFFF;
+			border-left: 2px solid #00FFFF;
+			left: 0;
+			top: 0;
+		}
+
+		.rt {
+			border-top: 2px solid #00FFFF;
+			border-right: 2px solid #00FFFF;
+			right: 0;
+			top: 0;
+		}
+
+		.rb {
+			border-bottom: 2px solid #00FFFF;
+			border-right: 2px solid #00FFFF;
+			right: 0;
+			bottom: 0;
+		}
+
+		.lb {
+			border-bottom: 2px solid #00FFFF;
+			border-left: 2px solid #00FFFF;
+			left: 0;
+			bottom: 0;
+		}
+
+		.card .title {
+			width: 100%;
+			height: 40px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+			color: #00FFFF;
+		}
+
+		.dot {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			margin-right: 10px;
+		}
+
+		.container {
+			width: 100%;
+			max-height: calc(100% - 40px);
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		.device {
+			width: calc((100% - 40px) / 3);
+			height: 60px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			margin-left: 10px;
+			margin-bottom: 10px;
+			background-color: rgba(0, 0, 0, 0.5);
+			box-shadow: 0 0 3px #00FFFF;
+			padding: 0 10px;
+			box-sizing: border-box;
+		}
+
+		.do-animation {
+			animation: rotate 1s;
+		}
+
+		@keyframes rotate {
+			from {
+				transform: rotateY(0)
+			}
+
+			to {
+				transform: rotateY(360deg);
+			}
+		}
+
+		.device .name {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.device .address {
+			font-size: 14px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			color: #ccc;
+			margin-top: 3px;
+		}
+
+		.device:nth-child(-n + 3) {
+			margin-top: 2px;
+		}
+
+		.fade-enter-active,
+		.fade-leave-active {
+			transition: all 1s;
+		}
+
+		.fade-enter,
+		.fade-leave-to {
+			opacity: 0;
+		}
+
+		.fade-enter {
+			transform: translateY(20px);
+		}
+
+		.fade-leave-to {
+			transform: translateY(-20px);
+		}
+
+		.rotate-enter-active,
+		.rotate-leave-active {
+			transition: all .5s;
+		}
+
+		.rotate-enter,
+		.rotate-leave-to {
+			transform: rotateY(180deg);
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app" v-cloak>
+		<div class="nav">
+			<h1>新零售系统设备监控平台</h1>
+		</div>
+		<div class="header">
+			<div class="lt horn"></div>
+			<div class="rt horn"></div>
+			<div class="rb horn"></div>
+			<div class="lb horn"></div>
+			<div class="stats-view">
+				<span class="title">今日出货</span>
+				<div class="value">
+					<span>{{stats.today.value}}</span>
+					<transition name="fade">
+						<span class="add" v-if="stats.today.show">+{{stats.today.num}}</span>
+					</transition>
+				</div>
+			</div>
+			<div class="line"></div>
+			<div class="stats-view">
+				<span class="title">本月出货</span>
+				<div class="value">
+					<span>{{stats.month.value}}</span>
+					<transition name="fade">
+						<span class="add" v-if="stats.month.show">+{{stats.month.num}}</span>
+					</transition>
+				</div>
+			</div>
+			<div class="line"></div>
+			<div class="stats-view">
+				<span class="title">总计出货</span>
+				<div class="value">
+					<span>{{stats.all.value}}</span>
+					<transition name="fade">
+						<span class="add" v-if="stats.all.show">+{{stats.all.num}}</span>
+					</transition>
+				</div>
+			</div>
+			<div class="line"></div>
+			<div class="stats-view">
+				<span class="title">用户总数</span>
+				<div class="value">
+					<span>{{stats.user.value}}</span>
+					<transition name="fade">
+						<span class="add" v-if="stats.user.show">+{{stats.user.num}}</span>
+					</transition>
+				</div>
+			</div>
+			<div class="line"></div>
+			<div class="stats-view">
+				<span class="title">设备总数</span>
+				<div class="value">
+					<span>{{stats.device.value}}</span>
+					<transition name="fade">
+						<span class="add" v-if="stats.device.show">+{{stats.device.num}}</span>
+					</transition>
+				</div>
+			</div>
+		</div>
+		<div class="main">
+			<div class="card">
+				<div class="lt horn"></div>
+				<div class="rt horn"></div>
+				<div class="rb horn"></div>
+				<div class="lb horn"></div>
+				<div class="title">
+					<div class="dot" style="background-color: #00FF7F;"></div>
+					<span>在线设备（{{online.total}}台）</span>
+				</div>
+				<div class="container" ref="online">
+					<div class="device" :class="{'do-animation': rotate}" v-for="item in online.list"
+						:style="{'height': `${(online.height - 42)/4}px`}">
+						<span class="name">{{item.name}}</span>
+						<span class="address"
+							v-if="item.location && item.location.address">{{item.location.address}}</span>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="lt horn"></div>
+				<div class="rt horn"></div>
+				<div class="rb horn"></div>
+				<div class="lb horn"></div>
+				<div class="title">
+					<div class="dot" style="background-color: #FF8C00;"></div>
+					<div>缺货设备（{{low.total}}台）</div>
+				</div>
+				<div class="container" ref="low">
+					<div class="device" :class="{'do-animation': rotate}" v-for="item in low.list"
+						:style="{'height': `${(low.height - 42)/4}px`}">
+						<span class="name">{{item.name}}</span>
+						<span class="address"
+							v-if="item.location && item.location.address">{{item.location.address}}</span>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="lt horn"></div>
+				<div class="rt horn"></div>
+				<div class="rb horn"></div>
+				<div class="lb horn"></div>
+				<div class="title">
+					<div class="dot" style="background-color: #DCDCDC;"></div>
+					<span>离线设备（{{offline.total}}台）</span>
+				</div>
+				<div class="container" ref="offline">
+					<div class="device" :class="{'do-animation': rotate}" v-for="item in offline.list"
+						:style="{'height': `${(offline.height - 42)/4}px`}">
+						<span class="name">{{item.name}}</span>
+						<span class="address"
+							v-if="item.location && item.location.address">{{item.location.address}}</span>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="lt horn"></div>
+				<div class="rt horn"></div>
+				<div class="rb horn"></div>
+				<div class="lb horn"></div>
+				<div class="title">
+					<div class="dot" style="background-color: #FF0000;"></div>
+					<div>故障设备（{{error.total}}台）</div>
+				</div>
+				<div class="container" ref="error">
+					<div class="device" :class="{'do-animation': rotate}" v-for="item in error.list"
+						:style="{'height': `${(error.height - 42)/4}px`}">
+						<span class="name">{{item.name}}</span>
+						<span class="address"
+							v-if="item.location && item.location.address">{{item.location.address}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.staticfile.org/vue/2.6.9/vue.min.js"></script>
+	<script src="https://cdn.staticfile.org/axios/0.24.0/axios.min.js"></script>
+	<script>
+		new Vue({
+			el: '#app',
+			data: {
+				url: '{$api_url}',
+				online: {
+					list: [],
+					page: 1,
+					pagesize: 12,
+					totalpage: 0,
+					total: 0,
+					height: 0
+				},
+				offline: {
+					list: [],
+					page: 1,
+					pagesize: 12,
+					total: 0,
+					height: 0
+				},
+				error: {
+					list: [],
+					page: 1,
+					pagesize: 12,
+					total: 0,
+					height: 0
+				},
+				low: {
+					list: [],
+					page: 1,
+					pagesize: 12,
+					total: 0,
+					height: 0
+				},
+				rotate: false,
+				promiseList: [],
+				stats: {
+					today: {
+						value: 0,
+						old: 0,
+						num: 0,
+						show: false,
+						interval: null
+					},
+					month: {
+						value: 0,
+						old: 0,
+						num: 0,
+						show: false,
+						interval: null
+					},
+					all: {
+						value: 0,
+						old: 0,
+						num: 0,
+						show: false,
+						interval: null
+					},
+					user: {
+						value: 0,
+						old: 0,
+						num: 0,
+						show: false,
+						interval: null
+					},
+					device: {
+						value: 0,
+						old: 0,
+						num: 0,
+						show: false,
+						interval: null
+					}
+				}
+			},
+			mounted () {
+				this.getContainerHeight()
+				this.getData()
+				this.getStats()
+				setInterval(() => {
+					if (++this.online.page > this.online.totalpage) {
+						this.online.page = 1
+					}
+					if (++this.offline.page > this.offline.totalpage) {
+						this.offline.page = 1
+					}
+					if (++this.low.page > this.low.totalpage) {
+						this.low.page = 1
+					}
+					if (++this.error.page > this.error.totalpage) {
+						this.error.page = 1
+					}
+					this.getData()
+					this.getStats()
+				}, 1000 * 10)
+			},
+			methods: {
+				getContainerHeight () {
+					this.online.height = this.$refs.online.clientHeight
+					this.offline.height = this.$refs.offline.clientHeight
+					this.low.height = this.$refs.low.clientHeight
+					this.error.height = this.$refs.error.clientHeight
+				},
+				getData () {
+					this.rotate = false
+					this.promiseList = []
+
+					this.getDeviceList('online')
+					this.getDeviceList('offline')
+					this.getDeviceList('low')
+					this.getDeviceList('error')
+
+					Promise.all(this.promiseList).then((res) => {
+						res.forEach(({ key, data }) => {
+							this[key].list = data.list || []
+							this[key].total = data.total || 0
+							this[key].totalpage = data.totalpage || 0
+						})
+						this.rotate = true
+					})
+				},
+				getDeviceList (key) {
+					let params = {
+						op: 'data',
+						page: this[key].page,
+						pagesize: this[key].pagesize
+					}
+					switch (key) {
+						case 'online':
+							params.online = 1
+							break
+						case 'offline':
+							params.online = 0
+							break
+						case 'low':
+							params.low = 1
+							break
+						case 'error':
+							params.error = 1
+							break
+					}
+					const p = new Promise((resolve, reject) => {
+						axios.get(this.url, { params }).then(res => {
+							if (res.data.status) {
+								resolve({ key, data: res.data.data })
+							}
+						})
+					})
+					this.promiseList.push(p)
+				},
+				getStats () {
+					const params = {
+						op: 'stats'
+					}
+					axios.get(this.url, { params }).then(res => {
+						if (res.data.status) {
+							const data = res.data.data
+							const today = data.stats.today.n
+							const month = data.stats.month.n
+							const all = data.stats.all.n
+							const user = data.total.user
+							const device = data.total.device
+
+							this.numberGrow('today', today - this.stats.today.value)
+							this.numberGrow('month', month - this.stats.month.value)
+							this.numberGrow('all', all - this.stats.all.value)
+							this.numberGrow('user', user - this.stats.user.value)
+							this.numberGrow('device', device - this.stats.device.value)
+						}
+					})
+				},
+				numberGrow (key, num) {
+					if (num !== 0) {
+						const step = parseInt(num / 20)
+						this.stats[key].num = num
+						this.stats[key].show = true
+						setTimeout(() => {
+							this.stats[key].show = false
+						}, 2000);
+						let i = 1
+						this.stats[key].interval = setInterval(() => {
+							if (i++ > (step > 0 ? 20 : num)) {
+								this.stats[key].value = this.stats[key].old + num
+								this.stats[key].old = this.stats[key].value
+								clearInterval(this.stats[key].interval)
+							} else {
+								this.stats[key].value += step > 0 ? step : 1
+							}
+						}, 50)
+					}
+				}
+			}
+		})
+	</script>
+</body>
+
+</html>

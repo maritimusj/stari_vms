@@ -978,6 +978,7 @@ class Order extends State
             'goods_num' => '商品数量',
             'goods_price' => '商品价格',
             'way' => '购买方式',
+            'price' => '支付金额',
             'refund' => '是否退款',
             'refund_time' => '退款时间',
             'account_title' => '公众号',
@@ -1117,6 +1118,9 @@ class Order extends State
                             $data[$header] = '';
                         }
                         break;
+                    case 'price': 
+                        $data[$header] = number_format($entry->getPrice() / 100, 2, '.', '');
+                        break;
                     case 'pay_type':
                         $data[$header] = User::getUserCharacter($entry->getUser())['title'];
                         break;
@@ -1165,7 +1169,7 @@ class Order extends State
                         $data[$header] = $entry->getNum();
                         break;
                     case 'goods_price':
-                        $data[$header] = number_format($entry->getPrice() / 100, 2, '.', '');
+                        $data[$header] = number_format($entry->getGoodsPrice() / 100, 2, '.', '');
                         break;
                     case 'way':
                         if ($entry->getPrice() > 0) {

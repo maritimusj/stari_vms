@@ -17,7 +17,8 @@
 			color: white;
 			margin: 0;
 			padding: 0;
-			background-image: url({MODULE_URL}static/img/bg.jpeg);
+			/* background-image: url({MODULE_URL}static/img/bg.jpeg); */
+			background-image: url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.pptjia.com%2Fimage%2F20190108%2F9ec44adb1dde6b9113c773744c6b5e9f.jpg&refer=http%3A%2F%2Fimg.pptjia.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1656293964&t=f9cba7317dcb952e4946905989fc899a");
 			background-size: cover;
 			background-position: center;
 		}
@@ -41,10 +42,10 @@
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			background-image: url({MODULE_URL}static/img/bar.png);
+			/* background-image: url({MODULE_URL}static/img/bar.png); */
 			background-size: cover;
 			background-position: center;
-			color: #00FFFF;
+			color: #000;
 		}
 
 		.nav img {
@@ -57,7 +58,7 @@
 			display: flex;
 			flex-direction: row;
 			align-items: center;
-			background-color: #00FFFF22;
+			background-color: #0003;
 			position: relative;
 			margin-top: 10px;
 		}
@@ -72,7 +73,7 @@
 
 		.stats-view .title {
 			font-weight: bold;
-			color: #00FFFF;
+			color: #000;
 		}
 
 		.stats-view .value {
@@ -81,18 +82,19 @@
 			display: flex;
 			flex-direction: row;
 			align-items: center;
+			color: white;
 		}
 
 		.stats-view .add {
 			font-size: 22px;
 			margin-left: 10px;
-			color: #00FF7F;
+			color: white;
 		}
 
 		.line {
 			width: 1px;
 			height: 80px;
-			background-color: #00FFFF33;
+			background-color: #0003;
 		}
 
 		.main {
@@ -112,7 +114,7 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			background-color: #00FFFF22;
+			background-color: #0003;
 			position: relative;
 		}
 
@@ -123,29 +125,29 @@
 		}
 
 		.lt {
-			border-top: 2px solid #00FFFF;
-			border-left: 2px solid #00FFFF;
+			border-top: 2px solid #000;
+			border-left: 2px solid #000;
 			left: 0;
 			top: 0;
 		}
 
 		.rt {
-			border-top: 2px solid #00FFFF;
-			border-right: 2px solid #00FFFF;
+			border-top: 2px solid #000;
+			border-right: 2px solid #000;
 			right: 0;
 			top: 0;
 		}
 
 		.rb {
-			border-bottom: 2px solid #00FFFF;
-			border-right: 2px solid #00FFFF;
+			border-bottom: 2px solid #000;
+			border-right: 2px solid #000;
 			right: 0;
 			bottom: 0;
 		}
 
 		.lb {
-			border-bottom: 2px solid #00FFFF;
-			border-left: 2px solid #00FFFF;
+			border-bottom: 2px solid #000;
+			border-left: 2px solid #000;
 			left: 0;
 			bottom: 0;
 		}
@@ -158,7 +160,6 @@
 			align-items: center;
 			justify-content: center;
 			font-weight: bold;
-			color: #00FFFF;
 		}
 
 		.dot {
@@ -184,8 +185,8 @@
 			justify-content: center;
 			margin-left: 10px;
 			margin-bottom: 10px;
-			background-color: rgba(0, 0, 0, 0.5);
-			box-shadow: 0 0 3px #00FFFF;
+			background-color: rgba(0, 0, 0, 0.3);
+			box-shadow: 0 0 3px #000;
 			padding: 0 10px;
 			box-sizing: border-box;
 		}
@@ -215,7 +216,7 @@
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			color: #ccc;
+			color: white;
 			margin-top: 3px;
 		}
 
@@ -326,8 +327,8 @@
 				<div class="container" ref="online">
 					<div class="device" :class="{'do-animation': rotate}" v-for="item in online.list"
 						:style="{'height': `${(online.height - 42)/4}px`}">
-						<span class="name">{{item.name}}</span>
-						<span class="address"
+						<span class="name" style="color: #00FF7F;">{{item.name}}</span>
+						<span class="address" style="color: #00FF7FAA;"
 							v-if="item.location && item.location.address">{{item.location.address}}</span>
 					</div>
 				</div>
@@ -344,8 +345,8 @@
 				<div class="container" ref="low">
 					<div class="device" :class="{'do-animation': rotate}" v-for="item in low.list"
 						:style="{'height': `${(low.height - 42)/4}px`}">
-						<span class="name">{{item.name}}</span>
-						<span class="address"
+						<span class="name" style="color: #000;">{{item.name}}</span>
+						<span class="address" style="color: #000a;"
 							v-if="item.location && item.location.address">{{item.location.address}}</span>
 					</div>
 				</div>
@@ -362,8 +363,8 @@
 				<div class="container" ref="offline">
 					<div class="device" :class="{'do-animation': rotate}" v-for="item in offline.list"
 						:style="{'height': `${(offline.height - 42)/4}px`}">
-						<span class="name">{{item.name}}</span>
-						<span class="address"
+						<span class="name" style="color: #f00;">{{item.name}}</span>
+						<span class="address" style="color: #f00a;"
 							v-if="item.location && item.location.address">{{item.location.address}}</span>
 					</div>
 				</div>
@@ -380,8 +381,8 @@
 				<div class="container" ref="error">
 					<div class="device" :class="{'do-animation': rotate}" v-for="item in error.list"
 						:style="{'height': `${(error.height - 42)/4}px`}">
-						<span class="name">{{item.name}}</span>
-						<span class="address"
+						<span class="name" style="color: #000;">{{item.name}}</span>
+						<span class="address" style="color: #000a;"
 							v-if="item.location && item.location.address">{{item.location.address}}</span>
 					</div>
 				</div>

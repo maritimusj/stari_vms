@@ -77,9 +77,9 @@
                 <th>设备</th>
                 <th class="center">请求数据</th>
                 <th class="center">API响应</th>
-                <th class="center">通知</th>
+                <th class="center">回调通知</th>
                 <th style="width: 300px;">订单{if \zovye\App::isBalanceEnabled()}/积分{/if}</th>
-                <th style="width: 200px;">时间</th>
+                <th style="width: 200px;">创建时间</th>
             </thead>
             <tbody>
                 {loop $list $index $e}
@@ -138,7 +138,7 @@
                         </div>
                         {/if}
                         {if $e['last_cb']}
-                        <span style="color: red;" title="收到多次回调通知">*</span>
+                        <span style="color: red;cursor: default;" title="注意：收到{$e['last_cb']}次回调通知！">*</span>
                         {/if}
                     </td>
                     <td>

@@ -1074,16 +1074,33 @@ if ($op == 'default') {
             $data['request'] = $entry->getRequest();
             $data['result'] = $entry->getResult();
             $data['cb'] = $entry->getExtraData('cb');
+            $last_cb = $entry->getExtraData('last_cb');
+            if ($last_cb) {
+                $data['last_cb'] = count($last_cb);
+                if (empty($data['cb']['order_uid'])) {
+                    foreach((array)$last_cb as $cb) {
+                        if (!empty($cb['order_uid'])) {
+                            $data['cb']['order_uid'] = $cb['order_uid'];
+                            break;
+                        }
+                    }
+                }
+                if (empty($data['cb']['serial'])) {
+                    foreach((array)$last_cb as $cb) {
+                        if (!empty($cb['serial'])) {
+                            $data['cb']['serial'] = $cb['serial'];
+                            break;
+                        }
+                    }
+                }
+            }
             if ($data['cb']['serial']) {
                 $log = BalanceLog::findOne(['s2' => $data['cb']['serial']]);
                 if ($log) {
                     $data['balance'] = $log->getExtraData('bonus', 0);
                 }
             }
-            $last_cb = $entry->getExtraData('last_cb');
-            if ($last_cb) {
-                $data['last_cb'] = count($last_cb);
-            }
+
             $data['createtime'] = $entry->getCreatetime();
 
             $list[] = $data;

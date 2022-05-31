@@ -85,6 +85,7 @@ $user_data = [
 $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
 $js_sdk = Util::fetchJSSDK();
+$jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
@@ -95,7 +96,6 @@ wx.hideAllNonBaseMenuItem();
 });
 
 const zovye_fn = {
-api_url: "$api_url",
 user: JSON.parse(`$user_json_str`),
 }
 zovye_fn.getUserInfo = function (cb) {

@@ -16,7 +16,7 @@ use zovye\model\userModelObj;
 class WeiSureAccount
 {
 
-    const ResponseOk = '{"code":"0", "msg":"成功","returnData":"{}"}';
+    const ResponseOk = '{"code":"0", "msg":"成功","returnData":{}}';
 
     public static function getUid(): string
     {
@@ -44,8 +44,10 @@ class WeiSureAccount
                 'outerUserId' => base64_encode("{$user->getOpenid()}:{$device->getShadowId()}"),
             ];
 
-            $url = We7::murl('weisure', $params);
-
+            $config['parsed_h5url']['query'] = http_build_query(is_array($config['parsed_h5url']['query']) ? array_merge($config['parsed_h5url']['query'], $params) : $params);
+            
+            $url = Util::buildUrl($config['parsed_h5url']);
+            
             $res = Util::createQrcodeFile("weisure.{$user->getOpenid()}", $url);
             if (is_error($res)) {
                 Log::error('weisure', [
@@ -61,7 +63,7 @@ class WeiSureAccount
                     Account::createQueryLog($acc, $user, $device, [
                         'params' => $params,
                         'h5' => $url,
-                    ], []);
+                    ], null);
                 }
             }
 
@@ -137,7 +139,7 @@ class WeiSureAccount
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
-            Log::error('weisuire', [
+            Log::error('weisure', [
                 'error' => $e->getMessage(),
                 'params' => $params,
             ]);

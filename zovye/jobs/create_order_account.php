@@ -146,6 +146,14 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
     } catch (ZovyeException $e) {
         $params['error'] = $e->getMessage();
 
+        if (isset($account) && $account->isThirdPartyPlatform()) {
+            Account::updateQueryLogCBData($account, $user, $device, [
+                'data' => [
+                    'error' => $e->getMessage(),
+                ]
+            ]);            
+        }
+
         $device = $e->getDevice();
         if ($device) {
             $device->appShowMessage($e->getMessage(), 'error');

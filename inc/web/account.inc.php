@@ -426,12 +426,19 @@ if ($op == 'default') {
                 $data['name'] = Account::WEISURE_NAME;
                 $data['img'] = Account::WEISURE_HEAD_IMG;
                 $data['url'] = Util::murl('weisure');
-                $account->set('config', [
+                $config = [
                     'type' => Account::WEISURE,
                     'companyId' => request::trim('companyId'),
                     'wtagid' => request::trim('wtagid'),
                     'h5url' => request::trim('h5url'),
-                ]);
+                ];
+                if ($config['h5url']) {
+                    $parsed_url = parse_url($config['h5url']);
+                    parse_str($parsed_url['query'], $parsed_query);
+                    $parsed_url['query'] = $parsed_query;
+                    $config['parsed_h5url'] = $parsed_url;
+                }
+                $account->set('config', $config);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');
                 $account->set('config', [

@@ -28,6 +28,22 @@ if (request::is_post()) {
     exit(WeiSureAccount::ResponseOk);
 }
 
+$op == request::op('default');
+if ($op == 'check') {
+    // 每个用户限领一次
+    if (Util::checkLimit($acc, $user, [], 1)) {
+        JSON::fail('已经参加活动了');
+    }
+
+    //40s后执行超时任务
+    CtrlServ::scheduleDelayJob('weisure_timeout', [
+        'user' => request::trim('user'),
+        'device' => request::trim('device'),
+    ], 40);
+
+    JSON::success('Ok');
+}
+
 $user = Util::getCurrentUser([
     'create' => true,
     'update' => true,
@@ -60,7 +76,7 @@ if (empty($config['companyId']) || isEmptyArray($config['h5url'])) {
     Util::resultAlert('活动没有正确配置！');
 }
 
-$device = $user->getLastActiveDevice();
+$device = Device::get('V558072121658584', true);//$user->getLastActiveDevice();
 if (empty($device)) {
     Util::resultAlert('请重新扫描设备二维码！');
 }
@@ -87,28 +103,44 @@ $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 $js_sdk = Util::fetchJSSDK();
 $jquery_url = JS_JQUERY_URL;
 
+$api_url = Util::murl('weisure', [
+    'op' => 'check', 
+    'user' => $user->getOpenid(),
+    'device' => $device->getImei(),
+]);
+
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 $js_sdk
 <script>
 wx.ready(function(){
-wx.hideAllNonBaseMenuItem();
+    wx.hideAllNonBaseMenuItem();
 });
 
 const zovye_fn = {
-user: JSON.parse(`$user_json_str`),
+    user: JSON.parse(`$user_json_str`),
 }
+
 zovye_fn.getUserInfo = function (cb) {
-if (typeof cb === 'function') {
-    return cb(zovye_fn.user)
+    if (typeof cb === 'function') {
+        return cb(zovye_fn.user)
+    }
 }
+
 zovye_fn.redirectToWeisure = function() {
     window.location.replace("$weisure_url");
 }
+
 zovye_fn.redirectToGetPage = function() {
-    window.location.replace("$get_url");
+    $.getJSON("$api_url", res => {
+        if (res && res.status) {
+            window.location.replace("$get_url");
+        } else {
+            alert(res.data.message);
+        }
+    });
 }
 </script>
 JSCODE;
 
-$this->showTemplate(Theme::file('weisure'), ['tpl' => $tpl_data]);
+app()->showTemplate(Theme::file('weisure'), ['tpl' => $tpl_data]);

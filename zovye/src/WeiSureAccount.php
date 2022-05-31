@@ -84,7 +84,7 @@ class WeiSureAccount
         return ['account' => $account];
     }
 
-    public static function cb(array $params = [])
+    public static function cb(array $params = [], $throw = false)
     {
         try {
             $res = self::verifyData($params);
@@ -110,7 +110,7 @@ class WeiSureAccount
 
             // 每个用户限领一次
             if (Util::checkLimit($acc, $user, [], 1)) {
-                return [];
+                throw new RuntimeException('用户已经参加了活动！');
             }
 
             /** @var deviceModelObj $device */
@@ -122,12 +122,15 @@ class WeiSureAccount
             $order_uid = Order::makeUID(
                 $user,
                 $device,
-                sha1($params['policyNo'] ?? $params['quoteNo'] ?? $params['outerUserId'])
+                sha1($params['outerUserId'])
             );
 
             Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
 
         } catch (Exception $e) {
+            if ($throw) {
+                throw $e;
+            }
             Log::error('weisure', [
                 'error' => $e->getMessage(),
                 'params' => $params,

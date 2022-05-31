@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>{$tpl['site']['title']}</title>
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        body {
+            background-color: white;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #101010;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .top-view {
+            width: 100%;
+            flex: 1;
+            background-color: #4F94FF;
+            border-bottom-left-radius: 100px;
+            border-bottom-right-radius: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            font-weight: bolder;
+        }
+
+        .middle-view {
+            width: 100%;
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            width: 50%;
+            height: 44px;
+            border-radius: 22px;
+            background-color: #4F94FF;
+            color: white;
+            text-align: center;
+            line-height: 44px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .bottom-view {
+            width: 100%;
+            flex: 1;
+            background-color: #4F94FF;
+            border-top-left-radius: 50px;
+            border-top-right-radius: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .desc-view {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            font-style:oblique;
+            position: relative;
+        }
+
+        .free-tag {
+            position: absolute;
+            top: 15px;
+            left: calc(50% + 80px);
+            font-size: 12px;
+            background-color: white;
+            color: #101010;
+            padding: 4px 5px;
+            box-shadow: 0 0 2px #101010;
+            font-weight: normal;
+            border-radius: 3px;
+        }
+
+        .tags {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .tag-item {
+            width: calc((100% - 80px) / 3);
+            height: 100%;
+            margin-left: 20px;
+            font-size: 12px;
+            text-align: center;
+            font-style:oblique;
+        }
+
+        .tag {
+            background-color: white;
+            text-align: center;
+            padding: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 2px #101010;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="top-view">
+            <span>自助取用环保袋</span>
+        </div>
+        <div class="middle-view">
+            <div class="btn" @click="getClick">免费领取</div>
+            <div style="font-size: 12px;margin-top: 10px;display: flex;flex-direction: row;align-items: center;
+            justify-content: center;" @click="checked = !checked">
+                <svg v-if="checked" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7071" width="12" height="12"><path d="M887.46666667 989.86666667H136.53333333c-56.55466667 0-102.4-45.84533333-102.4-102.4V136.53333333c0-56.55466667 45.84533333-102.4 102.4-102.4h750.93333334c56.55466667 0 102.4 45.84533333 102.4 102.4v750.93333334c0 56.55466667-45.84533333 102.4-102.4 102.4z m-436.66346667-209.19253334l392.53333333-392.53333333c13.32906667-13.32906667 13.32906667-34.94186667 0-48.27093333l-48.27093333-48.27093334c-13.32906667-13.32906667-34.94186667-13.3312-48.27306667 0L426.66666667 611.72266667l-149.4592-149.4592c-13.32906667-13.32906667-34.94186667-13.32906667-48.27306667 0l-48.27093333 48.27093333c-13.32906667 13.32906667-13.32906667 34.94186667 0 48.27093333l221.86666666 221.86666667c13.3312 13.33333333 34.94186667 13.33333333 48.27306667 0.00213333z" p-id="7072" fill="#4F94FF"></path></svg>
+                <svg v-else viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6747" width="12" height="12"><path d="M797.91331555 124.46606222H226.35178667c-56.55665778 0-102.40455111 45.84789333-102.40455112 102.40455111v571.56152889c0 56.55665778 45.84789333 102.40455111 102.40455112 102.40455111h571.56152888c56.55665778 0 102.40455111-45.84789333 102.40455112-102.40455111V226.87061333c0-56.55665778-45.84789333-102.40455111-102.40455112-102.40455111z m0-80.97109333c101.27587555 0 183.37678222 82.09976889 183.37678223 183.37678222v571.56152889c0 101.27587555-82.09976889 183.37564445-183.37678223 183.37564445H226.35178667c-101.27587555 0-183.37564445-82.09976889-183.37564445-183.37564445v-571.56266667c0-101.27587555 82.09976889-183.37678222 183.37564445-183.37678222h571.56152888z" p-id="6748" fill="#333333"></path></svg>
+                <span style="margin-left: 5px;">领取免费门诊津贴险</span>
+            </div>
+            <span style="font-size: 12px;" @click="checked = !checked">我已确认并同意 投保须知｜隐私政策</span>
+        </div>
+        <div class="bottom-view">
+            <div class="desc-view">
+                <span>
+                    <span>100元保额</span>
+                    <span style="font-size: 14px;">[最高]</span>
+                </span>
+                <span>门诊津贴险</span>
+                <div class="free-tag" @click="getClick">免费投保</div>
+            </div>
+            <div class="tags">
+                <div class="tag-item" @click="getClick">
+                    <div class="tag">感冒发烧</div>
+                    <span>等场景均可保</span>
+                </div>
+                <div class="tag-item" @click="getClick">
+                    <div class="tag">看病挂号</div>
+                    <span>等费用均可保</span>
+                </div>
+                <div class="tag-item" @click="getClick">
+                    <div class="tag">在线理赔</div>
+                    <span>直接到账至微信零钱</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                checked: true
+            },
+            methods: {
+                getClick() {
+                    if (this.checked) {
+                        zovye_fn.redirectToWeisure()
+                    } else {
+                        zovye_fn.redirectToGetPage()
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

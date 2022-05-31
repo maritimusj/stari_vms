@@ -76,7 +76,7 @@ if (empty($config['companyId']) || isEmptyArray($config['h5url'])) {
     Util::resultAlert('活动没有正确配置！');
 }
 
-$device = Device::get('V558072121658584', true);//$user->getLastActiveDevice();
+$device = $user->getLastActiveDevice();
 if (empty($device)) {
     Util::resultAlert('请重新扫描设备二维码！');
 }

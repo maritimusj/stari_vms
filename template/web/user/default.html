@@ -323,6 +323,10 @@
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetIDCardVerify"><i class="fa fa-bookmark fa-fw"></i> 清除实名认证</a></li>
             {/if} 
+            <li role="separator" class="divider"></li>
+            {if \zovye\App::isAccountLogEnabled()}
+            <li><a href="#" data-op="viewQueryLog"><i class="fa fa-history fa-fw"></i> 查看平台请求日志</a></li>
+            {/if}
             <li><a href="#" data-op="resetThirdPartyData"><i class="fa fa-comments-o fa-fw"></i> 清除第三方平台信息</a></li>
         </ul>
     </div>
@@ -428,7 +432,11 @@
 
     api.resetThirdPartyData = function(userid) {
         api.showResult({op: 'reset_thirdparty_data', id: userid});
-    }    
+    }
+
+    api.viewQueryLog = function(userid) {
+        window.location.href = "{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'user' => '__user__']);}".replace('__user__', userid);
+    }
 
     api.viewInventory = function(userid) {
         window.location.href = "{php echo $this->createWebUrl('inventory', ['op' => 'detail', 'id' => '__id__']);}".replace('__id__', userid);

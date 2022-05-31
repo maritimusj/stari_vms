@@ -1347,11 +1347,13 @@ class Account extends State
         return m('account_query')->create($data);
     }
 
-    public static function logQuery(accountModelObj $account, $condition = []): modelObjFinder
+    public static function logQuery(accountModelObj $account = null, $condition = []): modelObjFinder
     {
-        return m('account_query')
-            ->where(['account_id' => $account->getId()])
-            ->where($condition);
+        $query = m('account_query')->where($condition);
+        if ($account) {
+            $query->where(['account_id' => $account->getId()]);
+        }
+        return $query;
     }
 
     /**

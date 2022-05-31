@@ -31,6 +31,7 @@
     }
 </style>
 <ul class="nav nav-tabs" id="navbar">
+    {if $account}
     {if empty($user) && empty($device)}
     <li role="presentation"class="active">
         <a href="#">
@@ -42,14 +43,15 @@
     <li role="presentation">
         <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id']])}">
             <img src="{$account['img']}">
-            <span>{$account['name']}</span>的请求日志
+            <span>{$account['name']}</span>
         </a>
     </li>
+    {/if}
     {/if}
     {if $user}
     <li role="presentation"class="active">
         <a href="#">
-            <span>{$user['name']}</span>           
+            <span><b>{$user['name']}</b></span>的请求日志      
         </a>
     </li>
     {/if}
@@ -72,7 +74,9 @@
             <thead>
                 <th>#</th>
                 <th style="width: 260px;">流水号</th>
-                <!-- <th>公众号</th> -->
+                {if empty($account)}
+                <th>公众号</th>
+                {/if}
                 <th>用户</th>
                 <th>设备</th>
                 <th class="center">请求数据</th>
@@ -88,12 +92,14 @@
                     <td>
                         {$e['request_id']}
                     </td>
-                    <!-- <td>
+                    {if empty($account)}
+                    <td>
                         <div class="profile">
                             <img src="{$e['account']['img']}">
                             <span>{$e['account']['name']}</span>
                         </div>
-                    </td> -->
+                    </td>
+                    {/if}
                     <td>
                         <a href="{php echo $this->createWebUrl('account', ['op' => 'viewQueryLog', 'id' => $account['id'], 'user' => $e['user']['id']]);}">
                             <div class="profile">

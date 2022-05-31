@@ -1004,16 +1004,17 @@ if ($op == 'default') {
 
 } elseif ($op == 'viewQueryLog') {
 
-    $id = request::int('id');
-    $acc = Account::get($id);
+    $tpl_data = [];
 
-    if (empty($acc)) {
-        JSON::fail('找不到这个任务！');
+    if (request::has('id')) {
+        $id = request::int('id');
+        $acc = Account::get($id);
+
+        if (empty($acc)) {
+            JSON::fail('找不到这个任务！');
+        }
+        $tpl_data['account'] = $acc->profile();
     }
-
-    $tpl_data = [
-        'account' => $acc->profile(),
-    ];
 
     $query = Account::logQuery($acc);
 

@@ -31,7 +31,7 @@ class WeiSureAccount
         }
 
         $config = $acc->get('config', []);
-        if (empty($config['companyId']) || isEmptyArray($config['url'])) {
+        if (empty($config['companyId']) || isEmptyArray($config['h5url'])) {
             return [];
         }
 

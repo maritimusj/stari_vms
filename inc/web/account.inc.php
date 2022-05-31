@@ -428,12 +428,9 @@ if ($op == 'default') {
                 $data['url'] = Util::murl('weisure');
                 $account->set('config', [
                     'type' => Account::WEISURE,
-                    'companIid' => request::trim('companyId'),
+                    'companyId' => request::trim('companyId'),
                     'wtagid' => request::trim('wtagid'),
-                    'url' => [
-                        'h5' => request::trim('h5'),
-                        'wxapp' => request::trim('wxapp'),
-                    ]
+                    'h5url' => request::trim('h5url'),
                 ]);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');

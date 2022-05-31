@@ -426,6 +426,7 @@ if ($op == 'default') {
                 $data['name'] = Account::WEISURE_NAME;
                 $data['img'] = Account::WEISURE_HEAD_IMG;
                 $data['url'] = Util::murl('weisure');
+                $data['total'] = 1;
                 $config = [
                     'type' => Account::WEISURE,
                     'companyId' => request::trim('companyId'),

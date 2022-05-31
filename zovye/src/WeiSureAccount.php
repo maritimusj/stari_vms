@@ -30,7 +30,7 @@ class WeiSureAccount
             return [];
         }
 
-        // 每个用户限领一次
+        //每个用户限领一次
         if (Util::checkLimit($acc, $user, [], 1)) {
             return [];
         }
@@ -40,36 +40,15 @@ class WeiSureAccount
             return [];
         }
 
+        $user->setLastActiveDevice($device);
+
         try {
             $data = $acc->format();
 
-            $params = [
-                'companyId' => $config['companyId'],
-                'wtagid' => $config['wtagid'],
-                'outerUserId' => base64_encode("{$user->getOpenid()}:{$device->getShadowId()}"),
-            ];
-
-            $config['parsed_h5url']['query'] = http_build_query(is_array($config['parsed_h5url']['query']) ? array_merge($config['parsed_h5url']['query'], $params) : $params);
-            
-            $url = Util::buildUrl($config['parsed_h5url']);
-            
-            $res = Util::createQrcodeFile("weisure.{$user->getOpenid()}", $url);
-            if (is_error($res)) {
-                Log::error('weisure', [
-                    'error' => 'fail to createQrcode file',
-                    'result' => $res,
-                ]);
-
-                return [];
-            } else {
-                $data['qrcode'] = Util::toMedia($res);
-
-                if (App::isAccountLogEnabled()) {
-                    Account::createQueryLog($acc, $user, $device, [
-                        'params' => $params,
-                        'h5' => $url,
-                    ], null);
-                }
+            if (App::isAccountLogEnabled()) {
+                Account::createQueryLog($acc, $user, $device, [
+                    'config' => $config,
+                ], null);
             }
 
             return [$data];

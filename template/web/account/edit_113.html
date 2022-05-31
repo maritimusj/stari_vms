@@ -38,6 +38,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-md-2 control-label">二维码</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_image('qrcode', $account?$account->getQrcode():'');}
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-md-2 control-label">边框颜色</label>
                         <div class="col-md-10">
                             {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}

@@ -30,6 +30,11 @@ class WeiSureAccount
             return [];
         }
 
+        // 每个用户限领一次
+        if (Util::checkLimit($acc, $user, [], 1)) {
+            return [];
+        }
+
         $config = $acc->get('config', []);
         if (empty($config['companyId']) || isEmptyArray($config['h5url'])) {
             return [];

@@ -422,6 +422,19 @@ if ($op == 'default') {
                     'device_key' => request::trim('device_key'),
                     'scene' => request::trim('scene'),
                 ]);
+            } elseif ($account->isWeiSure()) {
+                $data['name'] = Account::WEISURE_NAME;
+                $data['img'] = Account::WEISURE_HEAD_IMG;
+                $data['url'] = Util::murl('weisure');
+                $account->set('config', [
+                    'type' => Account::WEISURE,
+                    'companIid' => request::trim('companyId'),
+                    'wtagid' => request::trim('wtagid'),
+                    'url' => [
+                        'h5' => request::trim('h5'),
+                        'wxapp' => request::trim('wxapp'),
+                    ]
+                ]);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');
                 $account->set('config', [
@@ -493,6 +506,8 @@ if ($op == 'default') {
                 Account::WxWORK_NAME,
                 Account::YOUFEN_NAME,
                 Account::MENGMO_NAME,
+                Account::YIDAO_NAME,
+                Account::WEISURE_NAME,
                 Account::TASK_NAME,
             ])) {
                 return err('名称 "'.$name.'" 是系统保留名称，无法使用！');

@@ -234,6 +234,7 @@ TEXT;
                     Account::YOUFEN => ['友粉', '完成友粉任务'],
                     Account::MENGMO => ['涨啊', '完成涨啊任务'],
                     Account::YIDAO => ['壹道', '完成壹道任务'],
+                    Account::WEISURE => ['微保', '完成微保任务'],
                     Account::QUESTIONNAIRE => ['问卷', '完成问卷调查'],
                 ][$account_data['type']] ?? ["未知({$account_data['id']})", '未知事件（任务已删除）'];
 

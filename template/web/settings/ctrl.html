@@ -328,6 +328,15 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
                             <label>
+                                <input type="checkbox" name="weiSureFAN" id="weiSureFAN" value="1" {if $settings['weiSure']['fan']['enabled']}checked{/if}>
+                                开启微保车阶推广功能
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
                                 <input type="checkbox" name="wxWorkFAN" id="wxWorkFAN" value="1" {if $settings['wxWork']['fan']['enabled']}checked{/if}>
                                 开启企业微信拉接（阿旗）平台接入功能
                             </label>

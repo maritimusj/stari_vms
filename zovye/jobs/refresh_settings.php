@@ -49,6 +49,8 @@ if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
         ['name' => Account::YFB_NAME, 'type' => Account::YFB, 'url' => Util::murl('yfb'),],
         ['name' => Account::WxWORK_NAME, 'type' => Account::WxWORK, 'url' => Util::murl('wxwork')],
         ['name' => Account::YOUFEN_NAME, 'type' => Account::YOUFEN, 'url' => Util::murl('youfen')],
+        ['name' => Account::YIDAO_NAME, 'type' => Account::YIDAO, 'url' => Util::murl('yidao')],
+        ['name' => Account::WEISURE_NAME, 'type' => Account::WEISURE, 'url' => Util::murl('weisure')],
         ['name' => Account::MENGMO_NAME, 'type' => Account::MENGMO, 'url' => Util::murl('mengmo')],
     ];
 

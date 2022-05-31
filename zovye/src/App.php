@@ -249,6 +249,17 @@ class App
         });
     }
 
+    /**
+     * 是否开启 微保
+     *
+     */
+    public static function isWeiSureEnabled(): bool
+    {
+        return onceCall(function () {
+            return !empty(settings('weiSure.fan.enabled'));
+        });
+    }
+
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function () {

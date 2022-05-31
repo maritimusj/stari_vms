@@ -210,6 +210,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__.'\Account::createYiDaoAccount',
                 'YiDao.fan.enabled',
             ],
+            'weiSureFAN' => [
+                __NAMESPACE__.'\Account::createWeiSureAccount',
+                'weiSure.fan.enabled',
+            ],
         ];
 
         $accounts_updated = false;

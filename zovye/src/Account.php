@@ -87,6 +87,8 @@ class Account extends State
 
     const YIDAO = 112;
 
+    const WEISURE = 113;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -131,6 +133,9 @@ class Account extends State
 
     const YIDAO_NAME = '壹道';
     const YIDAO_HEAD_IMG = MODULE_URL.'static/img/yidao.png';
+
+    const WEISURE_NAME = '微保';
+    const WEISURE_HEAD_IMG = MODULE_URL.'static/img/weisure.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -271,6 +276,7 @@ class Account extends State
             Account::YOUFEN => App::isYouFenEnabled(),
             Account::MENGMO => App::isMengMoEnabled(),
             Account::YIDAO => App::isYiDaoEnabled(),
+            Account::WEISURE => App::isWeiSureEnabled(),
         ];
 
         $result = [];
@@ -355,6 +361,7 @@ class Account extends State
                 Account::YOUFEN,
                 Account::MENGMO,
                 Account::YIDAO,
+                Account::WEISURE,
             ];
 
         $include = is_array($include) ? $include : [$include];
@@ -545,6 +552,18 @@ class Account extends State
                 },
                 function () use ($device, $user) {
                     return YiDaoAccount::fetch($device, $user);
+                },
+            ],
+
+            //微保
+            Account::WEISURE => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    return App::isWeiSureEnabled()
+                        && in_array(Account::WEISURE, $third_party_platform_includes)
+                        && !in_array(WeiSureAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return WeiSureAccount::fetch($device, $user);
                 },
             ],
         ];
@@ -950,6 +969,13 @@ class Account extends State
         $url = Util::murl('yidao');
 
         return self::createThirdPartyPlatform(Account::YIDAO, Account::YIDAO_NAME, Account::YIDAO_HEAD_IMG, $url);
+    }
+
+    public static function createWeiSureAccount(): ?accountModelObj
+    {
+        $url = Util::murl('weisure');
+
+        return self::createThirdPartyPlatform(Account::WEISURE, Account::WEISURE_NAME, Account::WEISURE_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -1434,6 +1460,7 @@ class Account extends State
             self::YOUFEN => '友粉',
             self::MENGMO => '涨啊',
             self::YIDAO => '壹道',
+            self::WEISURE => '微保',
         ];
 
         return $titles[$type] ?? '未知';

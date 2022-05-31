@@ -126,14 +126,19 @@ class WeiSureAccount
                 throw new RuntimeException('用户暂时不可用！');
             }
 
+            /** @var accountModelObj $acc */
+            $acc = $res['account'];
+
+            // 每个用户限领一次
+            if (Util::checkLimit($acc, $user, [], 1)) {
+                return [];
+            }
+
             /** @var deviceModelObj $device */
             $device = Device::findOne(['shadow_id' => $uid]);
             if (empty($device)) {
                 throw new RuntimeException('找不到指定的设备:'.$uid);
             }
-
-            /** @var accountModelObj $acc */
-            $acc = $res['account'];
 
             $order_uid = Order::makeUID(
                 $user,

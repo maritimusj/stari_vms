@@ -102,10 +102,10 @@ zovye_fn.getUserInfo = function (cb) {
 if (typeof cb === 'function') {
     return cb(zovye_fn.user)
 }
-zovye_fn.redirectToWeisure = function(lastId, pagesize) {
+zovye_fn.redirectToWeisure = function() {
     window.location.replace("$weisure_url");
 }
-zovye_fn.redirectToGetPage = function(lastId, pagesize) {
+zovye_fn.redirectToGetPage = function() {
     window.location.replace("$get_url");
 }
 </script>

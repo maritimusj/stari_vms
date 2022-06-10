@@ -241,8 +241,6 @@ class WxPlatform
                     $user->set('fansData', $result);
                 }
             }
-
-            return $user;
         }
 
         return $result;
@@ -713,12 +711,28 @@ class WxPlatform
                 throw new RuntimeException('找不到这个用户！');
             }
 
-            if ($user->isBanned()) {
-                throw new RuntimeException('用户已被禁用！');
+            $profile = self::getUserProfile2(Account::getAuthorizerAccessToken($acc), $msg['FromUserName']);
+            Log::error("wxplatform", [
+                'msg' => $msg,
+                'profile' => $profile,
+                'user' => $user->profile(),
+            ]);
+
+            list($qr_app, $qr_user_id, $qr_device_id) = explode(':', $profile['qr_scene_str'] ?? '');
+            if ($qr_app != App::uid(6)) {
+                throw new RuntimeException('AppUID不匹配！');
             }
 
-            if ($user->getOpenid() != $msg['FromUserName']) {
+            if ($qr_user_id != $user->getId()) {
                 throw new RuntimeException('用户不匹配！');
+            }
+
+            if ($qr_device_id != $device->getId()) {
+                throw new RuntimeException('设备不匹配！');
+            }
+
+            if ($user->isBanned()) {
+                throw new RuntimeException('用户已被禁用！');
             }
 
             //出货时机是用户点击链连后，直接返回推送的消息

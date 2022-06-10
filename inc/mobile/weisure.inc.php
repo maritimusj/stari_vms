@@ -28,13 +28,8 @@ if (request::is_post()) {
     exit(WeiSureAccount::ResponseOk);
 }
 
-$op == request::op('default');
+$op = request::op('default');
 if ($op == 'check') {
-    // 每个用户限领一次
-    if (Util::checkLimit($acc, $user, [], 1)) {
-        JSON::fail('已经参加活动了');
-    }
-
     //40s后执行超时任务
     CtrlServ::scheduleDelayJob('weisure_timeout', [
         'user' => request::trim('user'),
@@ -98,6 +93,7 @@ $user_data = [
     'status' => true,
     'data' => $user->profile(),
 ];
+
 $user_json_str = json_encode($user_data, JSON_HEX_TAG | JSON_HEX_QUOT);
 
 $js_sdk = Util::fetchJSSDK();

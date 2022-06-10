@@ -718,7 +718,7 @@ class WxPlatform
             }
 
             if ($user->getOpenid() != $msg['FromUserName']) {
-                throw new RuntimeException('用户已不匹配！');
+                throw new RuntimeException('用户不匹配！');
             }
 
             //出货时机是用户点击链连后，直接返回推送的消息

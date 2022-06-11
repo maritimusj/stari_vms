@@ -63,6 +63,7 @@ class keeper_devicesModelObj extends modelObj
     }
 
     /**
+     *
      * @return array
      */
     public function getCommissionValue(): array

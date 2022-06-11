@@ -221,7 +221,7 @@ class device
      * @param $id
      * @param agentModelObj|null $owner
      *
-     * @return mixed
+     * @return array|deviceModelObj
      */
     public static function getDevice($id, agentModelObj $owner = null)
     {
@@ -1077,5 +1077,36 @@ class device
         $msg = $device->openDoor($index) ? '开锁指令已发送！' : '开锁指令发送失败！';
 
         return ['msg' => $msg];
+    }
+
+    public static function deviceKeepers(): array
+    {
+        $user = common::getUser();
+
+        $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
+        $device = device::getDevice(request::str('id'), $agent);
+        if (is_error($device)) {
+            return $device;
+        }
+
+
+        $result = [];
+        $keepers = $device->getKeepers();
+        foreach ($keepers as $keeper) {
+            $data = [
+                'name' => $keeper->getName(),
+                'mobile' => $keeper->getMobile(),
+                'kind' => $keeper->getKind($device),
+                'commission' => $keeper->getCommissionValue($device),
+
+            ];
+            $user = $keeper->getUser();
+            if ($user) {
+                $data['user'] = $user->profile();
+            }
+            $result[] = $data;
+        }
+
+        return $result;
     }
 }

@@ -727,10 +727,6 @@ class WxPlatform
                 throw new RuntimeException('用户不匹配！');
             }
 
-            if ($qr_device_id != $device->getId()) {
-                throw new RuntimeException('设备不匹配！');
-            }
-
             if ($user->isBanned()) {
                 throw new RuntimeException('用户已被禁用！');
             }

@@ -1,0 +1,83 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation"><a href="{php echo $this->createWebUrl('device', ['op' => 'new_group']);}">普通分组</a></li>
+    <li role="presentation" class="active"><a href="#">充电桩分组</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('charging', array('op'=>'add'));}"><i class="fa fa-pencil" title="创建分组"></i></a>
+            <a href="{php echo $this->createWebUrl('device');}"><i class="fa fa-reply" title="返回设备列表"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <table class="table" id="grouplist">
+            <thead>
+            <th>#</th>
+            <th>名称</th>
+            <th>代理商</th>
+            <th class="center">设备数量</th>
+            <th>地址</th>
+            <th>创建时间</th>
+            <th>操作</th>
+            </thead>
+            <tbody>
+            {loop $list $index $item}
+            <tr data-id="{$index}">
+                <td>
+                    {php echo $index + 1}
+                </td>
+                <td class="group">
+                    <span>{$item['title']}</span>
+                </td>
+                <td>
+                    {if $item['agent']}
+                        <div class="agent" style="display:inline-block;">
+                            <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                <img src="{$item['agent']['avatar']}">
+                                <div class="nickname">{$item['agent']['name']}</div>
+                            </div>
+                        </div>
+                    {else}
+                    <span style="color:gray;">&lt;平台&gt;</span>
+                    {/if}
+                </td>
+                <td class="center">{php echo intval($item['total'])}</td> 
+                <td>
+                    <address>
+                        {$item['address']}<br>
+                        <span style="color: #ccc;">
+                            {$item['description']}
+                        </span>
+                    </address>
+                </td> 
+                <td>
+                    {$item['createtime']}
+                </td>
+                <td class="operate">
+                    <a href="{php echo $this->createWebUrl('charging',array('id'=>$item['id'],'op'=>'edit'));}">
+                        <i class="fa fa-edit" title="编辑"></i>
+                    </a>
+                    <a href="{php echo $this->createWebUrl('charging',array('id'=>$item['id'],'op'=>'remove'));}" onclick="if(!confirm('确定要删除这个分组吗？')){return false;}">
+                        <i class="fa fa-trash-o" title="删除这个分组？"></i>
+                    </a>                    
+                </td>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div style="float:right;">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何分组！
+        </div>
+        {/if}
+    </div>
+</div>
+
+{template 'common/footer'}

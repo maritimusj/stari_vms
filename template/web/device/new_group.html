@@ -2,7 +2,13 @@
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
 
 {if $op == 'new_group'}
-<div class="panel panel-default">
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">普通分组</a></li>
+    {if \zovye\App::isChargingDeviceEnabled()}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('charging');}">充电桩分组</a></li>
+    {/if}
+</ul>
+<div class="panel panel-default panel-first">
     <div class="heading">
         <span class="operate">
             <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group_add'));}"><i class="fa fa-pencil" title="创建分组"></i></a>
@@ -11,17 +17,6 @@
     </div>
     <div class="panel-body">
         {if $groups}
-        <ul class="nav nav-tabs" id="navbar">
-            {loop $navs $nav_op $nav_title}
-            {if $agent}
-            {if $op == $nav_op}
-            <li role="presentation"  ><a href="{php echo $this->createWebUrl('device', array('op' => 'new_group'));}">{$nav_title}</a></li>
-            {else}
-            <li role="presentation" class="active"><a href="">{$nav_title}</a></li>
-            {/if}
-            {/if}
-            {/loop}
-        </ul>
         <table class="table" id="grouplist">
             <thead>
             <th>#</th>

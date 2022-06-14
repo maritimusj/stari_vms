@@ -1147,7 +1147,7 @@ include './index.php';
      */
     public static function message($msg, string $redirect = '', string $type = ''): void
     {
-        We7::message($msg, $redirect, $type);
+        We7::message($msg, $redirect ? \referer() : $redirect, $type);
     }
 
     /**

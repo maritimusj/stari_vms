@@ -26,6 +26,8 @@ class Group
             $data['createtime'] = time();
         }
 
+        $data['extra'] = json_encode($data['extra']);
+
         return m('device_groups')->create($data);
     }
 
@@ -72,12 +74,21 @@ class Group
 
     public static function format(device_groupsModelObj $entry): array
     {
-        return [
+        $data = [
             'id' => intval($entry->getId()),
             'agentId' => intval($entry->getAgentId()),
             'title' => $entry->getTitle(),
             'clr' => $entry->getClr(),
             'createtime' => Date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];
+
+        if ($entry->getTypeId() == Group::CHARGING) {
+            $data['name'] = $entry->getName();
+            $data['description'] = $entry->getDescription();
+            $data['address'] = $entry->getAddress();
+            $data['loc'] = $entry->getLoc();
+        }
+
+        return $data;
     }
 }

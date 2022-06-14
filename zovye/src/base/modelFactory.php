@@ -68,7 +68,6 @@ class modelFactory
         $res = We7::pdo_insert($objClassname::getTableName(modelObj::OP_WRITE), $data);
         if ($res) {
             $id = intval(We7::pdo_insertid());
-
             return $this->load($id);
         }
 

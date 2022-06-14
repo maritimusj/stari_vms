@@ -76,4 +76,38 @@ class device_groupsModelObj extends modelObj
 
         return null;
     }
+
+    public function getName() {
+        return $this->getExtraData('name', '');
+    }
+
+    public function setName(string $name) {
+        return $this->setExtraData('name', $name);
+    }
+
+    public function getDescription() {
+        return $this->getExtraData('description', '');
+    }
+
+    public function setDescription(string $desc) {
+        return $this->setExtraData('description', $desc);
+    }
+
+    public function getAddress(): string {
+        return $this->getExtraData('address', '');
+    }
+
+    public function setAddress(string $address) {
+        return $this->setExtraData('address', $address);
+    }
+
+    public function getLoc(): array {
+        return [
+            'lat' => $this->getExtraData('lat', 0.0),
+            'lng' => $this->getExtraData('lng', 0.0),
+        ];
+    }
+    public function setLoc(array $loc) {
+        return $this->setExtraData('lat', $loc['lat']) && $this->setExtraData('lng', $loc['lng']);;
+    }
 }

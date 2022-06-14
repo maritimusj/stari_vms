@@ -1755,7 +1755,7 @@ HTML;
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         if (request::isset('agent_id')) {
-            $agent_id = request::int('agent_idd');
+            $agent_id = request::int('agent_id');
             if ($agent_id > 0) {
                 $agent = Agent::get($agent_id);
                 if (empty($agent)) {

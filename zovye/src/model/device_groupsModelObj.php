@@ -11,6 +11,7 @@ use zovye\Group;
 
 use function zovye\tb;
 use zovye\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
 
 /**
  * Class device_groupsModelObj
@@ -31,6 +32,9 @@ class device_groupsModelObj extends modelObj
 
     protected $uniacid;
 
+    /** @var int */
+    protected $typeid;
+
     /** @var string */
     protected $title;
 
@@ -40,8 +44,12 @@ class device_groupsModelObj extends modelObj
     /** @var int */
     protected $agent_id;
 
+    protected $extra;
+
     /** @var int */
     protected $createtime;
+
+    use ExtraDataGettersAndSetters;
 
     public static function getTableName($readOrWrite): string
     {

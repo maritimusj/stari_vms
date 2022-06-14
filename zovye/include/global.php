@@ -17,7 +17,10 @@ Util::setErrorHandler();
 EventBus::init();
 
 //设置httpClient
-CtrlServ::setHttpClient(new we7HttpClient());
+$http_client = new we7HttpClient();
+
+CtrlServ::setHttpClient($http_client);
+ChargingServ::setHttpClient($http_client);
 
 We7::load()->func('cache');
 

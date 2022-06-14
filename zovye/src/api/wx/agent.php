@@ -695,7 +695,7 @@ class agent
         }
 
         /** @var device_groupsModelObj $group */
-        $group = \zovye\Group::get($device->getGroupId());
+        $group = $device->getGroup();
 
         if ($device->getAgentId()) {
             //已绑定设备

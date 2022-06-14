@@ -333,12 +333,9 @@ if ($op == 'list') {
                     }
                 }
 
-                $groupId = $entry->getGroupId();
-                if ($groupId > 0) {
-                    $group = Group::get($groupId);
-                    if ($group) {
-                        $data['group'] = $group->format();
-                    }
+                $group = $entry->getGroup();
+                if ($group) {
+                    $data['group'] = $group->format();
                 }
 
                 $tags = $entry->getTagsAsText(false);
@@ -380,13 +377,15 @@ if ($op == 'list') {
     } elseif ($op == 'add' || $op == 'add_vd' || $op == 'add_bluetooth_device' || $op == 'edit') {
 
         //替换原先的groups
-        $group_res = Group::query()->findAll();
+        $group_res = Group::query(Group::NORMAL)->findAll();
+
         $group_arr = [];
 
         /** @var device_groupsModelObj $val */
         foreach ($group_res as $val) {
             $group_arr[$val->getId()] = ['title' => $val->getTitle()];
         }
+
         $tpl_data['groups'] = $group_arr;
 
         $id = request::int('id');
@@ -1665,7 +1664,7 @@ HTML;
 
         app()->showTemplate('web/device/report_list', $tpl_data);
     } elseif ($op == 'group') {
-        $query = Group::query();
+        $query = Group::query(Group::NORMAL);
 
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -1708,7 +1707,7 @@ HTML;
         Util::resultJSON(true, $result);
     } elseif ($op == 'group_search') {
 
-        $query = Group::query();
+        $query = Group::query(Group::NORMAL);
 
         $keyword = request::trim('keywords');
         if ($keyword) {
@@ -1750,7 +1749,7 @@ HTML;
         $navs[$op] = '分组';
 
         //分组表
-        $query = Group::query();
+        $query = Group::query(Group::NORMAL);
 
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -1851,6 +1850,7 @@ HTML;
             $one->setAgentId($agent_id);
         } else {
             $one = Group::create([
+                'type_id' => Group::NORMAL,
                 'agent_id' => $agent_id,
                 'title' => $title,
                 'clr' => $clr,

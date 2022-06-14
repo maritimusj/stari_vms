@@ -19,6 +19,8 @@ use zovye\traits\ExtraDataGettersAndSetters;
  * @method getId()
  * @method getTitle()
  * @method setTitle($title)
+ * @method getTypeId()
+ * @method setTypeId($title)*
  * @method getClr()
  * @method setClr($clr)
  * @method getAgentId()
@@ -33,7 +35,7 @@ class device_groupsModelObj extends modelObj
     protected $uniacid;
 
     /** @var int */
-    protected $typeid;
+    protected $type_id;
 
     /** @var string */
     protected $title;

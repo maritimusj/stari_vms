@@ -26,7 +26,7 @@ class group
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        $query = \zovye\Group::query();
+        $query = \zovye\Group::query(\zovye\Group::NORMAL);
 
         $keyword = request::trim('keyword');
         if (!empty($keyword)) {
@@ -102,7 +102,7 @@ class group
         $one = \zovye\Group::findOne([
             'id' => $group_id,
             'agent_id' => $user->getAgentId(),
-        ]);
+        ], \zovye\Group::NORMAL);
 
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
@@ -133,6 +133,7 @@ class group
         $agent = agent::getAgent();
 
         $data = [
+            'type_id' => \zovye\Group::NORMAL,
             'title' => $title,
             'clr' => $clr,
             'agent_id' => $agent->getAgentId(),
@@ -169,7 +170,8 @@ class group
         $one = \zovye\Group::findOne([
             'id' => $group_id,
             'agent_id' => $user->getAgentId(),
-        ]);
+        ], \zovye\Group::NORMAL);
+
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
         }
@@ -201,7 +203,8 @@ class group
         $one = \zovye\Group::findOne([
             'id' => $group_id,
             'agent_id' => $user->getAgentId(),
-        ]);
+        ], \zovye\Group::NORMAL);
+
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
         }

@@ -1003,7 +1003,7 @@ class deviceModelObj extends modelObj
     public function getGroup(): ?device_groupsModelObj
     {
         if ($this->group_id > 0) {
-            return Group::get($this->group_id);
+            return Group::get($this->group_id, Group::NORMAL);
         }
 
         return null;

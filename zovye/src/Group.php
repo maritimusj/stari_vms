@@ -10,6 +10,9 @@ use zovye\model\device_groupsModelObj;
 
 class Group
 {
+    const NORMAL = 0;
+    const CHARGING = 1;
+
     /**
      * @param array $data
      * @return mixed
@@ -32,24 +35,28 @@ class Group
      */
     public static function query($condition = []): base\modelObjFinder
     {
+        if (is_numeric($condition)) {
+            $condition = ['type_id' => $condition];
+        }
+
         return m('device_groups')->where(We7::uniacid([]))->where($condition);
     }
 
     /**
      * @param $id
+     * @param int $type_id
      * @return device_groupsModelObj|null
      */
-    public static function get($id): ?device_groupsModelObj
+    public static function get($id, int $type_id = self::NORMAL): ?device_groupsModelObj
     {
         static $cache = [];
         if ($id) {
             if (isset($cache[$id])) {
                 return $cache[$id];
             }
-            $res = self::findOne(['id' => $id]);
+            $res = self::findOne(['id' => $id], $type_id);
             if ($res) {
                 $cache[$res->getId()] = $res;
-
                 return $res;
             }
         }
@@ -57,8 +64,9 @@ class Group
         return null;
     }
 
-    public static function findOne($condition = []): ?device_groupsModelObj
+    public static function findOne($condition = [], $type_id = self::NORMAL): ?device_groupsModelObj
     {
+        $condition['type_id'] = $type_id;
         return self::query($condition)->findOne();
     }
 

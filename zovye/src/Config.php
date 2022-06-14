@@ -136,4 +136,18 @@ class Config
 
         return globalConfig('balance', $key, $v);
     }
+
+    /**
+     *  充电桩设备设置
+     */
+
+    public static function charging($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('charging', $key, $v);
+        }
+
+        return globalConfig('charging', $key, $v);
+    }
+    
 }

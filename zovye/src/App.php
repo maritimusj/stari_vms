@@ -590,4 +590,10 @@ class App
     {
         return settings('custom.device.brief-page.enabled', false);
     }
+
+    public static function isChargingDeviceEnabled(): bool
+    {
+        return Config::charging('enabled', false);
+    }
+    
 }

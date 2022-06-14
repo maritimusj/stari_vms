@@ -138,6 +138,13 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['ctrl']['signature'] = Util::random(32);
         }
 
+        if (App::isChargingDeviceEnabled()) {
+            Config::charging('server', [
+                'url' => request::trim('ChargingServerURL'),
+                'access_token' => request::trim('ChargingServerAccessToken'),
+            ], true);
+        }
+
         $settings['device']['v-device']['enabled'] = request::bool('vDevice') ? 1 : 0;
         $settings['goods']['lottery']['enabled'] = request::bool('lotteryGoods') ? 1 : 0;
         $settings['idcard']['verify']['enabled'] = request::bool('idCardVerify') ? 1 : 0;
@@ -255,7 +262,8 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             }
         }
 
-        Config::device('door.enable', request::bool('DeviceWithDoor') ? 1 : 0, true);
+        Config::device('door.enabled', request::bool('DeviceWithDoor') ? 1 : 0, true);
+        Config::charging('enabled', request::bool('ChargingDeviceEnabled') ? 1 : 0, true);
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
 
@@ -912,6 +920,20 @@ if ($op == 'account') {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
         $tpl_data['queue'] = Config::app('queue', []);
+    }
+
+    if (App::isChargingDeviceEnabled()) {
+        $tpl_data['charging'] = [
+            'server' => Config::charging('server', []),
+        ];
+
+        $res = ChargingServ::GetVersion();
+        if (is_error($res)) {
+            $tpl_data['charging']['server']['version'] = 'n/a';
+        } else {
+            $tpl_data['charging']['server']['version'] = $res['version'];
+            $tpl_data['charging']['server']['build'] = $res['build'];
+        }
     }
 
     $tpl_data['migrate'] = Migrate::detect();

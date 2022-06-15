@@ -357,8 +357,10 @@ class DeviceEventProcessor
         if ($data['IMEI']) {
             $device = Device::get($data['IMEI'], true);
             if ($device) {
-                $signal = intval($data['Signal']);
-                $device->setSig($signal);
+                if (isset($data['Signal'])) {
+                    $signal = intval($data['Signal']);
+                    $device->setSig($signal);
+                }
                 $device->setLastPing(TIMESTAMP);
                 $device->setLastOnline(TIMESTAMP);
                 $device->save();
@@ -661,6 +663,14 @@ class DeviceEventProcessor
 
             if (isset($extra['ICCID'])) {
                 $device->setIccid($extra['ICCID']);
+            }
+
+            if (isset($extra['iccid'])) {
+                $device->setIccid($extra['iccid']);
+            }
+
+            if (isset($extra['ip'])) {
+                $device->setLastOnlineIp(strval($extra['ip']));
             }
 
             if (isset($extra['RSSI'])) {

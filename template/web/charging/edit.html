@@ -104,6 +104,12 @@
                     </button>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">识别颜色</label>
+                <div class="col-md-10">
+                    {php echo tpl_form_field_color('clr', $group ? $group['clr'] : $clr);}
+                </div>
+            </div>
             <div id="app">
                 <div class="form-group">
                     <label for="l0ef" class="col-md-2 control-label">计费标准(1)<span class="charging-level l0"></span></label>

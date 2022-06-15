@@ -139,7 +139,8 @@ if ($op == 'default') {
         if (isset($agent)) {
             $group->setAgentId($agent->getId());
         }
-
+        
+        $group->setClr(request::trim('clr'));
         $group->setAddress(request::trim('address'));
         $group->setTitle(request::trim('title'));
         $group->setDescription(request::trim('description'));
@@ -148,13 +149,12 @@ if ($op == 'default') {
             'lat' => request::float('lat'),
         ]);
         $group->setFee($fee);
-
     } else {
         $data = [
             'agent_id' => isset($agent) ? $agent->getId() : 0,
             'type_id' => Group::CHARGING,
             'title' => request::trim('title'),
-            'clr' => '#ff5722',
+            'clr' => request::trim('clr'),
             'extra' => [
                 'name' => App::uid(6) . '-' . Util::random(16),
                 'description' => request::trim('description'),

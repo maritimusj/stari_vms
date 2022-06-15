@@ -271,6 +271,7 @@ if ($op == 'list') {
                     'remain' => $device->getRemainNum(),
                     'reset' => $device->getReset(),
                     'lastError' => $device->getLastError(),
+                    'lastOnlineIp' => $device->getLastOnlineIp(),
                     'lastOnline' => $device->getLastOnline() ? date('Y-m-d H:i:s', $device->getLastOnline()) : '',
                     'lastPing' => $device->getLastPing() ? date('Y-m-d H:i:s', $device->getLastPing()) : '',
                     'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),
@@ -495,7 +496,7 @@ HTML;
 
     } elseif ($op == 'deviceTestAll') {
 
-        $device = Device::get(request('id'));
+        $device = Device::get(request::int('id'));
         if (empty($device)) {
             JSON::fail('找不到这个设备！');
         }

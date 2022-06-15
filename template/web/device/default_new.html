@@ -663,7 +663,7 @@
                                     <div @click.self="refreshStatus(o)" :class="{'mcb': true, 'loading': !o.status, 'none': o.status.mcb === null, 'online': o.status && o.status.mcb === true, 'offline': o.status && o.status.mcb === false}" tabindex="0" role="button">
                                         <div class="devcie-detail">
                                             <div class="detail-seg">
-                                                <div><span class="title">IMEI：</span><span>{{o.IMEI}}</span></div> 
+                                                <div><span class="title" v-text="o.isCharging ? '设备编号：' : 'IMEI：'"></span><span>{{o.IMEI}}</span></div> 
                                                 <div>
                                                     <span class="title">ICCID：</span>
                                                     <span>{{o.ICCID ? o.ICCID : 'n/a'}}
@@ -731,6 +731,18 @@
                                             </div>
                                             </template>
                                             <div class="detail-seg" v-if="(o.lastError && o.lastError.errno) || o.firstMsgTotal || o.lastPing || o.lastOnline">
+                                                <div v-if="o.lastPing">
+                                                    <span class="title">最近心跳：</span>
+                                                    <span>{{o.lastPing}}</span>
+                                                </div>
+                                                <div v-if="o.lastOnlineIp">
+                                                    <span class="title">最后上线IP：</span>
+                                                    <span>{{o.lastOnlineIp}}</span>
+                                                </div>                                                
+                                                <div v-if="o.lastOnline">
+                                                    <span class="title">最后上线：</span>
+                                                    <span>{{o.lastOnline}}</span>
+                                                </div>
                                                 <div v-if="o.lastError && o.lastError.errno">
                                                     <span class="title">最近错误：</span>
                                                     <span class="error">{{o.lastError.message}}</span>
@@ -738,14 +750,6 @@
                                                 <div v-if="o.firstMsgTotal">
                                                     <span class="title">今日重启：</span>
                                                     <span>{{o.firstMsgTotal}}次</span>
-                                                </div>
-                                                <div v-if="o.lastPing">
-                                                    <span class="title">最近心跳：</span>
-                                                    <span>{{o.lastPing}}</span>
-                                                </div>
-                                                <div v-if="o.lastOnline">
-                                                    <span class="title">最后上线：</span>
-                                                    <span>{{o.lastOnline}}</span>
                                                 </div>
                                             </div>
                                         </div>

@@ -197,6 +197,16 @@ class deviceModelObj extends modelObj
         return m('device_logs')->findOne("LOCATE('$keywords', data) > 0");
     }
 
+    public function getLastOnlineIp()
+    {
+        return $this->settings('extra.v1.ip', '');
+    }
+
+    public function setLastOnlineIp($ip)
+    {
+        return $this->updateSettings('extra.v1.ip', $ip);
+    }
+
     public function setProtocolV1Code($code): bool
     {
         return $this->updateSettings('extra.v1.lastcode', $code);

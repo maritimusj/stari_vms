@@ -1,4 +1,45 @@
 {template 'common/header'}
+<style>
+.ts-arr {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.ts {
+    width: 100px;
+    height: 25px;
+    margin: 3px;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    font-size: small;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+}
+.charging-level {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-left: 10px;
+}
+.l0 {
+    background-color: #8bc34a;
+}
+.l1 {
+    background-color: #3296fa;
+}
+.l2 {
+    background-color: #ffc107;
+}
+.l3 {
+    background-color: #ff5722;
+}
+</style>
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}<ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">
         <i class="fa fa-pencil"></i> 
@@ -56,6 +97,67 @@
                     </button>
                 </div>
             </div>
+            <div id="app">
+                <div class="form-group">
+                    <label for="l0ef" class="col-md-2 control-label">计费标准(1)<span class="charging-level l0"></span></label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l0ef" id="l0ef" value="{php echo $group ? $group['fee']['l0']['ef'] : 0.00}" step="0.01">
+                        <span class="help-block">* 电费（元）</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l0sf" id="l0sf" value="{php echo $group ? $group['fee']['l0']['sf'] : 0.00}" step="0.01">
+                        <span class="help-block">* 服务费（元）</span>
+                    </div>    
+                </div>
+                <div class="form-group">
+                    <label for="l1ef" class="col-md-2 control-label">计费标准(2)<span class="charging-level l1"></span></label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l1ef" id="l1ef" value="{php echo $group ? $group['fee']['l1']['ef'] : 0.00}" step="0.01">
+                        <span class="help-block">* 电费（元）</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l1sf" id="l1sf" value="{php echo $group ? $group['fee']['l1']['sf'] : 0.00}" step="0.01">
+                        <span class="help-block">* 服务费（元）</span>
+                    </div>    
+                </div>
+                <div class="form-group">
+                    <label for="l2ef" class="col-md-2 control-label">计费标准(3)<span class="charging-level l2"></span></label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l2ef" id="l2ef" value="{php echo $group ? $group['fee']['l2']['ef'] : 0.00}" step="0.01">
+                        <span class="help-block">* 电费（元）</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l2sf" id="l2sf" value="{php echo $group ? $group['fee']['l2']['sf'] : 0.00}" step="0.01">
+                        <span class="help-block">* 服务费（元）</span>
+                    </div>    
+                </div>
+                <div class="form-group">
+                    <label for="l3ef" class="col-md-2 control-label">计费标准(4)<span class="charging-level l3"></span></label>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l3ef" id="l3ef" value="{php echo $group ? $group['fee']['l3']['ef'] : 0.00}" step="0.01">
+                        <span class="help-block">* 电费（元）</span>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" class="form-control" name="l3sf" id="l3sf" value="{php echo $group ? $group['fee']['l3']['sf'] : 0.00}" step="0.01">
+                        <span class="help-block">* 服务费（元）</span>
+                    </div>    
+                </div>
+                <div class="form-group">
+                    <label for="title" class="col-md-2 control-label">计费时段</label>
+                    <div class="col-md-10">
+                        <div class="ts-arr">
+                            <template v-for="e in ts">
+                                <div class="ts"
+                                :class="{l0:e.index===0, l1:e.index===1, l2:e.index===2, l3:e.index===3}"
+                                title="点击切换"
+                                @click="nextLevel(e)">{{e.title}}</div>
+                                <input type="hidden" name="ts[]" :value="e.index">
+                            </template>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -70,7 +172,51 @@
         <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('charging');}'">返回</button>
     </div>
 </form>
-
+<script>
+    const tsData = JSON.parse(`{php echo json_encode($group ? $group['fee']['ts']: [])}`);
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        new Vue({
+            el: "#app",
+            data: {
+                l0: {
+                    sf: 0.0,
+                    ef: 0.0,
+                },
+                l1: {
+                    sf: 0.0,
+                    ef: 0.0,
+                },
+                l2: {
+                    sf: 0.0,
+                    ef: 0.0,
+                },
+                l3: {
+                    sf: 0.0,
+                    ef: 0.0,
+                },
+                ts: []
+            },
+            created() {
+                const self = this;
+                const arr = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16','17', '18', '19', '20', '21', '22', '23'];
+                arr.forEach((e, i) => {
+                    let next = arr[i+1] ? arr[i+1] : arr[0];
+                    self.ts.push({
+                        index: tsData[i] ? tsData[i] : 0,
+                        title: `${e}:00 - ${next}:00`,
+                    })
+                })
+            },
+            methods: {
+                nextLevel(e) {
+                    if (++e.index > 3) {
+                        e.index = 0;
+                    }
+                }
+            }
+        })
+    })
+</script>
 <script>
     function OnQQMapPickerOk(data) {
         $("input[name=lat]").val(data.latlng.lat);

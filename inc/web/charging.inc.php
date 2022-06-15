@@ -73,7 +73,6 @@ if ($op == 'default') {
         $tpl_data['id'] = $group->getId();
         $tpl_data['group'] = $group->format();
     }
-
     app()->showTemplate('web/charging/edit', $tpl_data);
 
 } elseif ($op == 'save') {
@@ -85,6 +84,26 @@ if ($op == 'default') {
             Util::itoast('找不到这个代理商！', '', 'error');
         }
     }
+
+    $fee = [
+        'l0' => [
+            'ef' => request::float('l0ef'),
+            'sf' => request::float('l0sf'),
+        ],
+        'l1' => [
+            'ef' => request::float('l1ef'),
+            'sf' => request::float('l1sf'),
+        ],
+        'l2' => [
+            'ef' => request::float('l2ef'),
+            'sf' => request::float('l2sf'),
+        ],
+        'l3' => [
+            'ef' => request::float('l3ef'),
+            'sf' => request::float('l3sf'),
+        ],
+        'ts' => array_map(function($e) { return intval($e);}, request::array('ts', [])),
+    ];
 
     $id = request::int('id');
     if ($id) {
@@ -104,11 +123,13 @@ if ($op == 'default') {
             'lat' => request::float('lat'),
         ]);
 
+        $group->setExtraData('fee', $fee);
+
         if ($group->save()) {
-            Util::itoast('保存成功！', Util::url('charging'), 'success');
+            Util::itoast('保存成功！', Util::url('charging', ['op' => 'edit', 'id' => $id]), 'success');
         }
 
-        Util::itoast('保存失败！', Util::url('charging'), 'error');
+        Util::itoast('保存失败！', Util::url('charging', ['op' => 'edit', 'id' => $id]), 'error');
 
     } else {
         $data = [
@@ -121,15 +142,16 @@ if ($op == 'default') {
                 'address' => request::trim('address'),
                 'lat' => request::float('lat'),
                 'lng' => request::float('lng'),
+                'fee' => $fee,
             ],
         ];
 
         $group = Group::create($data);
         if ($group) {
-            Util::itoast('创建成功！', Util::url('charging'), 'success');
+            Util::itoast('创建成功！', Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]), 'success');
         }
 
-        Util::itoast('创建分组失败！', Util::url('charging'), 'error');
+        Util::itoast('创建分组失败！', Util::url('charging', ['op' => 'edit']), 'error');
     }
 
 } elseif ($op == 'remove') {

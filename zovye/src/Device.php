@@ -22,6 +22,7 @@ class Device extends State
     const VIRTUAL_DEVICE = 'vd';
     const BLUETOOTH_DEVICE = 'bluetooth';
     const NORMAL_DEVICE = 'normal';
+    const CHARGING_DEVICE = 'charging';
 
     const BLUETOOTH_CONNECTED = 1;
     const BLUETOOTH_READY = 2;

@@ -290,6 +290,14 @@
     <div class="panel panel-default" v-else>
         <div class="heading">
             <span class="operate">
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add'));}">
+                    <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
+                </a>
+                {if \zovye\App::isChargingDeviceEnabled()}
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_charging'));}">
+                    <img src="{MODULE_URL}static/img/charging.svg" class="icon" title="添加充电桩">
+                </a>
+                {/if}
                 {if \zovye\App::isVDeviceSupported()}
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'add_vd'));}">
                     <img src="{MODULE_URL}static/img/vdevice.svg" class="icon" title="添加虚拟设备">
@@ -303,9 +311,6 @@
                     <img src="{MODULE_URL}static/img/upload_bluetooth.svg" class="icon" title="导入蓝牙设备">
                 </a>
                 {/if}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'add'));}">
-                    <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
-                </a>
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group'));}">
                     <img src="{MODULE_URL}static/img/group.svg" class="icon" title="分组管理">
                 </a>

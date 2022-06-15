@@ -238,6 +238,14 @@ class deviceModelObj extends modelObj
         return $this->getDeviceModel() == Device::BLUETOOTH_DEVICE;
     }
 
+    /**
+     * 是不是充电桩
+     * @return bool
+     */
+    public function isChargingDevice(): bool {
+        return $this->getDeviceModel() == Device::CHARGING_DEVICE;
+    }
+
     public function getBUID(): string
     {
         if ($this->isBlueToothDevice()) {
@@ -332,6 +340,11 @@ class deviceModelObj extends modelObj
             case Device::BLUETOOTH_DEVICE:
                 if (App::isBluetoothDeviceSupported()) {
                     return Device::BLUETOOTH_DEVICE;
+                }
+                break;
+            case Device::CHARGING_DEVICE:
+                if (App::isChargingDeviceEnabled()) {
+                    return Device::CHARGING_DEVICE;
                 }
         }
 

@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\model\device_groupsModelObj;
+use zovye\model\deviceModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
@@ -70,7 +73,6 @@ if ($op == 'default') {
         $tpl_data['list'] = $list;
         $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
         $tpl_data['agentId'] = $agent_id ?? null;
-        $tpl_data['navs'] = $navs;
 
         app()->showTemplate('web/charging/default', $tpl_data);
 
@@ -201,7 +203,7 @@ if ($op == 'default') {
             }
         }
 
-        return ChargingServ::removeGroup($name);;   
+        return ChargingServ::removeGroup($name);
     });
 
     if (is_error($result)) {

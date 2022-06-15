@@ -374,19 +374,8 @@ if ($op == 'list') {
         }
 
         JSON::success($result);
-    } elseif ($op == 'add' || $op == 'add_vd' || $op == 'add_bluetooth_device' || $op == 'edit') {
 
-        //替换原先的groups
-        $group_res = Group::query(Group::NORMAL)->findAll();
-
-        $group_arr = [];
-
-        /** @var device_groupsModelObj $val */
-        foreach ($group_res as $val) {
-            $group_arr[$val->getId()] = ['title' => $val->getTitle()];
-        }
-
-        $tpl_data['groups'] = $group_arr;
+    } elseif ($op == 'add' || $op == 'add_vd' || $op == 'add_bluetooth_device' || $op == 'add_charging' || $op == 'edit') {
 
         $id = request::int('id');
 
@@ -430,6 +419,8 @@ if ($op == 'list') {
             $tpl_data['device_model'] = Device::VIRTUAL_DEVICE;
         } elseif ($op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice())) {
             $tpl_data['device_model'] = Device::BLUETOOTH_DEVICE;
+        } elseif ($op == 'add_charging' || (isset($device) && $device->isChargingDevice())) {
+            $tpl_data['device_model'] = Device::CHARGING_DEVICE;
         } else {
             $tpl_data['device_model'] = Device::NORMAL_DEVICE;
         }
@@ -454,13 +445,17 @@ if ($op == 'list') {
         }
 
         $module_url = MODULE_URL;
-        if ($op == 'add_vd' || ($device && $device->isVDevice())) {
+        if ($op == 'add_vd' || (isset($device) && $device->isVDevice())) {
             $icon_html = <<<HTML
         <img src="{$module_url}static/img/vdevice.svg" class="icon" title="虚拟设备">
 HTML;
-        } elseif ($op == 'add_bluetooth_device' || ($device && $device->isBlueToothDevice())) {
+        } elseif ($op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice())) {
             $icon_html = <<<HTML
         <img src="{$module_url}static/img/bluetooth.svg" class="icon" title="蓝牙设备">
+HTML;
+        } elseif ($op == 'add_charging' || (isset($device) && $device->isChargingDevice())) {
+            $icon_html = <<<HTML
+        <img src="{$module_url}static/img/charging.svg" class="icon" title="充电桩">
 HTML;
         } else {
             $icon_html = <<<HTML
@@ -468,10 +463,22 @@ HTML;
 HTML;
         }
 
+        $groups = [];
+        if ($op == 'add_charging' || (isset($device) && $device->isChargingDevice())) {
+            $group_query = Group::query(Group::CHARGING);
+        } else {
+            $group_query = Group::query(Group::NORMAL);
+        }
+        /** @var device_groupsModelObj $val */
+        foreach ($group_query->findAll() as $val) {
+            $groups[$val->getId()] = ['title' => $val->getTitle()];
+        }
+
+        $tpl_data['groups'] = $groups;
         $tpl_data['icon'] = $icon_html;
         $tpl_data['from'] = request::str('from', 'base');
-        $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice(
-                ));
+        $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice());
+        $tpl_data['is_charging_device'] = $op == 'add_charging' || (isset($device) && $device->isChargingDevice());
         $tpl_data['themes'] = Theme::all();
 
         app()->showTemplate('web/device/edit_new', $tpl_data);

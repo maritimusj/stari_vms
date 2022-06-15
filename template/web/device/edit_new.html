@@ -802,6 +802,7 @@
                 currentPackage: null,
                 config: {
                     is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
+                    is_charging_device: `{php echo is_charging_device? 1 :''}`,
                     app: `{php echo $app? 1 :''}`,
                     zero_bonus_enabled: `{php echo \zovye\App::isZeroBonusEnabled()? 1 : ''}`,
                     moscale_enabled: `{php echo $moscale ? 1 : ''}`,

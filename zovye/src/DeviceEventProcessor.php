@@ -657,50 +657,52 @@ class DeviceEventProcessor
 
             $device->setProtocolV1Code($data['code']);
 
-            if (isset($data['extra']['ICCID'])) {
-                $device->setIccid($data['extra']['ICCID']);
+            $extra = (array)$data['extra'];
+
+            if (isset($extra['ICCID'])) {
+                $device->setIccid($extra['ICCID']);
             }
 
-            if (isset($data['extra']['RSSI'])) {
-                $device->setSig($data['extra']['RSSI']);
+            if (isset($extra['RSSI'])) {
+                $device->setSig($extra['RSSI']);
             }
 
-            if (isset($data['extra']['LAC'])) {
+            if (isset($extra['LAC'])) {
                 if (settings('device.lac.enabled')) {
                     $lastLAC = $device->settings('extra.v1.lac.v', '');
-                    if (!empty($lastLAC) && $lastLAC != $data['extra']['LAC'] && empty($device->getS1())) {
+                    if (!empty($lastLAC) && $lastLAC != $extra['LAC'] && empty($device->getS1())) {
                         $device->setS1(1);
                         $device->UpdateSettings('extra.v1.lac.time', time());
                     }
                 }
 
-                $device->updateSettings('extra.v1.lac.v', strval($data['extra']['LAC']));
+                $device->updateSettings('extra.v1.lac.v', strval($extra['LAC']));
             }
 
-            if (isset($data['extra']['qoe'])) {
-                $device->setQoe($data['extra']['qoe']);
+            if (isset($extra['qoe'])) {
+                $device->setQoe($extra['qoe']);
             }
 
-            if (isset($data['extra']['voltage'])) {
-                $device->setV0Status(Device::V0_STATUS_VOLTAGE, $data['extra']['voltage']);
+            if (isset($extra['voltage'])) {
+                $device->setV0Status(Device::V0_STATUS_VOLTAGE, $extra['voltage']);
             }
 
-            if (isset($data['extra']['count'])) {
-                $device->setV0Status(Device::V0_STATUS_COUNT, $data['extra']['count']);
+            if (isset($extra['count'])) {
+                $device->setV0Status(Device::V0_STATUS_COUNT, $extra['count']);
             }
 
-            if (isset($data['extra']['error'])) {
-                $device->setV0Status(Device::V0_STATUS_ERROR, $data['extra']['error']);
+            if (isset($extra['error'])) {
+                $device->setV0Status(Device::V0_STATUS_ERROR, $extra['error']);
             }
 
-            if (isset($data['extra']['sensor'])) {
-                $sensors = isset($data['extra']['sensor']['type']) ? [$data['extra']['sensor']] : $data['extra']['sensor'];
+            if (isset($extra['sensor'])) {
+                $sensors = isset($extra['sensor']['type']) ? [$extra['sensor']] : $extra['sensor'];
                 foreach ($sensors as $sensor) {
                     $device->setSensorData($sensor['type'], $sensor['data']);
                 }
             }
 
-            $device->updateMcbStatus($data['extra']);
+            $device->updateMcbStatus($extra);
 
             $device->save();
         }

@@ -20,13 +20,20 @@
     color: #fff;
     cursor: pointer;
     user-select: none;
+    padding: 1px;
 }
+
 .charging-level {
     width: 15px;
     height: 15px;
     display: inline-block;
     margin-left: 10px;
 }
+
+.ts:hover {
+    box-shadow: 1px 1px 2px 2px rgb(204 204 204 / 56%);
+}
+
 .l0 {
     background-color: #8bc34a;
 }
@@ -102,44 +109,44 @@
                     <label for="l0ef" class="col-md-2 control-label">计费标准(1)<span class="charging-level l0"></span></label>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l0ef" id="l0ef" value="{php echo $group ? $group['fee']['l0']['ef'] : 0.00}" step="0.01">
-                        <span class="help-block">* 电费（元）</span>
+                        <span class="help-block">* 电费（元/分钟）</span>
                     </div>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l0sf" id="l0sf" value="{php echo $group ? $group['fee']['l0']['sf'] : 0.00}" step="0.01">
-                        <span class="help-block">* 服务费（元）</span>
+                        <span class="help-block">* 服务费（元/分钟）</span>
                     </div>    
                 </div>
                 <div class="form-group">
                     <label for="l1ef" class="col-md-2 control-label">计费标准(2)<span class="charging-level l1"></span></label>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l1ef" id="l1ef" value="{php echo $group ? $group['fee']['l1']['ef'] : 0.00}" step="0.01">
-                        <span class="help-block">* 电费（元）</span>
+                        <span class="help-block">* 电费（元/分钟）</span>
                     </div>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l1sf" id="l1sf" value="{php echo $group ? $group['fee']['l1']['sf'] : 0.00}" step="0.01">
-                        <span class="help-block">* 服务费（元）</span>
+                        <span class="help-block">* 服务费（元/分钟）</span>
                     </div>    
                 </div>
                 <div class="form-group">
                     <label for="l2ef" class="col-md-2 control-label">计费标准(3)<span class="charging-level l2"></span></label>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l2ef" id="l2ef" value="{php echo $group ? $group['fee']['l2']['ef'] : 0.00}" step="0.01">
-                        <span class="help-block">* 电费（元）</span>
+                        <span class="help-block">* 电费（元/分钟）</span>
                     </div>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l2sf" id="l2sf" value="{php echo $group ? $group['fee']['l2']['sf'] : 0.00}" step="0.01">
-                        <span class="help-block">* 服务费（元）</span>
+                        <span class="help-block">* 服务费（元/分钟）</span>
                     </div>    
                 </div>
                 <div class="form-group">
                     <label for="l3ef" class="col-md-2 control-label">计费标准(4)<span class="charging-level l3"></span></label>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l3ef" id="l3ef" value="{php echo $group ? $group['fee']['l3']['ef'] : 0.00}" step="0.01">
-                        <span class="help-block">* 电费（元）</span>
+                        <span class="help-block">* 电费（元/分钟）</span>
                     </div>
                     <div class="col-md-5">
                         <input type="number" class="form-control" name="l3sf" id="l3sf" value="{php echo $group ? $group['fee']['l3']['sf'] : 0.00}" step="0.01">
-                        <span class="help-block">* 服务费（元）</span>
+                        <span class="help-block">* 服务费（元/分钟）</span>
                     </div>    
                 </div>
                 <div class="form-group">

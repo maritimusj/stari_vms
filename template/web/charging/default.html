@@ -19,8 +19,10 @@
             <th>#</th>
             <th>名称</th>
             <th>代理商</th>
-            <th class="center">设备数量</th>
+            <th>计费</th>
+            <th>说明</th>
             <th>地址</th>
+            <th class="center">设备数量</th>
             <th>创建时间</th>
             <th>操作</th>
             </thead>
@@ -45,15 +47,16 @@
                     <span style="color:gray;">&lt;平台&gt;</span>
                     {/if}
                 </td>
-                <td class="center">{php echo intval($item['total'])}</td> 
                 <td>
-                    <address>
-                        {$item['address']}<br>
-                        <span style="color: #ccc;">
-                            {$item['description']}
-                        </span>
-                    </address>
+                    {$item['fee_tip']}
+                </td>
+                <td>
+                    {$item['description']}
+                </td>
+                <td>
+                    {$item['address']}
                 </td> 
+                <td class="center">{php echo intval($item['total'])}</td> 
                 <td>
                     {$item['createtime']}
                 </td>

@@ -147,7 +147,6 @@ if ($op == 'default') {
             'lng' => request::float('lng'),
             'lat' => request::float('lat'),
         ]);
-
         $group->setFee($fee);
 
     } else {
@@ -155,6 +154,7 @@ if ($op == 'default') {
             'agent_id' => isset($agent) ? $agent->getId() : 0,
             'type_id' => Group::CHARGING,
             'title' => request::trim('title'),
+            'clr' => '#ff5722',
             'extra' => [
                 'name' => App::uid(6) . '-' . Util::random(16),
                 'description' => request::trim('description'),

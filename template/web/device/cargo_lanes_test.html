@@ -1,14 +1,35 @@
 <div style="max-height: 300px;overflow: auto;">
     {if $params['cargo_lanes']}
+    {if $is_charging}
+    <table class="table table-bordered cargolanes operate" id="cargolanes">
+        <thead>
+            <th>枪号</th>
+            <th>SOC</th>
+            <th>当前状态</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+            {loop $params['cargo_lanes'] $index $item}
+            <tr data-fetchid="{$device_id}">
+                <td>{php echo $index + 1}</td>
+                <td>{$item['capacity']} {$item['goods_unit_title']}</td>
+                <td>{$item['num']} {$item['goods_unit_title']}</td>
+                <td class="test_btn">
+                    <img src="{MODULE_URL}static/img/start_charging.svg" data-op="deviceTestLaneN" data-params="{$index}" class="icon" title="测试充电">
+                    <img src="{MODULE_URL}static/img/stop_charging.svg" class="icon" title="停止充电">
+                </td>
+            </tr>
+            {/loop}
+        </tbody>
+    </table>
+    {else}
     <table class="table table-bordered cargolanes operate" id="cargolanes">
         <thead>
             <th>货道</th>
             <th>商品名称</th>
             <th>容量</th>
             <th>当前商品数量</th>
-            {if empty($item['is_vd'])}
             <th>操作</th>
-            {/if}
         </thead>
         <tbody>
             {loop $params['cargo_lanes'] $index $item}
@@ -21,16 +42,15 @@
                 </td>
                 <td>{$item['capacity']} {$item['goods_unit_title']}</td>
                 <td>{$item['num']} {$item['goods_unit_title']}</td>
-                {if empty($item['is_vd'])}
                 <td class="test_btn">
                     <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="测试出货"></i>
                     <i class="fa fa-level-up" data-op="deviceReset" data-params="{$index}" title="重置商品数量"></i>
                 </td>
-                {/if}
             </tr>
             {/loop}
         </tbody>
     </table>
+    {/if}
     {else}
     <div class="text-center text-muted">
         <i class="fa fa-question-circle"></i> 请检查设备型号是否正确！

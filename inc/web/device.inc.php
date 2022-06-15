@@ -477,7 +477,9 @@ HTML;
         $tpl_data['groups'] = $groups;
         $tpl_data['icon'] = $icon_html;
         $tpl_data['from'] = request::str('from', 'base');
+        $tpl_data['is_normal_device'] = $op == 'add' || (isset($device) && $device->isNormalDevice());
         $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice());
+        $tpl_data['is_vdevice'] = $op == 'add_vd' || (isset($device) && $device->isVDevice());
         $tpl_data['is_charging_device'] = $op == 'add_charging' || (isset($device) && $device->isChargingDevice());
         $tpl_data['themes'] = Theme::all();
 
@@ -491,7 +493,7 @@ HTML;
         }
 
         $data = [
-            'is_vd' => $device->isVDevice(),
+            'is_charging' => $device->isChargingDevice(),
             'device_id' => $device->getId(),
             'params' => $device->getPayload(true),
         ];
@@ -502,7 +504,7 @@ HTML;
         );
 
         JSON::success([
-            'title' => "设备货道 [ {$device->getName()} ]",
+            'title' => $device->isChargingDevice() ? "充电枪 [ {$device->getName()} ]" : "设备货道 [ {$device->getName()} ]",
             'content' => $content,
         ]);
     } elseif ($op == 'deviceTestLaneN') {
@@ -805,7 +807,7 @@ HTML;
                     throw new RuntimeException('创建失败！');
                 }
 
-                $model = request('device_model');
+                $model = request::str('device_model');
 
                 $device->setDeviceModel($model);
 
@@ -826,36 +828,51 @@ HTML;
                 $device->updateAppId();
             }
 
-            //处理自定义型号
-            if (empty($type_id)) {
+            if ($device->isChargingDevice()) {
                 $device->setDeviceType(0);
 
                 $device_type = DeviceTypes::from($device);
                 if (empty($device_type)) {
                     throw new RuntimeException('设备类型不正确！');
                 }
-
-                $old = $device_type->getExtraData('cargo_lanes', []);
-
                 $cargo_lanes = [];
-                $capacities = request::array('capacities');
-                foreach (request::array('goods') as $index => $goods_id) {
-                    $cargo_lanes[] = [
-                        'goods' => intval($goods_id),
-                        'capacity' => intval($capacities[$index]),
-                    ];
-                    if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $device->resetPayload([$index => '@0'], '管理员更改货道商品', $now);
-                    }
-                    unset($old[$index]);
+                for($i = 0; $i < request::int('chargerNum'); $i ++) {
+                    $cargo_lanes[] = [];
                 }
-
-                foreach ($old as $index => $lane) {
-                    $device->resetPayload([$index => '@0'], '管理员删除货道', $now);
-                }
-
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
                 $device_type->save();
+            } else {
+                //处理自定义型号
+                if (empty($type_id)) {
+                    $device->setDeviceType(0);
+
+                    $device_type = DeviceTypes::from($device);
+                    if (empty($device_type)) {
+                        throw new RuntimeException('设备类型不正确！');
+                    }
+
+                    $old = $device_type->getExtraData('cargo_lanes', []);
+
+                    $cargo_lanes = [];
+                    $capacities = request::array('capacities');
+                    foreach (request::array('goods') as $index => $goods_id) {
+                        $cargo_lanes[] = [
+                            'goods' => intval($goods_id),
+                            'capacity' => intval($capacities[$index]),
+                        ];
+                        if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
+                            $device->resetPayload([$index => '@0'], '管理员更改货道商品', $now);
+                        }
+                        unset($old[$index]);
+                    }
+
+                    foreach ($old as $index => $lane) {
+                        $device->resetPayload([$index => '@0'], '管理员删除货道', $now);
+                    }
+
+                    $device_type->setExtraData('cargo_lanes', $cargo_lanes);
+                    $device_type->save();
+                }                
             }
 
             if (empty($device_type)) {

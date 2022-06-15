@@ -798,12 +798,6 @@ class Device extends State
             //分组
             if (request::isset('group_id')) {
                 $group_id = request::int('group_id');
-                if ($group_id != 0) {
-                    $group = Group::get($group_id);
-                    if (empty($group)) {
-                        throw new Exception('找不到这个分组！');
-                    }
-                }
                 $query->where(['group_id' => $group_id]);
             }
 
@@ -951,6 +945,11 @@ class Device extends State
                 if (App::isBluetoothDeviceSupported()) {
                     if ($entry->isBlueToothDevice()) {
                         $data['isBluetooth'] = true;
+                    }
+                }
+                if (App::isChargingDeviceEnabled()) {
+                    if ($entry->isChargingDevice()) {
+                        $data['isCharging'] = true;
                     }
                 }
                 $devices['list'][] = $data;

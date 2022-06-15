@@ -219,14 +219,23 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.v0.status.lastonline', $last_online);
     }
 
+        /**
+     * 是不是蓝牙设备
+     * @return bool
+     */
+    public function isNormalDevice(): bool
+    {
+        return $this->getDeviceModel() == Device::NORMAL_DEVICE;
+    }
+
+
     /**
      * 是不是虚拟设备
      * @return bool
      */
     public function isVDevice(): bool
     {
-        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel(
-                ) == Device::VIRTUAL_DEVICE);
+        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
     }
 
     /**
@@ -604,6 +613,11 @@ class deviceModelObj extends modelObj
         $prefix = $this->migrateLanesData();
 
         return $this->updateSettings("{$prefix}cargo_lanes", $lanes_data);
+    }
+
+    public function getChargerNum(): int 
+    {
+        return count($this->getCargoLanes());
     }
 
     public function profile(): array
@@ -1016,6 +1030,9 @@ class deviceModelObj extends modelObj
     public function getGroup(): ?device_groupsModelObj
     {
         if ($this->group_id > 0) {
+            if ($this->isChargingDevice()) {
+                return Group::get($this->group_id, Group::CHARGING);
+            }
             return Group::get($this->group_id, Group::NORMAL);
         }
 

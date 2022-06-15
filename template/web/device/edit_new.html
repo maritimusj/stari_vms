@@ -210,10 +210,16 @@
                     </div>
                     {else}
                     <div class="form-group">
-                        <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
+                        <label for="IMEI" class="col-md-2 control-label" v-text="config.is_normal_device ? '硬件IMEI' : '设备编号'"></label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" :readonly="deviceId > 0" :required="deviceId === 0">
                             <span class="help-block" v-if="deviceId === 0">* 以后无法修改</span>
+                        </div>
+                    </div>
+                    <div class="form-group" v-if="config.is_charging_device">
+                        <label for="chargerNum" class="col-md-2 control-label">充电枪数量</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" name="chargerNum" id="chargerNum" value="{php echo $device ? $device->getChargerNum() : ''}">
                         </div>
                     </div>
                     <template v-if="config.is_bluetooth_device">
@@ -254,7 +260,7 @@
                         </div>                        
                     </template>
                     {/if}
-                    <div id="device_types">
+                    <div id="device_types" v-if="config.is_normal_device || config.is_bluetooth_device || config.is_vdevice">
                         <div class="form-group">
                             <label for="select_device_types" class="col-md-2 control-label">设备型号</label>
                             <div class="col-md-5">
@@ -530,7 +536,7 @@
                             </div>
                         </div>
                     -->
-                    <div class="form-group">
+                    <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
                         <label for="theme" class="col-md-2 control-label">手机端界面</label>
                         <div class="col-md-10">
                             <select name="theme" class="form-control" id="theme">
@@ -541,7 +547,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
                         <label for="group" class="col-md-2 control-label">商品列表</label>
                         <div class="col-md-10">
                             <select name="goodsList" id="group" style="width:100%;">
@@ -566,13 +572,13 @@
                             {/if}
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
                         <label for="address" class="col-md-2 control-label">地址</label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="address" id="address" value="{php echo strval($extra['address'])}">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
                         <label class="col-md-2 control-label">位置</label>
                         <div class="col-md-10">
                             {php echo tpl_form_field_coordinate('location', $loc);}
@@ -601,7 +607,7 @@
                         </div>
                     </div>
                     {if \zovye\App::isMustFollowAccountEnabled()}
-                    <div class="form-group">
+                    <div class="form-group" v-if="config.is_normal_device || config.is_vdevice">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">购买商品</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                             <label for="mustFollow0" class="radio-inline">
@@ -801,7 +807,9 @@
                 packages: [],
                 currentPackage: null,
                 config: {
+                    is_normal_device: `{php echo $is_normal_device? 1 :''}`,
                     is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
+                    is_vdevice: `{php echo $is_vdevice? 1 :''}`,
                     is_charging_device: `{php echo is_charging_device? 1 :''}`,
                     app: `{php echo $app? 1 :''}`,
                     zero_bonus_enabled: `{php echo \zovye\App::isZeroBonusEnabled()? 1 : ''}`,

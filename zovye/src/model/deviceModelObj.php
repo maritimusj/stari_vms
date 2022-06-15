@@ -360,6 +360,16 @@ class deviceModelObj extends modelObj
         ];
     }
 
+    public function setChargerData($chargerID, array $data)
+    {
+        return $this->updateSettings("extra.charger.{$chargerID}", $data);
+    }
+
+    public function getChargerData($chargerID): array
+    {
+        return $this->settings("extra.charger.{$chargerID}", []);
+    }
+
     public function setDeviceModel($model)
     {
         $this->updateSettings('device.model', $model);

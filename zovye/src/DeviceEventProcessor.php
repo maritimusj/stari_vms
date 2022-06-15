@@ -717,19 +717,17 @@ class DeviceEventProcessor
             }
 
             if ($device->isChargingDevice()) {
-                $chargerID = $extra['chargerID'];
-                $serial = $extra['serial'] ?? '';
-
                 if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
                     $device->setChargingData($extra);
                 }
 
                 if (is_array($extra['status'])) {
-
+                    $chargerID = $extra['chargerID'];
+                    $device->setChargerData($chargerID, $extra['status']);
                 }
 
                 if (is_array($extra['BMS'])) {
-
+                    $serial = $extra['serial'] ?? '';
                 }
             }
 

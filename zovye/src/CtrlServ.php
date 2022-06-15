@@ -124,6 +124,7 @@ class CtrlServ
             $ctrlServerUrl .= "/$path";
 
             $params['nostr'] = TIMESTAMP;
+            $ctrlServerUrl .= '?'.http_build_query($params);
 
             $headers = [];
 
@@ -170,7 +171,6 @@ class CtrlServ
                 );
             }
 
-            $ctrlServerUrl .= '?'.http_build_query($params);
             return self::$http_client->request($ctrlServerUrl, $method, $headers, $body);
         }
 

@@ -702,7 +702,26 @@ class DeviceEventProcessor
                 }
             }
 
-            $device->updateMcbStatus($extra);
+            if ($device->isNormalDevice()) {
+                $device->updateMcbStatus($extra);
+            }
+
+            if ($device->isChargingDevice()) {
+                $chargerID = $extra['chargerID'];
+                $serial = $extra['serial'] ?? '';
+
+                if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
+                    $device->setChargingData($extra);
+                }
+
+                if (is_array($extra['status'])) {
+
+                }
+
+                if (is_array($extra['BMS'])) {
+
+                }
+            }
 
             $device->save();
         }

@@ -332,6 +332,24 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.bluetooth.protocol', $protocol);
     }
 
+    public function setChargingData(array $data): bool
+    {
+        return $this->updateSettings('extra.charging', $data);
+    }
+
+    public function getChargingData(): array
+    {
+        $data = $this->settings('extra.charging',[]);
+        return [
+            'cft' => $data['cft'] == 0 ? 'DC' : 'AC',
+            'chargerNum' => $data['chargerNum'],
+            'carrier' => $data['carrier'],
+            'firmwareVersion' => $data['firmwareVersion'],
+            'network' => $data['network'],
+            'protocolVersion' => 'v'. $data['protocolVersion'] / 10,
+        ];
+    }
+
     public function setDeviceModel($model)
     {
         $this->updateSettings('device.model', $model);

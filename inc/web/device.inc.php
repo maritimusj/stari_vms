@@ -249,63 +249,65 @@ if ($op == 'list') {
 
             $devices = Device::query(['id' => $ids])->findAll();
 
-            /** @var deviceModelObj $entry */
+            /** @var deviceModelObj $device */
             foreach ($devices as $entry) {
                 $data = [
-                    'id' => $entry->getId(),
-                    'name' => $entry->getName(),
-                    'IMEI' => $entry->getImei(),
-                    'ICCID' => $entry->getIccid(),
-                    'qrcode' => $entry->getQrcode(),
-                    'model' => $entry->getDeviceModel(),
-                    'activeQrcode' => $entry->isActiveQrcodeEnabled(),
-                    'getUrl' => $entry->getUrl(),
+                    'id' => $device->getId(),
+                    'name' => $device->getName(),
+                    'IMEI' => $device->getImei(),
+                    'ICCID' => $device->getIccid(),
+                    'qrcode' => $device->getQrcode(),
+                    'model' => $device->getDeviceModel(),
+                    'activeQrcode' => $device->isActiveQrcodeEnabled(),
+                    'getUrl' => $device->getUrl(),
                     'v0_status' => [
-                        Device::V0_STATUS_SIG => $entry->getSig(),
-                        Device::V0_STATUS_QOE => $entry->getQoe(),
-                        Device::V0_STATUS_VOLTAGE => $entry->getV0Status(Device::V0_STATUS_VOLTAGE),
-                        Device::V0_STATUS_COUNT => (int)$entry->getV0Status(Device::V0_STATUS_COUNT),
-                        Device::V0_STATUS_ERROR => $entry->getV0ErrorDescription(),
+                        Device::V0_STATUS_SIG => $device->getSig(),
+                        Device::V0_STATUS_QOE => $device->getQoe(),
+                        Device::V0_STATUS_VOLTAGE => $device->getV0Status(Device::V0_STATUS_VOLTAGE),
+                        Device::V0_STATUS_COUNT => (int)$device->getV0Status(Device::V0_STATUS_COUNT),
+                        Device::V0_STATUS_ERROR => $device->getV0ErrorDescription(),
                     ],
-                    'capacity' => intval($entry->getCapacity()),
-                    'remain' => intval($entry->getRemainNum()),
-                    'reset' => $entry->getReset(),
-                    'lastError' => $entry->getLastError(),
-                    'lastOnline' => $entry->getLastOnline() ? date('Y-m-d H:i:s', $entry->getLastOnline()) : '',
-                    'lastPing' => $entry->getLastPing() ? date('Y-m-d H:i:s', $entry->getLastPing()) : '',
+                    'capacity' => $device->getCapacity(),
+                    'remain' => $device->getRemainNum(),
+                    'reset' => $device->getReset(),
+                    'lastError' => $device->getLastError(),
+                    'lastOnline' => $device->getLastOnline() ? date('Y-m-d H:i:s', $device->getLastOnline()) : '',
+                    'lastPing' => $device->getLastPing() ? date('Y-m-d H:i:s', $device->getLastPing()) : '',
                     'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
-                    'lockedTime' => $entry->isLocked() ? date('Y-m-d H:i:s', $entry->getLockedTime()) : '',
-                    'appId' => $entry->getAppId(),
-                    'appVersion' => $entry->getAppVersion(),
+                    'lockedTime' => $device->isLocked() ? date('Y-m-d H:i:s', $device->getLockedTime()) : '',
+                    'appId' => $device->getAppId(),
+                    'appVersion' => $device->getAppVersion(),
                     'total' => 'n/a',
                     'gettype' => [
-                        'location' => $entry->needValidateLocation(),
+                        'location' => $device->needValidateLocation(),
                     ],
                     'address' => [
-                        'web' => $entry->settings('extra.location.baidu.address', ''),
-                        'agent' => $entry->settings('extra.location.tencent.address', ''),
+                        'web' => $device->settings('extra.location.baidu.address', ''),
+                        'agent' => $device->settings('extra.location.tencent.address', ''),
                     ],
-                    'isDown' => $entry->settings('extra.isDown', Device::STATUS_NORMAL),
+                    'isDown' => $device->settings('extra.isDown', Device::STATUS_NORMAL),
                 ];
 
                 if (App::isDeviceWithDoorEnabled()) {
-                    $data['doorNum'] = $entry->getDoorNum();
+                    if (!$device->isChargingDevice()) {
+                        $data['doorNum'] = $device->getDoorNum();
+                    }
                 }
 
                 if (Util::isSysLoadAverageOk()) {
                     $data['total'] = [
-                        'month' => intval(Stats::getMonthTotal($entry)['total']),
-                        'today' => intval(Stats::getDayTotal($entry)['total']),
+                        'month' => intval(Stats::getMonthTotal($device)['total']),
+                        'today' => intval(Stats::getDayTotal($device)['total']),
                     ];
 
-                    $data['gettype']['freeLimitsReached'] = $entry->isFreeLimitsReached();
+                    $data['gettype']['freeLimitsReached'] = $device->isFreeLimitsReached();
 
-                    $accounts = $entry->getAssignedAccounts();
+                    $accounts = $device->getAssignedAccounts();
                     if ($accounts) {
                         $data['gettype']['free'] = true;
                     }
 
-                    $payload = $entry->getPayload(true);
+                    $payload = $device->getPayload(true);
                     $data = array_merge($data, $payload);
 
                     $low_price = 0;
@@ -333,12 +335,12 @@ if ($op == 'list') {
                     }
                 }
 
-                $group = $entry->getGroup();
+                $group = $device->getGroup();
                 if ($group) {
                     $data['group'] = $group->format();
                 }
 
-                $tags = $entry->getTagsAsText(false);
+                $tags = $device->getTagsAsText(false);
                 foreach ($tags as $i => $title) {
                     $data['tags'][] = [
                         'id' => $i,
@@ -347,24 +349,30 @@ if ($op == 'list') {
                 }
 
                 if (App::isVDeviceSupported()) {
-                    $data['isVD'] = $entry->isVDevice();
+                    $data['isVD'] = $device->isVDevice();
                     unset($data['lastOnline'], $data['lastPing'], $data['lastError']);
                 }
 
                 if (App::isBluetoothDeviceSupported()) {
-                    if ($entry->isBlueToothDevice()) {
+                    if ($device->isBlueToothDevice()) {
                         $data['isBluetooth'] = true;
-                        $data['BUID'] = $entry->getBUID();
+                        $data['BUID'] = $device->getBUID();
+                    }
+                }
+
+                if (App::isChargingDeviceEnabled()) {
+                    if ($device->isChargingDevice()) {
+                        $data['charging'] = $device->getChargingData();
                     }
                 }
 
                 if (settings('device.lac.enabled')) {
-                    $data['s1'] = $entry->getS1();
+                    $data['s1'] = $device->getS1();
                 }
 
-                $data['device_type'] = $entry->getDeviceType();
+                $data['device_type'] = $device->getDeviceType();
 
-                $statistic = $entry->get('firstMsgStatistic', []);
+                $statistic = $device->get('firstMsgStatistic', []);
                 if ($statistic) {
                     $data['firstMsgTotal'] = intval($statistic[date('Ym')][date('d')]['total']);
                 }

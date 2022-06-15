@@ -674,6 +674,14 @@
                                                         {/if}
                                                     </span>
                                                 </div>
+                                                <template v-if="o.charging">
+                                                    <div><span class="title">桩类型：</span><span>{{o.charging.cft}}</span></div>
+                                                    <div><span class="title">充电枪数量：</span><span>{{o.charging.chargerNum}}</span></div>
+                                                    <div><span class="title">通信协议版本：</span><span>{{o.charging.protocolVersion}}</span></div>
+                                                    <div><span class="title">固件版本：</span><span>{{o.charging.firmwareVersion}}</span></div>
+                                                    <div><span class="title">网络类型：</span><span>{{o.charging.network}}</span></div>
+                                                    <div><span class="title">运营商：</span><span>{{o.charging.carrier}}</span></div>
+                                                </template>
                                                 <template v-if="o.appId">
                                                     <div><span class="title">AppID：</span><span>{{o.appId}}</span></div>
                                                     <div><span class="title">AppVersion：</span><span>{{o.appVersion ? o.appVersion : 'n/a'}}</span></div>

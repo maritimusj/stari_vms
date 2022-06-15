@@ -7,6 +7,7 @@
 namespace zovye;
 
 use zovye\Contract\IHttpClient;
+use zovye\model\device_groupsModelObj;
 
 class ChargingServ
 {
@@ -27,7 +28,7 @@ class ChargingServ
     }
 
     public static function query(
-        $path,
+        $path = '',
         array $params = [],
         $body = '',
         string $contentType = '',
@@ -42,10 +43,6 @@ class ChargingServ
 
         if (empty($url) || empty($access_token)) {
             return error(State::ERROR, '配置错误！');
-        }
-
-        if ($url[strlen($url) - 1] != '/') {
-            $url .= '/';
         }
 
         $headers = [
@@ -80,12 +77,16 @@ class ChargingServ
             }
         }
 
-        $url .= '?'.http_build_query($params);
+        if ($url[strlen($url) - 1] != '/') {
+            $url .= '/';
+        }
+
+        $url .= "$path?" . http_build_query($params);
         return self::$http_client->request($url, $method, $headers, $body);
     }
 
     public static function GetVersion(): array {
-        $res = self::query('/');
+        $res = self::query();
         if (is_error($res)) {
             return $res;
         }
@@ -98,8 +99,53 @@ class ChargingServ
         ];
     }
 
-    public static function createOrUpdateGroup($group)
+    public static function createOrUpdateGroup(device_groupsModelObj $group)
     {
+        $loc = $group->getLoc();
+        $res = self::query("group/{$group->getName()}", [], [
+            'group' => [
+                'name' => $group->getName(),
+                'title' => $group->getTitle(),
+                'address' => $group->getAddress(),
+                'lat' => $loc['lat'],
+                'lng' => $loc['lng'],
+                'description' => $group->getDescription(),
+            ],
+            'plan' => $group->getFee(),
+        ]);
 
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if (!$res['status']) {
+            return err($res['data']['messsage'] ?? '请求失败！');
+        }
+
+        return $res['data']['version'] ?? '0';
+    }
+
+    public static function removeGroup($name)
+    {
+        $res = self::query("group/$name", [], '', '', 'DELETE');
+        if (is_error($res)) {
+            return $res;
+        }
+        if (!$res['status']) {
+            return err($res['data']['messsage'] ?? '请求失败！');
+        }
+        return true;
+    }
+
+    public static function getGroupVersion($name)
+    {
+        $res = self::query("group/$name/version");
+        if (is_error($res)) {
+            return $res;
+        }
+        if (!$res['status']) {
+            return err($res['data']['messsage'] ?? '请求失败！');
+        }
+        return $res['data']['version'] ?? 'n/a';
     }
 }

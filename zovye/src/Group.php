@@ -87,7 +87,8 @@ class Group
             $data['description'] = $entry->getDescription();
             $data['address'] = $entry->getAddress();
             $data['loc'] = $entry->getLoc();
-            $data['fee'] = $entry->getExtraData('fee', []);
+            $data['fee'] = $entry->getFee();
+            $data['version'] = $entry->getVersion();
         }
 
         return $data;

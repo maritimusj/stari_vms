@@ -61,6 +61,9 @@ if ($op == 'default') {
             if ($agent) {
                 $data['agent'] = $agent->profile();
             }
+
+            $data['remote_version'] = ChargingServ::getGroupVersion($data['name']);
+
             $list[] = $data;
         }
 
@@ -92,6 +95,7 @@ if ($op == 'default') {
         $tpl_data['id'] = $group->getId();
         $tpl_data['group'] = $group->format();
     }
+
     app()->showTemplate('web/charging/edit', $tpl_data);
 
 } elseif ($op == 'save') {
@@ -142,13 +146,7 @@ if ($op == 'default') {
             'lat' => request::float('lat'),
         ]);
 
-        $group->setExtraData('fee', $fee);
-
-        if ($group->save()) {
-            Util::itoast('保存成功！', Util::url('charging', ['op' => 'edit', 'id' => $id]), 'success');
-        }
-
-        Util::itoast('保存失败！', Util::url('charging', ['op' => 'edit', 'id' => $id]), 'error');
+        $group->setFee($fee);
 
     } else {
         $data = [
@@ -156,7 +154,7 @@ if ($op == 'default') {
             'type_id' => Group::CHARGING,
             'title' => request::trim('title'),
             'extra' => [
-                'name' => Util::random(16),
+                'name' => App::uid(6) . '-' . Util::random(16),
                 'description' => request::trim('description'),
                 'address' => request::trim('address'),
                 'lat' => request::float('lat'),
@@ -166,12 +164,21 @@ if ($op == 'default') {
         ];
 
         $group = Group::create($data);
-        if ($group) {
-            Util::itoast('创建成功！', Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]), 'success');
+    }
+
+    if ($group && $group->save()) {
+        $res = ChargingServ::createOrUpdateGroup($group);
+        if (is_error($res)) {
+            Log::error('group', $res);
         }
 
-        Util::itoast('创建分组失败！', Util::url('charging', ['op' => 'edit']), 'error');
+        $group->setVersion($res);
+        $group->save();
+
+        Util::itoast($id ? '保存成功！' : '创建成功！', Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]), 'success');
     }
+
+    Util::itoast($id ? '保存失败！' : '创建失败！', Util::url('charging', $group ? ['op' => 'edit', 'id' => $group->getId()] : []), 'error');
 
 } elseif ($op == 'remove') {
 
@@ -183,6 +190,8 @@ if ($op == 'default') {
             return err('找不到指定的分组！');
         }
 
+        $name = $group->getName();
+
         if ($group->destroy()) {
             $result = Device::query(['group_id' => $id])->findAll();
 
@@ -191,7 +200,8 @@ if ($op == 'default') {
                 $entry->setGroupId(0);
             }
         }
-        return true;   
+
+        return ChargingServ::removeGroup($name);;   
     });
 
     if (is_error($result)) {
@@ -199,4 +209,32 @@ if ($op == 'default') {
     }
 
     Util::itoast('已删除！', Util::url('charging'), 'success');
+
+
+} elseif ($op == 'refresh') {
+
+    $groups = [];
+    if (request::has('id')) {
+        $id = request::int('id');
+        $group = Group::get($id, Group::CHARGING);
+        if (!$group) {
+            Util::itoast('找不到这个分组！', Util::url('charging'), 'error');
+        }
+        $groups[] = $group;
+    } else {
+        foreach (Group::query(Group::CHARGING)->findAll() as  $group) {
+            $groups[] = $group;
+        }
+    }
+
+    foreach($groups as $group) {
+        $res = ChargingServ::createOrUpdateGroup($group);
+        if (is_error($res)) {
+            Log::error('group', $res);
+        }
+        $group->setVersion($res);
+        $group->save();
+    }
+
+    Util::itoast('已更新！', Util::url('charging'), 'success');
 }

@@ -230,7 +230,7 @@
         $("input[name=lng]").val(data.latlng.lng);
         $("input[name=address]").val(data.poiaddress);
     }
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210716')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210717')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('util');}");
     });

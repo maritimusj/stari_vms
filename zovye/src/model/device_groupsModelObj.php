@@ -110,4 +110,20 @@ class device_groupsModelObj extends modelObj
     public function setLoc(array $loc) {
         return $this->setExtraData('lat', $loc['lat']) && $this->setExtraData('lng', $loc['lng']);;
     }
+
+    public function setFee(array $fee) {
+        return $this->setExtraData('fee', $fee);
+    }
+
+    public function getFee(): array {
+        return $this->getExtraData('fee', []);
+    }
+
+    public function setVersion($version) {
+        return $this->setExtraData('version', $version);
+    }
+
+    public function getVersion(): string {
+        return $this->getExtraData('version', 'n/a');
+    }
 }

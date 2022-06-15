@@ -250,7 +250,7 @@ if ($op == 'list') {
             $devices = Device::query(['id' => $ids])->findAll();
 
             /** @var deviceModelObj $device */
-            foreach ($devices as $entry) {
+            foreach ($devices as $device) {
                 $data = [
                     'id' => $device->getId(),
                     'name' => $device->getName(),
@@ -273,7 +273,7 @@ if ($op == 'list') {
                     'lastError' => $device->getLastError(),
                     'lastOnline' => $device->getLastOnline() ? date('Y-m-d H:i:s', $device->getLastOnline()) : '',
                     'lastPing' => $device->getLastPing() ? date('Y-m-d H:i:s', $device->getLastPing()) : '',
-                    'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
+                    'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),
                     'lockedTime' => $device->isLocked() ? date('Y-m-d H:i:s', $device->getLockedTime()) : '',
                     'appId' => $device->getAppId(),
                     'appVersion' => $device->getAppVersion(),

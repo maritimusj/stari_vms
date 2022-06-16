@@ -202,14 +202,14 @@ class deviceModelObj extends modelObj
         return $this->settings('extra.v1.ip', '');
     }
 
-    public function setLastOnlineIp($ip)
+    public function setLastOnlineIp($ip): bool
     {
         return $this->updateSettings('extra.v1.ip', $ip);
     }
 
     public function setProtocolV1Code($code): bool
     {
-        return $this->updateSettings('extra.v1.lastcode', $code);
+        return $this->updateSettings('extra.v1.last_code', $code);
     }
 
     public function getLastOnline()
@@ -218,7 +218,7 @@ class deviceModelObj extends modelObj
             return date('Y-m-d H:i:s');
         }
 
-        return $this->settings('extra.v0.status.lastonline', $this->last_online);
+        return $this->settings('extra.v0.status.last_online', $this->last_online);
     }
 
     public function setLastOnline($last_online): bool
@@ -226,7 +226,7 @@ class deviceModelObj extends modelObj
         $this->last_online = $last_online;
         $this->setDirty('last_online');
 
-        return $this->updateSettings('extra.v0.status.lastonline', $last_online);
+        return $this->updateSettings('extra.v0.status.last_online', $last_online);
     }
 
         /**
@@ -360,27 +360,27 @@ class deviceModelObj extends modelObj
         ];
     }
 
-    public function setChargerData($chargerID, array $data)
+    public function setChargerData($chargerID, array $data): bool
     {
-        return $this->updateSettings("extra.charger.{$chargerID}", $data);
+        return $this->updateSettings("extra.charger.$chargerID", $data);
     }
 
     public function getChargerData($chargerID): array
     {
-        return $this->settings("extra.charger.{$chargerID}", []);
+        return $this->settings("extra.charger.$chargerID", []);
     }
 
-    public function setChargerBMSData($chargerID, array $data)
+    public function setChargerBMSData($chargerID, array $data): bool
     {
         $saved = $this->getChargerBMSData($chargerID);
         $data = array_merge($saved, $data);
         
-        return $this->updateSettings("extra.chargerBMS.{$chargerID}", $data);
+        return $this->updateSettings("extra.chargerBMS.$chargerID", $data);
     }
 
     public function getChargerBMSData($chargerID): array
     {
-        return $this->settings("extra.chargerBMS.{$chargerID}", []);
+        return $this->settings("extra.chargerBMS.$chargerID", []);
     }  
 
     public function setDeviceModel($model)
@@ -417,20 +417,20 @@ class deviceModelObj extends modelObj
             return date('Y-m-d H:i:s');
         }
 
-        return $this->settings('extra.v0.status.applastonline', $this->app_last_online);
+        return $this->settings('extra.v0.status.app_last_online', $this->app_last_online);
     }
 
     public function setAppLastOnline($last_online): bool
     {
-        return $this->updateSettings('extra.v0.status.applastonline', $last_online);
+        return $this->updateSettings('extra.v0.status.app_last_online', $last_online);
     }
 
-    public function getIccid()
+    public function getICCID()
     {
         return $this->settings('extra.v0.status.iccid', $this->iccid);
     }
 
-    public function setIccid($iccid): bool
+    public function setICCID($iccid): bool
     {
         return $this->updateSettings('extra.v0.status.iccid', $iccid);
     }
@@ -498,14 +498,14 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("extra.v0.status.$name", $val);
     }
 
-    public function setSensorData($type, $data)
+    public function setSensorData($type, $data): bool
     {
-        return $this->updateSettings("extra.sensor.{$type}", $data);
+        return $this->updateSettings("extra.sensor.$type", $data);
     }
 
     public function getSensorData($type, $default = null)
     {
-        return $this->settings("extra.sensor.{$type}", $default);
+        return $this->settings("extra.sensor.$type", $default);
     }
 
     public function getWaterLevel()
@@ -740,7 +740,7 @@ class deviceModelObj extends modelObj
         $this->remove('lastApkUpdate');
         $this->remove('lastErrorData');
         $this->remove('assigned');
-        $this->remove('advsData');
+        $this->remove('adsData');
         $this->remove('advs');
         $this->remove('accountsData');
         $this->remove('firstMsgStatistic');
@@ -1039,12 +1039,12 @@ class deviceModelObj extends modelObj
         $params['from'] = 'device';
         $params['device'] = $id;
 
-        return Util::murl('entry', $params, true);
+        return Util::murl('entry', $params);
     }
 
     public function getProtocolV1Code()
     {
-        return $this->settings('extra.v1.lastcode');
+        return $this->settings('extra.v1.last_code');
     }
 
     /**
@@ -1355,7 +1355,7 @@ class deviceModelObj extends modelObj
         }
 
         //广告列表
-        $advs = [];
+        $ads = [];
         $srt = [
             'speed' => intval(settings('advs.srt.speed', 1)),
             'subs' => [],
@@ -1391,7 +1391,7 @@ class deviceModelObj extends modelObj
                 if ($adv['extra']['area']) {
                     $data['area'] = intval($adv['extra']['area']);
                 }
-                $advs[] = $data;
+                $ads[] = $data;
             }
         }
 
@@ -1399,7 +1399,7 @@ class deviceModelObj extends modelObj
         $cfg = [
             'banner' => strval(Util::toMedia($banner)),
             'volume' => intval($vol),
-            'advs' => $advs,
+            'advs' => $ads,
         ];
 
         //自动开关机
@@ -1466,20 +1466,20 @@ class deviceModelObj extends modelObj
      */
     public function getAdvs($type, bool $ignore_cache = false): array
     {
-        $advs = null;
+        $ads = null;
 
-        if ($ignore_cache == false) {
-            if ($this->settings("advsData.type$type.version") == Advertising::version($type)) {
-                $advs = $this->settings("advsData.type$type.data");
+        if (!$ignore_cache) {
+            if ($this->settings("adsData.type$type.version") == Advertising::version($type)) {
+                $ads = $this->settings("adsData.type$type.data");
             }
         }
 
-        if (is_null($advs)) {
+        if (is_null($ads)) {
             $query = Advertising::query(['type' => $type]);
 
             $query->orderBy('createtime DESC');
 
-            $advs = [];
+            $ads = [];
 
             /** @var advertisingModelObj $entry */
             foreach ($query->findAll() as $entry) {
@@ -1487,24 +1487,24 @@ class deviceModelObj extends modelObj
                 if ($entry->getState() == Advertising::NORMAL && $passed) {
                     $assign_data = $entry->settings('assigned');
                     if ($this->isMatched($assign_data)) {
-                        $advs["U{$entry->getId()}"] = Advertising::format($entry);
+                        $ads["U{$entry->getId()}"] = Advertising::format($entry);
                         continue;
                     }
                 }
 
-                unset($advs["U{$entry->getId()}"]);
+                unset($ads["U{$entry->getId()}"]);
             }
 
             $this->updateSettings(
-                "advsData.type$type",
+                "adsData.type$type",
                 [
                     'version' => Advertising::version($type),
-                    'data' => $advs,
+                    'data' => $ads,
                 ]
             );
         }
 
-        return $advs;
+        return $ads;
     }
 
     /**
@@ -1638,7 +1638,7 @@ class deviceModelObj extends modelObj
      */
     public function updateScreenAdvsData(): bool
     {
-        if ($this->isAdvsUpdated(Advertising::SCREEN)) {
+        if ($this->isAdsUpdated(Advertising::SCREEN)) {
             return $this->appNotify('update');
         }
 
@@ -1650,20 +1650,20 @@ class deviceModelObj extends modelObj
      * @param $type
      * @return bool
      */
-    public function isAdvsUpdated($type): bool
+    public function isAdsUpdated($type): bool
     {
-        if ($this->settings("advsData.type$type.version") != Advertising::version($type)) {
+        if ($this->settings("adsData.type$type.version") != Advertising::version($type)) {
             return true;
         }
 
-        $cachedData = $this->settings("advsData.type$type.data", []);
-        $advs = $this->getAdvs($type, true);
+        $cachedData = $this->settings("adsData.type$type.data", []);
+        $ads = $this->getAdvs($type, true);
 
-        if (empty($cachedData) && empty($advs)) {
+        if (empty($cachedData) && empty($ads)) {
             return false;
         }
 
-        return array_keys($cachedData) != array_keys($advs);
+        return array_keys($cachedData) != array_keys($ads);
     }
 
     /**
@@ -1687,7 +1687,7 @@ class deviceModelObj extends modelObj
             return false;
         }
 
-        return $accounts_cached_data['lastupdate'] != $accounts['lastupdate'];
+        return $accounts_cached_data['last_update'] != $accounts['last_update'];
     }
 
     public function getAccounts($state_filter = [Account::NORMAL, Account::VIDEO, Account::AUTH]): array
@@ -1715,10 +1715,10 @@ class deviceModelObj extends modelObj
     {
         $accounts = [];
 
-        $last_update = settings('accounts.lastupdate');
+        $last_update = settings('accounts.last_update');
         if (!$ignore_cache) {
             $accounts_data = $this->get('accountsData', []);
-            if ($accounts_data && $accounts_data['lastupdate'] == $last_update) {
+            if ($accounts_data && $accounts_data['last_update'] == $last_update) {
                 return $accounts_data['data'] ?: [];
             }
         }
@@ -1749,7 +1749,7 @@ class deviceModelObj extends modelObj
             $this->set(
                 'accountsData',
                 [
-                    'lastupdate' => $last_update,
+                    'last_update' => $last_update,
                     'data' => $accounts,
                 ]
             );
@@ -2214,7 +2214,7 @@ class deviceModelObj extends modelObj
             $res = CtrlServ::v2_query(
                 "device/$this->imei/mcb/online",
                 [
-                    'nocache' => $use_cache == false ? 'true' : 'false',
+                    'nocache' => !$use_cache ? 'true' : 'false',
                 ]
             );
 
@@ -2239,7 +2239,7 @@ class deviceModelObj extends modelObj
         return false;
     }
 
-    public function setReady($scene = 'online', $is_ready = true)
+    public function setReady($scene = 'online', $is_ready = true): bool
     {
         return $this->updateSettings("last.$scene", $is_ready ? time() : 0);
     }

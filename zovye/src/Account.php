@@ -681,7 +681,7 @@ class Account extends State
      */
     public static function updateAccountData(): bool
     {
-        return updateSettings('accounts.lastupdate', ''.microtime(true));
+        return updateSettings('accounts.last_update', ''.microtime(true));
     }
 
     /**

@@ -600,7 +600,7 @@ class Device extends State
         $device->remove('lastErrorNotify');
         $device->remove('lastRemainWarning');
         $device->remove('fakeQrcodeData');
-        $device->remove('advsData');
+        $device->remove('adsData');
 
         //绑定appId
         $device->updateAppId();

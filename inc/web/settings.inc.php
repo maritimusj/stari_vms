@@ -247,7 +247,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         }
 
         if ($accounts_updated) {
-            setArray($settings, 'accounts.lastupdate', ''.microtime(true));
+            setArray($settings, 'accounts.last_update', ''.microtime(true));
         }
 
         $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;

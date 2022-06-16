@@ -381,8 +381,8 @@ class DeviceEventProcessor
             }
 
             if ($device) {
-                if ($data['ICCID'] && $device->getIccid() != $data['ICCID']) {
-                    $device->setIccid($data['ICCID']);
+                if ($data['ICCID'] && $device->getICCID() != $data['ICCID']) {
+                    $device->setICCID($data['ICCID']);
                 }
 
                 $device->setMcbOnline(Device::ONLINE);
@@ -662,11 +662,11 @@ class DeviceEventProcessor
             $extra = (array)$data['extra'];
 
             if (isset($extra['ICCID'])) {
-                $device->setIccid($extra['ICCID']);
+                $device->setICCID($extra['ICCID']);
             }
 
             if (isset($extra['iccid'])) {
-                $device->setIccid($extra['iccid']);
+                $device->setICCID($extra['iccid']);
             }
 
             if (isset($extra['ip'])) {
@@ -793,7 +793,7 @@ class DeviceEventProcessor
                 $device->setSig($data['extra']['RSSI']);
             }
             if (isset($data['extra']['ICCID'])) {
-                $device->setIccid($data['extra']['ICCID']);
+                $device->setICCID($data['extra']['ICCID']);
             }
             //重置设置锁
             $device->resetLock();

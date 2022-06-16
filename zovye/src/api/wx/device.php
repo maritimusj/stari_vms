@@ -100,7 +100,7 @@ class device
                 'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),
             ],
             'extra' => [
-                'iccid' => $device->getIccid(),
+                'iccid' => $device->getICCID(),
                 'volume' => intval($extra['volume']),
                 'is_down' => isset($extra['isDown']) && $extra['isDown'] == \zovye\Device::STATUS_MAINTENANCE ? 1 : 0,
             ],

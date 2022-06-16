@@ -54,7 +54,7 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
             $data = [
                 'name' => $device->getName(),
                 'imei' => $device->getImei(),
-                'iccid' => $device->getIccid() ?? '',
+                'iccid' => $device->getICCID() ?? '',
                 'app_id' => $device->getAppId() ?? '',
                 'model' => $device->getDeviceModel(),
                 'location' => isEmptyArray(

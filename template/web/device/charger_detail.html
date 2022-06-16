@@ -21,7 +21,7 @@
     </div>
 </div>
 <script>
-    var timer = null;
+    let timer = null;
     $(function(){
         $('body').on('hidden.bs.modal', function() {
             if (timer != null) {
@@ -37,7 +37,7 @@
     })
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         const api_url = "{php echo $this->createWebUrl('charging', ['id' => $device_id]);}";
-        const app = new Vue({
+        new Vue({
             el: "#app",
             data: {
                 data: [],
@@ -49,7 +49,7 @@
                     clearInterval(timer);
                     timer = null;
                 }
-                timer = setInterval(this.getData, 3000); 
+                timer = setInterval(this.getData, 3000);
             },
             methods: {
                 getData() {
@@ -58,10 +58,9 @@
                         if (res && res.status) {
                             self.data = res.data;
                         }
-                    })                    
+                    })
                 },
             },
-
         })
     })
 </script>

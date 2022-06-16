@@ -79,5 +79,5 @@ SQL;
         }
     }
 
-    updateSettings('accounts.lastupdate', time());
+    updateSettings('accounts.last_update', time());
 }

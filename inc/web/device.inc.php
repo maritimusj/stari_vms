@@ -254,7 +254,7 @@ if ($op == 'default') {
                 'id' => $device->getId(),
                 'name' => $device->getName(),
                 'IMEI' => $device->getImei(),
-                'ICCID' => $device->getIccid(),
+                'ICCID' => $device->getICCID(),
                 'qrcode' => $device->getQrcode(),
                 'model' => $device->getDeviceModel(),
                 'activeQrcode' => $device->isActiveQrcodeEnabled(),
@@ -579,7 +579,7 @@ HTML;
             if ($device->setAppId(null) && $device->setAppVersion(null) && $device->save()) {
 
                 //删除广告缓存
-                $device->remove('advsData');
+                $device->remove('adsData');
 
                 //通知app更新配置
                 if ($app_id) {
@@ -603,7 +603,7 @@ HTML;
     We7::file_remote_delete($device->getQrcode());
 
     $device->remove('assigned');
-    $device->remove('advsData');
+    $device->remove('adsData');
     $device->remove('accountsData');
     $device->remove('lastErrorNotify');
     $device->remove('lastRemainWarning');

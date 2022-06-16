@@ -8,6 +8,7 @@ namespace zovye;
 
 use zovye\Contract\IHttpClient;
 use zovye\model\device_groupsModelObj;
+use zovye\model\deviceModelObj;
 
 class ChargingServ
 {
@@ -147,5 +148,23 @@ class ChargingServ
             return err($res['data']['messsage'] ?? '请求失败！');
         }
         return $res['data']['version'] ?? 'n/a';
+    }
+
+    public static function setDeviceGroup(deviceModelObj $device)
+    {
+        $group = $device->getGroup();
+        if ($group) {
+            $res = self::query("device/{$device->getImei()}", [], [
+                'title' => $device->getName(),
+                'group' => $group->getName(),
+            ], '', 'PUT');
+            if (is_error($res)) {
+                return $res;
+            }
+            if (!$res['status']) {
+                return err($res['data']['messsage'] ?? '请求失败！');
+            }
+            return true;
+        }
     }
 }

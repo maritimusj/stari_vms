@@ -268,26 +268,26 @@ if ($op == 'default') {
         $status = '未知';
         switch($chargerData['status']) {
             case 0: 
-                $status = '离线'; 
+                $status = '<span class="title">离线</span>'; 
                 $data['status'] = 'offline'; 
                 break;
             case 1: 
-                $status = '故障'; 
+                $status = '<span class="title">故障</span>'; 
                 $data['status'] = 'malfunction'; 
                 break;
             case 2: 
-                $status = '空闲'; 
+                $status = '<span class="title">空闲</span> <i class="fa fa-bolt" title="开始充电" data-op="start" data-params="' . $i . '"></i>'; 
                 $data['status'] = 'idle'; 
                 break;
             case 3: 
-                $status = '<i class="fa fa-bolt" title="充电中"></i>'; 
+                $status = '<span class="title">充电中</span> <i class="fa fa-ban" title="停止充电" data-op="stop" data-params="' . $i . '"></i>';
                 $data['status'] = 'charging'; 
                 break;
         }
 
         $data['properties'][] = [
             'title' => '状态',
-            'val' => '<span class="charger-status">' . $status . '<span>',
+            'val' => '<div class="charger-status operate">' . $status . '<div>',
         ];
 
         $parked = '未知';

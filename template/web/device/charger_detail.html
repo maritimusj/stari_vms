@@ -9,7 +9,7 @@
     </ul>
     <div class="panel panel-default panel-first nav-tab-item">
         <div class="panel-body" :class="data[active].status">
-            <table class="table table-condensed">
+            <table class="table table-condensed" data-fetchid="{$device_id}">
                 <tbody>
                     <tr v-for="(e,i) in (data[active].properties || [])" class="property" :key="e.title">
                         <td v-html="e.title"></td>

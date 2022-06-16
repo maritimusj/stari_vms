@@ -18,7 +18,7 @@ $op = request::op('default');
 
 router::exec($op, [
     'login' => '\zovye\api\wxweb\api::login',
-    'advs' => '\zovye\api\wxweb\api::advs',
+    'advs' => '\zovye\api\wxweb\api::ads',
     'accounts' => '\zovye\api\wxweb\api::accounts',
     'goods' => '\zovye\api\wxweb\api::goods',
     'get' => '\zovye\api\wxweb\api::get',
@@ -45,4 +45,9 @@ router::exec($op, [
     'pageInfo' => '\zovye\api\wxx\common::pageInfo',
     'rewardOrderData' => '\zovye\api\wxweb\api::rewardOrderData',
     'validateLocation' => '\zovye\api\wxweb\api::validateLocation',
+
+    'chargingGroupList' => '\zovye\api\wxweb\charging::groupList',
+    'chargingGroupDetail' => '\zovye\api\wxweb\charging::groupDetail',
+    'chargingStart' => '\zovye\api\wxweb\charging::start',
+    'chargingStop' => '\zovye\api\wxweb\charging::stop',
 ]);

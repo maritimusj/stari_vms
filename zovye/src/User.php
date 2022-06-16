@@ -39,6 +39,7 @@ class User
     const TASK_LOCKER = 'task';
     const DAILY_SIGN_IN_LOCKER = 'balance:daily:sign_in';
     const BALANCE_GIVE_LOCKER = 'balance:give';
+    const CHARGING_LOCKER = 'charging';
 
     const API_USER_HEAD_IMG = MODULE_URL."static/img/api.svg";
 

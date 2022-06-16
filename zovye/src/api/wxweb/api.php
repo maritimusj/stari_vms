@@ -70,7 +70,7 @@ class api
      * 获取设备相关的广告
      * @return array
      */
-    public static function advs(): array
+    public static function ads(): array
     {
         $type = request::int('typeId');
         $num = request::int('num', 10);

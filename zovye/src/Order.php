@@ -50,6 +50,7 @@ class Order extends State
     const ACCOUNT = 1;
     const VOUCHER = 10;
     const BALANCE = 20;
+    const CHARGING = 30;
 
     const PAY_STR = 'pay';
     const FREE_STR = 'free';

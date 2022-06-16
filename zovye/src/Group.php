@@ -87,8 +87,29 @@ class Group
             $data['description'] = $entry->getDescription();
             $data['address'] = $entry->getAddress();
             $data['loc'] = $entry->getLoc();
-            $data['fee'] = $entry->getFee();
             $data['version'] = $entry->getVersion();
+
+            $fee =  $entry->getFee();;
+            $data['fee'] = $fee;
+
+            if (!isEmptyArray($fee)) {
+                $min = 0;
+                $max = 0;
+                for ($i = 0; $i < 4; $i ++) {
+                    $total = floatval($fee["l$i"]['ef'] + $fee["l$i"]['sf']);
+                    if ($total > 0 && (empty($min) || $total < $min)) {
+                        $min = $total;
+                    }
+                    if (empty($max) || $total > $max) {
+                        $max = $total;
+                    }
+                }
+                if ($max - $min < 0.001) {
+                    $data['tips'] = sprintf("¥ %.2f 元/分钟", $max);
+                } else {
+                    $data['tips'] = sprintf("¥ %.2f - %.2f 元/分钟", $min, $max);
+                }
+            }
         }
 
         return $data;

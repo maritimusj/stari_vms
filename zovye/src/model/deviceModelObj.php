@@ -229,7 +229,7 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.v0.status.last_online', $last_online);
     }
 
-        /**
+    /**
      * 是不是蓝牙设备
      * @return bool
      */
@@ -245,7 +245,8 @@ class deviceModelObj extends modelObj
      */
     public function isVDevice(): bool
     {
-        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
+        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel(
+                ) == Device::VIRTUAL_DEVICE);
     }
 
     /**
@@ -261,7 +262,8 @@ class deviceModelObj extends modelObj
      * 是不是充电桩
      * @return bool
      */
-    public function isChargingDevice(): bool {
+    public function isChargingDevice(): bool
+    {
         return $this->getDeviceModel() == Device::CHARGING_DEVICE;
     }
 
@@ -349,14 +351,15 @@ class deviceModelObj extends modelObj
 
     public function getChargingData(): array
     {
-        $data = $this->settings('extra.charging',[]);
+        $data = $this->settings('extra.charging', []);
+
         return [
             'cft' => $data['cft'] == 0 ? 'DC' : 'AC',
             'chargerNum' => $data['chargerNum'],
             'carrier' => $data['carrier'],
             'firmwareVersion' => $data['firmwareVersion'],
             'network' => $data['network'],
-            'protocolVersion' => 'v'. $data['protocolVersion'] / 10,
+            'protocolVersion' => 'v'.$data['protocolVersion'] / 10,
         ];
     }
 
@@ -374,14 +377,14 @@ class deviceModelObj extends modelObj
     {
         $saved = $this->getChargerBMSData($chargerID);
         $data = array_merge($saved, $data);
-        
+
         return $this->updateSettings("extra.chargerBMS.$chargerID", $data);
     }
 
     public function getChargerBMSData($chargerID): array
     {
         return $this->settings("extra.chargerBMS.$chargerID", []);
-    }  
+    }
 
     public function setDeviceModel($model)
     {
@@ -666,7 +669,7 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("{$prefix}cargo_lanes", $lanes_data);
     }
 
-    public function getChargerNum(): int 
+    public function getChargerNum(): int
     {
         return count($this->getCargoLanes());
     }
@@ -678,11 +681,14 @@ class deviceModelObj extends modelObj
             'imei' => $this->getImei(),
             'name' => $this->getName(),
         ];
+
         if ($this->isVDevice()) {
-            $data['vDevice'] = true;
+            $data['isVD'] = true;
         } elseif ($this->isBlueToothDevice()) {
-            $data['bluetooth'] = true;
+            $data['isBluetooth'] = true;
             $data['buid'] = $this->getBUID();
+        } elseif ($this->isChargingDevice()) {
+            $data['isCharging'] = true;
         }
 
         return $data;
@@ -1084,6 +1090,7 @@ class deviceModelObj extends modelObj
             if ($this->isChargingDevice()) {
                 return Group::get($this->group_id, Group::CHARGING);
             }
+
             return Group::get($this->group_id, Group::NORMAL);
         }
 
@@ -2923,5 +2930,24 @@ class deviceModelObj extends modelObj
             'ser' => Util::random(16, true),
             'sw' => $index,
         ]);
+    }
+
+    public function getChargingSerial(int $chargerID): string
+    {
+        $chargingData = $this->settings('extra.chargingData', []);
+        if (date('Ymd', $chargingData['last']) != date('Ymd')) {
+            $index = 0;
+        } else {
+            $index = intval($chargingData['index']);
+        }
+
+        $index ++;
+
+        $this->updateSettings('extra.chargingData', [
+            'last' => time(),
+            'index' => $index,
+        ]);
+
+        return sprintf('%s%s%04d', $this->imei, $chargerID, $index);
     }
 }

@@ -41,25 +41,6 @@ if ($op == 'default') {
         /** @var device_groupsModelObj $entry */
         foreach ($query->findAll() as $entry) {
             $data = $entry->format();
-            $fee = $data['fee'];
-            if (!isEmptyArray($fee)) {
-                $min = 0;
-                $max = 0;
-                for ($i = 0; $i < 4; $i ++) {
-                    $total = floatval($fee["l$i"]['ef'] + $fee["l$i"]['sf']);
-                    if ($total > 0 && (empty($min) || $total < $min)) {
-                        $min = $total;
-                    }
-                    if (empty($max) || $total > $max) {
-                        $max = $total;
-                    }
-                }
-                if ($max - $min < 0.001) {
-                    $data['fee_tip'] = sprintf("¥ %.2f 元/分钟", $max);
-                } else {
-                    $data['fee_tip'] = sprintf("¥ %.2f - %.2f 元/分钟", $min, $max);
-                }
-            }
             $agent = $entry->getAgent();
             if ($agent) {
                 $data['agent'] = $agent->profile();

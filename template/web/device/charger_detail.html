@@ -1,0 +1,67 @@
+
+<div id="app">
+    <ul class="nav nav-tabs" id="navbar">
+        <li role="presentation" :class="{active: active === i}" v-for="(e,i) in data" style="margin-bottom: -2px;">
+            <a href="#" @click="active = i">
+                <strong v-text="i+1"></strong>号枪
+            </a>
+        </li>
+    </ul>
+    <div class="panel panel-default panel-first nav-tab-item">
+        <div class="panel-body" :class="data[active].status">
+            <table class="table table-condensed">
+                <tbody>
+                    <tr v-for="(e,i) in (data[active].properties || [])" class="property" :key="e.title">
+                        <td v-html="e.title"></td>
+                        <td v-html="e.val" class="center" style="min-width: 100px;"></td>                        
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    var timer = null;
+    $(function(){
+        $('body').on('hidden.bs.modal', function() {
+            if (timer != null) {
+                clearInterval(timer);
+                timer = null;
+            }
+            $('.modal').each((i, e) => {
+                if ($(e).is(':hidden')) {
+                    $(e).remove();
+                }
+            });
+        })
+    })
+    require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+        const api_url = "{php echo $this->createWebUrl('charging', ['id' => $device_id]);}";
+        const app = new Vue({
+            el: "#app",
+            data: {
+                data: [],
+                active: 0,
+            },
+            created() {
+                this.getData();
+                if (timer != null) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+                timer = setInterval(this.getData, 3000); 
+            },
+            methods: {
+                getData() {
+                    const self = this;
+                    $.getJSON(api_url, {op: 'charger'}).then(res => {
+                        if (res && res.status) {
+                            self.data = res.data;
+                        }
+                    })                    
+                },
+            },
+
+        })
+    })
+</script>

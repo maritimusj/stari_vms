@@ -501,19 +501,25 @@ HTML;
             JSON::fail('找不到这个设备！');
         }
 
-        $data = [
-            'is_charging' => $device->isChargingDevice(),
-            'device_id' => $device->getId(),
-            'params' => $device->getPayload(true),
-        ];
+        if ($device->isChargingDevice()) {
+            $title = "充电枪 [ {$device->getName()} ]";
+            $tpl = 'web/device/charger_detail';
+            $data = [
+                'device_id' => $device->getId(),
+            ];
+        } else {
+            $title = "设备货道 [ {$device->getName()} ]";
+            $tpl = 'web/device/cargo_lanes_test';
+            $data = [
+                'device_id' => $device->getId(),
+                'params' => $device->getPayload(true),
+            ];
+        }
 
-        $content = app()->fetchTemplate(
-            'web/device/cargo_lanes_test',
-            $data
-        );
+        $content = app()->fetchTemplate($tpl, $data);
 
         JSON::success([
-            'title' => $device->isChargingDevice() ? "充电枪 [ {$device->getName()} ]" : "设备货道 [ {$device->getName()} ]",
+            'title' => $title,
             'content' => $content,
         ]);
     } elseif ($op == 'deviceTestLaneN') {

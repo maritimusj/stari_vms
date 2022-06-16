@@ -187,20 +187,43 @@
                         <div class="profile">
                             <img src="{media $item['agent']['avatar']}" />
                             {if empty($user)}
-                                <a href="{php echo $this->createWebUrl('withdraw', ['op' => 'default', 'agentId' => $item['agent']['id']]);}" title="点击查看{$item['agent']['name']}所有申请">
-                                    {$item['agent']['name']}
-                                </a>
-                            {else}
+                            <div>
+                            <a href="{php echo $this->createWebUrl('withdraw', ['op' => 'default', 'agentId' => $item['agent']['id']]);}" title="点击查看{$item['agent']['name']}所有申请">
                                 {$item['agent']['name']}
+                            </a>
+                            {if $item['keeper']}
+                            <br>
+                            <span style="color: #9e9e9e;">{$item['keeper']['name']}</span>
+                            </div>
+                            {/if}
+                            {else}
+                                {if $item['keeper']}
+                                <div>
+                                    {$item['agent']['name']}
+                                    {if $item['keeper']}
+                                    <br>
+                                    <span style="color: #9e9e9e;">{$item['keeper']['name']}</span>
+                                    </div>
+                                    {/if}
+                                </div>
+                                {else}
+                                    {$item['agent']['name']}
+                                {/if}
                             {/if}
                         </div>
                     </td>
                     <td>
                         <div>
-                            {if $item['agent']['mobile']}
-                            <a href="{php echo $this->createWebUrl('agent', ['keywords' => $item['agent']['mobile']]);}" title="搜索这个代理商">
-                                <span class="mobile" title="搜索代理商">{$item['agent']['mobile']}</span>
+                            {if $item['keeper']}
+                            <a href="{php echo $this->createWebUrl('user', ['s_keywords' => $item['keeper']['mobile']]);}" title="搜索这个用户">
+                                <span class="mobile" title="搜索用户">{$item['keeper']['mobile']}</span>
                             </a>
+                            {else}
+                                {if $item['agent']['mobile']}
+                                <a href="{php echo $this->createWebUrl('agent', ['keywords' => $item['agent']['mobile']]);}" title="搜索这个代理商">
+                                    <span class="mobile" title="搜索代理商">{$item['agent']['mobile']}</span>
+                                </a>
+                                {/if}
                             {/if}
                         </div>
                     </td>

@@ -27,12 +27,9 @@ if ($op == 'export') {
 
     set_time_limit(60);
 
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
-
     $query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
+    $query->where('(updatetime IS NULL OR updatetime=0)');
 
-    $query->page($page, $page_size);
     $query->orderBy('id desc');
 
     $list = [];
@@ -41,27 +38,36 @@ if ($op == 'export') {
     foreach ($query->findAll() as $entry) {
         $state = $entry->getExtraData('state');
         if (empty($state)) {
-            $agent = User::get($entry->getOpenid(), true);
-            if ($agent) {
-                $bank = $agent->settings('agentData.bank', []);
+            $user = User::get($entry->getOpenid(), true);
+            if ($user) {
+                $bank = $user->settings('agentData.bank', []);
                 $data = [
                     'id' => $entry->getId(),
-                    'name' => $agent->getName(),
-                    'mobile' => "[{$agent->getMobile()}]",
+                    'name' => $user->getName(),
+                    'mobile' => "[{$user->getMobile()}]",
                     'xval' => number_format(abs($entry->getXVal()) / 100, 2, '.', ''),
                     'bank' => $bank['bank'],
                     'branch' => $bank['branch'],
                     'realname' => $bank['realname'],
                     'account' => "[{$bank['account']}]",
                     'address' => $bank['address']['province'].$bank['address']['city'],
+                    'memo' => '',
                     'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 ];
+
+                if ($user->isKeeper()) {
+                    $keeper = $user->getKeeper();
+                    if ($keeper) {
+                        $data['memo'] = $keeper->getName();
+                    }
+                }
+                
                 $list[] = $data;
             }
         }
     }
 
-    Util::exportExcel('withdraw', ['#', '代理商', '手机', '金额(元)', '开户行', '开户支行', '姓名', '卡号', '开户行地址', '创建时间'], $list);
+    Util::exportExcel('withdraw', ['#', '代理商', '手机', '金额(元)', '开户行', '开户支行', '姓名', '卡号', '开户行地址', '备注',  '创建时间'], $list);
 
 } elseif ($op == 'default') {
 
@@ -144,11 +150,23 @@ if ($op == 'export') {
             /** @var userModelObj $user */
             $user = User::get($entry->getOpenid(), true);
             if ($user) {
+                $data['agent'] = [
+                    'id' => $user->getId(),
+                    'name' => $user->getName(),
+                    'avatar' => $user->getAvatar(),
+                    'mobile' => $user->getMobile(),
+                    'bank' => $user->settings('agentData.bank', []),
+                ];
+
                 $user_qrcode = [];
                 if ($user->isKeeper()) {
                     $keeper = $user->getKeeper();
                     if ($keeper) {
                         $user_qrcode = $keeper->settings('qrcode', []);
+                        $data['keeper'] = [
+                            'name' => $keeper->getName(),
+                            'mobile' => $keeper->getMobile(),
+                        ];
                     }
                 }
                 if (isEmptyArray($user_qrcode)) {
@@ -160,14 +178,7 @@ if ($op == 'export') {
                 if (isset($user_qrcode['ali'])) {
                     $user_qrcode['ali'] = Util::toMedia($user_qrcode['ali']);
                 }
-                $data['agent'] = [
-                    'id' => $user->getId(),
-                    'name' => $user->getName(),
-                    'avatar' => $user->getAvatar(),
-                    'mobile' => $user->getMobile(),
-                    'bank' => $user->settings('agentData.bank', []),
-                    'qrcode' => $user_qrcode,
-                ];
+                $data['agent']['qrcode'] = $user_qrcode;
             }
             $app_user_openid = $entry->getExtraData('openid');
             if ($app_user_openid) {

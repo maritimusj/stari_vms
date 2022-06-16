@@ -11,3 +11,10 @@ if (!We7::pdo_fieldexists($tb_name.'_device_groups', 'extra')) {
 SQL;
     Migrate::execSQL($sql);
 }
+
+if (!We7::pdo_fieldexists($tb_name.'_user', 's1')) {
+    $sql = <<<SQL
+    ALTER TABLE `ims_zovye_vms_user` ADD `s1` VARCHAR(32) NULL AFTER `mobile`, ADD INDEX (`s1`);
+SQL;
+    Migrate::execSQL($sql);
+}

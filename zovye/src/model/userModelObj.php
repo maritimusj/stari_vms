@@ -83,6 +83,9 @@ class userModelObj extends modelObj
     protected $mobile;
 
     /** @var string */
+    protected $s1;
+
+    /** @var string */
     protected $passport;
 
     /** @var int */
@@ -824,5 +827,19 @@ class userModelObj extends modelObj
             'phoneNum' => $phone_num,
             'address' => $address,
         ]);
+    }
+
+    public function getPhysicalCardNO(): string
+    {
+        if (empty($this->s1)) {
+            do {
+                $s1 = sprintf('%s%s', date('Ymd', $this->createtime), Util::random(4, true));
+            } while(User::findOne(['s1' => $s1]));
+            
+            $this->setS1($s1);
+            $this->save();
+        }
+
+        return $this->s1;
     }
 }

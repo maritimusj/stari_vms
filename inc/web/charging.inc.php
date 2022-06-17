@@ -13,49 +13,49 @@ defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
 if ($op == 'default') {
-        //分组表
-        $query = Group::query(Group::CHARGING);
+    //分组表
+    $query = Group::query(Group::CHARGING);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = max(1, request::int('page'));
+    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        if (request::isset('agent_id')) {
-            $agent_id = request::int('agent_id');
-            if ($agent_id > 0) {
-                $agent = Agent::get($agent_id);
-                if (empty($agent)) {
-                    Util::itoast('找不到这个代理商！', '', 'error');
-                }
-                $query->where(['agent_id' => $agent_id]);
-            } else {
-                $query->where(['agent_id' => 0]);
+    if (request::isset('agent_id')) {
+        $agent_id = request::int('agent_id');
+        if ($agent_id > 0) {
+            $agent = Agent::get($agent_id);
+            if (empty($agent)) {
+                Util::itoast('找不到这个代理商！', '', 'error');
             }
+            $query->where(['agent_id' => $agent_id]);
+        } else {
+            $query->where(['agent_id' => 0]);
+        }
+    }
+
+    $total = $query->count();
+
+    //列表数据
+    $query->page($page, $page_size);
+
+    $list = [];
+    /** @var device_groupsModelObj $entry */
+    foreach ($query->findAll() as $entry) {
+        $data = $entry->format();
+        $agent = $entry->getAgent();
+        if ($agent) {
+            $data['agent'] = $agent->profile();
         }
 
-        $total = $query->count();
+        $data['remote_version'] = ChargingServ::getGroupVersion($data['name']);
 
-        //列表数据
-        $query->page($page, $page_size);
+        $list[] = $data;
+    }
 
-        $list = [];
-        /** @var device_groupsModelObj $entry */
-        foreach ($query->findAll() as $entry) {
-            $data = $entry->format();
-            $agent = $entry->getAgent();
-            if ($agent) {
-                $data['agent'] = $agent->profile();
-            }
+    $tpl_data['list'] = $list;
+    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+    $tpl_data['agentId'] = $agent_id ?? null;
 
-            $data['remote_version'] = ChargingServ::getGroupVersion($data['name']);
-
-            $list[] = $data;
-        }
-
-        $tpl_data['list'] = $list;
-        $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
-        $tpl_data['agentId'] = $agent_id ?? null;
-
-        app()->showTemplate('web/charging/default', $tpl_data);
+    app()->showTemplate('web/charging/default', $tpl_data);
 
 } elseif ($op == 'add' || $op == 'edit') {
 
@@ -108,10 +108,16 @@ if ($op == 'default') {
             'ef' => request::float('l3ef'),
             'sf' => request::float('l3sf'),
         ],
-        'ts' => array_map(function($e) { return intval($e);}, request::array('ts', [])),
+        'ts' => array_map(function ($e) {
+            return intval($e);
+        }, request::array('ts', [])),
     ];
 
     $id = request::int('id');
+
+    $lng = request::float('lng');
+    $lat = request::float('lat');
+
     if ($id) {
         $group = Group::get($id, Group::CHARGING);
         if (empty($group)) {
@@ -120,14 +126,14 @@ if ($op == 'default') {
         if (isset($agent)) {
             $group->setAgentId($agent->getId());
         }
-        
+
         $group->setClr(request::trim('clr'));
         $group->setAddress(request::trim('address'));
         $group->setTitle(request::trim('title'));
         $group->setDescription(request::trim('description'));
         $group->setLoc([
-            'lng' => request::float('lng'),
-            'lat' => request::float('lat'),
+            'lng' => $lng,
+            'lat' => $lat,
         ]);
         $group->setFee($fee);
     } else {
@@ -137,11 +143,11 @@ if ($op == 'default') {
             'title' => request::trim('title'),
             'clr' => request::trim('clr'),
             'extra' => [
-                'name' => App::uid(6) . '-' . Util::random(16),
+                'name' => App::uid(6).'-'.Util::random(16),
                 'description' => request::trim('description'),
                 'address' => request::trim('address'),
-                'lat' => request::float('lat'),
-                'lng' => request::float('lng'),
+                'lng' => $lng,
+                'lat' => $lat,
                 'fee' => $fee,
             ],
         ];
@@ -158,16 +164,26 @@ if ($op == 'default') {
         $group->setVersion($res);
         $group->save();
 
-        Util::itoast($id ? '保存成功！' : '创建成功！', Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]), 'success');
+        $group->update(['loc' => sprintf("ST_GeomFromText('POINT(%f %f)')", $lng, $lat)]);
+
+        Util::itoast(
+            $id ? '保存成功！' : '创建成功！',
+            Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]),
+            'success'
+        );
     }
 
-    Util::itoast($id ? '保存失败！' : '创建失败！', Util::url('charging', $group ? ['op' => 'edit', 'id' => $group->getId()] : []), 'error');
+    Util::itoast(
+        $id ? '保存失败！' : '创建失败！',
+        Util::url('charging', $group ? ['op' => 'edit', 'id' => $group->getId()] : []),
+        'error'
+    );
 
 } elseif ($op == 'remove') {
 
     $id = request::int('id');
 
-    $result = Util::transactionDo(function() use ($id) {
+    $result = Util::transactionDo(function () use ($id) {
         $group = Group::get($id, Group::CHARGING);
         if (empty($group)) {
             return err('找不到指定的分组！');
@@ -205,12 +221,12 @@ if ($op == 'default') {
         }
         $groups[] = $group;
     } else {
-        foreach (Group::query(Group::CHARGING)->findAll() as  $group) {
+        foreach (Group::query(Group::CHARGING)->findAll() as $group) {
             $groups[] = $group;
         }
     }
 
-    foreach($groups as $group) {
+    foreach ($groups as $group) {
         $res = ChargingServ::createOrUpdateGroup($group);
         if (is_error($res)) {
             Log::error('group', $res);
@@ -233,8 +249,8 @@ if ($op == 'default') {
 
     $result = [];
 
-    $spanFN = function($str) {
-        return '<span class="val">' . $str . '</span>';
+    $spanFN = function ($str) {
+        return '<span class="val">'.$str.'</span>';
     };
 
     for ($i = 0; $i < $chargerNum; $i++) {
@@ -247,34 +263,38 @@ if ($op == 'default') {
         ];
 
         $status = '未知';
-        switch($chargerData['status']) {
-            case 0: 
-                $status = '<span class="title">离线</span>'; 
-                $data['status'] = 'offline'; 
+        switch ($chargerData['status']) {
+            case 0:
+                $status = '<span class="title">离线</span>';
+                $data['status'] = 'offline';
                 break;
-            case 1: 
-                $status = '<span class="title">故障</span>'; 
-                $data['status'] = 'malfunction'; 
+            case 1:
+                $status = '<span class="title">故障</span>';
+                $data['status'] = 'malfunction';
                 break;
-            case 2: 
-                $status = '<span class="title">空闲</span> <i class="fa fa-bolt" title="开始充电" data-op="start" data-params="' . $i . '"></i>'; 
-                $data['status'] = 'idle'; 
+            case 2:
+                $status = '<span class="title">空闲</span> <i class="fa fa-bolt" title="开始充电" data-op="start" data-params="'.$i.'"></i>';
+                $data['status'] = 'idle';
                 break;
-            case 3: 
-                $status = '<span class="title">充电中</span> <i class="fa fa-ban" title="停止充电" data-op="stop" data-params="' . $i . '"></i>';
-                $data['status'] = 'charging'; 
+            case 3:
+                $status = '<span class="title">充电中</span> <i class="fa fa-ban" title="停止充电" data-op="stop" data-params="'.$i.'"></i>';
+                $data['status'] = 'charging';
                 break;
         }
 
         $data['properties'][] = [
             'title' => '状态',
-            'val' => '<div class="charger-status operate">' . $status . '<div>',
+            'val' => '<div class="charger-status operate">'.$status.'<div>',
         ];
 
         $parked = '未知';
-        switch($chargerData['parked']) {
-            case 0: $parked = '否'; break;
-            case 1: $parked = '是'; break;
+        switch ($chargerData['parked']) {
+            case 0:
+                $parked = '否';
+                break;
+            case 1:
+                $parked = '是';
+                break;
         }
         $data['properties'][] = [
             'title' => '枪是否归位',
@@ -282,9 +302,13 @@ if ($op == 'default') {
         ];
 
         $plugged = '未知';
-        switch($chargerData['plugged']) {
-            case 0: $plugged = '否'; break;
-            case 1: $plugged = '是'; break;
+        switch ($chargerData['plugged']) {
+            case 0:
+                $plugged = '否';
+                break;
+            case 1:
+                $plugged = '是';
+                break;
         }
         $data['properties'][] = [
             'title' => '是否插枪',
@@ -292,11 +316,11 @@ if ($op == 'default') {
         ];
         $data['properties'][] = [
             'title' => '输出电压',
-            'val' => $spanFN(floatval($chargerData['outputVoltage'])) . 'V',
+            'val' => $spanFN(floatval($chargerData['outputVoltage'])).'V',
         ];
         $data['properties'][] = [
             'title' => '输出电流',
-            'val' => $spanFN(floatval($chargerData['outputCurrent'])) . 'A',
+            'val' => $spanFN(floatval($chargerData['outputCurrent'])).'A',
         ];
         $data['properties'][] = [
             'title' => '枪线编码',
@@ -304,31 +328,31 @@ if ($op == 'default') {
         ];
         $data['properties'][] = [
             'title' => '枪线温度',
-            'val' => $spanFN(floatval($chargerData['chargerWireTemp'])) . '°C',
+            'val' => $spanFN(floatval($chargerData['chargerWireTemp'])).'°C',
         ];
         $data['properties'][] = [
             'title' => 'SOC',
-            'val' => $spanFN(intval($chargerData['soc'])) . '%',
+            'val' => $spanFN(intval($chargerData['soc'])).'%',
         ];
         $data['properties'][] = [
             'title' => '电池组最高温度',
-            'val' => $spanFN(floatval($chargerData['batteryMaxTemp'])) . '°C',
+            'val' => $spanFN(floatval($chargerData['batteryMaxTemp'])).'°C',
         ];
         $data['properties'][] = [
             'title' => '累计充电时间',
-            'val' => $spanFN(intval($chargerData['timeTotal'])) . '分',
+            'val' => $spanFN(intval($chargerData['timeTotal'])).'分',
         ];
         $data['properties'][] = [
             'title' => '剩余时间',
-            'val' => $spanFN(intval($chargerData['timeRemain'])) . '分',
+            'val' => $spanFN(intval($chargerData['timeRemain'])).'分',
         ];
         $data['properties'][] = [
             'title' => '充电度数',
-            'val' => $spanFN(floatval($chargerData['chargedKWH'])) . 'kW·h',
+            'val' => $spanFN(floatval($chargerData['chargedKWH'])).'kW·h',
         ];
         $data['properties'][] = [
             'title' => '已充金额',
-            'val' => $spanFN(floatval($chargerData['priceTotal'])). '元',
+            'val' => $spanFN(floatval($chargerData['priceTotal'])).'元',
         ];
         $data['properties'][] = [
             'title' => '硬件故障',

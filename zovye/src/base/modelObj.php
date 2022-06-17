@@ -16,6 +16,7 @@ use zovye\Settings;
 use zovye\traits\DirtyChecker;
 use zovye\traits\GettersAndSetters;
 use zovye\Util;
+use zovye\We7;
 use function zovye\getArray;
 use function zovye\ifEmpty;
 use function zovye\setArray;
@@ -311,6 +312,16 @@ class modelObj implements ISettings
             return $this->factory->__saveToDb($this, null, $condition) > 0;
         }
 
+        return false;
+    }
+
+    public function update(array $data = []): bool
+    {
+        if ($this->factory) {
+            return We7::pdo_update(static::getTableName(modelObj::OP_WRITE), $data, [
+                'id' => $this->getId(),
+            ]);
+        }
         return false;
     }
 

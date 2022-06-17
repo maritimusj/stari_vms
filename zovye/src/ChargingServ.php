@@ -120,7 +120,7 @@ class ChargingServ
         }
 
         if (!$res['status']) {
-            return err($res['data']['messsage'] ?? '请求失败！');
+            return err($res['data']['message'] ?? '请求失败！');
         }
 
         return $res['data']['version'] ?? '0';
@@ -133,7 +133,7 @@ class ChargingServ
             return $res;
         }
         if (!$res['status']) {
-            return err($res['data']['messsage'] ?? '请求失败！');
+            return err($res['data']['message'] ?? '请求失败！');
         }
         return true;
     }
@@ -145,7 +145,7 @@ class ChargingServ
             return $res;
         }
         if (!$res['status']) {
-            return err($res['data']['messsage'] ?? '请求失败！');
+            return err($res['data']['message'] ?? '请求失败！');
         }
         return $res['data']['version'] ?? 'n/a';
     }
@@ -162,9 +162,18 @@ class ChargingServ
                 return $res;
             }
             if (!$res['status']) {
-                return err($res['data']['messsage'] ?? '请求失败！');
+                return err($res['data']['message'] ?? '请求失败！');
             }
             return true;
         }
+    }
+
+    public static function getChargingResult($serial)
+    {
+        $res = self::query("charging/$serial");
+        if (!$res['status']) {
+            return err($res['data']['message'] ?? '请求失败！');
+        }
+        return (array)$res['data'];
     }
 }

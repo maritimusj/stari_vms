@@ -58,9 +58,9 @@ class device_groupsModelObj extends modelObj
         return tb('device_groups');
     }
 
-    public function format(): array
+    public function format($detail = true): array
     {
-        return Group::format($this);
+        return Group::format($this, $detail);
     }
 
     public function profile(): array

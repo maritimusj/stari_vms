@@ -623,6 +623,20 @@ class DeviceEventProcessor
     {
         $device = Device::get($data['uid'], true);
         if ($device) {
+            if ($device->isChargingDevice()) {
+                $extra = (array)$data['extra'];
+                $order = Order::get($extra['ser'], true);
+                if ($order) {
+                    $order->setExtraData('charging.result', $extra);
+                    $order->save();
+                    if ($extra['re'] != 3) {
+                        
+                    }
+                } else {
+                    Log::debug('charging', 'order not found:'. $extra['ser']);
+                }
+            }
+
             $device->setProtocolV1Code($data['code']);
             $device->save();
         }
@@ -727,14 +741,26 @@ class DeviceEventProcessor
                 }
 
                 if (is_array($extra['BMS'])) {
-                    $chargerID = $extra['chargerID'];
                     $serial = $extra['serial'] ?? '';
                     if ($serial) {
+                        $chargerID = $extra['chargerID'];
                         $device->setChargerBMSData($chargerID, $extra['BMS']);
                     }
                 }
                 if (is_array($extra['record'])) {
-                    
+                    $serial = $extra['serial'] ?? '';
+                    if ($serial) {
+                        $chargerID = $extra['chargerID'];
+                        $order = Order::get($serial, true);
+                        if (empty($order)) {
+                            Log::warning('charging', $extra);
+                        } else {
+                            $record = $extra['record'];
+                            $order->setExtraData('charging.record', $record);
+                            $order->setPrice($record['totalPrice'] * 100);
+                            $order->save();
+                        }
+                    }
                 }
             }
 

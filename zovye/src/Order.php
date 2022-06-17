@@ -751,6 +751,12 @@ class Order extends State
                             $data['package']['list'][$index]['extra'] = $goods->getAppendage();
                         }
                     }
+                } else {
+                    $group = $order->getExtraData('group');
+                    if ($group) {
+                        $data['group'] = $group;
+                        $data['charging'] = $order->getExtraData('charging.record', []);
+                    }
                 }
             }
 

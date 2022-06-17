@@ -72,7 +72,7 @@ class Group
         return self::query($condition)->findOne();
     }
 
-    public static function format(device_groupsModelObj $entry): array
+    public static function format(device_groupsModelObj $entry, bool $detail = true): array
     {
         $data = [
             'id' => intval($entry->getId()),
@@ -90,8 +90,10 @@ class Group
             $data['version'] = $entry->getVersion();
 
             $fee =  $entry->getFee();;
-            $data['fee'] = $fee;
-
+            if ($detail) {
+                $data['fee'] = $fee;
+            }
+            
             if (!isEmptyArray($fee)) {
                 $min = 0;
                 $max = 0;
@@ -105,9 +107,9 @@ class Group
                     }
                 }
                 if ($max - $min < 0.001) {
-                    $data['tips'] = sprintf("¥ %.2f 元/分钟", $max);
+                    $data['tips'] = sprintf("¥ %.04f /kW.h", $max);
                 } else {
-                    $data['tips'] = sprintf("¥ %.2f - %.2f 元/分钟", $min, $max);
+                    $data['tips'] = sprintf("¥ %.04f - %.04f /kW.h", $min, $max);
                 }
             }
         }

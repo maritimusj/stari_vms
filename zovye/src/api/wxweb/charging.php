@@ -3,6 +3,7 @@
 namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
+use zovye\ChargingServ;
 use zovye\Device;
 use zovye\Group;
 use zovye\model\device_groupsModelObj;
@@ -14,6 +15,8 @@ use zovye\User;
 use zovye\Util;
 use function zovye\err;
 use function zovye\error;
+use function zovye\is_error;
+use function zovye\isEmptyArray;
 
 class charging
 {
@@ -30,7 +33,9 @@ class charging
         $result = [];
         /** @var device_groupsModelObj $group */
         foreach ($query->findAll() as $group) {
-            $result[] = $group->format();
+            $data = $group->format(false);
+            $data['devices_toatal'] = Device::query(['group_id' => $group->getId()])->count();
+            $result[] = $data;
         }
 
         return $result;
@@ -46,6 +51,7 @@ class charging
 
         $result = [
             'group' => $group->format(),
+            'list' => [],
         ];
 
         $query = Device::query(['group_id' => $group->getId()]);
@@ -60,9 +66,9 @@ class charging
             $data['charger'] = [];
             $chargerNum = $device->getChargerNum();
             for ($i = 0; $i < $chargerNum; $i++) {
-                $data['charger'] = $device->getChargerData($i);
+                $data['charger'][] = $device->getChargerData($i + 1);
             }
-            $result[] = $data;
+            $result['list'][] = $data;
         }
 
         return $result;
@@ -89,19 +95,50 @@ class charging
             return err('没有计费设置，请联系管理员！');
         }
 
+        if (!$device->isMcbOnline(false)) {
+            return err('设备离线，请稍后再试！');
+        }
+
+        if (!$device->lockAcquire()) {
+            return err('设备正忙，请稍后再试！');
+        }
+
+        $device_charging_data = $device->settings("extra.charging.$chargerID", []);
+        if ($device_charging_data && $device_charging_data['user'] != $user->getId()) {
+            return err('设备正忙，请稍后再试！');
+        }
+
+        if (Order::exists($device_charging_data['serial'])) {
+            return err('正在充电中！');
+        }
+
+        if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
+            return err('用户锁定失败，请稍后再试！');
+        }
+
+        $user_charging_data = $user->settings('extra.charging', []);
+        if ($user_charging_data && $user_charging_data['device'] != $device->getId()) {
+            return err('用户卡正在使用中，请稍后再试！');
+        }
+
         $total = $user->getCommissionBalance()->total();
         if ($total < 1) {
             return err('用户卡余额不足！');
         }
 
-        $locker = $user->acquireLocker(User::CHARGING_LOCKER);
-        if (empty($locker)) {
-            return err('用户锁定失败，请稍后再试！');
-        }
-
-        $last_serial = $user->settings('extra.charging.serial', '');
-        if ($last_serial) {
-            return err('用户卡正在使用中，请稍后再试！');
+        if ($device_charging_data || $user_charging_data) {
+            $serial = $device_charging_data ? $device_charging_data['serial'] : $user_charging_data['serial'];
+            if (!$device->mcbNotify('run', '', [
+                'ser' => $serial,
+                'ch' => $chargerID,
+                'timeout' => 60,
+                'cardNO' => $user->getPhysicalCardNO(),
+                'balance' => $total,
+            ])) {
+                return err('设备通信失败！');
+            }
+            
+            return '已通知设备开启！';
         }
 
         $serial = $device->getChargingSerial($chargerID);
@@ -125,6 +162,7 @@ class charging
                     'name' => $device->getName(),
                 ],
                 'user' => $user->profile(),
+                'card' => $user->getPhysicalCardNO(),
             ],
         ];
 
@@ -138,43 +176,111 @@ class charging
             return err('创建订单失败！');
         }
 
+        if (!$user->updateSettings('extra.charging', [
+            'serial' => $serial,
+            'device' => $device->getId(),
+            'chargerID' => $chargerID,
+            'time' => TIMESTAMP,
+        ])) {
+            return err('保存数据失败！');
+        }
+
+        if (!$device->updateSettings("extra.charging.$chargerID", [
+            'serial' => $serial,
+            'user' => $user->getId(),
+            'time' => TIMESTAMP,
+        ])) {
+            return err('保存数据失败！');
+        }
+
         if (!$device->mcbNotify('run', '', [
             'ser' => $serial,
             'ch' => $chargerID,
             'timeout' => 60,
-            'cardNO' => $user->getPhysicalCardNO(),
+            'card' => $user->getPhysicalCardNO(),
             'balance' => $total,
         ])) {
             return err('设备通信失败！');
         }
 
-        return '已通知设备开启！';
+        return '已通知设备开启，请及时插入充电枪！';
     }
 
     public static function stop()
     {
         $user = common::getUser();
 
-        $device = Device::get(request::str('deviceId'), true);
-        if (empty($device)) {
-            return err('找不到这个设备！');
-        }
-
-        $locker = $user->acquireLocker(User::CHARGING_LOCKER);
-        if (empty($locker)) {
+        if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
             return err('用户锁定失败，请稍后再试！');
         }
 
-        $last_serial = $user->settings('extra.charging.serial', '');
+        $last_charging_data = $user->settings('extra.charging', []);
+
+        if (isEmptyArray($last_charging_data)) {
+            return err('没有发现正在充电的设备！');
+        }
+
+        $device = Device::get($last_charging_data['device']);
+        if (empty($device)) {
+            return err('设备不存在！');
+        }
+
+        if (!$device->lockAcquire()) {
+            return err('设备正忙，请稍后再试！');
+        }
+
+        $chargerID = $last_charging_data['chargerID'];
+
+        $last_charging_data = $device->settings("extra.charging.$chargerID", []);
+        if ($last_charging_data && $last_charging_data['user'] != $user->getId()) {
+            return err('其他用户正在使用当前设备！');
+        }
 
         if ($device->mcbNotify('config', '', [
             "req" => "stop",
-            "ch" => request::int('chargerID'),
-            "ser" => $last_serial,
+            "ch" => $chargerID,
+            "ser" => $last_charging_data['serial'],
         ])) {
             return err('设备通信失败，请重试！');
         }
 
-        return '已通知设备停止';
+        return '已通知设备停止，请稍候！';
     }
+
+    public static function stats()
+    {
+        $user = common::getUser();
+
+        if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
+            return err('用户锁定失败，请稍后再试！');
+        }
+
+        $last_charging_data = $user->settings('extra.charging', []);
+
+        if (isEmptyArray($last_charging_data)) {
+            return err('没有发现正在充电的设备！');
+        }
+
+        $serial = $last_charging_data['serial'];
+
+        $order = Order::get($serial, true);
+        if (empty($order)) {
+            return err('订单不存在！');
+        }
+
+        $result = $order->getExtraData('charging.record', []);
+        if (empty($result)) {
+            $result = ChargingServ::getChargingResult($serial);
+            if (is_error($result)) {
+                return $result;
+            }
+
+            $order->setExtraData('charging.record', $result);
+            $order->setPrice($result['totalPrice'] * 100);
+            $order->save();
+        }
+
+        return $result;
+    }
+
 }

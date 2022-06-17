@@ -2270,8 +2270,14 @@ class deviceModelObj extends modelObj
         int $timeout = DEFAULT_DEVICE_WAIT_TIMEOUT,
         array $extra = []
     ): array {
-        $no_str = Util::random(16, true);
-        $order_no = 'P'.We7::uniacid()."NO$no_str";
+        if (!empty($extra['order_no'])) {
+            $order_no = strval($extra['order_no']);
+        }
+
+        if (empty($order_no)) {
+            $no_str = Util::random(16, true);
+            $order_no =  'P'.We7::uniacid()."NO$no_str";
+        }
 
         $params = [
             'deviceGUID' => $this->imei,
@@ -2948,6 +2954,6 @@ class deviceModelObj extends modelObj
             'index' => $index,
         ]);
 
-        return sprintf('%s%s%04d', $this->imei, $chargerID, $index);
+        return sprintf('%s%02d%04d', $this->imei, $chargerID, $index);
     }
 }

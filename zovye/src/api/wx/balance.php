@@ -125,7 +125,7 @@ class balance
                 ]
             )->count();
 
-            if ($count > $withdraw['count']['month']) {
+            if ($count >= $withdraw['count']['month']) {
                 return error(State::ERROR, '本月可用提现次数已用完！');
             }
         }

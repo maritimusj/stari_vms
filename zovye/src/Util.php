@@ -2228,10 +2228,10 @@ HTML_CONTENT;
         return [];
     }
 
-    public static function getDistance($from, $to)
+    public static function getDistance($from, $to, $mode = 'walking')
     {
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
-        $url = "https://apis.map.qq.com/ws/distance/v1/matrix?mode=walking&from={$from['lat']},{$from['lng']}&to={$to['lat']},{$to['lng']}&key=$lbs_key";
+        $url = "https://apis.map.qq.com/ws/distance/v1/matrix?mode=$mode&from={$from['lat']},{$from['lng']}&to={$to['lat']},{$to['lng']}&key=$lbs_key";
         $resp = ihttp::get($url);
 
         if (is_error($resp)) {

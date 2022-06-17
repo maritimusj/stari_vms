@@ -27,6 +27,18 @@ class charging
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
+        $lng = request::float('lng');
+        $lat = request::float('lat');
+        if ($lng > 0 && $lat > 0) {
+            $distanceFN = function($loc) use($lng, $lat) {
+                $res = Util::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
+                return is_error($res) ? 0 : $res;
+            };     
+        } else {
+            $distanceFN = function() { return 0;};
+        }
+
+
         //列表数据
         $query->page($page, $page_size);
 
@@ -34,7 +46,12 @@ class charging
         /** @var device_groupsModelObj $group */
         foreach ($query->findAll() as $group) {
             $data = $group->format(false);
-            $data['devices_toatal'] = Device::query(['group_id' => $group->getId()])->count();
+            if (!isEmptyArray($data['loc'])) {
+                $data['distance'] = $distanceFN($data['loc']);
+            }
+            $data['devices'] = [
+                'total' => Device::query(['group_id' => $group->getId()])->count(),
+            ];
             $result[] = $data;
         }
 

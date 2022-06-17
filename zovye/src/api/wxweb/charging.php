@@ -29,6 +29,7 @@ class charging
 
         $lng = request::float('lng');
         $lat = request::float('lat');
+
         if ($lng > 0 && $lat > 0) {
             $distanceFN = function($loc) use($lng, $lat) {
                 $res = Util::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
@@ -38,6 +39,8 @@ class charging
             $distanceFN = function() { return 0;};
         }
 
+        $orderby = sprintf("st_distance_sphere(POINT(%f,%f),loc) asc", $lng, $lat);
+        $query->orderBy($orderby);
 
         //列表数据
         $query->page($page, $page_size);

@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\base\modelObj;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 
@@ -164,8 +165,15 @@ if ($op == 'default') {
         $group->setVersion($res);
         $group->save();
 
-        $group->update(['loc' => sprintf("ST_GeomFromText('POINT(%f %f)')", $lng, $lat)]);
-
+        $tbname = We7::tablename(device_groupsModelObj::getTableName(modelObj::OP_WRITE));
+        $sql = sprintf("UPDATE %s SET `loc` = ST_GeomFromText('POINT(%f %f)') WHERE `id`=%d", $tbname, $lng, $lat, $group->getId());
+        if (!We7::pdo_run($sql)) {
+            Util::itoast(
+                '更新位置出错！',
+                Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]),
+                'error'
+            );
+        }
         Util::itoast(
             $id ? '保存成功！' : '创建成功！',
             Util::url('charging', ['op' => 'edit', 'id' => $group->getId()]),

@@ -48,6 +48,7 @@ router::exec($op, [
 
     'chargingGroupList' => '\zovye\api\wxweb\charging::groupList',
     'chargingGroupDetail' => '\zovye\api\wxweb\charging::groupDetail',
+    'chargingList' => '\zovye\api\wxweb\charging::chargingList',
     'chargingStart' => '\zovye\api\wxweb\charging::start',
     'chargingStop' => '\zovye\api\wxweb\charging::stop',
 ]);

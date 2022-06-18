@@ -69,13 +69,32 @@ class charging
             return err('找不到指定的分组信息！');
         }
 
-        $result = [
-            'group' => $group->format(),
-            'list' => [],
+        $group_data = $group->format();
+
+        $lng = request::float('lng');
+        $lat = request::float('lat');
+
+        $res = Util::getDistance($group_data['loc'], ['lng' => $lng, 'lat' => $lat], 'driving');
+        $group_data['distance'] = is_error($res) ? 0 : $res;
+
+        $group_data['devices'] = [
+            'total' => Device::query(['group_id' => $group->getId()])->count(),
         ];
+
+        return $group_data;
+    }
+
+    public static function chargingList()
+    {
+        $id = request::int('id');
+        $group = Group::get($id, Group::CHARGING);
+        if (empty($group)) {
+            return err('找不到指定的分组信息！');
+        }
 
         $query = Device::query(['group_id' => $group->getId()]);
 
+        $list = [];
         /** @var deviceModelObj $device */
         foreach ($query->findAll() as $device) {
             if (!$device->isChargingDevice()) {
@@ -88,10 +107,11 @@ class charging
             for ($i = 0; $i < $chargerNum; $i++) {
                 $data['charger'][] = $device->getChargerData($i + 1);
             }
-            $result['list'][] = $data;
+
+            $list[] = $data;
         }
 
-        return $result;
+        return $list;
     }
 
     public static function start()

@@ -99,7 +99,8 @@
                     <input type="text" class="form-control" name="address" id="address" value="{php echo $group ? $group['address'] : ''}">
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-default" type="button" data-op="QQMapPicker" title="选择位置">
+                    <button class="btn btn-default" type="button" data-op="QQMapPicker"
+                    {if $group} title="{$group['loc']['lng']},{$group['loc']['lat']}"{else} title="选择位置"{/if}>
                         <i class="fa fa-map-marker"></i>
                     </button>
                 </div>

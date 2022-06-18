@@ -108,7 +108,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">识别颜色</label>
                 <div class="col-md-10">
-                    {php echo tpl_form_field_color('clr', $group ? $group['clr'] : $clr);}
+                    {php echo tpl_form_field_color('clr', $group ? $group['clr'] : \zovye\Util::randColor());}
                 </div>
             </div>
             <div id="app">

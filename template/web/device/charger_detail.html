@@ -8,8 +8,8 @@
         </li>
     </ul>
     <div class="panel panel-default panel-first nav-tab-item">
-        <div class="panel-body" :class="data[active].status">
-            <table class="table table-condensed" data-fetchid="{$device_id}">
+        <div class="panel-body" :class="data[active] ? data[active].status : ''">
+            <table class="table table-condensed" data-fetchid="{$device_id}" v-if="data.length > 0">
                 <tbody>
                     <tr v-for="(e,i) in (data[active].properties || [])" class="property" :key="e.title">
                         <td v-html="e.title"></td>
@@ -43,7 +43,7 @@
                 data: [],
                 active: 0,
             },
-            created() {
+            mounted() {
                 this.getData();
                 if (timer != null) {
                     clearInterval(timer);

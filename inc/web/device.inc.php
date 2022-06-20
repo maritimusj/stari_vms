@@ -1084,6 +1084,10 @@ HTML;
         'event' => '消息',
     ];
 
+    if ($device->isChargingDevice()) {
+        unset($tpl_data['navs']['payload']);
+    }
+
     $tpl_data['media'] = [
         'image' => ['title' => '图片'],
         'video' => ['title' => '视频'],
@@ -1260,6 +1264,10 @@ HTML;
         'event' => '消息',
     ];
 
+    if ($device->isChargingDevice()) {
+        unset($tpl_data['navs']['payload']);
+    }
+
     $query = $device->logQuery();
     if (request::isset('way')) {
         $query->where(['level' => request::int('way')]);
@@ -1407,10 +1415,26 @@ HTML;
         'event' => '消息',
     ];
 
+    if ($device->isChargingDevice()) {
+        unset($tpl_data['navs']['payload']);
+    }
+
     $tpl_data['events'] = $events;
     $tpl_data['device'] = $device;
 
     app()->showTemplate('web/device/event', $tpl_data);
+
+}  elseif ($op == 'delete_logs') {
+
+    $device = Device::get(request('id'));
+    if (empty($device)) {
+        Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    }
+
+    $device->eventQuery()->delete();
+
+    Util::itoast('已清除所有消息日志！', $this->createWebUrl('device', ['op' => 'event', 'id' => $device->getId()]), 'success');
+
 } elseif ($op == 'daystats') {
 
     $device = Device::get(request('id'));

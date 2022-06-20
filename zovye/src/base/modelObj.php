@@ -315,16 +315,6 @@ class modelObj implements ISettings
         return false;
     }
 
-    public function update(array $data = []): bool
-    {
-        if ($this->factory) {
-            return We7::pdo_update(static::getTableName(modelObj::OP_WRITE), $data, [
-                'id' => $this->getId(),
-            ]);
-        }
-        return false;
-    }
-
     /**
      * @return bool
      */

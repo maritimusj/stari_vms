@@ -25,6 +25,11 @@ class charging
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
+        $keywords = request::trim('keywords');
+        if ($keywords) {
+            $query->where(['title REGEXP' => $keywords]);
+        }
+
         $lng = request::float('lng');
         $lat = request::float('lat');
 
@@ -91,6 +96,14 @@ class charging
         }
 
         $query = Device::query(['group_id' => $group->getId()]);
+
+        $keywords = request::trim('keywords');
+        if ($keywords) {
+            $query->whereOr([
+                'name REGEXP' => $keywords,
+                'IMEI REGEXP' => $keywords,
+            ]);
+        }
 
         $list = [];
         /** @var deviceModelObj $device */

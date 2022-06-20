@@ -25,6 +25,12 @@
         font-size: small;
         color: #9E9E9E;
     }
+    #orderlist .fee {
+        color: #4caf50;
+    }
+    #orderlist .price {
+        font-weight: bolder;
+    }
     a[filter] {
         cursor: pointer;
     }
@@ -303,7 +309,7 @@
                         <div  class="status operate">
                             <div class="detail">
                                 {if $order['group']}
-                                        收费标准：<span class="price">{$order['group']['tips']}</span>
+                                        收费标准：<span class="fee">{$order['group']['tips']}</span>
                                     {if $order['price'] > 0}
                                         <br>费用总计：<span class="price"> {$order['price']}</span>
                                     {else}

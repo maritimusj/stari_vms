@@ -135,6 +135,10 @@ class charging
             return err('找不到这个设备！');
         }
 
+        if (!$device->isChargingDevice()) {
+            return err('只支持充电桩设备！');
+        }
+
         $chargerID = request::int('chargerID');
 
         $data = $device->getChargerData($chargerID);
@@ -155,7 +159,7 @@ class charging
             return err('设备正忙，请稍后再试！');
         }
 
-        $device_charging_data = $device->settings("extra.charging.$chargerID", []);
+        $device_charging_data = $device->getChargerData($chargerID);
         if ($device_charging_data && $device_charging_data['user'] != $user->getId()) {
             return err('设备正忙，请稍后再试！');
         }

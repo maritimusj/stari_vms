@@ -610,7 +610,7 @@ class DeviceEventProcessor
             if ($device->isChargingDevice()) {
                 $chargerNum = $device->getChargerNum();
                 for ($i = 0; $i < $chargerNum; $i++) {
-                    $device->setChargerProperity($i + 1, 'status', 0);
+                    $device->setChargerProperty($i + 1, 'status', 0);
                 }
             }
 
@@ -637,9 +637,6 @@ class DeviceEventProcessor
                 if ($order) {
                     $order->setExtraData('charging.result', $extra);
                     $order->save();
-                    if ($extra['re'] != 3) {
-                        
-                    }
                 } else {
                     Log::debug('charging', 'order not found:'. $extra['ser']);
                 }
@@ -755,10 +752,10 @@ class DeviceEventProcessor
                         $device->setChargerBMSData($chargerID, $extra['BMS']);
                     }
                 }
+
                 if (is_array($extra['record'])) {
                     $serial = $extra['serial'] ?? '';
                     if ($serial) {
-                        $chargerID = $extra['chargerID'];
                         $order = Order::get($serial, true);
                         if (empty($order)) {
                             Log::warning('charging', $extra);

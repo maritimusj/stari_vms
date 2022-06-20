@@ -10,11 +10,9 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\Order;
 use zovye\request;
-use zovye\State;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
@@ -39,8 +37,8 @@ class charging
             $distanceFN = function() { return 0;};
         }
 
-        $orderby = sprintf("st_distance_sphere(POINT(%f,%f),loc) asc", $lng, $lat);
-        $query->orderBy($orderby);
+        $order_by = sprintf("st_distance_sphere(POINT(%f,%f),loc) asc", $lng, $lat);
+        $query->orderBy($order_by);
 
         //列表数据
         $query->page($page, $page_size);
@@ -84,7 +82,7 @@ class charging
         return $group_data;
     }
 
-    public static function deviceList()
+    public static function deviceList(): array
     {
         $id = request::int('id');
         $group = Group::get($id, Group::CHARGING);
@@ -307,6 +305,11 @@ class charging
         $order = Order::get($serial, true);
         if (empty($order)) {
             return err('订单不存在！');
+        }
+
+        $result = $order->getExtraData('charging.result', []);
+        if ($result && $result['re'] != 3) {
+            return err("设备故障：{$result['re']}");
         }
 
         $result = $order->getExtraData('charging.record', []);

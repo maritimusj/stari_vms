@@ -43,6 +43,7 @@ use function zovye\is_error;
  * @method setRefund(bool $bool)
  * @method getResultCode()
  * @method isRefund()
+ * @method setPrice(float|int $param)
  */
 class orderModelObj extends modelObj
 {

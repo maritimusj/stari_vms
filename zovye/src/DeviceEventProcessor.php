@@ -606,6 +606,14 @@ class DeviceEventProcessor
         $device = Device::get($data['uid'], true);
         if ($device) {
             $device->setMcbOnline(Device::OFFLINE);
+
+            if ($device->isChargingDevice()) {
+                $chargerNum = $device->getChargerNum();
+                for ($i = 0; $i < $chargerNum; $i++) {
+                    $device->setChargerProperity($i + 1, 'status', 0);
+                }
+            }
+
             $device->save();
 
             if ($device->isLastOnlineNotifyTimeout()) {

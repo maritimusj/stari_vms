@@ -368,9 +368,19 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("extra.charger.$chargerID", $data);
     }
 
+    public function setChargerProperity($chargerID, $key, $val): bool
+    {
+        return $this->updateSettings("extra.charger.$chargerID.$key", $val);
+    }
+
     public function getChargerData($chargerID): array
     {
         return $this->settings("extra.charger.$chargerID", []);
+    }
+
+    public function getChargerProperity($chargerID, $key, $defaultVal = null)
+    {
+        return $this->settings("extra.charger.$chargerID.$key", $$defaultVal);
     }
 
     public function setChargerBMSData($chargerID, array $data): bool

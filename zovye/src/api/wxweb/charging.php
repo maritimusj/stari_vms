@@ -84,7 +84,7 @@ class charging
         return $group_data;
     }
 
-    public static function chargingList()
+    public static function deviceList()
     {
         $id = request::int('id');
         $group = Group::get($id, Group::CHARGING);
@@ -102,6 +102,7 @@ class charging
             }
 
             $data = array_merge($device->profile(), $device->getChargingData());
+            $data['online'] = $device->isMcbOnline();
             $data['charger'] = [];
             $chargerNum = $device->getChargerNum();
             for ($i = 0; $i < $chargerNum; $i++) {

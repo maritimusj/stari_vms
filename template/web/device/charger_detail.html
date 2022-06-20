@@ -1,5 +1,5 @@
 
-<div id="app">
+<div id="app" :data-app="appId">
     <ul class="nav nav-tabs" id="navbar">
         <li role="presentation" :class="{active: active === i}" v-for="(e,i) in data" style="margin-bottom: -2px;">
             <a href="#" @click="active = i">
@@ -21,35 +21,37 @@
     </div>
 </div>
 <script>
-    let timer = null;
     $(function(){
-        $('body').on('hidden.bs.modal', function() {
-            if (timer != null) {
-                clearInterval(timer);
-                timer = null;
-            }
-            $('.modal').each((i, e) => {
-                if ($(e).is(':hidden')) {
-                    $(e).remove();
+        if (!window.hidden_bs_model) {
+            window.hidden_bs_model = true;
+            window.timer = {};
+
+            $('body').on('hidden.bs.modal', function(e) {
+                const timerId = $(e.target).find('[data-app]').data('app');
+                if (window.timer[timerId]) {
+                    clearInterval(timer[timerId]);
+                    window.timer[timerId] = null;
                 }
-            });
-        })
+               $('.modal').each((i, e) => {
+                    if ($(e).is(':hidden')) {
+                        $(e).remove();
+                    }
+                });
+            })
+        }
     })
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
         const api_url = "{php echo $this->createWebUrl('charging', ['id' => $device_id]);}";
         new Vue({
             el: "#app",
             data: {
+                appId: new Date().getTime(),
                 data: [],
                 active: 0,
             },
             mounted() {
                 this.getData();
-                if (timer != null) {
-                    clearInterval(timer);
-                    timer = null;
-                }
-                timer = setInterval(this.getData, 3000);
+                window.timer[this.appId] = setInterval(this.getData, 3000);
             },
             methods: {
                 getData() {

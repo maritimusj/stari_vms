@@ -346,12 +346,12 @@ class deviceModelObj extends modelObj
 
     public function setChargingData(array $data): bool
     {
-        return $this->updateSettings('extra.charging', $data);
+        return $this->updateSettings('charging', $data);
     }
 
     public function getChargingData(): array
     {
-        $data = $this->settings('extra.charging', []);
+        $data = $this->settings('charging', []);
 
         return [
             'cft' => $data['cft'] == 0 ? 'DC' : 'AC',
@@ -365,22 +365,22 @@ class deviceModelObj extends modelObj
 
     public function setChargerData($chargerID, array $data): bool
     {
-        return $this->updateSettings("extra.charger.$chargerID", $data);
+        return $this->updateSettings("charger_$chargerID", $data);
     }
 
     public function setChargerProperty($chargerID, $key, $val): bool
     {
-        return $this->updateSettings("extra.charger.$chargerID.$key", $val);
+        return $this->updateSettings("charger_$chargerID.$key", $val);
     }
 
     public function getChargerData($chargerID): array
     {
-        return $this->settings("extra.charger.$chargerID", []);
+        return $this->settings("charger_$chargerID", []);
     }
 
     public function getChargerProperty($chargerID, $key, $defaultVal = null)
     {
-        return $this->settings("extra.charger.$chargerID.$key", $$defaultVal);
+        return $this->settings("charger_$chargerID.$key", $$defaultVal);
     }
 
     public function setChargerBMSData($chargerID, array $data): bool
@@ -388,12 +388,12 @@ class deviceModelObj extends modelObj
         $saved = $this->getChargerBMSData($chargerID);
         $data = array_merge($saved, $data);
 
-        return $this->updateSettings("extra.chargerBMS.$chargerID", $data);
+        return $this->updateSettings("chargerBMS.$chargerID", $data);
     }
 
     public function getChargerBMSData($chargerID): array
     {
-        return $this->settings("extra.chargerBMS.$chargerID", []);
+        return $this->settings("chargerBMS.$chargerID", []);
     }
 
     public function setDeviceModel($model)

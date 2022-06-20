@@ -671,106 +671,108 @@ class DeviceEventProcessor
     public static function onMcbReport(array $data = [])
     {
         $device = Device::get($data['uid'], true);
-        if ($device) {
-            $device->setLastPing(time());
-            $device->setMcbOnline(Device::ONLINE);
-            $device->setLastOnline(TIMESTAMP);
-
-            $device->setProtocolV1Code($data['code']);
-
-            $extra = (array)$data['extra'];
-
-            if (isset($extra['ICCID'])) {
-                $device->setICCID($extra['ICCID']);
-            }
-
-            if (isset($extra['iccid'])) {
-                $device->setICCID($extra['iccid']);
-            }
-
-            if (isset($extra['ip'])) {
-                $device->setLastOnlineIp(strval($extra['ip']));
-            }
-
-            if (isset($extra['RSSI'])) {
-                $device->setSig($extra['RSSI']);
-            }
-
-            if (isset($extra['LAC'])) {
-                if (settings('device.lac.enabled')) {
-                    $lastLAC = $device->settings('extra.v1.lac.v', '');
-                    if (!empty($lastLAC) && $lastLAC != $extra['LAC'] && empty($device->getS1())) {
-                        $device->setS1(1);
-                        $device->UpdateSettings('extra.v1.lac.time', time());
-                    }
-                }
-
-                $device->updateSettings('extra.v1.lac.v', strval($extra['LAC']));
-            }
-
-            if (isset($extra['qoe'])) {
-                $device->setQoe($extra['qoe']);
-            }
-
-            if (isset($extra['voltage'])) {
-                $device->setV0Status(Device::V0_STATUS_VOLTAGE, $extra['voltage']);
-            }
-
-            if (isset($extra['count'])) {
-                $device->setV0Status(Device::V0_STATUS_COUNT, $extra['count']);
-            }
-
-            if (isset($extra['error'])) {
-                $device->setV0Status(Device::V0_STATUS_ERROR, $extra['error']);
-            }
-
-            if (isset($extra['sensor'])) {
-                $sensors = isset($extra['sensor']['type']) ? [$extra['sensor']] : $extra['sensor'];
-                foreach ($sensors as $sensor) {
-                    $device->setSensorData($sensor['type'], $sensor['data']);
-                }
-            }
-
-            if ($device->isNormalDevice()) {
-                $device->updateMcbStatus($extra);
-            }
-
-            if ($device->isChargingDevice()) {
-                if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
-                    $device->setChargingData($extra);
-                }
-
-                if (is_array($extra['status'])) {
-                    $chargerID = $extra['chargerID'];
-                    $device->setChargerData($chargerID, $extra['status']);
-                }
-
-                if (is_array($extra['BMS'])) {
-                    $serial = $extra['serial'] ?? '';
-                    if ($serial) {
-                        $chargerID = $extra['chargerID'];
-                        $device->setChargerBMSData($chargerID, $extra['BMS']);
-                    }
-                }
-
-                if (is_array($extra['record'])) {
-                    $serial = $extra['serial'] ?? '';
-                    if ($serial) {
-                        $order = Order::get($serial, true);
-                        if (empty($order)) {
-                            Log::warning('charging', $extra);
-                        } else {
-                            $record = $extra['record'];
-                            $order->setExtraData('charging.record', $record);
-                            $order->setPrice($record['totalPrice'] * 100);
-                            $order->save();
-                        }
-                    }
-                }
-            }
-
-            $device->save();
+        if (empty($device)) {
+            return err('找不到这个设备！');
         }
+    
+        $device->setLastPing(time());
+        $device->setMcbOnline(Device::ONLINE);
+        $device->setLastOnline(TIMESTAMP);
+
+        $device->setProtocolV1Code($data['code']);
+
+        $extra = (array)$data['extra'];
+
+        if (isset($extra['ICCID'])) {
+            $device->setICCID($extra['ICCID']);
+        }
+
+        if (isset($extra['iccid'])) {
+            $device->setICCID($extra['iccid']);
+        }
+
+        if (isset($extra['ip'])) {
+            $device->setLastOnlineIp(strval($extra['ip']));
+        }
+
+        if (isset($extra['RSSI'])) {
+            $device->setSig($extra['RSSI']);
+        }
+
+        if (isset($extra['LAC'])) {
+            if (settings('device.lac.enabled')) {
+                $lastLAC = $device->settings('extra.v1.lac.v', '');
+                if (!empty($lastLAC) && $lastLAC != $extra['LAC'] && empty($device->getS1())) {
+                    $device->setS1(1);
+                    $device->UpdateSettings('extra.v1.lac.time', time());
+                }
+            }
+
+            $device->updateSettings('extra.v1.lac.v', strval($extra['LAC']));
+        }
+
+        if (isset($extra['qoe'])) {
+            $device->setQoe($extra['qoe']);
+        }
+
+        if (isset($extra['voltage'])) {
+            $device->setV0Status(Device::V0_STATUS_VOLTAGE, $extra['voltage']);
+        }
+
+        if (isset($extra['count'])) {
+            $device->setV0Status(Device::V0_STATUS_COUNT, $extra['count']);
+        }
+
+        if (isset($extra['error'])) {
+            $device->setV0Status(Device::V0_STATUS_ERROR, $extra['error']);
+        }
+
+        if (isset($extra['sensor'])) {
+            $sensors = isset($extra['sensor']['type']) ? [$extra['sensor']] : $extra['sensor'];
+            foreach ($sensors as $sensor) {
+                $device->setSensorData($sensor['type'], $sensor['data']);
+            }
+        }
+
+        if ($device->isNormalDevice()) {
+            $device->updateMcbStatus($extra);
+        }
+
+        if ($device->isChargingDevice()) {
+            if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
+                $device->setChargingData($extra);
+            }
+
+            if (is_array($extra['status'])) {
+                $chargerID = $extra['chargerID'];
+                $device->setChargerData($chargerID, $extra['status']);
+            }
+
+            if (is_array($extra['BMS'])) {
+                $serial = $extra['serial'] ?? '';
+                if ($serial) {
+                    $chargerID = $extra['chargerID'];
+                    $device->setChargerBMSData($chargerID, $extra['BMS']);
+                }
+            }
+
+            if (is_array($extra['record'])) {
+                $serial = $extra['serial'] ?? '';
+                if ($serial) {
+                    $order = Order::get($serial, true);
+                    if (empty($order)) {
+                        Log::warning('charging', $extra);
+                    } else {
+                        $record = $extra['record'];
+                        $order->setExtraData('charging.record', $record);
+                        $order->setPrice($record['totalPrice'] * 100);
+                        $order->save();
+                    }
+                }
+            }
+        }
+
+        $device->save();     
     }
 
     /**

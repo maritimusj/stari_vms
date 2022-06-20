@@ -192,7 +192,7 @@ class userModelObj extends modelObj
             $name = $this->settings('partnerData.name', '');
         }
 
-        return empty($name) ? $this->nickname : strval($name);
+        return empty($name) ? strval($this->nickname) : strval($name);
     }
 
     /**

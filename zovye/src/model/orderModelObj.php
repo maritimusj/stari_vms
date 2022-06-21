@@ -227,6 +227,46 @@ class orderModelObj extends modelObj
         return !empty($pull_result) && !is_error($pull_result);
     }
 
+    public function isChargingResultOk(): bool
+    {
+        return $this->getExtraData('charging.result.re', 0) == 3;
+    }
+
+    public function setChargingResult($result)
+    {
+        return $this->setExtraData('charging.result', $result);
+    }
+
+    public function getChargingResult()
+    {
+        return $this->setExtraData('charging.result', []);
+    }
+
+    public function setChargingRecord($record)
+    {
+        return $this->setExtraData('charging.record', $record);
+    }
+
+    public function getChargingRecord()
+    {
+        return $this->getExtraData('charging.record', []);
+    }
+
+    public function isChargingFinished(): bool
+    {
+        $result = $this->getChargingResult();
+        if ($result && $result['re'] != 3) {
+            return true;
+        }
+
+        $record = $this->getChargingRecord();
+        if ($record && isset($record['totalPrice'])) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getPullSerialNO()
     {
         return $this->getExtraData('pull.result.serialNO', '');

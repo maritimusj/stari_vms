@@ -34,44 +34,37 @@ class Charging
             }
     
             $device_charging_data = $device->settings("extra.charging.$chargerID", []);
-            if ($device_charging_data && $device_charging_data['user'] != $user->getId()) {
-                return err('设备正忙，请稍后再试！');
+            if ($device_charging_data) {
+                if ($device_charging_data['user'] != $user->getId()) {
+                    return err('设备正忙，请稍后再试！');
+                }
+                $order = Order::get($device_charging_data['serial'], true);
+                if ($order && !$order->isChargingFinished()) {
+                    return err('正在充电中！');
+                }                
             }
-    
-            if (Order::exists($device_charging_data['serial'])) {
-                return err('正在充电中！');
-            }
-    
+
             if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
                 return err('用户锁定失败，请稍后再试！');
             }
     
             $user_charging_data = $user->settings('extra.charging', []);
-            if ($user_charging_data && $user_charging_data['device'] != $device->getId()) {
-                return err('用户卡正在使用中，请稍后再试！');
+            if ($user_charging_data) {
+                if ($user_charging_data['device'] != $device->getId()) {
+                    return err('用户卡正在使用中，请稍后再试！');
+                }
+                $order = Order::get($user_charging_data['serial'], true);
+                if ($order && !$order->isChargingFinished()) {
+                    return err('正在充电中！');
+                }
             }
     
             $total = $user->getCommissionBalance()->total();
             if ($total < 1) {
                 return err('用户卡余额不足！');
             }
-    
-            if ($device_charging_data || $user_charging_data) {
-                $serial = $device_charging_data ? $device_charging_data['serial'] : $user_charging_data['serial'];
-                if (!$device->mcbNotify('run', '', [
-                    'ser' => $serial,
-                    'ch' => $chargerID,
-                    'timeout' => 60,
-                    'cardNO' => $user->getPhysicalCardNO(),
-                    'balance' => $total,
-                ])) {
-                    return err('设备通信失败！');
-                }
-                
-                return '已通知设备开启！';
-            }
-    
-            $serial = $device->getChargingSerial($chargerID);
+
+            $serial = $device->generateChargingSerial($chargerID);
     
             $order_data = [
                 'src' => Order::CHARGING,
@@ -107,6 +100,14 @@ class Charging
                 return err('创建订单失败！');
             }
     
+            if (!$device->updateSettings("extra.charging.$chargerID", [
+                'serial' => $serial,
+                'user' => $user->getId(),
+                'time' => TIMESTAMP,
+            ])) {
+                return err('保存数据失败！');
+            }
+
             if (!$user->updateSettings('extra.charging', [
                 'serial' => $serial,
                 'device' => $device->getId(),
@@ -115,15 +116,7 @@ class Charging
             ])) {
                 return err('保存数据失败！');
             }
-    
-            if (!$device->updateSettings("extra.charging.$chargerID", [
-                'serial' => $serial,
-                'user' => $user->getId(),
-                'time' => TIMESTAMP,
-            ])) {
-                return err('保存数据失败！');
-            }
-    
+
             if (!$device->mcbNotify('run', '', [
                 'ser' => $serial,
                 'ch' => $chargerID,
@@ -188,23 +181,27 @@ class Charging
             return err('订单不存在！');
         }
 
-        $result = $order->getExtraData('charging.result', []);
+        $result = $order->getChargingResult();
         if ($result && $result['re'] != 3) {
             return err("设备故障：{$result['re']}");
         }
 
-        $result = $order->getExtraData('charging.record', []);
-        if (empty($result)) {
-            $result = ChargingServ::getChargingResult($serial);
-            if (is_error($result)) {
-                return $result;
+        $record = $order->getChargingRecord();
+        if (empty($record)) {
+            $record = ChargingServ::getChargingRecord($serial);
+            if (is_error($record)) {
+                return $record;
             }
 
-            $order->setExtraData('charging.record', $result);
-            $order->setPrice($result['totalPrice'] * 100);
-            $order->save();
+            if (isset($record['totalPrice'])) {
+                self::end($serial, $last_charging_data['chargerID'], function($order) use($record) {
+                    $order->setChargingRecord($record);
+                    $order->setPrice($record['totalPrice'] * 100);                   
+                });            
+            }
         }
-        return $result;
+
+        return $record ? $record : $result;
     }
 
     protected static function end(string $serial, int $chargerID, callable $cb)
@@ -256,6 +253,7 @@ class Charging
             if (!$order->save()) {
                 return err('保存数据失败！');
             }
+
             return true;            
         });
     }
@@ -263,12 +261,16 @@ class Charging
     public static function setResult(string $serial, int $chargerID, array $result)
     {
         if ($result['re'] != 3) {
-            
+            return self::end($serial, $chargerID, function (orderModelObj $order) use ($result) {
+                $order->setExtraData('charging.result', $result);
+            });            
+        } else {
+            $order = Order::get($serial, true);
+            if ($order) {
+                $order->setChargingResult($result);
+                $order->save();
+            }
         }
-        return self::end($serial, $chargerID, function (orderModelObj $order) use ($result) {
-            $order->setExtraData('charging.result', $result);
-        });
-
     }
 
     public static function settle(string $serial, int $chargerID, array $record)

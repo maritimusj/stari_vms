@@ -168,7 +168,7 @@ class ChargingServ
         }
     }
 
-    public static function getChargingResult($serial)
+    public static function getChargingRecord($serial)
     {
         $res = self::query("charging/$serial");
         if (!$res['status']) {

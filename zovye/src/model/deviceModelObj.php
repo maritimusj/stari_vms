@@ -2948,7 +2948,7 @@ class deviceModelObj extends modelObj
         ]);
     }
 
-    public function getChargingSerial(int $chargerID): string
+    public function generateChargingSerial(int $chargerID): string
     {
         $chargingData = $this->settings('extra.chargingData', []);
         if (date('Ymd', $chargingData['last']) != date('Ymd')) {

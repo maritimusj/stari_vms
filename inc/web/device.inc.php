@@ -781,16 +781,12 @@ HTML;
                 throw new RuntimeException('设备不存在！');
             }
 
-            if (!$device->payloadLockAcquire(3)) {
-                throw new RuntimeException('设备正忙，请稍后再试！');
-            }
-
             if ($data['shadow_id']) {
                 $device->setShadowId($data['shadow_id']);
             }
 
             if ($data['agent_id'] != $device->getAgentId()) {
-                if (!Device::unbind($device)) {
+                if ($device->getAgentId() > 0 && !Device::unbind($device)) {
                     throw new RuntimeException('无法解除代理商与设备的绑定关系！');
                 }
                 $device->setAgentId($data['agent_id']);
@@ -798,6 +794,10 @@ HTML;
 
             if ($data['name'] != $device->getName()) {
                 $device->setName($data['name']);
+            }
+
+            if (!$device->payloadLockAcquire(1)) {
+                throw new RuntimeException('设备正忙，请稍后再试！');
             }
 
             if ($data['device_type'] != $device->getDeviceType()) {

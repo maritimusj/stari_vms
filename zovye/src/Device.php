@@ -632,7 +632,7 @@ class Device extends State
         unset($extra['keepers']);
         $device->set('extra', $extra);
 
-        $locker = $device->payloadLockAcquire(3);
+        $locker = $device->payloadLockAcquire();
         if (empty($locker)) {
             return false;
         }

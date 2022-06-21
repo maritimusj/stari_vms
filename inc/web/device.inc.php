@@ -790,6 +790,9 @@ HTML;
             }
 
             if ($data['agent_id'] != $device->getAgentId()) {
+                if (!Device::unbind($device)) {
+                    throw new RuntimeException('无法解除代理商与设备的绑定关系！');
+                }
                 $device->setAgentId($data['agent_id']);
             }
 

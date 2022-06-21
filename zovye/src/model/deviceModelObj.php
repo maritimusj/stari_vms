@@ -758,6 +758,7 @@ class deviceModelObj extends modelObj
         $this->remove('assigned');
         $this->remove('adsData');
         $this->remove('advs');
+        $this->remove('ads');
         $this->remove('accountsData');
         $this->remove('firstMsgStatistic');
         $this->remove('location');
@@ -769,7 +770,10 @@ class deviceModelObj extends modelObj
         $this->resetPayload([], '设备初始化');
 
         $this->setGroupId(0);
+
+        Device::unbind($this);
         $this->setAgent();
+
         $this->resetLock();
         $this->setTagsFromText('');
         $this->updateQrcode(true);

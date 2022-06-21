@@ -7,9 +7,6 @@
         flex-direction: column;
         position: relative;
     }
-    .order .text {
-
-    }
     .order .status {
         width: fit-content;
         padding: 1px 6px;
@@ -79,10 +76,17 @@
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'free'));}">免费</a></li>
     {if \zovye\App::isBalanceEnabled()}
         <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'balance'));}">积分</a></li>
-        <li role="presentation" class="active"><a href="#">商城订单</a></li>     
+        <li role="presentation" class="active"><a href="#">商城</a></li>     
     {/if}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款订单</a></li>
-    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常订单</a></li>
+    {if \zovye\App::isChargingDeviceEnabled()}
+        {if $s_way=='charging'}
+        <li role="presentation" class="active"><a href="#">充电</a></li>
+        {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'charging'));}">充电</a></li>
+        {/if}
+    {/if}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常</a></li>
 </ul>
 <div class="panel panel-default nav-tab-item">
     <div class="panel-body">

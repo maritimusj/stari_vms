@@ -58,20 +58,27 @@
         <li role="presentation"><a filter data-name="way" data-val="balance">积分</a></li>
         {/if}
         {if $s_way=='delivery'}
-        <li role="presentation" class="active"><a href="#">商城订单</a></li>
+        <li role="presentation" class="active"><a href="#">商城</a></li>
         {else}
-        <li role="presentation"><a href="{php echo $this->createWebUrl('mall');}">商城订单</a></li>
+        <li role="presentation"><a href="{php echo $this->createWebUrl('mall');}">商城</a></li>
         {/if}        
     {/if}
+    {if \zovye\App::isChargingDeviceEnabled()}
+        {if $s_way=='charging'}
+        <li role="presentation" class="active"><a href="#">充电</a></li>
+        {else}
+        <li role="presentation"><a filter data-name="way" data-val="charging">充电</a></li>
+        {/if}
+    {/if}
     {if $s_way=='refund'}
-    <li role="presentation" class="active"><a href="#">退款订单</a></li>
+    <li role="presentation" class="active"><a href="#">退款</a></li>
     {else}
-    <li role="presentation"><a filter data-name="way" data-val="refund">退款订单</a></li>
+    <li role="presentation"><a filter data-name="way" data-val="refund">退款</a></li>
     {/if}
     {if $s_way=='unexpected'}
-    <li role="presentation" class="active"><a href="#">异常订单</a></li>
+    <li role="presentation" class="active"><a href="#">异常</a></li>
     {else}
-    <li role="presentation"><a filter data-name="way" data-val="unexpected">异常订单</a></li>
+    <li role="presentation"><a filter data-name="way" data-val="unexpected">异常</a></li>
     {/if}
     {if $device || $user}
     <li role="presentation"  class="active"><a href="#">{php echo $user?$user->getName():''}{if $user && $device} <i class="fa fa-sign-in" style="color:#CCC;"></i> {/if}{php echo $device ? $device->getName() : '';}</a></li>

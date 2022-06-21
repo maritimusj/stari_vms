@@ -632,13 +632,14 @@ class DeviceEventProcessor
         $device = Device::get($data['uid'], true);
         if ($device) {
             if ($device->isChargingDevice()) {
+                
                 $extra = (array)$data['extra'];
-                $order = Order::get($extra['ser'], true);
-                if ($order) {
-                    $order->setExtraData('charging.result', $extra);
-                    $order->save();
-                } else {
-                    Log::debug('charging', 'order not found:'. $extra['ser']);
+                $res = Charging::setResult($extra['ser'], $extra['re'], $extra);
+                if (is_error($res)) {
+                    Log::error('charging', [
+                        'data' => $data,
+                        'error' => $res,
+                    ]);
                 }
             }
 
@@ -758,16 +759,16 @@ class DeviceEventProcessor
 
             if (is_array($extra['record'])) {
                 $serial = $extra['serial'] ?? '';
-                if ($serial) {
-                    $order = Order::get($serial, true);
-                    if (empty($order)) {
-                        Log::warning('charging', $extra);
-                    } else {
-                        $record = $extra['record'];
-                        $order->setExtraData('charging.record', $record);
-                        $order->setPrice($record['totalPrice'] * 100);
-                        $order->save();
-                    }
+                $chargerID = intval($extra['chargerID']);
+
+                $res = Charging::settle($serial, $chargerID, $extra['record']);
+                if (is_error($res)) {
+                    Log::error('charging', [
+                        'serial' => $serial,
+                        'chargerID' => $chargerID,
+                        'data' => $extra['record'],
+                        'error' => $res,
+                    ]);
                 }
             }
         }

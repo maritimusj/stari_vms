@@ -398,6 +398,20 @@ class api
             $data['balance'] = $user->getBalance()->total();
         }
 
+        if (App::isChargingDeviceEnabled()) {
+            $last_charging_data = $user->settings('extra.charging', []);
+            if ($last_charging_data) {
+                $device = Device::get($last_charging_data['device']);
+                if ($device) {
+                    $chargerData = $device->getChargerData($last_charging_data['chargerID']);
+                    if ($chargerData) {
+                        $last_charging_data['status'] = $chargerData;
+                    }
+                }
+                $data['charging'] = $last_charging_data;
+            }
+        }
+
         return $data;
     }
 

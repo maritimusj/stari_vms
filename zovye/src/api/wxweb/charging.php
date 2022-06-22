@@ -127,7 +127,7 @@ class charging
         return $list;
     }
 
-    public static function deviceDetail()
+    public static function deviceDetail(): array
     {
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
@@ -178,14 +178,14 @@ class charging
         return IotCharging::stop($user);
     }
 
-    public static function orderStatus()
+    public static function orderStatus(): array
     {
         $serial = request::str('serial');
 
         return IotCharging::orderStatus($serial);
     }
 
-    public static function status()
+    public static function status(): array
     {
         $user = common::getUser();
         $last_charging_data = $user->settings('extra.charging', []);

@@ -100,14 +100,16 @@ class Charging
                 return err('创建订单失败！');
             }
 
-            $device->setChargerProperty($chargerID, 'timeTotal', 0);
-            $device->setChargerProperty($chargerID, 'timeRemain', 0);
-            $device->setChargerProperty($chargerID, 'chargedKWH', 0);
-            $device->setChargerProperty($chargerID, 'priceTotal', 0);
-            $device->setChargerProperty($chargerID, 'outputVoltage', 0);
-            $device->setChargerProperty($chargerID, 'outputCurrent', 0);
-            $device->setChargerProperty($chargerID, 'soc', 0);
-    
+            $device->setChargerProperty($chargerID, [
+                'timeTotal' => 0,
+                'timeRemain' => 0,
+                'chargedKWH' => 0,
+                'priceTotal' => 0,
+                'outputVoltage' => 0,
+                'outputCurrent' => 0,
+                'soc' => 0,
+            ]);
+
             if (!$device->updateSettings("extra.charging.$chargerID", [
                 'serial' => $serial,
                 'user' => $user->getId(),
@@ -279,13 +281,15 @@ class Charging
             return self::end($serial, $chargerID, function (orderModelObj $order) use ($result) {
                 $order->setChargingResult($result);
             });            
-        } else {
-            $order = Order::get($serial, true);
-            if ($order) {
-                $order->setChargingResult($result);
-                $order->save();
-            }
         }
+
+        $order = Order::get($serial, true);
+        if ($order) {
+            $order->setChargingResult($result);
+            return $order->save();
+        }
+
+        return false;
     }
 
     public static function settle(string $serial, int $chargerID, array $record)

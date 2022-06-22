@@ -107,7 +107,10 @@ class Charging
                 'priceTotal' => 0,
                 'outputVoltage' => 0,
                 'outputCurrent' => 0,
+                'batteryMaxTemp' => 0,
+                'chargerWireTemp' => 0,
                 'soc' => 0,
+                'error' => 0,
             ]);
 
             if (!$device->updateSettings("extra.charging.$chargerID", [

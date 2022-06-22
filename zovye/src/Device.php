@@ -667,7 +667,9 @@ class Device extends State
 
         //删除关联的营运人员
         foreach ($device->getKeepers() as $keeper) {
-            $device->removeKeeper($keeper);
+            if (!$device->removeKeeper($keeper)) {
+                return false;
+            }
         }
 
         return self::refresh($device);
@@ -713,7 +715,6 @@ class Device extends State
 
         if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
             $device->appNotify('update');
-
             return true;
         }
 

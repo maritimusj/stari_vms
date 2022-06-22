@@ -107,9 +107,9 @@ class Group
                     }
                 }
                 if ($max - $min < 0.001) {
-                    $data['tips'] = sprintf("¥ %.04f /kW.h", $max);
+                    $data['tips'] = sprintf("¥ %.04f /度", $max);
                 } else {
-                    $data['tips'] = sprintf("¥ %.04f - %.04f /kW.h", $min, $max);
+                    $data['tips'] = sprintf("¥ %.04f - %.04f /度", $min, $max);
                 }
             }
         }

@@ -399,7 +399,7 @@ class api
         }
 
         if (App::isChargingDeviceEnabled()) {
-            $last_charging_data = $user->settings('extra.charging', []);
+            $last_charging_data = $user->settings('chargingNOW', []);
             if ($last_charging_data) {
                 $device = Device::get($last_charging_data['device']);
                 if ($device) {

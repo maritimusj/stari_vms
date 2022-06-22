@@ -227,10 +227,8 @@ if ($op == 'default') {
 
             if ($commission_enabled) {
                 $total = $user->getCommissionBalance()->total();
-                if ($user->isAgent() || $user->isGSPor() || $user->isKeeper() || $user->isPartner()) {
-                    $data['commission_balance'] = $total;
-                    $data['commission_balance_formatted'] = number_format($total / 100, 2);
-                }
+                $data['commission_balance'] = $total;
+                $data['commission_balance_formatted'] = number_format($total / 100, 2);
             }
 
             if ($balance_enabled) {

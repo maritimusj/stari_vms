@@ -188,7 +188,7 @@ class charging
     public static function status(): array
     {
         $user = common::getUser();
-        $last_charging_data = $user->settings('extra.charging', []);
+        $last_charging_data = $user->settings('chargingNOW', []);
 
         if (isEmptyArray($last_charging_data)) {
             return err('没有发现正在充电的设备！');

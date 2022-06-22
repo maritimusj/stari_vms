@@ -33,7 +33,7 @@ class Charging
                 return err('锁定设备失败，请稍后再试！');
             }
     
-            $device_charging_data = $device->settings("extra.charging.$chargerID", []);
+            $device_charging_data = $device->settings("chargingNOW.$chargerID", []);
             if ($device_charging_data) {
                 if ($device_charging_data['user'] != $user->getId()) {
                     return err('设备正忙，请稍后再试！');
@@ -48,7 +48,7 @@ class Charging
                 return err('用户锁定失败，请稍后再试！');
             }
     
-            $user_charging_data = $user->settings('extra.charging', []);
+            $user_charging_data = $user->settings('chargingNOW', []);
             if ($user_charging_data) {
                 if ($user_charging_data['device'] != $device->getId()) {
                     return err('用户卡正在使用中，请稍后再试！');
@@ -113,7 +113,7 @@ class Charging
                 'error' => 0,
             ]);
 
-            if (!$device->updateSettings("extra.charging.$chargerID", [
+            if (!$device->updateSettings("chargingNOW.$chargerID", [
                 'serial' => $serial,
                 'user' => $user->getId(),
                 'time' => TIMESTAMP,
@@ -121,7 +121,7 @@ class Charging
                 return err('保存数据失败！');
             }
             
-            if (!$user->updateSettings('extra.charging', [
+            if (!$user->updateSettings('chargingNOW', [
                 'serial' => $serial,
                 'device' => $device->getId(),
                 'chargerID' => $chargerID,
@@ -149,7 +149,7 @@ class Charging
 
     public static function stop(userModelObj $user)
     {
-        $last_charging_data = $user->settings('extra.charging', []);
+        $last_charging_data = $user->settings('chargingNOW', []);
 
         if (isEmptyArray($last_charging_data)) {
             return err('没有发现正在充电的设备！');
@@ -166,7 +166,7 @@ class Charging
 
         $chargerID = $last_charging_data['chargerID'];
 
-        $last_charging_data = $device->settings("extra.charging.$chargerID", []);
+        $last_charging_data = $device->settings("chargingNOW.$chargerID", []);
         if ($last_charging_data && $last_charging_data['user'] != $user->getId()) {
             return err('其他用户正在使用当前设备！');
         }
@@ -224,7 +224,7 @@ class Charging
         return ['status' => $status];
     }
 
-    protected static function end(string $serial, int $chargerID, callable $cb)
+    public static function end(string $serial, int $chargerID, callable $cb)
     {
         return Util::transactionDo(function() use($serial, $chargerID, $cb) {
             $order = Order::get($serial, true);
@@ -241,12 +241,12 @@ class Charging
                 return err('设备正忙，请稍后再试！');
             }
 
-            $deviceChargingData = $device->settings("extra.charging.$chargerID", []);
-            if ($deviceChargingData && $deviceChargingData['serial'] == $serial) {
-                $device->updateSettings("extra.charging.$chargerID", []);
-                if (!$device->save()) {
-                    return err('保存数据失败！');
-                }
+            if ($device->settings("chargingNOW.$chargerID.serial", '') == $serial) {
+                $device->updateSettings("chargingNOW.$chargerID", []);
+            }
+
+            if (!$device->save()) {
+                return err('保存数据失败！');
             }
 
             $user = $order->getUser();
@@ -258,8 +258,8 @@ class Charging
                 return err('用户锁定失败，请稍后再试！');
             }
 
-            if ($user->settings('extra.charging.serial', '') == $serial) {
-                $user->updateSettings('extra.charging', []);
+            if ($user->settings('chargingNOW.serial', '') == $serial) {
+                $user->updateSettings('chargingNOW', []);
             }
 
             if (!$user->save()) {

@@ -149,13 +149,13 @@ class balance
                 $config = settings('commission.withdraw.fee', []);
                 if ($config) {
                     if (isset($config['permille'])) {
-                        $permille = intval($config['permille']);
+                        $ratio = intval($config['permille']);
                     } else {
-                        $permille = intval($config['percent']) * 10;
+                        $ratio = intval($config['percent']) * 10;
                     }
 
-                    if ($permille > 0) {
-                        $fee = intval(round($amount * $permille / 1000));
+                    if ($ratio > 0) {
+                        $fee = intval(round($amount * $ratio / 1000));
 
                         if (!empty($config['min']) && $fee < $config['min']) {
                             $fee = intval($config['min']);

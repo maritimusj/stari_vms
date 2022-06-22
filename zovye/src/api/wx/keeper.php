@@ -464,9 +464,14 @@ class keeper
 
             if ($agent->isPaymentConfigEnabled()) {
                 return error(State::ERROR, '提现申请被拒绝，请联系代理商！');
+              }
+
+            $total =  round(request::float('amount', 0, 2) * 100);
+            if ($total < 1) {
+                return error(State::ERROR, '提现金额不正确！');
             }
 
-            return balance::balanceWithdraw($user, round(request('amount') * 100));
+            return balance::balanceWithdraw($user, $total);
         }
 
         return error(State::ERROR, '提现失败，请联系客服！');

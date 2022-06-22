@@ -12,9 +12,9 @@ defined('IN_IA') or exit('Access Denied');
 if (request::is_post()) {
     Log::debug('weisure', [
         'raw' => request::raw(),
-        'userAction' => request::json('userAction'),
-        'actionTime' => request::json('actionTime'),
-        'outerUserId' => request::json('outerUserId'),
+        'userAction' => request::json('userAction', ''),
+        'actionTime' => request::json('actionTime', ''),
+        'outerUserId' => request::json('outerUserId', ''),
     ]);
 
     if (App::isWeiSureEnabled()) {

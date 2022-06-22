@@ -239,7 +239,7 @@ class orderModelObj extends modelObj
 
     public function getChargingResult()
     {
-        return $this->setExtraData('charging.result', []);
+        return $this->getExtraData('charging.result', []);
     }
 
     public function setChargingRecord($record)
@@ -250,6 +250,11 @@ class orderModelObj extends modelObj
     public function getChargingRecord()
     {
         return $this->getExtraData('charging.record', []);
+    }
+
+    public function getChargerID()
+    {
+        return $this->getExtraData('chargingID', 0);
     }
 
     public function isChargingFinished(): bool

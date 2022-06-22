@@ -127,6 +127,32 @@ class charging
         return $list;
     }
 
+    public static function deviceDetail()
+    {
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        if (!$device->isChargingDevice()) {
+            return err('这个设备不是充电桩！');
+        }
+
+        $result = $device->profile();
+        $result['chargerNum'] = $device->getChargerNum();
+        
+        if (request::has('chargerID')) {
+            $result['charger'] = $device->getChargerData(request::int('chargerID'));
+        }
+        
+        $group = $device->getGroup();
+        if ($group) {
+            $result['group'] = $group->format();
+        }
+
+        return $result;
+    }
+
     public static function start()
     {
         $user = common::getUser();
@@ -148,14 +174,28 @@ class charging
         if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
             return err('用户锁定失败，请稍后再试！');
         }
+        
         return IotCharging::stop($user);
     }
 
-    public static function stats()
+    public static function orderStatus()
+    {
+        $serial = request::str('serial');
+
+        return IotCharging::orderStatus($serial);
+    }
+
+    public static function status()
     {
         $user = common::getUser();
-        
-        return IotCharging::stats($user);
+        $last_charging_data = $user->settings('extra.charging', []);
+
+        if (isEmptyArray($last_charging_data)) {
+            return err('没有发现正在充电的设备！');
+        }
+
+        $serial = $last_charging_data['serial'];
+        return ['serial' => $serial];
     }
 
 }

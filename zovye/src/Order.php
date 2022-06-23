@@ -756,6 +756,15 @@ class Order extends State
                     if ($group) {
                         $data['group'] = $group;
                         $data['charging'] = $order->getExtraData('charging', []);
+                        if (!$order->isChargingFinished()) {
+                            $device = $order->getDevice();
+                            if ($device) {
+                                $chargerID = $order->getChargerID();
+                                if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
+                                    $data['charging']['status'] = $device->getChargerData($chargerID);
+                                }                                
+                            }
+                        }
                     }
                 }
             }

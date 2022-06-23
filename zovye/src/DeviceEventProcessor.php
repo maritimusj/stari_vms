@@ -632,7 +632,6 @@ class DeviceEventProcessor
         $device = Device::get($data['uid'], true);
         if ($device) {
             if ($device->isChargingDevice()) {
-                
                 $extra = (array)$data['extra'];
                 $res = Charging::setResult($extra['ser'], $extra['re'], $extra);
                 if (is_error($res)) {
@@ -768,6 +767,11 @@ class DeviceEventProcessor
                         'chargerID' => $chargerID,
                         'data' => $extra['record'],
                         'error' => $res,
+                    ]);
+                } else {
+                    Log::info('charging', [
+                        'data' => $extra,
+                        'res' => $res,
                     ]);
                 }
             }

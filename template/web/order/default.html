@@ -31,6 +31,9 @@
     #orderlist .price {
         font-weight: bolder;
     }
+    #orderlist .charging {
+        color: #4caf50;
+    }
     a[filter] {
         cursor: pointer;
     }
@@ -279,8 +282,7 @@
                                 </div>
                                 {if $order['charging']['record']['total']}
                                 <div>
-                                    <i class="fa fa-bolt"></i>
-                                    总电量：<strong>{$order['charging']['record']['total']}</strong> 度
+                                    <i class="fa fa-bolt"></i> 总耗电量：<strong>{$order['charging']['record']['total']}</strong> 度
                                 </div>
                                 {/if}
                                 {if $order['charging']['record']['start']}
@@ -302,12 +304,34 @@
                                 </div>
                                 {/if}
                             {else}
-                                {if $order['charging']['result']['re'] != 3}
+                                {if $order['charging']['result']['re'] == 3}
+                                {if $order['charging']['status']}
+                                    <div class="charging">
+                                        <i class="fa fa-share-alt"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? '?'}
+                                    </div>
+                                    <div class="charging">
+                                        <i class="fa fa-bolt"></i> 已用时间：<strong>{php echo $order['charging']['status']['chargedKWH']}</strong> 度
+                                    </div>
+                                    <div class="charging">
+                                        <i class="fa fa-clock-o"></i> 已用时间：<strong>{php echo $order['charging']['status']['timeTotal']}</strong> 分钟
+                                    </div>
+                                    <div class="charging">
+                                        <i class="fa fa-clock-o"></i> 剩余时间：<strong>{php echo $order['charging']['status']['timeRemain']}</strong> 分钟
+                                    </div>
+                                    <div class="charging">
+                                        <i class="fa fa fa-ellipsis-h"></i> 电池电量：<strong>{php echo $order['charging']['status']['soc']}</strong> %
+                                    </div>
+                                {/if}
+                                {elseif $order['charging']['result']}
                                 <div>
                                     <i class="fa fa-share-alt"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? '?'}
                                 </div>
                                 <div>
                                     <i class="fa fa-info-circle"></i> 设备故障：[{php echo $order['charging']['result']['re']??'n/a'}]
+                                </div>
+                                {else}
+                                <div>
+                                    <i class="fa fa-info-circle"></i> 未知状态
                                 </div>
                                 {/if}
                             {/if}

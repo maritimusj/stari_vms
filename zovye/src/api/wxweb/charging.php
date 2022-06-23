@@ -209,7 +209,10 @@ class charging
     {
         $user = common::getUser();
 
-        $query = Order::query(['src' => Order::CHARGING]);
+        $query = Order::query([
+            'src' => Order::CHARGING,
+            'openid' => $user->getOpenid(),
+        ]);
 
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);

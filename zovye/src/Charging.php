@@ -285,12 +285,14 @@ class Charging
         if ($result['re'] != 3) {
             return self::end($serial, $chargerID, function (orderModelObj $order) use ($result) {
                 $order->setChargingResult($result);
-            });            
+            });
         }
 
+        /** @var orderModelObj $order */
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
+            $order->setResultCode($result['re']);
             return $order->save();
         }
 

@@ -212,6 +212,7 @@ class charging
         $query = Order::query([
             'src' => Order::CHARGING,
             'openid' => $user->getOpenid(),
+            'result_code' => 3,
         ]);
 
         $page = max(1, request::int('page'));

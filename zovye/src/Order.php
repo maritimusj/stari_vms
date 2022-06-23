@@ -755,7 +755,7 @@ class Order extends State
                     $group = $order->getExtraData('group');
                     if ($group) {
                         $data['group'] = $group;
-                        $data['charging'] = $order->getExtraData('charging.record', []);
+                        $data['charging'] = $order->getExtraData('charging', []);
                     }
                 }
             }

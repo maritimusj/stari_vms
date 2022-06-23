@@ -18,3 +18,8 @@ if (!We7::pdo_fieldexists($tb_name.'_user', 's1')) {
 SQL;
     Migrate::execSQL($sql);
 }
+
+    $sql = <<<SQL
+ALTER TABLE `ims_zovye_vms_order` CHANGE `order_id` `order_id` VARCHAR(64) NOT NULL;
+SQL;
+    Migrate::execSQL($sql);

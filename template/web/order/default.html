@@ -206,9 +206,14 @@
                     <td>{php echo $index + 1}</td>
                     <td>
                         {if $order['group']}
-                        <div class="transactionId">
-                            <img src="{MODULE_URL}static/img/charging.svg" class="balance">{$order['orderId']}                      
+                        <div class="transactionId" title="充电桩订单编号">
+                            <img src="{MODULE_URL}static/img/charging.svg" class="balance">{$order['orderId']}                   
                         </div>
+                            {if $order['charging']['record']['VIN']}
+                        <div class="orderId" title="VIN">
+                            <i class="fa fa-car"></i> {php echo $order['charging']['record']['VIN']}
+                        </div>
+                            {/if}
                         {else}
                         {if $order['price']>0}    
                         <div class="transactionId {$order['src']}">
@@ -268,30 +273,44 @@
                         {elseif $order['group']}
                         {if $order['group']}
                         <div class="charging-ts">
-                            {if $order['charging']['total']}
-                            <div>
-                                <i class="fa fa-bolt"></i>
-                                总电量：<strong>{$order['charging']['total']}</strong> kW.H
-                            </div>
+                            {if $order['charging']['record']}
+                                <div>
+                                    <i class="fa fa-share-alt"></i> 充电枪号：{$order['charging']['record']['chargerID']}
+                                </div>
+                                {if $order['charging']['record']['total']}
+                                <div>
+                                    <i class="fa fa-bolt"></i>
+                                    总电量：<strong>{$order['charging']['record']['total']}</strong> 度
+                                </div>
+                                {/if}
+                                {if $order['charging']['record']['start']}
+                                <div>
+                                    <i class="fa fa-clock-o"></i>
+                                    开始时间：{php echo date('Y-m-d H:i:s', $order['charging']['record']['start'])}
+                                </div>
+                                {/if}
+                                {if $order['charging']['record']['end']}
+                                <div>
+                                    <i class="fa fa-clock-o"></i>
+                                    结束时间：{php echo date('Y-m-d H:i:s', $order['charging']['record']['end'])}
+                                </div>
+                                {/if}
+                                {if empty($order['charging']['record']['start']) && $order['charging']['record']['createdAt']}
+                                <div>
+                                    <i class="fa fa-clock-o"></i>
+                                    创建时间：{php echo date('Y-m-d H:i:s', $order['charging'['record']]['createdAt'])}
+                                </div>
+                                {/if}
+                            {else}
+                                {if $order['charging']['result']['re'] != 3}
+                                <div>
+                                    <i class="fa fa-share-alt"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? '?'}
+                                </div>
+                                <div>
+                                    <i class="fa fa-info-circle"></i> 设备故障：[{php echo $order['charging']['result']['re']??'n/a'}]
+                                </div>
+                                {/if}
                             {/if}
-                            {if $order['charging']['start']}
-                            <div>
-                                <i class="fa fa-clock-o"></i>
-                                开始时间：{php echo date('Y-m-d H:i:s', $order['charging']['start'])}
-                            </div>
-                            {/if}
-                            {if $order['charging']['end']}
-                            <div>
-                                <i class="fa fa-clock-o"></i>
-                                结束时间：{php echo date('Y-m-d H:i:s', $order['charging']['end'])}
-                            </div>
-                            {/if}
-                            {if empty($order['charging']['start']) && $order['charging']['createdAt']}
-                            <div>
-                                <i class="fa fa-clock-o"></i>
-                                创建时间：{php echo date('Y-m-d H:i:s', $order['charging']['createdAt'])}
-                            </div>
-                            {/if}                          
                         </div>
                         {/if}
                         {/if}

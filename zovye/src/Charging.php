@@ -38,10 +38,12 @@ class Charging
                 if ($device_charging_data['user'] != $user->getId()) {
                     return err('设备正忙，请稍后再试！');
                 }
-                $order = Order::get($device_charging_data['serial'], true);
+
+                $serial = $device_charging_data['serial'];
+                $order = Order::get($serial, true);
                 if ($order && !$order->isChargingFinished()) {
                     return err('正在充电中！');
-                }                
+                }
             }
 
             if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
@@ -75,7 +77,7 @@ class Charging
                 'name' => $group->getName(),
                 'goods_id' => $group->getId(),
                 'num' => 1,
-                'price' => -1,
+                'price' => 0,
                 'account' => empty($acc) ? '' : $acc->name(),
                 'ip' => Util::getClientIp(),
                 'extra' => [
@@ -242,7 +244,7 @@ class Charging
             }
 
             if ($device->settings("chargingNOW.$chargerID.serial", '') == $serial) {
-                $device->updateSettings("chargingNOW.$chargerID", []);
+                $device->removeSettings('chargingNOW', $chargerID);
             }
 
             if (!$device->save()) {
@@ -259,7 +261,7 @@ class Charging
             }
 
             if ($user->settings('chargingNOW.serial', '') == $serial) {
-                $user->updateSettings('chargingNOW', []);
+                $user->remove('chargingNOW');
             }
 
             if (!$user->save()) {

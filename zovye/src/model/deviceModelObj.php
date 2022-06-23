@@ -2978,6 +2978,6 @@ class deviceModelObj extends modelObj
             'index' => $index,
         ]);
 
-        return sprintf('%s%02d%04d', $this->imei, $chargerID, $index);
+        return sprintf('%s%02d%s%04d', $this->imei, $chargerID, date('Ymd'), $index);
     }
 }

@@ -4,7 +4,6 @@ namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
 use zovye\Charging as IotCharging;
-use zovye\ChargingServ;
 use zovye\Device;
 use zovye\Group;
 use zovye\model\device_groupsModelObj;
@@ -196,6 +195,57 @@ class charging
 
         $serial = $last_charging_data['serial'];
         return ['serial' => $serial];
+    }
+
+    public static function orderList(): array
+    {
+        $user = common::getUser();
+
+        $query = Order::query(['src' => Order::CHARGING]);
+
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+        $keywords = request::trim('keywords');
+        if ($keywords) {
+            $query->where(['order_id REGEXP' => $keywords]);
+        }
+
+        $list = [];
+        foreach($query->findAll() as $order) {
+            $list[] = Order::format($order);
+        }
+
+        return $list;
+    }
+
+    public static function orderDetail(): array
+    {
+        $user = common::getUser();
+
+        $serial = request::str('serial');
+
+        $order = Order::get($serial, true);
+        if (empty($order)) {
+            return err('找不到这个订单！');
+        }
+
+        $orderOwner = $order->getUser();
+        if ($orderOwner && $orderOwner->getId() != $user->getId()) {
+            return err('无法查看该订单！');
+        }
+
+        if (!$order->isChargingResultOk()) {
+            $data = $order->getChargingResult();
+            return err('订单没有完成，故障：' . $data['re']);
+        }
+
+        if (!$order->isChargingFinished()) {
+            return err('订单没有完成！');
+        }
+
+        $result = Order::format($order, true);
+        return $result;
     }
 
 }

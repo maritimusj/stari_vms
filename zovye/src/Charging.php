@@ -184,7 +184,7 @@ class Charging
         return '已通知设备停止，请稍候！';
     }
 
-    public static function orderStatus($serial)
+    public static function orderStatus($serial): array
     {
         $order = Order::get($serial, true);
         if (empty($order)) {

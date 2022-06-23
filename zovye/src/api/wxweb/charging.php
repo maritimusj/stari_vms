@@ -105,6 +105,14 @@ class charging
             ]);
         }
 
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+        //列表数据
+        $query->page($page, $page_size);
+
+        $query->orderby('id desc');
+
         $list = [];
         /** @var deviceModelObj $device */
         foreach ($query->findAll() as $device) {
@@ -206,14 +214,19 @@ class charging
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
+        //列表数据
+        $query->page($page, $page_size);
+
         $keywords = request::trim('keywords');
         if ($keywords) {
             $query->where(['order_id REGEXP' => $keywords]);
         }
 
+        $query->orderby('id desc');
+
         $list = [];
         foreach($query->findAll() as $order) {
-            $list[] = Order::format($order);
+            $list[] = Order::format($order, true);
         }
 
         return $list;

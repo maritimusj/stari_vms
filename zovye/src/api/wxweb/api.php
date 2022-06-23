@@ -403,12 +403,16 @@ class api
             if ($last_charging_data) {
                 $device = Device::get($last_charging_data['device']);
                 if ($device) {
-                    $chargerData = $device->getChargerData($last_charging_data['chargerID']);
+                    $chargerID = $last_charging_data['chargerID'];
+                    $data['charging'] = [
+                        'device' => $device->profile(),
+                        'chargerID' =>  $chargerID,
+                    ];
+                    $chargerData = $device->getChargerData($chargerID);
                     if ($chargerData) {
-                        $last_charging_data['status'] = $chargerData;
+                        $data['charging']['status'] = $chargerData;
                     }
                 }
-                $data['charging'] = $last_charging_data;
             }
         }
 

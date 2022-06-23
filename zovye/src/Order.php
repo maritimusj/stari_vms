@@ -756,6 +756,7 @@ class Order extends State
                     if ($group) {
                         $data['group'] = $group;
                         $data['charging'] = $order->getExtraData('charging', []);
+                        $data['charging']['chargerID'] = $order->getChargerID();
                         if (!$order->isChargingFinished()) {
                             $device = $order->getDevice();
                             if ($device) {
@@ -786,6 +787,7 @@ class Order extends State
                 $data['device'] = [
                     'id' => $device_obj->getId(),
                     'name' => $device_obj->getName(),
+                    'imei' => $device_obj->getImei(),
                     'type' => $device_obj->getDeviceType(),
                     'qrcode' => $device_obj->getQrcode(),
                     'address' => $device_obj->getAddress(),

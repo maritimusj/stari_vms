@@ -633,7 +633,7 @@ class DeviceEventProcessor
         if ($device) {
             if ($device->isChargingDevice()) {
                 $extra = (array)$data['extra'];
-                $res = Charging::setResult($extra['ser'], $extra['re'], $extra);
+                $res = Charging::setResult($extra['ser'], $extra['ch'], $extra);
                 if (is_error($res)) {
                     Log::error('charging', [
                         'data' => $data,
@@ -746,6 +746,10 @@ class DeviceEventProcessor
             if (is_array($extra['status'])) {
                 $chargerID = $extra['chargerID'];
                 $device->setChargerData($chargerID, $extra['status']);
+                if ($extra['status'] == 2) {
+                    //空闲
+                    Charging::checkCharging($device, $chargerID);
+                }
             }
 
             if (is_array($extra['BMS'])) {

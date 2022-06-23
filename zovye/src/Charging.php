@@ -306,4 +306,19 @@ class Charging
             $order->setPrice($record['totalPrice'] * 100);
         });
     }
+
+    public static function checkCharging(deviceModelObj $device, $chargerID)
+    {
+        $charging_data = $device->settings("chargingNOW.$chargerID", []);
+        if ($charging_data) {
+            $serial = $charging_data['serial'];
+            $order = Order::get($serial, true);
+            if ($order) {
+                $res = ChargingServ::getChargingRecord($serial);
+                if ($res && !is_error($res) && isset($res['totalPrice'])) {
+                    Charging::settle($serial, $chargerID, $res);
+                }
+            }
+        }
+    }
 }

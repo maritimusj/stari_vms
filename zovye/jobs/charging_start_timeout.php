@@ -10,7 +10,6 @@ namespace zovye\job\chargingTimeout;
 use zovye\Charging;
 use zovye\CtrlServ;
 use zovye\Device;
-use zovye\Job;
 use zovye\Log;
 
 use zovye\Order;
@@ -33,7 +32,7 @@ $params = [
 ];
 
 $op = request::op('default');
-if ($op == 'charging_timeout' && CtrlServ::checkJobSign($params)) {
+if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
     $order = Order::get($uid, true);
     if ($order) {
         $result = $order->getChargingResult();
@@ -75,4 +74,4 @@ if ($op == 'charging_timeout' && CtrlServ::checkJobSign($params)) {
 }
 
 $params['time_formatted'] = date('Y-m-d H:i:s', $params['time']);
-Log::debug('charging_timeout', $params);
+Log::debug('charging_start_timeout', $params);

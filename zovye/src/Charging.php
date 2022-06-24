@@ -145,7 +145,7 @@ class Charging
                 return err('设备通信失败！');
             }
 
-            Job::chargingTimeout($serial, $chargerID, $device->getId(), $user->getId(), $order->getId());
+            Job::chargingStartTimeout($serial, $chargerID, $device->getId(), $user->getId(), $order->getId());
 
             return [
                 'serial' => $serial,
@@ -182,6 +182,8 @@ class Charging
             return err('其他用户正在使用当前设备！');
         }
 
+        $serial = $last_charging_data['serial'];
+
         if (!$device->mcbNotify('config', '', [
             "req" => "stop",
             "ch" => $chargerID,
@@ -189,6 +191,8 @@ class Charging
         ])) {
             return err('设备通信失败，请重试！');
         }
+
+        Job::chargingStopTimeout($serial);
 
         return '已通知设备停止，请稍候！';
     }

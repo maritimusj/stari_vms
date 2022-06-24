@@ -313,19 +313,31 @@ class Job
         return false;
     }
 
-    public static function chargingTimeout(
+    public static function chargingStartTimeout(
         $serial,
         $chargerID,
-        $deviceId,
-        $userId,
-        $orderId
+        $device_id,
+        $user_id,
+        $order_id
     ): bool {
-        if (CtrlServ::scheduleDelayJob('charging_timeout', [
+        if (CtrlServ::scheduleDelayJob('charging_start_timeout', [
                 'uid' => $serial,
                 'chargerID' => $chargerID,
-                'device' => $deviceId,
-                'user' => $userId,
-                'order' => $orderId,
+                'device' => $device_id,
+                'user' => $user_id,
+                'order' => $order_id,
+                'time' => time(),
+            ], 60) !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function chargingStopTimeout($serial): bool
+    {
+        if (CtrlServ::scheduleDelayJob('charging_stop_timeout', [
+                'uid' => $serial,
                 'time' => time(),
             ], 60) !== false) {
             return true;

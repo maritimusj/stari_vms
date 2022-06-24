@@ -758,6 +758,10 @@ class DeviceEventProcessor
                 $serial = $extra['serial'] ?? '';
                 if ($serial) {
                     $chargerID = $extra['chargerID'];
+
+                    $extra['BMS']['serial'] = $serial;
+                    $extra['BMS']['chargerID'] = $chargerID;
+
                     $device->setChargerBMSData($chargerID, $extra['BMS']);
                 }
             }

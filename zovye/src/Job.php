@@ -9,6 +9,7 @@ namespace zovye;
 use DateTimeImmutable;
 use zovye\model\agentModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 
 class Job
@@ -306,6 +307,20 @@ class Job
     public static function refreshSettings(): bool
     {
         if (CtrlServ::scheduleJob('refresh_settings') !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function chargingTimeout(deviceModelObj $device, userModelObj $user, orderModelObj $order): bool
+    {
+        if (CtrlServ::scheduleDelayJob('charging_timeout', [
+                'device' => $device->getId(),
+                'user' => $user->getId(),
+                'order' => $order->getId(),
+                'time' => time(),
+            ], 60) !== false) {
             return true;
         }
 

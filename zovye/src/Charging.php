@@ -116,6 +116,8 @@ class Charging
                 'timestamp' => 0,
             ]);
 
+            $device->setChargerBMSData($chargerID, []);
+
             if (!$device->updateSettings("chargingNOW.$chargerID", [
                 'serial' => $serial,
                 'user' => $user->getId(),
@@ -142,6 +144,8 @@ class Charging
             ])) {
                 return err('设备通信失败！');
             }
+
+            Job::chargingTimeout($device, $user, $order);
     
             return [
                 'serial' => $serial,

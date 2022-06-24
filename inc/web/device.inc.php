@@ -1089,6 +1089,7 @@ HTML;
 
     if ($device->isChargingDevice()) {
         unset($tpl_data['navs']['payload']);
+        unset($tpl_data['navs']['log']);
     }
 
     $tpl_data['media'] = [
@@ -1269,6 +1270,7 @@ HTML;
 
     if ($device->isChargingDevice()) {
         unset($tpl_data['navs']['payload']);
+        unset($tpl_data['navs']['log']);
     }
 
     $query = $device->logQuery();
@@ -1420,6 +1422,7 @@ HTML;
 
     if ($device->isChargingDevice()) {
         unset($tpl_data['navs']['payload']);
+        unset($tpl_data['navs']['log']);
     }
 
     $tpl_data['events'] = $events;

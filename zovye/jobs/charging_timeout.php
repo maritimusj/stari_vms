@@ -10,13 +10,13 @@ namespace zovye\job\chargingTimeout;
 use zovye\Charging;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Job;
 use zovye\Log;
 
 use zovye\Order;
 use zovye\request;
 
-
-$serial = request::str('serial');
+$uid = request::str('uid');
 $chargerID = request::int('chargerID');
 $device_id = request::int('device');
 $user_id = request::int('user');
@@ -24,7 +24,7 @@ $order_id = request::int('order');
 $time = request::int('time');
 
 $params = [
-    'serial' => $serial,
+    'uid' => $uid,
     'chargerID' => $chargerID,
     'device' => $device_id,
     'user' => $user_id,
@@ -34,21 +34,23 @@ $params = [
 
 $op = request::op('default');
 if ($op == 'charging_timeout' && CtrlServ::checkJobSign($params)) {
-    $order = Order::get($serial, true);
+    $order = Order::get($uid, true);
     if ($order) {
         $result = $order->getChargingResult();
         if (empty($result)) {
-            Charging::end($serial, $chargerID, function ($order) {
+            Charging::end($uid, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
-                    'reason' => '没有收到充电结果通知！',
+                    'reason' => '没有收到充电桩结果通知！',
                 ]);
             });
 
             $params['error'] = [
                 'at' => time(),
-                'reason' => '没有收到充电结果通知！',
+                'reason' => '没有收到充电桩结果通知！',
             ];
+        } else {
+            $params['result'] = $result;
         }
     }
 
@@ -56,18 +58,21 @@ if ($op == 'charging_timeout' && CtrlServ::checkJobSign($params)) {
     if ($device) {
         $data = $device->getChargerBMSData($chargerID);
         if (empty($data)) {
-            Charging::end($serial, $chargerID, function ($order) {
+            Charging::end($uid, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
-                    'reason' => '没有收到充电设备消息反馈！',
+                    'reason' => '没有收到充电桩消息反馈！',
                 ]);
             });
             $params['error'] = [
                 'at' => time(),
-                'reason' => '没有收到充电设备消息反馈！',
+                'reason' => '没有收到充电桩消息反馈！',
             ];
+        } else {
+            $params['BMS'] = $data;
         }
     }
 }
 
+$params['time_formatted'] = date('Y-m-d H:i:s', $params['time']);
 Log::debug('charging_timeout', $params);

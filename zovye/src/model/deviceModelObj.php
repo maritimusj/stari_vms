@@ -365,6 +365,9 @@ class deviceModelObj extends modelObj
 
     public function setChargerData($chargerID, array $data): bool
     {
+        $saved = $this->getChargerData($chargerID, []);
+        $data = array_merge($saved, $data); 
+        
         return $this->updateSettings("charger_$chargerID", $data);
     }
 

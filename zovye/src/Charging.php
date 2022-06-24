@@ -145,7 +145,7 @@ class Charging
                 return err('设备通信失败！');
             }
 
-            Job::chargingTimeout($serial, $chargerID, $device, $user, $order);
+            Job::chargingTimeout($serial, $chargerID, $device->getId(), $user->getId(), $order->getId());
 
             return [
                 'serial' => $serial,
@@ -194,6 +194,23 @@ class Charging
         $order = Order::get($serial, true);
         if (empty($order)) {
             return err('找不到这个订单！');
+        }
+
+        $bms = $order->getExtraData('BMS.status', []);
+        if ($bms && time() - $bms['timestamp'] > 120) {
+            $chargerID = $order->getChargerID();
+            self::end($serial, $chargerID, function($order) {
+                $order->setExtraData('timeout', [
+                    'at' => time(),
+                    'reason' => '充电枪上报数据超时！',
+                ]);
+            });
+            return err('充电枪上报数据超时！');
+        }
+
+        $timeout = $order->getExtraData('timeout', []);
+        if ($timeout) {
+            return err($timeout['reason'] ?? '设备响应超时！');
         }
 
         $result = $order->getChargingResult();
@@ -329,6 +346,15 @@ class Charging
                 $res = ChargingServ::getChargingRecord($serial);
                 if ($res && !is_error($res) && isset($res['totalPrice'])) {
                     Charging::settle($serial, $chargerID, $res);
+                }
+                $chargerData = $device->getChargerData($chargerID);
+                if ($chargerData && $chargerData['status'] == 2) {
+                    Charging::end($serial, $chargerID, function($order) {
+                        $order->setExtraData('timeout', [
+                            'at' => time(),
+                            'reason' => '充电枪已进入空闲状态！',
+                        ]);
+                    });
                 }
             } else {
                 $user = User::get($charging_data['user']);

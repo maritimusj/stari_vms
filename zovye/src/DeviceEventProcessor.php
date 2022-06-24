@@ -748,7 +748,7 @@ class DeviceEventProcessor
                 $chargerID = $extra['chargerID'];
                 $extra['status']['timestamp'] = time();
                 $device->setChargerData($chargerID, $extra['status']);
-                if ($extra['status'] == 2) {
+                if ($extra['status']['status'] == 2) {
                     //空闲
                     Charging::checkCharging($device, $chargerID);
                 }
@@ -764,6 +764,8 @@ class DeviceEventProcessor
 
                     $device->setChargerBMSData($chargerID, $extra['BMS']);
 
+                    $extra['BMS']['timestamp'] = time();
+
                     if ($extra['event'] == 'finished') {
                         Charging::end($serial, $chargerID, function($order) use($extra) {
                             $order->setExtraData('BMS.finished', $extra['BMS']);
@@ -772,6 +774,11 @@ class DeviceEventProcessor
                         Charging::end($serial, $chargerID, function($order) use($extra) {
                             $order->setExtraData('BMS.stopped', $extra['BMS']);
                         });
+                    } else {
+                        $order = Order::get($serial, true);
+                        if ($order) {
+                            $order->setExtraData('BMS.status', $extra['BMS']);
+                        }
                     }
                 }
             }
@@ -843,7 +850,7 @@ class DeviceEventProcessor
             if ($device->isChargingDevice()) {
                 $chargerID = $data['chargerID'];
                 $property = [
-                    'last_active' => time(),
+                    'lastActive' => time(),
                 ];
                 if ($data['status'] == 1) {
                     $property['status'] = 1;

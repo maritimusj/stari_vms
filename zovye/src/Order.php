@@ -765,6 +765,11 @@ class Order extends State
                                     $data['charging']['status'] = $device->getChargerData($chargerID);
                                 }                                
                             }
+                        } else {
+                            $timeout = $order->getExtraData('timeout', []);
+                            if ($timeout) {
+                                $data['charging']['timeout'] = $timeout;
+                            }
                         }
                     }
                 }

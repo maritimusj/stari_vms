@@ -259,6 +259,10 @@ class orderModelObj extends modelObj
 
     public function isChargingFinished(): bool
     {
+        if ($this->getExtraData('timeout')) {
+            return true;
+        }
+        
         $result = $this->getChargingResult();
         if ($result && $result['re'] != 3) {
             return true;

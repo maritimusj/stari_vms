@@ -763,6 +763,16 @@ class DeviceEventProcessor
                     $extra['BMS']['chargerID'] = $chargerID;
 
                     $device->setChargerBMSData($chargerID, $extra['BMS']);
+
+                    if ($extra['event'] == 'finished') {
+                        Charging::end($serial, $chargerID, function($order) use($extra) {
+                            $order->setExtraData('BMS.finished', $extra['BMS']);
+                        });
+                    } elseif ($extra['event'] == 'stopped') {
+                        Charging::end($serial, $chargerID, function($order) use($extra) {
+                            $order->setExtraData('BMS.stopped', $extra['BMS']);
+                        });
+                    }
                 }
             }
 

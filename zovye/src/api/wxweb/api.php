@@ -403,14 +403,14 @@ class api
             if ($last_charging_data) {
                 $device = Device::get($last_charging_data['device']);
                 if ($device) {
+                    $serial = $last_charging_data['serial'];
                     $chargerID = $last_charging_data['chargerID'];
-                    $data['charging'] = [
-                        'device' => $device->profile(),
-                        'chargerID' =>  $chargerID,
-                    ];
-                    $chargerData = $device->getChargerData($chargerID);
-                    if ($chargerData) {
-                        $data['charging']['status'] = $chargerData;
+                    $chargerData = $device->getChargerBMSData($chargerID);
+                    if ($chargerData && $chargerData['serial'] == $serial) {
+                        $data['charging'] = [
+                            'device' => $device->profile(),
+                            'status' => $chargerData,
+                        ];
                     }
                 }
             }

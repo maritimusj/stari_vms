@@ -206,18 +206,23 @@ class Charging
             return ['record' => $result];
         }
 
-        $result = ChargingServ::getChargingRecord($serial);
-        if (is_error($result)) {
-            return $result;
+        $stopped = $order->getExtraData('BMS.stopped');
+        if ($stopped) {
+            return ['stopped' => $stopped];
         }
 
-        if (isset($result['totalPrice'])) {
-            $chargerID = $order->getChargerID();
-            self::end($serial, $chargerID, function($order) use($result) {
-                $order->setChargingRecord($result);
-                $order->setPrice($result['totalPrice'] * 100);                   
-            });
-            return ['record' => $result]; 
+        $finished = $order->getExtraData('BMS.finished');
+        if ($finished) {
+            $result = ChargingServ::getChargingRecord($serial);
+            if (!is_error($result) &&  isset($result['totalPrice'])) {
+                $chargerID = $order->getChargerID();
+                self::end($serial, $chargerID, function($order) use($result) {
+                    $order->setChargingRecord($result);
+                    $order->setPrice($result['totalPrice'] * 100);                   
+                });
+                return ['record' => $result]; 
+            }
+            return ['finished' => $finished];
         }
 
         $device = $order->getDevice();
@@ -252,10 +257,6 @@ class Charging
                 $device->removeSettings('chargingNOW', $chargerID);
             }
 
-            if (!$device->save()) {
-                return err('保存数据失败！');
-            }
-
             $user = $order->getUser();
             if (empty($user)) {
                 return err('找不到对应的用户！');
@@ -267,10 +268,6 @@ class Charging
 
             if ($user->settings('chargingNOW.serial', '') == $serial) {
                 $user->remove('chargingNOW');
-            }
-
-            if (!$user->save()) {
-                return err('保存数据失败！');
             }
 
             if ($cb != null) {
@@ -316,13 +313,21 @@ class Charging
     {
         $charging_data = $device->settings("chargingNOW.$chargerID", []);
         if ($charging_data) {
-            $serial = $charging_data['serial'];
+            $serial = $charging_data['serial'] ?? '';
             $order = Order::get($serial, true);
             if ($order) {
                 $res = ChargingServ::getChargingRecord($serial);
                 if ($res && !is_error($res) && isset($res['totalPrice'])) {
                     Charging::settle($serial, $chargerID, $res);
                 }
+            } else {
+                $user = User::get($charging_data['user']);
+                if ($user) {
+                    if ($user->settings('chargingNOW.serial', '') == $serial) {
+                        $user->remove('chargingNOW');
+                    }
+                }
+                $device->updateSettings("chargingNOW.$chargerID", []);
             }
         }
     }

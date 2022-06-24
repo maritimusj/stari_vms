@@ -395,9 +395,11 @@ class deviceModelObj extends modelObj
 
     public function setChargerBMSData($chargerID, array $data): bool
     {
-        $saved = $this->getChargerBMSData($chargerID);
-        $data = array_merge($saved, $data);
-
+        if ($data) {
+            $saved = $this->getChargerBMSData($chargerID);
+            $data = array_merge($saved, $data);            
+        }
+        
         return $this->updateSettings("chargerBMS.$chargerID", $data);
     }
 

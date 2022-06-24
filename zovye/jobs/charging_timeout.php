@@ -44,6 +44,11 @@ if ($op == 'charging_timeout' && CtrlServ::checkJobSign($params)) {
                     'reason' => '没有收到充电结果通知！',
                 ]);
             });
+
+            $params['error'] = [
+                'at' => time(),
+                'reason' => '没有收到充电结果通知！',
+            ];
         }
     }
 
@@ -57,6 +62,10 @@ if ($op == 'charging_timeout' && CtrlServ::checkJobSign($params)) {
                     'reason' => '没有收到充电设备消息反馈！',
                 ]);
             });
+            $params['error'] = [
+                'at' => time(),
+                'reason' => '没有收到充电设备消息反馈！',
+            ];
         }
     }
 }

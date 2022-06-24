@@ -313,9 +313,16 @@ class Job
         return false;
     }
 
-    public static function chargingTimeout(deviceModelObj $device, userModelObj $user, orderModelObj $order): bool
-    {
+    public static function chargingTimeout(
+        $serial,
+        $chargerID,
+        deviceModelObj $device,
+        userModelObj $user,
+        orderModelObj $order
+    ): bool {
         if (CtrlServ::scheduleDelayJob('charging_timeout', [
+                'serial' => $serial,
+                'chargerID' => $chargerID,
                 'device' => $device->getId(),
                 'user' => $user->getId(),
                 'order' => $order->getId(),

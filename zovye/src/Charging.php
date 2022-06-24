@@ -50,6 +50,10 @@ class Charging
                 return err('用户锁定失败，请稍后再试！');
             }
 
+            if (Order::exists(['src' => Order::CHARGING_UNPAID, 'openid' => $user->getOpenid()])) {
+                return err('请等待订单结算完成后再试！');
+            }
+
             $user_charging_data = $user->settings('chargingNOW', []);
             if ($user_charging_data) {
                 if ($user_charging_data['device'] != $device->getId()) {
@@ -69,7 +73,7 @@ class Charging
             $serial = $device->generateChargingSerial($chargerID);
 
             $order_data = [
-                'src' => Order::CHARGING,
+                'src' => Order::CHARGING_UNPAID,
                 'order_id' => $serial,
                 'openid' => $user->getOpenid(),
                 'agent_id' => $device->getAgentId(),
@@ -339,9 +343,22 @@ class Charging
     public static function settle(string $serial, int $chargerID, array $record)
     {
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($record) {
-            $order->setChargingRecord($record);
+            $order->setSrc(Order::CHARGING);
             $order->setPrice($record['totalPrice'] * 100);
+            $order->setChargingRecord($record);
             $order->setExtraData('timeout', []);
+
+            $order->save();
+
+            $device = $order->getDevice();
+            $user = $order->getUser();
+
+            //事件：订单已经创建
+            EventBus::on('device.orderCreated', [
+                'device' => $device,
+                'user' => $user,
+                'order' => $order,
+            ]);
         });
     }
 

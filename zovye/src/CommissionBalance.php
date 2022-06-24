@@ -30,6 +30,8 @@ class CommissionBalance extends State
     const RELOAD_OUT = 11;
     const RELOAD_IN = 12;
 
+    const CHARGING = 20;
+
     protected static $unknown = 'n/a';
 
     protected static $title = [
@@ -45,6 +47,7 @@ class CommissionBalance extends State
         self::ADJUST => '管理员操作',
         self::RELOAD_OUT => '支付补货佣金',
         self::RELOAD_IN => '补货佣金收入',
+        self::CHARGING => '充电桩订单结算',
     ];
 
     private $user;
@@ -244,6 +247,30 @@ $device_info
 <dd class="memo">$memo</dd>
 </dl>
 REALOD_IN;
+        } elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
+            $order_uid = $entry->getExtraData('order');
+            $order = Order::get($order_uid, true);
+            $device_info = '';
+            $group_info = '';
+            if ($order) {
+                $device = $order->getDevice();
+                if ($device) {
+                    $device_info = "<dt>充电桩</dt><dd class=\"admin\">{$device->getName()}</dd>";
+                }
+                $title = $order->getExtraData('group.title', '');
+                $address = $order->getExtraData('group.address', '');
+                $group_info = "<dt>充电站</dt><dd class=\"admin\">$title</dd><dt>地址</dt><dd class=\"admin\">$address</dd>";
+            }
+            $data['memo'] = <<<CHARGING
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">充电桩订单结算</dd>
+<dt>订单</dt>
+<dd class="event">$order_uid</dd>
+$group_info
+$device_info
+</dl>
+CHARGING;
         }
 
         return $data;

@@ -44,6 +44,7 @@ use function zovye\is_error;
  * @method getResultCode()
  * @method isRefund()
  * @method setPrice(float|int $param)
+ * @method setSrc(int $CHARGING)
  */
 class orderModelObj extends modelObj
 {

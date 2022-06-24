@@ -198,7 +198,14 @@ class Charging
 
         $result = $order->getChargingResult();
         if ($result && $result['re'] != 3) {
-            return err("设备故障：{$result['re']}");
+            if ($result['re'] == 112) {
+                return err("启动失败：正在充电中");
+            } elseif ($result['re'] == 113) {
+                return err("启动失败：设备故障");
+            } elseif ($result['re'] == 114) { 
+                return err("启动失败：设备离线");
+            }
+            return err("启动失败：故障[{$result['re']}]");
         }
 
         $result = $order->getChargingRecord();

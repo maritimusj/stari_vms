@@ -667,6 +667,7 @@ class DeviceEventProcessor
     /**
      * v1版本 mcb::report 事件处理
      * @param array $data
+     * @return array|void
      */
     public static function onMcbReport(array $data = [])
     {
@@ -745,6 +746,7 @@ class DeviceEventProcessor
 
             if (is_array($extra['status'])) {
                 $chargerID = $extra['chargerID'];
+                $extra['status']['timestamp'] = time();
                 $device->setChargerData($chargerID, $extra['status']);
                 if ($extra['status'] == 2) {
                     //空闲

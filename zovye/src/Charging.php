@@ -113,6 +113,7 @@ class Charging
                 'chargerWireTemp' => 0,
                 'soc' => 0,
                 'error' => 0,
+                'timestamp' => 0,
             ]);
 
             if (!$device->updateSettings("chargingNOW.$chargerID", [

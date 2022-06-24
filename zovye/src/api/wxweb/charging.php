@@ -177,10 +177,6 @@ class charging
     public static function stop()
     {
         $user = common::getUser();
-
-        if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
-            return err('用户锁定失败，请稍后再试！');
-        }
         
         return IotCharging::stop($user);
     }

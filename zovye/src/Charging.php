@@ -156,6 +156,10 @@ class Charging
 
     public static function stop(userModelObj $user)
     {
+        if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
+            return err('用户锁定失败，请稍后再试！');
+        }
+        
         $last_charging_data = $user->settings('chargingNOW', []);
 
         if (isEmptyArray($last_charging_data)) {

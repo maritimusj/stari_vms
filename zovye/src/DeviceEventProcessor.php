@@ -39,7 +39,7 @@ class DeviceEventProcessor
             'handler' => __NAMESPACE__.'\DeviceEventProcessor::onPingMsg',
             'params' => [
                 'log' => [
-                    'enable' => true,
+                    'enable' => false,
                     'id' => 1,
                 ],
             ],
@@ -69,7 +69,7 @@ class DeviceEventProcessor
             'handler' => __NAMESPACE__.'\DeviceEventProcessor::onResultMsg',
             'params' => [
                 'log' => [
-                    'enabled' => true,
+                    'enable' => true,
                     'id' => 4,
                 ],
             ],
@@ -189,7 +189,7 @@ class DeviceEventProcessor
             'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbRecord',
             'params' => [
                 'log' => [
-                    'enabled' => true,
+                    'enable' => true,
                     'id' => 16,
                 ],
             ],
@@ -199,7 +199,7 @@ class DeviceEventProcessor
             'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbReset',
             'params' => [
                 'log' => [
-                    'enabled' => true,
+                    'enable' => true,
                     'id' => 17,
                 ],
             ],
@@ -209,7 +209,7 @@ class DeviceEventProcessor
             'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbPing',
             'params' => [
                 'log' => [
-                    'enabled' => false,
+                    'enable' => false,
                     'id' => 18,
                 ],
             ],
@@ -823,6 +823,19 @@ class DeviceEventProcessor
             $device->setMcbOnline(Device::ONLINE);
             $device->setLastPing(TIMESTAMP);
             $device->setLastOnline(TIMESTAMP);
+
+            if ($device->isChargingDevice()) {
+                $chargerID = $data['chargerID'];
+                $property = [
+                    'last_active' => time(),
+                ];
+                if ($data['status'] == 1) {
+                    $property['status'] = 1;
+                }
+                $device->setChargerProperty($chargerID, $property);
+
+            }
+
             $device->save();
         }
     }

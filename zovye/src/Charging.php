@@ -333,6 +333,7 @@ class Charging
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($record) {
             $order->setChargingRecord($record);
             $order->setPrice($record['totalPrice'] * 100);
+            $order->setExtraData('timeout', []);
         });
     }
 
@@ -343,6 +344,7 @@ class Charging
             $serial = $charging_data['serial'] ?? '';
             $order = Order::get($serial, true);
             if ($order) {
+                
                 $res = ChargingServ::getChargingRecord($serial);
                 if ($res && !is_error($res) && isset($res['totalPrice'])) {
                     Charging::settle($serial, $chargerID, $res);
@@ -350,10 +352,12 @@ class Charging
                 $chargerData = $device->getChargerData($chargerID);
                 if ($chargerData && $chargerData['status'] == 2) {
                     Charging::end($serial, $chargerID, function($order) {
-                        $order->setExtraData('timeout', [
-                            'at' => time(),
-                            'reason' => '充电枪已进入空闲状态！',
-                        ]);
+                        if (!$order->getChargingRecord()) {
+                            $order->setExtraData('timeout', [
+                                'at' => time(),
+                                'reason' => '充电枪已进入空闲状态！',
+                            ]);                            
+                        }
                     });
                 }
             } else {

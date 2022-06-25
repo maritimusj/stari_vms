@@ -248,11 +248,13 @@ $device_info
 </dl>
 REALOD_IN;
         } elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
-            $order_uid = $entry->getExtraData('order');
-            $order = Order::get($order_uid, true);
+            $order_id = $entry->getExtraData('order');
+            $order = Order::get($order_id);
+            $order_info = '';
             $device_info = '';
             $group_info = '';
             if ($order) {
+                $order_info = $order->getOrderNO();
                 $device = $order->getDevice();
                 if ($device) {
                     $device_info = "<dt>充电桩</dt><dd class=\"admin\">{$device->getName()}</dd>";
@@ -266,7 +268,7 @@ REALOD_IN;
 <dt>事件</dt>
 <dd class="event">充电桩订单结算</dd>
 <dt>订单</dt>
-<dd class="event">$order_uid</dd>
+<dd class="event">$order_info</dd>
 $group_info
 $device_info
 </dl>
@@ -296,10 +298,14 @@ CHARGING;
                 $goods = Goods::data($order->getGoodsId(), ['useImageProxy' => true]);
 
                 if ($order->getPrice() > 0) {
-
-                    $m = number_format($order->getPrice() / 100, 2);
-                    $userData = User::getUserCharacter($order->getOpenid());
-                    $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";
+                    if ($order->getExtraData('group')) {
+                        $m = number_format($order->getPrice() / 100, 2);
+                        $spec = "<span class=\"wxpay\">充电桩充电，共计：<span class=\"money\">￥$m</span>元</span>";
+                    } else {
+                        $m = number_format($order->getPrice() / 100, 2);
+                        $userData = User::getUserCharacter($order->getOpenid());
+                        $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";    
+                    }
 
                 } elseif ($order->getBalance() > 0) {
 

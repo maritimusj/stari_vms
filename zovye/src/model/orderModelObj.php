@@ -269,6 +269,10 @@ class orderModelObj extends modelObj
 
     public function isChargingFinished(): bool
     {
+        if ($this->getSrc() != Order::CHARGING_UNPAID) {
+            return true;
+        }
+
         if ($this->getExtraData('timeout')) {
             return true;
         }

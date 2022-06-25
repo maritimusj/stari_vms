@@ -63,7 +63,7 @@ class Charging
                 return err('用户锁定失败，请稍后再试！');
             }
 
-            if (Order::exists(['src' => Order::CHARGING_UNPAID, 'openid' => $user->getOpenid()])) {
+            if (self::hasUnpaidOrder($user)) {
                 return err('请等待订单结算完成后再试！');
             }
 

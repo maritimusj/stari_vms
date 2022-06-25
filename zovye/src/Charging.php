@@ -240,14 +240,9 @@ class Charging
             $result = ChargingServ::getChargingRecord($serial);
             if (!is_error($result) && isset($result['totalPrice'])) {
                 $chargerID = $order->getChargerID();
-                self::end($serial, $chargerID, function ($order) use ($result) {
-                    $order->setChargingRecord($result);
-                    $order->setPrice($result['totalPrice'] * 100);
-                });
-
+                self::settle($serial, $chargerID, $result);
                 return ['record' => $result];
             }
-
             return ['finished' => $finished];
         }
 
@@ -294,6 +289,7 @@ class Charging
     public static function end(string $serial, int $chargerID, callable $cb)
     {
         return Util::transactionDo(function () use ($serial, $chargerID, $cb) {
+
             $order = Order::get($serial, true);
             if (empty($order)) {
                 return err('没有找到对应的订单！');
@@ -342,6 +338,7 @@ class Charging
         if ($result['re'] != 3) {
             return self::end($serial, $chargerID, function (orderModelObj $order) use ($result) {
                 $order->setChargingResult($result);
+                $order->setResultCode($result['re']);
             });
         }
 
@@ -349,10 +346,8 @@ class Charging
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
-            $order->setResultCode($result['re']);
-
             return $order->save();
-        }
+        }   
 
         return false;
     }
@@ -360,11 +355,10 @@ class Charging
     public static function settle(string $serial, int $chargerID, array $record)
     {
         if (!Locker::try($serial)) {
-            return false;
+            return err('锁定订单失败！');
         }
 
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($serial, $chargerID, $record) {
-
             $order->setChargingRecord($record);
 
             if ($order->getSrc() == Order::CHARGING) {

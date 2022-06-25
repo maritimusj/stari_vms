@@ -775,18 +775,18 @@ class DeviceEventProcessor
 
                     $extra['BMS']['timestamp'] = time();
 
-                    if ($extra['event'] == 'finished') {
+                    if ($extra['BMS']['event'] == 'finished') {
                         Charging::end($serial, $chargerID, function($order) use($extra) {
-                            $order->setExtraData('BMS.finished', $extra['BMS']);
+                            $order->setExtraData('BMS.finished', $extra['BMS']['data']);
                         });
-                    } elseif ($extra['event'] == 'stopped') {
+                    } elseif ($extra['BMS']['event'] == 'stopped') {
                         Charging::end($serial, $chargerID, function($order) use($extra) {
-                            $order->setExtraData('BMS.stopped', $extra['BMS']);
+                            $order->setExtraData('BMS.stopped', $extra['BMS']['data']);
                         });
                     } else {
                         $order = Order::get($serial, true);
                         if ($order) {
-                            $order->setExtraData('BMS.status', $extra['BMS']);
+                            $order->setExtraData('BMS.status', $extra['BMS']['data']);
                         }
                     }
                 }

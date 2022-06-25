@@ -52,7 +52,7 @@ class YiDaoAccount
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
             'nonce' => Util::random(16, true),
             'timestamp' => TIMESTAMP,
-            'state' => $device->getImei(),
+            'state' => $device->getImei().':'.Util::random(16),
         ];
 
         $data['signature'] = self::makeSign([
@@ -153,22 +153,24 @@ class YiDaoAccount
                 throw new RuntimeException('用户已被禁用！');
             }
 
+            list($device_imei, $once_str) = explode($params['state'], ':');
+            $once_str = $once_str ?? time();
             /** @var accountModelObj $acc */
             $acc = $res['account'];
             if ($acc->getBonusType() == Account::BALANCE) {
-                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['openid']}");
+                $serial = sha1("{$user->getId()}{$acc->getUid()}$once_str");
                 $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $params);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
                 }
             } else {
                 /** @var deviceModelObj $device */
-                $device = Device::get($params['state'], true);
+                $device = Device::get($device_imei, true);
                 if (empty($device)) {
-                    throw new RuntimeException('找不对这个设备:'.$params['state']);
+                    throw new RuntimeException('找不对这个设备:'.$device_imei);
                 }
 
-                $order_uid = Order::makeUID($user, $device, sha1($params['openid']));
+                $order_uid = Order::makeUID($user, $device, sha1($once_str));
                 Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
             }
         } catch (Exception $e) {

@@ -245,6 +245,15 @@ class orderModelObj extends modelObj
 
     public function setChargingRecord($record)
     {
+        $saved = $this->getChargingRecord();
+        if ($saved) {
+            if (sha1(json_encode($saved)) == sha1(json_encode($record))) {
+                return true;
+            }
+            $ts = time();
+            return $this->setExtraData("charging.record.$ts", $record);
+        }
+
         return $this->setExtraData('charging.record', $record);
     }
 
@@ -263,7 +272,7 @@ class orderModelObj extends modelObj
         if ($this->getExtraData('timeout')) {
             return true;
         }
-        
+
         $result = $this->getChargingResult();
         if ($result && $result['re'] != 3) {
             return true;

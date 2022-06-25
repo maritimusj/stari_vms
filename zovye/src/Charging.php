@@ -9,6 +9,18 @@ use zovye\model\userModelObj;
 
 class Charging
 {
+    public static function hasUnpaidOrder(userModelObj $user): bool
+    {
+        $query = Order::query(['src' => Order::CHARGING_UNPAID, 'openid' => $user->getOpenid()]);
+        /** @var orderModelObj $order */
+        foreach ($query->findAll() as $order) {
+            if (!$order->isChargingFinished()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function start(userModelObj $user, deviceModelObj $device, $chargerID)
     {
         return Util::transactionDo(function () use ($user, $device, $chargerID) {
@@ -209,35 +221,6 @@ class Charging
             return err('找不到这个订单！');
         }
 
-        $bms = $order->getExtraData('BMS.status', []);
-        if ($bms && time() - $bms['timestamp'] > 120) {
-            $chargerID = $order->getChargerID();
-            self::end($serial, $chargerID, function($order) {
-                $order->setExtraData('timeout', [
-                    'at' => time(),
-                    'reason' => '充电枪上报数据超时！',
-                ]);
-            });
-            return err('充电枪上报数据超时！');
-        }
-
-        $timeout = $order->getExtraData('timeout', []);
-        if ($timeout) {
-            return err($timeout['reason'] ?? '设备响应超时！');
-        }
-
-        $result = $order->getChargingResult();
-        if ($result && $result['re'] != 3) {
-            if ($result['re'] == 112) {
-                return err("启动失败：正在充电中");
-            } elseif ($result['re'] == 113) {
-                return err("启动失败：设备故障");
-            } elseif ($result['re'] == 114) { 
-                return err("启动失败：设备离线");
-            }
-            return err("启动失败：故障[{$result['re']}]");
-        }
-
         $result = $order->getChargingRecord();
         if ($result) {
             return ['record' => $result];
@@ -262,6 +245,35 @@ class Charging
             }
 
             return ['finished' => $finished];
+        }
+
+        $timeout = $order->getExtraData('timeout', []);
+        if ($timeout) {
+            return err($timeout['reason'] ?? '设备响应超时！');
+        }
+
+        $bms = $order->getExtraData('BMS.status', []);
+        if ($bms && time() - $bms['timestamp'] > 120) {
+            $chargerID = $order->getChargerID();
+            self::end($serial, $chargerID, function($order) {
+                $order->setExtraData('timeout', [
+                    'at' => time(),
+                    'reason' => '充电枪上报数据超时！',
+                ]);
+            });
+            return err('充电枪上报数据超时！');
+        }
+
+        $result = $order->getChargingResult();
+        if ($result && $result['re'] != 3) {
+            if ($result['re'] == 112) {
+                return err("启动失败：正在充电中");
+            } elseif ($result['re'] == 113) {
+                return err("启动失败：设备故障");
+            } elseif ($result['re'] == 114) {
+                return err("启动失败：设备离线");
+            }
+            return err("启动失败：故障[{$result['re']}]");
         }
 
         $device = $order->getDevice();
@@ -344,13 +356,19 @@ class Charging
     public static function settle(string $serial, int $chargerID, array $record)
     {
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($serial, $chargerID, $record) {
-
             $totalPrice = intval($record['totalPrice'] * 100);
 
-            $order->setSrc(Order::CHARGING);
-            $order->setPrice($totalPrice);
+            if ($order->getSrc() == Order::CHARGING_UNPAID) {
+                $order->setSrc(Order::CHARGING);
+                $order->setPrice($totalPrice);
+                $order->setExtraData('timeout', []);
+            }
+
             $order->setChargingRecord($record);
-            $order->setExtraData('timeout', []);
+
+            if ($order->getSrc() != Order::CHARGING_UNPAID) {
+                return true;
+            }
 
             $device = $order->getDevice();
             $user = $order->getUser();
@@ -373,6 +391,8 @@ class Charging
                     throw new RuntimeException('创建用户余额变动日志失败！');
                 }
             }
+
+            return true;
         });
     }
 
@@ -380,24 +400,26 @@ class Charging
     {
         $charging_data = $device->settings("chargingNOW.$chargerID", []);
         if ($charging_data) {
+
             $serial = $charging_data['serial'] ?? '';
             $order = Order::get($serial, true);
+
             if ($order) {
-                
                 $res = ChargingServ::getChargingRecord($serial);
                 if ($res && !is_error($res) && isset($res['totalPrice'])) {
                     Charging::settle($serial, $chargerID, $res);
-                }
-                $chargerData = $device->getChargerData($chargerID);
-                if ($chargerData && $chargerData['status'] == 2) {
-                    Charging::end($serial, $chargerID, function($order) {
-                        if (!$order->getChargingRecord()) {
-                            $order->setExtraData('timeout', [
-                                'at' => time(),
-                                'reason' => '充电枪已进入空闲状态！',
-                            ]);                            
-                        }
-                    });
+                } else {
+                    $chargerData = $device->getChargerData($chargerID);
+                    if ($chargerData && $chargerData['status'] == 2) {
+                        Charging::end($serial, $chargerID, function($order) {
+                            if (!$order->getChargingRecord()) {
+                                $order->setExtraData('timeout', [
+                                    'at' => time(),
+                                    'reason' => '充电枪已进入空闲状态！',
+                                ]);
+                            }
+                        });
+                    }
                 }
             } else {
                 $user = User::get($charging_data['user']);

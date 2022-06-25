@@ -745,12 +745,21 @@ class DeviceEventProcessor
             }
 
             if (is_array($extra['status'])) {
+                $serial = $extra['serial'] ?? '';
                 $chargerID = $extra['chargerID'];
+
                 $extra['status']['timestamp'] = time();
                 $device->setChargerData($chargerID, $extra['status']);
-                if ($extra['status']['status'] == 2) {
-                    //空闲
-                    Charging::checkCharging($device, $chargerID);
+
+                if ($serial) {
+                    $order = Order::get($serial, true);
+                    $order->setExtraData('charging.status', $extra['status']);
+                    $order->save();
+                } else {
+                    if ($extra['status']['status'] == 2) {
+                        //空闲
+                        Charging::checkCharging($device, $chargerID);
+                    }
                 }
             }
 

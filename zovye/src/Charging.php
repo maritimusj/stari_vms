@@ -17,6 +17,10 @@ class Charging
             if (!$order->isChargingFinished()) {
                 return true;
             }
+            $last_charging_status = $order->getExtraData('charging.status', []);
+            if ($last_charging_status && $last_charging_status['totalPrice'] > 0) {
+                return true;
+            }
         }
         return false;
     }
@@ -359,21 +363,20 @@ class Charging
 
             $order->setChargingRecord($record);
 
-            $totalPrice = intval($record['totalPrice'] * 100);
-
-            if ($order->getSrc() == Order::CHARGING_UNPAID) {
-                $order->setPrice($totalPrice);
-                $order->setExtraData('timeout', []);
-            } else {
+            if ($order->getSrc() == Order::CHARGING) {
                 return true;
             }
 
+            $totalPrice = intval($record['totalPrice'] * 100);
+
+            $order->setPrice($totalPrice);
+            $order->setExtraData('timeout', []);
             $order->setSrc(Order::CHARGING);
 
             $device = $order->getDevice();
             $user = $order->getUser();
 
-            //todo 扣除用户账户金额
+            //扣除用户账户金额
             if ($totalPrice > 0) {
                 $balance = $user->getCommissionBalance();
                 if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING, [

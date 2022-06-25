@@ -356,19 +356,19 @@ class Charging
     public static function settle(string $serial, int $chargerID, array $record)
     {
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($serial, $chargerID, $record) {
-            $totalPrice = intval($record['totalPrice'] * 100);
-
-            if ($order->getSrc() == Order::CHARGING_UNPAID) {
-                $order->setSrc(Order::CHARGING);
-                $order->setPrice($totalPrice);
-                $order->setExtraData('timeout', []);
-            }
 
             $order->setChargingRecord($record);
 
-            if ($order->getSrc() != Order::CHARGING_UNPAID) {
+            $totalPrice = intval($record['totalPrice'] * 100);
+
+            if ($order->getSrc() == Order::CHARGING_UNPAID) {
+                $order->setPrice($totalPrice);
+                $order->setExtraData('timeout', []);
+            } else {
                 return true;
             }
+
+            $order->setSrc(Order::CHARGING);
 
             $device = $order->getDevice();
             $user = $order->getUser();
@@ -415,7 +415,7 @@ class Charging
                             if (!$order->getChargingRecord()) {
                                 $order->setExtraData('timeout', [
                                     'at' => time(),
-                                    'reason' => '充电枪已进入空闲状态！',
+                                    'reason' => '充电枪已停止充电！',
                                 ]);
                             }
                         });

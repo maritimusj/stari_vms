@@ -40,13 +40,13 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
             Charging::end($uid, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
-                    'reason' => '没有收到充电桩结果通知！',
+                    'reason' => '没有收到充电桩响应消息！',
                 ]);
             });
 
             $params['error'] = [
                 'at' => time(),
-                'reason' => '没有收到充电桩结果通知！',
+                'reason' => '没有收到充电桩响应消息！',
             ];
         } else {
             $params['result'] = $result;

@@ -206,9 +206,9 @@ class charging
         $user = common::getUser();
 
         $query = Order::query([
-            'src' => Order::CHARGING,
             'openid' => $user->getOpenid(),
             'result_code' => 3,
+            'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
         ]);
 
         $page = max(1, request::int('page'));

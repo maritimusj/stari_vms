@@ -34,6 +34,9 @@
     #orderlist .charging {
         color: #4caf50;
     }
+    #orderlist small {
+        font-size: 60%;
+    }
     a[filter] {
         cursor: pointer;
     }
@@ -354,7 +357,8 @@
                                 {elseif $order['package']}
                                 {$order['package']['title']}
                                 {elseif $order['group'] }
-                                {$order['group']['title']}
+                                {$order['group']['title']}<br>
+                                <small>单价：<span class="fee">{$order['group']['tips']}</span></small>
                                 {/if}                                
                             </span>
                             {if !$order['group']}
@@ -366,9 +370,8 @@
                         <div  class="status operate">
                             <div class="detail">
                                 {if $order['group']}
-                                        收费标准：<span class="fee">{$order['group']['tips']}</span>
                                     {if $order['price'] > 0}
-                                        <br>费用总计：<span class="price"> {$order['price']}</span>
+                                        费用总计：<span class="price"> {$order['price']}</span>
                                     {else}
                                     {/if}
                                 {else}

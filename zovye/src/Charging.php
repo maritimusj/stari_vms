@@ -230,11 +230,6 @@ class Charging
             return ['record' => $result];
         }
 
-        $stopped = $order->getExtraData('BMS.stopped');
-        if ($stopped) {
-            return ['stopped' => $stopped];
-        }
-
         $finished = $order->getExtraData('BMS.finished');
         if ($finished) {
             $result = ChargingServ::getChargingRecord($serial);
@@ -244,6 +239,11 @@ class Charging
                 return ['record' => $result];
             }
             return ['finished' => $finished];
+        }
+
+        $stopped = $order->getExtraData('BMS.stopped');
+        if ($stopped) {
+            return ['stopped' => $stopped];
         }
 
         $timeout = $order->getExtraData('timeout', []);

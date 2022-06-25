@@ -359,6 +359,10 @@ class Charging
 
     public static function settle(string $serial, int $chargerID, array $record)
     {
+        if (!Locker::try($serial)) {
+            return false;
+        }
+
         return self::end($serial, $chargerID, function (orderModelObj $order) use ($serial, $chargerID, $record) {
 
             $order->setChargingRecord($record);

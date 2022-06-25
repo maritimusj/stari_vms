@@ -64,6 +64,10 @@ class Statistics
         $result['free'] = (int)Order::query($condition)->where(['src' => Order::ACCOUNT])->get('sum(num)');
         $result['pay'] = (int)Order::query($condition)->where(['src' => Order::PAY])->get('sum(num)');
 
+        if (App::isChargingDeviceEnabled()) {
+            $result['pay'] += (int)Order::query($condition)->where(['src' => Order::CHARGING])->get('sum(num)');
+        }
+
         $balance = (int)Order::query($condition)->where(['src' => Order::BALANCE])->get('sum(num)');
 
         if (App::isBalanceEnabled()) {

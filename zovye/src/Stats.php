@@ -614,7 +614,7 @@ class Stats
     {
         $num = intval($order->getNum());
         if ($num > 0) {
-            if ($order->getSrc() == Order::PAY) {
+            if ($order->getSrc() == Order::PAY || $order->getSrc() == Order::CHARGING) {
                 $way = 'p';
             } elseif ($order->getSrc() == Order::ACCOUNT) {
                 $way = 'f';

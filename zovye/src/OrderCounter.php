@@ -143,7 +143,15 @@ class OrderCounter extends StatsCounter
     public function getDayPayTotal($obj, DateTimeInterface $day = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::PAY;
+
+        if (App::isChargingDeviceEnabled()) {
+            $params['src'] = [
+                Order::CHARGING,
+                Order::PAY,
+            ];
+        } else {
+            $params['src'] = Order::PAY;
+        }
 
         return $this->getDay($params, $day ?? new DateTimeImmutable());
     }
@@ -180,7 +188,15 @@ class OrderCounter extends StatsCounter
     public function getMonthPayTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::PAY;
+
+        if (App::isChargingDeviceEnabled()) {
+            $params['src'] = [
+                Order::CHARGING,
+                Order::PAY,
+            ];
+        } else {
+            $params['src'] = Order::PAY;
+        }
 
         return $this->getMonth($params, $month ?? new DateTimeImmutable());
     }
@@ -217,7 +233,15 @@ class OrderCounter extends StatsCounter
     public function getYearPayTotal($obj, DateTimeInterface $year = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::PAY;
+
+        if (App::isChargingDeviceEnabled()) {
+            $params['src'] = [
+                Order::CHARGING,
+                Order::PAY,
+            ];
+        } else {
+            $params['src'] = Order::PAY;
+        }
 
         return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
@@ -238,6 +262,11 @@ class OrderCounter extends StatsCounter
         }
         $this->removeDays(array_merge(['src' => Order::ACCOUNT], $params), $day);
         $this->removeDays(array_merge(['src' => Order::PAY], $params), $day);
+
+        if (App::isChargingDeviceEnabled()) {
+            $this->removeDays(array_merge(['src' => [Order::CHARGING, Order::PAY]], $params), $day);
+        }
+
         $this->removeDays(array_merge(['src' => Order::BALANCE], $params), $day);
     }
 
@@ -249,6 +278,11 @@ class OrderCounter extends StatsCounter
         }
         $this->removeMonths(array_merge(['src' => Order::ACCOUNT], $params), $month);
         $this->removeMonths(array_merge(['src' => Order::PAY], $params), $month);
+
+        if (App::isChargingDeviceEnabled()) {
+            $this->removeDays(array_merge(['src' => [Order::CHARGING, Order::PAY]], $params), $month);
+        }
+
         $this->removeMonths(array_merge(['src' => Order::BALANCE], $params), $month);
     }
 
@@ -260,6 +294,11 @@ class OrderCounter extends StatsCounter
         }
         $this->removeYears(array_merge(['src' => Order::ACCOUNT], $params), $year);
         $this->removeYears(array_merge(['src' => Order::PAY], $params), $year);
+
+        if (App::isChargingDeviceEnabled()) {
+            $this->removeDays(array_merge(['src' => [Order::CHARGING, Order::PAY]], $params), $year);
+        }
+
         $this->removeYears(array_merge(['src' => Order::BALANCE], $params), $year);
     }
 }

@@ -55,6 +55,11 @@ if ($device_id) {
     if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
         Util::resultAlert('设备二维码不正确！', 'error');
     }
+
+    if ($device->isChargingDevice()) {
+        Util::resultAlert('请使用指定小程序扫描二维码！', 'error');
+    }
+
     /**
      * @param userModelObj $user
      * @return array

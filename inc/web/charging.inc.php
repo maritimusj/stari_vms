@@ -281,11 +281,11 @@ if ($op == 'default') {
                 $data['status'] = 'malfunction';
                 break;
             case 2:
-                $status = '<span class="title">空闲</span> <i class="fa fa-bolt" title="开始充电" data-op="start" data-params="'.$i.'"></i>';
+                $status = '<span class="title">空闲</span>';
                 $data['status'] = 'idle';
                 break;
             case 3:
-                $status = '<span class="title">充电中</span> <i class="fa fa-ban" title="停止充电" data-op="stop" data-params="'.$i.'"></i>';
+                $status = '<span class="title">充电中</span> ';
                 $data['status'] = 'charging';
                 break;
         }

@@ -1069,6 +1069,8 @@ class deviceModelObj extends modelObj
 
         if ($this->isBlueToothDevice()) {
             $params['wxapp'] = 'true';
+        } elseif ($this->isChargingDevice()) {
+            $params['charging'] = 'true';
         }
 
         $params['from'] = 'device';
@@ -2179,6 +2181,9 @@ class deviceModelObj extends modelObj
 
         $result = null;
 
+        if ($this->isChargingDevice()) {
+            return error(State::ERROR, '不支持的设备类型！');
+        }
         //蓝牙设备
         if ($this->isBlueToothDevice()) {
             $protocol = $this->getBlueToothProtocol();

@@ -261,12 +261,12 @@ REALOD_IN;
                 }
                 $title = $order->getExtraData('group.title', '');
                 $address = $order->getExtraData('group.address', '');
-                $group_info = "<dt>充电站</dt><dd class=\"admin\">$title</dd><dt>地址</dt><dd class=\"admin\">$address</dd>";
+                $group_info = "<dt>站点</dt><dd class=\"admin\">$title</dd><dt>地址</dt><dd class=\"admin\">$address</dd>";
             }
             $data['memo'] = <<<CHARGING
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">充电桩订单结算</dd>
+<dd class="event">充电订单结算</dd>
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
 $group_info
@@ -300,7 +300,7 @@ CHARGING;
                 if ($order->getPrice() > 0) {
                     if ($order->getExtraData('group')) {
                         $m = number_format($order->getPrice() / 100, 2);
-                        $spec = "<span class=\"wxpay\">充电桩充电，共计：<span class=\"money\">￥$m</span>元</span>";
+                        $spec = "<span class=\"wxpay\">充电桩充电，支付：<span class=\"money\">￥$m</span>元</span>";
                     } else {
                         $m = number_format($order->getPrice() / 100, 2);
                         $userData = User::getUserCharacter($order->getOpenid());

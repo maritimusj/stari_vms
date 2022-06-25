@@ -1399,7 +1399,7 @@ class deviceModelObj extends modelObj
             'subs' => [],
         ];
 
-        foreach ($this->getAdvs(Advertising::SCREEN) as $adv) {
+        foreach ($this->getAds(Advertising::SCREEN) as $adv) {
 
             if ($adv['extra']['media'] == 'srt') {
                 if (!empty($adv['extra']['text'])) {
@@ -1484,7 +1484,7 @@ class deviceModelObj extends modelObj
      */
     public function getOneAdv($type, bool $random = false): ?array
     {
-        $advs = $this->getAdvs($type);
+        $advs = $this->getAds($type);
         if (!isEmptyArray($advs)) {
             if ($random) {
                 shuffle($advs);
@@ -1502,7 +1502,7 @@ class deviceModelObj extends modelObj
      * @param bool $ignore_cache
      * @return array
      */
-    public function getAdvs($type, bool $ignore_cache = false): array
+    public function getAds($type, bool $ignore_cache = false): array
     {
         $ads = null;
 
@@ -1695,7 +1695,7 @@ class deviceModelObj extends modelObj
         }
 
         $cachedData = $this->settings("adsData.type$type.data", []);
-        $ads = $this->getAdvs($type, true);
+        $ads = $this->getAds($type, true);
 
         if (empty($cachedData) && empty($ads)) {
             return false;
@@ -1908,7 +1908,7 @@ class deviceModelObj extends modelObj
         }
 
         $subs = [];
-        foreach ($this->getAdvs(Advertising::SCREEN) as $adv) {
+        foreach ($this->getAds(Advertising::SCREEN) as $adv) {
             if ($adv['extra']['media'] == 'srt') {
                 if (!empty($adv['extra']['text'])) {
                     $subs[] = strval($adv['extra']['text']);
@@ -2384,7 +2384,7 @@ class deviceModelObj extends modelObj
     {
         $delay = 0;
 
-        $advs = $this->getAdvs(Advertising::REDIRECT_URL);
+        $advs = $this->getAds(Advertising::REDIRECT_URL);
         if ($advs) {
             foreach ($advs as $adv) {
 

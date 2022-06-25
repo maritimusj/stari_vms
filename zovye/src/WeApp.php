@@ -654,13 +654,13 @@ JSCODE;
         if ($device) {
             //格式化广告
             $tpl['slides'] = [];
-            $advs = $device->getAdvs(Advertising::GET_PAGE);
-            if ($advs) {
+            $ads = $device->getAds(Advertising::GET_PAGE);
+            if ($ads) {
                 $url_params = [
                     'deviceid' => $tpl['device']['id'],
                     'accountid' => $tpl['account']['id'],
                 ];
-                foreach ($advs as $adv) {
+                foreach ($ads as $adv) {
                     if ($adv['extra']['images']) {
                         foreach ($adv['extra']['images'] as $image) {
                             if ($image) {
@@ -942,8 +942,8 @@ JSCODE;
             $device = Device::get($tpl['device']['id']);
             if ($device) {
                 $tpl['slides'] = [];
-                $advs = $device->getAdvs(Advertising::WELCOME_PAGE);
-                foreach ($advs as $adv) {
+                $ads = $device->getAds(Advertising::WELCOME_PAGE);
+                foreach ($ads as $adv) {
                     if ($adv['extra']['images']) {
                         foreach ($adv['extra']['images'] as $image) {
                             if ($image) {

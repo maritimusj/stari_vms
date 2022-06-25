@@ -2731,10 +2731,10 @@ HTML_CONTENT;
         return '已指定部分设备';
     }
 
-    public static function getDeviceAdvs(deviceModelObj $device, $type, $max_total): array
+    public static function getDeviceAds(deviceModelObj $device, $type, $max_total): array
     {
         $result = [];
-        foreach ($device->getAdvs($type) as $item) {
+        foreach ($device->getAds($type) as $item) {
             $data = [
                 'id' => $item['id'],
                 'title' => $item['title'],
@@ -3004,13 +3004,13 @@ HTML_CONTENT;
 
     public static function selectSiteUrl()
     {
-        $siteurl = _W('siteurl');
+        $site_url = _W('siteurl');
         $domain = settings('app.domain', []);
         if (empty($domain['enabled']) || empty($domain['main']) || empty($domain['bak'])) {
             return false;
         }
 
-        if (strpos($siteurl, $domain['main']) === false) {
+        if (strpos($site_url, $domain['main']) === false) {
             return false;
         }
 
@@ -3019,7 +3019,7 @@ HTML_CONTENT;
             return false;
         }
 
-        return str_replace($domain['main'], $url, $siteurl);
+        return str_replace($domain['main'], $url, $site_url);
     }
 
     public static function redirectToBakSite()

@@ -24,8 +24,8 @@ if ($op == 'default') {
     $device = Device::get(request::int('deviceid'));
     if ($device) {
         //广告列表
-        $advs = $device->getAdvs(Advertising::GET_PAGE);
-        foreach ($advs as $adv) {
+        $ads = $device->getAds(Advertising::GET_PAGE);
+        foreach ($ads as $adv) {
             if ($adv['extra']['images']) {
                 foreach ($adv['extra']['images'] as $image) {
                     if ($image) {

@@ -33,7 +33,7 @@ if (request::has('deviceid')) {
     $device = Device::getDummyDevice();
 }
 
-$result = Util::getDeviceAdvs($device, $type_id, $num);
+$result = Util::getDeviceAds($device, $type_id, $num);
 if (is_error($result)) {
     JSON::fail($result);
 }

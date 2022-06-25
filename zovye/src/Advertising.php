@@ -385,8 +385,8 @@ class Advertising extends State
     public static function getDeviceSliders(deviceModelObj $device): array
     {
         $slides = [];
-        $advs = $device->getAdvs(Advertising::WELCOME_PAGE);
-        foreach ($advs as $adv) {
+        $ads = $device->getAds(Advertising::WELCOME_PAGE);
+        foreach ($ads as $adv) {
             if ($adv['extra']['images']) {
                 foreach ($adv['extra']['images'] as $image) {
                     if ($image) {

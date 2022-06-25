@@ -82,7 +82,7 @@ class api
             }
         }
 
-        return Util::getDeviceAdvs($device ?? Device::getDummyDevice(), $type, $num);
+        return Util::getDeviceAds($device ?? Device::getDummyDevice(), $type, $num);
     }
 
     public static function accounts(): array

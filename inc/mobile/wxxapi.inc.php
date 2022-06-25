@@ -18,7 +18,7 @@ router::exec($op, [
     'VoucherList' => '\zovye\api\wxx\common::voucherList',
     'PageInfo' => '\zovye\api\wxx\common::pageInfo',
     'GetGoodsList' => '\zovye\api\wxx\common::getGoodsList',
-    'Advs' => '\zovye\api\wxx\common::advs',
+    'Advs' => '\zovye\api\wxx\common::ads',
     'OnConnected' => '\zovye\api\wxx\common::onConnected',
     'DeviceStatus' => '\zovye\api\wxx\common::deviceStatus',
     'OnDeviceData' => '\zovye\api\wxx\common::onDeviceData',

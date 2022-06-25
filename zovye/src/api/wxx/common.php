@@ -134,7 +134,7 @@ class common
      * 获取设备相关的广告
      * @return array
      */
-    public static function advs(): array
+    public static function ads(): array
     {
         $imei = request::str('device');
 
@@ -144,9 +144,9 @@ class common
         }
 
         //广告列表
-        $advs = $device->getAdvs(Advertising::WELCOME_PAGE);
+        $ads = $device->getAds(Advertising::WELCOME_PAGE);
         $result = [];
-        foreach ($advs as $adv) {
+        foreach ($ads as $adv) {
             if ($adv['extra']['images']) {
                 foreach ($adv['extra']['images'] as $image) {
                     if ($image) {
@@ -614,7 +614,7 @@ class common
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        return Util::getDeviceAdvs($device, $type, $num);
+        return Util::getDeviceAds($device, $type, $num);
     }
 
     public static function orderDefault(): array
@@ -627,9 +627,11 @@ class common
         $agent = $user->getAgent();
         $condition['agent_id'] = $agent->getId();
 
-        $res = Device::query(We7::uniacid(['agent_id' => $agent->getId()]))->findAll();
         $devices = [];
         $device_keys = [];
+
+        $res = Device::query(We7::uniacid(['agent_id' => $agent->getId()]))->findAll();
+
         /** @var deviceModelObj $item */
         foreach ($res as $item) {
             $devices[$item->getId()] = $item->getName().' - '.$item->getImei();

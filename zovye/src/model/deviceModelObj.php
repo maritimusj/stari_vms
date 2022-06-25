@@ -2182,7 +2182,7 @@ class deviceModelObj extends modelObj
         $result = null;
 
         if ($this->isChargingDevice()) {
-            return error(State::ERROR, '不支持的设备类型！');
+            return error(State::ERROR, '设备不支持这个操作！');
         }
         //蓝牙设备
         if ($this->isBlueToothDevice()) {

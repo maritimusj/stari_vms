@@ -2,6 +2,7 @@
 
 namespace zovye;
 
+use RuntimeException;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
@@ -342,23 +343,36 @@ class Charging
 
     public static function settle(string $serial, int $chargerID, array $record)
     {
-        return self::end($serial, $chargerID, function (orderModelObj $order) use ($record) {
+        return self::end($serial, $chargerID, function (orderModelObj $order) use ($serial, $chargerID, $record) {
+
+            $totalPrice = intval($record['totalPrice'] * 100);
+
             $order->setSrc(Order::CHARGING);
-            $order->setPrice($record['totalPrice'] * 100);
+            $order->setPrice($totalPrice);
             $order->setChargingRecord($record);
             $order->setExtraData('timeout', []);
-
-            $order->save();
 
             $device = $order->getDevice();
             $user = $order->getUser();
 
-            //事件：订单已经创建
-            EventBus::on('device.orderCreated', [
-                'device' => $device,
-                'user' => $user,
-                'order' => $order,
-            ]);
+            //todo 扣除用户账户金额
+            if ($totalPrice > 0) {
+                $balance = $user->getCommissionBalance();
+                if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING, [
+                    'order' => $order->getId(),
+                    'serial' => $serial,
+                    'chargerID' => $chargerID,
+                ])) {
+                    //事件：订单已经创建
+                    EventBus::on('device.orderCreated', [
+                        'device' => $device,
+                        'user' => $user,
+                        'order' => $order,
+                    ]);
+                } else {
+                    throw new RuntimeException('创建用户余额变动日志失败！');
+                }
+            }
         });
     }
 

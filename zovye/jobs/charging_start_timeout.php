@@ -40,13 +40,13 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
             Charging::end($uid, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
-                    'reason' => '没有收到充电桩响应消息！',
+                    'reason' => '充电桩无响应，请稍后再试！',
                 ]);
             });
 
             $params['error'] = [
                 'at' => time(),
-                'reason' => '没有收到充电桩响应消息！',
+                'reason' => '充电桩无响应，请稍后再试！',
             ];
         } else {
             $params['result'] = $result;
@@ -60,12 +60,12 @@ if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
             Charging::end($uid, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
-                    'reason' => '没有收到充电桩消息反馈！',
+                    'reason' => '充电桩失去响应，请重试！',
                 ]);
             });
             $params['error'] = [
                 'at' => time(),
-                'reason' => '没有收到充电桩消息反馈！',
+                'reason' => '充电桩失去响应，请重试！',
             ];
         } else {
             $params['BMS'] = $data;

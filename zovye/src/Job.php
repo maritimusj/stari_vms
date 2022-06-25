@@ -327,7 +327,7 @@ class Job
                 'user' => $user_id,
                 'order' => $order_id,
                 'time' => time(),
-            ], 60) !== false) {
+            ], 70) !== false) {
             return true;
         }
 

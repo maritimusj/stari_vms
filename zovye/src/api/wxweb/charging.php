@@ -207,7 +207,7 @@ class charging
 
         $query = Order::query([
             'openid' => $user->getOpenid(),
-            'result_code' => 3,
+            'result_code' => 0,
             'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
         ]);
 

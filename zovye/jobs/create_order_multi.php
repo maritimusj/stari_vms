@@ -13,6 +13,7 @@ use zovye\EventBus;
 use zovye\ExceptionNeedsRefund;
 use zovye\Helper;
 use zovye\Job;
+use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
@@ -64,10 +65,19 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
  */
 function process($order_no): bool
 {
+    $locker = Locker::try("pay_log:$order_no", REQUEST_ID, 6);
+    if (!$locker) {
+        throw new Exception('无法锁定支付信息！');
+    }
+
     /** @var pay_logsModelObj $pay_log */
     $pay_log = Pay::getPayLog($order_no);
     if (empty($pay_log)) {
         throw new Exception('找不到支付信息！');
+    }
+
+    if ($pay_log->isRefund()) {
+        throw new Exception('支付已退款！');
     }
 
     $device = Device::get($pay_log->getDeviceId());
@@ -121,6 +131,8 @@ function process($order_no): bool
         ]);
         ExceptionNeedsRefund::throwWith($device, $orderResult['message']);
     } else {
+        $locker->release();
+
         /** @var orderModelObj $order */
         $order = $orderResult;
 

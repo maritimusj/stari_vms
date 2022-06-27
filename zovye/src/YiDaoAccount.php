@@ -153,7 +153,7 @@ class YiDaoAccount
                 throw new RuntimeException('用户已被禁用！');
             }
 
-            list($device_imei, $once_str) = explode($params['state'], ':');
+            list($device_imei, $once_str) = explode(':', $params['state'], 2);
             $once_str = $once_str ?? time();
             /** @var accountModelObj $acc */
             $acc = $res['account'];

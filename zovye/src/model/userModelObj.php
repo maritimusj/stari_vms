@@ -11,8 +11,10 @@ use DateTime;
 use DateTimeImmutable;
 use zovye\Account;
 use zovye\Balance;
+use zovye\ICard;
 use zovye\Locker;
 use zovye\Pay;
+use zovye\UserCommissionBalanceICard;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -505,6 +507,7 @@ class userModelObj extends modelObj
         return null;
     }
 
+
     /**
      * 获取用户名佣金帐户.
      *
@@ -827,6 +830,10 @@ class userModelObj extends modelObj
             'phoneNum' => $phone_num,
             'address' => $address,
         ]);
+    }
+
+    public function getCommissionBalanceCard():ICard {
+        return new UserCommissionBalanceICard($this);
     }
 
     public function getPhysicalCardNO(): string

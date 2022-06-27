@@ -29,6 +29,7 @@ class CommissionBalance extends State
     const ADJUST = 10;
     const RELOAD_OUT = 11;
     const RELOAD_IN = 12;
+    const RECHARGE = 13;
 
     const CHARGING = 20;
 
@@ -47,6 +48,7 @@ class CommissionBalance extends State
         self::ADJUST => '管理员操作',
         self::RELOAD_OUT => '支付补货佣金',
         self::RELOAD_IN => '补货佣金收入',
+        self::RECHARGE => '现金充值',
         self::CHARGING => '充电桩订单结算',
     ];
 
@@ -273,6 +275,8 @@ $group_info
 $device_info
 </dl>
 CHARGING;
+        } elseif ($entry->getSrc() == CommissionBalance::RECHARGE) {
+
         }
 
         return $data;

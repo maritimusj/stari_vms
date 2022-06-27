@@ -6,10 +6,12 @@
 
 namespace zovye\model;
 
+use zovye\ICard;
+use zovye\User;
 use function zovye\tb;
 use zovye\BaseLogsModelObj;
 
-class pay_logsModelObj extends BaseLogsModelObj
+class pay_logsModelObj extends BaseLogsModelObj implements ICard
 {
     public static function getTableName($readOrWrite): string
     {
@@ -130,8 +132,36 @@ class pay_logsModelObj extends BaseLogsModelObj
         return !empty($this->getData('refund'));
     }
 
+    public function isRecharged(): bool
+    {
+        return !empty($this->getData('recharged'));
+    }
+
     public function isPaid(): bool
     {
         return !empty($this->getPayResult()) || !empty($this->getQueryResult());
+    }
+
+    public function getOwner(): userModelObj
+    {
+       return User::get($this->getUserOpenid(), true);
+    }
+
+    public function getUID(): string
+    {
+        return $this->getOwner()->getPhysicalCardNO();
+    }
+
+    public function total(): int
+    {
+        if (!$this->isPaid() || $this->isRefund()) {
+            return 0;
+        }
+        return $this->getPrice();
+    }
+
+    public function getTypename(): string
+    {
+        return 'pay_log';
     }
 }

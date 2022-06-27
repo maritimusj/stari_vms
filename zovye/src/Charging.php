@@ -25,11 +25,11 @@ class Charging
         return false;
     }
 
-    public static function start(userModelObj $user, deviceModelObj $device, $chargerID)
+    public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID)
     {
-        return Util::transactionDo(function () use ($user, $device, $chargerID) {
+        return Util::transactionDo(function () use ($card, $device, $chargerID, $serial) {
             if (!$device->isChargingDevice()) {
-                return err('只支持充电桩设备！');
+                return err('设备类型不正确！');
             }
 
             $data = $device->getChargerData($chargerID);
@@ -50,16 +50,17 @@ class Charging
                 return err('锁定设备失败，请稍后再试！');
             }
 
+            $user = $card->getOwner();
+
             $device_charging_data = $device->settings("chargingNOW.$chargerID", []);
             if ($device_charging_data) {
                 if ($device_charging_data['user'] != $user->getId()) {
                     return err('设备正忙，请稍后再试！');
                 }
 
-                $serial = $device_charging_data['serial'];
-                $order = Order::get($serial, true);
+                $order = Order::get($device_charging_data['serial'], true);
                 if ($order && !$order->isChargingFinished()) {
-                    return err('正在充电中！');
+                    return err('设备正在充电中！');
                 }
             }
 
@@ -76,18 +77,17 @@ class Charging
                 if ($user_charging_data['device'] != $device->getId()) {
                     return err('用户卡正在使用中，请稍后再试！');
                 }
+
                 $order = Order::get($user_charging_data['serial'], true);
                 if ($order && !$order->isChargingFinished()) {
-                    return err('正在充电中！');
+                    return err('用户正在充电中！');
                 }
             }
 
-            $total = $user->getCommissionBalance()->total();
+            $total = $card->total();
             if ($total < 1) {
                 return err('用户卡余额不足，请先充值后再试！');
             }
-
-            $serial = $device->generateChargingSerial($chargerID);
 
             $order_data = [
                 'src' => Order::CHARGING_UNPAID,
@@ -109,7 +109,7 @@ class Charging
                     ],
                     'user' => $user->profile(),
                     'chargingID' => $chargerID,
-                    'card' => $user->getPhysicalCardNO(),
+                    'card' => $card->getUID(),
                 ],
             ];
 
@@ -160,7 +160,7 @@ class Charging
                 'ser' => $serial,
                 'ch' => $chargerID,
                 'timeout' => 60,
-                'card' => $user->getPhysicalCardNO(),
+                'card' => $card->getUID(),
                 'balance' => $total,
             ])) {
                 return err('设备通信失败！');
@@ -222,7 +222,24 @@ class Charging
     {
         $order = Order::get($serial, true);
         if (empty($order)) {
-            return err('找不到这个订单！');
+            $pay_log = Pay::getPayLog($serial);
+            if (empty($pay_log)) {
+                return err('找不到这个订单记录！');
+            } else {
+                if ($pay_log->isCancelled()) {
+                    return err('支付已取消！');
+                }
+                if ($pay_log->isTimeout()) {
+                    return err('支付已超时！');
+                }
+                if ($pay_log->isRefund()) {
+                    return err('支付已退款！');
+                }
+                if (!$pay_log->isPaid()) {
+                    return ['message' => '正在查询支付结果..'];
+                }
+                return ['message' => '已支付，请稍等..'];
+            }
         }
 
         $result = $order->getChargingRecord();
@@ -374,25 +391,36 @@ class Charging
             $device = $order->getDevice();
             $user = $order->getUser();
 
-            //扣除用户账户金额
-            if ($totalPrice > 0) {
-                $balance = $user->getCommissionBalance();
-                if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING, [
-                    'order' => $order->getId(),
-                    'serial' => $serial,
-                    'chargerID' => $chargerID,
-                ])) {
-                    //事件：订单已经创建
-                    EventBus::on('device.orderCreated', [
-                        'device' => $device,
-                        'user' => $user,
-                        'order' => $order,
-                    ]);
-                } else {
-                    throw new RuntimeException('创建用户余额变动日志失败！');
+            $pay_log = Pay::getPayLog($serial);
+            if ($pay_log) {
+                $remain = $pay_log->getPrice() - $totalPrice;
+                if ($remain > 0) {
+                    Job::refund($serial, '充电订单结算退款');
+                }
+            } else {
+                //扣除用户账户金额
+                if ($totalPrice > 0) {
+                    $balance = $user->getCommissionBalance();
+                    $extra = [
+                        'order' => $order->getId(),
+                        'serial' => $serial,
+                        'chargerID' => $chargerID,
+                    ];
+                    if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING, $extra)) {
+                        //事件：订单已经创建
+                        EventBus::on('device.orderCreated', [
+                            'device' => $device,
+                            'user' => $user,
+                            'order' => $order,
+                        ]);
+                    } else {
+                        Log::error('charging', [
+                            'error' => '用户捐款失败！',
+                            'data' => $extra,
+                        ]);
+                    }
                 }
             }
-
             return true;
         });
     }

@@ -25,7 +25,7 @@ $log = [
 ];
 
 if ($op == 'order_timeout' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
-    if (Locker::try("pay_log:$order_no", REQUEST_ID, 6)) {
+    if (Locker::try("pay:$order_no", REQUEST_ID, 3)) {
         $order = Order::get($order_no, true);
         if (empty($order)) {
             //没有订单，尝试退款

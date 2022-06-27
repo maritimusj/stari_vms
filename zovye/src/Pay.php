@@ -98,16 +98,15 @@ class Pay
         array $pay_data = []
     ): array {
         if ($pay_data['order_no']) {
-            $partial = $pay_data['order_no'];
+            $order_no = $pay_data['order_no'];
         } else {
             $partial = $pay_data['serial'] ? 'E'.strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace(
                 '.',
                 '',
                 'S'.microtime(true)
             );
+            $order_no = Order::makeUID($user, $device, $partial);
         }
-
-        $order_no = Order::makeUID($user, $device, $partial);
 
         $more = [
             'device' => $device->getId(),
@@ -301,13 +300,14 @@ class Pay
         }
 
         $device_id = $pay_log->getDeviceId();
-        if (empty($device_id)) {
-            return error(State::ERROR, '无效的设备ID！');
-        }
 
-        $device = Device::get($device_id);
-        if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+        if ($device_id == 0) {
+            $device = Device::getDummyDevice();
+        } else {
+            $device = Device::get($device_id);
+            if (empty($device)) {
+                return error(State::ERROR, '找不到这个设备！');
+            }
         }
 
         $pay = self::getActivePayObj($device, $pay_log->getPayName());
@@ -352,13 +352,14 @@ class Pay
         }
 
         $device_id = $pay_log->getDeviceId();
-        if (empty($device_id)) {
-            return error(State::ERROR, '无效的设备ID！');
-        }
 
-        $device = Device::get($device_id);
-        if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+        if ($device_id == 0) {
+            $device = Device::getDummyDevice();
+        } else {
+            $device = Device::get($device_id);
+            if (empty($device)) {
+                return error(State::ERROR, '找不到这个设备！');
+            }
         }
 
         $pay = self::getActivePayObj($device, $pay_log->getPayName());

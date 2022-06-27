@@ -113,17 +113,28 @@ class Order extends State
      */
     public static function refundBy($order_no, int $total = 0): bool
     {
-        //退款
-        $res = Pay::refund($order_no, $total);
-
         //记录退款结果
         $pay_log = Pay::getPayLog($order_no);
         if ($pay_log) {
+
+            //如果total < 0，表示退款金额需要减去total
+            if ($total < 0) {
+                $total = $pay_log->getPrice() + $total;
+                if ($total < 1) {
+                    return false;
+                }
+            }
+
+            //退款
+            $res = Pay::refund($order_no, $total);
+
             $pay_log->setData(is_error($res) ? 'refund_fail' : 'refund', $res);
             $pay_log->save();
+
+            return !is_error($res);
         }
 
-        return !$res && !is_error($res);
+        return false;
     }
 
     public static function queryStatus($serialNO)
@@ -764,7 +775,7 @@ class Order extends State
                                 $chargerID = $order->getChargerID();
                                 if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
                                     $data['charging']['status'] = $device->getChargerData($chargerID);
-                                }                                
+                                }
                             }
                         } else {
                             $timeout = $order->getExtraData('timeout', []);
@@ -1142,7 +1153,7 @@ class Order extends State
                             $data[$header] = '';
                         }
                         break;
-                    case 'price': 
+                    case 'price':
                         $data[$header] = number_format($entry->getPrice() / 100, 2, '.', '');
                         break;
                     case 'pay_type':

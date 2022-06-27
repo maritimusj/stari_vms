@@ -96,6 +96,24 @@ class Job
         );
     }
 
+    public static function chargingPayResult($serial, $start = 0, $timeout = 3)
+    {
+        return CtrlServ::scheduleDelayJob(
+            'charging_pay_result',
+            ['orderNO' => $serial, 'start' => $start ?: time()],
+            $timeout
+        );
+    }
+
+    public static function rechargePayResult($serial, $start = 0, $timeout = 3)
+    {
+        return CtrlServ::scheduleDelayJob(
+            'recharge_pay_result',
+            ['orderNO' => $serial, 'start' => $start ?: time()],
+            $timeout
+        );
+    }
+
     public static function orderTimeout($order_no, $timeout = PAY_TIMEOUT)
     {
         return CtrlServ::scheduleDelayJob('order_timeout', ['orderNO' => $order_no], $timeout);

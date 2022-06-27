@@ -442,6 +442,86 @@ class Helper
         return $data;
     }
 
+    public static function createChargingOrder(
+        userModelObj $user,
+        deviceModelObj $device,
+        int $chargerID,
+        int $total_price,
+        string $serial = ''
+    ) {
+
+        if ($total_price < 1) {
+            return err('支付金额不能为零！');
+        }
+
+        list($order_no, $data) = Pay::createXAppPay(
+            $device,
+            $user,
+            [
+                'title' => '充电订单',
+                'price' => $total_price,
+                'chargerID' => $chargerID,
+            ],
+            [
+                'level' => LOG_CHARGING_PAY,
+                'price' => $total_price,
+                'order_no' => $serial,
+            ]
+        );
+
+        if (is_error($data)) {
+            return err('创建支付失败: '.$data['message']);
+        }
+
+        //加入一个支付结果检查
+        $res = Job::chargingPayResult($order_no);
+        if (empty($res) || is_error($res)) {
+            return err('创建支付任务失败！');
+        }
+
+        //加入一个支付超时任务
+        $res = Job::orderTimeout($order_no);
+
+        if (empty($res) || is_error($res)) {
+            return err('创建支付任务失败！');
+        }
+
+        $data['orderNO'] = $order_no;
+
+        return $data;
+    }
+
+    public static function createRechargeOrder(userModelObj $user, int $price, string $title = '')
+    {
+        if ($price < 1) {
+            return err('支付金额不能为零！');
+        }
+
+        list($order_no, $data) = Pay::createXAppPay(
+            Device::getDummyDevice(),
+            $user,
+            [
+                'title' => empty($title) ? '充值订单' : $title,
+                'price' => $price,
+            ],
+            [
+                'level' => LOG_RECHARGE,
+                'price' => $price,
+            ]
+        );
+
+        if (is_error($data)) {
+            return err('创建支付失败: '.$data['message']);
+        }
+
+        //加入一个支付结果检查
+        Job::rechargePayResult($order_no);
+
+        $data['orderNO'] = $order_no;
+
+        return $data;
+    }
+
     public static function validateLocation(userModelObj $user, deviceModelObj $device, $lat, $lng)
     {
         $data = [

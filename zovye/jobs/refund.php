@@ -12,6 +12,7 @@ use Exception;
 use zovye\CtrlServ;
 use zovye\Helper;
 use zovye\Job;
+use zovye\Locker;
 use zovye\Log;
 use zovye\model\orderModelObj;
 use zovye\Order;
@@ -39,6 +40,13 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
         'num' => $num,
         'message' => request('message'),
     ])) {
+
+    if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
+        $log['relaunch refund job'] = Job::refund($order_no, request('message'), $num, $reset_payload, 10);
+        Log::debug('refund', $log);
+        Job::exit();
+    }
+
     $order = Order::get($order_no, true);
     if (empty($order)) {
         //没有订单，也要尝试退款
@@ -56,22 +64,40 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
     }
 
     $device = $order->getDevice();
-    //蓝牙设备退款
-    if ($device && $device->isBlueToothDevice()) {
-        if ($order->isBluetoothResultOk()) {
-            $log['result'] = '订单已成功，取消退款！';
+    if ($device) {
+        //蓝牙设备退款
+        if ($device->isBlueToothDevice()) {
+            if ($order->isBluetoothResultOk()) {
+                $log['result'] = '订单已成功，取消退款！';
+                Log::debug('refund', $log);
+                Job::exit();
+            }
+
+            //退款
+            $res = Order::refund($order->getOrderNO(), 0, ['message' => $log['message']]);
+            if ($reset_payload && !is_error($res)) {
+                resetPayload($order, $num);
+            }
+
+            $log['result'] = is_error($res) ? $res : '退款成功！';
             Log::debug('refund', $log);
             Job::exit();
-        }
 
-        //退款
-        $res = Order::refund($order->getOrderNO(), 0, ['message' => $log['message']]);
-        if ($reset_payload && !is_error($res)) {
-            resetPayload($order, $num);
+        } elseif ($device->isChargingDevice()) {
+            if ($order->isChargingFinished()) {
+                try {
+                    $log['result'] = Order::refundBy($order_no, 0 - $order->getPrice());
+                } catch (Exception $e) {
+                    $log['exception'] = [
+                        'type' => get_class($e),
+                        'code' => $e->getCode(),
+                        'msg' => $e->getMessage(),
+                    ];
+                }
+                Log::debug('refund', $log);
+                Job::exit();
+            }
         }
-        $log['result'] = is_error($res) ? $res : '退款成功！';
-        Log::debug('refund', $log);
-        Job::exit();
     }
 
     //以下是普通设备退款

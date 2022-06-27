@@ -56,4 +56,7 @@ router::exec($op, [
     'chargingOrderList' => '\zovye\api\wxweb\charging::orderList',
     'chargingOrderDetail' => '\zovye\api\wxweb\charging::orderDetail',
     'chargingStatus' => '\zovye\api\wxweb\charging::status',
+    'payForCharging' => '\zovye\api\wxweb\charging::payForCharging',
+    'payForRecharge' => '\zovye\api\wxweb\charging::payForRecharge',
+    'rechargeResult' => '\zovye\api\wxweb\charging::rechargeResult',
 ]);

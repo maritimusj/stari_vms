@@ -65,7 +65,7 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
  */
 function process($order_no): bool
 {
-    $locker = Locker::try("pay_log:$order_no", REQUEST_ID, 6);
+    $locker = Locker::try("pay:$order_no", REQUEST_ID, 6);
     if (!$locker) {
         throw new Exception('无法锁定支付信息！');
     }

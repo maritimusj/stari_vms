@@ -3,12 +3,15 @@
 namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
+use zovye\App;
 use zovye\Charging as IotCharging;
 use zovye\Device;
 use zovye\Group;
+use zovye\Helper;
 use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\Order;
+use zovye\Pay;
 use zovye\request;
 use zovye\User;
 use zovye\Util;
@@ -34,12 +37,15 @@ class charging
         $lat = request::float('lat');
 
         if ($lng > 0 && $lat > 0) {
-            $distanceFN = function($loc) use($lng, $lat) {
+            $distanceFN = function ($loc) use ($lng, $lat) {
                 $res = Util::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
+
                 return is_error($res) ? 0 : $res;
-            };     
+            };
         } else {
-            $distanceFN = function() { return 0;};
+            $distanceFN = function () {
+                return 0;
+            };
         }
 
         $order_by = sprintf("st_distance_sphere(POINT(%f,%f),loc) asc", $lng, $lat);
@@ -147,11 +153,11 @@ class charging
 
         $result = $device->profile();
         $result['chargerNum'] = $device->getChargerNum();
-        
+
         if (request::has('chargerID')) {
             $result['charger'] = $device->getChargerData(request::int('chargerID'));
         }
-        
+
         $group = $device->getGroup();
         if ($group) {
             $result['group'] = $group->format();
@@ -170,14 +176,15 @@ class charging
         }
 
         $chargerID = request::int('chargerID');
+        $serial = $device->generateChargingSerial($chargerID);
 
-        return IotCharging::start($user, $device, $chargerID);
+        return IotCharging::start($serial, $user->getCommissionBalanceCard(), $device, $chargerID);
     }
 
     public static function stop()
     {
         $user = common::getUser();
-        
+
         return IotCharging::stop($user);
     }
 
@@ -198,6 +205,7 @@ class charging
         }
 
         $serial = $last_charging_data['serial'];
+
         return ['serial' => $serial];
     }
 
@@ -225,7 +233,7 @@ class charging
         $query->orderby('id desc');
 
         $list = [];
-        foreach($query->findAll() as $order) {
+        foreach ($query->findAll() as $order) {
             $list[] = Order::format($order, true);
         }
 
@@ -250,15 +258,102 @@ class charging
 
         if (!$order->isChargingResultOk()) {
             $data = $order->getChargingResult();
-            return err('订单没有完成，故障：' . $data['re']);
+
+            return err('订单没有完成，故障：'.$data['re']);
         }
 
         if (!$order->isChargingFinished()) {
             return err('订单没有完成！');
         }
 
-        $result = Order::format($order, true);
-        return $result;
+        return Order::format($order, true);
     }
 
+    public static function payForCharging(): array
+    {
+        $user = common::getWXAppUser();
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
+        $device = Device::get(request::str('deviceId'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        if (!$device->isChargingDevice()) {
+            return err('不是充电桩设备！');
+        }
+
+        if (!$device->isMcbOnline()) {
+            return err('设备不在线！');
+        }
+
+        $chargerID = request::int('chargerID');
+
+        $charging_data = $device->settings("chargingNOW.$chargerID");
+        if (!empty($charging_data)) {
+            return err('充电枪正在使用中！');
+        }
+
+        $price = intval(request::float('price', 0, 2) * 100);
+        if ($price < 1) {
+            return err('付款金额不正确！');
+        }
+
+        App::setContainer($user);
+
+        $serial = $device->generateChargingSerial($chargerID);
+
+        return Helper::createChargingOrder($user, $device, $price, $serial);
+    }
+
+    public static function payForRecharge(): array
+    {
+        $user = common::getWXAppUser();
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
+        $price = intval(request::float('price', 0, 2) * 100);
+        if ($price < 1) {
+            return err('付款金额不正确！');
+        }
+
+        return Helper::createRechargeOrder($user, $price);
+    }
+
+    public static function rechargeResult(): array
+    {
+        $order_no = request::str('orderNO');
+
+        $pay_log = Pay::getPayLog($order_no);
+        if (empty($pay_log)) {
+            return err('找不到这个支付记录!');
+        }
+
+        if ($pay_log->isRecharged()) {
+            return ['msg' => '充值已到账！'];
+        }
+
+        if ($pay_log->isCancelled()) {
+            return err('支付已取消');
+        }
+
+        if ($pay_log->isTimeout()) {
+            return err('支付已超时！');
+        }
+
+        if ($pay_log->isRefund()) {
+            return err('支付已退款！');
+        }
+
+        if ($pay_log->isPaid()) {
+            return err('支付已成功！');
+        }
+
+        return ['msg' => '正在查询..'];
+    }
 }

@@ -61,6 +61,8 @@ define('LOG_GOODS_VOUCHER', 114);
 define('LOG_GOODS_ADV', 115);
 define('LOG_GOODS_RETRY', 116);
 define('LOG_GOODS_BALANCE', 117);
+define('LOG_CHARGING_PAY', 120);
+define('LOG_RECHARGE', 121);
 
 define('DEFAULT_PAGE_SIZE', 20);
 define('DEFAULT_DEVICE_CAPACITY', 10);

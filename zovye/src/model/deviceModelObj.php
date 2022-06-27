@@ -47,6 +47,8 @@ use zovye\BlueToothProtocol;
 use zovye\base\modelObjFinder;
 use function zovye\isEmptyArray;
 use zovye\Contract\bluetooth\IBlueToothProtocol;
+use zovye\Order;
+use zovye\Pay;
 
 /**
  * @method getGroupId()
@@ -2974,20 +2976,35 @@ class deviceModelObj extends modelObj
 
     public function generateChargingSerial(int $chargerID): string
     {
-        $chargingData = $this->settings('extra.chargingData', []);
-        if (date('Ymd', $chargingData['last']) != date('Ymd')) {
-            $index = 0;
+        $locker = Locker::try("charging:serial:{$this->imei}");
+        if ($locker) {
+            $chargingData = $this->settings('extra.chargingData', []);
+            if (date('Ymd', $chargingData['last']) != date('Ymd')) {
+                $index = 0;
+            } else {
+                $index = intval($chargingData['index']);
+            }
+
+            $index ++;
+
+            $this->updateSettings('extra.chargingData', [
+                'last' => time(),
+                'index' => $index,
+            ]);
+
+            $locker->release();
         } else {
-            $index = intval($chargingData['index']);
+            $index = rand(8000, 9999);
+        }
+        
+        $serial = sprintf('%s%02d%s%04d', $this->imei, $chargerID, date('Ymd'), $index);
+        if (Order::exists($serial)) {
+            return self::generateChargingSerial($chargerID);
+        }
+        if (Pay::getPayLog($serial)) {
+            return self::generateChargingSerial($chargerID); 
         }
 
-        $index ++;
-
-        $this->updateSettings('extra.chargingData', [
-            'last' => time(),
-            'index' => $index,
-        ]);
-
-        return sprintf('%s%02d%s%04d', $this->imei, $chargerID, date('Ymd'), $index);
+        return $serial;
     }
 }

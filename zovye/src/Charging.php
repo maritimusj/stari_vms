@@ -288,6 +288,8 @@ class Charging
                 return err("启动失败：设备故障");
             } elseif ($result['re'] == 114) {
                 return err("启动失败：设备离线");
+            } elseif ($result['re'] == 115) {
+                return err("启动失败：充电枪没有插入");
             }
             return err("启动失败：故障[{$result['re']}]");
         }

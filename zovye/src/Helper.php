@@ -416,6 +416,8 @@ class Helper
             return err('支付金额不能为零！');
         }
 
+        App::setContainer($user);
+
         list($order_no, $data) = Pay::createXAppPay($device, $user, $goods, [
             'level' => LOG_GOODS_PAY,
             'discount' => $discount ?? 0,

@@ -457,8 +457,6 @@ class common
             return err('没有指定商品！');
         }
 
-        App::setContainer($user);
-
         return Helper::createWxAppOrder($user, $device, $goods_id);
     }
 

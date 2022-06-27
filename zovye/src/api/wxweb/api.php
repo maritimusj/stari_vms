@@ -346,8 +346,6 @@ class api
             $is_package = true;
         }
 
-        App::setContainer($user);
-
         return Helper::createWxAppOrder($user, $device, $goods_or_package_id, $num ?? 1, $is_package);
     }
 

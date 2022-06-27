@@ -5,6 +5,7 @@ namespace zovye;
 use RuntimeException;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
+use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;
 
 class Charging
@@ -462,5 +463,50 @@ class Charging
                 $device->updateSettings("chargingNOW.$chargerID", []);
             }
         }
+    }
+
+    public static function startFromPayLog(pay_logsModelObj $pay_log)
+    {
+        if (!$pay_log->isPaid()) {
+            return err('未支付完成！');
+        }
+
+        if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund() || $pay_log->isRecharged()) {
+            return err('支付已无效!');
+        }
+
+        if ($pay_log->isCharging()) {
+            return err('已经开始充电！');
+        }
+    
+        $device_id = $pay_log->getDeviceId();
+
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            return err("找不到指定设备!");
+        }
+    
+        if (!$device->isChargingDevice()) {
+            return err("不是充电桩设备!");
+        }
+    
+        $user = $pay_log->getOwner();
+        if (empty($user)) {
+            return err('找不到指定的用户!');
+        }
+    
+        $chargerID = $pay_log->getData('chargerID');
+    
+        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        $pay_log->setData('charging', $res);
+        if (!$pay_log->save()) {
+            return err('保存数据失败！');
+        }
+
+        return true;
     }
 }

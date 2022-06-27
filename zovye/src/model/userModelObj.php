@@ -31,6 +31,7 @@ use zovye\Device;
 use zovye\Keeper;
 use zovye\Principal;
 
+use function zovye\err;
 use function zovye\m;
 use function zovye\tb;
 use function zovye\settings;
@@ -654,6 +655,44 @@ class userModelObj extends modelObj
     public function acquireLocker(string $name = ''): ?lockerModelObj
     {
         return Locker::try("user:{$this->getId()}:$name", REQUEST_ID);
+    }
+
+    public function recharge(pay_logsModelObj $pay_log)
+    {
+        if (!$pay_log->isPaid()) {
+            return err('未支付完成！');
+        }
+
+        if ($pay_log->isRecharged()) {
+            return err('支付记录已使用！');
+        }
+
+        if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund()) {
+            return err('支付已无效!');
+        }
+    
+        return Util::transactionDo(function() use($pay_log) {
+            
+            $price = $pay_log->getPrice();
+            if ($price < 1) {
+                return err('支付金额小于1!');
+            }
+        
+            $balance = $this->getCommissionBalance();
+            if (!$balance->change($price, CommissionBalance::RECHARGE)) {
+                return err('创建用户帐户记录失败!');
+            }
+        
+            $pay_log->setData('recharged', [
+                'time' => time(),
+            ]);
+        
+            if (!$pay_log->save()) {
+                return err('保存用户数据失败!');
+            }    
+
+            return true;        
+        });
     }
 
     /**

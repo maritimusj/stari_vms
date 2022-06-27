@@ -5,6 +5,7 @@ namespace zovye\api\wxweb;
 use zovye\api\wx\common;
 use zovye\App;
 use zovye\Charging as IotCharging;
+use zovye\CommissionBalance;
 use zovye\Device;
 use zovye\Group;
 use zovye\Helper;
@@ -21,6 +22,34 @@ use function zovye\isEmptyArray;
 
 class charging
 {
+    public static function chargingUserInfo() 
+    {
+        $user = common::getWXAppUser();
+    
+        $data = $user->profile();
+        $data['banned'] = $user->isBanned();
+        $data['commission_balance'] = $user->getCommissionBalance()->total();
+
+        if (App::isChargingDeviceEnabled()) {
+            $last_charging_data = $user->settings('chargingNOW', []);
+            if ($last_charging_data) {
+                $device = Device::get($last_charging_data['device']);
+                if ($device) {
+                    $serial = $last_charging_data['serial'];
+                    $chargerID = $last_charging_data['chargerID'];
+                    $chargerData = $device->getChargerBMSData($chargerID);
+                    if ($chargerData && $chargerData['serial'] == $serial) {
+                        $data['charging'] = [
+                            'device' => $device->profile(),
+                            'status' => $chargerData,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
     public static function groupList(): array
     {
         $query = Group::query(Group::CHARGING);
@@ -168,7 +197,7 @@ class charging
 
     public static function start()
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
@@ -183,7 +212,7 @@ class charging
 
     public static function stop()
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         return IotCharging::stop($user);
     }
@@ -197,7 +226,7 @@ class charging
 
     public static function status(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
         $last_charging_data = $user->settings('chargingNOW', []);
 
         if (isEmptyArray($last_charging_data)) {
@@ -211,7 +240,7 @@ class charging
 
     public static function orderList(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $query = Order::query([
             'openid' => $user->getOpenid(),
@@ -242,7 +271,7 @@ class charging
 
     public static function orderDetail(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $serial = request::str('serial');
 
@@ -315,7 +344,7 @@ class charging
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $price = intval(request::float('price', 0, 2) * 100);
+        $price = 1;//intval(request::float('price', 0, 2) * 100);
         if ($price < 1) {
             return err('付款金额不正确！');
         }
@@ -333,7 +362,7 @@ class charging
         }
 
         if ($pay_log->isRecharged()) {
-            return ['msg' => '充值已到账！'];
+            return ['msg' => '充值已到账！', 'code' => 200];
         }
 
         if ($pay_log->isCancelled()) {
@@ -349,9 +378,30 @@ class charging
         }
 
         if ($pay_log->isPaid()) {
-            return err('支付已成功！');
+            return ['msg' => '支付已成功！'];
         }
 
         return ['msg' => '正在查询..'];
+    }
+
+    public static function rechargeList(): array
+    {
+        $user = common::getWXAppUser();
+
+        $query = $user->getCommissionBalance()->log();
+        $query->where(['src' => CommissionBalance::RECHARGE]);
+
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $query->page($page, $page_size);
+
+        $query->orderBy('createtime DESC');
+
+        $result = [];
+        foreach($query->findAll() as $log) {
+            $result[] = CommissionBalance::format($log);
+        }
+
+        return $result;
     }
 }

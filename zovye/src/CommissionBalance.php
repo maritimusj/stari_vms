@@ -276,7 +276,12 @@ $device_info
 </dl>
 CHARGING;
         } elseif ($entry->getSrc() == CommissionBalance::RECHARGE) {
-
+            $data['memo'] = <<<RECHARGE
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">用户充值</dd>
+</dl>
+RECHARGE;
         }
 
         return $data;

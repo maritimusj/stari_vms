@@ -11,7 +11,7 @@ class JobException extends RuntimeException
 
     public function __construct($message, $data)
     {
-        parent::__construct($message, 0, 0);
+        parent::__construct($message, 0, null);
         $this->data = $data;
     }
 

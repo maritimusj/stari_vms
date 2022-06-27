@@ -394,6 +394,7 @@ class api
         if (App::isBalanceEnabled()) {
             $data['signed'] = $user->isSigned();
             $data['balance'] = $user->getBalance()->total();
+            $data['commission_balance'] = $user->getCommissionBalance()->total();
         }
 
         if (App::isChargingDeviceEnabled()) {

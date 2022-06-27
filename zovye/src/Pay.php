@@ -240,9 +240,6 @@ class Pay
             }
 
             $device = Device::get($data['deviceUID'], true);
-            if (empty($device)) {
-                throw new Exception('找不到这个设备！');
-            }
 
             //获取一个配置完整的pay对象
             $pay = self::getActivePayObj($device, $name);
@@ -254,9 +251,13 @@ class Pay
                 throw new Exception('回调数据异常！');
             }
 
+            if (!Locker::try("pay:{$data['orderNO']}", REQUEST_ID, 3)) {
+                throw new Exception('无法锁定支付记录！');
+            }
+
             $pay_log = self::getPayLog($data['orderNO']);
             if (empty($pay_log)) {
-                throw new Exception('找不对支付记录！');
+                throw new Exception('找不到支付记录！');
             }
 
             $pay_log->setData('payResult', $data);
@@ -264,6 +265,29 @@ class Pay
 
             if (!$pay_log->save()) {
                 throw new Exception('保存支付记录失败！');
+            }
+
+            if ($pay_log->getLevel() == LOG_RECHARGE) {
+                $user = $pay_log->getOwner();
+                if ($user) {
+                    if ($user->recharge($pay_log)) {
+                        return $pay->getResponse(false);
+                    }
+                }
+                throw new Exception('处理充值失败！');
+
+            } elseif ($pay_log->getLevel() == LOG_CHARGING_PAY) {
+
+                $res = Charging::startFromPayLog($pay_log);
+                if (is_error($res)) {
+                    throw new Exception($res['message']);
+                }
+                
+                return $pay->getResponse(false);
+            }
+
+            if (empty($device)) {
+                throw new Exception('找不到这个设备！');
             }
 
             //创建一个回调执行创建订单，出货任务

@@ -46,6 +46,7 @@ router::exec($op, [
     'rewardOrderData' => '\zovye\api\wxweb\api::rewardOrderData',
     'validateLocation' => '\zovye\api\wxweb\api::validateLocation',
 
+    'chargingUserInfo' => '\zovye\api\wxweb\charging::chargingUserInfo',
     'chargingGroupList' => '\zovye\api\wxweb\charging::groupList',
     'chargingGroupDetail' => '\zovye\api\wxweb\charging::groupDetail',
     'chargingDeviceList' => '\zovye\api\wxweb\charging::deviceList',
@@ -59,4 +60,5 @@ router::exec($op, [
     'payForCharging' => '\zovye\api\wxweb\charging::payForCharging',
     'payForRecharge' => '\zovye\api\wxweb\charging::payForRecharge',
     'rechargeResult' => '\zovye\api\wxweb\charging::rechargeResult',
+    'rechargeList' => '\zovye\api\wxweb\charging::rechargeList',
 ]);

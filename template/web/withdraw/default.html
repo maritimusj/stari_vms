@@ -356,7 +356,7 @@
         }
         
         api.pay = function(id, cb) {
-            if (confirm('确定要给代理打款吗？')) {
+            if (confirm('确定要给用户打款吗？')) {
                 api.showResult({op: 'withdraw_pay', id: id}, null, cb);
             }
         }
@@ -368,7 +368,7 @@
         }
         
         api.refund = function(id, cb) {
-            if (confirm('确定退款到代理商佣金帐户吗？')) {
+            if (confirm('确定退款到用户佣金帐户吗？')) {
                 api.showResult({op: 'withdraw_refund', id: id}, null, cb);
             }
         }

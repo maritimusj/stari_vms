@@ -329,7 +329,7 @@ if ($op == 'withdraw_pay') {
                 }
 
                 if ($balance_obj->update(['state' => 'cancelled', 'refund_id' => $r->getId()], true)) {
-                    return ['message' => '申请已退回，金额已退款到用户帐户！'];
+                    return ['message' => '申请已退回，金额已退款到用户账户！'];
                 }
             }
 

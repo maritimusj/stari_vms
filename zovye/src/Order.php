@@ -607,7 +607,7 @@ class Order extends State
 
                             $commission_balance = $agent->getCommissionBalance();
                             if ($commission_balance->total() < $x_val) {
-                                return error(State::FAIL, '代理商帐户余额不足，无法退款！');
+                                return error(State::FAIL, '代理商账户余额不足，无法退款！');
                             }
 
                             $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [

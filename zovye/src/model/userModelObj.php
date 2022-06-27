@@ -510,7 +510,7 @@ class userModelObj extends modelObj
 
 
     /**
-     * 获取用户名佣金帐户.
+     * 获取用户名佣金账户
      *
      * @return CommissionBalance
      */
@@ -520,7 +520,7 @@ class userModelObj extends modelObj
     }
 
     /**
-     * 获取用户名积分帐户.
+     * 获取用户名积分账户
      *
      * @return Balance
      */
@@ -680,7 +680,7 @@ class userModelObj extends modelObj
         
             $balance = $this->getCommissionBalance();
             if (!$balance->change($price, CommissionBalance::RECHARGE)) {
-                return err('创建用户帐户记录失败!');
+                return err('创建用户账户记录失败!');
             }
         
             $pay_log->setData('recharged', [

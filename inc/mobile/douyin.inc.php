@@ -137,7 +137,7 @@ if (DouYin::isTokenExpired($user)) {
 }
 
 if ($user->isBanned()) {
-    Util::resultAlert('用户帐户暂时无法使用该功能，请联系管理员！', 'error');
+    Util::resultAlert('用户暂时无法使用该功能，请联系管理员！', 'error');
 }
 
 if (App::isUserVerify18Enabled()) {

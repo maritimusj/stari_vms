@@ -7,6 +7,7 @@
 namespace zovye\api\wx;
 
 use zovye\Device;
+use zovye\Group as ZovyeGroup;
 use zovye\model\device_groupsModelObj;
 use zovye\request;
 use zovye\State;
@@ -216,13 +217,13 @@ class group
         return error(State::ERROR, '删除失败！');
     }
 
-    public static function getDeviceGroup($id): array
+    public static function getDeviceGroup($id, $typeid = ZovyeGroup::NORMAL): array
     {
         static $cache = [];
 
         if (empty($cache[$id])) {
             /** @var device_groupsModelObj $res */
-            $res = \zovye\Group::get($id);
+            $res = \zovye\Group::get($id, $typeid);
             if ($res) {
                 $cache[$id] = [
                     'id' => $res->getId(),

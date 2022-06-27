@@ -17,6 +17,7 @@ use zovye\CtrlServ;
 use zovye\model\deviceModelObj;
 use zovye\DeviceTypes;
 use zovye\Goods;
+use zovye\Group as ZovyeGroup;
 use zovye\model\goods_stats_vwModelObj;
 use zovye\request;
 use zovye\State;
@@ -66,6 +67,7 @@ class device
                 'device' => [
                     'id' => $device->getImei(),
                     'name' => $device->getName(),
+                    'modal' => $device->getDeviceModel(),
                 ],
                 'keeper' => [
                     'keeper_id' => $keeper_id,
@@ -95,6 +97,7 @@ class device
             'device' => [
                 'id' => $device->getImei(),
                 'name' => $device->getName(),
+                'modal' => $device->getDeviceModel(),
                 'rank' => $device->getRank(),
                 'qrcode' => $device->getQrcode(),
                 'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),
@@ -165,8 +168,12 @@ class device
         }
 
         if ($device->getGroupId()) {
-            $groupData = group::getDeviceGroup($device->getGroupId());
-            if (!empty($groupData['agent_id']) && $groupData['agent_id'] == $device->getAgentId()) {
+            if ($device->isChargingDevice()) {
+                $groupData = group::getDeviceGroup($device->getGroupId(), ZovyeGroup::CHARGING);
+            } else {
+                $groupData = group::getDeviceGroup($device->getGroupId());
+            }
+            if (empty($groupData['agent_id']) || $groupData['agent_id'] == $device->getAgentId()) {
                 $result['group'] = $groupData;
             }
         }

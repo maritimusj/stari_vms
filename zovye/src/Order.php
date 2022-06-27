@@ -401,12 +401,8 @@ class Order extends State
                             $remain -= $x_val;
 
                             $commission_balance = $keeperUser->getCommissionBalance();
-                            if (empty($commission_balance)) {
-                                return error(State::ERROR, '找不到用户佣金帐户，无法退款[202]');
-                            }
-
                             if ($commission_balance->total() < $x_val) {
-                                return error(State::FAIL, "运营人员{$keeperUser->getName()}帐户余额不足，无法退款！");
+                                return error(State::FAIL, "运营人员{$keeperUser->getName()}账户余额不足，无法退款！");
                             }
 
                             $r = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -432,12 +428,8 @@ class Order extends State
                             $remain -= $x_val;
 
                             $commission_balance = $user->getCommissionBalance();
-                            if (empty($commission_balance)) {
-                                return error(State::ERROR, '找不到用户佣金帐户，无法退款[205]');
-                            }
-
                             if ($commission_balance->total() < $x_val) {
-                                return error(State::FAIL, "分佣帐户{$user->getName()}余额不足，无法退款！");
+                                return error(State::FAIL, "{$user->getName()}账户余额不足，无法退款！");
                             }
 
                             $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -464,12 +456,8 @@ class Order extends State
                         }
 
                         $commission_balance = $agent->getCommissionBalance();
-                        if (empty($commission_balance)) {
-                            return error(State::ERROR, '找不到设备代理商佣金帐户，无法退款[207]');
-                        }
-
                         if ($commission_balance->total() < $x_val) {
-                            return error(State::FAIL, '代理商帐户余额不足，无法退款！');
+                            return error(State::FAIL, '代理商账户余额不足，无法退款！');
                         }
 
                         $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -556,19 +544,15 @@ class Order extends State
                         foreach ($commission['keepers'] as $entry) {
                             $keeperUser = User::get($entry['openid'], true);
                             if (empty($keeperUser)) {
-                                return error(State::ERROR, '找不到佣金用户，无法退款[201]');
+                                return error(State::ERROR, '找不到该用户，无法退款[201]');
                             }
                             $x_val = intval($entry['xval'] * $percent);
                             if ($x_val > 0) {
                                 $total_remain -= $x_val;
 
                                 $commission_balance = $keeperUser->getCommissionBalance();
-                                if (empty($commission_balance)) {
-                                    return error(State::ERROR, '找不到用户佣金帐户，无法退款[202]');
-                                }
-
                                 if ($commission_balance->total() < $x_val) {
-                                    return error(State::FAIL, "运营人员{$keeperUser->getName()}帐户余额不足，无法退款！");
+                                    return error(State::FAIL, "运营人员{$keeperUser->getName()}账户余额不足，无法退款！");
                                 }
 
                                 $r = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -587,19 +571,15 @@ class Order extends State
                         foreach ($commission['gsp'] as $entry) {
                             $user = User::get($entry['openid'], true);
                             if (empty($user)) {
-                                return error(State::ERROR, '找不到佣金用户，无法退款[204]');
+                                return error(State::ERROR, '找不到该用户，无法退款[204]');
                             }
                             $x_val = intval($entry['xval'] * $percent);
                             if ($x_val > 0) {
                                 $total_remain -= $x_val;
 
                                 $commission_balance = $user->getCommissionBalance();
-                                if (empty($commission_balance)) {
-                                    return error(State::ERROR, '找不到用户佣金帐户，无法退款[205]');
-                                }
-
                                 if ($commission_balance->total() < $x_val) {
-                                    return error(State::FAIL, "分佣帐户{$user->getName()}余额不足，无法退款！");
+                                    return error(State::FAIL, "{$user->getName()}账户余额不足，无法退款！");
                                 }
 
                                 $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -626,10 +606,6 @@ class Order extends State
                             }
 
                             $commission_balance = $agent->getCommissionBalance();
-                            if (empty($commission_balance)) {
-                                return error(State::ERROR, '找不到设备代理商佣金帐户，无法退款[207]');
-                            }
-
                             if ($commission_balance->total() < $x_val) {
                                 return error(State::FAIL, '代理商帐户余额不足，无法退款！');
                             }

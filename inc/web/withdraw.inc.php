@@ -126,7 +126,7 @@ if ($op == 'export') {
             }
 
            $memo = $entry->getExtraData('memo', '');
-            if (isset($memo)) {
+            if (!empty($memo)) {
                 $data['memo'] = $memo;
             }
 

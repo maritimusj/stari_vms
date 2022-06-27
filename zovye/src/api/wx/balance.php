@@ -91,10 +91,11 @@ class balance
 
     /**
      * @param $user userModelObj
-     * @param $amount
+     * @param int $amount
+     * @param string $memo
      * @return array
      */
-    public static function balanceWithdraw(userModelObj $user, $amount): array
+    public static function balanceWithdraw(userModelObj $user, int $amount, string $memo = ''): array
     {
         //先锁定用户，防止恶意重复提交
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
@@ -143,7 +144,7 @@ class balance
         }
 
         $res = Util::transactionDo(
-            function () use ($amount, $balance, $user) {
+            function () use ($amount, $memo, $balance, $user) {
                 //计算手续费
                 $fee = 0;
                 $config = settings('commission.withdraw.fee', []);
@@ -201,6 +202,7 @@ class balance
                         'current' => $balance_total,
                         'remain' => $balance_total - $amount - $fee,
                         'fee' => $fee,
+                        'memo' => $memo,
                     ]
                 );
 

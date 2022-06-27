@@ -414,6 +414,6 @@ class charging
 
         $total =  round(request::float('amount', 0, 2) * 100);
 
-        return balance::balanceWithdraw($user, $total);
+        return balance::balanceWithdraw($user, $total, request::str('memo'));
     }
 }

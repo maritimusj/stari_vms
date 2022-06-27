@@ -235,6 +235,9 @@
                     <td>
                         <div class="price val">
                             ￥{$item['xval']}
+                            {if $item['memo']}
+                            <i class="fa fa-comment-o" title="{$item['memo']}"></i>
+                            {/if}
                         </div>
                         {if $item['paymentNO']}
                         <div class="paymentNO">

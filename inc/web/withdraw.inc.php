@@ -125,6 +125,11 @@ if ($op == 'export') {
                 $data['fee'] = $fee;
             }
 
+           $memo = $entry->getExtraData('memo', '');
+            if (isset($memo)) {
+                $data['memo'] = $memo;
+            }
+
             $state = $entry->getExtraData('state');
             if (empty($state)) {
                 $status = '审核中';

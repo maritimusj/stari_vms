@@ -1256,6 +1256,10 @@ class common
                 $user->setAvatar($user_info['avatarUrl']);
             }
 
+            if ($res['phoneNumber']) {
+                $user->setMobile($res['phoneNumber']);
+            }
+
             $user->save();
         }
 

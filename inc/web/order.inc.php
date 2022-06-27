@@ -440,7 +440,13 @@ if ($op == 'default') {
     $page = max(1, request::str('page'));
     $page_size = $is_ajax ? 10 : max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-    $query = m('user_logs')->where(['level' => LOG_PAY])->orderBy('id DESC');
+    $query = m('user_logs')->where([
+        'level' => [
+            LOG_PAY, 
+            LOG_CHARGING_PAY, 
+            LOG_RECHARGE,
+        ],
+    ])->orderBy('id DESC');
 
     //使用自增长id做为总数，数据量大时使用$query->count()效率太低，
     //注意：需要先调用$query->orderBy('id desc'); 

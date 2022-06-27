@@ -84,7 +84,7 @@ class Pay
 
         list($order_no,) = self::prepareDataWithPay($pay->getName(), $device, $user, $goods, $pay_data);
         if (is_error($order_no)) {
-            return ['', $order_no];
+            return $order_no;
         }
 
         return [$pay, $order_no];
@@ -169,7 +169,15 @@ class Pay
         if (is_callable([$pay, $fn])) {
             $res = $pay->$fn($user->getOpenid(), $device->getImei(), $order_no, $price, $title);
         } else {
-            $res = error(State::ERROR, 'unknown pay function');
+            Log::debug('pay', [
+                'result' => $result,
+                'pay' => $pay,
+                'fn' => $fn,
+                'goods' => $goods,
+                'data' => $pay_data,
+                'user' => $user->profile(),
+            ]);
+            $res = error(State::ERROR, 'unknown pay function:' . $fn);
         }
 
         if (is_error($res)) {
@@ -403,8 +411,9 @@ class Pay
      */
     public static function createPayLog(userModelObj $user, string $order_no, array $data = []): ?pay_logsModelObj
     {
-        if ($user->payLog($order_no, $data)) {
-            return self::getPayLog($order_no);
+        $level = intval($data['level'] ?? LOG_PAY);
+        if ($user->payLog($order_no, $level, $data)) {
+            return self::getPayLog($order_no, $level);
         }
 
         return null;
@@ -416,8 +425,15 @@ class Pay
      * @param int $level 支付类型
      * @return pay_logsModelObj|null
      */
-    public static function getPayLog(string $order_no, int $level = LOG_PAY): ?pay_logsModelObj
+    public static function getPayLog(string $order_no, int $level = 0): ?pay_logsModelObj
     {
+        if (empty($level)) {
+            $level = [
+                LOG_PAY,
+                LOG_CHARGING_PAY,
+                LOG_RECHARGE,
+            ];
+        }
         $data = We7::uniacid(['title' => $order_no, 'level' => $level]);
 
         return m('pay_logs')->findOne($data);

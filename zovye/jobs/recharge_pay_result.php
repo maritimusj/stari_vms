@@ -35,7 +35,7 @@ if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
     throw new JobException('无法锁定支付记录！', $log);
 }
 
-$pay_log = Pay::getPayLog($order_no);
+$pay_log = Pay::getPayLog($order_no, LOG_RECHARGE);
 if (empty($pay_log)) {
     throw new JobException('找不到这个支付记录!', $log);
 }

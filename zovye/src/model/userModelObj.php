@@ -275,9 +275,9 @@ class userModelObj extends modelObj
         );
     }
 
-    public function payLog($order_id, $data): bool
+    public function payLog($order_id, $level, $data): bool
     {
-        return $this->log(LOG_PAY, $order_id, $data);
+        return $this->log($level, $order_id, $data);
     }
 
     /**

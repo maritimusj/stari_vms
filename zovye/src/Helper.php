@@ -464,12 +464,12 @@ class Helper
             [
                 'title' => '充电订单',
                 'price' => $total_price,
-                'chargerID' => $chargerID,
             ],
             [
                 'level' => LOG_CHARGING_PAY,
                 'price' => $total_price,
                 'order_no' => $serial,
+                'chargerID' => $chargerID,
             ]
         );
 

@@ -28,6 +28,11 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
         return intval($this->getData('device'));
     }
 
+    public function getChargerID(): int
+    {
+        return intval($this->getData('chargerID'));
+    }
+
     public function getUserOpenid(): string
     {
         return strval($this->getData('user'));

@@ -94,9 +94,11 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
                         'msg' => $e->getMessage(),
                     ];
                 }
-                Log::debug('refund', $log);
-                Job::exit();
+            } else {
+                $log['err'] = '充电订单未结束！';
             }
+            Log::debug('refund', $log);
+            Job::exit();
         }
     }
 

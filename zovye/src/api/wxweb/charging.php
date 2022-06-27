@@ -336,7 +336,53 @@ class charging
 
         $serial = $device->generateChargingSerial($chargerID);
 
-        return Helper::createChargingOrder($user, $device, $price, $serial);
+        $result = Helper::createChargingOrder($user, $device, $chargerID, $price, $serial);
+        if (is_error($result)) {
+            return $result;
+        }
+
+        return $result;
+    }
+
+    public static function chargingPayResult(): array
+    {
+        $order_no = request::str('orderNO');
+
+        $pay_log = Pay::getPayLog($order_no, LOG_CHARGING_PAY);
+        if (empty($pay_log)) {
+            return err('找不到这个支付记录!');
+        }
+
+        if ($pay_log->isCancelled()) {
+            return err('支付已取消');
+        }
+
+        if ($pay_log->isTimeout()) {
+            return err('支付已超时！');
+        }
+
+        if ($pay_log->isRefund()) {
+            return err('支付已退款！');
+        }
+
+        if ($pay_log->isPaid()) {
+            $device = Device::get($pay_log->getDeviceId());
+            if (!$device) {
+                return err('找不到设备！');
+            }
+
+            $chargerID = $pay_log->getChargerID();
+
+            return [
+                'msg' => '支付成功！', 
+                'code' => 200,
+                'device' => $device->getImei(),
+                'chargerID' => $chargerID,
+                'serial' => $pay_log->getOrderNO(),
+            ];
+        }
+
+        return ['msg' => '正在查询..'];
     }
 
     public static function payForRecharge(): array
@@ -359,7 +405,7 @@ class charging
     {
         $order_no = request::str('orderNO');
 
-        $pay_log = Pay::getPayLog($order_no);
+        $pay_log = Pay::getPayLog($order_no, LOG_RECHARGE);
         if (empty($pay_log)) {
             return err('找不到这个支付记录!');
         }
@@ -381,7 +427,7 @@ class charging
         }
 
         if ($pay_log->isPaid()) {
-            return ['msg' => '支付已成功！'];
+            return ['msg' => '支付成功！'];
         }
 
         return ['msg' => '正在查询..'];

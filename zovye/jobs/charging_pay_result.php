@@ -41,12 +41,12 @@ if ($order) {
     throw new JobException('订单已创建!', $log);
 }
 
-$pay_log = Pay::getPayLog($order_no);
+$pay_log = Pay::getPayLog($order_no, LOG_CHARGING_PAY);
 if (empty($pay_log)) {
     throw new JobException('找不到支付记录!', $log);
 }
 
-if ($pay_log->isPaid()) {
+if (!$pay_log->isPaid()) {
     $res = Pay::query($order_no);
     if (is_error($res)) {
         if (time() - $start < 30) {
@@ -86,7 +86,7 @@ try {
     }
 
 } catch (JobException $e) {
-    Job::refund($order_no, "启动充电失败：{$res['message']}");
+    Job::refund($order_no, "启动充电失败：{$e->getMessage()}");
     throw $e;
 }
 

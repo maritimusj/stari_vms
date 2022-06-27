@@ -111,6 +111,7 @@ class Charging
                     'user' => $user->profile(),
                     'chargingID' => $chargerID,
                     'card' => $card->getUID(),
+                    'cardType' => $card->getTypename(),
                 ],
             ];
 
@@ -476,7 +477,7 @@ class Charging
         }
 
         if ($pay_log->isCharging()) {
-            return err('已经开始充电！');
+            return true;
         }
     
         $device_id = $pay_log->getDeviceId();
@@ -495,7 +496,7 @@ class Charging
             return err('找不到指定的用户!');
         }
     
-        $chargerID = $pay_log->getData('chargerID');
+        $chargerID = $pay_log->getChargerID();
     
         $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID);
         if (is_error($res)) {

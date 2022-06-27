@@ -454,6 +454,8 @@ class Helper
             return err('支付金额不能为零！');
         }
 
+        App::setContainer($user);
+
         list($order_no, $data) = Pay::createXAppPay(
             $device,
             $user,
@@ -496,6 +498,8 @@ class Helper
         if ($price < 1) {
             return err('支付金额不能为零！');
         }
+
+        App::setContainer($user);
 
         list($order_no, $data) = Pay::createXAppPay(
             Device::getDummyDevice(),

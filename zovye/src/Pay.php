@@ -494,7 +494,7 @@ class Pay
             }
         }
 
-        if (empty($res['enable']) || empty(array_diff_key($res, ['enable' => 1, 'name' => 1]))) {
+        if (empty($res) || empty($res['enable']) || empty(array_diff_key($res, ['enable' => 1, 'name' => 1]))) {
             $res = self::getDefaultPayParams($name);
         }
 
@@ -590,7 +590,7 @@ class Pay
      * @param string $name
      * @return array|IPay
      */
-    private static function getActivePayObj(deviceModelObj $device, string $name = '')
+    public static function getActivePayObj(deviceModelObj $device, string $name = '')
     {
         $res = self::getPayParams($device, $name);
         if (is_error($res)) {

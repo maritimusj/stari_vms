@@ -302,8 +302,6 @@ class charging
             return err('付款金额不正确！');
         }
 
-        App::setContainer($user);
-
         $serial = $device->generateChargingSerial($chargerID);
 
         return Helper::createChargingOrder($user, $device, $price, $serial);

@@ -140,6 +140,18 @@ class device
             $result['device']['protocol'] = $device->getBlueToothProtocolName();
         }
 
+        if (App::isChargingDeviceEnabled() && $device->isChargingDevice()) {
+            $result['charger'] = [];
+            $chargerNum = $device->getChargerNum();
+            for ($i = 0; $i < $chargerNum; $i++) {
+                $charging_data = $device->getChargerData($i + 1);
+                $result['charger'][] = [
+                    'status' => $charging_data['status'],
+                    'soc' => $charging_data['soc'],
+                ];
+            }
+        }
+
         $payload = $device->getPayload(true);
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
@@ -167,17 +179,6 @@ class device
             $result['status']['online'] = $device->isMcbOnline();
         }
 
-        if ($device->getGroupId()) {
-            if ($device->isChargingDevice()) {
-                $groupData = group::getDeviceGroup($device->getGroupId(), ZovyeGroup::CHARGING);
-            } else {
-                $groupData = group::getDeviceGroup($device->getGroupId());
-            }
-            if (empty($groupData['agent_id']) || $groupData['agent_id'] == $device->getAgentId()) {
-                $result['group'] = $groupData;
-            }
-        }
-
         if (!isEmptyArray($location)) {
             $result['extra']['location'] = $location;
         }
@@ -198,6 +199,17 @@ class device
             }
         } else {
             $result['location']['area'] = array_values($result['location']['area']);
+        }
+
+        if ($device->getGroupId()) {
+            if ($device->isChargingDevice()) {
+                $groupData = group::getDeviceGroup($device->getGroupId(), ZovyeGroup::CHARGING);
+            } else {
+                $groupData = group::getDeviceGroup($device->getGroupId());
+            }
+            if (empty($groupData['agent_id']) || $groupData['agent_id'] == $device->getAgentId()) {
+                $result['group'] = $groupData;
+            }
         }
 
         $result['status'][\zovye\Device::V0_STATUS_VOLTAGE] = $device->getV0Status(\zovye\Device::V0_STATUS_VOLTAGE);

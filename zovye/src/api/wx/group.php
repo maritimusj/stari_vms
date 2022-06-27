@@ -225,12 +225,20 @@ class group
             /** @var device_groupsModelObj $res */
             $res = \zovye\Group::get($id, $typeid);
             if ($res) {
-                $cache[$id] = [
+                $data = [
                     'id' => $res->getId(),
                     'agent_id' => $res->getAgentId(),
                     'title' => $res->getTitle(),
                     'clr' => $res->getClr(),
                 ];
+
+                if ($typeid == ZovyeGroup::CHARGING) {
+                    $data['description'] = $res->getDescription();
+                    $data['address'] = $res->getAddress();
+                    $data['loc'] = $res->getLoc();
+                }
+
+                $cache[$id] = $data;
             }
         }
 

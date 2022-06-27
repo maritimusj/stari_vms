@@ -42,7 +42,7 @@
                 <th>用户</th>
                 <th>设备</th>
                 <th>
-                    商品
+                    说明
                 </th>
                 <th>
                     创建时间
@@ -115,8 +115,14 @@
                     {$log['device']['name']}
                 </td>
                 <td>
+                    {if $log['data']['level'] == LOG_RECHARGE}
+                    充值
+                    {elseif $log['data']['level'] == LOG_CHARGING_PAY}
+                    充电
+                    {else}
                     {php $goods = $log['data']['orderData']['extra']['goods'];}
                     {$goods['name']}({$goods['price_formatted']})
+                    {/if}
                 </td>
                 <td>{$log['createtime_formatted']}</td>
             </tr>

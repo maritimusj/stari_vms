@@ -458,6 +458,7 @@ if ($op == 'default') {
     foreach ($query->page($page, $page_size)->findAll() as $entry) {
         $log = [
             'id' => $entry->getId(),
+            'level' => $entry->getLevel(),
             'orderNO' => $entry->getTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
         ];

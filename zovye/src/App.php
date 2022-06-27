@@ -593,7 +593,9 @@ class App
 
     public static function isChargingDeviceEnabled(): bool
     {
-        return Config::charging('enabled', false);
+        return onceCall(function () {
+            return Config::charging('enabled', false);
+        });
     }
     
 }

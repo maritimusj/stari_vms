@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author jin@stariture.com
  * @url www.stariture.com
@@ -9,7 +10,6 @@ namespace zovye\api\wx;
 use DateTime;
 use DateTimeImmutable;
 use Exception;
-use stdClass;
 use zovye\App;
 use zovye\CommissionBalance;
 use zovye\Config;
@@ -19,6 +19,7 @@ use zovye\Locker;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
+use zovye\Group as ZovyeGroup;
 use zovye\request;
 use zovye\JSON;
 use zovye\model\keeperModelObj;
@@ -112,7 +113,7 @@ class keeper
             }
 
             if ($keeper_data) {
-                $token = sha1(time()."$mobile$session_key");
+                $token = sha1(time() . "$mobile$session_key");
                 $data = [
                     'src' => LoginData::KEEPER,
                     'user_id' => 0,
@@ -464,7 +465,7 @@ class keeper
 
             if ($agent->isPaymentConfigEnabled()) {
                 return error(State::ERROR, '提现申请被拒绝，请联系代理商！');
-              }
+            }
 
             $total =  round(request::float('amount', 0, 2) * 100);
 
@@ -780,6 +781,9 @@ class keeper
             'name' => $device->getName(),
             'address' => $device->getAddress('<地址未登记>'),
             'status' => [],
+            'device' => [
+                'modal' => $device->getDeviceModel(),
+            ]
         ];
 
         //电量
@@ -799,8 +803,27 @@ class keeper
             if ($device->getMAC()) {
                 $result['device']['mac'] = $device->getMAC();
             }
-        } else {
-            $result['device'] = new stdClass();
+        } elseif (App::isChargingDeviceEnabled() && $device->isChargingDevice()) {
+            $result['charger'] = [];
+            $chargerNum = $device->getChargerNum();
+            for ($i = 0; $i < $chargerNum; $i++) {
+                $charging_data = $device->getChargerData($i + 1);
+                $result['charger'][] = [
+                    'status' => $charging_data['status'],
+                    'soc' => $charging_data['soc'],
+                ];
+            }
+        }
+
+        if ($device->getGroupId()) {
+            if ($device->isChargingDevice()) {
+                $groupData = group::getDeviceGroup($device->getGroupId(), ZovyeGroup::CHARGING);
+            } else {
+                $groupData = group::getDeviceGroup($device->getGroupId());
+            }
+            if (empty($groupData['agent_id']) || $groupData['agent_id'] == $device->getAgentId()) {
+                $result['group'] = $groupData;
+            }
         }
 
         $payload = $device->getPayload(true);
@@ -922,7 +945,7 @@ class keeper
             }
 
             $data = [
-                $lane => $num != 0 ? '@'.$num : 0,
+                $lane => $num != 0 ? '@' . $num : 0,
             ];
         } else {
             $data = [];
@@ -967,7 +990,7 @@ class keeper
             $err = $create_commission_fn($total);
             if (is_error($err)) {
                 Log::error('keeper', [
-                    'error' => '创建营运人员补货佣金失败:'.$err['message'],
+                    'error' => '创建营运人员补货佣金失败:' . $err['message'],
                     'total' => $total,
                 ]);
 

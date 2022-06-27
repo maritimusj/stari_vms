@@ -1284,11 +1284,10 @@ class common
             if (empty($user)) {
                 return error(State::ERROR, '没有找到关联的微信用户！');
             }
-        }
-
-        if ($res['phoneNumber']) {
-            $user->setMobile($res['phoneNumber']);
-            $user->save();
+            if ($res['phoneNumber']) {
+                $user->setMobile($res['phoneNumber']);
+                $user->save();
+            }
         }
 
         if ($user->isBanned()) {

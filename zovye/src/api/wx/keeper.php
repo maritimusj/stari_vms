@@ -467,9 +467,6 @@ class keeper
               }
 
             $total =  round(request::float('amount', 0, 2) * 100);
-            if ($total < 1) {
-                return error(State::ERROR, '提现金额不正确！');
-            }
 
             return balance::balanceWithdraw($user, $total);
         }

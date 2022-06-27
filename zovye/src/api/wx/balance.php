@@ -105,8 +105,8 @@ class balance
             return error(State::ERROR, '用户已经被禁用！');
         }
 
-        if ($amount <= 0) {
-            return error(State::ERROR, '提现金额不能小于等于零！');
+        if ($amount < 1) {
+            return error(State::ERROR, '提现金额不不正确！');
         }
 
         $balance = $user->getCommissionBalance();

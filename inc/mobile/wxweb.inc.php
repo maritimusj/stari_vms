@@ -61,4 +61,5 @@ router::exec($op, [
     'payForRecharge' => '\zovye\api\wxweb\charging::payForRecharge',
     'rechargeResult' => '\zovye\api\wxweb\charging::rechargeResult',
     'rechargeList' => '\zovye\api\wxweb\charging::rechargeList',
+    'withdraw' => '\zovye\api\wxweb\charging::withdraw',
 ]);

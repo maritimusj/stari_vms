@@ -2,6 +2,7 @@
 
 namespace zovye\api\wxweb;
 
+use zovye\api\wx\balance;
 use zovye\api\wx\common;
 use zovye\App;
 use zovye\Charging as IotCharging;
@@ -14,9 +15,11 @@ use zovye\model\deviceModelObj;
 use zovye\Order;
 use zovye\Pay;
 use zovye\request;
+use zovye\State;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
+use function zovye\error;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
@@ -403,5 +406,14 @@ class charging
         }
 
         return $result;
+    }
+
+    public static function withdraw(): array
+    {
+        $user = common::getWXAppUser();
+
+        $total =  round(request::float('amount', 0, 2) * 100);
+
+        return balance::balanceWithdraw($user, $total);
     }
 }

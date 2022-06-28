@@ -2607,7 +2607,7 @@ HTML;
         JSON::fail('没有配置第三方平台！');
     }
 
-    if (Job::uploadDevieInfo()) {
+    if (Job::uploadDeviceInfo()) {
         JSON::success('已启动设备上传任务！');
     }
 

@@ -91,7 +91,7 @@ if ($op == 'upload_device_info' && CtrlServ::checkJobSign($data)) {
             ]);
         }
         if ($device) {
-            Job::uploadDevieInfo($device->getId());
+            Job::uploadDeviceInfo($device->getId());
         }
     }
 }

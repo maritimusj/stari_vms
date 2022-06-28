@@ -1482,19 +1482,26 @@ class deviceModelObj extends modelObj
      * 获取一个指定类型的广告
      * @param $type
      * @param bool $random
+     * @param callable|null $filterFN
      * @return array|null
      */
-    public function getOneAdv($type, bool $random = false): ?array
+    public function getOneAdv($type, bool $random = false, callable $filterFN = null): ?array
     {
-        $advs = $this->getAds($type);
-        if (!isEmptyArray($advs)) {
+        $ads = $this->getAds($type);
+        if (!isEmptyArray($ads)) {
             if ($random) {
-                shuffle($advs);
+                shuffle($ads);
             }
-
-            return current($advs);
+            if ($filterFN) {
+                foreach ($ads as $ad) {
+                    if ($ad && $filterFN($ad)) {
+                        return $ad;
+                    }
+                }
+                reset($ads);
+            }
+            return current($ads);
         }
-
         return null;
     }
 

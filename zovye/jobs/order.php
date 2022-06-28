@@ -8,11 +8,13 @@ namespace zovye\job\order;
 
 use zovye\Advertising;
 use zovye\Agent;
+use zovye\App;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Job;
 use zovye\Locker;
 use zovye\Log;
+use zovye\model\advertisingModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\Order;
@@ -119,6 +121,18 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 $log['statistics'][$order->getId()] = Util::transactionDo(function () use ($order) {
                     return Util::orderStatistics($order);
                 });
+
+                if ($order->isFree() && App::isSponsorAdEnabled()) {
+                    /** @var advertisingModelObj $ad */
+                    $ad = $device->getOneAdv(Advertising::SPONSOR, true, function($ad) {
+                        return $ad->getExtraData('num', 0) > 0;
+                    });
+                    if ($ad) {
+                        $num = $ad->getExtraData('num', 0);
+                        $ad->setExtraData('num', max(0, $num - 1));
+                        $ad->save();
+                    }
+                }
             }
         }
 

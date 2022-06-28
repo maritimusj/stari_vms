@@ -101,6 +101,13 @@ if ($op == 'default') {
         ],
     ];
 
+    if (App::isSponsorAdEnabled()) {
+        $tpl_data['navs'][] = [
+            'type' => Advertising::SPONSOR,
+            'title' => '赞助商轮播文字',
+        ];
+    }
+
     $url_params = [];
 
     $page = max(1, request::int('page'));
@@ -252,6 +259,13 @@ if ($op == 'default') {
 
                 $data['code'] = $entry->getExtraData('code');
 
+            } elseif ($type == Advertising::SPONSOR) {
+
+                $data['name'] = $entry->getExtraData('name', '');
+                $data['num'] = $entry->getExtraData('num', 0);
+                $data['title'] = PlaceHolder::replace($data['title'], [
+                    'num' => $data['num'],
+                ]);
             }
 
             $list[] = $data;
@@ -465,6 +479,10 @@ if ($op == 'default') {
 
             $tpl_data['code'] = $adv->getExtraData('code');
 
+        } elseif ($type == Advertising::SPONSOR) {
+
+            $tpl_data['name'] = $adv->getExtraData('name', '');
+            $tpl_data['num'] = $adv->getExtraData('num', 0);
         }
     }
 

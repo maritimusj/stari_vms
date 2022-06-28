@@ -32,7 +32,8 @@ class Advertising extends State
     const QRCODE = 11; //推广二维码
     const PASSWD = 12; //用于推广的口令
     const WX_APP_URL_CODE = 13; //微信小程序URL识别码
-
+    const SPONSOR = 14; //赞助商轮播文字
+    
     public static $names = [
         self::UNKNOWN => 'default',
         self::SCREEN => 'screen',
@@ -47,6 +48,7 @@ class Advertising extends State
         self::QRCODE => 'qrcode',
         self::PASSWD => 'passwd',
         self::WX_APP_URL_CODE => 'wx_app_url_code',
+        self::SPONSOR => 'sponsor',
     ];
 
     protected static $title = [
@@ -63,6 +65,7 @@ class Advertising extends State
         self::QRCODE => '推广二维码',
         self::PASSWD => '口令',
         self::WX_APP_URL_CODE => '微信小程序识别码',
+        self::SPONSOR => '赞助商轮播文字',
     ];
 
     /**
@@ -318,6 +321,11 @@ class Advertising extends State
 
             $extra['code'] = trim($params['code']);
 
+        } elseif ($type == Advertising::SPONSOR) {
+
+            $extra['name'] = trim($params['name']);
+            $extra['num'] = intval($params['num']);
+
         } else {
             $extra['url'] = trim($params['url']);
         }
@@ -453,6 +461,7 @@ class Advertising extends State
                             "reviewData.$current.result",
                             ReviewResult::REJECTED
                         ) && Advertising::update($adv)) {
+                            
                         Job::advReviewResult($adv->getId());
 
                         return true;

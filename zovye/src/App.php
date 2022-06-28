@@ -597,5 +597,10 @@ class App
             return Config::charging('enabled', false);
         });
     }
+
+    public static function isSponsorAdEnabled(): bool
+    {
+        return Config::app('ad.sponsor.enabled', false);
+    }
     
 }

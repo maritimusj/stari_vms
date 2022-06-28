@@ -12,21 +12,20 @@ use zovye\model\userModelObj;
 
 class PlaceHolder
 {
-    public static function replace($url, $params = [])
+    public static function replace($text, $params = [])
     {
         foreach ($params as $index => $o) {
             if ($o instanceof userModelObj) {
-                $url = str_ireplace(is_string($index) ? '{'.$index.'}' : '{user_uid}', $o->getOpenid(), $url);
+                $text = str_ireplace(is_string($index) ? '{'.$index.'}' : '{user_uid}', $o->getOpenid(), $text);
             } elseif ($o instanceof deviceModelObj) {
-                $url = str_ireplace(is_string($index) ? '{'.$index.'}' : '{device_uid}', $o->getShadowId(), $url);
-                $url = str_ireplace(is_string($index) ? '{'.$index.'}' : '{device_imei}', $o->getImei(), $url);
+                $text = str_ireplace(is_string($index) ? '{'.$index.'}' : '{device_uid}', $o->getShadowId(), $text);
+                $text = str_ireplace(is_string($index) ? '{'.$index.'}' : '{device_imei}', $o->getImei(), $text);
             } elseif ($o instanceof DateTimeInterface) {
-                $url = str_ireplace(is_string($index) ? '{'.$index.'}' : '{timestamp}', $o->getTimestamp(), $url);
-            } elseif (is_string($index) && is_string($o)) {
-                $url = str_ireplace('{'.$index.'}', $o, $url);
+                $text = str_ireplace(is_string($index) ? '{'.$index.'}' : '{timestamp}', $o->getTimestamp(), $text);
+            } elseif (is_string($index) && is_scalar($o)) {
+                $text = str_ireplace('{'.$index.'}', strval($o), $text);
             }
         }
-
-        return preg_replace('/{.*?}/i', '', $url);
+        return preg_replace('/{.*?}/i', '', $text);
     }
 }

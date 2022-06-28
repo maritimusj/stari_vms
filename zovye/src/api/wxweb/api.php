@@ -9,6 +9,7 @@ namespace zovye\api\wxweb;
 
 use DateTime;
 use zovye\Account;
+use zovye\Advertising;
 use zovye\Goods;
 use zovye\Helper;
 use zovye\Job;
@@ -28,6 +29,7 @@ use zovye\Config;
 use zovye\Delivery;
 use zovye\Log;
 use zovye\Mall;
+use zovye\PlaceHolder;
 use zovye\Questionnaire;
 
 use function zovye\err;
@@ -82,7 +84,23 @@ class api
             }
         }
 
-        return Util::getDeviceAds($device ?? Device::getDummyDevice(), $type, $num);
+        $list = Util::getDeviceAds($device ?? Device::getDummyDevice(), $type, $num);
+
+        if ($type == Advertising::SPONSOR) {
+            $total = 0;
+            foreach($list as &$item) {
+                $item['title'] = PlaceHolder::replace($item['title'], [
+                    'num' => intval($item['data']['num']),
+                ]);
+                $total += intval($item['data']['num']);
+            }
+            return [
+                'total' => $total,
+                'list' => $list,
+            ];
+        }
+
+        return $list;
     }
 
     public static function accounts(): array

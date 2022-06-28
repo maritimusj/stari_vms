@@ -52,7 +52,31 @@ class order
         }
 
         $goods_id = $order->getGoodsId();
-        $result['goods'] = Goods::data($goods_id);
+        if ($goods_id) {
+            $result['goods'] = Goods::data($goods_id);
+        }
+
+        $group = $order->getExtraData('group');
+        if ($group) {
+            $data['group'] = $group;
+            $data['charging'] = $order->getExtraData('charging', []);
+            $data['charging']['chargerID'] = $order->getChargerID();
+            if (!$order->isChargingFinished()) {
+                $device = $order->getDevice();
+                if ($device) {
+                    $chargerID = $order->getChargerID();
+                    if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
+                        $data['charging']['status'] = $device->getChargerData($chargerID);
+                    }
+                }
+            } else {
+                $timeout = $order->getExtraData('timeout', []);
+                if ($timeout) {
+                    $data['charging']['timeout'] = $timeout;
+                }
+            }
+        }
+        
         $result['createtime'] = date('Y-m-d H:i:s', $order->getCreatetime());
 
         return $result;
@@ -163,6 +187,26 @@ class order
 
             $data['goods'] = $entry->getExtraData('goods');
             $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
+
+            $group = $entry->getExtraData('group');
+            if ($group) {
+                $data['charging'] = $entry->getExtraData('charging', []);
+                $data['charging']['chargerID'] = $entry->getChargerID();
+                if (!$entry->isChargingFinished()) {
+                    $device = $entry->getDevice();
+                    if ($device) {
+                        $chargerID = $entry->getChargerID();
+                        if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
+                            $data['charging']['status'] = $device->getChargerData($chargerID);
+                        }
+                    }
+                } else {
+                    $timeout = $entry->getExtraData('timeout', []);
+                    if ($timeout) {
+                        $data['charging']['timeout'] = $timeout;
+                    }
+                }
+            }
 
             //用户信息
             $user_obj = $entry->getUser();

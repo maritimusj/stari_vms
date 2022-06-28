@@ -1494,8 +1494,9 @@ class deviceModelObj extends modelObj
             }
             if ($filterFN) {
                 foreach ($ads as $ad) {
-                    if ($ad && $filterFN($ad)) {
-                        return $ad;
+                    $adv = Advertising::get($ad['id']);
+                    if ($adv && $filterFN($adv)) {
+                        return Advertising::format($adv);
                     }
                 }
                 reset($ads);

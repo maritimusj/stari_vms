@@ -123,16 +123,18 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                 });
 
                 if ($order->isFree() && App::isSponsorAdEnabled()) {
-                    /** @var advertisingModelObj $ad */
-                    $ad = $device->getOneAdv(Advertising::SPONSOR, true, function($ad) {
-                        return $ad->getExtraData('num', 0) > 0;
-                    });
-                    if ($ad) {
-                        $num = $ad->getExtraData('num', 0);
-                        $ad->setExtraData('num', max(0, $num - 1));
-                        $ad->save();
+                    $data = $device->getOneAdv(Advertising::SPONSOR, true, function($adv) {
+                       return $adv && $adv->getExtraData('num', 0) > 0;
+                     });                     
+                    if ($data) {
+                        $adv = Advertising::get($data['id']);
+                        if ($adv) {
+                             $num =  $adv->getExtraData('num', 0);
+                             $adv->setExtraData('num', max(0, $num - 1));
+                             $adv->save();                            
+                        }
                     }
-                }
+                 }
             }
         }
 

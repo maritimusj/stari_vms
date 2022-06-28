@@ -160,10 +160,10 @@ if ($op == 'default') {
         $res = ChargingServ::createOrUpdateGroup($group);
         if (is_error($res)) {
             Log::error('group', $res);
+        } else {
+            $group->setVersion($res);
+            $group->save();            
         }
-
-        $group->setVersion($res);
-        $group->save();
 
         $tbname = We7::tablename(device_groupsModelObj::getTableName(modelObj::OP_WRITE));
         $sql = sprintf("UPDATE %s SET `loc` = ST_GeomFromText('POINT(%f %f)') WHERE `id`=%d", $tbname, $lng, $lat, $group->getId());
@@ -238,6 +238,7 @@ if ($op == 'default') {
         $res = ChargingServ::createOrUpdateGroup($group);
         if (is_error($res)) {
             Log::error('group', $res);
+            continue;
         }
         $group->setVersion($res);
         $group->save();

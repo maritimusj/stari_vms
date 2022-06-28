@@ -123,7 +123,7 @@ class device_groupsModelObj extends modelObj
         return $this->setExtraData('version', $version);
     }
 
-    public function getVersion(): string {
+    public function getVersion() {
         return $this->getExtraData('version', 'n/a');
     }
 }

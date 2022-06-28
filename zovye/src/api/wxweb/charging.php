@@ -15,17 +15,15 @@ use zovye\model\deviceModelObj;
 use zovye\Order;
 use zovye\Pay;
 use zovye\request;
-use zovye\State;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
 
 class charging
 {
-    public static function chargingUserInfo() 
+    public static function chargingUserInfo(): array
     {
         $user = common::getWXAppUser();
     
@@ -70,8 +68,9 @@ class charging
 
         if ($lng > 0 && $lat > 0) {
             $distanceFN = function ($loc) use ($lng, $lat) {
-                $res = Util::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
-
+                $res = Util::cachedCall(300, function () use ($loc, $lng, $lat) {
+                    return Util::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
+                }, $loc, $lng, $lat);
                 return is_error($res) ? 0 : $res;
             };
         } else {
@@ -115,8 +114,16 @@ class charging
         $lng = request::float('lng');
         $lat = request::float('lat');
 
-        $res = Util::getDistance($group_data['loc'], ['lng' => $lng, 'lat' => $lat], 'driving');
-        $group_data['distance'] = is_error($res) ? 0 : $res;
+        if ($lng > 0 && $lat > 0) {
+            $res = Util::cachedCall(300, function () use ($group_data, $lng, $lat) {
+                return Util::getDistance($group_data['loc'], ['lng' => $lng, 'lat' => $lat], 'driving');
+            }, $group_data['loc'], $lng, $lat);
+            $distance = is_error($res) ? 0 : $res;
+        } else {
+            $distance = 0;
+        }
+
+        $group_data['distance'] = $distance;
 
         $group_data['devices'] = [
             'total' => Device::query(['group_id' => $group->getId()])->count(),

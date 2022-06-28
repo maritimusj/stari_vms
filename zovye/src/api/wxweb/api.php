@@ -394,25 +394,6 @@ class api
         if (App::isBalanceEnabled()) {
             $data['signed'] = $user->isSigned();
             $data['balance'] = $user->getBalance()->total();
-            $data['commission_balance'] = $user->getCommissionBalance()->total();
-        }
-
-        if (App::isChargingDeviceEnabled()) {
-            $last_charging_data = $user->settings('chargingNOW', []);
-            if ($last_charging_data) {
-                $device = Device::get($last_charging_data['device']);
-                if ($device) {
-                    $serial = $last_charging_data['serial'];
-                    $chargerID = $last_charging_data['chargerID'];
-                    $chargerData = $device->getChargerBMSData($chargerID);
-                    if ($chargerData && $chargerData['serial'] == $serial) {
-                        $data['charging'] = [
-                            'device' => $device->profile(),
-                            'status' => $chargerData,
-                        ];
-                    }
-                }
-            }
         }
 
         return $data;

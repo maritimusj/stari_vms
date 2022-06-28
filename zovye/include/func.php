@@ -380,8 +380,12 @@ function hashFN(callable $fn, ...$val): string
                 $data[] = 'datetime:'.$v->getTimestamp();
             } elseif ($v instanceof modelObj) {
                 $data[] = get_class($v).':'.$v->getId();
-            } else {
+            } elseif (is_scalar($v)) {
                 $data[] = strval($v);
+            } elseif (is_array($v)) {
+                $data[] = http_build_query($v);
+            } else {
+                $data[] = json_encode($v);
             }
         }
 

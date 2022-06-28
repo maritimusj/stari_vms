@@ -11,7 +11,8 @@ use DateTime;
 use DateTimeImmutable;
 use zovye\Account;
 use zovye\Balance;
-use zovye\ICard;
+
+use zovye\Contract\ICard;
 use zovye\Locker;
 use zovye\Pay;
 use zovye\UserCommissionBalanceICard;
@@ -670,28 +671,28 @@ class userModelObj extends modelObj
         if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund()) {
             return err('支付已无效!');
         }
-    
-        return Util::transactionDo(function() use($pay_log) {
-            
+
+        return Util::transactionDo(function () use ($pay_log) {
+
             $price = $pay_log->getPrice();
             if ($price < 1) {
                 return err('支付金额小于1!');
             }
-        
+
             $balance = $this->getCommissionBalance();
             if (!$balance->change($price, CommissionBalance::RECHARGE)) {
                 return err('创建用户账户记录失败!');
             }
-        
+
             $pay_log->setData('recharged', [
                 'time' => time(),
             ]);
-        
+
             if (!$pay_log->save()) {
                 return err('保存用户数据失败!');
-            }    
+            }
 
-            return true;        
+            return true;
         });
     }
 
@@ -871,7 +872,8 @@ class userModelObj extends modelObj
         ]);
     }
 
-    public function getCommissionBalanceCard():ICard {
+    public function getCommissionBalanceCard(): ICard
+    {
         return new UserCommissionBalanceICard($this);
     }
 
@@ -880,8 +882,8 @@ class userModelObj extends modelObj
         if (empty($this->s1)) {
             do {
                 $s1 = sprintf('%s%s', date('Ymd', $this->createtime), Util::random(4, true));
-            } while(User::findOne(['s1' => $s1]));
-            
+            } while (User::findOne(['s1' => $s1]));
+
             $this->setS1($s1);
             $this->save();
         }

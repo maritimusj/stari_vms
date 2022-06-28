@@ -6,7 +6,7 @@
 
 namespace zovye\model;
 
-use zovye\ICard;
+use zovye\Contract\ICard;
 use zovye\User;
 use function zovye\tb;
 use zovye\BaseLogsModelObj;
@@ -152,7 +152,7 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
         return !empty($this->getPayResult()) || !empty($this->getQueryResult());
     }
 
-    public function getOwner(): userModelObj
+    public function getOwner(): ?userModelObj
     {
        return User::get($this->getUserOpenid(), true);
     }

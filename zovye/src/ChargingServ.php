@@ -82,11 +82,13 @@ class ChargingServ
             $url .= '/';
         }
 
-        $url .= "$path?" . http_build_query($params);
+        $url .= "$path?".http_build_query($params);
+
         return self::$http_client->request($url, $method, $headers, $body);
     }
 
-    public static function GetVersion(): array {
+    public static function GetVersion(): array
+    {
         $res = self::query();
         if (is_error($res)) {
             return $res;
@@ -94,6 +96,7 @@ class ChargingServ
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
+
         return [
             'version' => $res['data']['version'] ?? 'n/a',
             'build' => $res['data']['build'] ?? '',
@@ -135,6 +138,7 @@ class ChargingServ
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
+
         return true;
     }
 
@@ -147,6 +151,7 @@ class ChargingServ
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
+
         return $res['data']['version'] ?? 'n/a';
     }
 
@@ -164,16 +169,18 @@ class ChargingServ
             if (!$res['status']) {
                 return err($res['data']['message'] ?? '请求失败！');
             }
+
             return true;
         }
     }
 
-    public static function getChargingRecord($serial)
+    public static function getChargingRecord($serial): array
     {
         $res = self::query("charging/$serial");
         if (!$res['status']) {
             return err($res['data']['message'] ?? '请求失败！');
         }
+
         return (array)$res['data'];
     }
 }

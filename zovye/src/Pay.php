@@ -177,7 +177,7 @@ class Pay
                 'data' => $pay_data,
                 'user' => $user->profile(),
             ]);
-            $res = error(State::ERROR, 'unknown pay function:' . $fn);
+            $res = error(State::ERROR, 'unknown pay function:'.$fn);
         }
 
         if (is_error($res)) {
@@ -290,7 +290,7 @@ class Pay
                 if (is_error($res)) {
                     throw new Exception($res['message']);
                 }
-                
+
                 return $pay->getResponse(false);
             }
 

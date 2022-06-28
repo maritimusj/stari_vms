@@ -26,7 +26,7 @@ class charging
     public static function chargingUserInfo(): array
     {
         $user = common::getWXAppUser();
-    
+
         $data = $user->profile();
         $data['banned'] = $user->isBanned();
         $data['commission_balance'] = $user->getCommissionBalance()->total();
@@ -51,6 +51,7 @@ class charging
 
         return $data;
     }
+
     public static function groupList(): array
     {
         $query = Group::query(Group::CHARGING);
@@ -71,6 +72,7 @@ class charging
                 $res = Util::cachedCall(600, function () use ($loc, $lng, $lat) {
                     return Util::getDistance($loc, ['lng' => $lng, 'lat' => $lat], 'driving');
                 }, $loc, $lng, $lat);
+
                 return is_error($res) ? 0 : $res;
             };
         } else {
@@ -381,7 +383,7 @@ class charging
             $chargerID = $pay_log->getChargerID();
 
             return [
-                'msg' => '支付成功！', 
+                'msg' => '支付成功！',
                 'code' => 200,
                 'device' => $device->getImei(),
                 'chargerID' => $chargerID,
@@ -454,7 +456,7 @@ class charging
         $query->orderBy('createtime DESC');
 
         $result = [];
-        foreach($query->findAll() as $log) {
+        foreach ($query->findAll() as $log) {
             $result[] = CommissionBalance::format($log);
         }
 
@@ -469,7 +471,7 @@ class charging
             return err('请等待订单结算完成后再试！');
         }
 
-        $total =  round(request::float('amount', 0, 2) * 100);
+        $total = round(request::float('amount', 0, 2) * 100);
 
         return balance::balanceWithdraw($user, $total, request::str('memo'));
     }

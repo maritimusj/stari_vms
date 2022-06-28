@@ -54,8 +54,8 @@ interface IPay
 
     /**
      * 获取支付Js
-     * @param $device
-     * @param $user
+     * @param deviceModelObj $device
+     * @param userModelObj $user
      * @return mixed
      */
     public function getPayJs(deviceModelObj $device, userModelObj $user);

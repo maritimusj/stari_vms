@@ -2,7 +2,7 @@
 
 namespace zovye;
 
-use RuntimeException;
+use zovye\Contract\ICard;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
@@ -23,6 +23,7 @@ class Charging
                 return true;
             }
         }
+
         return false;
     }
 
@@ -182,7 +183,7 @@ class Charging
         if (!$user->acquireLocker(User::CHARGING_LOCKER)) {
             return err('用户锁定失败，请稍后再试！');
         }
-        
+
         $last_charging_data = $user->settings('chargingNOW', []);
 
         if (isEmptyArray($last_charging_data)) {
@@ -240,6 +241,7 @@ class Charging
                 if (!$pay_log->isPaid()) {
                     return ['message' => '正在查询支付结果..'];
                 }
+
                 return ['message' => '已支付，请稍等..'];
             }
         }
@@ -255,8 +257,10 @@ class Charging
             if (!is_error($result) && isset($result['totalPrice'])) {
                 $chargerID = $order->getChargerID();
                 self::settle($serial, $chargerID, $result);
+
                 return ['record' => $result];
             }
+
             return ['finished' => $finished];
         }
 
@@ -273,12 +277,13 @@ class Charging
         $bms = $order->getExtraData('BMS.status', []);
         if ($bms && time() - $bms['timestamp'] > 120) {
             $chargerID = $order->getChargerID();
-            self::end($serial, $chargerID, function($order) {
+            self::end($serial, $chargerID, function ($order) {
                 $order->setExtraData('timeout', [
                     'at' => time(),
                     'reason' => '充电枪上报数据超时！',
                 ]);
             });
+
             return err('充电枪上报数据超时！');
         }
 
@@ -293,6 +298,7 @@ class Charging
             } elseif ($result['re'] == 115) {
                 return err("启动失败：充电枪没有插入");
             }
+
             return err("启动失败：故障[{$result['re']}]");
         }
 
@@ -367,8 +373,9 @@ class Charging
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
+
             return $order->save();
-        }   
+        }
 
         return false;
     }
@@ -425,6 +432,7 @@ class Charging
                     }
                 }
             }
+
             return true;
         });
     }
@@ -444,7 +452,7 @@ class Charging
                 } else {
                     $chargerData = $device->getChargerData($chargerID);
                     if ($chargerData && $chargerData['status'] == 2) {
-                        Charging::end($serial, $chargerID, function($order) {
+                        Charging::end($serial, $chargerID, function ($order) {
                             if (!$order->getChargingRecord()) {
                                 $order->setExtraData('timeout', [
                                     'at' => time(),
@@ -479,25 +487,25 @@ class Charging
         if ($pay_log->isCharging()) {
             return true;
         }
-    
+
         $device_id = $pay_log->getDeviceId();
 
         $device = Device::get($device_id);
         if (empty($device)) {
             return err("找不到指定设备!");
         }
-    
+
         if (!$device->isChargingDevice()) {
             return err("不是充电桩设备!");
         }
-    
+
         $user = $pay_log->getOwner();
         if (empty($user)) {
             return err('找不到指定的用户!');
         }
-    
+
         $chargerID = $pay_log->getChargerID();
-    
+
         $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID);
         if (is_error($res)) {
             return $res;

@@ -442,7 +442,7 @@ if ($op == 'default') {
 
     $query = m('user_logs')->where([
         'level' => [
-            LOG_PAY, 
+            LOG_GOODS_PAY,
             LOG_CHARGING_PAY, 
             LOG_RECHARGE,
         ],

@@ -411,7 +411,7 @@ class Pay
      */
     public static function createPayLog(userModelObj $user, string $order_no, array $data = []): ?pay_logsModelObj
     {
-        $level = intval($data['level'] ?? LOG_PAY);
+        $level = intval($data['level'] ?? LOG_GOODS_PAY);
         if ($user->payLog($order_no, $level, $data)) {
             return self::getPayLog($order_no, $level);
         }
@@ -429,13 +429,13 @@ class Pay
     {
         if (empty($level)) {
             $level = [
-                LOG_PAY,
+                LOG_GOODS_PAY,
                 LOG_CHARGING_PAY,
                 LOG_RECHARGE,
             ];
         }
+       
         $data = We7::uniacid(['title' => $order_no, 'level' => $level]);
-
         return m('pay_logs')->findOne($data);
     }
 

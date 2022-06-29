@@ -47,6 +47,7 @@ if ($op == 'default') {
             $data['agent'] = $agent->profile();
         }
 
+        $data['total'] = Device::query(['group_id' => $entry->getId()])->count();
         $data['remote_version'] = ChargingServ::getGroupVersion($data['name']);
 
         $list[] = $data;

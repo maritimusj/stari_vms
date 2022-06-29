@@ -304,7 +304,7 @@ class Pay
                 throw new Exception('创建订单任务失败！');
             }
 
-            return $pay->getResponse(true);
+            return $pay->getResponse();
 
         } catch (Exception $e) {
             Log::error('pay', [

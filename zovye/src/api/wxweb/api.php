@@ -134,6 +134,8 @@ class api
         } else {
             if (request::str('type') == 'all') {
                 $types = null;
+            } elseif (request::str('type') == 'normal') {
+                $types = [Account::NORMAL, Account::AUTH];
             } else {
                 $type = request::int('type', Account::VIDEO);
                 $types = [$type];

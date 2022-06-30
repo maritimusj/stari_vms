@@ -36,6 +36,6 @@ class router
             JSON::result($result);
         }
 
-        JSON::fail('不正确的调用！');
+        JSON::fail('不正确的调用:' . $op);
     }
 }

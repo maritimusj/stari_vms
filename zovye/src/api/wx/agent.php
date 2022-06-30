@@ -1777,6 +1777,9 @@ class agent
     public static function getUserQRCode(): array
     {
         $user = common::getAgentOrKeeper();
+        if ($user instanceof keeperModelObj) {
+            return common::getUserQRCode($user->getUser());
+        }
         return common::getUserQRCode($user);
     }
 
@@ -1784,6 +1787,9 @@ class agent
     {
         $user = common::getAgentOrKeeper();
         $type = request::str('type');
+        if ($user instanceof keeperModelObj) {
+            return common::updateUserQRCode($user->getUser(), $type);
+        }
         return common::updateUserQRCode($user, $type);
     }
 

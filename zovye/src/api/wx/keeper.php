@@ -487,19 +487,7 @@ class keeper
         $keeper = keeper::getKeeper();
         $user = $keeper->getUser();
         if ($user) {
-            return $user->settings(
-                'agentData.bank',
-                [
-                    'realname' => '',
-                    'bank' => '',
-                    'branch' => '',
-                    'account' => '',
-                    'address' => [
-                        'province' => '',
-                        'city' => '',
-                    ],
-                ]
-            );
+            return common::getUserBank($user);
         }
 
         return $result;

@@ -279,6 +279,23 @@ class common
         return false;
     }
 
+    public static function getUserBank(userModelObj $user): array
+    {
+        return $user->settings(
+            'agentData.bank',
+            [
+                'realname' => '',
+                'bank' => '',
+                'branch' => '',
+                'account' => '',
+                'address' => [
+                    'province' => '',
+                    'city' => '',
+                ],
+            ]
+        );
+    }
+
     /**
      * @param userModelObj $user
      *

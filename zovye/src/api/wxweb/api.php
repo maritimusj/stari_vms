@@ -766,19 +766,7 @@ class api
     public static function getUserBank(): array
     {
         $user = \zovye\api\wx\common::getUser();
-        return $user->settings(
-            'agentData.bank',
-            [
-                'realname' => '',
-                'bank' => '',
-                'branch' => '',
-                'account' => '',
-                'address' => [
-                    'province' => '',
-                    'city' => '',
-                ],
-            ]
-        );
+        return \zovye\api\wx\common::getUserBank($user);
     }
 
     /**

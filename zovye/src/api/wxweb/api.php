@@ -752,11 +752,14 @@ class api
         if (empty($device)) {
             return err('找不到这个设备！');
         }
-        $res = Helper::validateLocation($user, $device, request::float('lat'), request::float('lng'));
-        if (is_error($res)) {
-            return $res;
-        }
 
+        if ($device->needValidateLocation()) {
+            $res = Helper::validateLocation($user, $device, request::float('lat'), request::float('lng'));
+            if (is_error($res)) {
+                return $res;
+            }                    
+        }
+        
         return '成功！';
     }
 

@@ -645,8 +645,10 @@ class Device extends State
         $locker->unlock();
 
         //设备分组
-        $device->setGroupId(0);
-
+        if (!$device->isChargingDevice()) {
+            $device->setGroupId(0);
+        }
+        
         //设备标签
         $device->setTagsFromText('');
 

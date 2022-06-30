@@ -1777,44 +1777,14 @@ class agent
     public static function getUserQRCode(): array
     {
         $user = common::getAgentOrKeeper();
-        $user_qrcode = $user->settings('qrcode', []);
-        if (isset($user_qrcode['wx'])) {
-            $user_qrcode['wx'] = Util::toMedia($user_qrcode['wx']);
-        }
-        if (isset($user_qrcode['ali'])) {
-            $user_qrcode['ali'] = Util::toMedia($user_qrcode['ali']);
-        }
-
-        return (array)$user_qrcode;
+        return common::getUserQRCode($user);
     }
 
     public static function updateUserQRCode(): array
     {
         $user = common::getAgentOrKeeper();
         $type = request::str('type');
-
-        We7::load()->func('file');
-        $res = We7::file_upload($_FILES['pic'], 'image');
-
-        if (!is_error($res)) {
-            $filename = $res['path'];
-            if ($res['success'] && $filename) {
-                try {
-                    We7::file_remote_upload($filename);
-                } catch (Exception $e) {
-                    Log::error('doPageUserQRcode', $e->getMessage());
-                }
-            }
-
-            $user_qrcode = $user->settings('qrcode', []);
-            $user_qrcode[$type] = $filename;
-
-            $user->updateSettings('qrcode', $user_qrcode);
-
-            return ['status' => 'success', 'msg' => '上传成功！'];
-        } else {
-            return error(State::ERROR, '上传失败！');
-        }
+        return common::updateUserQRCode($user, $type);
     }
 
     public static function aliAuthCode()

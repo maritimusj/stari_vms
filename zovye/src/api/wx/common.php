@@ -6,18 +6,24 @@
 
 namespace zovye\api\wx;
 
+use Exception;
 use zovye\model\agentModelObj;
 use zovye\App;
 use zovye\request;
 use zovye\JSON;
+use zovye\Log;
 use zovye\model\keeperModelObj;
 use zovye\LoginData;
 use zovye\User;
 use zovye\model\userModelObj;
+use zovye\State;
+use zovye\Util;
+use zovye\We7;
 use zovye\Wx;
 use zovye\WxApp;
 use function zovye\_W;
 use function zovye\err;
+use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -294,5 +300,44 @@ class common
         $user->updateSettings('agentData.bank', $bankData);
 
         return ['msg' => '保存成功！'];
+    }
+
+    public static function getUserQRCode(userModelObj $user): array
+    {
+        $user_qrcode = $user->settings('qrcode', []);
+        if (isset($user_qrcode['wx'])) {
+            $user_qrcode['wx'] = Util::toMedia($user_qrcode['wx']);
+        }
+        if (isset($user_qrcode['ali'])) {
+            $user_qrcode['ali'] = Util::toMedia($user_qrcode['ali']);
+        }
+
+        return (array)$user_qrcode;
+    }
+
+    public static function updateUserQRCode(userModelObj $user, $type): array
+    {
+        We7::load()->func('file');
+        $res = We7::file_upload($_FILES['pic'], 'image');
+
+        if (!is_error($res)) {
+            $filename = $res['path'];
+            if ($res['success'] && $filename) {
+                try {
+                    We7::file_remote_upload($filename);
+                } catch (Exception $e) {
+                    Log::error('doPageUserQRcode', $e->getMessage());
+                }
+            }
+
+            $user_qrcode = $user->settings('qrcode', []);
+            $user_qrcode[$type] = $filename;
+
+            $user->updateSettings('qrcode', $user_qrcode);
+
+            return ['status' => 'success', 'msg' => '上传成功！'];
+        }
+        
+        return error(State::ERROR, '上传失败！');
     }
 }

@@ -757,4 +757,52 @@ class api
 
         return '成功！';
     }
+
+    /**
+     * 获取银行信息.
+     *
+     * @return array
+     */
+    public static function getUserBank(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+        return $user->settings(
+            'agentData.bank',
+            [
+                'realname' => '',
+                'bank' => '',
+                'branch' => '',
+                'account' => '',
+                'address' => [
+                    'province' => '',
+                    'city' => '',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * 设置提现银行信息.
+     *
+     * @return array
+     */
+    public static function setUserBank(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+        return \zovye\api\wx\common::setUserBank($user);
+    }
+
+
+    public static function getUserQRCode(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+        return \zovye\api\wx\common::getUserQRCode($user);
+    }
+
+    public static function updateUserQRCode(): array
+    {
+        $user = \zovye\api\wx\common::getUser();
+        $type = request::str('type');
+        return \zovye\api\wx\common::updateUserQRCode($user, $type);
+    }
 }

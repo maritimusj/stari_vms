@@ -255,9 +255,10 @@ if ($op == 'default') {
         JSON::fail('设备不正确！');
     }
 
+    $result = [];
+
     $chargerNum = $device->getChargerNum();
 
-    $result = [];
 
     $spanFN = function ($str) {
         return '<span class="val">'.$str.'</span>';
@@ -269,6 +270,7 @@ if ($op == 'default') {
         $data = [
             'status' => 'unknown',
             'properties' => [],
+            'qrcode' => Util::toMedia($device->getChargerProperty($i + 1, 'qrcode', '')),
             'errors' => $chargerData['errorBits'] || [],
         ];
 

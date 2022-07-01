@@ -2521,12 +2521,24 @@ HTML;
     $ids = request::array('ids', []);
     $query = Device::query(['id' => $ids]);
 
+    $addFile = function($url) use ($zip, $url_prefix, $attach_prefix) {
+        $filename = str_replace($url_prefix, $attach_prefix, $url);
+        $filename = preg_replace('/\?.*/', '', $filename);
+        if (file_exists($filename)) {
+            $zip->addFile($filename, basename($filename));
+        }
+    };
+
     /** @var deviceModelObj $device */
     foreach ($query->findAll() as $device) {
-        $file_real = str_replace($url_prefix, $attach_prefix, $device->getQrcode());
-        $file_real = preg_replace('/\?.*/', '', $file_real);
-        if (file_exists($file_real)) {
-            $zip->addFile($file_real, basename($file_real));
+        if ($device->isChargingDevice()) {
+            $chargerNum = $device->getChargerNum();
+            for($i = 0; $i < $chargerNum; $i ++ ){
+                $url = Util::toMedia($device->getChargerProperty($i + 1, 'qrcode', ''));
+                $addFile($url);
+            }
+        } else {
+            $addFile($device->getQrcode());
         }
     }
 

@@ -270,9 +270,13 @@
                             <div class="imei">
                                 <img src="{MODULE_URL}static/img/qrcode.svg" class="qrcode" v-if="o.activeQrcode">
                                 <i class="fa fa-qrcode" v-else></i>
-                                <div class="zovye_qrcode" :data-url="o.getUrl" title="点击复制取货链接">
+                                <div class="zovye_qrcode" :data-url="o.getUrl" title="点击复制链接">
                                     <img :src="o.qrcode" />
+                                    <template v-for="url in o.qrcodes" v-if="o.qrcodes">
+                                        <img :src="url" />
+                                    </template>  
                                 </div>
+
                             </div>
                         </td>
                         <td>

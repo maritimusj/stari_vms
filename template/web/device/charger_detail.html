@@ -1,4 +1,19 @@
 
+<style>
+    .heading .operate {
+        position: relative;
+    }
+    .heading .operate img {
+        display: none;
+        position: absolute;
+        width: 150px;
+        box-shadow: 1px;
+        box-shadow: 3px 2px 0 2px rgb(158 158 158 / 30%);
+    }
+    .heading .operate:hover img {
+        display: block;
+    }
+</style>
 <div id="app" :data-app="appId">
     <ul class="nav nav-tabs" id="navbar">
         <li role="presentation" :class="{active: active === i}" v-for="(e,i) in data" style="margin-bottom: -2px;">
@@ -8,6 +23,14 @@
         </li>
     </ul>
     <div class="panel panel-default panel-first nav-tab-item">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-qrcode"></i>
+                <template v-for="(e, i) in data">
+                    <img :src="e.qrcode" v-if="active == i">
+                </template>
+            </span>
+        </div>
         <div class="panel-body" :class="data[active] ? data[active].status : ''">
             <table class="table table-condensed" data-fetchid="{$device_id}" v-if="data.length > 0">
                 <tbody>

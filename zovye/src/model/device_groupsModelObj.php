@@ -6,6 +6,7 @@
 
 namespace zovye\model;
 
+use DateTimeInterface;
 use zovye\Agent;
 use zovye\Group;
 
@@ -77,53 +78,83 @@ class device_groupsModelObj extends modelObj
         return null;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->getExtraData('name', '');
     }
 
-    public function setName(string $name) {
+    public function setName(string $name)
+    {
         return $this->setExtraData('name', $name);
     }
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->getExtraData('description', '');
     }
 
-    public function setDescription(string $desc) {
+    public function setDescription(string $desc)
+    {
         return $this->setExtraData('description', $desc);
     }
 
-    public function getAddress(): string {
+    public function getAddress(): string
+    {
         return $this->getExtraData('address', '');
     }
 
-    public function setAddress(string $address) {
+    public function setAddress(string $address)
+    {
         return $this->setExtraData('address', $address);
     }
 
-    public function getLoc(): array {
+    public function getLoc(): array
+    {
         return [
             'lat' => $this->getExtraData('lat', 0.0),
             'lng' => $this->getExtraData('lng', 0.0),
         ];
     }
-    public function setLoc(array $loc) {
+
+    public function setLoc(array $loc): bool
+    {
         return $this->setExtraData('lat', $loc['lat']) && $this->setExtraData('lng', $loc['lng']);;
     }
 
-    public function setFee(array $fee) {
+    public function setFee(array $fee)
+    {
         return $this->setExtraData('fee', $fee);
     }
 
-    public function getFee(): array {
+    public function getFee(): array
+    {
         return $this->getExtraData('fee', []);
     }
 
-    public function setVersion($version) {
+    public function getFeeAt(DateTimeInterface $time)
+    {
+        $hour = $time->format('H') * 2;
+
+        $minute = $time->format('i');
+        $second = $time->format('s');
+
+        if ($minute > 30 || ($minute == 30 && $second > 0)) {
+            $hour += 1;
+        }
+
+        $fee = $this->getFee();
+        $level = 'l'.($fee['ts'][$hour] ?? 0);
+
+        return $fee[$level] ?? $fee['l0'];
+    }
+
+    public function setVersion($version)
+    {
         return $this->setExtraData('version', $version);
     }
 
-    public function getVersion() {
+    public function getVersion()
+    {
         return $this->getExtraData('version', 'n/a');
     }
 }

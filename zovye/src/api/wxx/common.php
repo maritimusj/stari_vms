@@ -1284,6 +1284,9 @@ class common
             if (empty($user)) {
                 return error(State::ERROR, '没有找到关联的微信用户！');
             }
+            if (isset($device)) {
+                $user->setLastActiveDevice($device);
+            }
             if ($res['phoneNumber']) {
                 $user->setMobile($res['phoneNumber']);
                 $user->save();

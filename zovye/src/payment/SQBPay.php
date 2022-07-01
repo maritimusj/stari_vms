@@ -72,6 +72,10 @@ class SQBPay implements IPay
             'res' => $res,
         ]);
 
+        if (is_error($res)) {
+            return $res;
+        }
+
         if ($res['result_code'] !== 'PRECREATE_SUCCESS') {
             return err($res['error_message']);
         }

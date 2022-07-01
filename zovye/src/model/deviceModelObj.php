@@ -1050,6 +1050,19 @@ class deviceModelObj extends modelObj
 
         $this->setQrcode($qrcode_file);
 
+        if ($this->isChargingDevice()) {
+            $chargerNum = $this->getChargerNum();
+            for($i = 0; $i < $chargerNum; $i++) {
+                $qrcode_file = Util::createQrcodeFile("device.$this->imei$i", "charging=true&device=$this->imei&charger=$i", function ($filename) use ($i) {
+                    $this->renderTxt($filename, sprintf("%s:%02d", $this->imei, $i));
+                });
+                if (is_error($qrcode_file)) {
+                    return false;
+                }
+                $this->setChargerProperty($i + 1, 'qrcode', $qrcode_file);
+            }
+        }
+
         return $this->save();
     }
 

@@ -274,7 +274,11 @@ $tpl_data = Util::getTplData([
         'timeout' => App::deviceWaitTimeout(),
         'user.ticket' => $ticket_data['id'],
     ],
+    'misc' => [
+        'wx_app.username' => settings('agentWxapp.name', ''),
+    ]
 ]);
+
 
 //领取页面
 app()->getPage($tpl_data);

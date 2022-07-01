@@ -275,7 +275,7 @@ $tpl_data = Util::getTplData([
         'user.ticket' => $ticket_data['id'],
     ],
     'misc' => [
-        'wx_app.username' => settings('agentWxapp.name', ''),
+        'wx_app.username' => settings('agentWxapp.username', ''),
     ]
 ]);
 

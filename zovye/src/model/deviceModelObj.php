@@ -1055,7 +1055,7 @@ class deviceModelObj extends modelObj
             for($i = 0; $i < $chargerNum; $i++) {
                 $chargerID = $i + 1;
                 $qrcode_file = Util::createQrcodeFile("device.$this->imei$chargerID", "charging=true&device=$this->imei&charger=$chargerID", function ($filename) use ($chargerID) {
-                    $this->renderTxt($filename, sprintf("%s:%02d", $this->imei, $chargerID));
+                    $this->renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
                 });
                 if (is_error($qrcode_file)) {
                     return false;

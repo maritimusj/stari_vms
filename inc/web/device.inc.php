@@ -348,22 +348,18 @@ if ($op == 'default') {
                 ];
             }
 
-            if (App::isVDeviceSupported()) {
-                $data['isVD'] = $device->isVDevice();
+            if (App::isVDeviceSupported() && $device->isVDevice()) {
+                $data['isVD'] = true;
                 unset($data['lastOnline'], $data['lastPing'], $data['lastError']);
             }
 
-            if (App::isBluetoothDeviceSupported()) {
-                if ($device->isBlueToothDevice()) {
-                    $data['isBluetooth'] = true;
-                    $data['BUID'] = $device->getBUID();
-                }
+            if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
+                $data['isBluetooth'] = true;
+                $data['BUID'] = $device->getBUID();
             }
 
-            if (App::isChargingDeviceEnabled()) {
-                if ($device->isChargingDevice()) {
-                    $data['charging'] = $device->getChargingData();
-                }
+            if (App::isChargingDeviceEnabled() && $device->isChargingDevice()) {
+                $data['charging'] = $device->getChargingData();
             }
 
             if (settings('device.lac.enabled')) {

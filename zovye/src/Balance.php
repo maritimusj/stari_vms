@@ -62,9 +62,10 @@ class Balance
      * @param int $val
      * @param int $src
      * @param array $extra
+     * @param bool $notify
      * @return balanceModelObj
      */
-    public function change(int $val, int $src, array $extra = []): ?balanceModelObj
+    public function change(int $val, int $src, array $extra = [], bool $notify = true): ?balanceModelObj
     {
         if ($this->user && $val != 0) {
             $result = m('balance')->create(
@@ -77,9 +78,8 @@ class Balance
                     ]
                 )
             );
-            if ($result) {
+            if ($result && $notify) {
                 $this->on_change($result);
-
                 return $result;
             }
         }

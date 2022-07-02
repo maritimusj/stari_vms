@@ -11,13 +11,27 @@ use zovye\model\userModelObj;
 $op = request::op('default');
 $app_key = request::str('appkey');
 
+function findApiUser() :? userModelObj {
+    if (request::has('id')) {
+        $user = User::get(request::int('id'));
+    } elseif (request::has('openid')) {
+        $user = User::get(request::str('openid'), true);
+    } elseif (request::has('mobile')) {
+        $user = User::findOne(['mobile' => request::str('mobile'), 'app' => request::int('app', User::WX)]);
+    }
+    return $user ?? null;
+}
+
 if (empty($app_key) || $app_key !== Config::balance('app.key')) {
     JSON::fail('非法请求！');
 }
 
 if ($op == 'default') {
+
     JSON::success('Ok');
+
 } elseif ($op == 'list') {
+
     $query = User::query();
 
     $page = request::int('page', 1);
@@ -39,34 +53,27 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
-    if (request::has('id')) {
-        $user = User::get(request::int('id'));
-    } elseif (request::has('openid')) {
-        $user = User::get(request::str('openid'), true);
-    }
+    $user = findApiUser();
 
     if (empty($user)) {
-        JSON::fail('找不到这个用户！');
+        JSON::fail('用户不存在！');
     }
-    $data = $user->profile(true);
+
+    $data = $user->profile();
     $data['balance'] = $user->getBalance()->total();
     JSON::result($data);
 
 } elseif ($op == 'update') {
 
-    if (request::has('id')) {
-        $user = User::get(request::int('id'));
-    } elseif (request::has('openid')) {
-        $user = User::get(request::str('openid'), true);
+    $user = findApiUser();
+
+    if (empty($user)) {
+        JSON::fail('用户不存在！');
     }
 
     $val = request::int('val');
     if (empty($val)) {
         JSON::fail('积分值不能为0！');
-    }
-
-    if (empty($user)) {
-        JSON::fail('用户不存在！');
     }
 
     $result = $user->getBalance()->change($val, Balance::API_UPDATE, [

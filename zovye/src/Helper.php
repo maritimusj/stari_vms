@@ -277,13 +277,7 @@ class Helper
         $result = $device->pull($pull_data);
 
         //v1版本新版本返回数据包含在json的data下
-        if (is_error($result)) {
-            $device->setError($result['errno'], $result['message']);
-            $device->scheduleErrorNotifyJob($result['errno'], $result['message']);
-        } elseif (is_error($result['data'])) {
-            $device->setError($result['data']['errno'], $result['data']['message']);
-            $device->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
-        } else {
+        if (!is_error($result)) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {
                 return error(State::ERROR, '设备正忙，请重试！');

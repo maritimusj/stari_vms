@@ -2248,10 +2248,26 @@ class deviceModelObj extends modelObj
             if (empty($extra['user-agent'])) {
                 $extra['user-agent'] = $_SERVER['HTTP_USER_AGENT'];
             }
+
             //打开设备，出货
             /** @var string|array $result */
             $result = $this->open($mcb_channel, $num, $timeout, $extra);
+
+            if (is_error($result)) {
+                $this->setError($result['errno'], $result['message']);
+                if (empty($options['test'])) {
+                    $this->scheduleErrorNotifyJob($result['errno'], $result['message']);
+                }
+            } elseif (is_error($result['data'])) {
+                $this->setError($result['data']['errno'], $result['data']['message']);
+                if (empty($options['test'])) {
+                    $this->scheduleErrorNotifyJob($result['data']['errno'], $result['data']['message']);
+                }
+                $result = $result['data'];
+            }
         }
+
+        $this->save();
 
         return $result;
     }

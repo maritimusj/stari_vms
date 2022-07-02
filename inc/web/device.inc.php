@@ -1042,10 +1042,6 @@ HTML;
             if (is_error($res)) {
                 JSON::fail($res);
             }
-
-            $device->cleanError();
-            $device->save();
-
             JSON::success('出货成功！');
         }
     }

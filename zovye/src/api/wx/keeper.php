@@ -1033,9 +1033,6 @@ class keeper
             return $res;
         }
 
-        $device->cleanError();
-        $device->save();
-
         $resp = ['id' => $device->getImei(), 'msg' => '出货成功！'];
         if ($device->isBlueToothDevice()) {
             $data = $res['data'];

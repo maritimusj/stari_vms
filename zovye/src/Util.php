@@ -1693,6 +1693,7 @@ HTML_CONTENT;
                 'userid' => isset($user) ? $user->getName() : _W('username'),
                 'num' => 1,
                 'from' => 'web.admin',
+                'test' => true,
                 'timeout' => settings('device.waitTimeout', DEFAULT_DEVICE_WAIT_TIMEOUT),
             ],
             $params
@@ -2034,9 +2035,6 @@ HTML_CONTENT;
 
                 if (is_error($res)) {
                     $order->setResultCode($res['errno']);
-
-                    $device->setError($res['errno'], $res['message']);
-                    $device->scheduleErrorNotifyJob($res['errno'], $res['message']);
 
                     try {
                         //事件：出货失败

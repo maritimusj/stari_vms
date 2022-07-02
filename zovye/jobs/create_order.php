@@ -327,9 +327,6 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
     }
 
     if (is_error($res)) {
-        $device->setError($res['errno'], $res['message']);
-        $device->scheduleErrorNotifyJob($res['errno'], $res['message']);
-
         try {
             //事件：出货失败
             EventBus::on('device.openFail', $params);

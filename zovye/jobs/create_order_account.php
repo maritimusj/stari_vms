@@ -146,7 +146,7 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
     } catch (ZovyeException $e) {
         $params['error'] = $e->getMessage();
 
-        if (isset($account) && $account->isThirdPartyPlatform()) {
+        if (isset($account) && $account->isThirdPartyPlatform() && isset($user)) {
             Account::updateQueryLogCBData($account, $user, $device, [
                 'data' => [
                     'error' => $e->getMessage(),

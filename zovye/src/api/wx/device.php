@@ -329,7 +329,7 @@ class device
 
             if ($user->isKeeper()) {
                 $agent = $device->getAgent();
-                if ($agent && !$agent->allowReductGoodsNum()) {
+                if ($agent && !$agent->allowReduceGoodsNum()) {
                     if ($num < $laneData['num']) {
                         return err('不允许减少商品库存！');
                     }

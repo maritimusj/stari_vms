@@ -23,7 +23,6 @@ use function zovye\setArray;
 
 /**
  * @method getQrcode()
- * @method setData($data)
  * @method getCreatetime()
  * @method hasCreatetime()
  */

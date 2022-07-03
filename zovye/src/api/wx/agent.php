@@ -245,6 +245,7 @@ class agent
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
             Log::error('wxapi', $res);
+            return $res;
         }
 
         $result = agent::doUserLogin($res);
@@ -2090,5 +2091,4 @@ class agent
 
         return error(State::ERROR, '无法启动刷新任务，请联系管理员！');
     }
-
 }

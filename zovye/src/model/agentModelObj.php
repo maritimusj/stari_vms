@@ -161,9 +161,9 @@ class agentModelObj extends userModelObj
         return null;
     }
 
-    public function allowReductGoodsNum(): bool
+    public function allowReduceGoodsNum(): bool
     {
-        return (bool)$this->getAgentData('keeper.reductGoodsNum.enabled', true);
+        return (bool)$this->getAgentData('keeper.reduceGoodsNum.enabled', true);
     }
 
     public function isPaymentConfigEnabled(): bool

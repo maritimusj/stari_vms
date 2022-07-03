@@ -89,7 +89,7 @@ class common
         return User::get($login_data->getOpenidX(), true);
     }
 
-    public static function getUser(): userModelObj
+    public static function getUser($token = ''): userModelObj
     {
         if (self::$user) {
             return self::$user;

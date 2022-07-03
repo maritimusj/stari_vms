@@ -68,6 +68,12 @@ class api
         );
     }
 
+    public static function migrateUrl(): array
+    {
+        $url = Util::murl('util', ['op' => 'migrate', 'token' => \zovye\api\wx\common::getToken()]);
+        return ['url' => $url];
+    }
+
     /**
      * 获取设备相关的广告
      * @return array

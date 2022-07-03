@@ -57,6 +57,7 @@ use function zovye\is_error;
  * @method getAgentId()
  * @method getCreatetime()
  * @method setLockedUid(string $UNLOCKED)
+ * @method setOpenid($getOpenid)
  *
  * @property login_dataModelObj $loginData
  */

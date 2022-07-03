@@ -925,7 +925,7 @@ class keeper
             $lane = request::int('lane');
             $num = request::int('num');
 
-            if ($num != 0 && !$agent->allowReductGoodsNum()) {
+            if ($num != 0 && !$agent->allowReduceGoodsNum()) {
                 $laneData = $device->getLane($lane);
                 if ($laneData && $num < $laneData['num']) {
                     return err('不允许减少商品库存！');

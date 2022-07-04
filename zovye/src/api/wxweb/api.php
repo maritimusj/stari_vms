@@ -237,6 +237,11 @@ class api
             if (empty($account)) {
                 return err('找不到指定任务！');
             }
+
+            if ($account->getBonusType() != Account::COMMISSION) {
+                return err('公众号奖励类型不正确！');
+            }
+
             $orderUID = Order::makeUID($user, $device);
 
             if (Job::createAccountOrder([

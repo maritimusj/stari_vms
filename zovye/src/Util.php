@@ -2408,6 +2408,7 @@ HTML_CONTENT;
             } elseif ($entry instanceof accountModelObj) {
                 $data['account'] = [
                     'uid' => $entry->getUid(),
+                    'bonus_type' => $entry->getBonusType(),
                     'title' => $entry->getTitle(),
                     'descr' => $entry->getDescription(),
                     'img' => $entry->getImg(),

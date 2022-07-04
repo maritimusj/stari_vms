@@ -216,7 +216,11 @@ if ($op == 'default') {
 } elseif ($op == 'migrate') {
     //代理商小程序更改后，代理商数据迁移
 
-    $user = Util::getCurrentUser();
+    $user = Util::getCurrentUser([
+        'create' => true,
+        'update' => true,
+    ]);
+    
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -260,21 +264,28 @@ if ($op == 'default') {
 
     $result = Util::transactionDo(function () use ($user, $agent) {
         $total = $agent->getCommissionBalance()->total();
-
-        if (!$agent->commission_change(0 - $total, CommissionBalance::ADJUST)) {
-            return err('余额变动失败！');
-        }
-
-        if (!$user->commission_change($total, CommissionBalance::ADJUST)) {
-            return err('余额变动失败！');
-        }
-
         $balance_total = $agent->getBalance()->total();
-        if (!$agent->getBalance()->change(0 - $balance_total, Balance::ADJUST)) {
+
+        $data =  [
+            'admin' => _W('username'),
+            'ip' => CLIENT_IP,
+            'user-agent' => $_SERVER['HTTP_USER_AGENT'],
+            'memo' => '系统公众号迁移',
+        ];
+
+        if (!$agent->commission_change(0 - $total, CommissionBalance::ADJUST, $data)) {
+            return err('余额变动失败！');
+        }
+
+        if (!$user->commission_change($total, CommissionBalance::ADJUST, $data)) {
+            return err('余额变动失败！');
+        }
+
+        if (!$agent->getBalance()->change(0 - $balance_total, Balance::ADJUST, $data)) {
             return err('积分变动失败！');
         }
 
-        if (!$user->getBalance()->change($balance_total, Balance::ADJUST)) {
+        if (!$user->getBalance()->change($balance_total, Balance::ADJUST, $data)) {
             return err('积分变动失败！');
         }
 
@@ -294,6 +305,22 @@ if ($op == 'default') {
         $user->setOpenid($agent_openid);
         if (!$user->save()) {
             return err('无法保存用户信息！');
+        }
+
+        if (!$agent->remove('commission_balance')) {
+            return err('无法清除余额缓存！');
+        }
+
+        if (!$user->remove('commission_balance')) {
+            return err('无法清除余额缓存！');
+        }
+        
+        if (!$agent->remove('balance:cache')) {
+            return err('无法清除余额缓存！');
+        }
+
+        if (!$user->remove('balance:cache')) {
+            return err('无法清除余额缓存！');
         }
 
         return true;

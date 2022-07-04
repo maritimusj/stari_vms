@@ -11,6 +11,8 @@ use zovye\User;
 use zovye\Util;
 use zovye\Device;
 
+use function zovye\err;
+use function zovye\is_error;
 use function zovye\m;
 use function zovye\settings;
 
@@ -227,45 +229,52 @@ class agentModelObj extends userModelObj
      */
     public function setPartner(userModelObj $user, string $name, string $mobile, array $notice = []): bool
     {
-        if ($this->isAgent()) {
-            $classname = m('user')->objClassname();
-            if ($user instanceof $classname && !$user->isAgent() && $mobile) {
-
-                if (!$user->isPartner()) {
-                    if (!$user->setPrincipal(User::PARTNER)) {
-                        return false;
-                    }
-                }
-
-                if ($user->updateSettings(
-                    'partnerData',
-                    [
-                        'name' => $name,
-                        'mobile' => $mobile,
-                        'agent' => $this->getId(),
-                        'createtime' => TIMESTAMP,
-                    ]
-                )) {
-
-                    $user->setMobile($mobile);
-                    $user->save();
-                    if ($this->updateSettings(
-                        "agentData.partners.{$user->getId()}",
-                        [
-                            'openid' => $user->getOpenid(),
-                            'name' => $name,
-                            'mobile' => $mobile,
-                            'notice' => $notice,
-                            'createtime' => TIMESTAMP,
-                        ]
-                    )) {
-                        return true;
-                    }
-                }
-            }
+        if (!$this->isAgent()) {
+            return false;
         }
 
-        return false;
+        if ($user->isAgent() || $user->isPartner()) {
+            return false;
+        }
+
+        if (empty($mobile)) {
+            return false;
+        }
+
+        $result = Util::transactionDo(function () use ($user, $name, $mobile, $notice) {
+            if (!$user->setPrincipal(User::PARTNER)) {
+                return err('设置身份失败！');
+            }
+
+            if (!$user->updateSettings('partnerData', [
+                'name' => $name,
+                'mobile' => $mobile,
+                'agent' => $this->getId(),
+                'createtime' => TIMESTAMP,
+            ])) {
+                return err('保存数据失败！');
+            }
+
+            $user->setMobile($mobile);
+
+            if (!$user->save()) {
+                return err('保存数据失败！');
+            }
+
+            if (!$this->updateSettings("agentData.partners.{$user->getId()}", [
+                'openid' => $user->getOpenid(),
+                'name' => $name,
+                'mobile' => $mobile,
+                'notice' => $notice,
+                'createtime' => TIMESTAMP,
+            ])) {
+                return err('保存数据失败！');
+            }
+
+            return true;
+        });
+
+        return !is_error($result);
     }
 
     /**

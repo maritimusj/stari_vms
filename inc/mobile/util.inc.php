@@ -239,32 +239,27 @@ if ($op == 'default') {
 
     $token = request::str('token');
 
-    $agent = api\wx\common::getUser($token);
-    if (empty($agent)) {
-        JSON::fail('找不到这个代理商！');
+    $original = api\wx\common::getUser($token);
+    if (empty($original)) {
+        JSON::fail('找不到这个用户！');
     }
 
-    if (!$agent->isAgent()) {
-        JSON::fail('用户不是我们的代理商！');
-    }
-
-    $agent = $agent->agent();
-
-    if ($user->getId() == $agent->getId()) {
-        JSON::fail('代理商已完成迁移！');
-    }
-
-    if (!$agent->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-        JSON::fail('无法锁定用户！');
+    if ($user->getId() == $original->getId()) {
+        JSON::fail('已完成迁移！');
     }
 
     if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
         JSON::fail('无法锁定用户！');
     }
 
-    $result = Util::transactionDo(function () use ($user, $agent) {
-        $total = $agent->getCommissionBalance()->total();
-        $balance_total = $agent->getBalance()->total();
+    if (!$original->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
+        JSON::fail('无法锁定用户！');
+    }
+
+    $result = Util::transactionDo(function () use ($user, $original) {
+
+        $total = $original->getCommissionBalance()->total();
+        $balance_total = $original->getBalance()->total();
 
         $data =  [
             'admin' => _W('username'),
@@ -273,7 +268,7 @@ if ($op == 'default') {
             'memo' => '系统公众号迁移',
         ];
 
-        if (!$agent->commission_change(0 - $total, CommissionBalance::ADJUST, $data)) {
+        if (!$original->commission_change(0 - $total, CommissionBalance::ADJUST, $data)) {
             return err('余额变动失败！');
         }
 
@@ -281,7 +276,7 @@ if ($op == 'default') {
             return err('余额变动失败！');
         }
 
-        if (!$agent->getBalance()->change(0 - $balance_total, Balance::ADJUST, $data)) {
+        if (!$original->getBalance()->change(0 - $balance_total, Balance::ADJUST, $data)) {
             return err('积分变动失败！');
         }
 
@@ -295,19 +290,34 @@ if ($op == 'default') {
             return err('无法保存用户信息！');
         }
 
-        $agent_openid = $agent->getOpenid();
-        $agent->setOpenid($user_openid);
-        $agent->settings('agentData.openid', $agent_openid);
-        if (!$agent->save()) {
-            return err('无法保存用户信息！');
+        $original_openid = $original->getOpenid();
+
+        if ($original->isAgent()) {
+            $agent = $original->agent();
+            $agent->settings('agentData.openid', $original_openid);
+            if (!$agent->save()) {
+                return err('无法保存用户信息！');
+            }
+        } elseif ($original->isPartner()) {
+            $agent = $original->getPartnerAgent();
+            if ($agent) {
+                if (!$agent->updateSettings("agentData.partners.{$original->getId()}.openid", $original->getOpenid())) {
+                    return err('无法保存用户信息！');
+                }
+            }
+        } elseif ($original->isKeeper()) {
+            $keeper = $original->getKeeper();
+            //暂无处理
         }
 
-        $user->setOpenid($agent_openid);
+        $original->setOpenid($user_openid);
+
+        $user->setOpenid($original_openid);
         if (!$user->save()) {
             return err('无法保存用户信息！');
         }
 
-        if (!$agent->remove('commission_balance')) {
+        if (!$original->remove('commission_balance')) {
             return err('无法清除余额缓存！');
         }
 
@@ -315,7 +325,7 @@ if ($op == 'default') {
             return err('无法清除余额缓存！');
         }
         
-        if (!$agent->remove('balance:cache')) {
+        if (!$original->remove('balance:cache')) {
             return err('无法清除余额缓存！');
         }
 
@@ -331,7 +341,7 @@ if ($op == 'default') {
     }
 
     //清除原来的登录信息
-    foreach (LoginData::query(['user_id' => [$user->getId(), $agent->getId()]])->findAll() as $entry) {
+    foreach (LoginData::query(['user_id' => [$user->getId(), $original->getId()]])->findAll() as $entry) {
         $entry->destroy();
     }
 

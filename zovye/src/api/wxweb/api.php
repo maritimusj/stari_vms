@@ -485,7 +485,7 @@ class api
 
         $result = Balance::give($user, $account);
         if (is_error($result)) {
-            return err($result);
+            return $result;
         }
 
         return [

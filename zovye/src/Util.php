@@ -2379,6 +2379,7 @@ HTML_CONTENT;
             if ($entry instanceof userModelObj) {
                 $data['user'] = [
                     'id' => $entry->getId(),
+                    'openid' => $entry->getOpenid(),
                     'nickname' => $entry->getNickname(),
                     'avatar' => $entry->getAvatar(),
                     '_obj' => $entry,

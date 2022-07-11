@@ -636,6 +636,30 @@ JSCODE;
         $this->showTemplate($file, ['tpl' => $tpl]);
     }
 
+        /**
+     * 领取页面.
+     *
+     * @param array $params
+     */
+    public function jumpPage($params = [])
+    {
+        $tpl = is_array($params) ? $params : [];
+        $js_sdk = Util::fetchJSSDK();
+
+        $tpl['js']['code'] = <<<JSCODE
+        $js_sdk
+        <script>
+            wx.ready(function(){
+                wx.hideAllNonBaseMenuItem();
+            })
+        </script>
+JSCODE;
+        
+        $file = Theme::getThemeFile(null, 'jump');
+
+        $this->showTemplate($file, ['tpl' => $tpl]);
+    }
+
     /**
      * 领取页面.
      *

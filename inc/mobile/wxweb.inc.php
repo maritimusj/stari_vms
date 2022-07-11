@@ -26,6 +26,7 @@ router::exec($op, [
     'pay' => '\zovye\api\wxweb\api::pay',
     'orderStatus' => '\zovye\api\wxweb\api::orderStatus',
     'userInfo' => '\zovye\api\wxweb\api::userInfo',
+    'getJumpUserInfo' => '\zovye\api\wxweb\api::getJumpUserInfo',
     'getUserBank' => '\zovye\api\wxweb\api::getUserBank',
     'setUserBank' => '\zovye\api\wxweb\api::setUserBank',
     'getUserQRcode' => '\zovye\api\wxweb\api::getUserQRCode',

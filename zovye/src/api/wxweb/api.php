@@ -430,6 +430,27 @@ class api
         return $data;
     }
 
+    public static function getJumpUserInfo(): array
+    {
+        $openid = request::str('openid');
+        
+        $user = User::get($openid, true);
+        if (empty($user)) {
+            return err('找不到这个用户！');
+        }
+
+        $data = $user->profile();
+        $data['banned'] = $user->isBanned();
+
+        $account = $user->getLastActiveAccount();
+        if (!empty($account)) {
+            $data['account'] = $account->profile();
+        }
+
+        return $data;
+    }
+    
+
     public static function feedback(): array
     {
         $user = \zovye\api\wx\common::getUser();

@@ -18,43 +18,6 @@ if ($op == 'default') {
     $js_sdk = Util::fetchJSSDK();
     app()->showTemplate('map', ['jssdk' => $js_sdk]);
 
-} elseif ($op == 'jump') {
-
-    //用户参数
-    $params = [
-        'from' => [
-            'src' => 'mobile',
-            'ip' => CLIENT_IP,
-            'user-agent' => $_SERVER['HTTP_USER_AGENT'],
-        ],
-        'create' => true,
-        'update' => true,
-    ];
-
-    $user = Util::getCurrentUser($params);
-    if (empty($user)) {
-        Util::resultAlert('只能从微信中打开，谢谢！', 'error');
-    }
-
-    $js_sdk = Util::fetchJSSDK();
-    $file = Theme::getThemeFile(null, 'jump');
-
-    $tpl_data = [
-        'js' => [
-            'code' => $js_sdk,
-        ], 
-        'user' => [
-            'id' => $user->getId(),
-            'nickname' => $user->getNickname(),
-            'avatar' => $user->getAvatar(),
-        ],
-        'misc' => [
-            'wx_app.username' => settings('agentWxapp.username', ''),
-        ],
-    ];
-
-    app()->showTemplate($file, ['tpl' => $tpl_data]);
-
 } elseif ($op == 'data') {
 
     //请求附近设备数据

@@ -106,8 +106,24 @@ if ($device_id) {
             return [];
         };
     } else {
+        //转跳回小程序
+        if (request::bool('jump')) {
+            $cb = function(userModelObj $user) use($account) {
+                $user->setLastActiveAccount($account);
+                
+                $tpl_data = Util::getTplData([
+                    $user,
+                    $account,
+                    'misc' => [
+                        'wx_app.username' => settings('agentWxapp.username', ''),
+                    ]
+                ]);
+                
+                app()->jumpPage($tpl_data);
+            };
+        }
         //如果公众号奖励为积分，显示获取积分页面
-        if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
+        elseif (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
             $cb = function (userModelObj $user) use ($account) {
                 app()->getBalanceBonusPage($user, $account);
             };

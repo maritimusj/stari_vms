@@ -69,7 +69,7 @@ define('DEFAULT_DEVICE_CAPACITY', 10);
 define('DEFAULT_DEVICE_WAIT_TIMEOUT', 15);
 define('DEFAULT_LOCK_TIMEOUT', 15);
 
-define('VISIT_DATA_TIMEOUT', 100);
+define('VISIT_DATA_TIMEOUT', 300);
 define('PAY_TIMEOUT', 180); //支付超时，秒
 
 define('DEFAULT_ACCOUNT_DESC', '长按识别公众号，免费领取');

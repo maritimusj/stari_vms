@@ -130,14 +130,7 @@
                 <span>立即领取</span>
                 <div class="launch">
                     <wx-open-launch-weapp id="launch-btn" :username="wxapp_username"
-                        :path="'pages/bigcms/user/goods/goods?deviceId=' + imei + '&accountUid=' + uid + '&type=commission'" v-if="type === 'commission'">
-                        <script type="text/wxtag-template">
-                            <style>.btn { width: 160px; height: 160px; }</style>
-                            <button class="btn">打开小程序</button>
-                        </script>
-                    </wx-open-launch-weapp>
-                    <wx-open-launch-weapp id="launch-btn" :username="wxapp_username"
-                        :path="'pages/bigcms/user/follow/follow?deviceId=' + imei + '&accountUid=' + uid + '&type=balance'" v-else-if="type === 'balance'">
+                        :path="'pages/bigcms/user/jump/jump?openid=' + user.openid + '&accountUid=' + uid + '&type=' + type">
                         <script type="text/wxtag-template">
                             <style>.btn { width: 160px; height: 160px; }</style>
                             <button class="btn">打开小程序</button>
@@ -169,13 +162,12 @@
             el: '#app',
             data: {
                 user: {
+                    openid: "{$tpl['user']['openid']}",
                     nickname: "{$tpl['user']['nickname']}",
                     avatar: "{$tpl['user']['avatar']}"
                 },
-                imei: "{$tpl['device']['imei']}",
                 uid: "{$tpl['account']['uid']}",
-                // type: "{$tpl['account']['bonus_type']}",
-                type: "balance",
+                type: "{$tpl['account']['bonus_type']}",
                 wxapp_username: "{php echo $tpl['misc']['wx_app.username']}"
             },
             created () {

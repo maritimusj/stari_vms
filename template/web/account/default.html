@@ -453,6 +453,11 @@
                                         {/if}
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="#" data-url="{$a['url']}&jump=1" onclick="return false;"><i class="fa fa-arrow-circle-right fa-fw"></i> 
+                                        小程序转跳链接
+                                    </a>
+                                </li>
 
                                 {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
                                 <li>

@@ -1286,6 +1286,7 @@ class common
             }
             if (isset($device)) {
                 $user->setLastActiveDevice($device);
+                $user->setLastActiveData('from', 'wxapp');
             }
             if ($res['phoneNumber']) {
                 $user->setMobile($res['phoneNumber']);

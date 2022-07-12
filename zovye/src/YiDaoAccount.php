@@ -45,6 +45,8 @@ class YiDaoAccount
         if (empty($fans['sex'])) {
             //要求用户必须提供性别
             $data = $acc->format();
+            //防止qrcode为空被IsReady()过滤掉
+            $data['qrcode'] = Account::YIDAO_HEAD_IMG;
             $data['redirect_url'] = Util::murl('util', ['op' => 'user', 'device' => $device->getImei()]);
 
             return [$data];

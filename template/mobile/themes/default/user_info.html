@@ -91,6 +91,12 @@
 			.btn:not(.disabled):active {
 				opacity: 0.7;
 			}
+
+            .desc {
+                color: #9d9d9d;
+                font-size: 14px;
+                margin-top: 30px;
+            }
 		</style>
 	</head>
 	<body ontouchstart>
@@ -104,6 +110,7 @@
 				<span>女 ｜ Female</span>
 			</div>
 			<!-- <div class="btn" :class="{'disabled': sex === 0}" @click="submit">下一步</div> -->
+            <span class="desc">请选择您的性别</span>
 		</div>
         {$tpl['js']['code']}
 		{php \zovye\url(true, JS_VUE_URL);}
@@ -115,6 +122,7 @@
 				},
 				methods: {
 					choose(value) {
+                        this.sex = value
 						zovye_fn.update({sex: value}).then(res => {
                             if (res.data.redirect_url) {
                                 window.location.replace(res.data.redirect_url)

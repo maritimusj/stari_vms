@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>选择性别</title>
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				width: 100%;
+			}
+
+			body {
+				background-color: white;
+				font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-size: 18px;
+				font-weight: 500;
+				color: white;
+				margin: 0;
+				padding: 0 0 20px;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			}
+
+			#app {
+				width: 100vw;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+			
+			.card {
+				width: calc(100% - 40px);
+				padding: 20px;
+				box-sizing: border-box;
+				background-color: white;
+				margin-top: 20px;
+				border-radius: 10px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+			
+			.card span {
+				flex: 1;
+			}
+			
+			.card img {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+			}
+			
+			.male {
+				background-image: linear-gradient(to right, #8FA0FE, #8FA0FE77);
+			}
+			
+			.female {
+				background-image: linear-gradient(to left, #FF8E8E, #FF8E8E77);
+			}
+			
+			.female span {
+				text-align: right;
+			}
+			
+			.check {
+				box-shadow: 0 0 10px 3px orange;
+			}
+			
+			.btn {
+				width: 75px;
+				height: 75px;
+				font-size: 15px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				margin-top: 50px;
+				background-color: orange;
+			}
+			
+			.disabled {
+				background-color: #eee;
+			}
+			
+			.btn:not(.disabled):active {
+				opacity: 0.7;
+			}
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app" v-cloak>
+			<div class="card male" :class="{'check': sex === 1}" @click="choose(1)">
+				<span>男 ｜ Male</span>
+				<img src="{MODULE_URL}static/img/male.png">
+			</div>
+			<div class="card female" :class="{'check': sex === 2}" @click="choose(2)">
+				<img src="{MODULE_URL}static/img/female.png">
+				<span>女 ｜ Female</span>
+			</div>
+			<!-- <div class="btn" :class="{'disabled': sex === 0}" @click="submit">下一步</div> -->
+		</div>
+        {$tpl['js']['code']}
+		{php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+			new Vue({
+				el: '#app',
+				data: {
+					sex: 0
+				},
+				methods: {
+					choose(value) {
+						zovye_fn.update({sex: value}).then(res => {
+                            if (res.data.redirect_url) {
+                                window.location.replace(res.data.redirect_url)
+                            } else {
+                                alert(res.data.msg)
+                            }
+                        })
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

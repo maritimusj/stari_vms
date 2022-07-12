@@ -7,7 +7,6 @@
 namespace zovye;
 
 use Exception;
-use RuntimeException;
 use zovye\model\deviceModelObj;
 
 defined('IN_IA') or exit('Access Denied');
@@ -17,6 +16,17 @@ if ($op == 'default') {
 
     $js_sdk = Util::fetchJSSDK();
     app()->showTemplate('map', ['jssdk' => $js_sdk]);
+
+} elseif ($op == 'user') {
+
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        Util::resultAlert('请使用微信打开！', 'error');
+    }
+
+    $device = Device::get(request::str('device'), true);
+
+    app()->userInfoPage($user, $device);
 
 } elseif ($op == 'data') {
 
@@ -188,6 +198,11 @@ if ($op == 'default') {
             $user->updateSettings('customData.sex', request::int('sex'));
         }
     }
+    
+    JSON::success([
+        'redirect_url' => Util::murl('entry', ['device' => request::str('device')]),
+    ]);
+    
 } elseif ($op == 'upload_pic') {
 
     $user = Util::getCurrentUser();

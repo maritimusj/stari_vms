@@ -429,6 +429,7 @@ class Pay
     {
         if (empty($level)) {
             $level = [
+                LOG_PAY,
                 LOG_GOODS_PAY,
                 LOG_CHARGING_PAY,
                 LOG_RECHARGE,

@@ -31,12 +31,10 @@ class Wx
      * @param string $url
      * @return mixed
      */
-    public static function sendTplNotice($openid, $tpl_id, $content, string $url = ''): bool
+    public static function sendTplNotice($openid, $tpl_id, $content, string $url = '')
     {
         $wx = self::getWx();
-        $result = $wx->sendTplNotice($openid, $tpl_id, $content, $url);
-
-        return !is_error($result);
+        return $wx->sendTplNotice($openid, $tpl_id, $content, $url);
     }
 
     /**

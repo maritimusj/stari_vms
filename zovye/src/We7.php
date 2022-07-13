@@ -38,6 +38,7 @@ use we7\db;
  * @method static cutstr($name, int $int, bool $true)
  * @method static mc_credit_types()
  * @method static isimplexml_load_string($result, string $string, int $LIBXML_NOCDATA)
+ * @method static pagination(int $total, mixed $page, int $page_size)
  *
 
  */

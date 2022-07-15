@@ -6,13 +6,15 @@
 
 namespace zovye;
 
-use Exception;
 use RuntimeException;
 
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
 if ($op == 'sms') {
+    if (!App::isSmsPromoEnabled()) {
+        JSON::fail('没有启用这个功能！');
+    }
 
     $result = Util::transactionDo(function() {
         $mobile = request::trim('mobile');

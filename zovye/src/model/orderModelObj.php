@@ -106,11 +106,23 @@ class orderModelObj extends modelObj
 
     public function isFree(): bool
     {
-        if ($this->getSrc() == Order::ACCOUNT) {
+        if ($this->getSrc() == Order::ACCOUNT || $this->getSrc() == Order::FREE) {
             return true;
         }
         if ($this->getSrc() == Order::BALANCE) {
             return App::isBalanceEnabled() && Balance::isFreeOrder();
+        }
+
+        return false;
+    }
+
+    public function isPay(): bool
+    {
+        if ($this->getSrc() == Order::PAY) {
+            return true;
+        }
+        if ($this->getSrc() == Order::BALANCE) {
+            return App::isBalanceEnabled() && Balance::isPayOrder();
         }
 
         return false;
@@ -341,4 +353,5 @@ class orderModelObj extends modelObj
             'createtime' => $this->getCreatetime(),
         ];
     }
+
 }

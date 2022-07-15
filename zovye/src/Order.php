@@ -52,6 +52,7 @@ class Order extends State
     const BALANCE = 20;
     const CHARGING = 30;
     const CHARGING_UNPAID = 31;
+    const FREE = 100;
 
     const PAY_STR = 'pay';
     const FREE_STR = 'free';
@@ -851,9 +852,9 @@ class Order extends State
 
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+                $condition['src'] = [Order::FREE, Order::ACCOUNT, Order::BALANCE];
             } else {
-                $condition['src'] = Order::ACCOUNT;
+                $condition['src'] = [Order::FREE, Order::ACCOUNT];
             }
         } elseif ($way == 'pay') {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {
@@ -1238,5 +1239,4 @@ class Order extends State
 
         return ['filename' => Util::toMedia($filename)];
     }
-
 }

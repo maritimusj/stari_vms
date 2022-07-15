@@ -98,7 +98,7 @@ class OrderCounter extends StatsCounter
     public function getHourFreeTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::ACCOUNT;
+        $params['src'] = [Order::ACCOUNT, Order::FREE];
 
         return $this->getHour($params, $hour ?? new DateTimeImmutable());
     }
@@ -135,7 +135,7 @@ class OrderCounter extends StatsCounter
     public function getDayFreeTotal($obj, DateTimeInterface $day = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::ACCOUNT;
+        $params['src'] = [Order::ACCOUNT, Order::FREE];
 
         return $this->getDay($params, $day ?? new DateTimeImmutable());
     }
@@ -180,7 +180,7 @@ class OrderCounter extends StatsCounter
     public function getMonthFreeTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::ACCOUNT;
+        $params['src'] = [Order::ACCOUNT, Order::FREE];
 
         return $this->getMonth($params, $month ?? new DateTimeImmutable());
     }
@@ -225,7 +225,7 @@ class OrderCounter extends StatsCounter
     public function getYearFreeTotal($obj, DateTimeInterface $year = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::ACCOUNT;
+        $params['src'] = [Order::ACCOUNT, Order::FREE];
 
         return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
@@ -260,7 +260,7 @@ class OrderCounter extends StatsCounter
         if (!$day) {
             $day = new DateTimeImmutable();
         }
-        $this->removeDays(array_merge(['src' => Order::ACCOUNT], $params), $day);
+        $this->removeDays(array_merge(['src' => Order::ACCOUNT, Order::FREE], $params), $day);
         $this->removeDays(array_merge(['src' => Order::PAY], $params), $day);
 
         if (App::isChargingDeviceEnabled()) {
@@ -276,7 +276,7 @@ class OrderCounter extends StatsCounter
         if (!$month) {
             $month = new DateTimeImmutable();
         }
-        $this->removeMonths(array_merge(['src' => Order::ACCOUNT], $params), $month);
+        $this->removeMonths(array_merge(['src' => [Order::ACCOUNT, Order::FREE]], $params), $month);
         $this->removeMonths(array_merge(['src' => Order::PAY], $params), $month);
 
         if (App::isChargingDeviceEnabled()) {
@@ -292,7 +292,7 @@ class OrderCounter extends StatsCounter
         if (!$year) {
             $year = new DateTimeImmutable();
         }
-        $this->removeYears(array_merge(['src' => Order::ACCOUNT], $params), $year);
+        $this->removeYears(array_merge(['src' => [Order::ACCOUNT, Order::FREE]], $params), $year);
         $this->removeYears(array_merge(['src' => Order::PAY], $params), $year);
 
         if (App::isChargingDeviceEnabled()) {

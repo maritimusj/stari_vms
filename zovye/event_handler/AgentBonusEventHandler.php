@@ -37,20 +37,14 @@ class AgentBonusEventHandler
 
         //免费订单
         if (!$agent->settings('agentData.bonus.order.f')) {
-            if ($order->getSrc() == Order::ACCOUNT) {
-                return true;
-            }
-            if ($order->getSrc() == Order::BALANCE && Balance::isFreeOrder()) {
+            if ($order->isFree()) {
                 return true;
             }
         }
 
         //支付订单
         if (!$agent->settings('agentData.bonus.order.p')) {
-            if ($order->getSrc() == Order::PAY) {
-                return true;
-            }
-            if ($order->getSrc() == Order::BALANCE && Balance::isPayOrder()) {
+            if ($order->isPay()) {
                 return true;
             }
         }

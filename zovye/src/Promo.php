@@ -17,6 +17,10 @@ class Promo
             'sms' => [
                 'max' => 3,
                 'delay' => 10,
+                'expired' => 5 * 60,
+            ],
+            'goods' => [
+                'max' => 9,
             ],
         ];
     }
@@ -25,7 +29,7 @@ class Promo
         return Util::random(6, true);
     }
 
-    public static function veriyfSMS(userModelObj $user) {
+    public static function verifySMS(userModelObj $user) {
         $config = self::getConfig();
 
         $today = new DateTime('00:00');

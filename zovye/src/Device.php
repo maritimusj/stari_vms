@@ -761,7 +761,7 @@ class Device extends State
             LOG_GOODS_TEST => '测试',
             LOG_GOODS_PAY => '支付',
             LOG_GOODS_CB => '回调',
-            LOG_GOODS_GET => '领取',
+            LOG_GOODS_FREE => '免费',
             LOG_GOODS_VOUCHER => '取货',
             LOG_GOODS_ADV => '广告',
             LOG_GOODS_RETRY => '重试',

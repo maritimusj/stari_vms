@@ -588,9 +588,9 @@ class userModelObj extends modelObj
 
         if ($way == Order::FREE_STR) {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+                $condition['src'] = [Order::ACCOUNT, Order::FREE,  Order::BALANCE];
             } else {
-                $condition['src'] = Order::ACCOUNT;
+                $condition['src'] = [Order::ACCOUNT, Order::FREE];
             }
         } elseif ($way == Order::PAY_STR) {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {

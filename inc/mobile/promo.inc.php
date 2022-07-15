@@ -41,7 +41,7 @@ if ($op == 'sms') {
             throw new RuntimeException('An error occurred, please try again later!');
         }
     
-        $res = Promo::veriyfSMS($user);
+        $res = Promo::verifySMS($user);
         if (is_error($res)) {
             throw new RuntimeException($res['message']);
         }
@@ -59,13 +59,14 @@ if ($op == 'sms') {
 
         if (!Promo::createSMSLog($user, [
             'code' => $code,
+            'result' => $res,
             'device' => $device->getImei(),
             'createtime' => time(),
         ])) {
             throw new RuntimeException('An error occurred, please try again later!');
         }
         
-        JSON::success(['token' => $token, 'code' => $code]); //code here for debug
+        JSON::success(['code' => $code]); //code here for debug
 
     } catch(RuntimeException $e) {
         JSON::fail($e);
@@ -78,33 +79,84 @@ if ($op == 'sms') {
     $code = request::str('code');
     $num = request::int('num', 1);
 
+    $config = Promo::getConfig();
+
     if (empty($mobile) || empty($code)) {
-        JSON::fail('invalid request params.');
+        JSON::fail('Invalid request params.');
     }
 
     $user = User::get($mobile, true, User::PROMO);
     if (empty($user)) {
-        JSON::fail('incorrect mobile number.');
+        JSON::fail('Incorrect mobile number.');
     }
 
     $log = Promo::getLastSMSLog($user);
     if (empty($log)) {
-        JSON::fail('incorrect sms code.');
+        JSON::fail('Incorrect sms code.');
     }
 
     $data = $log->getData();
-    
-    //5分钟超时
-    if ($data['code'] !== $code || time() - $data['createtime'] > 60 * 5) {
-        JSON::fail('invlaid verification code or expired.');
+
+    if ($data['code'] !== $code || time() - $data['createtime'] > $config['sms']['expired']) {
+        JSON::fail('Invalid verification code or expired.');
     }
 
     $device = Device::get($data['device'], true);
     if (empty($device)) {
-        JSON::fail('device not exists.');
+        JSON::fail('Device not exists.');
     }
 
+    if ($num > $config['goods']['max']) {
+        JSON::fail('number of goods exceeded.');
+    }
 
-    
+    //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
+    $goods = $device->getGoodsByLane(0);
+    if ($goods && $goods['num'] < 1) {
+        $goods = $device->getGoods($goods['id']);
+    }
 
+    if (empty($goods) || $goods['num'] < 1) {
+        JSON::fail('Insufficient quantity of goods.');
+    }
+
+    $nonce_str = sha1("{$log->getId()}");
+    $order_no = Order::makeUID($user, $device, $nonce_str);
+
+    $order_data = [
+        'src' => Order::FREE,
+        'order_id' => $order_no,
+        'openid' => $user->getOpenid(),
+        'agent_id' => $device->getAgentId(),
+        'device_id' => $device->getId(),
+        'name' => $goods['name'],
+        'goods_id' => $goods['id'],
+        'num' => $num,
+        'price' => 0,
+        'ip' => Util::getClientIp(),
+        'extra' => [
+            'level' => LOG_GOODS_FREE,
+            'goods' => $goods,
+            'device' => [
+                'imei' => $device->getImei(),
+                'name' => $device->getName(),
+            ],
+            'user' => $user->profile(),
+            'promo' => [
+                'log' => $log->getId(),
+            ],
+        ],
+    ];
+
+    $order = Order::create($order_data);
+
+    if (empty($order)) {
+        JSON::fail('An error occurred, please try again later!');
+    }
+
+    if (!Job::createOrderFor($order)) {
+        JSON::fail('An error occurred, please try again later!');
+    }
+
+    JSON::success(['msg' => 'succeed, please wait for a moment.']);
 }

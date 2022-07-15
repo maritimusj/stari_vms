@@ -68,7 +68,7 @@ try {
             $device,
             $user,
             $account,
-            'level' => LOG_GOODS_GET,
+            'level' => LOG_GOODS_FREE,
             'goodsId' => $goods_id,
             'online' => false,
         ]);

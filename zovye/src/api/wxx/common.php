@@ -653,9 +653,9 @@ class common
         $way = request::trim('way');
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+                $condition['src'] = [Order::ACCOUNT, Order::FREE, Order::BALANCE];
             } else {
-                $condition['src'] = Order::ACCOUNT;
+                $condition['src'] = [Order::ACCOUNT, Order::FREE];
             }
         } elseif ($way == 'fee') {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {
@@ -1092,9 +1092,9 @@ class common
         $way = request::trim('way');
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-                $condition['src'] = [Order::ACCOUNT, Order::BALANCE];
+                $condition['src'] = [Order::ACCOUNT, Order::FREE, Order::BALANCE];
             } else {
-                $condition['src'] = Order::ACCOUNT;
+                $condition['src'] = [Order::ACCOUNT, Order::FREE];
             }
         } elseif ($way == 'fee') {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {

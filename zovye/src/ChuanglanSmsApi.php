@@ -10,7 +10,7 @@ class ChuanglanSmsApi
 
     const API_PASSWORD = '';// 创蓝API密码
 
-    const CONTENT_TPL = 'your verification code is {code}';
+    const CONTENT_TPL = 'your verification code is [{code}]';
 
     public function send(string $mobile, string $code): array
     {
@@ -21,9 +21,8 @@ class ChuanglanSmsApi
         $data = array(
             'account' => self::API_ACCOUNT,
             'password' => self::API_PASSWORD,
-            'msg' => urlencode($msg),
-            'phone' => $mobile,
-            'report' => false,
+            'msg' => $msg,
+            'mobile' => $mobile,
         );
 
         return Util::post(self::API_URL, $data);

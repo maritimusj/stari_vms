@@ -363,4 +363,15 @@ class Job
 
         return false;
     }
+
+    public static function createOrderFor(orderModelObj $order): bool
+    {
+        if (CtrlServ::scheduleJob('create_order_for', [
+                'orderNO' => $order->getOrderNO(),
+            ]) !== false) {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -74,7 +74,7 @@ if ($op == 'default') {
 
     $way = request::str('way');
     if ($way == 'free') {
-        $query->where(['src' => Order::ACCOUNT]);
+        $query->where(['src' => [Order::FREE, Order::ACCOUNT]]);
     } elseif ($way == 'pay') {
         $query->where(['src' => Order::PAY]);
     } elseif ($way == 'balance') {

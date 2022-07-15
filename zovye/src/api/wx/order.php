@@ -143,10 +143,10 @@ class order
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
                 $query->where([
-                    'src' => [\zovye\Order::ACCOUNT, \zovye\Order::BALANCE],
+                    'src' => [\zovye\Order::ACCOUNT, \zovye\Order::FREE, \zovye\Order::BALANCE],
                 ]);
             } else {
-                $query->where(['src' => \zovye\Order::ACCOUNT]);
+                $query->where(['src' => [\zovye\Order::ACCOUNT, \zovye\Order::FREE]]);
             }
         } elseif ($way == 'pay') {
             if (App::isBalanceEnabled() && Balance::isPayOrder()) {

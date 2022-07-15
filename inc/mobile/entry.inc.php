@@ -69,7 +69,7 @@ if ($device_id) {
             if ($theme == 'promo') {
                 //推广首页
                 app()->smsPromoPage([
-                    'device' => $device->getId(),
+                    'device' => $device->getImei(),
                 ]);
             }
         }

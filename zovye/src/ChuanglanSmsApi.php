@@ -10,10 +10,17 @@ class ChuanglanSmsApi
 
     const API_PASSWORD = '';// 创蓝API密码
 
+    const MOBILE_PREFIX = '001';
+    
     const CONTENT_TPL = 'your verification code is [{code}]';
 
     public function send(string $mobile, string $code): array
     {
+
+        if (empty(self::API_ACCOUNT) || empty(self::API_PASSWORD)) {
+            return err('Invalid config of SMS api.');
+        }
+
         $msg = PlaceHolder::replace(self::CONTENT_TPL, [
             'code' => $code,
         ]);

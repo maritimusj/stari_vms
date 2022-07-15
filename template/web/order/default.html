@@ -256,6 +256,12 @@
                             &lt;n/a&gt;
                             {/if}
                         </div>
+                        {elseif $order['promo']}
+                        <div class="orderSrc">
+                            <div class="account-title">
+                                <img src="{MODULE_URL}static/img/sms.svg"> 手机短信免费领取
+                            </div>
+                        </div>
                         {/if}
                         <div class="orderId">
                             {$order['orderId']}

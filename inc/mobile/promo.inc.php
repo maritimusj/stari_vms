@@ -34,6 +34,7 @@ if ($op == 'sms') {
         $user = User::getOrCreate($mobile, User::PROMO, [
             'nickname' => $mobile,
             'mobile' => $mobile,
+            'avatar' => MODULE_URL . 'static/img/unknown.svg',
         ]);
         if (empty($user)) {
             throw new RuntimeException('Fail to get user info!');
@@ -48,16 +49,16 @@ if ($op == 'sms') {
             throw new RuntimeException($res['message']);
         }
     
-        $code = '123456';//Promo::getSMSCode();
+        $code = Promo::getSMSCode();
 
-        // $res = (new ChuanglanSmsApi())->send($mobile, $code);
-        // if (is_error($res)) {
-        //     throw new RuntimeException($res['message']);
-        // }
+        $res = (new ChuanglanSmsApi())->send($mobile, $code);
+        if (is_error($res)) {
+            throw new RuntimeException($res['message']);
+        }
 
-        // if (!empty($res['code'])) {
-        //     throw new RuntimeException("Fail to send sms: {$res['error']}");
-        // }
+        if (!empty($res['code'])) {
+            throw new RuntimeException("Fail to send sms: {$res['error']}");
+        }
 
         if (!Promo::createSMSLog($user, [
             'code' => $code,
@@ -70,7 +71,7 @@ if ($op == 'sms') {
         
         $config = Promo::getConfig();
 
-        return ['code' => $code, 'delay' => $config['sms']['delay']];
+        return ['delay' => $config['sms']['delay']];
     });
 
     JSON::result($result);

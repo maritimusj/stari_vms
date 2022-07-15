@@ -836,6 +836,13 @@ class Order extends State
             if ($reward) {
                 $data['reward'] = $reward;
             }
+
+            if (App::isSmsPromoEnabled()) {
+                $promo = $order->getExtraData('promo');
+                if ($promo) {
+                    $data['promo'] = $promo;
+                }
+            }
         }
 
         return $data;

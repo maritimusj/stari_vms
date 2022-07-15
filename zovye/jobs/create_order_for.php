@@ -16,7 +16,6 @@ use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
-use zovye\Promo;
 use zovye\request;
 use function zovye\error;
 use function zovye\is_error;
@@ -81,7 +80,6 @@ try {
 
 $fail = 0;
 $success = 0;
-$is_pull_result_updated = false;
 
 $level = intval($order->getExtraData('level', LOG_GOODS_FREE));
 $goods_id = $order->getGoodsId();

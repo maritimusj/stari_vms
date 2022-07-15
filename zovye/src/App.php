@@ -602,5 +602,11 @@ class App
     {
         return Config::app('ad.sponsor.enabled', false);
     }
-    
+
+    public static function isSmsPromoEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.smsPromo.enabled'));
+        });
+    }
 }

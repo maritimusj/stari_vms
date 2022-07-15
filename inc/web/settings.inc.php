@@ -159,9 +159,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
         $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
         $settings['custom']['device']['brief-page']['enabled'] = request::bool('deviceBriefPage') ? 1 : 0;
-
-        Config::app('ad.sponsor.enabled', request::bool('sponsorAd'), true);
+        $settings['custom']['smsPromo']['enabled'] = request::bool('smsPromoEnabled') ? 1 : 0;
         
+        Config::app('ad.sponsor.enabled', request::bool('sponsorAd'), true);
+
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
         $settings['account']['douyin']['enabled'] = request::bool('douyin') ? 1 : 0;
 

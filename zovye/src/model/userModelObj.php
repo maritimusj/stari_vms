@@ -143,6 +143,11 @@ class userModelObj extends modelObj
         return $this->app == User::THIRD_ACCOUNT;
     }
 
+    public function isPromoUser(): bool
+    {
+        return $this->app == User::PROMO;
+    }
+
     public function isDouYinUser(): bool
     {
         return $this->app == User::DouYin;

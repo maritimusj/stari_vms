@@ -1755,5 +1755,37 @@ $js_sdk
 JSCODE;
         $this->showTemplate(Theme::file('user_info'), ['tpl' => $tpl_data]);
     }
+
+    public function smsPromoPage(array $param = [])
+    {
+        $device = Device::get($param['device'], true);
+        if (empty($device)) {
+            Util::resultAlert('找不到这个设备！', 'error');
+        }
+
+        $tpl_data = [];
+        $api_url = Util::murl('promo', ['device' => $device->getShadowId()]);
+        $jquery_url = JS_JQUERY_URL;
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+
+    zovye_fn.send = function(mobile) {
+        return $.getJSON(zovye_fn.api_url, {op: "sms", mobile});
+    }
+
+    zovye_fn.verify = function(mobile, code, num) {
+        return $.getJSON(zovye_fn.api_url, {op: "verify", mobile, code, num});
+    }
+</script>
+JSCODE;
+        $filename = Theme::getThemeFile($device, 'device');
+        $this->showTemplate($filename, ['tpl' => $tpl_data]);
+    }
 }
 

@@ -16,6 +16,13 @@ $account_id = request::str('account');
 $xid = request::str('xid');
 $tid = request::str('tid');
 
+if (App::isSmsPromoEnabled()) {
+    //推广首页
+    app()->smsPromoPage([
+        'device' => $device_id,
+    ]);
+}
+
 if (Util::isAliAppContainer()) {
     $ali_entry_url = Util::murl('ali', [
         'from' => $from,

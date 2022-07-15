@@ -21,6 +21,7 @@ class User
     const DouYin = 3;   //抖音用户
     const API = 10;     //API用户
     const THIRD_ACCOUNT = 15;   //第三方公众号
+    const PROMO = 20; //PROMO 用户
 
     const UNKNOWN = 0;
     const MALE = 1;
@@ -92,6 +93,12 @@ class User
                 'color' => '#4CAF50',
                 'icon' => MODULE_URL."static/img/douyin.svg",
             ],
+            'promo' => [
+                'name' => '',
+                'title' => '推广用户',
+                'color' => '#ff9800',
+                'icon' => MODULE_URL."static/img/promo.svg",
+            ],
         ];
 
         if (self::isAliUser($obj)) {
@@ -104,6 +111,8 @@ class User
             return $data['third'];
         } elseif (self::isDouYinUser($obj)) {
             return $data['douyin'];
+        } elseif (self::isPromoUser($obj)) {
+            return $data['promo'];
         }
 
         return $data['wx'];
@@ -158,6 +167,16 @@ class User
         $user = User::get($obj, is_string($obj));
 
         return $user && $user->isThirdAccountUser();
+    }
+
+    public static function isPromoUser($obj): bool
+    {
+        if ($obj instanceof userModelObj) {
+            return $obj->isPromoUser();
+        }
+        $user = User::get($obj, is_string($obj));
+
+        return $user && $user->isPromoUser();
     }
 
     public static function isDouYinUser($obj): bool

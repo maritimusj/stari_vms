@@ -59,21 +59,21 @@ if ($device_id) {
         Util::resultAlert('请使用指定小程序扫描二维码！', 'error');
     }
 
+    if (App::isSmsPromoEnabled()) {
+        $theme = Helper::getTheme($device);
+        if ($theme == 'promo') {
+            //推广首页
+            app()->smsPromoPage([
+                'device' => $device->getImei(),
+            ]);
+        }
+    }
+
     /**
      * @param userModelObj $user
      * @return array
      */
     $cb = function (userModelObj $user) use ($device) {
-        if (App::isSmsPromoEnabled()) {
-            $theme = Helper::getTheme($device);
-            if ($theme == 'promo') {
-                //推广首页
-                app()->smsPromoPage([
-                    'device' => $device->getImei(),
-                ]);
-            }
-        }
-
         //记录设备ID
         $user->setLastActiveDevice($device);
 

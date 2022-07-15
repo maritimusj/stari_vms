@@ -136,13 +136,6 @@ function process($order_no): bool
         /** @var orderModelObj $order */
         $order = $orderResult;
 
-        //事件：出货成功，目前用于统计数据
-        EventBus::on('device.openSuccess', [
-            'device' => $device,
-            'user' => $user,
-            'order' => $order,
-        ]);
-
         $fail = 0;
         $success = 0;
         $is_pull_result_updated = false;
@@ -189,6 +182,13 @@ function process($order_no): bool
         $order->save();
 
         $device->appShowMessage('出货完成，欢迎下次使用！');
+
+        //事件：出货成功，目前用于统计数据
+        EventBus::on('device.openSuccess', [
+            'device' => $device,
+            'user' => $user,
+            'order' => $order,
+        ]);
     }
 
     return true;

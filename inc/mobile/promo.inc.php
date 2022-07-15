@@ -8,37 +8,39 @@ namespace zovye;
 
 use Exception;
 use RuntimeException;
-use zovye\model\deviceModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
 $op = request::op('default');
 if ($op == 'sms') {
 
-    try {
+    $result = Util::transactionDo(function() {
         $mobile = request::trim('mobile');
 
         if (empty($mobile)) {
-            throw new RuntimeException('Invalid mobile phone number!');
+            throw new RuntimeException('Invalid mobile phone number.');
         }
     
+        $device = Device::get(request::str('device'), true);
+        if (empty($device)) {
+            throw new RuntimeException('Fail to get device info.');
+        }
+    
+        if (!$device->lockAcquire()) {
+            throw new RuntimeException('An error occurred, please try again later.');
+        }
+
         /** userModelObj $user */
-        $user = User::getOrCreate($mobile, User::PROMO);
+        $user = User::getOrCreate($mobile, User::PROMO, [
+            'nickname' => $mobile,
+            'mobile' => $mobile,
+        ]);
         if (empty($user)) {
             throw new RuntimeException('Fail to get user info!');
         }
     
         if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-            throw new RuntimeException('An error occurred, please try again later!');
-        }
-    
-        $device = Device::get(request::str('device'), true);
-        if (empty($device)) {
-            throw new RuntimeException('Fail to get device info!');
-        }
-    
-        if (!$device->lockAcquire()) {
-            throw new RuntimeException('An error occurred, please try again later!');
+            throw new RuntimeException('An error occurred, please try again later.');
         }
     
         $res = Promo::verifySMS($user);
@@ -46,16 +48,16 @@ if ($op == 'sms') {
             throw new RuntimeException($res['message']);
         }
     
-        $code = Promo::getSMSCode();
+        $code = '123456';//Promo::getSMSCode();
 
-        $res = (new ChuanglanSmsApi())->send($mobile, $code);
-        if (is_error($res)) {
-            throw new RuntimeException($res['message']);
-        }
+        // $res = (new ChuanglanSmsApi())->send($mobile, $code);
+        // if (is_error($res)) {
+        //     throw new RuntimeException($res['message']);
+        // }
 
-        if (!empty($res['code'])) {
-            throw new RuntimeException("Fail to send sms: {$res['error']}");
-        }
+        // if (!empty($res['code'])) {
+        //     throw new RuntimeException("Fail to send sms: {$res['error']}");
+        // }
 
         if (!Promo::createSMSLog($user, [
             'code' => $code,
@@ -63,17 +65,17 @@ if ($op == 'sms') {
             'device' => $device->getImei(),
             'createtime' => time(),
         ])) {
-            throw new RuntimeException('An error occurred, please try again later!');
+            throw new RuntimeException('An error occurred, please try again later.');
         }
         
-        JSON::success(['code' => $code]); //code here for debug
+        $config = Promo::getConfig();
 
-    } catch(RuntimeException $e) {
-        JSON::fail($e);
-    }
+        return ['code' => $code, 'delay' => $config['sms']['delay']];
+    });
 
-    
-} elseif ($op == 'order') {
+    JSON::result($result);
+
+} elseif ($op == 'verify') {
     
     $mobile = request::str('mobile');
     $code = request::str('code');
@@ -90,6 +92,10 @@ if ($op == 'sms') {
         JSON::fail('Incorrect mobile number.');
     }
 
+    if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+        throw new RuntimeException('An error occurred, please try again later.');
+    }
+
     $log = Promo::getLastSMSLog($user);
     if (empty($log)) {
         JSON::fail('Incorrect sms code.');
@@ -98,6 +104,10 @@ if ($op == 'sms') {
     $data = $log->getData();
 
     if ($data['code'] !== $code || time() - $data['createtime'] > $config['sms']['expired']) {
+        JSON::fail('Invalid verification code or expired.');
+    }
+
+    if ($data['orderNO']) {
         JSON::fail('Invalid verification code or expired.');
     }
 
@@ -151,12 +161,18 @@ if ($op == 'sms') {
     $order = Order::create($order_data);
 
     if (empty($order)) {
-        JSON::fail('An error occurred, please try again later!');
+        JSON::fail('An error occurred, please try again later.');
     }
 
     if (!Job::createOrderFor($order)) {
-        JSON::fail('An error occurred, please try again later!');
+        JSON::fail('An error occurred, please try again later.');
     }
 
-    JSON::success(['msg' => 'succeed, please wait for a moment.']);
+    $log->setData('orderNO', $order_no);
+    $log->save();
+
+    JSON::success([
+        'msg' => 'succeed, please wait for a moment.',
+        'orderNO' => $order_no,
+    ]);
 }

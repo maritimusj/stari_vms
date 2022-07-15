@@ -16,8 +16,9 @@ use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
+use zovye\Promo;
 use zovye\request;
-use function zovye\err;
+use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -73,6 +74,8 @@ try {
         'user' => $user,
     ]);
 } catch (Exception $e) {
+    $order->setExtraData('pull.result', error(1, $e->getMessage()));
+    $order->save();
     throw new JobException($e->getMessage(), $log);
 }
 
@@ -87,6 +90,8 @@ $total = $order->getNum();
 $goods = $device->getGoods($goods_id);
 
 if (empty($goods) || $goods['num'] < $total) {
+    $order->setExtraData('pull.result', error(1, '商品库存不足！'));
+    $order->save();
     throw new JobException('商品库存不足！', $log);
 }
 
@@ -95,12 +100,9 @@ $goods['goods_id'] = $goods_id;
 
 for ($i = 0; $i < $total; $i++) {
     $result = Helper::pullGoods($order, $device, $user, $level, $goods);
-    if (is_error($result) || !$is_pull_result_updated) {
+    if (is_error($result)) {
         $order->setResultCode($result['errno']);
         $order->setExtraData('pull.result', $result);
-        if ($order->save()) {
-            $is_pull_result_updated = true;
-        }
     }
     if (is_error($result)) {
         $log['error'][] = $result;
@@ -108,10 +110,18 @@ for ($i = 0; $i < $total; $i++) {
     } else {
         $success++;
     }
+
+    $order->setExtraData('stats', [
+        'i' => $i + 1,
+        'success' => $success,
+        'fail' => $fail,
+    ]);
+
+    $order->save();
 }
 
 if ($fail > 0) {
-    $order->setExtraData('pull.result', err('部分商品出货失败！'));
+    $order->setExtraData('pull.result', error(1, '部分商品出货失败！'));
 } else {
     $order->setExtraData('pull.result', [
         'errno' => 0,

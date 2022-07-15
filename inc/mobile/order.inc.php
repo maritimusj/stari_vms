@@ -198,6 +198,15 @@ if ($op === 'create') {
             }
         }
 
+        $stats = $order->getExtraData('stats', []);
+        if ($stats) {
+            $response['stats'] = $stats;
+        }
+
+        if ($response['code'] != 200) {
+            JSON::success($response);
+        }
+        
         $vouchers = $order->getExtraData('extra.voucher.recv', 0);
         if ($vouchers > 0) {
             $response['tips'] = [

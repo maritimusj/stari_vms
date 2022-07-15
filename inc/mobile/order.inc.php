@@ -150,15 +150,24 @@ if ($op === 'create') {
 
 } elseif ($op == 'result') {
 
-    //查询订单状态
-    $user = Util::getCurrentUser();
-    if (empty($user) || $user->isBanned()) {
-        JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
+    if (request::has('openid')) {
+        $user = User::get(request::str('openid'), true);
+        if (empty($user) || $user->isBanned()) {
+            JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
+        }
+        
+    } else {
+        //查询订单状态
+        $user = Util::getCurrentUser();
+        if (empty($user) || $user->isBanned()) {
+            JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
+        }
+
+        if (App::isIDCardVerifyEnabled() && !$user->isIDCardVerified()) {
+            JSON::success(['code' => 101, 'msg' => '请先填写实名认主证信息！']);
+        }        
     }
 
-    if (App::isIDCardVerifyEnabled() && !$user->isIDCardVerified()) {
-        JSON::success(['code' => 101, 'msg' => '请先填写实名认主证信息！']);
-    }
 
     $order_no = request::str('orderNO');
 

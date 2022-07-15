@@ -1764,7 +1764,8 @@ JSCODE;
         }
 
         $tpl_data = [];
-        $api_url = Util::murl('promo', ['device' => $device->getShadowId()]);
+        $api_url = Util::murl('promo', ['device' => $device->getImei()]);
+        $result_url = Util::murl('order', ['op' => 'result']);
         $jquery_url = JS_JQUERY_URL;
 
         $tpl_data['js']['code'] = <<<JSCODE
@@ -1773,6 +1774,7 @@ JSCODE;
 
     const zovye_fn = {
         api_url: "$api_url",
+        result_url: "$result_url",
     }
 
     zovye_fn.send = function(mobile) {
@@ -1782,6 +1784,11 @@ JSCODE;
     zovye_fn.verify = function(mobile, code, num) {
         return $.getJSON(zovye_fn.api_url, {op: "verify", mobile, code, num});
     }
+
+    zovye_fn.result = function(mobile, orderNO) {
+        return $.getJSON(zovye_fn.result_url, {openid: mobile, orderNO});
+    }
+
 </script>
 JSCODE;
         $filename = Theme::getThemeFile($device, 'device');

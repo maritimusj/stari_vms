@@ -16,7 +16,7 @@ class Promo
         return [
             'sms' => [
                 'max' => 3,
-                'delay' => 10,
+                'delay' => 30,
                 'expired' => 5 * 60,
             ],
             'goods' => [

@@ -224,16 +224,17 @@ class User
         return null;
     }
 
-    public static function getOrCreate($openid, $app = null): ?userModelObj
+    public static function getOrCreate($openid, $app = null, $extra = []): ?userModelObj
     {
         $user = self::get($openid, true, $app);
         if ($user) {
             return $user;
         }
 
-        $data = [
+        $data = array_merge($extra, [
             'openid' => $openid,
-        ];
+        ]);
+        
         if (isset($app)) {
             $data['app'] = $app;
         }

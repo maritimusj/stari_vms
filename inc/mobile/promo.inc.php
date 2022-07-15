@@ -7,6 +7,7 @@
 namespace zovye;
 
 use RuntimeException;
+use zovye\model\userModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -32,12 +33,16 @@ if ($op == 'sms') {
             throw new RuntimeException('An error occurred, please try again later.');
         }
 
-        /** userModelObj $user */
-        $user = User::getOrCreate($mobile, User::PROMO, [
-            'nickname' => $mobile,
-            'mobile' => $mobile,
-            'avatar' => MODULE_URL . 'static/img/unknown.svg',
-        ]);
+        /** @var userModelObj $user */
+        $user = User::findOne(['mobile' => $mobile]);
+        if (empty($user)) {
+            $user = User::getOrCreate($mobile, User::PROMO, [
+                'nickname' => $mobile,
+                'mobile' => $mobile,
+                'avatar' => MODULE_URL . 'static/img/unknown.svg',
+            ]);
+        }
+
         if (empty($user)) {
             throw new RuntimeException('Fail to get user info!');
         }
@@ -90,7 +95,11 @@ if ($op == 'sms') {
         JSON::fail('Invalid request params.');
     }
 
-    $user = User::get($mobile, true, User::PROMO);
+    $user = User::findOne(['mobile' => $mobile]);
+    if (empty($user)) {
+        $user = User::get($mobile, true, User::PROMO);
+    }
+
     if (empty($user)) {
         JSON::fail('Incorrect mobile number.');
     }

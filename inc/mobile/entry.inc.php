@@ -16,13 +16,6 @@ $account_id = request::str('account');
 $xid = request::str('xid');
 $tid = request::str('tid');
 
-if (App::isSmsPromoEnabled()) {
-    //推广首页
-    app()->smsPromoPage([
-        'device' => $device_id,
-    ]);
-}
-
 if (Util::isAliAppContainer()) {
     $ali_entry_url = Util::murl('ali', [
         'from' => $from,
@@ -48,7 +41,6 @@ $device = null;
 $account = null;
 
 if ($device_id) {
-
     $device = Device::find($device_id, ['imei', 'shadow_id']);
     if (empty($device)) {
         Util::resultAlert('请重新扫描设备上的二维码！', 'error');
@@ -72,6 +64,16 @@ if ($device_id) {
      * @return array
      */
     $cb = function (userModelObj $user) use ($device) {
+        if (App::isSmsPromoEnabled()) {
+            $theme = Helper::getTheme($device);
+            if ($theme == 'promo') {
+                //推广首页
+                app()->smsPromoPage([
+                    'device' => $device->getId(),
+                ]);
+            }
+        }
+
         //记录设备ID
         $user->setLastActiveDevice($device);
 

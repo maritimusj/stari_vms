@@ -91,6 +91,7 @@ if (empty($goods) || $goods['num'] < $total) {
 }
 
 $log['error'] = [];
+$goods['goods_id'] = $goods_id;
 
 for ($i = 0; $i < $total; $i++) {
     $result = Helper::pullGoods($order, $device, $user, $level, $goods);

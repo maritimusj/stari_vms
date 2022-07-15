@@ -29,7 +29,7 @@ class ChuanglanSmsApi
             'account' => self::API_ACCOUNT,
             'password' => self::API_PASSWORD,
             'msg' => $msg,
-            'mobile' => $mobile,
+            'mobile' => self::MOBILE_PREFIX . $mobile,
         );
 
         return Util::post(self::API_URL, $data);

@@ -20,7 +20,8 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_order` CHANGE `order_id` `order_id` VARCHAR(64) NOT NULL;
-SQL;
-    Migrate::execSQL($sql);
+//暂时取消，需要时手动升级
+//    $sql = <<<SQL
+//ALTER TABLE `ims_zovye_vms_order` CHANGE `order_id` `order_id` VARCHAR(64) NOT NULL;
+//SQL;
+//    Migrate::execSQL($sql);

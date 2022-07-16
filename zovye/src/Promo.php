@@ -40,12 +40,12 @@ class Promo
     {
         $config = self::getConfig();
 
-        $today = new DateTime('00:00');
-
         $daily_limit = intval($config['user']['limit']['day']);
         if ($daily_limit > 0 && Stats::getDayTotal($user)['total'] > $daily_limit) {
             return err('you have reached the daily limit.');
         }
+
+        $today = new DateTime('00:00');
 
         $total = m('user_logs')->where([
             'title' => $user->getMobile(),

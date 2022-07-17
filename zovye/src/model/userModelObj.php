@@ -896,4 +896,50 @@ class userModelObj extends modelObj
 
         return $this->s1;
     }
+
+    public function getAgentLevel(): array
+    {
+        if (!$this->isAgent()) {
+            return [];
+        }
+
+        $levels = settings('agent.levels');
+        $res = array_intersect(array_keys($levels), $this->getPrincipals());
+        if ($res) {
+            $res = array_values($res);
+            $data = $levels[$res[0]];
+            $data['level'] = $res[0];
+
+            return $data;
+        }
+
+        return [];
+
+    }
+
+    /**
+     * @param string $path
+     * @param null $default
+     * @return mixed
+     */
+    public function getAgentData(string $path = '', $default = null)
+    {
+        if ($this->isAgent()) {
+            $key = 'agentData';
+            if (!empty($path)) {
+                $key .= ".$path";
+            }
+
+            return $this->settings($key, $default);
+        }
+
+        if ($this->isPartner()) {
+            $agent = $this->getPartnerAgent();
+            if ($agent) {
+                return $agent->getAgentData($path, $default);
+            }
+        }
+
+        return null;
+    }
 }

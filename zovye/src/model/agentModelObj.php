@@ -137,31 +137,6 @@ class agentModelObj extends userModelObj
         return false;
     }
 
-    /**
-     * @param string $path
-     * @param null $default
-     * @return mixed
-     */
-    public function getAgentData(string $path = '', $default = null)
-    {
-        if ($this->isAgent()) {
-            $key = 'agentData';
-            if (!empty($path)) {
-                $key .= ".$path";
-            }
-
-            return $this->settings($key, $default);
-        }
-
-        if ($this->isPartner()) {
-            $agent = $this->getPartnerAgent();
-            if ($agent) {
-                return $agent->getAgentData($path, $default);
-            }
-        }
-
-        return null;
-    }
 
     public function allowReduceGoodsNum(): bool
     {
@@ -277,23 +252,7 @@ class agentModelObj extends userModelObj
         return !is_error($result);
     }
 
-    /**
-     * 获取代理商的等级信息
-     */
-    public function getAgentLevel(): array
-    {
-        $levels = settings('agent.levels');
-        $res = array_intersect(array_keys($levels), $this->getPrincipals());
-        if ($res) {
-            $res = array_values($res);
-            $data = $levels[$res[0]];
-            $data['level'] = $res[0];
 
-            return $data;
-        }
-
-        return [];
-    }
 
     /**
      * 是否为指定代理商的合伙人

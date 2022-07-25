@@ -336,9 +336,9 @@
                         <td>
                             <div class="operate">
                                 <div class="getway">
-                                    <i class="fa fa-map-marker" :style="{'color': o.gettype && o.gettype.location ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.location?'需要定位':''"></i>
-                                    <i class="fa fa-street-view" :style="{'color': o.gettype && o.gettype.free ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.free?'关注公众号领取' + (o.gettype.freeLimitsReached?'(已限额)':''):''"></i>
-                                    <i class="fa fa-shopping-cart" :style="{'color': o.gettype && o.gettype.price ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.price?'可支付' + o.gettype.price + '元购买':''"></i>
+                                    <i class="fa fa-map-marker" :style="{'color': o.gettype && o.gettype.location ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.location?'需要定位':'未开启定位'"></i>
+                                    <i class="fa fa-street-view" :style="{'color': o.gettype && o.gettype.free ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.free?'关注公众号领取' + (o.gettype.freeLimitsReached?'(已限额)':''):'不允许关注领取'"></i>
+                                    <i class="fa fa-shopping-cart" :style="{'color': o.gettype && o.gettype.price ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.price?'可支付' + o.gettype.price + '元购买':'不允许支付购买'"></i>
                                 </div>
                             </div>
                         </td>

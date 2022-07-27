@@ -145,10 +145,11 @@ class Locker
             if ($locker) {
                 return $locker;
             }
-            if ($i++ < $retries) {
-                sleep($retry_delay_seconds);
+            if (++$i > $retries) {
+                break;
             }
-        } while ($i < $retries && time() < $expired_at);
+            sleep($retry_delay_seconds);
+        } while (time() < $expired_at);
 
         return null;
     }

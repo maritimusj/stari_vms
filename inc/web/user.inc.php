@@ -142,6 +142,7 @@ if ($op == 'default') {
             'isPartner' => $user->isPartner(),
             'isKeeper' => $user->isKeeper(),
             'isTester' => $user->isTester(),
+            'isGSPor' => $user->isGSPor(),
             'verified' => $user->isIDCardVerified(),
         ];
 

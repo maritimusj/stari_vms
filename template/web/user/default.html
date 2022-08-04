@@ -315,6 +315,9 @@
             <li role="separator" class="divider"></li>
             {/if}
             <li><a href="#" data-op="orderList"><i class="fa fa-list fa-fw"></i> 领取记录</a></li>
+            {if $item['isGSPor']}
+            <li><a href="#" data-op="withdrawList"><i class="fa fa-credit-card fa-fw"></i> 提现记录</a></li>
+            {/if}
             {if empty($item['isAgent']) && empty($item['isPartner']) && empty($item['isKeeper']) && $item['mobile']}
             <li role="separator" class="divider"></li>
             <li><a href="#" data-op="resetMobile"><i class="fa fa-mobile fa-fw"></i> 清除手机号码</a></li>
@@ -444,6 +447,10 @@
 
     api.orderList = function(userid) {
         api.showResult({user_id: userid}, api.ordersUrl);
+    }
+
+    api.withdrawList = function(userid) {
+        window.location.href = "{php echo $this->createWebUrl('withdraw', ['agentId' => '__user__']);}".replace('__user__', userid);
     }
 
     api.viewCommissionLog = function(userid) {

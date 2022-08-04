@@ -165,7 +165,7 @@ class inventoryModelObj extends modelObj
             'src_inventory_id' => $src_inventory_id,
             'inventory_id' => $this->id,
             'goods_id' => $goods_id,
-            'num' => intval($num),
+            'num' => $num,
             'extra' => $extra,
         ];
 

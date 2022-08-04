@@ -442,11 +442,10 @@ if ($op == 'default') {
                 ];
             }
         } else {
-            $user->setSuperiorId(null);
+            $user->setSuperiorId(0);
         }
 
         if ($user->isAgent()) {
-
             $user->updateSettings('agentData.name', $name);
             $user->updateSettings('agentData.company', $company);
             $user->updateSettings('agentData.license', $license);

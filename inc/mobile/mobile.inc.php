@@ -141,6 +141,7 @@ if ($op == 'save') {
             if (!$user->updateSettings('agentData', $agent_data)) {
                 throw new RuntimeException('失败01，请联系管理员！');
             }
+
             if (!$user->setAgent($level)) {
                 throw new RuntimeException('失败02，请联系管理员！');
             }

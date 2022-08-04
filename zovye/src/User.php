@@ -192,10 +192,10 @@ class User
     /**
      * @param $id
      * @param bool $is_openid
-     * @param int? $app
+     * @param int|null $app
      * @return userModelObj|null
      */
-    public static function get($id, bool $is_openid = false, $app = null): ?userModelObj
+    public static function get($id, bool $is_openid = false, int $app = null): ?userModelObj
     {
         /** @var userModelObj[] $cache */
         static $cache = [];

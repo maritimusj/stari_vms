@@ -361,4 +361,20 @@ if ($op == 'default') {
     }
 
     return ['msg' => '完成！'];
+} elseif ($op == 'snapshot') {
+
+    unset($GLOBALS['_W']['openid']);
+    unset($_SESSION['userinfo']);
+    unset($_SESSION['openid']);
+    unset($_SESSION['oauth_openid']);
+    unset($_SESSION['is_snapshotuser']);
+    unset($_SESSION['oauth_acid']);
+    unset($_SESSION['wx_user_id']);
+
+    $url = Util::murl('entry', ['device' => request::str('device'), 'serial' => Util::random(10)]);
+    $_SESSION['dest_url'] = $url;
+    
+    JSON::success([
+        'redirect' => $url,
+    ]);
 }

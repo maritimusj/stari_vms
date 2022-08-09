@@ -1175,6 +1175,9 @@ class Account extends State
                 }
                 break;
             default:
+                if ($account['redirect_url']) {
+                    return true;
+                }
                 if (empty($account['qrcode'])) {
                     return false;
                 }

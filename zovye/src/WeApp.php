@@ -634,14 +634,13 @@ JSCODE;
         <div style="position: absolute;width: 100%;height: 100%;z-index: 1000;background: rgba(0,0,0,0);left: 0;top: 0;">
         <div style="flex-direction: column;display: flex;align-items: center;justify-content: center;width: 100%;height: 100%;color: #fff;font-size: large;">
             <div style="width: 80%;text-align: center;padding: 20px 0px;background: rgba(0,0,0,.5);">
-            未授权用户无法使用该操作，请
+            需要用户授权才能使用该功能，请
             <br>
             <span>点击<b style="color:#fc6;">使用完整服务</b>！</span>
             </div>
         </div>
         </div>
 HTML;
-            $user = $_SESSION['is_snapshotuser'] ? 'snapshot':'real';
             $snapshot_url = Util::murl('util', ['op' => 'snapshot', 'device' => $device_imei]);
             $tpl['js']['code'] .= <<<JSCODE
             \r\n

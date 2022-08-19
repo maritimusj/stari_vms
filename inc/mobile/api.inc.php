@@ -77,6 +77,10 @@ if (empty($goods) || $goods['num'] < 1) {
     JSON::fail('商品库存不足！');
 }
 
+if (request::bool('verify')) {
+    JSON::success('成功！');
+}
+
 $order_uid = Order::makeUID($user, $device);
 
 Job::createThirdPartyPlatformOrder([
@@ -86,4 +90,7 @@ Job::createThirdPartyPlatformOrder([
     'orderUID' => $order_uid,
 ]);
 
-JSON::success('成功！');
+JSON::success([
+    'orderUID' => $order_uid,
+    'msg' => '成功！',
+]);

@@ -345,7 +345,7 @@ JSCODE;
 
         /** @var userModelObj $user */
         $user = $tpl['user']['_obj'];
-  
+
         if (App::isAliUser()) {
             $tpl['accounts'] = [];
         } else {
@@ -629,8 +629,19 @@ zovye_fn.balancePay = function(goods, num) {
 JSCODE;
         }
 
-    if ($_SESSION['is_snapshotuser']) {
-        $html =<<<HTML
+        $tpl['js']['code'] .= "\r\n</script>";
+
+        if ($_SESSION['is_snapshotuser']) {
+            $tpl['js']['code'] .= $this->snapshotJs($device_imei);
+        }
+
+        $file = Theme::getThemeFile($device, 'device');
+        $this->showTemplate($file, ['tpl' => $tpl]);
+    }
+
+    public function snapshotJs(string $device_imei): string
+    {
+        $html = <<<HTML
         <div style="position: absolute;width: 100%;height: 100%;z-index: 1000;background: rgba(0,0,0,0);left: 0;top: 0;">
         <div style="flex-direction: column;display: flex;align-items: center;justify-content: center;width: 100%;height: 100%;color: #fff;font-size: large;">
             <div style="width: 80%;text-align: center;padding: 20px 0px;background: rgba(0,0,0,.5);">
@@ -641,11 +652,13 @@ JSCODE;
         </div>
         </div>
 HTML;
-            $snapshot_url = Util::murl('util', ['op' => 'snapshot', 'device' => $device_imei]);
-            $tpl['js']['code'] .= <<<JSCODE
-            \r\n
-            zovye_fn.snapshot = function(goods, num) {
-                const res = $.get("$snapshot_url").then(res => {
+        $snapshot_url = Util::murl('util', ['op' => 'snapshot', 'device' => $device_imei]);
+
+        return <<<JSCODE
+\r\n
+        <script>
+            zovye_fn.snapshot = function() {
+                $.get("$snapshot_url").then(res => {
                     if (res.status && res.data && res.data.redirect) {
                         window.location.reload();
                     }
@@ -653,18 +666,14 @@ HTML;
             }
             $(`$html`).appendTo('body').click(function(){
                 zovye_fn.snapshot();
-            });
+            });        
+    </script>
+
 
 JSCODE;
-        }
-
-        $tpl['js']['code'] .= "\r\n</script>";
-
-        $file = Theme::getThemeFile($device, 'device');
-        $this->showTemplate($file, ['tpl' => $tpl]);
     }
 
-        /**
+    /**
      * 领取页面.
      *
      * @param array $params
@@ -682,7 +691,7 @@ JSCODE;
             })
         </script>
 JSCODE;
-        
+
         $file = Theme::getThemeFile(null, 'jump');
 
         $this->showTemplate($file, ['tpl' => $tpl]);
@@ -736,7 +745,7 @@ JSCODE;
         $get_goods_list_url = Util::murl('goodslist', ['free' => true, 'ticket' => $params['user']['ticket']]);
 
         $jquery_url = JS_JQUERY_URL;
-        
+
 
         $tpl['timeout'] = App::deviceWaitTimeout();
         $tpl['js']['code'] = <<<JSCODE
@@ -978,7 +987,9 @@ $js_sdk
     })
 </script>
 JSCODE;
-
+        if ($_SESSION['is_snapshotuser']) {
+            $tpl['js']['code'] .= $this->snapshotJs($tpl['device']['imei']);
+        }
         $this->showTemplate(Theme::file('location'), ['tpl' => $tpl]);
     }
 

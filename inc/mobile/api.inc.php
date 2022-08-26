@@ -39,7 +39,17 @@ if (request::has('orderUID')) {
     $result = $order->getExtraData('pull', []);
     $device = $order->getDevice();
     if ($device) {
-        $result['goods'] = $device->getGoodsTotal($order->getGoodsId());
+        $goods = $device->getGoods($order->getGoodsId());
+        if ($goods) {
+            $result['goods'] = [
+                'id' => $goods['id'],
+                'name' => $goods['name'],
+                'image' => Util::toMedia($goods['img'], true),
+                'price' => $goods['price_formatted'],
+                'num' => $goods['num'],
+                'unit' => $goods['unit_title'],
+            ];            
+        }
     }
 
     JSON::success($result);
@@ -153,15 +163,20 @@ if (empty($price)) {
     /**
      * 创建支付记录
      */
+    $total = $data['num'];
+    $goods['num'] = $total;
     $pay_log = Pay::createPayLog($user, $order_no, [
         'device' => $device->getId(),
         'user' => $user->getOpenid(),
+        'goods' => $goods['id'],
+        'level' => LOG_GOODS_PAY,
+        'total' => $total,
         'pay' => [
             'name' => 'api',
         ],
         'orderData' => [
             'orderNO' => $order_no,
-            'num' => $data['num'],
+            'num' => $total,
             'price' => $price,
             'ip' => CLIENT_IP,
             'extra' => [
@@ -170,6 +185,7 @@ if (empty($price)) {
             'createtime' => time(),
         ],
         'payResult' => [
+            'type' => 'api',
             'result' => 'success',
         ],
     ]);

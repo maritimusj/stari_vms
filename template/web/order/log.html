@@ -64,7 +64,10 @@
                         {/if}
                         {elseif isset($log['data']['queryResult'])}
                         {$log['data']['queryResult']['transaction_id']}
-                        {/if}                 
+                        {/if}
+                        {if $log['data']['pay']['name'] == 'api'}
+                        第三方API完成支付
+                        {/if}
                     </div>
                     <div class="orderNO">
                         {if $log['orderNO']}

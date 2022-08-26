@@ -7,7 +7,7 @@
 namespace zovye;
 
 $app_key = request::str('appkey');
-if ($app_key !== settings('app.key')) {
+if (empty($app_key) || $app_key !== settings('app.key')) {
     JSON::fail('appkey不正确！');
 }
 

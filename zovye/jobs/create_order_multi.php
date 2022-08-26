@@ -26,7 +26,6 @@ use zovye\User;
 use zovye\Util;
 use zovye\ZovyeException;
 use function zovye\err;
-use function zovye\getArray;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -59,6 +58,25 @@ if ($op == 'create_order_multi' && CtrlServ::checkJobSign(['orderNO' => $order_n
 }
 
 /**
+ * @throws Exception
+ */
+function throwException(pay_logsModelObj $pay_log, $message, $refund = false, $device = null)
+{
+    $pay_log->setData('create_order.error', err($message));
+    $pay_log->save();
+
+    if ($refund && $pay_log->getPayName() != 'api') {
+        if ($device) {
+            ExceptionNeedsRefund::throwWith($device, $message);
+        } else {
+            ExceptionNeedsRefund::throw($message);
+        }
+    }
+
+    throw new Exception($message);
+}
+
+/**
  * @param $order_no
  * @return bool
  * @throws Exception
@@ -82,16 +100,16 @@ function process($order_no): bool
 
     $device = Device::get($pay_log->getDeviceId());
     if (empty($device)) {
-        ExceptionNeedsRefund::throw('找不到指定的设备！');
+        throwException($pay_log, '找不到指定的设备！', true);
     }
 
     $user = User::get($pay_log->getUserOpenid(), true);
     if (empty($user)) {
-        ExceptionNeedsRefund::throwWith($device, '找不到指定的用户！');
+        throwException($pay_log, '找不到指定的用户！', true);
     }
 
     if (!$user->acquireLocker(User::ORDER_LOCKER)) {
-        throw new Exception('用户无法锁定！');
+        throwException($pay_log, '用户无法锁定！');
     }
 
     //锁定设备
@@ -101,16 +119,16 @@ function process($order_no): bool
     if (!$device->lockAcquire($retries, $delay)) {
         if (settings('order.waitQueue.enabled', false)) {
             if (!Job::createOrder($order_no, $device)) {
-                throw new Exception('启动排队任务失败！');
+                throwException($pay_log, '启动排队任务失败！');
             }
 
             return true;
         }
-        ExceptionNeedsRefund::throwWith($device, '设备被占用！');
+        throwException($pay_log, '设备被占用！');
     }
 
     if (Order::exists($order_no)) {
-        throw new Exception('订单已经存在！');
+        throwException($pay_log, '订单已经存在！');
     }
 
     //事件：设备已锁定
@@ -129,7 +147,7 @@ function process($order_no): bool
             'orderNO' => $order_no,
             'error' => $orderResult,
         ]);
-        ExceptionNeedsRefund::throwWith($device, $orderResult['message']);
+        throwException($pay_log, $orderResult['message'], true, $device);
     } else {
         $locker->release();
 
@@ -146,13 +164,6 @@ function process($order_no): bool
         foreach ($goods_list as $goods) {
             for ($i = 0; $i < $goods['num']; $i++) {
                 $result = Helper::pullGoods($order, $device, $user, $level, $goods);
-                if (is_error($result) || !$is_pull_result_updated) {
-                    $order->setResultCode($result['errno']);
-                    $order->setExtraData('pull.result', $result);
-                    if ($order->save()) {
-                        $is_pull_result_updated = true;
-                    }
-                }
                 if (is_error($result)) {
                     Log::error('order_create_multi', [
                         'orderNO' => $order_no,
@@ -162,23 +173,40 @@ function process($order_no): bool
                 } else {
                     $success++;
                 }
+                $order->setExtraData('pull.stats', [
+                    'status' => 'pulling',
+                    'success' => $success,
+                    'fail' => $fail,
+                    'num' => $i + 1,
+                    'total' => $goods['num'],
+                ]);
+                if (is_error($result) || !$is_pull_result_updated) {
+                    $order->setResultCode($result['errno']);
+                    $order->setExtraData('pull.result', $result);
+                    if ($order->save()) {
+                        $is_pull_result_updated = true;
+                    }
+                }
+                $order->save();
             }
         }
 
         if (empty($success)) {
-            ExceptionNeedsRefund::throwWith($device, '出货失败！');
+            throwException($pay_log, '出货失败！', true, $device);
         } elseif ($fail > 0) {
             $order->setExtraData('pull.result', err('部分商品出货失败！'));
             $order->save();
 
             //-1 表示失败的商品退款
-            ExceptionNeedsRefund::throwWithN($device, -1, '部分商品出货失败！');
+            throwException($pay_log, '部分商品出货失败！', true, $device);
         }
 
+        $order->setExtraData('pull.stats.status', 'finished');
         $order->setExtraData('pull.result', [
             'errno' => 0,
             'message' => '出货完成！',
         ]);
+
         $order->save();
 
         $device->appShowMessage('出货完成，欢迎下次使用！');

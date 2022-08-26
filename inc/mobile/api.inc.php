@@ -11,18 +11,38 @@ if ($app_key !== settings('app.key')) {
     JSON::fail('appkey不正确！');
 }
 
-$account_uid = settings('api.account');
-if (empty($account_uid)) {
-    JSON::fail('没有指定公众号！');
-}
+/**
+ * 查询订单状态
+ */
+if (request::has('orderUID')) {
+    $order_no = request::str('orderUID');
+    $pay_log = Pay::getPayLog($order_no);
+    if (empty($pay_log)) {
+        JSON::fail('找不到这个订单的支付记录！');
+    }
 
-$account = Account::findOneFromUID($account_uid);
-if (empty($account)) {
-    JSON::fail('找不到指定的公众号！');
-}
+    $err = $pay_log->getData('create_order.error');
+    if (is_error($err)) {
+        JSON::fail($err);
+    }
 
-if ($account->isBanned()) {
-    JSON::fail('公众号被禁用！');
+    $order = Order::get($order_no, true);
+    if (empty($order)) {
+        JSON::success(
+            [
+                'code' => 100,
+                'msg' => '正在创建订单中！',
+            ]
+        );
+    }
+
+    $result = $order->getExtraData('pull', []);
+    $device = $order->getDevice();
+    if ($device) {
+        $result['goods'] = $device->getGoodsTotal($order->getGoodsId());
+    }
+
+    JSON::success($result);
 }
 
 $user_uid = request::str('user');
@@ -62,35 +82,104 @@ if (!$device->isMcbOnline()) {
     JSON::fail('设备不在线！');
 }
 
-$res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
-if (is_error($res)) {
-    JSON::fail($res['message']);
+$order_no = Order::makeUID($user, $device);
+
+$data = [
+    'device' => $device->getId(),
+    'user' => $user->getId(),
+    'orderUID' => $order_no,
+];
+
+$price = request::int('price');
+if (empty($price)) {
+    /**
+     * 公众号免费出货
+     */
+    $account_uid = settings('api.account');
+    if (empty($account_uid)) {
+        JSON::fail('没有指定公众号！');
+    }
+
+    $account = Account::findOneFromUID($account_uid);
+    if (empty($account)) {
+        JSON::fail('找不到指定的公众号！');
+    }
+
+    if ($account->isBanned()) {
+        JSON::fail('公众号被禁用！');
+    }
+
+    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    if (is_error($res)) {
+        JSON::fail($res['message']);
+    }
+
+    $data['account'] = $account->getId();
+    $data['num'] = 1;
+
+} else {
+    /**
+     * 第三方API收费订单
+     */
+    $num = request::int('num', 1);
+    if ($num < 1 || $num > App::orderMaxGoodsNum()) {
+        JSON::fail("商品数量超出限制！");
+    }
+
+    $data['num'] = $num;
+    $data['price'] = $price;
 }
 
 //获取第一货道上的商品，如果该商品数量不足，则去获取其它货道上的相同商品
 $goods = $device->getGoodsByLane(0);
-if ($goods && $goods['num'] < 1) {
+if ($goods && $goods['num'] < $data['num']) {
     $goods = $device->getGoods($goods['id']);
 }
 
-if (empty($goods) || $goods['num'] < 1) {
+if (empty($goods) || $goods['num'] < $data['num']) {
     JSON::fail('商品库存不足！');
 }
 
+/**
+ * 检查用户是否符合出货要求
+ */
 if (request::bool('verify')) {
     JSON::success('成功！');
 }
 
-$order_uid = Order::makeUID($user, $device);
-
-Job::createThirdPartyPlatformOrder([
-    'device' => $device->getId(),
-    'user' => $user->getId(),
-    'account' => $account->getId(),
-    'orderUID' => $order_uid,
-]);
+if (empty($price)) {
+    Job::createThirdPartyPlatformOrder($data);
+} else {
+    /**
+     * 创建支付记录
+     */
+    $pay_log = Pay::createPayLog($user, $order_no, [
+        'device' => $device->getId(),
+        'user' => $user->getOpenid(),
+        'pay' => [
+            'name' => 'api',
+        ],
+        'orderData' => [
+            'orderNO' => $order_no,
+            'num' => $data['num'],
+            'price' => $price,
+            'ip' => CLIENT_IP,
+            'extra' => [
+                'goods' => $goods,
+            ],
+            'createtime' => time(),
+        ],
+        'payResult' => [
+            'result' => 'success',
+        ],
+    ]);
+    if (empty($pay_log)) {
+        JSON::fail("创建支付记录失败！");
+    }
+    Job::createOrder($order_no);
+}
 
 JSON::success([
-    'orderUID' => $order_uid,
+    'orderUID' => $order_no,
     'msg' => '成功！',
 ]);

@@ -648,7 +648,7 @@ JSCODE;
             <div style="width: 80%;text-align: center;padding: 20px 20px;background: rgba(0,0,0,.5);">
             需要用户授权才能使用该功能，请点击右下角 <b style="color:#fc6;">“使用完整服务”</b>！</span>
             </div>
-            <img src="{$gif_url}" style="width:60px;bottom: 10px;right: 40px;position: absolute;">
+            <img src="{$gif_url}" style="width:60px;bottom: 20px;right: 40px;position: absolute;">
         </div>
         </div>
 HTML;

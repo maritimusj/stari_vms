@@ -274,6 +274,10 @@ class orderModelObj extends modelObj
         return $this->getExtraData('charging.record', []);
     }
 
+    public function isChargingOrder() {
+        return !empty($this->getChargerID());
+    }
+
     public function getChargerID()
     {
         return $this->getExtraData('chargingID', 0);
@@ -314,6 +318,22 @@ class orderModelObj extends modelObj
 
     public function getCommissionPrice(): int
     {
+        if ($this->isChargingOrder()) {
+            $sf = 0.0;
+            $device = $this->getDevice();
+            if ($device) {
+                $group = $device->getGroup();
+                if ($group) {
+                    $fee = $group->getFee();
+                    $sf = floatval($fee['l0']['sf']);
+                }
+            }
+            $record = $this->getChargingRecord();
+            if ($record) {
+                return intval((floatval($record['total']) * $sf) * 100);
+            }
+            return 0;
+        }
         return $this->getPrice();
     }
 

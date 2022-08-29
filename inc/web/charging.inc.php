@@ -96,19 +96,19 @@ if ($op == 'default') {
     $fee = [
         'l0' => [
             'ef' => request::float('l0ef'),
-            'sf' => request::float('l0sf'),
+            'sf' => request::float('sf'),
         ],
         'l1' => [
             'ef' => request::float('l1ef'),
-            'sf' => request::float('l1sf'),
+            'sf' => request::float('sf'),
         ],
         'l2' => [
             'ef' => request::float('l2ef'),
-            'sf' => request::float('l2sf'),
+            'sf' => request::float('sf'),
         ],
         'l3' => [
             'ef' => request::float('l3ef'),
-            'sf' => request::float('l3sf'),
+            'sf' => request::float('sf'),
         ],
         'ts' => array_map(function ($e) {
             return intval($e);

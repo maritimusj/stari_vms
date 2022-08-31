@@ -1854,7 +1854,7 @@ if ($op == 'default') {
         foreach ($query->findAll() as $index => $entry) {
             $data = [
                 'id' => $index + 1,
-                'xval' => number_format($entry->getXVal() / 100, 2),
+                'xval' => number_format($entry->getXVal() / 100, 2, '.', ''),
                 'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 'event' => '',  //事件
                 'device' => '',  //设备

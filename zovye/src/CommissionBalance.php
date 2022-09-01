@@ -20,8 +20,8 @@ class CommissionBalance extends State
     const ORDER_BALANCE = 1;
     const ORDER_WX_PAY = 2;
     const WITHDRAW = 3;
-    const REFUND = 4;
 
+    const REFUND = 4;
     const ORDER_REFUND = 6;
     const GSP = 7;
     const BONUS = 8;
@@ -32,6 +32,7 @@ class CommissionBalance extends State
     const RECHARGE = 13;
 
     const CHARGING = 20;
+    const CHARGING_SF = 21;
 
     protected static $unknown = 'n/a';
 
@@ -50,6 +51,7 @@ class CommissionBalance extends State
         self::RELOAD_IN => '补货佣金收入',
         self::RECHARGE => '现金充值',
         self::CHARGING => '充电桩订单结算',
+        self::CHARGING_SF => '充电桩订单服务费',
     ];
 
     private $user;
@@ -249,7 +251,33 @@ $device_info
 <dd class="memo">$memo</dd>
 </dl>
 REALOD_IN;
-        } elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
+        } elseif ($entry->getSrc() == CommissionBalance::CHARGING_SF) {
+            $order_id = $entry->getExtraData('order');
+            $order = Order::get($order_id);
+            $order_info = '';
+            $device_info = '';
+            $group_info = '';
+            if ($order) {
+                $order_info = $order->getOrderNO();
+                $device = $order->getDevice();
+                if ($device) {
+                    $device_info = "<dt>充电桩</dt><dd class=\"admin\">{$device->getName()}</dd>";
+                }
+                $title = $order->getExtraData('group.title', '');
+                $address = $order->getExtraData('group.address', '');
+                $group_info = "<dt>站点</dt><dd class=\"admin\">$title</dd><dt>地址</dt><dd class=\"admin\">$address</dd>";
+            }
+            $data['memo'] = <<<CHARGING
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">充电订单服务费</dd>
+<dt>订单</dt>
+<dd class="event">$order_info</dd>
+$group_info
+$device_info
+</dl>
+CHARGING;
+        }  elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
             $order_id = $entry->getExtraData('order');
             $order = Order::get($order_id);
             $order_info = '';

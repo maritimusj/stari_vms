@@ -316,8 +316,7 @@ class orderModelObj extends modelObj
         return intval($this->getExtraData('discount.total', 0));
     }
 
-    public function getCommissionPrice(): int
-    {
+    public function getChargingSF(): int {
         if ($this->isChargingOrder()) {
             $sf = 0.0;
             $device = $this->getDevice();
@@ -332,8 +331,17 @@ class orderModelObj extends modelObj
             if ($record) {
                 return intval((floatval($record['total']) * $sf) * 100);
             }
-            return 0;
         }
+
+        return 0;
+    }
+
+    public function getChargingEF(): int {
+        return max(0, $this->getPrice() - $this->getChargingSF());
+    }
+
+    public function getCommissionPrice(): int
+    {
         return $this->getPrice();
     }
 

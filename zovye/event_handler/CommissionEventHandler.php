@@ -36,6 +36,10 @@ class CommissionEventHandler
             return true;
         }
 
+        if ($order->isChargingOrder()) {
+            return self::charging($device, $order);
+        }
+
         if (App::isZeroBonusEnabled() && $order->isZeroBonus()) {
             return true;
         }
@@ -55,6 +59,54 @@ class CommissionEventHandler
 
         if ($order->getPrice() > 0) {
             return self::pay($device, $order);
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected static function charging(deviceModelObj $device, orderModelObj $order): bool
+    {
+        $agent = $device->getAgent();
+        if (empty($agent)) {
+            return true;
+        }
+
+        if (!$agent->isCommissionEnabled()) {
+            return true;
+        }
+
+        $commission_price = $order->getCommissionPrice();
+
+        $order->setExtraData('commission.local.total', $commission_price);
+
+        $sf = $order->getChargingSF();
+
+        //第3步，对利润进行佣金分配
+        if ($sf > 0) {
+            $sf = self::processProfit($device, $order, $agent, $sf, CommissionBalance::CHARGING_SF);
+        }
+
+        $ef = $order->getChargingEF() + $sf;
+        if ($ef < 1) {
+            return true;
+        }
+
+        $balance = $agent->getCommissionBalance();
+
+        $r = $balance->change($ef, CommissionBalance::CHARGING, ['orderid' => $order->getId()]);
+        if ($r && $r->update([], true)) {
+            //记录佣金
+            $order->setExtraData('commission.agent', [
+                'id' => $r->getId(),
+                'xval' => $r->getXVal(),
+                'openid' => $agent->getOpenid(),
+                'name' => $agent->getName(),
+            ]);
+        } else {
+            throw new Exception('创建代理佣金数据失败！', State::ERROR);
         }
 
         return true;
@@ -254,7 +306,8 @@ class CommissionEventHandler
     protected static function processKeeperCommissions(
         int $commission_price,
         deviceModelObj $device,
-        orderModelObj $order
+        orderModelObj $order,
+        int $src = CommissionBalance::GSP
     ): int {
         if ($commission_price <= 0) {
             return 0;
@@ -294,7 +347,7 @@ class CommissionEventHandler
             }
 
             if ($price > 0) {
-                $r = $user->commission_change($price, CommissionBalance::GSP, ['orderid' => $order->getId()]);
+                $r = $user->commission_change($price, $src, ['orderid' => $order->getId()]);
                 if ($r && $r->update([], true)) {
                     //记录佣金
                     $log[] = [
@@ -325,20 +378,25 @@ class CommissionEventHandler
      * @param int $commission_price
      * @param agentModelObj $agent
      * @param orderModelObj $order
+     * @param int $src
      * @return int
      * @throws Exception
      */
-    protected static function processGSP(int $commission_price, agentModelObj $agent, orderModelObj $order): int
-    {
+    protected static function processGSP(
+        int $commission_price,
+        agentModelObj $agent,
+        orderModelObj $order,
+        int $src =  CommissionBalance::GSP
+    ): int {
         $available_price = $commission_price;
 
         $gsp_log = [];
-        $createCommission = function ($price, $user) use (&$available_price, $order, &$gsp_log) {
+        $createCommission = function ($price, $user) use (&$available_price, $order, $src, &$gsp_log) {
             if ($price > $available_price) {
                 $price = $available_price;
             }
             if ($price > 0) {
-                $gsp_r = $user->commission_change($price, CommissionBalance::GSP, ['orderid' => $order->getId()]);
+                $gsp_r = $user->commission_change($price, $src, ['orderid' => $order->getId()]);
                 if ($gsp_r && $gsp_r->update([], true)) {
                     $gsp_log[] = [
                         'id' => $gsp_r->getId(),
@@ -450,6 +508,7 @@ class CommissionEventHandler
      * @param orderModelObj $order
      * @param agentModelObj $agent
      * @param int $commission_price
+     * @param int $src
      * @return int
      * @throws Exception
      */
@@ -457,16 +516,17 @@ class CommissionEventHandler
         deviceModelObj $device,
         orderModelObj $order,
         agentModelObj $agent,
-        int $commission_price
+        int $commission_price,
+        int $src = CommissionBalance::GSP
     ): int {
         //处理佣金分享用户
-        $commission_price = self::processGSP($commission_price, $agent, $order);
+        $commission_price = self::processGSP($commission_price, $agent, $order, $src);
         if ($commission_price < 1) {
             return 0;
         }
 
         //处理营运人员佣金
-        return self::processKeeperCommissions($commission_price, $device, $order);
+        return self::processKeeperCommissions($commission_price, $device, $order, $src);
     }
 
     /**

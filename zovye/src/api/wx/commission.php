@@ -302,8 +302,18 @@ class commission
         ])->sum('x_val');
 
 
-        $result['ef'] = Stats::getMonthStats($user, CommissionBalance::CHARGING);
-        $result['sf'] = Stats::getMonthStats($user, CommissionBalance::CHARGING_SF);
+        $sf = Stats::getMonthStats($user, CommissionBalance::CHARGING);
+        $ef = Stats::getMonthStats($user, CommissionBalance::CHARGING_SF);
+
+        foreach ($sf as $i => $total) {
+            $result[$i] = [
+                'sf' => $total,
+            ];
+        }
+
+        foreach ($ef as $i => $total) {
+            $result[$i]['ef'] = $total;
+        }
 
         return $result;
     }

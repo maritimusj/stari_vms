@@ -1178,7 +1178,7 @@ class Stats
                 $end = new DateTime("@{$begin->getTimestamp()}");
                 $end->modify('first day of next month 00:00');
 
-                $result[$begin->format('Y年m月')] = $balance->log()->where([
+                $result[$begin->format('Y年m月')] = (int)$balance->log()->where([
                     'src' => $src,
                     'createtime >=' => $begin->getTimestamp(),
                     'createtime <' => $end->getTimestamp(),

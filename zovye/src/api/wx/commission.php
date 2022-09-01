@@ -255,6 +255,10 @@ class commission
         $balance = $user->getCommissionBalance();
 
         $result = [
+            'yesterday' => [
+                'ef' => 0,
+                'sf' => 0,
+            ],
             'today' => [
                 'ef' => 0,
                 'sf' => 0,
@@ -265,22 +269,34 @@ class commission
             ],
         ];
 
-        $result['today']['ef'] = $balance->log()->where([
+        $result['yesterday']['ef'] = (int)$balance->log()->where([
+            'src' => CommissionBalance::CHARGING,
+            'createtime >=' => (new DateTime('last day 00:00'))->getTimestamp(),
+            'createtime <' => (new DateTime('today'))->getTimestamp(),
+        ])->sum('x_val');
+
+        $result['yesterday']['sf'] = (int)$balance->log()->where([
+            'src' => CommissionBalance::CHARGING_SF,
+            'createtime >=' => (new DateTime('last day 00:00'))->getTimestamp(),
+            'createtime <' => (new DateTime('today'))->getTimestamp(),
+        ])->sum('x_val');
+
+        $result['today']['ef'] = (int)$balance->log()->where([
             'src' => CommissionBalance::CHARGING,
             'createtime >=' => (new DateTime('today'))->getTimestamp(),
         ])->sum('x_val');
 
-        $result['today']['sf'] = $balance->log()->where([
+        $result['today']['sf'] = (int)$balance->log()->where([
             'src' => CommissionBalance::CHARGING_SF,
             'createtime >=' => (new DateTime('today'))->getTimestamp(),
         ])->sum('x_val');
 
-        $result['month']['ef'] = $balance->log()->where([
+        $result['month']['ef'] = (int)$balance->log()->where([
             'src' => CommissionBalance::CHARGING,
             'createtime >=' => (new DateTime('first day of this month 00:00'))->getTimestamp(),
         ])->sum('x_val');
 
-        $result['month']['sf'] = $balance->log()->where([
+        $result['month']['sf'] = (int)$balance->log()->where([
             'src' => CommissionBalance::CHARGING_SF,
             'createtime >=' => (new DateTime('first day of this month 00:00'))->getTimestamp(),
         ])->sum('x_val');

@@ -169,7 +169,7 @@ router::exec($op, [
     'OrderStats' => '\zovye\api\wx\misc::orderStats',
 
     'ChargingStats' => '\zovye\api\wx\commission::chargingStats',
-    'chargingMonthStats' => '\zovye\api\wx\commission::chargingMonthStats',
+    'ChargingMonthStats' => '\zovye\api\wx\commission::chargingMonthStats',
 
 ]);
 

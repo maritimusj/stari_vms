@@ -305,14 +305,15 @@ class commission
         $sf = Stats::getMonthStats($user, CommissionBalance::CHARGING);
         $ef = Stats::getMonthStats($user, CommissionBalance::CHARGING_SF);
 
+        $result['list'] = [];
         foreach ($sf as $i => $total) {
-            $result[$i] = [
+            $result['list'][$i] = [
                 'sf' => $total,
             ];
         }
 
         foreach ($ef as $i => $total) {
-            $result[$i]['ef'] = $total;
+            $result['list'][$i]['ef'] = $total;
         }
 
         return $result;

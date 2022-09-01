@@ -8,6 +8,8 @@
 namespace zovye\api\wx;
 
 use DateTime;
+use DateTimeImmutable;
+use Exception;
 use zovye\Account;
 use zovye\App;
 use zovye\CommissionBalance;
@@ -242,6 +244,37 @@ class commission
         }
 
         return ['data' => Stats::getUserCommissionStats($user)];
+    }
+
+    public static function chargingMonthStats(): array
+    {
+        if (!App::isChargingDeviceEnabled()) {
+            return err('没有开启这个功能！');
+        }
+
+        $user = common::getAgent();
+        $result  = [];
+
+        try {
+            $month = new DateTimeImmutable(request::str('month') . '-01 00:00');
+
+            $sf = Stats::getDailyStats($user, CommissionBalance::CHARGING, $month);
+            $ef = Stats::getDailyStats($user, CommissionBalance::CHARGING_SF, $month);
+
+            foreach ($sf as $i => $total) {
+                $result[$i] = [
+                    'sf' => $total,
+                ];
+            }
+
+            foreach ($ef as $i => $total) {
+                $result[$i]['ef'] = $total;
+            }
+
+        } catch (Exception $e) {
+        }
+
+        return $result;
     }
 
     public static function chargingStats(): array

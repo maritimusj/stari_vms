@@ -1161,7 +1161,7 @@ class Stats
         return $data;
     }
 
-    public static function getMonthStats(userModelObj $user, $src): array
+    public static function getMonthStats(userModelObj $user, int $src): array
     {
         $result = [];
 
@@ -1174,11 +1174,11 @@ class Stats
             $now = new DateTime();
             $begin = $first_datetime;
 
-            while($first_datetime < $now) {
+            while ($first_datetime < $now) {
                 $end = new DateTime("@{$begin->getTimestamp()}");
                 $end->modify('first day of next month 00:00');
 
-                $result[$begin->format('Y年m月')] = (int)$balance->log()->where([
+                $result[$begin->format('Y-m')] = (int)$balance->log()->where([
                     'src' => $src,
                     'createtime >=' => $begin->getTimestamp(),
                     'createtime <' => $end->getTimestamp(),
@@ -1188,6 +1188,34 @@ class Stats
             }
             krsort($result);
         }
+
+        return $result;
+    }
+
+    public static function getDailyStats(userModelObj $user, int $src, DateTimeImmutable $month): array
+    {
+        $result = [];
+
+        $balance = $user->getCommissionBalance();
+
+        $begin = $month->modify("first day of month 00:00");
+        $end = $month->modify("first day of next month 00:00");
+
+        if ($end->getTimestamp() > time()) {
+            $end = $end->setTimestamp(time());
+        }
+
+        while ($end > $begin) {
+            $result[$begin->format('m-d')] = (int)$balance->log()->where([
+                'src' => $src,
+                'createtime >=' => $begin->getTimestamp(),
+                'createtime <' => $end->getTimestamp(),
+            ])->sum('x_val');
+
+            $begin = $begin->modify('next day');
+        }
+
+        krsort($result);
 
         return $result;
     }

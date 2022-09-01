@@ -1160,4 +1160,35 @@ class Stats
 
         return $data;
     }
+
+    public static function getMonthStats(userModelObj $user, $src): array
+    {
+        $result = [];
+
+        $balance = $user->getCommissionBalance();
+
+        $first = CommissionBalance::getFirstCommissionBalanceOf($user, $src);
+        if ($first) {
+            $first_datetime = new DateTime("@{$first->getCreatetime()}");
+
+            $now = new DateTime();
+            $begin = $first_datetime;
+
+            while($first_datetime < $now) {
+                $end = new DateTime("@{$begin->getTimestamp()}");
+                $end->modify('first day of next month 00:00');
+
+                $result[$begin->format('Y年m月')] = $balance->log()->where([
+                    'src' => $src,
+                    'createtime >=' => $begin->getTimestamp(),
+                    'createtime <' => $end->getTimestamp(),
+                ])->sum('x_val');
+
+                $begin->modify('+1 month');
+            }
+            krsort($result);
+        }
+
+        return $result;
+    }
 }

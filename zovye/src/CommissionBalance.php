@@ -517,4 +517,24 @@ ORDER;
 
         return null;
     }
+
+    public static function getFirstCommissionBalanceOf(userModelObj $user, $src): ?commission_balanceModelObj
+    {
+        $id = $user->settings("extra.first.commission_$src.id");
+        if ($id) {
+            return self::findOne(['id' => $id]);
+        }
+        $query = self::query(['openid' => $user->getOpenid(), 'src' => $src]);
+        /** @var commission_balanceModelObj $log */
+        $log = $query->orderBy('id ASC')->findOne();
+        if ($log) {
+            $user->updateSettings("extra.first.commission_$src", [
+                'id' => $log->getId(),
+            ]);
+
+            return $log;
+        }
+
+        return null;
+    }
 }

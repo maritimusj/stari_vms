@@ -7,8 +7,12 @@
 
 namespace zovye\api\wx;
 
+use DateTime;
 use zovye\Account;
+use zovye\App;
+use zovye\CommissionBalance;
 use zovye\model\accountModelObj;
+use zovye\model\userModelObj;
 use zovye\request;
 use zovye\Schema;
 use zovye\State;
@@ -238,5 +242,53 @@ class commission
         }
 
         return ['data' => Stats::getUserCommissionStats($user)];
+    }
+
+    public static function chargingStats(): array
+    {
+        if (!App::isChargingDeviceEnabled()) {
+            return err('没有开启这个功能！');
+        }
+
+        $user = common::getAgent();
+
+        $balance = $user->getCommissionBalance();
+
+        $result = [
+            'today' => [
+                'ef' => 0,
+                'sf' => 0,
+            ],
+            'month' => [
+                'ef' => 0,
+                'sf' => 0,
+            ],
+        ];
+
+        $result['today']['ef'] = $balance->log()->where([
+            'src' => CommissionBalance::CHARGING,
+            'createtime >=' => (new DateTime('today'))->getTimestamp(),
+        ])->sum('x_val');
+
+        $result['today']['sf'] = $balance->log()->where([
+            'src' => CommissionBalance::CHARGING_SF,
+            'createtime >=' => (new DateTime('today'))->getTimestamp(),
+        ])->sum('x_val');
+
+        $result['month']['ef'] = $balance->log()->where([
+            'src' => CommissionBalance::CHARGING,
+            'createtime >=' => (new DateTime('first day of this month 00:00'))->getTimestamp(),
+        ])->sum('x_val');
+
+        $result['month']['sf'] = $balance->log()->where([
+            'src' => CommissionBalance::CHARGING_SF,
+            'createtime >=' => (new DateTime('first day of this month 00:00'))->getTimestamp(),
+        ])->sum('x_val');
+
+
+        $result['ef'] = Stats::getMonthStats($user, CommissionBalance::CHARGING);
+        $result['sf'] = Stats::getMonthStats($user, CommissionBalance::CHARGING_SF);
+
+        return $result;
     }
 }

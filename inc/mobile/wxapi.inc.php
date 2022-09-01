@@ -167,5 +167,6 @@ router::exec($op, [
 
     'DeviceStats' => '*\zovye\api\wx\misc::deviceStats',
     'OrderStats' => '\zovye\api\wx\misc::orderStats',
-]);
+
+    'ChargingStats' => '\zovye\api\wx\commission::chargingStats']);
 

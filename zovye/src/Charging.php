@@ -418,7 +418,7 @@ class Charging
                 if ($totalPrice > 0) {
                     $balance = $user->getCommissionBalance();
                     $extra = [
-                        'order' => $order->getId(),
+                        'orderid' => $order->getId(),
                         'serial' => $serial,
                         'chargerID' => $chargerID,
                     ];

@@ -115,36 +115,36 @@
                 <div class="form-group">
                     <label for="l0ef" class="col-md-2 control-label">计费标准(1)<span class="charging-level l0"></span></label>
                     <div class="col-md-5">
-                        <input type="number" class="form-control" name="l0ef" id="l0ef" value="{php echo $group ? $group['fee']['l0']['ef'] : 0.00}" step="0.01">
+                        <input type="number" class="form-control" name="l0ef" id="l0ef" value="{php echo $group ? number_format($group['fee']['l0']['ef'], 2, '.', '') : 0.00}" step="0.01">
                         <span class="help-block">* 电费（元/分钟）</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="l1ef" class="col-md-2 control-label">计费标准(2)<span class="charging-level l1"></span></label>
                     <div class="col-md-5">
-                        <input type="number" class="form-control" name="l1ef" id="l1ef" value="{php echo $group ? $group['fee']['l1']['ef'] : 0.00}" step="0.01">
+                        <input type="number" class="form-control" name="l1ef" id="l1ef" value="{php echo $group ? number_format($group['fee']['l1']['ef'], 2, '.', '') : 0.00}" step="0.01">
                         <span class="help-block">* 电费（元/分钟）</span>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="l2ef" class="col-md-2 control-label">计费标准(3)<span class="charging-level l2"></span></label>
                     <div class="col-md-5">
-                        <input type="number" class="form-control" name="l2ef" id="l2ef" value="{php echo $group ? $group['fee']['l2']['ef'] : 0.00}" step="0.01">
+                        <input type="number" class="form-control" name="l2ef" id="l2ef" value="{php echo $group ? number_format($group['fee']['l2']['ef'], 2, '.', '') : 0.00}" step="0.01">
                         <span class="help-block">* 电费（元/分钟）</span>
                     </div>  
                 </div>
                 <div class="form-group">
                     <label for="l3ef" class="col-md-2 control-label">计费标准(4)<span class="charging-level l3"></span></label>
                     <div class="col-md-5">
-                        <input type="number" class="form-control" name="l3ef" id="l3ef" value="{php echo $group ? $group['fee']['l3']['ef'] : 0.00}" step="0.01">
+                        <input type="number" class="form-control" name="l3ef" id="l3ef" value="{php echo $group ? number_format($group['fee']['l3']['ef'], 2, '.', '') : 0.00}" step="0.01">
                         <span class="help-block">* 电费（元/分钟）</span>
                     </div>  
                 </div>
                 <div class="form-group">
-                    <label for="l3ef" class="col-md-2 control-label">服务费<span class="charging-level l3"></span></label>
+                    <label for="l3ef" class="col-md-2 control-label">服务费</label>
                     <div class="col-md-5">
-                        <input type="number" class="form-control" name="sf" id="sf" value="{php echo $group ? $group['fee']['l0']['sf'] : 0.00}" step="0.01">
-                        <span class="help-block">* 服务费（元/分钟）</span>
+                        <input type="number" class="form-control" name="sf" id="sf" value="{php echo $group ? number_format($group['fee']['l0']['sf'], 2, '.', '') : 0.00}" step="0.01">
+                        <span class="help-block">* 服务费（元/度）</span>
                     </div>    
                 </div>
                 <div class="form-group">

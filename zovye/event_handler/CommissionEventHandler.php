@@ -89,12 +89,27 @@ class CommissionEventHandler
             $sf = self::processProfit($device, $order, $agent, $sf, CommissionBalance::CHARGING_SF);
         }
 
-        $ef = $order->getChargingEF() + $sf;
+        $balance = $agent->getCommissionBalance();
+
+        if ($sf > 0) {
+            $r = $balance->change($sf, CommissionBalance::CHARGING_SF, ['orderid' => $order->getId()]);
+            if ($r && $r->update([], true)) {
+                //记录佣金
+                $order->setExtraData('commission.agent', [
+                    'id' => $r->getId(),
+                    'xval' => $r->getXVal(),
+                    'openid' => $agent->getOpenid(),
+                    'name' => $agent->getName(),
+                ]);
+            } else {
+                throw new Exception('创建代理佣金数据失败！', State::ERROR);
+            }
+        }
+
+        $ef = $order->getChargingEF();
         if ($ef < 1) {
             return true;
         }
-
-        $balance = $agent->getCommissionBalance();
 
         $r = $balance->change($ef, CommissionBalance::CHARGING_EF, ['orderid' => $order->getId()]);
         if ($r && $r->update([], true)) {

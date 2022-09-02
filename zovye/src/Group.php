@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use DateTime;
 use zovye\model\device_groupsModelObj;
 
 class Group
@@ -111,6 +112,8 @@ class Group
                 } else {
                     $data['tips'] = sprintf("¥ %.04f - %.04f /度", $min, $max);
                 }
+
+                $data['current_price'] = sprintf("¥ %.04f /度", $entry->getFeeAt(new DateTime()));
             }
         }
 

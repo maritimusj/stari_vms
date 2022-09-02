@@ -1198,7 +1198,7 @@ class Stats
 
         $balance = $user->getCommissionBalance();
 
-        $begin = $month->modify("first day of month 00:00");
+        $begin = $month->modify("first day of this month 00:00");
         $end = $month->modify("first day of next month 00:00");
 
         if ($end->getTimestamp() > time()) {

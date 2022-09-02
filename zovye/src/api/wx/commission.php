@@ -253,13 +253,16 @@ class commission
         }
 
         $user = common::getAgent();
+
+        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
+
         $result  = [];
 
         try {
             $month = new DateTimeImmutable(request::str('month') . '-01 00:00');
 
-            $sf = Stats::getDailyStats($user, CommissionBalance::CHARGING, $month);
-            $ef = Stats::getDailyStats($user, CommissionBalance::CHARGING_SF, $month);
+            $ef = Stats::getDailyStats($agent, CommissionBalance::CHARGING, $month);
+            $sf = Stats::getDailyStats($agent, CommissionBalance::CHARGING_SF, $month);
 
             foreach ($sf as $i => $total) {
                 $result[$i] = [
@@ -285,7 +288,9 @@ class commission
 
         $user = common::getAgent();
 
-        $balance = $user->getCommissionBalance();
+        $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
+
+        $balance = $agent->getCommissionBalance();
 
         $result = [
             'yesterday' => [
@@ -335,18 +340,22 @@ class commission
         ])->sum('x_val');
 
 
-        $sf = Stats::getMonthStats($user, CommissionBalance::CHARGING);
-        $ef = Stats::getMonthStats($user, CommissionBalance::CHARGING_SF);
+        $ef = Stats::getMonthStats($agent, CommissionBalance::CHARGING);
+        $sf = Stats::getMonthStats($agent, CommissionBalance::CHARGING_SF);
 
         $result['list'] = [];
         foreach ($sf as $i => $total) {
             $result['list'][$i] = [
                 'sf' => $total,
+                'ef' => 0,
             ];
         }
 
         foreach ($ef as $i => $total) {
             $result['list'][$i]['ef'] = $total;
+            if (!isset($result['list'][$i]['sf'])) {
+                $result['list'][$i]['sf'] = 0;
+            }
         }
 
         return $result;

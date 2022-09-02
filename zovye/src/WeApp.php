@@ -643,7 +643,7 @@ JSCODE;
     {
         $gif_url = MODULE_URL . "static/img/here.gif";
         $html = <<<HTML
-        <div style="position: absolute;width: 100vw;height:100vh;z-index: 1000;background: rgba(0,0,0,0.7);left: 0;top: 0;bottom:0">
+        <div style="position: fixed;width: 100vw;height:100vh;z-index: 1000;background: rgba(0,0,0,0.7);left: 0;top: 0;bottom:0">
         <div style="flex-direction: column;display: flex;align-items: center;justify-content: center;width: 100%;height: 100%;color: #fff;font-size: large;">
             <div style="width: 80%;text-align: center;padding: 20px 20px;background: rgba(0,0,0,.5);">
             需要用户授权才能使用该功能，请点击右下角 <b style="color:#fc6;">“使用完整服务”</b>！</span>

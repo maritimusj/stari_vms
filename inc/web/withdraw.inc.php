@@ -110,6 +110,10 @@ if ($op == 'export') {
                 'createtime' => date('Y-m-d H:i:s', $entry->getCreatetime()),
             ];
 
+            if ($entry->getExtraData('charging', false)) {
+                $data['charging'] = true;
+            }
+
             $current = $entry->getExtraData('current');
             if (isset($current)) {
                 $data['current'] = number_format($current / 100, 2);

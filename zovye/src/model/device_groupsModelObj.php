@@ -131,6 +131,10 @@ class device_groupsModelObj extends modelObj
         return $this->getExtraData('fee', []);
     }
 
+    public function getServiceFee(): float {
+        return floatval($this->getExtraData('fee.l0.sf', 0.0));
+    }
+
     public function getFeeAt(DateTimeInterface $time)
     {
         $hour = $time->format('H') * 2;

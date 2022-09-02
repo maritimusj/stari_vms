@@ -310,6 +310,12 @@ class Charging
         $chargerID = $order->getChargerID();
         $status = $device->getChargerData($chargerID);
 
+        $group = $device->getGroup();
+        if ($group) {
+            $status['serviceFee'] = round($group->getServiceFee() * floatval($status['chargedKWH']), 2);
+            $status['priceTotal'] = round($status['priceTotal'] - $status['serviceFee'], 2);
+        }
+
         return ['status' => $status];
     }
 

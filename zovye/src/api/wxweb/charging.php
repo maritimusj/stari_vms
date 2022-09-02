@@ -193,10 +193,13 @@ class charging
         }
 
         $result = $device->profile();
+
         $result['chargerNum'] = $device->getChargerNum();
 
         if (request::has('chargerID')) {
-            $result['charger'] = $device->getChargerData(request::int('chargerID'));
+            $chargerID = request::int('chargerID');
+            $result['charger'] = $device->getChargerData($chargerID);
+            $result['charger']['index'] = $chargerID;
         }
 
         $group = $device->getGroup();
@@ -447,7 +450,13 @@ class charging
         $user = common::getWXAppUser();
 
         $query = $user->getCommissionBalance()->log();
-        $query->where(['src' => CommissionBalance::RECHARGE]);
+        $query->where([
+            'src' => [
+                CommissionBalance::RECHARGE,
+                CommissionBalance::CHARGING,
+                CommissionBalance::WITHDRAW,
+            ],
+        ]);
 
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -473,6 +482,8 @@ class charging
 
         $total = round(request::float('amount', 0, 2) * 100);
 
-        return balance::balanceWithdraw($user, $total, request::str('memo'));
+        return balance::balanceWithdraw($user, $total, request::str('memo'), [
+            'charging' => true,
+        ]);
     }
 }

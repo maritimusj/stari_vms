@@ -96,7 +96,7 @@ class CommissionEventHandler
 
         $balance = $agent->getCommissionBalance();
 
-        $r = $balance->change($ef, CommissionBalance::CHARGING, ['orderid' => $order->getId()]);
+        $r = $balance->change($ef, CommissionBalance::CHARGING_EF, ['orderid' => $order->getId()]);
         if ($r && $r->update([], true)) {
             //记录佣金
             $order->setExtraData('commission.agent', [

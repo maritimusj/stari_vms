@@ -93,9 +93,10 @@ class balance
      * @param $user userModelObj
      * @param int $amount
      * @param string $memo
+     * @param array $extra
      * @return array
      */
-    public static function balanceWithdraw(userModelObj $user, int $amount, string $memo = ''): array
+    public static function balanceWithdraw(userModelObj $user, int $amount, string $memo = '', $extra = []): array
     {
         //先锁定用户，防止恶意重复提交
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
@@ -144,7 +145,7 @@ class balance
         }
 
         $res = Util::transactionDo(
-            function () use ($amount, $memo, $balance, $user) {
+            function () use ($amount, $memo, $balance, $user, $extra) {
                 //计算手续费
                 $fee = 0;
                 $config = settings('commission.withdraw.fee', []);
@@ -195,7 +196,7 @@ class balance
                 $r = $balance->change(
                     -$amount,
                     CommissionBalance::WITHDRAW,
-                    [
+                    array_merge($extra, [
                         'openid' => $user->getOpenid(),
                         'ip' => CLIENT_IP,
                         'user-agent' => $_SERVER['HTTP_USER_AGENT'],
@@ -203,7 +204,7 @@ class balance
                         'remain' => $balance_total - $amount - $fee,
                         'fee' => $fee,
                         'memo' => $memo,
-                    ]
+                    ])
                 );
 
                 if (empty($r)) {
@@ -448,8 +449,6 @@ class balance
             $page_size = max(1, $page_size);
 
             return self::getUserBalanceLog($user, $type, $page, $page_size);
-
-
         }
 
         return error(State::ERROR, '获取列表失败！');

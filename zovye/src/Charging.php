@@ -379,7 +379,6 @@ class Charging
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
-
             return $order->save();
         }
 

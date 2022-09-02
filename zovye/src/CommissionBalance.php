@@ -33,6 +33,7 @@ class CommissionBalance extends State
 
     const CHARGING = 20;
     const CHARGING_SF = 21;
+    const CHARGING_EF = 22;
 
     protected static $unknown = 'n/a';
 
@@ -51,7 +52,8 @@ class CommissionBalance extends State
         self::RELOAD_IN => '补货佣金收入',
         self::RECHARGE => '现金充值',
         self::CHARGING => '充电桩订单结算',
-        self::CHARGING_SF => '充电桩订单服务费',
+        self::CHARGING_SF => '充电桩订单(服务费)',
+        self::CHARGING_EF => '充电桩订单(电费)',
     ];
 
     private $user;
@@ -133,7 +135,7 @@ class CommissionBalance extends State
             $data['memo'] = <<<WITHDRAW
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">佣金提现$status</dd>
+<dd class="event">余额提现$status</dd>
 $user_info
 </dl>
 WITHDRAW;
@@ -252,7 +254,7 @@ $device_info
 </dl>
 REALOD_IN;
         } elseif ($entry->getSrc() == CommissionBalance::CHARGING_SF) {
-            $order_id = $entry->getExtraData('order');
+            $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             $order_info = '';
             $device_info = '';
@@ -270,15 +272,43 @@ REALOD_IN;
             $data['memo'] = <<<CHARGING
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">充电订单服务费</dd>
+<dd class="event">充电订单(服务费)</dd>
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
 $group_info
 $device_info
 </dl>
 CHARGING;
-        }  elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
-            $order_id = $entry->getExtraData('order');
+        }
+        elseif ($entry->getSrc() == CommissionBalance::CHARGING_EF) {
+            $order_id = $entry->getExtraData('orderid');
+            $order = Order::get($order_id);
+            $order_info = '';
+            $device_info = '';
+            $group_info = '';
+            if ($order) {
+                $order_info = $order->getOrderNO();
+                $device = $order->getDevice();
+                if ($device) {
+                    $device_info = "<dt>充电桩</dt><dd class=\"admin\">{$device->getName()}</dd>";
+                }
+                $title = $order->getExtraData('group.title', '');
+                $address = $order->getExtraData('group.address', '');
+                $group_info = "<dt>站点</dt><dd class=\"admin\">$title</dd><dt>地址</dt><dd class=\"admin\">$address</dd>";
+            }
+            $data['memo'] = <<<CHARGING
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">充电订单(电费)</dd>
+<dt>订单</dt>
+<dd class="event">$order_info</dd>
+$group_info
+$device_info
+</dl>
+CHARGING;
+        }
+        elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
+            $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             $order_info = '';
             $device_info = '';

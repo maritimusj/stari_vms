@@ -27,7 +27,7 @@ class group
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        $query = \zovye\Group::query(\zovye\Group::NORMAL);
+        $query = ZovyeGroup::query(ZovyeGroup::NORMAL);
 
         $keyword = request::trim('keyword');
         if (!empty($keyword)) {
@@ -100,10 +100,10 @@ class group
         $group_id = request::int('id');
 
         /** @var device_groupsModelObj $one */
-        $one = \zovye\Group::findOne([
+        $one = ZovyeGroup::findOne([
             'id' => $group_id,
             'agent_id' => $user->getAgentId(),
-        ], \zovye\Group::NORMAL);
+        ]);
 
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
@@ -134,14 +134,14 @@ class group
         $agent = agent::getAgent();
 
         $data = [
-            'type_id' => \zovye\Group::NORMAL,
+            'type_id' => ZovyeGroup::NORMAL,
             'title' => $title,
             'clr' => $clr,
             'agent_id' => $agent->getAgentId(),
             'createtime' => time(),
         ];
 
-        $app = \zovye\Group::create($data);
+        $app = ZovyeGroup::create($data);
         if ($app) {
             return ['msg' => '创建成功'];
         }
@@ -168,10 +168,10 @@ class group
         $user = agent::getAgent();
 
         /** @var device_groupsModelObj $one */
-        $one = \zovye\Group::findOne([
+        $one = ZovyeGroup::findOne([
             'id' => $group_id,
             'agent_id' => $user->getAgentId(),
-        ], \zovye\Group::NORMAL);
+        ]);
 
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
@@ -201,10 +201,10 @@ class group
         $group_id = request::trim('id');
 
         /** @var device_groupsModelObj $one */
-        $one = \zovye\Group::findOne([
+        $one = ZovyeGroup::findOne([
             'id' => $group_id,
             'agent_id' => $user->getAgentId(),
-        ], \zovye\Group::NORMAL);
+        ]);
 
         if (empty($one)) {
             return error(State::ERROR, '找不到这个分组！');
@@ -223,7 +223,7 @@ class group
 
         if (empty($cache[$id])) {
             /** @var device_groupsModelObj $res */
-            $res = \zovye\Group::get($id, $typeid);
+            $res = ZovyeGroup::get($id, $typeid);
             if ($res) {
                 $data = [
                     'id' => $res->getId(),

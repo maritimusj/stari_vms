@@ -32,144 +32,138 @@ if ($op == 'default') {
 
     header('location:'.Util::murl('entry', ['from' => 'device', 'device' => $device->getShadowId()]));
 
-} else {
-    if ($op == 'feed_back') {
+} elseif ($op == 'feed_back') {
 
-        $user = Util::getCurrentUser();
-        if (empty($user) || $user->isBanned()) {
-            JSON::fail('找不到用户！');
-        }
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户！');
+    }
 
-        $device_imei = request::str('device');
-        $device = Device::get($device_imei, true);
+    $device_imei = request::str('device');
+    $device = Device::get($device_imei, true);
 
-        if (!$device) {
-            JSON::fail('找不到这台设备！');
-        }
+    if (!$device) {
+        JSON::fail('找不到这台设备！');
+    }
 
-        $text = request::trim('text');
-        $pics = request::array('pics');
+    $text = request::trim('text');
+    $pics = request::array('pics');
 
-        if (empty($text)) {
-            JSON::fail('请输入反馈内容！');
-        }
+    if (empty($text)) {
+        JSON::fail('请输入反馈内容！');
+    }
 
-        $data = [
-            'device_id' => $device->getId(),
-            'user_id' => $user->getId(),
-            'text' => $text,
-            'pics' => serialize($pics),
-            'createtime' => time(),
-        ];
+    $data = [
+        'device_id' => $device->getId(),
+        'user_id' => $user->getId(),
+        'text' => $text,
+        'pics' => serialize($pics),
+        'createtime' => time(),
+    ];
 
-        if (m('device_feedback')->create($data)) {
-            JSON::success('反馈成功！');
-        } else {
-            JSON::fail('反馈失败！');
-        }
-
+    if (m('device_feedback')->create($data)) {
+        JSON::success('反馈成功！');
     } else {
-        if ($op == 'detail') {
+        JSON::fail('反馈失败！');
+    }
 
-            $device = Device::get(request::int('id'));
-            if (empty($device)) {
-                JSON::fail('找不到这个设备！');
-            }
+} elseif ($op == 'detail') {
 
-            $detail = $device->getOnlineDetail();
-            if ($detail && $detail['mcb'] && $detail['mcb']['online']) {
-                $device->updateSettings('last.online', time());
-            } else {
-                $device->updateSettings('last.online', 0);
-            }
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
 
-            $device->save();
+    $detail = $device->getOnlineDetail();
+    if ($detail && $detail['mcb'] && $detail['mcb']['online']) {
+        $device->updateSettings('last.online', time());
+    } else {
+        $device->updateSettings('last.online', 0);
+    }
 
-            JSON::success($detail);
+    $device->save();
 
-        } else {
-            if ($op == 'is_ready') {
+    JSON::success($detail);
 
-                $device = Device::get(request::int('id'));
-                if (empty($device)) {
-                    JSON::fail('找不到这个设备！');
-                }
+} elseif ($op == 'is_ready') {
 
-                $is_ready = false;
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
 
-                $scene = request::str('scene');
-                if ($scene == 'online') {
-                    $is_ready = $device->isMcbOnline(false);
-                } elseif ($scene == 'lock') {
-                    if (!$device->isLocked()) {
-                        if (Locker::try("device:is_ready:{$device->getId()}")) {
-                            $is_ready = true;
-                        }
-                    }
-                }
+    $is_ready = false;
 
-                $device->setReady($scene, $is_ready);
-
-                JSON::success([
-                    'is_ready' => $is_ready,
-                ]);
-
-            } elseif ($op == 'goods') {
-
-                $device = Device::get(request::int('id'));
-                if (empty($device)) {
-                    JSON::fail('找不到这个设备！');
-                }
-
-                $user = Util::getCurrentUser();
-                if (empty($user) || $user->isBanned()) {
-                    JSON::fail('找不到用户！');
-                }
-
-                $type = request::str('type'); //free or pay or balance
-
-                if ($type == 'exchange') {
-                    $result = $device->getGoodsList($user, [Goods::AllowExchange]);
-                } elseif ($type == 'free') {
-                    $result = $device->getGoodsList($user, [Goods::AllowFree]);
-                } elseif ($type == 'pay') {
-                    $result = $device->getGoodsAndPackages($user, [Goods::AllowPay]);
-                } else {
-                    $result = [];
-                }
-
-                JSON::success($result);
-
-            } elseif ($op == 'choose_goods') {
-                $device = Device::get(request::int('id'));
-                if (empty($device)) {
-                    JSON::fail('找不到这个设备！');
-                }
-
-                $user = Util::getCurrentUser();
-                if (empty($user) || $user->isBanned()) {
-                    JSON::fail('找不到用户！');
-                }
-
-                $id = request::int('goods');
-                $num = request::int('num', 1);
-
-                $goods = $device->getGoods($id);
-                if (empty($goods)) {
-                    JSON::fail('商品不存在！');
-                }
-
-                if ($goods['num'] < $num) {
-                    JSON::fail('商品库存不足！');
-                }
-
-                if (!$goods[Goods::AllowFree]) {
-                    JSON::fail('商品不允许免费领取！');
-                }
-
-                $user->setLastActiveData('goods', $goods['id']);
-                JSON::success('已保存用户选择！');
+    $scene = request::str('scene');
+    if ($scene == 'online') {
+        $is_ready = $device->isMcbOnline(false);
+    } elseif ($scene == 'lock') {
+        if (!$device->isLocked()) {
+            if (Locker::try("device:is_ready:{$device->getId()}")) {
+                $is_ready = true;
             }
         }
     }
+
+    $device->setReady($scene, $is_ready);
+
+    JSON::success([
+        'is_ready' => $is_ready,
+    ]);
+
+} elseif ($op == 'goods') {
+
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户！');
+    }
+
+    $type = request::str('type'); //free or pay or balance
+
+    if ($type == 'exchange') {
+        $result = $device->getGoodsList($user, [Goods::AllowExchange]);
+    } elseif ($type == 'free') {
+        $result = $device->getGoodsList($user, [Goods::AllowFree]);
+    } elseif ($type == 'pay') {
+        $result = $device->getGoodsAndPackages($user, [Goods::AllowPay]);
+    } else {
+        $result = [];
+    }
+
+    JSON::success($result);
+
+} elseif ($op == 'choose_goods') {
+    $device = Device::get(request::int('id'));
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $user = Util::getCurrentUser();
+    if (empty($user) || $user->isBanned()) {
+        JSON::fail('找不到用户！');
+    }
+
+    $id = request::int('goods');
+    $num = request::int('num', 1);
+
+    $goods = $device->getGoods($id);
+    if (empty($goods)) {
+        JSON::fail('商品不存在！');
+    }
+
+    if ($goods['num'] < $num) {
+        JSON::fail('商品库存不足！');
+    }
+
+    if (!$goods[Goods::AllowFree]) {
+        JSON::fail('商品不允许免费领取！');
+    }
+
+    $user->setLastActiveData('goods', $goods['id']);
+    JSON::success('已保存用户选择！');
 }

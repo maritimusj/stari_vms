@@ -2678,10 +2678,23 @@ HTML;
 
         $result = [];
 
+        $status_title = [
+            "00" => '正常使用',
+            "10" => '测试期',
+            "02" => '停机',
+            "03" => '预销号',
+            "04" => '销号',
+            "11" => '沉默期',
+            "12" => '停机保号',
+            "99" => '未知',
+        ];
+
         $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
 
         $n = 0;
         foreach ($query->findAll() as $device) {
+            $last_id = $device->getId();
+
             $iccid = $device->getICCID();
             if (empty($iccid)) {
                 continue;
@@ -2696,7 +2709,7 @@ HTML;
                 continue;
             }
         
-            $card = $result['data'] ?? [];
+            $card = $res['data'] ?? [];
             if (empty($card)) {
                 continue;
             }
@@ -2705,14 +2718,13 @@ HTML;
                 $device->getImei(),
                 $card['iccid'],
                 $card['carrier'],
-                $card['status'],
+                $status_title[$card['account_status']] ?? '未知',
                 $card['data_plan'],
                 $card['data_usage'],
                 $card['active_date'],
                 $card['expiry_date'],
             ];
             $n++;
-            $last_id = $device->getId();
         }
 
         Util::exportExcelFile($full_filename, [

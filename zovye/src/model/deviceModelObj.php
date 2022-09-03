@@ -1038,6 +1038,25 @@ class deviceModelObj extends modelObj
      */
     public function createQrcodeFile(): bool
     {
+        if ($this->isChargingDevice()) {
+            $chargerNum = $this->getChargerNum();
+            for($i = 0; $i < $chargerNum; $i++) {
+                $chargerID = $i + 1;
+                $url = Util::url('device', [
+                    'charging' => true,
+                    'device' => $this->getImei(),
+                    'charger' => $chargerID,
+                ]);
+                $qrcode_file = Util::createQrcodeFile("device.$this->imei$chargerID", $url, function ($filename) use ($chargerID) {
+                    $this->renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
+                });
+                if (is_error($qrcode_file)) {
+                    return false;
+                }
+                $this->setChargerProperty($chargerID, 'qrcode', $qrcode_file);
+            }
+        }
+
         $url = $this->getUrl();
 
         $qrcode_file = Util::createQrcodeFile("device.$this->imei", $url, function ($filename) {
@@ -1049,21 +1068,6 @@ class deviceModelObj extends modelObj
         }
 
         $this->setQrcode($qrcode_file);
-
-        if ($this->isChargingDevice()) {
-            $chargerNum = $this->getChargerNum();
-            for($i = 0; $i < $chargerNum; $i++) {
-                $chargerID = $i + 1;
-                $qrcode_file = Util::createQrcodeFile("device.$this->imei$chargerID", "charging=true&device=$this->imei&charger=$chargerID", function ($filename) use ($chargerID) {
-                    $this->renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
-                });
-                if (is_error($qrcode_file)) {
-                    return false;
-                }
-                $this->setChargerProperty($chargerID, 'qrcode', $qrcode_file);
-            }
-        }
-
         return $this->save();
     }
 

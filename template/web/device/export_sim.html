@@ -1,0 +1,66 @@
+<div id="sim">
+    <div class="progress" v-if="total>0">
+        <div class="progress-bar" :style="{'width': percent}">
+            {{percent}}
+        </div>
+    </div>
+    <div v-else>
+        <i class="fa fa-question-circle text-muted"></i> 暂时没有任何数据
+    </div>
+    <div v-if="download_url" style="text-align: right;color: gray;">
+        如果没有自动开始下载，请点<a :href="download_url" style="text-decoration: underline;color: #2196f3;">这里</a>手动下载
+    </div>
+</div>
+
+<script>
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
+    const apiUrl = "{php echo $this->createWebUrl('device', ['op' => 'export_sim'])}";
+    require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
+        new Vue({
+            el: "#sim",
+            data: {
+                total: parseInt('{$total}'),
+                serial: '{$serial}',
+                last: 0,
+                num: 0,
+                download_url: "",
+            },
+            computed: {
+                percent: function() {
+                    return Math.min(100, Math.round((this.num / this.total) * 100)) + "%";
+                }
+            },
+            mounted() {
+                if (this.total > 0) {
+                    this.next();
+                }
+            },
+            methods: {
+                next() {
+                    const self = this;
+                    $.getJSON(apiUrl, {step: "load", serial: this.serial, last: this.last}).then(res => {
+                        if (res && res.status) {
+                            self.last = res.data.last;
+                            self.num += res.data.num; 
+                            if (self.num < self.total) {
+                                self.next();
+                            } else {
+                                self.download();
+                            }
+                        }
+                    })
+                },
+                download() {
+                    const self = this;
+                    $.getJSON(apiUrl, {step: "download", serial: this.serial}).then(res => {
+                        if (res && res.status && res.data && res.data.url) {
+                            self.download_url = res.data.url;
+                            window.location.replace(res.data.url);
+                        }
+                    })
+                }
+            }
+        });
+    })
+
+</script>

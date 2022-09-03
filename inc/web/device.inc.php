@@ -214,6 +214,29 @@ if ($op == 'default') {
     }
 
     JSON::success($result);
+
+} elseif ($op == 'sim') {
+    $id = request::int('id');
+
+    $result = [];
+
+    $device = Device::get($id);
+    if (!$device) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $iccid = $device->getICCID();
+    if (!$iccid) {
+        JSON::fail('没有ICCID');
+    }
+
+    $result = CtrlServ::v2_query("iccid/$iccid");
+    if (is_error($result)) {
+        JSON::fail('查询失败');
+    }
+
+    JSON::success($result);
+
 } elseif ($op == 'device_stats') {
 
     $id = request::int('id');
@@ -2616,6 +2639,89 @@ HTML;
     }
 
     JSON::fail('设备信息上传任务启动失败！');
+
+} elseif ($op == 'export_sim') {
+
+    $step = request::str('step');
+    if (empty($step)) {
+        $total = Device::query()->count();
+
+        $content = app()->fetchTemplate('web/device/export_sim',[
+            'total' => $total,
+            'serial' => (new DateTime())->format('YmdHis'),
+        ]);
+        
+        JSON::success([
+            'title' => "导出SIM卡信息",
+            'content' => $content,
+        ]);        
+    }
+
+    $serial = request::str('serial');
+    if (empty($serial)) {
+        JSON::fail("缺少serial");
+    }
+
+    $filename = "$serial.csv";
+    $dirname = "export/sim/";
+    $full_filename = Util::getAttachmentFileName($dirname, $filename);
+
+    if ($step == 'load') {
+        $last_id = request::int('last');
+
+        $result = [];
+
+        $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
+        
+        $n = 0;
+        foreach($query->findAll() as $device) {
+            $iccid = $device->getICCID();
+            if (empty($iccid)) {
+                continue;
+            }
+
+            $card = CtrlServ::v2_query("iccid/$iccid");
+            if (is_error($card)) {
+                continue;
+            }
+
+            $result[] =  [
+                $device->getImei(),
+                $card['iccid'],
+                $card['carrier'],
+                $card['status'],
+                $card['data_plan'],
+                $card['data_usage'],
+                $card['active_date'],
+                $card['expiry_date'],
+            ];
+            $n ++;
+            $last_id = $device->getId();
+        }
+
+        Util::exportExcelFile($full_filename, [
+            '设备IMEI',
+            'ICCID',
+            '运营商',
+            '状态',
+            '套餐',
+            '用量',
+            '激活日期',
+            '过期日期',
+        ], $result);
+
+        JSON::success([
+            'num' => 10,
+            'success' => $n,
+            'last' => $last_id,
+        ]);
+
+    } elseif ($step == 'download') {
+        JSON::success([
+            'url' => Util::toMedia("$dirname$filename"),
+        ]);
+    }
+
 
 } elseif ($op == 'start') {
 

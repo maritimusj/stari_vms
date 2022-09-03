@@ -42,6 +42,7 @@
                 {if $upload}
                 <img src="{MODULE_URL}static/img/upload_device.svg" class="icon" title="上传设备信息"  onclick="api.uploadInfo();">
                 {/if}
+                <img src="{MODULE_URL}static/img/sim.svg" class="icon" title="导出SIM卡"  onclick="api.exportSIM();">
             </span>
         </div>
         <div class="panel-body">
@@ -565,5 +566,5 @@
         tags: JSON.parse(decodeURIComponent('{php echo json_encode($s_tags ?: [])}')),
     }
 </script>
-<script src="{php echo MODULE_URL}static/js/device.min.js?v=20211224005"></script>
+<script src="{php echo MODULE_URL}static/js/device.min.js?v=20220903001"></script>
 {template 'common/footer'}

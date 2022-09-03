@@ -2687,8 +2687,17 @@ HTML;
                 continue;
             }
 
-            $card = CtrlServ::v2_query("iccid/$iccid");
-            if (is_error($card)) {
+            $res = CtrlServ::v2_query("iccid/$iccid");
+            if ( is_error($res)) {
+                continue;
+            }
+
+            if (!$res['status']) {
+                continue;
+            }
+        
+            $card = $result['data'] ?? [];
+            if (empty($card)) {
                 continue;
             }
 

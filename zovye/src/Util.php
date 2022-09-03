@@ -1668,8 +1668,8 @@ HTML_CONTENT;
     }
 
     /**
-     * @param userModelObj|keeperModelObj $user
-     * @param int|string|deviceModelObj $device
+     * @param userModelObj|keeperModelObj|null $user
+     * @param int|string|deviceModelObj|null $device
      * @param int $lane
      * @param array $params
      *
@@ -2697,7 +2697,7 @@ HTML_CONTENT;
         return $FNs;
     }
 
-    public static function parseIdsFromGPC()
+    public static function parseIdsFromGPC(): array
     {
         $ids = [];
 

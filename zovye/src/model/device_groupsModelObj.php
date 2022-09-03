@@ -137,7 +137,7 @@ class device_groupsModelObj extends modelObj
 
     public function getFeeAt(DateTimeInterface $time)
     {
-        $hour = $time->format('H') * 2;
+        $hour = $time->format('G');
 
         $minute = $time->format('i');
         $second = $time->format('s');

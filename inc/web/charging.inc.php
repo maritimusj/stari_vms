@@ -270,7 +270,7 @@ if ($op == 'default') {
         $data = [
             'status' => 'unknown',
             'properties' => [],
-            'qrcode' => Util::toMedia($device->getChargerProperty($i + 1, 'qrcode', '')),
+            'qrcode' => Util::toMedia($device->getChargerProperty($i + 1, 'qrcode', '')) . '?v=' . time(),
             'errors' => $chargerData['errorBits'] || [],
         ];
 

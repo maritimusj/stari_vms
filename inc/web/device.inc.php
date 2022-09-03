@@ -2273,495 +2273,490 @@ HTML;
     } else {
         JSON::fail('error');
     }
-} else {
-    if ($op == 'add_fb') {
+} elseif ($op == 'add_fb') {
 
-        $id = request::int('id');
+    $id = request::int('id');
 
-        /** @var device_feedbackModelObj $res */
-        $res = m('device_feedback')->findOne(['id' => $id]);
-        if ($res) {
-            if ($res->getRemark() != '') {
-                JSON::fail('已处理该反馈！');
-            }
-        } else {
-            JSON::fail('找不到该记录！');
+    /** @var device_feedbackModelObj $res */
+    $res = m('device_feedback')->findOne(['id' => $id]);
+    if ($res) {
+        if ($res->getRemark() != '') {
+            JSON::fail('已处理该反馈！');
         }
-
-        $content = app()->fetchTemplate(
-            'web/device/deal_fb',
-            [
-                'chartid' => Util::random(10),
-                'id' => $res->getId(),
-                'text' => $res->getText(),
-            ]
-        );
-
-        JSON::success(['content' => $content]);
     } else {
-        if ($op == 'import_bluetooth_device_upload') {
-
-            $tpl_data = [];
-            app()->showTemplate('web/device/bluetooth_upload', $tpl_data);
-        } else {
-            if ($op == 'create_bluetooth_device') {
-
-                $data = [
-                    'agent_id' => request('agent'),
-                    'name' => request('name'),
-                    'imei' => request('imei'),
-                    'group_id' => request('groupId'),
-                    'capacity' => 0,
-                    'remain' => 0,
-                ];
-
-                if (empty($data['name']) || empty($data['imei'])) {
-                    JSON::fail('设备名称或IMEI不能为空！');
-                }
-
-                if (Device::get($data['imei'], true)) {
-                    JSON::fail('IMEI已经存在！');
-                }
-
-                $extra = [
-                    'pushAccountMsg' => '',
-                    'activeQrcode' => 0,
-                    'grantloc' => [
-                        'lng' => 0,
-                        'lat' => 0,
-                    ],
-                    'location' => [],
-                ];
-
-                $protocol = strtolower(request('protocol'));
-                if (!in_array($protocol, ['wx', 'grid'])) {
-                    $protocol = 'wx';
-                }
-
-                $blue_tooth_screen = empty(request('screen')) ? 0 : 1;
-                $power = empty(request('power')) ? 0 : 1;
-                $blue_tooth_disinfectant = empty(request('disinfect')) ? 0 : 1;
-
-                $extra['bluetooth'] = [
-                    'protocol' => $protocol,
-                    'uid' => strval(request('buid')),
-                    'mac' => strval(request('mac')),
-                    'screen' => $blue_tooth_screen,
-                    'power' => $power,
-                    'disinfectant' => $blue_tooth_disinfectant,
-                ];
-
-                if ($data['agent_id']) {
-                    $agent = Agent::get($data['agentId']);
-                    if (empty($agent)) {
-                        JSON::fail('找不到这个代理商!');
-                    }
-                }
-
-                $type_id = request('typeid');
-                $device_type = DeviceTypes::get($type_id);
-                if (empty($device_type)) {
-                    JSON::fail('设备类型不正确!');
-                }
-
-                $type_data = DeviceTypes::format($device_type);
-
-                $data['device_type'] = $type_data['id'];
-                $extra['cargo_lanes'] = $type_data['cargo_lanes'];
-
-                $device = Device::create($data);
-
-                if (empty($device)) {
-                    JSON::fail('创建失败！');
-                }
-
-                $device->setDeviceModel(Device::BLUETOOTH_DEVICE);
-                $device->updateQrcode(true);
-
-                if ($device->set('extra', $extra) && $device->save()) {
-                    JSON::success(['message' => '成功']);
-                }
-
-                JSON::fail('无法保存数据！');
-            } elseif ($op == 'poll_event') {
-
-                $device = Device::get(request('id'));
-                if (empty($device)) {
-                    Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
-                }
-
-                $query = $device->eventQuery();
-
-                $query->where(['event' => [14, 20]]);
-                $query->orderBy('id DESC');
-                $query->limit(10);
-
-                $events = [];
-                $the_first_id = 0;
-
-                /** @var device_eventsModelObj $item */
-                foreach ($query->findAll() as $item) {
-                    if (!$the_first_id) {
-                        $the_first_id = $item->getId();
-                    }
-
-                    $extra = json_decode($item->getExtra(), true);
-                    $extra = $extra['extra'];
-
-                    $arr = [];
-                    $arr['id'] = $item->getId();
-                    $arr['time'] = date('H:i:s', $item->getCreatetime());
-                    if ($item->getEvent() == 14) {
-                        $rssi = $extra['RSSI'] ?: 0;
-                        $per = floor($rssi * 100 / 31);
-                        $iccid = $extra['ICCID'] ?: '';
-
-                        $arr['type'] = 14;
-                        $arr['per'] = $per;
-                        $arr['iccid'] = $iccid;
-                    }
-
-                    if ($item->getEvent() == 20) {
-                        $sw = $extra['sw'] ?: [];
-                        $f_sw = [];
-                        foreach ($sw as $val) {
-                            if ($val == 1) {
-                                $f_sw[] = '工作';
-                            } else {
-                                $f_sw[] = '待机';
-                            }
-                        }
-
-                        $door = $extra['door'] ?: [];
-                        $f_door = [];
-                        foreach ($door as $val) {
-                            if ($val == 1) {
-                                $f_door[] = '关';
-                            } else {
-                                $f_door[] = '开';
-                            }
-                        }
-
-                        $arr['type'] = 20;
-                        $arr['sw'] = $f_sw;
-                        $arr['door'] = $f_door;
-                        $arr['temperature'] = $extra['temperature'];
-                        $arr['weights'] = $extra['weights'];
-                    }
-
-                    $events[] = $arr;
-                }
-
-                $tpl_data['navs'] = [
-                    'detail' => $device->getName(),
-                    'log' => '日志',
-                    //'poll_event' => '最新',
-                    'event' => '事件',
-                ];
-
-                $tpl_data['device'] = $device;
-                $tpl_data['events'] = $events;
-                $tpl_data['the_first_id'] = $the_first_id;
-
-                app()->showTemplate('web/device/poll_event', $tpl_data);
-            } elseif ($op == 'new_event') {
-
-                $device = Device::get(request('id'));
-                if (empty($device)) {
-                    Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
-                }
-
-                $query = $device->eventQuery();
-
-                $the_first_id = request('the_first_id') ?: 0;
-
-                $query->where(['event' => [14, 20]]);
-                $query->where(['id >' => $the_first_id]);
-
-                $res = $query->findAll();
-                if (count($res) == 0) {
-                    echo json_encode([]);
-                } else {
-                    $events = [];
-                    /** @var device_eventsModelObj $item */
-                    foreach ($res as $item) {
-                        $extra = json_decode($item->getExtra(), true);
-                        $extra = $extra['extra'];
-
-                        $arr = [];
-                        $arr['id'] = $item->getId();
-                        $arr['time'] = date('H:i:s', $item->getCreatetime());
-
-                        if ($item->getEvent() == 14) {
-                            $rssi = $extra['RSSI'] ?: 0;
-                            $per = floor($rssi * 100 / 31);
-                            $iccid = $extra['ICCID'] ?: '';
-
-                            $arr['type'] = 14;
-                            $arr['per'] = $per;
-                            $arr['iccid'] = $iccid;
-                        }
-                        if ($item->getEvent() == 20) {
-                            $sw = $extra['sw'] ?: [];
-                            $f_sw = [];
-                            foreach ($sw as $val) {
-                                if ($val == 1) {
-                                    $f_sw[] = '工作';
-                                } else {
-                                    $f_sw[] = '待机';
-                                }
-                            }
-                            $door = $extra['door'] ?: [];
-                            $f_door = [];
-                            foreach ($door as $val) {
-                                if ($val == 1) {
-                                    $f_door[] = '关';
-                                } else {
-                                    $f_door[] = '开';
-                                }
-                            }
-                            $arr['type'] = 20;
-                            $arr['sw'] = $f_sw;
-                            $arr['door'] = $f_door;
-                            $arr['temperature'] = $extra['temperature'];
-                            $arr['weights'] = $extra['weights'];
-                        }
-                        $events[] = $arr;
-                    }
-                    echo json_encode($events);
-                }
-            } elseif ($op == 'qrcode_download') {
-
-                //简单的二维码导出功能
-                $url_prefix = We7::attachment_set_attach_url();
-                $attach_prefix = ATTACHMENT_ROOT;
-
-                $zip = new ZipArchive();
-                $file_name = time().'_'.rand().'.zip';
-                $file_path = $attach_prefix.$file_name;
-                $zip->open($file_path, ZipArchive::CREATE);   //打开压缩包
-
-                $ids = request::array('ids', []);
-                $query = Device::query(['id' => $ids]);
-
-                $addFile = function ($url) use ($zip, $url_prefix, $attach_prefix) {
-                    $filename = str_replace($url_prefix, $attach_prefix, $url);
-                    $filename = preg_replace('/\?.*/', '', $filename);
-                    if (file_exists($filename)) {
-                        $zip->addFile($filename, basename($filename));
-                    }
-                };
-
-                /** @var deviceModelObj $device */
-                foreach ($query->findAll() as $device) {
-                    if ($device->isChargingDevice()) {
-                        $chargerNum = $device->getChargerNum();
-                        for ($i = 0; $i < $chargerNum; $i++) {
-                            $url = Util::toMedia($device->getChargerProperty($i + 1, 'qrcode', ''));
-                            $addFile($url);
-                        }
-                    } else {
-                        $addFile($device->getQrcode());
-                    }
-                }
-
-                $zip->close();
-
-                JSON::success(['url' => Util::toMedia($file_name)]);
-
-            } elseif ($op == 'card_status') {
-
-                $iccid = request::str('iccid');
-                if (empty($iccid)) {
-                    JSON::fail('错误：iccid 为空！');
-                }
-
-                $result = CtrlServ::v2_query("iccid/$iccid");
-                if (is_error($result)) {
-                    JSON::fail($result);
-                }
-
-                if (!$result['status']) {
-                    JSON::fail($result['data']['message'] ?? '查询失败！');
-                }
-
-                $card = $result['data'] ?? [];
-                if (empty($card)) {
-                    JSON::fail('查询失败，请稍后再试！');
-                }
-
-                $status_title = [
-                    "00" => '正常使用',
-                    "10" => '测试期',
-                    "02" => '停机',
-                    "03" => '预销号',
-                    "04" => '销号',
-                    "11" => '沉默期',
-                    "12" => '停机保号',
-                    "99" => '未知',
-                ];
-
-                $card['status'] = $status_title[$card['account_status']] ?? '未知';
-
-                $content = app()->fetchTemplate(
-                    'web/device/card_status',
-                    [
-                        'card' => $card,
-                    ]
-                );
-                JSON::success([
-                    'title' => "流量卡状态",
-                    'content' => $content,
-                ]);
-
-            } elseif ($op == 'openDoor') {
-
-                if (!App::isDeviceWithDoorEnabled()) {
-                    JSON::fail('没有启用这个功能！');
-                }
-
-                $id = request::int('id');
-                $device = Device::get($id);
-                if (empty($device)) {
-                    JSON::fail('找不到这个设备！');
-                }
-
-                $index = request::int('index', 1);
-
-                $result = $device->openDoor($index);
-                if (is_error($result)) {
-                    JSON::fail($result);
-                }
-
-                JSON::success('开锁指令已发送！');
-
-            } elseif ($op == 'upload_info') {
-
-                $config = settings('device.upload', []);
-                if (empty($config['url'])) {
-                    JSON::fail('没有配置第三方平台！');
-                }
-
-                if (Job::uploadDeviceInfo()) {
-                    JSON::success('已启动设备上传任务！');
-                }
-
-                JSON::fail('设备信息上传任务启动失败！');
-
-            } elseif ($op == 'export_sim') {
-
-                $step = request::str('step');
-                if (empty($step)) {
-                    $total = Device::query()->count();
-
-                    $content = app()->fetchTemplate('web/device/export_sim', [
-                        'total' => $total,
-                        'serial' => (new DateTime())->format('YmdHis'),
-                    ]);
-
-                    JSON::success([
-                        'title' => "导出SIM卡信息",
-                        'content' => $content,
-                    ]);
-                }
-
-                $serial = request::str('serial');
-                if (empty($serial)) {
-                    JSON::fail("缺少serial");
-                }
-
-                $filename = "$serial.csv";
-                $dirname = "export/sim/";
-                $full_filename = Util::getAttachmentFileName($dirname, $filename);
-
-                if ($step == 'load') {
-                    $last_id = request::int('last');
-
-                    $result = [];
-
-                    $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
-
-                    $n = 0;
-                    foreach ($query->findAll() as $device) {
-                        $iccid = $device->getICCID();
-                        if (empty($iccid)) {
-                            continue;
-                        }
-
-                        $card = CtrlServ::v2_query("iccid/$iccid");
-                        if (is_error($card)) {
-                            continue;
-                        }
-
-                        $result[] = [
-                            $device->getImei(),
-                            $card['iccid'],
-                            $card['carrier'],
-                            $card['status'],
-                            $card['data_plan'],
-                            $card['data_usage'],
-                            $card['active_date'],
-                            $card['expiry_date'],
-                        ];
-                        $n++;
-                        $last_id = $device->getId();
-                    }
-
-                    Util::exportExcelFile($full_filename, [
-                        '设备IMEI',
-                        'ICCID',
-                        '运营商',
-                        '状态',
-                        '套餐',
-                        '用量',
-                        '激活日期',
-                        '过期日期',
-                    ], $result);
-
-                    JSON::success([
-                        'num' => 10,
-                        'success' => $n,
-                        'last' => $last_id,
-                    ]);
-
-                } elseif ($step == 'download') {
-                    JSON::success([
-                        'url' => Util::toMedia("$dirname$filename"),
-                    ]);
-                }
-
-
-            } elseif ($op == 'start') {
-
-                $id = request::int('id');
-                $device = Device::get($id);
-                if (empty($device)) {
-                    JSON::fail('找不到这个设备！');
-                }
-
-                $chargerID = request::int('chargerID');
-
-                $res = Util::deviceTest(null, $device, $chargerID);
-
-                Util::resultJSON(!is_error($res), ['msg' => $res['message']]);
-
-            } elseif ($op == 'stop') {
-
-                $id = request::int('id');
-                $device = Device::get($id);
-                if (empty($device)) {
-                    JSON::fail('找不到这个设备！');
-                }
-
-                $chargerID = request::int('chargerID');
-
-                $params = [
-                    "req" => "stop",
-                    "ch" => $chargerID,
-                ];
-
-                $device->mcbNotify('config', '', $params);
-            }
+        JSON::fail('找不到该记录！');
+    }
+
+    $content = app()->fetchTemplate(
+        'web/device/deal_fb',
+        [
+            'chartid' => Util::random(10),
+            'id' => $res->getId(),
+            'text' => $res->getText(),
+        ]
+    );
+
+    JSON::success(['content' => $content]);
+} elseif ($op == 'import_bluetooth_device_upload') {
+
+    $tpl_data = [];
+    app()->showTemplate('web/device/bluetooth_upload', $tpl_data);
+
+} elseif ($op == 'create_bluetooth_device') {
+
+    $data = [
+        'agent_id' => request('agent'),
+        'name' => request('name'),
+        'imei' => request('imei'),
+        'group_id' => request('groupId'),
+        'capacity' => 0,
+        'remain' => 0,
+    ];
+
+    if (empty($data['name']) || empty($data['imei'])) {
+        JSON::fail('设备名称或IMEI不能为空！');
+    }
+
+    if (Device::get($data['imei'], true)) {
+        JSON::fail('IMEI已经存在！');
+    }
+
+    $extra = [
+        'pushAccountMsg' => '',
+        'activeQrcode' => 0,
+        'grantloc' => [
+            'lng' => 0,
+            'lat' => 0,
+        ],
+        'location' => [],
+    ];
+
+    $protocol = strtolower(request('protocol'));
+    if (!in_array($protocol, ['wx', 'grid'])) {
+        $protocol = 'wx';
+    }
+
+    $blue_tooth_screen = empty(request('screen')) ? 0 : 1;
+    $power = empty(request('power')) ? 0 : 1;
+    $blue_tooth_disinfectant = empty(request('disinfect')) ? 0 : 1;
+
+    $extra['bluetooth'] = [
+        'protocol' => $protocol,
+        'uid' => strval(request('buid')),
+        'mac' => strval(request('mac')),
+        'screen' => $blue_tooth_screen,
+        'power' => $power,
+        'disinfectant' => $blue_tooth_disinfectant,
+    ];
+
+    if ($data['agent_id']) {
+        $agent = Agent::get($data['agentId']);
+        if (empty($agent)) {
+            JSON::fail('找不到这个代理商!');
         }
     }
+
+    $type_id = request('typeid');
+    $device_type = DeviceTypes::get($type_id);
+    if (empty($device_type)) {
+        JSON::fail('设备类型不正确!');
+    }
+
+    $type_data = DeviceTypes::format($device_type);
+
+    $data['device_type'] = $type_data['id'];
+    $extra['cargo_lanes'] = $type_data['cargo_lanes'];
+
+    $device = Device::create($data);
+
+    if (empty($device)) {
+        JSON::fail('创建失败！');
+    }
+
+    $device->setDeviceModel(Device::BLUETOOTH_DEVICE);
+    $device->updateQrcode(true);
+
+    if ($device->set('extra', $extra) && $device->save()) {
+        JSON::success(['message' => '成功']);
+    }
+
+    JSON::fail('无法保存数据！');
+} elseif ($op == 'poll_event') {
+
+    $device = Device::get(request('id'));
+    if (empty($device)) {
+        Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    }
+
+    $query = $device->eventQuery();
+
+    $query->where(['event' => [14, 20]]);
+    $query->orderBy('id DESC');
+    $query->limit(10);
+
+    $events = [];
+    $the_first_id = 0;
+
+    /** @var device_eventsModelObj $item */
+    foreach ($query->findAll() as $item) {
+        if (!$the_first_id) {
+            $the_first_id = $item->getId();
+        }
+
+        $extra = json_decode($item->getExtra(), true);
+        $extra = $extra['extra'];
+
+        $arr = [];
+        $arr['id'] = $item->getId();
+        $arr['time'] = date('H:i:s', $item->getCreatetime());
+        if ($item->getEvent() == 14) {
+            $rssi = $extra['RSSI'] ?: 0;
+            $per = floor($rssi * 100 / 31);
+            $iccid = $extra['ICCID'] ?: '';
+
+            $arr['type'] = 14;
+            $arr['per'] = $per;
+            $arr['iccid'] = $iccid;
+        }
+
+        if ($item->getEvent() == 20) {
+            $sw = $extra['sw'] ?: [];
+            $f_sw = [];
+            foreach ($sw as $val) {
+                if ($val == 1) {
+                    $f_sw[] = '工作';
+                } else {
+                    $f_sw[] = '待机';
+                }
+            }
+
+            $door = $extra['door'] ?: [];
+            $f_door = [];
+            foreach ($door as $val) {
+                if ($val == 1) {
+                    $f_door[] = '关';
+                } else {
+                    $f_door[] = '开';
+                }
+            }
+
+            $arr['type'] = 20;
+            $arr['sw'] = $f_sw;
+            $arr['door'] = $f_door;
+            $arr['temperature'] = $extra['temperature'];
+            $arr['weights'] = $extra['weights'];
+        }
+
+        $events[] = $arr;
+    }
+
+    $tpl_data['navs'] = [
+        'detail' => $device->getName(),
+        'log' => '日志',
+        //'poll_event' => '最新',
+        'event' => '事件',
+    ];
+
+    $tpl_data['device'] = $device;
+    $tpl_data['events'] = $events;
+    $tpl_data['the_first_id'] = $the_first_id;
+
+    app()->showTemplate('web/device/poll_event', $tpl_data);
+
+} elseif ($op == 'new_event') {
+
+    $device = Device::get(request('id'));
+    if (empty($device)) {
+        Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
+    }
+
+    $query = $device->eventQuery();
+
+    $the_first_id = request('the_first_id') ?: 0;
+
+    $query->where(['event' => [14, 20]]);
+    $query->where(['id >' => $the_first_id]);
+
+    $res = $query->findAll();
+    if (count($res) == 0) {
+        echo json_encode([]);
+    } else {
+        $events = [];
+        /** @var device_eventsModelObj $item */
+        foreach ($res as $item) {
+            $extra = json_decode($item->getExtra(), true);
+            $extra = $extra['extra'];
+
+            $arr = [];
+            $arr['id'] = $item->getId();
+            $arr['time'] = date('H:i:s', $item->getCreatetime());
+
+            if ($item->getEvent() == 14) {
+                $rssi = $extra['RSSI'] ?: 0;
+                $per = floor($rssi * 100 / 31);
+                $iccid = $extra['ICCID'] ?: '';
+
+                $arr['type'] = 14;
+                $arr['per'] = $per;
+                $arr['iccid'] = $iccid;
+            }
+            if ($item->getEvent() == 20) {
+                $sw = $extra['sw'] ?: [];
+                $f_sw = [];
+                foreach ($sw as $val) {
+                    if ($val == 1) {
+                        $f_sw[] = '工作';
+                    } else {
+                        $f_sw[] = '待机';
+                    }
+                }
+                $door = $extra['door'] ?: [];
+                $f_door = [];
+                foreach ($door as $val) {
+                    if ($val == 1) {
+                        $f_door[] = '关';
+                    } else {
+                        $f_door[] = '开';
+                    }
+                }
+                $arr['type'] = 20;
+                $arr['sw'] = $f_sw;
+                $arr['door'] = $f_door;
+                $arr['temperature'] = $extra['temperature'];
+                $arr['weights'] = $extra['weights'];
+            }
+            $events[] = $arr;
+        }
+        echo json_encode($events);
+    }
+} elseif ($op == 'qrcode_download') {
+
+    //简单的二维码导出功能
+    $url_prefix = We7::attachment_set_attach_url();
+    $attach_prefix = ATTACHMENT_ROOT;
+
+    $zip = new ZipArchive();
+    $file_name = time().'_'.rand().'.zip';
+    $file_path = $attach_prefix.$file_name;
+    $zip->open($file_path, ZipArchive::CREATE);   //打开压缩包
+
+    $ids = request::array('ids', []);
+    $query = Device::query(['id' => $ids]);
+
+    $addFile = function ($url) use ($zip, $url_prefix, $attach_prefix) {
+        $filename = str_replace($url_prefix, $attach_prefix, $url);
+        $filename = preg_replace('/\?.*/', '', $filename);
+        if (file_exists($filename)) {
+            $zip->addFile($filename, basename($filename));
+        }
+    };
+
+    /** @var deviceModelObj $device */
+    foreach ($query->findAll() as $device) {
+        if ($device->isChargingDevice()) {
+            $chargerNum = $device->getChargerNum();
+            for ($i = 0; $i < $chargerNum; $i++) {
+                $url = Util::toMedia($device->getChargerProperty($i + 1, 'qrcode', ''));
+                $addFile($url);
+            }
+        } else {
+            $addFile($device->getQrcode());
+        }
+    }
+
+    $zip->close();
+
+    JSON::success(['url' => Util::toMedia($file_name)]);
+
+} elseif ($op == 'card_status') {
+
+    $iccid = request::str('iccid');
+    if (empty($iccid)) {
+        JSON::fail('错误：iccid 为空！');
+    }
+
+    $result = CtrlServ::v2_query("iccid/$iccid");
+    if (is_error($result)) {
+        JSON::fail($result);
+    }
+
+    if (!$result['status']) {
+        JSON::fail($result['data']['message'] ?? '查询失败！');
+    }
+
+    $card = $result['data'] ?? [];
+    if (empty($card)) {
+        JSON::fail('查询失败，请稍后再试！');
+    }
+
+    $status_title = [
+        "00" => '正常使用',
+        "10" => '测试期',
+        "02" => '停机',
+        "03" => '预销号',
+        "04" => '销号',
+        "11" => '沉默期',
+        "12" => '停机保号',
+        "99" => '未知',
+    ];
+
+    $card['status'] = $status_title[$card['account_status']] ?? '未知';
+
+    $content = app()->fetchTemplate(
+        'web/device/card_status',
+        [
+            'card' => $card,
+        ]
+    );
+    JSON::success([
+        'title' => "流量卡状态",
+        'content' => $content,
+    ]);
+
+} elseif ($op == 'openDoor') {
+
+    if (!App::isDeviceWithDoorEnabled()) {
+        JSON::fail('没有启用这个功能！');
+    }
+
+    $id = request::int('id');
+    $device = Device::get($id);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $index = request::int('index', 1);
+
+    $result = $device->openDoor($index);
+    if (is_error($result)) {
+        JSON::fail($result);
+    }
+
+    JSON::success('开锁指令已发送！');
+
+} elseif ($op == 'upload_info') {
+
+    $config = settings('device.upload', []);
+    if (empty($config['url'])) {
+        JSON::fail('没有配置第三方平台！');
+    }
+
+    if (Job::uploadDeviceInfo()) {
+        JSON::success('已启动设备上传任务！');
+    }
+
+    JSON::fail('设备信息上传任务启动失败！');
+
+} elseif ($op == 'export_sim') {
+
+    $step = request::str('step');
+    if (empty($step)) {
+        $total = Device::query()->count();
+
+        $content = app()->fetchTemplate('web/device/export_sim', [
+            'total' => $total,
+            'serial' => (new DateTime())->format('YmdHis'),
+        ]);
+
+        JSON::success([
+            'title' => "导出SIM卡信息",
+            'content' => $content,
+        ]);
+    }
+
+    $serial = request::str('serial');
+    if (empty($serial)) {
+        JSON::fail("缺少serial");
+    }
+
+    $filename = "$serial.csv";
+    $dirname = "export/sim/";
+    $full_filename = Util::getAttachmentFileName($dirname, $filename);
+
+    if ($step == 'load') {
+        $last_id = request::int('last');
+
+        $result = [];
+
+        $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
+
+        $n = 0;
+        foreach ($query->findAll() as $device) {
+            $iccid = $device->getICCID();
+            if (empty($iccid)) {
+                continue;
+            }
+
+            $card = CtrlServ::v2_query("iccid/$iccid");
+            if (is_error($card)) {
+                continue;
+            }
+
+            $result[] = [
+                $device->getImei(),
+                $card['iccid'],
+                $card['carrier'],
+                $card['status'],
+                $card['data_plan'],
+                $card['data_usage'],
+                $card['active_date'],
+                $card['expiry_date'],
+            ];
+            $n++;
+            $last_id = $device->getId();
+        }
+
+        Util::exportExcelFile($full_filename, [
+            '设备IMEI',
+            'ICCID',
+            '运营商',
+            '状态',
+            '套餐',
+            '用量',
+            '激活日期',
+            '过期日期',
+        ], $result);
+
+        JSON::success([
+            'num' => 10,
+            'success' => $n,
+            'last' => $last_id,
+        ]);
+
+    } elseif ($step == 'download') {
+        JSON::success([
+            'url' => Util::toMedia("$dirname$filename"),
+        ]);
+    }
+
+} elseif ($op == 'start') {
+
+    $id = request::int('id');
+    $device = Device::get($id);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $chargerID = request::int('chargerID');
+
+    $res = Util::deviceTest(null, $device, $chargerID);
+
+    Util::resultJSON(!is_error($res), ['msg' => $res['message']]);
+
+} elseif ($op == 'stop') {
+
+    $id = request::int('id');
+    $device = Device::get($id);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $chargerID = request::int('chargerID');
+
+    $params = [
+        "req" => "stop",
+        "ch" => $chargerID,
+    ];
+
+    $device->mcbNotify('config', '', $params);
 }

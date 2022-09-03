@@ -139,17 +139,10 @@ class device_groupsModelObj extends modelObj
     {
         $hour = $time->format('G');
 
-        $minute = $time->format('i');
-        $second = $time->format('s');
-
-        if ($minute > 30 || ($minute == 30 && $second > 0)) {
-            $hour += 1;
-        }
-
         $fee = $this->getFee();
         $level = 'l'.($fee['ts'][$hour] ?? 0);
 
-        return $fee[$level] ?? $fee['l0'];
+        return (array)($fee[$level] ?? $fee['l0']);
     }
 
     public function setVersion($version)

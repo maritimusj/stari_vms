@@ -113,7 +113,8 @@ class Group
                     $data['tips'] = sprintf("¥ %.04f - %.04f /度", $min, $max);
                 }
 
-                $fee = (array)$entry->getFeeAt(new DateTime());
+                $fee = $entry->getFeeAt(new DateTime());
+                
                 $data['current_ef'] = sprintf("¥ %.04f /度", $fee['ef']);
                 $data['current_sf'] .= sprintf("¥ %.04f /度", $fee['sf']);
             }

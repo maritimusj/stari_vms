@@ -92,12 +92,12 @@ class CommissionEventHandler
         $balance = $agent->getCommissionBalance();
 
         if ($sf > 0) {
-            $r = $balance->change($sf, CommissionBalance::CHARGING_SF, ['orderid' => $order->getId()]);
-            if ($r && $r->update([], true)) {
+            $r1 = $balance->change($sf, CommissionBalance::CHARGING_SF, ['orderid' => $order->getId()]);
+            if ($r1 && $r1->update([], true)) {
                 //记录佣金
                 $order->setExtraData('commission.agent', [
-                    'id' => $r->getId(),
-                    'xval' => $r->getXVal(),
+                    'id' => $r1->getId(),
+                    'xval' => $r1->getXVal(),
                     'openid' => $agent->getOpenid(),
                     'name' => $agent->getName(),
                 ]);
@@ -111,12 +111,12 @@ class CommissionEventHandler
             return true;
         }
 
-        $r = $balance->change($ef, CommissionBalance::CHARGING_EF, ['orderid' => $order->getId()]);
-        if ($r && $r->update([], true)) {
+        $r2 = $balance->change($ef, CommissionBalance::CHARGING_EF, ['orderid' => $order->getId()]);
+        if ($r2 && $r2->update([], true)) {
             //记录佣金
             $order->setExtraData('commission.agent', [
-                'id' => $r->getId(),
-                'xval' => $r->getXVal(),
+                'id' => $r2->getId(),
+                'xval' => $r2->getXVal() + (isset($r1) ? $r1->getXVal() : 0),
                 'openid' => $agent->getOpenid(),
                 'name' => $agent->getName(),
             ]);

@@ -11,7 +11,9 @@ defined('IN_IA') or exit('Access Denied');
 $op = request::op('default');
 
 if ($op == 'default') {
-
+    if (request::bool('charging')) {
+        Util::resultAlert('请关联充电桩小程序');
+    }
     //检查设备
     $device_id = request('id'); //设备ＩＤ
     if (empty($device_id)) {

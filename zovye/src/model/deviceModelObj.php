@@ -1041,12 +1041,15 @@ class deviceModelObj extends modelObj
         if ($this->isChargingDevice()) {
             $chargerNum = $this->getChargerNum();
             for($i = 0; $i < $chargerNum; $i++) {
+                
                 $chargerID = $i + 1;
-                $url = Util::url('device', [
+
+                $url = Util::murl('device', [
                     'charging' => true,
                     'device' => $this->getImei(),
                     'charger' => $chargerID,
                 ]);
+                
                 $qrcode_file = Util::createQrcodeFile("device.$this->imei$chargerID", $url, function ($filename) use ($chargerID) {
                     $this->renderTxt($filename, sprintf("%s%02d", $this->imei, $chargerID));
                 });

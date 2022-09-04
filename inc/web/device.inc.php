@@ -2692,6 +2692,7 @@ HTML;
         $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
 
         $n = 0;
+        /** @var deviceModelObj $device */
         foreach ($query->findAll() as $device) {
             $last_id = $device->getId();
 
@@ -2716,7 +2717,7 @@ HTML;
 
             $result[] = [
                 $device->getImei(),
-                $card['iccid'],
+                "'" . $card['iccid'],
                 $card['carrier'],
                 $status_title[$card['account_status']] ?? '未知',
                 $card['data_plan'],

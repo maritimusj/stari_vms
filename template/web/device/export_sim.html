@@ -1,7 +1,9 @@
 <div id="sim">
-    <div class="progress" v-if="total>0">
-        <div class="progress-bar" :style="{'width': percent}">
+    <div class="progress" v-if="total>0" style="position: relative;">
+        <div style="position: absolute;text-align:center;width: 100%;mix-blend-mode: difference;">
             {{percent}}
+        </div>
+        <div class="progress-bar" :style="{'width': percent}">
         </div>
     </div>
     <div v-else style="text-align: center;">

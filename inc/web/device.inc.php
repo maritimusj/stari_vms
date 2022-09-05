@@ -2669,7 +2669,7 @@ HTML;
             }
 
             $result[] = [
-                $device->getImei(),
+                "'" . $device->getImei(),
                 "'" . $data['iccid'],
                 $data['carrier'],
                 $data['status'],
@@ -2682,8 +2682,8 @@ HTML;
         }
 
         Util::exportExcelFile($full_filename, [
-            '设备IMEI',
-            'ICCID',
+            '\'设备IMEI',
+            '\'ICCID',
             '运营商',
             '状态',
             '套餐',

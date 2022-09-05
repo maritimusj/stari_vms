@@ -2575,37 +2575,15 @@ HTML;
         JSON::fail('错误：iccid 为空！');
     }
 
-    $result = CtrlServ::v2_query("iccid/$iccid");
+    $result = SIM::get($iccid);
     if (is_error($result)) {
         JSON::fail($result);
     }
 
-    if (!$result['status']) {
-        JSON::fail($result['data']['message'] ?? '查询失败！');
-    }
-
-    $card = $result['data'] ?? [];
-    if (empty($card)) {
-        JSON::fail('查询失败，请稍后再试！');
-    }
-
-    $status_title = [
-        "00" => '正常使用',
-        "10" => '测试期',
-        "02" => '停机',
-        "03" => '预销号',
-        "04" => '销号',
-        "11" => '沉默期',
-        "12" => '停机保号',
-        "99" => '未知',
-    ];
-
-    $card['status'] = $status_title[$card['account_status']] ?? '未知';
-
     $content = app()->fetchTemplate(
         'web/device/card_status',
         [
-            'card' => $card,
+            'card' => $result,
         ]
     );
     JSON::success([
@@ -2678,17 +2656,6 @@ HTML;
 
         $result = [];
 
-        $status_title = [
-            "00" => '正常使用',
-            "10" => '测试期',
-            "02" => '停机',
-            "03" => '预销号',
-            "04" => '销号',
-            "11" => '沉默期',
-            "12" => '停机保号',
-            "99" => '未知',
-        ];
-
         $query = Device::query(['id >' => $last_id])->limit(10)->orderBy('id asc');
 
         $n = 0;
@@ -2696,34 +2663,20 @@ HTML;
         foreach ($query->findAll() as $device) {
             $last_id = $device->getId();
 
-            $iccid = $device->getICCID();
-            if (empty($iccid)) {
-                continue;
-            }
-
-            $res = CtrlServ::v2_query("iccid/$iccid");
-            if ( is_error($res)) {
-                continue;
-            }
-
-            if (!$res['status']) {
-                continue;
-            }
-        
-            $card = $res['data'] ?? [];
-            if (empty($card)) {
+            $data = $device->getSIM();
+            if (is_error($data)) {
                 continue;
             }
 
             $result[] = [
                 $device->getImei(),
-                "'" . $card['iccid'],
-                $card['carrier'],
-                $status_title[$card['account_status']] ?? '未知',
-                $card['data_plan'],
-                $card['data_usage'],
-                $card['active_date'],
-                $card['expiry_date'],
+                "'" . $data['iccid'],
+                $data['carrier'],
+                $data['status'],
+                $data['data_plan'],
+                $data['data_usage'],
+                $data['active_date'],
+                $data['expiry_date'],
             ];
             $n++;
         }

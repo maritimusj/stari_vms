@@ -15,6 +15,7 @@ use zovye\Locker;
 use zovye\Package;
 use zovye\PayloadLogs;
 use zovye\PlaceHolder;
+use zovye\SIM;
 use zovye\Stats;
 use zovye\We7;
 use zovye\User;
@@ -463,6 +464,15 @@ class deviceModelObj extends modelObj
     public function setICCID($iccid): bool
     {
         return $this->updateSettings('extra.v0.status.iccid', $iccid);
+    }
+
+    public function getSIM()
+    {
+        $iccid = $this->getICCID();
+        if (empty($iccid)) {
+            return err('ICCID为空！');
+        }
+        return SIM::get($this->getICCID());
     }
 
     public function getCapacity(): int
@@ -1083,6 +1093,8 @@ class deviceModelObj extends modelObj
         $id = $this->isActiveQrcodeEnabled() ? $this->shadow_id : $this->imei;
 
         $params = [];
+
+        //小程序识别码
         $adv = $this->getOneAdv(Advertising::WX_APP_URL_CODE);
         if ($adv && $adv['extra']['code']) {
             $params['app'] = strval($adv['extra']['code']);

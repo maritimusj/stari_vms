@@ -511,7 +511,7 @@ class Stats
             if (Config::app('order.total', 0) > 100000) {
                 $last_order = Order::getLastOrder();
                 if ($last_order) {
-                    $total = $last_order['id'].'（订单）';
+                    $total = $last_order['id'].'（订单）<i class="fa fa-question-circle" title="系统订单数量超过十万后，不再统计出货数量！" style="color:#9e9e9e;"></i>';
                 }
             } else {
                 $begin = new DateTime();

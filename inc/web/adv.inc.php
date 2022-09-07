@@ -427,10 +427,8 @@ if ($op == 'default') {
             $tpl_data['images'] = $adv->getExtraData('images');
             $tpl_data['link'] = $adv->getExtraData('link');
 
-            if ($type == Advertising::GET_PAGE) {
-                $tpl_data['app_id'] = $adv->getExtraData('app_id');
-                $tpl_data['app_path'] = $adv->getExtraData('app_path');
-            }
+            $tpl_data['app_id'] = $adv->getExtraData('app_id');
+            $tpl_data['app_path'] = $adv->getExtraData('app_path');
 
         } elseif ($type == Advertising::REDIRECT_URL) {
 
@@ -521,8 +519,8 @@ if ($op == 'default') {
             'error'
         );
     }
-
-    Util::itoast($result['msg'], $this->createWebUrl('adv', ['type' => $from_type]), 'success');
+    
+    Util::itoast($result['msg'], $this->createWebUrl('adv', ['op' => 'edit', 'type' => $adv->getType(), 'id' => $id]), 'success');
 
 } elseif ($op == 'remove') {
 

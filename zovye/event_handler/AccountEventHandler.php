@@ -7,6 +7,7 @@
 
 namespace zovye;
 
+use Error;
 use Exception;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -64,7 +65,7 @@ class AccountEventHandler
 
         try {
             $v = random_int($config['min'], $config['max']);
-        } catch (Exception $e) {
+        } catch (Exception|Error $e) {
         }
 
         if (empty($v)) {

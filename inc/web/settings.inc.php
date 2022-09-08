@@ -160,7 +160,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
         $settings['custom']['device']['brief-page']['enabled'] = request::bool('deviceBriefPage') ? 1 : 0;
         $settings['custom']['smsPromo']['enabled'] = request::bool('smsPromoEnabled') ? 1 : 0;
-        
+
         Config::app('ad.sponsor.enabled', request::bool('sponsorAd'), true);
 
         $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
@@ -817,7 +817,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             Config::balance('sign.bonus', [
                 'enabled' => request::bool('dailySignInEnabled') ? 1 : 0,
                 'min' => request::int('dailySignInBonusMin'),
-                'max' => request::int('dailySignInBonusMax'),
+                'max' => max(request::int('dailySignInBonusMin'), request::int('dailySignInBonusMax')),
             ], true);
 
             Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
@@ -830,7 +830,11 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             }
 
             Config::balance('account.promote_bonus.min', request::int('accountPromoteBonusMin'), true);
-            Config::balance('account.promote_bonus.max', request::int('accountPromoteBonusMax'), true);
+            Config::balance(
+                'account.promote_bonus.max',
+                max(request::int('accountPromoteBonusMin'), request::int('accountPromoteBonusMax')),
+                true
+            );
         }
     }
 
@@ -1133,7 +1137,7 @@ if ($op == 'account') {
     $tpl_data['credit_types'] = We7::mc_credit_types();
 
     $tpl_data['data_url'] = Util::murl('data');
-    $tpl_data['device_brief_url'] = Util::murl('brief');    
+    $tpl_data['device_brief_url'] = Util::murl('brief');
     $tpl_data['api_url'] = Util::murl('api');
 
     $app_key = settings('app.key');

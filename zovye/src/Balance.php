@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use Error;
 use Exception;
 use zovye\model\accountModelObj;
 use zovye\model\balanceModelObj;
@@ -462,7 +463,7 @@ TEXT;
         } else {
             try {
                 $val = random_int($min, $max);
-            } catch (Exception $e) {
+            } catch (Exception|Error $e) {
             }
         }
 

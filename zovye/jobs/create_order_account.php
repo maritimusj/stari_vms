@@ -10,6 +10,7 @@ use Exception;
 use zovye\Account;
 use zovye\CtrlServ;
 use zovye\Device;
+use zovye\Goods;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\deviceModelObj;
@@ -88,9 +89,20 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
         }
 
         if (empty($goods_id)) {
-            $goods = $device->getGoodsByLane(0);
-            if ($goods && $goods['num'] < 1) {
-                $goods = $device->getGoods($goods['id']);
+            /**
+             * 依次判断前10个货道上的商品是否为免费商品并且数量大于0
+             */
+            for ($i = 0; $i < 10; $i++) {
+                $goods = $device->getGoodsByLane($i);
+                if (empty($goods) || !$goods[Goods::AllowFree]) {
+                    continue;
+                }
+                if ($goods['num'] < 1) {
+                    $goods = $device->getGoods($goods['id']);
+                }
+                if ($goods && $goods['num'] > 0) {
+                    break;
+                }
             }
         } else {
             $goods = $device->getGoods($goods_id);
@@ -150,8 +162,8 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
             Account::updateQueryLogCBData($account, $user, $device, [
                 'data' => [
                     'error' => $e->getMessage(),
-                ]
-            ]);            
+                ],
+            ]);
         }
 
         $device = $e->getDevice();

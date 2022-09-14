@@ -116,6 +116,13 @@
     }
 
     $(function () {
+        $('body').on('hidden.bs.modal', function() {
+            $('.modal').each((i, e) => {
+                if ($(e).is(':hidden')) {
+                    $(e).remove();
+                }
+            });
+        })
         $('#find_agent').click(function () {
             const keyword = $('input[name=keyword_agent]').val();
             util.loading();

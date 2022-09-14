@@ -40,18 +40,20 @@
             },
             methods: {
                 next() {
-                    const self = this;
-                    $.getJSON(apiUrl, {step: "load", serial: this.serial, last: this.last}).then(res => {
-                        if (res && res.status) {
-                            self.last = res.data.last;
-                            self.num += res.data.num; 
-                            if (self.num < self.total) {
-                                self.next();
-                            } else {
-                                self.download();
+                    if ($("#export_div").length > 0) {
+                        const self = this;
+                        $.getJSON(apiUrl, {step: "load", serial: this.serial, last: this.last}).then(res => {
+                            if (res && res.status) {
+                                self.last = res.data.last;
+                                self.num += res.data.num; 
+                                if (self.num < self.total) {
+                                    self.next();
+                                } else {
+                                    self.download();
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
                 },
                 download() {
                     const self = this;

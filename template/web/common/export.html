@@ -29,7 +29,8 @@
             },
             computed: {
                 percent: function() {
-                    return Math.min(100, Math.round((this.num / this.total) * 100)) + "%";
+                    let p = Math.min(100, Math.round((this.num / this.total) * 100));
+                    return  p > 0 ? p + "%" : '正在计算中...';
                 }
             },
             mounted() {

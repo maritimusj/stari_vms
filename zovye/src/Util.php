@@ -2612,7 +2612,7 @@ HTML_CONTENT;
 
         if (!file_exists($filename)) {
             $tab_header = implode(",", $header);
-            $str_export = chr(0xEF).chr(0xBB).chr(0xBF).$tab_header."\r\n";
+            $str_export = $tab_header."\r\n";
         }
 
         foreach ($data as $row) {

@@ -1,4 +1,4 @@
-<div id="sim">
+<div id="export_div">
     <div class="progress" v-if="total>0" style="position: relative;">
         <div style="position: absolute;text-align:center;width: 100%;mix-blend-mode: difference;">
             {{percent}}
@@ -16,10 +16,10 @@
 
 <script>
     const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
-    const apiUrl = "{php echo $this->createWebUrl('device', ['op' => 'export_sim'])}";
+    const apiUrl = "{$api_url}";
     require(['jquery', 'util', vuejsUrl], function ($, util, Vue) {
         new Vue({
-            el: "#sim",
+            el: "#export_div",
             data: {
                 total: parseInt('{$total}'),
                 serial: '{$serial}',

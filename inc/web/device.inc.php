@@ -2631,7 +2631,8 @@ HTML;
     if (empty($step)) {
         $total = Device::query()->count();
 
-        $content = app()->fetchTemplate('web/device/export_sim', [
+        $content = app()->fetchTemplate('web/common/export', [
+            'api_url' => Util::url('device', [ 'op' => 'export_sim']),
             'total' => $total,
             'serial' => (new DateTime())->format('YmdHis'),
         ]);

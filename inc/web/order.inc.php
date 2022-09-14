@@ -412,28 +412,61 @@ if ($op == 'default') {
 
     app()->showTemplate('web/order/export', $tpl_data);
 
-} elseif ($op == 'export_list') {
-
-    $res = Order::getExportIDS([
+} elseif ($op == 'export_do') {
+    $params = [
         'agent_openid' => request::str('agent_openid'),
         'account_id' => request::int('accountid'),
         'device_id' => request::int('deviceid'),
-        'last_id' => request::int('lastid'),
         'start' => request::str('start'),
         'end' => request::str('end'),
-    ]);
+    ];
 
-    JSON::result($res);
+    $query = Order::getExportQuery($params);
 
-} elseif ($op == 'export_update') {
+    if (is_error($query)) {
+        JSON::fail($query);
+    }
 
-    $res = Order::export([
-        'headers' => request::array('headers'),
-        'uid' => request::trim('uid'),
-        'ids' => request::array('ids'),
-    ]);
+    $step = request::str('step');
+    if (empty($step)) {
+        $params['headers'] = request::array('headers');
+        $params['op'] = 'export_do';
+        $content = app()->fetchTemplate('web/common/export', [
+            'api_url' => Util::url('order', $params),
+            'total' => $query->count(),
+            'serial' => (new DateTime())->format('YmdHis'),
+        ]);
 
-    JSON::result($res);
+        JSON::success([
+            'title' => "导出订单",
+            'content' => $content,
+        ]);
+    }
+
+    $serial = request::str('serial');
+    if (empty($serial)) {
+        JSON::fail("缺少serial");
+    }
+
+    $filename = "$serial.csv";
+    $dirname = "export/order/";
+    $full_filename = Util::getAttachmentFileName($dirname, $filename);
+
+    if ($step == 'load') {
+
+        $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
+        $last_id = Order::export($full_filename, $query, request::array('headers'));
+
+        JSON::success([
+            'num' => 100,
+            'last' => $last_id,
+        ]);
+
+    } elseif ($step == 'download') {
+        JSON::success([
+            'url' => Util::toMedia("$dirname$filename"),
+        ]);
+    }
 
 } elseif ($op == 'log') {
 

@@ -1012,12 +1012,11 @@ class Order extends State
         return $onlyKeys ? array_keys($headers) : $headers;
     }
 
-    public static function getExportIDS($params = []): array
+    public static function getExportQuery($params = []) 
     {
         $agent_openid = $params['agent_openid'] ?? false;
         $account_id = $params['account_id'] ?? false;
         $device_id = $params['device_id'] ?? false;
-        $last_id = $params['last_id'] ?? 0;
 
         $query = Order::query();
         if ($agent_openid) {
@@ -1068,46 +1067,23 @@ class Order extends State
             'createtime <' => $e_date->getTimestamp(),
         ]);
 
-        if ($last_id > 0) {
-            $query->where(['id >' => $last_id]);
-        }
-
-        $query->orderBy('id ASC');
-        $query->limit($params['max'] ?? 200);
-
-        $result = $query->findAll([], true);
-        $total = $result->count();
-
-        $ids = [];
-        for ($i = 0; $i < $total; $i++) {
-            $ids[] = $result[$i]['id'];
-        }
-
-        return $ids;
+        return $query;
     }
 
-    public static function export($params = []): array
+    public static function export($filename, $query, $headers = [])
     {
-        $headers = $params['headers'] ?? [];
         if (empty($headers)) {
             $headers = ['order_no', 'createtime'];
         }
 
         array_unshift($headers, 'ID');
 
-        $uid = $params['uid'] ?? '';
-        $ids = $params['ids'] ?? [];
-        if (empty($uid) || empty($ids)) {
-            return err('参数错误！');
-        }
-
-        $query = Order::query(['id' => $ids]);
-        $query->orderBy('id ASC');
-
         $result = [];
+        $last_id = 0;
 
         /** @var orderModelObj $entry */
         foreach ($query->findAll() as $entry) {
+            $last_id = $entry->getId();
 
             $user = User::get($entry->getOpenid(), true);
             $goods = Goods::data($entry->getGoodsId());
@@ -1127,9 +1103,9 @@ class Order extends State
                         $pay_result = $entry->getExtraData('payResult');
                         if ($pay_result) {
                             if (isset($pay_result['uniontid'])) {
-                                $data[$header] = $pay_result['uniontid'];
+                                $data[$header] = '\'' . $pay_result['uniontid'];
                             } elseif (isset($pay_result['transaction_id'])) {
-                                $data[$header] = $pay_result['transaction_id'];
+                                $data[$header] = '\'' . $pay_result['transaction_id'];
                             } else {
                                 $data[$header] = '';
                             }
@@ -1240,10 +1216,9 @@ class Order extends State
 
         $all_headers = Order::getExportHeaders();
         $column = array_values(array_intersect_key($all_headers, array_flip($headers)));
-        $filename = "export/$uid.xls";
 
-        Util::exportExcelFile(ATTACHMENT_ROOT.$filename, $column, $result);
+        Util::exportExcelFile($filename, $column, $result);
 
-        return ['filename' => Util::toMedia($filename)];
+        return $last_id;
     }
 }

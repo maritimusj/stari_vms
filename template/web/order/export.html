@@ -87,42 +87,29 @@
     </div>
 </form>
 <script>
-    function uid() {
-        function S4() {
-            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-        }
-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    const api = {
+        url: "{php echo $this->createWebUrl('order')}",
     }
 
-    const url = "{php echo $this->createWebUrl('order');}";
-
-    let lastid = 0;
-    let filenames = [];    
-    let q = [];    
-
-    function getList(uid, params, headers) {
-        $.getJSON(url, Object.assign({ op: 'export_list', lastid, uid }, params)).then(res => {
-            if (res && res.status) {
-                if (res.data && res.data.length > 0) {
-                    lastid = Math.max(...res.data);
-                    getList(uid, params, headers);
-                    q.push($.post(url, { op: 'export_update', ids: res.data, uid, headers }).then(res => {
-                        if (filenames.indexOf(res.data.filename) === -1) {
-                            filenames.push(res.data.filename);
-                        }
-                    }));
-                } else {
-                    $.when(...q).then(function () {
-                        filenames.forEach(filename => {
-                            window.location.href = filename;
-                        })
-                        
-                        util.loaded();
-
-                        lastid = 0;
-                        filenames = [];
-                        q = [];                        
-                    });
+    api.showResult = function (params, url, cb) {
+        $.getJSON(url || api.url, params).done(function (res) {
+            if (res) {
+                if (typeof cb == 'function') {
+                    if (cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        const dlg = util.dialog(res.data.title || '', res.data.content);
+                        dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
                 }
             }
         })
@@ -209,15 +196,16 @@
             });
 
             const params = {
+                op: 'export_do',
                 agent_openid,
                 accountid,
                 deviceid,
                 start,
                 end,
+                headers,
             };
 
-            util.loading();
-            getList(uid(), params, headers);
+            api.showResult(params);
         })
 
         require(["daterangepicker"], function () {

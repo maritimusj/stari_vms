@@ -158,7 +158,9 @@ if (request::bool('verify')) {
 }
 
 if (empty($price)) {
-    Job::createThirdPartyPlatformOrder($data);
+    if (!Job::createThirdPartyPlatformOrder($data)) {
+        JSON::fail("启动订单任务失败！");
+    }
 } else {
     /**
      * 创建支付记录

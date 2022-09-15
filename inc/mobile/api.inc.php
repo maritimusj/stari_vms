@@ -125,7 +125,6 @@ if (empty($price)) {
     }
 
     $data['account'] = $account->getId();
-    $data['num'] = 1;
 
 } else {
     /**

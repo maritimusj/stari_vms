@@ -192,7 +192,9 @@ if (empty($price)) {
     if (empty($pay_log)) {
         JSON::fail("创建支付记录失败！");
     }
-    Job::createOrder($order_no);
+    if (!Job::createOrder($order_no)) {
+        JSON::fail("启动订单任务失败！");
+    }
 }
 
 JSON::success([

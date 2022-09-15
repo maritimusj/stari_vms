@@ -1205,14 +1205,15 @@ class Stats
             $end = $end->setTimestamp(time());
         }
 
-        while ($end > $begin) {
+        while ($begin < $end) {
+            $next_day = $begin->modify('next day 00:00');
             $result[$begin->format('m-d')] = (int)$balance->log()->where([
                 'src' => $src,
                 'createtime >=' => $begin->getTimestamp(),
-                'createtime <' => $end->getTimestamp(),
+                'createtime <' => $next_day->getTimestamp(),
             ])->sum('x_val');
 
-            $begin = $begin->modify('next day');
+            $begin = $next_day;
         }
 
         krsort($result);

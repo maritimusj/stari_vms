@@ -271,6 +271,10 @@ class commission
             }
 
             foreach ($ef as $i => $total) {
+                if ($total == 0 && $result[$i]['sf'] == 0) {
+                    unset($result[$i]);
+                    continue;
+                }
                 $result[$i]['ef'] = $total;
             }
 

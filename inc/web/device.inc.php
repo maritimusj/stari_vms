@@ -1390,6 +1390,14 @@ HTML;
 
     $query = $device->eventQuery();
 
+    if (request::isset('enable')) {
+        $enable = request::bool('enable');
+        $device->setEventLogEnabled($enable);
+        $device->save();
+    }
+
+    $tpl_data['enabled'] = $device->isEventLogEnabled();
+
     if (request::isset('event')) {
         $query->where(['event' => request('event')]);
     }

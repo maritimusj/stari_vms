@@ -95,7 +95,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['device']['v-device']['enabled'] = request::bool('vDevice') ? 1 : 0;
         $settings['device']['lac']['enabled'] = request::bool('lacConfirm') ? 1 : 0;
-        $settings['device']['event']['enabled'] = request::bool('eventLog') ? 1 : 0;
 
     } elseif ($save_type == 'user') {
 

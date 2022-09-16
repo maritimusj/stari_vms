@@ -232,6 +232,16 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.v0.status.last_online', $last_online);
     }
 
+    public function setEventLogEnabled($enable = true)
+    {
+        return $this->updateSettings('extra.event.log.enabled', $enable);
+    }
+
+    public function isEventLogEnabled()
+    {
+        return $this->settings('extra.event.log.enabled', false);
+    }
+
     /**
      * 是不是蓝牙设备
      * @return bool

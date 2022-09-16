@@ -280,9 +280,8 @@ class DeviceEventProcessor
         Util::transactionDo(function () use ($event, $data) {
             $e = self::$events[$event];
             if (isset($e)) {
-                if (settings('device.event.enabled')) {
-                    self::log($e, $data);
-                }
+                self::log($e, $data);
+                
                 $fn = $e['handler'];
                 if (!empty($fn)) {
                     if (is_callable($fn)) {
@@ -325,7 +324,7 @@ class DeviceEventProcessor
                 $app_id = $data['id'];
                 $device = Device::getFromAppId($app_id);
             }
-            if (isset($device)) {
+            if (isset($device) && $device->isEventLogEnabled()) {
                 $data = We7::uniacid([
                     'event' => $log['id'],
                     'device_uid' => $device->getUid(),

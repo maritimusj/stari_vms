@@ -348,12 +348,7 @@ class charging
 
         $serial = $device->generateChargingSerial($chargerID);
 
-        $result = Helper::createChargingOrder($user, $device, $chargerID, $price, $serial);
-        if (is_error($result)) {
-            return $result;
-        }
-
-        return $result;
+        return Helper::createChargingOrder($user, $device, $chargerID, $price, $serial);
     }
 
     public static function chargingPayResult(): array

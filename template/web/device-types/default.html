@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 <style>
     #editDeviceTypesForm .operate i.fa {
         font-size: 20px;
@@ -81,10 +81,9 @@
                 <tr data-id="{$item['id']}">
                     <td>
                         {php echo $index + 1}
-                        (型号ID：{$item['id']})
                     </td>
                     <td class="device_types">
-                        {$item['title']}
+                        {$item['title']}<sup class="id" title="型号ID">{$item['id']}</sup>
                         {if $item['id'] == $first_type}
                         <span class="default_type">[默认]</span>
                         {/if}
@@ -308,11 +307,11 @@
                    if (res.data.list) {
                        let optStr = '';
                        res.data.list.forEach(function( v){
-                            optStr += '<option value="'+v.id+'">'+v.name;
+                            optStr += ('<option value="'+v.id+'">'+v.name+'&lt;ID:'+v.id);
                             if (v.agent) {
-                                optStr += '<代理商：'+v.agent.name+'>';
+                                optStr += ', '+v.agent.name;
                             }
-                            optStr += '</option>';
+                            optStr += '></option>';
                        });
 
                        if (optStr == '') {

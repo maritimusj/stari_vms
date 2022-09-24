@@ -76,10 +76,13 @@
             <label class="col-md-2 control-label"><span class="J_carCount">1</span>货道</label>
             <div class="col-md-10">
                 <select class="col-md-4" name="goods[]" id="J_select1">
-                    <option value="0">&lt;选择商品&gt;</option>
+                    <option value="0" disabled>&lt;选择商品&gt;</option>
                     {if $device_type['cargo_lanes'][0]['goods_profile']}
                     <option value="{$device_type['cargo_lanes'][0]['goods_profile']['id']}" selected>
-                        {$device_type['cargo_lanes'][0]['goods_profile']['name']}{if $device_type['cargo_lanes'][0]['goods_profile']['agent']} &lt;代理商：{$device_type['cargo_lanes'][0]['goods_profile']['agent']['name']}>{/if}
+                        {$device_type['cargo_lanes'][0]['goods_profile']['name']}
+                        &lt;{$device_type['cargo_lanes'][0]['goods_profile']['id']}
+                        {if $device_type['cargo_lanes'][0]['goods_profile']['agent']} &lt;代理商：{$device_type['cargo_lanes'][0]['goods_profile']['agent']['name']}{/if}
+                        &gt;
                         </option>
                     {/if}
                 </select>
@@ -109,10 +112,10 @@
             <label class="col-md-2 control-label"><span class="J_carCount">{php echo $index + 1}</span>货道</label>
             <div class="col-md-10">
                 <select class="col-md-4" name="goods[]"  id="J_select{php echo $index + 1}">
-                    <option value="0">&lt;选择商品&gt;</option>
+                    <option value="0" disabled>&lt;选择商品&gt;</option>
                     {if  $item['goods_profile']}
                     <option value="{$item['goods_profile']['id']}" selected>
-                        {$item['goods_profile']['name']}{if $item['goods_profile']['agent']} &lt;代理商：{$item['goods_profile']['agent']['name']}>{/if}
+                        {$item['goods_profile']['name']}&lt;ID:{$item['goods_profile']['id']}{if $item['goods_profile']['agent']}, {$item['goods_profile']['agent']['name']}{/if}&gt;
                         </option>
                     {/if}
                 </select>

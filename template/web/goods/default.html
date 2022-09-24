@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 <style>
     #addGoodsForm fieldset[disabled] label, #addGoodsForm fieldset[disabled] input, #addGoodsForm fieldset[disabled] table{
         color: gray;
@@ -143,7 +143,7 @@
                         {php echo $index + 1}
                     </td>
                     <td>
-                        {$item['name']}
+                        {$item['name']}<sup class="id" title="商品ID">{$item['id']}</sup>
                         {if $item['lottery']}
                         <span class="lottery" title="固定货道商品">
                             <i class="fa fa-fw fa-ticket"></i>

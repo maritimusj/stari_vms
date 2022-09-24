@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 {php \zovye\url(true, 'static/css/orderlist.css?v=20220302');}
 <style>
     #orderlist .transactionId {
@@ -391,7 +391,8 @@
                         <div class="name">
                             <span {if $order["result"] && isset($order["result"]["errno"]) && $order["result"]["errno"] != 0} title="{php echo empty($order['refund']) ?  $order["result"]["message"] : $order['refund']['reason']}{/if}">
                                 {if $order['goods']}                            
-                                {$order['goods']['name']}                            
+                                {$order['goods']['name']}        
+                                <sup class="id" title="商品ID">{$order['goods']['id']}</sup>                    
                                 {elseif $order['package']}
                                 {$order['package']['title']}
                                 {elseif $order['group'] }

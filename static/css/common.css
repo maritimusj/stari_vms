@@ -1426,3 +1426,16 @@ img.disabled {
     filter: grayscale(100%);
     opacity: 0.66;
 }
+
+sup.id {
+    color: #9E9E9E;
+    padding-left: 4px;
+    cursor: default;
+}
+sup.id:hover {
+    color: #666;
+}
+sup.id::before {
+    content: '▸';
+    padding-right: 3px;
+}

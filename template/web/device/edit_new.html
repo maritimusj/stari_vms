@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 <style>
     #location, #tag_tpl {
         display: none;
@@ -307,7 +307,10 @@
                                                 </div>
                                             </td>
                                             <td :class="{operate: isCustomType}">
-                                                <span :class="{'goods_name': isCustomType}"  @click="chooseGoods(lane)" title="点击选择商品">{{lane.goods_name}}</span>
+                                                <span :class="{'goods_name': isCustomType}"  @click="chooseGoods(lane)" title="点击选择商品">
+                                                    {{lane.goods_name}}
+                                                    <sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
+                                                </span>
                                                 <span v-show="lane.goods_unit_title">（{{lane.goods_unit_title}}）</span>                                     
                                             </td>
                                             <td>
@@ -392,7 +395,7 @@
                                                     {{index +1}}
                                                 </td>
                                                 <td>
-                                                    {{goods.name}}
+                                                    {{goods.name}}<sup class="id" title="商品ID">{{goods.id}}</sup>
                                                     <span v-if="goods.unit_title">({{goods.unit_title}})</span>
                                                 </td>
                                                 <td>

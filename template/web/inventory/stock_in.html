@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 <style>
     .gray {
         color: gray;
@@ -110,7 +110,10 @@
                                 <div class="goods" @click="chooseGoods(e)">
                                     <template v-if="e.goods" >
                                         <img :src="e.goods.img"  >
-                                        <span class="name" >{{e.goods.name}}</span>
+                                        <span class="name" >
+                                            {{e.goods.name}}
+                                            <sup class="id" title="商品ID">{{e.goods.id}}</sup>
+                                        </span>
                                     </template>
                                     <span class="gray" v-else>&lt;请选择商品&gt;</span>
                                 </div>
@@ -169,7 +172,10 @@
                             </td>
                             <td class="goods">
                                 <img :src="log.goods.img">
-                                <span>{{log.goods.name}}</span>
+                                <span>
+                                    {{log.goods.name}}
+                                    <sup class="id" title="商品ID">{{log.goods.id}}</sup>
+                                </span>
                             </td>
                             <td>
                                 <span>

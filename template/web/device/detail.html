@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 <style>
     .right-content {
         overflow: hidden;
@@ -239,7 +239,10 @@
                             {loop $payload['cargo_lanes'] $index $item}
                             <tr data-fetchid="{php echo $device ? $device->getId() : 0;}">
                                 <td>货道{php echo $index + 1}</td>
-                                <td{if empty($item['goods_id'])} class="text-gray"{/if}>{$item['goods_name']}</td>
+                                <td
+                                {if empty($item['goods_id'])} class="text-gray"{/if}>{$item['goods_name']}
+                                <sup class="id" title="商品ID">{$item['goods_id']}</sup>
+                                </td>
                                 <td>{$item['goods_price_formatted']}</td>
                                 <td>{$item['capacity']} {$item['goods_unit_title']}</td>
                                 <td>{$item['num']} {$item['goods_unit_title']}</td>

@@ -993,6 +993,7 @@ class Order extends State
             'openid' => '用户openid',
             'sex' => '用户性别',
             'region' => '用户区域',
+            'goods_id' => '商品ID',
             'goods_name' => '商品名称',
             'goods_num' => '商品数量',
             'goods_price' => '商品价格',
@@ -1157,6 +1158,9 @@ class Order extends State
                             $data[$header] = '';
                         }
                         break;
+                    case 'goods_id':
+                            $data[$header] = str_replace('"', '', $goods['id']);
+                            break;
                     case 'goods_name':
                         $data[$header] = str_replace('"', '', $goods['name']);
                         break;

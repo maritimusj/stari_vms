@@ -1178,7 +1178,9 @@ HTML;
     );
 
     $tpl_data['device'] = $device;
-    $tpl_data['payload'] = $device->getPayload(true);
+    if (!$device->isChargingDevice()) {
+        $tpl_data['payload'] = $device->getPayload(true);
+    }
 
     $packages = [];
     $query = Package::query(['device_id' => $device->getId()]);

@@ -1,5 +1,5 @@
 {template 'common/header'}
-{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, 'static/css/common.css?v=20220517');}
 <style>
 #list img, .goods img {
     width: 60px;
@@ -54,6 +54,7 @@ table th,table td {
                     </td>
                     <td>
                         {$item['goods']['name']}
+                        <sup class="id" title="商品ID">{$item['goods']['id']}</sup>
                     </td>
                     <td class="total">
                         <span class="num">{$item['num']}</span> <span class="change"></span>

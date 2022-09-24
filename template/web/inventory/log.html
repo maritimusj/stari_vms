@@ -120,7 +120,10 @@
                         <img src="{$e['goods']['img']}">
                     </td>
                     <td>
-                        <span>{$e['goods']['name']}</span>
+                        <span>
+                            {$e['goods']['name']}
+                            <sup class="id" title="商品ID">{$e['goods']['id']}</sup>
+                        </span>
                         {if $e['goods']['deleted']}
                         <span class="text-muted">&lt;已删除&gt;</span>
                         {/if}

@@ -15,6 +15,9 @@
                 <td>
                     <span {if empty($item['goods_id'])}class="text-gray"{/if}>
                         {$item['goods_name']}
+                        {if $item['goods_id'] > 0}
+                        <sup class="id" title="商品ID">{$item['goods_id']}</sup>
+                        {/if}
                     </span>
                 </td>
                 <td>{$item['capacity']} {$item['goods_unit_title']}</td>

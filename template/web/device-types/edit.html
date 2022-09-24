@@ -80,8 +80,8 @@
                     {if $device_type['cargo_lanes'][0]['goods_profile']}
                     <option value="{$device_type['cargo_lanes'][0]['goods_profile']['id']}" selected>
                         {$device_type['cargo_lanes'][0]['goods_profile']['name']}
-                        &lt;{$device_type['cargo_lanes'][0]['goods_profile']['id']}
-                        {if $device_type['cargo_lanes'][0]['goods_profile']['agent']} &lt;代理商：{$device_type['cargo_lanes'][0]['goods_profile']['agent']['name']}{/if}
+                        &lt;ID:{$device_type['cargo_lanes'][0]['goods_profile']['id']}
+                        {if $device_type['cargo_lanes'][0]['goods_profile']['agent']} ,{$device_type['cargo_lanes'][0]['goods_profile']['agent']['name']}{/if}
                         &gt;
                         </option>
                     {/if}

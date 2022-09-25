@@ -440,7 +440,7 @@ class Charging
                         ]);
                     } else {
                         Log::error('charging', [
-                            'error' => '用户捐款失败！',
+                            'error' => '用户扣款失败！',
                             'data' => $extra,
                         ]);
                     }

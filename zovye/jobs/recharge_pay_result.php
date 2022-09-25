@@ -9,7 +9,6 @@ namespace zovye\job\orderPayResult;
 
 //充值支付结果检查
 
-use zovye\CommissionBalance;
 use zovye\CtrlServ;
 use zovye\Job;
 use zovye\JobException;
@@ -44,7 +43,7 @@ if (!$pay_log->isPaid()) {
     $res = Pay::query($order_no);
 
     if (is_error($res)) {
-        if (time() - $start < 30) {
+        if (time() - $start < 100) {
             //重新加入一个支付结果检查任务
             $log['job schedule'] = Job::rechargePayResult($order_no, $start);
         }

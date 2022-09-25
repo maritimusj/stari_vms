@@ -44,6 +44,8 @@ class charging
                             'device' => $device->profile(),
                             'status' => $chargerData,
                         ];
+                    } else {
+                        IotCharging::settleCharging($serial);
                     }
                 }
             }

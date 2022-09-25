@@ -172,6 +172,7 @@ class ChargingServ
 
             return true;
         }
+        return false;
     }
 
     public static function getChargingRecord($serial): array

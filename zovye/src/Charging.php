@@ -15,7 +15,7 @@ class Charging
         $query = Order::query(['src' => Order::CHARGING_UNPAID, '$device_id' => $device->getId()]);
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
-            self::settleOrder($order);
+            self::checkOrder($order);
         }
     }
 
@@ -450,15 +450,19 @@ class Charging
             return true;
         });
     }
-
-    public static function settleOrder($serial)
+    public static function checkOrder(orderModelObj $order)
+    {
+        $serial = $order->getOrderNO();
+        $res = ChargingServ::getChargingRecord($serial);
+        if ($res && !is_error($res) && isset($res['totalPrice'])) {
+            Charging::settle($serial, $res['chargerID'], $res);
+        }
+    }
+    public static function settleCharging($serial)
     {
         $order = Order::get($serial, true);
-        if ($order) {
-            $res = ChargingServ::getChargingRecord($serial);
-            if ($res && !is_error($res) && isset($res['totalPrice'])) {
-                Charging::settle($serial, $res['chargerID'], $res);
-            }
+        if ($order && !$order->isChargingFinished()) {
+            self::checkOrder($order);
         }
     }
 

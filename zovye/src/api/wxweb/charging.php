@@ -219,6 +219,8 @@ class charging
             return err('找不到这个设备！');
         }
 
+        IotCharging::checkUnfinishedOrder($device);
+
         $chargerID = request::int('chargerID');
         $serial = $device->generateChargingSerial($chargerID);
 

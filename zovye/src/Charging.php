@@ -10,6 +10,15 @@ use zovye\model\userModelObj;
 
 class Charging
 {
+    public static function checkUnfinishedOrder(deviceModelObj $device)
+    {
+        $query = Order::query(['src' => Order::CHARGING_UNPAID, '$device_id' => $device->getId()]);
+        /** @var orderModelObj $order */
+        foreach ($query->findAll() as $order) {
+            self::settleOrder($order);
+        }
+    }
+
     public static function hasUnpaidOrder(userModelObj $user): bool
     {
         $query = Order::query(['src' => Order::CHARGING_UNPAID, 'openid' => $user->getOpenid()]);
@@ -440,6 +449,17 @@ class Charging
 
             return true;
         });
+    }
+
+    public static function settleOrder($serial)
+    {
+        $order = Order::get($serial, true);
+        if ($order) {
+            $res = ChargingServ::getChargingRecord($serial);
+            if ($res && !is_error($res) && isset($res['totalPrice'])) {
+                Charging::settle($serial, $res['chargerID'], $res);
+            }
+        }
     }
 
     public static function checkCharging(deviceModelObj $device, $chargerID)

@@ -247,10 +247,8 @@ class Pay
                 throw new Exception($data['message']);
             }
 
-            $device = Device::get($data['deviceUID'], true);
-
             //获取一个配置完整的pay对象
-            $pay = self::getActivePayObj($device, $name);
+            $pay = self::getActivePayObj($data['deviceUID'], $name);
             if (is_error($pay)) {
                 throw new Exception($pay['message']);
             }
@@ -294,8 +292,9 @@ class Pay
                 return $pay->getResponse(false);
             }
 
+            $device = Device::get($data['deviceUID'], true);
             if (empty($device)) {
-                throw new Exception('找不到这个设备！');
+                throw new Exception('找不到这个设备:' . $data['deviceUID']);
             }
 
             //创建一个回调执行创建订单，出货任务
@@ -627,11 +626,11 @@ class Pay
 
     /**
      * 根据设备和名称获取已配置好的支付对象
-     * @param deviceModelObj $device
+     * @param string|deviceModelObj $device
      * @param string $name
      * @return array|IPay
      */
-    public static function getActivePayObj(deviceModelObj $device, string $name = '')
+    public static function getActivePayObj($device, string $name = '')
     {
         $res = self::getPayParams($device, $name);
         if (is_error($res)) {

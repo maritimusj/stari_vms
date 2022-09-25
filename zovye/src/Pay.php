@@ -294,7 +294,7 @@ class Pay
 
             $device = Device::get($data['deviceUID'], true);
             if (empty($device)) {
-                throw new Exception('找不到这个设备:' . $data['deviceUID']);
+                throw new Exception('找不到这个设备:'.$data['deviceUID']);
             }
 
             //创建一个回调执行创建订单，出货任务
@@ -312,7 +312,7 @@ class Pay
                 'input' => $input,
             ]);
 
-            return isset($pay) ? $pay->getResponse(false) : $e->getMessage();
+            return $pay instanceof IPay ? $pay->getResponse(false) : $e->getMessage();
         }
     }
 
@@ -434,8 +434,9 @@ class Pay
                 LOG_RECHARGE,
             ];
         }
-       
+
         $data = We7::uniacid(['title' => $order_no, 'level' => $level]);
+
         return m('pay_logs')->findOne($data);
     }
 

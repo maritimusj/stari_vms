@@ -1836,7 +1836,7 @@ class deviceModelObj extends modelObj
             }
         }
 
-        if (!preg_match('/^'.Device::DUMMY_DEVICE_PREFIX.'/', $this->imei)) {
+        if (!$this->isDummyDevice()) {
             $this->set(
                 'accountsData',
                 [
@@ -1847,6 +1847,11 @@ class deviceModelObj extends modelObj
         }
 
         return $accounts;
+    }
+
+    public function isDummyDevice(): bool
+    {
+       return Device::isDummyDeviceIMEI($this->imei);
     }
 
     public function getOnlineDetail($use_cache = true): array

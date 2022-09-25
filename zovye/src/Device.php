@@ -442,6 +442,11 @@ class Device extends State
         return isset(self::$cache[$id]);
     }
 
+    public static function isDummyDeviceIMEI($imei): bool
+    {
+        return boolval(preg_match('/^'.Device::DUMMY_DEVICE_PREFIX.'/', $imei));
+    }
+
     /**
      * @param mixed $id
      * @param bool $is_imei
@@ -455,7 +460,11 @@ class Device extends State
                 return self::getFromCache($id);
             }
             if ($is_imei) {
-                $device = self::findOne(['imei' => strval($id)]);
+                $imei = strval($id);
+                if (self::isDummyDeviceIMEI($imei)) {
+                    return self::getDummyDevice($imei);
+                }
+                $device = self::findOne(['imei' => $imei]);
             } else {
                 $device = self::findOne(['id' => intval($id)]);
             }
@@ -523,13 +532,16 @@ class Device extends State
         return self::query()->findOne($cond);
     }
 
-    public static function getDummyDevice(): deviceModelObj
+    public static function getDummyDevice($imei = ''): deviceModelObj
     {
         $deviceClassname = m('device')->objClassname();
 
         $device = new $deviceClassname(0, m('device'));
-        $device->setImei(self::DUMMY_DEVICE_PREFIX.Util::random(16, true));
+        if (empty($imei)) {
+            $imei = self::DUMMY_DEVICE_PREFIX.Util::random(16, true);
+        }
 
+        $device->setImei($imei);
         return $device;
     }
 
@@ -648,7 +660,7 @@ class Device extends State
         if (!$device->isChargingDevice()) {
             $device->setGroupId(0);
         }
-        
+
         //设备标签
         $device->setTagsFromText('');
 
@@ -717,6 +729,7 @@ class Device extends State
 
         if (self::reset($device, $agent ? '绑定设备' : '解绑设备')) {
             $device->appNotify('update');
+
             return true;
         }
 
@@ -858,7 +871,7 @@ class Device extends State
                 $query->where(['remain <' => $remain_warning]);
             }
 
-            //位置已变化        
+            //位置已变化
             if (request::bool('lac')) {
                 $query->where(['s1' => 1]);
             }

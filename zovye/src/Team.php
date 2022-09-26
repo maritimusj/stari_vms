@@ -54,13 +54,13 @@ class Team
         string $remark = ''
     ): ?team_memberModelObj {
         return m('team_member')->create(
-            We7::uniacid([
+            [
                 'team_id' => $team->getId(),
                 'user_id' => $user->getId(),
                 'mobile' => $user->getMobile(),
                 'name' => $name,
                 'remark' => $remark,
-            ])
+            ]
         );
     }
 
@@ -71,12 +71,12 @@ class Team
         string $remark = ''
     ): ?team_memberModelObj {
         return m('team_member')->create(
-            We7::uniacid([
+            [
                 'team_id' => $team->getId(),
                 'mobile' => $mobile,
                 'name' => $name,
                 'remark' => $remark,
-            ])
+            ]
         );
     }
 

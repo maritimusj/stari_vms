@@ -3,9 +3,12 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
+
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\Contract\ICard;
+use zovye\User;
 use function zovye\tb;
 
 class teamModelObj extends modelObj
@@ -14,17 +17,30 @@ class teamModelObj extends modelObj
     {
         return tb('team');
     }
-    
-    /** @var int */
-	protected $uniacid;
 
     /** @var int */
-	protected $owner_id;
+    protected $uniacid;
+
+    /** @var int */
+    protected $owner_id;
 
     /** @var string */
-	protected $name;
+    protected $name;
 
     /** @var int */
-	protected $createtime;
+    protected $createtime;
 
+    public function owner(): ?userModelObj
+    {
+        return User::get($this->owner_id);
+    }
+
+    public function profile(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->name,
+            'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
+        ];
+    }
 }

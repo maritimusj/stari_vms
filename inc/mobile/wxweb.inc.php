@@ -68,4 +68,12 @@ router::exec($op, [
     'rechargeResult' => '\zovye\api\wxweb\charging::rechargeResult',
     'rechargeList' => '\zovye\api\wxweb\charging::rechargeList',
     'withdraw' => '\zovye\api\wxweb\charging::withdraw',
+
+    'getMemberList' => '\zovye\api\wxweb\member::getMemberList',
+    'memberUserInfo' => '\zovye\api\wxweb\member::memberUserInfo',
+    'createMember' => '\zovye\api\wxweb\member::createMember',
+    'editMember' => '\zovye\api\wxweb\member::editMember',
+    'removeMember' => '\zovye\api\wxweb\member::removeMember',
+    'transfer' => '\zovye\api\wxweb\member::transfer',
+    'chargingList' => '\zovye\api\wxweb\member::chargingList',
 ]);

@@ -15,6 +15,7 @@ use zovye\Balance;
 use zovye\Contract\ICard;
 use zovye\Locker;
 use zovye\Pay;
+use zovye\Team;
 use zovye\UserCommissionBalanceICard;
 use zovye\We7;
 use zovye\User;
@@ -588,7 +589,7 @@ class userModelObj extends modelObj
 
         if ($way == Order::FREE_STR) {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
-                $condition['src'] = [Order::ACCOUNT, Order::FREE,  Order::BALANCE];
+                $condition['src'] = [Order::ACCOUNT, Order::FREE, Order::BALANCE];
             } else {
                 $condition['src'] = [Order::ACCOUNT, Order::FREE];
             }

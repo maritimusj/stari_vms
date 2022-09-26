@@ -35,8 +35,8 @@ class CommissionBalance extends State
     const CHARGING_SF = 21;
     const CHARGING_EF = 22;
 
-    const CHARGING_PAY_FOR_TEAM = 23;
-    const CHARGING_PAID_BY_TEAM = 24;
+    const TRANSFER_FROM = 50;
+    const TRANSFER_TO = 51;
 
     protected static $unknown = 'n/a';
 
@@ -57,8 +57,8 @@ class CommissionBalance extends State
         self::CHARGING => '充电桩订单结算',
         self::CHARGING_SF => '充电桩订单(服务费)',
         self::CHARGING_EF => '充电桩订单(电费)',
-        self::CHARGING_PAY_FOR_TEAM => '充电桩订单结算(代付)',
-        self::CHARGING_PAID_BY_TEAM => '充电桩订单结算(车队代付)',
+        self::TRANSFER_FROM => '转帐给用户',
+        self::TRANSFER_TO => '收到转帐',
     ];
 
     private $user;

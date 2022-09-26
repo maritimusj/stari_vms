@@ -22,7 +22,6 @@ use function zovye\ifEmpty;
 use function zovye\setArray;
 
 /**
- * @method getQrcode()
  * @method getCreatetime()
  * @method hasCreatetime()
  */

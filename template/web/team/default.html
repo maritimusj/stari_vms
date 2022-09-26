@@ -1,0 +1,57 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active"><a href="#">车队管理</a></li>
+</ul>
+<div class="panel panel-default panel-first">
+    <div class="panel-body">
+        {if $list}
+        <table class="table table-bordered">
+            <thead>
+            <th>#</th>
+            <th>名称</th>
+            <th>用户</th>
+            <th>手机号码</th>
+            <th>备注</th>
+            <th>时间</th>
+            </thead>
+            <tbody>
+            {loop $list $index $member}
+            <tr>
+                <td>{php echo $index + 1</td>
+                <tr>{$member['name']}</tr>
+                <tr>
+                    {if $member['user']}
+                    <div class="profile">
+                        <img src="{$member['user']['avatar']}" />
+                        <div>
+                            <span class="nickname">
+                                {php echo $member['user']['nickname']?:'&lt;匿名用户&gt;'}
+                            </span>
+                            <div>
+                                {if $member['user']['mobile']}
+                                <span class="mobile" data-mobile="{$item['mobile']}" title="点击复制"><i class="fa fa-mobile"></i> {$member['user']['mobile']}</span>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                </tr>
+                <tr>{$member['mobile']}</tr>
+                <tr>{$member['remark']}</tr>
+                <tr>{$member['createtime_formatted']}</tr>
+            </tr>
+            {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何成员！
+        </div>
+        {/if}
+    </div>
+</div>
+{template 'common/footer'}

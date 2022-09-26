@@ -15,9 +15,12 @@ use zovye\Helper;
 use zovye\Job;
 use zovye\JSON;
 use zovye\model\balanceModelObj;
+use zovye\model\team_memberModelObj;
+use zovye\model\teamModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Task;
+use zovye\Team;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
@@ -32,6 +35,7 @@ use zovye\Mall;
 use zovye\PlaceHolder;
 use zovye\Questionnaire;
 
+use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
@@ -71,6 +75,7 @@ class api
     public static function migrateUrl(): array
     {
         $url = Util::murl('util', ['op' => 'migrate', 'token' => \zovye\api\wx\common::getToken()]);
+
         return ['url' => $url];
     }
 
@@ -94,12 +99,13 @@ class api
 
         if ($type == Advertising::SPONSOR) {
             $total = 0;
-            foreach($list as &$item) {
+            foreach ($list as &$item) {
                 $item['title'] = PlaceHolder::replace($item['title'], [
                     'num' => intval($item['data']['num']),
                 ]);
                 $total += intval($item['data']['num']);
             }
+
             return [
                 'total' => $total,
                 'list' => $list,
@@ -433,7 +439,7 @@ class api
     public static function getJumpUserInfo(): array
     {
         $openid = request::str('openid');
-        
+
         $user = User::get($openid, true);
         if (empty($user)) {
             return err('找不到这个用户！');
@@ -449,7 +455,7 @@ class api
 
         return $data;
     }
-    
+
 
     public static function feedback(): array
     {
@@ -789,9 +795,9 @@ class api
             $res = Helper::validateLocation($user, $device, request::float('lat'), request::float('lng'));
             if (is_error($res)) {
                 return $res;
-            }                    
+            }
         }
-        
+
         return '成功！';
     }
 
@@ -803,6 +809,7 @@ class api
     public static function getUserBank(): array
     {
         $user = \zovye\api\wx\common::getUser();
+
         return \zovye\api\wx\common::getUserBank($user);
     }
 
@@ -814,13 +821,14 @@ class api
     public static function setUserBank(): array
     {
         $user = \zovye\api\wx\common::getUser();
+
         return \zovye\api\wx\common::setUserBank($user);
     }
-
 
     public static function getUserQRCode(): array
     {
         $user = \zovye\api\wx\common::getUser();
+
         return \zovye\api\wx\common::getUserQRCode($user);
     }
 
@@ -828,6 +836,7 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
         $type = request::str('type');
+
         return \zovye\api\wx\common::updateUserQRCode($user, $type);
     }
 }

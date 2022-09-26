@@ -15,6 +15,7 @@ use zovye\model\deviceModelObj;
 use zovye\Order;
 use zovye\Pay;
 use zovye\request;
+use zovye\Team;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
@@ -30,6 +31,13 @@ class charging
         $data = $user->profile();
         $data['banned'] = $user->isBanned();
         $data['commission_balance'] = $user->getCommissionBalance()->total();
+
+        if (App::isTeamEnabled()) {
+            $team = Team::getFor($user);
+            if ($team) {
+                $data['team'] = $team->profile();
+            }
+        }
 
         if (App::isChargingDeviceEnabled()) {
             $last_charging_data = $user->settings('chargingNOW', []);

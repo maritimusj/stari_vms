@@ -21,7 +21,7 @@ class member
 {
     public static function getMemberList(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
         $locker = $user->acquireLocker('team');
         try {
             if (empty($locker)) {
@@ -126,7 +126,7 @@ class member
 
     public static function memberUserInfo(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $mobile = request::str('mobile');
 
@@ -154,7 +154,7 @@ class member
 
     public static function createMember()
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $team = Team::getOrCreateFor($user);
         if (empty($team)) {
@@ -193,7 +193,7 @@ class member
 
     public static function editMember()
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $id = request::int('id');
         $member = Team::getMember($id);
@@ -236,7 +236,7 @@ class member
 
     public static function removeMember()
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $id = request::int('id');
         $member = Team::getMember($id);
@@ -260,7 +260,7 @@ class member
 
     public static function transfer()
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         if (!App::isTeamEnabled()) {
             return err('车队功能没有启用！');
@@ -278,7 +278,7 @@ class member
                 return err('转帐金额不正确！');
             }
 
-            if ($total > $user->getCommissionBalanceCard()->total()) {
+            if ($total > $user->getCommissionBalance()->total()) {
                 return err('帐户余额不足！');
             }
 
@@ -345,7 +345,7 @@ class member
 
     public static function orderList(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $id = request::int('id');
 
@@ -427,7 +427,7 @@ class member
 
     public static function chargingList(): array
     {
-        $user = common::getUser();
+        $user = common::getWXAppUser();
 
         $id = request::int('id');
 

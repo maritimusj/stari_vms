@@ -540,7 +540,7 @@ class Device extends State
         if (empty($imei)) {
             $imei = self::DUMMY_DEVICE_PREFIX.Util::random(16, true);
         }
-
+        $device->setName('');
         $device->setImei($imei);
         return $device;
     }

@@ -197,6 +197,7 @@ class agent
                 'wxplatform' => App::isWxPlatformEnabled(),
                 'douyin' => App::isDouyinEnabled(),
                 'balance' => App::isBalanceEnabled(),
+                'team' => App::isTeamEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

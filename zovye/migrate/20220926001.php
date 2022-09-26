@@ -20,7 +20,7 @@ CREATE TABLE `ims_zovye_vms_team_member` (
     `user_id` INT NOT NULL DEFAULT '0', 
     `mobile` VARCHAR(32) NOT NULL , 
     `name` VARCHAR(32) NOT NULL , 
-    `created_at` INT NOT NULL , 
+    `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     INDEX (`team_id`, `user_id`), 
     INDEX (`mobile`)) ENGINE = InnoDB;

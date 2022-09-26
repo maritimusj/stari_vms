@@ -609,4 +609,11 @@ class App
             return boolval(settings('custom.smsPromo.enabled'));
         });
     }
+
+    public static function isTeamEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.team.enabled'));
+        });
+    }    
 }

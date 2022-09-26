@@ -326,7 +326,7 @@ class member
             $to = $u->getCommissionBalance()->change($total, CommissionBalance::TRANSFER_TO, [
                 'from' => [
                     'team' => $team->profile(),
-                    'member' => $member->profile(),
+                    'member' => $member->profile(false),
                     'user' => $user->profile(false),
                 ],
             ]);
@@ -335,10 +335,12 @@ class member
                 return err('转帐失败，请重试！');
             }
 
+            $profile = $u->profile();
+            $profile['commission_balance'] = $u->getCommissionBalance()->total();
             return [
                 'message' => '转帐成功！',
                 'total' => $total,
-                'to' => $u->profile(),
+                'to' => $profile,
             ];
         });
     }

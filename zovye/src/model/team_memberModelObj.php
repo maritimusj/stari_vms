@@ -58,17 +58,22 @@ class team_memberModelObj extends modelObj
         return null;
     }
 
-    public function profile(): array
+    public function profile($detail = true): array
     {
         $user = $this->user();
 
-        return [
+        $data = [
             'id' => $this->getId(),
-            'user' => $user ? $user->profile() : [],
             'mobile' => $this->mobile,
             'name' => $this->name,
             'remark' => $this->remark,
             'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
         ];
+
+        if ($detail) {
+            $user = $this->user();
+            $data['user'] = $user ? $user->profile() : [];
+        }
+        return $data;
     }
 }

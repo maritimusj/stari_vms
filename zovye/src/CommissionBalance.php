@@ -364,21 +364,21 @@ PAY_INFO;
 $pay_info
 </dl>
 RECHARGE;
-        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_TO) {
+        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_FROM) {
             $user = $entry->getExtraData('to.user', []);
             $data['memo'] = <<<TRANSFER
 <dl class="log dl-horizontal">
 <dt>事件</dt>
-<dd class="event">转账给用户</dd>
-<dt>用户</dt><dd class=\"user\"><img src=\"{$user['headimgurl']}\" alt=''/>{$user['nickname']}</dd>
+<dd class="event">余额转出</dd>
+<dt>对方</dt><dd class="user"><img src="{$user['headimgurl']}" alt=''/>{$user['nickname']}</dd>
 TRANSFER;
-        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_FROM) {
+        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_TO) {
             $user = $entry->getExtraData('from.user', []);
             $data['memo'] = <<<TRANSFER
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">收到转账</dd>
-<dt>用户</dt><dd class=\"user\"><img src=\"{$user['headimgurl']}\" alt=''/>{$user['nickname']}</dd>
+<dt>来自</dt><dd class="user"><img src="{$user['headimgurl']}" alt=''/>{$user['nickname']}</dd>
 TRANSFER;
         }
 

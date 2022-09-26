@@ -203,7 +203,7 @@ class member
 
         $team = $member->team();
         if (empty($team)) {
-            return err('没有权限管理这个成员');
+            return err('没有权限管理这个队员');
         }
 
         if ($team->getOwnerId() != $user->getId()) {
@@ -246,7 +246,7 @@ class member
 
         $team = $member->team();
         if (empty($team)) {
-            return err('没有权限管理这个成员');
+            return err('没有权限管理这个队员');
         }
 
         if ($team->getOwnerId() != $user->getId()) {
@@ -289,7 +289,7 @@ class member
 
             $team = $member->team();
             if (empty($team)) {
-                return err('没有权限管理这个成员');
+                return err('没有权限管理这个队员');
             }
 
             if ($team->getOwnerId() != $user->getId()) {
@@ -356,7 +356,7 @@ class member
 
         $team = $member->team();
         if (empty($team)) {
-            return err('没有权限管理这个成员');
+            return err('没有权限管理这个队员');
         }
 
         if ($team->getOwnerId() != $user->getId()) {
@@ -438,7 +438,7 @@ class member
 
         $team = $member->team();
         if (empty($team)) {
-            return err('没有权限管理这个成员');
+            return err('没有权限管理这个队员');
         }
 
         if ($team->getOwnerId() != $user->getId()) {

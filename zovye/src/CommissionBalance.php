@@ -57,8 +57,8 @@ class CommissionBalance extends State
         self::CHARGING => '充电桩订单结算',
         self::CHARGING_SF => '充电桩订单(服务费)',
         self::CHARGING_EF => '充电桩订单(电费)',
-        self::TRANSFER_FROM => '转帐给用户',
-        self::TRANSFER_TO => '收到转帐',
+        self::TRANSFER_FROM => '转账给用户',
+        self::TRANSFER_TO => '收到转账',
     ];
 
     private $user;
@@ -364,6 +364,22 @@ PAY_INFO;
 $pay_info
 </dl>
 RECHARGE;
+        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_TO) {
+            $user = $entry->getExtraData('to.user', []);
+            $data['memo'] = <<<TRANSFER
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">转账给用户</dd>
+<dt>用户</dt><dd class=\"user\"><img src=\"{$user['headimgurl']}\" alt=''/>{$user['nickname']}</dd>
+TRANSFER;
+        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_FROM) {
+            $user = $entry->getExtraData('from.user', []);
+            $data['memo'] = <<<TRANSFER
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">收到转账</dd>
+<dt>用户</dt><dd class=\"user\"><img src=\"{$user['headimgurl']}\" alt=''/>{$user['nickname']}</dd>
+TRANSFER;
         }
 
         return $data;

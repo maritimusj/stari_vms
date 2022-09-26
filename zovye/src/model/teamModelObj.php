@@ -11,6 +11,10 @@ use zovye\Contract\ICard;
 use zovye\User;
 use function zovye\tb;
 
+/**
+ * @method getOwnerId();
+ * @method setOwnerId()
+ */
 class teamModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

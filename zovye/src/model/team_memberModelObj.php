@@ -11,6 +11,14 @@ use zovye\Team;
 use zovye\User;
 use function zovye\tb;
 
+/**
+ * @method getMobile();
+ * @method setMobile(string $mobile);
+ * @method setName(string $name);
+ * @method getName();
+ * @method getRemark();
+ * @method setRemark(string $remark);
+ */
 class team_memberModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

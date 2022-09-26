@@ -7,6 +7,8 @@ use zovye\App;
 use zovye\CommissionBalance;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
+use zovye\model\userModelObj;
+use zovye\Order;
 use zovye\request;
 use zovye\State;
 use zovye\Team;
@@ -52,6 +54,8 @@ class member
 
             $query->page($page, $page_size);
 
+            $query->orderby('id desc');
+
             $list = [];
 
             /** @var team_memberModelObj $member */
@@ -83,25 +87,35 @@ class member
         }
     }
 
-    public static function checkMember(teamModelObj $team, $mobile)
+    public static function checkMember(teamModelObj $team, $mobile, $member_id = 0)
     {
         if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
             return err('手机号码不正确！');
         }
 
-        $member_exists = Team::findAllMember($team, [
-            'mobile' => $mobile,
-        ])->exists();
+        $member = $member_id > 0 ? [
+            'id <>' => $member_id,
+        ] : [];
+
+        $member_exists = Team::findAllMember(
+            $team,
+            array_merge([
+                'mobile' => $mobile,
+            ], $member)
+        )->exists();
 
         if ($member_exists) {
             return err('手机号码已经是车队成员！');
         }
 
-        $u = User::findOne(['mobile' => $mobile]);
+        $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         if ($u) {
-            $member_exists = Team::findAllMember($team, [
-                'user_id' => $u->getId(),
-            ])->exists();
+            $member_exists = Team::findAllMember(
+                $team,
+                array_merge([
+                    'user_id' => $u->getId(),
+                ], $member)
+            )->exists();
 
             if ($member_exists) {
                 return err('手机号码已经加入车队！');
@@ -126,7 +140,7 @@ class member
             return err('找不到车队或者创建车队失败！');
         }
 
-        $result = self::checkMember($team, $mobile);
+        $result = self::checkMember($team, $mobile, request::int('member'));
         if (is_error($result)) {
             return $result;
         }
@@ -330,6 +344,88 @@ class member
         });
     }
 
+    public static function orderList(): array
+    {
+        $user = common::getUser();
+
+        $id = request::int('id');
+
+        $member = Team::getMember($id);
+        if (empty($member)) {
+            return err('找不到这个车队队员！');
+        }
+
+        $team = $member->team();
+        if (empty($team)) {
+            return err('没有权限管理这个成员');
+        }
+
+        if ($team->getOwnerId() != $user->getId()) {
+            return err('没有权限管理这个队员！');
+        }
+
+        $u = $member->user();
+        if (empty($u)) {
+            $mobile = $member->getMobile();
+            if (!empty($mobile)) {
+                $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
+            }
+        }
+
+        if (empty($u)) {
+            return err('找不到这个成员对应的用户！');
+        }
+
+        $query = Order::query([
+            'openid' => $u->getOpenid(),
+            'result_code' => 0,
+            'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
+        ]);
+
+        $page = max(1, request::int('page'));
+        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+        //列表数据
+        $query->page($page, $page_size);
+
+        $keywords = request::trim('keywords');
+        if ($keywords) {
+            $query->where(['order_id REGEXP' => $keywords]);
+        }
+
+        $query->orderby('id desc');
+
+        $list = [];
+        foreach ($query->findAll() as $order) {
+            $list[] = Order::format($order, true);
+        }
+
+        return $list;
+    }
+
+    public static function orderDetail(): array
+    {
+        $serial = request::str('serial');
+
+        $order = Order::get($serial, true);
+        if (empty($order)) {
+            return err('找不到这个订单！');
+        }
+
+        if (!$order->isChargingResultOk()) {
+            $data = $order->getChargingResult();
+
+            return err('订单没有完成，故障：'.$data['re']);
+        }
+
+        if (!$order->isChargingFinished()) {
+            return err('订单没有完成！');
+        }
+
+        return Order::format($order, true);
+    }
+
+
     public static function chargingList(): array
     {
         $user = common::getUser();
@@ -365,6 +461,7 @@ class member
         $query = $u->getCommissionBalance()->log();
         $query->where([
             'src' => [
+                CommissionBalance::TRANSFER_TO,
                 CommissionBalance::CHARGING,
                 CommissionBalance::WITHDRAW,
             ],

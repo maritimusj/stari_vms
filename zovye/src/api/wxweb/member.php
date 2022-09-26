@@ -110,7 +110,7 @@ class member
             return $result;
         }
 
-        $u = User::findOne(['mobile' => $mobile]);
+        $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         if ($u) {
             return $u->profile();
         }
@@ -141,7 +141,7 @@ class member
         $name = request::str('name');
         $remark = request::str('remark');
 
-        $u = User::findOne(['mobile' => $mobile]);
+        $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         if ($u) {
             /** @var team_memberModelObj $member */
             $member = Team::addMember($team, $u, $name, $remark);
@@ -266,7 +266,7 @@ class member
             if (empty($u)) {
                 $mobile = $member->getMobile();
                 if (!empty($mobile)) {
-                    $u = User::findOne(['mobile' => $mobile]);
+                    $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
                 }
             }
 
@@ -333,7 +333,7 @@ class member
         if (empty($u)) {
             $mobile = $member->getMobile();
             if (!empty($mobile)) {
-                $u = User::findOne(['mobile' => $mobile]);
+                $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
             }
         }
 

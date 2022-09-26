@@ -75,5 +75,7 @@ router::exec($op, [
     'editMember' => '\zovye\api\wxweb\member::editMember',
     'removeMember' => '\zovye\api\wxweb\member::removeMember',
     'transfer' => '\zovye\api\wxweb\member::transfer',
-    'chargingList' => '\zovye\api\wxweb\member::chargingList',
+    'memberOrderList' => '\zovye\api\wxweb\member::orderList',
+    'memberOrderDetail' => '\zovye\api\wxweb\member::orderDetail',
+    'memberChargingList' => '\zovye\api\wxweb\member::chargingList',
 ]);

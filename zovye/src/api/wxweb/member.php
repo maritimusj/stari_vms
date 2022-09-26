@@ -92,6 +92,11 @@ class member
             return err('手机号码不正确！');
         }
 
+        $owner = $team->owner();
+        if ($owner && $owner->getMobile() == $mobile) {
+            return err('不能添加自己的手机号码！');
+        }
+
         $member = $member_id > 0 ? [
             'id <>' => $member_id,
         ] : [];
@@ -306,6 +311,10 @@ class member
 
             if (empty($u)) {
                 return err('找不到这个成员对应的用户！');
+            }
+
+            if ($user->getId() == $u->getId()) {
+                return err('无法给自己转账！');
             }
 
             $from = $user->getCommissionBalance()->change(

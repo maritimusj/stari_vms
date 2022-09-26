@@ -39,6 +39,15 @@ class member
             $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $query = Team::findAllMember($team);
+
+            if (request::has('keyword')) {
+                $keyword = request::trim('keyword');
+                $query->whereOr([
+                    'mobile LIKE' => '%' . $keyword . '%',
+                    'remark LIKE' => '%' . $keyword . '%',
+                ]);
+            }
+
             $total = $query->count();
 
             $query->page($page, $page_size);

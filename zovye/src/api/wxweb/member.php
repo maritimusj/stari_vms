@@ -43,8 +43,8 @@ class member
             if (request::has('keyword')) {
                 $keyword = request::trim('keyword');
                 $query->whereOr([
-                    'mobile LIKE' => '%' . $keyword . '%',
-                    'remark LIKE' => '%' . $keyword . '%',
+                    'mobile LIKE' => '%'.$keyword.'%',
+                    'remark LIKE' => '%'.$keyword.'%',
                 ]);
             }
 
@@ -56,7 +56,19 @@ class member
 
             /** @var team_memberModelObj $member */
             foreach ($query->findAll() as $member) {
-                $list[] = $member->profile();
+                $data = $member->profile();
+                $user = $member->user();
+                if (empty($user)) {
+                    $mobile = $member->getMobile();
+                    if ($mobile) {
+                        $user = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
+                    }
+                }
+                if ($user) {
+                    $data['user'] = $user->profile();
+                    $data['balance'] = $user->getCommissionBalance()->total();
+                }
+                $list[] = $data;
             }
 
             return [

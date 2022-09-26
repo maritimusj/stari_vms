@@ -246,6 +246,7 @@ class agent
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
             Log::error('wxapi', $res);
+
             return $res;
         }
 
@@ -1779,6 +1780,7 @@ class agent
         if ($user instanceof keeperModelObj) {
             return common::getUserQRCode($user->getUser());
         }
+
         return common::getUserQRCode($user);
     }
 
@@ -1789,6 +1791,7 @@ class agent
         if ($user instanceof keeperModelObj) {
             return common::updateUserQRCode($user->getUser(), $type);
         }
+
         return common::updateUserQRCode($user, $type);
     }
 
@@ -1980,7 +1983,7 @@ class agent
                 'agent' => $user->getAgentId(),
             ];
 
-            $countFN = function (DateTimeInterface $begin = null, DateTimeInterface $end = null) use ($user) {
+            $countFN = function ($begin = null, $end = null) use ($user) {
                 $cond = [
                     'agent_id' => $user->getAgentId(),
                 ];

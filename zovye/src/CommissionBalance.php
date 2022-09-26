@@ -35,6 +35,9 @@ class CommissionBalance extends State
     const CHARGING_SF = 21;
     const CHARGING_EF = 22;
 
+    const CHARGING_PAY_FOR_TEAM = 23;
+    const CHARGING_PAID_BY_TEAM = 24;
+
     protected static $unknown = 'n/a';
 
     protected static $title = [
@@ -54,6 +57,8 @@ class CommissionBalance extends State
         self::CHARGING => '充电桩订单结算',
         self::CHARGING_SF => '充电桩订单(服务费)',
         self::CHARGING_EF => '充电桩订单(电费)',
+        self::CHARGING_PAY_FOR_TEAM => '充电桩订单结算(代付)',
+        self::CHARGING_PAID_BY_TEAM => '充电桩订单结算(车队代付)',
     ];
 
     private $user;
@@ -502,7 +507,7 @@ ORDER;
      */
     public function change(int $val, int $src, array $extra = []): ?commission_balanceModelObj
     {
-        if ($this->user && $val != 0) {
+        if ($this->user) {
             return m('commission_balance')->create(
                 We7::uniacid(
                     [

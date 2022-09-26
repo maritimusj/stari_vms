@@ -315,7 +315,7 @@
             <li role="separator" class="divider"></li>
             {/if}
             {if \zovye\App::isTeamEnabled()}
-            <li><a href="#" data-op="viewTeam"><i class="fa users fa-fw"></i> 查看车队</a></li>
+            <li><a href="#" data-op="viewTeam"><i class="fa fa-users fa-fw"></i> 查看车队</a></li>
             <li role="separator" class="divider"></li>
             {/if}
             <li><a href="#" data-op="orderList"><i class="fa fa-list fa-fw"></i> 领取记录</a></li>
@@ -450,7 +450,7 @@
     }
 
     api.viewTeam = function(userid) {
-        window.location.href = "{php echo $this->createWebUrl('team', ['op' => 'team', 'id' => '__id__']);}".replace('__id__', userid);
+        window.location.href = "{php echo $this->createWebUrl('team', ['op' => 'detail', 'id' => '__id__']);}".replace('__id__', userid);
     }
 
     api.orderList = function(userid) {

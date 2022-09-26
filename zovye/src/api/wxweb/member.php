@@ -3,6 +3,7 @@
 namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
+use zovye\App;
 use zovye\CommissionBalance;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
@@ -226,6 +227,10 @@ class member
     public static function transfer()
     {
         $user = common::getUser();
+
+        if (!App::isTeamEnabled()) {
+            return err('车队功能没有启用！');
+        }
 
         //先锁定用户，防止恶意重复提交
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {

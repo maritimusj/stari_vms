@@ -11,6 +11,7 @@ use zovye\model\team_memberModelObj;
 $op = request::op('default');
 
 if ($op == 'detail') {
+    
     $user_id = request::int('id');
     $user = User::get($user_id);
     if (empty($user)) {

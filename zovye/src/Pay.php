@@ -418,6 +418,11 @@ class Pay
         return null;
     }
 
+    public static function getPayLogById(int $id): ?pay_logsModelObj
+    {
+        return m('pay_logs')->findOne(['id' => $id]);
+    }
+
     /**
      * 获取支付记录
      * @param string $order_no 订单编号

@@ -687,7 +687,9 @@ class userModelObj extends modelObj
             }
 
             $balance = $this->getCommissionBalance();
-            if (!$balance->change($price, CommissionBalance::RECHARGE)) {
+            if (!$balance->change($price, CommissionBalance::RECHARGE, [
+                'pay_log' => $pay_log->getId(),
+            ])) {
                 return err('创建用户账户记录失败!');
             }
 

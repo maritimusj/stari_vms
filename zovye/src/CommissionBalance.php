@@ -339,10 +339,29 @@ $device_info
 </dl>
 CHARGING;
         } elseif ($entry->getSrc() == CommissionBalance::RECHARGE) {
+            $pay_info = '';
+            $pay_log_id = $entry->getExtraData('pay_log', 0);
+            if ($pay_log_id > 0) {
+                $pay_log = Pay::getPayLogById($pay_log_id);
+                if ($pay_log) {
+                    $result = $entry->getPayResult();
+                    if (empty($result)) {
+                        $result = $entry->getQueryResult();
+                    }
+                    $transaction_id = $result ? $result['transaction_id'] : '';
+                    $pay_name = $entry->getPayName();
+                    $pay_info = <<<PAY_INFO
+<dt><img src="{MODULE_URL}static/img/$pay_name.svg" title="{php echo \zovye\Pay::getTitle($pay_name)}"></dt>
+<dd class="event">$transaction_id</dd>
+PAY_INFO;
+                }
+            }
+
             $data['memo'] = <<<RECHARGE
 <dl class="log dl-horizontal">
 <dt>事件</dt>
 <dd class="event">用户充值</dd>
+$pay_info
 </dl>
 RECHARGE;
         }

@@ -69,7 +69,7 @@ router::exec($op, [
     'rechargeList' => '\zovye\api\wxweb\charging::rechargeList',
     'withdraw' => '\zovye\api\wxweb\charging::withdraw',
 
-    'getMemberList' => '\zovye\api\wxweb\member::getMemberList',
+    'memberList' => '\zovye\api\wxweb\member::getMemberList',
     'memberUserInfo' => '\zovye\api\wxweb\member::memberUserInfo',
     'createMember' => '\zovye\api\wxweb\member::createMember',
     'editMember' => '\zovye\api\wxweb\member::editMember',

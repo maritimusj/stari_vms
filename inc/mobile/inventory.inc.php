@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use RuntimeException;
+
 defined('IN_IA') or exit('Access Denied');
 
 $mobile = request::str('mobile');
@@ -26,3 +28,37 @@ if (!$inventory->acquireLocker()) {
     JSON::fail('锁定用户仓库失败！');
 }
 
+$goods = Goods::get($goods_id);
+if (empty($goods)) {
+    JSON::fail('找不到指定的商品！');
+}
+
+$result = Util::transactionDo(function () use ($inventory, $goods, $num) {
+    $clr = Util::randColor();
+
+    $inventory_goods = $inventory->query(['goods_id' => $goods->getId()])->findOne();
+    if (!empty($inventory_goods)) {
+        $num = $num - $inventory_goods->getNum();
+    }
+
+    $log = $inventory->stock(null, $goods, $num, [
+        'memo' => '第三方接口请求',
+        'clr' => $clr,
+        'serial' => REQUEST_ID,
+    ]);
+
+    if (!$log) {
+        throw new RuntimeException('入库失败！');
+    }
+
+    return $num;
+});
+
+if (is_error($result)) {
+    JSON::fail($result);
+}
+
+JSON::success([
+    'request_id' => REQUEST_ID,
+    'num' => $num,
+]);

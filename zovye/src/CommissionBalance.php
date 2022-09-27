@@ -344,15 +344,17 @@ CHARGING;
             if ($pay_log_id > 0) {
                 $pay_log = Pay::getPayLogById($pay_log_id);
                 if ($pay_log) {
-                    $result = $entry->getPayResult();
+                    $result = $pay_log->getPayResult();
                     if (empty($result)) {
-                        $result = $entry->getQueryResult();
+                        $result = $pay_log->getQueryResult();
                     }
                     $transaction_id = $result ? $result['transaction_id'] : '';
-                    $pay_name = $entry->getPayName();
+                    $pay_name = $pay_log->getPayName();
+                    $title = Pay::getTitle($pay_name);
+                    $image = MODULE_URL . "static/img/$pay_name.svg";
                     $pay_info = <<<PAY_INFO
-<dt><img src="{MODULE_URL}static/img/$pay_name.svg" title="{php echo \zovye\Pay::getTitle($pay_name)}"></dt>
-<dd class="event">$transaction_id</dd>
+<dt>支付</dt>
+<dd class="event"><img src="$image" title="$title" style="width: 18px;height: 18px;">$transaction_id</dd>
 PAY_INFO;
                 }
             }

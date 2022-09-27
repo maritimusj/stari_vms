@@ -70,6 +70,9 @@
     a[filter] {
         cursor: pointer;
     }
+    strong.total {
+        color: #8bc34a;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_way)}
@@ -322,7 +325,7 @@
                                     </div>
                                     {if $order['charging']['record']['total']}
                                     <div>
-                                        <i class="fa fa-bolt"></i> 总耗电量：<strong>{$order['charging']['record']['total']}</strong> 度
+                                        <i class="fa fa-bolt"></i> 总耗电量：<strong class="total">{$order['charging']['record']['total']}</strong> 度
                                     </div>
                                     {/if}
                                     {if $order['charging']['record']['start']}

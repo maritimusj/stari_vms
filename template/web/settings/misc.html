@@ -221,8 +221,8 @@
                 <div class="form-group">
                     <label for="inventoryApiUrl" class="col-md-2 control-label">API URL</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="inventoryApiUrl" id="inventoryApiUrl" value="{$inventory_api_url}">
-                        <span class="help-block">* 第三方调用该接口操作指定代理商库存数据</span>
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$inventory_api_url}"></i> {$inventory_api_url}</span>
+                        <span class="help-block">* 第三方调用该接口操作指定代理商库存数据，必要参数: mobile(代理商手机号码), goods(商品ID), num(变动数量), key(API KEY)</span>
                     </div>
                 </div>
             </div>

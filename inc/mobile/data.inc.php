@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $op = request::op('default');
 if ($op == 'default') {
     app()->showTemplate('misc/data', [

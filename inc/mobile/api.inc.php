@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $app_key = request::str('appkey');
 if (empty($app_key) || $app_key !== settings('app.key')) {
     JSON::fail('appkey不正确！');

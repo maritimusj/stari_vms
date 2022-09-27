@@ -97,30 +97,16 @@ class member
             return err('不能添加自己的手机号码！');
         }
 
-        $member = $member_id > 0 ? [
-            'id <>' => $member_id,
-        ] : [];
+        $condition = $member_id > 0 ? ['id <>' => $member_id] : [];
 
-        $member_exists = Team::findAllMember(
-            $team,
-            array_merge([
-                'mobile' => $mobile,
-            ], $member)
-        )->exists();
-
+        $member_exists = Team::findAllMember($team, array_merge(['mobile' => $mobile], $condition))->exists();
         if ($member_exists) {
             return err('手机号码已经是车队成员！');
         }
 
         $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         if ($u) {
-            $member_exists = Team::findAllMember(
-                $team,
-                array_merge([
-                    'user_id' => $u->getId(),
-                ], $member)
-            )->exists();
-
+            $member_exists = Team::findAllMember($team, array_merge(['user_id' => $u->getId()], $condition))->exists();
             if ($member_exists) {
                 return err('手机号码已经加入车队！');
             }
@@ -346,6 +332,7 @@ class member
 
             $profile = $u->profile();
             $profile['commission_balance'] = $u->getCommissionBalance()->total();
+
             return [
                 'message' => '转帐成功！',
                 'total' => $total,

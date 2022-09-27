@@ -32,7 +32,6 @@ use zovye\Mall;
 use zovye\PlaceHolder;
 use zovye\Questionnaire;
 
-use zovye\We7;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\isEmptyArray;

@@ -376,6 +376,26 @@
                                     <div>
                                         <i class="fa fa-info-circle"></i> 设备故障：[{php echo $order['charging']['result']['re']??'n/a'}]
                                     </div>
+                                    {if $order['charging']['result']['re'] != 3}
+                                    <div>
+                                        <i class="fa fa-info-circle"></i> 故障描述：
+                                        {if $order['charging']['result']['re'] == 112}
+                                        设备正在充电中
+                                        {elseif $order['charging']['result']['re'] == 113}
+                                        设备发生故障
+                                        {elseif $order['charging']['result']['re'] == 114}
+                                        设备离线
+                                        {elseif $order['charging']['result']['re'] == 115}
+                                        充电枪没有插入
+                                        {elseif $order['charging']['result']['re'] == 121}
+                                        设备通讯失败
+                                        {elseif $order['charging']['result']['re'] == 122}
+                                        设备响应超时
+                                        {else}
+                                        其它设备故障[{php echo $order['charging']['result']['re'] - 110}
+                                        {/if}
+                                    </div>
+                                    {/if}
                                     {else}
                                     <div>
                                         <i class="fa fa-info-circle"></i> 查询中...

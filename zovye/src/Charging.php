@@ -306,9 +306,12 @@ class Charging
                 return err("启动失败：设备离线");
             } elseif ($result['re'] == 115) {
                 return err("启动失败：充电枪没有插入");
+            } elseif ($result['re'] == 121) {
+                return err("启动失败：设备通讯失败");
+            } elseif ($result['re'] == 122) {
+                return err("启动失败：设备响应超时");
             }
-
-            return err("启动失败：故障[{$result['re']}]");
+            return err("启动失败：设备故障".($result['re'] - 110));
         }
 
         $device = $order->getDevice();
@@ -388,6 +391,7 @@ class Charging
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
+
             return $order->save();
         }
 
@@ -450,6 +454,7 @@ class Charging
             return true;
         });
     }
+
     public static function checkOrder(orderModelObj $order)
     {
         $serial = $order->getOrderNO();
@@ -458,6 +463,7 @@ class Charging
             Charging::settle($serial, $res['chargerID'], $res);
         }
     }
+
     public static function settleCharging($serial)
     {
         $order = Order::get($serial, true);

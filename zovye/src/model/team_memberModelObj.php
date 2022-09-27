@@ -58,10 +58,22 @@ class team_memberModelObj extends modelObj
         return null;
     }
 
-    public function profile($detail = true): array
+    public function getAssociatedUser(): ?userModelObj
     {
         $user = $this->user();
+        if ($user) {
+            return $user;
+        }
 
+        if (!empty($this->mobile)) {
+            return User::findOne(['mobile' => $this->mobile, 'app' => User::WxAPP]);
+        }
+
+        return null;
+    }
+
+    public function profile($detail = true): array
+    {
         $data = [
             'id' => $this->getId(),
             'mobile' => $this->mobile,
@@ -74,6 +86,7 @@ class team_memberModelObj extends modelObj
             $user = $this->user();
             $data['user'] = $user ? $user->profile() : [];
         }
+
         return $data;
     }
 }

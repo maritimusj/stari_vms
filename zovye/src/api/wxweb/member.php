@@ -5,6 +5,7 @@ namespace zovye\api\wxweb;
 use zovye\api\wx\common;
 use zovye\App;
 use zovye\CommissionBalance;
+use zovye\model\orderModelObj;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
 use zovye\Order;
@@ -60,13 +61,7 @@ class member
             /** @var team_memberModelObj $member */
             foreach ($query->findAll() as $member) {
                 $data = $member->profile();
-                $user = $member->user();
-                if (empty($user)) {
-                    $mobile = $member->getMobile();
-                    if ($mobile) {
-                        $user = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
-                    }
-                }
+                $user = $member->getAssociatedUser();
                 if ($user) {
                     $data['user'] = $user->profile();
                     $data['balance'] = $user->getCommissionBalance()->total();
@@ -287,14 +282,7 @@ class member
                 return err('没有权限管理这个队员！');
             }
 
-            $u = $member->user();
-            if (empty($u)) {
-                $mobile = $member->getMobile();
-                if (!empty($mobile)) {
-                    $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
-                }
-            }
-
+            $u = $member->getAssociatedUser();
             if (empty($u)) {
                 return err('找不到这个成员对应的用户！');
             }
@@ -345,36 +333,50 @@ class member
     {
         $user = common::getWXAppUser();
 
-        $id = request::int('id');
+        if (request::has('id')) {
+            $id = request::int('id');
 
-        $member = Team::getMember($id);
-        if (empty($member)) {
-            return err('找不到这个车队队员！');
-        }
+            $member = Team::getMember($id);
+            if (empty($member)) {
+                return err('找不到这个车队队员！');
+            }
 
-        $team = $member->team();
-        if (empty($team)) {
-            return err('没有权限管理这个队员');
-        }
+            $team = $member->team();
+            if (empty($team)) {
+                return err('没有权限管理这个队员');
+            }
 
-        if ($team->getOwnerId() != $user->getId()) {
-            return err('没有权限管理这个队员！');
-        }
+            if ($team->getOwnerId() != $user->getId()) {
+                return err('没有权限管理这个队员！');
+            }
 
-        $u = $member->user();
-        if (empty($u)) {
-            $mobile = $member->getMobile();
-            if (!empty($mobile)) {
-                $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
+            $u = $member->getAssociatedUser();
+            if (empty($u)) {
+                return err('找不到这个成员对应的用户！');
+            }
+
+            $member_openid = $u->getOpenid();
+
+        } else {
+            $team = Team::getFor($user);
+            if (empty($team)) {
+                return err('找不到用户的车队信息！');
+            }
+
+            $member_openid = [];
+            $member_query = Team::findAllMember($team);
+            /** @var team_memberModelObj $member */
+            foreach ($member_query->findAll() as $member) {
+                $user = $member->getAssociatedUser();
+                if (empty($user)) {
+                    continue;
+                }
+                $member_openid[] = $user->getOpenid();
             }
         }
 
-        if (empty($u)) {
-            return err('找不到这个成员对应的用户！');
-        }
-
         $query = Order::query([
-            'openid' => $u->getOpenid(),
+            'openid' => $member_openid,
             'result_code' => 0,
             'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
         ]);
@@ -393,8 +395,17 @@ class member
         $query->orderby('id desc');
 
         $list = [];
+        /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
-            $list[] = Order::format($order, true);
+            $data = Order::format($order, true);
+            $user = $order->getUser();
+            if ($user) {
+                $member = Team::getMemberFor($team, $user);
+                if ($member) {
+                    $data['member'] = $member->profile(false);
+                }
+            }
+            $list[] = $data;
         }
 
         return $list;
@@ -443,14 +454,7 @@ class member
             return err('没有权限管理这个队员！');
         }
 
-        $u = $member->user();
-        if (empty($u)) {
-            $mobile = $member->getMobile();
-            if (!empty($mobile)) {
-                $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
-            }
-        }
-
+        $u = $member->getAssociatedUser();
         if (empty($u)) {
             return err('找不到这个成员对应的用户！');
         }

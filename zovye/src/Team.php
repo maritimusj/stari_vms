@@ -47,6 +47,11 @@ class Team
         return m('team_member')->findOne(['id' => $id]);
     }
 
+    public static function getMemberFor(teamModelObj $team, userModelObj $user): ?team_memberModelObj
+    {
+        return m('team_member')->findOne(['team_id' => $team->getId(), 'user_id' => $user->getId()]);
+    }
+
     public static function addMember(
         teamModelObj $team,
         userModelObj $user,

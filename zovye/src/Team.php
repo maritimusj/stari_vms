@@ -49,7 +49,15 @@ class Team
 
     public static function getMemberFor(teamModelObj $team, userModelObj $user): ?team_memberModelObj
     {
-        return m('team_member')->findOne(['team_id' => $team->getId(), 'user_id' => $user->getId()]);
+        $member = m('team_member')->findOne(['team_id' => $team->getId(), 'user_id' => $user->getId()]);
+        if ($member) {
+            return $member;
+        }
+        $mobile = $user->getMobile();
+        if ($mobile) {
+            return m('team_member')->findOne(['team_id' => $team->getId(), 'mobile' => $mobile]);
+        }
+        return null;
     }
 
     public static function addMember(

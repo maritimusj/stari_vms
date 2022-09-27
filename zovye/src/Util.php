@@ -373,12 +373,13 @@ class Util
             error_reporting(0);
         }
 
-        set_error_handler(function ($severity, $str, $file, $line) {
+        set_error_handler(function ($severity, $str, $file, $line,  $context) {
             Log::error('app', [
                 'level' => $severity,
                 'str' => $str,
                 'file' => $file,
                 'line' => $line,
+                'context' => $context,
             ]);
         }, E_ALL ^ E_NOTICE);
 

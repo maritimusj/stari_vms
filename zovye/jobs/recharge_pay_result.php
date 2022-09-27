@@ -70,7 +70,7 @@ if (empty($user)) {
 }
 
 $res = $user->recharge($pay_log);
-if (is_error($res)) {
+if (is_error($res) && $res['errno'] < 0) {
     throw new JobException($res['message'], $log);
 }
 

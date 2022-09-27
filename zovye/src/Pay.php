@@ -276,9 +276,11 @@ class Pay
             if ($pay_log->getLevel() == LOG_RECHARGE) {
                 $user = $pay_log->getOwner();
                 if ($user) {
-                    if ($user->recharge($pay_log)) {
-                        return $pay->getResponse(false);
+                    $res = $user->recharge($pay_log);
+                    if (is_error($res) && $res['errno'] < 0) {
+                        throw new Exception($res['message']);
                     }
+                    return $pay->getResponse();
                 }
                 throw new Exception('处理充值失败！');
 

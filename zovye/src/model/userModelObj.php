@@ -668,15 +668,15 @@ class userModelObj extends modelObj
     public function recharge(pay_logsModelObj $pay_log)
     {
         if (!$pay_log->isPaid()) {
-            return err('未支付完成！');
+            return error(1, '未支付完成！');
         }
 
         if ($pay_log->isRecharged()) {
-            return err('支付记录已使用！');
+            return error(1, '支付记录已使用！');
         }
 
         if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund()) {
-            return err('支付已无效!');
+            return error(1, '支付已无效!');
         }
 
         return Util::transactionDo(function () use ($pay_log) {

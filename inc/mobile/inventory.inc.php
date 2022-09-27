@@ -64,7 +64,10 @@ if (is_error($result)) {
     JSON::fail($result);
 }
 
+$profile = $goods->profile();
+$profile['num'] = $result;
+
 JSON::success([
     'request_id' => REQUEST_ID,
-    'num' => $num,
+    'goods' => $profile,
 ]);

@@ -12,7 +12,7 @@ class Charging
 {
     public static function checkUnfinishedOrder(deviceModelObj $device)
     {
-        $query = Order::query(['src' => Order::CHARGING_UNPAID, '$device_id' => $device->getId()]);
+        $query = Order::query(['src' => Order::CHARGING_UNPAID, 'device_id' => $device->getId()]);
         /** @var orderModelObj $order */
         foreach ($query->findAll() as $order) {
             self::checkOrder($order);

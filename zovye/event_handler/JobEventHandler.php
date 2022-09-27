@@ -18,6 +18,24 @@ class JobEventHandler
     {
         if ($order) {
             Job::order($order->getId());
+
+            //订单通知
+            $notify = Config::notify('order', []);
+            if (!empty($notify['url'])) {
+                if (($notify['f'] && $order->isFree()) || ($notify['p'] && $order->isPay())) {
+                    $data = [];
+                    $device = $order->getDevice();
+                    if ($device) {
+                        $data['device'] = $device->profile(true);
+                    }
+
+                    $agent = $order->getAgent();
+                    if ($agent) {
+                        $data['agent'] = $agent->profile();
+                    }
+                    CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify['url'], json_encode($data));
+                }
+            }
         }
     }
 }

@@ -721,7 +721,7 @@ class deviceModelObj extends modelObj
         return count($this->getCargoLanes());
     }
 
-    public function profile(): array
+    public function profile($detail = false): array
     {
         $data = [
             'id' => $this->getId(),
@@ -736,6 +736,10 @@ class deviceModelObj extends modelObj
             $data['buid'] = $this->getBUID();
         } elseif ($this->isChargingDevice()) {
             $data['isCharging'] = true;
+        }
+
+        if ($detail) {
+            $data['location'] = $this->getLocation();
         }
 
         return $data;
@@ -2478,6 +2482,11 @@ class deviceModelObj extends modelObj
         }
 
         return ['url' => PlaceHolder::replace($url, [$this]), 'delay' => intval($delay)];
+    }
+
+    public function getLocation()
+    {
+       return $this->settings('extra.location.tencent', $this->settings('extra.location', []));
     }
 
     /**

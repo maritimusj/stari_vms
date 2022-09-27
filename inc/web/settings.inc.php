@@ -647,6 +647,14 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 'p' => request::bool('zeroBonusOrderPay') ? 1 : 0,
             ];
         }
+
+        Config::notify('order', [
+            'key' => request::str('orderNotifyAppKey'),
+            'url' => request::trim('orderNotifyUrl'),
+            'f' => request::bool('orderNotifyFree'),
+            'p' => request::bool('orderNotifyPay'),
+        ], true);
+
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;
         $settings['pay']['wx']['enable'] = $wx_enabled;
@@ -1150,6 +1158,12 @@ if ($op == 'account') {
     if (App::isDonatePayEnabled()) {
         $tpl_data['donatePay'] = Config::donatePay('qsc');
     }
+
+    $tpl_data['notify_app_key'] = Config::notify('order.key', Util::random(16));
+    $tpl_data['orderNotifyFree'] = Config::notify('order.f', true);
+    $tpl_data['orderNotifyPay'] = Config::notify('order.p', true);
+    $tpl_data['order_notify_url'] = Config::notify('order.url', '');
+    
 
 } elseif ($op == 'accountMsgConfig') {
 

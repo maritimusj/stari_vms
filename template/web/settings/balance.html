@@ -123,26 +123,24 @@
             <div class="seg">
                 <div class="title">第三方接口</div>
                 <div class="form-group">
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">API Key</label>
-                        <div class="col-md-10">
-                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$app_key}"></i> {$app_key}</span>
-                            <span class="help-block">* 用户第三方接口鉴别身份，详情请参考<a href="https://www.stariata.com/upload/file/20211129.pdf" target="_blank"><b>文档</b></a></span>
-                        </div>
+                    <label class="col-md-2 control-label">API Key</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$app_key}"></i> {$app_key}</span>
+                        <span class="help-block">* 用户第三方接口鉴别身份，详情请参考<a href="https://www.stariata.com/upload/file/20211129.pdf" target="_blank"><b>文档</b></a></span>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">API网址</label>
-                        <div class="col-md-10">
-                            <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$api_url}"></i> {$api_url}</span>
-                            <span class="help-block">* 该接口用于获取积分用户列表，操作用户积分</span>
-                        </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">API网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制网址" data-url="{$api_url}"></i> {$api_url}</span>
+                        <span class="help-block">* 该接口用于获取积分用户列表，操作用户积分</span>
                     </div>
-                    <div class="form-group">
-                        <label for="balanceNotifyUrl" class="col-md-2 control-label">变动通知URL</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="balanceNotifyUrl" id="balanceNotifyUrl" value="{$notify_url}">
-                            <span class="help-block">* 由第三方提供，当用户积分发生变动时，调用此接口</span>
-                        </div>
+                </div>
+                <div class="form-group">
+                    <label for="balanceNotifyUrl" class="col-md-2 control-label">变动通知URL</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="balanceNotifyUrl" id="balanceNotifyUrl" value="{$notify_url}">
+                        <span class="help-block">* 由第三方提供，当用户积分发生变动时，调用此接口</span>
                     </div>
                 </div>
             </div>

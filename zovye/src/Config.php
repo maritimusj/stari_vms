@@ -150,4 +150,13 @@ class Config
         return globalConfig('charging', $key, $v);
     }
     
+    public static function notify($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('notify', $key, $v);
+        }
+
+        return globalConfig('notify', $key, $v);
+    }
+    
 }

@@ -179,6 +179,36 @@
                 {/if}
             </div>
             <div class="seg">
+                <div class="title">订单通知</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">API Key</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$app_key}"></i> {$notify_app_key}</span>
+                        <input type="hidden" name="orderNotifyAppKey" value="{$app_key}"> 
+                        <span class="help-block">* 用户第三方接口鉴别身份</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">订单类型</label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="orderNotifyFree" value="free" {if $orderNotifyFree}checked{/if}> 免费订单
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="orderNotifyPay" value="pay" {if $orderNotifyPay}checked{/if}> 支付订单
+                        </label>
+                        <span class="help-block">* 请选择需要通知的订单类型</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="orderNotifyUrl" class="col-md-2 control-label">通知URL</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="orderNotifyUrl" id="orderNotifyUrl" value="{$order_notify_url}">
+                        <span class="help-block">* 由第三方提供，当指定类型的订单创建后，调用此第三方接口。注：第三方接口返回字符串"Ok"（不包含引号）表示已处理</span>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
                 <div class="title">第三方接口</div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">API网址</label>

@@ -209,6 +209,24 @@
                 </div>
             </div>
             <div class="seg">
+                <div class="title">库存访问接口</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">API Key</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{$inventory_access_key}"></i> {$inventory_access_key}</span>
+                        <input type="hidden" name="inventoryAccessKey" value="{$inventory_access_key}">
+                        <span class="help-block">* 用户于鉴别第三方用户身份</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inventoryApiUrl" class="col-md-2 control-label">API URL</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="inventoryApiUrl" id="inventoryApiUrl" value="{$inventory_api_url}">
+                        <span class="help-block">* 第三方调用该接口操作指定代理商库存数据</span>
+                    </div>
+                </div>
+            </div>
+            <div class="seg">
                 <div class="title">第三方接口</div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">API网址</label>

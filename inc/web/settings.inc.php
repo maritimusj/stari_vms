@@ -655,6 +655,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             'p' => request::bool('orderNotifyPay'),
         ], true);
 
+        Config::notify('inventory', [
+            'key' => request::str('inventoryAccessKey'),
+        ], true);
+
     } elseif ($save_type == 'payment') {
         $wx_enabled = request::bool('wx') ? 1 : 0;
         $settings['pay']['wx']['enable'] = $wx_enabled;
@@ -1163,7 +1167,10 @@ if ($op == 'account') {
     $tpl_data['orderNotifyFree'] = Config::notify('order.f', true);
     $tpl_data['orderNotifyPay'] = Config::notify('order.p', true);
     $tpl_data['order_notify_url'] = Config::notify('order.url', '');
-    
+
+    $tpl_data['inventory_access_key'] = Config::notify('inventory.key', Util::random(16));
+    $tpl_data['inventory_api_url'] = Util::murl('inventory');
+
 
 } elseif ($op == 'accountMsgConfig') {
 

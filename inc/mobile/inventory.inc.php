@@ -13,6 +13,12 @@ defined('IN_IA') or exit('Access Denied');
 $mobile = request::str('mobile');
 $goods_id = request::int('goods');
 $num = request::int('num');
+$key = request::str('key');
+
+$access_key = Config::notify('inventory.key', '');
+if (empty($access_key) || $key != $access_key) {
+    JSON::fail('没有权限访问！');
+}
 
 $agent = Agent::findOne(['mobile' => $mobile]);
 if (empty($agent)) {

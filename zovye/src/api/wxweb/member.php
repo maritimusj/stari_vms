@@ -188,12 +188,8 @@ class member
         }
 
         $team = $member->team();
-        if (empty($team)) {
+        if (empty($team) || $team->getOwnerId() != $user->getId()) {
             return err('没有权限管理这个队员');
-        }
-
-        if ($team->getOwnerId() != $user->getId()) {
-            return err('没有权限管理这个队员！');
         }
 
         $mobile = request::trim('mobile');
@@ -231,12 +227,8 @@ class member
         }
 
         $team = $member->team();
-        if (empty($team)) {
+        if (empty($team) || $team->getOwnerId() != $user->getId()) {
             return err('没有权限管理这个队员');
-        }
-
-        if ($team->getOwnerId() != $user->getId()) {
-            return err('没有权限管理这个队员！');
         }
 
         $member->destroy();
@@ -274,11 +266,7 @@ class member
             }
 
             $team = $member->team();
-            if (empty($team)) {
-                return err('没有权限管理这个队员');
-            }
-
-            if ($team->getOwnerId() != $user->getId()) {
+            if (empty($team) || $team->getOwnerId() != $user->getId()) {
                 return err('没有权限管理这个队员！');
             }
 
@@ -342,11 +330,7 @@ class member
             }
 
             $team = $member->team();
-            if (empty($team)) {
-                return err('没有权限管理这个队员');
-            }
-
-            if ($team->getOwnerId() != $user->getId()) {
+            if (empty($team) || $team->getOwnerId() != $user->getId()) {
                 return err('没有权限管理这个队员！');
             }
 
@@ -439,18 +423,13 @@ class member
         $user = common::getWXAppUser();
 
         $id = request::int('id');
-
         $member = Team::getMember($id);
         if (empty($member)) {
             return err('找不到这个车队队员！');
         }
 
         $team = $member->team();
-        if (empty($team)) {
-            return err('没有权限管理这个队员');
-        }
-
-        if ($team->getOwnerId() != $user->getId()) {
+        if (empty($team) || $team->getOwnerId() != $user->getId()) {
             return err('没有权限管理这个队员！');
         }
 

@@ -382,12 +382,9 @@
                                     <div>
                                         <i class="fa fa-share-alt fa-fw"></i> 充电枪号：{php echo $order['charging']['result']['ch'] ?? '?'}
                                     </div>
-                                    <div>
-                                        <i class="fa fa-info-circle fa-fw"></i> 设备故障：[{php echo $order['charging']['result']['re']??'n/a'}]
-                                    </div>
                                     {if $order['charging']['result']['re'] != 3}
                                     <div>
-                                        <i class="fa fa-comments-o fa-fw"></i> 故障描述：
+                                        <i class="fa fa-info-circle fa-fw"></i> 故障描述：
                                         {if $order['charging']['result']['re'] == 112}
                                         设备正在充电中
                                         {elseif $order['charging']['result']['re'] == 113}
@@ -401,7 +398,7 @@
                                         {elseif $order['charging']['result']['re'] == 122}
                                         设备响应超时
                                         {else}
-                                        其它设备故障[{php echo $order['charging']['result']['re'] - 110}
+                                        其它设备故障[ {php echo $order['charging']['result']['re'] - 110} ]
                                         {/if}
                                     </div>
                                     {/if}

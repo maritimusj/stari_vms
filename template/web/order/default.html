@@ -346,6 +346,12 @@
                                         创建时间：{php echo date('Y-m-d H:i:s', $order['charging'['record']]['createdAt'])}
                                     </div>
                                     {/if}
+                                    {if $order['charging']['record']['stopReasonDesc']}
+                                    <div>
+                                        <i class="fa fa-comments-o"></i>
+                                        停止原因：{$order['charging']['record']['stopReasonDesc']}
+                                    </div>
+                                    {/if}
                                 {else}
                                     {if $order['charging']['result']['re'] == 3}
                                     {if $order['charging']['status']}

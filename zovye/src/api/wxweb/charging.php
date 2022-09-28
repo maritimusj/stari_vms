@@ -462,8 +462,8 @@ class charging
                 CommissionBalance::RECHARGE,
                 CommissionBalance::CHARGING,
                 CommissionBalance::WITHDRAW,
-                CommissionBalance::TRANSFER_FROM,
-                CommissionBalance::TRANSFER_TO,
+                CommissionBalance::TRANSFER_OUT,
+                CommissionBalance::TRANSFER_RECEIVED,
             ],
         ]);
 

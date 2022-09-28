@@ -35,8 +35,8 @@ class CommissionBalance extends State
     const CHARGING_SF = 21;
     const CHARGING_EF = 22;
 
-    const TRANSFER_FROM = 50;
-    const TRANSFER_TO = 51;
+    const TRANSFER_OUT = 50;
+    const TRANSFER_RECEIVED = 51;
 
     protected static $unknown = 'n/a';
 
@@ -57,8 +57,8 @@ class CommissionBalance extends State
         self::CHARGING => '充电桩订单结算',
         self::CHARGING_SF => '充电桩订单(服务费)',
         self::CHARGING_EF => '充电桩订单(电费)',
-        self::TRANSFER_FROM => '转账给用户',
-        self::TRANSFER_TO => '收到转账',
+        self::TRANSFER_OUT => '转账给用户',
+        self::TRANSFER_RECEIVED => '收到转账',
     ];
 
     private $user;
@@ -366,7 +366,7 @@ PAY_INFO;
 $pay_info
 </dl>
 RECHARGE;
-        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_FROM) {
+        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_OUT) {
             $user = $entry->getExtraData('to.user', []);
             $data['memo'] = <<<TRANSFER
 <dl class="log dl-horizontal">
@@ -374,7 +374,7 @@ RECHARGE;
 <dd class="event">余额转出</dd>
 <dt>对方</dt><dd class="user"><img src="{$user['headimgurl']}" alt=''/>{$user['nickname']}</dd>
 TRANSFER;
-        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_TO) {
+        } elseif ($entry->getSrc() == CommissionBalance::TRANSFER_RECEIVED) {
             $user = $entry->getExtraData('from.user', []);
             $data['memo'] = <<<TRANSFER
 <dl class="log dl-horizontal">

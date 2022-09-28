@@ -280,7 +280,7 @@ class member
             }
 
             $from = $user->getCommissionBalance()->change(
-                -$total, CommissionBalance::TRANSFER_FROM,
+                -$total, CommissionBalance::TRANSFER_OUT,
                 [
                     'to' => [
                         'team' => $team->profile(),
@@ -294,7 +294,7 @@ class member
                 return err('转帐失败，请重试！');
             }
 
-            $to = $u->getCommissionBalance()->change($total, CommissionBalance::TRANSFER_TO, [
+            $to = $u->getCommissionBalance()->change($total, CommissionBalance::TRANSFER_RECEIVED, [
                 'from' => [
                     'team' => $team->profile(),
                     'member' => $member->profile(false),
@@ -441,7 +441,7 @@ class member
         $query = $u->getCommissionBalance()->log();
         $query->where([
             'src' => [
-                CommissionBalance::TRANSFER_TO,
+                CommissionBalance::TRANSFER_RECEIVED,
                 CommissionBalance::CHARGING,
                 CommissionBalance::WITHDRAW,
             ],

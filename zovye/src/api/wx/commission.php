@@ -261,8 +261,8 @@ class commission
         try {
             $month = new DateTimeImmutable(request::str('month') . '-01 00:00');
 
-            $sf = Stats::getDailyStats($agent, CommissionBalance::CHARGING_SF, $month);
-            $ef = Stats::getDailyStats($agent, CommissionBalance::CHARGING_EF, $month);
+            $sf = Stats::getDailyStats($agent, CommissionBalance::CHARGING_SERVICE_FEE, $month);
+            $ef = Stats::getDailyStats($agent, CommissionBalance::CHARGING_ELECTRIC_FEE, $month);
 
             foreach ($sf as $i => $total) {
                 $result[$i] = [
@@ -312,40 +312,40 @@ class commission
         ];
 
         $result['yesterday']['ef'] = (int)$balance->log()->where([
-            'src' => CommissionBalance::CHARGING_EF,
+            'src' => CommissionBalance::CHARGING_ELECTRIC_FEE,
             'createtime >=' => (new DateTime('last day 00:00'))->getTimestamp(),
             'createtime <' => (new DateTime('today'))->getTimestamp(),
         ])->sum('x_val');
 
         $result['yesterday']['sf'] = (int)$balance->log()->where([
-            'src' => CommissionBalance::CHARGING_SF,
+            'src' => CommissionBalance::CHARGING_SERVICE_FEE,
             'createtime >=' => (new DateTime('last day 00:00'))->getTimestamp(),
             'createtime <' => (new DateTime('today'))->getTimestamp(),
         ])->sum('x_val');
 
         $result['today']['ef'] = (int)$balance->log()->where([
-            'src' => CommissionBalance::CHARGING_EF,
+            'src' => CommissionBalance::CHARGING_ELECTRIC_FEE,
             'createtime >=' => (new DateTime('today'))->getTimestamp(),
         ])->sum('x_val');
 
         $result['today']['sf'] = (int)$balance->log()->where([
-            'src' => CommissionBalance::CHARGING_SF,
+            'src' => CommissionBalance::CHARGING_SERVICE_FEE,
             'createtime >=' => (new DateTime('today'))->getTimestamp(),
         ])->sum('x_val');
 
         $result['month']['ef'] = (int)$balance->log()->where([
-            'src' => CommissionBalance::CHARGING_EF,
+            'src' => CommissionBalance::CHARGING_ELECTRIC_FEE,
             'createtime >=' => (new DateTime('first day of this month 00:00'))->getTimestamp(),
         ])->sum('x_val');
 
         $result['month']['sf'] = (int)$balance->log()->where([
-            'src' => CommissionBalance::CHARGING_SF,
+            'src' => CommissionBalance::CHARGING_SERVICE_FEE,
             'createtime >=' => (new DateTime('first day of this month 00:00'))->getTimestamp(),
         ])->sum('x_val');
 
 
-        $sf = Stats::getMonthStats($agent, CommissionBalance::CHARGING_SF);
-        $ef = Stats::getMonthStats($agent, CommissionBalance::CHARGING_EF);
+        $sf = Stats::getMonthStats($agent, CommissionBalance::CHARGING_SERVICE_FEE);
+        $ef = Stats::getMonthStats($agent, CommissionBalance::CHARGING_ELECTRIC_FEE);
 
         $result['list'] = [];
         foreach ($sf as $i => $total) {

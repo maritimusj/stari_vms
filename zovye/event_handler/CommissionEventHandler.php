@@ -86,13 +86,13 @@ class CommissionEventHandler
 
         //第3步，对利润进行佣金分配
         if ($sf > 0) {
-            $sf = self::processProfit($device, $order, $agent, $sf, CommissionBalance::CHARGING_SF);
+            $sf = self::processProfit($device, $order, $agent, $sf, CommissionBalance::CHARGING_SERVICE_FEE);
         }
 
         $balance = $agent->getCommissionBalance();
 
         if ($sf > 0) {
-            $r1 = $balance->change($sf, CommissionBalance::CHARGING_SF, ['orderid' => $order->getId()]);
+            $r1 = $balance->change($sf, CommissionBalance::CHARGING_SERVICE_FEE, ['orderid' => $order->getId()]);
             if ($r1 && $r1->update([], true)) {
                 //记录佣金
                 $order->setExtraData('commission.agent', [
@@ -111,7 +111,7 @@ class CommissionEventHandler
             return true;
         }
 
-        $r2 = $balance->change($ef, CommissionBalance::CHARGING_EF, ['orderid' => $order->getId()]);
+        $r2 = $balance->change($ef, CommissionBalance::CHARGING_ELECTRIC_FEE, ['orderid' => $order->getId()]);
         if ($r2 && $r2->update([], true)) {
             //记录佣金
             $order->setExtraData('commission.agent', [

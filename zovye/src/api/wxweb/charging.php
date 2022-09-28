@@ -460,7 +460,7 @@ class charging
         $query->where([
             'src' => [
                 CommissionBalance::RECHARGE,
-                CommissionBalance::CHARGING,
+                CommissionBalance::CHARGING_FEE,
                 CommissionBalance::WITHDRAW,
                 CommissionBalance::TRANSFER_OUT,
                 CommissionBalance::TRANSFER_RECEIVED,

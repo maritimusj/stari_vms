@@ -442,7 +442,7 @@ class member
         $query->where([
             'src' => [
                 CommissionBalance::TRANSFER_RECEIVED,
-                CommissionBalance::CHARGING,
+                CommissionBalance::CHARGING_FEE,
                 CommissionBalance::WITHDRAW,
             ],
         ]);

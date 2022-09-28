@@ -31,9 +31,9 @@ class CommissionBalance extends State
     const RELOAD_IN = 12;
     const RECHARGE = 13;
 
-    const CHARGING = 20;
-    const CHARGING_SF = 21;
-    const CHARGING_EF = 22;
+    const CHARGING_FEE = 20;
+    const CHARGING_SERVICE_FEE = 21;
+    const CHARGING_ELECTRIC_FEE = 22;
 
     const TRANSFER_OUT = 50;
     const TRANSFER_RECEIVED = 51;
@@ -54,9 +54,9 @@ class CommissionBalance extends State
         self::RELOAD_OUT => '支付补货佣金',
         self::RELOAD_IN => '补货佣金收入',
         self::RECHARGE => '现金充值',
-        self::CHARGING => '充电桩订单结算',
-        self::CHARGING_SF => '充电桩订单(服务费)',
-        self::CHARGING_EF => '充电桩订单(电费)',
+        self::CHARGING_FEE => '充电桩订单结算',
+        self::CHARGING_SERVICE_FEE => '充电桩订单(服务费)',
+        self::CHARGING_ELECTRIC_FEE => '充电桩订单(电费)',
         self::TRANSFER_OUT => '转账给用户',
         self::TRANSFER_RECEIVED => '收到转账',
     ];
@@ -258,7 +258,7 @@ $device_info
 <dd class="memo">$memo</dd>
 </dl>
 REALOD_IN;
-        } elseif ($entry->getSrc() == CommissionBalance::CHARGING_SF) {
+        } elseif ($entry->getSrc() == CommissionBalance::CHARGING_SERVICE_FEE) {
             $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             $order_info = '';
@@ -284,8 +284,7 @@ $group_info
 $device_info
 </dl>
 CHARGING;
-        }
-        elseif ($entry->getSrc() == CommissionBalance::CHARGING_EF) {
+        } elseif ($entry->getSrc() == CommissionBalance::CHARGING_ELECTRIC_FEE) {
             $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             $order_info = '';
@@ -311,8 +310,7 @@ $group_info
 $device_info
 </dl>
 CHARGING;
-        }
-        elseif ($entry->getSrc() == CommissionBalance::CHARGING) {
+        } elseif ($entry->getSrc() == CommissionBalance::CHARGING_FEE) {
             $order_id = $entry->getExtraData('orderid');
             $order = Order::get($order_id);
             $order_info = '';
@@ -351,7 +349,7 @@ CHARGING;
                     $transaction_id = $result ? $result['transaction_id'] : '';
                     $pay_name = $pay_log->getPayName();
                     $title = Pay::getTitle($pay_name);
-                    $image = MODULE_URL . "static/img/$pay_name.svg";
+                    $image = MODULE_URL."static/img/$pay_name.svg";
                     $pay_info = <<<PAY_INFO
 <dt>支付</dt>
 <dd class="event"><img src="$image" title="$title" style="width: 18px;height: 18px;">$transaction_id</dd>
@@ -413,7 +411,7 @@ TRANSFER;
                     } else {
                         $m = number_format($order->getPrice() / 100, 2);
                         $userData = User::getUserCharacter($order->getOpenid());
-                        $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";    
+                        $spec = "<span class=\"wxpay\"><img src=\"{$userData['icon']}\" title=\"{$userData['title']}\"  alt=\"\"/>{$userData['title']}<span class=\"money\">￥$m</span>元购买：{$goods['name']}x{$order->getNum()}</span>";
                     }
 
                 } elseif ($order->getBalance() > 0) {

@@ -435,7 +435,7 @@ class Charging
                         'serial' => $serial,
                         'chargerID' => $chargerID,
                     ];
-                    if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING, $extra)) {
+                    if ($balance->change(0 - $totalPrice, CommissionBalance::CHARGING_FEE, $extra)) {
                         //事件：订单已经创建
                         EventBus::on('device.orderCreated', [
                             'device' => $device,

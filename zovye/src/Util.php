@@ -2268,21 +2268,10 @@ HTML_CONTENT;
      */
     public static function mustValidateLocation(userModelObj $user, deviceModelObj $device): bool
     {
-        if (!$user->isWxUser() && !$user->isWXAppUser()) {
-            return false;
-        }
-
-        if (!$device->needValidateLocation()) {
-            return false;
-        }
-
-        if (time() - $user->getLastActiveData('location.time', 0) < settings('user.scanAlive', VISIT_DATA_TIMEOUT)) {
-            if ($user->getLastActiveData('location.validated')) {
-                return false;
-            }
-        }
-
-        return true;
+        return ($user->isWxUser() || $user->isWXAppUser() || $user->isDouYinUser()) 
+                && $device->needValidateLocation()
+                && time() - $user->getLastActiveData('location.time', 0) > settings('user.scanAlive', VISIT_DATA_TIMEOUT)
+                && !$user->getLastActiveData('location.validated');
     }
 
     /**

@@ -928,19 +928,15 @@ JSCODE;
     {
         $tpl = is_array($params) ? $params : [];
 
-        $js_sdk = Util::fetchJSSDK();
-
         $api_url = Util::murl('util', ['op' => 'location', 'id' => $tpl['device']['shadowId']]);
 
-        $we7_util_url = JS_WE7UTIL_URL;
         $jquery_url = JS_JQUERY_URL;
         $lbs_key = settings('user.location.appkey', DEFAULT_LBS_KEY);
 
+        if (Util::isDouYinAppContainer()) {
         $tpl['js']['code'] = <<<JSCODE
-<script src="$we7_util_url"></script>
 <script src="$jquery_url"></script>
 <script src="https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"></script>
-$js_sdk
 <script>
     const zovye_fn = {
         cb: null,
@@ -969,24 +965,67 @@ $js_sdk
 			}, options);
     }
 
-    zovye_fn.close = function() {
-        wx && wx.closeWindow();
-    }
-
     zovye_fn.ready = function(fn) {
-        zovye_fn.cb = fn;
+        $(fn);
     }
 
-    wx.ready(function(){
-        wx.hideAllNonBaseMenuItem();
-        if (typeof zovye_fn.cb === 'function') {
-            zovye_fn.cb();
-        }
-    })
+    zovye_fn.close = function() {}
 </script>
 JSCODE;
-        if ($_SESSION['is_snapshotuser']) {
-            $tpl['js']['code'] .= $this->snapshotJs($tpl['device']['imei']);
+        } else {
+            $js_sdk = Util::fetchJSSDK();
+            $tpl['js']['code'] = <<<JSCODE
+            <script src="$jquery_url"></script>
+            <script src="https://mapapi.qq.com/web/mapComponents/geoLocation/v/geolocation.min.js"></script>
+            $js_sdk
+            <script>
+                const zovye_fn = {
+                    cb: null,
+                    api_url: "$api_url",
+                    redirect_url: "{$tpl['redirect']}",
+                }
+                zovye_fn.check = function(cb) {
+                    const geolocation = new qq.maps.Geolocation("$lbs_key", "myapp");
+                    const options = {
+                        timeout: 8000,
+                    }
+                    geolocation.getLocation(
+                        function success(res) {
+                            $.getJSON(zovye_fn.api_url, {lng: res.lng, lat: res.lat}).then(function(res){
+                                if (res.status) {
+                                    window.location.replace(zovye_fn.redirect_url);
+                                }else{
+                                    if (typeof cb === 'function') {
+                                        cb(res.data && res.data.msg || '失败！');
+                                    }
+                                }
+                            })
+                        },
+                        function error() {
+                            alert("定位失败，请检查是否开启定位功能！")
+                        }, options);
+                }
+            
+                zovye_fn.close = function() {
+                    wx && wx.closeWindow();
+                }
+            
+                zovye_fn.ready = function(fn) {
+                    zovye_fn.cb = fn;
+                }
+            
+                wx.ready(function(){
+                    wx.hideAllNonBaseMenuItem();
+                    if (typeof zovye_fn.cb === 'function') {
+                        zovye_fn.cb();
+                    }
+                })
+            </script>
+JSCODE;
+
+            if ($_SESSION['is_snapshotuser']) {
+                $tpl['js']['code'] .= $this->snapshotJs($tpl['device']['imei']);
+            }  
         }
         $this->showTemplate(Theme::file('location'), ['tpl' => $tpl]);
     }

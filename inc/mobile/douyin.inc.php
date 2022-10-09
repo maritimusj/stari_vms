@@ -155,13 +155,31 @@ if (empty($device)) {
     Util::resultAlert('请重新扫描设备上的二维码！', 'error');
 }
 
+//开启了shadowId的设备，只能通过shadowId找到
+if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
+    Util::resultAlert('设备二维码不匹配！', 'error');
+}
+
 if ($device->isDown()) {
     Util::resultAlert('设备维护中，请稍后再试！', 'error');
 }
 
-//开启了shadowId的设备，只能通过shadowId找到
-if ($device->isActiveQrcodeEnabled() && $device->getShadowId() !== $device_id) {
-    Util::resultAlert('设备二维码不匹配！', 'error');
+//检查用户定位
+if (Util::mustValidateLocation($user, $device)) {
+    $user->cleanLastActiveData();
+    $tpl_data = Util::getTplData(
+        [
+            $user,
+            $device,
+            [
+                'page.title' => '查找设备',
+                'redirect' => Util::murl('entry', ['from' => 'location', 'device' => $device->getShadowId()]),
+            ],
+        ]
+    );
+
+    //定位页面
+    app()->locationPage($tpl_data);
 }
 
 if ($from == 'device') {

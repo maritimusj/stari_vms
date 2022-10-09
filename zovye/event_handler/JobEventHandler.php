@@ -23,7 +23,37 @@ class JobEventHandler
             $notify = Config::notify('order', []);
             if (!empty($notify['url'])) {
                 if (($notify['f'] && $order->isFree()) || ($notify['p'] && $order->isPay())) {
-                    $data = [];
+                    $orderData =  [
+                        'orderNO' => $order->getOrderNO(),
+                        'price' => $order->getCommissionPrice(),
+                    ];
+
+                    $goods = $order->getGoodsData();
+                    $orderData['goods'] = [
+                        'id' => $goods['id'], 
+                        'name' => $goods['name'],
+                        'img' => $goods['img'],
+                        'price' => $goods['price'],
+                        'price_formatted' => $goods['price_formatted'],
+                        'unit_title' => $goods['unit_title'],
+                        'num' => $goods['num'],
+                        'balance' => $goods['balance'],
+                        'cargo_lane' => $goods['cargo_lane'],
+                        'createtime_formatted' => $goods['createtime_formatted'],
+                    ];
+
+                    if ($order->isFree()) {
+                        $$orderData['goods']['is_free'] = true;
+                    }
+                    if ($order->isPay()) {
+                        $$orderData['goods']['is_pay'] = true;
+                    }
+                    
+                    $data = [
+                        'request_id' => REQUEST_ID,
+                        'order' => $orderData,
+                    ];
+
                     $device = $order->getDevice();
                     if ($device) {
                         $data['device'] = $device->profile(true);
@@ -33,6 +63,7 @@ class JobEventHandler
                     if ($agent) {
                         $data['agent'] = $agent->profile();
                     }
+
                     CtrlServ::httpQueuedCallback(LEVEL_NORMAL, $notify['url'], json_encode($data));
                 }
             }

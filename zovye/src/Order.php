@@ -1037,7 +1037,7 @@ class Order extends State
         }
 
         if ($device_id) {
-            $device = Device::get($device_id, true);
+            $device = Device::get($device_id);
             if (empty($device)) {
                 return err('找不到指定的设备！');
             }

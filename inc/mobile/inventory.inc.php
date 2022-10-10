@@ -26,7 +26,7 @@ if (empty($agent)) {
 }
 
 $inventory = Inventory::for($agent);
-if ($inventory) {
+if (!$inventory) {
     JSON::fail('打开用户仓库失败！');
 }
 

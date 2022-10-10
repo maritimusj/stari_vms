@@ -42,11 +42,6 @@ if (empty($goods)) {
 $result = Util::transactionDo(function () use ($inventory, $goods, $num) {
     $clr = Util::randColor();
 
-    $inventory_goods = $inventory->query(['goods_id' => $goods->getId()])->findOne();
-    if (!empty($inventory_goods)) {
-        $num = $num - $inventory_goods->getNum();
-    }
-
     $log = $inventory->stock(null, $goods, $num, [
         'memo' => '第三方接口请求',
         'clr' => $clr,

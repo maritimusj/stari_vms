@@ -8,14 +8,16 @@
         {if $list}
         <table class="table table-bordered">
             <thead>
-                <tr>
-                    <th class="center">#</th>
-                    <th class="center">名称</th>
-                    <th>用户</th>
-                    <th>手机号码</th>
-                    <th class="center">备注</th>
-                    <th>创建时间</th>
-                </tr>
+            <tr>
+                <th class="center">#</th>
+                <th class="center">名称</th>
+                <th>用户</th>
+                <th>手机号码</th>
+                <th class="center">帐户余额</th>
+                <th class="center">透支额度</th>
+                <th class="center">备注</th>
+                <th>创建时间</th>
+            </tr>
             </thead>
             <tbody>
             {loop $list $index $member}
@@ -40,7 +42,15 @@
                     {/if}
                 </td>
                 <td>{$member['mobile']}</td>
-                <td class="center">{$member['remark']}</td>
+                <td class="center">{php echo number_format($member['balance'] / 100, 2, '.', '')}</td>
+                <td class="center">{php echo number_format($member['credit'] / 100, 2, '.', '')}</td>
+                <td class="center">
+                    <div class="remark">
+                        <span>
+                            {$member['remark']}
+                        </span>
+                    </div>
+                </td>
                 <td>{$member['createtime_formatted']}</tr>
             </tr>
             {/loop}

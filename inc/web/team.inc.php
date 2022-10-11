@@ -39,7 +39,9 @@ if ($op == 'detail') {
 
     /** @var team_memberModelObj $member */
     foreach ($query->findAll() as $member) {
-        $list[] = $member->profile();
+        $data = $member->profile();
+        $data['balance'] = $member->user()->getCommissionBalance()->total();
+        $list[] = $data;
     }
 
     $tpl_data['list'] = $list;

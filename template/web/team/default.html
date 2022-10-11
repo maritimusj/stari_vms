@@ -1,29 +1,31 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
 <ul class="nav nav-tabs" id="navbar">
-    <li role="presentation" class="active"><a href="#">车队管理</a></li>
+    <li role="presentation" class="active"><a href="#">车队成员</a></li>
 </ul>
 <div class="panel panel-default panel-first">
     <div class="panel-body">
         {if $list}
         <table class="table table-bordered">
             <thead>
-            <th>#</th>
-            <th>名称</th>
-            <th>用户</th>
-            <th>手机号码</th>
-            <th>备注</th>
-            <th>时间</th>
+                <tr>
+                    <th class="center">#</th>
+                    <th class="center">名称</th>
+                    <th>用户</th>
+                    <th>手机号码</th>
+                    <th class="center">备注</th>
+                    <th>创建时间</th>
+                </tr>
             </thead>
             <tbody>
             {loop $list $index $member}
             <tr>
-                <td>{php echo $index + 1</td>
-                <tr>{$member['name']}</tr>
-                <tr>
+                <td class="center">{php echo $index + 1}</td>
+                <td class="center">{$member['name']}</td>
+                <td>
                     {if $member['user']}
                     <div class="profile">
-                        <img src="{$member['user']['avatar']}" />
+                        <img src="{$member['user']['headimgurl']}" />
                         <div>
                             <span class="nickname">
                                 {php echo $member['user']['nickname']?:'&lt;匿名用户&gt;'}
@@ -36,10 +38,10 @@
                         </div>
                     </div>
                     {/if}
-                </tr>
-                <tr>{$member['mobile']}</tr>
-                <tr>{$member['remark']}</tr>
-                <tr>{$member['createtime_formatted']}</tr>
+                </td>
+                <td>{$member['mobile']}</td>
+                <td class="center">{$member['remark']}</td>
+                <td>{$member['createtime_formatted']}</tr>
             </tr>
             {/loop}
             </tbody>

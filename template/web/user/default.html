@@ -58,6 +58,14 @@
         text-decoration: underline;
         font-weight: bolder;
     }
+    .team sup::before {
+        content: '⚑';
+        padding-right: 3px;
+        color: #2196f3;
+    }
+    .team {
+        color: #2196f3;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_principal)}
@@ -198,6 +206,7 @@
                         {if $item['verified']}
                         <i class="fa fa-bookmark" style="color:#8BC34A;" title="已通过实名认证"></i>
                         {/if}
+                        <span class="team"></span>
                     </span>
                     {if $item['agent']}
                     <span class="agent-user"> {php echo $item['agent']['title']} </span>
@@ -524,6 +533,9 @@
                         if (stats.balance === 0) {
                             tr.find('.balance.log .price').addClass('zero');
                         }
+                    }
+                    if (stats.team_members !== undefined && stats.team_members > 0) {
+                        tr.find('.team').html("<sup>"+stats.team_members+"</sup>");
                     }                    
                 })
             }

@@ -211,6 +211,7 @@ if ($op == 'default') {
 
     $commission_enabled = App::isCommissionEnabled();
     $balance_enabled = App::isBalanceEnabled();
+    $team_enabled = App::isTeamEnabled();
 
     $query = User::query(['id' => $ids]);
 
@@ -234,6 +235,13 @@ if ($op == 'default') {
 
             if ($balance_enabled) {
                 $data['balance'] = $user->getBalance()->total();
+            }
+
+            if ($team_enabled) {
+                $team = Team::getOrCreateFor($user);
+                if ($team) {
+                    $data['team_members'] = Team::findAllMember($team)->count();
+                }
             }
 
             $result[] = $data;

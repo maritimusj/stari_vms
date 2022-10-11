@@ -411,7 +411,7 @@ class Charging
                 return true;
             }
 
-            $totalPrice = intval($record['totalPrice'] * 100);
+            $totalPrice = intval(round($record['totalPrice'] * 100));
 
             $order->setPrice($totalPrice);
             $order->setExtraData('timeout', []);

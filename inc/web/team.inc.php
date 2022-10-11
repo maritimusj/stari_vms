@@ -43,6 +43,7 @@ if ($op == 'detail') {
         $user = $member->user();
         if ($user) {
             $data['balance'] = $user->getCommissionBalance()->total();
+            $data['credit'] = $user->getCredit();
         }
         $list[] = $data;
     }
@@ -81,7 +82,7 @@ if ($op == 'detail') {
         JSON::fail('找不到这个用户！');
     }
 
-    $val = request::int('val');
+    $val = request::float('val', 0, 2) * 100;
 
     if ($user->setCredit($val)) {
         JSON::success('已保存！');

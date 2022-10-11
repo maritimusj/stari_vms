@@ -47,10 +47,14 @@
                     {/if}
                 </td>
                 <td>{$member['mobile']}</td>
-                <td class="center">{php echo number_format($member['balance'] / 100, 2, '.', '')}</td>
                 <td class="center">
+                    {php echo number_format($member['balance'] / 100, 2, '.', '')}
+                </td>
+                <td class="center" data-user="{$member['user']['id']}">
                     <div data-op="editCredit">
-                        {php echo number_format($member['credit'] / 100, 2, '.', '')}
+                        <span class="val">
+                            {php echo number_format($member['credit'] / 100, 2, '.', '')}
+                        </span>
                     </div>
                 </td>
                 <td class="center">
@@ -77,8 +81,8 @@
 </div>
 
 <script>
+    const api_url = "{php echo $this->createWebUrl('team');}";
     require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210717')}"], function (zovye) {
-        const api_url = "{php echo $this->createWebUrl('team');}";
         zovye.enableOp();
         zovye.enableCopy('mobile');
         zovye.setApiUrl(api_url);
@@ -86,13 +90,16 @@
             const tr = self.closest('tr');
             const id = tr.data('id');
             next({id});
-        })
-        zovye.saveCredit = function(id) {
+        });
+        zovye.op('saveCredit', function(self, next) {
+            const id = self.closest('[data-id]').data('id');
             const val = $('input[name=price]').val();
-            $.getJSON(api_url, {op:'saveCredit', val}).then(res => {
-
+            next({id, val}, function() {
+                $('[data-user='+id+'] .val').html(val);
+                $('#modal-message').modal('hide');
             })
-        }
+        });
     });
+
 </script>
 {template 'common/footer'}

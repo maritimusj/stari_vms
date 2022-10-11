@@ -5,7 +5,7 @@ namespace zovye;
 use zovye\Contract\ICard;
 use zovye\model\userModelObj;
 
-class UserCommissionBalanceICard implements ICard
+class UserCommissionBalanceCard implements ICard
 {
     /** @var userModelObj */
     private $user;
@@ -25,7 +25,11 @@ class UserCommissionBalanceICard implements ICard
 
     function total(): int
     {
-        return $this->user->getCommissionBalance()->total();
+        $total = $this->user->getCommissionBalance()->total();
+        if ($total > 0) {
+            return $total + $this->user->getCredit();
+        }
+        return $total;
     }
 
     function getOwner(): ?userModelObj

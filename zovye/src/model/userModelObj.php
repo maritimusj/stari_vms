@@ -15,8 +15,7 @@ use zovye\Balance;
 use zovye\Contract\ICard;
 use zovye\Locker;
 use zovye\Pay;
-use zovye\Team;
-use zovye\UserCommissionBalanceICard;
+use zovye\UserCommissionBalanceCard;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -662,7 +661,7 @@ class userModelObj extends modelObj
      */
     public function acquireLocker(string $name = ''): ?lockerModelObj
     {
-        return Locker::try("user:{$this->getId()}:$name", REQUEST_ID);
+        return Locker::try("user:{$this->getId()}:$name");
     }
 
     public function recharge(pay_logsModelObj $pay_log)
@@ -883,7 +882,7 @@ class userModelObj extends modelObj
 
     public function getCommissionBalanceCard(): ICard
     {
-        return new UserCommissionBalanceICard($this);
+        return new UserCommissionBalanceCard($this);
     }
 
     public function getPhysicalCardNO(): string

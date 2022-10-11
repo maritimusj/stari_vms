@@ -945,4 +945,12 @@ class userModelObj extends modelObj
 
         return null;
     }
+
+    public function getCredit(): int {
+        return $this->settings('credit.val', 0);
+    }
+
+    public function setCredit(int $val): bool {
+        return $this->updateSettings('credit.val', $val);
+    }
 }

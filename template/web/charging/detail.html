@@ -1,0 +1,139 @@
+<div id="price_detail" style="height: 300px;overflow: auto;">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>交易流水号</td>
+                <td>{$data['serial']}</td>
+            </tr>
+            <tr>
+                <td>枪号</td>
+                <td>{$data['chargerID']}</td>
+            </tr>
+            <tr>
+                <td>开始时间</td>
+                <td>{php echo date('Y-m-d H:i:s', $data['start'])}</td>
+            </tr>
+            <tr>
+                <td>结束时间</td>
+                <td>{php echo date('Y-m-d H:i:s', $data['end'])}</td>
+            </tr>
+            <tr>
+                <td>尖单价</td>
+                <td>{php echo number_format($data['l0Price'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>尖电量</td>
+                <td>{$data['l0Total']}</td>
+            </tr>
+            <tr>
+                <td>计损尖电量</td>
+                <td>{$data['l0LossTotal']}</td>
+            </tr>
+            <tr>
+                <td>尖金额</td>
+                <td>{php echo number_format($data['l0TotalPrice'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>峰单价</td>
+                <td>{php echo number_format($data['l1Price'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>峰电量</td>
+                <td>{$data['l1Total']}</td>
+            </tr>
+            <tr>
+                <td>计损峰电量</td>
+                <td>{$data['l1LossTotal']}</td>
+            </tr>
+            <tr>
+                <td>峰金额</td>
+                <td>{php echo number_format($data['l1TotalPrice'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>平单价</td>
+                <td>{php echo number_format($data['l2Price'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>平电量</td>
+                <td>{$data['l2Total']}</td>
+            </tr>            
+            <tr>
+                <td>计损平电量</td>
+                <td>{$data['l2LossTotal']}</td>
+            </tr>
+            <tr>
+                <td>平金额</td>
+                <td>{php echo number_format($data['l2TotalPrice'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>谷单价</td>
+                <td>{php echo number_format($data['l3Price'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>谷电量</td>
+                <td>{$data['l3Total']}</td>
+            </tr>
+            <tr>
+                <td>计损谷电量</td>
+                <td>{$data['l3LossTotal']}</td>
+            </tr>
+            <tr>
+                <td>谷金额</td>
+                <td>{php echo number_format($data['l3TotalPrice'], 2, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>电表总起值</td>
+                <td>{php echo number_format($data['totalBegin'], 4, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>电表总止值</td>
+                <td>{php echo number_format($data['totalEnd'], 4, '.', '')}</td>
+            </tr>
+            <tr>
+                <td>总电量</td>
+                <td>{$data['total']}</td>
+            </tr>
+            <tr>
+                <td>计损总电量</td>
+                <td>{$data['lossTotal']}</td>
+            </tr>
+            <tr>
+                <td>消费金额</td>
+                <td>{$data['totalPrice']}</td>
+            </tr>
+            <tr>
+                <td>电动汽车唯一标识</td>
+                <td>{$data['VIN']}</td>
+            </tr>
+            <tr>
+                <td>交易标识</td>
+                <td>
+                    {if $data['mode'] == 0x01}
+                    App启动
+                    {elseif $data['mode'] == 0x02}
+                    卡启动
+                    {elseif $data['mode'] == 0x04}
+                    离线卡启动
+                    {elseif $data['mode'] == 0x05}
+                    vin码启动
+                    {else}
+                    未知
+                    {/if}
+                    (代码：{$data['mode']})
+                </td>
+            </tr>
+            <tr>
+                <td>交易时间</td>
+                <td>{php echo date('Y-m-d H:i:s', $data['createdAt'])}</td>
+            </tr>
+            <tr>
+                <td>停止原因</td>
+                <td>{$data['stopReasonDesc']}</td>
+            </tr>
+            <tr>
+                <td>物理卡号</td>
+                <td>{$data['physicalCardNO']}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

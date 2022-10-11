@@ -581,6 +581,23 @@ if ($op == 'default') {
     $tpl_data['total'] = $total;
 
     app()->showTemplate('web/order/stat', $tpl_data);
+
+} elseif ($op == 'priceDetail') {
+    $id = request::int('id');
+    
+    $order = Order::get($id);
+    if (!$order) {
+        JSON::fail('找不到这个订单！');
+    }
+
+    $content = app()->fetchTemplate(
+        'web/charging/detail',
+        [
+            'data' => $order->getChargingRecord(),
+        ]
+    );
+
+    JSON::success(['title' => '计费详情', 'content' => $content]);
 }
 
 function calc_stats($agent_openid, $device_id, $start, $end): array

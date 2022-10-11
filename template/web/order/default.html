@@ -436,7 +436,7 @@
                             <div class="detail">
                                 {if $order['group']}
                                     {if $order['price'] > 0}
-                                        费用总计：<span class="price"> {$order['price']}</span>
+                                        总价：<span class="price" data-op="priceDetail"> {$order['price']}</span>
                                     {else}
                                     {/if}
                                 {else}
@@ -723,6 +723,9 @@
             params.delete('user_id');
             params.set('page', 1);
         });
+    }
+    api.priceDetail = function(id) {
+        api.showResult({ op: 'priceDetail', id: id });
     }
 
     function reloadPageWithFilter(fn) {

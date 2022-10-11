@@ -331,19 +331,19 @@
                                     {if $order['charging']['record']['start']}
                                     <div>
                                         <i class="fa fa-clock-o fa-fw"></i>
-                                        开始时间：{php echo date('Y-m-d H:i:s', $order['charging']['record']['start'])}
+                                        开始时间：{php echo date('Y-m-d H:i:s', intval($order['charging']['record']['start']))}
                                     </div>
                                     {/if}
                                     {if $order['charging']['record']['end']}
                                     <div>
                                         <i class="fa fa-clock-o fa-fw"></i>
-                                        结束时间：{php echo date('Y-m-d H:i:s', $order['charging']['record']['end'])}
+                                        结束时间：{php echo date('Y-m-d H:i:s', intval($order['charging']['record']['end']))}
                                     </div>
                                     {/if}
                                     {if empty($order['charging']['record']['start']) && $order['charging']['record']['createdAt']}
                                     <div>
                                         <i class="fa fa-clock-o fa-fw"></i>
-                                        创建时间：{php echo date('Y-m-d H:i:s', $order['charging'['record']]['createdAt'])}
+                                        创建时间：{php echo date('Y-m-d H:i:s', intval($order['charging'['record']]['createdAt']))}
                                     </div>
                                     {/if}
                                     {if $order['charging']['record']['stopReasonDesc']}

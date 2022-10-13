@@ -49,6 +49,7 @@ if ($op == 'default') {
         $inventories['page'] = $page;
         $inventories['totalpage'] = $total_page;
 
+        $query->page($page, $page_size);
         $query->orderBy('id DESC');
 
         /** @var inventoryModelObj $entry */

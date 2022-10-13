@@ -171,5 +171,8 @@ router::exec($op, [
     'ChargingStats' => '\zovye\api\wx\commission::chargingStats',
     'ChargingMonthStats' => '\zovye\api\wx\commission::chargingMonthStats',
 
+    'InventoryGoods' => '\zovye\api\wx\inventory::list',
+    'InventoryLogs' => '\zovye\api\wx\inventory::logs',
+
 ]);
 

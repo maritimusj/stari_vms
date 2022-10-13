@@ -83,7 +83,7 @@ class team_memberModelObj extends modelObj
         ];
 
         if ($detail) {
-            $user = $this->user();
+            $user = $this->getAssociatedUser();
             $data['user'] = $user ? $user->profile() : [];
         }
 

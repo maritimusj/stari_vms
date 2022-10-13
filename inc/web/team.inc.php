@@ -40,7 +40,7 @@ if ($op == 'detail') {
     /** @var team_memberModelObj $member */
     foreach ($query->findAll() as $member) {
         $data = $member->profile();
-        $user = $member->user();
+        $user = $member->getAssociatedUser();
         if ($user) {
             $data['balance'] = $user->getCommissionBalance()->total();
             $data['credit'] = $user->getCredit();
@@ -59,7 +59,7 @@ if ($op == 'detail') {
         JSON::fail('找不到这个车队成员！');
     }
 
-    $user = $member->user();
+    $user = $member->getAssociatedUser();
     if (empty($user)) {
         JSON::fail('找不到这个车队成员关联的用户！');
     }

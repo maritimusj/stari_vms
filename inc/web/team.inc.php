@@ -44,6 +44,7 @@ if ($op == 'detail') {
         if ($user) {
             $data['balance'] = $user->getCommissionBalance()->total();
             $data['credit'] = $user->getCredit();
+            $data['dynamic'] = empty($member->user());
         }
         $list[] = $data;
     }

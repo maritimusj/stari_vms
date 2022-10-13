@@ -8,6 +8,9 @@
         color: #2196f3;
         text-decoration: underline;
     }
+    .profile.dynamic {
+        color: #ff9800;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">车队成员</a></li>
@@ -35,7 +38,7 @@
                 <td class="center">{$member['name']}</td>
                 <td>
                     {if $member['user']}
-                    <div class="profile">
+                    <div {if $member['dynamic']}class="profile dynamic" title="手机号码动态关联用户"{else}class="profile"{/if}>
                         <img src="{$member['user']['headimgurl']}" />
                         <div>
                                 <span class="nickname">
@@ -48,6 +51,8 @@
                             </div>
                         </div>
                     </div>
+                    {else}
+                    <span class="text-muted">&lt;暂无用户&gt;</span>
                     {/if}
                 </td>
                 <td>{$member['mobile']}</td>

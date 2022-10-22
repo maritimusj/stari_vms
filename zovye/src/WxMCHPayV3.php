@@ -43,11 +43,11 @@ class WxMCHPayV3
         if ($client == null) {
             // 设置参数
             // 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名
-            $merchantPrivateKeyFilePath = "file://".$this->config['pem']['key'];
+            $merchantPrivateKeyFilePath = $this->config['pem']['key'];
             $merchantPrivateKeyInstance = Rsa::from($merchantPrivateKeyFilePath, Rsa::KEY_TYPE_PRIVATE);
 
             // 从本地文件中加载「微信支付平台证书」，用来验证微信支付应答的签名
-            $platformCertificateFilePath = "file://".$this->config['pem']['cert'];
+            $platformCertificateFilePath = $this->config['pem']['cert'];
             $platformPublicKeyInstance = Rsa::from($platformCertificateFilePath, Rsa::KEY_TYPE_PUBLIC);
 
             // 从「微信支付平台证书」中获取「证书序列号」
@@ -73,7 +73,7 @@ class WxMCHPayV3
             $response = $this->getV3Client()->chain('v3/transfer/batches')->post(['json' => $data]);
             $contents = $response->getBody()->getContents();
 
-            return json_decode($contents);
+            return json_decode($contents, true);
         } catch (Exception $e) {
             Log::error('v3_transfer', [
                 'error' => $e->getMessage(),
@@ -82,7 +82,7 @@ class WxMCHPayV3
                 $r = $e->getResponse();
                 $contents = $r->getBody()->getContents();
 
-                return json_decode($contents);
+                return json_decode($contents, true);
             }
         }
 

@@ -706,7 +706,7 @@ class userModelObj extends modelObj
         });
     }
 
-    public function getMCHPayResult($transcition, $trade_no): array
+    public function getMCHPayResult($transaction, $trade_no): array
     {
         $params = Pay::getDefaultPayParams(Pay::WX);
         if (empty($params)) {
@@ -714,7 +714,7 @@ class userModelObj extends modelObj
         }
         if (!isEmptyArray($params['v3'])) {
             $mch_pay =  new WxMCHPayV3($params['v3']);
-            return $mch_pay->transferInfo($transcition, $trade_no);
+            return $mch_pay->transferInfo($transaction, $trade_no);
         } 
         
         $mch_pay =  new WxMCHPay($params);
@@ -726,7 +726,7 @@ class userModelObj extends modelObj
         $params['pem']['cert'] = $file['cert_filename'];
         $params['pem']['key'] = $file['key_filename'];
 
-        return $mch_pay->transferInfo($transcition, $trade_no);
+        return $mch_pay->transferInfo($transaction, $trade_no);
     }
 
     /**

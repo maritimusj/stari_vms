@@ -11,3 +11,4 @@ zovye/config.php
 /api.php
 payment/*.php
 .vscode
+./vendor

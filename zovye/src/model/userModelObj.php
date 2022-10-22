@@ -727,16 +727,15 @@ class userModelObj extends modelObj
                 $mch_pay =  new WxMCHPayV3($params['v3']);
             } else {
                 $mch_pay =  new WxMCHPay($params);
+                $file = Pay::getPEMFile($params['pem']);
+                if (is_error($file)) {
+                    return $file;
+                }
+    
+                $params['pem']['cert'] = $file['cert_filename'];
+                $params['pem']['key'] = $file['key_filename'];
             }
-
-            $file = Pay::getPEMFile($params['pem']);
-            if (is_error($file)) {
-                return $file;
-            }
-
-            $params['pem']['cert'] = $file['cert_filename'];
-            $params['pem']['key'] = $file['key_filename'];
-
+            
             $res = $mch_pay->transferTo($this->openid, $trade_no, $n, $desc);
             if (is_error($res)) {
                 return $res;

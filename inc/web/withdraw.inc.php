@@ -147,7 +147,7 @@ if ($op == 'export') {
                         $status = '已提交';
                         $user = User::get($entry->getOpenid(), true);
                         if ($user) {
-                            $$MCHPayResult = $user->getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
+                            $MCHPayResult = $user->getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
                             if ($MCHPayResult['detail_status'] == 'SUCCESS') {
                                 $entry->update(['mchpayResult' =>  $MCHPayResult]);
                                 $entry->save();

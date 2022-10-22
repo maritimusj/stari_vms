@@ -149,7 +149,7 @@ if ($op == 'export') {
                         if ($user) {
                             $$MCHPayResult = $user->getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
                             if ($MCHPayResult['detail_status'] == 'SUCCESS') {
-                                $entry->setExtraData('mchpayResult', $MCHPayResult);
+                                $entry->update(['mchpayResult' =>  $MCHPayResult]);
                                 $entry->save();
                             }
                         }

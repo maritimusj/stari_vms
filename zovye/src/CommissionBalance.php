@@ -99,7 +99,7 @@ class CommissionBalance extends State
                 'admin' => _W('username'),
             ], true)) {
 
-                $res = $user->MCHPay($n, $trade_no, '佣金提现');
+                $res = $user->MCHPay($n, $trade_no, '帐户余额提现');
                 if (is_error($res)) {
                     return $res;
                 }

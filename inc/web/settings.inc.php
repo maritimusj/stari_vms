@@ -677,8 +677,8 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['pay']['wx']['v3']['serial'] = request::trim('v3Serial');
             $settings['pay']['wx']['v3']['mch_id'] = request::trim('V3MCHID');
             $settings['pay']['wx']['v3']['pem'] = [
-                'cert' => request::trim('cert'),
-                'key' => request::trim('key'),
+                'cert' => request::trim('V3cert'),
+                'key' => request::trim('V3key'),
             ];
 
             if (false === Util::createApiRedirectFile('payment/wx.php', 'payresult', [

@@ -14,5 +14,8 @@
       "ext-simplexml": "*",
       "ext-openssl": "*",
         "wechatpay/wechatpay": "^1.4"
-    }
+    },
+    "config": {
+      "platform-check": false
+  }
 }

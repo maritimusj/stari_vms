@@ -6,13 +6,15 @@
 
 namespace zovye;
 
+require MODULE_ROOT . 'vendor/autoload.php';
+
 use Exception;
+
 use GuzzleHttp\Exception\RequestException;
 use WeChatPay\Builder;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
-
 class WxMCHPayV3
 {
     private $config;

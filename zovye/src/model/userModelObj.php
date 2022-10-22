@@ -768,7 +768,7 @@ class userModelObj extends modelObj
                 if ($res['batch_id']) {
                     $info = $mch_pay->transferInfo($res['batch_id'], $trade_no);
                     if ($info && $info['detail_status'] == 'SUCCESS') {
-                         return $res;
+                         return $info;
                     }
                    return $res;
                 }

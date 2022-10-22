@@ -88,7 +88,10 @@ class CommissionBalance extends State
         $n = abs($r->getXVal());
 
         if ($n > 0) {
-            $trade_no = "r{$r->getId()}d{$r->getCreatetime()}";
+            $trade_no = $r->getExtraData('trade_no', '');
+            if (empty($trade_no)) {
+                $trade_no = "r{$r->getId()}d{$r->getCreatetime()}";
+            }
             //先写数据再执行操作
             if ($r->update([
                 'state' => 'mchpay',

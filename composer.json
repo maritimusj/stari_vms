@@ -12,6 +12,7 @@
       "ext-dom": "*",
       "ext-gd": "*",
       "ext-simplexml": "*",
-      "ext-openssl": "*"
+      "ext-openssl": "*",
+        "wechatpay/wechatpay": "^1.4"
     }
 }

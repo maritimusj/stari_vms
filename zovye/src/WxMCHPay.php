@@ -47,6 +47,12 @@ class WxMCHPay
         $data['sign'] = $this->makeSign($data);
 
         $res = $this->curlApiUrl(self::TRANSFER_URL, $data);
+
+        Log::error("WxMCHPay", [
+            'data' => $data,
+            'res' => $res,
+        ]);
+
         if (is_error($res)) {
             return $res;
         }

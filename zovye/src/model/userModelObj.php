@@ -32,7 +32,9 @@ use zovye\Device;
 use zovye\Keeper;
 use zovye\Principal;
 
+use zovye\WxMCHPayV3;
 use function zovye\err;
+use function zovye\isEmptyArray;
 use function zovye\m;
 use function zovye\tb;
 use function zovye\settings;
@@ -721,6 +723,12 @@ class userModelObj extends modelObj
                 return error(State::ERROR, '没有配置微信打款信息！');
             }
 
+            if (!isEmptyArray($params['v3'])) {
+                $mch_pay =  new WxMCHPayV3($params['v3']);
+            } else {
+                $mch_pay =  new WxMCHPay($params);
+            }
+
             $file = Pay::getPEMFile($params['pem']);
             if (is_error($file)) {
                 return $file;
@@ -729,7 +737,7 @@ class userModelObj extends modelObj
             $params['pem']['cert'] = $file['cert_filename'];
             $params['pem']['key'] = $file['key_filename'];
 
-            $res = (new WxMCHPay($params))->transferTo($this->openid, $trade_no, $n, $desc);
+            $res = $mch_pay->transferTo($this->openid, $trade_no, $n, $desc);
             if (is_error($res)) {
                 return $res;
             }

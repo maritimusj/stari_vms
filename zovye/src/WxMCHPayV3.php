@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-require MODULE_ROOT . 'vendor/autoload.php';
+require MODULE_ROOT.'vendor/autoload.php';
 
 use Exception;
 
@@ -15,6 +15,7 @@ use WeChatPay\Builder;
 use WeChatPay\BuilderChainable;
 use WeChatPay\Crypto\Rsa;
 use WeChatPay\Util\PemUtil;
+
 class WxMCHPayV3
 {
     private $config;
@@ -67,13 +68,23 @@ class WxMCHPayV3
         return $client;
     }
 
-    protected function getResponse($data)
+    protected function getResponse($method, $path, $data = [])
     {
         try {
-            $response = $this->getV3Client()->chain('v3/transfer/batches')->post(['json' => $data]);
+            if ($method == 'post') {
+                $response = $this->getV3Client()->chain($path)->post(['json' => $data]);
+            } elseif ($method == 'get') {
+                $response = $this->getV3Client()->chain($path)->get([
+                    'query' => $data,
+                ]);
+            } else {
+                return err('暂不支持的http方法:'.$method);
+            }
+
             $contents = $response->getBody()->getContents();
 
             return json_decode($contents, true);
+
         } catch (Exception $e) {
             Log::error('v3_transfer', [
                 'error' => $e->getMessage(),
@@ -112,7 +123,7 @@ class WxMCHPayV3
             ],
         ];
 
-        $response = $this->getResponse($data);
+        $response = $this->getResponse('post', 'v3/transfer/batches', $data);
         if (is_error($response)) {
             return $response;
         }
@@ -127,6 +138,50 @@ class WxMCHPayV3
                 'partner_trade_no' => $response['out_batch_no'],
                 'payment_no' => $response['batch_id'],
             ];
+        }
+
+        return err('接口返回数据错误！');
+    }
+
+    /**
+     * 转帐订单信息
+     * @param string $batch_id
+     * @param string $trade_no
+     * @return mixed
+     */
+    public function transferInfo(string $batch_id, string $trade_no = ''): array
+    {
+        $response = $this->getResponse(
+            'get',
+            "v3/transfer/batches/batch-id/{v3/transfer/batches/batch-id/$batch_id}",
+            [
+                'need_query_detail' => true,
+            ]
+        );
+
+        if (is_error($response)) {
+            return $response;
+        }
+
+        if (!empty($response['code'])) {
+            $code = $response['code'];
+
+            return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
+        }
+
+        $list = (array)$response['transfer_detail_list'];
+        if ($list) {
+            if ($trade_no) {
+                foreach ($list as $i) {
+                    if ($i && $i['out_detail_no'] == $trade_no) {
+                        return $i;
+                    }
+                }
+
+                return [];
+            }
+
+            return $list;
         }
 
         return err('接口返回数据错误！');

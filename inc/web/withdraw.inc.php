@@ -143,6 +143,7 @@ if ($op == 'export') {
                     $status = '已打款';
                     $data['paymentNO'] = $MCHPayResult['payment_no'];
                 } else {
+                    $status = '未知状态';
                     if ($MCHPayResult['batch_id']) {
                         $status = '已提交';
                         $user = User::get($entry->getOpenid(), true);

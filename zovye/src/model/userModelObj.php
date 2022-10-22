@@ -706,6 +706,29 @@ class userModelObj extends modelObj
         });
     }
 
+    public function getMCHPayResult($transcition, $trade_no): array
+    {
+        $params = Pay::getDefaultPayParams(Pay::WX);
+        if (empty($params)) {
+            return error(State::ERROR, '没有配置微信打款信息！');
+        }
+        if (!isEmptyArray($params['v3'])) {
+            $mch_pay =  new WxMCHPayV3($params['v3']);
+            return $mch_pay->transferInfo($transcition, $trade_no);
+        } 
+        
+        $mch_pay =  new WxMCHPay($params);
+        $file = Pay::getPEMFile($params['pem']);
+        if (is_error($file)) {
+            return $file;
+        }
+
+        $params['pem']['cert'] = $file['cert_filename'];
+        $params['pem']['key'] = $file['key_filename'];
+
+        return $mch_pay->transferInfo($transcition, $trade_no);
+    }
+
     /**
      * 给用户打款.
      *
@@ -741,11 +764,20 @@ class userModelObj extends modelObj
                 return $res;
             }
 
-            if ($res && $res['partner_trade_no'] == $trade_no && isset($res['payment_no'])) {
-                return $res;
-            } else {
-                return error(State::ERROR, '打款失败！');
-            }
+            if ($res) {
+                if ($res['batch_id']) {
+                    $info = $mch_pay->transferInfo($res['batch_id'], $trade_no);
+                    if ($info && $info['detail_status'] == 'SUCCESS') {
+                         return $res;
+                    }
+                   return $res;
+                }
+                if ($res['partner_trade_no'] == $trade_no && isset($res['payment_no'])) {
+                    return $res;
+                }
+            } 
+
+            return error(State::ERROR, '打款失败！');
         }
 
         return error(State::ERROR, '参数不正确！');

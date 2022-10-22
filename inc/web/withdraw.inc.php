@@ -138,9 +138,26 @@ if ($op == 'export') {
             if (empty($state)) {
                 $status = '审核中';
             } elseif ($state == 'mchpay') {
-                $status = '已打款';
                 $MCHPayResult = $entry->getExtraData('mchpayResult');
-                $data['paymentNO'] = $MCHPayResult['payment_no'];
+                if ($MCHPayResult['payment_no']) {
+                    $status = '已打款';
+                    $data['paymentNO'] = $MCHPayResult['payment_no'];
+                } else {
+                    if ($MCHPayResult['batch_id']) {
+                        $status = '已提交';
+                        $user = User::get($entry->getOpenid(), true);
+                        if ($user) {
+                            $$MCHPayResult = $user->getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
+                            if ($MCHPayResult['detail_status'] == 'SUCCESS') {
+                                $entry->setExtraData('mchpayResult', $MCHPayResult);
+                                $entry->save();
+                            }
+                        }
+                    }
+                    if ($MCHPayResult['detail_status'] && $MCHPayResult['detail_status'] == 'SUCCESS') {
+                        $status = '已打款';
+                    }
+                }
             } elseif ($state == 'confirmed') {
                 $status = '已完成';
             } elseif ($state == 'cancelled') {

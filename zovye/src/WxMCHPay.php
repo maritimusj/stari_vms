@@ -159,7 +159,7 @@ class WxMCHPay
      * @param $trade_no
      * @return mixed
      */
-    public function transferInfo($trade_no): array
+    public function transferInfo($transcition, $trade_no): array
     {
         $data = array(
             'appid' => $this->config['appid'],

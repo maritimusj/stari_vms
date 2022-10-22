@@ -82,7 +82,6 @@ class WxMCHPayV3
             }
 
             $contents = $response->getBody()->getContents();
-
             return json_decode($contents, true);
 
         } catch (Exception $e) {
@@ -92,7 +91,6 @@ class WxMCHPayV3
             if ($e instanceof RequestException && $e->hasResponse()) {
                 $r = $e->getResponse();
                 $contents = $r->getBody()->getContents();
-
                 return json_decode($contents, true);
             }
         }
@@ -129,15 +127,15 @@ class WxMCHPayV3
         }
 
         if (!empty($response['code'])) {
+            if ($response['message']) {
+                return err($response['message']);
+            }
             $code = $response['code'];
             return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
         }
 
         if ($response['batch_id']) {
-            return [
-                'partner_trade_no' => $response['out_batch_no'],
-                'payment_no' => $response['batch_id'],
-            ];
+            return $response;
         }
 
         return err('接口返回数据错误！');
@@ -153,9 +151,10 @@ class WxMCHPayV3
     {
         $response = $this->getResponse(
             'get',
-            "v3/transfer/batches/batch-id/{v3/transfer/batches/batch-id/$batch_id}",
+            "v3/transfer/batches/batch-id/$batch_id",
             [
-                'need_query_detail' => true,
+                'need_query_detail' => 'true',
+                'detail_status' => 'ALL',
             ]
         );
 
@@ -164,8 +163,10 @@ class WxMCHPayV3
         }
 
         if (!empty($response['code'])) {
+            if ($response['message']) {
+                return err($response['message']);
+            }
             $code = $response['code'];
-
             return err(self::$errMsg[$code] ?? self::$errMsg['UNKNOWN']);
         }
 
@@ -177,7 +178,6 @@ class WxMCHPayV3
                         return $i;
                     }
                 }
-
                 return [];
             }
 

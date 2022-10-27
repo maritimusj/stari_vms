@@ -577,7 +577,7 @@ class App
     public static function isDeviceWithDoorEnabled(): bool
     {
         return onceCall(function () {
-            return Config::device('door.enable', false);
+            return Config::device('door.enabled', false);
         });
     }
 

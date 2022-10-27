@@ -274,7 +274,8 @@ class orderModelObj extends modelObj
         return $this->getExtraData('charging.record', []);
     }
 
-    public function isChargingOrder() {
+    public function isChargingOrder(): bool
+    {
         return !empty($this->getChargerID());
     }
 

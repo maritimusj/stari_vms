@@ -238,10 +238,11 @@ if ($op == 'default') {
             }
 
             if ($team_enabled) {
-                $team = Team::getOrCreateFor($user);
+                $team = Team::getFor($user);
                 if ($team) {
                     $data['team_members'] = Team::findAllMember($team)->count();
                 }
+                $data['is_member'] = Team::isMember($user);
             }
 
             $result[] = $data;

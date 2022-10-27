@@ -57,6 +57,7 @@ class Team
         if ($mobile) {
             return m('team_member')->findOne(['team_id' => $team->getId(), 'mobile' => $mobile]);
         }
+
         return null;
     }
 
@@ -132,6 +133,17 @@ class Team
 
         return $member_list;
     }
+
+    public static function isMember($user): bool
+    {
+        $cond = ['user_id' => $user->getId()];
+        $mobile = $user->getMobile();
+        if ($mobile) {
+            $cond['mobile'] = $mobile;
+        }
+        return m('team_member')->query()->whereOr($cond)->exists();
+    }
+
 
     public static function findAllMember(teamModelObj $team, $condition = []): base\modelObjFinder
     {

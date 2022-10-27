@@ -485,10 +485,6 @@ class charging
     {
         $user = common::getWXAppUser();
 
-        if (IotCharging::hasUnpaidOrder($user)) {
-            return err('请等待订单结算完成后再试！');
-        }
-
         $total = round(request::float('amount', 0, 2) * 100);
 
         return balance::balanceWithdraw($user, $total, request::str('memo'), [

@@ -9,6 +9,7 @@ namespace zovye\api\wx;
 use DateTimeImmutable;
 use zovye\Account;
 use zovye\App;
+use zovye\Charging as IotCharging;
 use zovye\model\commission_balanceModelObj;
 use zovye\CommissionBalance;
 use zovye\Device;
@@ -20,6 +21,7 @@ use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
+use function zovye\err;
 use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
@@ -93,7 +95,7 @@ class balance
      * @param $user userModelObj
      * @param int $amount
      * @param string $memo
-     * @param array $extra
+     * @param mixed $extra
      * @return array
      */
     public static function balanceWithdraw(userModelObj $user, int $amount, string $memo = '', $extra = []): array
@@ -105,6 +107,10 @@ class balance
 
         if ($user->isBanned()) {
             return error(State::ERROR, '用户已经被禁用！');
+        }
+
+        if (App::isChargingDeviceEnabled() && IotCharging::hasUnpaidOrder($user)) {
+            return err('请等待订单结算完成后再试！');
         }
 
         if ($amount < 1) {

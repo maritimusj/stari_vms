@@ -32,7 +32,6 @@ class Charging
                 return true;
             }
         }
-
         return false;
     }
 
@@ -85,19 +84,12 @@ class Charging
 
             $user_charging_data = $user->settings('chargingNOW', []);
             if ($user_charging_data) {
-                if ($user_charging_data['device'] != $device->getId()) {
-                    return err('用户卡正在使用中，请稍后再试！');
-                }
-
-                $order = Order::get($user_charging_data['serial'], true);
-                if ($order && !$order->isChargingFinished()) {
-                    return err('用户正在充电中！');
-                }
+                return err('用户卡正在使用中，请稍后再试！');
             }
 
             $total = $card->total();
-            if ($total < 1) {
-                return err('用户卡余额不足，请先充值后再试！');
+            if ($total < 100) {
+                return err('用户卡余额不足1.00元，请先充值后再试！');
             }
 
             $order_data = [

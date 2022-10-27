@@ -109,7 +109,7 @@ class balance
             return error(State::ERROR, '用户已经被禁用！');
         }
 
-        if (App::isChargingDeviceEnabled() && IotCharging::hasUnpaidOrder($user)) {
+        if (IotCharging::hasUnpaidOrder($user)) {
             return err('请等待订单结算完成后再试！');
         }
 

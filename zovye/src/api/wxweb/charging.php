@@ -224,6 +224,10 @@ class charging
     {
         $user = common::getWXAppUser();
 
+        if ($user->isBanned()) {
+            return err('对不起，用户暂时无法使用！');
+        }
+
         $device = Device::get(request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -484,6 +488,10 @@ class charging
     public static function withdraw(): array
     {
         $user = common::getWXAppUser();
+
+        if ($user->isBanned()) {
+            return err('对不起，用户暂时无法使用！');
+        }
 
         $user_charging_data = $user->settings('chargingNOW', []);
         if ($user_charging_data) {

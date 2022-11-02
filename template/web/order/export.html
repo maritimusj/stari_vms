@@ -191,8 +191,8 @@
 
         $('#export').click(function () {
             const agent_openid = $('select[name=agent_openid]').val();
-            const accountid = $('select[name=account_id]').val();
-            const deviceid = $('select[name=device_id]').val();
+            const account_id = $('select[name=account_id]').val();
+            const device_id = $('select[name=device_id]').val();
 
             const start = $('input[name="datelimit[start]"]').val();
             const end = $('input[name="datelimit[end]"]').val();
@@ -205,8 +205,8 @@
             const params = {
                 op: 'export_do',
                 agent_openid,
-                accountid,
-                deviceid,
+                account_id,
+                device_id,
                 start,
                 end,
                 headers,

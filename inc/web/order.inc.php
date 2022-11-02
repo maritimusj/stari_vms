@@ -415,8 +415,8 @@ if ($op == 'default') {
 } elseif ($op == 'export_do') {
     $params = [
         'agent_openid' => request::str('agent_openid'),
-        'account_id' => request::int('accountid'),
-        'device_id' => request::int('deviceid'),
+        'account_id' => request::int('account_id'),
+        'device_id' => request::int('device_id'),
         'start' => request::str('start'),
         'end' => request::str('end'),
     ];

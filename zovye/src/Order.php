@@ -1087,8 +1087,12 @@ class Order extends State
             $last_id = $entry->getId();
 
             $user = User::get($entry->getOpenid(), true);
-            $goods = Goods::data($entry->getGoodsId());
             $device = Device::get($entry->getDeviceId());
+            if ($device && !$device->isChargingDevice()) {
+                $goods = Goods::data($entry->getGoodsId());
+            } else {
+                $goods = [];
+            }
 
             $data = [];
 
@@ -1162,13 +1166,25 @@ class Order extends State
                             $data[$header] = str_replace('"', '', $goods['id']);
                             break;
                     case 'goods_name':
-                        $data[$header] = str_replace('"', '', $goods['name']);
+                        if ($device->isChargingDevice()) {
+                            $data[$header] = "充电";
+                        } else {
+                            $data[$header] = str_replace('"', '', $goods['name']);
+                        }
                         break;
                     case 'goods_num':
-                        $data[$header] = $entry->getNum();
+                        if ($device->isChargingDevice()) {
+                            $data[$header] = $entry->getChargingRecord('total', 0) . '度';
+                        } else {
+                            $data[$header] = $entry->getNum();
+                        }
                         break;
                     case 'goods_price':
-                        $data[$header] = number_format($entry->getGoodsPrice() / 100, 2, '.', '');
+                        if ($device->isChargingDevice()) {
+                            $data[$header] = $entry->getPrice();
+                        } else {
+                            $data[$header] = number_format($entry->getGoodsPrice() / 100, 2, '.', '');
+                        }
                         break;
                     case 'way':
                         if ($entry->getPrice() > 0) {

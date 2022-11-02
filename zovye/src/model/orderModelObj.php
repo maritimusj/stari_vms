@@ -269,9 +269,12 @@ class orderModelObj extends modelObj
         return $this->setExtraData('charging.record', $record);
     }
 
-    public function getChargingRecord()
+    public function getChargingRecord($sub = '', $default = null)
     {
-        return $this->getExtraData('charging.record', []);
+        if (empty($sub)) {
+            return $this->getExtraData('charging.record', is_null($default) ? [] : $default);
+        }
+        return $this->getExtraData("charging.record.$sub", $default);
     }
 
     public function isChargingOrder(): bool

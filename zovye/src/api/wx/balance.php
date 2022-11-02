@@ -106,7 +106,7 @@ class balance
         }
 
         if ($user->isBanned()) {
-            return error(State::ERROR, '用户已经被禁用！');
+            return error(State::ERROR, '用户暂时无法提现！');
         }
 
         if (IotCharging::hasUnpaidOrder($user)) {

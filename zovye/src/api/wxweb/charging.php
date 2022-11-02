@@ -489,10 +489,6 @@ class charging
     {
         $user = common::getWXAppUser();
 
-        if ($user->isBanned()) {
-            return err('对不起，用户暂时无法使用！');
-        }
-
         $user_charging_data = $user->settings('chargingNOW', []);
         if ($user_charging_data) {
             return err('用户卡正在使用中，请稍后再试！');

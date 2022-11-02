@@ -752,8 +752,16 @@ class DeviceEventProcessor
 
                 if ($serial) {
                     $order = Order::get($serial, true);
-                    $order->setExtraData('charging.status', $extra['status']);
-                    $order->save();
+                    if ($order) {
+                        $order->setExtraData('charging.status', $extra['status']);
+                        $order->save();
+
+                        //检查用户余额
+                        $user = $order->getUser();
+                        if (empty($user) || $user->getCommissionBalanceCard()->total() < round($extra['status']['priceTotal'] * 100)) {
+                            Charging::stopCharging($device, $chargerID, $serial);
+                        }
+                    }
                 } else {
                     if ($extra['status']['status'] == 2) {
                         //空闲

@@ -115,6 +115,10 @@ class CloudFIAccount
             return err('没有配置！');
         }
 
+        if (md5($params['openid'] . $params['timestamp'] . $config['key']) !== $params['sign']) {
+            return err('签名检验失败！');
+        }
+
         return ['account' => $acc];
     }
 
@@ -137,7 +141,7 @@ class CloudFIAccount
             $acc = $res['account'];
 
             if ($acc->getBonusType() == Account::BALANCE) {
-                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['zkopenid']}");
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['zkOpenid']}");
                 $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $params);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
@@ -149,7 +153,7 @@ class CloudFIAccount
                     throw new RuntimeException('找不到指定的设备!');
                 }
 
-                $order_uid = Order::makeUID($user, $device, sha1($params['zkopenid']));
+                $order_uid = Order::makeUID($user, $device, sha1($params['zkOpenid']));
                 Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
             }
 

@@ -260,6 +260,17 @@ class App
         });
     }
 
+    /**
+     * 是否开启 中科
+     *
+     */
+    public static function isCloudFIEnabled(): bool
+    {
+        return onceCall(function () {
+            return !empty(settings('cloudFI.fan.enabled'));
+        });
+    }
+
     public static function isCommissionEnabled(): bool
     {
         return onceCall(function () {

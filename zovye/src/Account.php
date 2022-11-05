@@ -89,6 +89,8 @@ class Account extends State
 
     const WEISURE = 113;
 
+    const CloudFI = 114;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 
@@ -136,6 +138,9 @@ class Account extends State
 
     const WEISURE_NAME = '微保';
     const WEISURE_HEAD_IMG = MODULE_URL.'static/img/weisure.png';
+
+    const CloudFI_NAME = '中科在线';
+    const CloudFI_HEAD_IMG = MODULE_URL.'static/img/cloudfi.png';
 
     protected static $title = [
         self::BANNED => '已禁用',
@@ -277,6 +282,7 @@ class Account extends State
             Account::MENGMO => App::isMengMoEnabled(),
             Account::YIDAO => App::isYiDaoEnabled(),
             Account::WEISURE => App::isWeiSureEnabled(),
+            Account::CloudFI => App::isCloudFIEnabled(),
         ];
 
         $result = [];
@@ -362,6 +368,7 @@ class Account extends State
                 Account::MENGMO,
                 Account::YIDAO,
                 Account::WEISURE,
+                Account::CloudFI,
             ];
 
         $include = is_array($include) ? $include : [$include];
@@ -564,6 +571,18 @@ class Account extends State
                 },
                 function () use ($device, $user) {
                     return WeiSureAccount::fetch($device, $user);
+                },
+            ],
+
+            //中科
+            Account::CloudFI => [
+                function () use ($third_party_platform_includes, $exclude) {
+                    return App::isCloudFIEnabled()
+                        && in_array(Account::CloudFI, $third_party_platform_includes)
+                        && !in_array(CloudFIAccount::getUid(), $exclude);
+                },
+                function () use ($device, $user) {
+                    return CloudFIAccount::fetch($device, $user);
                 },
             ],
         ];
@@ -865,7 +884,7 @@ class Account extends State
         return $result;
     }
 
-    public static function makeThirdPartyPlatformUID($type, $name): string
+    public static function makeThirdPartyPlatformUID(int $type, String $name): string
     {
         return self::makeUID("$type:$name");
     }
@@ -976,6 +995,13 @@ class Account extends State
         $url = Util::murl('weisure');
 
         return self::createThirdPartyPlatform(Account::WEISURE, Account::WEISURE_NAME, Account::WEISURE_HEAD_IMG, $url);
+    }
+
+    public static function createCloudFIAccount(): ?accountModelObj
+    {
+        $url = Util::murl('cloudfi');
+
+        return self::createThirdPartyPlatform(Account::CloudFI, Account::CloudFI_NAME, Account::CloudFI_HEAD_IMG, $url);
     }
 
     public static function getAuthorizerQrcodeById(int $id, string $sceneStr, $temporary = true): array
@@ -1466,6 +1492,7 @@ class Account extends State
             self::MENGMO => '涨啊',
             self::YIDAO => '壹道',
             self::WEISURE => '微保',
+            self::CloudFI => '中科在线',
         ];
 
         return $titles[$type] ?? '未知';

@@ -440,6 +440,17 @@ if ($op == 'default') {
                     $config['parsed_h5url'] = $parsed_url;
                 }
                 $account->set('config', $config);
+            } elseif ($account->isCloudFI()) {
+                $data['name'] = Account::CloudFI_NAME;
+                $data['img'] = Account::CloudFI_HEAD_IMG;
+                $data['url'] = Util::murl('cloudfi');
+                $config = [
+                    'type' => Account::CloudFI,
+                    'key' => request::trim('key'),
+                    'channel' => request::trim('channel'),
+                    'scene' => request::trim('scene'),
+                ];
+                $account->set('config', $config);
             } elseif ($account->isWxApp()) {
                 $data['img'] = request::trim('img');
                 $account->set('config', [

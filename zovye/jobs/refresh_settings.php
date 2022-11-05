@@ -52,6 +52,7 @@ if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
         ['name' => Account::YIDAO_NAME, 'type' => Account::YIDAO, 'url' => Util::murl('yidao')],
         ['name' => Account::WEISURE_NAME, 'type' => Account::WEISURE, 'url' => Util::murl('weisure')],
         ['name' => Account::MENGMO_NAME, 'type' => Account::MENGMO, 'url' => Util::murl('mengmo')],
+        ['name' => Account::CloudFI_NAME, 'type' => Account::CloudFI, 'url' => Util::murl('cloudfi')],
     ];
 
     foreach ($third_party_platform as $item) {

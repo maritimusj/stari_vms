@@ -177,6 +177,7 @@ class accountModelObj extends modelObj
                     Account::MENGMO => App::isMengMoEnabled(),
                     Account::YIDAO => App::isYiDaoEnabled(),
                     Account::WEISURE => App::isWeiSureEnabled(),
+                    Account::CloudFI => App::isCloudFIEnabled(),
                 ];
             }
 
@@ -281,6 +282,7 @@ class accountModelObj extends modelObj
             Account::MENGMO,
             Account::YIDAO,
             Account::WEISURE,
+            Account::CloudFI,
         ]);
     }
 
@@ -521,6 +523,11 @@ class accountModelObj extends modelObj
     public function isWeiSure(): bool
     {
         return $this->getType() == Account::WEISURE;
+    }
+
+    public function isCloudFI(): bool
+    {
+        return $this->getType() == Account::CloudFI;
     }
 
     public function isNormal(): bool

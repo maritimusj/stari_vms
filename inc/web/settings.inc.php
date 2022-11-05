@@ -224,6 +224,10 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 __NAMESPACE__.'\Account::createWeiSureAccount',
                 'weiSure.fan.enabled',
             ],
+            'cloudFIFAN' => [
+                __NAMESPACE__.'\Account::createCloudFIAccount',
+                'cloudFI.fan.enabled',
+            ],
         ];
 
         $accounts_updated = false;

@@ -59,7 +59,7 @@ class YiDaoAccount
             'ip' => Util::getClientIp(),
             'auth_open_id' => $fans['openid'],
             'nickname' => $fans['nickname'],
-            'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
+            'sex' => $fans['sex'],
             'nonce' => Util::random(16, true),
             'timestamp' => TIMESTAMP,
             'state' => $device->getImei().':'.Util::random(16),

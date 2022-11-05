@@ -173,9 +173,6 @@ class CloudFIAccount
             'openid' => $fans['openid'],
             'nickname' => $fans['nickname'],
             'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
-            'ip' => $user->getLastActiveIp(),
-            'os' => 0,
-            'param' => "{$device->getShadowId()}:{$user->getOpenid()}",
             'timestamp' => TIMESTAMP,
         ];
 

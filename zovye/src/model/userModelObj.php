@@ -749,7 +749,6 @@ class userModelObj extends modelObj
             if (!isEmptyArray($params['v3'])) {
                 $mch_pay =  new WxMCHPayV3($params['v3']);
             } else {
-                $mch_pay =  new WxMCHPay($params);
                 $file = Pay::getPEMFile($params['pem']);
                 if (is_error($file)) {
                     return $file;
@@ -757,6 +756,8 @@ class userModelObj extends modelObj
     
                 $params['pem']['cert'] = $file['cert_filename'];
                 $params['pem']['key'] = $file['key_filename'];
+
+                $mch_pay =  new WxMCHPay($params);
             }
             
             $res = $mch_pay->transferTo($this->openid, $trade_no, $n, $desc);

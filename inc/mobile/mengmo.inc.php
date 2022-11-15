@@ -8,7 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-
 MengMoAccount::cb([
     'open_id' => request::str('open_id'),
     'facility_id' => request::str('facility_id'),

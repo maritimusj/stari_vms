@@ -19,5 +19,3 @@ MengMoAccount::cb([
     'subscribe_time' => request::int('subscribe_time'),
     'sign' => request::str('sign'),
 ]);
-
-echo REQUEST_ID;

@@ -293,10 +293,6 @@ class orderModelObj extends modelObj
             return true;
         }
 
-        if ($this->getExtraData('timeout')) {
-            return true;
-        }
-
         $result = $this->getChargingResult();
         if ($result && $result['re'] != 3) {
             return true;

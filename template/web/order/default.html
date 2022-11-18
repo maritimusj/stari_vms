@@ -370,13 +370,6 @@
                                         <div class="charging">
                                             <i class="fa fa fa-ellipsis-h fa-fw"></i> 电池电量：<strong>{php echo $order['charging']['status']['soc']}</strong> %
                                         </div>
-                                    {elseif $order['charging']['timeout']}
-                                    <div>
-                                        <i class="fa fa-share-alt fa-fw"></i> 充电枪号：{php echo $order['charging']['chargerID'] ?? '?'}
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-info-circle fa-fw"></i> 设备故障：{php echo $order['charging']['timeout']['reason']??'n/a'}
-                                    </div>
                                     {/if}
                                     {elseif $order['charging']['result']}
                                     <div>
@@ -402,6 +395,13 @@
                                         {/if}
                                     </div>
                                     {/if}
+                                    {elseif $order['charging']['timeout']}
+                                    <div>
+                                        <i class="fa fa-share-alt fa-fw"></i> 充电枪号：{php echo $order['charging']['chargerID'] ?? '?'}
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-info-circle fa-fw"></i> 设备故障：{php echo $order['charging']['timeout']['reason']??'n/a'}
+                                    </div>
                                     {else}
                                     <div>
                                         <i class="fa fa-info-circle fa-fw"></i> 查询中...

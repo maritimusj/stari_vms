@@ -298,6 +298,10 @@ class orderModelObj extends modelObj
             return true;
         }
 
+        if (empty($result) && $this->getExtraData('timeout')) {
+            return true;
+        }
+
         $record = $this->getChargingRecord();
         if ($record && isset($record['totalPrice'])) {
             return true;

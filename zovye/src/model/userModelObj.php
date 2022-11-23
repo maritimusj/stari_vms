@@ -60,6 +60,7 @@ use function zovye\is_error;
  * @method getCreatetime()
  * @method setLockedUid(string $UNLOCKED)
  * @method setOpenid($getOpenid)
+ * @method getApp()
  *
  * @property login_dataModelObj $loginData
  */

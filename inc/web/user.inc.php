@@ -9,6 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
+use Exception;
 use zovye\model\goodsModelObj;
 use zovye\model\keeper_devicesModelObj;
 use zovye\model\keeperModelObj;
@@ -751,24 +752,29 @@ if ($op == 'default') {
     
     $start = request::str('start');
     if ($start) {
-        $s_date = new \DateTime($start);
-        $query->where(['createtime >=' => $s_date->getTimestamp()]);
+        try {
+            $s_date = new DateTime($start);
+            $query->where(['createtime >=' => $s_date->getTimestamp()]);
+        } catch (Exception $e) {
+        }
     }
 
     $end = request::str('end');
     if ($end) {
-        $e_date = new \DateTime($end);
-        $query->where(['createtime <' => $e_date->getTimestamp()]);
+        try {
+            $e_date = new DateTime($end);
+            $query->where(['createtime <' => $e_date->getTimestamp()]);
+        } catch (Exception $e) {
+        }
     }
 
     $step = request::str('step');
     if (empty($step)) {
         $total = $query->count();
-
         $content = app()->fetchTemplate('web/common/export', [
             'api_url' => Util::url('user', [ 'op' => 'user_export_do', 'types' => $user_types, 'start' => $start, 'end' => $end]),
             'total' => $total,
-            'serial' => (new \DateTime())->format('YmdHis'),
+            'serial' => (new DateTime())->format('YmdHis'),
         ]);
 
         JSON::success([

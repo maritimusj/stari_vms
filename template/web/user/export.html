@@ -1,0 +1,78 @@
+<form class="form-horizontal" id="userExportForm">
+    <div class="form-group">
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <label>
+                <input type="checkbox" name="s_type_wx" value="0" checked>
+                公众号
+            </label>                              
+            <label>
+                <input type="checkbox" name="s_type_wxapp" value = "1" checked>
+                小程序
+            </label>                        
+            <label>
+                <input type="checkbox" name="s_type_ali" value="2" checked>
+                支付宝
+            </label>
+            {if \zovye\App::isDouyinEnabled()}
+            <label>
+                <input type="checkbox" name="s_type_douyin" value="3">
+                抖音
+            </label>
+            {/if}
+            <label>
+                <input type="checkbox" name="s_type_api" value="10">
+                第三方API
+            </label>
+            <label>
+                <input type="checkbox" name="s_type_third" value="15">
+                第三方公众号
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-8">
+            <input name="datelimit[start]" type="hidden" value="{php echo $s_date}"/>
+            <input name="datelimit[end]" type="hidden" value="{php echo $e_date}"/>
+            <button class="btn btn-default daterange daterange-date" type="button">
+            <span class="date-title">
+                {if empty($s_date) && empty($e_date)}
+                不限时间
+                {else}
+                {$s_date} 至 {$e_date}
+                {/if}
+            </span> <i class="fa fa-calendar"></i>
+            </button>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <button type="button" class="btn btn-primary" data-op="exportDo">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        </div>
+    </div>
+</form>
+
+<script>
+require(["daterangepicker"], function () {
+    $(function () {
+        $(".daterange.daterange-date").each(function () {
+            var elm = this;
+            $(this).daterangepicker({
+                startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                endDate: $(elm).prev().val() || moment("不限", "Y"),
+                format: "YYYY-MM-DD",
+                clear: 1
+            }, function (start, end) {
+                start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
+                var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至 " + end))
+                $(elm).find(".date-title").html(html);
+                $(elm).prev().prev().val(start);
+                $(elm).prev().val(end);
+            })
+        })
+    })
+})
+</script>

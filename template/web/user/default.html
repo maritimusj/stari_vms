@@ -102,6 +102,11 @@
     {/if}
 </ul>
 <div class="panel panel-default{if empty($s_principal)} panel-first{/if} nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <i class="fa fa-sign-out" title="导出用户信息" data-op="exportUser"></i>
+        </span>
+    </div>
     <div class="panel-body">
         <div id="search-bar">
             <div class="text-input">
@@ -116,11 +121,11 @@
                     <div class="col-md-10" id="other">
                         <label>
                             <input type="checkbox" name="s_type_wx" value="1" {if $s_type_wx} checked{/if}>
-                            微信
+                            公众号
                         </label>                              
                         <label>
                             <input type="checkbox" name="s_type_wxapp" value="1" {if $s_type_wxapp} checked{/if}>
-                            微信小程序
+                            小程序
                         </label>                        
                         <label>
                             <input type="checkbox" name="s_type_ali" value="1" {if $s_type_ali} checked{/if}>
@@ -134,11 +139,11 @@
                         {/if}
                         <label>
                             <input type="checkbox" name="s_type_api" value="1" {if $s_type_api} checked{/if}>
-                            第三方API用户
+                            第三方API
                         </label>
                         <label>
                             <input type="checkbox" name="s_type_third" value="1" {if $s_type_third} checked{/if}>
-                            第三方公众号授权用户
+                            第三方公众号
                         </label>
                     </div>
                 </div>
@@ -423,6 +428,22 @@
         }).fail(function(){
             loading && util.loaded();
         })
+    }
+
+    api.exportDo = function() {
+        const types = [];
+        $('#userExportForm input:checked').each((i, e) => {
+            types.push($(e).val());
+        })
+
+        const start = $('#userExportForm input[name="datelimit[start]"]').val();
+        const end = $('#userExportForm input[name="datelimit[end]"]').val();
+
+        api.showResult({op: 'user_export_do', types, start, end});
+    }
+
+    api.exportUser = function() {
+        api.showResult({op: 'user_export'});
     }
     
     api.userBan = function(userid) {

@@ -156,10 +156,11 @@ class WxMCHPay
 
     /**
      * 转帐订单信息
+     * @param $transaction
      * @param $trade_no
      * @return mixed
      */
-    public function transferInfo($transcition, $trade_no): array
+    public function transferInfo($transaction, $trade_no): array
     {
         $data = array(
             'appid' => $this->config['appid'],

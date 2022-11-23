@@ -184,6 +184,18 @@ class WxMCHPayV3
             return $list;
         }
 
+        if ($response['transfer_batch']) {
+            $batch = $response['transfer_batch'];
+            if ($batch['batch_status'] == 'CLOSED') {
+                return [
+                    'detail_status' => 'FAIL',
+                    'batch_id' => $batch['batch_id'],
+                    'out_batch_no' => $batch['out_batch_no'],
+                    'close_reason' => $batch['close_reason'],
+                ];
+            }
+        }
+
         return err('接口返回数据错误！');
     }
 }

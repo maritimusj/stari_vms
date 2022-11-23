@@ -140,23 +140,31 @@ if ($op == 'export') {
             } elseif ($state == 'mchpay') {
                 $MCHPayResult = $entry->getExtraData('mchpayResult');
                 if ($MCHPayResult['payment_no']) {
-                    $status = '已打款';
+                    $status = '已支付';
                     $data['paymentNO'] = $MCHPayResult['payment_no'];
                 } else {
                     $status = '未知状态';
+                    $state = 'mchpay unknown';
                     if ($MCHPayResult['batch_id']) {
                         $status = '已提交';
+                        $state = 'mchpay committed';
                         $user = User::get($entry->getOpenid(), true);
                         if ($user) {
                             $MCHPayResult = $user->getMCHPayResult($MCHPayResult['batch_id'], $MCHPayResult['out_batch_no']);
-                            if ($MCHPayResult['detail_status'] == 'SUCCESS') {
+                            if ($MCHPayResult['detail_status'] == 'SUCCESS' || $MCHPayResult['detail_status'] == 'FAIL') {
                                 $entry->update(['mchpayResult' =>  $MCHPayResult]);
                                 $entry->save();
                             }
                         }
                     }
-                    if ($MCHPayResult['detail_status'] && $MCHPayResult['detail_status'] == 'SUCCESS') {
-                        $status = '已打款';
+                    if ($MCHPayResult['detail_status']) {
+                        if ($MCHPayResult['detail_status'] == 'SUCCESS') {
+                            $status = '已支付';
+                            $state = 'mchpay';
+                        } else {
+                            $status = '失败';
+                            $state = 'mchpay failed';
+                        }
                     }
                 }
             } elseif ($state == 'confirmed') {
@@ -242,6 +250,13 @@ function getAndCheckWithdraw($id)
     }
 
     if ($balance_obj->getUpdatetime()) {
+        $state = $balance_obj->getExtraData('state');
+        if ($state === 'mchpay') {
+            $MCHPayResult = $balance_obj->getExtraData('mchpayResult');
+            if (empty($MCHPayResult['payment_no']) && $MCHPayResult['detail_status'] === 'FAIL') {
+                return $balance_obj;
+            }
+        }
         return error(State::ERROR, '操作失败，请刷新页面后再试！');
     }
 

@@ -161,7 +161,7 @@ if ($op == 'export') {
                         if ($MCHPayResult['detail_status'] == 'SUCCESS') {
                             $status = '已支付';
                             $state = 'mchpay';
-                        } else {
+                        } elseif ($MCHPayResult['detail_status'] == 'FAIL') {
                             $status = '失败';
                             $state = 'mchpay failed';
                         }

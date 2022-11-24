@@ -626,5 +626,12 @@ class App
         return onceCall(function () {
             return boolval(settings('custom.team.enabled'));
         });
+    }
+
+    public static function isCZTVEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.cztv.enabled'));
+        });
     }    
 }

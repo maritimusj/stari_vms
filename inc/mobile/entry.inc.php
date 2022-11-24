@@ -21,6 +21,7 @@ if (Util::isAliAppContainer()) {
         'from' => $from,
         'device' => $device_id,
     ]);
+
     Util::redirect($ali_entry_url);
 } elseif (Util::isDouYinAppContainer()) {
     $douyin_entry_url = Util::murl('douyin', [
@@ -28,7 +29,13 @@ if (Util::isAliAppContainer()) {
         'device' => $device_id,
         'account' => $account_id,
     ]);
+
     Util::redirect($douyin_entry_url);
+}
+
+//暖心小屋定制功能
+if (CZTV::handle()) {
+    exit();
 }
 
 $params = [

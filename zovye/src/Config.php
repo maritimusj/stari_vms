@@ -123,6 +123,20 @@ class Config
 
         return globalConfig('douyin', $key, $v);
     }
+    
+    /**
+     *  暖心小屋APP设置
+     */
+
+    public static function cztv($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('cztv', $key, $v);
+        }
+
+        return globalConfig('cztv', $key, $v);
+    }
+
 
     /**
      *  积分、余额设置

@@ -87,6 +87,32 @@
                 </div>
             </div>
             {/if}
+            {if \zovye\App::isCZTVEnabled()}
+            <div class="seg">
+                <div class="title">暖心小屋APP</div>
+                <div class="form-group">
+                    <label for="cztvAppId" class="col-md-2 control-label">appid</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="cztvAppId" id="cztvAppId" value="{$cztv['appid']}">
+                        <span class="help-block">* 暖心小屋平台 appid</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cztvAccountUID" class="col-md-2 control-label">关联公众号</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="cztvAccountUID" id="cztvAccountUID" value="{$cztv['account_uid']}">
+                        <span class="help-block">* 暖心小屋平台订单 (关联到指定的公众号，应用这个公众号规则限制)</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cztvRedirectURL" class="col-md-2 control-label">转跳网址</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" name="cztvRedirectURL" id="cztvRedirectURL" value="{$cztv['redirect_url']}">
+                        <span class="help-block">* 没有token数据时，自动转跳到指定网址</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
             <div class="seg">
                 <div class="title">设置</div>
                 <div class="form-group">

@@ -160,6 +160,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['device']['brief-page']['enabled'] = request::bool('deviceBriefPage') ? 1 : 0;
         $settings['custom']['smsPromo']['enabled'] = request::bool('smsPromoEnabled') ? 1 : 0;
         $settings['custom']['team']['enabled'] = request::bool('teamEnabled') ? 1 : 0;
+        $settings['custom']['cztv']['enabled'] = request::bool('cztvEnabled') ? 1 : 0;
 
         Config::app('ad.sponsor.enabled', request::bool('sponsorAd'), true);
 
@@ -538,6 +539,14 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             ], true);
         }
 
+        if (App::isCZTVEnabled()) {
+            Config::cztv('client', [
+                'appid' => request::trim('cztvAppId'),
+                'redirect_url' => request::trim('cztvRedirectURL'),
+                'account_uid' => request::trim('cztvAccountUID'),
+            ], true);
+        }
+
         $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
 
         $settings['misc']['pushAccountMsg_type'] = request::trim('pushAccountMsg_type');
@@ -912,6 +921,10 @@ if ($op == 'account') {
 
     if (App::isDouyinEnabled()) {
         $tpl_data['douyin'] = Config::douyin('client', []);
+    }
+
+    if (App::isCZTVEnabled()) {
+        $tpl_data['cztv'] = Config::cztv('client', []);
     }
 
 } elseif ($op == 'refreshWxPlatformToken') {

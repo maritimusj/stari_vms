@@ -34,7 +34,7 @@ if (Util::isAliAppContainer()) {
 }
 
 //暖心小屋定制功能
-if (CZTV::handle()) {
+if (CZTV::handle($device_id)) {
     exit();
 }
 

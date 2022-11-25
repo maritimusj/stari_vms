@@ -52,11 +52,13 @@ class CZTV
 
         $user->setLastActiveDevice($device);
 
-        $account = Account::findOneFromUID($config['account_uid']);
-        if ($account) {
-            $res = Util::checkAvailable($user, $account,  $device);
-            if (is_error($res)) {
-                Util::resultAlert($res['message'], 'error');
+        if (!empty($config['account_uid'])) {
+            $account = Account::findOneFromUID($config['account_uid']);
+            if ($account) {
+                $res = Util::checkAvailable($user, $account,  $device);
+                if (is_error($res)) {
+                    Util::resultAlert($res['message'], 'error');
+                }
             }
         }
 

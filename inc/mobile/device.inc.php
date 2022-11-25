@@ -118,7 +118,12 @@ if ($op == 'default') {
         JSON::fail('找不到这个设备！');
     }
 
-    $user = Util::getCurrentUser();
+    if (request::has('user')) {
+        $user = User::get(request::str('user'), true);
+    } else {
+        $user = Util::getCurrentUser();
+    }
+    
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -166,4 +171,21 @@ if ($op == 'default') {
 
     $user->setLastActiveData('goods', $goods['id']);
     JSON::success('已保存用户选择！');
+
+} elseif ($op == 'get') {
+
+    if (App::isCZTVEnabled()) {
+        $user = User::get(request::str('user'), true);
+        if (empty($user) || $user->isBanned()) {
+            JSON::fail('找不到用户！');
+        }
+    
+        $device = $user->getLastActiveDevice();
+        if (empty($device)) {
+            JSON::fail('请重新扫描设备二维码！');
+        }
+    
+        $result = CZTV::get($user, $device->getUid(), request::int('goods'));
+        JSON::result($result);
+    }
 }

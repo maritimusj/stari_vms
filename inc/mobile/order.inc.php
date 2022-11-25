@@ -339,7 +339,12 @@ if ($op === 'create') {
 } elseif ($op == 'list') {
 
     //手机  用户订单列表
-    $user = Util::getCurrentUser();
+    if (request::has('user') && App::isCZTVEnabled()) {
+        $user = User::get(request::str('user'), true);
+    } else {
+        $user = Util::getCurrentUser();
+    }
+    
     if (empty($user) || $user->isBanned()) {
         JSON::fail('找不到用户！');
     }
@@ -376,7 +381,12 @@ if ($op === 'create') {
 } elseif ($op == 'detail') {
 
     //查询订单状态
-    $user = Util::getCurrentUser();
+    if (request::has('user') && App::isCZTVEnabled()) {
+        $user = User::get(request::str('user'), true);
+    } else {
+        $user = Util::getCurrentUser();
+    }
+    
     if (empty($user) || $user->isBanned()) {
         JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
     }
@@ -407,7 +417,7 @@ if ($op === 'create') {
 
 } elseif ($op == 'jump') {
 
-    $api_url = Util::murl('order');
+    $api_url = Util::murl('order', ['user' => request::str('user')]);
     $jquery_url = JS_JQUERY_URL;
 
     $js_code = <<<CODE

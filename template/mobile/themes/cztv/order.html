@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title>我的订单</title>
+	<style type="text/css">
+		html,
+		body {
+			position: relative;
+			width: 100%;
+		}
+
+		body {
+			background-color: #F7F7F7;
+			font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+			font-size: 14px;
+			color: #101010;
+			margin: 0;
+			padding: 0;
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+
+		#app {
+			width: 100vw;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		[v-cloak] {
+			display: none !important;
+		}
+
+		.list {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			padding-bottom: 10px;
+		}
+
+		.card-view {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			padding: 10px 0;
+			background-color: #fff;
+			position: relative;
+		}
+
+        .card-view:not(:first-child) {
+			margin-top: 10px;
+        }
+
+		.row {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+		}
+
+		.title {
+			width: 90px;
+			text-align: right;
+			font-weight: bold;
+		}
+
+		.content {
+			width: calc(100% - 90px);
+		}
+
+		.success {
+			color: #16A811;
+		}
+
+		.refund {
+			color: #888;
+		}
+
+		.fail {
+			color: #FA639B;
+		}
+
+		.load-more {
+			width: 100%;
+			padding: 10px 0;
+			background-color: #eee;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			color: #9d9d9d;
+		}
+
+		.load-more:active {
+			background-color: #ddd;
+		}
+
+		.no-data-view {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 15vh;
+		}
+
+		.no-data-img {
+			width: 80px;
+			height: 80px;
+		}
+
+		.no-data-desc {
+			margin-top: 10px;
+			color: #bbb;
+		}
+	</style>
+</head>
+<body ontouchstart>
+<div id="app" v-cloak>
+	<div class="list">
+		<div class="card-view" v-for="item in free.list">
+			<div class="row">
+				<span class="title">领取来源：</span>
+				<span class="content">{{item.tips.text}}</span>
+			</div>
+			<div class="row" v-if="item.status">
+				<span class="title">订单状态：</span>
+				<span :class="{'content':true,'success':item.status == '成功','fail':item.status == '故障'}">{{item.status}}</span>
+			</div>
+			<div class="row">
+				<span class="title">商品信息：</span>
+				<span class="content">{{item.goods ? item.goods.name : '未知'}}</span>
+			</div>
+			<div class="row">
+				<span class="title">设备名称：</span>
+				<span class="content">{{item.device ? item.device.name : '未知'}}</span>
+			</div>
+			<div class="row">
+				<span class="title">领取日期：</span>
+				<span class="content">{{item.createtime}}</span>
+			</div>
+		</div>
+		<div class="load-more" v-if="free.list && free.list.length < free.total" @click="freeLoadMore">加载更多</div>
+		<div class="no-data-view" v-if="free.list && free.list.length == 0">
+			<img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
+			<span class="no-data-desc">暂无数据</span>
+		</div>
+	</div>
+</div>
+{$tpl['js']['code']}
+{php \zovye\url(true, JS_VUE_URL);}
+{php \zovye\url(true, 'static/m/html2canvas.min.js');}
+<script type="text/javascript">
+	const app = new Vue({
+		el: '#app',
+		data: {
+			tabs: [{
+				title: "购买记录",
+				val: 1
+			}, {
+				title: "免费领取记录",
+				val: 2
+			}],
+			val: 1,
+			fee: {
+				list: null,
+				page: 1,
+				pagesize: 20,
+				total: 0
+			},
+			free: {
+				list: null,
+				page: 1,
+				pagesize: 20,
+				total: 0
+			},
+			detail: {
+				visible: false,
+				data: null,
+				img: null
+			}
+		},
+		created() {
+			this.getFreeList();
+		},
+		methods: {
+			getFreeList() {
+				zovye_fn.get_free_list(this.free.page, this.free.pagesize)
+						.then((res) => {
+							if (res.status) {
+								let tmpList = res.data.orders || [];
+								if (this.free.page == 1) {
+									this.free.list = tmpList;
+								} else {
+									this.free.list = this.free.list.concat(tmpList);
+								}
+								this.free.total = res.data.total || 0;
+							}
+						})
+						.catch((error) => {
+							console.log(error);
+						});
+			},
+			freeLoadMore() {
+				this.free.page++;
+				this.getFreeList();
+			}
+		}
+	})
+</script>
+</body>
+</html>

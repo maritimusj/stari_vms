@@ -27,7 +27,7 @@ class CZTV
             return false;
         }
 
-        $token = request::str('token');
+        $token = request::str('sessionid');
         if (empty($token)) {
             if ($config['redirect_url']) {
                 Util::redirect($config['redirect_url']);
@@ -38,7 +38,7 @@ class CZTV
 
         $user = self::getUser($config, $token);
         if (empty($user) || is_error($user)) {
-            Util::resultAlert('找不到用户，请重试！', 'error');
+            Util::resultAlert('无法获取用户信息，请重试！', 'error');
         }
 
         $device = Device::find($device_id, ['imei', 'shadow_id']);
@@ -52,17 +52,17 @@ class CZTV
 
         $user->setLastActiveDevice($device);
 
-        if (!empty($config['account_uid'])) {
-            $account = Account::findOneFromUID($config['account_uid']);
-            if ($account) {
-                $res = Util::checkAvailable($user, $account,  $device);
-                if (is_error($res)) {
-                    Util::resultAlert($res['message'], 'error');
-                }
+        $account = Account::findOneFromUID($config['account_uid']);
+        if ($account) {
+            $res = Util::checkAvailable($user, $account,  $device);
+            if (is_error($res)) {
+                Util::resultAlert($res['message'], 'error');
             }
+        } else {
+            Util::resultAlert('没有关联公众号！', 'error');
         }
 
-        app()->cztvPage($device);
+        app()->cztvPage($device, $user);
 
         return true;
     }
@@ -104,5 +104,63 @@ class CZTV
         }
 
         return $user;
+    }
+
+    public static function get(userModelObj $user, $device_uid, $goods_id, $num = 1, $order_no = '')
+    {
+        if (!App::isCZTVEnabled()) {
+            return err('这个功能没有启用！');
+        }
+
+        $device = Device::get($device_uid, true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        if (Util::mustValidateLocation($user, $device)) {
+            return err('设备位置不在允许的范围内！');
+        }
+
+        $goods = $device->getGoods($goods_id);
+        if (empty($goods) || empty($goods[Goods::AllowFree])) {
+            return err('无法领取这个商品，请联系管理员！');
+        }
+
+        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+            return err('无法锁定用户，请稍后再试！');
+        }
+
+        $num = min(App::orderMaxGoodsNum(), max($num, 1));
+        if ($num < 1) {
+            return err('对不起，商品数量不正确！');
+        }
+
+        if ($goods['num'] < $num) {
+            return err('对不起，商品数量不足！');
+        }
+
+        if (empty($order_no)) {
+            $order_no = Order::makeUID($user, $device, sha1(REQUEST_ID));
+        }
+
+        $ip = $user->getLastActiveIp();
+
+        $account = Account::findOneFromUID(config::cztv('client.account_uid'));
+        if (empty($account)) {
+            return err('没有关联公众号！');
+        }
+
+        if (Job::createAccountOrder([
+            'account' => $account->getId(),
+            'device' => $device->getId(),
+            'user' => $user->getId(),
+            'goods' => $goods['id'],
+            'orderUID' => $order_no,
+            'ip' => $ip,
+        ])) {
+            return ['order_uid' => $order_no];
+        }
+
+        return err('失败，请稍后再试！');
     }
 }

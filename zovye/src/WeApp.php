@@ -643,44 +643,47 @@ JSCODE;
      * 暖心小屋定制页面
      * @param deviceModelObj $device
      */
-    public function cztvPage(deviceModelObj $device)
+    public function cztvPage(deviceModelObj $device, userModelObj $user)
     {
         $tpl = [];
 
-        $device_api_url = Util::murl('device', ['id' => $device->getId()]);
-        $order_jump_url = Util::murl('order', ['op' => 'jump']);
+        $user_json_str = json_encode($user->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);
 
+        $user_openid = $user->getOpenid();
+
+        $device_api_url = Util::murl('device', ['id' => $device->getId()]);
+        $order_jump_url = Util::murl('order', ['op' => 'jump', 'user' => $user_openid]);
+ 
         $tpl['js']['code'] .= <<<JSCODE
 <script>
-    const device_api_url = "$device_api_url";
+    const api_url = "$device_api_url";
+    zovye_fn = {
+        user: JSON.parse(`$user_json_str`),
+    };
 
-    if (typeof zovye_fn === 'undefined') {
-        zovye_fn = {};
-    }
-    zovye_fn.closeWindow = function () {
-        wx && wx.ready(function() {
-            wx.closeWindow();
-       })
-    }
     zovye_fn.redirectToOrderPage = function() {
         window.location.href = "$order_jump_url";
     }
 JSCODE;
         $tpl['js']['code'] .= <<<JSCODE
-\r\nzovye_fn.getGoodsList = function(cb, type = 'pay') {
-$.get("$device_api_url", {op: 'goods', type}).then(function(res) {
-        if (typeof cb === 'function') {
-            cb(res);
-        }
+\r\nzovye_fn.getGoodsList = function(cb, type = 'free') {
+    $.get(api_url, {op: 'goods', user: '$user_openid', type}).then(function(res) {
+            if (typeof cb === 'function') {
+                cb(res);
+            }
     });
 }
+zovye_fn.get = function(goods, cb) {
+    $.get(api_url, {op: 'get', goods,  user: '$user_openid'}).then(function(res) {
+            if (typeof cb === 'function') {
+                cb(res);
+            }
+    });
+}
+
 JSCODE;
 
         $tpl['js']['code'] .= "\r\n</script>";
-
-        if ($_SESSION['is_snapshotuser']) {
-            $tpl['js']['code'] .= $this->snapshotJs($device->getImei());
-        }
 
         $file = Theme::getThemeFile($device, 'cztv');
         $this->showTemplate($file, ['tpl' => $tpl]);

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>{$tpl['site']['title']}</title>
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100%;
+        }
+
+        body {
+            background-color: #f8f8f8;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px !important;
+            color: #101010;
+            margin: 0;
+            padding: 0 0 20px;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .user-info {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            background-color: white;
+            box-shadow: 0 1px 5px #eee;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .nickname {
+            margin: 0 10px;
+            flex: 1;
+        }
+
+        .list {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin-top: 60px;
+        }
+
+        .list-item {
+            width: calc((100vw - 60px) / 2);
+            background-color: white;
+            margin-top: 20px;
+            margin-left: 20px;
+            box-shadow: 0 0 10px #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .img {
+            display: block;
+            width: calc((100vw - 60px) / 2);
+            height: calc((100vw - 60px) / 2);
+            object-fit: cover;
+        }
+
+        .footer {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn {
+            width: 90%;
+            height: 30px;
+            border-radius: 15px;
+            margin-top: 5px;
+            color: white;
+            border: none;
+            background-image: linear-gradient(to right, #f00, #f80);
+        }
+
+        .btn:active {
+            opacity: 0.7;
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .modal {
+            width: 80%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .content {
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .confirm {
+            width: 200px;
+            height: 36px;
+            border-radius: 18px;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            background-image: none;
+            background-color: #FFA500;
+        }
+
+        .order {
+            width: 80px;
+            font-size: 12px;
+            background-image: none;
+            background-color: #FFA500;
+        }
+
+        .no-data-view {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15vh;
+        }
+
+        .no-data-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .no-data-desc {
+            margin-top: 10px;
+            color: #bbb;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="user-info">
+            <img class="avatar" :src="userInfo.headimgurl">
+            <span class="nickname">{{userInfo.nickname}}</span>
+            <button class="btn order" @click="onClickOrder">我的订单</button>
+        </div>
+        <div class="list">
+            <div class="list-item" v-for="item in list" :key="item.id">
+                <img class="img" :src="item.img">
+                <div class="footer">
+                    <div class="name">{{item.name}}</div>
+                    <button class="btn" @click="onClickGet(item.id)">免费领取</button>
+                </div>
+            </div>
+            <div class="no-data-view" v-if="list.length == 0">
+                <img class="no-data-img" src="{MODULE_URL}static/m/balance/img/no_data_icon.png">
+                <span class="no-data-desc">暂无数据</span>
+            </div>
+        </div>
+        <div class="mask" v-if="mask.visible">
+            <div class="modal">
+                <span class="title">提示</span>
+                <span class="content">领取成功，请等待出货...</span>
+                <button class="btn confirm" @click="onClickConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL, JS_JQUERY_URL);}
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                userInfo: zovye_fn.user,
+                list: [],
+                mask: {
+                    visible: false
+                }
+            },
+            created () {
+                this.getGoodsList()
+            },
+            methods: {
+                getGoodsList () {
+                    zovye_fn.getGoodsList((res) => {
+                        if (res.status) {
+                            this.list = res.data
+                        }
+                    })
+                },
+                onClickGet (id) {
+                    zovye_fn.get(id, (res) => {
+                        if (res.status) {
+                            this.mask.visible = true
+                        }
+                    })
+                },
+                onClickConfirm () {
+                    window.location.reload()
+                },
+                onClickOrder () {
+                    zovye_fn.redirectToOrderPage()
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

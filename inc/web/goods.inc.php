@@ -145,7 +145,8 @@ if ($op == 'default' || $op == 'goods') {
         Util::itoast('成本价不能高于单价！', '', 'error');
     }
 
-    if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 || ($params['discountPrice'] > 0 && $params['discountPrice'] >= $params['goodsPrice'])) {
+    if ($params['discountPrice'] < 0 || $params['goodsPrice'] < 0 ||
+        ($params['discountPrice'] > 0 && $params['discountPrice'] >= $params['goodsPrice'])) {
         Util::itoast('优惠价不能高于或者等于单价！', '', 'error');
     }
 

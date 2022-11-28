@@ -292,7 +292,12 @@
                                     <sup class="charging" title="充电桩">
                                         <img src="{MODULE_URL}static/img/charging.svg" class="icon">
                                     </sup>
-                                </template>                                  
+                                </template>
+                                <template v-if="o.isFueling">
+                                    <sup class="charging" title="尿素加注设备">
+                                        <img src="{MODULE_URL}static/img/fueling.svg" class="icon">
+                                    </sup>
+                                </template>
                                 <template v-if="o.isVD">
                                     <sup class="vdevice" title="虚拟设备">
                                         <img src="{MODULE_URL}static/img/vdevice.svg" class="icon">
@@ -341,7 +346,7 @@
                         </td>
                         <td>
                             <div class="operate">
-                                <div class="getway">
+                                <div class="getway" v-if="o.model === 'normal' || o.model === 'vd'">
                                     <i class="fa fa-map-marker" :style="{'color': o.gettype && o.gettype.location ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.location?'需要定位':'未开启定位'"></i>
                                     <i class="fa fa-street-view" :style="{'color': o.gettype && o.gettype.free ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.free?'关注公众号领取' + (o.gettype.freeLimitsReached?'(已限额)':''):'不允许关注领取'"></i>
                                     <i class="fa fa-shopping-cart" :style="{'color': o.gettype && o.gettype.price ? '#607D8B':'#eee'}" :title="o.gettype&&o.gettype.price?'可支付' + o.gettype.price + '元购买':'不允许支付购买'"></i>

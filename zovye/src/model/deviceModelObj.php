@@ -456,6 +456,10 @@ class deviceModelObj extends modelObj
                 if (App::isChargingDeviceEnabled()) {
                     return Device::CHARGING_DEVICE;
                 }
+            case Device::FUELING_DEVICE:
+                if (App::isFuelingDeviceEnabled()) {
+                    return Device::FUELING_DEVICE;
+                }
         }
 
         return Device::NORMAL_DEVICE;

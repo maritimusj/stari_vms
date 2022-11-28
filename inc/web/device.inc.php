@@ -312,7 +312,7 @@ if ($op == 'default') {
             ];
 
             if (App::isDeviceWithDoorEnabled()) {
-                if (!$device->isChargingDevice()) {
+                if (!$device->isChargingDevice() && !$device->isFuelingDevice()) {
                     $data['doorNum'] = $device->getDoorNum();
                 }
             }
@@ -382,8 +382,13 @@ if ($op == 'default') {
             }
 
             if (App::isChargingDeviceEnabled() && $device->isChargingDevice()) {
+                $data['isCharging'] = true;
                 $data['charging'] = $device->getChargingData();
             }
+
+            if (App::isFuelingDeviceEnabled() && $device->isFuelingDevice()) {
+                $data['isFueling'] = true;
+            }            
 
             if (settings('device.lac.enabled')) {
                 $data['s1'] = $device->getS1();
@@ -448,6 +453,8 @@ if ($op == 'default') {
         $tpl_data['device_model'] = Device::BLUETOOTH_DEVICE;
     } elseif ($op == 'add_charging' || (isset($device) && $device->isChargingDevice())) {
         $tpl_data['device_model'] = Device::CHARGING_DEVICE;
+    }  elseif ($op == 'add_fueling' || (isset($device) && $device->isFuelingDevice())) {
+        $tpl_data['device_model'] = Device::FUELING_DEVICE;
     } else {
         $tpl_data['device_model'] = Device::NORMAL_DEVICE;
     }

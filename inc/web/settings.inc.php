@@ -981,6 +981,10 @@ if ($op == 'account') {
         }
     }
 
+    if (App::isFuelingDeviceEnabled()) {
+        
+    }
+
     $tpl_data['migrate'] = Migrate::detect();
 
 } elseif ($op == 'unlock') {

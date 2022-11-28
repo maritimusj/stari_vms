@@ -609,6 +609,13 @@ class App
         });
     }
 
+    public static function isFuelingDeviceEnabled(): bool
+    {
+        return onceCall(function () {
+            return Config::fueling('enabled', false);
+        });
+    }
+
     public static function isSponsorAdEnabled(): bool
     {
         return Config::app('ad.sponsor.enabled', false);

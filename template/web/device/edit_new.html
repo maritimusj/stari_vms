@@ -216,12 +216,38 @@
                             <span class="help-block" v-if="deviceId === 0">* 以后无法修改</span>
                         </div>
                     </div>
+                    <!--充电桩-->
                     <div class="form-group" v-if="config.is_charging_device">
                         <label for="chargerNum" class="col-md-2 control-label">充电枪数量</label>
                         <div class="col-md-10">
                             <input type="number" class="form-control" name="chargerNum" id="chargerNum" value="{php echo $device ? $device->getChargerNum() : ''}">
                         </div>
                     </div>
+                    <!--尿素加注机-->
+                    <template v-if="config.is_fueling_device">
+                        <div class="form-group">
+                            <label for="coefficient" class="col-md-2 control-label">流量系数</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="coefficient" id="coefficient" value="{php echo $device ? $device->getCoefficient() : ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">到期时间</label>
+                            <div class="col-md-8">
+                                <input name="datelimit[start]" type="hidden" value="{php echo $device ? $device->getExpiration() : ''}"/>
+                                <button class="btn btn-default daterange daterange-date" type="button">
+                                <span class="date-title">
+                                    {if empty($device) || empty($device->getExpiration())}
+                                    不限时间
+                                    {else}
+                                    {php echo $device->getExpiration()}
+                                    {/if}
+                                </span> <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <!--蓝牙设备-->
                     <template v-if="config.is_bluetooth_device">
                         <div class="form-group">
                             <label for="BUID" class="col-md-2 control-label">蓝牙UID</label>
@@ -814,6 +840,7 @@
                     is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
                     is_vdevice: `{php echo $is_vdevice? 1 :''}`,
                     is_charging_device: `{php echo $is_charging_device? 1 :''}`,
+                    is_fueling_device: `{php echo $is_fueling_device? 1 :''}`,
                     app: `{php echo $app? 1 :''}`,
                     zero_bonus_enabled: `{php echo \zovye\App::isZeroBonusEnabled()? 1 : ''}`,
                     moscale_enabled: `{php echo $moscale ? 1 : ''}`,
@@ -936,7 +963,7 @@
                                 self.error = res.data.msg || '&lt;出错了&gt;';
                             }
                         }
-                        if (self.list.length == 0) {
+                        if (self.list.length === 0) {
                             self.currentType = {};      
                             self.currentTypeID = 0;
                         }
@@ -1035,7 +1062,7 @@
                             num: 1,
                             unit_title: lane.goods_unit_title,
                         })
-                        this.calcPakcageGoodsTotal(this.currentPackage);
+                        this.calcPackageGoodsTotal(this.currentPackage);
                     }
                 },
                 removePackage(p,index)
@@ -1052,10 +1079,10 @@
                 {
                     if (this.currentPackage) {
                         this.currentPackage.list.splice(index, 1);
-                        this.calcPakcageGoodsTotal(this.currentPackage);
+                        this.calcPackageGoodsTotal(this.currentPackage);
                     }
                 },
-                calcPakcageGoodsTotal(p) {
+                calcPackageGoodsTotal(p) {
                     p.price = 0;
                     p.list.forEach(e => {
                         p.price += e.price * e.num;
@@ -1101,11 +1128,11 @@
                 {
                     goods.edit = false;
                     goods.price = parseFloat(goods.price).toFixed(2);
-                    this.calcPakcageGoodsTotal(this.currentPackage);
+                    this.calcPackageGoodsTotal(this.currentPackage);
                 },
                 editPackageGoodsNumDone(goods,index)
                 {
-                    this.calcPakcageGoodsTotal(this.currentPackage);
+                    this.calcPackageGoodsTotal(this.currentPackage);
                 },
             }
         })
@@ -1288,7 +1315,7 @@
                 params.append("keywords", s_keywords);
             }
             const agentId = $.trim(form.find('select[name=agentId]').val());
-            if (agentId != '') {
+            if (agentId !== '') {
                 params.append("agentId", agentId);
             }
             if (typeof fn === 'function') {
@@ -1321,6 +1348,25 @@
             e.preventDefault();
             const url = $(this).attr("href");
             reload(url);
+        })
+    })
+</script>
+<script>
+    require(["daterangepicker"], function () {
+        $(function () {
+            $(".daterange.daterange-date").each(function () {
+                var elm = this;
+                $(this).daterangepicker({
+                    startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
+                    format: "YYYY-MM-DD",
+                    clear: 1
+                }, function (start) {
+                    start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
+                    var html = (start === "" ? "不限时间" : start)
+                    $(elm).find(".date-title").html(html);
+                    $(elm).prev().prev().val(start);
+                })
+            })
         })
     })
 </script>

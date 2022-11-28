@@ -227,7 +227,7 @@
                     }, function (start, end) {
                         start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
                         end = end.toDateStr().indexOf("0000-01-01") != -1 ? "" : end.toDateStr();
-                        var html = (start == "" ? "不限时间" : start) + (start == "" && end === "" ? "" : (" 至 " + end))
+                        var html = (start == "" ? "不限时间" : start) + (start === "" && end === "" ? "" : (" 至 " + end))
                         $(elm).find(".date-title").html(html);
                         $(elm).prev().prev().val(start);
                         $(elm).prev().val(end);

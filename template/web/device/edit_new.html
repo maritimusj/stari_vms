@@ -223,30 +223,7 @@
                             <input type="number" class="form-control" name="chargerNum" id="chargerNum" value="{php echo $device ? $device->getChargerNum() : ''}">
                         </div>
                     </div>
-                    <!--尿素加注机-->
-                    <template v-if="config.is_fueling_device">
-                        <div class="form-group">
-                            <label for="coefficient" class="col-md-2 control-label">流量系数</label>
-                            <div class="col-md-10">
-                                <input type="text" class="form-control" name="coefficient" id="coefficient" value="{php echo $device ? $device->getCoefficient() : ''}">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-2 control-label">到期时间</label>
-                            <div class="col-md-8">
-                                <input name="datelimit[start]" type="hidden" value="{php echo $device ? $device->getExpiration() : ''}"/>
-                                <button class="btn btn-default daterange daterange-date" type="button">
-                                <span class="date-title">
-                                    {if empty($device) || empty($device->getExpiration())}
-                                    不限时间
-                                    {else}
-                                    {php echo $device->getExpiration()}
-                                    {/if}
-                                </span> <i class="fa fa-calendar"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </template>
+
                     <!--蓝牙设备-->
                     <template v-if="config.is_bluetooth_device">
                         <div class="form-group">
@@ -666,6 +643,23 @@
                     </div>
                     {/if} 
                     -->
+                    <!--尿素加注机-->
+                    <template v-if="config.is_fueling_device">
+                        <div class="form-group">
+                            <label for="coefficient" class="col-md-2 control-label">流量系数</label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="coefficient" id="coefficient" value="{php echo $device ? $device->getCoefficient() : ''}">
+                                <span class="help-block">* 请输入流量系数值</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">到期时间</label>
+                            <div class="col-md-10">
+                                <input type="text" name="expiration"  value="{php echo $device ? $device->getExpiration() : ''}" placeholder="请选择日期时间" readonly="readonly" class="datetimepicker form-control" style="padding-left:12px;" />
+                                <span class="help-block">* 请输入设备到期时间</span>
+                            </div>
+                        </div>
+                    </template>
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">设备状态</label>
                         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
@@ -1352,22 +1346,15 @@
     })
 </script>
 <script>
-    require(["daterangepicker"], function () {
-        $(function () {
-            $(".daterange.daterange-date").each(function () {
-                var elm = this;
-                $(this).daterangepicker({
-                    startDate: $(elm).prev().prev().val() || moment("不限", "Y"),
-                    format: "YYYY-MM-DD",
-                    clear: 1
-                }, function (start) {
-                    start = start.toDateStr().indexOf("0000-01-01") != -1 ? "" : start.toDateStr();
-                    var html = (start === "" ? "不限时间" : start)
-                    $(elm).find(".date-title").html(html);
-                    $(elm).prev().prev().val(start);
-                })
-            })
-        })
-    })
+    require(["datetimepicker"], function(){
+            var option = {
+                lang : "zh",
+                step : 5,
+                timepicker : false,
+                closeOnDateSelect : true,
+                format : "Y-m-d",
+            };
+        $(".datetimepicker[name = 'expiration']").datetimepicker(option);
+    });
 </script>
 {template 'common/footer'}

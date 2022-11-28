@@ -7,6 +7,8 @@
 
 namespace zovye\model;
 
+use DateTime;
+use Exception;
 use zovye\App;
 use zovye\Balance;
 use zovye\Job;
@@ -251,15 +253,14 @@ class deviceModelObj extends modelObj
         return $this->getDeviceModel() == Device::NORMAL_DEVICE;
     }
 
-
     /**
      * 是不是虚拟设备
      * @return bool
      */
     public function isVDevice(): bool
     {
-        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || $this->getDeviceModel(
-                ) == Device::VIRTUAL_DEVICE);
+        return App::isVDeviceSupported() && ($this->settings('device.is_vd') || 
+        $this->getDeviceModel() == Device::VIRTUAL_DEVICE);
     }
 
     /**
@@ -595,6 +596,32 @@ class deviceModelObj extends modelObj
     public function getDoorNum(): int
     {
         return $this->settings('extra.door.num', 0);
+    }
+
+    public function getCoefficient(): string
+    {
+        return $this->settings('extra.coefficient', 0);
+    }
+
+    public function getExpiration(): string
+    {
+        return $this->settings('extra.expiration', '');
+    }
+
+    public function isExpired(): bool
+    {
+        $expiration = $this->getExpiration();
+        if (!empty($expiration)) {
+            try {
+                $expired_at = new DateTime($expiration);
+                if ($expired_at && $expired_at->getTimestamp() < time()) {
+                    return true;
+                }
+            } catch(Exception $e) {
+
+            }
+        }
+        return false;
     }
 
     /**

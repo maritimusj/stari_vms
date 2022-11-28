@@ -795,6 +795,11 @@ HTML;
             ];
         }
 
+        if (App::isFuelingDeviceEnabled() && request::str('device_model') == Device::FUELING_DEVICE) {
+            $extra['coefficient'] = request::int('coefficient');
+            $extra['expiration'] = request::str('expiration');
+        }
+
         $agent_id = request::int('agent_id');
         if ($agent_id) {
             $agent = Agent::get($agent_id);

@@ -402,7 +402,7 @@ if ($op == 'default') {
 
     JSON::success($result);
 
-} elseif ($op == 'add' || $op == 'add_vd' || $op == 'add_bluetooth_device' || $op == 'add_charging' || $op == 'edit') {
+} elseif (in_array($op, ['add', 'add_vd', 'add_bluetooth_device', 'add_charging', 'add_fueling', 'edit'])) {
 
     $id = request::int('id');
 
@@ -484,6 +484,10 @@ HTML;
         $icon_html = <<<HTML
     <img src="{$module_url}static/img/charging.svg" class="icon" title="充电桩">
 HTML;
+    } elseif ($op == 'add_fueling' || (isset($device) && $device->isFuelingDevice())) {
+        $icon_html = <<<HTML
+    <img src="{$module_url}static/img/fueling.svg" class="icon" title="尿素加注设备">
+HTML;
     } else {
         $icon_html = <<<HTML
     <img src="{$module_url}static/img/machine.svg" class="icon">
@@ -496,6 +500,7 @@ HTML;
     } else {
         $group_query = Group::query(Group::NORMAL);
     }
+
     /** @var device_groupsModelObj $val */
     foreach ($group_query->findAll() as $val) {
         $groups[$val->getId()] = ['title' => $val->getTitle()];
@@ -505,10 +510,10 @@ HTML;
     $tpl_data['icon'] = $icon_html;
     $tpl_data['from'] = request::str('from', 'base');
     $tpl_data['is_normal_device'] = $op == 'add' || (isset($device) && $device->isNormalDevice());
-    $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice(
-            ));
+    $tpl_data['is_bluetooth_device'] = $op == 'add_bluetooth_device' || (isset($device) && $device->isBlueToothDevice());
     $tpl_data['is_vdevice'] = $op == 'add_vd' || (isset($device) && $device->isVDevice());
     $tpl_data['is_charging_device'] = $op == 'add_charging' || (isset($device) && $device->isChargingDevice());
+    $tpl_data['is_fueling_device'] = $op == 'add_fueling' || (isset($device) && $device->isFuelingDevice());
     $tpl_data['themes'] = Theme::all();
 
     app()->showTemplate('web/device/edit_new', $tpl_data);
@@ -2642,7 +2647,7 @@ HTML;
         $total = Device::query()->count();
 
         $content = app()->fetchTemplate('web/common/export', [
-            'api_url' => Util::url('device', [ 'op' => 'export_sim']),
+            'api_url' => Util::url('device', ['op' => 'export_sim']),
             'total' => $total,
             'serial' => (new DateTime())->format('YmdHis'),
         ]);
@@ -2680,8 +2685,8 @@ HTML;
             }
 
             $result[] = [
-                "'" . $device->getImei(),
-                "'" . $data['iccid'],
+                "'".$device->getImei(),
+                "'".$data['iccid'],
                 $data['carrier'],
                 $data['status'],
                 $data['data_plan'],

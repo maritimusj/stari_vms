@@ -280,6 +280,15 @@ class deviceModelObj extends modelObj
         return $this->getDeviceModel() == Device::CHARGING_DEVICE;
     }
 
+    /**
+     * 是不是尿素加注机
+     * @return bool
+     */
+    public function isFuelingDevice(): bool
+    {
+        return $this->getDeviceModel() == Device::FUELING_DEVICE;
+    }
+
     public function getBUID(): string
     {
         if ($this->isBlueToothDevice()) {

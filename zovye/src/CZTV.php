@@ -37,6 +37,13 @@ class CZTV
         }
 
         $user = self::getUser($config, $token);
+
+        Log::debug("cztv", [
+            'sessionid' => request::str('sessionid'),
+            'config' => $config,
+            'result' => $user,
+        ]);
+
         if (empty($user) || is_error($user)) {
             Util::resultAlert('无法获取用户信息，请重试！', 'error');
         }
@@ -69,10 +76,12 @@ class CZTV
 
     public static function getUser($config, $token)
     {
-        $response = Util::get(self::API_URL, 3, [
+        $url = self::API_URL . '?' . http_build_query([
             'appId' => $config['appid'],
             'token' => $token,
-        ], true);
+        ]);
+
+        $response = Util::get($url, 3, [], true);
 
         if (is_error($response)) {
             return $response;

@@ -163,6 +163,19 @@ class Config
 
         return globalConfig('charging', $key, $v);
     }
+
+    /**
+     *  尿素加注设备设置
+     */
+
+    public static function fueling($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('fueling', $key, $v);
+        }
+
+        return globalConfig('fueling', $key, $v);
+    }
     
     public static function notify($key, $v = null, bool $update = false)
     {

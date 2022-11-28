@@ -272,6 +272,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         Config::device('door.enabled', request::bool('DeviceWithDoor') ? 1 : 0, true);
         Config::charging('enabled', request::bool('ChargingDeviceEnabled') ? 1 : 0, true);
+        Config::fueling('enabled', request::bool('FuelingDeviceEnabled') ? 1 : 0, true);
 
         $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
 

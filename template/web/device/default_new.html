@@ -16,6 +16,11 @@
                     <img src="{MODULE_URL}static/img/charging.svg" class="icon" title="添加充电桩">
                 </a>
                 {/if}
+                {if \zovye\App::isFuelingDeviceEnabled()}
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'add_fueling'));}">
+                    <img src="{MODULE_URL}static/img/fueling.svg" class="icon" title="添加尿素加注设备">
+                </a>
+                {/if}
                 {if \zovye\App::isVDeviceSupported()}
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'add_vd'));}">
                     <img src="{MODULE_URL}static/img/vdevice.svg" class="icon" title="添加虚拟设备">

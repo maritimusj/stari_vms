@@ -41,7 +41,7 @@ class CZTV
         Log::debug("cztv", [
             'sessionid' => request::str('sessionid'),
             'config' => $config,
-            'result' => $user,
+            'result' => is_error($user) ? $user : $user->profile(),
         ]);
 
         if (empty($user) || is_error($user)) {

@@ -748,7 +748,11 @@ class userModelObj extends modelObj
             }
 
             if (!isEmptyArray($params['v3'])) {
-                $mch_pay =  new WxMCHPayV3($params['v3']);
+
+                $config = $params['v3'];
+                $config['appid'] = $params['appid'];
+                $mch_pay =  new WxMCHPayV3($config);
+
             } else {
                 $file = Pay::getPEMFile($params['pem']);
                 if (is_error($file)) {

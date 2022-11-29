@@ -687,7 +687,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 'key' => request::trim('keyPEM'),
             ];
 
-            $settings['pay']['wx']['v3']['appid'] = request::trim('v3AppID');
             $settings['pay']['wx']['v3']['serial'] = request::trim('v3Serial');
             $settings['pay']['wx']['v3']['mch_id'] = request::trim('V3MCHID');
             $settings['pay']['wx']['v3']['pem'] = [

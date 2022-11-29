@@ -750,7 +750,10 @@ class userModelObj extends modelObj
             if (!isEmptyArray($params['v3'])) {
 
                 $config = $params['v3'];
+
                 $config['appid'] = $params['appid'];
+                $config['mch_id'] = $params['mch_id'];
+                
                 $mch_pay =  new WxMCHPayV3($config);
 
             } else {

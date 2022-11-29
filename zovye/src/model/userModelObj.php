@@ -713,8 +713,13 @@ class userModelObj extends modelObj
         if (empty($params)) {
             return error(State::ERROR, '没有配置微信打款信息！');
         }
+
         if (!isEmptyArray($params['v3'])) {
-            $mch_pay =  new WxMCHPayV3($params['v3']);
+            $config = $params['v3'];
+            $config['appid'] = $params['appid'];
+            $config['mch_id'] = $params['mch_id'];
+
+            $mch_pay =  new WxMCHPayV3($config);
             return $mch_pay->transferInfo($transaction, $trade_no);
         } 
         
@@ -750,7 +755,6 @@ class userModelObj extends modelObj
             if (!isEmptyArray($params['v3'])) {
 
                 $config = $params['v3'];
-
                 $config['appid'] = $params['appid'];
                 $config['mch_id'] = $params['mch_id'];
                 

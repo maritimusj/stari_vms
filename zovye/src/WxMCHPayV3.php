@@ -37,44 +37,14 @@ class WxMCHPayV3
         $this->config = $config;
     }
 
-    public function getV3Client(): ?BuilderChainable
-    {
-        static $client = null;
-
-        if ($client == null) {
-            // 设置参数
-            // 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名
-            $merchantPrivateKeyFilePath = $this->config['pem']['key'];
-            $merchantPrivateKeyInstance = Rsa::from($merchantPrivateKeyFilePath, Rsa::KEY_TYPE_PRIVATE);
-
-            // 从本地文件中加载「微信支付平台证书」，用来验证微信支付应答的签名
-            $platformCertificateFilePath = $this->config['pem']['cert'];
-            $platformPublicKeyInstance = Rsa::from($platformCertificateFilePath, Rsa::KEY_TYPE_PUBLIC);
-
-            // 从「微信支付平台证书」中获取「证书序列号」
-            $platformCertificateSerial = PemUtil::parseCertificateSerialNo($platformCertificateFilePath);
-
-            // 构造一个 APIv3 客户端实例
-            $client = Builder::factory([
-                'mchid' => $this->config['mch_id'],    // 商户号
-                'serial' => $this->config['serial'],       // 「商户API证书」的「证书序列号」
-                'privateKey' => $merchantPrivateKeyInstance,
-                'certs' => [
-                    $platformCertificateSerial => $platformPublicKeyInstance,
-                ],
-            ]);
-        }
-
-        return $client;
-    }
-
     protected function getResponse($method, $path, $data = [])
     {
         try {
+            $client = WxPayV3::getClient($this->config);
             if ($method == 'post') {
-                $response = $this->getV3Client()->chain($path)->post(['json' => $data]);
+                $response = $client->chain($path)->post(['json' => $data]);
             } elseif ($method == 'get') {
-                $response = $this->getV3Client()->chain($path)->get([
+                $response = $client->chain($path)->get([
                     'query' => $data,
                 ]);
             } else {

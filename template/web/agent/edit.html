@@ -1345,41 +1345,9 @@
                 </div>
                 <fieldset {if empty($agent_data['pay']['wx']['enable'])}disabled{/if} name="wx">
                 <div class="form-group">
-                    <label for="wxAppID" class="col-md-2 control-label">公众号 appID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxAppID" id="wxAppID" value="{$agent_data['pay']['wx']['appid']}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="wxxAppID" class="col-md-2 control-label">小程序 appID</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control" name="wxxAppID" id="wxxAppID" value="{$agent_data['pay']['wx']['wxappid']}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="wxAppKey" class="col-md-2 control-label">api 密钥</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="wxAppKey" id="wxAppKey" value="{$agent_data['pay']['wx']['key']}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="wxMCHID" class="col-md-2 control-label">商户号</label>
+                    <label for="wxMCHID" class="col-md-2 control-label">子商户号</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$agent_data['pay']['wx']['mch_id']}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="certPEM" class="col-md-2 control-label">证书</label>
-                    <div class="col-md-10">
-                        <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$agent_data['pay']['wx']['pem']['cert']}</textarea>
-                        <span class="help-block">* 微信退款API证书文件，要求pem格式</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="keyPEM" class="col-md-2 control-label">密钥</label>
-                    <div class="col-md-10">
-                        <textarea type="text" class="form-control inputMask" name="keyPEM" id="keyPEM">{$agent_data['pay']['wx']['pem']['key']}</textarea>
-                        <span class="help-block">* 微信退款API密钥文件，要求pem格式</span>
                     </div>
                 </div>
                 </fieldset>

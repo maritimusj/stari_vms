@@ -635,14 +635,7 @@ if ($op == 'default') {
             $wx_enabled = request('wx') ? 1 : 0;
             $data['wx']['enable'] = $wx_enabled;
             if ($wx_enabled) {
-                $data['wx']['appid'] = request::trim('wxAppID');
-                $data['wx']['wxappid'] = request::trim('wxxAppID');
-                $data['wx']['key'] = request::trim('wxAppKey');
                 $data['wx']['mch_id'] = request::trim('wxMCHID');
-                $data['wx']['pem'] = [
-                    'cert' => request::trim('certPEM'),
-                    'key' => request::trim('keyPEM'),
-                ];
             }
 
             $lcsw_enabled = request::bool('lcsw');

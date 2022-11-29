@@ -681,8 +681,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             $settings['pay']['wx']['appid'] = request::trim('wxAppID');
             $settings['pay']['wx']['wxappid'] = request::trim('wxxAppID');
             $settings['pay']['wx']['key'] = request::trim('wxAppKey');
-            $settings['pay']['wx']['mch_id'] = request::trim('wxMCHID');
-            
+            $settings['pay']['wx']['mch_id'] = request::trim('wxMCHID');     
             $settings['pay']['wx']['pem'] = [
                 'cert' => request::trim('certPEM'),
                 'key' => request::trim('keyPEM'),

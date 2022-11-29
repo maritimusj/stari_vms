@@ -191,26 +191,27 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="wxAppKey" class="col-md-2 control-label">api 密钥</label>
-                    <div class="col-md-10">
-                        <input type="text" class="form-control inputMask" name="wxAppKey" id="wxAppKey" value="{$settings['pay']['wx']['key']}">
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="wxMCHID" class="col-md-2 control-label">商户号</label>
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="wxMCHID" id="wxMCHID" value="{$settings['pay']['wx']['mch_id']}">
                     </div>
                 </div>
+                <div class="seg-divider"></div>
                 <div class="form-group">
-                    <label for="certPEM" class="col-md-2 control-label">证书</label>
+                    <label for="wxAppKey" class="col-md-2 control-label">API密钥(v2)</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control inputMask" name="wxAppKey" id="wxAppKey" value="{$settings['pay']['wx']['key']}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="certPEM" class="col-md-2 control-label">证书(v2)</label>
                     <div class="col-md-10">
                         <textarea type="text" class="form-control inputMask" name="certPEM" id="certPEM">{$settings['pay']['wx']['pem']['cert']}</textarea>
                         <span class="help-block">* 微信退款API证书文件，要求pem格式</span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="keyPEM" class="col-md-2 control-label">密钥</label>
+                    <label for="keyPEM" class="col-md-2 control-label">密钥(v2)</label>
                     <div class="col-md-10">
                         <textarea type="text" class="form-control inputMask" name="keyPEM" id="keyPEM">{$settings['pay']['wx']['pem']['key']}</textarea>
                         <span class="help-block">* 微信退款API密钥文件，要求pem格式</span>

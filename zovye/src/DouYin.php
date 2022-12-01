@@ -106,10 +106,13 @@ class DouYin
     {
         $url = self::API_URL.'/oauth/userinfo/?'.http_build_query([
                 'open_id' => $openid,
-                'access_token' => $access_token,
             ]);
 
-        $res = Util::get($url, 3, [], true);
+        $res = Util::get($url, 3, [
+            CURLOPT_HTTPHEADER => [
+                'access-token' => $access_token,
+            ],
+        ], true);
         if (is_error($res)) {
             return $res;
         }
@@ -126,16 +129,43 @@ class DouYin
         return $data;
     }
 
+    public function fansCheck($access_token, $openid, $follower_openid)
+    {
+        $url = self::API_URL.'/fans/check/?'.http_build_query([
+                'open_id' => $openid,
+                'follower_open_id' => $follower_openid,
+            ]);
+
+        $res = Util::get($url, 3, [
+            CURLOPT_HTTPHEADER => [
+                'access-token' => $access_token,
+            ],
+        ], true);
+
+        if (is_error($res)) {
+            return $res;
+        }
+
+        if (getArray($res, 'extra.error_code', 1) > 0) {
+            return err(getArray($res, 'extra.description', 'unknown error'));
+        }
+
+        return getArray($res, 'data.is_follower', false);
+    }
+
     public function getFollowingList($access_token, $openid, $cursor = 0, $count = 10)
     {
         $url = self::API_URL.'/following/list/?'.http_build_query([
                 'open_id' => $openid,
-                'access_token' => $access_token,
                 'cursor' => $cursor,
                 'count' => $count,
             ]);
 
-        $res = Util::get($url, 3, [], true);
+        $res = Util::get($url, 3, [
+            CURLOPT_HTTPHEADER => [
+                'access-token' => $access_token,
+            ],
+        ], true);
         if (is_error($res)) {
             return $res;
         }
@@ -181,11 +211,17 @@ class DouYin
         return empty($token) || time() - $token['updatetime'] > $token['expires_in'] - 1000;
     }
 
+    public static function isFans(userModelObj $user, $openid)
+    {
+        $access_token = $user->settings('douyin_token.access_token', '');
+        $o = self::getInstance();
+        return $o->fansCheck($access_token, $openid, $user->getOpenid());
+    }
+
     public static function getUserFollowList(userModelObj $user, $cursor = 0, $count = 10)
     {
         $access_token = $user->settings('douyin_token.access_token', '');
         $o = self::getInstance();
-
         return $o->getFollowingList($access_token, $user->getOpenid(), $cursor, $count);
     }
 

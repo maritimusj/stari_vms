@@ -2837,8 +2837,21 @@ HTML_CONTENT;
             $params[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36';
         }
 
+        $headers = [];
         foreach ($params as $index => $val) {
+            if ($index == CURLOPT_HTTPHEADER) {
+                if (array($val)) {
+                    $headers = array_merge($headers, $val);
+                } else {
+                    $headers[] = $val;
+                }
+                continue;
+            }
             curl_setopt($ch, $index, $val);
+        }
+
+        if ($headers) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
         $response = curl_exec($ch);

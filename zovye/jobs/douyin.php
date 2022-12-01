@@ -68,25 +68,22 @@ if ($op == 'douyin' && CtrlServ::checkJobSign($data)) {
         //延时一定时间后读取用户关注列表
         usleep((2 + log($i + 1, 2)) * 1000000);
 
-        $result = DouYin::getUserFollowList($user);
+        $result = DouYin::isFans($user, $openid);
         if (is_error($result)) {
             $log['error'] = $result;
             Job::exit($writeLog);
         }
 
-        $list = $result['list'] ?? [];
-        foreach ($list as $entry) {
-            if ($entry && $entry['open_id'] == $openid) {
-                $log['target'] = $entry;
-                $log['order'] = Job::createAccountOrder([
-                    'device' => $device->getId(),
-                    'user' => $user->getId(),
-                    'account' => $account->getId(),
-                    'orderUID' => Order::makeUID($user, $device, sha1("douyin:".$account->getUid())),
-                ]);
-                Job::exit($writeLog);
-            }
+        if ($result) {
+            $log['order'] = Job::createAccountOrder([
+                'device' => $device->getId(),
+                'user' => $user->getId(),
+                'account' => $account->getId(),
+                'orderUID' => Order::makeUID($user, $device, sha1("douyin:".$account->getUid())),
+            ]);
+            Job::exit($writeLog);
         }
+
         if (time() - $data['time'] > 60) {
             $log['error'] = '用户操作时间已超过60秒！';
             Job::exit($writeLog);

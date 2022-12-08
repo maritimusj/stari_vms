@@ -12,6 +12,7 @@ use DateTimeImmutable;
 use zovye\Account;
 use zovye\Balance;
 
+use zovye\Charging as IotCharging;
 use zovye\Contract\ICard;
 use zovye\Locker;
 use zovye\Pay;
@@ -753,13 +754,19 @@ class userModelObj extends modelObj
             }
 
             if (!isEmptyArray($params['v3'])) {
-
                 $config = $params['v3'];
-                $config['appid'] = $params['appid'];
+
+                if ($this->isWxUser()) {
+                    $config['appid'] =  $params['appid'];
+                } elseif ($this->isWXAppUser()) {
+                    $config['appid'] = $params['wxappid'];
+                } else {
+                    return error(State::ERROR, '只能给微信或微信小程序用户转账！');
+                }
+
                 $config['mch_id'] = $params['mch_id'];
                 
                 $mch_pay =  new WxMCHPayV3($config);
-
             } else {
                 $file = Pay::getPEMFile($params['pem']);
                 if (is_error($file)) {
@@ -1003,5 +1010,20 @@ class userModelObj extends modelObj
 
     public function setCredit(int $val): bool {
         return $this->updateSettings('credit.val', $val);
+    }
+
+    public function isBusyState(): bool
+    {
+        if (App::isChargingDeviceEnabled()) {
+            $user_charging_data = $this->settings('chargingNOW', []);
+            if ($user_charging_data) {
+                return true;
+            }
+            if (IotCharging::hasUnpaidOrder($this)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

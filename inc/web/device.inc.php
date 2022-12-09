@@ -1064,6 +1064,9 @@ HTML;
     }
 
     $res = $device->getOnlineDetail(false);
+    if (is_error($res)) {
+        JSON::fail($res);
+    }
     if (empty($res)) {
         JSON::fail('请求出错，请稍后再试！');
     }

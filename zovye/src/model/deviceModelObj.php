@@ -1910,6 +1910,10 @@ class deviceModelObj extends modelObj
             return $res['data'];
         }
 
+        if ($res['data']['message']) {
+            return err($res['data']['message']);
+        }
+
         return [];
     }
 

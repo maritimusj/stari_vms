@@ -434,6 +434,21 @@ class deviceModelObj extends modelObj
         return $this->settings("chargerBMS.$chargerID", []);
     }
 
+    public function setFuelingStatusData($chargerID, array $data): bool
+    {
+        if ($data) {
+            $saved = $this->getFuelingStatusData($chargerID);
+            $data = array_merge($saved, $data);
+        }
+
+        return $this->updateSettings("fuelingStatus.$chargerID", $data);
+    }
+
+    public function getFuelingStatusData($chargerID): array
+    {
+        return $this->settings("fuelingStatus.$chargerID", []);
+    }
+
     public function setDeviceModel($model)
     {
         $this->updateSettings('device.model', $model);

@@ -245,6 +245,20 @@ class orderModelObj extends modelObj
         return $this->getExtraData('charging.result.re', 0) == 3;
     }
 
+    public function isChargingResultFailed(): bool
+    {
+        $result = $this->getExtraData('charging.result', []);
+        if ($result && $result['re'] != 3) {
+            return true;
+        }
+
+        if (empty($result) && $this->getExtraData('timeout')) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function setChargingResult($result)
     {
         return $this->setExtraData('charging.result', $result);
@@ -274,31 +288,22 @@ class orderModelObj extends modelObj
         if (empty($sub)) {
             return $this->getExtraData('charging.record', is_null($default) ? [] : $default);
         }
+
         return $this->getExtraData("charging.record.$sub", $default);
     }
 
     public function isChargingOrder(): bool
     {
-        return !empty($this->getChargerID());
-    }
-
-    public function getChargerID()
-    {
-        return $this->getExtraData('chargingID', 0);
+        return !empty($this->getExtraData('charging'));
     }
 
     public function isChargingFinished(): bool
     {
-        if ($this->getSrc() != Order::CHARGING_UNPAID) {
+        if ($this->getSrc() == Order::CHARGING) {
             return true;
         }
 
-        $result = $this->getChargingResult();
-        if ($result && $result['re'] != 3) {
-            return true;
-        }
-
-        if (empty($result) && $this->getExtraData('timeout')) {
+        if ($this->isChargingResultFailed()) {
             return true;
         }
 
@@ -308,6 +313,11 @@ class orderModelObj extends modelObj
         }
 
         return false;
+    }
+
+    public function getChargerID()
+    {
+        return $this->getExtraData('chargingID', 0);
     }
 
     public function getPullSerialNO()
@@ -320,7 +330,8 @@ class orderModelObj extends modelObj
         return intval($this->getExtraData('discount.total', 0));
     }
 
-    public function getChargingSF(): int {
+    public function getChargingSF(): int
+    {
         if ($this->isChargingOrder()) {
             $sf = 0.0;
             $device = $this->getDevice();
@@ -340,7 +351,8 @@ class orderModelObj extends modelObj
         return 0;
     }
 
-    public function getChargingEF(): int {
+    public function getChargingEF(): int
+    {
         return max(0, $this->getPrice() - $this->getChargingSF());
     }
 
@@ -386,4 +398,77 @@ class orderModelObj extends modelObj
         ];
     }
 
+    /**
+     * @param $result
+     * @return mixed
+     */
+    public function setFuelingResult($result)
+    {
+        return $this->setExtraData('fueling.result', $result);
+    }
+
+    public function getFuelingResult()
+    {
+        return $this->getExtraData('fueling.result', []);
+    }
+
+    public function setFuelingRecord($record)
+    {
+        $saved = $this->getFuelingRecord();
+        if ($saved) {
+            if (sha1(json_encode($saved)) == sha1(json_encode($record))) {
+                return true;
+            }
+            $ts = time();
+            return $this->setExtraData("fueling.record.$ts", $record);
+        }
+
+        return $this->setExtraData('fueling.record', $record);
+    }
+
+    public function getFuelingRecord($sub = '', $default = null)
+    {
+        if (empty($sub)) {
+            return $this->getExtraData('fueling.record', is_null($default) ? [] : $default);
+        }
+
+        return $this->getExtraData("fueling.record.$sub", $default);
+    }
+
+    public function isFuelingResultOk(): bool
+    {
+        return $this->getExtraData('fueling.result.re', 0) == 3;
+    }
+
+    public function isFuelingResultFailed(): bool
+    {
+        $result = $this->getExtraData('fueling.result', []);
+        if ($result && $result['re'] != 3) {
+            return true;
+        }
+
+        if (empty($result) && $this->getExtraData('timeout')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isFuelingFinished(): bool
+    {
+        if ($this->getSrc() == Order::FUELING) {
+            return true;
+        }
+
+        if ($this->isFuelingResultFailed()) {
+            return true;
+        }
+
+        $record = $this->getChargingRecord();
+        if ($record && isset($record['totalPrice'])) {
+            return true;
+        }
+
+        return false;
+    }
 }

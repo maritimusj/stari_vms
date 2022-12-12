@@ -31,6 +31,7 @@ class DeviceEventProcessor
     const EVENT_V1_PING = 'mcb.ping';
     const EVENT_V1_NEW_CARD = 'mcb.m-newcard';
 
+    const EVENT_V1_FEE = 'mcb.fee';
     const EVENT_V2_STARTUP = 'mcb.startup';
 
     protected static $events = [
@@ -253,6 +254,17 @@ class DeviceEventProcessor
                 ],
             ],
         ],
+        self::EVENT_V1_FEE => [
+            'title' => '[v1]计费信息',
+            'handler' => __NAMESPACE__.'\DeviceEventProcessor::onMcbFee',
+            'params' => [
+                'log' => [
+                    'enable' => true,
+                    'id' => 23,
+                ],
+            ],
+        ],
+
     ];
 
     public static function logEventTitle($id): string
@@ -400,7 +412,7 @@ class DeviceEventProcessor
 
     /**
      * reset 事件处理
-     * @param array array $data
+     * @param array $data
      */
     public static function onResetMsg(array $data)
     {
@@ -579,7 +591,10 @@ class DeviceEventProcessor
 
             //重置设置锁
             $device->resetLock();
-            $device->setProtocolV1Code($data['code']);
+
+            if ($data['code']) {
+                $device->setProtocolV1Code($data['code']);
+            }
 
             if ($device->isMcbStatusExpired()) {
                 $device->reportMcbStatus($data['code']);
@@ -592,6 +607,10 @@ class DeviceEventProcessor
             }
 
             $device->save();
+
+            if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+                Fueling::onEventOnline($device);
+            }
         }
     }
 
@@ -630,18 +649,19 @@ class DeviceEventProcessor
     {
         $device = Device::get($data['uid'], true);
         if ($device) {
-            if ($device->isChargingDevice()) {
+            if ($device->isNormalDevice()) {
+                if ($data['code']) {
+                    $device->setProtocolV1Code($data['code']);
+                }
+            } else {
                 $extra = (array)$data['extra'];
-                $res = Charging::setResult($extra['ser'], $extra['ch'], $extra);
-                if (is_error($res)) {
-                    Log::error('charging', [
-                        'data' => $data,
-                        'error' => $res,
-                    ]);
+                if ($device->isChargingDevice() && App::isChargingDeviceEnabled()) {
+                    Charging::onEventResult($device, $extra);
+                }
+                if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+                    Fueling::onEventResult($device, $extra);
                 }
             }
-
-            $device->setProtocolV1Code($data['code']);
             $device->save();
         }
     }
@@ -679,7 +699,9 @@ class DeviceEventProcessor
         $device->setMcbOnline(Device::ONLINE);
         $device->setLastOnline(TIMESTAMP);
 
-        $device->setProtocolV1Code($data['code']);
+        if ($data['code']) {
+            $device->setProtocolV1Code($data['code']);
+        }
 
         $extra = (array)$data['extra'];
 
@@ -736,87 +758,13 @@ class DeviceEventProcessor
 
         if ($device->isNormalDevice()) {
             $device->updateMcbStatus($extra);
-        }
-
-        if ($device->isChargingDevice()) {
-            if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
-                $device->setChargingData($extra);
+        } else {
+            if ($device->isChargingDevice() && App::isChargingDeviceEnabled()) {
+                Charging::onEventReport($device, $extra);
             }
 
-            if (is_array($extra['status'])) {
-                $serial = $extra['serial'] ?? '';
-                $chargerID = $extra['chargerID'];
-
-                $extra['status']['timestamp'] = time();
-                $device->setChargerData($chargerID, $extra['status']);
-
-                if ($serial) {
-                    $order = Order::get($serial, true);
-                    if ($order) {
-                        $order->setExtraData('charging.status', $extra['status']);
-                        $order->save();
-
-                        //检查用户余额
-                        $user = $order->getUser();
-                        if (empty($user) || $user->getCommissionBalanceCard()->total() < round($extra['status']['priceTotal'] * 100)) {
-                            Charging::stopCharging($device, $chargerID, $serial);
-                        }
-                    }
-                } else {
-                    if ($extra['status']['status'] == 2) {
-                        //空闲
-                        Charging::checkCharging($device, $chargerID);
-                    }
-                }
-            }
-
-            if (is_array($extra['BMS'])) {
-                $serial = $extra['serial'] ?? '';
-                if ($serial) {
-                    $chargerID = $extra['chargerID'];
-
-                    $extra['BMS']['serial'] = $serial;
-                    $extra['BMS']['chargerID'] = $chargerID;
-
-                    $device->setChargerBMSData($chargerID, $extra['BMS']);
-
-                    $extra['BMS']['timestamp'] = time();
-
-                    if ($extra['BMS']['event'] == 'finished') {
-                        Charging::end($serial, $chargerID, function($order) use($extra) {
-                            $order->setExtraData('BMS.finished', $extra['BMS']['data']);
-                        });
-                    } elseif ($extra['BMS']['event'] == 'stopped') {
-                        Charging::end($serial, $chargerID, function($order) use($extra) {
-                            $order->setExtraData('BMS.stopped', $extra['BMS']['data']);
-                        });
-                    } else {
-                        $order = Order::get($serial, true);
-                        if ($order) {
-                            $order->setExtraData('BMS.status', $extra['BMS']['data']);
-                        }
-                    }
-                }
-            }
-
-            if (is_array($extra['record'])) {
-                $serial = $extra['serial'] ?? '';
-                $chargerID = intval($extra['chargerID']);
-
-                $res = Charging::settle($serial, $chargerID, $extra['record']);
-                if (is_error($res)) {
-                    Log::error('charging', [
-                        'serial' => $serial,
-                        'chargerID' => $chargerID,
-                        'data' => $extra['record'],
-                        'error' => $res,
-                    ]);
-                } else {
-                    Log::info('charging', [
-                        'data' => $extra,
-                        'res' => $res,
-                    ]);
-                }
+            if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+                Fueling::onEventReport($device, $extra);
             }
         }
 
@@ -899,6 +847,16 @@ class DeviceEventProcessor
                 Job::deviceOnlineNotify($device);
             }
             $device->save();
+        }
+    }
+
+    public static function onMcbFee(array $data = [])
+    {
+        if (App::isFuelingDeviceEnabled()) {
+            $device = Device::get($data['uid'], true);
+            if ($device && $device->isFuelingDevice()) {
+                Fueling::onEventFee($device, (array)$data['da']);
+            }
         }
     }
 }

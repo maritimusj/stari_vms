@@ -109,8 +109,8 @@ class balance
             return error(State::ERROR, '用户暂时无法提现！');
         }
 
-        if (IotCharging::hasUnpaidOrder($user)) {
-            return err('请等待订单结算完成后再试！');
+        if ($user->isBusyState()) {
+            return error(State::ERROR, '请等待订单结算完成后再试！');
         }
 
         if ($amount < 1) {

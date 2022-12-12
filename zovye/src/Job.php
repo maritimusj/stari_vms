@@ -364,6 +364,39 @@ class Job
         return false;
     }
 
+    public static function fuelingStartTimeout(
+        $serial,
+        $chargerID,
+        $device_id,
+        $user_id,
+        $order_id
+    ): bool {
+        if (CtrlServ::scheduleDelayJob('fueling_start_timeout', [
+                'uid' => $serial,
+                'chargerID' => $chargerID,
+                'device' => $device_id,
+                'user' => $user_id,
+                'order' => $order_id,
+                'time' => time(),
+            ], 70) !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function fuelingStopTimeout($serial): bool
+    {
+        if (CtrlServ::scheduleDelayJob('fueling_stop_timeout', [
+                'uid' => $serial,
+                'time' => time(),
+            ], 60) !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function createOrderFor(orderModelObj $order): bool
     {
         if (CtrlServ::scheduleJob('create_order_for', [

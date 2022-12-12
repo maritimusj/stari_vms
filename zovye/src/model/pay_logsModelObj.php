@@ -174,4 +174,9 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
     {
         return 'pay_log';
     }
+
+    function isUsable(): bool
+    {
+        return $this->isPaid() && !$this->isRefund();
+    }
 }

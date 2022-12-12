@@ -17,4 +17,6 @@ interface ICard
     function getTypename(): string;
 
     function total(): int;
+
+    function isUsable(): bool;
 }

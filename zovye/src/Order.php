@@ -52,6 +52,9 @@ class Order extends State
     const BALANCE = 20;
     const CHARGING = 30;
     const CHARGING_UNPAID = 31;
+    const FUELING = 40;
+    const FUELING_UNPAID = 41;
+
     const FREE = 100;
 
     const PAY_STR = 'pay';

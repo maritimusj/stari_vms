@@ -165,11 +165,12 @@ class Charging
                 'ch' => $chargerID,
                 'timeout' => 60,
                 'card' => $card->getUID(),
-                'balance' => $total,
+                'balance' => $card->total(),
             ])) {
                 return err('设备通信失败！');
             }
 
+            //开启一个任务检查设备响应是否超时
             Job::chargingStartTimeout($serial, $chargerID, $device->getId(), $user->getId(), $order->getId());
 
             return [
@@ -556,5 +557,98 @@ class Charging
         }
 
         return true;
+    }
+
+    public static function onEventResult(deviceModelObj $device, $extra) {
+        $res = self::setResult($extra['ser'], $extra['ch'], $extra);
+        if (is_error($res)) {
+            Log::error('charging', [
+                'device' => $device->profile(),
+                'data' => $extra,
+                'error' => $res,
+            ]);
+        }
+    }
+
+    public static function onEventReport(deviceModelObj $device, $extra) {
+        if (isset($extra['firmwareVersion']) && isset($extra['protocolVersion'])) {
+            $device->setChargingData($extra);
+        }
+
+        if (is_array($extra['status'])) {
+            $serial = $extra['serial'] ?? '';
+            $chargerID = $extra['chargerID'];
+
+            $extra['status']['timestamp'] = time();
+            $device->setChargerData($chargerID, $extra['status']);
+
+            if ($serial) {
+                $order = Order::get($serial, true);
+                if ($order) {
+                    $order->setExtraData('charging.status', $extra['status']);
+                    $order->save();
+
+                    //检查用户余额
+                    $user = $order->getUser();
+                    if (empty($user) || $user->getCommissionBalanceCard()->total() < round($extra['status']['priceTotal'] * 100)) {
+                        Charging::stopCharging($device, $chargerID, $serial);
+                    }
+                }
+            } else {
+                if ($extra['status']['status'] == 2) {
+                    //空闲
+                    Charging::checkCharging($device, $chargerID);
+                }
+            }
+        }
+
+        if (is_array($extra['BMS'])) {
+            $serial = $extra['serial'] ?? '';
+            if ($serial) {
+                $chargerID = $extra['chargerID'];
+
+                $extra['BMS']['serial'] = $serial;
+                $extra['BMS']['chargerID'] = $chargerID;
+
+                $device->setChargerBMSData($chargerID, $extra['BMS']);
+
+                $extra['BMS']['timestamp'] = time();
+
+                if ($extra['BMS']['event'] == 'finished') {
+                    Charging::end($serial, $chargerID, function($order) use($extra) {
+                        $order->setExtraData('BMS.finished', $extra['BMS']['data']);
+                    });
+                } elseif ($extra['BMS']['event'] == 'stopped') {
+                    Charging::end($serial, $chargerID, function($order) use($extra) {
+                        $order->setExtraData('BMS.stopped', $extra['BMS']['data']);
+                    });
+                } else {
+                    $order = Order::get($serial, true);
+                    if ($order) {
+                        $order->setExtraData('BMS.status', $extra['BMS']['data']);
+                    }
+                }
+            }
+        }
+
+        if (is_array($extra['record'])) {
+            $serial = $extra['serial'] ?? '';
+            $chargerID = intval($extra['chargerID']);
+
+            $res = Charging::settle($serial, $chargerID, $extra['record']);
+            if (is_error($res)) {
+                Log::error('charging', [
+                    'serial' => $serial,
+                    'chargerID' => $chargerID,
+                    'data' => $extra['record'],
+                    'error' => $res,
+                ]);
+            } else {
+                Log::info('charging', [
+                    'data' => $extra,
+                    'res' => $res,
+                ]);
+            }
+        }
     }
 }

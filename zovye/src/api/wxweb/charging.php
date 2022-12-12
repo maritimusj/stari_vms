@@ -412,7 +412,7 @@ class charging
     {
         $user = common::getWXAppUser();
 
-        if (!$user->acquireLocker(User::ORDER_LOCKER)) {
+        if (!$user->acquireLocker(User::BALANCE_LOCKER)) {
             return err('无法锁定用户，请稍后再试！');
         }
 
@@ -488,11 +488,6 @@ class charging
     public static function withdraw(): array
     {
         $user = common::getWXAppUser();
-
-        $user_charging_data = $user->settings('chargingNOW', []);
-        if ($user_charging_data) {
-            return err('用户卡正在使用中，请稍后再试！');
-        }
 
         $total = round(request::float('amount', 0, 2) * 100);
 

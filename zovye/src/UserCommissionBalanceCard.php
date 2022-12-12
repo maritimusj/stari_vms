@@ -41,4 +41,27 @@ class UserCommissionBalanceCard implements ICard
     {
         return 'commission_balance';
     }
+
+    function isUsable(): bool
+    {
+        $owner = $this->getOwner();
+        if (empty($owner) || $owner->isBanned()) {
+            return false;
+        }
+
+        if (App::isChargingDeviceEnabled()) {
+            $user_charging_data = $owner->settings('chargingNOW', []);
+            if ($user_charging_data) {
+                return false;
+            }
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $user_fueling_data = $owner->settings('fuelingNOW', []);
+            if ($user_fueling_data) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

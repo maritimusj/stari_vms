@@ -20,6 +20,10 @@ class Fueling
                 return err('设备类型不正确！');
             }
 
+            if ($device->isExpired()) {
+                return err('设备授权已过期，请联系管理员!');
+            }
+
             if (!$device->isMcbOnline(false)) {
                 return err('设备离线，请稍后再试！');
             }

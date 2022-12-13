@@ -70,7 +70,7 @@ class Fueling
             }
 
             if (empty($serial)) {
-                $serial = time();
+                $serial = Order::makeSerial($user);
             }
 
             $order_data = [

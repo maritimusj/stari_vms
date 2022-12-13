@@ -99,14 +99,9 @@ class fueling
             return err('付款金额不正确！');
         }
 
-        $serial = $user->getId() . time();
+        $serial = Order::makeSerial($user);
 
         return Helper::createFuelingOrder($user, $device, $chargerID, $price, $serial);
-    }
-
-    public static function fuelingPayResult(): array
-    {
-
     }
 
     /**

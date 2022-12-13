@@ -110,6 +110,11 @@ class Order extends State
         return substr("U{$user->getId()}D{$device->getId()}$nonce".Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
+    public static function makeSerial(userModelObj $user): string
+    {
+        return sprintf("%d%05d%d", We7::uniacid(), $user->getId(), time());
+    }
+
     /**
      * @param $order_no
      * @param int $total

@@ -445,7 +445,6 @@ class Helper
         int $total_price,
         string $serial = ''
     ) {
-
         if ($total_price < 1) {
             return err('支付金额不能为零！');
         }
@@ -473,6 +472,57 @@ class Helper
 
         //加入一个支付结果检查
         $res = Job::chargingPayResult($order_no);
+        if (empty($res) || is_error($res)) {
+            return err('创建支付任务失败！');
+        }
+
+        //加入一个支付超时任务
+        $res = Job::orderTimeout($order_no);
+
+        if (empty($res) || is_error($res)) {
+            return err('创建支付任务失败！');
+        }
+
+        $data['orderNO'] = $order_no;
+
+        return $data;
+    }
+
+    public static function createFuelingOrder(
+        userModelObj $user,
+        deviceModelObj $device,
+        int $chargerID,
+        int $total_price,
+        string $serial = ''
+    ) {
+
+        if ($total_price < 1) {
+            return err('支付金额不能为零！');
+        }
+
+        App::setContainer($user);
+
+        list($order_no, $data) = Pay::createXAppPay(
+            $device,
+            $user,
+            [
+                'title' => '加注订单',
+                'price' => $total_price,
+            ],
+            [
+                'level' => LOG_FUELING_PAY,
+                'price' => $total_price,
+                'order_no' => $serial,
+                'chargerID' => $chargerID,
+            ]
+        );
+
+        if (is_error($data)) {
+            return err('创建支付失败: '.$data['message']);
+        }
+
+        //加入一个支付结果检查
+        $res = Job::fuelingPayResult($order_no);
         if (empty($res) || is_error($res)) {
             return err('创建支付任务失败！');
         }

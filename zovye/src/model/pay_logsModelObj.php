@@ -147,6 +147,11 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
         return !empty($this->getData('charging'));
     }
 
+    public function isFueling(): bool
+    {
+        return !empty($this->getData('fueling'));
+    }
+
     public function isPaid(): bool
     {
         return !empty($this->getPayResult()) || !empty($this->getQueryResult());

@@ -9,6 +9,7 @@ namespace zovye;
 use zovye\Contract\ICard;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
+use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;
 
 class Fueling
@@ -199,6 +200,51 @@ class Fueling
         return true;
     }
 
+    public static function startFromPayLog(pay_logsModelObj $pay_log)
+    {
+        if (!$pay_log->isPaid()) {
+            return err('未支付完成！');
+        }
+
+        if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund() || $pay_log->isRecharged()) {
+            return err('支付已无效!');
+        }
+
+        if ($pay_log->isFueling()) {
+            return true;
+        }
+
+        $device_id = $pay_log->getDeviceId();
+
+        $device = Device::get($device_id);
+        if (empty($device)) {
+            return err("找不到指定设备!");
+        }
+
+        if (!$device->isFuelingDevice()) {
+            return err("设备类型不正确!");
+        }
+
+        $user = $pay_log->getOwner();
+        if (empty($user)) {
+            return err('找不到指定的用户!');
+        }
+
+        $chargerID = $pay_log->getChargerID();
+
+        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        $pay_log->setData('fueling', $res);
+        if (!$pay_log->save()) {
+            return err('保存数据失败！');
+        }
+
+        return true;
+    }
+
     public static function end(string $serial, int $chargerID, callable $cb)
     {
         return Util::transactionDo(function () use ($serial, $chargerID, $cb) {
@@ -287,6 +333,7 @@ class Fueling
         if (!$result) {
             return err('通知设备更新配置失败！');
         }
+
         return true;
     }
 
@@ -309,7 +356,7 @@ class Fueling
 
         if ($data['re'] != 3) {
             return self::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
-                $order->setChargingResult($data);
+                $order->setFuelingResult($data);
                 $order->setResultCode($data['re']);
             });
         }
@@ -318,6 +365,7 @@ class Fueling
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($data);
+
             return $order->save();
         }
 
@@ -334,7 +382,7 @@ class Fueling
     {
         $serial = strval($data['ser']);
         $chargerID = intval($data['ch']);
-        self::end($serial, $chargerID, function (orderModelObj $order)  use ($data) {
+        self::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
             $order->setFuelingRecord($data);
         });
     }

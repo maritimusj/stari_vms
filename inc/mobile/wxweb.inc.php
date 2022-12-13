@@ -9,6 +9,7 @@ namespace zovye\wxWebApi;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
+use zovye\api\wxweb\fueling;
 use zovye\request;
 use zovye\Util;
 
@@ -64,10 +65,11 @@ router::exec($op, [
     'chargingStatus' => '\zovye\api\wxweb\charging::status',
     'payForCharging' => '\zovye\api\wxweb\charging::payForCharging',
     'chargingPayResult' => '\zovye\api\wxweb\charging::chargingPayResult',
-    'payForRecharge' => '\zovye\api\wxweb\charging::payForRecharge',
-    'rechargeResult' => '\zovye\api\wxweb\charging::rechargeResult',
-    'rechargeList' => '\zovye\api\wxweb\charging::rechargeList',
     'withdraw' => '\zovye\api\wxweb\charging::withdraw',
+
+    'payForRecharge' => '\zovye\api\wxweb\user::payForRecharge',
+    'rechargeResult' => '\zovye\api\wxweb\user::rechargeResult',
+    'rechargeList' => '\zovye\api\wxweb\user::rechargeList',
 
     'memberList' => '\zovye\api\wxweb\member::getMemberList',
     'memberUserInfo' => '\zovye\api\wxweb\member::memberUserInfo',
@@ -82,4 +84,7 @@ router::exec($op, [
     'fuelingStart' => '\zovye\api\wxweb\fueling::start',
     'fuelingStop' => '\zovye\api\wxweb\fueling::stop',
     'fuelingOrderStatus' => '\zovye\api\wxweb\fueling::orderStatus',
+    'fuelingPay' => '\zovye\api\wxweb\fueling::payForFueling',
+    'fuelingPayResult' => '\zovye\api\wxweb\fueling::fuelingPayResult',
+    'fuelingWithdraw' => '\zovye\api\wxweb\fueling::withdraw',
 ]);

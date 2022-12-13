@@ -105,6 +105,15 @@ class Job
         );
     }
 
+    public static function fuelingPayResult($serial, $start = 0, $timeout = 3)
+    {
+        return CtrlServ::scheduleDelayJob(
+            'fueling_pay_result',
+            ['orderNO' => $serial, 'start' => $start ?: time()],
+            $timeout
+        );
+    }
+
     public static function rechargePayResult($serial, $start = 0, $timeout = 3)
     {
         return CtrlServ::scheduleDelayJob(

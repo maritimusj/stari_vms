@@ -30,8 +30,9 @@ class DeviceEventProcessor
     const EVENT_V1_RESET = 'mcb.reset';
     const EVENT_V1_PING = 'mcb.ping';
     const EVENT_V1_NEW_CARD = 'mcb.m-newcard';
-
     const EVENT_V1_FEE = 'mcb.fee';
+    const EVENT_V1_CONFIG = 'mcb.config';
+
     const EVENT_V2_STARTUP = 'mcb.startup';
 
     protected static $events = [
@@ -264,7 +265,15 @@ class DeviceEventProcessor
                 ],
             ],
         ],
-
+        self::EVENT_V1_CONFIG => [
+            'title' => '[v1]配置更新',
+            'params' => [
+                'log' => [
+                    'enable' => true,
+                    'id' => 24,
+                ],
+            ],
+        ],
     ];
 
     public static function logEventTitle($id): string

@@ -351,12 +351,17 @@ class Device extends State
         $result = [];
 
         $payload = self::getPayload($device);
+        $lane = $payload['cargo_lanes'][$lane_id];
 
-        if (!empty($payload['cargo_lanes'][$lane_id])) {
-            $goods_id = $payload['cargo_lanes'][$lane_id]['goods'];
+        if (!empty($lane)) {
+            $goods_id = $lane['goods'];
             $result = Goods::data($goods_id);
             if ($result) {
-                $result['num'] = $payload['cargo_lanes'][$lane_id]['num'];
+                $result['num'] = $lane['num'];
+                if ($lane['goods_price']) {
+                    $result['price'] = $lane['goods_price'];
+                    $result['price_formatted'] = $lane['goods_price_formatted'];
+                }
             }
         }
 

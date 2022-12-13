@@ -78,4 +78,8 @@ router::exec($op, [
     'memberOrderList' => '\zovye\api\wxweb\member::orderList',
     'memberOrderDetail' => '\zovye\api\wxweb\member::orderDetail',
     'memberChargingList' => '\zovye\api\wxweb\member::chargingList',
+
+    'fuelingStart' => '\zovye\api\wxweb\fueling::start',
+    'fuelingStop' => '\zovye\api\wxweb\fueling::stop',
+    'fuelingOrderStatus' => '\zovye\api\wxweb\fueling::orderStatus',
 ]);

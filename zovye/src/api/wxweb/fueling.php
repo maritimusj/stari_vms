@@ -37,11 +37,8 @@ class fueling
             return err('找不到这个设备！');
         }
 
-
-
-
-
-
+        $chargerID = request::int('chargerID');
+        return \zovye\Fueling::start('', $user->getCommissionBalanceCard(), $device, $chargerID);
     }
 
     /**
@@ -49,7 +46,8 @@ class fueling
      */
     public static function stop()
     {
-
+        $user = common::getWXAppUser();
+        return \zovye\Fueling::stop($user);
     }
 
     /**
@@ -57,7 +55,8 @@ class fueling
      */
     public static function status()
     {
-
+        $serial = request::str('serial');
+        return \zovye\Fueling::orderStatus($serial);
     }
 
     /**

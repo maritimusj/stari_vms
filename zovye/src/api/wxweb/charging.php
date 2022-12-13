@@ -244,14 +244,12 @@ class charging
     public static function stop()
     {
         $user = common::getWXAppUser();
-
         return IotCharging::stop($user);
     }
 
     public static function orderStatus(): array
     {
         $serial = request::str('serial');
-
         return IotCharging::orderStatus($serial);
     }
 
@@ -265,7 +263,6 @@ class charging
         }
 
         $serial = $last_charging_data['serial'];
-
         return ['serial' => $serial];
     }
 

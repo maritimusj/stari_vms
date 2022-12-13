@@ -16,22 +16,21 @@ class router
     public static function exec($op, $map)
     {
         $fn = $map[$op];
-        if (We7::starts_with($fn, '@')) {
-            $fn = ltrim($fn, '@');
-            if (is_callable($fn)) {
-                $result = Util::transactionDo($fn);
-            }
-        } elseif (We7::starts_with($fn, '*')) {
-            $fn = ltrim($fn, '*');
-            if (is_callable($fn)) {
-                $result = Util::cachedCall(6, $fn, common::getToken());
-            }
+        if (is_callable($fn)) {
+            $result = $fn();
         } else {
-            if (is_callable($fn)) {
-                $result = $fn();
+            if (We7::starts_with($fn, '@')) {
+                $fn = ltrim($fn, '@');
+                if (is_callable($fn)) {
+                    $result = Util::transactionDo($fn);
+                }
+            } elseif (We7::starts_with($fn, '*')) {
+                $fn = ltrim($fn, '*');
+                if (is_callable($fn)) {
+                    $result = Util::cachedCall(6, $fn, common::getToken());
+                }
             }
         }
-
         if (isset($result)) {
             JSON::result($result);
         }

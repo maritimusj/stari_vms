@@ -234,7 +234,7 @@ class deviceModelObj extends modelObj
         return $this->updateSettings('extra.v0.status.last_online', $last_online);
     }
 
-    public function setEventLogEnabled($enable = true)
+    public function setEventLogEnabled($enable = true): bool
     {
         return $this->updateSettings('extra.event.log.enabled', $enable);
     }
@@ -472,10 +472,12 @@ class deviceModelObj extends modelObj
                 if (App::isChargingDeviceEnabled()) {
                     return Device::CHARGING_DEVICE;
                 }
+                break;
             case Device::FUELING_DEVICE:
                 if (App::isFuelingDeviceEnabled()) {
                     return Device::FUELING_DEVICE;
                 }
+                break;
         }
 
         return Device::NORMAL_DEVICE;
@@ -633,6 +635,19 @@ class deviceModelObj extends modelObj
         return $this->settings('extra.expiration', '');
     }
 
+    public function isExpired(): bool
+    {
+        $expiration = $this->getExpiration();
+        if ($expiration) {
+            try {
+                $expired_at = strtotime($expiration);
+                return $expired_at > time();
+            }catch (Exception $e) {
+            }
+        }
+        return false;
+    }
+
     public function getFuelingConfig(): array
     {
         $config = [
@@ -648,22 +663,6 @@ class deviceModelObj extends modelObj
         }
 
         return $config;
-    }
-
-    public function isExpired(): bool
-    {
-        $expiration = $this->getExpiration();
-        if (!empty($expiration)) {
-            try {
-                $expired_at = new DateTime($expiration);
-                if ($expired_at && $expired_at->getTimestamp() < time()) {
-                    return true;
-                }
-            } catch(Exception $e) {
-
-            }
-        }
-        return false;
     }
 
     /**

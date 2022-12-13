@@ -244,12 +244,14 @@ class charging
     public static function stop()
     {
         $user = common::getWXAppUser();
+
         return IotCharging::stop($user);
     }
 
     public static function orderStatus(): array
     {
         $serial = request::str('serial');
+
         return IotCharging::orderStatus($serial);
     }
 
@@ -263,6 +265,7 @@ class charging
         }
 
         $serial = $last_charging_data['serial'];
+
         return ['serial' => $serial];
     }
 
@@ -313,7 +316,7 @@ class charging
             return err('无法查看该订单！');
         }
 
-        if (!$order->isChargingResultOk()) {
+        if ($order->isChargingResultFailed()) {
             $data = $order->getChargingResult();
 
             return err('订单没有完成，故障：'.$data['re']);
@@ -362,124 +365,6 @@ class charging
         $serial = $device->generateChargingSerial($chargerID);
 
         return Helper::createChargingOrder($user, $device, $chargerID, $price, $serial);
-    }
-
-    public static function chargingPayResult(): array
-    {
-        $order_no = request::str('orderNO');
-
-        $pay_log = Pay::getPayLog($order_no, LOG_CHARGING_PAY);
-        if (empty($pay_log)) {
-            return err('找不到这个支付记录!');
-        }
-
-        if ($pay_log->isCancelled()) {
-            return err('支付已取消');
-        }
-
-        if ($pay_log->isTimeout()) {
-            return err('支付已超时！');
-        }
-
-        if ($pay_log->isRefund()) {
-            return err('支付已退款！');
-        }
-
-        if ($pay_log->isPaid()) {
-            $device = Device::get($pay_log->getDeviceId());
-            if (!$device) {
-                return err('找不到设备！');
-            }
-
-            $chargerID = $pay_log->getChargerID();
-
-            return [
-                'msg' => '支付成功！',
-                'code' => 200,
-                'device' => $device->getImei(),
-                'chargerID' => $chargerID,
-                'serial' => $pay_log->getOrderNO(),
-            ];
-        }
-
-        return ['msg' => '正在查询..'];
-    }
-
-    public static function payForRecharge(): array
-    {
-        $user = common::getWXAppUser();
-
-        if (!$user->acquireLocker(User::BALANCE_LOCKER)) {
-            return err('无法锁定用户，请稍后再试！');
-        }
-
-        $price = intval(request::float('price', 0, 2) * 100);
-        if ($price < 1) {
-            return err('付款金额不正确！');
-        }
-
-        return Helper::createRechargeOrder($user, $price);
-    }
-
-    public static function rechargeResult(): array
-    {
-        $order_no = request::str('orderNO');
-
-        $pay_log = Pay::getPayLog($order_no, LOG_RECHARGE);
-        if (empty($pay_log)) {
-            return err('找不到这个支付记录!');
-        }
-
-        if ($pay_log->isRecharged()) {
-            return ['msg' => '充值已到账！', 'code' => 200];
-        }
-
-        if ($pay_log->isCancelled()) {
-            return err('支付已取消');
-        }
-
-        if ($pay_log->isTimeout()) {
-            return err('支付已超时！');
-        }
-
-        if ($pay_log->isRefund()) {
-            return err('支付已退款！');
-        }
-
-        if ($pay_log->isPaid()) {
-            return ['msg' => '支付成功！'];
-        }
-
-        return ['msg' => '正在查询..'];
-    }
-
-    public static function rechargeList(): array
-    {
-        $user = common::getWXAppUser();
-
-        $query = $user->getCommissionBalance()->log();
-        $query->where([
-            'src' => [
-                CommissionBalance::RECHARGE,
-                CommissionBalance::CHARGING_FEE,
-                CommissionBalance::WITHDRAW,
-                CommissionBalance::TRANSFER_OUT,
-                CommissionBalance::TRANSFER_RECEIVED,
-            ],
-        ]);
-
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
-        $query->page($page, $page_size);
-
-        $query->orderBy('createtime DESC');
-
-        $result = [];
-        foreach ($query->findAll() as $log) {
-            $result[] = CommissionBalance::format($log);
-        }
-
-        return $result;
     }
 
     public static function withdraw(): array

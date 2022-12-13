@@ -114,7 +114,6 @@ class WXPay implements IPay
         return $data;
     }
 
-
     /**
      * 获取页面支付时需要调用的js代码
      * @param deviceModelObj $device

@@ -127,7 +127,6 @@ class Fueling
             $result = $device->mcbNotify('run', '', [
                 'ser' => $serial,
                 'ch' => $chargerID,
-                'timeout' => 60,
                 'card' => $card->getUID(),
                 'balance' => $card->total(),
             ]);
@@ -177,8 +176,8 @@ class Fueling
         $serial = $fueling_data['serial'];
 
         if (!$device->mcbNotify('stop', '', [
-            "ch" => $chargerID,
-            "ser" => $fueling_data['serial'],
+            'ch' => $chargerID,
+            'ser' => $fueling_data['serial'],
         ])) {
             return err('设备通信失败，请重试！');
         }

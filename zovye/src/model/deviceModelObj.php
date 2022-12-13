@@ -641,7 +641,7 @@ class deviceModelObj extends modelObj
         if ($expiration) {
             try {
                 $expired_at = strtotime($expiration);
-                return $expired_at > time();
+                return $expired_at < time();
             }catch (Exception $e) {
             }
         }

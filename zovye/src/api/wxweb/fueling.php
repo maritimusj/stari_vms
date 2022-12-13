@@ -168,15 +168,4 @@ class fueling
 
         return Order::format($order, true);
     }
-
-    public static function withdraw(): array
-    {
-        $user = common::getWXAppUser();
-
-        $total = round(request::float('amount', 0, 2) * 100);
-
-        return balance::balanceWithdraw($user, $total, request::str('memo'), [
-            'fueling' => true,
-        ]);
-    }
 }

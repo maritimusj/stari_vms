@@ -44,6 +44,7 @@ if ($op == 'default' || $op == 'goods') {
     }
 
     $tpl_data['w'] = $w;
+    $tpl_data['types'] = request::array('types', []);
 
     $agent_id = request::int('agentId');
     if ($agent_id > 0) {
@@ -118,9 +119,11 @@ if ($op == 'default' || $op == 'goods') {
         }
     }
 
-    $lottery = request::str('type') == 'lottery';
-    if ($lottery) {
+    $type = request::str('type');
+    if ($type == 'lottery') {
         app()->showTemplate('web/goods/edit_lottery', $params);
+    } elseif ($type == 'fueling') {
+        app()->showTemplate('web/goods/edit_fueling', $params);
     } else {
         app()->showTemplate('web/goods/edit', $params);
     }
@@ -275,6 +278,8 @@ if ($op == 'default' || $op == 'goods') {
         if (isset($params['discountPrice'])) {
             $data['extra']['discountPrice'] = floatval($params['discountPrice'] * 100);
         }
+
+        $data['extra']['type'] = strval($params['type']);
 
         $goods = Goods::create($data);
     }

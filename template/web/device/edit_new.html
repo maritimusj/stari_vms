@@ -153,6 +153,13 @@
         align-items: stretch;
         align-content: stretch;
     }
+    .divider {
+        width: calc(100% + 20px);
+        border-top: 1px solid #CCC;
+        margin: 2em 0;
+        position: relative;
+        left: -10px;
+    }
     [v-cloak] {
         display: none;
     }
@@ -213,7 +220,7 @@
                         <label for="IMEI" class="col-md-2 control-label" v-text="config.is_normal_device ? '硬件IMEI' : '设备编号'"></label>
                         <div class="col-md-10">
                             <input type="text" class="form-control" name="IMEI" id="IMEI" value="{php echo $device ? $device->getImei() : ''}" :readonly="deviceId > 0" :required="deviceId === 0">
-                            <span class="help-block" v-if="deviceId === 0">* 以后无法修改</span>
+                            <span class="help-block" v-if="deviceId === 0">* 注意：{{config.is_normal_device ? '硬件IMEI' : '设备编号'}}以后无法修改！</span>
                         </div>
                     </div>
                     <!--充电桩-->
@@ -263,8 +270,8 @@
                         </div>                        
                     </template>
                     {/if}
-                    <div id="device_types" v-if="config.is_normal_device || config.is_bluetooth_device || config.is_vdevice">
-                        <div class="form-group">
+                    <div id="device_types" v-if="config.is_normal_device || config.is_bluetooth_device || config.is_vdevice || config.is_fueling_device">
+                        <div class="form-group" v-if="!config.is_fueling_device">
                             <label for="select_device_types" class="col-md-2 control-label">设备型号</label>
                             <div class="col-md-5">
                                 <select name="deviceType" id="select_device_types" style="width:100%;" data-device="{php echo $device ? $device->getId() : 0}"
@@ -292,7 +299,7 @@
                             <div class="col-md-10" id="lane_detail">
                                 <table  class="table table-bordered cargo_lanes" v-if="currentType && currentType.cargo_lanes">
                                     <thead>
-                                        <th>货道</th>
+                                        <th>{{config.is_fueling_device ? '枪号':'货道'}}</th>
                                         <th>商品名称</th>
                                         <th class="fixed">价格</th>
                                         <th class="fixed">容量</th>
@@ -367,7 +374,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div v-if="!config.is_bluetooth_device">
+                                <div v-if="!config.is_bluetooth_device && !config.is_fueling_device">
                                     <button class="btn btn-success" 
                                     @click.prevent="newPackage" 
                                     :disabled="loading"
@@ -645,11 +652,33 @@
                     -->
                     <!--尿素加注机-->
                     <template v-if="config.is_fueling_device">
+                        <div class="divider"></div>
                         <div class="form-group">
-                            <label for="coefficient" class="col-md-2 control-label">流量系数</label>
+                            <label class="col-xs-12 col-md-2 col-md-2 control-label">单机模式</label>
+                            <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                                <label for="solo0" class="radio-inline">
+                                    <input name="solo" id="solo0" type="radio" value="1" {if $extra['solo'] == 1}checked="checked"{/if} >
+                                    启用
+                                </label>
+                                <label for="solo1" class="radio-inline">
+                                    <input name="solo" id="solo1" type="radio" value="0"  {if empty($extra['solo'])}checked="checked"{/if} >
+                                    停用
+                                </label>
+                                <span class="help-block">* 是否启用单机模式</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pulse" class="col-md-2 control-label">流量系数</label>
                             <div class="col-md-10">
-                                <input type="number" class="form-control" name="coefficient" id="coefficient" value="{php echo $device ? $device->getCoefficient() : ''}">
-                                <span class="help-block">* 请输入流量系数值</span>
+                                <input type="number" class="form-control" name="pulse" id="pulse" value="{php echo $device ? $device->getPulseValue() : 160}">
+                                <span class="help-block">* 请输入流量系数值，默认160，范围0 - 300</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="timeout" class="col-md-2 control-label">超时时间（秒）</label>
+                            <div class="col-md-10">
+                                <input type="number" class="form-control" name="timeout" id="timeout" value="{php echo $device ? $device->getTimeout() : 120}">
+                                <span class="help-block">* 流量计无流量超时时间，默认120秒</span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -659,6 +688,7 @@
                                 <span class="help-block">* 请输入设备到期时间</span>
                             </div>
                         </div>
+                        <div class="divider"></div>
                     </template>
                     <div class="form-group">
                         <label class="col-xs-12 col-md-2 col-md-2 control-label">设备状态</label>
@@ -804,8 +834,8 @@
         }
     }
 
-    api.chooseGoods = function() {
-        api.showResult({op: 'goods', pagesize: 10});
+    api.chooseGoods = function(params) {
+        api.showResult({op: 'goods', pagesize: 10, ...params});
     }
 
     require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
@@ -1086,7 +1116,7 @@
                 chooseGoods(lane){
                     if (this.isCustomType) {
                         this.currentLane = lane;
-                        api.chooseGoods();
+                        api.chooseGoods(this.config.is_fueling_device ? {types: ['fueling']} : {});
                     }
                 },
                 setGoods(goods) {
@@ -1132,7 +1162,7 @@
         })
 
         $(function() {
-            $('body').on('click', '#goodslist tr[data-goods] .name', function(e) {
+            $('body').on('click', '#goodslist tr:not(.disabled)[data-goods] .name', function(e) {
                 const tr = $(e.currentTarget).closest('tr');
                 const id = tr.data('goods');
                 const name = tr.data('name');

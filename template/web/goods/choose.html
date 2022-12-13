@@ -46,7 +46,7 @@
     #search-form {
         display: none;
     }
-    #goodslist tr:hover .index {
+    #goodslist tr:not(.disabled):hover .index {
         display: none;       
     }
     #goodslist tr .check {
@@ -56,11 +56,17 @@
     #goodslist tr td:nth-child(2) {
         cursor: pointer;
     }
+    #goodslist tr.disabled td:nth-child(2) {
+        cursor: default;
+    }
     #goodslist tr:hover td:nth-child(2) {
         color: green;
     }
-    #goodslist tr:hover .check {
+    #goodslist tr:not(.disabled):hover .check {
         display: inline;
+    }
+    #goodslist tr.disabled {
+        filter: grayscale(1);
     }
 </style>
 {template "web/goods/nav"}
@@ -122,6 +128,7 @@
                 <tbody>
                 {loop $goods_list $index $item}
                 <tr 
+                {if $types && !in_array($item['type'], $types)}class="disabled"{/if}
                 data-goods="{$item['id']}" 
                 data-name="{$item['name']}" 
                 data-title="{$item['unit_title']}" 
@@ -140,6 +147,11 @@
                         {if $item['lottery']}
                         <span class="lottery" title="固定货道商品">
                             <i class="fa fa-fw fa-ticket"></i>
+                        </span>
+                        {/if}
+                        {if $item['type'] == 'fueling'}
+                        <span class="lottery">
+                            <img src="{MODULE_URL}static/img/gas.svg" class="icon" title="尿素机商品">
                         </span>
                         {/if}
                     </td>

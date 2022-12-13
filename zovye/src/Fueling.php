@@ -276,24 +276,24 @@ class Fueling
 
     }
 
-    public static function onEventOnline(deviceModelObj $device)
+    public static function config(deviceModelObj $device)
     {
-        $config = $device->settings('fueling', [
-            'solo' => 1,
-        ]);
-
-        $goods = $device->getGoodsByLane(0);
-        if ($goods) {
-            $config['price'] = $goods['price'];
-        } else {
-            $config['price'] = 0;
-        }
-
+        $config = $device->getFuelingConfig();
         $result = $device->mcbNotify('config', '', $config);
         if (!$result) {
+            return err('通知设备更新配置失败！');
+        }
+        return true;
+    }
+
+    public static function onEventOnline(deviceModelObj $device)
+    {
+        $res = self::config($device);
+        if (is_error($res)) {
             Log::error('fueling', [
+                'config' => $device->getFuelingConfig(),
                 'device' => $device->profile(),
-                'error' => 'config device failed',
+                'error' => $res,
             ]);
         }
     }

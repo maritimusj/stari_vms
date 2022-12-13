@@ -239,7 +239,7 @@
                             标签
                         </th>
                         <th class="center">
-                            <div data-orderby="online" @click="getListBy('mcb_online')" :class="['fa', sort.by === 'mcb_online' ? sort.dir: '']">设备状态</div>
+                            <div data-orderby="online" @click="getListBy('mcb_online')" :class="['fa', sort.by === 'mcb_online' ? sort.dir: '']">状态</div>
                         </th>
                         <th style="width: 165px;">
                             响应时间
@@ -499,8 +499,8 @@
                         </td>
                         <td class="operate">
                             <div class="btn-group">
-                                <a class="btn btn-default" href="#" :title="o.isCharging ? '充电枪':'查看货道'" data-op="deviceTestAll">
-                                    <i :class="['fa', o.isCharging? 'fa-bolt' : 'fa-sign-out']"></i>
+                                <a class="btn btn-default" href="#" :title="o.isCharging ? '充电枪' : o.isFueling ? '加注枪' : '货道'" data-op="deviceTestAll">
+                                    <i :class="{'fa': true, 'fa-bolt' : o.isCharging, 'fa-sign-out' : !o.isCharging && !o.isFueling, 'fa-filter': o.isFueling}"></i>
                                 </a>
                                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                                     <span class="fa fa-caret-down"></span></a>
@@ -519,7 +519,7 @@
                                     </template>                                    
                                     <template v-if="!o.isCharging">
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部货道商品数量</a></li>
+                                        <li><a href="#" data-op="deviceReset" data-params="all"><i class="fa fa-undo fa-fw"></i> 重置全部{{o.isFueling?'枪位':'货道'}}商品数量</a></li>
                                         <li role="separator" class="divider"></li>
                                     </template>
                                     <li><a href="#" data-op="deviceConfig"><i class="fa fa-exchange fa-fw"></i> 刷新设备状态和配置</a></li>

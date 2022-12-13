@@ -613,14 +613,41 @@ class deviceModelObj extends modelObj
         return $this->settings('extra.door.num', 0);
     }
 
-    public function getCoefficient(): string
+    public function getPulseValue(): int
     {
-        return $this->settings('extra.coefficient', 0);
+        return $this->settings('extra.pulse', 160);
+    }
+
+    public function getTimeout(): int
+    {
+        return $this->settings('extra.timeout', 120);
+    }
+
+    public function getSoloMode(): int
+    {
+        return $this->settings('extra.solo', 1);
     }
 
     public function getExpiration(): string
     {
         return $this->settings('extra.expiration', '');
+    }
+
+    public function getFuelingConfig(): array
+    {
+        $config = [
+            'price' => 0,
+            'solo' => $this->getSoloMode(),
+            'pulse' => $this->getPulseValue(),
+            'timeout' => $this->getTimeout(),
+        ];
+
+        $goods = $this->getGoodsByLane(0);
+        if ($goods) {
+            $config['price'] = intval($goods['price']);
+        }
+
+        return $config;
     }
 
     public function isExpired(): bool

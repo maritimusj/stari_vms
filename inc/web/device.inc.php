@@ -533,16 +533,17 @@ HTML;
     }
 
     if ($device->isChargingDevice()) {
-        $title = "充电枪 [ {$device->getName()} ]";
+        $title = "设备 [ {$device->getName()} ]";
         $tpl = 'web/device/charger_detail';
         $data = [
             'device_id' => $device->getId(),
         ];
     } else {
-        $title = "设备货道 [ {$device->getName()} ]";
+        $title = "设备 [ {$device->getName()} ]";
         $tpl = 'web/device/cargo_lanes_test';
         $data = [
             'device_id' => $device->getId(),
+            'is_fueling_device' => $device->isFuelingDevice(),
             'params' => $device->getPayload(true),
         ];
     }
@@ -796,7 +797,9 @@ HTML;
         }
 
         if (App::isFuelingDeviceEnabled() && request::str('device_model') == Device::FUELING_DEVICE) {
-            $extra['coefficient'] = request::int('coefficient');
+            $extra['pulse'] = request::int('pulse');
+            $extra['timeout'] = request::int('timeout');
+            $extra['solo'] = request::bool('solo') ? 1 : 0;
             $extra['expiration'] = request::str('expiration');
         }
 
@@ -1011,35 +1014,45 @@ HTML;
             throw new RuntimeException('保存数据失败！');
         }
 
-        if (App::isZJBaoEnabled()) {
-            $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
-        }
-
-        //更新公众号缓存
-        $device->updateAccountData();
-
         $msg = '保存成功';
         $error = false;
 
-        $device->updateScreenAdvsData();
-
-        $device->updateAppVolume();
-
-        $device->updateAppRemain();
+        if ($device->isFuelingDevice()) {
+            if ($device->isMcbOnline()) {
+                $res = Fueling::config($device);
+                if (is_error($res)) {
+                    $msg .= '，发生错误：'.$res['message'];
+                    $error = true;
+                }
+            }
+        } elseif ($device->isChargingDevice()) {
+            //todo 暂无操作
+        } else {
+            if (App::isZJBaoEnabled()) {
+                $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
+            }
+    
+            //更新公众号缓存
+            $device->updateAccountData();
+    
+            $device->updateScreenAdvsData();
+    
+            $device->updateAppVolume();
+    
+            $device->updateAppRemain();
+        }
 
         $res = $device->updateQrcode(true);
-
+    
         if (is_error($res)) {
             $msg .= ', 发生错误：'.$res['message'];
             $error = true;
         }
 
         if (isset($activeRes) && is_error($activeRes)) {
-            $msg .= '，发生错误：无法激活设备';
+            $msg .= '，发生错误：无法激活设备！';
             $error = true;
         }
-
-        $msg .= '!';
 
         return ['error' => $error, 'message' => $msg];
     });

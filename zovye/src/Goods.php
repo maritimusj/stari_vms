@@ -151,6 +151,7 @@ class Goods
             'img' => $imageUrlFN($entry->getImg()),
             'sync' => boolval($entry->getSync()),
             'price' => intval($entry->getPrice()),
+            'type' => $entry->getExtraData('type', ''),
             'price_formatted' => '￥'.number_format($entry->getPrice() / 100, 2).'元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
@@ -168,6 +169,7 @@ class Goods
         $lottery = $entry->getExtraData('lottery', []);
         if (!empty($lottery)) {
             $data['lottery'] = $lottery;
+            $data['type'] = 'lottery';
         }
 
         $cost_price = $entry->getCostPrice();

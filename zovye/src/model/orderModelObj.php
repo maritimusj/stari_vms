@@ -412,6 +412,11 @@ class orderModelObj extends modelObj
         return $this->getExtraData('fueling.result', []);
     }
 
+    /**
+     * 设置订单收费信息
+     * @param $record
+     * @return mixed|true
+     */
     public function setFuelingRecord($record)
     {
         $saved = $this->getFuelingRecord();
@@ -426,7 +431,13 @@ class orderModelObj extends modelObj
         return $this->setExtraData('fueling.record', $record);
     }
 
-    public function getFuelingRecord($sub = '', $default = null)
+    /**
+     * 获取订单计费数据
+     * @param string $sub
+     * @param $default
+     * @return mixed|null
+     */
+    public function getFuelingRecord(string $sub = '', $default = null)
     {
         if (empty($sub)) {
             return $this->getExtraData('fueling.record', is_null($default) ? [] : $default);

@@ -83,7 +83,7 @@ router::exec($op, [
 
     'fuelingStart' => '\zovye\api\wxweb\fueling::start',
     'fuelingStop' => '\zovye\api\wxweb\fueling::stop',
-    'fuelingOrderStatus' => '\zovye\api\wxweb\fueling::orderStatus',
+    'fuelingStatus' => '\zovye\api\wxweb\fueling::status',
     'fuelingPay' => '\zovye\api\wxweb\fueling::payForFueling',
     'fuelingPayResult' => '\zovye\api\wxweb\fueling::fuelingPayResult',
 ]);

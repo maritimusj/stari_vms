@@ -434,6 +434,12 @@ class deviceModelObj extends modelObj
         return $this->settings("chargerBMS.$chargerID", []);
     }
 
+    /**
+     * 设置当前加注状态
+     * @param $chargerID
+     * @param array $data
+     * @return bool
+     */
     public function setFuelingStatusData($chargerID, array $data): bool
     {
         if ($data) {
@@ -444,6 +450,11 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("fuelingStatus.$chargerID", $data);
     }
 
+    /**
+     * 获取当前加注状态
+     * @param $chargerID
+     * @return array
+     */
     public function getFuelingStatusData($chargerID): array
     {
         return $this->settings("fuelingStatus.$chargerID", []);

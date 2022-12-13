@@ -287,6 +287,16 @@ class Fueling
                 return err('保存数据失败！');
             }
 
+            $res = $device->mcbNotify('confirm', '', [
+                'ser' => $serial,
+            ]);
+
+            if (!$res) {
+                Log::error('fueling', [
+                    'err' => '计费确认失败：设备通讯失败！'
+                ]);
+            }
+
             return true;
         });
     }
@@ -321,8 +331,25 @@ class Fueling
             return ['record' => $result];
         }
 
-        //todo 其它状态
+        $timeout = $order->getExtraData('timeout', []);
+        if ($timeout) {
+            return err($timeout['reason'] ?? '设备响应超时！');
+        }
 
+        $result = $order->getFuelingResult();
+        if ($result && $result['re'] != 3) {
+            return err("启动失败：设备故障".($result['re']));
+        }
+
+        $device = $order->getDevice();
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        $chargerID = $order->getChargerID();
+        $status = $device->getFuelingStatusData($chargerID);
+
+        return ['status' => $status];
     }
 
     public static function config(deviceModelObj $device)

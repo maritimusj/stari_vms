@@ -106,7 +106,7 @@ class VIP
         ]);
     }
 
-    public static function rechargePromotion(int $amount)
+    public static function getRechargePromotionVal(int $amount): int
     {
         $promotion = Config::fueling('vip.recharge.promotion', []);
         if (empty($promotion) || !$promotion['enabled'] || empty($promotion['list'])) {
@@ -136,6 +136,6 @@ class VIP
             }
         }
 
-        return $amount + $last_val;
+        return $last_val;
     }
 }

@@ -691,13 +691,20 @@ class userModelObj extends modelObj
             }
 
             if (App::isFuelingDeviceEnabled()) {
-                $price = VIP::rechargePromotion($price);
+                $promotion_price = VIP::getRechargePromotionVal($price);
+            }
+
+            $extra = [
+                'pay_log' => $pay_log->getId(),
+            ];
+
+            if (isset($promotion_price) && $promotion_price != 0) {
+                $extra['promotion_price'] = $promotion_price;
+                $price += $promotion_price;
             }
 
             $balance = $this->getCommissionBalance();
-            if (!$balance->change($price, CommissionBalance::RECHARGE, [
-                'pay_log' => $pay_log->getId(),
-            ])) {
+            if (!$balance->change($price, CommissionBalance::RECHARGE, $extra)) {
                 return err('创建用户账户记录失败!');
             }
 

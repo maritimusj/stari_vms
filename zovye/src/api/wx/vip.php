@@ -6,19 +6,36 @@
 
 namespace zovye\api\wx;
 
-use DateTime;
-use Exception;
-use zovye\App;
-use zovye\model\userModelObj;
 use zovye\model\vipModelObj;
 use zovye\request;
 use zovye\User;
-
-use zovye\Util;
 use function zovye\err;
 
 class vip
 {
+    public static function userInfo()
+    {
+        $agent = common::getAgent();
+        $mobile = request::trim('mobile');
+        if (!preg_match(REGULAR_TEL, $mobile)) {
+            return err('手机号码格式不正确！');
+        }
+
+        if (\zovye\VIP::existsByMobile($agent, $mobile)) {
+            return err('该手机号码的用户已经是VIP用户！');
+        }
+
+        $user = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
+        if ($user) {
+            if (\zovye\VIP::exists($agent, $user)) {
+                return err('该用户已经是VIP用户！');
+            }
+            return $user->profile();
+        }
+        
+        return [];
+    }
+
     public static function create(): array
     {
         $agent = common::getAgent();
@@ -40,7 +57,7 @@ class vip
             if ($user->isBanned()) {
                 return err('这个用户已被禁用！');
             }
-            $locker = $user->acquireLocker("VIP:create");
+            $locker = $user->acquireLocker('VIP::create');
             if (!$locker) {
                 return err('锁定用户失败，请重试！');
             }

@@ -17,6 +17,7 @@ use zovye\Contract\ICard;
 use zovye\Locker;
 use zovye\Pay;
 use zovye\UserCommissionBalanceCard;
+use zovye\VIP;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -687,6 +688,10 @@ class userModelObj extends modelObj
             $price = $pay_log->getPrice();
             if ($price < 1) {
                 return err('支付金额小于1!');
+            }
+
+            if (App::isFuelingDeviceEnabled()) {
+                $price = VIP::rechargePromotion($price);
             }
 
             $balance = $this->getCommissionBalance();

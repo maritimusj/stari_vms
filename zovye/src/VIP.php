@@ -105,4 +105,29 @@ class VIP
             'mobile' => $mobile,
         ]);
     }
+
+    public static function rechargePromotion(int $amount)
+    {
+        $promotion = Config::fueling('recharge.promotion', []);
+        if (empty($promotion) || !$promotion['enabled'] || empty($promotion['list'])) {
+            return $amount;
+        }
+
+        $list = (array)$promotion['list'];
+
+        $min_val = 0;
+        $val = 0;
+
+        foreach ($list as $item) {
+            if (empty($item['base']) || empty($item['val']) || $amount < $item['base']) {
+                continue;
+            }
+            if ($min_val == 0 || $amount - $item['base'] < $min_val) {
+                $val = $item['val'];
+                $min_val = $item['base'] - $amount;
+            }
+        }
+
+        return $amount + $val;
+    }
 }

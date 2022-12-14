@@ -1687,6 +1687,35 @@ if ($op == 'default') {
             'back_url' => Util::url('agent', []),
         ]
     );
+} elseif ($op == 'vip') {
+
+    $id = request::int('id');
+
+    $agent = Agent::get($id);
+    if (empty($agent)) {
+        JSON::fail('找不到这个代理商！');
+    }
+
+    $query = VIP::query(['agent_id' => $agent->getId()]);
+
+    $result = [];
+    /** @var vipModelObj $vip */
+    foreach ($query->findAll() as $vip) {
+        $user = $vip->getUser();
+        $result[] = [
+            'user' => empty($user) ? [] : $user->profile(),
+            'createtime' => date('Y-m-d H:i:s', $vip->getCreatetime()),
+        ];
+    }
+
+    app()->showTemplate(
+        'web/agent/vip',
+        [
+            'agent' => $agent->profile(),
+            'list' => $result,
+            'back_url' => Util::url('agent', []),
+        ]
+    );
 } elseif ($op == 'refresh_rel') {
 
     if (!YZShop::isInstalled()) {

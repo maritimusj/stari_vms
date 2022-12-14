@@ -183,6 +183,9 @@
                                         <i class="fa fa-users"></i> 他的下级代理商
                                     </a>
                                 </li>
+                                {if \zovye\App::isFuelingDeviceEnabled()}
+                                <li><a href="{php echo $this->createWebUrl('agent', array('op' => 'vip', 'id'=>$agent['id']));}"> <i class="fa fa-users fa-fw"></i> 他的VIP用户</a></li>
+                                {/if}
                                 {if isset($agent['commission'])}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="viewCommissionLog"><i class="fa fa-rmb fa-fw"></i> 佣金明细</a></li>

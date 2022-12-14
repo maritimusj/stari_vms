@@ -1,0 +1,88 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<style>
+    #list .profile img{
+        width: 32px;
+        height: 32px;
+    }
+    .we7-modal-dialog .modal-body{
+        max-height: unset;
+    }
+
+</style>
+
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            <div class="agent" title="{$agent['level']['title']}" style="display:inline-block;">
+                <div class="profile" style="background-color:{$agent['level']['clr']}">
+                    <img src="{$agent['headimgurl']}">
+                    <div class="nickname">{$agent['name']}</div>                            
+                </div>
+            </div>
+            的VIP用户
+        </a>
+    </li>
+</ul>
+<div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{$back_url}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $list}
+        <div id="keeperlist">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>用户</th>
+                    <th>姓名</th>
+                    <th>手机号码</th>
+                    <th>设备数量</th>
+                    <th style="text-align: center;width: 10em;">
+                        <div>创建时间</div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $list $index $item}
+                <tr>
+                    <td>{php echo $index + 1}</td>
+                    <td>
+                        <div class="profile">
+                            <img src="{$item['user']['headimgurl']}" />
+                            <span class="nickname">
+                                {php echo $item['user']['nickname'] ?: '&lt;匿名用户&gt;'}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        {$item['name']}
+                    </td>
+                    <td>
+                        {$item['mobile']}
+                    </td>
+                    <td style="text-align: center;">
+                        {$item['devices_total']}
+                    </td>
+                    <td>
+                        <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div class="pull-right">
+                {$pager}
+            </div>
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时没有任何VIP用户！
+        </div>
+        {/if}        
+    </div>
+</div>
+{template 'common/footer'}

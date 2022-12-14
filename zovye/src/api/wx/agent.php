@@ -198,7 +198,8 @@ class agent
                 'douyin' => App::isDouyinEnabled(),
                 'balance' => App::isBalanceEnabled(),
                 'team' => App::isTeamEnabled(),
-                'vip' => App::isFuelingDeviceEnabled(),
+                'charging' => App::isChargingDeviceEnabled(),
+                'fueling' => App::isFuelingDeviceEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

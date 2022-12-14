@@ -1460,6 +1460,23 @@ if ($op == 'account') {
     $tpl_data['app_key'] = Config::balance('app.key');
     $tpl_data['notify_url'] = Config::balance('app.notify_url');
 
+} elseif ($op == 'recharge_config') {
+
+    $data = Config::fueling('vip.recharge', []);
+    JSON::success($data);
+
+} elseif ($op == 'save_recharge_config') {
+
+    $promotion = request::array('promotion');
+
+    $enabled = $promotion['enabled'] == 'true';
+    
+    Config::fueling('vip.recharge.promotion', [
+        'enabled' => $enabled, 
+        'list' => $enabled ? (array)($promotion['list']) : [],
+    ], true);
+
+    JSON::success('Ok');
 }
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {

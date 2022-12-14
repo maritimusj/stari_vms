@@ -70,9 +70,8 @@
                     </div>
                 </div>
             </div>
-
             <div class="seg">
-                <div class="title">用户</div>
+                <div class="title">订单</div>
                 <div class="form-group">
                     <label for="discountPrice" class="col-md-2 control-label">首单优惠（元）</label>
                     <div class="col-md-10">
@@ -99,7 +98,7 @@
             </div>
             {if \zovye\App::isBalanceEnabled()}
             <div class="seg">
-                <div class="title">积分奖励</div>
+                <div class="title">积分</div>
                 <div class="form-group">
                     <label for="newUser" class="col-md-2 control-label">新用户首次赠送积分 <img src="{MODULE_URL}static/img/coin.svg" class="balance"></label>
                     <div class="col-md-10">
@@ -115,6 +114,108 @@
                     </div>
                 </div>
             </div>
+            {/if}
+            {if \zovye\App::isFuelingDeviceEnabled()}
+            <div class="seg" id="recharge">
+                <div class="title">充值</div>
+                <div class="form-group">
+                    <label for="rechargePromotion" class="col-md-2 control-label">充值赠送</label>
+                    <div class="col-md-10">
+                        <input type="checkbox" id="rechargePromotion" v-model="promotion.enabled">
+                        启用后，用户充值达到指定金额时，额外赠送相应金额
+                    </div>
+                </div>
+                <div class="form-group" v-show="promotion.enabled" v-for="(data, index) in promotion.list">
+                    <label for="dailySignInBonusMin" class="col-md-2 control-label">
+                    </label>
+                    <div class="col-md-10">
+                        <div class="col-md-5" style="padding-left:0;">
+                            <input type="number" class="form-control" min="0" step="0.01" title="充值金额" v-model="data.base">
+                            <span class="help-block">* 充值金额（元）</span>
+                        </div>
+                        <div class="col-md-4" style="padding-left:0;">
+                            <input type="number" class="form-control" min="0" step="0.01" title="赠送金额" v-model="data.val">
+                            <span class="help-block">* 赠送金额（元）</span>
+                        </div>
+                        <div class="col-md-1 operate">
+                            <div class="btn" style="padding-left: 0;">
+                                <i class="fa fa-trash" title="删除" @click="remove(index)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" v-show="promotion.enabled">
+                    <label class="col-md-2">
+                    </label>
+                    <div class="col-md-10">
+                        <div class="operate">
+                            <i class="fa fa-plus" @click="add()"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                const api_url = "{php echo $this->createWebUrl('settings');}";
+                require(['jquery', '{php \zovye\url(false, JS_VUE_URL);}'], function($, Vue) {
+                    const app = new Vue({
+                        el: "#recharge",
+                        data: {
+                            promotion: {
+                                enabled: false,
+                                list: [],
+                            }
+                        },
+                        watch: {
+                            ['promotion.enabled'](val) {
+                                if (val && this.promotion.list.length == 0) {
+                                    this.promotion.list.push({
+                                        base: 0,
+                                        val: 0,
+                                    })
+                                }
+                            },
+                            ['promotion.list'](val) {
+                                if (val.length == 0) {
+                                    this.promotion.enabled = false;
+                                }
+                            }
+                        },
+                        created() {
+                            const self = this;
+                            $.getJSON(api_url, {op: 'recharge_config'}).then(res => {
+                                if (res && res.status) {
+                                    return res.data || {};
+                                }
+                            }).then(data => {
+                                if (data.promotion) {
+                                    self.promotion.enabled = data.promotion.enabled;
+                                    self.promotion.list = data.promotion.list;
+                                }
+                            })
+                        },
+                        mounted() {
+
+                        },
+                        methods: {
+                            add() {
+                                this.promotion.list.push({
+                                    base: 0,
+                                    val: 0,
+                                });
+                            },
+                            remove(i) {
+                                this.promotion.list.splice(i, 1);
+                            },
+                            submit() {
+                                $.post(api_url, {op: 'save_recharge_config', promotion: this.promotion});
+                            }
+                        }
+                    })
+                    $('form').submit(function(){
+                        app.submit();
+                    });
+                });
+            </script>
             {/if}
         </div>
     </div>

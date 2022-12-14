@@ -134,13 +134,13 @@ class device
             ];
         }
 
-        if (App::isBluetoothDeviceSupported() && $device->isBlueToothDevice()) {
+        if ($device->isBlueToothDevice() && App::isBluetoothDeviceSupported()) {
             $result['device']['buid'] = $device->getBUID();
             $result['device']['mac'] = $device->getMAC();
             $result['device']['protocol'] = $device->getBlueToothProtocolName();
         }
 
-        if (App::isChargingDeviceEnabled() && $device->isChargingDevice()) {
+        if ($device->isChargingDevice() && App::isChargingDeviceEnabled()) {
             $result['charger'] = [];
             $chargerNum = $device->getChargerNum();
             for ($i = 0; $i < $chargerNum; $i++) {
@@ -150,6 +150,16 @@ class device
                     'soc' => $charging_data['soc'],
                 ];
             }
+        }
+
+        if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+            $result['device']['expiration'] = [
+                'date' => $device->getExpiration(),
+                'is_expired' => $device->isExpired(),
+            ];
+            $result['device']['solo'] = $device->getSoloMode();
+            $result['device']['timeout'] = $device->getTimeout();
+            $result['device']['pulse'] = $device->getPulseValue();
         }
 
         $payload = $device->getPayload(true);

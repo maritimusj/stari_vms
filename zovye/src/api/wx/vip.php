@@ -16,6 +16,7 @@ class vip
     public static function userInfo(): array
     {
         $agent = common::getAgent();
+
         $mobile = request::trim('mobile');
         if (!preg_match(REGULAR_TEL, $mobile)) {
             return err('手机号码格式不正确！');
@@ -86,21 +87,16 @@ class vip
     {
         $agent = common::getAgent();
 
-        $user_id = request::int('user');
-        $mobile = request::str('mobile');
-
-        if ($user_id) {
-            $user = User::get($user_id);
-            if ($user) {
-                \zovye\VIP::remove($agent, $user);
-            } else {
-                \zovye\VIP::removeByUserId($agent, $user_id);
-            }
+        $vip = \zovye\VIP::get(request::int('id'));
+        if (empty($vip)) {
+            return err('找不到指定的vip用户！');
         }
 
-        if ($mobile) {
-            \zovye\VIP::removeByMobile($agent, $mobile);
+        if ($vip->getAgentId() != $agent->getId()) {
+            return err('没有权限！');
         }
+
+        $vip->destroy();
 
         return ['message' => '删除成功！'];
     }

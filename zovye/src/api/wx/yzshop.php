@@ -18,7 +18,7 @@ class yzshop
      */
     public static function stats(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $result = [];
 
@@ -63,7 +63,7 @@ class yzshop
      */
     public static function news(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $result = '';
 

@@ -37,7 +37,7 @@ class commission
      */
     public static function sharedAccount(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
@@ -110,7 +110,7 @@ class commission
      */
     public static function accountAssign(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
@@ -157,7 +157,7 @@ class commission
      */
     public static function ptAgreement(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
@@ -252,7 +252,7 @@ class commission
             return err('没有开启这个功能！');
         }
 
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
@@ -290,7 +290,7 @@ class commission
             return err('没有开启这个功能！');
         }
 
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 

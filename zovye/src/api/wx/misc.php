@@ -25,7 +25,7 @@ class misc
 
     public static function deviceStats(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $total = $user->getDeviceCount();
@@ -52,7 +52,7 @@ class misc
 
     public static function orderStats(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $query = \zovye\Order::query();

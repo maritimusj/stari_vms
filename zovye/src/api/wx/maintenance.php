@@ -54,7 +54,7 @@ class maintenance
 
     public static function record(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         return maintenance::createMaintainRecord($user);
     }
@@ -70,7 +70,7 @@ class maintenance
 
     public static function MRList(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 

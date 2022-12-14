@@ -48,7 +48,7 @@ class balance
             return $result;
         }
 
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if (App::isCommissionEnabled() && $agent) {
@@ -273,7 +273,7 @@ class balance
     {
         common::checkCurrentUserPrivileges('F_cm');
 
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if ($agent) {
@@ -425,7 +425,7 @@ class balance
      */
     public static function log(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_cm');
 

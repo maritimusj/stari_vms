@@ -36,7 +36,7 @@ class mp
      */
     public static function detail(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xf');
 
@@ -93,7 +93,7 @@ class mp
 
         $data['bonus_type'] = $account->getBonusType();
 
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         if ($more) {
             $data['img_signatured'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
@@ -150,7 +150,7 @@ class mp
      */
     public static function assign(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xf');
 
@@ -233,7 +233,7 @@ class mp
      */
     public static function accounts(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xf');
 
@@ -285,7 +285,7 @@ class mp
      */
     public static function ban(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xf');
 
@@ -319,7 +319,7 @@ class mp
      */
     public static function delete(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xf');
 
@@ -348,7 +348,7 @@ class mp
      */
     public static function save(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xf');
 

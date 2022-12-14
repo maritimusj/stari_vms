@@ -16,7 +16,7 @@ class goods
 {
     public static function list(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sp');
 
@@ -46,7 +46,7 @@ class goods
 
     public static function detail(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sp');
 
@@ -63,7 +63,7 @@ class goods
 
     public static function delete(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sp');
 
@@ -85,7 +85,7 @@ class goods
 
     public static function create(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sp');
 

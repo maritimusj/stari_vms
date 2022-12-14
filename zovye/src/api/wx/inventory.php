@@ -16,7 +16,7 @@ class inventory
 {
     public static function list(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $inventory = \zovye\Inventory::for($user);
         if (empty($inventory)) {
@@ -56,7 +56,7 @@ class inventory
 
     public static function logs(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $inventory = \zovye\Inventory::for($user);
         if (empty($inventory)) {

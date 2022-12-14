@@ -32,7 +32,7 @@ class adv
      */
     public static function assign(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gg');
 
@@ -83,7 +83,7 @@ class adv
      */
     public static function list(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gg');
 
@@ -246,7 +246,7 @@ class adv
      */
     public static function createOrUpdate(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gg');
 
@@ -277,7 +277,7 @@ class adv
      */
     public static function delete(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gg');
 
@@ -315,7 +315,7 @@ class adv
      */
     public static function uploadFile(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gg');
 
@@ -355,7 +355,7 @@ class adv
 
     public static function groupAssign(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gg');
 

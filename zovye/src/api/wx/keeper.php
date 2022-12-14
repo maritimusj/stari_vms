@@ -153,7 +153,7 @@ class keeper
      */
     public static function setKeeper(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_yy');
 
@@ -216,7 +216,7 @@ class keeper
      */
     public static function deleteKeeper(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_yy');
 
@@ -262,7 +262,7 @@ class keeper
      */
     public static function keepers(): array
     {
-        $agent = common::getAgent();
+        $agent = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_yy');
 
@@ -314,7 +314,7 @@ class keeper
 
     public static function removeDevicesFromKeeper(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_yy');
 
@@ -357,7 +357,7 @@ class keeper
      */
     public static function assignDevicesToKeeper(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_yy');
 
@@ -1162,7 +1162,7 @@ class keeper
      */
     public static function viewKeeperStats(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_yy');
 

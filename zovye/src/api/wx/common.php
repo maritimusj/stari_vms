@@ -143,12 +143,27 @@ class common
      *
      * @return agentModelObj
      */
+    public static function getAgentOrPartner(): agentModelObj
+    {
+        $user = self::getUser();
+
+        if (!$user->isAgent() && !$user->isPartner()) {
+            JSON::fail('您还不是我们的代理商，请联系我们！');
+        }
+
+        return $user->agent();
+    }
+
     public static function getAgent(): agentModelObj
     {
         $user = self::getUser();
 
         if (!$user->isAgent() && !$user->isPartner()) {
             JSON::fail('您还不是我们的代理商，请联系我们！');
+        }
+
+        if ($user->isPartner()) {
+            return $user->getPartnerAgent();
         }
 
         return $user->agent();
@@ -254,7 +269,7 @@ class common
      */
     public static function checkCurrentUserPrivileges($fn, bool $get_result = false): bool
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $commission_state = App::isCommissionEnabled() && $user->isCommissionEnabled();
 

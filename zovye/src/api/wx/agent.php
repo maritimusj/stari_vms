@@ -56,7 +56,7 @@ class agent
      */
     public static function getAgent(): ?agentModelObj
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         if ($user->isAgent()) {
             return $user;
         }
@@ -306,7 +306,7 @@ class agent
      */
     public static function setAgentBank(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         if ($user->isAgent() || $user->isPartner()) {
             $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
             if ($agent) {
@@ -324,7 +324,7 @@ class agent
      */
     public static function getAgentBank(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $result = [];
 
@@ -357,7 +357,7 @@ class agent
      */
     public static function agentMsg(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
@@ -399,7 +399,7 @@ class agent
      */
     public static function msgDetail(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $id = request::int('id');
         if ($id) {
@@ -423,7 +423,7 @@ class agent
      */
     public static function msgRemove(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $id = request::int('id');
         if ($id) {
@@ -446,7 +446,7 @@ class agent
      */
     public static function deviceList(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -469,7 +469,7 @@ class agent
 
     public static function keeperDeviceList(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -520,7 +520,7 @@ class agent
      */
     public static function deviceUpdate(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -689,7 +689,7 @@ class agent
      */
     public static function deviceInfo(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -756,7 +756,7 @@ class agent
      */
     public static function deviceBind(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -804,7 +804,7 @@ class agent
      */
     public static function deviceTest()
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -846,7 +846,7 @@ class agent
      */
     public static function deviceReset(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -901,7 +901,7 @@ class agent
      */
     public static function deviceAssign(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -952,7 +952,7 @@ class agent
      */
     public static function deviceLowRemain(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_qz');
 
@@ -1006,7 +1006,7 @@ class agent
      */
     public static function deviceError(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_gz');
 
@@ -1055,7 +1055,7 @@ class agent
 
     public static function orderRefund(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
         if (!settings('agent.order.refund')) {
@@ -1181,7 +1181,7 @@ class agent
      */
     public static function deviceSetErrorCode(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -1232,7 +1232,7 @@ class agent
      */
     public static function agentSearch(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xj');
 
@@ -1323,7 +1323,7 @@ class agent
      */
     public static function agentUpdate(): array
     {
-        common::getAgent();
+        common::getAgentOrPartner();
 
         $guid = request::trim('guid');
 
@@ -1342,7 +1342,7 @@ class agent
 
     public static function getAgentKeepers(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $keep_res = Keeper::query(['agent_id' => $agent->getId()])->findAll();
@@ -1395,7 +1395,7 @@ class agent
 
     public static function agentStat(): array
     {
-        $agent = common::getAgent();
+        $agent = common::getAgentOrPartner();
 
         if ($agent->isAgent() || $agent->isPartner()) {
             if ($agent->isPartner()) {
@@ -1445,7 +1445,7 @@ class agent
 
     public static function removeAgent(): array
     {
-        $op_user = common::getAgent();
+        $op_user = common::getAgentOrPartner();
 
         if ($op_user->isAgent() || $op_user->isPartner()) {
             if ($op_user->settings('agentData.misc.power')) {
@@ -1479,7 +1479,7 @@ class agent
 
     public static function agentSub(): array
     {
-        $agent = common::getAgent();
+        $agent = common::getAgentOrPartner();
         if ($agent->isAgent() || $agent->isPartner()) {
             if ($agent->isPartner()) {
                 $agent = $agent->getPartnerAgent();
@@ -1559,7 +1559,7 @@ class agent
 
     public static function setAgentProfile(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
 
         if ($agent) {
@@ -1577,7 +1577,7 @@ class agent
 
     public static function getAgentProfile(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
 
         $result = [];
@@ -1821,7 +1821,7 @@ class agent
 
     public static function homepageOrderStat(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent_id = $user->getAgentId();
         if (request::has('start')) {
             $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
@@ -1960,7 +1960,7 @@ class agent
 
     public static function homepageDefault(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         return Util::cachedCall(30, function () use ($user) {
 
@@ -2057,7 +2057,7 @@ class agent
 
     public static function repair()
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
         $repairData = $agent->settings('repair', []);

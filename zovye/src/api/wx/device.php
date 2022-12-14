@@ -367,7 +367,7 @@ class device
 
     public static function deviceGoods(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_tj');
 
@@ -604,7 +604,7 @@ class device
      */
     public static function statistics(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $params = [
             'date' => request('date'),
             'guid' => request('guid'),
@@ -787,7 +787,7 @@ class device
 
     public static function deviceTypes(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         $params = [
             'page' => request::int('page'),
@@ -805,7 +805,7 @@ class device
 
     public static function deleteDeviceTypes(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_xh');
 
@@ -840,7 +840,7 @@ class device
     {
         $data = request::is_string('data') ? json_decode(urldecode(request::str('data')), true) : [];
 
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         common::checkCurrentUserPrivileges('F_xh');
@@ -938,7 +938,7 @@ class device
 
     public static function deviceSub(): array
     {
-        $agent = common::getAgent();
+        $agent = common::getAgentOrPartner();
 
         if ($agent->isPartner()) {
             $agent = $agent->getPartnerAgent();
@@ -1052,7 +1052,7 @@ class device
      */
     public static function appRestart(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
         $app_id = request::trim('id');

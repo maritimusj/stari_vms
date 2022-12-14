@@ -91,7 +91,7 @@ class order
                 return err('找不到这个用户！');
             }
         } else {
-            $user = common::getAgent();
+            $user = common::getAgentOrPartner();
         }
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
@@ -272,7 +272,7 @@ class order
 
     public static function getExportIds(): array
     {
-        $user = common::getAgent();
+        $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
 
         return \zovye\Order::getExportIDS([

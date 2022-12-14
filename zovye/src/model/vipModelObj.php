@@ -5,7 +5,10 @@
  */
 namespace zovye\model;
 
+use zovye\Agent;
 use zovye\base\modelObj;
+use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\User;
 use function zovye\tb;
 
 class vipModelObj extends modelObj
@@ -31,5 +34,16 @@ class vipModelObj extends modelObj
 
 	/** @var int */
 	protected $createtime;
+
+    use ExtraDataGettersAndSetters;
+
+    public function getUser(): ?userModelObj {
+        return User::get($this->user_id);
+    }
+
+    public function getAgent(): ? agentModelObj {
+        return Agent::get($this->agent_id);
+    }
+
 
 }

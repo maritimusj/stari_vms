@@ -174,5 +174,10 @@ router::exec($op, [
     'InventoryGoods' => '\zovye\api\wx\inventory::list',
     'InventoryLogs' => '\zovye\api\wx\inventory::logs',
 
+    'vipCreate' => '\zovye\api\wx\vip::create',
+    'vipRemove' => '\zovye\api\wx\vip::remove',
+    'vipList' => '\zovye\api\wx\vip::getList',
+    'vipDevice' => '\zovye\api\wx\vip::updateDeviceIds',
+
 ]);
 

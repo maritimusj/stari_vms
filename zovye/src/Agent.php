@@ -170,6 +170,9 @@ class Agent
                 $adv->destroy();
             }
 
+            //删除盯关vip用户数据
+            VIP::removeAll($agent);
+
             if ($agent->save()) {
                 return ['message' => '成功！'];
             }

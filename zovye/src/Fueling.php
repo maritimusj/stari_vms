@@ -348,8 +348,11 @@ class Fueling
 
         $chargerID = $order->getChargerID();
         $status = $device->getFuelingStatusData($chargerID);
+        if ($status['ser'] === $order->getOrderNO()) {
+            return ['status' => $status];
+        }
 
-        return ['status' => $status];
+        return ['message' => '正在查询状态！'];
     }
 
     public static function config(deviceModelObj $device)
@@ -400,8 +403,10 @@ class Fueling
 
     public static function onEventReport(deviceModelObj $device, $data)
     {
-        $chargerID = intval($data['ch']);
-        $device->setFuelingStatusData($chargerID, $data);
+        if ($data['ser']) {
+            $chargerID = intval($data['ch']);
+            $device->setFuelingStatusData($chargerID, $data);            
+        }
     }
 
     public static function onEventFee(deviceModelObj $device, $data)

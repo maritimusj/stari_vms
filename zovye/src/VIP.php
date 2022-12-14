@@ -108,7 +108,7 @@ class VIP
 
     public static function rechargePromotion(int $amount)
     {
-        $promotion = Config::fueling('recharge.promotion', []);
+        $promotion = Config::fueling('vip.recharge.promotion', []);
         if (empty($promotion) || !$promotion['enabled'] || empty($promotion['list'])) {
             return $amount;
         }
@@ -116,18 +116,26 @@ class VIP
         $list = (array)$promotion['list'];
 
         $min_val = 0;
-        $val = 0;
+        $last_val = 0;
 
         foreach ($list as $item) {
-            if (empty($item['base']) || empty($item['val']) || $amount < $item['base']) {
+            if (empty($item['base']) || empty($item['val'])) {
                 continue;
             }
-            if ($min_val == 0 || $amount - $item['base'] < $min_val) {
-                $val = $item['val'];
-                $min_val = $item['base'] - $amount;
+
+            $base = intval($item['base'] * 100);
+            $val = intval($item['val'] * 100);
+
+            if ($base > $amount) {
+                continue;
+            }
+
+            if ($min_val == 0 || $amount - $base < $min_val) {
+                $last_val = $val;
+                $min_val = $amount - $base;
             }
         }
 
-        return $amount + $val;
+        return $amount + $last_val;
     }
 }

@@ -13,7 +13,7 @@ use function zovye\err;
 
 class vip
 {
-    public static function userInfo()
+    public static function userInfo(): array
     {
         $agent = common::getAgent();
         $mobile = request::trim('mobile');
@@ -30,9 +30,10 @@ class vip
             if (\zovye\VIP::exists($agent, $user)) {
                 return err('该用户已经是VIP用户！');
             }
+
             return $user->profile();
         }
-        
+
         return [];
     }
 
@@ -53,6 +54,8 @@ class vip
             $user = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         }
 
+        $name = request::str('name');
+
         if (isset($user)) {
             if ($user->isBanned()) {
                 return err('这个用户已被禁用！');
@@ -65,13 +68,14 @@ class vip
                 return err('这个用户已经是VIP用户！');
             }
 
-            if (\zovye\VIP::addUser($agent, $user)) {
+            if (\zovye\VIP::addUser($agent, $user, $name)) {
                 return ['message' => '创建成功！'];
             }
         }
 
         if (isset($mobile)) {
-            \zovye\VIP::addMobile($agent, $mobile);
+            \zovye\VIP::addMobile($agent, $name, $mobile);
+
             return ['message' => '手机号码添加成功！'];
         }
 
@@ -112,6 +116,7 @@ class vip
         foreach ($query->findAll() as $vip) {
             $data = [
                 'id' => $vip->getId(),
+                'name' => $vip->getName(),
                 'mobile' => $vip->getMobile(),
                 'device' => [],
                 'createtime_formatted' => date('Y-m-d H:i:s', $vip->getCreatetime()),

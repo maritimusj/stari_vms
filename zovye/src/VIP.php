@@ -56,12 +56,12 @@ class VIP
     public static function remove(agentModelObj $agent, userModelObj $user): bool
     {
         return m('vip')->delete([
-            'agent_id' => $agent->getId(),
-            'user_id' => $user->getId(),
-        ]) && m('vip')->delete([
-            'agent_id' => $agent->getId(),
-            'mobile' => $user->getMobile(),
-        ]);
+                'agent_id' => $agent->getId(),
+                'user_id' => $user->getId(),
+            ]) && m('vip')->delete([
+                'agent_id' => $agent->getId(),
+                'mobile' => $user->getMobile(),
+            ]);
     }
 
     public static function removeByUserId(agentModelObj $agent, int $user_id): bool
@@ -87,19 +87,21 @@ class VIP
         ]);
     }
 
-    public static function addUser(agentModelObj $agent, userModelObj $user): vipModelObj
+    public static function addUser(agentModelObj $agent, userModelObj $user, string $name): vipModelObj
     {
         return self::create([
             'agent_id' => $agent->getId(),
             'user_id' => $user->getId(),
+            'name' => empty($name) ? $user->getName() : $name,
             'mobile' => $user->getMobile(),
         ]);
     }
 
-    public static function addMobile(agentModelObj $agent, string $mobile): vipModelObj
+    public static function addMobile(agentModelObj $agent, string $name, string $mobile): vipModelObj
     {
         return self::create([
             'agent_id' => $agent->getId(),
+            'name' => strval($name),
             'mobile' => $mobile,
         ]);
     }

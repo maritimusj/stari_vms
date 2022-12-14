@@ -12,6 +12,7 @@ use zovye\User;
 use function zovye\tb;
 
 /**
+ * @method getName();
  * @method getMobile();
  * @method getAgentId();
  * @method getCreatetime();
@@ -34,6 +35,9 @@ class vipModelObj extends modelObj
 
     /** @var int */
     protected $user_id;
+
+    /** @var string */
+    protected $name;
 
 	/** @var string */
 	protected $mobile;

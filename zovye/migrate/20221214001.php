@@ -14,7 +14,7 @@ CREATE TABLE `ims_zovye_vms_vip` (
     `extra` JSON NOT NULL , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    INDEX (`agent_id`, `user_id`)) ENGINE = InnoDB;
+    INDEX (`uniacid`, `agent_id`, `user_id`)) ENGINE = InnoDB;
 SQL;
     Migrate::execSQL($sql);
 }

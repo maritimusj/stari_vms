@@ -403,9 +403,26 @@ class Fueling
 
     public static function onEventReport(deviceModelObj $device, $data)
     {
-        if ($data['ser']) {
+        $serial = strval($data['ser']);
+        if ($serial) {
             $chargerID = intval($data['ch']);
-            $device->setFuelingStatusData($chargerID, $data);            
+            $device->setFuelingStatusData($chargerID, $data);
+
+            //检查当前费用是否已经超出支付费用或卡余额
+            $total_price = intval($data['price_total']);
+            if ($total_price) {
+                $pay_log = Pay::getPayLog($serial, LOG_FUELING_PAY);
+                if ($pay_log) {
+                    if ($total_price > $pay_log->getTotal()) {
+                        self::stopFueling($device, $chargerID, $serial);
+                    }
+                } else {
+                    $order = Order::get($serial, true);
+                    if ($order) {
+                        self::stopFueling($device, $chargerID, $serial);
+                    }
+                }
+            }
         }
     }
 

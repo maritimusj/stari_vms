@@ -6,7 +6,6 @@
 
 namespace zovye\api\wxweb;
 
-use zovye\api\wx\balance;
 use zovye\api\wx\common;
 use zovye\Device;
 use zovye\Helper;

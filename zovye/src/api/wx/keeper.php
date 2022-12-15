@@ -770,7 +770,7 @@ class keeper
             'address' => $device->getAddress('<地址未登记>'),
             'status' => [],
             'device' => [
-                'modal' => $device->getDeviceModel(),
+                'model' => $device->getDeviceModel(),
             ]
         ];
 

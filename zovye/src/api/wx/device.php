@@ -67,7 +67,7 @@ class device
                 'device' => [
                     'id' => $device->getImei(),
                     'name' => $device->getName(),
-                    'modal' => $device->getDeviceModel(),
+                    'model' => $device->getDeviceModel(),
                 ],
                 'keeper' => [
                     'keeper_id' => $keeper_id,
@@ -97,7 +97,7 @@ class device
             'device' => [
                 'id' => $device->getImei(),
                 'name' => $device->getName(),
-                'modal' => $device->getDeviceModel(),
+                'model' => $device->getDeviceModel(),
                 'rank' => $device->getRank(),
                 'qrcode' => $device->getQrcode(),
                 'createtime' => date('Y-m-d H:i:s', $device->getCreatetime()),

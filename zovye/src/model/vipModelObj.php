@@ -73,8 +73,13 @@ class vipModelObj extends modelObj
         return $this->setExtraData('device.ids', (array)$ids);
     }
 
-    public function getDeviceTotal()
+    public function getDeviceTotal(): int
     {
         return count($this->getDeviceIds());
+    }
+
+    public function hasPrivilege(deviceModelObj $device): bool
+    {
+        return $device->getAgentId() == $this->getAgentId() && in_array($device->getId(), $this->getDeviceIds());
     }
 }

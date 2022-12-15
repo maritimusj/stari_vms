@@ -123,11 +123,13 @@ class vip
                 $data['user'] = $user->profile();
             }
 
-            $ids = $vip->getExtraData('device.ids', []);
+            $ids = $vip->getDeviceIds();
             foreach ($ids as $id) {
                 $device = \zovye\Device::get($id);
-                if ($device && $device->getAgentId() == $agent->getId()) {
-                    $data['device'][] = $device->profile();
+                if ($device) {
+                    $profile = $device->profile();
+                    $profile['enabled'] = $device->getAgentId() == $agent->getId();
+                    $data['device'][] = $profile;
                 }
             }
 
@@ -158,7 +160,7 @@ class vip
             }
         }
 
-        $vip->setExtraData('device.ids', $ids);
+        $vip->setDeviceIds($ids);
 
         return ['message' => '设备成功！'];
     }

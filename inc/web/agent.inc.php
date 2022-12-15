@@ -1703,7 +1703,11 @@ if ($op == 'default') {
     foreach ($query->findAll() as $vip) {
         $user = $vip->getUser();
         $result[] = [
+            'id' => $vip->getId(),
             'user' => empty($user) ? [] : $user->profile(),
+            'mobile' => $vip->getMobile(),
+            'name' => $vip->getName(),
+            'devices_total' => $vip->getDevicesTotal(),
             'createtime' => date('Y-m-d H:i:s', $vip->getCreatetime()),
         ];
     }
@@ -1716,6 +1720,57 @@ if ($op == 'default') {
             'back_url' => Util::url('agent', []),
         ]
     );
+} elseif ($op == 'viewVipDevices') {
+
+    $vip = VIP::get(request::int('id'));
+    if (!$vip) {
+        JSON::fail('找不到这个VIP用户！');
+    }
+
+    $devices_list = [];
+
+    $ids = $vip->getDeviceIds();
+
+    foreach($ids as $id) {
+        $device = Device::get($id);
+        if ($device) {
+            $data = $device->profile();
+            $data['enabled'] = $device->getAgentId() == $vip->getAgentId();
+            $devices_list[] = $data;
+        }
+    }
+    $content = app()->fetchTemplate(
+        'web/agent/vip_devices',
+        [
+            'vip' => [
+                'id' => $vip->getId(),
+            ],
+            'user' => $vip->getUser() ?? [],
+            'list' => $devices_list,
+        ]
+    );
+
+    JSON::success(['title' => "{$vip->getName()}的可用设备", 'content' => $content]);
+
+} elseif ($op == 'removeVipDevice') {
+
+    $vip_id = request::int('vip');
+    $vip = VIP::get($vip_id);
+    if (empty($vip)) {
+        JSON::fail('找不到这个VIP用户！');
+    }
+
+    $device_id = request::int('id');
+
+    $ids = $vip->getDeviceIds();
+
+    $ids = array_diff($ids, [$device_id]);
+    $vip->setDeviceIds($ids);
+
+    $vip->save();
+
+    JSON::success('删除成功！');
+
 } elseif ($op == 'refresh_rel') {
 
     if (!YZShop::isInstalled()) {

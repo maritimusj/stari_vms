@@ -62,4 +62,19 @@ class vipModelObj extends modelObj
     public function getAgent(): ? agentModelObj {
         return Agent::get($this->agent_id);
     }
+
+    public function getDeviceIds(): array
+    {
+        return (array)$this->getExtraData('device.ids', []);
+    }
+
+    public function setDeviceIds($ids)
+    {
+        return $this->setExtraData('device.ids', (array)$ids);
+    }
+
+    public function getDeviceTotal()
+    {
+        return count($this->getDeviceIds());
+    }
 }

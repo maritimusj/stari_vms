@@ -8,7 +8,13 @@
     .we7-modal-dialog .modal-body{
         max-height: unset;
     }
-
+    [data-op]{
+        cursor: pointer;
+    }
+    [data-op]:hover{
+        color: blue;
+        text-decoration: underline;
+    }
 </style>
 
 <ul class="nav nav-tabs" id="navbar">
@@ -40,7 +46,7 @@
                     <th>用户</th>
                     <th>姓名</th>
                     <th>手机号码</th>
-                    <th>设备数量</th>
+                    <th class="text-center">可用设备数量</th>
                     <th style="text-align: center;width: 10em;">
                         <div>创建时间</div>
                     </th>
@@ -48,15 +54,21 @@
                 </thead>
                 <tbody>
                 {loop $list $index $item}
-                <tr>
+                <tr data-id="{$item['id']}">
                     <td>{php echo $index + 1}</td>
                     <td>
+                        {if !$item['user']}
                         <div class="profile">
                             <img src="{$item['user']['headimgurl']}" />
                             <span class="nickname">
                                 {php echo $item['user']['nickname'] ?: '&lt;匿名用户&gt;'}
                             </span>
                         </div>
+                        {else}
+                        <span class="text-center text-muted">
+                            &lt;没有关联用户&gt;
+                        </span>
+                        {/if}
                     </td>
                     <td>
                         {$item['name']}
@@ -64,8 +76,10 @@
                     <td>
                         {$item['mobile']}
                     </td>
-                    <td style="text-align: center;">
-                        {$item['devices_total']}
+                    <td class="text-center">
+                        <span data-op="viewVipDevices">
+                            {php echo intval($item['devices_total'])}
+                        </span>
                     </td>
                     <td>
                         <div style="color:#9E9E9E;font-size:12px;">{$item['createtime']}</div>
@@ -85,4 +99,23 @@
         {/if}        
     </div>
 </div>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.setApiUrl("{php echo $this->createWebUrl('agent');}")
+        zovye.enableOp();
+        zovye.op('removeVipDevice', function(self, next) {
+            if (!confirm('确定移除这个设备吗？')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const vip = tr.data('vip');
+            const id = tr.data('id');
+            next({vip, id}, function(res) {
+                if (res && res.status) {
+                    tr.remove();
+               }
+            });
+        })
+    });
+</script>
 {template 'common/footer'}

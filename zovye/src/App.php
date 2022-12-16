@@ -30,6 +30,13 @@ class App
         }, $len);
     }
 
+    public static function isApiEnabled(): bool
+    {
+        return onceCall(function () {
+            return Config::api('enabled', false);
+        });
+    }
+
     public static function isLocationValidateEnabled(): bool
     {
         return onceCall(function () {

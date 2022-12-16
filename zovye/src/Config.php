@@ -13,6 +13,15 @@ namespace zovye;
  */
 class Config
 {
+    public static function api($key, $v = null, bool $update = false)
+    {
+        if ($update) {
+            return updateGlobalConfig('api', $key, $v);
+        }
+
+        return globalConfig('api', $key, $v);
+    }
+
     /**
      * 代理商相关配置
      * @param $key

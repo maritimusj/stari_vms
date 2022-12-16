@@ -35,7 +35,11 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 }  elseif (isset(\$_SERVER['HTTP_STA_WXWEB'])) {
     \$_GET['do'] = 'wxweb';
 } else {
-    exit('invalid request!');
+    if (\zovye\App::isApiEnabled()) {
+        \$_GET['do'] = 'query';
+    } else {
+        exit('invalid request!');
+    }
 }
 ";
     });
@@ -153,6 +157,8 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
         $settings['device']['bluetooth']['enabled'] = request::bool('bluetoothDevice') ? 1 : 0;
         $settings['goods']['voucher']['enabled'] = request::bool('goodsVoucher') ? 1 : 0;
+
+        Config::api('enabled', request::bool('API', false), true);
 
         $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
         $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;

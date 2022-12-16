@@ -73,7 +73,7 @@ class vipModelObj extends modelObj
         return $this->setExtraData('device.ids', (array)$ids);
     }
 
-    public function getDeviceTotal(): int
+    public function getDevicesTotal(): int
     {
         return count($this->getDeviceIds());
     }

@@ -127,7 +127,10 @@ class vip
             foreach ($ids as $id) {
                 $device = \zovye\Device::get($id);
                 if ($device) {
-                    $profile = $device->profile();
+                    $profile = [
+                        'id' => $device->getImei(),
+                        'name' => $device->getName(),
+                    ];
                     $profile['enabled'] = $device->getAgentId() == $agent->getId();
                     $data['device'][] = $profile;
                 }
@@ -151,7 +154,7 @@ class vip
         //ids 中包括的id是设备imei
         $imei_list = request::array('ids');
         $ids = [];
-        
+
         foreach ($imei_list as $imei) {
             $device = \zovye\Device::get(strval($imei), true);
             if (empty($device)) {

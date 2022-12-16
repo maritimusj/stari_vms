@@ -161,7 +161,10 @@ class vip
         }
 
         $vip->setDeviceIds($ids);
+        if (!$vip->save()) {
+            return err('保存数据失败！');
+        }
 
-        return ['message' => '设备成功！'];
+        return ['message' => '设置成功！'];
     }
 }

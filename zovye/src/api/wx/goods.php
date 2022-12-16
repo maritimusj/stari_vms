@@ -203,9 +203,11 @@ class goods
                 $goods_data['extra']['costPrice'] = request::float('costPrice', 0, 2) * 100;
             }
 
+            $goods_data['extra']['type'] = request::str('type');
+
             $goods = \zovye\Goods::create($goods_data);
         }
-
+        
         if ($goods && $goods->save()) {
             return ['msg' => '商品保存成功！'];
         }

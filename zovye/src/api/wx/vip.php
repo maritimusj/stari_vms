@@ -148,19 +148,23 @@ class vip
             return err('没有权限管理这个VIP用户！');
         }
 
-        $ids = request::array('ids');
-
-        foreach ($ids as $id) {
-            $device = \zovye\Device::get(intval($id));
+        //ids 中包括的id是设备imei
+        $imei_list = request::array('ids');
+        $ids = [];
+        
+        foreach ($imei_list as $imei) {
+            $device = \zovye\Device::get(strval($imei), true);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
             if ($device->getAgentId() != $agent->getId()) {
                 return err('没有权限管理这个设备！');
             }
+            $ids[] = $device->getId();
         }
 
         $vip->setDeviceIds($ids);
+
         if (!$vip->save()) {
             return err('保存数据失败！');
         }

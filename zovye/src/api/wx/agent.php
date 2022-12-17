@@ -675,6 +675,12 @@ class agent
 
         $extra['isDown'] = request::int('is_down');
 
+        if (App::isFuelingDeviceEnabled() && $device->isFuelingDevice()) {
+            $extra['pulse'] = request::int('pulse');
+            $extra['timeout'] = request::int('timeout');
+            $extra['solo'] = request::bool('solo') ? 1 : 0;
+        }
+
         if ($device->set('extra', $extra) && $device->save()) {
             return ['msg' => '保存成功！'];
         }

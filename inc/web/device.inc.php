@@ -923,13 +923,13 @@ HTML;
                         'capacity' => intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $device->resetPayload([$index => '@0'], '管理员更改货道商品', $now);
+                        $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '管理员更改加注枪商品' : '管理员更改货道商品', $now);
                     }
                     unset($old[$index]);
                 }
 
                 foreach ($old as $index => $lane) {
-                    $device->resetPayload([$index => '@0'], '管理员删除货道', $now);
+                    $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '管理员删除加注枪' : '管理员删除货道', $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);

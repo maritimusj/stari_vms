@@ -588,13 +588,13 @@ class agent
                         'capacity' => intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $payload[] = $device->resetPayload([$index => '@0'], '代理商更改货道商品', $now);
+                        $payload[] = $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '代理商更改加注枪商品' : '代理商更改货道商品', $now);
                     }
                     unset($old[$index]);
                 }
 
                 foreach ($old as $index => $lane) {
-                    $payload[] = $device->resetPayload([$index => '@0'], '代理商删除货道', $now);
+                    $payload[] = $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '代理商删除加注枪' : '代理商删除货道', $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);

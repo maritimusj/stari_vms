@@ -65,9 +65,9 @@ if (!$pay_log->isPaid()) {
         throw new JobException('无法保存payResult!', $log);
     }
 
-    $deviceId = $pay_log->getDeviceId();
+    $device_id = $pay_log->getDeviceId();
 
-    $device = Device::get($deviceId);
+    $device = Device::get($device_id);
     if (!$device) {
         throw new JobException('找不到指定的设备!', $log);
     }
@@ -83,7 +83,6 @@ if (!$pay_log->isPaid()) {
     $time->modify("+$years year");
 
     $device->setExpiration($time->format('Y-m-d'));
-
     $device->save();
 }
 

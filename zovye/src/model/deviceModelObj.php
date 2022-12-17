@@ -646,6 +646,11 @@ class deviceModelObj extends modelObj
         return $this->settings('extra.expiration', '');
     }
 
+    public function setExpiration($expiration): bool
+    {
+        return $this->updateSettings('extra.expiration', $expiration);
+    }
+
     public function isExpired(): bool
     {
         $expiration = $this->getExpiration();

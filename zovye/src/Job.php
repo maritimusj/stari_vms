@@ -96,6 +96,15 @@ class Job
         );
     }
 
+    public static function deviceRenewalPayResult($serial, $start = 0, $timeout = 3)
+    {
+        return CtrlServ::scheduleDelayJob(
+            'device_renewal_pay_result',
+            ['serial' => $serial, 'start' => $start ?: time()],
+            $timeout
+        );
+    }
+
     public static function chargingPayResult($serial, $start = 0, $timeout = 3)
     {
         return CtrlServ::scheduleDelayJob(

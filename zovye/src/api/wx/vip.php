@@ -6,6 +6,7 @@
 
 namespace zovye\api\wx;
 
+use zovye\Helper;
 use zovye\model\vipModelObj;
 use zovye\request;
 use zovye\User;
@@ -176,7 +177,7 @@ class vip
     }
 
     // 设备续费（有效期）
-    public static function payForDevice(): array
+    public static function payForDeviceRenewal(): array
     {
         $agent = common::getAgent();
 
@@ -189,8 +190,12 @@ class vip
             return err('没有权限管理这个设备！');
         }
 
-        //todo 创建支付
+        //获取代理商手机对应的小程序用户
+        $user = User::findOne(['mobile' => $agent->getMobile(), 'app' => User::WxAPP]);
+        if (empty($user)) {
+            return err('找不到对应的小程序用户，无法创建支付！');
+        }
 
-        return ['message' => '续费成功！'];
+        return Helper::createForDeviceRenewal($user, $device, request::int('year', 1));
     }
 }

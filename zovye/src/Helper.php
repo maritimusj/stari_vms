@@ -438,6 +438,43 @@ class Helper
         return $data;
     }
 
+    public static function createForDeviceRenewal(userModelObj $user, deviceModelObj $device, int $years)
+    {
+        $total_price = intval(settings('agent.device.fee.year', 0) * $years);
+        if ($total_price < 1) {
+            return err('支付金额不能为零！');
+        }
+
+        App::setContainer($user);
+
+        list($serial, $data) = Pay::createXAppPay(
+            $device,
+            $user,
+            [
+                'title' => '设备年费',
+                'price' => $total_price,
+            ],
+            [
+                'level' => LOG_DEVICE_RENEWAL_PAY,
+                'price' => $total_price,
+                'years' => $years,
+            ]
+        );
+
+        if (is_error($data)) {
+            return err('创建支付失败: '.$data['message']);
+        }
+
+        //加入一个支付结果检查
+        $res = Job::deviceRenewalPayResult($serial);
+        if (empty($res) || is_error($res)) {
+            return err('创建支付任务失败！');
+        }
+
+        $data['serial'] = $serial;
+        return $data;
+    }
+
     public static function createChargingOrder(
         userModelObj $user,
         deviceModelObj $device,

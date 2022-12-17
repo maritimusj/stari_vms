@@ -64,6 +64,8 @@ define('LOG_GOODS_BALANCE', 117);
 define('LOG_CHARGING_PAY', 120);
 define('LOG_RECHARGE', 121);
 define('LOG_FUELING_PAY', 122);
+define('LOG_DEVICE_RENEWAL_PAY', 123);
+
 define('LOG_SMS', 30);
 
 define('DEFAULT_PAGE_SIZE', 20);

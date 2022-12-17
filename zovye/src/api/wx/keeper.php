@@ -75,7 +75,7 @@ class keeper
                 return error(State::ERROR, '获取手机号码失败，请稍后再试！');
             }
 
-            $user = User::findOne(['mobile' => $mobile]);
+            $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
             if (empty($user)) {
                 $url = Util::murl('keeper', ['mobile' => $mobile]);
                 JSON::fail(['msg' => '您还没有绑定手机号码，请立即绑定！', 'url' => $url]);

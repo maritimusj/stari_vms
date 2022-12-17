@@ -179,6 +179,7 @@ router::exec($op, [
     'VipRemove' => '\zovye\api\wx\vip::remove',
     'VipList' => '\zovye\api\wx\vip::getList',
     'VipDevice' => '\zovye\api\wx\vip::updateDeviceIds',
+    'VipDeviceRenewal' => '\zovye\api\wx\vip::payForDeviceRenewal',
 
 ]);
 

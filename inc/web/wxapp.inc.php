@@ -132,5 +132,5 @@ if ($op == 'add' || $op == 'edit') {
     Config::app('wxapp.advs.reward.max', max(0, request::str('max')), true);
     Config::app('wxapp.advs.reward.allowFree', request::bool('allowFree') ? 1 : 0, true);
     Config::app('wxapp.advs.reward.freeLimit', max(0, request::int('freeLimit')), true);
-    Config::app('wxapp.advs.reward.freeCommission', max(0, intval(request::float('freeCommission', 0, 2) * 100)), true);
+    Config::app('wxapp.advs.reward.freeCommission', max(0, intval(round(request::float('freeCommission', 0, 2) * 100))), true);
 }

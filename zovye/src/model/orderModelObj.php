@@ -344,7 +344,7 @@ class orderModelObj extends modelObj
             }
             $record = $this->getChargingRecord();
             if ($record) {
-                return intval((floatval($record['total']) * $sf) * 100);
+                return intval(round((floatval($record['total']) * $sf) * 100));
             }
         }
 

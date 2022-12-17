@@ -357,7 +357,7 @@ class charging
             return err('充电枪正在使用中！');
         }
 
-        $price = intval(request::float('price', 0, 2) * 100);
+        $price = intval(round(request::float('price', 0, 2) * 100));
         if ($price < 1) {
             return err('付款金额不正确！');
         }
@@ -371,7 +371,7 @@ class charging
     {
         $user = common::getWXAppUser();
 
-        $total = round(request::float('amount', 0, 2) * 100);
+        $total = intval(round(request::float('amount', 0, 2) * 100));
 
         return balance::balanceWithdraw($user, $total, request::str('memo'), [
             'charging' => true,

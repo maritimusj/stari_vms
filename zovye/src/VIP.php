@@ -123,8 +123,8 @@ class VIP
                 continue;
             }
 
-            $base = intval($item['base'] * 100);
-            $val = intval($item['val'] * 100);
+            $base = intval(round($item['base'] * 100));
+            $val = intval(round($item['val'] * 100));
 
             if ($base > $amount) {
                 continue;

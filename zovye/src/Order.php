@@ -405,7 +405,7 @@ class Order extends State
                         if (empty($keeperUser)) {
                             return error(State::ERROR, '找不到佣金用户，无法退款[201]');
                         }
-                        $x_val = intval($entry['xval'] * $percent);
+                        $x_val = intval(round($entry['xval'] * $percent));
                         if ($x_val > 0) {
                             $remain -= $x_val;
 
@@ -432,7 +432,7 @@ class Order extends State
                         if (empty($user)) {
                             return error(State::ERROR, '找不到佣金用户，无法退款[204]');
                         }
-                        $x_val = intval($entry['xval'] * $percent);
+                        $x_val = intval(round($entry['xval'] * $percent));
                         if ($x_val > 0) {
                             $remain -= $x_val;
 
@@ -454,7 +454,7 @@ class Order extends State
                 }
 
                 if (is_array($commission['agent'])) {
-                    $x_val = intval($commission['agent']['xval'] * $percent);
+                    $x_val = intval(round($commission['agent']['xval'] * $percent));
                     if ($x_val > 0) {
                         $x_val = min($remain, $x_val);
 
@@ -555,7 +555,7 @@ class Order extends State
                             if (empty($keeperUser)) {
                                 return error(State::ERROR, '找不到该用户，无法退款[201]');
                             }
-                            $x_val = intval($entry['xval'] * $percent);
+                            $x_val = intval(round($entry['xval'] * $percent));
                             if ($x_val > 0) {
                                 $total_remain -= $x_val;
 
@@ -582,7 +582,7 @@ class Order extends State
                             if (empty($user)) {
                                 return error(State::ERROR, '找不到该用户，无法退款[204]');
                             }
-                            $x_val = intval($entry['xval'] * $percent);
+                            $x_val = intval(round($entry['xval'] * $percent));
                             if ($x_val > 0) {
                                 $total_remain -= $x_val;
 
@@ -604,7 +604,7 @@ class Order extends State
                     }
 
                     if (is_array($commission['agent'])) {
-                        $x_val = intval($commission['agent']['xval'] * $percent);
+                        $x_val = intval(round($commission['agent']['xval'] * $percent));
                         if ($x_val > 0) {
                             $x_val = min($total_remain, $x_val);
 

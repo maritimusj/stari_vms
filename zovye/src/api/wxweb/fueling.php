@@ -93,7 +93,7 @@ class fueling
             return err('设备正在使用中！');
         }
 
-        $price = intval(request::float('price', 0, 2) * 100);
+        $price = intval(round(request::float('price', 0, 2) * 100));
         if ($price < 1) {
             return err('付款金额不正确！');
         }

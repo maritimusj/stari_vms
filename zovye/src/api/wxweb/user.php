@@ -19,7 +19,7 @@ class user
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $price = intval(request::float('price', 0, 2) * 100);
+        $price = intval(round(request::float('price', 0, 2) * 100));
         if ($price < 1) {
             return err('充值金额不正确！');
         }

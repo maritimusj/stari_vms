@@ -33,16 +33,16 @@ SQL;
         if ($mode == GSP::REL) {
             $data = $agent->settings('agentData.gsp.rel', []);
             if ($data) {
-                $data['level1'] = intval(floatval($data['level1']) * 100);
-                $data['level2'] = intval(floatval($data['level2']) * 100);
-                $data['level3'] = intval(floatval($data['level3']) * 100);
+                $data['level1'] = intval(round(floatval($data['level1']) * 100));
+                $data['level2'] = intval(round(floatval($data['level2']) * 100));
+                $data['level3'] = intval(round(floatval($data['level3']) * 100));
                 $agent->updateSettings('agentData.gsp.rel', $data);
             }
         } elseif ($mode == GSP::FREE) {
             $gsp_users = $agent->settings('agentData.gsp.users', []);
             foreach ($gsp_users as $openid => &$data) {
-                $data['percent'] = intval(floatval($data['percent']) * 100);
-                $data['amount'] = intval(floatval($data['amount']) * 100);
+                $data['percent'] = intval(round(floatval($data['percent']) * 100));
+                $data['amount'] = intval(round(floatval($data['amount']) * 100));
             }
             $agent->updateSettings('agentData.gsp.users', $gsp_users);
         }

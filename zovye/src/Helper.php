@@ -447,7 +447,7 @@ class Helper
 
         App::setContainer($user);
 
-        list($serial, $data) = Pay::createXAppPay(
+        list($order_no, $data) = Pay::createXAppPay(
             $device,
             $user,
             [
@@ -466,12 +466,12 @@ class Helper
         }
 
         //加入一个支付结果检查
-        $res = Job::deviceRenewalPayResult($serial);
+        $res = Job::deviceRenewalPayResult($order_no);
         if (empty($res) || is_error($res)) {
             return err('创建支付任务失败！');
         }
 
-        $data['serial'] = $serial;
+        $data['orderNO'] = $order_no;
         return $data;
     }
 

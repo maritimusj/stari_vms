@@ -20,11 +20,11 @@ use zovye\Pay;
 use zovye\request;
 use function zovye\is_error;
 
-$serial = request::str('serial');
+$order_no = request::str('orderNO');
 $start = request::int('start');
 
 $log = [
-    'serial' => $serial,
+    'orderNO' => $order_no,
     'start' => $start,
 ];
 
@@ -32,24 +32,24 @@ if (!CtrlServ::checkJobSign($log)) {
     throw new JobException('签名不正确!', $log);
 }
 
-if (!Locker::try("pay:$serial", REQUEST_ID, 3)) {
+if (!Locker::try("pay:$order_no", REQUEST_ID, 3)) {
     throw new JobException('锁定支付失败!', $log);
 }
 
-$pay_log = Pay::getPayLog($serial, LOG_DEVICE_RENEWAL_PAY);
+$pay_log = Pay::getPayLog($order_no, LOG_DEVICE_RENEWAL_PAY);
 if (empty($pay_log)) {
     throw new JobException('找不到支付记录!', $log);
 }
 
 if (!$pay_log->isPaid()) {
-    $res = Pay::query($serial);
+    $res = Pay::query($order_no);
 
     $log['res'] = $res;
 
     if (is_error($res)) {
         if (time() - $start < 30) {
             //重新加入一个支付结果检查任务
-            $log['job schedule'] = Job::deviceRenewalPayResult($serial, $start);
+            $log['job schedule'] = Job::deviceRenewalPayResult($order_no, $start);
         }
         throw new JobException($res['message'], $log);
     }

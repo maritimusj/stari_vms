@@ -42,7 +42,7 @@ if (empty($pay_log)) {
 }
 
 if (!$pay_log->isPaid()) {
-    $res = Pay::query($order_no);
+    $res = Pay::queryFor($pay_log);
 
     $log['res'] = $res;
 

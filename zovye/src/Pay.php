@@ -367,18 +367,8 @@ class Pay
         return $res;
     }
 
-    /**
-     * 查询指定支付信息
-     * @param string $order_no
-     * @return mixed
-     */
-    public static function query(string $order_no)
+    public static function queryFor(pay_logsModelObj $pay_log)
     {
-        $pay_log = self::getPayLog($order_no);
-        if (empty($pay_log)) {
-            return error(State::ERROR, '找不到支付记录！');
-        }
-
         $device_id = $pay_log->getDeviceId();
 
         if ($device_id == 0) {
@@ -395,7 +385,22 @@ class Pay
             return $pay;
         }
 
+        $order_no = $pay_log->getOrderNO();
         return $pay->query($order_no);
+    }
+
+    /**
+     * 查询指定支付信息
+     * @param string $order_no
+     * @return mixed
+     */
+    public static function query(string $order_no)
+    {
+        $pay_log = self::getPayLog($order_no);
+        if (empty($pay_log)) {
+            return error(State::ERROR, '找不到支付记录！');
+        }
+        return self::queryFor($pay_log);
     }
 
     /**

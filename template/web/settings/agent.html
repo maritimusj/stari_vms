@@ -89,6 +89,7 @@
                         </div>
                     </div>
                 </div>
+                {if \zovye\App::isFuelingDeviceEnabled()}
                 <div class="seg-divider"></div>
                 <div class="form-group">
                     <label for="deviceFeeYear" class="col-md-2 control-label">年费价格（元）</label>
@@ -97,6 +98,7 @@
                         <span class="help-block">* 每台设备有效期续费一年的金额</span>
                     </div>
                 </div>
+                {/if}
             </div>
             {if \zovye\App::isInventoryEnabled()}
             <div class="seg">

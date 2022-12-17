@@ -347,9 +347,12 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['agent']['reg']['mode'] = request::bool(
             'agentRegMode'
         ) ? Agent::REG_MODE_AUTO : Agent::REG_MODE_NORMAL;
-        $settings['agent']['reg']['referral'] = request::bool('agentReferral') ? 1 : 0;
 
+        $settings['agent']['reg']['referral'] = request::bool('agentReferral') ? 1 : 0;
         $settings['agent']['device']['unbind'] = request::bool('deviceUnbind') ? 1 : 0;
+        $settings['agent']['device']['fee'] = [
+            'year' => intval(round(request::float('deviceFeeYear', 0.0, 2) * 100)),
+        ];
 
         if ($settings['agent']['reg']['mode'] == Agent::REG_MODE_AUTO) {
 

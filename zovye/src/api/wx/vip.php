@@ -174,4 +174,23 @@ class vip
 
         return ['message' => '设置成功！'];
     }
+
+    // 设备续费（有效期）
+    public static function payForDevice(): array
+    {
+        $agent = common::getAgent();
+
+        $device = \zovye\Device::get(request::str('id'), true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
+
+        if ($device->getAgentId() != $agent->getId()) {
+            return err('没有权限管理这个设备！');
+        }
+
+        //todo 创建支付
+
+        return ['message' => '续费成功！'];
+    }
 }

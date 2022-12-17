@@ -100,12 +100,7 @@ class Pay
         if ($pay_data['order_no']) {
             $order_no = $pay_data['order_no'];
         } else {
-            $partial = $pay_data['serial'] ? 'E'.strtoupper(substr(sha1($pay_data['serial']), 0, 16)) : str_replace(
-                '.',
-                '',
-                'S'.microtime(true)
-            );
-            $order_no = Order::makeUID($user, $device, $partial);
+            $order_no = Order::makeUID($user, $device, $pay_data['serial'] ?? time());
         }
 
         $more = [

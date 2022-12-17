@@ -179,14 +179,14 @@ class vip
     // 设备续费（有效期）
     public static function payForDeviceRenewal(): array
     {
-        $agent = common::getAgent();
+        $agent = common::getAgentOrPartner();
 
         $device = \zovye\Device::get(request::str('id'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
-        if ($device->getAgentId() != $agent->getId()) {
+        if ($device->getAgentId() != $agent->getAgentId()) {
             return err('没有权限管理这个设备！');
         }
 

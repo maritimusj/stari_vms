@@ -196,6 +196,6 @@ class vip
             return err('找不到对应的小程序用户，无法创建支付！');
         }
 
-        return Helper::createForDeviceRenewal($user, $device, request::int('year', 1));
+        return Helper::createForDeviceRenewal($user, $device, request::int('years', 1));
     }
 }

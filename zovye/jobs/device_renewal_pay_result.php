@@ -15,6 +15,7 @@ use zovye\Device;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Locker;
+use zovye\Log;
 use zovye\Pay;
 use zovye\request;
 use function zovye\is_error;
@@ -85,3 +86,5 @@ if (!$pay_log->isPaid()) {
 
     $device->save();
 }
+
+Log::debug(request::op('job'), $log);

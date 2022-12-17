@@ -134,12 +134,14 @@ class device
             ];
         }
 
+        //蓝牙设备
         if ($device->isBlueToothDevice() && App::isBluetoothDeviceSupported()) {
             $result['device']['buid'] = $device->getBUID();
             $result['device']['mac'] = $device->getMAC();
             $result['device']['protocol'] = $device->getBlueToothProtocolName();
         }
 
+        //充电桩
         if ($device->isChargingDevice() && App::isChargingDeviceEnabled()) {
             $result['charger'] = [];
             $chargerNum = $device->getChargerNum();
@@ -152,6 +154,7 @@ class device
             }
         }
 
+        //尿素加注设备
         if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
             $result['device']['expiration'] = [
                 'date' => $device->getExpiration(),
@@ -160,6 +163,10 @@ class device
             $result['device']['solo'] = $device->getSoloMode();
             $result['device']['timeout'] = $device->getTimeout();
             $result['device']['pulse'] = $device->getPulseValue();
+        } else {
+            if (App::isDeviceWithDoorEnabled()) {
+                $result['doorNum'] = $device->getDoorNum();
+            }
         }
 
         $payload = $device->getPayload(true);
@@ -226,7 +233,6 @@ class device
         $result['status'][\zovye\Device::V0_STATUS_COUNT] = (int)$device->getV0Status(\zovye\Device::V0_STATUS_COUNT);
         $result['status'][\zovye\Device::V0_STATUS_ERROR] = $device->getV0ErrorDescription();
 
-
         //信号强度
         $sig = $device->getSig();
         if ($sig != -1) {
@@ -237,10 +243,6 @@ class device
         $qoe = $device->getQoe();
         if (isset($qoe) && $qoe > 0) {
             $result['status']['qoe'] = intval($qoe);
-        }
-
-        if (App::isDeviceWithDoorEnabled()) {
-            $result['doorNum'] = $device->getDoorNum();
         }
 
         return $result;

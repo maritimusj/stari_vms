@@ -114,6 +114,8 @@ class agent
             return error(State::ERROR, '获取用户手机号码失败，请稍后再试！');
         }
 
+        Log::debug('wxapi', $res);
+
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if ($user) {
             if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
@@ -129,7 +131,7 @@ class agent
                 $entry->destroy();
             }
 
-            $token = sha1(time()."$mobile$session_key");
+            $token = sha1($mobile . time());
             $data = [
                 'src' => LoginData::AGENT,
                 'user_id' => $user->getId(),

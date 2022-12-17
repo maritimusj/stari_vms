@@ -1303,7 +1303,7 @@ class common
             $entry->destroy();
         }
 
-        $token = sha1($openid.Util::random(16));
+        $token = sha1($openid.time());
         $data = [
             'src' => LoginData::USER,
             'user_id' => $user->getId(),

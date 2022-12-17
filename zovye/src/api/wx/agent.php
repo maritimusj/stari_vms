@@ -10,7 +10,6 @@ use ali\aop\AopClient;
 use ali\aop\request\AlipaySystemOauthTokenRequest;
 use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Exception;
 use zovye\Cache;
 use zovye\Config;
@@ -114,7 +113,24 @@ class agent
             return error(State::ERROR, '获取用户手机号码失败，请稍后再试！');
         }
 
-        Log::debug('wxapi', $res);
+        //创建 or 更新该小程序用户
+        $openid = strval($res['openId']);
+        if ($openid) {
+            $user = User::get($openid, true);
+            if ($user) {
+              $user->setMobile($mobile);
+              $user->save();
+            } else {
+                User::create([
+                    'app' => User::WxAPP,
+                    'openid' => $openid,
+                    'nickname' => '微信用户',
+                    'avatar' => '',
+                    'mobile' => $mobile,
+                    'createtime' => time(),
+                ]);
+            }
+        }
 
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if ($user) {
@@ -131,7 +147,7 @@ class agent
                 $entry->destroy();
             }
 
-            $token = sha1($mobile . time());
+            $token = sha1($mobile.time());
             $data = [
                 'src' => LoginData::AGENT,
                 'user_id' => $user->getId(),
@@ -188,7 +204,8 @@ class agent
         return error(State::ERROR, '您还不是我们的代理商,立即注册?[102]');
     }
 
-    public static function preLogin(): array
+    public
+    static function preLogin(): array
     {
         $result = [
             'secret' => sha1(App::uid(10)),
@@ -232,7 +249,8 @@ class agent
     /**
      * @deprecated
      */
-    public static function pluginsList(): array
+    public
+    static function pluginsList(): array
     {
         return [
             'wxplatform' => App::isWxPlatformEnabled(),
@@ -245,7 +263,8 @@ class agent
      *
      * @return array
      */
-    public static function login(): array
+    public
+    static function login(): array
     {
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
@@ -272,7 +291,8 @@ class agent
      *
      * @return array
      */
-    public static function application(): array
+    public
+    static function application(): array
     {
         $name = request::trim('name');
         $mobile = request::trim('mobile');
@@ -306,7 +326,8 @@ class agent
      *
      * @return array
      */
-    public static function setAgentBank(): array
+    public
+    static function setAgentBank(): array
     {
         $user = common::getAgentOrPartner();
         if ($user->isAgent() || $user->isPartner()) {
@@ -324,7 +345,8 @@ class agent
      *
      * @return array
      */
-    public static function getAgentBank(): array
+    public
+    static function getAgentBank(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -357,7 +379,8 @@ class agent
      *
      * @return array
      */
-    public static function agentMsg(): array
+    public
+    static function agentMsg(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -399,7 +422,8 @@ class agent
      *
      * @return array
      */
-    public static function msgDetail(): array
+    public
+    static function msgDetail(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -423,7 +447,8 @@ class agent
      *
      * @return array
      */
-    public static function msgRemove(): array
+    public
+    static function msgRemove(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -446,7 +471,8 @@ class agent
      * @return array
      * @throws Exception
      */
-    public static function deviceList(): array
+    public
+    static function deviceList(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -469,7 +495,8 @@ class agent
         return \zovye\api\wx\device::getDeviceList($user, $query);
     }
 
-    public static function keeperDeviceList(): array
+    public
+    static function keeperDeviceList(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -520,7 +547,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceUpdate(): array
+    public
+    static function deviceUpdate(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -590,13 +618,17 @@ class agent
                         'capacity' => intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $payload[] = $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '代理商更改加注枪商品' : '代理商更改货道商品', $now);
+                        $payload[] = $device->resetPayload([$index => '@0'],
+                            $device->isFuelingDevice() ? '代理商更改加注枪商品' : '代理商更改货道商品',
+                            $now);
                     }
                     unset($old[$index]);
                 }
 
                 foreach ($old as $index => $lane) {
-                    $payload[] = $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '代理商删除加注枪' : '代理商删除货道', $now);
+                    $payload[] = $device->resetPayload([$index => '@0'],
+                        $device->isFuelingDevice() ? '代理商删除加注枪' : '代理商删除货道',
+                        $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -695,7 +727,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceInfo(): array
+    public
+    static function deviceInfo(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -762,7 +795,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceBind(): array
+    public
+    static function deviceBind(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -810,7 +844,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceTest()
+    public
+    static function deviceTest()
     {
         $user = common::getAgentOrPartner();
 
@@ -852,7 +887,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceReset(): array
+    public
+    static function deviceReset(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -907,7 +943,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceAssign(): array
+    public
+    static function deviceAssign(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -958,7 +995,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceLowRemain(): array
+    public
+    static function deviceLowRemain(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1012,7 +1050,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceError(): array
+    public
+    static function deviceError(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1061,7 +1100,8 @@ class agent
         return $result;
     }
 
-    public static function orderRefund(): array
+    public
+    static function orderRefund(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
@@ -1094,7 +1134,8 @@ class agent
      *
      * @return array
      */
-    public static function orders(): array
+    public
+    static function orders(): array
     {
         common::checkCurrentUserPrivileges('F_sb');
 
@@ -1187,7 +1228,8 @@ class agent
      *
      * @return array
      */
-    public static function deviceSetErrorCode(): array
+    public
+    static function deviceSetErrorCode(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1238,7 +1280,8 @@ class agent
      *
      * @return array
      */
-    public static function agentSearch(): array
+    public
+    static function agentSearch(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -1304,7 +1347,10 @@ class agent
                     'name' => $agent->getName(),
                     'avatar' => $agent->getAvatar(),
                     'mobile' => substr_replace($agent->getMobile(), '****', 3, 4),
-                    'address' => is_array($agent_data['area']) ? implode('-', array_values($agent_data['area'])) : '',
+                    'address' => is_array($agent_data['area']) ? implode(
+                        '-',
+                        array_values($agent_data['area'])
+                    ) : '',
                     'level' => $agent_levels[$agent_data['level']],
                     'device_count' => Device::query(['agent_id' => $agent->getAgentId()])->count(),
                     'hasB' => User::findOne(['superior_id' => $agent->getAgentId()]) ? 1 : 0,
@@ -1329,7 +1375,8 @@ class agent
     /**
      * 修改下级代理商名称
      */
-    public static function agentUpdate(): array
+    public
+    static function agentUpdate(): array
     {
         common::getAgentOrPartner();
 
@@ -1348,7 +1395,8 @@ class agent
         return ['msg' => '修改成功！'];
     }
 
-    public static function getAgentKeepers(): array
+    public
+    static function getAgentKeepers(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
@@ -1401,7 +1449,8 @@ class agent
         return ['data' => $data];
     }
 
-    public static function agentStat(): array
+    public
+    static function agentStat(): array
     {
         $agent = common::getAgentOrPartner();
 
@@ -1451,7 +1500,8 @@ class agent
         return error(State::ERROR, '没有权限！');
     }
 
-    public static function removeAgent(): array
+    public
+    static function removeAgent(): array
     {
         $op_user = common::getAgentOrPartner();
 
@@ -1485,7 +1535,8 @@ class agent
         return error(State::ERROR, '只有代理商才能保存运营人员信息！');
     }
 
-    public static function agentSub(): array
+    public
+    static function agentSub(): array
     {
         $agent = common::getAgentOrPartner();
         if ($agent->isAgent() || $agent->isPartner()) {
@@ -1565,7 +1616,8 @@ class agent
         return error(State::ERROR, '获取列表失败！');
     }
 
-    public static function setAgentProfile(): array
+    public
+    static function setAgentProfile(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
@@ -1583,7 +1635,8 @@ class agent
         }
     }
 
-    public static function getAgentProfile(): array
+    public
+    static function getAgentProfile(): array
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
@@ -1599,8 +1652,12 @@ class agent
         return $result;
     }
 
-    public static function getAgentStat($agent, $s_ts, $e_ts): array
-    {
+    public
+    static function getAgentStat(
+        $agent,
+        $s_ts,
+        $e_ts
+    ): array {
         return Util::cachedCall(30, function () use ($agent, $s_ts, $e_ts) {
             $query = Order::query([
                 'agent_id' => $agent->getId(),
@@ -1632,7 +1689,8 @@ class agent
         }, $agent->getId(), $s_ts, $e_ts);
     }
 
-    public static function loginQR(): array
+    public
+    static function loginQR(): array
     {
         $url = Util::murl('agent', [
             'op' => 'login_scan',
@@ -1644,7 +1702,8 @@ class agent
         ];
     }
 
-    public static function loginScan(): array
+    public
+    static function loginScan(): array
     {
         $uniq = request::str('uniq');
         if (empty($uniq)) {
@@ -1703,7 +1762,8 @@ class agent
         return error(State::ERROR, '登录失败，无法创建登录数据！');
     }
 
-    public static function loginPoll(): array
+    public
+    static function loginPoll(): array
     {
         $uniq = request('uniq');
         if (empty($uniq)) {
@@ -1732,7 +1792,8 @@ class agent
         ];
     }
 
-    public static function userIncome(): array
+    public
+    static function userIncome(): array
     {
         //one month
         $user = agent::getUserByGUID(request('guid'));
@@ -1784,7 +1845,8 @@ class agent
         return error(State::ERROR, '获取列表失败！');
     }
 
-    public static function getUserQRCode(): array
+    public
+    static function getUserQRCode(): array
     {
         $user = common::getAgentOrKeeper();
         if ($user instanceof keeperModelObj) {
@@ -1794,7 +1856,8 @@ class agent
         return common::getUserQRCode($user);
     }
 
-    public static function updateUserQRCode(): array
+    public
+    static function updateUserQRCode(): array
     {
         $user = common::getAgentOrKeeper();
         $type = request::str('type');
@@ -1805,7 +1868,8 @@ class agent
         return common::updateUserQRCode($user, $type);
     }
 
-    public static function aliAuthCode()
+    public
+    static function aliAuthCode()
     {
         $auth_code = request::str('authcode');
 
@@ -1827,7 +1891,8 @@ class agent
         }
     }
 
-    public static function homepageOrderStat(): array
+    public
+    static function homepageOrderStat(): array
     {
         $user = common::getAgentOrPartner();
         $agent_id = $user->getAgentId();
@@ -1966,7 +2031,8 @@ class agent
         }, $agent_id, $s_date->getTimestamp(), $e_date->getTimestamp(), $device_id);
     }
 
-    public static function homepageDefault(): array
+    public
+    static function homepageDefault(): array
     {
         $user = common::getAgentOrPartner();
 
@@ -2063,7 +2129,8 @@ class agent
         }, $user->getId());
     }
 
-    public static function repair()
+    public
+    static function repair()
     {
         $user = common::getAgentOrPartner();
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;

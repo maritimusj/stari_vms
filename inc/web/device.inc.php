@@ -167,7 +167,7 @@ if ($op == 'default') {
 
         $ids_str = json_encode($online_ids);
         $devices_status = Util::cachedCall(10, function () use ($ids_str) {
-            $res = CtrlServ::v2_query('detail', [], $ids_str, 'application/json');
+            $res = CtrlServ::postV2('detail', $ids_str);
             if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                 return $res['data'];
             }
@@ -230,7 +230,7 @@ if ($op == 'default') {
         JSON::fail('没有ICCID');
     }
 
-    $result = CtrlServ::v2_query("iccid/$iccid");
+    $result = CtrlServ::getV2("iccid/$iccid");
     if (is_error($result)) {
         JSON::fail('查询失败');
     }

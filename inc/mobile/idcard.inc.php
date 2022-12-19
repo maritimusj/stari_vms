@@ -72,7 +72,7 @@ if ($op == 'default') {
     );
 
     $str = base64_encode("$name|$num");
-    $res = CtrlServ::v2_query("idcard/check/$str");
+    $res = CtrlServ::getV2("idcard/check/$str");
     if (empty($res) || empty($res['status'])) {
         if ($res['data']['message'] == 'invalid idcard') {
             JSON::fail('身份证号码填写有误，请检查后再试！');

@@ -1131,7 +1131,7 @@ if ($op == 'account') {
 } elseif ($op == 'user') {
 
     if (App::isIDCardVerifyEnabled()) {
-        $res = CtrlServ::v2_query('idcard/balance');
+        $res = CtrlServ::getV2('idcard/balance');
 
         if (!empty($res) && $res['status']) {
             $tpl_data['idcard_balance'] = $res['data']['balance'];

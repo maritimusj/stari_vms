@@ -1967,7 +1967,7 @@ class deviceModelObj extends modelObj
                 'mcb' => true,
             ];
         }
-        $res = CtrlServ::v2_query("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
+        $res = CtrlServ::getV2("device/$this->imei/online", ['nocache' => $use_cache ? 'false' : 'true']);
         if ($res['status'] === true) {
             return $res['data'];
         }
@@ -1987,7 +1987,7 @@ class deviceModelObj extends modelObj
     {
         if ($this->app_id) {
             if ($this->imei) {
-                $res = CtrlServ::v2_query("device/$this->imei/app/online", ['nocache' => false]);
+                $res = CtrlServ::getV2("device/$this->imei/app/online", ['nocache' => false]);
 
                 return $res['status'] === true && $res['data']['app'] === true;
             }
@@ -2436,7 +2436,7 @@ class deviceModelObj extends modelObj
         }
 
         if ($this->imei) {
-            $res = CtrlServ::v2_query(
+            $res = CtrlServ::getV2(
                 "device/$this->imei/mcb/online",
                 [
                     'nocache' => !$use_cache ? 'true' : 'false',

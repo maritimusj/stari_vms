@@ -20,7 +20,7 @@ class SIM
     ];
 
     public static function get($iccid) {
-        $res = CtrlServ::v2_query("iccid/$iccid");
+        $res = CtrlServ::getV2("iccid/$iccid");
         if ( is_error($res)) {
             return $res;
         }

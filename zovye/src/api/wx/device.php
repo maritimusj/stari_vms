@@ -668,7 +668,7 @@ class device
         }
 
         if (!isEmptyArray($ids)) {
-            $res = CtrlServ::v2_query('online', [], json_encode($ids), 'application/json');
+            $res = CtrlServ::postV2('online', $ids);
             if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                 return $res['data'];
             }
@@ -758,7 +758,7 @@ class device
                 }
 
                 if ($onlineStatus) {
-                    $res = CtrlServ::v2_query('online', [], json_encode($ids), 'application/json');
+                    $res = CtrlServ::postV2('online', $ids);
                     if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                         $online_status = $res['data'];
                     }
@@ -1025,7 +1025,7 @@ class device
                     }
                 }
 
-                $res = CtrlServ::v2_query('online', [], json_encode($ids), 'application/json');
+                $res = CtrlServ::postV2('online', $ids);
                 if (!empty($res) && $res['status'] === true && is_array($res['data'])) {
                     $online_status = $res['data'];
                 }

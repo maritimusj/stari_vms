@@ -148,7 +148,7 @@ class Order extends State
 
     public static function queryStatus($serialNO)
     {
-        return CtrlServ::v2_query("goods/{$serialNO}", ["nostr" => microtime(true)]);
+        return CtrlServ::getV2("goods/{$serialNO}", ["nostr" => microtime(true)]);
     }
 
     /**

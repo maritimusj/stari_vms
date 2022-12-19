@@ -208,7 +208,7 @@ class CtrlServ
 
     public static function status()
     {
-        $res = self::v2_query();
+        $res = self::getV2();
         if ($res) {
             if (is_error($res)) {
                 return $res;
@@ -219,6 +219,16 @@ class CtrlServ
         }
 
         return err('请求失败！');
+    }
+
+    public static function getV2(string $path = '', array $params = [])
+    {
+        return self::v2_query($path, $params);
+    }
+
+    public static function postV2(string $path = '', $body = [])
+    {
+        return self::v2_query($path, [], is_string($body) ? $body : json_encode($body), 'application/json');
     }
 
     /**

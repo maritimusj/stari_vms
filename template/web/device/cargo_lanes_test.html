@@ -23,9 +23,7 @@
                 <td>{$item['capacity']} {$item['goods_unit_title']}</td>
                 <td>{$item['num']} {$item['goods_unit_title']}</td>
                 <td class="test_btn">
-                    {if !$is_fueling_device}
                     <i class="fa fa-sign-out" data-op="deviceTestLaneN" data-params="{$index}" title="测试"></i>
-                    {/if}
                     <i class="fa fa-level-up" data-op="deviceReset" data-params="{$index}" data-name="{if $is_fueling_device}枪号{else}货道{/if}" title="重置商品数量"></i>
                 </td>
             </tr>

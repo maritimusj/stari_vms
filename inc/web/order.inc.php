@@ -154,8 +154,11 @@ if ($op == 'default') {
 
     /** @var orderModelObj $entry */
     foreach ($query->findAll() as $entry) {
+        $data = Order::format($entry, true);
+
         //公众号信息
-        if (empty($accounts[$entry->getAccount()])) {
+        $account_name = $entry->getAccount();
+        if ($account_name && empty($accounts[$account_name])) {
             $account = Account::findOneFromName($entry->getAccount());
             if ($account) {
                 $profile = [
@@ -187,30 +190,29 @@ if ($op == 'default') {
                         $profile['questionnaire+1'] .= 'n/a';
                     }
                 }
-                $accounts[$entry->getAccount()] = $profile;
+                $accounts[$account_name] = $profile;
             }
-        }
+        }            
 
-        $data = Order::format($entry, true);
-        if ($accounts[$data['account']]) {
-            if (isset($accounts[$data['account']]['media'])) {
-                $data['account_title'] = '视频 '.$accounts[$data['account']]['title'];
-            } elseif ($accounts[$data['account']]['douyin']) {
-                $data['account_title'] = '抖音 '.$accounts[$data['account']]['title'];
-            } elseif ($accounts[$data['account']]['wxapp']) {
-                $data['account_title'] = '小程序 '.$accounts[$data['account']]['title'];
-            } elseif ($accounts[$data['account']]['questionnaire']) {
-                $data['account_title'] = '问卷 '.$accounts[$data['account']]['title'];
+        if ($account_name && $accounts[$account_name]) {
+            if (isset($accounts[$account_name]['media'])) {
+                $data['account_title'] = '视频 '.$accounts[$account_name]['title'];
+            } elseif ($accounts[$account_name]['douyin']) {
+                $data['account_title'] = '抖音 '.$accounts[$account_name]['title'];
+            } elseif ($accounts[$account_name]['wxapp']) {
+                $data['account_title'] = '小程序 '.$accounts[$account_name]['title'];
+            } elseif ($accounts[$account_name]['questionnaire']) {
+                $data['account_title'] = '问卷 '.$accounts[$account_name]['title'];
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', '');
-            } elseif ($accounts[$data['account']]['questionnaire+1']) {
-                $data['account_title'] = '公众号 '.$accounts[$data['account']]['title'].' + '.$accounts[$data['account']]['questionnaire+1'];
+            } elseif ($accounts[$account_name]['questionnaire+1']) {
+                $data['account_title'] = '公众号 '.$accounts[$account_name]['title'].' + '.$accounts[$account_name]['questionnaire+1'];
                 $data['questionnaire_log'] = $entry->getExtraData('ticket.logId', 0);
-            } elseif ($accounts[$data['account']]['third-party-platform']) {
-                $data['account_title'] = '第三方平台 '.$accounts[$data['account']]['title'];
+            } elseif ($accounts[$account_name]['third-party-platform']) {
+                $data['account_title'] = '第三方平台 '.$accounts[$account_name]['title'];
             } else {
-                $data['account_title'] = '公众号 '.$accounts[$data['account']]['title'];
+                $data['account_title'] = '公众号 '.$accounts[$account_name]['title'];
             }
-            $data['clr'] = $accounts[$data['account']]['clr'];
+            $data['clr'] = $accounts[$account_name]['clr'];
         } else {
             if ($data['balance']) {
                 $data['clr'] = '#ffc107';

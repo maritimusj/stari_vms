@@ -1137,16 +1137,44 @@ HTML;
     ];
 
     if ($device->isChargingDevice()) {
+
         unset($tpl_data['navs']['payload']);
         unset($tpl_data['navs']['log']);
-    }
 
-    $tpl_data['media'] = [
-        'image' => ['title' => '图片'],
-        'video' => ['title' => '视频'],
-        'audio' => ['title' => '音频'],
-        'srt' => ['title' => '字幕'],
-    ];
+    } elseif ($device->isFuelingDevice()) {
+
+        $tpl_data['payload'] = $device->getPayload(true);
+        
+    } else {
+        $tpl_data['media'] = [
+            'image' => ['title' => '图片'],
+            'video' => ['title' => '视频'],
+            'audio' => ['title' => '音频'],
+            'srt' => ['title' => '字幕'],
+        ];
+
+        $accounts = $device->getAssignedAccounts();
+        if ($accounts) {
+            foreach ($accounts as &$entry) {
+                $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);
+                if (empty($entry['qrcode'])) {
+                    $entry['qrcode'] = MODULE_URL.'static/img/qrcode_blank.svg';
+                }
+            }
+        }
+        $tpl_data['accounts'] = $accounts;
+
+        $tpl_data['payload'] = $device->getPayload(true);
+
+        $packages = [];
+        $query = Package::query(['device_id' => $device->getId()]);
+        /** @var packageModelObj $i */
+        foreach ($query->findAll() as $i) {
+            $packages[] = $i->format(true);
+        }
+    
+        $tpl_data['packages'] = $packages;
+    }
 
     $res = Device::getAppConfigData($device);
     if (is_error($res)) {
@@ -1179,17 +1207,6 @@ HTML;
     $tpl_data['first_msg_statistic'] = $device->settings('firstMsgStatistic');
     $tpl_data['first_total'] = intval($tpl_data['firstMsgStatistic'][date('Ym')][date('d')]['total']);
 
-    $accounts = $device->getAssignedAccounts();
-    if ($accounts) {
-        foreach ($accounts as &$entry) {
-            $entry['edit_url'] = $this->createWebUrl('account', ['op' => 'edit', 'id' => $entry['id']]);
-            if (empty($entry['qrcode'])) {
-                $entry['qrcode'] = MODULE_URL.'static/img/qrcode_blank.svg';
-            }
-        }
-    }
-    $tpl_data['accounts'] = $accounts;
-
     $tpl_data['day_stats'] = app()->fetchTemplate(
         'web/device/stats',
         [
@@ -1211,19 +1228,6 @@ HTML;
     );
 
     $tpl_data['device'] = $device;
-    if (!$device->isChargingDevice()) {
-        $tpl_data['payload'] = $device->getPayload(true);
-    }
-
-    $packages = [];
-    $query = Package::query(['device_id' => $device->getId()]);
-    /** @var packageModelObj $i */
-    foreach ($query->findAll() as $i) {
-        $packages[] = $i->format(true);
-    }
-
-    $tpl_data['packages'] = $packages;
-
     $tpl_data['mcb_online'] = $device->isMcbOnline();
     $tpl_data['app_online'] = $device->isAppOnline();
 

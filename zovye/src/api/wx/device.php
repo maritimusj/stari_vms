@@ -160,6 +160,13 @@ class device
                 'date' => $device->getExpiration(),
                 'is_expired' => $device->isExpired(),
             ];
+
+            $result['device']['renewal'] = [
+                'year' => [
+                    'price' => $device->getYearRenewalPrice(),
+                ]
+            ];
+
             $result['device']['solo'] = $device->getSoloMode();
             $result['device']['timeout'] = $device->getTimeout();
             $result['device']['pulse'] = $device->getPulseValue();

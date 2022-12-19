@@ -664,6 +664,11 @@ class deviceModelObj extends modelObj
         return false;
     }
 
+    public function getYearRenewalPrice(): int
+    {
+        return intval(settings('agent.device.fee.year', 0));
+    }
+
     public function getFuelingConfig(): array
     {
         $config = [

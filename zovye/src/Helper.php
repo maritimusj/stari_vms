@@ -440,7 +440,7 @@ class Helper
 
     public static function createForDeviceRenewal(userModelObj $user, deviceModelObj $device, int $years)
     {
-        $total_price = intval(settings('agent.device.fee.year', 0) * $years);
+        $total_price = $device->getYearRenewalPrice() * $years;
         if ($total_price < 1) {
             return err('支付金额不能为零！');
         }

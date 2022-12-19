@@ -14,6 +14,15 @@ use zovye\model\userModelObj;
 
 class Fueling
 {
+    public static function test(deviceModelObj $device, int $amount, $chargerID = Device::DEFAULT_CARGO_LANE): bool
+    {
+        return $device->mcbNotify('run', '', [
+            'ser' => $serial ?? Util::random(16, true),
+            'ch' => $chargerID,
+            'amount' => $amount,
+        ]);
+    }
+
     public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0)
     {
         return Util::transactionDo(function () use ($serial, $card, $device, $chargerID) {

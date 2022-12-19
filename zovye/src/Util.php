@@ -1688,6 +1688,13 @@ HTML_CONTENT;
             return error(State::ERROR, '找不到这个设备！');
         }
 
+        if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+            if (Fueling::test($device, 1000)) {
+                return ['message' => '已发送测试请求！'];
+            }
+            return err('请求失败！');
+        }
+
         $data = array_merge(
             [
                 'online' => true,

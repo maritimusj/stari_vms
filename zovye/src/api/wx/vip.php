@@ -71,14 +71,14 @@ class vip
             }
 
             if (\zovye\VIP::addUser($agent, $user, $name)) {
-                return ['message' => '创建成功！'];
+                return ['msg' => '创建成功！'];
             }
         }
 
         if (isset($mobile)) {
             \zovye\VIP::addMobile($agent, $name, $mobile);
 
-            return ['message' => '手机号码添加成功！'];
+            return ['msg' => '手机号码添加成功！'];
         }
 
         return err('创建失败！');
@@ -99,7 +99,7 @@ class vip
 
         $vip->destroy();
 
-        return ['message' => '删除成功！'];
+        return ['msg' => '删除成功！'];
     }
 
     public static function getList(): array
@@ -173,7 +173,7 @@ class vip
             return err('保存数据失败！');
         }
 
-        return ['message' => '设置成功！'];
+        return ['msg' => '设置成功！'];
     }
 
     // 设备续费（有效期）

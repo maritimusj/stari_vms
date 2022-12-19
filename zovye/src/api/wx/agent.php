@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use Exception;
 use zovye\Cache;
 use zovye\Config;
+use zovye\Fueling;
 use zovye\Inventory;
 use zovye\Log;
 use zovye\model\agent_msgModelObj;
@@ -709,14 +710,22 @@ class agent
 
         $extra['isDown'] = request::int('is_down');
 
+        $msg = '保存成功';
         if (App::isFuelingDeviceEnabled() && $device->isFuelingDevice()) {
             $extra['pulse'] = request::int('pulse');
             $extra['timeout'] = request::int('timeout');
             $extra['solo'] = request::bool('solo') ? 1 : 0;
+            if ($device->isMcbOnline()) {
+                $res = Fueling::config($device);
+                if (is_error($res)) {
+                    $msg .= '，发生错误：'.$res['message'];
+                    $error = true;
+                }
+            }
         }
 
         if ($device->set('extra', $extra) && $device->save()) {
-            return ['msg' => '保存成功！'];
+            return ['msg' => $msg];
         }
 
         return error(State::ERROR, '保存失败！');
@@ -1121,7 +1130,7 @@ class agent
 
         $num = request::int('num');
 
-        $res = Order::refund($order->getOrderNO(), $num, ['message' => '代理商：'.$agent->getName()]);
+        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '代理商：'.$agent->getName()]);
         if (is_error($res)) {
             return error(State::ERROR, $res['message']);
         }
@@ -1522,7 +1531,7 @@ class agent
                     );
 
                     if (!is_error($res)) {
-                        return ['message' => '已取消用户代理身份！'];
+                        return ['msg' => '已取消用户代理身份！'];
                     }
                 }
 

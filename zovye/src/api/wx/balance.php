@@ -250,7 +250,7 @@ class balance
                     }
                 }
 
-                return ['message' => $msg];
+                return ['msg' => $msg];
             }
         );
 

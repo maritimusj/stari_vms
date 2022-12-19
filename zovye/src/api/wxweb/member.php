@@ -310,7 +310,7 @@ class member
             $profile['commission_balance'] = $u->getCommissionBalance()->total();
 
             return [
-                'message' => '转帐成功！',
+                'msg' => '转帐成功！',
                 'total' => $total,
                 'to' => $profile,
             ];

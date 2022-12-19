@@ -230,7 +230,6 @@
                             <input type="number" class="form-control" name="chargerNum" id="chargerNum" value="{php echo $device ? $device->getChargerNum() : ''}">
                         </div>
                     </div>
-
                     <!--蓝牙设备-->
                     <template v-if="config.is_bluetooth_device">
                         <div class="form-group">
@@ -683,9 +682,14 @@
                         </div>
                         <div class="form-group">
                             <label class="col-md-2 control-label">到期时间</label>
-                            <div class="col-md-10">
-                                <input type="text" name="expiration"  value="{php echo $device ? $device->getExpiration() : ''}" placeholder="请选择日期时间" readonly="readonly" class="datetimepicker form-control" style="padding-left:12px;" />
+                            <div class="col-md-8">
+                                <input type="text" name="expiration"  value="{php echo $device ? $device->getExpiration() : ''}" placeholder="&lt;无限制&gt;" readonly="readonly" class="datetimepicker form-control" style="padding-left:12px;" />
                                 <span class="help-block">* 请输入设备到期时间</span>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-default" type="button" id="removeExpiration" title="清除时间">
+                                    <i class="fa fa-ban"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="divider"></div>
@@ -1218,7 +1222,7 @@
         })
         renderTags(tags);
 
-        $('#addTagBtn').click(function(){
+        $('#addTagBtn').click(function() {
             const titles = $('input[name=newtags]').val().split(',');
             titles.forEach(function(title){
                 title = $.trim(title);
@@ -1230,7 +1234,11 @@
             renderTags(tags);
         })
 
-        $('#tagslist').on('click', '.tag', function(){
+        $('#removeExpiration').click(function() {
+            $('input[name=expiration]').val('');
+        })
+
+        $('#tagslist').on('click', '.tag', function() {
             const title = $(this).text().trim();
             tags = tags.filter(function(e){
                 return e !== title;
@@ -1238,7 +1246,7 @@
             renderTags(tags);
         })
 
-        $('[enter-key]').bind("keypress", function(e){
+        $('[enter-key]').bind("keypress", function(e) {
             if (e.keyCode === 13) {
                 const target = $(this).attr('enter-key');
                 $(target).click();
@@ -1276,7 +1284,7 @@
             })
         })
 
-        $('#special input[name=spec]').click(function(){
+        $('#special input[name=spec]').click(function() {
             $('#special fieldset').attr('disabled', !$(this).is(':checked'));
         })
     }

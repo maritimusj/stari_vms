@@ -10,6 +10,15 @@ namespace zovye;
  * 全局配置越来越大，这个类主要用来独立部分配置
  * Class Config
  * @package zovye
+ * @method static agent(string $key, $v = '', $update = false)
+ * @method static balance(string $key, $v = '', $update = false)
+ * @method static device(string $key, $v = '', $update = false)
+ * @method static charging(string $key, $v = '', $update = false)
+ * @method static fueling(string $key, $v = '', $update = false)
+ * @method static app(string $key, $v = '', $update = false)
+ * @method static cztv(string $key, $v = '', $update = false)
+ * @method static douyin(string $key, $v = '', $update = false)
+ * @method static wxplatform(string $key, $v = '', $update = false)
  */
 class Config
 {

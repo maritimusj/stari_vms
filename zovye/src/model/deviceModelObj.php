@@ -676,6 +676,7 @@ class deviceModelObj extends modelObj
             'solo' => $this->getSoloMode(),
             'pulse' => $this->getPulseValue(),
             'timeout' => $this->getTimeout(),
+            'ts' => time(),
         ];
 
         $goods = $this->getGoodsByLane(0);

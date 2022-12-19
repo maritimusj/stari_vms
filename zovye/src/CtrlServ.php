@@ -223,12 +223,12 @@ class CtrlServ
 
     public static function getV2(string $path = '', array $params = [])
     {
-        return self::v2_query($path, $params);
+        return self::queryV2($path, $params);
     }
 
     public static function postV2(string $path = '', $body = [])
     {
-        return self::v2_query($path, [], is_string($body) ? $body : json_encode($body), 'application/json');
+        return self::queryV2($path, [], is_string($body) ? $body : json_encode($body), 'application/json');
     }
 
     /**
@@ -240,7 +240,7 @@ class CtrlServ
      * @param string $method
      * @return mixed
      */
-    public static function v2_query(
+    public static function queryV2(
         string $path = '',
         array $params = [],
         $body = '',

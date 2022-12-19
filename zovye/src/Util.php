@@ -1689,6 +1689,9 @@ HTML_CONTENT;
         }
 
         if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+            if (!$device->isMcbOnline()) {
+                return err('设备不在线！');
+            }
             if (Fueling::test($device, 1000)) {
                 return ['message' => '已发送测试请求！'];
             }

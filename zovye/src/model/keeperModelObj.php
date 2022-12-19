@@ -48,7 +48,7 @@ class keeperModelObj extends modelObj
 
     public function getUser(): ?userModelObj
     {
-        return User::findOne(['mobile' => $this->mobile]);
+        return User::findOne(['mobile' => $this->mobile, 'app' => User::WX]);
     }
 
     /**

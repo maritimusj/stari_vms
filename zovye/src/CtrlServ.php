@@ -223,31 +223,12 @@ class CtrlServ
 
     public static function getV2(string $path = '', array $params = [])
     {
-        return self::queryV2($path, $params);
+        return self::queryData('v2', $path, $params);
     }
 
     public static function postV2(string $path = '', $body = [])
     {
-        return self::queryV2($path, [], is_string($body) ? $body : json_encode($body), 'application/json');
-    }
-
-    /**
-     * 与控制中心交互 api版本v2
-     * @param string $path
-     * @param array $params
-     * @param mixed $body
-     * @param string $contentType
-     * @param string $method
-     * @return mixed
-     */
-    public static function queryV2(
-        string $path = '',
-        array $params = [],
-        $body = '',
-        string $contentType = '',
-        string $method = ''
-    ) {
-        return self::queryData('v2', $path, $params, $body, $contentType, $method);
+        return self::queryData('v2', $path, [], is_string($body) ? $body : json_encode($body), 'application/json');
     }
 
     /**

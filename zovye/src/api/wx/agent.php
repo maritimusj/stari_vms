@@ -719,9 +719,10 @@ class agent
                 $res = Fueling::config($device);
                 if (is_error($res)) {
                     $msg .= '，发生错误：'.$res['message'];
-                    $error = true;
                 }
             }
+        } else {
+            $msg .= '！';
         }
 
         if ($device->set('extra', $extra) && $device->save()) {

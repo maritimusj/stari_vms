@@ -228,7 +228,8 @@ class CtrlServ
 
     public static function postV2(string $path = '', $body = [])
     {
-        return self::queryData('v2', $path, [], is_string($body) ? $body : json_encode($body), 'application/json');
+        $body = is_string($body) ? $body : json_encode($body);
+        return self::queryData('v2', $path, [], $body, 'application/json');
     }
 
     /**

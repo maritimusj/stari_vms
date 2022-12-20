@@ -99,6 +99,22 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
             }
             Log::debug('refund', $log);
             Job::exit();
+        } elseif ($device->isFuelingDevice()) {
+            if ($order->isFuelingFinished()) {
+                try {
+                    $log['result'] = Order::refundBy($order_no, 0 - $order->getPrice());
+                } catch (Exception $e) {
+                    $log['exception'] = [
+                        'type' => get_class($e),
+                        'code' => $e->getCode(),
+                        'msg' => $e->getMessage(),
+                    ];
+                }
+            } else {
+                $log['err'] = '加注订单未结束！';
+            }
+            Log::debug('refund', $log);
+            Job::exit();
         }
     }
 

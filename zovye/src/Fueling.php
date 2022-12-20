@@ -473,9 +473,33 @@ class Fueling
                 $order = Order::findOne(['order_id' => $serial, 'src' => Order::FUELING_UNPAID]);
                 if ($order) {
                     $order->setSrc(Order::FUELING);
-                    $order->save();
 
                     $user = $order->getUser();
+
+                    //减少库存
+                    $locker = $device->payloadLockAcquire(3);
+                    if (empty($locker)) {
+                        return err('设备正忙，请重试！');
+                    }
+
+                    $res = $device->resetPayload([$chargerID => -$order->getNum()], "订单：$serial");
+                    if (is_error($res)) {
+                        return err('保存库存变动失败！');
+                    }
+
+                    $locker->unlock();
+
+                    //事件：订单已经创建
+                    EventBus::on('device.orderCreated', [
+                        'device' => $device,
+                        'user' => $user,
+                        'order' => $order,
+                    ]);
+
+                    if (!$order->save()) {
+                        return err('保存订单失败！');
+                    }
+
                     $pay_log = Pay::getPayLog($serial);
                     if ($pay_log) {
                         $remain = $pay_log->getPrice() - $order->getPrice();
@@ -492,38 +516,23 @@ class Fueling
                                 'chargerID' => $chargerID,
                             ];
                             if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
-                                Log::error('fueling', [
-                                    'error' => '用户扣款失败！',
-                                    'data' => $extra,
-                                ]);
+                                return err('用户扣款失败！');
                             }
                         }
                     }
-
-                    //事件：订单已经创建
-                    try {
-                        EventBus::on('device.orderCreated', [
-                            'device' => $device,
-                            'user' => $user,
-                            'order' => $order,
-                        ]);
-                        $order->save();
-                    } catch (Exception $e) {
-                        Log::error('fueling', [
-                            'error' => '用户订单创建事件处理异常！',
-                            'data' => $e->getMessage(),
-                        ]);
-                    }
                 }
+                return true;
             });
 
             if (!is_error($result)) {
+
                 $result = self::confirm($device, $serial);
                 if (is_error($result)) {
                     Log::error('fueling', [
                         'confirm' => $result,
                     ]);
                 }
+
             }
         }
     }

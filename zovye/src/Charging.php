@@ -111,7 +111,7 @@ class Charging
                         'name' => $device->getName(),
                     ],
                     'user' => $user->profile(),
-                    'chargingID' => $chargerID,
+                    'chargerID' => $chargerID,
                     'card' => $card->getUID(),
                     'cardType' => $card->getTypename(),
                 ],

@@ -135,7 +135,8 @@ class CommissionEventHandler
      */
     protected static function reward(deviceModelObj $device, orderModelObj $order): bool
     {
-        $commission_price = Config::app('wxapp.advs.reward.freeCommission') * $order->getNum();
+        $commission = intval(Config::app('wxapp.advs.reward.freeCommission', 0));
+        $commission_price =  $commission * $order->getNum();
 
         return self::processCommissions($device, $order, $commission_price);
     }
@@ -148,7 +149,8 @@ class CommissionEventHandler
      */
     protected static function balance(deviceModelObj $device, orderModelObj $order): bool
     {
-        $commission_price = Config::balance('order.commission.val', 0) * $order->getNum();
+        $val = intval(Config::balance('order.commission.val', 0));
+        $commission_price = $val * $order->getNum();
 
         return self::processCommissions($device, $order, $commission_price);
     }

@@ -388,6 +388,7 @@ class Order extends State
 
             if ($order->isFuelingOrder()) {
                 $cardUID = $order->getExtraData('card', '');
+                //todo 退款处理
             }
 
             $order_no = $order->getOrderNO();

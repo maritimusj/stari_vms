@@ -479,10 +479,8 @@
                                     {if $order['discount']>0}
                                         <span class="price">{php echo number_format($order['price'], 2)}</span>
                                     {/if}
-                                    {if empty($order['refund']) && $order['type'] != 'charging'}
-                                    {if $order['type'] != 'fueling' || $order['fueling']['record']}
+                                    {if empty($order['refund']) && $order['type'] != 'charging' && $order['type'] != 'fueling'}
                                     <img src="{php echo MODULE_URL . 'static/img/refund.svg'}" class="icon" title="退款" data-op="refund">
-                                    {/if}
                                     {/if}
                                 {/if}
                                 {/if}

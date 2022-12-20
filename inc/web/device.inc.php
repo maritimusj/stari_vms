@@ -661,12 +661,19 @@ HTML;
     Util::itoast('删除成功！', $this->createWebUrl('device'), 'success');
 } elseif ($op == 'get_lane_detail') {
 
-    $priceFN = function ($data) {
+    $priceFN = function ($is_floating, $data) {
         if ($data['cargo_lanes']) {
             foreach ((array)$data['cargo_lanes'] as $index => $lane) {
                 $data['cargo_lanes'][$index]['goods_price'] = number_format($lane['goods_price'] / 100, 2);
                 if (!isset($lane['num'])) {
                     $data['cargo_lanes'][$index]['num'] = 0;
+                } else {
+                    if ($is_floating) {
+                        $data['cargo_lanes'][$index]['num'] = round($lane['num'] / 100, 2);
+                    }
+                }
+                if ($is_floating) {
+                    $data['cargo_lanes'][$index]['capacity'] = round($lane['capacity'] / 100, 2);
                 }
             }
         }
@@ -688,14 +695,13 @@ HTML;
         }
 
         $data = DeviceTypes::format($device_type, true);
-        $data = $priceFN($data);
         if (isset($device)) {
             $payload = $device->getPayload(false);
             foreach ((array)$payload['cargo_lanes'] as $index => $lane) {
                 $data['cargo_lanes'][$index]['num'] = intval($lane['num']);
             }
         }
-        JSON::success($data);
+        JSON::success($priceFN($device && $device->isFuelingDevice(), $data));
     }
 
 
@@ -706,7 +712,7 @@ HTML;
         }
 
         $data = $device->getPayload(true);
-        JSON::success($priceFN($data));
+        JSON::success($priceFN($device && $device->isFuelingDevice(), $data));
     }
 
     JSON::success([
@@ -917,19 +923,21 @@ HTML;
 
                 $cargo_lanes = [];
                 $capacities = request::array('capacities');
+                $is_fueling =  $device->isFuelingDevice();
+                
                 foreach (request::array('goods') as $index => $goods_id) {
                     $cargo_lanes[] = [
                         'goods' => intval($goods_id),
-                        'capacity' => intval($capacities[$index]),
+                        'capacity' => $is_fueling ? intval(round($capacities[$index] * 100)) : intval($capacities[$index]),
                     ];
                     if ($old[$index] && $old[$index]['goods'] != intval($goods_id)) {
-                        $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '管理员更改加注枪商品' : '管理员更改货道商品', $now);
+                        $device->resetPayload([$index => '@0'], $is_fueling ? '管理员更改加注枪商品' : '管理员更改货道商品', $now);
                     }
                     unset($old[$index]);
                 }
 
                 foreach ($old as $index => $lane) {
-                    $device->resetPayload([$index => '@0'], $device->isFuelingDevice() ? '管理员删除加注枪' : '管理员删除货道', $now);
+                    $device->resetPayload([$index => '@0'], $is_fueling ? '管理员删除加注枪' : '管理员删除货道', $now);
                 }
 
                 $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -941,12 +949,19 @@ HTML;
             throw new RuntimeException('获取型号失败！');
         }
 
+        $is_fueling =  $device->isFuelingDevice();
+
         //货道商品数量和价格
         $type_data = DeviceTypes::format($device_type);
         $cargo_lanes = [];
         foreach ($type_data['cargo_lanes'] as $index => $lane) {
+            if ( $is_fueling) {
+                $num = intval(request::float("lane{$index}_num", 0, 2) * 100);
+            } else {
+                $num = request::int("lane{$index}_num");
+            }
             $cargo_lanes[$index] = [
-                'num' => '@'.max(0, request::int("lane{$index}_num")),
+                'num' => '@'.max(0, $num),
             ];
             if ($device_type->getDeviceId() == $device->getId()) {
                 $cargo_lanes[$index]['price'] = request::float("price$index", 0, 2) * 100;
@@ -1306,6 +1321,7 @@ HTML;
     $tpl_data['logs'] = $logs;
     $tpl_data['verified'] = $verified;
     $tpl_data['device'] = $device;
+    $tpl_data['is_fueling'] = $device->isFuelingDevice();
 
     app()->showTemplate('web/device/payload', $tpl_data);
 } elseif ($op == 'log') {

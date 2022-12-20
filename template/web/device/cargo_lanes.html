@@ -22,7 +22,7 @@
             <td data-price="{$item['goods_price']}">{$item['goods_price_formatted']}</td>
             <td>{$item['capacity']} {$item['goods_unit_title']}</td>
             <td>
-                <input type="number" class="form-control capacity" name="lane{$index}_num" value="{$item['num']}" min="0" max="{$item['capacity']}">
+                <input type="number" class="form-control capacity" name="lane{$index}_num" value="{$item['num']}" min="0.00" max="{$item['capacity']}">
             </td>
         </tr>
     {/loop}

@@ -69,21 +69,21 @@
                     <sup class="id" title="商品ID">{$item['goods']['id']}</sup>
                 </td>
                 <td>
-                    {$item['org']}
+                    {php echo $is_fueling ? number_format($item['org']/100, 2, '.', '') : $item['org']}
                 </td>
                 <td>
                     {if $item['num']>0}
                     <span class="inc">
-                        +{$item['num']}
+                        +{php echo $is_fueling ? number_format($item['num']/100, 2, '.', '') : $item['num']}
                     </span>                    
                     {else}
                     <span class="dec">
-                        {$item['num']}
+                        {php echo $is_fueling ? number_format($item['num']/100, 2, '.', '') : $item['num']}
                     </span>                    
                     {/if}
                 </td>
                 <td>
-                    {$item['new']}
+                    {php echo $is_fueling ? number_format($item['new']/100, 2, '.', '') : $item['new']}
                 </td>
                 <td>
                     {$item['reason']}

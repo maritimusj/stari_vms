@@ -861,11 +861,9 @@ class DeviceEventProcessor
 
     public static function onMcbFee(array $data = [])
     {
-        if (App::isFuelingDeviceEnabled()) {
-            $device = Device::get($data['uid'], true);
-            if ($device && $device->isFuelingDevice()) {
-                Fueling::onEventFee($device, (array)$data['da']);
-            }
+        $device = Device::get($data['uid'], true);
+        if ($device && $device->isFuelingDevice()) {
+            Fueling::onEventFee($device, (array)$data['da']);
         }
     }
 }

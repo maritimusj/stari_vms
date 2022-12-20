@@ -416,19 +416,31 @@ class Fueling
             $device->setFuelingStatusData($chargerID, $data);
 
             //检查当前费用是否已经超出支付费用或卡余额
+            $should_stop_fueling = false;
             $total_price = intval($data['price_total']);
             if ($total_price) {
                 $pay_log = Pay::getPayLog($serial, LOG_FUELING_PAY);
                 if ($pay_log) {
                     if ($total_price > $pay_log->getTotal()) {
-                        self::stopFueling($device, $chargerID, $serial);
+                        $should_stop_fueling = true;
                     }
                 } else {
                     $order = Order::get($serial, true);
                     if ($order) {
-                        self::stopFueling($device, $chargerID, $serial);
+                        $user = $order->getUser();
+                        if (empty($user) || $user->isBanned()) {
+                            $should_stop_fueling = true;
+                        } else {
+                            $card = $user->getCommissionBalanceCard();
+                            if (empty($card) || $card->total() < $total_price) {
+                                $should_stop_fueling = true;
+                            }
+                        }
                     }
                 }
+            }
+            if ($should_stop_fueling) {
+                self::stopFueling($device, $chargerID, $serial);
             }
         }
     }

@@ -452,6 +452,10 @@ class Fueling
         $serial = strval($data['ser']);
         $chargerID = intval($data['ch']);
         self::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
+            
+            $total_price = intval($data['price_total']);
+            $order->setPrice($total_price);
+
             $order->setFuelingRecord($data);
         });
     }

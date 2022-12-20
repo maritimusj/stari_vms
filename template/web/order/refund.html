@@ -7,12 +7,12 @@
           </div>
         </div>
     </div>
-    {if $order['package']}
+    {if $order['way'] == 'money'}
     <div class="form-group">
         <label for="price" class="col-md-2 control-label">退款金额（元）：</label>
         <div class="col-md-10">
           <input type="number" class="form-control" id="price" name="price"  value="{$order['price']}" min="0.01" max="{$order['price']}" step="0.01" required>
-          <span class="help-block">* 请输入要退款的金额，范围：0.01 ~ {$order['price']}</span>
+          <span class="help-block">* 请输入要退款的金额，范围：0.01 ~ {$order['price']} 元</span>
         </div>
     </div>
     {else}
@@ -26,7 +26,7 @@
     {/if}
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10" style="text-align: right;">
-            {if $order['package']}
+            {if $order['way'] == 'money'}
             <button type="button" class="btn btn-primary" onclick="api.orderRefund2({$order['id']})">确定</button>
             {else}
             <button type="button" class="btn btn-primary" onclick="api.orderRefund({$order['id']})">确定</button>

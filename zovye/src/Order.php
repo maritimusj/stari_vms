@@ -386,6 +386,10 @@ class Order extends State
                 }
             }
 
+            if ($order->isFuelingOrder()) {
+                $cardUID = $order->getExtraData('card', '');
+            }
+
             $order_no = $order->getOrderNO();
 
             $pay_log = Pay::getPayLog($order_no);

@@ -262,7 +262,12 @@
                             {/if}
                         {elseif $order['src'] == \zovye\Order::FUELING ||  $order['src'] == \zovye\Order::FUELING_UNPAID}
                         <div class="transactionId" title="尿素加注订单">
-                            <img src="{MODULE_URL}static/img/fueling.svg" class="balance">{$order['orderId']}                   
+                            {if $order['fueling']['record']}
+                            <img src="{MODULE_URL}static/img/fueling.svg" class="balance">
+                            {else}
+                            <img src="{MODULE_URL}static/img/charger.svg" class="balance">
+                            {/if}
+                            {$order['orderId']}
                         </div>
                         {else}
                         {if $order['price']>0}    

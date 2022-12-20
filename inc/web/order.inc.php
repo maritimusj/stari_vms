@@ -315,6 +315,7 @@ if ($op == 'default') {
     }
 
     $data = [
+        'way' => 'num',
         'id' => $order->getId(),
         'num' => $order->getNum(),
         'price' => number_format($order->getPrice() / 100, 2),
@@ -322,8 +323,8 @@ if ($op == 'default') {
         'createtime' => date('Y-m-d H:i:s', $order->getCreatetime()),
     ];
 
-    if ($order->isPackage()) {
-        $data['package'] = $order->getPackageId();
+    if ($order->isPackage() || $order->isFuelingOrder()) {
+        $data['way'] = 'money';
     }
 
     $pay_result = $order->getExtraData('payResult');

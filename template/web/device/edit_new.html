@@ -653,15 +653,15 @@
                     <template v-if="config.is_fueling_device">
                         <div class="divider"></div>
                         <div class="form-group">
-                            <label class="col-xs-12 col-md-2 col-md-2 control-label">单机模式</label>
+                            <label class="col-xs-12 col-md-2 col-md-2 control-label">运行模式</label>
                             <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                                 <label for="solo0" class="radio-inline">
-                                    <input name="solo" id="solo0" type="radio" value="1" {if $extra['solo'] == 1}checked="checked"{/if} >
-                                    启用
+                                    <input name="solo" id="solo0" type="radio" value="0" {if empty($extra['solo'])}checked="checked"{/if} >
+                                    单机
                                 </label>
                                 <label for="solo1" class="radio-inline">
-                                    <input name="solo" id="solo1" type="radio" value="0"  {if empty($extra['solo'])}checked="checked"{/if} >
-                                    停用
+                                    <input name="solo" id="solo1" type="radio" value="1"  {if $extra['solo'] == 1}checked="checked"{/if} >
+                                    联网
                                 </label>
                                 <span class="help-block">* 是否启用单机模式</span>
                             </div>

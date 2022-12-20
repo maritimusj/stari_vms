@@ -133,7 +133,7 @@ class modelObj implements ISettings
      */
     public function removeSettings(string $key, string $sub): bool
     {
-        if ($key && $sub) {
+        if ($key && isset($sub)) {
             $data = $this->settings($key, []);
             unset($data[$sub]);
 

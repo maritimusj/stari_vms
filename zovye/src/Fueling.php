@@ -23,6 +23,17 @@ class Fueling
         ]);
     }
 
+    public static function config(deviceModelObj $device)
+    {
+        $config = $device->getFuelingConfig();
+        $result = $device->mcbNotify('config', '', $config);
+        if (!$result) {
+            return err('通知设备更新配置失败！');
+        }
+
+        return true;
+    }
+
     public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0)
     {
         return Util::transactionDo(function () use ($serial, $card, $device, $chargerID) {
@@ -175,20 +186,18 @@ class Fueling
             return err('设备正忙，请稍后再试！');
         }
 
-        $chargerID = $fueling_data['chargerID'];
+        $chargerID = intval($fueling_data['chargerID']);
 
         $fueling_data = $device->settings("fuelingNOW.$chargerID", []);
         if ($fueling_data && $fueling_data['user'] != $user->getId()) {
             return err('其他用户正在使用当前设备！');
         }
 
-        $serial = $fueling_data['serial'];
+        $serial = strval($fueling_data['serial']);
 
-        if (!$device->mcbNotify('stop', '', [
-            'ch' => $chargerID,
-            'ser' => $fueling_data['serial'],
-        ])) {
-            return err('设备通信失败，请重试！');
+        $result = self::stopFueling($device, $chargerID, $serial);
+        if (is_error($result)) {
+            return $result;
         }
 
         Job::fuelingStopTimeout($serial);
@@ -362,17 +371,6 @@ class Fueling
         }
 
         return ['message' => '正在查询状态！'];
-    }
-
-    public static function config(deviceModelObj $device)
-    {
-        $config = $device->getFuelingConfig();
-        $result = $device->mcbNotify('config', '', $config);
-        if (!$result) {
-            return err('通知设备更新配置失败！');
-        }
-
-        return true;
     }
 
     public static function onEventOnline(deviceModelObj $device)

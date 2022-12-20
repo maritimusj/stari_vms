@@ -58,21 +58,21 @@ class order
 
         $group = $order->getExtraData('group');
         if ($group) {
-            $data['group'] = $group;
-            $data['charging'] = $order->getExtraData('charging', []);
-            $data['charging']['chargerID'] = $order->getChargerID();
+            $result['group'] = $group;
+            $result['charging'] = $order->getExtraData('charging', []);
+            $result['charging']['chargerID'] = $order->getChargerID();
             if (!$order->isChargingFinished()) {
                 $device = $order->getDevice();
                 if ($device) {
                     $chargerID = $order->getChargerID();
-                    if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
-                        $data['charging']['status'] = $device->getChargerData($chargerID);
+                    if ($device->chargingNOWData($chargerID, 'serial') == $result['orderId']) {
+                        $result['charging']['status'] = $device->getChargerStatusData($chargerID);
                     }
                 }
             } else {
                 $timeout = $order->getExtraData('timeout', []);
                 if ($timeout) {
-                    $data['charging']['timeout'] = $timeout;
+                    $result['charging']['timeout'] = $timeout;
                 }
             }
         }
@@ -196,8 +196,8 @@ class order
                     $device = $entry->getDevice();
                     if ($device) {
                         $chargerID = $entry->getChargerID();
-                        if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
-                            $data['charging']['status'] = $device->getChargerData($chargerID);
+                        if ($device->chargingNOWData($chargerID, 'serial') == $data['orderId']) {
+                            $data['charging']['status'] = $device->getChargerStatusData($chargerID);
                         }
                     }
                 } else {
@@ -268,29 +268,5 @@ class order
             'pagesize' => $page_size,
             'total' => $total ?? 0,
         ];
-    }
-
-    public static function getExportIds(): array
-    {
-        $user = common::getAgentOrPartner();
-        $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
-
-        return \zovye\Order::getExportIDS([
-            'agent_openid' => $agent->getOpenid(),
-            'account_id' => request::int('accountId'),
-            'device_id' => request::str('deviceId'),//deviceId is imei
-            'last_id' => request::int('lastId'),
-            'start' => request::str('start'),
-            'end' => request::str('end'),
-        ]);
-    }
-
-    public static function export(): array
-    {
-        return \zovye\Order::export([
-            'headers' => request::array('headers', \zovye\Order::getExportHeaders(true)),
-            'uid' => request::trim('uid'),
-            'ids' => request::array('ids'),
-        ]);
     }
 }

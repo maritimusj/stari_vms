@@ -388,7 +388,7 @@ class deviceModelObj extends modelObj
 
     public function setChargerData($chargerID, array $data): bool
     {
-        $saved = $this->getChargerData($chargerID, []);
+        $saved = $this->getChargerStatusData($chargerID, []);
         $data = array_merge($saved, $data); 
         
         return $this->updateSettings("charger_$chargerID", $data);
@@ -414,7 +414,7 @@ class deviceModelObj extends modelObj
         return $this->settings("charger_$chargerID.$key", $defaultVal);
     }
 
-    public function getChargerData($chargerID): array
+    public function getChargerStatusData($chargerID): array
     {
         return $this->settings("charger_$chargerID", []);
     }
@@ -432,6 +432,25 @@ class deviceModelObj extends modelObj
     public function getChargerBMSData($chargerID): array
     {
         return $this->settings("chargerBMS.$chargerID", []);
+    }
+
+    public function setChargingNOWData(int $chargerID, $data): bool
+    {
+        return $this->updateSettings("chargingNOW.$chargerID", $data);
+    }
+
+    public function removeChargingNOWData(int $chargerID): bool
+    {
+        return $this->removeSettings('chargingNOW', $chargerID);
+    }
+
+    public function chargingNOWData(int $chargerID, string $key = '', $default = [])
+    {
+        $path = "chargingNOW.$chargerID";
+        if ($key) {
+            $path .= ".$key";
+        }
+        return $this->settings($path, $default);
     }
 
     /**
@@ -458,6 +477,25 @@ class deviceModelObj extends modelObj
     public function getFuelingStatusData($chargerID): array
     {
         return $this->settings("fuelingStatus.$chargerID", []);
+    }
+
+    public function setFuelingNOWData(int $chargerID, $data): bool
+    {
+        return $this->updateSettings("fuelingNOW.$chargerID", $data);
+    }
+
+    public function fuelingNOWData(int $chargerID, string $key = '', $default = [])
+    {
+        $path = "fuelingNOW.$chargerID";
+        if ($key) {
+            $path .= ".$key";
+        }
+        return $this->settings($path, $default);
+    }
+
+    public function removeFuelingNOWData(int $chargerID): bool
+    {
+        return $this->removeSettings('fuelingNOW', $chargerID);
     }
 
     public function setDeviceModel($model)

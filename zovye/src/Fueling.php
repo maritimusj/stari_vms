@@ -60,7 +60,7 @@ class Fueling
 
             $user = $card->getOwner();
 
-            $device_fueling_data = $device->settings("fuelingNOW.$chargerID", []);
+            $device_fueling_data = $device->fuelingNOWData($chargerID);
             if ($device_fueling_data) {
                 if ($device_fueling_data['user'] != $user->getId()) {
                     return err('设备正忙，请稍后再试！');
@@ -127,7 +127,7 @@ class Fueling
                 return err('创建订单失败！');
             }
 
-            if (!$device->updateSettings("fuelingNOW.$chargerID", [
+            if (!$device->setFuelingNOWData($chargerID, [
                 'serial' => $serial,
                 'user' => $user->getId(),
                 'time' => TIMESTAMP,
@@ -135,7 +135,7 @@ class Fueling
                 return err('保存数据失败！');
             }
 
-            if (!$user->updateSettings('fuelingNOW', [
+            if (!$user->setFuelingNOWData([
                 'serial' => $serial,
                 'device' => $device->getId(),
                 'chargerID' => $chargerID,
@@ -171,7 +171,7 @@ class Fueling
             return err('用户锁定失败，请稍后再试！');
         }
 
-        $fueling_data = $user->settings('fuelingNOW', []);
+        $fueling_data = $user->fuelingNOWData();
 
         if (isEmptyArray($fueling_data)) {
             return err('没有发现正在加注的设备！');
@@ -188,7 +188,7 @@ class Fueling
 
         $chargerID = intval($fueling_data['chargerID']);
 
-        $fueling_data = $device->settings("fuelingNOW.$chargerID", []);
+        $fueling_data = $device->fuelingNOWData($chargerID);
         if ($fueling_data && $fueling_data['user'] != $user->getId()) {
             return err('其他用户正在使用当前设备！');
         }
@@ -280,8 +280,8 @@ class Fueling
                 return err('设备正忙，请稍后再试！');
             }
 
-            if ($device->settings("fuelingNOW.$chargerID.serial", '') == $serial) {
-                $device->removeSettings('fuelingNOW', $chargerID);
+            if ($device->fuelingNOWData($chargerID, 'serial', '') == $serial) {
+                $device->removeFuelingNOWData($chargerID);
             }
 
             $user = $order->getUser();
@@ -293,8 +293,8 @@ class Fueling
                 return err('用户锁定失败，请稍后再试！');
             }
 
-            if ($user->settings('fuelingNOW.serial', '') == $serial) {
-                $user->remove('fuelingNOW');
+            if ($user->fuelingNOWData('serial', '') == $serial) {
+                $user->removeFuelingNOWData();
             }
 
             if ($cb != null) {
@@ -311,7 +311,7 @@ class Fueling
 
             if (!$res) {
                 Log::error('fueling', [
-                    'err' => '计费确认失败：设备通讯失败！'
+                    'err' => '计费确认失败：设备通讯失败！',
                 ]);
             }
 
@@ -401,6 +401,7 @@ class Fueling
         $order = Order::get($serial, true);
         if ($order) {
             $order->setFuelingResult($data);
+
             return $order->save();
         }
 
@@ -428,7 +429,7 @@ class Fueling
                     if ($order) {
                         $order->setPrice($total_price);
                         $order->save();
-                        
+
                         $user = $order->getUser();
                         if (empty($user) || $user->isBanned()) {
                             $should_stop_fueling = true;
@@ -452,7 +453,7 @@ class Fueling
         $serial = strval($data['ser']);
         $chargerID = intval($data['ch']);
         self::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
-            
+
             $total_price = intval($data['price_total']);
             $order->setPrice($total_price);
 

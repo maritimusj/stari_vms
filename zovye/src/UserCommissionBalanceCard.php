@@ -50,14 +50,14 @@ class UserCommissionBalanceCard implements ICard
         }
 
         if (App::isChargingDeviceEnabled()) {
-            $user_charging_data = $owner->settings('chargingNOW', []);
+            $user_charging_data = $owner->chargingNOWData();
             if ($user_charging_data) {
                 return false;
             }
         }
 
         if (App::isFuelingDeviceEnabled()) {
-            $user_fueling_data = $owner->settings('fuelingNOW', []);
+            $user_fueling_data = $owner->fuelingNOWData();
             if ($user_fueling_data) {
                 return false;
             }

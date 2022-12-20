@@ -128,15 +128,14 @@ class modelObj implements ISettings
     /**
      * 删除指定的settings值
      * @param string $key
-     * @param string $sub
+     * @param mixed $sub
      * @return bool
      */
-    public function removeSettings(string $key, string $sub): bool
+    public function removeSettings(string $key, $sub): bool
     {
         if ($key && isset($sub)) {
             $data = $this->settings($key, []);
             unset($data[$sub]);
-
             return $this->updateSettings($key, $data);
         }
 

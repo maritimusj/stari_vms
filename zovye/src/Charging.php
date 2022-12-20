@@ -42,7 +42,7 @@ class Charging
                 return err('设备类型不正确！');
             }
 
-            $data = $device->getChargerData($chargerID);
+            $data = $device->getChargerStatusData($chargerID);
             if (empty($data)) {
                 return err('充电枪不存在！');
             }
@@ -62,7 +62,7 @@ class Charging
 
             $user = $card->getOwner();
 
-            $device_charging_data = $device->settings("chargingNOW.$chargerID", []);
+            $device_charging_data = $device->chargingNOWData($chargerID);
             if ($device_charging_data) {
                 if ($device_charging_data['user'] != $user->getId()) {
                     return err('设备正忙，请稍后再试！');
@@ -82,7 +82,7 @@ class Charging
                 return err('请等待订单结算完成后再试！');
             }
 
-            $user_charging_data = $user->settings('chargingNOW', []);
+            $user_charging_data = $user->chargingNOWData();
             if ($user_charging_data) {
                 return err('用户卡正在使用中，请稍后再试！');
             }
@@ -143,7 +143,7 @@ class Charging
 
             $device->setChargerBMSData($chargerID, []);
 
-            if (!$device->updateSettings("chargingNOW.$chargerID", [
+            if (!$device->setChargingNOWData($chargerID, [
                 'serial' => $serial,
                 'user' => $user->getId(),
                 'time' => TIMESTAMP,
@@ -151,7 +151,7 @@ class Charging
                 return err('保存数据失败！');
             }
 
-            if (!$user->updateSettings('chargingNOW', [
+            if (!$user->setChargingNOWData([
                 'serial' => $serial,
                 'device' => $device->getId(),
                 'chargerID' => $chargerID,
@@ -186,7 +186,7 @@ class Charging
             return err('用户锁定失败，请稍后再试！');
         }
 
-        $last_charging_data = $user->settings('chargingNOW', []);
+        $last_charging_data = $user->chargingNOWData();
 
         if (isEmptyArray($last_charging_data)) {
             return err('没有发现正在充电的设备！');
@@ -203,7 +203,7 @@ class Charging
 
         $chargerID = $last_charging_data['chargerID'];
 
-        $last_charging_data = $device->settings("chargingNOW.$chargerID", []);
+        $last_charging_data = $device->chargingNOWData($chargerID);
         if ($last_charging_data && $last_charging_data['user'] != $user->getId()) {
             return err('其他用户正在使用当前设备！');
         }
@@ -325,7 +325,7 @@ class Charging
         }
 
         $chargerID = $order->getChargerID();
-        $status = $device->getChargerData($chargerID);
+        $status = $device->getChargerStatusData($chargerID);
 
         $group = $device->getGroup();
         if ($group) {
@@ -354,8 +354,8 @@ class Charging
                 return err('设备正忙，请稍后再试！');
             }
 
-            if ($device->settings("chargingNOW.$chargerID.serial", '') == $serial) {
-                $device->removeSettings('chargingNOW', $chargerID);
+            if ($device->chargingNOWData($chargerID, 'serial', '') == $serial) {
+                $device->removeChargingNOWData($chargerID);
             }
 
             $user = $order->getUser();
@@ -367,8 +367,8 @@ class Charging
                 return err('用户锁定失败，请稍后再试！');
             }
 
-            if ($user->settings('chargingNOW.serial', '') == $serial) {
-                $user->remove('chargingNOW');
+            if ($user->chargingNOWData('serial', '') == $serial) {
+                $user->removeFuelingNOWData();
             }
 
             if ($cb != null) {
@@ -479,7 +479,7 @@ class Charging
 
     public static function checkCharging(deviceModelObj $device, $chargerID)
     {
-        $charging_data = $device->settings("chargingNOW.$chargerID", []);
+        $charging_data = $device->chargingNOWData($chargerID);
         if ($charging_data) {
 
             $serial = $charging_data['serial'] ?? '';
@@ -490,7 +490,7 @@ class Charging
                 if ($res && !is_error($res) && isset($res['totalPrice'])) {
                     Charging::settle($serial, $chargerID, $res);
                 } else {
-                    $chargerData = $device->getChargerData($chargerID);
+                    $chargerData = $device->getChargerStatusData($chargerID);
                     if ($chargerData && $chargerData['status'] == 2) {
                         Charging::end($serial, $chargerID, function ($order) {
                             if (!$order->getChargingRecord()) {
@@ -505,11 +505,11 @@ class Charging
             } else {
                 $user = User::get($charging_data['user']);
                 if ($user) {
-                    if ($user->settings('chargingNOW.serial', '') == $serial) {
-                        $user->remove('chargingNOW');
+                    if ($user->chargingNOWData('serial', '') == $serial) {
+                        $user->removeChargingNOWData();
                     }
                 }
-                $device->updateSettings("chargingNOW.$chargerID", []);
+                $device->removeChargingNOWData($chargerID);
             }
         }
     }

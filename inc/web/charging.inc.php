@@ -265,7 +265,7 @@ if ($op == 'default') {
     };
 
     for ($i = 0; $i < $chargerNum; $i++) {
-        $chargerData = $device->getChargerData($i + 1);
+        $chargerData = $device->getChargerStatusData($i + 1);
 
         $data = [
             'status' => 'unknown',

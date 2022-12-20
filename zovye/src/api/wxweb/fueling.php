@@ -88,7 +88,7 @@ class fueling
 
         $chargerID = request::int('chargerID');
 
-        $charging_data = $device->settings("fuelingNOW.$chargerID");
+        $charging_data = $device->fuelingNOWData($chargerID);
         if (!empty($charging_data)) {
             return err('设备正在使用中！');
         }

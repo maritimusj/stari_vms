@@ -729,43 +729,60 @@ class Order extends State
             $data['agent'] = [];
             $data['device'] = [];
 
-            $goods = $order->getExtraData('goods');
-            if (!empty($goods)) {
-                $data['goods'] = $goods;
-                $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
-                $goods = Goods::get($data['goods']['id']);
-                if ($goods) {
-                    $data['goods']['extra'] = $goods->getAppendage();
-                }
-            } else {
-                $package = $order->getExtraData('package');
-                if ($package) {
-                    $data['package'] = $package;
-                    foreach ($data['package']['list'] as $index => $goods) {
-                        $data['package']['list'][$index]['image'] = Util::toMedia($goods['image'], true);
-                        $goods = Goods::get($goods['id']);
-                        if ($goods) {
-                            $data['package']['list'][$index]['extra'] = $goods->getAppendage();
+            if ($order->isChargingOrder()) {
+                $group = $order->getExtraData('group');
+                if ($group) {
+                    $data['group'] = $group;
+                    $data['charging'] = $order->getExtraData('charging', []);
+                    $data['charging']['chargerID'] = $order->getChargerID();
+                    if (!$order->isChargingFinished()) {
+                        $device = $order->getDevice();
+                        if ($device) {
+                            $chargerID = $order->getChargerID();
+                            if ($device->chargingNOWData($chargerID, 'serial') == $data['orderId']) {
+                                $data['charging']['status'] = $device->getChargerStatusData($chargerID);
+                            }
+                        }
+                    } else {
+                        $timeout = $order->getExtraData('timeout', []);
+                        if ($timeout) {
+                            $data['charging']['timeout'] = $timeout;
                         }
                     }
+                }
+            } elseif ($order->isFuelingOrder()) {
+                $goods = $order->getExtraData('goods');
+                $data['goods'] = $goods;
+                $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
+                $data['fueling'] = $order->getExtraData('fueling', []);
+                $data['fueling']['chargerID'] = $order->getChargerID();
+                if (!$order->isFuelingFinished()) {
+                    $device = $order->getDevice();
+                    if ($device) {
+                        $chargerID = $order->getChargerID();
+                        if ($device->fuelingNOWData($chargerID, 'serial') == $data['orderId']) {
+                            $data['fueling']['status'] = $device->getFuelingStatusData($chargerID);
+                        }
+                    }
+                }
+            } else {
+                $goods = $order->getExtraData('goods');
+                if (!empty($goods)) {
+                    $data['goods'] = $goods;
+                    $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);
+                    $goods = Goods::get($data['goods']['id']);
+                    if ($goods) {
+                        $data['goods']['extra'] = $goods->getAppendage();
+                    }
                 } else {
-                    $group = $order->getExtraData('group');
-                    if ($group) {
-                        $data['group'] = $group;
-                        $data['charging'] = $order->getExtraData('charging', []);
-                        $data['charging']['chargerID'] = $order->getChargerID();
-                        if (!$order->isChargingFinished()) {
-                            $device = $order->getDevice();
-                            if ($device) {
-                                $chargerID = $order->getChargerID();
-                                if ($device->settings("chargingNOW.$chargerID.serial") == $data['orderId']) {
-                                    $data['charging']['status'] = $device->getChargerData($chargerID);
-                                }
-                            }
-                        } else {
-                            $timeout = $order->getExtraData('timeout', []);
-                            if ($timeout) {
-                                $data['charging']['timeout'] = $timeout;
+                    $package = $order->getExtraData('package');
+                    if ($package) {
+                        $data['package'] = $package;
+                        foreach ($data['package']['list'] as $index => $goods) {
+                            $data['package']['list'][$index]['image'] = Util::toMedia($goods['image'], true);
+                            $goods = Goods::get($goods['id']);
+                            if ($goods) {
+                                $data['package']['list'][$index]['extra'] = $goods->getAppendage();
                             }
                         }
                     }

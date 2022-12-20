@@ -294,7 +294,7 @@ class orderModelObj extends modelObj
 
     public function isChargingOrder(): bool
     {
-        return !empty($this->getExtraData('charging'));
+        return $this->src == Order::CHARGING || $this->src == Order::CHARGING_UNPAID;
     }
 
     public function isChargingFinished(): bool
@@ -396,6 +396,11 @@ class orderModelObj extends modelObj
             'orderNO' => $this->getOrderNO(),
             'createtime' => $this->getCreatetime(),
         ];
+    }
+
+    public function isFuelingOrder(): bool
+    {
+        return $this->src == Order::FUELING || $this->src == Order::FUELING_UNPAID;
     }
 
     /**

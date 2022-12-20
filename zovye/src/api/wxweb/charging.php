@@ -40,7 +40,7 @@ class charging
         }
 
         if (App::isChargingDeviceEnabled()) {
-            $last_charging_data = $user->settings('chargingNOW', []);
+            $last_charging_data = $user->chargingNOWData();
             if ($last_charging_data) {
                 $device = Device::get($last_charging_data['device']);
                 if ($device) {
@@ -182,7 +182,7 @@ class charging
             $data['charger'] = [];
             $chargerNum = $device->getChargerNum();
             for ($i = 0; $i < $chargerNum; $i++) {
-                $data['charger'][] = $device->getChargerData($i + 1);
+                $data['charger'][] = $device->getChargerStatusData($i + 1);
             }
 
             $list[] = $data;
@@ -208,7 +208,7 @@ class charging
 
         if (request::has('chargerID')) {
             $chargerID = request::int('chargerID');
-            $result['charger'] = $device->getChargerData($chargerID);
+            $result['charger'] = $device->getChargerStatusData($chargerID);
             $result['charger']['index'] = $chargerID;
         }
 
@@ -258,7 +258,7 @@ class charging
     public static function status(): array
     {
         $user = common::getWXAppUser();
-        $last_charging_data = $user->settings('chargingNOW', []);
+        $last_charging_data = $user->chargingNOWData();
 
         if (isEmptyArray($last_charging_data)) {
             return err('没有发现正在充电的设备！');
@@ -352,7 +352,7 @@ class charging
 
         $chargerID = request::int('chargerID');
 
-        $charging_data = $device->settings("chargingNOW.$chargerID");
+        $charging_data = $device->chargingNOWData($chargerID);
         if (!empty($charging_data)) {
             return err('充电枪正在使用中！');
         }

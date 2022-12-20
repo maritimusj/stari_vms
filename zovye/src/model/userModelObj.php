@@ -1038,4 +1038,42 @@ class userModelObj extends modelObj
 
         return false;
     }
+
+    public function setChargingNOWData($data): bool
+    {
+        return $this->updateSettings('chargingNOW', $data);
+    }
+
+    public function chargingNOWData(string $key = '', $default = [])
+    {
+        $path = 'chargingNOW';
+        if ($key) {
+            $path .= ".$key";
+        }
+        return $this->settings($path, $default);
+    }
+
+    public function removeChargingNOWData(): bool
+    {
+        return $this->remove('chargingNOW');
+    }
+
+    public function setFuelingNOWData($data): bool
+    {
+        return $this->updateSettings('fuelingNOW', $data);
+    }
+
+    public function fuelingNOWData(string $key = '', $default = [])
+    {
+        $path = 'fuelingNOW';
+        if ($key) {
+            $path .= ".$key";
+        }
+        return $this->settings($path, $default);
+    }
+
+    public function removeFuelingNOWData(): bool
+    {
+        return $this->remove('fuelingNOW');
+    }
 }

@@ -146,7 +146,7 @@ class device
             $result['charger'] = [];
             $chargerNum = $device->getChargerNum();
             for ($i = 0; $i < $chargerNum; $i++) {
-                $charging_data = $device->getChargerData($i + 1);
+                $charging_data = $device->getChargerStatusData($i + 1);
                 $result['charger'][] = [
                     'status' => $charging_data['status'],
                     'soc' => $charging_data['soc'],

@@ -415,9 +415,7 @@
                         </div>
                         {/if}
                         <!--充电订单结束-->
-                        {if $order['src'] == \zovye\Order::FUELING ||  $order['src'] == \zovye\Order::FUELING_UNPAID}
-                        
-                        {/if}
+
                         <!--加注订单开始-->
                         <!--加注订单结束-->
                         <!--普通订单开始-->
@@ -484,6 +482,16 @@
                                     {/if}
                                 {/if}
                                 {/if}
+
+                                {if $order['src'] == \zovye\Order::FUELING ||  $order['src'] == \zovye\Order::FUELING_UNPAID}
+                                    {if $order['fueling']['result']['re'] != 3}
+                                    <span>
+                                        <i class="fa fa-info-circle" title="{if $order['fueling']['result']['re'] == 9}正在使用中{else}其它故障[ {php echo $order['fueling']['result']['re']} ]{/if}"
+                                        ></i>
+                                    </span>
+                                    {/if}
+                                {/if}
+
                             <!-- 佣金详情开始 -->
                             {if $order['commission']}
                             <div class="commission_detail local">

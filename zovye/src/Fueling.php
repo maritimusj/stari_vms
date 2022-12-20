@@ -507,6 +507,7 @@ class Fueling
                             'user' => $user,
                             'order' => $order,
                         ]);
+                        $order->save();
                     } catch (Exception $e) {
                         Log::error('fueling', [
                             'error' => '用户订单创建事件处理异常！',

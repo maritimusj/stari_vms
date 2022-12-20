@@ -1692,7 +1692,7 @@ HTML_CONTENT;
             if (!$device->isMcbOnline()) {
                 return err('设备不在线！');
             }
-            if (Fueling::test($device, 1000)) {
+            if (Fueling::test($device, 100)) {
                 return ['message' => '已发送测试请求！'];
             }
             return err('请求失败！');

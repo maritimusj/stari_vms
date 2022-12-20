@@ -428,6 +428,8 @@ class Fueling
                     $order = Order::get($serial, true);
                     if ($order) {
                         $order->setPrice($total_price);
+                        $amount = intval($data['amount']);
+                        $order->setNum($amount);
                         $order->save();
 
                         $user = $order->getUser();
@@ -456,6 +458,9 @@ class Fueling
 
             $total_price = intval($data['price_total']);
             $order->setPrice($total_price);
+            
+            $amount = intval($data['amount']);
+            $order->setNum($amount);
 
             $order->setFuelingRecord($data);
         });

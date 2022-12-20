@@ -712,6 +712,7 @@ class Order extends State
         $userCharacter = User::getUserCharacter($order->getOpenid());
         $data = [
             'id' => $order->getId(),
+            'src' => $order->getSrc(),
             'num' => $order->getNum(),
             'price' => number_format($order->getPrice() / 100, 2),
             'discount' => number_format($order->getDiscount() / 100, 2),

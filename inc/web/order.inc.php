@@ -81,6 +81,8 @@ if ($op == 'default') {
         $query->where(['src' => Order::BALANCE]);
     }  elseif ($way == 'charging') {
         $query->where(['src' => [Order::CHARGING, Order::CHARGING_UNPAID]]);
+    }   elseif ($way == 'fueling') {
+        $query->where(['src' => [Order::FUELING, Order::FUELING_UNPAID]]);
     } elseif ($way == 'refund') {
         $query->where(['refund' => 1]);
         if (App::isBalanceEnabled() && Balance::isFreeOrder()) {

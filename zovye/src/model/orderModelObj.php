@@ -480,8 +480,8 @@ class orderModelObj extends modelObj
             return true;
         }
 
-        $record = $this->getChargingRecord();
-        if ($record && isset($record['totalPrice'])) {
+        $record = $this->getFuelingRecord();
+        if ($record && isset($record['price_total'])) {
             return true;
         }
 

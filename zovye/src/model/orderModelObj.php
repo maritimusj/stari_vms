@@ -317,7 +317,7 @@ class orderModelObj extends modelObj
 
     public function getChargerID()
     {
-        return $this->getExtraData('chargingID', 0);
+        return $this->getExtraData('chargerID', 0);
     }
 
     public function getPullSerialNO()

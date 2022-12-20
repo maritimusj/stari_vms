@@ -713,6 +713,7 @@ class Order extends State
         $data = [
             'id' => $order->getId(),
             'src' => $order->getSrc(),
+            'type' => 'normal',
             'num' => $order->getNum(),
             'price' => number_format($order->getPrice() / 100, 2),
             'discount' => number_format($order->getDiscount() / 100, 2),
@@ -731,6 +732,7 @@ class Order extends State
             $data['device'] = [];
 
             if ($order->isChargingOrder()) {
+                $data['type'] = 'charing';
                 $group = $order->getExtraData('group');
                 if ($group) {
                     $data['group'] = $group;
@@ -752,6 +754,8 @@ class Order extends State
                     }
                 }
             } elseif ($order->isFuelingOrder()) {
+                $data['type'] = 'fueling';
+                $data['num'] = number_format($data['num'] / 100, 2, '.', '');
                 $goods = $order->getExtraData('goods');
                 $data['goods'] = $goods;
                 $data['goods']['img'] = Util::toMedia($data['goods']['img'], true);

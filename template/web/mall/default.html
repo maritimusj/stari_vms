@@ -85,6 +85,13 @@
         <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'charging'));}">充电</a></li>
         {/if}
     {/if}
+    {if \zovye\App::isFuelingDeviceEnabled()}
+    {if $s_way=='charging'}
+    <li role="presentation" class="active"><a href="#">加注</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'fueling'));}">加注</a></li>
+    {/if}
+{/if}
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'refund'));}">退款</a></li>
     <li role="presentation"><a href="{php echo $this->createWebUrl('order', array('way' => 'except'));}">异常</a></li>
 </ul>

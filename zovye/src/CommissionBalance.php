@@ -35,6 +35,8 @@ class CommissionBalance extends State
     const CHARGING_SERVICE_FEE = 21;
     const CHARGING_ELECTRIC_FEE = 22;
 
+    const FUELING_FEE = 30;
+
     const TRANSFER_OUT = 50;
     const TRANSFER_RECEIVED = 51;
 
@@ -57,6 +59,7 @@ class CommissionBalance extends State
         self::CHARGING_FEE => '充电桩订单结算',
         self::CHARGING_SERVICE_FEE => '充电桩订单(服务费)',
         self::CHARGING_ELECTRIC_FEE => '充电桩订单(电费)',
+        self::FUELING_FEE => '尿素加注订单结算',
         self::TRANSFER_OUT => '转账给用户',
         self::TRANSFER_RECEIVED => '收到转账',
     ];
@@ -336,6 +339,27 @@ CHARGING;
 <dt>订单</dt>
 <dd class="event">$order_info</dd>
 $group_info
+$device_info
+</dl>
+CHARGING;
+        } elseif ($entry->getSrc() == CommissionBalance::FUELING_FEE) {
+            $order_id = $entry->getExtraData('orderid');
+            $order = Order::get($order_id);
+            $order_info = '';
+            $device_info = '';
+            if ($order) {
+                $order_info = $order->getOrderNO();
+                $device = $order->getDevice();
+                if ($device) {
+                    $device_info = "<dt>设备</dt><dd class=\"admin\">{$device->getName()}</dd>";
+                }
+            }
+            $data['memo'] = <<<CHARGING
+<dl class="log dl-horizontal">
+<dt>事件</dt>
+<dd class="event">尿素加注订单结算</dd>
+<dt>订单</dt>
+<dd class="event">$order_info</dd>
 $device_info
 </dl>
 CHARGING;

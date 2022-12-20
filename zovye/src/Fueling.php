@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use Exception;
 use zovye\Contract\ICard;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
@@ -34,6 +35,18 @@ class Fueling
         return true;
     }
 
+    public static function confirm(deviceModelObj $device, string $serial)
+    {
+        $res = $device->mcbNotify('confirm', '', [
+            'ser' => $serial,
+        ]);
+
+        if (!$res) {
+            return err('计费确认失败：设备通讯失败！');
+        }
+
+        return true;
+    }
     public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0)
     {
         return Util::transactionDo(function () use ($serial, $card, $device, $chargerID) {
@@ -305,16 +318,6 @@ class Fueling
                 return err('保存数据失败！');
             }
 
-            $res = $device->mcbNotify('confirm', '', [
-                'ser' => $serial,
-            ]);
-
-            if (!$res) {
-                Log::error('fueling', [
-                    'err' => '计费确认失败：设备通讯失败！',
-                ]);
-            }
-
             return true;
         });
     }
@@ -454,16 +457,67 @@ class Fueling
     {
         $serial = strval($data['ser']);
         $chargerID = intval($data['ch']);
-        self::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
+
+        self::end($serial, $chargerID, function (orderModelObj $order) use ($device, $serial, $data) {
+            $order->setSrc(Order::FUELING);
 
             $total_price = intval($data['price_total']);
             $order->setPrice($total_price);
-            
+
             $amount = intval($data['amount']);
             $order->setNum($amount);
 
             $order->setFuelingRecord($data);
+
+            $result = self::confirm($device, $serial);
+            if (is_error($result)) {
+                Log::error('fueling', [
+                    'confirm' => $result,
+                ]);
+            }
         });
+
+        $order = Order::findOne(['order_no' => $serial, 'src' => Order::FUELING]);
+        if ($order && Locker::try($serial)) {
+            $user = $order->getUser();
+            $pay_log = Pay::getPayLog($serial);
+            if ($pay_log) {
+                $remain = $pay_log->getPrice() - $order->getPrice();
+                if ($remain > 0) {
+                    Job::refund($serial, '订单结算退款');
+                }
+            } else {
+                //扣除用户账户金额
+                if ($order->getPrice() > 0) {
+                    $balance = $user->getCommissionBalance();
+                    $extra = [
+                        'orderid' => $order->getId(),
+                        'serial' => $serial,
+                        'chargerID' => $chargerID,
+                    ];
+                    if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
+                        Log::error('fueling', [
+                            'error' => '用户扣款失败！',
+                            'data' => $extra,
+                        ]);
+                    }
+                }
+            }
+
+            //事件：订单已经创建
+            try {
+                EventBus::on('device.orderCreated', [
+                    'device' => $device,
+                    'user' => $user,
+                    'order' => $order,
+                ]);
+            } catch (Exception $e) {
+                Log::error('fueling', [
+                    'error' => '用户订单创建事件处理异常！',
+                    'data' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     public static function hasUnpaidOrder(userModelObj $user): bool

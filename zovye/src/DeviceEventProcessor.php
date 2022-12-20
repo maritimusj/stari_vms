@@ -664,10 +664,10 @@ class DeviceEventProcessor
                 }
             } else {
                 $extra = (array)$data['extra'];
-                if ($device->isChargingDevice() && App::isChargingDeviceEnabled()) {
+                if ($device->isChargingDevice()) {
                     Charging::onEventResult($device, $extra);
                 }
-                if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+                if ($device->isFuelingDevice()) {
                     Fueling::onEventResult($device, $extra);
                 }
             }
@@ -863,7 +863,7 @@ class DeviceEventProcessor
     {
         $device = Device::get($data['uid'], true);
         if ($device && $device->isFuelingDevice()) {
-            Fueling::onEventFee($device, (array)$data['da']);
+            Fueling::onEventFee($device, (array)$data['extra']);
         }
     }
 }

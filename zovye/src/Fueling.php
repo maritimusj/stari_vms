@@ -111,7 +111,7 @@ class Fueling
                     ],
                     'goods' => $goods,
                     'user' => $user->profile(),
-                    'chargingID' => $chargerID,
+                    'chargerID' => $chargerID,
                     'card' => $card->getUID(),
                     'cardType' => $card->getTypename(),
                 ],
@@ -400,8 +400,7 @@ class Fueling
         /** @var orderModelObj $order */
         $order = Order::get($serial, true);
         if ($order) {
-            $order->setChargingResult($data);
-
+            $order->setFuelingResult($data);
             return $order->save();
         }
 
@@ -427,6 +426,9 @@ class Fueling
                 } else {
                     $order = Order::get($serial, true);
                     if ($order) {
+                        $order->setPrice($total_price);
+                        $order->save();
+                        
                         $user = $order->getUser();
                         if (empty($user) || $user->isBanned()) {
                             $should_stop_fueling = true;

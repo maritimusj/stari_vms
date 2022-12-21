@@ -71,7 +71,7 @@ class Fueling
                 return err('没有指定商品信息！');
             }
 
-            if ($goods['num'] < 1) {
+            if ($goods['num'] < 100) {
                 return err('商品库存不足！');
             }
 

@@ -54,13 +54,17 @@ class fueling
 
         $fuelingNOWData = $user->fuelingNOWData();
         if ($fuelingNOWData) {
-            $profile['fueling'] = $fuelingNOWData;
+            $profile['fueling'] = [
+                'serial' => $fuelingNOWData['serial'],
+            ];
         }
 
         $chargerID = request::int('chargerID');
         $deviceFuelingNOWData = $device->fuelingNOWData($chargerID);
         if ($deviceFuelingNOWData && $deviceFuelingNOWData['user'] != $user->getId()) {
-            $profile['fueling']['error'] = '设备正在使用中!';
+            $profile['fueling'] = [
+                'error' =>  '设备正在使用中!',
+            ];
         }
 
         $goods = $device->getGoodsByLane($chargerID);

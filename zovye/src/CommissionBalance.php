@@ -6,6 +6,7 @@
 
 namespace zovye;
 
+use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;
 use zovye\model\commission_balanceModelObj;
 
@@ -361,9 +362,9 @@ CHARGING;
                     $goods_info = "<dt>商品</dt><dd class=\"admin\">{$goods['name']} x <span style='color:#2196f3;'>{$num}</span>{$goods['unit_title']}</dd>";
                 }
                 $card_type = $order->getExtraData('card.type');
-                if ($card_type == 'commission_balance') {
+                if ($card_type == UserCommissionBalanceCard::getTypename()) {
                     $pay_type = "<dt>支付方式</dt><dd class=\"admin\">余额支付</dd>";
-                } elseif ($card_type == 'pay_log') {
+                } elseif ($card_type == pay_logsModelObj::getTypename()) {
                     $pay_type = "<dt>支付方式</dt><dd class=\"admin\">现金支付</dd>";
                 }
             }

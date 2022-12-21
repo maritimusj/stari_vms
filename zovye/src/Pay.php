@@ -352,12 +352,12 @@ class Pay
             return $pay;
         }
 
-        $price = $pay_log->getPrice();
-        if ($total < 1 || $total > $price) {
-            $total = $price;
+        $price_total = $pay_log->getPrice();
+        if ($total < 1 || $total > $price_total) {
+            $total = $price_total;
         }
 
-        $res = $pay->refund($order_no, $total);
+        $res = $pay->refund($order_no, $price_total, $total);
         if (is_error($res)) {
             $pay_log->setData('refund_fail', ['result' => $res]);
             $pay_log->save();

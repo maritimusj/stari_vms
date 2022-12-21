@@ -236,7 +236,12 @@ JS_CODE;
     {
         $wx = $this->getWx();
 
-        return $wx->refund($order_no, $total, $is_transaction_id);
+        $res = $this->query($order_no);
+        if (is_error($res)) {
+            return $res;
+        }
+
+        return $wx->refund($order_no, $res['total'], $total, $is_transaction_id);
     }
 
     public function query(string $order_no)

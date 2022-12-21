@@ -21,12 +21,16 @@ class pay
         $this->config = $config;
     }
 
-    public function refund($no, $total, $is_transaction_id = false)
+    public function refund($no, $total, $refund_val = 0, $is_transaction_id = false)
     {
+        if (empty($refund_val)) {
+            $refund_val = $total;
+        }
+
         $out_refund_no = Util::random(32);
         $data = [
             'total_fee' => $total,
-            'refund_fee' => $total,
+            'refund_fee' => $refund_val,
             'out_refund_no' => $out_refund_no,
         ];
         if ($is_transaction_id) {

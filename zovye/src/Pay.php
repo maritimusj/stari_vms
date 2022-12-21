@@ -357,11 +357,10 @@ class Pay
             $total = $price_total;
         }
 
-        $res = $pay->refund($order_no, $price_total, $total);
+        $res = $pay->refund($order_no, $total);
         if (is_error($res)) {
             $pay_log->setData('refund_fail', ['result' => $res]);
             $pay_log->save();
-
             return $res;
         }
 

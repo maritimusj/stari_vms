@@ -241,7 +241,7 @@ JS_CODE;
             return $res;
         }
 
-        return $wx->refund($order_no, $res['total'], $total, $is_transaction_id);
+        return $wx->refund($order_no, intval($res['total']), $total, $is_transaction_id);
     }
 
     public function query(string $order_no)

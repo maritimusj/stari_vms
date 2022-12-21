@@ -19,6 +19,8 @@ namespace zovye;
  * @method static cztv(string $key, $v = '', $update = false)
  * @method static douyin(string $key, $v = '', $update = false)
  * @method static wxplatform(string $key, $v = '', $update = false)
+ * @method static notify(string $key, $v = '', $update = false)
+ * @method static donatePay(string $key, $v = '', $update = false)
  */
 class Config
 {

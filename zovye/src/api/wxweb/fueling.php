@@ -7,6 +7,7 @@
 namespace zovye\api\wxweb;
 
 use zovye\api\wx\common;
+use zovye\Config;
 use zovye\Device;
 use zovye\Helper;
 use zovye\model\deviceModelObj;
@@ -19,7 +20,6 @@ use function zovye\err;
 
 class fueling
 {
-
     protected static function isVIP(userModelObj $user, deviceModelObj $device): bool
     {
         $agent = $device->getAgent();
@@ -30,6 +30,10 @@ class fueling
         }
 
         return false;
+    }
+
+    public static function rechargeInfo() {
+        return Config::fueling('vip.recharge', []);
     }
 
     /**

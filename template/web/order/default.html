@@ -58,6 +58,10 @@
     #orderlist .fee {
         color: #4caf50;
     }
+    #orderlist .icon.big {
+        width: 32px;
+        height: 32px;
+    }
     #orderlist .price {
         font-weight: bolder;
     }
@@ -251,7 +255,7 @@
                 <tr data-id="{$order['id']}" {if $order['result'] && isset($order['result']['errno']) && $order['result']['errno'] != 0}class="failed"{/if}>
                     <td>{php echo $index + 1}</td>
                     <td>
-                        {if $order['src'] == \zovye\Order::CHARGING ||  $order['src'] == \zovye\Order::CHARGING_UNPAID}
+                        {if $order['type'] == 'charging'}
                         <div class="transactionId" title="充电桩订单编号">
                             <img src="{MODULE_URL}static/img/charging.svg" class="balance">{$order['orderId']}                   
                         </div>
@@ -260,17 +264,13 @@
                             <i class="fa fa-car"></i> {php echo $order['charging']['record']['VIN']}
                         </div>
                             {/if}
-                        {elseif $order['src'] == \zovye\Order::FUELING ||  $order['src'] == \zovye\Order::FUELING_UNPAID}
-                        <div class="transactionId" title="尿素加注订单">
-                            {if $order['fueling']['record']}
-                            <img src="{MODULE_URL}static/img/fueling.svg" class="balance">
-                            {else}
-                            <img src="{MODULE_URL}static/img/charger.svg" class="balance">
-                            {/if}
+                        {elseif $order['type'] == 'fueling'}
+                        <div class="transactionId operate" title="尿素加注订单">
+                            <img src="{MODULE_URL}static/img/gas.svg" class="balance">
                             {$order['orderId']}
                         </div>
                         {else}
-                        {if $order['price']>0}    
+                        {if $order['price']>0}
                         <div class="transactionId {$order['src']}">
                             <img src="{MODULE_URL}static/img/{$order['pay_name']}.svg" title="{php echo \zovye\Pay::getTitle($order['pay_name'])}">
                             {$order['transaction_id']}
@@ -319,7 +319,7 @@
                     </td>
                     <td>
                         <!--充电订单开始-->
-                        {if $order['src'] == \zovye\Order::CHARGING ||  $order['src'] == \zovye\Order::CHARGING_UNPAID}
+                        {if $order['type'] == 'charging'}
                         <div class="charging-ts-container">
                             <div class="charging-ts">
                                 {if $order['charging']['record']}
@@ -448,10 +448,13 @@
                                 <small>单价：<span class="fee">{$order['group']['tips']}</span></small>
                                 {/if}                                
                             </span>
-                            {if !$order['group']}
+                            {if $order['type'] != 'charging'}
                             <span {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num gray" title="{$order['pull_logs']}"{/if}> 
                                 {$order['num']}
                                 <span style="font-size: small;">{$order['goods']['unit_title']}</span>
+                                {if $order['src'] ==  \zovye\Order::FUELING_UNPAID}
+                                <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中">
+                                {/if}
                             </span>
                             {/if}
                         </div>
@@ -459,7 +462,7 @@
                     <td>
                         <div  class="status operate">
                             <div class="detail">
-                                {if $order['group']}
+                                {if $order['type'] == 'charging'}
                                     {if $order['price'] > 0}
                                         总价：<span class="price" data-op="priceDetail"> {$order['price']}</span>
                                     {else}
@@ -483,7 +486,7 @@
                                 {/if}
                                 {/if}
 
-                                {if $order['src'] == \zovye\Order::FUELING ||  $order['src'] == \zovye\Order::FUELING_UNPAID}
+                                {if $order['type'] == 'fueling'}
                                     {if empty($order['fueling']['record']) && $order['fueling']['result']['re'] != 3}
                                     <span>
                                         <i class="fa fa-info-circle" title="{if $order['fueling']['result']['re'] == 9}正在使用中{else}其它故障[ {php echo $order['fueling']['result']['re']} ]{/if}"

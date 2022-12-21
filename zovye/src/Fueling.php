@@ -330,7 +330,7 @@ class Fueling
     {
         $order = Order::get($serial, true);
         if (empty($order)) {
-            $pay_log = Pay::getPayLog($serial);
+            $pay_log = Pay::getPayLog($serial, LOG_FUELING_PAY);
             if (empty($pay_log)) {
                 return err('找不到这个订单记录！');
             } else {

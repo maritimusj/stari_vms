@@ -484,7 +484,7 @@
                                 {/if}
 
                                 {if $order['src'] == \zovye\Order::FUELING ||  $order['src'] == \zovye\Order::FUELING_UNPAID}
-                                    {if $order['fueling']['result']['re'] != 3}
+                                    {if empty($order['fueling']['record']) && $order['fueling']['result']['re'] != 3}
                                     <span>
                                         <i class="fa fa-info-circle" title="{if $order['fueling']['result']['re'] == 9}正在使用中{else}其它故障[ {php echo $order['fueling']['result']['re']} ]{/if}"
                                         ></i>

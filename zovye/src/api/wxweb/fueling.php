@@ -19,9 +19,15 @@ class fueling
     /**
      * 设备详情
      */
-    public static function deviceDetail()
+    public static function deviceDetail(): array
     {
+        $device_id = request::str('deviceId');
+        $device = Device::get($device_id, true);
+        if (empty($device)) {
+            return err('找不到这个设备！');
+        }
 
+        return $device->profile(true);
     }
 
     /**

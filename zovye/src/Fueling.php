@@ -431,7 +431,7 @@ class Fueling
             if ($total_price) {
                 $pay_log = Pay::getPayLog($serial, LOG_FUELING_PAY);
                 if ($pay_log) {
-                    if ($total_price > $pay_log->getTotal()) {
+                    if ($total_price > $pay_log->getPrice()) {
                         $should_stop_fueling = true;
                     }
                 } else {

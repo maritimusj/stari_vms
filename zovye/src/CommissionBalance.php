@@ -349,7 +349,6 @@ CHARGING;
             $order_info = '';
             $device_info = '';
             $goods_info = '';
-            $pay_type = '';
             if ($order) {
                 $order_info = $order->getOrderNO();
                 $device = $order->getDevice();
@@ -361,12 +360,6 @@ CHARGING;
                     $num = number_format($order->getNum() / 100, 2, '.', '');
                     $goods_info = "<dt>商品</dt><dd class=\"admin\">{$goods['name']} x <span style='color:#2196f3;'>{$num}</span>{$goods['unit_title']}</dd>";
                 }
-                $card_type = $order->getExtraData('card.type');
-                if ($card_type == UserCommissionBalanceCard::getTypename()) {
-                    $pay_type = "<dt>支付方式</dt><dd class=\"admin\">余额支付</dd>";
-                } elseif ($card_type == pay_logsModelObj::getTypename()) {
-                    $pay_type = "<dt>支付方式</dt><dd class=\"admin\">现金支付</dd>";
-                }
             }
             $data['memo'] = <<<CHARGING
 <dl class="log dl-horizontal">
@@ -376,7 +369,6 @@ CHARGING;
 <dd class="event">$order_info</dd>
 $device_info
 $goods_info
-$pay_type
 </dl>
 CHARGING;
         } elseif ($entry->getSrc() == CommissionBalance::RECHARGE) {

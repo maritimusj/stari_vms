@@ -49,12 +49,12 @@ class fueling
             return err('找不到这个设备！');
         }
 
-        $profile = $device->profile(true);
-        $profile['vip'] = self::isVIP($user, $device);
+        $data = $device->profile(true);
+        $data['vip'] = self::isVIP($user, $device);
 
         $fuelingNOWData = $user->fuelingNOWData();
         if ($fuelingNOWData) {
-            $profile['fueling'] = [
+            $data['fueling'] = [
                 'serial' => $fuelingNOWData['serial'],
             ];
         }
@@ -62,19 +62,19 @@ class fueling
         $chargerID = request::int('chargerID');
         $deviceFuelingNOWData = $device->fuelingNOWData($chargerID);
         if ($deviceFuelingNOWData && $deviceFuelingNOWData['user'] != $user->getId()) {
-            $profile['fueling'] = [
+            $data['fueling'] = [
                 'error' =>  '设备正在使用中!',
             ];
         }
 
         $goods = $device->getGoodsByLane($chargerID);
         if ($goods) {
-            $profile['goods'] = $goods;
+            $data['goods'] = $goods;
         } else {
-            $profile['goods'] = [];
+            $data['goods'] = [];
         }
 
-        return $profile;
+        return $data;
     }
 
     /**

@@ -244,8 +244,22 @@
                                 <sup class="id" title="商品ID">{$item['goods_id']}</sup>
                                 </td>
                                 <td>{$item['goods_price_formatted']}</td>
-                                <td>{$item['capacity']} {$item['goods_unit_title']}</td>
-                                <td>{$item['num']} {$item['goods_unit_title']}</td>
+                                <td>
+                                    {if $device->isFuelingDevice()}
+                                    {php echo number_format($item['capacity'] / 100, 2, '.', '');}
+                                    {else}
+                                    {$item['capacity']}
+                                    {/if}
+                                    {$item['goods_unit_title']}
+                                </td>
+                                <td>
+                                    {if $device->isFuelingDevice()}
+                                    {php echo number_format($item['num'] / 100, 2, '.', '');}
+                                    {else}
+                                    {$item['num']}
+                                    {/if}
+                                    {$item['goods_unit_title']}
+                                </td>
                             </tr>
                             {/loop}
                         </tbody>

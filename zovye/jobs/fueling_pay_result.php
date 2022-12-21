@@ -83,7 +83,6 @@ try {
     if (is_error($log['res'])) {
         throw new JobException($log['res']['message'], $log);
     }
-
 } catch (JobException $e) {
     Job::refund($order_no, "启动设备失败：{$e->getMessage()}");
     throw $e;

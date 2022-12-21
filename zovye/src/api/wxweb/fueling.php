@@ -34,10 +34,12 @@ class fueling
         $profile['vip'] = false;
 
         $agent = $device->getAgent();
-        $vip = VIP::getFor($agent, $user);
+        if ($agent) {
+            $vip = VIP::getFor($agent, $user);
 
-        if ($vip && $vip->hasPrivilege($device)) {
-            $profile['vip'] = true;
+            if ($vip && $vip->hasPrivilege($device)) {
+                $profile['vip'] = true;
+            }
         }
 
         return $profile;

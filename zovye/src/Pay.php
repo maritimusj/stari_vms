@@ -287,6 +287,15 @@ class Pay
                 }
 
                 return $pay->getResponse(false);
+
+            } elseif ($pay_log->getLevel() == LOG_FUELING_PAY) {
+
+                $res = Fueling::startFromPayLog($pay_log);
+                if (is_error($res)) {
+                    throw new Exception($res['message']);
+                }
+                
+                return $pay->getResponse(false);
             }
 
             $device = Device::get($data['deviceUID'], true);
@@ -438,6 +447,7 @@ class Pay
                 LOG_PAY,
                 LOG_GOODS_PAY,
                 LOG_CHARGING_PAY,
+                LOG_FUELING_PAY,
                 LOG_RECHARGE,
             ];
         }

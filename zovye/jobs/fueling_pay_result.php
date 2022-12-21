@@ -42,7 +42,7 @@ if ($order) {
 
 $pay_log = Pay::getPayLog($order_no, LOG_FUELING_PAY);
 if (empty($pay_log)) {
-    throw new JobException('找不到支付记录!', $log);
+    throw new JobException('找不到支付记录！', $log);
 }
 
 if (!$pay_log->isPaid()) {

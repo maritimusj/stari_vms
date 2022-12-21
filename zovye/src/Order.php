@@ -139,7 +139,7 @@ class Order extends State
             $res['total'] = $total;
 
             $pay_log->setData(is_error($res) ? 'refund_fail' : 'refund', $res);
-            if ($pay_log->save()) {
+            if (!$pay_log->save()) {
                 return err('保存数据失败！');
             }
 

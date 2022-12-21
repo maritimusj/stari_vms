@@ -57,6 +57,13 @@ class fueling
             $profile['fueling'] = $fuelingNOWData;
         }
 
+        $goods = $device->getGoodsByLane(request::int('chargerID'));
+        if ($goods) {
+            $profile['goods'] = $goods;
+        } else {
+            $profile['goods'] = [];
+        }
+
         return $profile;
     }
 

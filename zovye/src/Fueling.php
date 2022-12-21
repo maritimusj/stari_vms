@@ -66,7 +66,7 @@ class Fueling
                 return err('锁定设备失败，请稍后再试！');
             }
 
-            $goods = $device->getGoodsByLane(0);
+            $goods = $device->getGoodsByLane($chargerID);
             if (empty($goods)) {
                 return err('没有指定商品信息！');
             }

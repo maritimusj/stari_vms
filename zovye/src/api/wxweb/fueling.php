@@ -12,6 +12,7 @@ use zovye\Helper;
 use zovye\Order;
 use zovye\request;
 use zovye\User;
+use zovye\VIP;
 use function zovye\err;
 
 class fueling
@@ -21,13 +22,25 @@ class fueling
      */
     public static function deviceDetail(): array
     {
+        $user = common::getWXAppUser();
+
         $device_id = request::str('deviceId');
         $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
-        return $device->profile(true);
+        $profile = $device->profile(true);
+        $profile['vip'] = false;
+
+        $agent = $device->getAgent();
+        $vip = VIP::getFor($agent, $user);
+
+        if ($vip && $vip->hasPrivilege($device)) {
+            $profile['vip'] = true;
+        }
+
+        return $profile;
     }
 
     /**

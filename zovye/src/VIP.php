@@ -33,7 +33,7 @@ class VIP
         return self::query($condition)->findOne();
     }
 
-    public static function getFor(agentModelObj $agent, userModelObj $user): bool
+    public static function getFor(agentModelObj $agent, userModelObj $user): ?vipModelObj
     {
         return self::query(['agent_id' => $agent->getId(), 'user_id' => $user->getId()])->findOne();
     }

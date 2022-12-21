@@ -118,7 +118,7 @@ class Order extends State
     /**
      * @param $order_no
      * @param int $total
-     * @return bool
+     * @return array|bool
      */
     public static function refundBy($order_no, int $total = 0)
     {

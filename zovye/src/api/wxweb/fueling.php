@@ -48,6 +48,11 @@ class fueling
         $profile = $device->profile(true);
         $profile['vip'] = self::isVIP($user, $device);
 
+        $fuelingNOWData = $user->fuelingNOWData();
+        if ($fuelingNOWData) {
+            $profile['fueling'] = $fuelingNOWData;
+        }
+
         return $profile;
     }
 

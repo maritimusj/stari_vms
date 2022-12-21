@@ -605,7 +605,7 @@ if ($op == 'default') {
 
     $user = User::get(request::int('id'));
     if ($user) {
-        $title = "<b>{$user->getName()}</b>的佣金记录";
+        $title = "<b>{$user->getName()}</b>的余额变动记录";
         $page = max(1, request::int('page'));
         $page_size = request::int('pagesize', 5);
 

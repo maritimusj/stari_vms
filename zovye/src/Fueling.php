@@ -515,15 +515,18 @@ class Fueling
                         }
                     } else {
                         //扣除用户账户金额
-                        if ($order->getPrice() > 0) {
-                            $balance = $user->getCommissionBalance();
-                            $extra = [
-                                'orderid' => $order->getId(),
-                                'serial' => $serial,
-                                'chargerID' => $chargerID,
-                            ];
-                            if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
-                                return err('用户扣款失败！');
+                        $card_type = $order->getExtraData('card.type', '');
+                        if ($card_type == UserCommissionBalanceCard::getTypename()) {
+                            if ($order->getPrice() > 0) {
+                                $balance = $user->getCommissionBalance();
+                                $extra = [
+                                    'orderid' => $order->getId(),
+                                    'serial' => $serial,
+                                    'chargerID' => $chargerID,
+                                ];
+                                if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
+                                    return err('用户扣款失败！');
+                                }
                             }
                         }
                     }

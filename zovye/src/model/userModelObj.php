@@ -18,6 +18,7 @@ use zovye\Locker;
 use zovye\Pay;
 use zovye\UserCommissionBalanceCard;
 use zovye\VIP;
+use zovye\VIPCard;
 use zovye\We7;
 use zovye\User;
 use zovye\Util;
@@ -954,6 +955,11 @@ class userModelObj extends modelObj
     public function getCommissionBalanceCard(): ICard
     {
         return new UserCommissionBalanceCard($this);
+    }
+
+    public function getVIPCard(): ICard
+    {
+        return new VIPCard($this);
     }
 
     public function getPhysicalCardNO(): string

@@ -14,7 +14,7 @@ interface ICard
 
     function getUID(): string;
 
-    function getTypename(): string;
+    static function getTypename(): string;
 
     function total(): int;
 

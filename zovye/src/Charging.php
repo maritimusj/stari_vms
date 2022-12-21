@@ -112,8 +112,11 @@ class Charging
                     ],
                     'user' => $user->profile(),
                     'chargerID' => $chargerID,
-                    'card' => $card->getUID(),
-                    'cardType' => $card->getTypename(),
+                    'card' => [
+                        'uid' => $card->getUID(),
+                        'balance' => $card->total(),
+                        'type' => $card->getTypename(),
+                    ]
                 ],
             ];
 

@@ -175,7 +175,7 @@ class pay_logsModelObj extends BaseLogsModelObj implements ICard
         return $this->getPrice();
     }
 
-    public function getTypename(): string
+    public static function getTypename(): string
     {
         return 'pay_log';
     }

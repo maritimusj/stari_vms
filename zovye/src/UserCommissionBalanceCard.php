@@ -18,12 +18,12 @@ class UserCommissionBalanceCard implements ICard
         $this->user = $user;
     }
 
-    function getUID(): string
+    public function getUID(): string
     {
         return $this->user->getPhysicalCardNO();
     }
 
-    function total(): int
+    public function total(): int
     {
         $total = $this->user->getCommissionBalance()->total();
         if ($total > 0) {
@@ -32,17 +32,17 @@ class UserCommissionBalanceCard implements ICard
         return $total;
     }
 
-    function getOwner(): ?userModelObj
+    public function getOwner(): ?userModelObj
     {
         return $this->user;
     }
 
-    function getTypename(): string
+    public static function getTypename(): string
     {
         return 'commission_balance';
     }
 
-    function isUsable(): bool
+    public function isUsable(): bool
     {
         $owner = $this->getOwner();
         if (empty($owner) || $owner->isBanned()) {

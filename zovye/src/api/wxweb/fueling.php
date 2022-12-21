@@ -9,6 +9,8 @@ namespace zovye\api\wxweb;
 use zovye\api\wx\common;
 use zovye\Device;
 use zovye\Helper;
+use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\request;
 use zovye\User;
@@ -17,6 +19,19 @@ use function zovye\err;
 
 class fueling
 {
+
+    protected static function isVIP(userModelObj $user, deviceModelObj $device): bool
+    {
+        $agent = $device->getAgent();
+        if ($agent) {
+            $vip = VIP::getFor($agent, $user);
+
+            return $vip && $vip->hasPrivilege($device);
+        }
+
+        return false;
+    }
+
     /**
      * 设备详情
      */
@@ -31,16 +46,7 @@ class fueling
         }
 
         $profile = $device->profile(true);
-        $profile['vip'] = false;
-
-        $agent = $device->getAgent();
-        if ($agent) {
-            $vip = VIP::getFor($agent, $user);
-
-            if ($vip && $vip->hasPrivilege($device)) {
-                $profile['vip'] = true;
-            }
-        }
+        $profile['vip'] = self::isVIP($user, $device);
 
         return $profile;
     }
@@ -63,7 +69,9 @@ class fueling
 
         $chargerID = request::int('chargerID');
 
-        return \zovye\Fueling::start('', $user->getCommissionBalanceCard(), $device, $chargerID);
+        $card = self::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
+
+        return \zovye\Fueling::start('', $card, $device, $chargerID);
     }
 
     /**
@@ -178,6 +186,7 @@ class fueling
 
         if ($order->isFuelingResultFailed()) {
             $data = $order->getFuelingResult();
+
             return err('订单没有完成，故障：'.$data['re']);
         }
 

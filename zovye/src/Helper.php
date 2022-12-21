@@ -551,6 +551,7 @@ class Helper
                 'price' => $total_price,
                 'order_no' => $serial,
                 'chargerID' => $chargerID,
+                'ip' => Util::getClientIp(),
             ]
         );
 

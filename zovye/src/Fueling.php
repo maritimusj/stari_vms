@@ -47,9 +47,9 @@ class Fueling
 
         return true;
     }
-    public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0)
+    public static function start(string $serial, ICard $card, deviceModelObj $device, $chargerID = 0, $extra = [])
     {
-        return Util::transactionDo(function () use ($serial, $card, $device, $chargerID) {
+        return Util::transactionDo(function () use ($serial, $card, $device, $chargerID, $extra) {
             if (!$device->isFuelingDevice()) {
                 return err('设备类型不正确！');
             }
@@ -120,7 +120,7 @@ class Fueling
                 'goods_id' => $goods['id'],
                 'num' => 1,
                 'price' => 0,
-                'ip' => Util::getClientIp(),
+                'ip' => $extra['ip'] ?? Util::getClientIp(),
                 'extra' => [
                     'device' => [
                         'imei' => $device->getImei(),
@@ -130,6 +130,7 @@ class Fueling
                     'user' => $user->profile(),
                     'chargerID' => $chargerID,
                     'card' => $card->getUID(),
+                    'cardBalance' => $card->total(),
                     'cardType' => $card->getTypename(),
                 ],
             ];
@@ -266,7 +267,7 @@ class Fueling
 
         $chargerID = $pay_log->getChargerID();
 
-        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID);
+        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID, ['ip' => $pay_log->getData('ip', '')]);
         if (is_error($res)) {
             return $res;
         }

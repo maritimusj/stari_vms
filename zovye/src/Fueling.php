@@ -129,9 +129,11 @@ class Fueling
                     'goods' => $goods,
                     'user' => $user->profile(),
                     'chargerID' => $chargerID,
-                    'card' => $card->getUID(),
-                    'cardBalance' => $card->total(),
-                    'cardType' => $card->getTypename(),
+                    'card' => [
+                        'uid' => $card->getUID(),
+                        'balance' => $card->total(),
+                        'type' => $card->getTypename(),
+                    ]
                 ],
             ];
 

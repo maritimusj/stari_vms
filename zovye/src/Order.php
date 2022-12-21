@@ -795,6 +795,7 @@ class Order extends State
                         ];
                     }
                 }
+                $data['pay'] = $order->getExtraData('card', []);
             } else {
                 $goods = $order->getExtraData('goods');
                 if (!empty($goods)) {

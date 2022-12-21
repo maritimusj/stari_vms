@@ -33,7 +33,7 @@ class fueling
     }
 
     public static function rechargeInfo() {
-        return Config::fueling('vip.recharge', []);
+        return Config::fueling('vip.recharge.promotion', []);
     }
 
     /**

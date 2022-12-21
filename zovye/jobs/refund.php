@@ -102,7 +102,10 @@ if ($op == 'refund' && CtrlServ::checkJobSign([
         } elseif ($device->isFuelingDevice()) {
             if ($order->isFuelingFinished()) {
                 try {
-                    $log['result'] = Order::refundBy($order_no, 0 - $order->getPrice());
+                    $res = Order::refundBy($order_no, 0 - $order->getPrice());
+                    $order->setExtraData('fueling.refund', $res);
+                    $order->save();
+                    $log['result'] = $res;
                 } catch (Exception $e) {
                     $log['exception'] = [
                         'type' => get_class($e),

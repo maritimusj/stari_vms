@@ -120,7 +120,7 @@ class Order extends State
      * @param int $total
      * @return bool
      */
-    public static function refundBy($order_no, int $total = 0): bool
+    public static function refundBy($order_no, int $total = 0)
     {
         //记录退款结果
         $pay_log = Pay::getPayLog($order_no);
@@ -139,12 +139,18 @@ class Order extends State
             $res['total'] = $total;
 
             $pay_log->setData(is_error($res) ? 'refund_fail' : 'refund', $res);
-            $pay_log->save();
+            if ($pay_log->save()) {
+                return err('保存数据失败！');
+            }
 
-            return !is_error($res);
+            if (is_error($res)) {
+                return $res;
+            }
+
+            return ['message' => '退款成功！', 'total' => $total];
         }
 
-        return false;
+        return err('找不到支付记录！');
     }
 
     public static function queryStatus($serialNO)

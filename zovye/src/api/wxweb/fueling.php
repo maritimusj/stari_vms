@@ -155,9 +155,8 @@ class fueling
             return err('无法查看该订单！');
         }
 
-        if (!$order->isFuelingResultFailed()) {
+        if ($order->isFuelingResultFailed()) {
             $data = $order->getFuelingResult();
-
             return err('订单没有完成，故障：'.$data['re']);
         }
 

@@ -786,6 +786,14 @@ class Order extends State
                             $data['fueling']['status'] = $device->getFuelingStatusData($chargerID);
                         }
                     }
+                } else {
+                    $timeout = $order->getExtraData('timeout', []);
+                    if ($timeout) {
+                        $data['fueling']['result'] = [
+                            're' => -1,
+                            'message' => $timeout['reason'] ?? '设备超时！',
+                        ];
+                    }
                 }
             } else {
                 $goods = $order->getExtraData('goods');

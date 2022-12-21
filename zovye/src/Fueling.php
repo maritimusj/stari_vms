@@ -496,12 +496,16 @@ class Fueling
 
                     $locker->unlock();
 
-                    //事件：订单已经创建
-                    EventBus::on('device.orderCreated', [
-                        'device' => $device,
-                        'user' => $user,
-                        'order' => $order,
-                    ]);
+                    $card_type = $order->getExtraData('card.type', '');
+
+                    if ($card_type != VIPCard::getTypename()) {
+                        //事件：订单已经创建
+                        EventBus::on('device.orderCreated', [
+                            'device' => $device,
+                            'user' => $user,
+                            'order' => $order,
+                        ]);
+                    }
 
                     if (!$order->save()) {
                         return err('保存订单失败！');
@@ -515,7 +519,6 @@ class Fueling
                         }
                     } else {
                         //扣除用户账户金额
-                        $card_type = $order->getExtraData('card.type', '');
                         if ($card_type == UserCommissionBalanceCard::getTypename()) {
                             if ($order->getPrice() > 0) {
                                 $balance = $user->getCommissionBalance();

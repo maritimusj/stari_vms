@@ -159,6 +159,11 @@ class userModelObj extends modelObj
         return $this->app == User::DouYin;
     }
 
+    public function isPseudoUser(): bool
+    {
+        return $this->app == User::PSEUDO;
+    }
+
     public function profile($detail = true): array
     {
         $data = [

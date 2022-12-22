@@ -102,6 +102,12 @@ class User
                 'color' => '#ff9800',
                 'icon' => MODULE_URL."static/img/promo.svg",
             ],
+            'pseudo' => [
+                'name' => '',
+                'title' => '虚拟用户',
+                'color' => '#9e9e9e',
+                'icon' => MODULE_URL."static/img/unknown.svg",
+            ],
         ];
 
         if (self::isAliUser($obj)) {
@@ -116,6 +122,8 @@ class User
             return $data['douyin'];
         } elseif (self::isPromoUser($obj)) {
             return $data['promo'];
+        } elseif (self::isPseudoUser($obj)) {
+            return $data['pseudo'];
         }
 
         return $data['wx'];
@@ -180,6 +188,16 @@ class User
         $user = User::get($obj, is_string($obj));
 
         return $user && $user->isPromoUser();
+    }
+
+    public static function isPseudoUser($obj): bool
+    {
+        if ($obj instanceof userModelObj) {
+            return $obj->isPseudoUser();
+        }
+        $user = User::get($obj, is_string($obj));
+
+        return $user && $user->isPseudoUser();
     }
 
     public static function isDouYinUser($obj): bool

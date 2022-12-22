@@ -216,14 +216,16 @@ if ($op == 'default') {
             }
             $data['clr'] = $accounts[$account_name]['clr'];
         } else {
-            if ($data['balance']) {
-                $data['clr'] = '#ffc107';
-            } else {
-                $data['account_title'] = 'n/a';
-                $data['clr'] = '#ccc';
-            }
-            if ($data['refund']) {
-                $data['clr'] = '#ccc';
+            if ($data['type'] == 'normla') {
+                if ($data['balance']) {
+                    $data['clr'] = '#ffc107';
+                } else {
+                    $data['account_title'] = 'n/a';
+                    $data['clr'] = '#ccc';
+                }
+                if ($data['refund']) {
+                    $data['clr'] = '#ccc';
+                }
             }
         }
 

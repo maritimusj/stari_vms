@@ -112,6 +112,9 @@
 #orderlist .tips.free{
     background: #4CAF50;
 }
+#orderlist .tips.vip{
+    background: #4CAF50;
+}
 #orderlist .tips.balancex{
     background: #ffc107;
 }

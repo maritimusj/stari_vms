@@ -71,6 +71,12 @@
     #orderlist small {
         font-size: 60%;
     }
+    #orderlist .pay_info {
+        padding: 6px 0;
+        font-style: italic;
+        font-size: smaller;
+        color: #9e9e9e;
+    }
     a[filter] {
         cursor: pointer;
     }
@@ -449,7 +455,7 @@
                                 {/if}                                
                             </span>
                             {if $order['type'] != 'charging'}
-                            <span {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num gray" title="{$order['pull_logs']}"{/if}> 
+                            <span {if $order['pull_logs'] === true}  class="num" data-op="pullsDetail" title="查看出货记录..."{else} class="num" title="{$order['pull_logs']}"{/if}> 
                                 {$order['num']}
                                 <span style="font-size: small;">{$order['goods']['unit_title']}</span>
                                 {if $order['src'] ==  \zovye\Order::FUELING_UNPAID}
@@ -485,7 +491,6 @@
                                     {/if}
                                 {/if}
                                 {/if}
-
                                 {if $order['type'] == 'fueling'}
                                     {if empty($order['fueling']['record']) && $order['fueling']['result']['re'] != 3}
                                     <span>
@@ -578,8 +583,14 @@
                                 <span class="refund-title" title="{$order['refund']['title']}"> （已退款） </span>
                                 {/if}
                             </div>
-
                         </div>
+                        {if $order['pay'] && $order['pay']['type'] == \zovye\model\pay_logsModelObj::getTypename()}
+                        <div class="pay_info">
+                            <i class="fa fa-tag"></i>
+                            支付{php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元{if $order['fueling']['refund']}, 剩余{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元已退回
+                            {/if}
+                        </div>
+                        {/if}
                 </td>
                 <td>
                     <div class="profile">

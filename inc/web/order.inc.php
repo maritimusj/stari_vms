@@ -248,9 +248,10 @@ if ($op == 'default') {
         }
 
         $device = $entry->getDevice();
-        if ($device && ($device->isVDevice() || $device->isNormalDevice())) {
-            $data['pull_logs'] = true;
+        if ($device) {
+            $data['pull_logs'] = $device->isVDevice() || $device->isNormalDevice();
         }
+
         
         $orders[] = $data;
     }

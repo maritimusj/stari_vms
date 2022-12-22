@@ -14,6 +14,7 @@ use zovye\model\userModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\order_goodsModelObj;
+use zovye\model\pay_logsModelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
 class Order extends State
@@ -796,6 +797,13 @@ class Order extends State
                     }
                 }
                 $data['pay'] = $order->getExtraData('card', []);
+                if ($data['pay']['type'] == UserCommissionBalanceCard::getTypename()) {
+                    $data['tips'] = ['text' => '余额', 'class' => 'wxpay'];
+                } elseif($data['pay']['type'] == pay_logsModelObj::getTypename()) {
+                    $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
+                } elseif ($data['pay']['type'] == VIPCard::getTypename()) {
+                    $data['tips'] = ['text' => 'VIP', 'class' => 'wxpay'];
+                }
             } else {
                 $goods = $order->getExtraData('goods');
                 if (!empty($goods)) {
@@ -871,12 +879,14 @@ class Order extends State
                 }
             }
 
-            if ($data['price'] > 0) {
-                $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-            } elseif ($data['balance'] > 0) {
-                $data['tips'] = ['text' => '积分', 'class' => 'balanceex'];
-            } else {
-                $data['tips'] = ['text' => '免费', 'class' => 'free'];
+            if (empty($data['tips'])) {
+                if ($data['price'] > 0) {
+                    $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
+                } elseif ($data['balance'] > 0) {
+                    $data['tips'] = ['text' => '积分', 'class' => 'balanceex'];
+                } else {
+                    $data['tips'] = ['text' => '免费', 'class' => 'free'];
+                }
             }
 
             $refund = $order->getExtraData('refund');

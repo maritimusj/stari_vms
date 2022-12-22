@@ -586,7 +586,11 @@
                         </div>
                         {if $order['pay'] && $order['pay']['type'] == \zovye\model\pay_logsModelObj::getTypename()}
                         <div class="pay_info">
+                            {if ($order['pay']['pay_name'])}
+                            <img src="{MODULE_URL}static/img/{$pay_name}.svg" class="balance">
+                            {else}
                             <i class="fa fa-tag"></i>
+                            {/if}
                             支付{php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元{if $order['fueling']['refund']}, 剩余{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元已退回
                             {/if}
                         </div>

@@ -136,6 +136,10 @@ class Fueling
                 ],
             ];
 
+            if ($extra['pay_name']) {
+                $order_data['extra']['card']['pay_name'] = $extra['pay_name'];
+            }
+
             $agent = $device->getAgent();
             if ($agent) {
                 $order_data['extra']['agent'] = $agent->profile();
@@ -268,7 +272,10 @@ class Fueling
 
         $chargerID = $pay_log->getChargerID();
 
-        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID, ['ip' => $pay_log->getData('ip', '')]);
+        $res = self::start($pay_log->getOrderNO(), $pay_log, $device, $chargerID, [
+            'ip' => $pay_log->getData('ip', ''),
+            'pay_name' => $pay_log->getPayName(),
+        ]);
         if (is_error($res)) {
             return $res;
         }

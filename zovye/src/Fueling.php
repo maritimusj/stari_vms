@@ -576,11 +576,17 @@ class Fueling
         $chargerID = intval($data['ch']);
 
         $user = self::getSoloUser();
+
+        $order_no = Order::makeSerial($user, $serial);
+        if (Order::exists($order_no)) {
+            return true;
+        }
+
         $goods = $device->getGoodsByLane($chargerID);
 
         $order_data = [
             'src' => Order::FUELING_SOLO,
-            'order_id' => $serial,
+            'order_id' => $order_no,
             'openid' => $user->getOpenid(),
             'agent_id' => $device->getAgentId(),
             'device_id' => $device->getId(),

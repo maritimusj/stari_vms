@@ -318,10 +318,17 @@ if ($op == 'default') {
             }
 
             if (Util::isSysLoadAverageOk()) {
-                $data['total'] = [
-                    'month' => intval(Stats::getMonthTotal($device)['total']),
-                    'today' => intval(Stats::getDayTotal($device)['total']),
-                ];
+                if ($device->isFuelingDevice()) {
+                    $data['total'] = [
+                        'month' => floatval(Stats::getMonthTotal($device)['total'] / 100),
+                        'today' => floatval(Stats::getDayTotal($device)['total'] / 200),
+                    ];
+                } else {
+                    $data['total'] = [
+                        'month' => intval(Stats::getMonthTotal($device)['total']),
+                        'today' => intval(Stats::getDayTotal($device)['total']),
+                    ];
+                }
 
                 $data['gettype']['freeLimitsReached'] = $device->isFreeLimitsReached();
 

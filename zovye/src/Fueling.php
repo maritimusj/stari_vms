@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use Exception;
 use zovye\Contract\ICard;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
@@ -133,7 +132,7 @@ class Fueling
                         'uid' => $card->getUID(),
                         'balance' => $card->total(),
                         'type' => $card->getTypename(),
-                    ]
+                    ],
                 ],
             ];
 
@@ -552,6 +551,15 @@ class Fueling
 
     public static function hasUnpaidOrder(userModelObj $user): bool
     {
+        $query = Order::query(['openid' => $user->getOpenid(), 'src' => Order::FUELING_UNPAID]);
+
+        /** @var orderModelObj $order */
+        foreach ($query->findAll() as $order) {
+            if (!$order->isFuelingFinished()) {
+                return true;
+            }
+        }
+
         return false;
     }
 }

@@ -49,19 +49,33 @@ class UserCommissionBalanceCard implements ICard
             return false;
         }
 
+        $isOrderFinished = function ($order_no) {
+            $order = Order::get($order_no, true);
+            if ($order) {
+                if ($order->isChargingOrder()) {
+                    return $order->isChargingFinished();
+                }
+                if ($order->isFuelingOrder()) {
+                    return $order->isFuelingFinished();
+                }
+            }
+            return true;
+        };
+
         if (App::isChargingDeviceEnabled()) {
-            $user_charging_data = $owner->chargingNOWData();
-            if ($user_charging_data) {
+            $data = $owner->chargingNOWData();
+            if ($data && !$isOrderFinished($data['serial'])) {
                 return false;
             }
         }
 
         if (App::isFuelingDeviceEnabled()) {
-            $user_fueling_data = $owner->fuelingNOWData();
-            if ($user_fueling_data) {
+            $data = $owner->fuelingNOWData();
+            if ($data && !$isOrderFinished($data['serial'])) {
                 return false;
             }
         }
+
         return true;
     }
 }

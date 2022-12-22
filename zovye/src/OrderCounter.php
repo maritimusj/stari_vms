@@ -196,7 +196,18 @@ class OrderCounter extends StatsCounter
     public function getMonthFreeTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = [Order::ACCOUNT, Order::FREE];
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'] = [
+                Order::ACCOUNT,
+                Order::FREE,
+                Order::FUELING_SOLO,
+            ];
+        } else {
+            $params['src'] = [
+                Order::ACCOUNT,
+                Order::FREE,
+            ];
+        }
 
         return $this->getMonth($params, $month ?? new DateTimeImmutable());
     }
@@ -208,6 +219,11 @@ class OrderCounter extends StatsCounter
         if (App::isChargingDeviceEnabled()) {
             $params['src'] = [
                 Order::CHARGING,
+                Order::PAY,
+            ];
+        } elseif (App::isFuelingDeviceEnabled()) {
+            $params['src'] = [
+                Order::FUELING,
                 Order::PAY,
             ];
         } else {

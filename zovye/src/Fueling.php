@@ -386,7 +386,7 @@ class Fueling
             return ['status' => $status];
         }
 
-        return ['message' => '正在查询状态！'];
+        return ['message' => '正在查询状态...'];
     }
 
     /**

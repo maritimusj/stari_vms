@@ -836,6 +836,7 @@ class Order extends State
                     'id' => $user_obj->getId(),
                     'nickname' => $user_obj->getNickname(),
                     'avatar' => $user_obj->getAvatar(),
+                    'mobile' => $user_obj->getMobile(),
                 ];
             }
 

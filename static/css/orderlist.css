@@ -243,12 +243,9 @@
     border-color: #FF5722;
     color: #ff5722;
 }
-#orderlist td .mobile {
-    margin-left: 6px;
+#orderlist .profile .nickname a {
+    padding: 0 0;
 }
-#orderlist td .mobile:hover {
-    color: #607D8B;
-}    
 #orderlist .orderId{
     color: #9E9E9E;
     white-space: nowrap;

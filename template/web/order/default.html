@@ -1,6 +1,6 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220517');}
-{php \zovye\url(true, 'static/css/orderlist.css?v=20220303');}
+{php \zovye\url(true, 'static/css/orderlist.css?v=20220304');}
 <style>
     #orderlist .transactionId {
         display: flex;
@@ -599,7 +599,8 @@
                 <td>
                     <div class="profile">
                         <img src="{$order['user']['avatar']}" />
-                        <span class="nickname">
+                        <div>
+                            <span class="nickname">
                                 {if $user}
                                 {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
                                 {else}
@@ -607,7 +608,13 @@
                                     {php echo $order['user']['nickname'] ?: '&lt;匿名用户&gt;'}
                                 </a>
                                 {/if}
-                        </span>
+                            </span>
+                            <div>
+                            {if $order['user']['mobile']}
+                            <span class="mobile" data-mobile="{$order['user']['mobile']}" title="点击复制"><i class="fa fa-mobile"></i> {$order['user']['mobile']}</span>
+                            {/if}                                
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td class="from">

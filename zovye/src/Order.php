@@ -7,6 +7,7 @@
 namespace zovye;
 
 use DateTime;
+use zovye\base\modelObj;
 use zovye\model\accountModelObj;
 use zovye\model\agentModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -112,9 +113,9 @@ class Order extends State
         return substr("U{$user->getId()}D{$device->getId()}$nonce".Util::random(32, true), 0, MAX_ORDER_NO_LEN);
     }
 
-    public static function makeSerial(userModelObj $user, $serial = null): string
+    public static function makeSerial(modelObj $obj, $serial = null): string
     {
-        return sprintf("%d%05d%d", We7::uniacid(), $user->getId(), $serial ?? time());
+        return sprintf("%d%05d%d", We7::uniacid(), $obj->getId(), $serial ?? time());
     }
 
     /**

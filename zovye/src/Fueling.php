@@ -577,7 +577,7 @@ class Fueling
 
         $user = self::getSoloUser();
 
-        $order_no = Order::makeSerial($user, $serial);
+        $order_no = Order::makeSerial($device, $serial);
         if (Order::exists($order_no)) {
             return true;
         }

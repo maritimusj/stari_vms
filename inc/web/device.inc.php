@@ -1545,7 +1545,9 @@ HTML;
             'chartid' => Util::random(10),
             'title' => $title,
             'chart' => Util::cachedCall(30, function () use ($device, $title) {
-                return Stats::chartDataOfDay($device, new DateTime(), "设备：{$device->getName()}($title)");
+                return Stats::chartDataOfDay($device, new DateTime(), "设备：{$device->getName()}($title)", $device->isFuelingDevice() ? function ($val) {
+                    return $val / 100;
+                } : null);
             }, $device->getId()),
         ]
     );
@@ -1573,7 +1575,9 @@ HTML;
             'chartid' => Util::random(10),
             'title' => $title,
             'chart' => Util::cachedCall(30, function () use ($device, $month, $title) {
-                return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}($title)");
+                return Stats::chartDataOfMonth($device, $month, "设备：{$device->getName()}($title)", $device->isFuelingDevice() ? function ($val) {
+                    return $val / 100;
+                } : null);
             }, $device->getId(), $month),
         ]
     );

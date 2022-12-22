@@ -189,7 +189,7 @@ class Stats
      * @param string $title
      * @return array
      */
-    public static function chartDataOfDay(modelObj $obj, DateTimeInterface $day, string $title = ''): array
+    public static function chartDataOfDay(modelObj $obj, DateTimeInterface $day, string $title = '', callable $fn = null): array
     {
         $chart = self::getChartInitData($title);
 
@@ -218,8 +218,8 @@ class Stats
 
                 self::calcBalanceOrder($data);
 
-                $chart['series'][0]['data'][] = $data['free'];
-                $chart['series'][1]['data'][] = $data['pay'];
+                $chart['series'][0]['data'][] = $fn != null ? $fn($data['free']) : $data['free'];
+                $chart['series'][1]['data'][] = $fn != null ? $fn($data['pay']) : $data['pay'];
 
                 $chart['xAxis']['data'][] = $begin->format('H:00');
 
@@ -239,7 +239,7 @@ class Stats
      * @param string $title
      * @return array
      */
-    public static function chartDataOfMonth(modelObj $obj, DateTimeInterface $month, string $title = ''): array
+    public static function chartDataOfMonth(modelObj $obj, DateTimeInterface $month, string $title = '', callable $fn = null): array
     {
         $chart = self::getChartInitData($title);
 
@@ -277,8 +277,8 @@ class Stats
 
                 self::calcBalanceOrder($data);
 
-                $chart['series'][0]['data'][] = $data['free'];
-                $chart['series'][1]['data'][] = $data['pay'];
+                $chart['series'][0]['data'][] = $fn != null ? $fn($data['free']) : $data['free'];
+                $chart['series'][1]['data'][] = $fn != null ? $fn($data['pay']) : $data['pay'];
 
                 $chart['xAxis']['data'][] = $begin->format('m月d日');
 

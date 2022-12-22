@@ -66,6 +66,16 @@
     .team {
         color: #2196f3;
     }
+    #userlist .icon {
+        cursor: pointer;
+        border: 0;
+        width: 20px;
+        height: 20px;
+    }
+    #userlist .icon.big {
+        width: 32px;
+        height: 32px;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {if empty($s_principal)}
@@ -233,6 +243,14 @@
                         <span class="mobile" data-mobile="{$item['mobile']}" title="点击复制"><i class="fa fa-mobile"></i> {$item['mobile']}</span>
                         {/if}
                     </div>
+                </div>
+                <div>
+                    {if $item['charging']}
+                    <img src="{MODULE_URL}static/img/charger.svg" class="icon" title="正在充电中" data-op="stopCharging">
+                    {/if}
+                    {if $item['fueling']}
+                    <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中" data-op="stopFueling">
+                    {/if}
                 </div>
             </div>
         </td>
@@ -579,6 +597,14 @@
         const year = self.data('year');
         const userid = self.closest('.year').data('user');
         api.showResult({op: 'month_stat', id: userid, year});
+    }
+
+    api.stopCharging = function (userid) {
+        api.showResult({op: 'stop_charging', id: userid});
+    }
+
+    api.stopFueling = function (userid) {
+        api.showResult({op: 'stop_fueling', id: userid});
     }
 
     $(function(){

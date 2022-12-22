@@ -126,6 +126,10 @@ if ($op == 'default') {
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
     $query->orderBy('id desc');
+
+    $charging_device_enabled = App::isChargingDeviceEnabled();
+    $fueling_device_enabled = App::isFuelingDeviceEnabled();
+
     $users = [];
     /** @var  userModelObj $user */
     foreach ($query->findAll() as $user) {
@@ -187,6 +191,15 @@ if ($op == 'default') {
         }
 
         $data['type'] = User::getUserCharacter($user);
+
+        if ($charging_device_enabled) {
+            $data['charging'] = $user->chargingNOWData();
+        }
+
+        if ($fueling_device_enabled) {
+            $data['fueling'] = $user->fuelingNOWData();
+        }
+
         $users[] = $data;
     }
 
@@ -730,6 +743,92 @@ if ($op == 'default') {
     }
 
     JSON::fail('保存数据失败！');
+
+} elseif ($op == 'stop_charging') {
+    
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $data = $user->chargingNOWData();
+    if (empty($data)) {
+        JSON::fail('没有发现用户充电信息！');
+    }
+
+    $device = Device::get($data['device']);
+    if (empty($device)) {
+        $uesr->removeChargingNOWData();
+        JSON::success('找不到设备，已清除用户充电状态！');
+    }
+
+    $deviceNOW = $device->chargingNOWData($data['chargerID']);
+    if (empty($deviceNOW) || $deviceNOW['serial'] != $data['serial']) {
+        $uesr->removeChargingNOWData();
+        JSON::success('设备状态不匹配，已清除用户充电状态！');
+    }
+
+    $order = Order::get($data['serial'], true);
+    if (empty($order) || $order->isChargingFinished()) {
+        $uesr->removeChargingNOWData();
+        $device->removeChargingNOWData($data['chargerID']);
+        JSON::success('充电订单已结束，已清相关充电状态！');
+    }
+
+    // $content = app()->fetchTemplate(
+    //     'web/user/charging',
+    //     [
+    //         'user' => $user->profile(),
+    //         'device' => $device->profile(),
+    //         'order' => $order->profile(),
+    //         'status' => $device->getChargerStatusData($data['chargerID']),
+    //     ]
+    // );
+
+    // JSON::success(['title' => '充电信息', 'content' => $content]);  
+    
+} elseif ($op == 'stop_fueling') {
+
+    $user = User::get(request::int('id'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $data = $user->fuelingNOWData();
+    if (empty($data)) {
+        JSON::fail('没有发现用户加注信息！');
+    }
+
+    $device = Device::get($data['device']);
+    if (empty($device)) {
+        $uesr->removeFuelingNOWData();
+        JSON::success('找不到设备，已清除用户加注状态！');
+    }
+
+    $deviceNOW = $device->fuelingNOWData($data['chargerID']);
+    if (empty($deviceNOW) || $deviceNOW['serial'] != $data['serial']) {
+        $uesr->removeFuelingNOWData;
+        JSON::success('设备状态不匹配，已清除用户加注状态！');
+    }
+
+    $order = Order::get($data['serial'], true);
+    if (empty($order) || $order->isFuelingFinished()) {
+        $uesr->removeFuelingNOWData;
+        $device->removeFuelingNOWData($data['chargerID']);
+        JSON::success('订单已结束，已清相关加注状态！');
+    }
+
+    // $content = app()->fetchTemplate(
+    //     'web/user/feuling',
+    //     [
+    //         'user' => $user->profile(),
+    //         'device' => $device->profile(),
+    //         'order' => $order->profile(),
+    //         'status' => $device->getFuelingStatusData($data['chargerID']),
+    //     ]
+    // );
+
+    // JSON::success(['title' => '加注信息', 'content' => $content]);  
 
 } elseif ($op == 'user_export') {
 

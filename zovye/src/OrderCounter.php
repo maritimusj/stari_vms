@@ -98,7 +98,11 @@ class OrderCounter extends StatsCounter
     public function getHourFreeTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = [Order::ACCOUNT, Order::FREE];
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'] = [Order::ACCOUNT, Order::FREE, Order::FUELING_SOLO];
+        } else {
+            $params['src'] = [Order::ACCOUNT, Order::FREE];
+        }
 
         return $this->getHour($params, $hour ?? new DateTimeImmutable());
     }
@@ -106,7 +110,14 @@ class OrderCounter extends StatsCounter
     public function getHourPayTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
-        $params['src'] = Order::PAY;
+
+        if (App::isChargingDeviceEnabled()) {
+            $params['src'] = [Order::PAY, Order::CHARGING];
+        } elseif (App::isFuelingDeviceEnabled()) {
+            $params['src'] = [Order::PAY, Order::FUELING];
+        } else {
+            $params['src'] = Order::PAY;
+        }
 
         return $this->getHour($params, $hour ?? new DateTimeImmutable());
     }

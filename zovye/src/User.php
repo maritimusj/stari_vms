@@ -106,7 +106,7 @@ class User
                 'name' => 'pseudo',
                 'title' => '虚拟用户',
                 'color' => '#9e9e9e',
-                'icon' => MODULE_URL."static/img/unknown.svg",
+                'icon' => MODULE_URL."static/img/random.svg",
             ],
         ];
 

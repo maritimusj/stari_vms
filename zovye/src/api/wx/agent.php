@@ -1209,7 +1209,6 @@ class agent
                 $data['avatar'] = $x->getAvatar();
             }
 
-
             $pull_result = $order->getExtraData('pull.result', []);
             if (is_error($pull_result)) {
                 $data['status'] = [
@@ -1225,6 +1224,15 @@ class agent
 
             if ($data['refund']) {
                 $data['status']['title'] .= '（已退款）';
+            }
+
+            if ($order->isChargingOrder()) {
+                $data['type'] = 'charging';
+            } elseif ($order->isFuelingOrder()) {
+                $data['type'] = 'fueling';
+                $data['pay'] = $order->getExtraData('card', []);
+            } else {
+                $data['type'] = 'normal';
             }
 
             $result['list'][] = $data;

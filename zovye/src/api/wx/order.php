@@ -65,7 +65,7 @@ class order
                 $device = $order->getDevice();
                 if ($device) {
                     $chargerID = $order->getChargerID();
-                    if ($device->chargingNOWData($chargerID, 'serial') == $result['orderId']) {
+                    if ($device->chargingNOWData($chargerID, 'serial', '') == $result['orderId']) {
                         $result['charging']['status'] = $device->getChargerStatusData($chargerID);
                     }
                 }
@@ -196,7 +196,7 @@ class order
                     $device = $entry->getDevice();
                     if ($device) {
                         $chargerID = $entry->getChargerID();
-                        if ($device->chargingNOWData($chargerID, 'serial') == $data['orderId']) {
+                        if ($device->chargingNOWData($chargerID, 'serial', '') == $data['orderId']) {
                             $data['charging']['status'] = $device->getChargerStatusData($chargerID);
                         }
                     }

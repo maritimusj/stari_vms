@@ -444,7 +444,7 @@ class deviceModelObj extends modelObj
         return $this->removeSettings('chargingNOW', $chargerID);
     }
 
-    public function chargingNOWData(int $chargerID, string $key = '', $default = [])
+    public function chargingNOWData(int $chargerID, string $key = '', $default = null)
     {
         $path = "chargingNOW.$chargerID";
         if ($key) {
@@ -484,7 +484,7 @@ class deviceModelObj extends modelObj
         return $this->updateSettings("fuelingNOW.$chargerID", $data);
     }
 
-    public function fuelingNOWData(int $chargerID, string $key = '', $default = [])
+    public function fuelingNOWData(int $chargerID, string $key = '', $default = null)
     {
         $path = "fuelingNOW.$chargerID";
         if ($key) {

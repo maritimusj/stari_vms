@@ -758,19 +758,19 @@ if ($op == 'default') {
 
     $device = Device::get($data['device']);
     if (empty($device)) {
-        $uesr->removeChargingNOWData();
+        $user->removeChargingNOWData();
         JSON::success('找不到设备，已清除用户充电状态！');
     }
 
     $deviceNOW = $device->chargingNOWData($data['chargerID']);
     if (empty($deviceNOW) || $deviceNOW['serial'] != $data['serial']) {
-        $uesr->removeChargingNOWData();
+        $user->removeChargingNOWData();
         JSON::success('设备状态不匹配，已清除用户充电状态！');
     }
 
     $order = Order::get($data['serial'], true);
     if (empty($order) || $order->isChargingFinished()) {
-        $uesr->removeChargingNOWData();
+        $user->removeChargingNOWData();
         $device->removeChargingNOWData($data['chargerID']);
         JSON::success('充电订单已结束，已清相关充电状态！');
     }
@@ -802,19 +802,19 @@ if ($op == 'default') {
 
     $device = Device::get($data['device']);
     if (empty($device)) {
-        $uesr->removeFuelingNOWData();
+        $user->removeFuelingNOWData();
         JSON::success('找不到设备，已清除用户加注状态！');
     }
 
     $deviceNOW = $device->fuelingNOWData($data['chargerID']);
     if (empty($deviceNOW) || $deviceNOW['serial'] != $data['serial']) {
-        $uesr->removeFuelingNOWData;
+        $user->removeFuelingNOWData();
         JSON::success('设备状态不匹配，已清除用户加注状态！');
     }
 
     $order = Order::get($data['serial'], true);
     if (empty($order) || $order->isFuelingFinished()) {
-        $uesr->removeFuelingNOWData;
+        $user->removeFuelingNOWData();
         $device->removeFuelingNOWData($data['chargerID']);
         JSON::success('订单已结束，已清相关加注状态！');
     }

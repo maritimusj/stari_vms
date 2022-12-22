@@ -14,6 +14,9 @@ use zovye\model\userModelObj;
 
 class Fueling
 {
+    public const MODE_SOLO = 0; //单机模式
+    public const MODE_REMOTE = 1; //联网模式
+
     public static function test(deviceModelObj $device, int $amount, $chargerID = Device::DEFAULT_CARGO_LANE): bool
     {
         return $device->mcbNotify('run', '', [
@@ -398,10 +401,6 @@ class Fueling
     public static function settle(deviceModelObj $device, $data)
     {
         $serial = strval($data['ser']);
-        if (!Locker::try('fueling:' . $serial)) {
-            return err('锁定失败！');
-        }
-
         $chargerID = intval($data['ch']);
 
         self::end($serial, $chargerID, function (orderModelObj $order) use ($device, $serial, $data) {
@@ -563,17 +562,75 @@ class Fueling
         }
     }
 
+    public static function getSoloUser(): userModelObj
+    {
+        return User::getOrCreate('fueling_user_0000', User::PSEUDO, [
+            'nickname' => '普通用户',
+        ]);
+    }
+
+    public static function createOrderForData(deviceModelObj $device, $data)
+    {
+        $serial = strval($data['ser']);
+        $chargerID = intval($data['ch']);
+
+        $user = self::getSoloUser();
+        $goods = $device->getGoodsByLane($chargerID);
+
+        $order_data = [
+            'src' => Order::FUELING_SOLO,
+            'order_id' => $serial,
+            'openid' => $user->getOpenid(),
+            'agent_id' => $device->getAgentId(),
+            'device_id' => $device->getId(),
+            'name' => $goods['name'] ?? '尿素商品',
+            'goods_id' => $goods['id'] ?? 0,
+            'num' => $data['amount'],
+            'price' => $data['price_total'],
+            'ip' => "",
+            'extra' => [
+                'device' => [
+                    'imei' => $device->getImei(),
+                    'name' => $device->getName(),
+                ],
+                'goods' => $goods,
+                'user' => $user->profile(),
+                'chargerID' => $chargerID,
+            ],
+        ];
+
+        $agent = $device->getAgent();
+        if ($agent) {
+            $order_data['extra']['agent'] = $agent->profile();
+        }
+
+        $order = Order::create($order_data);
+        if (empty($order)) {
+            return err('创建订单失败！');
+        }
+
+        return $order;
+    }
+
     public static function onEventFee(deviceModelObj $device, $data)
     {
-        $result = self::settle($device, $data);
-        if (!is_error($result)) {
-            $serial = strval($data['ser']);
+        $serial = strval($data['ser']);
+        if (Locker::try('fueling:' . $serial)) {
+            if ($data['solo'] === self::MODE_SOLO) {
+                $result = self::createOrderForData($device, $data);
+            } else {
+                $result = self::settle($device, $data);
+            }
 
-            $result = self::confirm($device, $serial);
-            if (is_error($result)) {
-                Log::error('fueling', [
-                    'confirm' => $result,
-                ]);
+            if (!is_error($result)) {
+                $serial = strval($data['ser']);
+
+                $result = self::confirm($device, $serial);
+                if (is_error($result)) {
+                    Log::error('fueling', [
+                        'confirm' => $result,
+                    ]);
+                }
             }
         }
     }

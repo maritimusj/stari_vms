@@ -15,6 +15,8 @@ use zovye\base\modelObjFinder;
  */
 class User
 {
+    const PSEUDO = -1;   //虚拟用户
+
     const WX = 0;   //微信H5用户
     const WxAPP = 1;    //微信小程序用户
     const ALI = 2;  //阿里支付宝用户

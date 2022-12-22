@@ -1231,6 +1231,10 @@ class agent
             } elseif ($order->isFuelingOrder()) {
                 $data['type'] = 'fueling';
                 $data['pay'] = $order->getExtraData('card', []);
+                $refund = $order->getExtraData('fueling.refund', []);
+                if ($refund) {
+                    $data['pay']['refund'] = $refund;
+                }
             } else {
                 $data['type'] = 'normal';
             }

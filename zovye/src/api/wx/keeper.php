@@ -897,18 +897,23 @@ class keeper
             }
 
             if ($agent->getCommissionBalance()->total() >= $total) {
+                $keeperUser = $keeper->getUser();
+
                 $r1 = $agent->commission_change(0 - $total, CommissionBalance::RELOAD_OUT, [
                     'device' => $device->getId(),
                     'keeper' => $keeper->getId(),
+                    'user' => $keeperUser ? $keeperUser->getId() : -1,
                 ]);
 
                 if ($r1 && $r1->update([], true)) {
-                    $keeperUser = $keeper->getUser();
                     if (!empty($keeperUser)) {
                         $r2 = $keeperUser->commission_change(
                             $total,
                             CommissionBalance::RELOAD_IN,
-                            ['device' => $device->getId()]
+                            [
+                                'device' => $device->getId(),
+                                'r1' => $r1->getId(),
+                            ]
                         );
                         if ($r2 && $r2->update([], true)) {
                             return true;
@@ -964,6 +969,7 @@ class keeper
                 $entry['num'],
                 [
                     'device' => [
+                        'id' => $device->getId(),
                         'name' => $device->getName(),
                     ],
                 ]

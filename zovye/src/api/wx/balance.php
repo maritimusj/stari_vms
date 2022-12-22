@@ -204,6 +204,7 @@ class balance
                     CommissionBalance::WITHDRAW,
                     array_merge($extra, [
                         'openid' => $user->getOpenid(),
+                        'mobile' => $user->getMobile(),
                         'ip' => CLIENT_IP,
                         'user-agent' => $_SERVER['HTTP_USER_AGENT'],
                         'current' => $balance_total,

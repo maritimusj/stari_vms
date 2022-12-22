@@ -564,8 +564,9 @@ class Fueling
 
     public static function getSoloUser(): userModelObj
     {
-        return User::getOrCreate('fueling_user_0000', User::PSEUDO, [
+        return User::getOrCreate('fueling_user_0001', User::PSEUDO, [
             'nickname' => '普通用户',
+            'avatar' => MODULE_URL . 'static/img/unknown.svg',
         ]);
     }
 

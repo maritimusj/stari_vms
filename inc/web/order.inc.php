@@ -82,7 +82,7 @@ if ($op == 'default') {
     }  elseif ($way == 'charging') {
         $query->where(['src' => [Order::CHARGING, Order::CHARGING_UNPAID]]);
     }   elseif ($way == 'fueling') {
-        $query->where(['src' => [Order::FUELING, Order::FUELING_UNPAID]]);
+        $query->where(['src' => [Order::FUELING, Order::FUELING_UNPAID, Order::FUELING_SOLO]]);
     } elseif ($way == 'refund') {
         $query->where(['refund' => 1]);
         if (App::isBalanceEnabled() && Balance::isFreeOrder()) {

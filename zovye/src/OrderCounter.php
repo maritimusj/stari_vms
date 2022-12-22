@@ -98,10 +98,11 @@ class OrderCounter extends StatsCounter
     public function getHourFreeTotal($obj, DateTimeInterface $hour = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
+
+        $params['src'] = [Order::ACCOUNT, Order::FREE];
+
         if (App::isFuelingDeviceEnabled()) {
-            $params['src'] = [Order::ACCOUNT, Order::FREE, Order::FUELING_SOLO];
-        } else {
-            $params['src'] = [Order::ACCOUNT, Order::FREE];
+            $params['src'][] = Order::FUELING_SOLO;
         }
 
         return $this->getHour($params, $hour ?? new DateTimeImmutable());
@@ -111,12 +112,14 @@ class OrderCounter extends StatsCounter
     {
         $params = is_array($obj) ? $obj : [$obj];
 
+        $params['src'] = [Order::PAY];
+
         if (App::isChargingDeviceEnabled()) {
-            $params['src'] = [Order::PAY, Order::CHARGING];
-        } elseif (App::isFuelingDeviceEnabled()) {
-            $params['src'] = [Order::PAY, Order::FUELING];
-        } else {
-            $params['src'] = Order::PAY;
+            $params['src'][] = Order::CHARGING;
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'][] = Order::FUELING;
         }
 
         return $this->getHour($params, $hour ?? new DateTimeImmutable());
@@ -146,17 +149,14 @@ class OrderCounter extends StatsCounter
     public function getDayFreeTotal($obj, DateTimeInterface $day = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
+
+        $params['src'] = [
+            Order::ACCOUNT,
+            Order::FREE,
+        ];
+
         if (App::isFuelingDeviceEnabled()) {
-            $params['src'] = [
-                Order::ACCOUNT,
-                Order::FREE,
-                Order::FUELING_SOLO,
-            ];
-        } else {
-            $params['src'] = [
-                Order::ACCOUNT,
-                Order::FREE,
-            ];
+            $params['src'][] = Order::FUELING_SOLO;
         }
 
         return $this->getDay($params, $day ?? new DateTimeImmutable());
@@ -166,18 +166,14 @@ class OrderCounter extends StatsCounter
     {
         $params = is_array($obj) ? $obj : [$obj];
 
+        $params['src'] = [Order::PAY];
+
         if (App::isChargingDeviceEnabled()) {
-            $params['src'] = [
-                Order::CHARGING,
-                Order::PAY,
-            ];
-        } elseif (App::isFuelingDeviceEnabled()) {
-            $params['src'] = [
-                Order::FUELING,
-                Order::PAY,
-            ];
-        } else {
-            $params['src'] = Order::PAY;
+            $params['src'][] = Order::CHARGING;
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'][] = Order::FUELING;
         }
 
         return $this->getDay($params, $day ?? new DateTimeImmutable());
@@ -207,17 +203,14 @@ class OrderCounter extends StatsCounter
     public function getMonthFreeTotal($obj, DateTimeInterface $month = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
+
+        $params['src'] = [
+            Order::ACCOUNT,
+            Order::FREE,
+        ];
+
         if (App::isFuelingDeviceEnabled()) {
-            $params['src'] = [
-                Order::ACCOUNT,
-                Order::FREE,
-                Order::FUELING_SOLO,
-            ];
-        } else {
-            $params['src'] = [
-                Order::ACCOUNT,
-                Order::FREE,
-            ];
+            $params['src'][] = Order::FUELING_SOLO;
         }
 
         return $this->getMonth($params, $month ?? new DateTimeImmutable());
@@ -227,18 +220,14 @@ class OrderCounter extends StatsCounter
     {
         $params = is_array($obj) ? $obj : [$obj];
 
+        $params['src'] = [Order::PAY];
+
         if (App::isChargingDeviceEnabled()) {
-            $params['src'] = [
-                Order::CHARGING,
-                Order::PAY,
-            ];
-        } elseif (App::isFuelingDeviceEnabled()) {
-            $params['src'] = [
-                Order::FUELING,
-                Order::PAY,
-            ];
-        } else {
-            $params['src'] = Order::PAY;
+            $params['src'][] = Order::CHARGING;
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'][] = Order::FUELING;
         }
 
         return $this->getMonth($params, $month ?? new DateTimeImmutable());
@@ -268,7 +257,12 @@ class OrderCounter extends StatsCounter
     public function getYearFreeTotal($obj, DateTimeInterface $year = null): int
     {
         $params = is_array($obj) ? $obj : [$obj];
+
         $params['src'] = [Order::ACCOUNT, Order::FREE];
+
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'][] = Order::FUELING_SOLO;
+        }
 
         return $this->getYear($params, $year ?? new DateTimeImmutable());
     }
@@ -277,13 +271,14 @@ class OrderCounter extends StatsCounter
     {
         $params = is_array($obj) ? $obj : [$obj];
 
+        $params['src'] = [Order::PAY];
+
         if (App::isChargingDeviceEnabled()) {
-            $params['src'] = [
-                Order::CHARGING,
-                Order::PAY,
-            ];
-        } else {
-            $params['src'] = Order::PAY;
+            $params['src'][] = Order::CHARGING;
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $params['src'][] = Order::FUELING;
         }
 
         return $this->getYear($params, $year ?? new DateTimeImmutable());
@@ -303,6 +298,7 @@ class OrderCounter extends StatsCounter
         if (!$day) {
             $day = new DateTimeImmutable();
         }
+
         $this->removeDays(array_merge(['src' => Order::ACCOUNT, Order::FREE], $params), $day);
         $this->removeDays(array_merge(['src' => Order::PAY], $params), $day);
 

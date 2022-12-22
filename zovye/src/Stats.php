@@ -506,7 +506,11 @@ class Stats
         $first_order = Order::getFirstOrder();
         $total = 0;
         if ($first_order) {
-            $e = [app(), 'goods'];
+            if (App::isChargingDeviceEnabled() || App::isFuelingDeviceEnabled()) {
+                $e = [app()];
+            } else {
+                $e = [app(), 'goods'];
+            }
 
             if (Config::app('order.total', 0) > 100000) {
                 $last_order = Order::getLastOrder();

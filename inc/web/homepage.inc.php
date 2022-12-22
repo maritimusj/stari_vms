@@ -16,7 +16,7 @@ if ($op == 'stats') {
 
     $data = Util::cachedCall(30, function () {
         $rows = [
-            'n' => ['title' => '出货数量', 'unit' => ''],
+            'n' => ['title' => App::isChargingDeviceEnabled() || App::isFuelingDeviceEnabled() ? '订单数量' : '出货数量', 'unit' => ''],
             'f' => ['title' => '净增用户', 'unit' => ''],
         ];
 

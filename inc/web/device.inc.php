@@ -321,7 +321,7 @@ if ($op == 'default') {
                 if ($device->isFuelingDevice()) {
                     $data['total'] = [
                         'month' => floatval(Stats::getMonthTotal($device)['total'] / 100),
-                        'today' => floatval(Stats::getDayTotal($device)['total'] / 200),
+                        'today' => floatval(Stats::getDayTotal($device)['total'] / 100),
                     ];
                 } else {
                     $data['total'] = [

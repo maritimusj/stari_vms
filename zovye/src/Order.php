@@ -761,7 +761,7 @@ class Order extends State
                         $device = $order->getDevice();
                         if ($device) {
                             $chargerID = $order->getChargerID();
-                            if ($device->chargingNOWData($chargerID, 'serial') == $data['orderId']) {
+                            if ($device->chargingNOWData($chargerID, 'serial', '') == $data['orderId']) {
                                 $data['charging']['status'] = $device->getChargerStatusData($chargerID);
                             }
                         }
@@ -783,7 +783,7 @@ class Order extends State
                     $device = $order->getDevice();
                     if ($device) {
                         $chargerID = $order->getChargerID();
-                        if ($device->fuelingNOWData($chargerID, 'serial') == $data['orderId']) {
+                        if ($device->fuelingNOWData($chargerID, 'serial', '') == $data['orderId']) {
                             $data['fueling']['status'] = $device->getFuelingStatusData($chargerID);
                         }
                     }

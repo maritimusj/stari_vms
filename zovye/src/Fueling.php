@@ -596,6 +596,12 @@ class Fueling
                 'goods' => $goods,
                 'user' => $user->profile(),
                 'chargerID' => $chargerID,
+                'fueling' => [
+                    'result' => [
+                        're' => 3,
+                    ],
+                    'record' => $data,
+                ]
             ],
         ];
 

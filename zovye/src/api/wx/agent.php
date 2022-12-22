@@ -711,21 +711,22 @@ class agent
         $extra['isDown'] = request::int('is_down');
 
         $msg = '保存成功';
-        if (App::isFuelingDeviceEnabled() && $device->isFuelingDevice()) {
+
+        if ($device->isFuelingDevice()) {
             $extra['pulse'] = request::int('pulse');
             $extra['timeout'] = request::int('timeout');
             $extra['solo'] = request::bool('solo') ? 1 : 0;
-            if ($device->isMcbOnline()) {
-                $res = Fueling::config($device);
-                if (is_error($res)) {
-                    $msg .= '，发生错误：'.$res['message'];
-                }
-            }
         } else {
             $msg .= '！';
         }
 
         if ($device->set('extra', $extra) && $device->save()) {
+            if ($device->isFuelingDevice() && $device->isMcbOnline()) {
+                $res = Fueling::config($device);
+                if (is_error($res)) {
+                    $msg .= '，发生错误：'.$res['message'];
+                }
+            }
             return ['msg' => $msg];
         }
 

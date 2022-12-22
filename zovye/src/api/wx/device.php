@@ -180,7 +180,7 @@ class device
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
                 $lane['goods_price'] = intval($lane['goods_price']);
-
+                $lane['goods_img'] = Util::toMedia($lane['goods_img']);
                 return $lane;
             }, $payload['cargo_lanes']);
         } else {

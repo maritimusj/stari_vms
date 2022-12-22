@@ -587,7 +587,7 @@
                         {if $order['pay'] && $order['pay']['type'] == \zovye\model\pay_logsModelObj::getTypename()}
                         <div class="pay_info">
                             {if ($order['pay']['pay_name'])}
-                            <img src="{MODULE_URL}static/img/{$pay_name}.svg" class="balance">
+                            <img src="{MODULE_URL}static/img/{$order['pay']['pay_name']}.svg" class="balance">
                             {else}
                             <i class="fa fa-tag"></i>
                             {/if}

@@ -585,8 +585,8 @@ class Fueling
             'device_id' => $device->getId(),
             'name' => $goods['name'] ?? '尿素商品',
             'goods_id' => $goods['id'] ?? 0,
-            'num' => $data['amount'],
-            'price' => $data['price_total'],
+            'num' => intval($data['amount']),
+            'price' => intval($data['price_total']),
             'ip' => "",
             'extra' => [
                 'device' => [

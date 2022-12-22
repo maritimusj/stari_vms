@@ -401,7 +401,7 @@ class orderModelObj extends modelObj
 
     public function isFuelingOrder(): bool
     {
-        return $this->src == Order::FUELING || $this->src == Order::FUELING_UNPAID;
+        return $this->src == Order::FUELING || $this->src == Order::FUELING_UNPAID || $this->src == Order::FUELING_SOLO;
     }
 
     /**

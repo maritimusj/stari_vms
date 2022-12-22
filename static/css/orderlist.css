@@ -118,6 +118,9 @@
 #orderlist .tips.balancex{
     background: #ffc107;
 }
+#orderlist .tips.solo{
+    background: #009688;
+}
 #orderlist [data-op] {
     cursor: pointer;
 }
@@ -227,7 +230,6 @@
     width: 15em;
     overflow: hidden;
 }
-
 #orderlist .account .fa {
     font-size: 40px;
     color: #607d8b;

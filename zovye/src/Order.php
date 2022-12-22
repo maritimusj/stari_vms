@@ -797,13 +797,17 @@ class Order extends State
                         ];
                     }
                 }
-                $data['pay'] = $order->getExtraData('card', []);
-                if ($data['pay']['type'] == UserCommissionBalanceCard::getTypename()) {
-                    $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
-                } elseif($data['pay']['type'] == pay_logsModelObj::getTypename()) {
-                    $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
-                } elseif ($data['pay']['type'] == VIPCard::getTypename()) {
-                    $data['tips'] = ['text' => 'VIP', 'class' => 'vip'];
+                if ($order->getSrc() == Order::FUELING_SOLO) {
+                    $data['tips'] = ['text' => '单机', 'class' => 'solo'];
+                } else {
+                    $data['pay'] = $order->getExtraData('card', []);
+                    if ($data['pay']['type'] == UserCommissionBalanceCard::getTypename()) {
+                        $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
+                    } elseif($data['pay']['type'] == pay_logsModelObj::getTypename()) {
+                        $data['tips'] = ['text' => '支付', 'class' => 'wxpay'];
+                    } elseif ($data['pay']['type'] == VIPCard::getTypename()) {
+                        $data['tips'] = ['text' => 'VIP', 'class' => 'vip'];
+                    }
                 }
             } else {
                 $goods = $order->getExtraData('goods');

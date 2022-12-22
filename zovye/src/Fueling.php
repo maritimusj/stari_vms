@@ -382,6 +382,103 @@ class Fueling
         return ['message' => '正在查询状态！'];
     }
 
+    /**
+     * 结算订单
+     * @param deviceModelObj $device
+     * @param $data
+     * @return array|mixed
+     */
+    public static function settle(deviceModelObj $device, $data)
+    {
+        $serial = strval($data['ser']);
+        if (!Locker::try('fueling:' . $serial)) {
+            return err('锁定失败！');
+        }
+
+        $chargerID = intval($data['ch']);
+
+        self::end($serial, $chargerID, function (orderModelObj $order) use ($device, $serial, $data) {
+            $total_price = intval($data['price_total']);
+            $order->setPrice($total_price);
+
+            $amount = intval($data['amount']);
+            $order->setNum($amount);
+
+            $order->setFuelingRecord($data);
+        });
+
+        $result = Util::transactionDo(function () use($serial, $device, $chargerID) {
+            $order = Order::findOne(['order_id' => $serial, 'src' => Order::FUELING_UNPAID]);
+            if ($order) {
+                $order->setSrc(Order::FUELING);
+
+                $user = $order->getUser();
+
+                //减少库存
+                $locker = $device->payloadLockAcquire(3);
+                if (empty($locker)) {
+                    return err('设备正忙，请重试！');
+                }
+
+                $res = $device->resetPayload([$chargerID => -$order->getNum()], "订单：$serial");
+                if (is_error($res)) {
+                    return err('保存库存变动失败！');
+                }
+
+                $locker->unlock();
+
+                $card_type = $order->getExtraData('card.type', '');
+
+                if ($card_type != VIPCard::getTypename()) {
+                    //事件：订单已经创建
+                    EventBus::on('device.orderCreated', [
+                        'device' => $device,
+                        'user' => $user,
+                        'order' => $order,
+                    ]);
+                }
+
+                if (!$order->save()) {
+                    return err('保存订单失败！');
+                }
+
+                $pay_log = Pay::getPayLog($serial);
+                if ($pay_log) {
+                    $remain = $pay_log->getPrice() - $order->getPrice();
+                    if ($remain > 0) {
+                        Job::refund($serial, '订单结算退款');
+                    }
+                } else {
+                    //扣除用户账户金额
+                    if ($card_type == UserCommissionBalanceCard::getTypename()) {
+                        if ($order->getPrice() > 0) {
+                            $balance = $user->getCommissionBalance();
+                            $extra = [
+                                'orderid' => $order->getId(),
+                                'serial' => $serial,
+                                'chargerID' => $chargerID,
+                            ];
+                            if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
+                                return err('用户扣款失败！');
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        });
+
+        if (is_error($result)) {
+            Log::error('fueling', [
+                'error' => '结算订单出错！',
+                'result' => $result,
+                'data' => $data,
+            ]);
+        }
+
+        return $result;
+    }
+
     public static function onEventOnline(deviceModelObj $device)
     {
         $res = self::config($device);
@@ -461,90 +558,15 @@ class Fueling
 
     public static function onEventFee(deviceModelObj $device, $data)
     {
-        $serial = strval($data['ser']);
-        $chargerID = intval($data['ch']);
+        $result = self::settle($device, $data);
+        if (!is_error($result)) {
+            $serial = strval($data['ser']);
 
-        self::end($serial, $chargerID, function (orderModelObj $order) use ($device, $serial, $data) {
-            $total_price = intval($data['price_total']);
-            $order->setPrice($total_price);
-
-            $amount = intval($data['amount']);
-            $order->setNum($amount);
-
-            $order->setFuelingRecord($data);
-        });
-
-        if (Locker::try('fueling:' . $serial)) {
-            $result = Util::transactionDo(function () use($serial, $device, $chargerID) {
-                $order = Order::findOne(['order_id' => $serial, 'src' => Order::FUELING_UNPAID]);
-                if ($order) {
-                    $order->setSrc(Order::FUELING);
-
-                    $user = $order->getUser();
-
-                    //减少库存
-                    $locker = $device->payloadLockAcquire(3);
-                    if (empty($locker)) {
-                        return err('设备正忙，请重试！');
-                    }
-
-                    $res = $device->resetPayload([$chargerID => -$order->getNum()], "订单：$serial");
-                    if (is_error($res)) {
-                        return err('保存库存变动失败！');
-                    }
-
-                    $locker->unlock();
-
-                    $card_type = $order->getExtraData('card.type', '');
-
-                    if ($card_type != VIPCard::getTypename()) {
-                        //事件：订单已经创建
-                        EventBus::on('device.orderCreated', [
-                            'device' => $device,
-                            'user' => $user,
-                            'order' => $order,
-                        ]);
-                    }
-
-                    if (!$order->save()) {
-                        return err('保存订单失败！');
-                    }
-
-                    $pay_log = Pay::getPayLog($serial);
-                    if ($pay_log) {
-                        $remain = $pay_log->getPrice() - $order->getPrice();
-                        if ($remain > 0) {
-                            Job::refund($serial, '订单结算退款');
-                        }
-                    } else {
-                        //扣除用户账户金额
-                        if ($card_type == UserCommissionBalanceCard::getTypename()) {
-                            if ($order->getPrice() > 0) {
-                                $balance = $user->getCommissionBalance();
-                                $extra = [
-                                    'orderid' => $order->getId(),
-                                    'serial' => $serial,
-                                    'chargerID' => $chargerID,
-                                ];
-                                if (!$balance->change(0 -  $order->getPrice(), CommissionBalance::FUELING_FEE, $extra)) {
-                                    return err('用户扣款失败！');
-                                }
-                            }
-                        }
-                    }
-                }
-                return true;
-            });
-
-            if (!is_error($result)) {
-
-                $result = self::confirm($device, $serial);
-                if (is_error($result)) {
-                    Log::error('fueling', [
-                        'confirm' => $result,
-                    ]);
-                }
-
+            $result = self::confirm($device, $serial);
+            if (is_error($result)) {
+                Log::error('fueling', [
+                    'confirm' => $result,
+                ]);
             }
         }
     }

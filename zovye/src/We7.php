@@ -181,7 +181,6 @@ EOF;
     {
         if (is_array($data)) {
             $data['uniacid'] = _W('uniacid');
-
             return $data;
         }
 

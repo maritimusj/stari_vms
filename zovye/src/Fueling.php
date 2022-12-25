@@ -564,7 +564,7 @@ class Fueling
 
     public static function getSoloUser(): userModelObj
     {
-        return User::getOrCreate('fueling_user_0001', User::PSEUDO, [
+        return User::getOrCreate('fueling_user_' . We7::uniacid(), User::PSEUDO, [
             'nickname' => '普通用户',
             'avatar' => MODULE_URL . 'static/img/unknown.svg',
         ]);
@@ -573,6 +573,10 @@ class Fueling
     public static function createOrderForData(deviceModelObj $device, $data)
     {
         $serial = strval($data['ser']);
+        if (empty($serial)) {
+            return err('不正确的计费数据！');
+        }
+
         $chargerID = intval($data['ch']);
 
         $user = self::getSoloUser();
@@ -635,9 +639,14 @@ class Fueling
                 $result = self::settle($device, $data);
             }
 
-            if (!is_error($result)) {
-                $serial = strval($data['ser']);
+            if (is_error($result)) {
+                Log::error('fueling', [
+                    'error' => $result,
+                    'data' => $data,
+                ]);
 
+            } else {
+                $serial = strval($data['ser']);
                 $result = self::confirm($device, $serial);
                 if (is_error($result)) {
                     Log::error('fueling', [

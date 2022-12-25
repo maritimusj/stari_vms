@@ -570,7 +570,7 @@ class Fueling
         ]);
     }
 
-    public static function createOrderForData(deviceModelObj $device, $data)
+    public static function createOrderFromSoloModeData(deviceModelObj $device, $data)
     {
         $serial = strval($data['ser']);
         if (empty($serial)) {
@@ -634,7 +634,7 @@ class Fueling
         $serial = strval($data['ser']);
         if (Locker::try('fueling:' . $serial)) {
             if ($data['solo'] === self::MODE_SOLO) {
-                $result = self::createOrderForData($device, $data);
+                $result = self::createOrderFromSoloModeData($device, $data);
             } else {
                 $result = self::settle($device, $data);
             }

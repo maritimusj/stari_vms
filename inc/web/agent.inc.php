@@ -887,20 +887,19 @@ if ($op == 'default') {
     }
 
     $level = $agent->getAgentLevel();
-    $partners = [];
+    $partners = Agent::getAllPartners($agent);
 
-    foreach ($agent->settings('agentData.partners', []) as $partner_id => $data) {
-        $user = User::get($partner_id);
-        if ($user) {
-            $partners[] = [
-                'id' => $user->getId(),
-                'nickname' => $user->getNickname(),
-                'avatar' => $user->getAvatar(),
-                'name' => $data['name'] ?: '&lt;未登记&gt;',
-                'mobile' => $user->getMobile(),
-                'createtime' => date('Y-m-d H:i:s', $data['createtime']),
-            ];
-        }
+    $result = [];
+    /** @var userModelObj $partner */
+    foreach ($partners as $partner) {
+        $result[] = [
+            'id' => $partner->getId(),
+            'nickname' => $partner->getNickname(),
+            'avatar' => $partner->getAvatar(),
+            'name' => $partner->getName() ?: '&lt;未登记&gt;',
+            'mobile' => $partner->getMobile(),
+            'createtime' => date('Y-m-d H:i:s', $partner->getCreatetime()),
+        ];
     }
 
     app()->showTemplate('web/agent/partner', [
@@ -908,7 +907,7 @@ if ($op == 'default') {
         'id' => $id,
         'agent' => $agent,
         'level' => $level,
-        'partners' => $partners,
+        'partners' => $result,
     ]);
 } elseif ($op == 'partneradd') {
 

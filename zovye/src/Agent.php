@@ -195,4 +195,18 @@ class Agent
 
         return $result;
     }
+
+    public static function getAllPartners(agentModelObj $agent): array
+    {
+        $partners = [];
+
+        foreach ($agent->settings('agentData.partners', []) as $partner_id => $data) {
+            $user = User::get($partner_id);
+            if ($user) {
+                $partners[] = $user;
+            }
+        }
+
+        return $partners;
+    }
 }

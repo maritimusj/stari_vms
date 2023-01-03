@@ -14,7 +14,6 @@ use zovye\Device;
 use zovye\Job;
 use zovye\Locker;
 use zovye\Log;
-use zovye\model\advertisingModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\Order;

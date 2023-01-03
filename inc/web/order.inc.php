@@ -254,7 +254,6 @@ if ($op == 'default') {
             $data['pull_logs'] = $device->isVDevice() || $device->isNormalDevice();
         }
 
-        
         $orders[] = $data;
     }
 

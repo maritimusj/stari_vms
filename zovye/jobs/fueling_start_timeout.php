@@ -38,6 +38,8 @@ if ($op == 'fueling_start_timeout' && CtrlServ::checkJobSign($params)) {
         $result = $order->getFuelingResult();
         if (empty($result)) {
             Fueling::end($uid, $chargerID, function ($order) {
+                $order->setSrc(Order::FUELING);
+
                 $order->setExtraData('timeout', [
                     'at' => time(),
                     'reason' => '设备无响应，请稍后再试！',
@@ -58,6 +60,8 @@ if ($op == 'fueling_start_timeout' && CtrlServ::checkJobSign($params)) {
         $data = $device->getFuelingStatusData($chargerID);
         if (empty($data)) {
             Fueling::end($uid, $chargerID, function ($order) {
+                $order->setSrc(Order::FUELING);
+
                 $order->setExtraData('timeout', [
                     'at' => time(),
                     'reason' => '设备失去响应，请重试！',

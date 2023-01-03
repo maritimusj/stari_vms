@@ -31,6 +31,8 @@ if ($op == 'fueling_stop_timeout' && CtrlServ::checkJobSign($params)) {
         if (!$order->isFuelingFinished()) {
             $chargerID = $order->getChargerID();
             Fueling::end($uid, $chargerID, function ($order) {
+                $order->setSrc(Order::FUELING);
+
                 $order->setExtraData('timeout', [
                     'at' => time(),
                     'reason' => '没有收到计费信息！',

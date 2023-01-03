@@ -504,6 +504,7 @@ class Fueling
 
         if ($data['re'] != 3) {
             return self::end($serial, $chargerID, function (orderModelObj $order) use ($data) {
+                $order->setSrc(Order::FUELING);
                 $order->setFuelingResult($data);
                 $order->setResultCode($data['re']);
             });

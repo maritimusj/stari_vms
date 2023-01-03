@@ -245,7 +245,7 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 是不是蓝牙设备
+     * 是不是普通设备?
      * @return bool
      */
     public function isNormalDevice(): bool
@@ -254,7 +254,7 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 是不是虚拟设备
+     * 是不是虚拟设备?
      * @return bool
      */
     public function isVDevice(): bool
@@ -264,7 +264,7 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 是不是蓝牙设备
+     * 是不是蓝牙设备?
      * @return bool
      */
     public function isBlueToothDevice(): bool
@@ -273,7 +273,7 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 是不是充电桩
+     * 是不是充电桩?
      * @return bool
      */
     public function isChargingDevice(): bool
@@ -282,7 +282,7 @@ class deviceModelObj extends modelObj
     }
 
     /**
-     * 是不是尿素加注机
+     * 是不是尿素加注机?
      * @return bool
      */
     public function isFuelingDevice(): bool

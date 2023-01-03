@@ -77,9 +77,10 @@ class Stats
      * 获取对象某天的统计数据
      * @param modelObj $obj
      * @param mixed $day
+     * @param string $w
      * @return array
      */
-    public static function getDayTotal(modelObj $obj, $day = null): array
+    public static function getDayTotal(modelObj $obj, $day = null, string $w = 'goods'): array
     {
         try {
             if (is_string($day)) {
@@ -109,7 +110,7 @@ class Stats
         }
 
         $counter = new OrderCounter();
-        $result = $counter->getDayAll([$obj, 'goods'], $begin);
+        $result = $counter->getDayAll([$obj, $w], $begin);
 
         self::calcBalanceOrder($result);
 
@@ -120,9 +121,10 @@ class Stats
      * 获取对象某月的统计数据
      * @param modelObj $obj
      * @param mixed $month
+     * @param string $w
      * @return array
      */
-    public static function getMonthTotal(modelObj $obj, $month = null): array
+    public static function getMonthTotal(modelObj $obj, $month = null, string $w = 'goods'): array
     {
         try {
             if (is_string($month)) {
@@ -152,7 +154,7 @@ class Stats
         }
 
         $counter = new OrderCounter();
-        $result = $counter->getMonthAll([$obj, 'goods'], $begin);
+        $result = $counter->getMonthAll([$obj, $w], $begin);
 
         self::calcBalanceOrder($result);
 
@@ -802,9 +804,10 @@ class Stats
     /**
      * @param modelObj $obj
      * @param mixed $day
+     * @param string $w
      * @return array
      */
-    public static function daysOfMonth(modelObj $obj, $day = null): array
+    public static function daysOfMonth(modelObj $obj, $day = null, string $w = 'goods'): array
     {
         if (is_string($day)) {
             try {
@@ -844,7 +847,7 @@ class Stats
         $result = [];
         $counter = new OrderCounter();
         while ($begin < $end) {
-            $data = $counter->getDayAll([$obj, 'goods'], $begin);
+            $data = $counter->getDayAll([$obj, $w], $begin);
 
             self::calcBalanceOrder($data);
 
@@ -870,9 +873,10 @@ class Stats
     /**
      * @param modelObj $obj
      * @param mixed $day
+     * @param string $w
      * @return array
      */
-    public static function hoursOfDay(modelObj $obj, $day = null): array
+    public static function hoursOfDay(modelObj $obj, $day = null, string $w = 'goods'): array
     {
         try {
             if (is_string($day)) {
@@ -912,7 +916,7 @@ class Stats
         $result = [];
         $counter = new OrderCounter();
         while ($begin < $end) {
-            $data = $counter->getHourAll([$obj, 'goods'], $begin);
+            $data = $counter->getHourAll([$obj, $w], $begin);
 
             self::calcBalanceOrder($data);
 

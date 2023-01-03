@@ -48,10 +48,11 @@ class OrderCounter extends StatsCounter
         $condition = $this->fillCondition($params, $begin, $end);
         if (in_array('goods', $params)) {
             $v = Order::query($condition)->get('sum(num)');
+        } elseif (in_array('price', $params)) {
+            $v = Order::query($condition)->get('sum(price)');
         } else {
             $v = Order::query($condition)->count();
         }
-
         return intval($v);
     }
 

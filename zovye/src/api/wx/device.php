@@ -164,7 +164,7 @@ class device
             $result['device']['renewal'] = [
                 'year' => [
                     'price' => $device->getYearRenewalPrice(),
-                ]
+                ],
             ];
 
             $result['device']['solo'] = $device->getSoloMode();
@@ -181,6 +181,7 @@ class device
             $result['status']['cargo_lanes'] = array_map(function ($lane) {
                 $lane['goods_price'] = intval($lane['goods_price']);
                 $lane['goods_img'] = Util::toMedia($lane['goods_img']);
+
                 return $lane;
             }, $payload['cargo_lanes']);
         } else {
@@ -564,9 +565,9 @@ class device
             }
 
             if ($m == 'days') {
-                $data = Stats::daysOfMonth($obj, $date_str);
+                $data = Stats::daysOfMonth($obj, $date_str, request::str('w', 'goods'));
             } elseif ($m == 'hours') {
-                $data = Stats::hoursOfDay($obj, $date_str);
+                $data = Stats::hoursOfDay($obj, $date_str, request::str('w', 'goods'));
             } else {
                 $data = [];
             }
@@ -595,7 +596,7 @@ class device
             ) ? 1 : 0; //是否有未读消息
 
             //今日出货
-            $data = Stats::getDayTotal($agent);
+            $data = Stats::getDayTotal($agent, null, request::str('w', 'goods'));
             $result['all'] = [
                 'name' => $agent->getName(),
                 'free' => $data['free'],

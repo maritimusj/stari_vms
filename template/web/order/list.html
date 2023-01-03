@@ -133,7 +133,7 @@
                 {else}
                 <div class="pay">
                     <span class="num">{$order['num']}</span>
-                    {if $order['price']>0}
+                    {if $order['price']>0 || $order['fueling']}
                     (价格：<span class="price {if $order['price']==0}zeroprice{/if}">￥{$order['price']}</span>)
                     {else}
                     (<span class="zeroprice">免费领取</span>)

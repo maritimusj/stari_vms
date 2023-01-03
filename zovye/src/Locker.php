@@ -80,7 +80,7 @@ class Locker
 
         $fp = fopen($dir.sha1($uid).'.lock', 'w+');
         if ($fp) {
-            if (flock($fp, LOCK_EX | LOCK_NB)) {
+            if (flock($fp, LOCK_EX)) {
                 if ($callback) {
                     $result = $callback();
                 }

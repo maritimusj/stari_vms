@@ -1485,35 +1485,49 @@ class agent
             $dt = new DateTime('today');
             $today_st = $dt->getTimestamp();
 
-            $dt->modify('yesterday');
-            $yesterday_st = $dt->getTimestamp();
-
-            $dt->setTimestamp($today_st);
-            $dt->modify('tomorrow');
-            $tomorrow_st = $dt->getTimestamp();
-
-            $dt->setTimestamp($today_st);
-            $dt->modify('first day of this month');
-            $this_month_first_st = $dt->getTimestamp();
-            $dt->modify('first day of next month');
-            $next_month_first_st = $dt->getTimestamp();
-
             $result = [];
 
             $w = request::str('w');
             if (empty($w) || $w == 'today') {
+                $dt->setTimestamp($today_st);
+                $dt->modify('tomorrow');
+                $tomorrow_st = $dt->getTimestamp();
+
                 $result[empty($w) ? 'today' : 'w'] = self::getAgentStat($agent, $today_st, $tomorrow_st);
             }
 
             if (empty($w) || $w == 'yesterday') {
+                $dt->modify('yesterday');
+                $yesterday_st = $dt->getTimestamp();
+
                 $result[empty($w) ? 'yesterday' : 'w'] = self::getAgentStat($agent, $yesterday_st, $today_st);
             }
 
             if (empty($w) || $w == 'month') {
+                $dt->setTimestamp($today_st);
+                $dt->modify('first day of this month');
+                $this_month_first_st = $dt->getTimestamp();
+                $dt->modify('first day of next month');
+                $next_month_first_st = $dt->getTimestamp();
+
                 $result[empty($w) ? 'month' : 'w'] = self::getAgentStat(
                     $agent,
                     $this_month_first_st,
                     $next_month_first_st
+                );
+            }
+
+            if (empty($w) || $w == 'year') {
+                $dt->setTimestamp($today_st);
+                $dt->modify('first day of this year');
+                $year_st = $dt->getTimestamp();
+                $dt->modify('tomorrow');
+                $tomorrow_st = $dt->getTimestamp();
+
+                $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(
+                    $agent,
+                    $year_st,
+                    $tomorrow_st
                 );
             }
 

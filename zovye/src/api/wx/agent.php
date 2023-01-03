@@ -1702,7 +1702,7 @@ class agent
                 'createtime <' => $e_ts,
             ]);
 
-            list($priceTotal, $orderTotal) = $query->get(['sum(price)', 'count(*)']);
+            list($priceTotal, $orderTotal, $numTotal) = $query->get(['sum(price)', 'count(*)', 'sum(num)']);
 
             $commissionTotal = CommissionBalance::query([
                 'openid' => $agent->getOpenid(),
@@ -1721,6 +1721,7 @@ class agent
             return [
                 'price_all' => intval($priceTotal),
                 'order' => intval($orderTotal),
+                'num' => intval($numTotal),
                 'comm' => intval($commissionTotal),
             ];
         }, $agent->getId(), $s_ts, $e_ts);

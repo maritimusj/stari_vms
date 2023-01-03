@@ -73,23 +73,23 @@ class Locker
         });
     }
 
-    public static function flock($uid): bool
+    public static function flock($uid, callable $callback)
     {
-        $dir = ATTACHMENT_ROOT. 'lock' . DIRECTORY_SEPARATOR;
+        $dir = ATTACHMENT_ROOT.'lock'.DIRECTORY_SEPARATOR;
         We7::mkDirs($dir);
-        
-        $fp = fopen($dir. sha1($uid).'.lock', 'w+');
-        if (!$fp) {
-            return false;
+
+        $fp = fopen($dir.sha1($uid).'.lock', 'w+');
+        if ($fp) {
+            if (flock($fp, LOCK_EX | LOCK_NB)) {
+                if ($callback) {
+                    $result = $callback();
+                }
+                flock($fp, LOCK_UN);
+            }
+            fclose($fp);
         }
 
-        if(flock($fp, LOCK_EX | LOCK_NB)) {
-            return true;
-        }
-
-        fclose($fp);
-
-        return false;
+        return $result ?? null;
     }
 
     /**
@@ -111,45 +111,43 @@ class Locker
             $uid = Util::generateUID();
         }
 
-        if (!self::flock($uid)) {
-            return null;
-        }
+        return self::flock($uid, function () use ($uid, $requestID, $auto_release, $available, $expired_at) {
+            $locker = self::get($uid, true);
+            if ($locker) {
+                if ($locker->isExpired()) {
+                    $locker->destroy();
+                } else {
+                    if ($locker->reenter($requestID)) {
+                        if ($auto_release) {
+                            self::registerLockerDestroy($locker);
+                        }
 
-        $locker = self::get($uid, true);
-        if ($locker) {
-            if ($locker->isExpired()) {
-                $locker->destroy();
-            } else {
-                if ($locker->reenter($requestID)) {
-                    if ($auto_release) {
-                        self::registerLockerDestroy($locker);
+                        return $locker;
                     }
 
-                    return $locker;
+                    return null;
+                }
+            }
+
+            try {
+                $locker = self::create([
+                    'uid' => $uid,
+                    'request_id' => $requestID,
+                    'available' => max(1, $available),
+                    'used' => 1,
+                    'expired_at' => max($expired_at, 0),
+                ]);
+                if ($locker && $auto_release) {
+                    self::registerLockerDestroy($locker);
                 }
 
-                return null;
-            }
-        }
-
-        try {
-            $locker = self::create([
-                'uid' => $uid,
-                'request_id' => $requestID,
-                'available' => max(1, $available),
-                'used' => 1,
-                'expired_at' => max($expired_at, 0),
-            ]);
-            if ($locker && $auto_release) {
-                self::registerLockerDestroy($locker);
+                return $locker;
+            } catch (Exception $e) {
+                Log::error('locker', $e->getMessage());
             }
 
-            return $locker;
-        } catch (Exception $e) {
-            Log::error('locker', $e->getMessage());
-        }
-
-        return null;
+            return null;
+        });
     }
 
     public static function try(

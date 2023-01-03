@@ -9,8 +9,6 @@ namespace zovye\job\order;
 use zovye\Advertising;
 use zovye\Agent;
 use zovye\App;
-use zovye\CommissionBalance;
-use zovye\Contract\ICard;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Job;
@@ -138,7 +136,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                             } else {
                                 $card = $order->getExtraData('card', []);
                                 if ($card['type'] == UserCommissionBalanceCard::getTypename()) {
-                                    $type = '用户余额';
+                                    $type = '会员卡';
                                 } elseif ($card['type'] == pay_logsModelObj::getTypename()) {
                                     $type = '现金支付';
                                 } elseif ($card['type'] == VIPCard::getTypename()) {
@@ -150,7 +148,7 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                         }
                         $notify_data = [
                             'first' => ['value' => '新订单已创建，详情如下：'],
-                            'keyword1' => ['value' => $price_formatted],
+                            'keyword1' => ['value' => $price_formatted, 'color' => '#ff0000'],
                             'keyword2' => ['value' => "$num_formatted{$goods['unit_title']}"],
                             'keyword3' => ['value' => $device->getName()],
                             'keyword4' => ['value' => $type],

@@ -87,6 +87,8 @@ class Locker
             return true;
         }
 
+        fclose($fp);
+
         return false;
     }
 

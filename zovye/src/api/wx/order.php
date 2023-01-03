@@ -259,6 +259,20 @@ class order
 
             //出货结果
             $data['result'] = $entry->getExtraData('pull.result', []);
+
+            if ($entry->isChargingOrder()) {
+                $data['type'] = 'charging';
+            } elseif ($entry->isFuelingOrder()) {
+                $data['type'] = 'fueling';
+                $data['pay'] = $entry->getExtraData('card', []);
+                $refund = $entry->getExtraData('fueling.refund', []);
+                if ($refund) {
+                    $data['pay']['refund'] = $refund;
+                }
+            } else {
+                $data['type'] = 'normal';
+            }
+
             $orders[] = $data;
         }
 

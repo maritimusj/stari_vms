@@ -73,6 +73,12 @@ class Locker
         });
     }
 
+    public static function flock($uid): bool
+    {
+        $file = fopen(ATTACHMENT_ROOT.$uid.'.lock', 'w+');
+        return flock($file, LOCK_EX + LOCK_NB);
+    }
+
     /**
      * @param string $uid 锁的全局唯一UID
      * @param string $requestID

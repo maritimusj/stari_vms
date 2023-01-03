@@ -881,7 +881,7 @@ HTML;
 
             $device->setDeviceModel($model);
 
-            if ($model == Device::NORMAL_DEVICE || $model == Device::CHARGING_DEVICE) {
+            if ($device->isNormalDevice() || $device->isChargingDevice() || $device->isFuelingDevice()) {
                 $activeRes = Util::activeDevice($device->getImei());
             }
 

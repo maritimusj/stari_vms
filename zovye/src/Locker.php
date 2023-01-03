@@ -78,7 +78,7 @@ class Locker
         $dir = ATTACHMENT_ROOT. 'lock' . DIRECTORY_SEPARATOR;
         We7::mkDirs($dir);
         
-        $fp = fopen($dir. $uid.'.lock', 'w+');
+        $fp = fopen($dir. sha1($uid).'.lock', 'w+');
         if (!$fp) {
             return false;
         }

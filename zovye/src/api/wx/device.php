@@ -528,7 +528,7 @@ class device
                 if (empty($params['deviceid']) || $params['deviceid'] == $id) {
                     //具体到哪一天时，顺便加入设备详情
                     if ($m == 'hours') {
-                        $data = Stats::getDayTotal($item, $date_str);
+                        $data = Stats::getDayTotal($item, $date_str, $params['w']);
                         if ($data['total'] > 0) {
                             $result['devices'][$id] = [
                                 'name' => $name,
@@ -565,9 +565,9 @@ class device
             }
 
             if ($m == 'days') {
-                $data = Stats::daysOfMonth($obj, $date_str, request::str('w', 'goods'));
+                $data = Stats::daysOfMonth($obj, $date_str, $params['w']);
             } elseif ($m == 'hours') {
-                $data = Stats::hoursOfDay($obj, $date_str, request::str('w', 'goods'));
+                $data = Stats::hoursOfDay($obj, $date_str, $params['w']);
             } else {
                 $data = [];
             }
@@ -596,7 +596,7 @@ class device
             ) ? 1 : 0; //是否有未读消息
 
             //今日出货
-            $data = Stats::getDayTotal($agent, null, request::str('w', 'goods'));
+            $data = Stats::getDayTotal($agent, null, $params['w']);
             $result['all'] = [
                 'name' => $agent->getName(),
                 'free' => $data['free'],
@@ -619,7 +619,7 @@ class device
             'date' => request('date'),
             'guid' => request('guid'),
             'deviceid' => request('deviceid'),
-            'w' => request::str('w'),
+            'w' => request::str('w', 'goods'),
         ];
 
         return Util::cachedCall(6, function () use ($user, $params) {

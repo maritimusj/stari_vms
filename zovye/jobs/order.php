@@ -122,48 +122,6 @@ if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
                     }
                 }
 
-                if ($device && isset($agent)) {
-                    //通过微信模板消息给代理商推送消息
-                    $tpl_id = settings('notice.order_tplid');
-                    if ($tpl_id) {
-                        $price_formatted = number_format($order->getPrice() / 100, 2, '.', '') . '元';
-                        $num_formatted = $device->isFuelingDevice() ? $order->getNum() / 100 : $order->getNum();
-                        $goods = $order->getGoodsData();
-                        $type = '';
-                        if ($device->isFuelingDevice()) {
-                            if ($order->getSrc() == Order::FUELING_SOLO) {
-                                $type = '单机模式';
-                            } else {
-                                $card = $order->getExtraData('card', []);
-                                if ($card['type'] == UserCommissionBalanceCard::getTypename()) {
-                                    $type = '会员卡';
-                                } elseif ($card['type'] == pay_logsModelObj::getTypename()) {
-                                    $type = '现金支付';
-                                } elseif ($card['type'] == VIPCard::getTypename()) {
-                                    $type = 'VIP用户';
-                                } else {
-                                    $type = '其它方式';
-                                }
-                            }
-                        }
-                        $notify_data = [
-                            'first' => ['value' => '新订单已创建，详情如下：'],
-                            'keyword1' => ['value' => $price_formatted, 'color' => '#ff0000'],
-                            'keyword2' => ['value' => "$num_formatted{$goods['unit_title']}"],
-                            'keyword3' => ['value' => $device->getName()],
-                            'keyword4' => ['value' => $type],
-                            'keyword5' => ['value' => date('Y-m-d H:i:s', $order->getCreatetime())],
-                            'remark' => ['value' => "订单已经结算完成！"],
-                        ];
-
-                        $log['notify']['data'] = $notify_data;
-
-                        foreach (Util::getNotifyOpenIds($agent, 'order') as $openid) {
-                            $log['notify']['result'][$openid] = Wx::sendTplNotice($openid, $tpl_id, $notify_data);
-                        }
-                    }
-                }
-
                 $log['statistics'][$order->getId()] = Util::transactionDo(function () use ($order) {
                     return Util::orderStatistics($order);
                 });

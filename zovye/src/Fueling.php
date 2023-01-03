@@ -470,6 +470,8 @@ class Fueling
                         }
                     }
                 }
+
+                Job::orderNotify($order);
             }
             return true;
         });
@@ -626,6 +628,8 @@ class Fueling
         if (empty($order)) {
             return err('创建订单失败！');
         }
+
+        Job::orderNotify($order);
 
         return $order;
     }

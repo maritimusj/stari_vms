@@ -425,4 +425,14 @@ class Job
 
         return false;
     }
+
+    public static function orderNotify(orderModelObj $order): bool
+    {
+        if (CtrlServ::scheduleJob('order_notify', [
+                'id' => $order->getId(),
+            ]) !== false) {
+            return true;
+        }
+        return false;
+    }
 }

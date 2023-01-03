@@ -75,8 +75,19 @@ class Locker
 
     public static function flock($uid): bool
     {
-        $file = fopen(ATTACHMENT_ROOT.$uid.'.lock', 'w+');
-        return flock($file, LOCK_EX + LOCK_NB);
+        $dir = ATTACHMENT_ROOT. 'lock' . DIRECTORY_SEPARATOR;
+        We7::mkDirs($dir);
+        
+        $fp = fopen($dir. $uid.'.lock', 'w+');
+        if (!$fp) {
+            return false;
+        }
+
+        if(flock($fp, LOCK_EX | LOCK_NB)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -96,6 +107,10 @@ class Locker
     ): ?lockerModelObj {
         if (empty($uid)) {
             $uid = Util::generateUID();
+        }
+
+        if (!self::flock($uid)) {
+            return null;
         }
 
         $locker = self::get($uid, true);

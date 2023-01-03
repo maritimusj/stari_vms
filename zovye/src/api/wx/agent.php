@@ -1489,7 +1489,11 @@ class agent
             $result = [];
 
             $w = request::str('w');
-            $src = request::array('src');
+            $src = [];
+
+            if (request::has('src')) {
+                $src[] = request::int('src');
+            }
 
             if (empty($w) || $w == 'today') {
                 $dt->setTimestamp($today_st);

@@ -619,6 +619,7 @@ class device
             'date' => request('date'),
             'guid' => request('guid'),
             'deviceid' => request('deviceid'),
+            'w' => request::str('w'),
         ];
 
         return Util::cachedCall(6, function () use ($user, $params) {

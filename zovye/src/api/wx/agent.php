@@ -119,8 +119,8 @@ class agent
         if ($openid) {
             $user = User::get($openid, true);
             if ($user) {
-              $user->setMobile($mobile);
-              $user->save();
+                $user->setMobile($mobile);
+                $user->save();
             } else {
                 User::create([
                     'app' => User::WxAPP,
@@ -727,6 +727,7 @@ class agent
                     $msg .= '，发生错误：'.$res['message'];
                 }
             }
+
             return ['msg' => $msg];
         }
 
@@ -1488,19 +1489,21 @@ class agent
             $result = [];
 
             $w = request::str('w');
+            $src = request::array('src');
+
             if (empty($w) || $w == 'today') {
                 $dt->setTimestamp($today_st);
                 $dt->modify('tomorrow');
                 $tomorrow_st = $dt->getTimestamp();
 
-                $result[empty($w) ? 'today' : 'w'] = self::getAgentStat($agent, $today_st, $tomorrow_st);
+                $result[empty($w) ? 'today' : 'w'] = self::getAgentStat($agent, $today_st, $tomorrow_st, $src);
             }
 
             if (empty($w) || $w == 'yesterday') {
                 $dt->modify('yesterday');
                 $yesterday_st = $dt->getTimestamp();
 
-                $result[empty($w) ? 'yesterday' : 'w'] = self::getAgentStat($agent, $yesterday_st, $today_st);
+                $result[empty($w) ? 'yesterday' : 'w'] = self::getAgentStat($agent, $yesterday_st, $today_st, $src);
             }
 
             if (empty($w) || $w == 'month') {
@@ -1513,7 +1516,8 @@ class agent
                 $result[empty($w) ? 'month' : 'w'] = self::getAgentStat(
                     $agent,
                     $this_month_first_st,
-                    $next_month_first_st
+                    $next_month_first_st,
+                    $src
                 );
             }
 
@@ -1527,7 +1531,8 @@ class agent
                 $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(
                     $agent,
                     $year_st,
-                    $tomorrow_st
+                    $tomorrow_st,
+                    $src
                 );
             }
 
@@ -1693,14 +1698,17 @@ class agent
     static function getAgentStat(
         $agent,
         $s_ts,
-        $e_ts
+        $e_ts,
+        $src = []
     ): array {
-        return Util::cachedCall(30, function () use ($agent, $s_ts, $e_ts) {
-            $query = Order::query([
-                'agent_id' => $agent->getId(),
-                'createtime >=' => $s_ts,
-                'createtime <' => $e_ts,
-            ]);
+        return Util::cachedCall(30, function () use ($agent, $s_ts, $e_ts, $src) {
+            $query = Order::query(
+                array_merge([
+                    'agent_id' => $agent->getId(),
+                    'createtime >=' => $s_ts,
+                    'createtime <' => $e_ts,
+                ], $src)
+            );
 
             list($priceTotal, $orderTotal, $numTotal) = $query->get(['sum(price)', 'count(*)', 'sum(num)']);
 

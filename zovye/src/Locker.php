@@ -81,6 +81,11 @@ class Locker
         $fp = fopen($dir.sha1($uid).'.lock', 'w+');
         if ($fp) {
             if (flock($fp, LOCK_EX)) {
+                if (DEBUG) {
+                    fwrite($fp, REQUEST_ID . "\r\n");
+                    fwrite($fp, time() . "\r\n");
+                    fwrite($fp, $uid . "\r\n");
+                }
                 if ($callback) {
                     $result = $callback();
                 }

@@ -1492,7 +1492,7 @@ class agent
             $src = [];
 
             if (request::has('src')) {
-                $src[] = request::int('src');
+                $src['src'] = request::int('src');
             }
 
             if (empty($w) || $w == 'today') {

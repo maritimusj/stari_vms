@@ -1527,10 +1527,11 @@ class agent
 
             if (empty($w) || $w == 'year') {
                 $dt->setTimestamp($today_st);
-                $dt->modify('first day of this year');
-                $year_st = $dt->getTimestamp();
                 $dt->modify('tomorrow');
                 $tomorrow_st = $dt->getTimestamp();
+
+                $dt->modify('first day of this year');
+                $year_st = $dt->getTimestamp();
 
                 $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(
                     $agent,

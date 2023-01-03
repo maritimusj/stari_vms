@@ -459,15 +459,15 @@ class keeper
                 return error(State::ERROR, '检查身份失败！');
             }
 
-            if ($agent->getCommissionBalance()->total() < 0) {
-                return error(State::ERROR, '代理商账户异常，请联系代理商！');
+            $total =  round(request::float('amount', 0, 2) * 100);
+
+            if ($agent->getCommissionBalance()->total() < $total) {
+                return error(State::ERROR, '代理商账户余额不足，请联系代理商！');
             }
 
             if ($agent->isPaymentConfigEnabled()) {
                 return error(State::ERROR, '提现申请被拒绝，请联系代理商！');
             }
-
-            $total =  round(request::float('amount', 0, 2) * 100);
 
             return balance::balanceWithdraw($user, $total);
         }

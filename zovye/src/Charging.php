@@ -28,7 +28,7 @@ class Charging
                 return true;
             }
             $last_charging_status = $order->getExtraData('charging.status', []);
-            if ($last_charging_status && $last_charging_status['totalPrice'] > 0) {
+            if ($last_charging_status && $last_charging_status['priceTotal'] > 0) {
                 return true;
             }
         }
@@ -399,7 +399,6 @@ class Charging
         $order = Order::get($serial, true);
         if ($order) {
             $order->setChargingResult($result);
-
             return $order->save();
         }
 

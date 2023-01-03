@@ -1773,7 +1773,7 @@ class agent
             return error(State::ERROR, '获取用户手机号码失败，请稍后再试！');
         }
 
-        $user = User::findONe(['mobile' => $mobile]);
+        $user = User::findONe(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($user)) {
             return error(State::ERROR, '用户不存在！');
         }

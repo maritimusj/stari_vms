@@ -1116,47 +1116,20 @@ class Stats
 
         $res = CommissionBalance::query($cond)->findAll();
 
-        $c_arr = [
-            CommissionBalance::ORDER_FREE,
-            CommissionBalance::ORDER_BALANCE,
-            CommissionBalance::ORDER_WX_PAY,
-            CommissionBalance::ORDER_REFUND,
-            CommissionBalance::REFUND,
-            CommissionBalance::GSP,
-            CommissionBalance::BONUS,
-        ];
-
         $data = [
             'income' => 0,
             'withdraw' => 0,
             'fee' => 0,
         ];
+
         /** @var commission_balanceModelObj $item */
         foreach ($res as $item) {
 
             $src = $item->getSrc();
             $x_val = $item->getXVal();
 
-            if (in_array($src, $c_arr)) {
-
-                $data['income'] += $x_val;
-
-            } elseif ($src == CommissionBalance::ADJUST) {
-
-                if ($x_val > 0) {
-                    $data['income'] += $x_val;
-                } else {
-                    $data['withdraw'] += $x_val;
-                }
-
-            } elseif ($src == CommissionBalance::WITHDRAW) {
-
+            if ($src == CommissionBalance::WITHDRAW) {
                 $data['withdraw'] += $x_val;
-
-            } elseif ($src == CommissionBalance::FEE) {
-
-                $data['fee'] += $x_val;
-
             } else {
                 if ($x_val > 0) {
                     $data['income'] += $x_val;

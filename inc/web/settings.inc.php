@@ -578,6 +578,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
                 'verify' => request::trim('smsVerify'),
             ],
             'reload_smstplid' => request::trim('reloadSMSTplid'),
+            'order_tplid' => request::trim('order_tplid'),
             'reload_tplid' => request::trim('reload_tplid'),
             'agentReq_tplid' => request::trim('agentReqTplid'),
             'deviceerr_tplid' => request::trim('deviceErrorTplid'),

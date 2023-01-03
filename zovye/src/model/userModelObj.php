@@ -14,6 +14,7 @@ use zovye\Balance;
 
 use zovye\Charging as IotCharging;
 use zovye\Contract\ICard;
+use zovye\Fueling;
 use zovye\Locker;
 use zovye\Pay;
 use zovye\UserCommissionBalanceCard;
@@ -1038,11 +1039,21 @@ class userModelObj extends modelObj
     public function isBusyState(): bool
     {
         if (App::isChargingDeviceEnabled()) {
-            $user_charging_data = $this->settings('chargingNOW', []);
+            $user_charging_data = $this->chargingNOWData();
             if ($user_charging_data) {
                 return true;
             }
             if (IotCharging::hasUnpaidOrder($this)) {
+                return true;
+            }
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $user_fueling_data = $this->fuelingNOWData();
+            if ($user_fueling_data) {
+                return true;
+            }
+            if (Fueling::hasUnpaidOrder($this)) {
                 return true;
             }
         }

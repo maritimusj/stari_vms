@@ -221,6 +221,12 @@
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
+                                <input type="checkbox" name="orderNotify" value="1" {if !isset($agent_data['notice']) || $agent_data['notice']['order']}checked{/if}>
+                                接收 <big>订单结算</big> 微信推送通知
+                            </label>
+                        </div>      
+                        <div class="checkbox">
+                            <label>
                                 <input type="checkbox" name="remainWarning" value="1" {if !isset($agent_data['notice']) || $agent_data['notice']['remainWarning']}checked{/if}>
                                 接收 <big>设备缺货</big> 微信推送通知
                             </label>

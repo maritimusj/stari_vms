@@ -461,6 +461,7 @@ if ($op == 'default') {
                 'level' => $level,
                 'area' => $area,
                 'notice' => [
+                    'order' => 1,
                     'agentApp' => 1,
                     'remainWarning' => 1,
                     'deviceError' => 1,
@@ -493,6 +494,7 @@ if ($op == 'default') {
                 'agentData.notice',
                 [
                     'agentApp' => request::bool('agentApp') ? 1 : 0,
+                    'order' => request::bool('orderNotify') ? 1 : 0,
                     'remainWarning' => request::bool('remainWarning') ? 1 : 0,
                     'deviceError' => request::bool('deviceError') ? 1 : 0,
                     'deviceOnline' => request::bool('deviceOnline') ? 1 : 0,
@@ -1031,6 +1033,7 @@ if ($op == 'default') {
 
     $notice = [
         'agentApp' => request('agentApp') ? 1 : 0,
+        'order' => request('orderNotify') ? 1 : 0,
         'remainWarning' => request('remainWarning') ? 1 : 0,
         'deviceError' => request('deviceError') ? 1 : 0,
         'reviewResult' => request('reviewResult') ? 1 : 0,

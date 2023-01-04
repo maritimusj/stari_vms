@@ -14,11 +14,11 @@ class CZTV
 
     public static function handle($device_id): bool
     {
-        if (empty($device_id)) {
+        if (!App::isCZTVEnabled()) {
             return false;
         }
 
-        if (!App::isCZTVEnabled()) {
+        if (empty($device_id)) {
             return false;
         }
 
@@ -27,13 +27,19 @@ class CZTV
             return false;
         }
 
-        $token = request::str('sessionid');
+        $token = request::str('sessionId');
         if (empty($token)) {
-            if ($config['redirect_url']) {
-                Util::redirect($config['redirect_url']);
-            } else {
-                return false;
-            }
+            app()->cztvPage(null, null, $config['redirect_url']);
+            return false;
+        }
+
+        $device = Device::find($device_id, ['imei', 'shadow_id']);
+        if (empty($device)) {
+            Util::resultAlert('请重新扫描设备上的二维码！', 'error');
+        }
+
+        if ($device->isDown()) {
+            Util::resultAlert('设备维护中，请稍后再试！', 'error');
         }
 
         $user = self::getUser($config, $token);
@@ -45,16 +51,8 @@ class CZTV
         ]);
 
         if (empty($user) || is_error($user)) {
-            Util::resultAlert('无法获取用户信息，请重试！', 'error');
-        }
-
-        $device = Device::find($device_id, ['imei', 'shadow_id']);
-        if (empty($device)) {
-            Util::resultAlert('请重新扫描设备上的二维码！', 'error');
-        }
-
-        if ($device->isDown()) {
-            Util::resultAlert('设备维护中，请稍后再试！', 'error');
+            app()->cztvPage(null, null,  $config['redirect_url']);
+            return false;
         }
 
         $user->setLastActiveDevice($device);
@@ -77,12 +75,15 @@ class CZTV
     public static function getUser($config, $token)
     {
         $url = self::API_URL . '?' . http_build_query([
-            'appId' => $config['appid'],
-            'token' => $token,
-        ]);
+                'appId' => $config['appid'],
+                'token' => $token,
+            ]);
 
         $response = Util::get($url, 3, [], true);
-
+        Log::debug("cztv", [
+            'url' => $url,
+            'result' => $response,
+        ]);
         if (is_error($response)) {
             return $response;
         }
@@ -96,15 +97,15 @@ class CZTV
         }
 
         $data = $response['data'];
-        if (isEmptyArray($data) || empty($data['wechatOpenId'])) {
+        if (isEmptyArray($data) || empty($data['uuid'])) {
             return err('API返回数据无效！');
         }
 
-        $user= User::getOrCreate($data['wechatOpenId'], User::THIRD_ACCOUNT, [
+        $user= User::getOrCreate($data['uuid'], User::THIRD_ACCOUNT, [
             'app' => User::THIRD_ACCOUNT,
             'nickname' => $data['nickName'],
-            'avatar' => $data['avatar'],
-            'openid' => $data['wechatOpenId'],
+            'avatar' => $data['avatar'] ?? MODULE_URL . 'static/img/unknown.svg',
+            'openid' => $data['uuid'],
             'mobile' => $data['mobile'],
         ]);
 

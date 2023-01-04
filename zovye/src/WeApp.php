@@ -641,11 +641,40 @@ JSCODE;
 
     /**
      * 暖心小屋定制页面
-     * @param deviceModelObj $device
+     * @param deviceModelObj|null $device
+     * @param userModelObj|null $user
+     * @param string $redirect_url
      */
-    public function cztvPage(deviceModelObj $device, userModelObj $user)
+    public function cztvPage(deviceModelObj $device = null, userModelObj $user = null, string $redirect_url = "")
     {
         $tpl = [];
+
+        if (empty($user)) {
+            //尝试调起用户登录页面
+            $tpl['js']['code'] = <<<JSCODE
+<script>
+    
+	const u = navigator.userAgent;
+    const isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+    const isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+    if (isAndroid) {
+        if (window.AndroidJsInterface && window.AndroidJsInterface.login) {
+            window.AndroidJsInterface.login();
+        } else {
+            window.location.href = "$redirect_url";
+        }
+    } else {
+        if (window.webkit && window.webkit.messageHandlers.login) {
+            window.webkit.messageHandlers.login.postMessage(null);
+        } else {
+            window.location.href = "$redirect_url";
+        }
+    }
+</script>
+JSCODE;
+            $file = Theme::getThemeFile($device, 'cztv');
+            $this->showTemplate($file, ['tpl' => $tpl]);
+        }
 
         $user_json_str = json_encode($user->profile(), JSON_HEX_TAG | JSON_HEX_QUOT);
 

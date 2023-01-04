@@ -218,41 +218,43 @@
     {$tpl['js']['code']}
     {php \zovye\url(true, JS_VUE_URL, JS_JQUERY_URL);}
     <script>
-        new Vue({
-            el: '#app',
-            data: {
-                userInfo: zovye_fn.user,
-                list: [],
-                mask: {
-                    visible: false
+        if (zovye_fn !== undefined) {
+            new Vue({
+                el: '#app',
+                data: {
+                    userInfo: zovye_fn.user,
+                    list: [],
+                    mask: {
+                        visible: false
+                    }
+                },
+                created () {
+                    this.getGoodsList()
+                },
+                methods: {
+                    getGoodsList () {
+                        zovye_fn.getGoodsList((res) => {
+                            if (res.status) {
+                                this.list = res.data
+                            }
+                        })
+                    },
+                    onClickGet (id) {
+                        zovye_fn.get(id, (res) => {
+                            if (res.status) {
+                                this.mask.visible = true
+                            }
+                        })
+                    },
+                    onClickConfirm () {
+                        window.location.reload()
+                    },
+                    onClickOrder () {
+                        zovye_fn.redirectToOrderPage()
+                    }
                 }
-            },
-            created () {
-                this.getGoodsList()
-            },
-            methods: {
-                getGoodsList () {
-                    zovye_fn.getGoodsList((res) => {
-                        if (res.status) {
-                            this.list = res.data
-                        }
-                    })
-                },
-                onClickGet (id) {
-                    zovye_fn.get(id, (res) => {
-                        if (res.status) {
-                            this.mask.visible = true
-                        }
-                    })
-                },
-                onClickConfirm () {
-                    window.location.reload()
-                },
-                onClickOrder () {
-                    zovye_fn.redirectToOrderPage()
-                }
-            }
-        })
+            })
+        }
     </script>
 </body>
 

@@ -1473,75 +1473,90 @@ class agent
         return ['data' => $data];
     }
 
+
+    static function agentStatsData($agent): array
+    {
+        $dt = new DateTime('today');
+        $today_st = $dt->getTimestamp();
+
+        $result = [];
+
+        $w = request::str('w');
+        $src = [];
+
+        if (request::has('src')) {
+            $src['src'] = request::int('src');
+        }
+
+        if (empty($w) || $w == 'today') {
+            $dt->setTimestamp($today_st);
+            $dt->modify('tomorrow');
+            $tomorrow_st = $dt->getTimestamp();
+
+            $result[empty($w) ? 'today' : 'w'] = self::getAgentStat($agent, $today_st, $tomorrow_st, $src);
+        }
+
+        if (empty($w) || $w == 'yesterday') {
+            $dt->modify('yesterday');
+            $yesterday_st = $dt->getTimestamp();
+
+            $result[empty($w) ? 'yesterday' : 'w'] = self::getAgentStat($agent, $yesterday_st, $today_st, $src);
+        }
+
+        if (empty($w) || $w == 'month') {
+            $dt->setTimestamp($today_st);
+            $dt->modify('first day of this month');
+            $this_month_first_st = $dt->getTimestamp();
+            $dt->modify('first day of next month');
+            $next_month_first_st = $dt->getTimestamp();
+
+            $result[empty($w) ? 'month' : 'w'] = self::getAgentStat(
+                $agent,
+                $this_month_first_st,
+                $next_month_first_st,
+                $src
+            );
+        }
+
+        if (empty($w) || $w == 'year') {
+            $dt->setTimestamp($today_st);
+            $dt->modify('tomorrow');
+            $tomorrow_st = $dt->getTimestamp();
+
+            $dt->modify('first day of this year');
+            $year_st = $dt->getTimestamp();
+
+            $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(
+                $agent,
+                $year_st,
+                $tomorrow_st,
+                $src
+            );
+        }
+
+        return $result;
+    }
+
     public
     static function agentStat(): array
     {
         $agent = common::getAgentOrPartner();
 
+        if (request::has('guid')) {
+            $guid = request::trim('guid');
+
+            $res = agent::getUserByGUID($guid);
+            if (empty($res)) {
+                return error(State::ERROR, '用户不存在！');
+            }
+            return self::agentStatsData($agent);
+        }
+
         if ($agent->isAgent() || $agent->isPartner()) {
             if ($agent->isPartner()) {
                 $agent = $agent->getPartnerAgent();
             }
-
-            $dt = new DateTime('today');
-            $today_st = $dt->getTimestamp();
-
-            $result = [];
-
-            $w = request::str('w');
-            $src = [];
-
-            if (request::has('src')) {
-                $src['src'] = request::int('src');
-            }
-
-            if (empty($w) || $w == 'today') {
-                $dt->setTimestamp($today_st);
-                $dt->modify('tomorrow');
-                $tomorrow_st = $dt->getTimestamp();
-
-                $result[empty($w) ? 'today' : 'w'] = self::getAgentStat($agent, $today_st, $tomorrow_st, $src);
-            }
-
-            if (empty($w) || $w == 'yesterday') {
-                $dt->modify('yesterday');
-                $yesterday_st = $dt->getTimestamp();
-
-                $result[empty($w) ? 'yesterday' : 'w'] = self::getAgentStat($agent, $yesterday_st, $today_st, $src);
-            }
-
-            if (empty($w) || $w == 'month') {
-                $dt->setTimestamp($today_st);
-                $dt->modify('first day of this month');
-                $this_month_first_st = $dt->getTimestamp();
-                $dt->modify('first day of next month');
-                $next_month_first_st = $dt->getTimestamp();
-
-                $result[empty($w) ? 'month' : 'w'] = self::getAgentStat(
-                    $agent,
-                    $this_month_first_st,
-                    $next_month_first_st,
-                    $src
-                );
-            }
-
-            if (empty($w) || $w == 'year') {
-                $dt->setTimestamp($today_st);
-                $dt->modify('tomorrow');
-                $tomorrow_st = $dt->getTimestamp();
-
-                $dt->modify('first day of this year');
-                $year_st = $dt->getTimestamp();
-
-                $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(
-                    $agent,
-                    $year_st,
-                    $tomorrow_st,
-                    $src
-                );
-            }
-
-            return $result;
+            return self::agentStatsData($agent);
         }
 
         return error(State::ERROR, '没有权限！');

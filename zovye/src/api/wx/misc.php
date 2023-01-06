@@ -116,13 +116,14 @@ class misc
         if (request::bool('detail')) {
             $list = [];
             $query->groupBy('goods_id');
-            $res = $query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price']);
+            $res = $query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price', 'sum(num) AS amount']);
             foreach ((array)$res as $entry) {
                 $goods = Goods::get($entry['goods_id']);
                 if ($goods) {
                     $list[] = [
                         'goods' => Goods::format($goods),
                         'num' => intval($entry['num']),
+                        'amount' => intval($entry['amount']),
                         'price' => intval($entry['price']),
                         'price_formatted' => number_format($entry['price'] / 100, 2),
                     ];

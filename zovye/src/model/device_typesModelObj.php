@@ -53,7 +53,7 @@ class device_typesModelObj extends modelObj
      * @param bool $detail
      * @return array
      */
-    public function getCargoLanes($detail = false): array
+    public function getCargoLanes(bool $detail = false): array
     {
         return DeviceTypes::getCargoLanes($this, $detail);
     }

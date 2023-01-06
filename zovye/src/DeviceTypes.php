@@ -197,7 +197,7 @@ class DeviceTypes
                     $lane['goods_id'] = $goods_data['id'];
                     $lane['goods_unit_title'] = $goods_data['unit_title'];
                     $lane['goods_name'] = $goods_data['name'];
-                    $lane['goods_img'] = $goods_data['img'];
+                    $lane['goods_img'] = Util::toMedia($goods_data['img'], true);
                     $lane['goods_price'] = $goods_data['price'];
                     $lane['goods_price_formatted'] = $goods_data['price_formatted'];
                     $lane[Goods::AllowPay] = $goods_data[Goods::AllowPay];

@@ -466,6 +466,8 @@ class deviceModelObj extends modelObj
             $data = array_merge($saved, $data);
         }
 
+        $data['time'] = time();
+
         return $this->updateSettings("fuelingStatus.$chargerID", $data);
     }
 

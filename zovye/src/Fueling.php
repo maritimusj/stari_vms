@@ -395,20 +395,24 @@ class Fueling
     /**
      * 结算订单
      * @param deviceModelObj $device
-     * @param $data
+     * @param array $data
      * @return array|mixed
      */
-    public static function settle(deviceModelObj $device, $data)
+    public static function settle(deviceModelObj $device, array $data)
     {
         $serial = strval($data['ser']);
         $chargerID = intval($data['ch']);
 
         self::end($serial, $chargerID, function (orderModelObj $order) use ($device, $serial, $data) {
-            $total_price = intval($data['price_total']);
-            $order->setPrice($total_price);
+            if (isset($data['price_total'])) {
+                $total_price = intval($data['price_total']);
+                $order->setPrice($total_price);
+            }
 
-            $amount = intval($data['amount']);
-            $order->setNum($amount);
+            if (isset($data['amount'])) {
+                $amount = intval($data['amount']);
+                $order->setNum($amount);
+            }
 
             $order->setFuelingRecord($data);
         });
@@ -487,6 +491,27 @@ class Fueling
         return $result;
     }
 
+    public static function checkUnfinishedOrder(deviceModelObj $device, string $exclude_serial = '')
+    {
+        $query = Order::query(['src' => Order::FUELING_UNPAID, 'device_id' => $device->getId()]);
+        /** @var orderModelObj $order */
+        foreach ($query->findAll() as $order) {
+            if ($exclude_serial && $order->getOrderNO() == $exclude_serial) {
+                continue;
+            }
+
+            $last_update_time = $order->getExtraData('fueling.stats.time', $order->getCreatetime());
+            if ($exclude_serial || time() - $last_update_time > 300) {
+                self::settle($device, [
+                    'ser' => $order->getOrderNO(),
+                    'ch' => $order->getChargerID(),
+                    'reason' => -1,
+                    'time' => time(),
+                ]);
+            }
+        }
+    }
+
     public static function onEventOnline(deviceModelObj $device)
     {
         $res = self::config($device);
@@ -527,6 +552,8 @@ class Fueling
     {
         $serial = strval($data['ser']);
         if ($serial) {
+            self::checkUnfinishedOrder($device, $serial);
+
             $chargerID = intval($data['ch']);
             $device->setFuelingStatusData($chargerID, $data);
 
@@ -545,6 +572,7 @@ class Fueling
                         $order->setPrice($total_price);
                         $amount = intval($data['amount']);
                         $order->setNum($amount);
+                        $order->setExtraData('fueling.status.time', time());
                         $order->save();
 
                         $user = $order->getUser();
@@ -615,7 +643,7 @@ class Fueling
                         're' => 3,
                     ],
                     'record' => $data,
-                ]
+                ],
             ],
         ];
 

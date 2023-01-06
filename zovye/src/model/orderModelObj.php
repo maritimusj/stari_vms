@@ -36,6 +36,7 @@ use function zovye\is_error;
  * @method setIp($ip)
  * @method setOrderId(string $string)
  * @method getDeviceType()
+ * @method setUpdatetime($ts)
  * @method getUpdatetime()
  * @method getCreatetime()
  * @method getPrice()

@@ -68,6 +68,7 @@ class user
             'src' => [
                 CommissionBalance::RECHARGE,
                 CommissionBalance::CHARGING_FEE,
+                CommissionBalance::FUELING_FEE,
                 CommissionBalance::WITHDRAW,
                 CommissionBalance::TRANSFER_OUT,
                 CommissionBalance::TRANSFER_RECEIVED,

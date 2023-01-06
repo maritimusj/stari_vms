@@ -66,6 +66,7 @@ class user
         $query = $user->getCommissionBalance()->log();
         $query->where([
             'src' => [
+                CommissionBalance::ADJUST,
                 CommissionBalance::RECHARGE,
                 CommissionBalance::CHARGING_FEE,
                 CommissionBalance::FUELING_FEE,

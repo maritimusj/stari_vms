@@ -1549,7 +1549,7 @@ class agent
             if (empty($res)) {
                 return error(State::ERROR, '用户不存在！');
             }
-            return self::agentStatsData($agent);
+            return self::agentStatsData($res);
         }
 
         if ($agent->isAgent() || $agent->isPartner()) {

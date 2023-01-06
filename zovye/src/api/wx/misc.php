@@ -104,12 +104,13 @@ class misc
             }
         }
 
-        list($price, $num) = $query->get(['sum(price)', 'count(num)']);
+        list($price, $num, $amount) = $query->get(['sum(price)', 'count(*)', 'sum(num)']);
 
         $result = [
             'price' => intval($price),
             'price_formatted' => number_format($price / 100, 2),
             'num' => intval($num),
+            'amount' => intval($amount),
         ];
 
         if (request::bool('detail')) {

@@ -230,7 +230,7 @@ class Goods
         $query = Goods::query();
 
         if (isset($params['agent_id'])) {
-            if (We7::starts_with('*', $params['agent_id'])) {
+            if (We7::starts_with($params['agent_id'], '*')) {
                 $agent_id = ltrim($params['agent_id'], '*');
 
                 $agent = Agent::get($agent_id);

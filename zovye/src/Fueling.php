@@ -534,6 +534,11 @@ class Fueling
                 $order->setSrc(Order::FUELING);
                 $order->setFuelingResult($data);
                 $order->setResultCode($data['re']);
+
+                $pay_log = Pay::getPayLog($order->getOrderNO());
+                if ($pay_log) {
+                    Job::refund($order->getOrderNO(), '订单失败退款');
+                }
             });
         }
 

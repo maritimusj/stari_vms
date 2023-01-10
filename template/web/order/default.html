@@ -459,7 +459,7 @@
                                 {$order['num']}
                                 <span style="font-size: small;">{$order['goods']['unit_title']}</span>
                                 {if $order['src'] ==  \zovye\Order::FUELING_UNPAID}
-                                <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中">
+                                <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中" data-op="stopFueling">
                                 {/if}
                             </span>
                             {/if}
@@ -591,7 +591,7 @@
                             {else}
                             <i class="fa fa-tag"></i>
                             {/if}
-                            已支付{php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元{if $order['fueling']['refund'] && $order['fueling']['refund']['total'] > 0}, 剩余{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元已退回
+                            已支付{php echo number_format($order['pay']['balance'] / 100, 2, '.', '')}元{if $order['fueling']['refund']}, {if $order['fueling']['refund']['total']>0}剩余{php echo number_format($order['fueling']['refund']['total'] / 100, 2, '.', '')}元已退回{else}已全额退款{/if}
                             {/if}
                         </div>
                         {/if}
@@ -771,6 +771,12 @@
 
     api.pullsDetail = function (id) {
         api.showResult({ op: 'pullsDetail', id: id });
+    }
+
+    api.stopFueling = function (id) {
+        if (confirm('请确认是否要强制结束该订单？')) {
+            api.showResult({ op: 'stopFueling', id: id });
+        }
     }
 
     api.viewQuestionnaireDetail = function(id, self) {

@@ -139,7 +139,7 @@ class Order extends State
 
             //退款
             $res = Pay::refund($order_no, $total);
-            $res['total'] = $total;
+            $res['total'] = $total > 0 ? $total : $pay_log->getPrice();
 
             $pay_log->setData(is_error($res) ? 'refund_fail' : 'refund', $res);
             if (!$pay_log->save()) {

@@ -115,7 +115,7 @@ class Order extends State
 
     public static function makeSerial(modelObj $obj, $serial = null): string
     {
-        return sprintf("%d%05d%d", We7::uniacid(), $obj->getId(), $serial ?? time());
+        return sprintf("%d%05d%s", We7::uniacid(), $obj->getId(), $serial ?? time());
     }
 
     /**

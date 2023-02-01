@@ -1732,16 +1732,21 @@ class agent
 
             list($priceTotal, $orderTotal, $numTotal) = $query->get(['sum(price)', 'count(*)', 'sum(num)']);
 
+            $src_data = [
+                CommissionBalance::ORDER_FREE,
+                CommissionBalance::ORDER_BALANCE,
+                CommissionBalance::ORDER_WX_PAY,
+                CommissionBalance::GSP,
+                CommissionBalance::BONUS,
+            ];
+
+            if (!App::isFuelingDeviceEnabled()) {
+                $src_data[] = CommissionBalance::ORDER_REFUND;
+            }
+
             $commissionTotal = CommissionBalance::query([
                 'openid' => $agent->getOpenid(),
-                'src' => [
-                    CommissionBalance::ORDER_FREE,
-                    CommissionBalance::ORDER_BALANCE,
-                    CommissionBalance::ORDER_WX_PAY,
-                    CommissionBalance::ORDER_REFUND,
-                    CommissionBalance::GSP,
-                    CommissionBalance::BONUS,
-                ],
+                'src' => $src_data,
                 'createtime >=' => $s_ts,
                 'createtime <' => $e_ts,
             ])->get('sum(x_val)');

@@ -637,7 +637,7 @@ class keeper
 
         if ($user) {
 
-            $type = request::int('type');
+            $type = request::str('type');
             $page = max(1, request::int('page'));
             $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
 

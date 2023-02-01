@@ -449,6 +449,7 @@ if ($op == 'default') {
                     'key' => request::trim('key'),
                     'channel' => request::trim('channel'),
                     'scene' => request::trim('scene'),
+                    'area' => request::trim('area'),
                 ];
                 $account->set('config', $config);
             } elseif ($account->isWxApp()) {

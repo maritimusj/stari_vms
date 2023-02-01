@@ -15,17 +15,20 @@ class CloudFIAccount
     private $key;
     private $channel;
     private $scene;
+    private $area;
 
     /**
      * @param $key
      * @param $channel
      * @param $scene
+     * @param $area
      */
-    public function __construct($key, $channel, $scene)
+    public function __construct($key, $channel, $scene, $area)
     {
         $this->key = $key;
         $this->channel = $channel;
         $this->scene = $scene;
+        $this->area = $area;
     }
 
     public static function getUid(): string
@@ -47,7 +50,7 @@ class CloudFIAccount
 
         $v = [];
 
-        (new CloudFIAccount($config['key'], $config['channel'], $config['scene']))->fetchOne(
+        (new CloudFIAccount($config['key'], $config['channel'], $config['scene'], $config['area']))->fetchOne(
             $device,
             $user,
             function ($request, $result) use ($acc, $device, $user, &$v) {
@@ -172,7 +175,7 @@ class CloudFIAccount
         $data = [
             'channel' => $this->channel,
             'scene' => $this->scene,
-            'areaCode' => "",
+            'areaCode' => $this->area,
             'msg' => "",
             'openid' => $fans['openid'],
             'nickname' => $fans['nickname'],

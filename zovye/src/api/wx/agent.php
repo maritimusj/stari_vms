@@ -1523,7 +1523,7 @@ class agent
             $dt->modify('tomorrow');
             $tomorrow_st = $dt->getTimestamp();
 
-            $dt->modify('first day of January this year 00:00');
+            $dt->modify('first day of Jan this year 00:00');
             $year_st = $dt->getTimestamp();
 
             $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(

@@ -150,7 +150,7 @@ abstract class StatsCounter
             $begin = new DateTime($year->format('Y-01-01 00:00'));
             $end = new DateTime($year->format('Y-01-01 00:00'));
 
-            $end->modify("first day of January next year 00:00");
+            $end->modify("first day of Jan next year 00:00");
 
             $num = $this->initFN($begin, $end, $params);
 

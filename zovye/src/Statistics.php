@@ -96,12 +96,12 @@ class Statistics
             return [];
         }
         if (empty($start)) {
-            $begin->modify('first day of January this year 00:00');
+            $begin->modify('first day of Jan this year 00:00');
         } else {
             $begin->modify('today 00:00');
         }
         if (empty($end)) {
-            $end = $begin->modify('first day of January next year 00:00');
+            $end = $begin->modify('first day of Jan next year 00:00');
         } else {
             $end->modify('next day 00:00');
         }
@@ -166,8 +166,8 @@ class Statistics
         };
 
         if ($month == 0) {
-            $date->modify('first day of January 00:00');
-            $end = DateTimeImmutable::createFromMutable($date)->modify('first day of January next year 00:00');
+            $date->modify('first day of Jan 00:00');
+            $end = DateTimeImmutable::createFromMutable($date)->modify('first day of Jan next year 00:00');
 
             while ($date < $end) {
                 if ($date->getTimestamp() > time()) {

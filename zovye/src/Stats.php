@@ -1032,7 +1032,7 @@ class Stats
             $begin->modify('first day of this month');
 
             $end = new DateTime($time->format('Y-m-d 00:00'));
-            $end->modify('first day of jan next year 00:00');
+            $end->modify('first day of Jan next year 00:00');
 
         } catch (Exception $e) {
             return $result;
@@ -1046,7 +1046,7 @@ class Stats
         $data = [];
         $years = [];
 
-        $first_datetime->modify('first day of jan');
+        $first_datetime->modify('first day of Jan');
         while ($first_datetime < $now) {
             $years[] = $first_datetime->format('Y');
             $first_datetime->modify('next year');

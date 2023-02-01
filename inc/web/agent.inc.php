@@ -2202,7 +2202,7 @@ if ($op == 'default') {
             JSON::fail('订单数据不正确！');
         }
 
-        $nextYear = new DateTime('first day of jan next year 00:00');
+        $nextYear = new DateTime('first day of Jan next year 00:00');
         $today = new DateTime();
         if ($nextYear > $today) {
             $nextYear = $today;

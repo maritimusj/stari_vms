@@ -114,7 +114,7 @@ class balance
         }
 
         if ($amount < 1) {
-            return error(State::ERROR, '提现金额不不正确！');
+            return error(State::ERROR, '提现金额不正确！');
         }
 
         $balance = $user->getCommissionBalance();

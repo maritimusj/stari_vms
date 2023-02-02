@@ -20,6 +20,7 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\Group as ZovyeGroup;
+use zovye\Order;
 use zovye\request;
 use zovye\JSON;
 use zovye\model\keeperModelObj;
@@ -1249,5 +1250,42 @@ class keeper
         }
 
         return error(State::ERROR, '请求出错！');
+    }
+
+    public
+    static function orderRefund(): array
+    {
+        if (!settings('agent.order.refund')) {
+            return error(State::ERROR, '不允许退款，请联系管理员！');
+        }
+
+        $keeper = keeper::getKeeper();
+
+        $agent = $keeper->getAgent();
+
+        $order_id =  request::str('orderid');
+
+        $order = Order::get($order_id);
+        if (empty($order) || $order->getAgentId() != $agent->getId()) {
+            return error(State::ERROR, '找不到这个订单！');
+        }
+
+        $device = $order->getDevice();
+        if (empty($device) || !$device->hasKeeper($keeper) || $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
+            return error(State::ERROR, '没有权限管理这个订单！');
+        }
+
+        if ($agent->getCommissionBalance()->total() < $order->getPrice()) {
+            return error(State::ERROR, '代理商余额不足，无法退款！');
+        }
+
+        $num = request::int('num');
+
+        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '营运人员：' . $keeper->getName()]);
+        if (is_error($res)) {
+            return error(State::ERROR, $res['message']);
+        }
+
+        return ['msg' => '退款成功！'];
     }
 }

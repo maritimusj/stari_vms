@@ -100,6 +100,7 @@ router::exec($op, [
     'KeeperStats' => '\zovye\api\wx\keeper::stats',
     'KeeperOrders' => '\zovye\api\wx\keeper::getOrders',
     'ViewKeeperStats' => '\zovye\api\wx\keeper::viewKeeperStats',
+    'KeeperOrderRefund' => '\zovye\api\wx\keeper::orderRefund',
 
     'MpDetail' => '\zovye\api\wx\mp::detail',
     'MpAssign' => '\zovye\api\wx\mp::assign',

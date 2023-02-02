@@ -1261,10 +1261,9 @@ class keeper
 
         $keeper = keeper::getKeeper();
 
+        $order_id =  request::int('orderid');
+
         $agent = $keeper->getAgent();
-
-        $order_id =  request::str('orderid');
-
         $order = Order::get($order_id);
         if (empty($order) || $order->getAgentId() != $agent->getId()) {
             return error(State::ERROR, '找不到这个订单！');

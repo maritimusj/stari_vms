@@ -1122,7 +1122,7 @@ class agent
             return error(State::ERROR, '不允许退款，请联系管理员！');
         }
 
-        $order = Order::get(request('orderid'));
+        $order = Order::get(request::int('orderid'));
         if (empty($order) || $order->getAgentId() != $agent->getId()) {
             return error(State::ERROR, '找不到这个订单！');
         }

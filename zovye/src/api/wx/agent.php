@@ -1141,33 +1141,10 @@ class agent
         return ['msg' => '退款成功！'];
     }
 
-    /**
-     * 订单列表.
-     *
-     * @return array
-     */
     public
-    static function orders(): array
+    static function getAssociatedOrderList($condition = []): array
     {
-        common::checkCurrentUserPrivileges('F_sb');
-
         $query = Order::query();
-        $condition = [];
-
-        if (request::has('deviceid')) {
-            $device = \zovye\api\wx\device::getDevice(request('deviceid'));
-            if (is_error($device)) {
-                return $device;
-            }
-
-            $condition['device_id'] = $device->getId();
-            $condition['agent_id'] = $device->getAgentId();
-        }
-
-        $user_id = request::int('userid');
-        if ($user_id) {
-            $condition['user_id'] = $user_id;
-        }
 
         $query->where($condition);
 
@@ -1245,6 +1222,36 @@ class agent
         }
 
         return $result;
+    }
+
+    /**
+     * 订单列表.
+     *
+     * @return array
+     */
+    public
+    static function orders(): array
+    {
+        common::checkCurrentUserPrivileges('F_sb');
+
+        $condition = [];
+
+        if (request::has('deviceid')) {
+            $device = \zovye\api\wx\device::getDevice(request('deviceid'));
+            if (is_error($device)) {
+                return $device;
+            }
+
+            $condition['device_id'] = $device->getId();
+            $condition['agent_id'] = $device->getAgentId();
+        }
+
+        $user_id = request::int('userid');
+        if ($user_id) {
+            $condition['user_id'] = $user_id;
+        }
+
+        return self::getAssociatedOrderList($condition);
     }
 
     /**

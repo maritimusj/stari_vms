@@ -511,6 +511,31 @@ class keeper
         return error(State::ERROR, '无法保存，请联系管理员！');
     }
 
+    public static function getOrders(): array
+    {
+        $keeper = keeper::getKeeper();
+        $condition = [
+            'agent_id' => $keeper->getAgentId(),
+        ];
+
+        if (request::has('deviceid')) {
+            $device = \zovye\api\wx\device::getDevice(request('deviceid'));
+            if (is_error($device)) {
+                return $device;
+            }
+            $condition['device_id'] = $device->getId();
+        } else {
+            $condition['device_id'] = [];
+
+            $query = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId()]);
+            foreach ($query->findAll() as $device) {
+                $condition['device_id'][] = $device->getId();
+            }
+        }
+
+        return agent::getAssociatedOrderList($condition);
+    }
+
     /**
      * 运营人员统计信息.
      *

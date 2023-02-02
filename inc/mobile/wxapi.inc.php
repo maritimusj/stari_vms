@@ -98,6 +98,7 @@ router::exec($op, [
     'KeeperDeviceReset' => '@\zovye\api\wx\keeper::deviceReset',
     'KeeperDeviceTest' => '\zovye\api\wx\keeper::deviceTest',
     'KeeperStats' => '\zovye\api\wx\keeper::stats',
+    'KeeperOrders' => '\zovye\api\wx\keeper::getOrders',
     'ViewKeeperStats' => '\zovye\api\wx\keeper::viewKeeperStats',
 
     'MpDetail' => '\zovye\api\wx\mp::detail',

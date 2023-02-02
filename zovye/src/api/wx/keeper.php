@@ -20,6 +20,7 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\Group as ZovyeGroup;
+use zovye\Order;
 use zovye\request;
 use zovye\JSON;
 use zovye\model\keeperModelObj;
@@ -31,6 +32,7 @@ use zovye\Util;
 use zovye\We7;
 use function zovye\err;
 use function zovye\error;
+use function zovye\isEmptyArray;
 use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
@@ -608,6 +610,41 @@ class keeper
                 'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),
                 'num' => (int)$entry->getNum(),
             ];
+        }
+
+        if (App::isFuelingDeviceEnabled()) {
+            $cond = [
+                'device_id' => [],
+            ];
+
+            $query = Device::keeper($keeper)->where(['agent_id' => $keeper->getAgentId()]);
+            foreach ($query->findAll() as $device) {
+                $cond['device_id'][] = $device->getId();
+            }
+
+            if (!isEmptyArray($cond['device_id'])) {
+                if (request::has('src')) {
+                    $cond['src'] = request::int('src');
+                }
+
+                $w = request::str('w');
+
+                if (empty($w) || $w == 'today') {
+                    $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
+                }
+
+                if (empty($w) || $w == 'yesterday') {
+                    $result['yesterday'] = agent::getUserYesterdayStats($user ? $user->getOpenid() : '', $cond);
+                }
+
+                if (empty($w) || $w == 'month') {
+                    $result['month'] = agent::getUserMonthStats($user ? $user->getOpenid() : '', $cond);
+                }
+
+                if (empty($w) || $w == 'year') {
+                    $result['year'] = agent::getUserYearStats($user ? $user->getOpenid() : '', $cond);
+                }
+            }
         }
 
         return $result;

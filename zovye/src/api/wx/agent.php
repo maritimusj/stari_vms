@@ -1474,64 +1474,33 @@ class agent
     }
 
 
-    static function agentStatsData($agent): array
+    static function agentStatsData(agentModelObj $agent): array
     {
-        $dt = new DateTime('today');
-        $today_st = $dt->getTimestamp();
-
         $result = [];
 
         $w = request::str('w');
-        $src = [];
+
+        $cond = [];
+        $cond['agent_id'] = $agent->getId();
 
         if (request::has('src')) {
-            $src['src'] = request::int('src');
+            $cond['src'] = request::int('src');
         }
 
         if (empty($w) || $w == 'today') {
-            $dt->setTimestamp($today_st);
-            $dt->modify('tomorrow');
-            $tomorrow_st = $dt->getTimestamp();
-
-            $result[empty($w) ? 'today' : 'w'] = self::getAgentStat($agent, $today_st, $tomorrow_st, $src);
+            $result[empty($w) ? 'today' : 'w'] = self::getUserTodayStats($agent->getOpenid(), $cond);
         }
 
         if (empty($w) || $w == 'yesterday') {
-            $dt->modify('yesterday');
-            $yesterday_st = $dt->getTimestamp();
-
-            $result[empty($w) ? 'yesterday' : 'w'] = self::getAgentStat($agent, $yesterday_st, $today_st, $src);
+            $result[empty($w) ? 'yesterday' : 'w'] = self::getUserYesterdayStats($agent->getOpenid(), $cond);
         }
 
         if (empty($w) || $w == 'month') {
-            $dt->setTimestamp($today_st);
-            $dt->modify('first day of this month');
-            $this_month_first_st = $dt->getTimestamp();
-            $dt->modify('first day of next month');
-            $next_month_first_st = $dt->getTimestamp();
-
-            $result[empty($w) ? 'month' : 'w'] = self::getAgentStat(
-                $agent,
-                $this_month_first_st,
-                $next_month_first_st,
-                $src
-            );
+            $result[empty($w) ? 'month' : 'w'] = self::getUserMonthStats($agent->getOpenid(), $cond);
         }
 
         if (empty($w) || $w == 'year') {
-            $dt->setTimestamp($today_st);
-            $dt->modify('tomorrow');
-            $tomorrow_st = $dt->getTimestamp();
-
-            $dt->modify('first day of Jan this year 00:00');
-            $year_st = $dt->getTimestamp();
-
-            $result[empty($w) ? 'year' : 'w'] = self::getAgentStat(
-                $agent,
-                $year_st,
-                $tomorrow_st,
-                $src
-            );
+            $result[empty($w) ? 'year' : 'w'] = self::getUserYearStats($agent->getOpenid(), $cond);
         }
 
         return $result;
@@ -1714,50 +1683,109 @@ class agent
         return $result;
     }
 
+    public static function getUserTodayStats($openid, $cond = []): array
+    {
+        $dt = new DateTime('today');
+        $today_st = $dt->getTimestamp();
+
+        $dt->modify('+1 day');
+        $tomorrow_st = $dt->getTimestamp();
+
+        return self::getUserStats($openid, $today_st, $tomorrow_st, $cond);
+    }
+
+    public static function getUserYesterdayStats($openid, $cond = []): array
+    {
+        $dt = new DateTime('today');
+        $today_st = $dt->getTimestamp();
+
+        $dt->modify('-1 day');
+        $yesterday_st = $dt->getTimestamp();
+
+        return self::getUserStats($openid, $yesterday_st, $today_st, $cond);
+    }
+
+    public static function getUserMonthStats($openid, $cond = []): array
+    {
+        $dt = new DateTime('today');
+
+        $dt->modify('first day of this month');
+        $this_month_first_st = $dt->getTimestamp();
+
+        $dt->modify('first day of next month');
+        $next_month_first_st = $dt->getTimestamp();
+
+        return self::getUserStats(
+            $openid,
+            $this_month_first_st,
+            $next_month_first_st,
+            $cond
+        );
+    }
+
+    public static function getUserYearStats($openid, $cond = []): array
+    {
+        $dt = new DateTime('today');
+
+        $dt->modify('+1 day');
+        $tomorrow_st = $dt->getTimestamp();
+
+        $dt->modify('first day of Jan this year 00:00');
+        $year_st = $dt->getTimestamp();
+
+        return self::getUserStats(
+            $openid,
+            $year_st,
+            $tomorrow_st,
+            $cond
+        );
+    }
+
     public
-    static function getAgentStat(
-        $agent,
+    static function getUserStats(
+        $openid,
         $s_ts,
         $e_ts,
-        $src = []
+        $cond = []
     ): array {
-        return Util::cachedCall(30, function () use ($agent, $s_ts, $e_ts, $src) {
+        return Util::cachedCall(30, function () use ($openid, $s_ts, $e_ts, $cond) {
             $query = Order::query(
                 array_merge([
-                    'agent_id' => $agent->getId(),
                     'createtime >=' => $s_ts,
                     'createtime <' => $e_ts,
-                ], $src)
+                ], $cond)
             );
 
             list($priceTotal, $orderTotal, $numTotal) = $query->get(['sum(price)', 'count(*)', 'sum(num)']);
 
-            $src_data = [
-                CommissionBalance::ORDER_FREE,
-                CommissionBalance::ORDER_BALANCE,
-                CommissionBalance::ORDER_WX_PAY,
-                CommissionBalance::GSP,
-                CommissionBalance::BONUS,
-            ];
+            if ($openid) {
+                $src = [
+                    CommissionBalance::ORDER_FREE,
+                    CommissionBalance::ORDER_BALANCE,
+                    CommissionBalance::ORDER_WX_PAY,
+                    CommissionBalance::GSP,
+                    CommissionBalance::BONUS,
+                ];
 
-            if (!App::isFuelingDeviceEnabled()) {
-                $src_data[] = CommissionBalance::ORDER_REFUND;
+                if (!App::isFuelingDeviceEnabled()) {
+                    $src[] = CommissionBalance::ORDER_REFUND;
+                }
+
+                $commissionTotal = CommissionBalance::query([
+                    'openid' => $openid,
+                    'src' => $src,
+                    'createtime >=' => $s_ts,
+                    'createtime <' => $e_ts,
+                ])->get('sum(x_val)');
             }
-
-            $commissionTotal = CommissionBalance::query([
-                'openid' => $agent->getOpenid(),
-                'src' => $src_data,
-                'createtime >=' => $s_ts,
-                'createtime <' => $e_ts,
-            ])->get('sum(x_val)');
 
             return [
                 'price_all' => intval($priceTotal),
                 'order' => intval($orderTotal),
                 'num' => intval($numTotal),
-                'comm' => intval($commissionTotal),
+                'comm' => intval($commissionTotal ?? 0),
             ];
-        }, $agent->getId(), $s_ts, $e_ts, $src);
+        }, $openid, $s_ts, $e_ts, $cond);
     }
 
     public

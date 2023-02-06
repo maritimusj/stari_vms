@@ -175,7 +175,7 @@ class CloudFIAccount
         $data = [
             'channel' => $this->channel,
             'scene' => $this->scene,
-            'areaCode' => $this->area,
+            'areaCode' => intval($this->area),
             'msg' => "",
             'openid' => $fans['openid'],
             'nickname' => $fans['nickname'],

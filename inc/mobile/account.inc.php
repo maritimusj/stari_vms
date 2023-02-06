@@ -193,7 +193,7 @@ if ($op == 'default') {
             }
         }
         if (!$ok) {
-            JSON::success([]);
+            JSON::success();
         }
         $include[] = Account::COMMISSION;
     }

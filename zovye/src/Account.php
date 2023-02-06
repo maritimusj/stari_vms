@@ -1214,6 +1214,10 @@ class Account extends State
 
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
+        if ($_SESSION['is_snapshotuser']) {
+            return [];
+        }
+
         //获取本地可用公众号列表
         $accounts = Account::match($device, $user, array_merge(['max' => settings('misc.maxAccounts', 0)], $params));
         if (!empty($accounts)) {

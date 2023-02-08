@@ -138,16 +138,6 @@ if ($op == 'default') {
     $page = max(1, request::int('page'));
     $page_size = $is_ajax ? 10 : request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-    $total = Config::app('order.total');
-    if ($total < 100000) {
-        $total = $query->count();
-        if ($total > 100000) {
-            Config::app('order.total', $total, true);
-        }
-    } else {
-        $total = $page * $page_size * 100;
-    }
-
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 
@@ -257,6 +247,7 @@ if ($op == 'default') {
         $orders[] = $data;
     }
 
+    $total = $query->count();
     $pager = We7::pagination($total, $page, $page_size);
     if (stripos($pager, '&filter=1') === false) {
         $filter = [

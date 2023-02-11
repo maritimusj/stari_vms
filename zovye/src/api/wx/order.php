@@ -313,7 +313,7 @@ class order
         if (empty($step)) {
             return [
                 'total' => $query->count(),
-                'serial' => (new DateTime())->format('YmdHis'),
+                'serial' => $agent->getId() . (new DateTime())->format('YmdHis'),
             ];
         }
 

@@ -287,9 +287,10 @@ class order
 
     public static function getOrderExportHeaders(): array
     {
-        $all_headers = \zovye\Order::getExportHeaders();
-        unset($all_headers['ID']);
-        return $all_headers;
+        $headers = \zovye\Order::getExportHeaders();
+        unset($headers['ID']);
+
+        return $headers;
     }
 
     public static function orderExportDo(): array

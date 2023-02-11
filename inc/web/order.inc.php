@@ -425,10 +425,10 @@ if ($op == 'default') {
     JSON::success(['title' => '详情', 'content' => $content]);
 } elseif ($op == 'export') {
 
-    $all_headers = Order::getExportHeaders();
-    unset($all_headers['ID']);
+    $headers = Order::getExportHeaders();
+    unset($headers['ID']);
 
-    $tpl_data['headers'] = $all_headers;
+    $tpl_data['headers'] = $headers;
     $tpl_data['s_date'] = (new DateTime('first day of this month'))->format('Y-m-d');
     $tpl_data['e_date'] = (new DateTime())->format('Y-m-d');
 

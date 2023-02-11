@@ -136,8 +136,8 @@ router::exec($op, [
 
     'OrderDetail' => '\zovye\api\wx\order::detail',
     'OrderDefault' => '\zovye\api\wx\order::default',
-    'OrderGetIds' => '\zovye\api\wx\order::getExportIds',
-    'OrderExport' => '\zovye\api\wx\order::export',
+    'OrderExportHeaders' => '\zovye\api\wx\order::getOrderExportHeaders',
+    'OrderExportDo' => '\zovye\api\wx\order::orderExportDo',
 
     'CommissionSharedAccount' => '\zovye\api\wx\commission::sharedAccount',
     'CommissionAccountAssign' => '\zovye\api\wx\commission::accountAssign',

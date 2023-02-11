@@ -18,6 +18,7 @@ use zovye\User;
 use zovye\Util;
 use function zovye\err;
 use function zovye\error;
+use function zovye\is_error;
 
 class order
 {
@@ -282,5 +283,64 @@ class order
             'pagesize' => $page_size,
             'total' => $total ?? 0,
         ];
+    }
+
+    public static function getOrderExportHeaders(): array
+    {
+        $all_headers = \zovye\Order::getExportHeaders();
+        unset($all_headers['ID']);
+        return $all_headers;
+    }
+
+    public static function orderExportDo(): array
+    {
+        $agent = common::getAgent();
+
+        $params = [
+            'agent_openid' => $agent->getOpenid(),
+            'account_id' => request::int('account_id'),
+            'device_id' => request::int('device_id'),
+            'start' => request::str('start'),
+            'end' => request::str('end'),
+        ];
+
+        $query = \zovye\Order::getExportQuery($params);
+        if (is_error($query)) {
+            return $query;
+        }
+
+        $step = request::str('step');
+        if (empty($step)) {
+            return [
+                'total' => $query->count(),
+                'serial' => (new DateTime())->format('YmdHis'),
+            ];
+        }
+
+        $serial = request::str('serial');
+        if (empty($serial)) {
+            return err("缺少serial");
+        }
+
+        $filename = "$serial.csv";
+        $dirname = "export/order/";
+        $full_filename = Util::getAttachmentFileName($dirname, $filename);
+
+        if ($step == 'load') {
+            $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
+            $last_id = \zovye\Order::export($full_filename, $query, request::array('headers'));
+
+            return [
+                'num' => 100,
+                'last' => $last_id,
+            ];
+
+        } elseif ($step == 'download') {
+            return [
+                'url' => Util::toMedia("$dirname$filename"),
+            ];
+        }
+
+        return err('不正确的请求！');
     }
 }

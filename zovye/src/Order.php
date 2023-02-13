@@ -1250,21 +1250,21 @@ class Order extends State
                             $data[$header] = str_replace('"', '', $goods['id']);
                             break;
                     case 'goods_name':
-                        if ($device->isChargingDevice()) {
+                        if ($device && $device->isChargingDevice()) {
                             $data[$header] = "充电";
                         } else {
                             $data[$header] = str_replace('"', '', $goods['name']);
                         }
                         break;
                     case 'goods_num':
-                        if ($device->isChargingDevice()) {
+                        if ($device && $device->isChargingDevice()) {
                             $data[$header] = $entry->getChargingRecord('total', 0) . '度';
                         } else {
                             $data[$header] = $entry->getNum();
                         }
                         break;
                     case 'goods_price':
-                        if ($device->isChargingDevice()) {
+                        if ($device && $device->isChargingDevice()) {
                             $data[$header] = $entry->getPrice();
                         } else {
                             $data[$header] = number_format($entry->getGoodsPrice() / 100, 2, '.', '');

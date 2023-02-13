@@ -461,8 +461,6 @@ class keeper
                 return error(State::ERROR, '检查身份失败！');
             }
 
-            $total =  round(request::float('amount', 0, 2) * 100);
-
             //如果营运人员补货导致代理商余额小于零，则不允许营运人员提现
             if ($agent->getCommissionBalance()->total() < 0) {
                 return error(State::ERROR, '代理商账户异常，请联系代理商！');
@@ -471,6 +469,8 @@ class keeper
             if ($agent->isPaymentConfigEnabled()) {
                 return error(State::ERROR, '提现申请被拒绝，请联系代理商！');
             }
+
+            $total =  round(request::float('amount', 0, 2) * 100);
 
             return balance::balanceWithdraw($user, $total);
         }

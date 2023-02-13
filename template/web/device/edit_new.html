@@ -1016,8 +1016,7 @@
                         self.changing = false;
                     })
                 },
-                isPackageGoodsValid(goods)
-                {
+                isPackageGoodsValid(goods) {
                     if (this.currentType && this.currentType.cargo_lanes) {
                         return this.currentType.cargo_lanes.findIndex(e => e.goods_id == goods.goods_id) !== -1;
                     }
@@ -1093,8 +1092,7 @@
                         this.calcPackageGoodsTotal(this.currentPackage);
                     }
                 },
-                removePackage(p,index)
-                {
+                removePackage(p,index) {
                     if (p && p.id && !this.loading && confirm('确定要删除这个套餐吗？')) {
                         $.getJSON(package_api_url, {op: 'remove', id: p.id}).then(res => {
                             if (res && res.status) {
@@ -1103,8 +1101,7 @@
                         })
                     }                    
                 },
-                removeGoodsFromPackage(index)
-                {
+                removeGoodsFromPackage(index) {
                     if (this.currentPackage) {
                         this.currentPackage.list.splice(index, 1);
                         this.calcPackageGoodsTotal(this.currentPackage);
@@ -1117,7 +1114,7 @@
                     })
                     p.price = p.price.toFixed(2);
                 },
-                chooseGoods(lane){
+                chooseGoods(lane) {
                     if (this.isCustomType) {
                         this.currentLane = lane;
                         api.chooseGoods(this.config.is_fueling_device ? {types: ['fueling']} : {});
@@ -1346,10 +1343,12 @@
             if (s_keywords) {
                 params.append("keywords", s_keywords);
             }
+            
             const agentId = $.trim(form.find('select[name=agentId]').val());
             if (agentId !== '') {
                 params.append("agentId", agentId);
             }
+
             if (typeof fn === 'function') {
                 fn(params);
             }

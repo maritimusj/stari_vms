@@ -311,35 +311,35 @@ class order
         }
 
         $step = request::str('step');
-        if (empty($step)) {
+        if (empty($step) || $step == 'init') {
             return [
                 'total' => $query->count(),
                 'serial' => $agent->getId() . (new DateTime())->format('YmdHis'),
             ];
-        }
+        } else {
+            $serial = request::str('serial');
+            if (empty($serial)) {
+                return err("缺少serial");
+            }
 
-        $serial = request::str('serial');
-        if (empty($serial)) {
-            return err("缺少serial");
-        }
+            $filename = "$serial.csv";
+            $dirname = "export/order/";
+            $full_filename = Util::getAttachmentFileName($dirname, $filename);
 
-        $filename = "$serial.csv";
-        $dirname = "export/order/";
-        $full_filename = Util::getAttachmentFileName($dirname, $filename);
+            if ($step == 'load') {
+                $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
+                $last_id = \zovye\Order::export($full_filename, $query, request::array('headers'));
 
-        if ($step == 'load') {
-            $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
-            $last_id = \zovye\Order::export($full_filename, $query, request::array('headers'));
+                return [
+                    'num' => 100,
+                    'last' => $last_id,
+                ];
 
-            return [
-                'num' => 100,
-                'last' => $last_id,
-            ];
-
-        } elseif ($step == 'download') {
-            return [
-                'url' => Util::toMedia("$dirname$filename"),
-            ];
+            } elseif ($step == 'download') {
+                return [
+                    'url' => Util::toMedia("$dirname$filename"),
+                ];
+            }            
         }
 
         return err('不正确的请求！');

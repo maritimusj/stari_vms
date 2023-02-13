@@ -450,7 +450,7 @@ if ($op == 'default') {
     }
 
     $step = request::str('step');
-    if (empty($step)) {
+    if (empty($step) || $step == 'init') {
         $params['headers'] = request::array('headers');
         $params['op'] = 'export_do';
         $content = app()->fetchTemplate('web/common/export', [
@@ -463,32 +463,33 @@ if ($op == 'default') {
             'title' => "导出订单",
             'content' => $content,
         ]);
+    } else {
+        $serial = request::str('serial');
+        if (empty($serial)) {
+            JSON::fail("缺少serial");
+        }
+
+        $filename = "$serial.csv";
+        $dirname = "export/order/";
+        $full_filename = Util::getAttachmentFileName($dirname, $filename);
+
+        if ($step == 'load') {
+            $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
+            $last_id = Order::export($full_filename, $query, request::array('headers'));
+
+            JSON::success([
+                'num' => 100,
+                'last' => $last_id,
+            ]);
+
+        } elseif ($step == 'download') {
+            JSON::success([
+                'url' => Util::toMedia("$dirname$filename"),
+            ]);
+        }
     }
 
-    $serial = request::str('serial');
-    if (empty($serial)) {
-        JSON::fail("缺少serial");
-    }
-
-    $filename = "$serial.csv";
-    $dirname = "export/order/";
-    $full_filename = Util::getAttachmentFileName($dirname, $filename);
-
-    if ($step == 'load') {
-
-        $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
-        $last_id = Order::export($full_filename, $query, request::array('headers'));
-
-        JSON::success([
-            'num' => 100,
-            'last' => $last_id,
-        ]);
-
-    } elseif ($step == 'download') {
-        JSON::success([
-            'url' => Util::toMedia("$dirname$filename"),
-        ]);
-    }
+    JSON::fail('不正确的请求！');
 
 } elseif ($op == 'log') {
 

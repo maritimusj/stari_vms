@@ -463,8 +463,9 @@ class keeper
 
             $total =  round(request::float('amount', 0, 2) * 100);
 
-            if ($agent->getCommissionBalance()->total() < $total) {
-                return error(State::ERROR, '代理商账户余额不足，请联系代理商！');
+            //如果营运人员补货导致代理商余额小于零，则不允许营运人员提现
+            if ($agent->getCommissionBalance()->total() < 0) {
+                return error(State::ERROR, '代理商账户异常，请联系代理商！');
             }
 
             if ($agent->isPaymentConfigEnabled()) {

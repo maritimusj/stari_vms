@@ -1159,9 +1159,9 @@ class Order extends State
     {
         if (empty($headers)) {
             $headers = self::getExportHeaders();
+        } else {
+            array_unshift($headers, 'ID');
         }
-
-        array_unshift($headers, 'ID');
 
         $result = [];
         $last_id = 0;

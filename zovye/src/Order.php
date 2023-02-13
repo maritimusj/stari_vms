@@ -1158,7 +1158,7 @@ class Order extends State
     public static function export($filename, $query, $headers = [])
     {
         if (empty($headers)) {
-            $headers = self::getExportHeaders();
+            $headers = array_keys(self::getExportHeaders());
         } else {
             array_unshift($headers, 'ID');
         }

@@ -1093,6 +1093,7 @@ class Order extends State
         $agent_openid = $params['agent_openid'] ?? false;
         $account_id = $params['account_id'] ?? false;
         $device_id = $params['device_id'] ?? false;
+        $device_uid = $params['device_uid'] ?? false;
 
         $query = Order::query();
         if ($agent_openid) {
@@ -1113,6 +1114,14 @@ class Order extends State
 
         if ($device_id) {
             $device = Device::get($device_id);
+            if (empty($device)) {
+                return err('找不到指定的设备！');
+            }
+            $query->where(['device_id' => $device->getId()]);
+        }
+
+        if ($device_uid) {
+            $device = Device::get($device_uid, true);
             if (empty($device)) {
                 return err('找不到指定的设备！');
             }

@@ -300,7 +300,7 @@ class order
         $params = [
             'agent_openid' => $agent->getOpenid(),
             'account_id' => request::int('account_id'),
-            'device_id' => request::int('device_id'),
+            'device_uid' => request::str('device_uid'),
             'start' => request::str('start'),
             'end' => request::str('end'),
         ];

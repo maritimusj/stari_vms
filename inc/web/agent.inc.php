@@ -869,7 +869,7 @@ if ($op == 'default') {
     }
 
     $content = app()->fetchTemplate(
-        'web/agent/agent-msg',
+        'web/agent/agent_msg',
         [
             'agent' => $agent,
             'message' => $messages,
@@ -934,7 +934,7 @@ if ($op == 'default') {
 
     $partner_data['mobile'] = $user->getMobile();
 
-    app()->showTemplate('web/agent/partner-edit', [
+    app()->showTemplate('web/agent/partner_edit', [
         'op' => $op,
         'agent_id' => $agent_id,
         'user_id' => $user_id,
@@ -968,7 +968,7 @@ if ($op == 'default') {
     $agent_data = $agent->getAgentData();
     $notice = $agent_data['partners'][$user->getId()]['notice'] ?: [];
 
-    app()->showTemplate('web/agent/partner-edit', [
+    app()->showTemplate('web/agent/partner_edit', [
         'op' => $op,
         'agent_id' => $agent_id,
         'user_id' => $user_id,
@@ -1194,7 +1194,7 @@ if ($op == 'default') {
         }
     }
 
-    app()->showTemplate('web/agent/msg-edit', $tpl_data);
+    app()->showTemplate('web/agent/msg_edit', $tpl_data);
 } elseif ($op == 'msgsave') {
 
     $id = request::int('id');
@@ -1306,7 +1306,7 @@ if ($op == 'default') {
         $tpl_data['back_url'] = $this->createWebUrl('agent', ['op' => 'partner', 'id' => $user->getAgentId()]);
     }
 
-    app()->showTemplate('web/agent/agent-msg', $tpl_data);
+    app()->showTemplate('web/agent/agent_msg', $tpl_data);
 } elseif ($op == 'msglist_remove') {
 
     $id = request::int('id');
@@ -1415,7 +1415,7 @@ if ($op == 'default') {
                     $tpl_data['val'] = number_format($data['amount'] / 100, 2);
                 }
             }
-            app()->showTemplate('web/agent/free-edit-user', $tpl_data);
+            app()->showTemplate('web/agent/free_edit_user', $tpl_data);
         } elseif ($from == 'mixed') {
             if ($fn == 'adduser') {
                 $user = User::get(request::int('id'));
@@ -1437,7 +1437,7 @@ if ($op == 'default') {
             }
             $tpl_data['user'] = $user;
 
-            app()->showTemplate('web/agent/mixed-edit-user', $tpl_data);
+            app()->showTemplate('web/agent/mixed_edit_user', $tpl_data);
         } else {
             Util::resultAlert('不正确的操作！', 'error');
         }
@@ -1569,7 +1569,7 @@ if ($op == 'default') {
 
         $tpl_data['level'] = request::trim('level');
 
-        $content = app()->fetchTemplate('web/agent/gsp-add-role', $tpl_data);
+        $content = app()->fetchTemplate('web/agent/gsp_add_role', $tpl_data);
         JSON::success([
             'title' => '设置角色',
             'content' => $content,

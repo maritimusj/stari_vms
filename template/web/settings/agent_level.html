@@ -1,0 +1,26 @@
+<form>
+    <div class="form-group">
+        <label for="agentCommissionFee" class="col-md-2 control-label">支付订单<br/>手续费（<span id="fee_type_title">{if $settings['agent']['reg']['commission_fee_type'] == 0}元{else}%{/if}</span>）
+        </label>
+        <div class="col-md-10">
+            <div class="control-label checkbox-inline">
+                <label for="feeType1" class="radio-inline">
+                    <input name="feeType" id="feeType1" type="radio" value="1" {if $settings['agent']['reg']['commission_fee_type'] == 1}checked="checked"{/if} onclick="chfeeTypeTitle('%')">
+                    按百分比&nbsp
+                </label>
+                <label for="feeType0" class="radio-inline">
+                    <input name="feeType" id="feeType0" type="radio" value="0"  {if $settings['agent']['reg']['commission_fee_type'] == 0}checked="checked"{/if} onclick="chfeeTypeTitle('元')">
+                    固定金额 &nbsp
+                </label>
+                <input type="number"  class="form-control" style="display:inline-block;width:10em;" name="agentCommissionFee" id="agentCommissionFee" value="{php echo number_format($settings['agent']['reg']['commission_fee'] /100, 2)}" min="0" step="0.01">
+                <span class="help-block">* 扣除支付订单手续费后，剩余金额作为代理商佣金</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-btn">
+        <input type="hidden" name="save_type" value="commission">
+        <input type="hidden" name="op" value="save">
+        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+    </div>
+</form>

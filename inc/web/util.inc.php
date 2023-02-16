@@ -13,7 +13,7 @@ $op = request::op('default');
 if ($op == 'QQMapPicker') {
 
     $content = app()->fetchTemplate(
-        'web/util/QQMapPicker',
+        'web/util/qq_map_picker',
         [
             'lbs_key' => settings('user.location.appkey', DEFAULT_LBS_KEY),
         ]

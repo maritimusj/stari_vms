@@ -32,14 +32,14 @@
                     <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
                         <div class="radio">
                             <label>
-                                <input type="radio" name="deviceUnbind" value="0" {if empty($settings['agent']['device']['unbind'])}checked{/if} onclick="changeModeTypeTitle('%')">
-                                上级代理商
+                                <input type="radio" name="deviceUnbind" value="1"  {if !empty($settings['agent']['device']['unbind'])}checked{/if} onclick="changeModeTypeTitle('元')">
+                                平台
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" name="deviceUnbind" value="1"  {if !empty($settings['agent']['device']['unbind'])}checked{/if} onclick="changeModeTypeTitle('元')">
-                                平台
+                                <input type="radio" name="deviceUnbind" value="0" {if empty($settings['agent']['device']['unbind'])}checked{/if} onclick="changeModeTypeTitle('%')">
+                                上级代理商
                             </label>
                         </div>
                     </div>
@@ -79,6 +79,75 @@
                     <div class="col-md-10">
                         <input type="text" class="form-control" name="agentMsg" id="agentMsg" value="{$settings['agent']['msg_tplid']}">
                         <span class="help-block">* 管理员给代理商发送消息提醒时使用这个模板ID</span>
+                    </div>
+                </div>
+            </div>
+            <div class="seg operate">
+                <div class="title">代理等级</div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label" data-id="level0">默认等级</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level0" id="level0" value="{$settings['agent']['levels']['level0']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr0', $settings['agent']['levels']['level0']['clr']);}
+                        </span>                      
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label" data-id="level1">等级一</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level1" id="level1" value="{$settings['agent']['levels']['level1']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr1', $settings['agent']['levels']['level1']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label" data-id="level2">等级二</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level2" id="level2" value="{$settings['agent']['levels']['level2']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr2', $settings['agent']['levels']['level2']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label" data-id="level3">等级三</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level3" id="level3" value="{$settings['agent']['levels']['level3']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr3', $settings['agent']['levels']['level3']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label" data-id="level4">等级四</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level4" id="level4" value="{$settings['agent']['levels']['level4']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr4', $settings['agent']['levels']['level4']['clr']);}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="level0" class="col-md-2 control-label" data-id="level5">等级五</label>
+                    <div class="col-md-10">
+                        <span class="col-md-4">
+                            <input type="text" class="form-control" name="level5" id="level5" value="{$settings['agent']['levels']['level5']['title']}">
+                        </span>
+                        <span class="col-md-8">
+                            {php echo tpl_form_field_color('clr5', $settings['agent']['levels']['level5']['clr']);}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -127,7 +196,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="agentRegMode" class="col-md-2 control-label">代理功能</label>
+                    <label for="agentRegMode" class="col-md-2 control-label">小程序功能</label>
                     <div class="col-md-10">
                         <label class="checkbox-inline">
                             <input type="checkbox" name="F_tj" value="1" {if ($settings['agent']['reg']['funcs']['F_tj'])}checked{/if}> 出货统计
@@ -406,75 +475,6 @@
                 </fieldset>
             </div>
             {/if}
-            <div class="seg">
-                <div class="title">代理等级</div>
-                <div class="form-group">
-                    <label for="level0" class="col-md-2 control-label">等级 零</label>
-                    <div class="col-md-10">
-                        <span class="col-md-4">
-                            <input type="text" class="form-control" name="level0" id="level0" value="{$settings['agent']['levels']['level0']['title']}">
-                        </span>
-                        <span class="col-md-8">
-                            {php echo tpl_form_field_color('clr0', $settings['agent']['levels']['level0']['clr']);}
-                        </span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="level0" class="col-md-2 control-label">等级 一</label>
-                    <div class="col-md-10">
-                        <span class="col-md-4">
-                            <input type="text" class="form-control" name="level1" id="level1" value="{$settings['agent']['levels']['level1']['title']}">
-                        </span>
-                        <span class="col-md-8">
-                            {php echo tpl_form_field_color('clr1', $settings['agent']['levels']['level1']['clr']);}
-                        </span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="level0" class="col-md-2 control-label">等级 二</label>
-                    <div class="col-md-10">
-                        <span class="col-md-4">
-                            <input type="text" class="form-control" name="level2" id="level2" value="{$settings['agent']['levels']['level2']['title']}">
-                        </span>
-                        <span class="col-md-8">
-                            {php echo tpl_form_field_color('clr2', $settings['agent']['levels']['level2']['clr']);}
-                        </span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="level0" class="col-md-2 control-label">等级 三</label>
-                    <div class="col-md-10">
-                        <span class="col-md-4">
-                            <input type="text" class="form-control" name="level3" id="level3" value="{$settings['agent']['levels']['level3']['title']}">
-                        </span>
-                        <span class="col-md-8">
-                            {php echo tpl_form_field_color('clr3', $settings['agent']['levels']['level3']['clr']);}
-                        </span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="level0" class="col-md-2 control-label">等级 四</label>
-                    <div class="col-md-10">
-                        <span class="col-md-4">
-                            <input type="text" class="form-control" name="level4" id="level4" value="{$settings['agent']['levels']['level4']['title']}">
-                        </span>
-                        <span class="col-md-8">
-                            {php echo tpl_form_field_color('clr4', $settings['agent']['levels']['level4']['clr']);}
-                        </span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="level0" class="col-md-2 control-label">等级 五</label>
-                    <div class="col-md-10">
-                        <span class="col-md-4">
-                            <input type="text" class="form-control" name="level5" id="level5" value="{$settings['agent']['levels']['level5']['title']}">
-                        </span>
-                        <span class="col-md-8">
-                            {php echo tpl_form_field_color('clr5', $settings['agent']['levels']['level5']['clr']);}
-                        </span>
-                    </div>
-                </div>
-            </div>
             <div class="seg" id="special3">
                 <div class="title">代理商协议</div>
                 <div class="form-group">

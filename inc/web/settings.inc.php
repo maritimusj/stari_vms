@@ -1488,6 +1488,18 @@ if ($op == 'account') {
     ], true);
 
     JSON::success('Ok');
+    
+} elseif ($op == 'agentLevelConfig') {
+
+    $level = request::str('id');
+
+    $content = app()->fetchTemplate(
+        'web/settings/agent_level',
+        [
+        ]
+    );
+
+    JSON::success(['title' => '代理商等级配置', 'content' => $content]);
 }
 
 if (!(array_key_exists($op, $tpl_data['navs']) || $op == 'ctrl')) {

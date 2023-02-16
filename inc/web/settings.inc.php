@@ -320,13 +320,6 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
             }
         }
     } elseif ($save_type == 'agent') {
-        $settings['agentWxapp'] = [
-            'title' => request::trim('WxAppTitle'),
-            'name' => request::trim('WxAppName'),
-            'key' => request::trim('WxAppKey'),
-            'secret' => request::trim('WxAppSecret'),
-            'username' => request::trim('WxAppUsername'),
-        ];
 
         $settings['agent']['order']['refund'] = request::bool('allowAgentRefund') ? 1 : 0;
 
@@ -505,6 +498,14 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 
     } elseif ($save_type == 'wxapp') {
 
+        $settings['agentWxapp'] = [
+            'title' => request::trim('WxAppTitle'),
+            'name' => request::trim('WxAppName'),
+            'key' => request::trim('WxAppKey'),
+            'secret' => request::trim('WxAppSecret'),
+            'username' => request::trim('WxAppUsername'),
+        ];
+        
         if (App::isBalanceEnabled()) {
             $reward = Config::app('wxapp.advs.reward', []);
             $reward['id'] = request::str('reward');

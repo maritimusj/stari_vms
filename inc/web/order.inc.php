@@ -135,6 +135,8 @@ if ($op == 'default') {
         }
     }
 
+    $total = $query->count();
+
     $page = max(1, request::int('page'));
     $page_size = $is_ajax ? 10 : request::int('pagesize', DEFAULT_PAGE_SIZE);
 
@@ -247,7 +249,6 @@ if ($op == 'default') {
         $orders[] = $data;
     }
 
-    $total = $query->count();
     $pager = We7::pagination($total, $page, $page_size);
     if (stripos($pager, '&filter=1') === false) {
         $filter = [

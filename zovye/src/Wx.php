@@ -95,7 +95,7 @@ class Wx
         return $res;
     }
 
-    public static function getTempQRCodeTicket($scene, $expire_seconds = 60): array
+    public static function getTempQRCodeTicket($scene = '', $expire_seconds = 60): array
     {
         $wx = self::getWx();
 

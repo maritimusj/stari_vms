@@ -183,6 +183,7 @@
             <li role="presentation" class="active"><a href="#">已隐藏的任务</a></li>
         {else}
             <li role="presentation"{if !isset($type)} class="active"{/if}><a href="{php echo $this->createWebUrl('account');}">全部</a></li>
+            <li role="presentation"{if $type == \zovye\Account::FlashEgg} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::FlashEgg]);}">闪蛋</a></li>
             <li role="presentation"{if $type == -1} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
             <li role="presentation"{if $type === \zovye\Account::NORMAL} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
             <li role="presentation"{if $type == \zovye\Account::VIDEO} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
@@ -212,6 +213,13 @@
     <div class="heading">
         {if !$banned}
         <span class="operate">
+            {if (empty($type) || $type ==\zovye\Account::FlashEgg) && \zovye\App::isFlashEggEnabled()}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::FlashEgg));}">
+                <span class="state auth" title="添加闪蛋商品广告">
+                    <img src="{php echo MODULE_URL . 'static/img/egg.svg'}">
+                </span>
+            </a>
+            {/if}
             {if empty($type)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
             {/if}

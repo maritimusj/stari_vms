@@ -91,6 +91,8 @@ class Account extends State
 
     const CloudFI = 114;
 
+    const FlashEgg = 115;
+
     const SUBSCRIPTION_ACCOUNT = 0;
     const SERVICE_ACCOUNT = 2;
 

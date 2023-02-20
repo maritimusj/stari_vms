@@ -167,6 +167,7 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
         $settings['custom']['smsPromo']['enabled'] = request::bool('smsPromoEnabled') ? 1 : 0;
         $settings['custom']['team']['enabled'] = request::bool('teamEnabled') ? 1 : 0;
         $settings['custom']['cztv']['enabled'] = request::bool('cztvEnabled') ? 1 : 0;
+        $settings['custom']['flashEgg']['enabled'] = request::bool('flashEggEnabled') ? 1 : 0;
 
         Config::app('ad.sponsor.enabled', request::bool('sponsorAd'), true);
 

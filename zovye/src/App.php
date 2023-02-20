@@ -647,5 +647,12 @@ class App
         return onceCall(function () {
             return boolval(settings('custom.cztv.enabled'));
         });
-    }    
+    }
+
+    public static function isFlashEggEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.flashEgg.enabled'));
+        });
+    }
 }

@@ -25,7 +25,13 @@ class FlashEgg
         $this->debug = true;
     }
 
-    public function triggerAdPlay($uid, $no)
+    /**
+     * 请求触发闪蛋广告设备播放指定位置广告
+     * @param $uid string 闪蛋广告设备uid
+     * @param $no string 闪蛋广告点位值
+     * @return array|true
+     */
+    public function triggerAdPlay(string $uid, string $no)
     {
         $res = Util::post($this->debug ? self::DEBUG_API_URL : self::PRO_API_URL, [
             'devMac' => $uid,

@@ -535,7 +535,7 @@ class Device extends State
 
     public static function findOne($cond = []): ?deviceModelObj
     {
-        return self::query()->findOne($cond);
+        return self::query($cond)->findOne();
     }
 
     public static function getDummyDevice($imei = ''): deviceModelObj

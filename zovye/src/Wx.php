@@ -12,12 +12,18 @@ use WxappAccount;
 
 class Wx
 {
+    const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={access_token}';
+
     public static function getWx(): WeiXinAccount
     {
         static $wx = null;
         if (empty($wx)) {
-            We7::load()->classs('weixin.account');
-            $wx = WeAccount::create(We7::uniacid());
+            if ($GLOBALS['_W']['account'] instanceof WeiXinAccount) {
+                $wx = $GLOBALS['_W']['account'];
+            } else {
+                We7::load()->classs('weixin.account');
+                $wx = WeAccount::create(We7::uniacid());
+            }
         }
 
         return $wx;
@@ -87,5 +93,28 @@ class Wx
         }
 
         return $res;
+    }
+
+    public static function getTempQRCodeTicket($scene, $expire_seconds = 60): array
+    {
+        $wx = self::getWx();
+
+        $data = [
+            'expire_seconds' => $expire_seconds,
+            'action_name' => 'QR_SCENE',
+            'action_info' => [
+                'scene' => []
+            ]
+        ];
+
+        if (is_int($scene)) {
+            $data['action_info']['scene']['scene_id'] = intval($scene);
+        } else {
+            $data['action_info']['scene']['scene_str'] = strval($scene);
+        }
+
+        $token = $wx::token();
+
+        return Util::post(str_replace('{access_token}', $token, self::CREATE_QRCODE_URL), $data);
     }
 }

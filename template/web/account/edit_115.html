@@ -1,6 +1,10 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
-
+<style>
+    #navbar img {
+        width: 16px;
+    }
+</style>
 <div id="app"  v-cloak>
     <ul class="nav nav-tabs" id="navbar">
         <li role="presentation" :class="{'active': nav.op === active}" @click="active=nav.op" v-for="nav in navs">
@@ -43,7 +47,6 @@
                             <input type="text" class="form-control" name="title" id="title" value="{php echo $account?$account->getTitle() :''}">
                         </div>
                     </div>
-    
                     <div class="form-group">
                         <label class="col-md-2 control-label">
                             头像
@@ -52,43 +55,71 @@
                             {php echo tpl_form_field_image('img', $account?$account->getImg():'');}
                         </div>
                     </div>
-                    <div class="form-group">
+                </div>
+                <!-- 基本信息 结束 -->
+                <!-- 广告信息开始 -->
+                <div  v-show="active === 'ad'">
+                    <input type="hidden" name="mediaType" v-model="mediaType">
+                    <div class="form-group operate" v-show="mediaType === 'video'">
                         <label class="col-md-2 control-label">视频</label>
                         <div class="col-md-10">
-                            {php echo tpl_form_field_video('qrcode', $account ? $account->getMedia() : '')}
+                            {php echo tpl_form_field_video('video', $account ? $account->getMedia('video') : '')}
+                            <span class="help-block">* 点击 <i class="fa fa-image" @click="mediaType='images'"></i> 切换到图片广告</span>
                         </div>
                     </div>     
+                    <div class="form-group operate"  v-show="mediaType === 'images'">
+                        <label class="col-md-2 control-label">图片</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_multi_image('images', $account ? $account->getMedia('images') : []);}
+                            <span class="help-block">* 点击 <i class="fa fa-youtube-play" @click="mediaType='video'"></i> 切换到视频广告</span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="count" class="col-md-2 control-label">时长（秒）</label>
                         <div class="col-md-10">
                             <input type="number" class="form-control" name="duration" id="duration" value="{php echo $account?$account->getDuration():'1'}">
-                            <span class="help-block">* 用户等待视频播放指定时长后，才能成功领取奖励</span>
+                            <span class="help-block">* 用户等待广告展示指定时长后，才能成功领取奖励</span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label"></label>
+                        <label for="area" class="col-md-2 control-label">位置</label>
                         <div class="col-md-10">
-                            <label>
-                                <input type="checkbox" name="exclusive" id="exclusive" value="1" {if $account && $account->settings('config.video.exclusive')}checked{/if}>
-                                同一时间只允许一个用户观看视频
-                            </label>
-                            <span class="help-block">* 用户必须等待其他用户观看完成后，才能点击观看视频</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="descr" class="col-md-2 control-label">引导关注文字</label>
-                        <div class="col-md-10">
-                            <input type="text" class="form-control" name="descr" id="descr" value="{php echo $account?$account->getDescr():''}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">边框颜色</label>
-                        <div class="col-md-10">
-                            {php echo tpl_form_field_color('clr', $account?$account->getClr(): $clr);}
+                            <input type="text" class="form-control" name="area" id="area" value="{php echo $account?$account->getArea() :''}">
+                            <span class="help-block">* 播放设备中该广告的位置索引，比如1-1,1-2,1-3...</span>
                         </div>
                     </div>
                 </div>
-                <!-- 基本信息 结束 -->
+                <!-- 广告信息结束 -->
+                <!-- 商品信息 开始 -->
+                <div v-show="active === 'goods'">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">图片</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_image('goodsImgage', $goods?$goods['image'] : '');}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">详情图片</label>
+                        <div class="col-md-10">
+                            {php echo tpl_form_field_multi_image('gallery', $goods?$goods['gallery']:[]);}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="goodsUnitTitle" class="col-md-2 control-label">商品单位</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" id="goodsUnitTitle" name="goodsUnitTitle" value="{php echo $goods?$goods['unit_title'] : ''}" required>
+                            <span class="help-block">* 单位名称，比如：个、包、支、盒等等</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="goodsPrice" class="col-md-2 control-label">单价（元）</label>
+                        <div class="col-md-10">
+                            <input type="number" class="form-control" id="goodsPrice" name="goodsPrice" step="0.01" value="{php echo $goods? number_format($goods['price'] / 100, 2) : 0}">
+                            <span class="help-block">* 用户使用微信支付购买时的价格，小于等于0元则表示无法购买</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 商品信息 结束-->
                 <!-- 高级设置 开始 -->
                 <div v-show="active === 'advance'">
                     <div class="form-group">
@@ -132,35 +163,6 @@
                     </div> 
                 </div>
                 <!-- 高级设置 结束 -->
-                <!-- 用户限制 开始 -->
-                <div v-show="active === 'limits'">
-                    <div class="form-group">
-                        <label class="col-xs-12 col-md-2 col-md-2 control-label">性别</label>
-                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                            <label class="checkbox-inline">
-                            <input type="checkbox" id="sexCheckbox1" name="limits[]" value="male" {if $limits && $limits['male'] or empty($limits)}checked{/if}> 男
-                            </label>
-                            <label class="checkbox-inline">
-                            <input type="checkbox" id="sexCheckbox2" name="limits[]" value="female" {if $limits && $limits['female'] or empty($limits)}checked{/if}> 女
-                            </label>
-                            <label class="checkbox-inline">
-                            <input type="checkbox" id="sexCheckbox0" name="limits[]" value="unknown_sex" {if $limits && $limits['unknown_sex'] or empty($limits)}checked{/if}> 未知
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-xs-12 col-md-2 col-md-2 control-label">手机系统</label>
-                        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-                            <label class="checkbox-inline">
-                            <input type="checkbox" id="phoneCheckbox1" name="limits[]" value="ios" {if $limits && $limits['ios'] or empty($limits)}checked{/if}> iPhone手机
-                            </label>
-                            <label class="checkbox-inline">
-                            <input type="checkbox" id="phoneCheckbox2" name="limits[]" value="android" {if $limits && $limits['android'] or empty($limits)}checked{/if}> Android手机
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <!-- 用户限制 结束 -->
                 <!-- 其它设置 开始 -->
                 <div v-show="active === 'misc'">
                     <div class="form-group">
@@ -248,7 +250,7 @@
             <button type="submit" class="btn btn-primary">保存</button>
             </template>
             <button type="submit" class="btn btn-primary" v-else>创建</button>
-            <input type="hidden" name="type" value="{$type}">
+            <input type="hidden" name="type" value="115">
             <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
         </div>
     </form>
@@ -263,11 +265,15 @@
                 navs:[
                     {
                         'op': 'base',
-                        'content': `<i class="fa fa-fw fa-youtube-play"></i> 基本设置`,
+                        'content': `<img src="{php echo MODULE_URL . 'static/img/egg.svg'}"> 基本设置`,
                     },
                     {
-                        'op': 'limits',
-                        'content': `用户限制`,
+                        'op': 'ad',
+                        'content': `广告信息`,
+                    },
+                    {
+                        'op': 'goods',
+                        'content': `商品信息`,
                     },
                     {
                         'op': 'advance',
@@ -283,6 +289,7 @@
                     },
                 ],
                 active: '{$from}',
+                mediaType: '{$media_type}',
             },
             mounted() {
                 initPage();

@@ -235,7 +235,7 @@ if ($op == 'default') {
             'title' => request::str('title', $name),
             'descr' => request::str('descr'),
             'qrcode' => request::str('qrcode'),
-            'clr' => request::str('clr') ?: 'gray',
+            'clr' => request::str('clr') ?: Util::randColor(),
             'count' => max(0, request::int('count')),
             'sccount' => max(0, request::int('sccount')),
             'total' => max(0, request::int('total')),
@@ -665,6 +665,33 @@ if ($op == 'default') {
                 }
                 $account->setQrcode($qrcode_url);
                 $account->save();
+            } elseif ($account->isFlashEgg()) {
+                $type = request::str('mediaType', 'video');
+               
+                $config = [
+                    'type' => Account::FlashEgg,
+                    'ad' => [
+                        'type' => $type, 
+                        'duration' => request::int('duration'),
+                        'area' => request::trim('area'),
+                    ],
+                    'goods' => [
+                        'image' => request::str('goodsImgage', ''),
+                        'gallery' => request::array('gallery', []),
+                        'unit_title' => request::trim('goodsUnitTitle'),
+                        'price' => request::float('goodsPrice', 0, 2) * 100,
+                    ]
+                ];
+
+                if ($type == 'video') {
+                    $config['ad']['video'] = [
+                        'url' => request::trim('video', ''),
+                    ];
+                } else {
+                    $config['ad']['images'] = request::array('images', []);
+                }
+
+                $account->set('config', $config);
             }
 
             $commission_data = [];
@@ -737,52 +764,46 @@ if ($op == 'default') {
 
 } elseif ($op == 'edit') {
 
-    $id = request::int('id');
-
     $agent_name = '';
     $agent_mobile = '';
     $agent_openid = '';
     $config = [];
 
-    if ($id) {
-        $account = Account::get($id);
-        if (empty($account)) {
-            Util::itoast('任务不存在！', $this->createWebUrl('account'), 'error');
-        }
-
-        $type = $account->getType();
-
-        if ($account->getAgentId()) {
-            $agent = Agent::get($account->getAgentId());
-            if ($agent) {
-                $agent_name = $agent->getNickname();
-                $agent_mobile = $agent->getMobile();
-                $agent_openid = $agent->getOpenid();
-            }
-        }
-
-        $qr_codes = [];
-        $qrcode_data = $account->get('qrcodesData', []);
-        if ($qrcode_data && is_array($qrcode_data)) {
-            foreach ($qrcode_data as $entry) {
-                $qr_codes[] = $entry['img'];
-            }
-        }
-
-        $limits = $account->get('limits');
-
-        $bonus_type = $account->getBonusType();
-        if ($bonus_type == Account::COMMISSION) {
-            $amount = number_format($account->getCommissionPrice() / 100, 2);
-        } else {
-            $amount = $account->getBalancePrice();
-        }
-
-        $config = $account->get('config');
-    } else {
-        $type = Account::NORMAL;
-        $bonus_type = Account::COMMISSION;
+    $id = request::int('id');
+    $account = Account::get($id);
+    if (empty($account)) {
+        Util::itoast('任务不存在！', $this->createWebUrl('account'), 'error');
     }
+
+    $type = $account->getType();
+
+    if ($account->getAgentId()) {
+        $agent = Agent::get($account->getAgentId());
+        if ($agent) {
+            $agent_name = $agent->getNickname();
+            $agent_mobile = $agent->getMobile();
+            $agent_openid = $agent->getOpenid();
+        }
+    }
+
+    $qr_codes = [];
+    $qrcode_data = $account->get('qrcodesData', []);
+    if ($qrcode_data && is_array($qrcode_data)) {
+        foreach ($qrcode_data as $entry) {
+            $qr_codes[] = $entry['img'];
+        }
+    }
+
+    $limits = $account->get('limits', []);
+
+    $bonus_type = $account->getBonusType();
+    if ($bonus_type == Account::COMMISSION) {
+        $amount = number_format($account->getCommissionPrice() / 100, 2);
+    } else {
+        $amount = $account->getBalancePrice();
+    }
+
+    $config = $account->get('config');
 
     $tpl_data = [
         'op' => $op,
@@ -800,6 +821,11 @@ if ($op == 'default') {
         'config' => $config,
         'from' => request::str('from', 'base'),
     ];
+
+    if (App::isFlashEggEnabled() && $account->isFlashEgg()) {
+        $tpl_data['goods'] = $account->getGoods();
+        $tpl_data['media_type'] = $account->getMedia('video') ? 'video' : 'images' ;
+    }
 
     if (App::isMoscaleEnabled() && $type == Account::MOSCALE) {
         $tpl_data['moscaleMachineKey'] = settings('moscale.fan.key', '');
@@ -821,10 +847,12 @@ if ($op == 'default') {
 } elseif ($op == 'add') {
 
     $type = request::int('type', Account::NORMAL);
+
     app()->showTemplate('web/account/edit_'.$type, [
         'clr' => Util::randColor(),
         'op' => $op,
         'type' => $type,
+        'media_type' => 'video',
         'from' => 'base',
     ]);
 

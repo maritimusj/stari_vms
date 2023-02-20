@@ -195,26 +195,58 @@ class accountModelObj extends modelObj
         return $this->descr ?: DEFAULT_ACCOUNT_DESC;
     }
 
-    public function getMedia(): string
+    public function getMedia($type = '')
     {
-        return $this->isVideo() ? $this->qrcode : '';
+        if ($this->isVideo()) {
+            return $this->qrcode;
+        }
+        if ($this->isFlashEgg()) {
+            if ($type == 'video') {
+                return $this->settings('config.ad.video.url', '');
+            }
+            return $this->settings('config.ad.images', []);
+        }
+        return '';
     }
 
-    public function setMedia($url)
+    public function setMedia($url, $type = 'video')
     {
         if ($this->isVideo()) {
             $this->setQrcode($url);
+        } 
+
+        if ($this->isFlashEgg()) {
+            if ($type == 'video') {
+                return $this->updateSettings('config.ad.video.url', $url);
+            }
+            return $this->updateSettings('config.ad.images', $url);
         }
     }
 
     public function getDuration(): int
     {
+        if ($this->isFlashEgg()) {
+            return intval($this->settings('config.ad.duration', 1));
+        }
         return intval($this->settings('config.video.duration', 1));
     }
 
     public function setDuration($duration)
     {
+        if ($this->isFlashEgg()) {
+            return intval($this->updateSettings('config.ad.duration', $duration));
+        }
         return $this->settings('config.video.duration', intval($duration));
+    }
+
+    public function getArea()
+    {
+        return strval($this->settings('config.ad.area', ''));
+    }
+
+    public function getGoods()
+    {
+        return $this->settings('config.goods', []);
     }
 
     public function getTitle(): string
@@ -543,6 +575,11 @@ class accountModelObj extends modelObj
     public function isTask(): bool
     {
         return $this->getType() == Account::TASK;
+    }
+
+    public function isFlashEgg(): bool
+    {
+        return $this->getType() == Account::FlashEgg;
     }
 
     public function getAssignData(): array

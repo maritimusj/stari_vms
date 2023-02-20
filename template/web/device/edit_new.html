@@ -532,6 +532,15 @@
                         </div>
                     </div>
                 </div>
+                <div v-show="active === 'egg'">
+                    <div class="form-group">
+                        <label for="adDeviceUID" class="col-md-2 control-label">广告设备UID</label>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="adDeviceUID" id="adDeviceUID" value="{php echo strval($extra['ad']['device']['uid'])}">
+                            <span class="help-block">* 闪蛋广告设备UID，用于同步播放商品广告</span>
+                        </div>
+                    </div>
+                </div>
                 <div v-show="active === 'extra'">
                     <!--
                         <div class="form-group">
@@ -870,6 +879,7 @@
                     is_charging_device: `{php echo $is_charging_device? 1 :''}`,
                     is_fueling_device: `{php echo $is_fueling_device? 1 :''}`,
                     app: `{php echo $app? 1 :''}`,
+                    flash_egg_enabled: `{php echo \zovye\App::isFlashEggEnabled()? 1 : ''}`,
                     zero_bonus_enabled: `{php echo \zovye\App::isZeroBonusEnabled()? 1 : ''}`,
                     moscale_enabled: `{php echo $moscale ? 1 : ''}`,
                     zjb_enabled: `{php echo $zjb ? 1 : ''}`,
@@ -882,6 +892,10 @@
                         {
                             'op': 'func',
                             'content': `功能设置`,
+                        },
+                        {
+                            'op': 'egg',
+                            'content': `闪蛋设置`,
                         },
                         {
                             'op': 'app',
@@ -958,6 +972,9 @@
                     }
                     if (!this.config.zero_bonus_enabled) {
                         ops_reomved.push('zeroBonus');
+                    }
+                    if (!this.config.flash_egg_enabled) {
+                        ops_reomved.push('egg');
                     }
                     this.navs = this.navs.filter(nav => nav && ops_reomved.indexOf(nav.op) === -1);
                     console.log(this.navs);                    

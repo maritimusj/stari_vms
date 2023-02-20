@@ -783,6 +783,10 @@ HTML;
             setArray($extra, 'custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
         }
 
+        if (App::isFlashEggEnabled()) {
+            setArray($extra, 'ad.device.uid', request::trim('adDeviceUID'));
+        }
+
         if (empty($data['name']) || empty($data['imei'])) {
             throw new RuntimeException('设备名称或IMEI不能为空！');
         }

@@ -3235,4 +3235,9 @@ class deviceModelObj extends modelObj
 
         return $serial;
     }
+
+    public function getAdDeviceUID(): string
+    {
+        return settings('ad.device.uid', '');
+    }
 }

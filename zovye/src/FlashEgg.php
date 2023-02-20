@@ -48,7 +48,7 @@ class FlashEgg
         }
 
         if ($res['code'] != 200) {
-            return err($res['msg'] ?? '发生错误！');
+            return err($res['msg'] ?? '发生未知错误！');
         }
 
         return true;

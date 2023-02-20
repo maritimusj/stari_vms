@@ -631,7 +631,7 @@ JSCODE;
 
         $tpl['js']['code'] .= "\r\n</script>";
 
-        if ($_SESSION['is_snapshotuser']) {
+        if (User::isSnapshot()) {
             $tpl['js']['code'] .= $this->snapshotJs($device_imei);
         }
 
@@ -1101,7 +1101,7 @@ JSCODE;
             </script>
 JSCODE;
 
-            if ($_SESSION['is_snapshotuser']) {
+            if (User::isSnapshot()) {
                 $tpl['js']['code'] .= $this->snapshotJs($tpl['device']['imei']);
             }  
         }

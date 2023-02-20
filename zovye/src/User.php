@@ -57,6 +57,11 @@ class User
         return m('user')->objClassname();
     }
 
+    public static function isSnapshot(): bool
+    {
+        return boolval($_SESSION['is_snapshotuser']);
+    }
+
     public static function getUserCharacter($obj): array
     {
         static $data = [

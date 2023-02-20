@@ -1216,7 +1216,7 @@ class Account extends State
 
     public static function getAvailableList(deviceModelObj $device, userModelObj $user, array $params = []): array
     {
-        if ($_SESSION['is_snapshotuser']) {
+        if (User::isSnapshot()) {
             return [];
         }
 

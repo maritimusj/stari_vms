@@ -767,7 +767,6 @@ if ($op == 'default') {
     $agent_name = '';
     $agent_mobile = '';
     $agent_openid = '';
-    $config = [];
 
     $id = request::int('id');
     $account = Account::get($id);
@@ -803,13 +802,13 @@ if ($op == 'default') {
         $amount = $account->getBalancePrice();
     }
 
-    $config = $account->get('config');
+    $config = $account->get('config', []);
 
     $tpl_data = [
         'op' => $op,
         'type' => $type,
         'id' => $id,
-        'account' => $account ?? null,
+        'account' => $account,
         'qrcodes' => $qr_codes ?? null,
         'limits' => $limits ?? null,
         'bonus_type' => $bonus_type,
@@ -823,8 +822,8 @@ if ($op == 'default') {
     ];
 
     if (App::isFlashEggEnabled() && $account->isFlashEgg()) {
-        $tpl_data['goods'] = $account->getGoods();
-        $tpl_data['media_type'] = $account->getMedia('video') ? 'video' : 'images' ;
+        $tpl_data['goods'] = $account->getGoodsData();
+        $tpl_data['media_type'] = $account->getMediaType();
     }
 
     if (App::isMoscaleEnabled() && $type == Account::MOSCALE) {

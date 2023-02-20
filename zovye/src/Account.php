@@ -243,6 +243,15 @@ class Account extends State
             $data['username'] = $entry->getConfig('username', '');
             $data['path'] = $entry->getConfig('path', '');
             $data['delay'] = $entry->getConfig('delay', 1);
+        } elseif ($entry->isFlashEgg()) {
+            if ($entry->getMediaType() == 'video') {
+                $data['video'] = $entry->getMedia();
+            } else {
+                $data['images'] = $entry->getMedia();
+            }
+            $data['duration'] = $entry->getDuration();
+            $data['area'] = $entry->getArea();
+            $data['goods'] = $entry->getGoodsData();
         } else {
             $data['qrcode'] = $entry->getQrcode();
         }
@@ -613,24 +622,25 @@ class Account extends State
         $result = [];
 
         //如果所有公众号的排序值一样，则打乱排序
-        $shuffle_accounts = function ($result) {
-            if (count($result) > 1) {
-                $first = current($result);
-                $last = end($result);
+        $shuffle_accounts = function ($result) use ($params){
+            if ($params['shuffle'] !== false) {
+                if (count($result) > 1) {
+                    $first = current($result);
+                    $last = end($result);
 
-                if ($first['orderno'] == $last['orderno']) {
-                    $keys = array_keys($result);
-                    shuffle($keys);
+                    if ($first['orderno'] == $last['orderno']) {
+                        $keys = array_keys($result);
+                        shuffle($keys);
 
-                    $arr = [];
-                    foreach ($keys as $key) {
-                        $arr[] = $result[$key];
+                        $arr = [];
+                        foreach ($keys as $key) {
+                            $arr[] = $result[$key];
+                        }
+
+                        return $arr;
                     }
-
-                    return $arr;
                 }
             }
-
             return $result;
         };
 

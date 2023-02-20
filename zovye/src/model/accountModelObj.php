@@ -195,17 +195,19 @@ class accountModelObj extends modelObj
         return $this->descr ?: DEFAULT_ACCOUNT_DESC;
     }
 
-    public function getMedia($type = '')
+    public function getMedia()
     {
-        if ($this->isVideo()) {
-            return $this->qrcode;
-        }
         if ($this->isFlashEgg()) {
-            if ($type == 'video') {
+            if ($this->isVideo()) {
                 return $this->settings('config.ad.video.url', '');
             }
             return $this->settings('config.ad.images', []);
         }
+
+        if ($this->isVideo()) {
+            return $this->qrcode;
+        }
+
         return '';
     }
 
@@ -217,9 +219,11 @@ class accountModelObj extends modelObj
 
         if ($this->isFlashEgg()) {
             if ($type == 'video') {
-                return $this->updateSettings('config.ad.video.url', $url);
+                $this->updateSettings('config.ad.video.url', strval($url));
+            } else {
+                $images = is_array($url) ? $url : [$url];
+                $this->updateSettings('config.ad.images', $images);
             }
-            return $this->updateSettings('config.ad.images', $url);
         }
     }
 
@@ -239,12 +243,17 @@ class accountModelObj extends modelObj
         return $this->settings('config.video.duration', intval($duration));
     }
 
-    public function getArea()
+    public function getMediaType(): string
+    {
+        return strval($this->settings('config.ad.type', 'video'));
+    }
+
+    public function getArea(): string
     {
         return strval($this->settings('config.ad.area', ''));
     }
 
-    public function getGoods()
+    public function getGoodsData()
     {
         return $this->settings('config.goods', []);
     }
@@ -469,6 +478,10 @@ class accountModelObj extends modelObj
 
     public function isVideo(): bool
     {
+        if ($this->isFlashEgg()) {
+            return $this->getMediaType() == 'video';
+        }
+
         return $this->getType() == Account::VIDEO;
     }
 

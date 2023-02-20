@@ -22,15 +22,10 @@ if ($op == 'qrcode') {
     $res = Wx::getTempQRCodeTicket();
     if ($res && $res['ticket']) {
         JSON::success([
-            'url' => 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='. $res['ticket'],
+            'url' => 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket'],
         ]);
     }
     JSON::fail('无法获取公众号二维码！');
-}
-
-//获取商品列表
-if ($op == 'goods') {
-
 }
 
 $params = [
@@ -58,9 +53,10 @@ if (empty($device)) {
     /** @var userModelObj $user */
     $user = $getUserFN();
     $device = $user->getLastActiveDevice();
-    if (empty($device)) {
-        Util::resultAlert('请重新扫描设备二维码！', 'error');
-    }
+}
+
+if (empty($device)) {
+    Util::resultAlert('请重新扫描设备二维码！', 'error');
 }
 
 $params['from'] = [
@@ -81,6 +77,33 @@ $user->setLastActiveDevice($device);
 
 if (!$GLOBALS['_W']['fans']['follow']) {
     app()->followPage($user, $device);
+}
+
+//获取商品列表
+if ($op == 'goods') {
+    $params = ['type' => Account::FlashEgg, 'shuffle' => false];
+    if (request::has('max')) {
+        $params['max'] = request::int('max');
+    }
+
+    $result = Account::getAvailableList($device, $user, $params);
+    $list = [];
+    foreach ($result as $item) {
+        $goods = $item['goods'];
+        if ($goods) {
+            $goods['image'] = Util::toMedia($goods['image'], true);
+            $gallery = $goods['gallery'];
+            $goods['gallery'] = [];
+            if (is_array($gallery)) {
+                foreach ($gallery as $url) {
+                    $goods['gallery'][] = Util::toMedia($url, true);
+                }
+            }
+            $list[] = $goods;
+        }
+    }
+
+    JSON::success($list);
 }
 
 app()->goodsListPage($user, $device);

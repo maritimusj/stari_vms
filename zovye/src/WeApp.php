@@ -1967,6 +1967,7 @@ JSCODE;
     {
         $js_sdk = Util::fetchJSSDK();
         $api_url = Util::murl('simple');
+        $account_api_url = Util::murl('account');
 
         $jquery_url = JS_JQUERY_URL;
 
@@ -1991,6 +1992,13 @@ $js_sdk
     }
     zovye_fn.getGoodsDetail = function(id, fn) {
         $.getJSON("$api_url", {op: 'detail', id: id, device: "{$device->getImei()}"}).then(function(res){
+            if (typeof fn === 'function') {
+                fn(res);
+            }
+        })
+    }
+    zovye_fn.play = function(uid, seconds, fn) {
+        $.getJSON("$account_api_url", {op: 'play', uid, seconds, device: "{$device->getImei()}"}).then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }

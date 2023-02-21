@@ -160,12 +160,6 @@ if ($op == 'detail') {
         'uid' => $account->getUid(),
         'media' => $account->getMedia(true),
         'duration' => $account->getDuration(),
-        'api_url' => Util::murl('account', [
-            'op' => 'play',
-            'uid' => $account->getUid(),
-            'device' => $device->getUid(),
-            'seconds' => 1,
-        ]),
     ]);
 }
 

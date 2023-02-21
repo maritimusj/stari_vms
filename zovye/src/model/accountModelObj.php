@@ -10,6 +10,7 @@ use zovye\Account;
 use zovye\App;
 use zovye\base\modelObj;
 use zovye\base\modelObjFinder;
+use zovye\Goods;
 use zovye\State;
 use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\Util;
@@ -253,9 +254,18 @@ class accountModelObj extends modelObj
         return strval($this->settings('config.ad.area', ''));
     }
 
-    public function getGoodsData()
+    public function getGoods(): ?goodsModelObj
     {
-        return $this->settings('config.goods', []);
+        $goods_id = $this->settings('config.goods.id', 0);
+        return Goods::get($goods_id);
+    }
+    public function getGoodsData(): array
+    {
+        $goods = $this->getGoods();
+        if (!$goods) {
+            return [];
+        }
+        return Goods::format($goods);
     }
 
     public function getTitle(): string

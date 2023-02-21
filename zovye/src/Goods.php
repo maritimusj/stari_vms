@@ -21,6 +21,12 @@ class Goods
     const ALLOW_EXCHANGE = 0b100;
     const ALLOW_DELIVERY = 0b1000;
 
+    const Lottery = 'lottery';
+
+    const Fueling = 'fueling';
+
+    const FlashEgg = 'flashEgg';
+
     public static function setPayBitMask($s1, $allow = true): int
     {
         return $allow ? $s1 | self::ALLOW_PAY : $s1 ^ self::ALLOW_PAY;
@@ -151,7 +157,7 @@ class Goods
             'img' => $imageUrlFN($entry->getImg()),
             'sync' => boolval($entry->getSync()),
             'price' => intval($entry->getPrice()),
-            'type' => $entry->getExtraData('type', ''),
+            'type' => $entry->getType(),
             'price_formatted' => '￥'.number_format($entry->getPrice() / 100, 2).'元',
             'unit_title' => $entry->getUnitTitle(),
             'createtime_formatted' => date('Y-m-d H:i:s', $entry->getCreatetime()),

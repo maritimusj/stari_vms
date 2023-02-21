@@ -668,7 +668,51 @@ if ($op == 'default') {
 
             } elseif ($account->isFlashEgg()) {
                 $type = request::str('mediaType', 'video');
-               
+
+                $goods = $account->getGoods();
+                if (empty($goods)) {
+                    $s1 =  Goods::setFreeBitMask(0);
+                    $s1 = Goods::setPayBitMask($s1);
+
+                    $goods_data = [
+                        'agent_id' => $account->getAgentId(),
+                        'name' => $account->getTitle(),
+                        'img' => request::trim('goodsImage', ''),
+                        'sync' => 0,
+                        'price' => intval(round(request::float('goodsPrice', 0, 2) * 100)),
+                        's1' => $s1,
+                        'extra' => [
+                            'unitTitle' => request::trim('goodsUnitTitle', '个'),
+                            'type' => Goods::FlashEgg,
+                        ],
+                    ];
+
+                    $gallery = request::array('gallery');
+                    if ($gallery) {
+                        $goods_data['extra']['detailImg'] = $gallery[0];
+                        $goods_data['extra']['gallery'] = $gallery;
+                    }
+
+                    $goods = Goods::create($goods_data);
+                    if (empty($goods)) {
+                        return err('创建商品失败！');
+                    }
+                } else {
+                    $goods->setAgentId($account->getAgentId());
+                    $goods->setImg(request::trim('goodsImage', ''));
+                    $goods->setPrice(intval(round(request::float('goodsPrice', 0, 2) * 100)));
+                    $goods->setUnitTitle(request::trim('goodsUnitTitle', '个'));
+
+                    $gallery = request::array('gallery');
+                    $goods->setGallery($gallery);
+                    if ($gallery) {
+                        $goods->setDetailImg($gallery[0]);
+                    } else {
+                        $goods->setDetailImg('');
+                    }
+                    $goods->save();
+                }
+                
                 $config = [
                     'type' => Account::FlashEgg,
                     'ad' => [
@@ -677,10 +721,7 @@ if ($op == 'default') {
                         'area' => request::trim('area'),
                     ],
                     'goods' => [
-                        'image' => request::str('goodsImage', ''),
-                        'gallery' => request::array('gallery', []),
-                        'unit_title' => request::trim('goodsUnitTitle', '个'),
-                        'price' => request::float('goodsPrice', 0, 2) * 100,
+                        'id' => $goods->getId(),
                     ]
                 ];
 
@@ -691,6 +732,7 @@ if ($op == 'default') {
                 } else {
                     $config['ad']['images'] = request::array('images', []);
                 }
+
                 $account->set('config', $config);
             }
 

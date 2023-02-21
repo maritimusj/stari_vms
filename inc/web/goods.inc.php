@@ -120,9 +120,9 @@ if ($op == 'default' || $op == 'goods') {
     }
 
     $type = request::str('type');
-    if ($type == 'lottery') {
+    if ($type == Goods::Lottery) {
         app()->showTemplate('web/goods/edit_lottery', $params);
-    } elseif ($type == 'fueling') {
+    } elseif ($type == Goods::Fueling) {
         app()->showTemplate('web/goods/edit_fueling', $params);
     } else {
         app()->showTemplate('web/goods/edit', $params);

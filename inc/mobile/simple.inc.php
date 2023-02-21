@@ -97,7 +97,7 @@ if ($op == 'goods') {
         }
 
         if ($goods->getType() != Goods::FlashEgg) {
-            return false;
+            return true;
         }
 
         $account = $goods->getAccount();

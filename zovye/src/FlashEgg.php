@@ -15,6 +15,19 @@ class FlashEgg
 
     protected $debug = false;
 
+    /**
+     * @param string $app_key
+     * @param bool $debug
+     */
+    public function __construct(string $app_key = '', bool $debug = false)
+    {
+        if ($app_key) {
+            $this->app_key = $app_key;
+        }
+
+        $this->debug = $debug;
+    }
+
     protected function sign($params = []): string
     {
         return md5(implode($params).$this->app_key);

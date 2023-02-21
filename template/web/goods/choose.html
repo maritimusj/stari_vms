@@ -148,10 +148,13 @@
                         <span class="lottery" title="固定货道商品">
                             <i class="fa fa-fw fa-ticket"></i>
                         </span>
-                        {/if}
-                        {if $item['type'] == 'fueling'}
+                        {elseif $item['type'] == 'fueling'}
                         <span class="lottery">
                             <img src="{MODULE_URL}static/img/gas.svg" class="icon" title="尿素机商品">
+                        </span>
+                        {elseif $item['type'] == 'flashEgg'}
+                        <span class="icon">
+                            <img src="{MODULE_URL}static/img/egg.svg" class="icon" title="闪蛋商品">
                         </span>
                         {/if}
                     </td>

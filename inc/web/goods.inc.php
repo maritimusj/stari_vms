@@ -412,14 +412,11 @@ if ($op == 'default' || $op == 'goods') {
 } elseif ($op == 'removeGoods') {
 
     $goods = Goods::get(request('id'));
-    if ($goods) {
-        if (InventoryGoods::exists(['goods_id' => $goods->getId()])) {
-            $goods->delete();
-            $goods->save();
-        } else {
-            $goods->destroy();
+    if ($goods && $goods->getType() !== Goods::FlashEgg) {
+        
+        if (Goods::safeDelete($goods)) {
+            JSON::success('商品删除成功！');
         }
-        JSON::success('商品删除成功！');
     }
 
     JSON::fail('商品删除失败！');

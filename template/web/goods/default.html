@@ -34,7 +34,7 @@
         text-align: center;
         vertical-align: middle;
     }
-    #goodslist .lottery {
+    #goodslist .icon {
         color: coral;
     }
     #goodslist a .profile{
@@ -150,15 +150,19 @@
                     <td>
                         {$item['name']}<sup class="id" title="商品ID">{$item['id']}</sup>
                         {if $item['lottery']}
-                        <span class="lottery" title="固定货道商品">
+                        <span class="icon" title="固定货道商品">
                             <i class="fa fa-fw fa-ticket"></i>
                         </span>
-                        {/if}
-                        {if $item['type'] == 'fueling'}
-                        <span class="lottery">
+                        {elseif $item['type'] == 'fueling'}
+                        <span class="icon">
                             <img src="{MODULE_URL}static/img/gas.svg" class="icon" title="尿素机商品">
                         </span>
+                        {elseif $item['type'] == 'flashEgg'}
+                        <span class="icon">
+                            <img src="{MODULE_URL}static/img/egg.svg" class="icon" title="闪蛋商品">
+                        </span>
                         {/if}
+
                     </td>
                     <td>
                         {$item['unit_title']}
@@ -234,12 +238,16 @@
                                 <span class="fa fa-caret-down"></span>
                             </a>
                             <ul class="dropdown-menu">
+                                {if $item['type'] == 'flashEgg'}
+                                <li><a href="#" data-op="viewStats"><i class="fa fa-line-chart fa=fw"></i> 查看统计</li>
+                                {else}
                                 <li><a href="#" data-op="editAppendage"><i class="fa fa-external-link fa=fw"></i> 附加信息</li>
                                 <li><a href="#" data-op="viewStats"><i class="fa fa-line-chart fa=fw"></i> 查看统计</li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="editQuota"><i class="fa fa-gear fa=fw"></i> 设置限额</li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="#" data-op="removeGoods"><i class="fa fa-trash-o fa-fw"></i> 删除</li>
+                                {/if}
                             </ul>
                         </div>
                     </td>

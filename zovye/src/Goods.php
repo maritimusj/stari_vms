@@ -349,4 +349,13 @@ class Goods
         return self::query($cond)->findOne();
     }
 
+    public static function safeDelete(goodsModelObj $goods)
+    {
+        if (InventoryGoods::exists(['goods_id' => $goods->getId()])) {
+            $goods->delete();
+            return $goods->save();
+        }
+
+        return $goods->destroy();
+    }
 }

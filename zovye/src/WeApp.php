@@ -842,7 +842,7 @@ $js_sdk
         })
     }
     zovye_fn.getGoods = function(id, fn) {
-        $.getJSON("$get_x_url", {goodsid: id}).then(function(res){
+        $.getJSON("$get_x_url", {goodsId: id}).then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }

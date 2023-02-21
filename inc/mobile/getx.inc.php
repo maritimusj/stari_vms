@@ -59,7 +59,7 @@ try {
 
     $goods_id = $ticket_data_saved['goodsId'];
     if (empty($goods_id)) {
-        $goods_id = request::int('goodsid');
+        $goods_id = request::int('goodsId');
     }
 
     if (empty($goods_id)) {

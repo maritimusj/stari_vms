@@ -133,6 +133,40 @@ if ($op == 'goods') {
     JSON::success(array_values($goods));
 }
 
+if ($op == 'detail') {
+
+    $goods_id = request::int('goodsId');
+    $goods = Goods::get($goods_id);
+    if (empty($goods) || $goods->isDeleted()) {
+        JSON::fail('找不到这个商品！');
+    }
+
+    $account = $goods->getAccount();
+    if (empty($account) || $account->isBanned()) {
+        JSON::fail('商品暂时无法使用！');
+    }
+
+    $device = Device::get(request::str('device'), true);
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    if (is_error($res)) {
+        JSON::fail($res);
+    }
+
+    JSON::success([
+        'uid' => $account->getUid(),
+        'media' => $account->getMedia(),
+        'redirect' => Util::murl('account', [
+            'op' => 'play',
+            'uid' => $account->getUid(),
+            'device' => $device->getUid(),
+            'seconds' => 1,
+        ]),
+    ]);
+}
 
 app()->goodsListPage($user, $device);
 

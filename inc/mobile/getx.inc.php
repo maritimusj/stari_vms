@@ -57,7 +57,11 @@ try {
         throw new RuntimeException('定位超时，请重新扫描设备二维码 [605]');
     }
 
-    $goods_id = request::int('goodsid');
+    $goods_id = $ticket_data_saved['goodsId'];
+    if (empty($goods_id)) {
+        $goods_id = request::int('goodsid');
+    }
+
     if (empty($goods_id)) {
         throw new RuntimeException('请指定要出货的商品 [605]');
     }

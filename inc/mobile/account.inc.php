@@ -44,7 +44,7 @@ if ($op == 'default') {
         JSON::fail(['msg' => '找不到这个广告！']);
     }
 
-    if (!$account->isVideo()) {
+    if (!($account->isFlashEgg() || $account->isVideo())) {
         JSON::fail(['msg' => '广告类型不正确！']);
     }
 
@@ -111,6 +111,10 @@ if ($op == 'default') {
         'shadowId' => $device->getShadowId(),
         'accountId' => $account->getId(),
     ];
+
+    if ($account->isFlashEgg()) {
+        $ticket_data['goodsId'] = $account->getGoodsId();
+    }
 
     //准备领取商品的ticket
     $user->setLastActiveData('ticket', $ticket_data);

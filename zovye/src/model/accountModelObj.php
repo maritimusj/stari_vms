@@ -254,9 +254,14 @@ class accountModelObj extends modelObj
         return strval($this->settings('config.ad.area', ''));
     }
 
+    public function getGoodsId(): int
+    {
+        return $this->settings('config.goods.id', 0);
+    }
+
     public function getGoods(): ?goodsModelObj
     {
-        $goods_id = $this->settings('config.goods.id', 0);
+        $goods_id = $this->getGoodsId();
         return Goods::get($goods_id);
     }
     public function getGoodsData($full_path = true): array

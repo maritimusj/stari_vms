@@ -101,7 +101,7 @@ if ($op == 'goods') {
         }
 
         $account = $goods->getAccount();
-        if (empty($account)) {
+        if (empty($account) || $account->isBanned()) {
             return true;
         }
 

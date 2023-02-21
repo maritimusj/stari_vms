@@ -33,9 +33,10 @@ class FlashEgg
         return md5(implode($params).$this->app_key);
     }
 
-    public function setDebugMode()
+    public function debug(): FlashEgg
     {
         $this->debug = true;
+        return $this;
     }
 
     /**

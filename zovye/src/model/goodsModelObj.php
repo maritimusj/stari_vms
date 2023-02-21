@@ -6,6 +6,7 @@
 
 namespace zovye\model;
 
+use zovye\Account;
 use function zovye\tb;
 
 use zovye\base\modelObj;
@@ -201,5 +202,16 @@ class goodsModelObj extends modelObj
     public function getType(): string
     {
         return $this->getExtraData('type', '');
+    }
+
+    public function getAccountId(): int
+    {
+        return $this->getExtraData('accountId', 0);
+    }
+
+    public function getAccount(): ?accountModelObj
+    {
+        $account_id = $this->getAccountId();
+        return Account::get($account_id);
     }
 }

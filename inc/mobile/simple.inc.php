@@ -7,6 +7,7 @@
 
 namespace zovye;
 
+use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 
 defined('IN_IA') or exit('Access Denied');
@@ -83,38 +84,52 @@ if (!$GLOBALS['_W']['fans']['follow']) {
 
 //获取商品列表
 if ($op == 'goods') {
-    $params = [
-        'type' => Account::FlashEgg, 
-        's_type' => [],
-        'shuffle' => false,
-    ];
+    $payload = $device->getPayload(true);
+    $result = $payload['cargo_lanes'] ?? [];
 
-    if (request::has('max')) {
-        $params['max'] = request::int('max');
-    } else {
-        $params['max'] = 100;
-    }
+    $allow_free = request::bool('free');
+    $allow_pay = request::bool('pay');
 
-    $result = Account::getAvailableList($device, $user, $params);
+    $isLimitedFN = function ($goods_id) use($user) {
+        $goods = Goods::get($goods_id);
+        if (empty($goods)) {
+            return true;
+        }
 
-    $list = [];
-    foreach ($result as $item) {
-        $goods = $item['goods'];
-        if ($goods) {
-            $goods['name'] = $item['title'];
-            $goods['image'] = Util::toMedia($goods['image'], true);
-            $gallery = $goods['gallery'];
-            $goods['gallery'] = [];
-            if (is_array($gallery)) {
-                foreach ($gallery as $url) {
-                    $goods['gallery'][] = Util::toMedia($url, true);
-                }
+        if ($goods->getType() != Goods::FlashEgg) {
+            return false;
+        }
+
+        $account = $goods->getAccount();
+        if (empty($account)) {
+            return true;
+        }
+
+        $res = Util::checkAccountLimits($user, $account);
+        return is_error($res);
+    };
+
+    $goods = [];
+    foreach ($result as $entry) {
+        if ($allow_free && $entry[Goods::AllowFree] or $allow_pay && $entry[Goods::AllowPay] or !$allow_free && !$allow_pay) {
+            $key = "goods{$entry['goods_id']}";
+            if ($goods[$key]) {
+                $goods[$key]['num'] += intval($entry['num']);
+            } else {
+                $goods[$key] = [
+                    'id' => $entry['goods_id'],
+                    'name' => $entry['goods_name'],
+                    'img' => Util::toMedia($entry['goods_img'], true),
+                    'num' => intval($entry['num']),
+                    'allow_free' => $entry[Goods::AllowFree],
+                    'allow_pay' => $entry[Goods::AllowPay],
+                    'limited' => $isLimitedFN($entry['goods_id']),
+                ];
             }
-            $list[] = $goods;
         }
     }
 
-    JSON::success($list);
+    JSON::success(['title' => '请选择商品', 'goods' => array_values($goods)]);
 }
 
 app()->goodsListPage($user, $device);

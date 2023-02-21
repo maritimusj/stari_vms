@@ -1953,26 +1953,28 @@ JSCODE;
     public function followPage(userModelObj $user, deviceModelObj $device)
     {
         $res = Wx::getTempQRCodeTicket('follow');
-
-        $filename = Theme::getThemeFile($device, 'follow');
-        $this->showTemplate($filename, ['tpl' => [
+        $tpl_data = [
             'user' => $user->profile(),
             'device' => $device->profile(),
             'qrcode_url' => 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='. $res['ticket'],
-        ]]);
+        ];
+
+        $filename = Theme::getThemeFile($device, 'qrcode');
+        $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }
 
     public function goodsListPage(userModelObj $user, deviceModelObj $device)
     {
         $js_sdk = Util::fetchJSSDK();
-
-        $get_x_url = Util::murl('getx', ['ticket' => $params['user']['ticket']]);
-        $get_goods_list_url = Util::murl('goodslist', ['free' => true, 'ticket' => $params['user']['ticket']]);
+        $get_goods_list_url = Util::murl('simple', ['op' => 'goods']);
 
         $jquery_url = JS_JQUERY_URL;
 
-        $tpl['timeout'] = App::deviceWaitTimeout();
-        $tpl['js']['code'] = <<<JSCODE
+        $tpl_data['user'] = $user->profile();
+        $tpl_data['device'] = $device->profile();
+
+        $tpl_data['timeout'] = App::deviceWaitTimeout();
+        $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 $js_sdk
 <script>
@@ -1980,22 +1982,6 @@ $js_sdk
         wx.hideAllNonBaseMenuItem();
     })
     const zovye_fn = {};
-    zovye_fn.getx = function(fn) {
-        $.getJSON("$get_x_url").then(function(res){
-            if (res && res.status && res.data.msg) {
-                if (typeof fn === 'function') {
-                    fn(res);
-                }
-            }
-        })
-    }
-    zovye_fn.getGoods = function(id, fn) {
-        $.getJSON("$get_x_url", {goodsid: id}).then(function(res){
-            if (typeof fn === 'function') {
-                fn(res);
-            }
-        })
-    }
     zovye_fn.getGoodsList = function(fn) {
         $.getJSON("$get_goods_list_url").then(function(res){
             if (typeof fn === 'function') {
@@ -2005,11 +1991,8 @@ $js_sdk
     }
 </script>
 JSCODE;
-        $filename = Theme::getThemeFile($device, 'goods');
-        $this->showTemplate($filename, ['tpl' => [
-            'user' => $user->profile(),
-            'device' => $device->profile(),
-        ]]);
+        $filename = Theme::getThemeFile($device, 'device');
+        $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }
 }
 

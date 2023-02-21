@@ -278,7 +278,9 @@
                     </th>
                     <th>周期</th>
                     <th>详情</th>
+                    {if $type != \zovye\Account::FlashEgg}
                     <th>二维码</th>
+                    {/if}
                     <th></th>
                 </tr>
             </thead>
@@ -416,6 +418,7 @@
                             {/if}
                         </div>
                     </td>
+                    {if $type != \zovye\Account::FlashEgg}
                     <td style="position:relative;">
                         <div class="ercode loading">
                             {if $a['useAccountQRCode']}
@@ -426,6 +429,7 @@
                             <div class="zovye_qrcode"  data-src="{media $a['qrcode']}"></div>
                         </div>
                     </td>
+                    {/if}
                     {/if}
                     <td class="operate">
                         <div class="btn-group">

@@ -1,0 +1,101 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if $goods}
+            <i class="fa fa-edit"></i> 编辑商品
+            {else}
+            <i class="fa fa-gift"></i> 新建商品
+            {/if}
+        </a>
+    </li>
+</ul>
+<form id="addGoodsForm" method="POST" action="{php echo $this->createWebUrl('goods', ['op' => 'saveGoods'])}">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+            <span class="operate">
+                <a href="{php echo $this->createWebUrl('goods');}"><i class="fa fa-reply" title="返回"></i></a>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div class="seg">
+                <div class="title">基本设置</div>
+                <div class="form-group">
+                    <label for="goodsName" class="col-md-2 control-label">商品名称</label>
+                    <div class="col-md-10">
+                        <div type="text" class="form-control">{php echo $goods?$goods['name'] : ''}</div>
+                        <input type="hidden" name="goodsName" value="{php echo $goods?$goods['name'] : ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">图片</label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_image('goodsImg', $goods?$goods['img'] : '');}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">详情图片</label>
+                    <div class="col-md-10">
+                        {php echo tpl_form_field_multi_image('gallery', $goods?$goods['gallery']:[]);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goodsUnitTitle" class="col-md-2 control-label">商品单位</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control" id="goodsUnitTitle" name="goodsUnitTitle" value="{php echo $goods?$goods['unit_title'] : ''}" required>
+                        <span class="help-block">* 单位名称，比如：个、包、支、盒等等</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goodsPrice" class="col-md-2 control-label">单价（元）</label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" id="goodsPrice" name="goodsPrice" step="0.01" value="{php echo $goods? number_format($goods['price'] / 100, 2) : 0}">
+                        <span class="help-block">* 用户使用微信支付购买时的价格</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group pull-right">
+        <div class="col-md-12">
+            {if $goods}
+            <input type="hidden" name="goodsId" value="{php echo $goods?$goods['id'] : -1}">
+            <button type="submit" class="btn btn-primary">保存</button>
+            {else}
+            <button type="submit" class="btn btn-primary">确定</button>
+            {/if}
+            <a href="{php echo $this->createWebUrl('goods');}">
+                <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+            </a>                
+        </div>
+    </div>
+</form>
+<script>
+    $(function() {
+        $('body').on('click', '#find_agent', function() {
+            const ownerId = $('select[name=agentId]').val();
+            const keywords = $('input[name=find_keywords]').val();
+            util.loading();
+            $.get("{php echo $this->createWebUrl('agent', array('id'=>$id));}", {op:'search', keyword:keywords}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_**!_', e.id === ownerId ? 'selected' : '');
+                    })
+                }
+                html += '<option value="0"><无></option>';
+                $('#find_agent_select').html(html);
+
+            }, 'json').complete(function(){
+                util.loaded();
+            })
+        })
+    })
+</script>
+{template 'common/footer'}

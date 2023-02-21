@@ -7,7 +7,6 @@
 
 namespace zovye;
 
-use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
 
 defined('IN_IA') or exit('Access Denied');
@@ -82,6 +81,11 @@ if (!$GLOBALS['_W']['fans']['follow']) {
     app()->followPage($user, $device);
 }
 
+//默认显示商品列表
+if ($op == 'default') {
+    app()->goodsListPage($user, $device);
+}
+
 //获取商品列表
 if ($op == 'goods') {
     $payload = $device->getPayload(true);
@@ -133,6 +137,7 @@ if ($op == 'goods') {
     JSON::success(array_values($goods));
 }
 
+//获取商品和广告详情
 if ($op == 'detail') {
 
     $goods_id = request::int('id');
@@ -162,6 +167,4 @@ if ($op == 'detail') {
         'duration' => $account->getDuration(),
     ]);
 }
-
-app()->goodsListPage($user, $device);
 

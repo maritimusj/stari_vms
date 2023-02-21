@@ -77,7 +77,7 @@ class mp
         if ($account->isAuth()) {
             $data['config'] = $account->get('config', []);
         } elseif ($account->isVideo()) {
-            $data['media'] = Util::toMedia($account->getMedia());
+            $data['media'] = $account->getMedia(true);
             $data['duration'] = $account->getDuration();
         } elseif ($account->isDouyin()) {
             $config = $account->get('config', []);

@@ -196,17 +196,26 @@ class accountModelObj extends modelObj
         return $this->descr ?: DEFAULT_ACCOUNT_DESC;
     }
 
-    public function getMedia()
+    public function getMedia($full_path = false)
     {
         if ($this->isFlashEgg()) {
             if ($this->getMediaType() == 'video') {
-                return $this->settings('config.ad.video.url', '');
+                $url = $this->settings('config.ad.video.url', '');
+                return $full_path ? Util::toMedia($url) : $url;
             }
-            return $this->settings('config.ad.images', []);
+            $images = $this->settings('config.ad.images', []);
+            if ($full_path) {
+                $full_path_images = [];
+                foreach ((array)$images as $url) {
+                    $full_path_images[] = Util::toMedia($url, true);
+                }
+                return $full_path_images;
+            }
+            return $images;
         }
 
         if ($this->isVideo()) {
-            return $this->qrcode;
+            return $full_path ? Util::toMedia($this->qrcode) : $this->qrcode;
         }
 
         return '';

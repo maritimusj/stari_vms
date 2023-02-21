@@ -158,8 +158,9 @@ if ($op == 'detail') {
 
     JSON::success([
         'uid' => $account->getUid(),
-        'media' => $account->getMedia(),
-        'redirect' => Util::murl('account', [
+        'media' => $account->getMedia(true),
+        'duration' => $account->getDuration(),
+        'api_url' => Util::murl('account', [
             'op' => 'play',
             'uid' => $account->getUid(),
             'device' => $device->getUid(),

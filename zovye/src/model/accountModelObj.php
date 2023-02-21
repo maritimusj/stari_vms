@@ -198,7 +198,7 @@ class accountModelObj extends modelObj
     public function getMedia()
     {
         if ($this->isFlashEgg()) {
-            if ($this->isVideo()) {
+            if ($this->getMediaType() == 'video') {
                 return $this->settings('config.ad.video.url', '');
             }
             return $this->settings('config.ad.images', []);
@@ -478,10 +478,6 @@ class accountModelObj extends modelObj
 
     public function isVideo(): bool
     {
-        if ($this->isFlashEgg()) {
-            return $this->getMediaType() == 'video';
-        }
-
         return $this->getType() == Account::VIDEO;
     }
 

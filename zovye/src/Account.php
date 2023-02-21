@@ -346,7 +346,6 @@ class Account extends State
                 if (is_error($res)) {
                     return $res;
                 }
-
                 return $getter_fn($acc);
             };
 
@@ -417,7 +416,7 @@ class Account extends State
                 return [$acc->format()];
             });
         }
-
+ 
         $exclude = is_array($params['exclude']) ? $params['exclude'] : [];
         $third_party_platform = [
             //准粉吧
@@ -661,7 +660,6 @@ class Account extends State
                 return $shuffle_accounts($result);
             }
         }
-
         return $shuffle_accounts($result);
     }
 
@@ -1211,6 +1209,8 @@ class Account extends State
                 if (isEmptyArray($questions)) {
                     return false;
                 }
+                break;
+            case Account::FlashEgg:
                 break;
             default:
                 if ($account['redirect_url']) {

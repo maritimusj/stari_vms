@@ -95,7 +95,7 @@
                     <div class="form-group">
                         <label class="col-md-2 control-label">图片</label>
                         <div class="col-md-10">
-                            {php echo tpl_form_field_image('goodsImgage', $goods?$goods['image'] : '');}
+                            {php echo tpl_form_field_image('goodsImage', $goods?$goods['image'] : '');}
                         </div>
                     </div>
                     <div class="form-group">
@@ -107,7 +107,7 @@
                     <div class="form-group">
                         <label for="goodsUnitTitle" class="col-md-2 control-label">商品单位</label>
                         <div class="col-md-10">
-                            <input type="text" class="form-control" id="goodsUnitTitle" name="goodsUnitTitle" value="{php echo $goods?$goods['unit_title'] : ''}" required>
+                            <input type="text" class="form-control" id="goodsUnitTitle" name="goodsUnitTitle" value="{php echo $goods?$goods['unit_title'] : '个'}">
                             <span class="help-block">* 单位名称，比如：个、包、支、盒等等</span>
                         </div>
                     </div>
@@ -120,6 +120,13 @@
                     </div>
                 </div>
                 <!-- 商品信息 结束-->
+                <!-- 用户限制 开始 -->
+                <input type="hidden" name="limits[]" value="male">
+                <input type="hidden" name="limits[]" value="female">
+                <input type="hidden" name="limits[]" value="unknown_sex">
+                <input type="hidden" name="limits[]" value="ios">
+                <input type="hidden" name="limits[]" value="android">
+                <!-- 用户限制 结束 -->
                 <!-- 高级设置 开始 -->
                 <div v-show="active === 'advance'">
                     <div class="form-group">

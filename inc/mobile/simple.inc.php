@@ -42,6 +42,8 @@ $getUserFN = function () use (&$params) {
     if ($user->isBanned()) {
         Util::resultAlert('用户暂时无法使用该功能，请联系管理员！', 'error');
     }
+
+    return $user;
 };
 
 $device_uid = request::str('device');
@@ -81,16 +83,25 @@ if (!$GLOBALS['_W']['fans']['follow']) {
 
 //获取商品列表
 if ($op == 'goods') {
-    $params = ['type' => Account::FlashEgg, 'shuffle' => false];
+    $params = [
+        'type' => Account::FlashEgg, 
+        's_type' => [],
+        'shuffle' => false,
+    ];
+
     if (request::has('max')) {
         $params['max'] = request::int('max');
+    } else {
+        $params['max'] = 100;
     }
 
     $result = Account::getAvailableList($device, $user, $params);
+
     $list = [];
     foreach ($result as $item) {
         $goods = $item['goods'];
         if ($goods) {
+            $goods['name'] = $item['title'];
             $goods['image'] = Util::toMedia($goods['image'], true);
             $gallery = $goods['gallery'];
             $goods['gallery'] = [];

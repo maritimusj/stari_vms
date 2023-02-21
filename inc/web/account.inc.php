@@ -621,7 +621,7 @@ if ($op == 'default') {
                     }
                 }
             }
-
+            
             if ($account->isVideo()) {
                 $account->set('config', [
                     'type' => Account::VIDEO,
@@ -665,6 +665,7 @@ if ($op == 'default') {
                 }
                 $account->setQrcode($qrcode_url);
                 $account->save();
+
             } elseif ($account->isFlashEgg()) {
                 $type = request::str('mediaType', 'video');
                
@@ -676,9 +677,9 @@ if ($op == 'default') {
                         'area' => request::trim('area'),
                     ],
                     'goods' => [
-                        'image' => request::str('goodsImgage', ''),
+                        'image' => request::str('goodsImage', ''),
                         'gallery' => request::array('gallery', []),
-                        'unit_title' => request::trim('goodsUnitTitle'),
+                        'unit_title' => request::trim('goodsUnitTitle', '个'),
                         'price' => request::float('goodsPrice', 0, 2) * 100,
                     ]
                 ];
@@ -690,7 +691,6 @@ if ($op == 'default') {
                 } else {
                     $config['ad']['images'] = request::array('images', []);
                 }
-
                 $account->set('config', $config);
             }
 

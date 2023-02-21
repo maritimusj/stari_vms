@@ -608,7 +608,7 @@ class agent
                 return error(State::ERROR, '设备类型不正确！');
             }
 
-            if ($device->isCustomType()) {
+            if ($device->isCustomizedType()) {
                 $old = $device_type->getExtraData('cargo_lanes', []);
 
                 $cargo_lanes = [];

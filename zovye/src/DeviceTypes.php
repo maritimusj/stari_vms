@@ -42,7 +42,7 @@ class DeviceTypes
 
     public static function from(deviceModelObj $device): ?device_typesModelObj
     {
-        if (!$device->isCustomType()) {
+        if (!$device->isCustomizedType()) {
             return self::get($device->getDeviceType());
         }
 

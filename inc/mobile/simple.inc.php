@@ -129,7 +129,7 @@ if ($op == 'goods') {
         }
     }
 
-    JSON::success(['title' => '请选择商品', 'goods' => array_values($goods)]);
+    JSON::success(array_values($goods));
 }
 
 app()->goodsListPage($user, $device);

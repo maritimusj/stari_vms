@@ -1990,7 +1990,7 @@ $js_sdk
         })
     }
     zovye_fn.getGoodsDetail = function(id, fn) {
-        $.getJSON("$api_url", {op: 'detail', id: id}).then(function(res){
+        $.getJSON("$api_url", {op: 'detail', id: id, device: "{$device->getImei()}"}).then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }

@@ -63,14 +63,14 @@
                     <div class="form-group operate" v-show="mediaType === 'video'">
                         <label class="col-md-2 control-label">视频</label>
                         <div class="col-md-10">
-                            {php echo tpl_form_field_video('video', $account ? $account->getMedia('video') : '')}
+                            {php echo tpl_form_field_video('video', $account ? $account->getMedia() : '')}
                             <span class="help-block">* 点击 <i class="fa fa-image" @click="mediaType='images'"></i> 切换到图片广告</span>
                         </div>
                     </div>     
                     <div class="form-group operate"  v-show="mediaType === 'images'">
                         <label class="col-md-2 control-label">图片</label>
                         <div class="col-md-10">
-                            {php echo tpl_form_field_multi_image('images', $account ? $account->getMedia('images') : []);}
+                            {php echo tpl_form_field_multi_image('images', $account ? $account->getMedia() : []);}
                             <span class="help-block">* 点击 <i class="fa fa-youtube-play" @click="mediaType='video'"></i> 切换到视频广告</span>
                         </div>
                     </div>

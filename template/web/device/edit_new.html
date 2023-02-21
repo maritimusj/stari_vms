@@ -315,8 +315,8 @@
                                                     </span>                                                
                                                 </div>
                                             </td>
-                                            <td :class="{operate: isCustomType}">
-                                                <span :class="{'goods_name': isCustomType}"  @click="chooseGoods(lane)" title="点击选择商品">
+                                            <td :class="{operate: isCustomizedType}">
+                                                <span :class="{'goods_name': isCustomizedType}"  @click="chooseGoods(lane)" title="点击选择商品">
                                                     {{lane.goods_name}}
                                                     <sup class="id" title="商品ID" v-if="lane.goods_id>0">{{lane.goods_id}}</sup>
                                                 </span>
@@ -335,13 +335,13 @@
                                                     >
                                                 </div>
                                                 <span 
-                                                :class="{price:isCustomType}" 
+                                                :class="{price:isCustomizedType}"
                                                 @click="editPrice(lane, i)" 
                                                 v-show="currentLane!=lane"
                                                 title="点击修改价格">¥{{lane.goods_price}}元</span>
                                             </td>
                                             <td>
-                                                <template v-if="isCustomType">
+                                                <template v-if="isCustomizedType">
                                                     <input type="float" class="form-control goods" 
                                                     :name="'capacities[' + i + ']'" 
                                                     v-model="lane.capacity" 
@@ -361,10 +361,10 @@
                                                 title="加入套餐" 
                                                 @click="addPackage(lane)"></i>
                                                 <i class="fa fa-trash" title="删除" 
-                                                @click="removeLane(lane)" v-if="isCustomType && !currentPackage"></i>                                            
+                                                @click="removeLane(lane)" v-if="isCustomizedType && !currentPackage"></i>
                                             </td>
                                         </tr>
-                                        <tr v-if="isCustomType">
+                                        <tr v-if="isCustomizedType">
                                             <td class="operate">
                                                 <i class="fa fa-plus" title="添加货道"  @click.prevent="addCargoLane" :disabled="loading"></i>
                                             </td>
@@ -939,7 +939,7 @@
                 },
             },
             computed: {
-                isCustomType() {
+                isCustomizedType() {
                     return this.currentTypeID === 0 || this.currentTypeID === '0';
                 },
                 packageGoods() {
@@ -957,26 +957,26 @@
                     this.navs = [];
                     this.navs.push(nav);
                 } else {
-                    let ops_reomved = [];
+                    let ops_removed = [];
                     if (!this.config.is_bluetooth_device) {
-                        ops_reomved.push('func');
+                        ops_removed.push('func');
                     }
                     if (!this.config.app) {
-                        ops_reomved.push('app', 'schedule');
+                        ops_removed.push('app', 'schedule');
                     }
                     if (!this.config.moscale_enabled) {
-                        ops_reomved.push('moscale');
+                        ops_removed.push('moscale');
                     }
                     if (!this.config.zjb_enabled) {
-                        ops_reomved.push('zjb');
+                        ops_removed.push('zjb');
                     }
                     if (!this.config.zero_bonus_enabled) {
-                        ops_reomved.push('zeroBonus');
+                        ops_removed.push('zeroBonus');
                     }
                     if (!this.config.flash_egg_enabled) {
-                        ops_reomved.push('egg');
+                        ops_removed.push('egg');
                     }
-                    this.navs = this.navs.filter(nav => nav && ops_reomved.indexOf(nav.op) === -1);
+                    this.navs = this.navs.filter(nav => nav && ops_removed.indexOf(nav.op) === -1);
                     console.log(this.navs);                    
                 }
             },
@@ -1022,7 +1022,7 @@
                         if (res) {
                             if (res.status) {
                                 self.currentType = res.data;
-                                if (first && !self.isCustomType) {
+                                if (first && !self.isCustomizedType) {
                                     self.list.push(res.data);
                                 }
                             } else {
@@ -1040,7 +1040,7 @@
                     return false;
                 },
                 addCargoLane() {
-                    if (this.isCustomType) {
+                    if (this.isCustomizedType) {
                         if (!this.currentType.cargo_lanes) {
                             Vue.set(this.currentType, 'cargo_lanes', []);
                         }
@@ -1132,7 +1132,7 @@
                     p.price = p.price.toFixed(2);
                 },
                 chooseGoods(lane) {
-                    if (this.isCustomType) {
+                    if (this.isCustomizedType) {
                         this.currentLane = lane;
                         api.chooseGoods(this.config.is_fueling_device ? {types: ['fueling']} : {});
                     }
@@ -1148,7 +1148,7 @@
                     }
                 },
                 editPrice(lane, index) {
-                    if (this.isCustomType) {
+                    if (this.isCustomizedType) {
                         this.currentLane = lane;
                         this.$nextTick(() => {
                             this.$refs.price[index].focus();

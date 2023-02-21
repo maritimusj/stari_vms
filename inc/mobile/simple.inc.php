@@ -119,6 +119,7 @@ if ($op == 'goods') {
                 $goods[$key] = [
                     'id' => $entry['goods_id'],
                     'name' => $entry['goods_name'],
+                    'price' => $entry['goods_price'],
                     'img' => Util::toMedia($entry['goods_img'], true),
                     'num' => intval($entry['num']),
                     'allow_free' => $entry[Goods::AllowFree],
@@ -131,6 +132,7 @@ if ($op == 'goods') {
 
     JSON::success(array_values($goods));
 }
+
 
 app()->goodsListPage($user, $device);
 

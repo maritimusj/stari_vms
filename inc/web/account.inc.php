@@ -712,7 +712,7 @@ if ($op == 'default') {
                     }
                     $goods->save();
                 }
-                
+
                 $config = [
                     'type' => Account::FlashEgg,
                     'ad' => [
@@ -864,7 +864,7 @@ if ($op == 'default') {
     ];
 
     if (App::isFlashEggEnabled() && $account->isFlashEgg()) {
-        $tpl_data['goods'] = $account->getGoodsData();
+        $tpl_data['goods'] = $account->getGoodsData(false);
         $tpl_data['media_type'] = $account->getMediaType();
     }
 

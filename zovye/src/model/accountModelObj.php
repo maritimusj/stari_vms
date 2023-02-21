@@ -259,13 +259,13 @@ class accountModelObj extends modelObj
         $goods_id = $this->settings('config.goods.id', 0);
         return Goods::get($goods_id);
     }
-    public function getGoodsData(): array
+    public function getGoodsData($full_path = true): array
     {
         $goods = $this->getGoods();
         if (!$goods) {
             return [];
         }
-        return Goods::format($goods);
+        return Goods::format($goods, false, $full_path, $full_path);
     }
 
     public function getTitle(): string

@@ -135,7 +135,7 @@ if ($op == 'goods') {
 
 if ($op == 'detail') {
 
-    $goods_id = request::int('goodsId');
+    $goods_id = request::int('id');
     $goods = Goods::get($goods_id);
     if (empty($goods) || $goods->isDeleted()) {
         JSON::fail('找不到这个商品！');

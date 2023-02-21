@@ -1966,7 +1966,7 @@ JSCODE;
     public function goodsListPage(userModelObj $user, deviceModelObj $device)
     {
         $js_sdk = Util::fetchJSSDK();
-        $get_goods_list_url = Util::murl('simple', ['op' => 'goods']);
+        $api_url = Util::murl('simple');
 
         $jquery_url = JS_JQUERY_URL;
 
@@ -1983,7 +1983,14 @@ $js_sdk
     })
     const zovye_fn = {};
     zovye_fn.getGoodsList = function(fn) {
-        $.getJSON("$get_goods_list_url").then(function(res){
+        $.getJSON("$api_url", {op: 'goods'}).then(function(res){
+            if (typeof fn === 'function') {
+                fn(res);
+            }
+        })
+    }
+    zovye_fn.getGoodsDetail = function(id) {
+        $.getJSON("$api_url", {op: 'detail', id: id}).then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }

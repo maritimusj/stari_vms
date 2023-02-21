@@ -684,6 +684,7 @@ if ($op == 'default') {
                         'extra' => [
                             'unitTitle' => request::trim('goodsUnitTitle', '个'),
                             'type' => Goods::FlashEgg,
+                            'accountId' => $account->getId(),
                         ],
                     ];
 

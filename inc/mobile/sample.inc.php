@@ -19,7 +19,10 @@ $op = request::op('default');
 
 //获取关注公众号二维码
 if ($op == 'qrcode') {
-    $url = Wx::getTempQRCodeUrl(App::uid());
+    $url = Wx::getTempQRCodeUrl(http_build_query([
+        'app' => app::uid(),
+        'device' => request::trim('device'),
+    ]));
     if ($url) {
         JSON::success(['url' => $url]);
     }

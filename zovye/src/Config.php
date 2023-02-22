@@ -10,17 +10,17 @@ namespace zovye;
  * 全局配置越来越大，这个类主要用来独立部分配置
  * Class Config
  * @package zovye
- * @method static agent(string $key, $v = '', $update = false)
- * @method static balance(string $key, $v = '', $update = false)
- * @method static device(string $key, $v = '', $update = false)
- * @method static charging(string $key, $v = '', $update = false)
- * @method static fueling(string $key, $v = '', $update = false)
- * @method static app(string $key, $v = '', $update = false)
- * @method static cztv(string $key, $v = '', $update = false)
- * @method static douyin(string $key, $v = '', $update = false)
- * @method static wxplatform(string $key, $v = '', $update = false)
- * @method static notify(string $key, $v = '', $update = false)
- * @method static donatePay(string $key, $v = '', $update = false)
+ * @method static function agent(string $key, $v = '', $update = false)
+ * @method static function balance(string $key, $v = '', $update = false)
+ * @method static function device(string $key, $v = '', $update = false)
+ * @method static function charging(string $key, $v = '', $update = false)
+ * @method static function fueling(string $key, $v = '', $update = false)
+ * @method static function app(string $key, $v = '', $update = false)
+ * @method static function cztv(string $key, $v = '', $update = false)
+ * @method static function douyin(string $key, $v = '', $update = false)
+ * @method static function wxplatform(string $key, $v = '', $update = false)
+ * @method static function notify(string $key, $v = '', $update = false)
+ * @method static function donatePay(string $key, $v = '', $update = false)
  */
 class Config
 {

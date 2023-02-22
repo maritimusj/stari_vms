@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>{$tpl['site']['title']}</title>
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: white;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .status {
+            width: 100%;
+            margin-top: 79px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .big-circle {
+            width: 205px;
+            height: 205px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #FDF9EE;
+            border-radius: 50%;
+        }
+
+        .small-circle {
+            width: 177px;
+            height: 177px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #FCEFCF;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .waiting {
+            width: 127px;
+            height: 143px;
+            z-index: 2;
+        }
+
+        .ribbon {
+            width: 124px;
+            height: 124px;
+            position: absolute;
+            left: -63px;
+            z-index: 1;
+        }
+
+        .success {
+            width: 190px;
+            height: 190px;
+            z-index: 2;
+        }
+
+        .fireworks1 {
+            width: 262px;
+            height: 262px;
+            position: absolute;
+            bottom: 3px;
+            z-index: 1;
+        }
+
+        .fireworks2 {
+            width: 243px;
+            height: 158px;
+            position: absolute;
+            top: 170px;
+            left: calc((100vw - 177px) / 2 * -1);
+            z-index: 1;
+        }
+
+        .text {
+            font-weight: bold;
+        }
+
+        .countdown,
+        .desc {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        .empty {
+            width: 246px;
+            height: 246px;
+            margin-top: 13px;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="status" v-if="status === 'waiting'">
+            <div class="big-circle">
+                <div class="small-circle">
+                    <img class="waiting" src="{MODULE_URL}static/m/shandan/img/waiting.png">
+                    <img class="ribbon" src="{MODULE_URL}static/m/shandan/img/ribbon.png">
+                </div>
+            </div>
+            <span class="text" style="margin-top: 39px;">正在出货中</span>
+            <span class="countdown">{{time}}s</span>
+        </div>
+        <div class="status" v-else-if="status === 'success'">
+            <div class="big-circle">
+                <div class="small-circle">
+                    <img class="success" src="{MODULE_URL}static/m/shandan/img/success.png">
+                    <img class="fireworks1" src="{MODULE_URL}static/m/shandan/img/fireworks1.png">
+                    <img class="fireworks2" src="{MODULE_URL}static/m/shandan/img/fireworks2.png">
+                </div>
+            </div>
+            <span class="text" style="margin-top: 102px;">{{text}}</span>
+            <span class="desc">{{msg}}</span>
+        </div>
+        <div class="status" style="margin-top: 0;" v-else-if="status === 'fail'">
+            <img class="empty" src="{MODULE_URL}static/m/shandan/img/no_data.png">
+            <span class="text" style="margin-top: 20px;">{{text}}</span>
+            <span class="desc">{{msg}}</span>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                status: 'waiting',
+                time: 30,
+                interval: null,
+                text: '',
+                msg: ''
+            },
+            mounted () {
+                this.getResult()
+            },
+            methods: {
+                getResult () {
+                    this.countdown()
+                    zovye_fn.getResult().then(res => {
+                        console.log(res)
+                        if (res.status) {
+                            if (res.data.code === 100) {
+                                setTimeout(() => {
+                                    this.getResult()
+                                }, 1000)
+                            } else if (res.data.code === 200) {
+                                this.status = 'success'
+                                this.text = res.data.text || ''
+                                this.msg = res.data.msg || ''
+                            } else {
+                                this.status = 'fail'
+                                this.text = res.data.text || ''
+                                this.msg = res.data.msg || ''
+                            }
+                        } else {
+                            this.status = 'fail'
+                            this.text = res.data.text || ''
+                            this.msg = res.data.msg || ''
+                        }
+                    })
+                },
+                countdown () {
+                    this.interval = setInterval(() => {
+                        if (this.time === 0) {
+                            clearInterval(this.interval)
+                            this.status = 'fail'
+                            this.text = '出货超时'
+                        } else {
+                            this.time--
+                        }
+                    }, 1000)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

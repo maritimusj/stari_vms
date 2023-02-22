@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>{$tpl['site']['title']}</title>
+    <!-- {php \zovye\url(true, 'static/m/shandan/device.css?v=20220220');} -->
+    <link href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #FED136;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            width: 100%;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .flex-center {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .clickable:active {
+            opacity: 0.7;
+        }
+
+        .header {
+            width: 100%;
+            height: 48px;
+        }
+
+        .header .no {
+            margin-left: 16px;
+        }
+
+        .header button {
+            background-color: transparent;
+            border: none;
+            color: #1C1C1C;
+            font-size: 16px;
+            padding: 0;
+            margin-right: 16px;
+        }
+
+        .header button img {
+            width: 18px;
+            height: 18px;
+            margin-right: 4px;
+        }
+
+        .content {
+            width: 100%;
+            height: calc(100vh - 48px);
+            background-color: #FFFEFB;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+
+        .tabs {
+            width: calc(100% - 32px);
+            height: 36px;
+            border: 1px solid #FF8E3E;
+            border-radius: 19px;
+            margin-block: 0;
+            padding-inline: 0;
+            overflow: hidden;
+            background-color: #FFFAEB;
+        }
+
+        .tabs .item {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .tabs .item.active {
+            color: #1C1C1C;
+            background: linear-gradient(95deg, #FED136 0%, #FF8E3E 100%);
+        }
+
+        .tabs .item.free {
+            clip-path: polygon(0 0, 0 100%, 100% 100%, calc(100% - 10px) 0);
+            margin-right: -5px;
+        }
+
+        .tabs .item.pay {
+            clip-path: polygon(0 0, 10px 100%, 100% 100%, 100% 0);
+            margin-left: -5px;
+        }
+
+        .goods {
+            width: 100%;
+            height: calc(100% - 56px);
+            margin-top: 20px;
+            overflow-y: auto;
+        }
+
+        .goods .item {
+            width: calc((100vw - 75px) / 3);
+        }
+
+        .goods .item.disabled {
+            filter: grayscale(1);
+        }
+
+        .goods .item:nth-child(n + 4) {
+            margin-top: 53px;
+        }
+
+        .goods .item:nth-child(3n + 1) {
+            margin-left: 16px;
+        }
+
+        .goods .item:nth-child(3n + 2) {
+            margin-right: 21px;
+            margin-left: 22px;
+        }
+
+        .goods .item:nth-child(3n + 3) {
+            margin-right: 16px;
+        }
+
+        .goods .item .picture {
+            width: calc((100vw - 75px) / 3);
+            height: calc((100vw - 75px) / 3);
+            border-radius: 50%;
+            box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.16);
+        }
+
+        .goods .item .name {
+            margin-top: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .goods .item .remain {
+            margin-top: 8px;
+        }
+
+        .goods .item .remain .gift-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .goods .item .remain .value {
+            font-size: 14px;
+            color: #ACACAC;
+            margin-left: 6px;
+        }
+
+        .goods .item .detail-btn {
+            height: 24px;
+            padding: 0 18px;
+            background: #FF9041;
+            border-radius: 13px;
+            border: 1px solid #FF6A01;
+            font-size: 16px;
+            color: white;
+        }
+
+        .goods .empty {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin-left: calc((100vw - 200px) / 2);
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .detail {
+            padding: 16px;
+            box-sizing: border-box;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        .detail.disabled {
+            filter: grayscale(1);
+        }
+
+        .detail img {
+            width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .detail .name {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .detail .price {
+            width: 100%;
+            margin-top: 8px;
+            color: #FC2525;
+        }
+
+        .detail .price .value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .detail .num {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .detail .num .remain {
+            color: #999;
+        }
+
+        .detail .num .minus,
+        .detail .num .value,
+        .detail .num .plus {
+            width: 24px;
+            height: 24px;
+            background-color: #eee;
+        }
+
+        .detail .num .value {
+            margin: 0 1px;
+            color: #707070;
+        }
+
+        .detail .num .minus img,
+        .detail .num .plus img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .detail .num .disabled {
+            background-color: #f8f8f8;
+        }
+
+        .detail .get-btn {
+            width: 100%;
+            height: 44px;
+            border-radius: 22px;
+            color: #1C1C1C;
+            background: linear-gradient(90deg, #FED136 0%, #FF8E3E 100%);
+            margin-top: 20px;
+            border: none;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .detail .close {
+            width: 28px;
+            height: 28px;
+            margin-top: 28px;
+        }
+
+        .toast {
+            width: 200px;
+            background-color: #4E4E4E;
+            padding: 48px 20px;
+            box-sizing: border-box;
+            color: white;
+            border-radius: 10px;
+            position: fixed;
+            top: 30vh;
+            left: calc((100vw - 200px) / 2);
+            animation: showToast .5s;
+        }
+
+        .toast .title {
+            font-size: 18px;
+            word-break: break-all;
+        }
+
+        .toast .desc {
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        @keyframes showToast {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .video .countdown,
+        .images .countdown {
+            width: 150px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            position: absolute;
+            top: 20px;
+            z-index: 99;
+        }
+
+        #swiper-container {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+        }
+
+        .swiper-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .swiper-pagination-bullet {
+            background-color: white;
+        }
+
+        .swiper-pagination-bullet-active {
+            background-color: #FF8E3E;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" v-cloak>
+        <div class="header flex flex-row align-center">
+            <span class="no flex-1">NO.{{imei.substr(imei.length - 6)}}</span>
+            <button class="flex flex-row align-center clickable" @click="onOrderClick">
+                <img src="{MODULE_URL}static/m/shandan/img/profile.png">
+                <span>我的</span>
+            </button>
+            <button class="flex flex-row align-center clickable" @click="onFeedbackClick">
+                <img src="{MODULE_URL}static/m/shandan/img/question.png">
+                <span>反馈</span>
+            </button>
+        </div>
+        <div class="content flex flex-col align-center">
+            <ul class="tabs flex flex-row">
+                <li class="item flex-1 flex flex-center" v-for="(item, index) in tabs.list"
+                    :class="[item.value === tabs.active ? 'active' : '', item.value]" :key="index"
+                    @click="tabsOnChange(item.value)">{{item.title}}</li>
+            </ul>
+            <div class="goods flex flex-row flex-wrap">
+                <div class="item flex flex-col" :class="{'disabled': tabs.active === 'free' && item.limited}"
+                    v-for="(item, index) in goods" :key="index" @click="onClickGoodsItem(item)">
+                    <img class="picture" :src="item.img">
+                    <span class="name">{{item.name}}</span>
+                    <div class="remain flex flex-row align-center">
+                        <img class="gift-icon" src="{MODULE_URL}static/m/shandan/img/gift.png">
+                        <span class="value">剩余：{{item.num || 0}}</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="detail-btn clickable">详情</button>
+                    </div>
+                </div>
+                <img class="empty" src="{MODULE_URL}static/m/shandan/img/no_data.png" v-if="goods.length === 0">
+            </div>
+        </div>
+        <div class="mask detail flex flex-col align-center"
+            :class="{'disabled': tabs.active === 'free' && detail.data.limited}" v-if="detail.visible">
+            <img :src="detail.data.img">
+            <div class="name">{{detail.data.name}}</div>
+            <div class="price">
+                <span class="unit">¥</span>
+                <span class="value">{{(detail.data.price / 100).toFixed(2)}}元</span>
+            </div>
+            <div class="num flex flex-row align-center">
+                <span class="remain flex-1">剩余：{{detail.data.num || 0}}</span>
+                <div class="flex flex-row align-center">
+                    <div class="minus flex flex-center clickable" :class="{'disabled': detail.data.count <= 1}"
+                        @click="onReduce">
+                        <img src="{MODULE_URL}static/m/shandan/svg/minus.svg">
+                    </div>
+                    <div class="value flex flex-center">{{detail.data.count}}</div>
+                    <div class="plus flex flex-center clickable"
+                        :class="{'disabled': detail.data.count >= max || detail.data.count >= detail.data.num}"
+                        @click="onAdd">
+                        <img src="{MODULE_URL}static/m/shandan/svg/plus.svg">
+                    </div>
+                </div>
+            </div>
+            <button class="get-btn flex flex-center clickable" @click="onGet">{{tabs.active === 'free' ? '免费' :
+                '支付'}}领取</button>
+            <img class="close clickable" src="{MODULE_URL}static/m/shandan/svg/close.svg"
+                @click="detail.visible = false">
+        </div>
+        <div class="mask video flex flex-col align-center" v-if="video.visible">
+            <div class="countdown">出货倒计时：{{video.countdown}}秒</div>
+            <video id="player" class="video-js" width="100%" height="100%" x5-video-player-type="h5-page" playsinline>
+            </video>
+        </div>
+        <div class="mask images flex flex-col align-center" v-if="images.visible">
+            <div class="countdown">出货倒计时：{{images.countdown}}秒</div>
+            <div class="swiper" id="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" v-for="(item,index) in images.data.media">
+                        <img class="swiper-img" :src="item" />
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+        <div class="toast flex flex-col align-center" v-if="toast.visible">
+            <span class="title" v-if="toast.title">{{toast.title}}</span>
+            <span class="desc" v-if="toast.desc">{{toast.desc}}</span>
+        </div>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <!-- {php \zovye\url(true, 'static/m/shandan/device.js?v=20220220');} -->
+    <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"></script>
+    <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                imei: "{$tpl['device']['imei']}",
+                max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}'),
+                isHidden: null,
+                tabs: {
+                    list: [{
+                        title: '免费领取',
+                        value: 'free'
+                    }, {
+                        title: '支付领取',
+                        value: 'pay'
+                    }],
+                    active: 'free'
+                },
+                goods: [],
+                detail: {
+                    visible: false,
+                    data: null
+                },
+                toast: {
+                    visible: false,
+                    title: '',
+                    desc: '',
+                    timeout: null
+                },
+                video: {
+                    visible: false,
+                    data: null,
+                    countdown: 0,
+                    interval: null,
+                    player: null
+                },
+                images: {
+                    visible: false,
+                    data: null,
+                    countdown: 0,
+                    interval: null
+                },
+                getLoading: false
+            },
+            created () {
+                this.visibilitychange()
+            },
+            mounted () {
+                zovye_fn.getGoodsList(res => {
+                    if (res.status) {
+                        this.goods = res.data.map(e => {
+                            e.count = 1
+                            return e
+                        })
+                    }
+                })
+            },
+            methods: {
+                visibilitychange () {
+                    document.addEventListener('visibilitychange', () => {
+                        this.isHidden = document.hidden
+                        if (this.isHidden === true) {
+                            if (this.video.interval) {
+                                this.video.player.pause()
+                                clearInterval(this.video.interval)
+                            } else if (this.images.interval) {
+                                clearInterval(this.images.interval)
+                            }
+                        } else if (this.isHidden === false) {
+                            if (this.video.countdown > 0) {
+                                this.video.player.play()
+                                this.onPlayVideo()
+                            } else if (this.images.countdown > 0) {
+                                this.onPlayImages()
+                            }
+                        }
+                    })
+                },
+                onOrderClick () {
+                    if (zovye_fn.redirectToBonusPage) {
+                        zovye_fn.redirectToUserPage()
+                    } else {
+                        zovye_fn.redirectToOrderPage()
+                    }
+                },
+                onFeedbackClick () {
+                    zovye_fn.redirectToFeedBack()
+                },
+                tabsOnChange (value) {
+                    this.tabs.active = value
+                },
+                onClickGoodsItem (item) {
+                    this.detail.data = item
+                    this.detail.visible = true
+                },
+                onReduce () {
+                    if (this.detail.data.count > 1) {
+                        this.detail.data.count--
+                    } else {
+                        this.showToast({
+                            title: '不能再少啦～'
+                        })
+                    }
+                },
+                onAdd () {
+                    if (this.detail.data.count < this.max && this.detail.data.count < this.detail.data.num) {
+                        this.detail.data.count++
+                    } else {
+                        this.showToast({
+                            title: '不能再加啦～'
+                        })
+                    }
+                },
+                showToast ({ title, desc, time }) {
+                    if (this.toast.visible) {
+                        clearTimeout(this.toast.timeout)
+                        this.toast.timeout = null
+                    }
+                    this.toast.title = title || ''
+                    this.toast.desc = desc || ''
+                    this.toast.visible = true
+                    this.toast.timeout = setTimeout(() => {
+                        this.toast.visible = false
+                    }, time || 2000)
+                },
+                onGet () {
+                    if (this.getLoading) {
+                        return
+                    }
+                    this.getLoading = true
+                    if (this.tabs.active === 'free') {
+                        zovye_fn.getGoodsDetail(this.detail.data.id, res => {
+                            this.getLoading = false
+                            if (res.status) {
+                                const result = res.data
+                                if (typeof result.media === 'string') {
+                                    //播放视频
+                                    this.playVideo(result)
+                                } else if (result.media instanceof Array) {
+                                    //轮播图片
+                                    this.playImages(result)
+                                }
+                            } else {
+                                this.showToast({
+                                    desc: res.data.msg
+                                })
+                            }
+                        })
+                    } else if (this.tabs.active === 'pay') {
+                        const data = {
+                            goodsID: this.detail.data.id,
+                            total: this.detail.data.count
+                        }
+                        zovye_fn.goods_wxpay(data).then(() => {
+                            this.getLoading = false
+                        }).catch(() => {
+                            this.getLoading = false
+                        })
+                    }
+                },
+                playVideo (data) {
+                    const that = this
+                    if (!that.video.player) {
+                        that.video.data = data
+                        that.video.countdown = data.duration
+                        that.video.visible = true
+
+                        this.$nextTick(() => {
+                            const options = {
+                                autoplay: true,
+                                sources: [{
+                                    type: "video/mp4",
+                                    src: data.media
+                                }]
+                            }
+                            that.video.player = videojs('player', options, function onPlayerReady () {
+                                this.play()
+                                that.onPlayVideo()
+                            })
+                        })
+                    }
+                },
+                onPlayVideo () {
+                    this.playRequest('video')
+                    this.video.interval = setInterval(() => {
+                        this.video.countdown--
+                        if (this.video.countdown === 0) {
+                            clearInterval(this.video.interval)
+                        }
+                    }, 1000)
+                },
+                playImages (data) {
+                    this.images.data = data
+                    this.images.countdown = data.duration
+                    this.images.visible = true
+
+                    this.$nextTick(() => {
+                        new Swiper('#swiper-container', {
+                            autoplay: {
+                                delay: 3000,
+                                disableOnInteraction: false
+                            },
+                            loop: true,
+                            pagination: {
+                                el: '.swiper-pagination'
+                            }
+                        })
+                        this.onPlayImages()
+                    })
+                },
+                onPlayImages () {
+                    this.playRequest('images')
+                    this.images.interval = setInterval(() => {
+                        this.images.countdown--
+                        if (this.images.countdown === 0) {
+                            clearInterval(this.images.interval)
+                        }
+                    }, 1000)
+                },
+                playRequest (key) {
+                    zovye_fn.play(this[key].data.uid, this[key].data.duration - this[key].countdown, res => {
+                        if (res) {
+                            if (!res.status) {
+                                key === 'video' && this.video.player.pause()
+                                clearInterval(this[key].interval)
+                                this[key].visible = false
+                                this.isHidden = true
+                                alert(res.data.msg || '播放出错！')
+                            }
+                            if (res.data && res.data.redirect) {
+                                window.location.replace(res.data.redirect)
+                            } else if (res.status) {
+                                setTimeout(() => {
+                                    if (this.isHidden !== true) {
+                                        this.playRequest(key)
+                                    }
+                                }, 1000)
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

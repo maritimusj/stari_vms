@@ -2040,5 +2040,183 @@ JSCODE;
         $filename = Theme::getThemeFile($device, 'device');
         $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }
+
+    public function orderPage($user = '')
+    {
+        $api_url = Util::murl('order', ['user' => $user]);
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_code = <<<CODE
+<script src="$jquery_url"></script>
+<script>
+const zovye_fn = {};
+
+zovye_fn.get_list = function(way, page, pagesize) {
+  return new Promise((resolve) => {
+     $.getJSON("$api_url", {op: 'list', way, page, pagesize}).then(function(res) {
+        resolve(res);
+     });
+  });
+}
+
+zovye_fn.get_free_list = function(page, pagesize) {
+    return zovye_fn.get_list('free', page, pagesize);
+}
+
+zovye_fn.get_fee_list = function(page, pagesize) {
+    return zovye_fn.get_list('pay', page, pagesize);
+}
+
+zovye_fn.get_order_detail =function(orderNO) {
+    return new Promise((resolve, reject) => {
+        $.getJSON("$api_url", {op: 'detail', orderNO}).then(function(res) {
+            if (res && res.status) {
+                resolve(res);
+            } else {
+                reject(res && res.data.msg ? res.data.msg : '请求失败！');
+            }
+        });
+    });
+}
+</script>
+CODE;
+
+        $tpl_data['js']['code'] = $js_code;
+        app()->showTemplate(Theme::file('order'), ['tpl' => $tpl_data]);
+    }
+
+    public function feedbackPage()
+    {
+        $api_url1 = Util::murl('util', ['op' => 'upload_pic']);
+        $api_url2 = Util::murl('device', ['op' => 'feed_back']);
+
+        $axios_url = JS_AXIOS_URL;
+        $js_code = <<<CODE
+<script src="$axios_url"></script>
+<script>
+const zovye_fn = {};
+zovye_fn.upload = function(data) {
+    const param = new FormData();
+    param.append('pic', data);
+    
+    const config = {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+    return new Promise((resolve, reject) => {
+         axios.post('$api_url1',param, config).then((res) => {
+            return res.data;
+         }).then((res) => {
+             if (res.status && res.data) {
+                 resolve(res.data.data);
+             } else {
+                reject(res.msg || '上传失败！');
+             }
+         }).catch(() => {
+           reject("上传失败！");
+         });
+    })
+}
+
+zovye_fn.feedback = function(device, text, pics) {
+    const data = new FormData();
+    data.append('device', device);
+    data.append('text', text);
+    
+    for (let i = 0; i < (pics || []).length; i++) {
+        data.append(('pics[' + i + ']'), pics[i]);
+    }
+    
+    return new Promise((resolve, reject) => {
+        axios.post("$api_url2", data).then((res) => {
+            return res.data;
+        }).then((res) => {
+            if (res.status) {
+                resolve(res.data.msg || '反馈成功！');
+            } else {
+                reject(res.data.msg || '上传失败！');
+            }
+        }).catch(() =>{
+            reject("上传失败！");
+        });        
+    })
+}
+
+</script>
+CODE;
+
+        $tpl_data['js']['code'] = $js_code;
+        app()->showTemplate(Theme::file('feedback'), ['tpl' => $tpl_data]);
+    }
+
+    public function payResultPage($order_no, deviceModelObj $device = null)
+    {
+        $tpl = Util::getTplData(
+            [
+                [
+                    'timeout' => App::deviceWaitTimeout(),
+                    'slides' => [],
+                ],
+            ]
+        );
+
+        if ($device) {
+            //广告列表
+            $ads = $device->getAds(Advertising::GET_PAGE);
+            foreach ($ads as $adv) {
+                if ($adv['extra']['images']) {
+                    foreach ($adv['extra']['images'] as $image) {
+                        if ($image) {
+                            $tpl['slides'][] = [
+                                'id' => intval($adv['id']),
+                                'name' => strval($adv['name']),
+                                'image' => strval(Util::toMedia($image)),
+                                'url' => strval($adv['extra']['link']),
+                            ];
+                        }
+                    }
+                }
+            }
+
+            //失败转跳
+            $tpl['redirect'] = [
+                'fail' => $device->getRedirectUrl('fail')['url'],
+                'success' => $device->getRedirectUrl()['url'],
+            ];
+
+            $agent = $device->getAgent();
+            if ($agent) {
+                $tpl['mobile'] = $agent->getMobile();
+            }
+        }
+
+        $url_params = ['op' => 'result', 'orderNO' => $order_no];
+        if (request::has('balance')) {
+            $url_params['balance'] = 1;
+        }
+
+        $order_api_url = Util::murl('order', ['orderNO' => $order_no]);
+        $jquery_url = JS_JQUERY_URL;
+
+        $js_code = <<<CODE
+<script src="$jquery_url"></script>
+<script>
+const zovye_fn = {};
+
+zovye_fn.getResult = function() {
+  return $.getJSON("$order_api_url");
+}
+CODE;
+
+        $tpl['js']['code'] = $js_code;
+
+        $file = Theme::getThemeFile($device, 'payresult');
+        app()->showTemplate($file, [
+            'tpl' => $tpl,
+            'url' => Util::murl('order', $url_params),
+            'idcard_url' => Util::murl('idcard', ['orderNO' => $order_no]),
+        ]);
+    }
 }
 

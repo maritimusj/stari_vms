@@ -72,7 +72,11 @@ try {
         if ($adDeviceUID) {
             $area = $account->getArea();
             if ($area) {
-                $res = (new FlashEgg())->debug()->triggerAdPlay($adDeviceUID, $area);
+                $flashEgg = new FlashEgg();
+                if (DEBUG) {
+                    $flashEgg->debug();
+                }
+                $res = $flashEgg->triggerAdPlay($adDeviceUID, $area);
                 if (is_error($res)) {
                     Log::error('flash_egg', [
                         'device' => $device->getImei(),

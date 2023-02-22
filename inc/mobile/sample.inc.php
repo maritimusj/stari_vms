@@ -130,7 +130,7 @@ if ($op == 'goods') {
                     'num' => intval($entry['num']),
                     'allow_free' => $entry[Goods::AllowFree],
                     'allow_pay' => $entry[Goods::AllowPay],
-                    'limited' => $isLimitedFN($entry['goods_id']),
+                    'limited' => $entry['num'] < 1 || $isLimitedFN($entry['goods_id']),
                 ];
             }
         }

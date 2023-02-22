@@ -1950,10 +1950,10 @@ JSCODE;
 
     public function followPage(userModelObj $user, deviceModelObj $device)
     {
-        $tpl_data = [
+        $tpl_data = Util::getTplData([
             'user' => $user->profile(),
             'device' => $device->profile(),
-        ];
+        ]);
 
         $api_url = Util::murl('sample', ['device' => $device->getImei()]);
         $jquery_url = JS_JQUERY_URL;
@@ -1991,6 +1991,8 @@ JSCODE;
 
         $device_name = $device->getName();
         $device_imei = $device->getImei();
+
+        $tpl_data = Util::getTplData();
 
         $tpl_data['user'] = $user->profile();
         $tpl_data['device'] = $device->profile();
@@ -2081,6 +2083,7 @@ zovye_fn.get_order_detail =function(orderNO) {
 </script>
 CODE;
 
+        $tpl_data = Util::getTplData();
         $tpl_data['js']['code'] = $js_code;
         app()->showTemplate(Theme::file('order'), ['tpl' => $tpl_data]);
     }
@@ -2146,13 +2149,14 @@ zovye_fn.feedback = function(device, text, pics) {
 </script>
 CODE;
 
+        $tpl_data = Util::getTplData();
         $tpl_data['js']['code'] = $js_code;
         app()->showTemplate(Theme::file('feedback'), ['tpl' => $tpl_data]);
     }
 
     public function payResultPage($order_no, deviceModelObj $device = null)
     {
-        $tpl = Util::getTplData(
+        $tpl_data = Util::getTplData(
             [
                 [
                     'timeout' => App::deviceWaitTimeout(),
@@ -2168,7 +2172,7 @@ CODE;
                 if ($adv['extra']['images']) {
                     foreach ($adv['extra']['images'] as $image) {
                         if ($image) {
-                            $tpl['slides'][] = [
+                            $tpl_data['slides'][] = [
                                 'id' => intval($adv['id']),
                                 'name' => strval($adv['name']),
                                 'image' => strval(Util::toMedia($image)),
@@ -2180,14 +2184,14 @@ CODE;
             }
 
             //失败转跳
-            $tpl['redirect'] = [
+            $tpl_data['redirect'] = [
                 'fail' => $device->getRedirectUrl('fail')['url'],
                 'success' => $device->getRedirectUrl()['url'],
             ];
 
             $agent = $device->getAgent();
             if ($agent) {
-                $tpl['mobile'] = $agent->getMobile();
+                $tpl_data['mobile'] = $agent->getMobile();
             }
         }
 
@@ -2210,11 +2214,11 @@ zovye_fn.getResult = function() {
 </script>
 CODE;
 
-        $tpl['js']['code'] = $js_code;
+        $tpl_data['js']['code'] = $js_code;
 
         $file = Theme::getThemeFile($device, 'payresult');
         app()->showTemplate($file, [
-            'tpl' => $tpl,
+            'tpl' => $tpl_data,
             'url' => Util::murl('order', $url_params),
             'idcard_url' => Util::murl('idcard', ['orderNO' => $order_no]),
         ]);

@@ -1250,7 +1250,7 @@ class deviceModelObj extends modelObj
         if (App::isFlashEggEnabled()) {
             $adDeviceUID = $this->getAdDeviceUID();
             if ($adDeviceUID) {
-                return Util::murl('simple', ['device' => $this->imei]);
+                return Util::murl('sample', ['device' => $this->imei]);
             }
         }
 

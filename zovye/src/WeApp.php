@@ -1955,7 +1955,7 @@ JSCODE;
             'device' => $device->profile(),
         ];
 
-        $api_url = Util::murl('simple', ['device' => $device->getImei()]);
+        $api_url = Util::murl('sample', ['device' => $device->getImei()]);
         $jquery_url = JS_JQUERY_URL;
 
         $tpl_data['js']['code'] = <<<JSCODE
@@ -1978,7 +1978,7 @@ JSCODE;
 
     public function goodsListPage(userModelObj $user, deviceModelObj $device)
     {
-        $api_url = Util::murl('simple');
+        $api_url = Util::murl('sample');
         $account_api_url = Util::murl('account');
 
         $tpl_data['user'] = $user->profile();

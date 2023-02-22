@@ -1965,9 +1965,6 @@ JSCODE;
 
     public function goodsListPage(userModelObj $user, deviceModelObj $device)
     {
-
-        $jquery_url = JS_JQUERY_URL;
-        $js_sdk = Util::fetchJSSDK();
         $api_url = Util::murl('simple');
         $account_api_url = Util::murl('account');
 
@@ -1986,13 +1983,7 @@ JSCODE;
         $requestID = REQUEST_ID;
 
         $tpl_data['js']['code'] .= <<<JSCODE
-<script src="$jquery_url"></script>
-$js_sdk
 <script>
-    wx.ready(function(){
-        wx.hideAllNonBaseMenuItem();
-    })
-    const zovye_fn = {};
     zovye_fn.getGoodsList = function(fn) {
         $.getJSON("$api_url", {op: 'goods'}).then(function(res){
             if (typeof fn === 'function') {

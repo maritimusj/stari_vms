@@ -3245,6 +3245,6 @@ class deviceModelObj extends modelObj
 
     public function getAdDeviceUID(): string
     {
-        return settings('ad.device.uid', '');
+        return $this->settings('extra.ad.device.uid', '');
     }
 }

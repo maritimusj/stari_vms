@@ -75,7 +75,7 @@ $user = $getUserFN();
 //记录设备ID
 $user->setLastActiveDevice($device);
 
-if (!$GLOBALS['_W']['fans']['follow']) {
+if (!User::isSubscribed($user)) {
     app()->followPage($user, $device);
 }
 

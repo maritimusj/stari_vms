@@ -15,7 +15,7 @@ class Wx
     const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=';
     const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=';
 
-    public static function getWx(): WeiXinAccount
+    public static function getWxAccount(): WeiXinAccount
     {
         static $wx = null;
         if (empty($wx)) {
@@ -26,7 +26,6 @@ class Wx
                 $wx = WeAccount::create(We7::uniacid());
             }
         }
-
         return $wx;
     }
 
@@ -40,7 +39,7 @@ class Wx
      */
     public static function sendTplNotice($openid, $tpl_id, $content, string $url = '')
     {
-        $wx = self::getWx();
+        $wx = self::getWxAccount();
         return $wx->sendTplNotice($openid, $tpl_id, $content, $url);
     }
 
@@ -51,7 +50,7 @@ class Wx
      */
     public static function sendCustomNotice($msg): bool
     {
-        $wx = self::getWx();
+        $wx = self::getWxAccount();
         $result = $wx->sendCustomNotice($msg);
 
         return !is_error($result);
@@ -98,7 +97,7 @@ class Wx
 
     private static function getQRCodeTicket($action = '', $scene = '', $expire_seconds = 60): array
     {
-        $wx = self::getWx();
+        $wx = self::getWxAccount();
 
         $data = [
             'expire_seconds' => $expire_seconds,

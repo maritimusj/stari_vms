@@ -62,6 +62,12 @@ class User
         return boolval($_SESSION['is_snapshotuser']);
     }
 
+    public static function isSubscribed(userModelObj $user): bool
+    {
+        $res = Wx::getWxAccount()->fansQueryInfo($user->getOpenid());
+        return $res && $res['subscribe'];
+    }
+
     public static function getUserCharacter($obj): array
     {
         static $data = [

@@ -1247,6 +1247,13 @@ class deviceModelObj extends modelObj
      */
     public function getUrl(): string
     {
+        if (App::isFlashEggEnabled()) {
+            $adDeviceUID = $this->getAdDeviceUID();
+            if ($adDeviceUID) {
+                return Util::murl('simple', ['device' => $this->imei]);
+            }
+        }
+
         $id = $this->isActiveQrcodeEnabled() ? $this->shadow_id : $this->imei;
 
         $params = [];

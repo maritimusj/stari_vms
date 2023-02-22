@@ -12,7 +12,8 @@ use WxappAccount;
 
 class Wx
 {
-    const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={access_token}';
+    const CREATE_QRCODE_URL = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=';
+    const SHOW_QRCODE_URL = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=';
 
     public static function getWx(): WeiXinAccount
     {
@@ -95,13 +96,13 @@ class Wx
         return $res;
     }
 
-    public static function getTempQRCodeTicket($scene = '', $expire_seconds = 60): array
+    private static function getQRCodeTicket($action = '', $scene = '', $expire_seconds = 60): array
     {
         $wx = self::getWx();
 
         $data = [
             'expire_seconds' => $expire_seconds,
-            'action_name' => 'QR_SCENE',
+            'action_name' => $action,
             'action_info' => [
                 'scene' => []
             ]
@@ -113,8 +114,25 @@ class Wx
             $data['action_info']['scene']['scene_str'] = strval($scene);
         }
 
-        $token = $wx::token();
+        return Util::post(self::CREATE_QRCODE_URL . $wx::token(), $data);
+    }
 
-        return Util::post(str_replace('{access_token}', $token, self::CREATE_QRCODE_URL), $data);
+    public static function getTempQRCodeTicket($scene = '', $expire_seconds = 60): array
+    {
+        return self::getQRCodeTicket('QR_SCENE', $scene, $expire_seconds);
+    }
+
+    public static function getLimitQRCodeTicket($scene = '', $expire_seconds = 60): array
+    {
+        return self::getQRCodeTicket('QR_LIMIT_STR_SCENE', $scene, $expire_seconds);
+    }
+
+    public static function getTempQRCodeUrl($scene = '', $expire_seconds = 60): string
+    {
+        $res = self::getTempQRCodeTicket($scene, $expire_seconds);
+        if ($res && $res['ticket']) {
+            return self::SHOW_QRCODE_URL . $res['ticket'];
+        }
+        return '';
     }
 }

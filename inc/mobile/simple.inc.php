@@ -19,11 +19,9 @@ $op = request::op('default');
 
 //获取关注公众号二维码
 if ($op == 'qrcode') {
-    $res = Wx::getTempQRCodeTicket();
-    if ($res && $res['ticket']) {
-        JSON::success([
-            'url' => 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket'],
-        ]);
+    $url = Wx::getTempQRCodeUrl(App::uid());
+    if ($url) {
+        JSON::success(['url' => $url]);
     }
     JSON::fail('无法获取公众号二维码！');
 }
@@ -94,7 +92,7 @@ if ($op == 'goods') {
     $allow_free = request::bool('free');
     $allow_pay = request::bool('pay');
 
-    $isLimitedFN = function ($goods_id) use($user) {
+    $isLimitedFN = function ($goods_id) use ($user) {
         $goods = Goods::get($goods_id);
         if (empty($goods)) {
             return true;
@@ -110,6 +108,7 @@ if ($op == 'goods') {
         }
 
         $res = Util::checkAccountLimits($user, $account);
+
         return is_error($res);
     };
 

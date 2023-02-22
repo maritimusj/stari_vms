@@ -1952,13 +1952,28 @@ JSCODE;
 
     public function followPage(userModelObj $user, deviceModelObj $device)
     {
-        $res = Wx::getTempQRCodeTicket('follow');
         $tpl_data = [
             'user' => $user->profile(),
             'device' => $device->profile(),
-            'qrcode_url' => 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='. $res['ticket'],
         ];
 
+        $api_url = Util::murl('simple', ['device' => $device->getImei()]);
+        $jquery_url = JS_JQUERY_URL;
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+
+    zovye_fn.getQRCode = function() {
+        return $.getJSON(zovye_fn.api_url, {op: "qrcode"});
+    }
+    
+</script>
+JSCODE;
         $filename = Theme::getThemeFile($device, 'qrcode');
         $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }

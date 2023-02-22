@@ -1980,6 +1980,17 @@ JSCODE;
     {
         $api_url = Util::murl('sample');
         $account_api_url = Util::murl('account');
+        $feedback_url = Util::murl('order', ['op' => 'feedback']);
+        $order_jump_url = Util::murl('order', ['op' => 'jump']);
+
+        $agent = $device->getAgent();
+        $mobile = '';
+        if ($agent) {
+            $mobile = $agent->getMobile();
+        }
+
+        $device_name = $device->getName();
+        $device_imei = $device->getImei();
 
         $tpl_data['user'] = $user->profile();
         $tpl_data['device'] = $device->profile();
@@ -2017,6 +2028,12 @@ JSCODE;
                 fn(res);
             }
         })
+    }
+    zovye_fn.redirectToFeedBack = function() {
+        window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
+    }
+    zovye_fn.redirectToOrderPage = function() {
+        window.location.href = "$order_jump_url";
     }
 </script>
 JSCODE;

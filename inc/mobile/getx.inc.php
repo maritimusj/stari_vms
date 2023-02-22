@@ -150,9 +150,9 @@ try {
     }
 
     $response = [
-        'ok' => empty($result['orderId']) ? 0 : 1,
-        'text' => $result['title'],
-        'msg' => $result['msg'],
+        'ok' => !empty($result['orderId']),
+        'text' => empty($result['orderId']) ? '领取失败' : '领取成功',
+        'msg' => $result['message'],
     ];
 
     //成功转跳

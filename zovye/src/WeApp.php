@@ -834,10 +834,8 @@ $js_sdk
     const zovye_fn = {};
     zovye_fn.getx = function(fn) {
         $.getJSON("$get_x_url").then(function(res){
-            if (res && res.status && res.data.msg) {
-                if (typeof fn === 'function') {
-                    fn(res);
-                }
+            if (typeof fn === 'function') {
+                fn(res);
             }
         })
     }

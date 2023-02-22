@@ -1965,17 +1965,27 @@ JSCODE;
 
     public function goodsListPage(userModelObj $user, deviceModelObj $device)
     {
+
+        $jquery_url = JS_JQUERY_URL;
         $js_sdk = Util::fetchJSSDK();
         $api_url = Util::murl('simple');
         $account_api_url = Util::murl('account');
-
-        $jquery_url = JS_JQUERY_URL;
 
         $tpl_data['user'] = $user->profile();
         $tpl_data['device'] = $device->profile();
 
         $tpl_data['timeout'] = App::deviceWaitTimeout();
-        $tpl_data['js']['code'] = <<<JSCODE
+
+        $pay_js = Pay::getPayJs($device, $user);
+        if (is_error($pay_js)) {
+            Util::resultAlert($pay_js['message'], 'error');
+        }
+
+        $tpl_data['js']['code'] = $pay_js;
+
+        $requestID = REQUEST_ID;
+
+        $tpl_data['js']['code'] .= <<<JSCODE
 <script src="$jquery_url"></script>
 $js_sdk
 <script>
@@ -1998,7 +2008,7 @@ $js_sdk
         })
     }
     zovye_fn.play = function(uid, seconds, fn) {
-        $.getJSON("$account_api_url", {op: 'play', uid, seconds, device: "{$device->getImei()}"}).then(function(res){
+        $.getJSON("$account_api_url", {op: 'play', uid, seconds, device: "{$device->getImei()}", serial: "$requestID"}).then(function(res){
             if (typeof fn === 'function') {
                 fn(res);
             }

@@ -2205,8 +2205,9 @@ CODE;
 const zovye_fn = {};
 
 zovye_fn.getResult = function() {
-  return $.getJSON("$order_api_url");
+  return $.getJSON("$order_api_url", {op: 'result'});
 }
+</script>
 CODE;
 
         $tpl['js']['code'] = $js_code;

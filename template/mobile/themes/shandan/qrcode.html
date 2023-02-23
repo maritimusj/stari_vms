@@ -117,6 +117,9 @@
             },
             mounted () {
                 this.getQRCode()
+                setTimeout(() => {
+                    this.checkUser()
+                }, 3000)
             },
             methods: {
                 getQRCode () {
@@ -125,6 +128,19 @@
                             this.qrcode = res.data.url
                         } else {
                             alert(res.data.msg || '获取二维码失败')
+                        }
+                    })
+                },
+                checkUser () {
+                    zovye_fn.checkUser().then(res => {
+                        if (res.status) {
+                            if (res.data.subscribed) {
+                                location.reload()
+                            } else {
+                                setTimeout(() => {
+                                    this.checkUser()
+                                }, 1000)
+                            }
                         }
                     })
                 }

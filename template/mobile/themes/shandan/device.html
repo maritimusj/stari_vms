@@ -6,7 +6,6 @@
     <meta name="viewport"
         content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
     <title>{$tpl['site']['title']}</title>
-    <!-- {php \zovye\url(true, 'static/m/shandan/device.css?v=20220220');} -->
     <link href="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/video.js/4.1.0/video-js.min.css" rel="stylesheet">
     <style>
@@ -460,7 +459,6 @@
     </div>
     {$tpl['js']['code']}
     {php \zovye\url(true, JS_VUE_URL);}
-    <!-- {php \zovye\url(true, 'static/m/shandan/device.js?v=20220220');} -->
     <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"></script>
     <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
     <script>
@@ -592,35 +590,23 @@
                         return
                     }
                     this.getLoading = true
-                    if (this.tabs.active === 'free') {
-                        zovye_fn.getGoodsDetail(this.detail.data.id, res => {
-                            this.getLoading = false
-                            if (res.status) {
-                                const result = res.data
-                                if (typeof result.media === 'string') {
-                                    //播放视频
-                                    this.playVideo(result)
-                                } else if (result.media instanceof Array) {
-                                    //轮播图片
-                                    this.playImages(result)
-                                }
-                            } else {
-                                this.showToast({
-                                    desc: res.data.msg
-                                })
+                    zovye_fn.getGoodsDetail(this.detail.data.id, res => {
+                        this.getLoading = false
+                        if (res.status) {
+                            const result = res.data
+                            if (typeof result.media === 'string') {
+                                //播放视频
+                                this.playVideo(result)
+                            } else if (result.media instanceof Array) {
+                                //轮播图片
+                                this.playImages(result)
                             }
-                        })
-                    } else if (this.tabs.active === 'pay') {
-                        const data = {
-                            goodsID: this.detail.data.id,
-                            total: this.detail.data.count
+                        } else {
+                            this.showToast({
+                                desc: res.data.msg
+                            })
                         }
-                        zovye_fn.goods_wxpay(data).then(() => {
-                            this.getLoading = false
-                        }).catch(() => {
-                            this.getLoading = false
-                        })
-                    }
+                    })
                 },
                 playVideo (data) {
                     const that = this
@@ -692,7 +678,19 @@
                                 alert(res.data.msg || '播放出错！')
                             }
                             if (res.data && res.data.redirect) {
-                                window.location.replace(res.data.redirect)
+                                if (this.tabs.active === 'free') {
+                                    window.location.replace(res.data.redirect)
+                                } else if (this.tabs.active === 'pay') {
+                                    const params = {
+                                        goodsID: this.detail.data.id,
+                                        total: this.detail.data.count
+                                    }
+                                    zovye_fn.goods_wxpay(params).then(() => {
+                                        this.getLoading = false
+                                    }).catch(() => {
+                                        this.getLoading = false
+                                    })
+                                }
                             } else if (res.status) {
                                 setTimeout(() => {
                                     if (this.isHidden !== true) {

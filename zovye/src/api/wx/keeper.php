@@ -382,7 +382,7 @@ class keeper
                             $device_ids[] = $entry->getImei();
                         }
 
-                        $device_ids = array_unique($device_ids, SORT_STRING);
+                        $device_ids = array_unique($device_ids);
                     }
                 }
 
@@ -410,7 +410,6 @@ class keeper
                         return $data;
                     };
                 }
-
 
                 //way 分佣时机：Keeper::COMMISSION_RELOAD，补货时 Keeper::COMMISSION_ORDER，订单生成时
                 $way = request::int('way', -1);

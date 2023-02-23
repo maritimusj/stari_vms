@@ -2744,7 +2744,7 @@ class deviceModelObj extends modelObj
         }
 
         if (empty($keeper_id)) {
-            return 0;
+            return [];
         }
 
         $device_id = $this->getId();

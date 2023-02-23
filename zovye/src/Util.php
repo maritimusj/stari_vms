@@ -3058,6 +3058,8 @@ HTML_CONTENT;
             if ($location && $location['lat'] && $location['lng']) {
                 unset($location['area'], $location['address']);
                 $result[] = [
+                    'id' => $entry->getId(),
+                    'imei' => $entry->getImei(),
                     'name' => $entry->getName(),
                     'location' => $location,
                 ];

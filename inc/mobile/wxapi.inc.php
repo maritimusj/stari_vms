@@ -21,6 +21,7 @@ router::exec($op, [
     'DemoLogin' => '\zovye\api\wx\debug::login',
 
     'DeviceSetNum' => '@\zovye\api\wx\device::deviceReset',
+    'DeviceNearBy' => '\zovye\api\wx\device::deviceNearBy',
 
     'Reg' => '\zovye\api\wx\agent::reg',
     'PreLogin' => '\zovye\api\wx\agent::preLogin',

@@ -31,23 +31,9 @@ if ($op == 'default') {
 } elseif ($op == 'data') {
 
     //请求附近设备数据
-    $query = Device::query();
-
-    $result = [];
-
-    /** @var deviceModelObj $entry */
-    foreach ($query->findAll() as $entry) {
-        $location = $entry->settings('extra.location.tencent', $entry->settings('extra.location'));
-        if ($location && $location['lat'] && $location['lng']) {
-            unset($location['area'], $location['address']);
-            $result[] = [
-                'name' => $entry->getName(),
-                'location' => $location,
-            ];
-        }
-    }
-
+    $result = Util::devicesNearBy();
     JSON::success($result);
+
 } elseif ($op == 'location') {
     //请求定位
 

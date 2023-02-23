@@ -3044,4 +3044,26 @@ HTML_CONTENT;
             exit();
         }
     }
+
+    public static function devicesNearBy(agentModelObj $agent = null): array
+    {
+        //请求附近设备数据
+        $query = $agent ? Device::query(['agent_id' => $agent->getId()]) : Device::query();
+
+        $result = [];
+
+        /** @var deviceModelObj $entry */
+        foreach ($query->findAll() as $entry) {
+            $location = $entry->settings('extra.location.tencent', $entry->settings('extra.location'));
+            if ($location && $location['lat'] && $location['lng']) {
+                unset($location['area'], $location['address']);
+                $result[] = [
+                    'name' => $entry->getName(),
+                    'location' => $location,
+                ];
+            }
+        }
+
+        return $result;
+    }
 }

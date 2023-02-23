@@ -19,6 +19,9 @@ $op = request::op('default');
 
 router::exec($op, [
     'login' => '\zovye\api\wxweb\api::login',
+
+    'nearBy' => '\zovye\api\wxweb\api::nearBy',
+
     'advs' => '\zovye\api\wxweb\api::ads',
     'accounts' => '\zovye\api\wxweb\api::accounts',
     'goods' => '\zovye\api\wxweb\api::goods',

@@ -256,6 +256,12 @@ class device
         return $result;
     }
 
+    public static function deviceNearBy(): array
+    {
+        $agent = common::getAgent();
+        return Util::devicesNearBy($agent);
+    }
+
     /**
      * @param $id
      * @param agentModelObj|null $owner

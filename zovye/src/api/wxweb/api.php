@@ -68,6 +68,11 @@ class api
         );
     }
 
+    public static function nearBy(): array
+    {
+        return Util::devicesNearBy();
+    }
+
     public static function migrateUrl(): array
     {
         $url = Util::murl('util', ['op' => 'migrate', 'token' => \zovye\api\wx\common::getToken()]);

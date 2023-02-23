@@ -718,7 +718,7 @@ JSCODE;
         $this->showTemplate($file, ['tpl' => $tpl]);
     }
 
-    public function snapshotJs(string $device_imei): string
+    public function snapshotJs(string $device_imei, string $entry = 'entry'): string
     {
         $gif_url = MODULE_URL . "static/img/here.gif";
         $html = <<<HTML
@@ -731,7 +731,7 @@ JSCODE;
         </div>
         </div>
 HTML;
-        $snapshot_url = Util::murl('util', ['op' => 'snapshot', 'device' => $device_imei]);
+        $snapshot_url = Util::murl('util', ['op' => 'snapshot', 'entry' => $entry, 'device' => $device_imei]);
 
         return <<<JSCODE
 \r\n
@@ -1972,6 +1972,10 @@ JSCODE;
     
 </script>
 JSCODE;
+
+    if (User::isSnapshot()) {
+        $tpl_data['js']['code'] .= $this->snapshotJs($device->getImei(), 'sample');
+    }
         $filename = Theme::getThemeFile($device, 'qrcode');
         $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }

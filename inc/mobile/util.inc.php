@@ -371,7 +371,7 @@ if ($op == 'default') {
     unset($_SESSION['oauth_acid']);
     unset($_SESSION['wx_user_id']);
 
-    $url = Util::murl('entry', ['device' => request::str('device'), 'serial' => Util::random(10)]);
+    $url = Util::murl(request::trim('entry', 'entry'), ['device' => request::str('device'), 'serial' => Util::random(10)]);
     $_SESSION['dest_url'] = $url;
     
     JSON::success([

@@ -47,10 +47,20 @@ class FlashEgg
      */
     public function triggerAdPlay(string $uid, string $no)
     {
-        $res = Util::post($this->debug ? self::DEBUG_API_URL : self::PRO_API_URL, [
+        $url = $this->debug ? self::DEBUG_API_URL : self::PRO_API_URL;
+        
+        $data = [
             'devMac' => $uid,
             'triggerNo' => $no,
             'sign' => $this->sign([$uid, $no]),
+        ];
+
+        $res = Util::post($url, $data);
+
+        Log::debug('flash_egg', [
+            'url' => $url,
+            'data' => $data,
+            'result' => $res,
         ]);
 
         if (empty($res)) {

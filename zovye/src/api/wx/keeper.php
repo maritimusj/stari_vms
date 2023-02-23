@@ -386,28 +386,35 @@ class keeper
                     }
                 }
 
-                $commission = request::str('commission');
+                if (request::has('commission')) {
+                    $commission = request::str('commission');
 
-                //%结尾表示百分比，*表示固定金额
-                if (substr($commission, -1) == '%') {
-                    $commission = rtrim($commission, '%');
-                    $percent = max(0, min(100, intval($commission)));
-                    $set_commission = function (&$data) use ($percent) {
-                        $data['percent'] = $percent;
-                        return $data;
-                    };
+                    //%结尾表示百分比，*表示固定金额
+                    if (substr($commission, -1) == '%') {
+                        $commission = rtrim($commission, '%');
+                        $percent = max(0, min(100, intval($commission)));
+                        $set_commission = function (&$data) use ($percent) {
+                            $data['percent'] = $percent;
+                            return $data;
+                        };
+                    } else {
+                        $commission = rtrim($commission, '*');
+                        $fixed = max(0, intval($commission));
+                        $set_commission = function (&$data) use ($fixed) {
+                            $data['fixed'] = $fixed;
+                            return $data;
+                        };
+                    }
                 } else {
-                    $commission = rtrim($commission, '*');
-                    $fixed = max(0, intval($commission));
-                    $set_commission = function (&$data) use ($fixed) {
-                        $data['fixed'] = $fixed;
+                    $set_commission = function($data) {
                         return $data;
                     };
                 }
 
+
                 //way 分佣时机：Keeper::COMMISSION_RELOAD，补货时 Keeper::COMMISSION_ORDER，订单生成时
-                $way = request::int('way');
-                $kind = request::int('kind');
+                $way = request::int('way', -1);
+                $kind = request::int('kind', -1);
 
                 $keeper_id = request::int('keeperid');
                 $keeper = \zovye\Keeper::get($keeper_id);
@@ -422,10 +429,13 @@ class keeper
 
                 /** @var deviceModelObj $entry */
                 foreach ($query->findAll() as $entry) {
-                    $keeper_data = [
-                        'kind' => $kind,
-                        'way' => $way,
-                    ];
+                    $keeper_data = $entry->getKeeperData($keeper);
+                    if ($way != -1) {
+                        $keeper_data['way'] = $way;
+                    }
+                    if($kind != -1) {
+                        $keeper_data['kind'] = $kind;
+                    }
                     $entry->setKeeper($keeper, $set_commission($keeper_data));
                 }
 
@@ -817,11 +827,7 @@ class keeper
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        if (
-            $device->getAgentId() != $keeper->getAgentId() ||
-            !$device->hasKeeper($keeper) ||
-            $device->getKeeperKind($keeper) != \zovye\Keeper::OP
-        ) {
+        if ($device->getAgentId() != $keeper->getAgentId() ||!$device->hasKeeper($keeper)) {
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
@@ -832,6 +838,9 @@ class keeper
             'status' => [],
             'device' => [
                 'model' => $device->getDeviceModel(),
+            ],
+            'keeper' => [
+                'kind' => $device->getKeeperKind($keeper),
             ]
         ];
 

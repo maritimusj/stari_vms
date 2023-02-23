@@ -2735,6 +2735,45 @@ class deviceModelObj extends modelObj
         return false;
     }
 
+    public function getKeeperData($keeper): array
+    {
+        if ($keeper instanceof keeperModelObj) {
+            $keeper_id = $keeper->getId();
+        } else {
+            $keeper_id = intval($keeper);
+        }
+
+        if (empty($keeper_id)) {
+            return 0;
+        }
+
+        $device_id = $this->getId();
+        /** @var keeper_devicesModelObj $res */
+        $res = m('keeper_devices')->findOne(
+            [
+                'device_id' => $device_id,
+                'keeper_id' => $keeper_id,
+            ]
+        );
+
+        if ($res) {
+            $data = [
+                'kind' => $res->getKind(),
+                'way' => $res->getWay(),
+            ];
+
+            if ($res->getCommissionFixed() != -1) {
+                $data['fixed'] = $res->getCommissionFixed();
+            } else {
+                $data['percent'] = $res->getCommissionPercent();
+            }
+
+            return $data;
+        }
+
+        return [];
+    }
+
     public function getKeeperKind($keeper): int
     {
         if ($keeper instanceof keeperModelObj) {

@@ -237,7 +237,7 @@ REFUND;
 
             $keeper = Keeper::get($keeperId);
             $keeperName = $keeper ? $keeper->getName() : 'n/a';
-            $keeper_info = "<dt>营运人员</dt><dd class=\"admin\">$keeperName</dd>";
+            $keeper_info = "<dt>运营人员</dt><dd class=\"admin\">$keeperName</dd>";
 
             $memo = $entry->getExtraData('memo');
             $data['memo'] = <<<REALOD_OUT

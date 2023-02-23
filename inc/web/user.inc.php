@@ -428,7 +428,7 @@ if ($op == 'default') {
 
     $keeper = $user->getKeeper();
     if (empty($keeper)) {
-        JSON::fail('这个用户不是营运人员！');
+        JSON::fail('这个用户不是运营人员！');
     }
 
     $page = max(1, request::int('page'));
@@ -475,7 +475,7 @@ if ($op == 'default') {
     );
 
 } elseif ($op == 'keeper_device_edit') {
-    
+
 
 } elseif ($op == 'keeper_device_remove') {
 
@@ -486,7 +486,7 @@ if ($op == 'default') {
 
     $keeper = $user->getKeeper();
     if (empty($keeper)) {
-        JSON::fail('这个用户不是营运人员！');
+        JSON::fail('这个用户不是运营人员！');
     }
 
     /** @var deviceModelObj $entry */

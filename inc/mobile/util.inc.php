@@ -235,7 +235,7 @@ if ($op == 'default') {
     }
 
     if ($user->isKeeper()) {
-        JSON::fail('用户已经是营运人员！');
+        JSON::fail('用户已经是运营人员！');
     }
 
     $token = request::str('token');

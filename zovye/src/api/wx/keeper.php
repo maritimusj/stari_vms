@@ -53,7 +53,7 @@ class keeper
 
         $user = common::getUser();
         if (!$user->isKeeper()) {
-            JSON::fail(['msg' => '不是营运人员！']);
+            JSON::fail(['msg' => '不是运营人员！']);
         }
 
         return $user->getKeeper();
@@ -414,7 +414,7 @@ class keeper
                 $keeper_id = request::int('keeperid');
                 $keeper = \zovye\Keeper::get($keeper_id);
                 if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
-                    return err('找不到这个营运人员！');
+                    return err('找不到这个运营人员！');
                 }
 
                 $query = Device::query([
@@ -461,7 +461,7 @@ class keeper
                 return error(State::ERROR, '检查身份失败！');
             }
 
-            //如果营运人员补货导致代理商余额小于零，则不允许营运人员提现
+            //如果运营人员补货导致代理商余额小于零，则不允许运营人员提现
             if ($agent->getCommissionBalance()->total() < 0) {
                 return error(State::ERROR, '代理商账户异常，请联系代理商！');
             }
@@ -1014,7 +1014,7 @@ class keeper
 
         if (App::isInventoryEnabled()) {
             $user = $keeper->getUser();
-            $v = Inventory::syncDevicePayloadLog($user, $device, $result, '营运人员补货');
+            $v = Inventory::syncDevicePayloadLog($user, $device, $result, '运营人员补货');
             if (is_error($v)) {
                 return $v;
             }
@@ -1047,7 +1047,7 @@ class keeper
             $err = $create_commission_fn($total);
             if (is_error($err)) {
                 Log::error('keeper', [
-                    'error' => '创建营运人员补货佣金失败:' . $err['message'],
+                    'error' => '创建运营人员补货佣金失败:' . $err['message'],
                     'total' => $total,
                 ]);
 
@@ -1240,7 +1240,7 @@ class keeper
             /** @var keeperModelObj $keeper */
             $keeper = \zovye\Keeper::get($id);
             if (empty($keeper)) {
-                return error(State::ERROR, '找不到这个营运人员！');
+                return error(State::ERROR, '找不到这个运营人员！');
             }
 
             if ($keeper->getAgentId() != $user->getAgentId()) {
@@ -1281,7 +1281,7 @@ class keeper
 
         $num = request::int('num');
 
-        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '营运人员：' . $keeper->getName()]);
+        $res = Order::refund($order->getOrderNO(), $num, ['msg' => '运营人员：' . $keeper->getName()]);
         if (is_error($res)) {
             return error(State::ERROR, $res['message']);
         }

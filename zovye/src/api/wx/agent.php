@@ -506,7 +506,7 @@ class agent
         $keeperId = request::int('keeperid');
         $keeper = Keeper::get($keeperId);
         if (empty($keeper) || $user->getAgentId() != $keeper->getAgentId()) {
-            return error(State::ERROR, '找不到这个营运人员！');
+            return error(State::ERROR, '找不到这个运营人员！');
         }
 
         $query = Device::keeper($keeper);

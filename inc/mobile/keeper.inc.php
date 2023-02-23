@@ -56,7 +56,7 @@ if ($op == 'save') {
     }
 
     if (!Keeper::findOne(['mobile' => $mobile])) {
-        JSON::fail('对不起，您不是我们的营运人员，无法注册！');
+        JSON::fail('对不起，您不是我们的运营人员，无法注册！');
     }
 
     if (!$user->setKeeper()) {

@@ -27,7 +27,7 @@ if ($sign != sha1("$op$ts$secret")) {
 
 $op = request::str('q');
 
-//接口说明：请求指定用户的来源设备的营运人员信息
+//接口说明：请求指定用户的来源设备的运营人员信息
 if ($op == 'keeper') {
     $mobile = request::trim('mobile');
     if (empty($mobile)) {

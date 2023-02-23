@@ -645,7 +645,7 @@ class Device extends State
      */
     public static function reset(deviceModelObj $device, string $reason = '设备重置'): bool
     {
-        //清空营运人员
+        //清空运营人员
         $extra = $device->get('extra', []);
         unset($extra['keepers']);
         $device->set('extra', $extra);
@@ -685,7 +685,7 @@ class Device extends State
             $device->setDeviceType(DeviceTypes::UNKNOWN_TYPE);
         }
 
-        //删除关联的营运人员
+        //删除关联的运营人员
         foreach ($device->getKeepers() as $keeper) {
             if (!$device->removeKeeper($keeper)) {
                 return false;

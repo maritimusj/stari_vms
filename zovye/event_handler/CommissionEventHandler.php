@@ -184,7 +184,7 @@ class CommissionEventHandler
      * 第2步，计算商品利润（减去成本价）
      * 第3步，对利润进行佣金分配
      *       1，处理佣金分享用户
-     *       2，处理营运人员佣金
+     *       2，处理运营人员佣金
      * 第4步，成本及剩余利润分配给代理商
      *
      * @param deviceModelObj $device
@@ -313,7 +313,7 @@ class CommissionEventHandler
     }
 
     /**
-     * 处理营运人员佣金
+     * 处理运营人员佣金
      * @param int $commission_price
      * @param deviceModelObj $device
      * @param orderModelObj $order
@@ -379,7 +379,7 @@ class CommissionEventHandler
                         break;
                     }
                 } else {
-                    throw new Exception('创建营运人员佣金失败！', State::ERROR);
+                    throw new Exception('创建运营人员佣金失败！', State::ERROR);
                 }
             }
         }
@@ -542,7 +542,7 @@ class CommissionEventHandler
             return 0;
         }
 
-        //处理营运人员佣金
+        //处理运营人员佣金
         return self::processKeeperCommissions($commission_price, $device, $order, $src);
     }
 

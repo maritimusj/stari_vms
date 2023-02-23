@@ -1742,7 +1742,7 @@ HTML_CONTENT;
             return $pull_result;
         }
 
-        //如果是营运人员测试，则不减少库存
+        //如果是运营人员测试，则不减少库存
         if (empty($params['keeper'])) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {

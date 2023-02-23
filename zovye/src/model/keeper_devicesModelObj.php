@@ -28,16 +28,23 @@ class keeper_devicesModelObj extends modelObj
 {
     /** @var int */
     protected $id;
+
     /** @var int */
     protected $device_id;
+
     /** @var int */
     protected $keeper_id;
+
     /** @var int */
     protected $commission_percent;
+
     /** @var int */
     protected $commission_fixed;
-    protected $way;
-    protected $kind;
+
+    protected $way; //佣金类型 0 销售分成 1 补货分成
+
+    protected $kind; //补货权限 0 没有 1 有
+
     /** @var int */
     protected $createtime;
 

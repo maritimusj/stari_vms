@@ -394,7 +394,6 @@ class keeper
                     $percent = max(0, min(100, intval($commission)));
                     $set_commission = function (&$data) use ($percent) {
                         $data['percent'] = $percent;
-
                         return $data;
                     };
                 } else {
@@ -402,7 +401,6 @@ class keeper
                     $fixed = max(0, intval($commission));
                     $set_commission = function (&$data) use ($fixed) {
                         $data['fixed'] = $fixed;
-
                         return $data;
                     };
                 }

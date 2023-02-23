@@ -34,6 +34,9 @@
                         佣金
                     </th>
                     <th>
+                        补货权限
+                    </th>
+                    <th>
                         操作
                     </th>
                 </tr>
@@ -51,11 +54,20 @@
                         <div>{php echo $device['imei']}</div>
                     </td>
                     <td>
-                        <span class="kind">{$device['kind']}</span>
+                        <span class="way">{$device['way']}</span>
                     </td>
                     <td>
                         <div class="commission">
-                            {$device['commission']}
+                            {$device['val']}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="kind">
+                            {if $device['kind']}
+                            <i class="fa fa-check-square-o"></i>
+                            {else}
+                            <i class="fa fa-square-o"></i>
+                            {/if}
                         </div>
                     </td>
                     <td class="operate">

@@ -2,12 +2,12 @@
     <div class="form-group">
         <label class="col-xs-12 col-md-2 col-md-2 control-label">分佣方式</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-            <label for="kind0" class="radio-inline">
-                <input name="kind" id="kind0" type="radio" value="0" {if empty($kind)}checked="checked"{/if}>
+            <label for="way0" class="radio-inline">
+                <input name="way" id="way0" type="radio" value="0" {if empty($kind)}checked="checked"{/if}>
                 补货分成
             </label>
-            <label for="kind1" class="radio-inline">
-                <input name="kind" id="kind1" type="radio" value="1"  {if !empty($kind)}checked="checked"{/if}>
+            <label for="way1" class="radio-inline">
+                <input name="way" id="way1" type="radio" value="1"  {if !empty($kind)}checked="checked"{/if}>
                 销售分成
             </label>
             <span class="help-block">* 补货分成：完成补货即可获得分成；销售分成：设备售出商品获得分成。</span>
@@ -16,12 +16,12 @@
     <div class="form-group">
         <label class="col-xs-12 col-md-2 col-md-2 control-label">佣金类型</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-            <label for="way1" class="radio-inline">
-                <input name="way" id="way1" type="radio" value="1" {if !empty($way)}checked="checked"{/if}>
+            <label for="type0" class="radio-inline">
+                <input name="type" id="type0" type="radio" value="fixed" {if $type == 'fixed'}checked="checked"{/if}>
                 固定金额
             </label>
-            <label for="way0" class="radio-inline">
-                <input name="way" id="way0" type="radio" value="0"  {if empty($way)}checked="checked"{/if}>
+            <label for="type1" class="radio-inline">
+                <input name="type" id="type1" type="radio" value="percent"  {if $type == 'percent'}checked="checked"{/if}>
                 百分比
             </label>
         </div>
@@ -41,12 +41,12 @@
 </form>
 <script>
     $(function() {
-        changeTitle({$way})
-        $('input[name=way]').change(function() {
+        changeTitle({$type})
+        $('input[name=type]').change(function() {
             changeTitle($(this).val());
         });
     })
-    function changeTitle(way) {
-        $('#commissionTitle').text(!way || way == 0 ? '比例(%)' : '金额(元)');
+    function changeTitle(type) {
+        $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
     }
 </script>

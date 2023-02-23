@@ -10,6 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 use DateTime;
 use Exception;
+use zovye\model\deviceModelObj;
 use zovye\model\goodsModelObj;
 use zovye\model\keeper_devicesModelObj;
 use zovye\model\keeperModelObj;
@@ -457,8 +458,9 @@ if ($op == 'default') {
             $commission_val = $item->getCommissionPercent().'%';
         }
 
-        $data['commission'] = $commission_val;
-        $data['kind'] = empty($item->getKind()) ? '补货分成' : '销售分成';
+        $data['val'] = $commission_val;
+        $data['way'] = empty($item->getWay()) ? '销售分成' : '补货分成';
+        $data['kind'] = $item->getKind();
 
         $list[] = $data;
     }
@@ -497,15 +499,18 @@ if ($op == 'default') {
 
     if ($device->getCommissionFixed() != -1) {
         $commission_val = number_format(abs($device->getCommissionFixed()) / 100, 2);
+        $commission_type = 'fixed';
     } else {
         $commission_val = $device->getCommissionPercent();
+        $commission_type = 'percent';
     }
 
     $content = app()->fetchTemplate(
         'web/user/keeper_device_edit',
         [
             'device' => $device->profile(),
-            'commission_val' => $commission_val,
+            'val' => $commission_val,
+            'type' => $commission_type,
             'kind' => $device->getKind(),
             'way' => $device->getWay(),
         ]
@@ -541,8 +546,9 @@ if ($op == 'default') {
     ];
 
     $commission_val = request::float('val', 0, 2);
+    $commission_type = request::str('type', 'fixed');
 
-    if ($data['way']) {
+    if ($commission_type == 'fixed') {
         $data['fixed'] = max(0, intval($commission_val * 100));
     } else {
         $data['percent'] = max(0, min(100, intval($commission_val)));
@@ -552,7 +558,8 @@ if ($op == 'default') {
 
     JSON::success([
         'msg' => '保存成功！',
-        'kind' => empty($data['kind']) ? '补货分成' : '销售分成',
+        'way' => empty($data['way']) ? '销售分成' : '补货分成',
+        'kind' => $data['kind'],
         'val' => $data['way'] ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : $data['percent'] . '%',
     ]);
 

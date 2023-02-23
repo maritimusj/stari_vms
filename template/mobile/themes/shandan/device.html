@@ -418,7 +418,7 @@
             </div>
             <div class="num flex flex-row align-center">
                 <span class="remain flex-1">剩余：{{detail.data.num || 0}}</span>
-                <div class="flex flex-row align-center">
+                <div class="flex flex-row align-center" v-if="tabs.active === 'pay'">
                     <div class="minus flex flex-center clickable" :class="{'disabled': detail.data.count <= 1}"
                         @click="onReduce">
                         <img src="{MODULE_URL}static/m/shandan/svg/minus.svg">

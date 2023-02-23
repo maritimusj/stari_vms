@@ -66,29 +66,6 @@ try {
         throw new RuntimeException('请指定要出货的商品 [605]');
     }
 
-    if (App::isFlashEggEnabled()) {
-        //触发广告设备播放指定广告
-        $adDeviceUID = $device->getAdDeviceUID();
-        if ($adDeviceUID) {
-            $area = $account->getArea();
-            if ($area) {
-                $flashEgg = new FlashEgg();
-                if (DEBUG) {
-                    $flashEgg->debug();
-                }
-                $res = $flashEgg->triggerAdPlay($adDeviceUID, $area);
-                if (is_error($res)) {
-                    Log::error('flash_egg', [
-                        'device' => $device->getImei(),
-                        'adDeviceUID' => $adDeviceUID,
-                        'area' => $area,
-                        'error' => $res['message'],
-                    ]);
-                }
-            }
-        }
-    }
-
     $result = Util::transactionDo(function () use ($device, $user, $account, $goods_id, $ticket_data_saved) {
         //出货流程，EventBus会抛出异常
         $result = Util::openDevice([

@@ -171,6 +171,9 @@
     {if empty($agent)}
         {if $banned}
             <li role="presentation"><a href="{php echo $this->createWebUrl('account');}">全部</a></li>
+            {if \zovye\App::isFlashEggEnabled()}
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::FlashEgg]);}">闪蛋</a></li>
+            {/if}
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
@@ -183,7 +186,9 @@
             <li role="presentation" class="active"><a href="#">已隐藏的任务</a></li>
         {else}
             <li role="presentation"{if !isset($type)} class="active"{/if}><a href="{php echo $this->createWebUrl('account');}">全部</a></li>
+            {if \zovye\App::isFlashEggEnabled()}
             <li role="presentation"{if $type == \zovye\Account::FlashEgg} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::FlashEgg]);}">闪蛋</a></li>
+            {/if}
             <li role="presentation"{if $type == -1} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => -1]);}">第三方平台</a></li>
             <li role="presentation"{if $type === \zovye\Account::NORMAL} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::NORMAL]);}">公众号</a></li>
             <li role="presentation"{if $type == \zovye\Account::VIDEO} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['type' => \zovye\Account::VIDEO]);}">视频</a></li>
@@ -213,30 +218,39 @@
     <div class="heading">
         {if !$banned}
         <span class="operate">
-            {if (empty($type) || $type ==\zovye\Account::FlashEgg) && \zovye\App::isFlashEggEnabled()}
+            {if \zovye\App::isFlashEggEnabled()}
+            {if (empty($type) || $type ==\zovye\Account::FlashEgg)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::FlashEgg));}">
                 <span class="state auth" title="添加闪蛋商品广告">
                     <img src="{php echo MODULE_URL . 'static/img/egg.svg'}">
                 </span>
             </a>
             {/if}
+            {/if}
             {if empty($type)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add'));}"><i class="fa fa-fw fa-weixin" title="添加公众号"></i></a>
             {/if}
-            {if (empty($type) || $type ==\zovye\Account::AUTH) && \zovye\App::isWxPlatformEnabled()}
+
+            {if \zovye\App::isWxPlatformEnabled()}
+            {if (empty($type) || $type ==\zovye\Account::AUTH)}
             <i class="fa fa-fw fa-magic auth-weixin" title="授权接入公众号" data-op="accountAuthorize"></i>
             {/if}
+            {/if}
+
             {if !isset($type) || $type == \zovye\Account::VIDEO}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type'=> zovye\Account::VIDEO));}"><i class="fa fa-fw fa-youtube-play" title="添加视频广告"></i></a>
             {/if}
 
-            {if (!isset($type) || $type ==\zovye\Account::DOUYIN) && \zovye\App::isDouyinEnabled()}
+            {if \zovye\App::isDouyinEnabled()}
+            {if (!isset($type) || $type ==\zovye\Account::DOUYIN)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::DOUYIN));}">
                 <span class="state auth" title="添加抖音号">
                     <img src="{php echo MODULE_URL . 'static/img/douyin2.svg'}">
                 </span>
             </a>
             {/if}
+            {/if}
+
             {if (!isset($type) || $type ==\zovye\Account::WXAPP)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::WXAPP));}">
                 <span class="state auth" title="添加小程序">
@@ -251,12 +265,15 @@
                 </span>
             </a>
             {/if}
-            {if (!isset($type) || $type ==\zovye\Account::TASK) && \zovye\App::isBalanceEnabled()}
+
+            {if \zovye\App::isBalanceEnabled()}
+            {if (!isset($type) || $type ==\zovye\Account::TASK)}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'add', 'type' => zovye\Account::TASK));}">
                 <span class="state auth" title="添加自定义任务">
                     <img src="{php echo MODULE_URL . 'static/img/task.svg'}">
                 </span>
             </a>
+            {/if}
             {/if}
         </span>
         {/if}    

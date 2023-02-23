@@ -1,20 +1,29 @@
 <form data-id="{$device['id']}">
     <div class="form-group">
-        <label class="col-xs-12 col-md-2 col-md-2 control-label">分佣方式</label>
-        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
-            <label for="way0" class="radio-inline">
-                <input name="way" id="way0" type="radio" value="0" {if empty($kind)}checked="checked"{/if}>
-                补货分成
+        <label for="kind" class="col-md-2 control-label">权限</label>
+        <div class="col-md-10">
+            <label class="col-xs-12 col-md-2 col-md-2 control-label">
+                <input type="checkbox" name="kind" id="kind" value="1" {if $kind}checked{/if}>
+                允许补货
             </label>
-            <label for="way1" class="radio-inline">
-                <input name="way" id="way1" type="radio" value="1"  {if !empty($kind)}checked="checked"{/if}>
-                销售分成
-            </label>
-            <span class="help-block">* 补货分成：完成补货即可获得分成；销售分成：设备售出商品获得分成。</span>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-xs-12 col-md-2 col-md-2 control-label">佣金类型</label>
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">方式</label>
+        <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+            <label for="way0" class="radio-inline">
+                <input name="way" id="way0" type="radio" value="0" {if empty($way)}checked="checked"{/if}>
+                销售分成
+            </label>
+            <label for="way1" class="radio-inline">
+                <input name="way" id="way1" type="radio" value="1"  {if !empty($way)}checked="checked"{/if}>
+                补货分成
+            </label>
+            <span class="help-block">* 销售分成：设备售出商品获得分成；补货分成：完成补货即可获得分成。</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-xs-12 col-md-2 col-md-2 control-label">类型</label>
         <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
             <label for="type0" class="radio-inline">
                 <input name="type" id="type0" type="radio" value="fixed" {if $type == 'fixed'}checked="checked"{/if}>
@@ -27,9 +36,9 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="commissionVal" class="col-md-2 control-label">佣金<span id="commissionTitle">金额</span></label>
+        <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
         <div class="col-md-10">
-            <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$commission_val}">
+            <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$val}">
         </div>
     </div>
     <div class="form-group">

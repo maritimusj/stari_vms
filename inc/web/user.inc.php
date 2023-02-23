@@ -560,7 +560,8 @@ if ($op == 'default') {
         'msg' => '保存成功！',
         'way' => empty($data['way']) ? '销售分成' : '补货分成',
         'kind' => $data['kind'],
-        'val' => $data['way'] ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : $data['percent'] . '%',
+        'type' => $commission_type,
+        'val' => $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : $data['percent'] . '%',
     ]);
 
 } elseif ($op == 'keeper_device_remove') {

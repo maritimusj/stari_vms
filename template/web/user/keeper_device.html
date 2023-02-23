@@ -4,6 +4,16 @@
     .we7-modal-dialog .modal-body{
         max-height: unset;
     }
+    .fa-check-square-o {
+        color:green;
+    }
+    .fa-square-o {
+        color:#ccc;
+    }
+    .kind {
+        width: 100%;
+        text-align: center;
+    }
 </style>
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active">
@@ -27,14 +37,14 @@
                     <th>#</th>
                     <th>设备名称</th>
                     <th>设备编号</th>
+                    <th style="text-align: center;">
+                        补货权限
+                    </th>
                     <th>
                         类型
                     </th>            
                     <th>
                         佣金
-                    </th>
-                    <th>
-                        补货权限
                     </th>
                     <th>
                         操作
@@ -54,20 +64,20 @@
                         <div>{php echo $device['imei']}</div>
                     </td>
                     <td>
-                        <span class="way">{$device['way']}</span>
-                    </td>
-                    <td>
-                        <div class="commission">
-                            {$device['val']}
-                        </div>
-                    </td>
-                    <td>
                         <div class="kind">
                             {if $device['kind']}
                             <i class="fa fa-check-square-o"></i>
                             {else}
                             <i class="fa fa-square-o"></i>
                             {/if}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="way">{$device['way']}</span>
+                    </td>
+                    <td>
+                        <div class="val">
+                            {$device['val']}
                         </div>
                     </td>
                     <td class="operate">
@@ -110,12 +120,14 @@
             const id = e.data('id');
             const kind = e.find('input[name=kind]:checked').val();
             const way = e.find('input[name=way]:checked').val();
+            const type = e.find('input[name=type]:checked').val();
             const val = e.find('input[name=commissionVal]').val();
             const tr = $('#keeperDevice tr[data-id="'+id+'"]');
-            next({id, kind, way, val}, function(res) {
+            next({id, kind, way, type, val}, function(res) {
                 if (res && res.status) {
-                    tr.find('.kind').html(res.data.kind);
-                    tr.find('.commission').html(res.data.val);
+                    tr.find('.kind').html(res.data.kind ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-square-o"></i>');
+                    tr.find('.way').html(res.data.way);
+                    tr.find('.val').html(res.data.val);
                }
                $('#modal-message').modal('hide');
             });

@@ -78,6 +78,13 @@ $user = $getUserFN();
 //记录设备ID
 $user->setLastActiveDevice($device);
 
+if ($op == 'check') {
+    JSON::success([
+        'user' => $user->profile(false),
+        'subscribed' => User::isSubscribed($user),
+    ]);
+}
+
 if (!User::isSubscribed($user)) {
     app()->followPage($user, $device);
 }

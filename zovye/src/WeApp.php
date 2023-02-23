@@ -1970,6 +1970,10 @@ JSCODE;
         return $.getJSON(zovye_fn.api_url, {op: "qrcode"});
     }
     
+    zovye_fn.checkUser = function() {
+        return $.getJSON(zovye_fn.api_url, {op: "check"});
+    }
+    
 </script>
 JSCODE;
 

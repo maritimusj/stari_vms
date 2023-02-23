@@ -70,7 +70,7 @@ class api
 
     public static function nearBy(): array
     {
-        return Util::devicesNearBy();
+        return Util::getNearByDevices();
     }
 
     public static function migrateUrl(): array

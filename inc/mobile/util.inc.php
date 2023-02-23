@@ -31,7 +31,7 @@ if ($op == 'default') {
 } elseif ($op == 'data') {
 
     //请求附近设备数据
-    $result = Util::devicesNearBy();
+    $result = Util::getNearByDevices();
     JSON::success($result);
 
 } elseif ($op == 'location') {

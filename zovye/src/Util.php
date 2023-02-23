@@ -3045,7 +3045,7 @@ HTML_CONTENT;
         }
     }
 
-    public static function devicesNearBy(agentModelObj $agent = null): array
+    public static function getNearByDevices(agentModelObj $agent = null): array
     {
         //请求附近设备数据
         $query = $agent ? Device::query(['agent_id' => $agent->getId()]) : Device::query();

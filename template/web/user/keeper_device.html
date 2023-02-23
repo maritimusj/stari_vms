@@ -51,10 +51,10 @@
                         <div>{php echo $device['imei']}</div>
                     </td>
                     <td>
-                        {$device['way']}
+                        <span class="kind">{$device['kind']}</span>
                     </td>
                     <td>
-                        <div class="">
+                        <div class="commission">
                             {$device['commission']}
                         </div>
                     </td>
@@ -92,7 +92,23 @@
                     tr.remove();
                }
             });
-        })    
+        })
+        zovye.op('keeper_device_save', function(self, next) {
+            const e = self.closest('[data-id]');
+            const id = e.data('id');
+            const kind = e.find('input[name=kind]:checked').val();
+            const way = e.find('input[name=way]:checked').val();
+            const val = e.find('input[name=commissionVal]').val();
+            const tr = $('#keeperDevice tr[data-id="'+id+'"]');
+            next({id, kind, way, val}, function(res) {
+                if (res && res.status) {
+                    tr.find('.kind').html(res.data.kind);
+                    tr.find('.commission').html(res.data.val);
+               }
+               $('#modal-message').modal('hide');
+            });
+        })
+        
     });
 </script>
 {template 'common/footer'}

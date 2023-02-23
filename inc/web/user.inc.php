@@ -458,8 +458,7 @@ if ($op == 'default') {
         }
 
         $data['commission'] = $commission_val;
-        $data['kind'] = $item->getKind();
-        $data['way'] = empty($item->getWay()) ? '销售分成' : '补货分成';
+        $data['kind'] = empty($item->getKind()) ? '补货分成' : '销售分成';
 
         $list[] = $data;
     }
@@ -476,6 +475,86 @@ if ($op == 'default') {
 
 } elseif ($op == 'keeper_device_edit') {
 
+    $user = User::get(request::int('user'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $keeper = $user->getKeeper();
+    if (empty($keeper)) {
+        JSON::fail('这个用户不是运营人员！');
+    }
+
+    /** @var deviceModelObj $entry */
+    $device = Device::query([
+        'keeper_id' => $keeper->getId(),
+        'id' => request::int('id'),
+    ])->findOne();
+
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    if ($device->getCommissionFixed() != -1) {
+        $commission_val = number_format(abs($device->getCommissionFixed()) / 100, 2);
+    } else {
+        $commission_val = $device->getCommissionPercent();
+    }
+
+    $content = app()->fetchTemplate(
+        'web/user/keeper_device_edit',
+        [
+            'device' => $device->profile(),
+            'commission_val' => $commission_val,
+            'kind' => $device->getKind(),
+            'way' => $device->getWay(),
+        ]
+    );
+
+    JSON::success(['title' => "设备佣金[ {$device->getName()} ]" , 'content' => $content]);
+
+} elseif ($op == 'keeper_device_save') {
+
+    $user = User::get(request::int('user'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $keeper = $user->getKeeper();
+    if (empty($keeper)) {
+        JSON::fail('这个用户不是运营人员！');
+    }
+
+    /** @var deviceModelObj $device */
+    $device = Device::query([
+        'keeper_id' => $keeper->getId(),
+        'id' => request::int('id'),
+    ])->findOne();
+
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    $data = [
+        'kind' => request::int('kind'),
+        'way' => request::int('way'),
+    ];
+
+    $commission_val = request::float('val', 0, 2);
+
+    if ($data['way']) {
+        $data['fixed'] = max(0, intval($commission_val * 100));
+    } else {
+        $data['percent'] = max(0, min(100, intval($commission_val)));
+    }
+
+    $device->setKeeper($keeper, $data);
+
+    JSON::success([
+        'msg' => '保存成功！',
+        'kind' => empty($data['kind']) ? '补货分成' : '销售分成',
+        'val' => $data['way'] ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : $data['percent'] . '%',
+    ]);
 
 } elseif ($op == 'keeper_device_remove') {
 

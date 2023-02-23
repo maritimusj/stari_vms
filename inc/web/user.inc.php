@@ -464,15 +464,46 @@ if ($op == 'default') {
         $list[] = $data;
     }
 
-    $content = app()->fetchTemplate(
+    app()->showTemplate(
         'web/user/keeper_device',
         [
+            'keeper' => $keeper,
+            'user' => $user,
             'devices' => $list,
             'pager' => $pager,
         ]
     );
 
-    JSON::success(['title' => '', 'content' => $content]);
+} elseif ($op == 'keeper_device_edit') {
+    
+
+} elseif ($op == 'keeper_device_remove') {
+
+    $user = User::get(request::int('user'));
+    if (empty($user)) {
+        JSON::fail('找不到这个用户！');
+    }
+
+    $keeper = $user->getKeeper();
+    if (empty($keeper)) {
+        JSON::fail('这个用户不是营运人员！');
+    }
+
+    /** @var deviceModelObj $entry */
+    $device = Device::query([
+        'keeper_id' => $keeper->getId(),
+        'id' => request::int('id'),
+    ])->findOne();
+
+    if (empty($device)) {
+        JSON::fail('找不到这个设备！');
+    }
+
+    if ($device->removeKeeper($keeper)) {
+        JSON::success('操作成功！');
+    }
+
+    JSON::fail('操作失败！');
 
 } elseif ($op == 'keeper_replenish') {
 

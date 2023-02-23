@@ -319,7 +319,7 @@
         <ul class="dropdown-menu">
             {if $item['isKeeper']}
             <li><a href="{php echo $this->createWebUrl('user', array('op'=>'keeper', 'id'=>$item['id']));}" onclick="if(!confirm('确定要取消用户的运营人员身份吗？')){return false;}"><i class="fa fa-user-times fa-fw"></i> 取消运营人员</a></li>
-            <li><a href="#" data-op="keeperDevices" ><i class="fa fa-hdd-o fa-fw"></i> 运营的设备</a></li>
+            <li><a href="{php echo $this->createWebUrl('user', array('op'=>'keeper_device', 'id'=>$item['id']));}"><i class="fa fa-hdd-o fa-fw"></i> 运营的设备</a></li>
             <li><a href="#" data-op="keeperReplenish" ><i class="fa fa-sign-in fa-fw"></i> 补货记录</a></li>
             {/if}
             {if $item['isAgent']}
@@ -579,10 +579,6 @@
                 })
             }
         })
-    }
-
-    api.keeperDevices = function(userid) {
-        api.showResult({op: 'keeper_device', id: userid});
     }
 
     api.keeperReplenish = function (userid) {

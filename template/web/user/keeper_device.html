@@ -1,63 +1,98 @@
-{if $devices}
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
 <style>
     .we7-modal-dialog .modal-body{
         max-height: unset;
     }
 </style>
-<div id="keeperDevice">
-    <table class="table">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>设备名称</th>
-            <th>设备编号</th>
-            <th>
-                类型
-            </th>            
-            <th>
-                佣金
-            </th>
-            <th>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {loop $devices $index $device}
-        <tr>
-            <td>{php echo $index + 1}</td>
-            <td>
-                <div class="">
-                    <div>{php echo $device['name']}</div>
-                </div>
-            </td>
-            <td>
-                <div>{php echo $device['imei']}</div>
-            </td>
-            <td>
-                {$device['way']}
-            </td>
-            <td>
-                <div class="">
-                    {$device['commission']}
-                </div>
-            </td>
-            <td>
-            </td>
-        </tr>
-        {/loop}
-        </tbody>
-    </table>
-    <div class="pull-right">
-        {$pager}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            <b>{php echo $user ? $user->getName() : 'n/a'}</b>运营的设备列表
+        </a>
+    </li>
+</ul>
+<div class="panel panel-default{if empty($s_principal)} panel-first{/if} nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('user', ['s_principal' => 'keeper']);}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {if $devices}
+        <div id="keeperDevice">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>设备名称</th>
+                    <th>设备编号</th>
+                    <th>
+                        类型
+                    </th>            
+                    <th>
+                        佣金
+                    </th>
+                    <th>
+                        操作
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $devices $index $device}
+                <tr data-id="{$device['id']}">
+                    <td>{php echo $index + 1}</td>
+                    <td>
+                        <div class="">
+                            <div>{php echo $device['name']}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>{php echo $device['imei']}</div>
+                    </td>
+                    <td>
+                        {$device['way']}
+                    </td>
+                    <td>
+                        <div class="">
+                            {$device['commission']}
+                        </div>
+                    </td>
+                    <td class="operate">
+                        <i class="fa fa-edit" title="编辑" data-op="keeper_device_edit"></i>
+                        <i class="fa fa-trash" title="删除" data-op="keeper_device_remove"></i>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            <div class="pull-right">
+                {$pager}
+            </div>
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何设备！
+        </div>
+        {/if}
     </div>
 </div>
-{else}
-<div class="text-center text-muted">
-    <i class="fa fa-question-circle"></i> 暂时还没有任何设备！
-</div>
-{/if}
 <script>
-    $(function(){
-
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js?v=20210717')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('user', ['user' => $user?$user->getId() : 0]);}");
+        zovye.op('keeper_device_remove', function(self, next) {
+            if (!confirm('确定移除这个设备吗？')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+                if (res && res.status) {
+                    tr.remove();
+               }
+            });
+        })    
     });
 </script>
+{template 'common/footer'}

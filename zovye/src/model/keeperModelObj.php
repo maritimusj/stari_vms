@@ -104,5 +104,4 @@ class keeperModelObj extends modelObj
     {
         return Agent::get($this->agent_id);
     }
-
 }

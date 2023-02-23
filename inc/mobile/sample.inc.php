@@ -163,25 +163,23 @@ if ($op == 'detail') {
         JSON::fail($res);
     }
 
-    if (App::isFlashEggEnabled()) {
-        //触发广告设备播放指定广告
-        $adDeviceUID = $device->getAdDeviceUID();
-        if ($adDeviceUID) {
-            $area = $account->getArea();
-            if ($area) {
-                $flashEgg = new FlashEgg();
-                if (DEBUG) {
-                    $flashEgg->debug();
-                }
-                $res = $flashEgg->triggerAdPlay($adDeviceUID, $area);
-                if (is_error($res)) {
-                    Log::error('flash_egg', [
-                        'device' => $device->getImei(),
-                        'adDeviceUID' => $adDeviceUID,
-                        'area' => $area,
-                        'error' => $res['message'],
-                    ]);
-                }
+    //触发广告设备播放指定广告
+    $adDeviceUID = $device->getAdDeviceUID();
+    if ($adDeviceUID) {
+        $area = $account->getArea();
+        if ($area) {
+            $flashEgg = new FlashEgg();
+            if (DEBUG) {
+                $flashEgg->debug();
+            }
+            $res = $flashEgg->triggerAdPlay($adDeviceUID, $area);
+            if (is_error($res)) {
+                Log::error('flash_egg', [
+                    'device' => $device->getImei(),
+                    'adDeviceUID' => $adDeviceUID,
+                    'area' => $area,
+                    'error' => $res['message'],
+                ]);
             }
         }
     }

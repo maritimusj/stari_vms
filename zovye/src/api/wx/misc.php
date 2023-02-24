@@ -18,7 +18,7 @@ class misc
 {
     public static function getLowRemainDeviceTotal($agent): int
     {
-        $remainWarning = App::remainWarningNum($agent);
+        $remainWarning = App::getRemainWarningNum($agent);
 
         return \zovye\Device::query(['agent_id' => $agent->getId(), 'remain <' => $remainWarning])->count();
     }

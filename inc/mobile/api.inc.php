@@ -133,7 +133,7 @@ if (empty($price)) {
      * 第三方API收费订单
      */
     $num = request::int('num', 1);
-    if ($num < 1 || $num > App::orderMaxGoodsNum()) {
+    if ($num < 1 || $num > App::getOrderMaxGoodsNum()) {
         JSON::fail("商品数量超出限制！");
     }
 

@@ -55,7 +55,7 @@ if ($op === 'create') {
             JSON::fail('无法购买这个商品，请联系管理员！');
         }
 
-        $total = min(App::orderMaxGoodsNum(), max(request::int('total'), 1));
+        $total = min(App::getOrderMaxGoodsNum(), max(request::int('total'), 1));
 
         if ($goods['num'] < $total) {
             JSON::fail('对不起，商品数量不足！');

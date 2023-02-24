@@ -18,7 +18,7 @@ class We7CreditEventHandler
      */
     public static function onDeviceOrderCreated(userModelObj $user)
     {
-        if (App::we7CreditEnabled()) {
+        if (App::isWe7CreditEnabled()) {
 
             //使用微擎积分
             $credit_require = settings('we7credit.require', 0);

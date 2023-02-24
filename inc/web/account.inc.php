@@ -129,7 +129,7 @@ if ($op == 'default') {
                 $data['stats'] = Task::brief($entry);
             }
 
-            if (App::useAccountQRCode()) {
+            if (App::isUseAccountQRCode()) {
                 $data['useAccountQRCode'] = $entry->useAccountQRCode();
             }
 
@@ -1372,7 +1372,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'useAccountQRCode') {
 
-    if (!App::useAccountQRCode()) {
+    if (!App::isUseAccountQRCode()) {
         JSON::fail('未启用这个功能！');
     }
 

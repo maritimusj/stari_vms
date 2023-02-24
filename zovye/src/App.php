@@ -44,7 +44,7 @@ class App
         });
     }
 
-    public static function isAdvsReviewEnabled(): bool
+    public static function isAdsReviewEnabled(): bool
     {
         return onceCall(function () {
             return settings('agent.advs.review.enabled') !== 0;
@@ -306,77 +306,77 @@ class App
         });
     }
 
-    public static function agentRegMode(): int
+    public static function getAgentRegMode(): int
     {
         return onceCall(function () {
             return settings('agent.reg.mode', Agent::REG_MODE_NORMAL);
         });
     }
 
-    public static function userLocationValidateDistance($default = 0): int
+    public static function getUserLocationValidateDistance($default = 0): int
     {
         return onceCall(function () use ($default) {
             return intval(settings('user.location.validate.distance', $default));
         }, $default);
     }
 
-    public static function agentDefaultCommissionFeeType(): int
+    public static function getAgentDefaultCommissionFeeType(): int
     {
         return onceCall(function () {
             return intval(settings('agent.reg.commission_fee_type'));
         });
     }
 
-    public static function agentDefaultCommissionFee(): int
+    public static function getAgentDefaultCommissionFee(): int
     {
         return onceCall(function () {
             return intval(settings('agent.reg.commission_fee'));
         });
     }
 
-    public static function agentDefaultGSP(): array
+    public static function getAgentDefaultGSP(): array
     {
         return onceCall(function () {
             return settings('agent.reg.rel_gsp', []);
         });
     }
 
-    public static function agentDefaultGSDModeType(): string
+    public static function getAgentDefaultGSDModeType(): string
     {
         return onceCall(function () {
             return settings('agent.reg.gsp_mode_type', 'percent');
         });
     }
 
-    public static function agentDefaultBonus(): array
+    public static function getAgentDefaultBonus(): array
     {
         return onceCall(function () {
             return settings('agent.reg.bonus', []);
         });
     }
 
-    public static function agentDefaultFuncs(): array
+    public static function getAgentDefaultFuncs(): array
     {
         return onceCall(function () {
             return settings('agent.reg.funcs', []);
         });
     }
 
-    public static function agentDefaultLevel(): string
+    public static function getAgentDefaultLevel(): string
     {
         return onceCall(function () {
             return settings('agent.reg.level', 'level0');
         });
     }
 
-    public static function deviceAutoJoin(): bool
+    public static function isDeviceAutoJoin(): bool
     {
         return onceCall(function () {
             return !empty(settings('device.autoJoin'));
         });
     }
 
-    public static function deviceWaitTimeout(): int
+    public static function getDeviceWaitTimeout(): int
     {
         return onceCall(function () {
             return intval(settings('device.waitTimeout')) ?: DEFAULT_DEVICE_WAIT_TIMEOUT;
@@ -390,7 +390,7 @@ class App
         });
     }
 
-    public static function we7CreditEnabled(): bool
+    public static function isWe7CreditEnabled(): bool
     {
         return onceCall(function () {
             return !empty(settings('we7credit.enabled'));
@@ -427,28 +427,28 @@ class App
         return true;
     }
 
-    public static function orderMaxGoodsNum(): int
+    public static function getOrderMaxGoodsNum(): int
     {
         return onceCall(function () {
             return intval(settings('order.goods.maxNum')) ?: 10;
         });
     }
 
-    public static function imageProxyURL(): string
+    public static function getImageProxyURL(): string
     {
         return onceCall(function () {
             return strval(settings('goods.image.proxy.url'));
         });
     }
 
-    public static function imageProxySecretKey(): string
+    public static function getImageProxySecretKey(): string
     {
         return onceCall(function () {
             return strval(settings('goods.image.proxy.secret'));
         });
     }
 
-    public static function remainWarningNum(agentModelObj $agent = null): int
+    public static function getRemainWarningNum(agentModelObj $agent = null): int
     {
         return onceCall(function () use ($agent) {
             $remainWarning = 0;
@@ -545,7 +545,7 @@ class App
         return null;
     }
 
-    public static function useAccountQRCode(): bool
+    public static function isUseAccountQRCode(): bool
     {
         return onceCall(function () {
             return boolval(settings('custom.useAccountQRCode.enabled'));

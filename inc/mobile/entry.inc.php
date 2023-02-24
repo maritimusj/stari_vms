@@ -303,7 +303,7 @@ $tpl_data = Util::getTplData([
     $account,
     $device,
     [
-        'timeout' => App::deviceWaitTimeout(),
+        'timeout' => App::getDeviceWaitTimeout(),
         'user.ticket' => $ticket_data['id'],
     ],
     'misc' => [

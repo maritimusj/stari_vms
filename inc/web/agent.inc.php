@@ -275,7 +275,7 @@ if ($op == 'default') {
 
     if (!isset($agent_data['location']['validate']['enabled'])) {
         $agent_data['location']['validate']['enabled'] = App::isLocationValidateEnabled();
-        $agent_data['location']['validate']['distance'] = App::userLocationValidateDistance(1);
+        $agent_data['location']['validate']['distance'] = App::getUserLocationValidateDistance(1);
     }
     if (!isset($agent_data['gsp.order'])) {
         $agent_data['gsp.order'] = [
@@ -476,7 +476,7 @@ if ($op == 'default') {
                     'location' => [
                         'validate' => [
                             'enabled' => App::isLocationValidateEnabled() ? 1 : 0,
-                            'distance' => App::userLocationValidateDistance(),
+                            'distance' => App::getUserLocationValidateDistance(),
                         ],
                     ],
                     'commission' => [

@@ -1480,7 +1480,7 @@ class deviceModelObj extends modelObj
      */
     public function checkRemain()
     {
-        $remainWarning = App::remainWarningNum($this->getAgent());
+        $remainWarning = App::getRemainWarningNum($this->getAgent());
 
         $set_s2_flag = false;
 
@@ -1554,7 +1554,7 @@ class deviceModelObj extends modelObj
     public function getAccountQRCode(): string
     {
         //是否设置了屏幕二维码的公众号
-        if (App::useAccountQRCode()) {
+        if (App::isUseAccountQRCode()) {
             $accounts = $this->getAccounts(Account::AUTH);
             foreach ($accounts as $account) {
                 $obj = Account::get($account['id']);
@@ -1728,7 +1728,7 @@ class deviceModelObj extends modelObj
 
             /** @var advertisingModelObj $entry */
             foreach ($query->findAll() as $entry) {
-                $passed = !App::isAdvsReviewEnabled() || $entry->isReviewPassed();
+                $passed = !App::isAdsReviewEnabled() || $entry->isReviewPassed();
                 if ($entry->getState() == Advertising::NORMAL && $passed) {
                     $assign_data = $entry->settings('assigned');
                     if ($this->isMatched($assign_data)) {

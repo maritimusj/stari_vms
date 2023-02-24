@@ -1193,7 +1193,7 @@ class Account extends State
                 }
                 break;
             case Account::AUTH:
-                if (App::useAccountQRCode()) {
+                if (App::isUseAccountQRCode()) {
                     $obj = Account::get($account['id']);
                     if (empty($obj) || $obj->useAccountQRCode()) {
                         return false;
@@ -1343,7 +1343,7 @@ class Account extends State
         }
 
         foreach ($accounts as $index => $account) {
-            if (App::useAccountQRCode()) {
+            if (App::isUseAccountQRCode()) {
                 $obj = Account::get($account['id']);
                 if (empty($obj) || $obj->useAccountQRCode()) {
                     continue;

@@ -823,7 +823,7 @@ JSCODE;
 
         $jquery_url = JS_JQUERY_URL;
 
-        $tpl['timeout'] = App::deviceWaitTimeout();
+        $tpl['timeout'] = App::getDeviceWaitTimeout();
         $tpl['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 $js_sdk
@@ -2005,7 +2005,7 @@ JSCODE;
         $tpl_data['user'] = $user->profile();
         $tpl_data['device'] = $device->profile();
 
-        $tpl_data['timeout'] = App::deviceWaitTimeout();
+        $tpl_data['timeout'] = App::getDeviceWaitTimeout();
 
         $pay_js = Pay::getPayJs($device, $user);
         if (is_error($pay_js)) {
@@ -2167,7 +2167,7 @@ CODE;
         $tpl_data = Util::getTplData(
             [
                 [
-                    'timeout' => App::deviceWaitTimeout(),
+                    'timeout' => App::getDeviceWaitTimeout(),
                     'slides' => [],
                 ],
             ]

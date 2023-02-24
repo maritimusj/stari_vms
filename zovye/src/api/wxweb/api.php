@@ -372,7 +372,7 @@ class api
             if (empty($goods_or_package_id)) {
                 return err('没有指定商品！');
             }
-            $num = min(App::orderMaxGoodsNum(), max(request::int('num'), 1));
+            $num = min(App::getOrderMaxGoodsNum(), max(request::int('num'), 1));
             if ($num < 1) {
                 return err('购买数量不能小于1！');
             }

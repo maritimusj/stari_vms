@@ -234,7 +234,7 @@ class agent
                 ],
             ],
             'goods' => [
-                'max' => App::orderMaxGoodsNum(),
+                'max' => App::getOrderMaxGoodsNum(),
             ],
         ];
 

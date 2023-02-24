@@ -224,7 +224,7 @@ class orderModelObj extends modelObj
     {
         $code = $this->getExtraData('bluetooth.result', 0);
 
-        return $code === 2 || ($code === 0 && time() - $this->getCreatetime() > App::deviceWaitTimeout());
+        return $code === 2 || ($code === 0 && time() - $this->getCreatetime() > App::getDeviceWaitTimeout());
     }
 
     /**

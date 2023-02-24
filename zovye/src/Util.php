@@ -861,7 +861,7 @@ include './index.php';
             if ($max_free > 0) {
                 $remain = max(0, $max_free - $user->getTodayFreeTotal());
             } else {
-                $remain = App::orderMaxGoodsNum();
+                $remain = App::getOrderMaxGoodsNum();
             }
         }
 
@@ -885,7 +885,7 @@ include './index.php';
             if ($max_free > 0) {
                 $remain = max(0, $max_free - $user->getFreeTotal());
             } else {
-                $remain = App::orderMaxGoodsNum();
+                $remain = App::getOrderMaxGoodsNum();
             }
         }
 
@@ -2769,14 +2769,14 @@ HTML_CONTENT;
             return '';
         }
 
-        $url = App::imageProxyURL();
+        $url = App::getImageProxyURL();
         if (empty($url)) {
             return $image_url;
         }
 
         $signStr = '';
 
-        $secret = App::imageProxySecretKey();
+        $secret = App::getImageProxySecretKey();
         if ($secret) {
             $signStr = ',s'.strtr(base64_encode(hash_hmac('sha256', $image_url, $secret, true)), '+/', '-_');
             $url = rtrim($url, '\\/');

@@ -209,7 +209,7 @@ class Helper
     {
         $pull_data = [
             'online' => false,
-            'timeout' => App::deviceWaitTimeout(),
+            'timeout' => App::getDeviceWaitTimeout(),
             'userid' => $user->getOpenid(),
             'num' => $order->getNum(),
             'user-agent' => $order->getExtraData('from.user_agent'),
@@ -341,7 +341,7 @@ class Helper
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $num = min(App::orderMaxGoodsNum(), max($num, 1));
+        $num = min(App::getOrderMaxGoodsNum(), max($num, 1));
         if ($num < 1) {
             return err('对不起，商品数量不正确！');
         }
@@ -625,7 +625,7 @@ class Helper
         $location = $device->settings('extra.location.tencent', $device->settings('extra.location'));
         if ($location && $location['lng'] && $location['lat']) {
 
-            $distance = App::userLocationValidateDistance(1);
+            $distance = App::getUserLocationValidateDistance(1);
             $agent = $device->getAgent();
             if ($agent) {
                 if ($agent->settings('agentData.location.validate.enabled')) {

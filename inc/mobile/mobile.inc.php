@@ -63,8 +63,8 @@ if ($op == 'save') {
             throw new RuntimeException('保存手机号码失败！');
         }
 
-        if (App::agentRegMode() == Agent::REG_MODE_AUTO) {
-            $level = App::agentDefaultLevel();
+        if (App::getAgentRegMode() == Agent::REG_MODE_AUTO) {
+            $level = App::getAgentDefaultLevel();
             $agent_data = [
                 'name' => $user->getName(),
                 'company' => '<未登记>',
@@ -79,12 +79,12 @@ if ($op == 'save') {
                     'agentMsg' => 1,
                     'deviceOnline' => 1,
                 ],
-                'funcs' => App::agentDefaultFuncs(),
+                'funcs' => App::getAgentDefaultFuncs(),
                 'superior' => [],
                 'location' => [
                     'validate' => [
                         'enabled' => App::isLocationValidateEnabled() ? 1 : 0,
-                        'distance' => App::userLocationValidateDistance(),
+                        'distance' => App::getUserLocationValidateDistance(),
                     ],
                 ],
             ];
@@ -93,13 +93,13 @@ if ($op == 'save') {
 
                 $agent_data['commission'] = [
                     'enabled' => 1,
-                    'fee_type' => App::agentDefaultCommissionFeeType(),
-                    'fee' => App::agentDefaultCommissionFee(),
+                    'fee_type' => App::getAgentDefaultCommissionFeeType(),
+                    'fee' => App::getAgentDefaultCommissionFee(),
                 ];
 
                 //佣金分享
                 if (App::isAgentGSPEnabled()) {
-                    $gsp = App::agentDefaultGSP();
+                    $gsp = App::getAgentDefaultGSP();
                     $agent_data['gsp'] = [
                         'enabled' => 1,
                         'mode' => 'rel',
@@ -110,13 +110,13 @@ if ($op == 'save') {
                             'level3' => $gsp['level3'],
                         ],
                         'order' => $gsp['order'] ?? [],
-                        'mode_type' => App::agentDefaultGSDModeType(),
+                        'mode_type' => App::getAgentDefaultGSDModeType(),
                     ];
                 }
 
                 //佣金奖励
                 if (App::isAgentBonusEnabled()) {
-                    $agent_data['bonus'] = App::agentDefaultBonus();
+                    $agent_data['bonus'] = App::getAgentDefaultBonus();
                 }
             }
 

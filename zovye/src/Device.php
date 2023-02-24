@@ -377,7 +377,7 @@ class Device extends State
      */
     public static function createNewDevice(array $params = []): ?deviceModelObj
     {
-        if (App::deviceAutoJoin()) {
+        if (App::isDeviceAutoJoin()) {
             if (isset($params['IMEI'])) {
                 $imei = $params['IMEI'];
             } elseif (isset($params['uid'])) {

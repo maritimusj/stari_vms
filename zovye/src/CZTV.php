@@ -140,7 +140,7 @@ class CZTV
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $num = min(App::orderMaxGoodsNum(), max($num, 1));
+        $num = min(App::getOrderMaxGoodsNum(), max($num, 1));
         if ($num < 1) {
             return err('对不起，商品数量不正确！');
         }

@@ -679,7 +679,7 @@ class accountModelObj extends modelObj
             return $this->updateSettings('misc.useAccountQRCode', $enable ? 1 : 0);
         }
 
-        return App::useAccountQRCode() && $this->settings('misc.useAccountQRCode', 0);
+        return App::isUseAccountQRCode() && $this->settings('misc.useAccountQRCode', 0);
     }
 
     public function getOpenMsg($from, $to, $redirect_url = ''): string

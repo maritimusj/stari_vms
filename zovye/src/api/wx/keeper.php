@@ -729,7 +729,7 @@ class keeper
         if (request::has('remain')) {
             $remainWarning = max(1, request::int('remain'));
         } else {
-            $remainWarning = App::remainWarningNum($keeper->getAgent());
+            $remainWarning = App::getRemainWarningNum($keeper->getAgent());
         }
 
         $page = max(1, request::int('page'));

@@ -149,7 +149,7 @@ if ($op == 'default') {
             $account,
             $device,
             [
-                'timeout' => App::deviceWaitTimeout(),
+                'timeout' => App::getDeviceWaitTimeout(),
                 'user.ticket' => $ticket_data['id'],
             ],
         ]

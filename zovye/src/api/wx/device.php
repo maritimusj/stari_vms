@@ -132,6 +132,11 @@ class device
                 'id' => $device_type->getDeviceId() > 0 ? 0 : $device_type->getId(),
                 'title' => $device_type->getTitle(),
             ];
+        } else {
+            $result['type'] = [
+                'id' => 0,
+                'title' => '',
+            ];
         }
 
         //蓝牙设备

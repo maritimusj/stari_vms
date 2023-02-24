@@ -2771,6 +2771,12 @@ class deviceModelObj extends modelObj
             return $data;
         }
 
+        //返回代理商默认设置
+        $agent = $this->getAgent();
+        if ($agent) {
+            return $agent->settings('agentData.keeper.data', []);
+        }
+
         return [];
     }
 

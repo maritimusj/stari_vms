@@ -1168,12 +1168,66 @@
             <div class="seg">
                 <div class="title">运营人员</div>
                 <div class="form-group">
-                    <label for="reductGoodsNum" class="col-md-2 control-label">减少库存</label>
+                    <label for="kind" class="col-md-2 control-label">权限</label>
+                    <div class="col-md-10">
+                        <label class="col-xs-12 col-md-2 col-md-2 control-label">
+                            <input type="checkbox" name="kind" id="kind" value="1" {if $keeper_data['kind']}checked{/if}>
+                            允许补货
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">方式</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="way0" class="radio-inline">
+                            <input name="way" id="way0" type="radio" value="0" {if empty($keeper_data['way'])}checked="checked"{/if}>
+                            销售分成
+                        </label>
+                        <label for="way1" class="radio-inline">
+                            <input name="way" id="way1" type="radio" value="1"  {if !empty($keeper_data['way'])}checked="checked"{/if}>
+                            补货分成
+                        </label>
+                        <span class="help-block">* 销售分成：设备售出商品获得分成；补货分成：完成补货即可获得分成。</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-md-2 col-md-2 control-label">类型</label>
+                    <div class="col-md-8 col-md-8 col-lg-8 col-xs-12">
+                        <label for="type0" class="radio-inline">
+                            <input name="type" id="type0" type="radio" value="fixed" {if $keeper_data['type'] == 'fixed'}checked="checked"{/if}>
+                            固定金额
+                        </label>
+                        <label for="type1" class="radio-inline">
+                            <input name="type" id="type1" type="radio" value="percent"  {if $keeper_data['type'] == 'percent'}checked="checked"{/if}>
+                            百分比
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
+                    <div class="col-md-10">
+                        <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data[$keeper_data['type']]}">
+                        <span class="help-block">* 以上为运营人员默认设置</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="applyConfigToAll" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <label class="control-label">
+                            <input type="checkbox" name="applyConfigToAll" id="applyConfigToAll" value="1">
+                            更新该代理商所有运营人员的当前设置
+                            <span class="help-block">* 勾选后，所有运营人员佣金配置会被更改为当前配置，否则仅保存为默认配置。</span>
+                        </label>
+                    </div>
+                </div>             
+                <div class="seg-divider"></div>
+                <div class="form-group">
+                    <label for="reductGoodsNum" class="col-md-2 control-label">库存</label>
                     <div class="col-md-10">
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="reductGoodsNum" id="reductGoodsNum" value="1" {if !isset($agent_data['keeper']['reductGoodsNum']) || $agent_data['keeper']['reductGoodsNum']['enabled']}checked{/if}>
-                                允许运营人员补货时，减少设备商品库存
+                                运营人员补货后，减少设备商品库存
                             </label>
                         </div>
                     </div>
@@ -1209,7 +1263,14 @@
         $('#special2 input[name=locationEnabled]').click(function(){
             $('#special2 fieldset').attr('disabled', !$(this).is(':checked'));
         })
+        changeTitle("{$config['type']}")
+        $('input[name=type]').change(function() {
+            changeTitle($(this).val());
+        });
     })
+    function changeTitle(type) {
+        $('#commissionTitle').text(type === 'percent' ? '比例(%)' : '金额(元)');
+    }
 </script>
 {elseif $op == 'agent_payment'}
 <ul class="nav nav-tabs" id="navbar">

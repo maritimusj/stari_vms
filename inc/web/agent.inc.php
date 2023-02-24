@@ -363,6 +363,15 @@ if ($op == 'default') {
         }
     }
 
+    $keeper_data = $agent->settings('agentData.keeper.data', []);
+    if ($keeper_data) {
+        if ($keeper_data['type'] == 'fixed') {
+            $keeper_data['fixed'] = number_format($keeper_data['fixed'] / 100, 2, '.', '');
+        } else {
+            $keeper_data['percent'] = intval($keeper_data['percent']);
+        }
+    }
+
     $tpl_data = [
         'op' => $op,
         'agent_levels' => $agent_levels,
@@ -373,6 +382,7 @@ if ($op == 'default') {
         'superior_data' => $superior_data,
         'free_gsp_users' => $free_gsp_users ?? null,
         'mixed_gsp_users' => $mixed_gsp_users ?? null,
+        'keeper_data' => $keeper_data,
     ];
 
     if ($op == 'agent_misc') {
@@ -620,6 +630,35 @@ if ($op == 'default') {
                 $user->updateSettings('agentData.mfa', [
                     'enable' => request::int('mustFollow'),
                 ]);
+            }
+
+            $data = [
+                'kind' => request::int('kind'),
+                'way' => request::int('way'),
+            ];
+        
+            $commission_val = request::float('commissionVal', 0, 2);
+            $commission_type = request::str('type', 'fixed');
+        
+            if ($commission_type == 'fixed') {
+                $data['fixed'] = max(0, intval($commission_val * 100));
+                $data['type'] = 'fixed';
+            } else {
+                $data['percent'] = max(0, min(100, intval($commission_val)));
+                $data['type'] = 'percent';
+            }
+
+            $user->updateSettings('agentData.keeper.data', $data);
+
+            if (request::bool('applyConfigToAll')) {
+                /** @var keeperModelObj $keeper */
+                foreach (Keeper::query(['agent_id' => $user->getId()])->findAll() as $keeper) {
+                    $query = Device::query(['keeper_id' => $keeper->getId()]);
+                    /** @var keeper_devicesModelObj $device */
+                    foreach ($query->findAll() as $device) {
+                        $device->setKeeper($keeper, $data);
+                    }
+                }
             }
 
             $user->updateSettings('agentData.keeper.reductGoodsNum', [

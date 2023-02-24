@@ -1206,7 +1206,7 @@
                 <div class="form-group">
                     <label for="commissionVal" class="col-md-2 control-label"><span id="commissionTitle">金额</span></label>
                     <div class="col-md-10">
-                        <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data[$keeper_data['type']]}">
+                        <input type="number" class="form-control" name="commissionVal" id="commissionVal" value="{$keeper_data[$keeper_data['type']]}" step="0.01">
                         <span class="help-block">* 以上为运营人员默认设置</span>
                     </div>
                 </div>
@@ -1263,7 +1263,7 @@
         $('#special2 input[name=locationEnabled]').click(function(){
             $('#special2 fieldset').attr('disabled', !$(this).is(':checked'));
         })
-        changeTitle("{$config['type']}")
+        changeTitle("{$keeper_data['type']}")
         $('input[name=type]').change(function() {
             changeTitle($(this).val());
         });

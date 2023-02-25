@@ -13,12 +13,12 @@ class Goods
 {
     const AllowPay = 'allowPay';
     const AllowFree = 'allowFree';
-    const AllowExchange = 'allowExchange';
+    const AllowBalance = 'allowBalance';
     const AllowDelivery = 'allowDelivery';
 
     const ALLOW_PAY = 0b01;
     const ALLOW_FREE = 0b10;
-    const ALLOW_EXCHANGE = 0b100;
+    const ALLOW_BALANCE = 0b100;
     const ALLOW_DELIVERY = 0b1000;
 
     const Lottery = 'lottery';
@@ -47,14 +47,14 @@ class Goods
         return $s1 & self::ALLOW_FREE;
     }
 
-    public static function setExchangeBitMask($s1, $allow = true): int
+    public static function setBalanceBitMask($s1, $allow = true): int
     {
-        return $allow ? $s1 | self::ALLOW_EXCHANGE : $s1 ^ self::ALLOW_EXCHANGE;
+        return $allow ? $s1 | self::ALLOW_BALANCE : $s1 ^ self::ALLOW_BALANCE;
     }
 
-    public static function isAllowExchange($s1): bool
+    public static function isAllowBalance($s1): bool
     {
-        return $s1 & self::ALLOW_EXCHANGE;
+        return $s1 & self::ALLOW_BALANCE;
     }
 
     public static function setDeliveryBitMask($s1, $allow = true): int
@@ -164,7 +164,7 @@ class Goods
             'cw' => $entry->getExtraData('cw', 0), //成本是否参与分佣
             Goods::AllowFree => $entry->allowFree(),
             Goods::AllowPay => $entry->allowPay(),
-            Goods::AllowExchange => $entry->allowExchange(),
+            Goods::AllowBalance => $entry->allowBalance(),
             Goods::AllowDelivery => $entry->allowDelivery(),
         ];
 
@@ -273,8 +273,8 @@ class Goods
         if ((!empty($params[Goods::AllowFree]) || in_array(Goods::AllowFree, $params, true))) {
             $s1 = Goods::setFreeBitMask($s1);
         }
-        if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params, true))) {
-            $s1 = Goods::setExchangeBitMask($s1);
+        if ((!empty($params[Goods::AllowBalance]) || in_array(Goods::AllowBalance, $params, true))) {
+            $s1 = Goods::setBalanceBitMask($s1);
         }
         if ((!empty($params[Goods::AllowDelivery]) || in_array(Goods::AllowDelivery, $params, true))) {
             $s1 = Goods::setDeliveryBitMask($s1);

@@ -131,7 +131,7 @@ if ($op == 'default') {
     $type = request::str('type'); //free or pay or balance
 
     if ($type == 'exchange') {
-        $result = $device->getGoodsList($user, [Goods::AllowExchange]);
+        $result = $device->getGoodsList($user, [Goods::AllowBalance]);
     } elseif ($type == 'free') {
         $result = $device->getGoodsList($user, [Goods::AllowFree]);
     } elseif ($type == 'pay') {

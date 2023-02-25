@@ -88,9 +88,9 @@ class goodsModelObj extends modelObj
         return Goods::isAllowPay($this->s1);
     }
 
-    public function allowExchange(): bool
+    public function allowBalance(): bool
     {
-        return Goods::isAllowExchange($this->s1);
+        return Goods::isAllowBalance($this->s1);
     }
 
     public function allowDelivery(): bool
@@ -108,9 +108,9 @@ class goodsModelObj extends modelObj
         $this->setS1(Goods::setPayBitMask($this->s1, $allowed));
     }
 
-    public function setAllowExchange($allowed = true)
+    public function setAllowBalance($allowed = true)
     {
-        $this->setS1(Goods::setExchangeBitMask($this->s1, $allowed));
+        $this->setS1(Goods::setBalanceBitMask($this->s1, $allowed));
     }
 
     public function setAllowDelivery($allowed = true)

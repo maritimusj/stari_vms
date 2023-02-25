@@ -98,8 +98,8 @@ class goods
         if (request::bool(\zovye\Goods::AllowPay)) {
             $s1 = \zovye\Goods::setPayBitMask($s1);
         }
-        if (request::bool(\zovye\Goods::AllowExchange)) {
-            $s1 = \zovye\Goods::setExchangeBitMask($s1);
+        if (request::bool(\zovye\Goods::AllowBalance)) {
+            $s1 = \zovye\Goods::setBalanceBitMask($s1);
         }
         if (request::bool(\zovye\Goods::AllowDelivery)) {
             $s1 = \zovye\Goods::setDeliveryBitMask($s1);

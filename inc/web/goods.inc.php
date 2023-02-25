@@ -37,7 +37,7 @@ if ($op == 'default' || $op == 'goods') {
         $params[] = Goods::AllowFree;
     }
     if ($w == 'exchange') {
-        $params[] = Goods::AllowExchange;
+        $params[] = Goods::AllowBalance;
     }
     if ($w == 'mall') {
         $params[] = Goods::AllowDelivery;
@@ -164,8 +164,8 @@ if ($op == 'default' || $op == 'goods') {
     if ($params[Goods::AllowPay]) {
         $s1 = Goods::setPayBitMask($s1);
     }
-    if ($params[Goods::AllowExchange]) {
-        $s1 = Goods::setExchangeBitMask($s1);
+    if ($params[Goods::AllowBalance]) {
+        $s1 = Goods::setBalanceBitMask($s1);
     }
     if ($params[Goods::AllowDelivery]) {
         $s1 = Goods::setDeliveryBitMask($s1);

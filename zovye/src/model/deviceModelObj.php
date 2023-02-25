@@ -2992,7 +2992,7 @@ class deviceModelObj extends modelObj
         $goodsData[Goods::AllowFree] = false;
 
         if (Balance::isFreeOrder()) {
-            $goodsData[Goods::AllowExchange] = false;
+            $goodsData[Goods::AllowBalance] = false;
             $goodsData[Goods::AllowDelivery] = false;
         }
     }
@@ -3002,7 +3002,7 @@ class deviceModelObj extends modelObj
         $goodsData[Goods::AllowPay] = false;
 
         if (Balance::isPayOrder()) {
-            $goodsData[Goods::AllowExchange] = false;
+            $goodsData[Goods::AllowBalance] = false;
             $goodsData[Goods::AllowDelivery] = false;
         }
     }
@@ -3014,7 +3014,7 @@ class deviceModelObj extends modelObj
             $quota = $goods->getQuota();
 
             if (!isEmptyArray($quota)) {
-                if ($goods->allowFree() || (($goods->allowExchange() || $goods->allowDelivery(
+                if ($goods->allowFree() || (($goods->allowBalance() || $goods->allowDelivery(
                             )) && Balance::isFreeOrder())) {
                     $day_limit = $quota['free']['day'];
                     if ($day_limit > 0) {
@@ -3081,8 +3081,8 @@ class deviceModelObj extends modelObj
                         )) && empty($data[Goods::AllowFree])) {
                     return false;
                 }
-                if ((!empty($params[Goods::AllowExchange]) || in_array(Goods::AllowExchange, $params))) {
-                    if (empty($data[Goods::AllowExchange]) || empty($data['balance'])) {
+                if ((!empty($params[Goods::AllowBalance]) || in_array(Goods::AllowBalance, $params))) {
+                    if (empty($data[Goods::AllowBalance]) || empty($data['balance'])) {
                         return false;
                     }
                 }
@@ -3126,7 +3126,7 @@ class deviceModelObj extends modelObj
                         'num' => intval($goods_data['num']),
                         Goods::AllowFree => $goods_data[Goods::AllowFree],
                         Goods::AllowPay => $goods_data[Goods::AllowPay],
-                        Goods::AllowExchange => $goods_data[Goods::AllowExchange],
+                        Goods::AllowBalance => $goods_data[Goods::AllowBalance],
                     ];
 
                     if (isset($goods_data['balance'])) {

@@ -81,7 +81,7 @@
                         </label>
                         {if \zovye\App::isBalanceEnabled()}
                         <label class="checkbox-inline" title="使用积分兑换领取">
-                            <input type="checkbox" name="allowExchange" value="_balance" {if empty($goods) || $goods['allowExchange']}checked{/if}> 积分兑换
+                            <input type="checkbox" name="allowBalance" value="_balance" {if empty($goods) || $goods['allowBalance']}checked{/if}> 积分兑换
                         </label>
                         <label class="checkbox-inline" title="商城使用积分兑换">
                             <input type="checkbox" name="allowDelivery" value="_delivery" {if empty($goods) || $goods['allowDelivery']}checked{/if}> 商城

@@ -50,7 +50,7 @@ SQL;
             $s1 = Goods::setFreeBitMask($s1);
         }
         if ($goods->getBalance() > 0) {
-            $s1 = Goods::setExchangeBitMask($s1);
+            $s1 = Goods::setBalanceBitMask($s1);
         }
         $goods->setS1($s1);
         $goods->save();

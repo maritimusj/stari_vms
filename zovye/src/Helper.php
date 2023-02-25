@@ -326,7 +326,7 @@ class Helper
         }
 
         $goods = $device->getGoods($goods_id);
-        if (empty($goods) || empty($goods[Goods::AllowExchange])) {
+        if (empty($goods) || empty($goods[Goods::AllowBalance])) {
             return err('无法兑换这个商品，请联系管理员！');
         }
 

@@ -202,7 +202,7 @@ class DeviceTypes
                     $lane['goods_price_formatted'] = $goods_data['price_formatted'];
                     $lane[Goods::AllowPay] = $goods_data[Goods::AllowPay];
                     $lane[Goods::AllowFree] = $goods_data[Goods::AllowFree];
-                    $lane[Goods::AllowExchange] = $goods_data[Goods::AllowExchange];
+                    $lane[Goods::AllowBalance] = $goods_data[Goods::AllowBalance];
                 } else {
                     $lane['goods_id'] = 0;
                     $lane['goods_unit_title'] = '';

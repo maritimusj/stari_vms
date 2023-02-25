@@ -105,7 +105,7 @@ class YiDaoAccount
 
                 $data['title'] = $res['appname'] ?: Account::YIDAO_NAME;
                 $data['qrcode'] = $res['qrcode_url'];
-                $data['descr'] = Account::ReplaceCode($data['descr'], 'code', strval($res['code']));
+                $data['descr'] = Account::replaceCode($data['descr'], 'code', strval($res['code']));
 
                 $v[] = $data;
 

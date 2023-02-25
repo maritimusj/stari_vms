@@ -97,7 +97,7 @@ class MeiPaAccount
                     $data['redirect_url'] = $result['data']['joburl'];
                 }
 
-                $data['descr'] = Account::ReplaceCode($data['descr'], 'code', strval($result['data']['code_words']));
+                $data['descr'] = Account::replaceCode($data['descr'], 'code', strval($result['data']['code_words']));
 
                 $v[] = $data;
             }

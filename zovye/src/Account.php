@@ -209,68 +209,68 @@ class Account extends State
         return self::findOne(['uid' => $uid]);
     }
 
-    public static function format(accountModelObj $entry): array
+    public static function format(accountModelObj $account): array
     {
         //特殊吸粉的img路径中包含addon/{APP_NAME}，不能使用Util::toMedia()转换，否则会出错
         $data = [
-            'id' => $entry->getId(),
-            'uid' => $entry->getUid(),
-            'type' => $entry->getType(),
-            'banned' => $entry->isBanned(),
-            'name' => $entry->getName(),
-            'title' => $entry->getTitle(),
-            'descr' => html_entity_decode($entry->getDescription()),
-            'url' => $entry->getUrl(),
-            'clr' => $entry->getClr(),
-            'img' => $entry->isThirdPartyPlatform() || $entry->isDouyin() ? $entry->getImg() : Util::toMedia(
-                $entry->getImg()
+            'id' => $account->getId(),
+            'uid' => $account->getUid(),
+            'type' => $account->getType(),
+            'banned' => $account->isBanned(),
+            'name' => $account->getName(),
+            'title' => $account->getTitle(),
+            'descr' => html_entity_decode($account->getDescription()),
+            'url' => $account->getUrl(),
+            'clr' => $account->getClr(),
+            'img' => $account->isThirdPartyPlatform() || $account->isDouyin() ? $account->getImg() : Util::toMedia(
+                $account->getImg()
             ),
-            'scname' => $entry->getScname(),
-            'total' => $entry->getTotal(),
-            'count' => $entry->getCount(),
-            'groupname' => $entry->getGroupName(),
-            'orderno' => $entry->getOrderNo(),
-            'thirdparty_platform' => $entry->isThirdPartyPlatform() ? 1 : 0,
+            'scname' => $account->getScname(),
+            'total' => $account->getTotal(),
+            'count' => $account->getCount(),
+            'groupname' => $account->getGroupName(),
+            'orderno' => $account->getOrderNo(),
+            'thirdparty_platform' => $account->isThirdPartyPlatform() ? 1 : 0,
         ];
 
-        if ($entry->isVideo()) {
-            $data['media'] = $entry->getQrcode();
-            $data['duration'] = $entry->getDuration();
-        } elseif ($entry->isDouyin()) {
-            $data['url'] = DouYin::makeHomePageUrl($entry->getConfig('url'));
-            $data['openid'] = $entry->getConfig('openid', '');
-        } elseif ($entry->isWxApp()) {
-            $data['username'] = $entry->getConfig('username', '');
-            $data['path'] = $entry->getConfig('path', '');
-            $data['delay'] = $entry->getConfig('delay', 1);
-        } elseif ($entry->isFlashEgg()) {
-            if ($entry->getMediaType() == 'video') {
-                $data['video'] = $entry->getMedia();
+        if ($account->isVideo()) {
+            $data['media'] = $account->getQrcode();
+            $data['duration'] = $account->getDuration();
+        } elseif ($account->isDouyin()) {
+            $data['url'] = DouYin::makeHomePageUrl($account->getConfig('url'));
+            $data['openid'] = $account->getConfig('openid', '');
+        } elseif ($account->isWxApp()) {
+            $data['username'] = $account->getConfig('username', '');
+            $data['path'] = $account->getConfig('path', '');
+            $data['delay'] = $account->getConfig('delay', 1);
+        } elseif ($account->isFlashEgg()) {
+            if ($account->getMediaType() == 'video') {
+                $data['video'] = $account->getMedia();
             } else {
-                $data['images'] = $entry->getMedia();
+                $data['images'] = $account->getMedia();
             }
-            $data['duration'] = $entry->getDuration();
-            $data['area'] = $entry->getArea();
-            $data['goods'] = $entry->getGoodsData();
+            $data['duration'] = $account->getDuration();
+            $data['area'] = $account->getArea();
+            $data['goods'] = $account->getGoodsData();
         } else {
-            $data['qrcode'] = $entry->getQrcode();
+            $data['qrcode'] = $account->getQrcode();
         }
 
-        if ($entry->isAuth()) {
+        if ($account->isAuth()) {
             //授权公众号类型
-            $data['service_type'] = $entry->getServiceType();
+            $data['service_type'] = $account->getServiceType();
             //出货时机
-            $data['open_timing'] = $entry->settings('config.open.timing');
-            $appid = $entry->settings('authdata.authorization_info.authorizer_appid');
+            $data['open_timing'] = $account->settings('config.open.timing');
+            $appid = $account->settings('authdata.authorization_info.authorizer_appid');
             if ($appid) {
                 $data['appid'] = $appid;
             }
         }
 
-        if (App::isBalanceEnabled() && $entry->getBonusType() == Account::BALANCE) {
-            $data['balance'] = $entry->getBalancePrice();
+        if (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
+            $data['balance'] = $account->getBalancePrice();
         } else {
-            $data['commission'] = $entry->getCommissionPrice();
+            $data['commission'] = $account->getCommissionPrice();
         }
 
         return $data;
@@ -1514,7 +1514,7 @@ class Account extends State
         return $titles[$type] ?? '未知';
     }
 
-    public static function ReplaceCode($desc, $placeholder, $code)
+    public static function replaceCode($desc, $placeholder, $code)
     {
         if (strpos($desc, '{'.$placeholder.'}') !== false) {
             $desc = PlaceHolder::replace($desc, [

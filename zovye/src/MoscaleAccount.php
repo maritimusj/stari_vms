@@ -92,7 +92,7 @@ class MoscaleAccount
 
                     $data['name'] = $result['data']['name'] ?: Account::MOSCALE_NAME;
                     $data['qrcode'] = $result['data']['qrcode_url'];
-                    $data['descr'] = Account::ReplaceCode($data['descr'], 'key', strval($result['data']['rand_key']));
+                    $data['descr'] = Account::replaceCode($data['descr'], 'key', strval($result['data']['rand_key']));
 
                     $v[] = $data;
 

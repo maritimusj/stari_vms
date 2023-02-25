@@ -128,7 +128,7 @@ class SNTOAccount
                 $data['name'] = $result['data']['app_name'] ?: Account::SNTO_NAME;
                 $data['title'] = $result['data']['app_name'] ?: Account::SNTO_NAME;
                 $data['qrcode'] = $result['data']['qr_code_url'];
-                $data['descr'] = Account::ReplaceCode($data['descr'], 'key', strval($result['data']['keyword']));
+                $data['descr'] = Account::replaceCode($data['descr'], 'key', strval($result['data']['keyword']));
 
                 $v[] = $data;
 

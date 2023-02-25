@@ -358,13 +358,8 @@ class charging
         }
 
         $price = intval(round(request::float('price', 0, 2) * 100));
-        if ($price < 1) {
-            return err('付款金额不正确！');
-        }
 
-        $serial = $device->generateChargingSerial($chargerID);
-
-        return Helper::createChargingOrder($user, $device, $chargerID, $price, $serial);
+        return Helper::createChargingOrder($user, $device, $chargerID, $price, $device->generateChargingSerial($chargerID));
     }
 
     public static function withdraw(): array

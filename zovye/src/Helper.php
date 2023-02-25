@@ -482,8 +482,8 @@ class Helper
         int $total_price,
         string $serial = ''
     ) {
-        if ($total_price < 1) {
-            return err('支付金额不能为零！');
+        if ($total_price < 100) {
+            return err('支付金额不能小于1元！');
         }
 
         App::setContainer($user);
@@ -534,7 +534,7 @@ class Helper
     ) {
 
         if ($total_price < 1) {
-            return err('支付金额不能为零！');
+            return err('支付金额不正确！');
         }
 
         App::setContainer($user);

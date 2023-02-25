@@ -10,7 +10,6 @@ namespace zovye\job\orderPayResult;
 
 use zovye\Charging as IotCharging;
 use zovye\CtrlServ;
-use zovye\Device;
 use zovye\Job;
 use zovye\JobException;
 use zovye\Locker;

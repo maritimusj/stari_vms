@@ -149,13 +149,8 @@ class fueling
         }
 
         $price = intval(round(request::float('price', 0, 2) * 100));
-        if ($price < 1) {
-            return err('付款金额不正确！');
-        }
 
-        $serial = Order::makeSerial($user);
-
-        return Helper::createFuelingOrder($user, $device, $chargerID, $price, $serial);
+        return Helper::createFuelingOrder($user, $device, $chargerID, $price, Order::makeSerial($user));
     }
 
     /**

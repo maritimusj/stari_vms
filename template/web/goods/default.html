@@ -11,12 +11,11 @@
         background-color: gray;
         color: #fff;
         padding: 3px 6px;
-        cursor: default;
+        cursor: pointer;
         display: inline-block;
     }
     #goodslist .way span:not(.allowed) {
         background-color: #ccc;
-        cursor: default;
     }
     #goodslist .way span.free.allowed {
         background-color: #4CAF50;
@@ -27,7 +26,7 @@
     #goodslist .way span.balance.allowed {
         background-color: #ff9800;
     }
-    #goodslist .way span.mall.allowed {
+    #goodslist .way span.delivery.allowed {
         background-color: #2196f3;
     }
     #goodslist th:not(:nth-child(2)), #goodslist td:not(:nth-child(2)) {
@@ -171,10 +170,10 @@
                         <img src="{$item['img']}" />
                     </td>
                     <td class="way">
-                        <span class="free{if $item['allowFree']} allowed{/if}">免费</span>
-                        <span class="pay{if $item['allowPay']} allowed{/if}">支付</span>
-                        <span class="balance{if $item['allowBalance']} allowed{/if}">积分</span>
-                        <span class="mall{if $item['allowDelivery']} allowed{/if}">商城</span>                        
+                        <span class="free{if $item['allowFree']} allowed{/if}" data-op="toggleAllowFree">免费</span>
+                        <span class="pay{if $item['allowPay']} allowed{/if}" data-op="toggleAllowPay">支付</span>
+                        <span class="balance{if $item['allowBalance']} allowed{/if}" data-op="toggleAllowBalance">积分</span>
+                        <span class="delivery{if $item['allowDelivery']} allowed{/if}" data-op="toggleAllowDelivery">商城</span>                        
                     </td>
                     <td>
                         <div>
@@ -350,6 +349,27 @@
                     util.message(res.data.msg, "", res.status ? 'success':'error');
                 }
             })
+    }
+    api.toggle = function(target, w) {
+        const tr = target.closest('tr');
+        const id = tr.data('id');
+        $.post(api.url, {op: 'toggle', id, w}).then(function(res) {
+            if (res && res.status) {
+                tr.find('.way .'+w).toggleClass('allowed');
+            }
+        })
+    }
+    api.toggleAllowFree = function(target) {
+        api.toggle(target, 'free');
+    }
+    api.toggleAllowPay = function(target) {
+        api.toggle(target, 'pay');
+    }
+    api.toggleAllowBalance = function(target) {
+        api.toggle(target, 'balance');
+    }
+    api.toggleAllowDelivery = function(target) {
+        api.toggle(target, 'delivery');
     }
     $(function(){
         //搜索

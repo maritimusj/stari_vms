@@ -80,7 +80,7 @@ class Balance
                 )
             );
             if ($result && $notify) {
-                $this->on_change($result);
+                $this->onChange($result);
                 return $result;
             }
         }
@@ -88,7 +88,7 @@ class Balance
         return null;
     }
 
-    public function on_change(balanceModelObj $item)
+    public function onChange(balanceModelObj $item)
     {
         $notify_url = Config::balance('app.notify_url');
         if ($notify_url) {
@@ -378,6 +378,7 @@ TEXT;
      * @param userModelObj $user
      * @param accountModelObj $account
      * @param string $serial 做为唯一记录UID，存在时返回错误
+     * @param string $reason
      * @return array|balanceModelObj|bool
      */
     public static function give(userModelObj $user, accountModelObj $account, string $serial = '', string $reason = '')

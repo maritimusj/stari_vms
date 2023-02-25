@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\account\YfbAccount;
+
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('yfb', [

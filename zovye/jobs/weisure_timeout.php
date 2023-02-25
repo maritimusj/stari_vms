@@ -8,11 +8,11 @@ namespace zovye\job\accountMsg;
 
 //公众号消息推送
 
+use Exception;
+use zovye\account\WeiSureAccount;
 use zovye\CtrlServ;
 use zovye\Log;
 use zovye\request;
-use Exception;
-use zovye\WeiSureAccount;
 
 $data = [
     'user' => request::str('user'),

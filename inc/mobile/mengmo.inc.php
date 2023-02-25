@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\account\MengMoAccount;
+
 defined('IN_IA') or exit('Access Denied');
 
 MengMoAccount::cb([

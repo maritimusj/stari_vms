@@ -8,6 +8,21 @@ namespace zovye;
 
 //公众号状态
 
+use zovye\account\AQIInfoAccount;
+use zovye\account\CloudFIAccount;
+use zovye\account\JfbAccount;
+use zovye\account\KingFansAccount;
+use zovye\account\MeiPaAccount;
+use zovye\account\MengMoAccount;
+use zovye\account\MoscaleAccount;
+use zovye\account\SNTOAccount;
+use zovye\account\WeiSureAccount;
+use zovye\account\WxWorkAccount;
+use zovye\account\YfbAccount;
+use zovye\account\YiDaoAccount;
+use zovye\account\YouFenAccount;
+use zovye\account\YunfenbaAccount;
+use zovye\account\ZhiJinBaoAccount;
 use zovye\base\modelObjFinder;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
@@ -1031,10 +1046,10 @@ class Account extends State
             return err('没有认证数据！');
         }
 
-        $createtime = getArray($auth_data, 'createtime', 0);
+        $create_time = getArray($auth_data, 'createtime', 0);
         $expired = getArray($auth_data, 'authorization_info.expires_in', 0);
 
-        if (time() - $createtime > $expired) {
+        if (time() - $create_time > $expired) {
 
             $app_id = getArray($auth_data, 'authorization_info.authorizer_appid', '');
             $refreshToken = getArray($auth_data, 'authorization_info.authorizer_refresh_token', '');

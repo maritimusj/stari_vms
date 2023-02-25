@@ -4,13 +4,18 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\account;
 
 use Exception;
 use RuntimeException;
+use zovye\Account;
+use zovye\App;
+use zovye\Log;
 use zovye\model\accountModelObj;
-use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
+use zovye\Util;
+use function zovye\is_error;
 
 class AQIInfoAccount extends AQIInfo
 {

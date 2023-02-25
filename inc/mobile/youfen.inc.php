@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\account\YouFenAccount;
+
 $op = request::op('default');
 
 if ($op == 'yf_auth') {

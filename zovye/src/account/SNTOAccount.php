@@ -4,13 +4,23 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\account;
 
 use Exception;
 use RuntimeException;
+use zovye\Account;
+use zovye\App;
+use zovye\Device;
+use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Order;
+use zovye\User;
+use zovye\Util;
+use function zovye\err;
+use function zovye\is_error;
+use function zovye\isEmptyArray;
 
 class SNTOAccount
 {

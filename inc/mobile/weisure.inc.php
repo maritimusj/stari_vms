@@ -7,6 +7,8 @@
 
 namespace zovye;
 
+use zovye\account\WeiSureAccount;
+
 defined('IN_IA') or exit('Access Denied');
 
 if (request::is_post()) {

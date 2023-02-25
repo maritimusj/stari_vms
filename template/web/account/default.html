@@ -333,7 +333,7 @@
                             </span>
                             {elseif $a['type'] == \zovye\Account::QUESTIONNAIRE}
                              <span class="state auth" title="问卷">
-                                <a href="{php echo $this->createWebUrl('account', ['op' => 'qestionnaire_logs', 'account' => $a['id']]);}"  title="查看用户提交记录">
+                                <a href="{php echo $this->createWebUrl('account', ['op' => 'questionnaire_logs', 'account' => $a['id']]);}"  title="查看用户提交记录">
                                     <img src="{php echo MODULE_URL . 'static/img/questionnaire.svg'}">
                                 </a>
                             </span>                           
@@ -470,7 +470,7 @@
                                 <li><a href="#"  data-op="viewTaskLog"><i class="fa fa-list fa-fw"></i> 用户任务记录</a></li>
                             {else}
                                 {if $a['type'] == \zovye\Account::QUESTIONNAIRE}
-                                <li><a href="{php echo $this->createWebUrl('account', ['op' => 'qestionnaire_logs', 'account' => $a['id']]);}"><i class="fa fa-list fa-fw"></i> 用户提交记录</a></li>
+                                <li><a href="{php echo $this->createWebUrl('account', ['op' => 'questionnaire_logs', 'account' => $a['id']]);}"><i class="fa fa-list fa-fw"></i> 用户提交记录</a></li>
                                 <li role="separator" class="divider"></li>
                                 {/if}
                                 <li>

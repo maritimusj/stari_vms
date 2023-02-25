@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\account\AQIInfoAccount;
+
 defined('IN_IA') or exit('Access Denied');
 
 //如果是阿奇返回，则重新引导用户到设备页面

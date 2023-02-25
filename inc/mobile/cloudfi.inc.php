@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\account\CloudFIAccount;
+
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('cloudFI', [

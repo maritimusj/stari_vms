@@ -1,62 +1,71 @@
 <?php
-/**
- * @author jin@stariture.com
- * @url www.stariture.com
- */
 
-namespace zovye;
+namespace zovye\account;
 
 use Exception;
 use RuntimeException;
+use zovye\Account;
+use zovye\App;
+use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
+use zovye\Order;
+use zovye\User;
+use zovye\Util;
+use function zovye\err;
+use function zovye\is_error;
 
-class KingFansAccount
+class CloudFIAccount
 {
-    const API_URL = 'https://api.wxyes.cn/pool';
+    const API_URL = "https://www.cloudfi.cn/index.php/Interface/zk/getZkOrder";
 
-    private $bid;
     private $key;
+    private $channel;
+    private $scene;
+    private $area;
 
     /**
-     * KingFansAccount constructor.
-     * @param $bid
      * @param $key
+     * @param $channel
+     * @param $scene
+     * @param $area
      */
-    public function __construct($bid, $key)
+    public function __construct($key, $channel, $scene, $area)
     {
-        $this->bid = $bid;
         $this->key = $key;
+        $this->channel = $channel;
+        $this->scene = $scene;
+        $this->area = $area;
     }
 
     public static function getUid(): string
     {
-        return Account::makeThirdPartyPlatformUID(Account::KINGFANS, Account::KINGFANS_NAME);
+        return Account::makeThirdPartyPlatformUID(Account::CloudFI, Account::CloudFI_NAME);
     }
 
     public static function fetch(deviceModelObj $device, userModelObj $user): array
     {
-        $acc = Account::findOneFromType(Account::KINGFANS);
+        $acc = Account::findOneFromType(Account::CloudFI);
         if (empty($acc)) {
             return [];
         }
 
         $config = $acc->settings('config', []);
-        if (empty($config['bid']) || empty($config['key'])) {
+        if (empty($config['key']) || empty($config['channel'])) {
             return [];
         }
 
         $v = [];
 
-        (new KingFansAccount($config['bid'], $config['key']))->fetchOne(
+        (new CloudFIAccount($config['key'], $config['channel'], $config['scene'], $config['area']))->fetchOne(
             $device,
             $user,
             function ($request, $result) use ($acc, $device, $user, &$v) {
                 if (App::isAccountLogEnabled()) {
                     $log = Account::createQueryLog($acc, $user, $device, $request, $result);
                     if (empty($log)) {
-                        Log::error('kingfans_query', [
+                        Log::error('cloudFI_query', [
                             'query' => $request,
                             'result' => $result,
                         ]);
@@ -64,7 +73,7 @@ class KingFansAccount
                 }
 
                 try {
-                    if (empty($result) || empty($result['list'])) {
+                    if (empty($result) || empty($result['bizContent'])) {
                         throw new RuntimeException('返回数据为空！');
                     }
 
@@ -72,30 +81,29 @@ class KingFansAccount
                         throw new RuntimeException($result['message']);
                     }
 
-                    if ($result['error']) {
-                        throw new RuntimeException("请求失败，错误代码：{$result['error']}");
+                    if ($result['code'] != 200) {
+                        throw new RuntimeException("请求失败，错误信息：{$result['message']}");
                     }
 
-                    if (empty($result['list']['qrcode_url'])) {
+                    if (empty($result['bizContent']['qrcodeUrl'])) {
                         throw new RuntimeException('二维码为空！');
                     }
 
                     $data = $acc->format();
 
-                    $data['name'] = $result['list']['ghname'] ?: Account::KINGFANS_NAME;
-                    $data['qrcode'] = $result['list']['qrcode_url'];
-                    if ($result['list']['head_img']) {
-                        $data['img'] = $result['list']['head_img'];
-                    }
+                    $data['name'] = $result['bizContent']['appname'] ?: Account::CloudFI_NAME;
+                    $data['qrcode'] = $result['bizContent']['qrcodeUrl'];
 
                     $v[] = $data;
+
+                    $user->setLastActiveDevice($device);
 
                 } catch (Exception $e) {
                     if (App::isAccountLogEnabled() && isset($log)) {
                         $log->setExtraData('error_msg', $e->getMessage());
                         $log->save();
                     } else {
-                        Log::error('kingfans', [
+                        Log::error('cloudFI', [
                             'error' => $e->getMessage(),
                         ]);
                     }
@@ -108,11 +116,7 @@ class KingFansAccount
 
     public static function verifyData($params): array
     {
-        if (!App::isKingFansEnabled()) {
-            return err('没有启用！');
-        }
-
-        $acc = Account::findOneFromType(Account::KINGFANS);
+        $acc = Account::findOneFromType(Account::CloudFI);
         if (empty($acc)) {
             return err('找不到指定公众号！');
         }
@@ -122,14 +126,14 @@ class KingFansAccount
             return err('没有配置！');
         }
 
-        if (md5($params['oid'].$params['uid'].$params['timestamp'].$config['key']) !== $params['sign']) {
-            return err('签名错误！');
-        }
+        // if (md5($params['openid'] . $params['timestamp'] . $config['key']) !== $params['sign']) {
+        //     return err('签名检验失败！');
+        // }
 
         return ['account' => $acc];
     }
 
-    public static function cb($params = [])
+    public static function cb(array $params = [])
     {
         //出货流程
         try {
@@ -138,14 +142,8 @@ class KingFansAccount
                 throw new RuntimeException('发生错误：'.$res['message']);
             }
 
-            list($device_shadow_uid, $user_openid) = explode(':', $params['param']);
-
-            if (empty($device_shadow_uid) || empty($user_openid)) {
-                throw new RuntimeException('发生错误：回传参数为格式不正确！');
-            }
-
             /** @var userModelObj $user */
-            $user = User::get($user_openid, true);
+            $user = User::get($params['openid'], true);
             if (empty($user) || $user->isBanned()) {
                 throw new RuntimeException('找不到指定的用户或者已禁用');
             }
@@ -154,24 +152,24 @@ class KingFansAccount
             $acc = $res['account'];
 
             if ($acc->getBonusType() == Account::BALANCE) {
-                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['oid']}");
+                $serial = sha1("{$user->getId()}{$acc->getUid()}{$params['zkOpenid']}");
                 $result = Account::createThirdPartyPlatformBalance($acc, $user, $serial, $params);
                 if (is_error($result)) {
                     throw new RuntimeException($result['message'] ?: '奖励积分处理失败！');
                 }
             } else {
                 /** @var deviceModelObj $device */
-                $device = Device::findOne(['shadow_id' => $device_shadow_uid]);
+                $device = $user->getLastActiveDevice();
                 if (empty($device)) {
-                    throw new RuntimeException('找不到指定的设备:'.$device_shadow_uid);
+                    throw new RuntimeException('找不到指定的设备!');
                 }
 
-                $order_uid = Order::makeUID($user, $device, sha1($params['oid']));
+                $order_uid = Order::makeUID($user, $device, sha1($params['zkOpenid']));
                 Account::createThirdPartyPlatformOrder($acc, $user, $device, $order_uid, $params);
             }
 
         } catch (Exception $e) {
-            Log::error('kingfans', [
+            Log::error('cloudFI', [
                 'error' => '发生错误! ',
                 'result' => $e->getMessage(),
             ]);
@@ -183,22 +181,19 @@ class KingFansAccount
         $fans = empty($user) ? Util::fansInfo() : $user->profile();
 
         $data = [
-            'bid' => $this->bid,
-            'uuid' => $fans['openid'],
-            'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
+            'channel' => $this->channel,
+            'scene' => $this->scene,
+            'areaCode' => intval($this->area),
+            'msg' => "",
+            'openid' => $fans['openid'],
             'nickname' => $fans['nickname'],
-            'ip' => $user->getLastActiveIp(),
-            'os' => 0,
-            'param' => "{$device->getShadowId()}:{$user->getOpenid()}",
-            't' => TIMESTAMP,
+            'sex' => empty($fans['sex']) ? 0 : $fans['sex'],
+            'timestamp' => TIMESTAMP,
         ];
 
-        $data['sign'] = md5($this->key.$data['uuid'].$data['t']);
+        $data['sign'] = md5($data['openid'].$data['timestamp'].$this->key);
 
-        $result = Util::get(self::API_URL.'?'.http_build_query($data));
-        if (!empty($result) && is_string($result)) {
-            $result = json_decode($result, true);
-        }
+        $result = Util::post(self::API_URL, $data);
         if ($cb) {
             $cb($data, $result);
         }

@@ -11,6 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use DateTime;
 use DateTimeImmutable;
 use Exception;
+use zovye\account\MoscaleAccount;
 use zovye\model\account_queryModelObj;
 use zovye\model\accountModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -617,7 +618,7 @@ if ($op == 'default') {
                 } else {
                     if ($account->getConfig('questionnaire')) {
                         $questionnaire_attached = false;
-                        $account->setConfig('questionnaire', []);
+                        $account->setConfig('questionnaire');
                     }
                 }
             }
@@ -677,7 +678,7 @@ if ($op == 'default') {
                     $goods_data = [
                         'agent_id' => $account->getAgentId(),
                         'name' => $account->getTitle(),
-                        'img' => request::trim('goodsImage', ''),
+                        'img' => request::trim('goodsImage'),
                         'sync' => 0,
                         'price' => intval(round(request::float('goodsPrice', 0, 2) * 100)),
                         's1' => $s1,
@@ -700,7 +701,7 @@ if ($op == 'default') {
                     }
                 } else {
                     $goods->setAgentId($account->getAgentId());
-                    $goods->setImg(request::trim('goodsImage', ''));
+                    $goods->setImg(request::trim('goodsImage'));
                     $goods->setPrice(intval(round(request::float('goodsPrice', 0, 2) * 100)));
                     $goods->setUnitTitle(request::trim('goodsUnitTitle', '个'));
 
@@ -728,10 +729,10 @@ if ($op == 'default') {
 
                 if ($type == 'video') {
                     $config['ad']['video'] = [
-                        'url' => request::trim('video', ''),
+                        'url' => request::trim('video'),
                     ];
                 } else {
-                    $config['ad']['images'] = request::array('images', []);
+                    $config['ad']['images'] = request::array('images');
                 }
 
                 $account->set('config', $config);
@@ -1106,15 +1107,14 @@ if ($op == 'default') {
 
     $tpl_data = [];
 
-    if (request::has('id')) {
-        $id = request::int('id');
-        $acc = Account::get($id);
+    $id = request::int('id');
+    $acc = Account::get($id);
 
-        if (empty($acc)) {
-            JSON::fail('找不到这个任务！');
-        }
-        $tpl_data['account'] = $acc->profile();
+    if (empty($acc)) {
+        JSON::fail('找不到这个任务！');
     }
+
+    $tpl_data['account'] = $acc->profile();
 
     $query = Account::logQuery($acc);
 
@@ -1538,7 +1538,7 @@ if ($op == 'default') {
     $result = array_merge($result, $data);
     JSON::success($result);
 
-} elseif ($op == 'qestionnaire_logs') {
+} elseif ($op == 'questionnaire_logs') {
 
     $id = request::int('account');
     $account = Account::get($id);

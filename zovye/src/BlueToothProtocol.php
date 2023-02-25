@@ -13,6 +13,7 @@ class BlueToothProtocol
     public static function all(): array
     {
         static $protocols = [];
+
         if (empty($protocols)) {
             foreach (glob(MODULE_ROOT.'/lib/bluetooth/*', GLOB_ONLYDIR) as $name) {
                 $protoName = basename($name);
@@ -23,7 +24,6 @@ class BlueToothProtocol
                         'title' => $proto->getTitle(),
                     ];
                 }
-
             }
         }
 

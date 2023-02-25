@@ -2183,7 +2183,7 @@ class agent
             $uid_data['day'] = $today->format('Y-m-d');
             $data['today']['n'] = Cache::fetch($uid_data, function () use ($countFN, $today) {
                 return $countFN($today);
-            }, Cache::ResultExpiredAfter(10));
+            }, Cache::resultExpiredAfter(10));
 
             $yesterday = new DateTime('yesterday');
             $uid_data['day'] = $yesterday->format('Y-m-d');
@@ -2224,7 +2224,7 @@ class agent
 
             $res = Cache::fetch($uid_data, function () use ($countFN, $today) {
                 return $countFN(null, $today);
-            }, Cache::ResultExpiredAt('tomorrow'));
+            }, Cache::resultExpiredAt('tomorrow'));
 
             if (is_error($res)) {
                 return $res;

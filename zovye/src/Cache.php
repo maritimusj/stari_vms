@@ -41,35 +41,35 @@ class Cache
         return self::query($condition)->exists();
     }
 
-    public static function ResultExpiredAfter(int $seconds): Closure
+    public static function resultExpiredAfter(int $seconds): Closure
     {
         return function (array &$data) use ($seconds) {
             $data['expiration_time'] = time() + $seconds;
         };
     }
 
-    public static function ResultExpiredAt($time): Closure
+    public static function resultExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
             $data['expiration_time'] = is_int($time) ? $time : (new DateTimeImmutable($time))->getTimestamp();
         };
     }
 
-    public static function ErrorExpiredAfter(int $seconds): Closure
+    public static function errorExpiredAfter(int $seconds): Closure
     {
         return function (array &$data) use ($seconds) {
             $data['error_expiration'] = time() + $seconds;
         };
     }
 
-    public static function ErrorExpiredAt($time): Closure
+    public static function errorExpiredAt($time): Closure
     {
         return function (array &$data) use ($time) {
             $data['error_expiration'] = is_int($time) ? $time : (new DateTimeImmutable($time))->getTimestamp();
         };
     }
 
-    public static function Data($v): Closure
+    public static function data($v): Closure
     {
         return function (array &$data) use ($v) {
             $data['data'] = $v;

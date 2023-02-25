@@ -1066,7 +1066,7 @@ class Stats
             $params = [];
 
             if ($month_str == $now_str) {
-                $params[] = Cache::ResultExpiredAfter(10);
+                $params[] = Cache::resultExpiredAfter(10);
             }
 
             $res = Cache::fetch($uid, function () use ($user, $begin) {

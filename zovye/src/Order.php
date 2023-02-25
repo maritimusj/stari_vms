@@ -803,7 +803,7 @@ class Order extends State
                 if ($order->getSrc() == Order::FUELING_SOLO) {
                     $data['tips'] = ['text' => '单机', 'class' => 'solo'];
                 } else {
-                    $data['pay'] = $order->getExtraData('card', []);
+                    $data['pay'] = (array)$order->getExtraData('card', []);
                     if ($data['pay']['type'] == UserCommissionBalanceCard::getTypename()) {
                         $data['tips'] = ['text' => '余额', 'class' => 'balancex'];
                     } elseif($data['pay']['type'] == pay_logsModelObj::getTypename()) {

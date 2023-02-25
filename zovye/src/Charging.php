@@ -245,22 +245,22 @@ class Charging
             $pay_log = Pay::getPayLog($serial);
             if (empty($pay_log)) {
                 return err('找不到这个订单记录！');
-            } else {
-                if ($pay_log->isCancelled()) {
-                    return err('支付已取消！');
-                }
-                if ($pay_log->isTimeout()) {
-                    return err('支付已超时！');
-                }
-                if ($pay_log->isRefund()) {
-                    return err('支付已退款！');
-                }
-                if (!$pay_log->isPaid()) {
-                    return ['message' => '正在查询支付结果..'];
-                }
-
-                return ['message' => '已支付，请稍等..'];
             }
+
+            if ($pay_log->isCancelled()) {
+                return err('支付已取消！');
+            }
+            if ($pay_log->isTimeout()) {
+                return err('支付已超时！');
+            }
+            if ($pay_log->isRefund()) {
+                return err('支付已退款！');
+            }
+            if (!$pay_log->isPaid()) {
+                return ['message' => '正在查询支付结果..'];
+            }
+
+            return ['message' => '已支付，请稍等..'];
         }
 
         $result = $order->getChargingRecord();

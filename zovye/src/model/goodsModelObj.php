@@ -204,6 +204,11 @@ class goodsModelObj extends modelObj
         return $this->getExtraData('type', '');
     }
 
+    public function isFlashEgg(): bool
+    {
+        return $this->getAccountId() > 0;
+    }
+
     public function getAccountId(): int
     {
         return $this->getExtraData('accountId', 0);

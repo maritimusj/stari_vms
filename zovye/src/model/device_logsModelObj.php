@@ -7,7 +7,6 @@
 namespace zovye\model;
 
 use function zovye\tb;
-use zovye\BaseLogsModelObj;
 
 class device_logsModelObj extends BaseLogsModelObj
 {

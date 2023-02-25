@@ -9,7 +9,6 @@ namespace zovye\model;
 use zovye\Contract\ICard;
 use zovye\User;
 use function zovye\tb;
-use zovye\BaseLogsModelObj;
 
 class pay_logsModelObj extends BaseLogsModelObj implements ICard
 {

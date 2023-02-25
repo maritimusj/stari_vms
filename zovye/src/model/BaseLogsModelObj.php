@@ -4,7 +4,7 @@
  * @url www.stariture.com
  */
 
-namespace zovye;
+namespace zovye\model;
 
 use zovye\base\modelObj;
 use zovye\traits\DataGetterAndSetter;

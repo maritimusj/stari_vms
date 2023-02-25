@@ -18,7 +18,7 @@ class ChuanglanSmsApi
     {
 
         if (empty(self::API_ACCOUNT) || empty(self::API_PASSWORD)) {
-            return err('Invalid config of SMS api.');
+            return err('invalid config of SMS api.');
         }
 
         $msg = PlaceHolder::replace(self::CONTENT_TPL, [

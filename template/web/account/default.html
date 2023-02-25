@@ -488,7 +488,7 @@
                                     </a>
                                 </li>
 
-                                {if \zovye\App::useAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
+                                {if \zovye\App::isUseAccountQRCode() && $a['type'] == \zovye\Account::AUTH && $a['service'] == 2}
                                 <li>
                                     <a href="#" data-op="useAccountQRCode" onclick="return false;">
                                         <i class="fa fa-desktop fa-fw"></i>

@@ -27,7 +27,7 @@
                 </a>
                 {/if}
                 {if \zovye\App::isBluetoothDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'add', 'type'=>'bluetooth_device'));}">
+                <a href="{php echo $this->createWebUrl('device', array('op'=>'edit', 'type'=>'bluetooth_device'));}">
                     <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon" title="添加蓝牙设备">
                 </a>
                 <a href="{php echo $this->createWebUrl('device', array('op'=>'import_bluetooth_device_upload'));}">

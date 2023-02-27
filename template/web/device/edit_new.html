@@ -205,7 +205,7 @@
                             <input type="text" class="form-control" name="name" id="name" value="{php echo $device ? $device->getName() : ''}" required>
                         </div>
                     </div>
-                    {if \zovye\App::isVDeviceSupported() && $is_vdevice"}
+                    {if \zovye\App::isVDeviceSupported() && $is_vdevice}
                     <div class="form-group">
                         <label for="IMEI" class="col-md-2 control-label">硬件IMEI</label>
                         <div class="col-md-10">

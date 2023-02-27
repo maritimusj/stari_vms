@@ -234,7 +234,7 @@
 <script type="text/javascript">
 		const initData = {
 			imei: "{$tpl['device']['imei']}",
-			max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}')
+			max: parseInt('{php echo \zovye\App::getOrderMaxGoodsNum();}')
 		};
 </script>
 {php \zovye\url(true, 'static/m/spa2/device.js?v=202203181310');}

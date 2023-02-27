@@ -466,7 +466,7 @@
             el: '#app',
             data: {
                 imei: "{$tpl['device']['imei']}",
-                max: parseInt('{php echo \zovye\App::orderMaxGoodsNum();}'),
+                max: parseInt('{php echo \zovye\App::getOrderMaxGoodsNum();}'),
                 isHidden: null,
                 tabs: {
                     list: [{

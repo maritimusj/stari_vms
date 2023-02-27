@@ -29,34 +29,17 @@ class Site extends WeModuleSite
                 $fn = strtolower(substr($name, 8));
             }
 
-            $op = request::op('default');
-            $this->route($op);
-
             $file = $dir.$fn.'.inc.php';
             if (file_exists($file)) {
                 require $file;
-            } else {
-                if (DEBUG) {
-                    die($file.' not exists!');
-                }
             }
-        }
-    }
 
-    public function route($op)
-    {
-        $dir =  IA_ROOT.'/addons/'.$this->modulename.'/inc';
-        if ($this->inMobile) {
-            $dir .= '/mobile';
-        } else {
-            $dir .= '/web';
-        }
+            $op = request::op('default');
 
-        $dir .= '/' . $GLOBALS['_GPC']['do'];
-        $file = $dir . '/' . toSnakeCase(toCamelCase($op)) . '.php';
-
-        if (file_exists($file)) {
-            require($file);
+            $file = $dir.$fn.'/'.$op.'.php';
+            if (file_exists($file)) {
+                require $file;
+            }
         }
     }
 }

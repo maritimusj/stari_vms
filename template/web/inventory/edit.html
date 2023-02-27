@@ -47,7 +47,7 @@
                 <div class="form-group">
                     <label for="title" class="col-md-2 control-label">仓库名称</label>
                     <div class="col-md-10">
-                        <input type="text" class="form-control" name="title" v-model="inventory.title" required>
+                        <input type="text" class="form-control" name="title" id="title" v-model="inventory.title" required>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
 <script>
     const userApiUrl = "{php echo $this->createWebUrl('user')}";
     const inventoryApiUrl = "{php echo $this->createWebUrl('inventory')}";
-    require(["{php \zovye\url(false, JS_VUE_URL);}"], function(Vue) {
+    require(["jquery", "{php \zovye\url(false, JS_VUE_URL);}"], function($, Vue) {
         new Vue({
             el: "#app",
             data: {

@@ -1,15 +1,10 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
-
-use zovye\App;
-use zovye\We7;
-use zovye\Util;
-use zovye\Agent;
-use zovye\Goods;
-use zovye\Schema;
-use zovye\Account;
-use zovye\request;
 
 $res = Util::transactionDo(function () {
 
@@ -407,7 +402,7 @@ $res = Util::transactionDo(function () {
                 }
             }
         }
-        
+
         if ($account->isVideo()) {
             $account->set('config', [
                 'type' => Account::VIDEO,
@@ -457,7 +452,7 @@ $res = Util::transactionDo(function () {
 
             $goods = $account->getGoods();
             if (empty($goods)) {
-                $s1 =  Goods::setFreeBitMask(0);
+                $s1 = Goods::setFreeBitMask(0);
                 $s1 = Goods::setPayBitMask($s1);
 
                 $goods_data = [
@@ -503,13 +498,13 @@ $res = Util::transactionDo(function () {
             $config = [
                 'type' => Account::FlashEgg,
                 'ad' => [
-                    'type' => $type, 
+                    'type' => $type,
                     'duration' => request::int('duration'),
                     'area' => request::trim('area'),
                 ],
                 'goods' => [
                     'id' => $goods->getId(),
-                ]
+                ],
             ];
 
             if ($type == 'video') {

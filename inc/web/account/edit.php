@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
@@ -45,7 +49,7 @@ if ($bonus_type == Account::COMMISSION) {
 $config = $account->get('config', []);
 
 $tpl_data = [
-    'op' => $op,
+    'op' => 'edit',
     'type' => $type,
     'id' => $id,
     'account' => $account,

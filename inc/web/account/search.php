@@ -1,10 +1,12 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
-use zovye\JSON;
-use zovye\Account;
-use zovye\request;
+use zovye\model\accountModelObj;
 
 $result = [];
 

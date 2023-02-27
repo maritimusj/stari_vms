@@ -1,6 +1,12 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
+
+use zovye\model\account_queryModelObj;
 
 $tpl_data = [];
 

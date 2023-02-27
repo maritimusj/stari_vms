@@ -3,16 +3,19 @@
 
 <div class="panel panel-default">
     <div class="heading">
-        {if $op == 'art_add'}<i class="fa fa-pencil"></i> 添加文章{elseif $op=='art_edit'}<i class="fa fa-edit"></i> 编辑文章{/if}
-        {if $op == 'faq_add'}<i class="fa fa-comment-o"></i> 添加FAQ{elseif $op=='faq_edit'}<i class="fa fa-edit"></i> 编辑FAQ{/if}
+        {if $type == 'article'}
+        {if empty($id)}<i class="fa fa-pencil"></i> 添加文章{else}<i class="fa fa-edit"></i> 编辑文章{/if}
+        {/if}
+        {if $type == 'faq'}
+        {if empty($id)}<i class="fa fa-comment-o"></i> 添加FAQ{else}<i class="fa fa-edit"></i> 编辑FAQ{/if}
+        {/if}
         
         <span class="operate">
-            {if $op == 'art_add' || $op == 'art_edit'}
+            {if $type == 'article'}
              <a href="{php echo $this->createWebUrl('article')}"><i class="fa fa-reply" title="返回"></i></a>   
             {else}
              <a href="{php echo $this->createWebUrl('article', array('op'=>'faq'));}"><i class="fa fa-reply" title="返回"></i></a>   
             {/if}
-           
         </span>
     </div>
     <form class="form" action="{php echo $this->createWebUrl('article');}" method="post">
@@ -26,7 +29,7 @@
             <div class="form-group">
                 <label class="col-md-2 control-label">内容</label>
                 <div class="col-md-10">
-                    {if $op == 'art_add' || $op == 'art_edit'}
+                    {if $id > 0}
                     {php echo tpl_ueditor('content', $art ? $art->getContent():'')}
                     {else}
                     <textarea class="form-control" name="content" rows="10">{php echo $art?$art->getContent() : ''}</textarea>
@@ -35,7 +38,7 @@
             </div>
             <div class="form-btn">
                 <input type="hidden" name="type" value="{$type}">
-                {if $op == 'art_edit' || $op == 'faq_edit'}
+                {if $id > 0}
                 <input type="hidden" name="id" value="{$id}">
                 {/if}
                 <input type="hidden" name="op" value="art_save">
@@ -48,11 +51,7 @@
 <script>
     $(function(){
         $('form button[goback]').click(function(){
-            {if $op === 'art_add' || $op === 'art_edit'}
-             window.location = "{php echo $this->createWebUrl('article');}";
-            {else}
-            window.location = "{php echo $this->createWebUrl('article', array('op'=>$type));}";
-            {/if}
+            window.location = "{php echo $this->createWebUrl('article');}";
         })
     })
 </script>

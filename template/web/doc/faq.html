@@ -1,0 +1,43 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+{php \zovye\url(true, CSS_ANIMATE_URL);}
+
+<ul class="nav nav-tabs" id="navbar">
+  <li role="presentation"><a href="{php echo $this->createWebUrl('article', array('op' => 'art'));}">文章</a></li>
+  <li role="presentation"><a href="{php echo $this->createWebUrl('article', array('op' => 'files'));}">附件</a></li>
+  <li role="presentation" class="active"><a href="#">ＦＡＱ</a></li>
+</ul>
+<div class="panel panel-default nav-tab-item">
+    <div class="heading" style="background-color:#fff;border-bottom:0px;">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('article', array('op'=>'faq_add'));}"><i class="fa fa-comment-o animate__bounceIn" title="添加ＦＡＱ"></i></a>
+        </span>
+    </div>    
+    <div class="panel-body" id="faqlist">
+        {if $faq}
+        {loop $faq $index $f}
+            <div class="list-group">
+              <div class="list-group-item">
+                <h4 class="list-group-item-heading faq-header"><big>{php echo $index + 1}</big> {$f['title']}</h4>
+                <div class="operate">
+                            <a href="{php echo $this->createWebUrl('article', array('op'=>'faq_edit','id'=>$f['id']))}"><i class="fa fa-edit" title="编辑"></i></a>
+                            <a href="{php echo $this->createWebUrl('article', array('op'=>'faq_remove','id'=>$f['id']))}"><i class="fa fa-trash-o" title="删除？" onclick="if(!confirm('确定要删除这条ＦＡＱ吗？')){return false;}"></i></a>                    
+                </div>  
+                <p class="list-group-item-text">
+                    {$f['content']}
+                </p>
+              </div>
+            </div>        
+        {/loop}
+        <div class="pull-right">
+            {$pager}
+        </div>         
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何FAQ！
+        </div>     
+        {/if}
+    </div>
+</div>
+
+{template 'common/footer'}

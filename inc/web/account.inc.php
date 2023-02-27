@@ -1274,7 +1274,7 @@ if ($op == 'default') {
         'content' => $content,
     ]);
 
-} elseif ($op == 'platform_stat') {
+} elseif ($op == 'platformStats') {
 
     //平台 统计
     $date_limit = request::array('datelimit');
@@ -1352,7 +1352,7 @@ if ($op == 'default') {
     $e_date->modify('-1 day');
     $tpl_data['e_date'] = $e_date->format('Y-m-d');
 
-    app()->showTemplate('web/account/platform_stat', $tpl_data);
+    app()->showTemplate('web/account/platform_stats', $tpl_data);
 
 } elseif ($op == 'accountAuthorize') {
 

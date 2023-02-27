@@ -225,6 +225,13 @@
                     <img src="{php echo MODULE_URL . 'static/img/egg.svg'}">
                 </span>
             </a>
+            {if $type ==\zovye\Account::FlashEgg}
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'gift'));}">
+                <span class="state auth" title="闪蛋礼物">
+                    <img src="{php echo MODULE_URL . 'static/img/gift.svg'}">
+                </span>
+            </a>
+            {/if}
             {/if}
             {/if}
             {if empty($type)}

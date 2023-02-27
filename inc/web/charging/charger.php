@@ -16,7 +16,6 @@ $result = [];
 
 $chargerNum = $device->getChargerNum();
 
-
 $spanFN = function ($str) {
     return '<span class="val">'.$str.'</span>';
 };

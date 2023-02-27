@@ -69,6 +69,12 @@ class Agent
         return null;
     }
 
+    public static function getLevels($level = '')
+    {
+        $key = 'agent.levels';
+        return settings($level ? "$key.$level" : $key, []);
+    }
+
     /**
      * 是否开启定位
      * @param agentModelObj $agent

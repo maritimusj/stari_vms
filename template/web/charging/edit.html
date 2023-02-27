@@ -50,7 +50,7 @@
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}<ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">
         <i class="fa fa-pencil"></i> 
-        {if $op=='new_group_edit'}编辑{else}添加{/if}分组
+        {if $id > 0}编辑{else}添加{/if}分组
     </a></li>
 </ul>
 <form action="{php echo $this->createWebUrl('charging');}" method="post">
@@ -168,7 +168,7 @@
 
     <div class="form-btn">
         <input type="hidden" name="op" value="save">
-        {if $op=='edit' && $id}
+        {if $id > 0}
         <input type="hidden" name="id" value="{$id}">
         <button type="submit" class="btn btn-primary">保存</button>
         {else}

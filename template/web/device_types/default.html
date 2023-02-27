@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div id="search-form">
-                <form action="{php echo $this->createWebUrl('devicetypes', array('op'=>'default'));}" method="post">
+                <form action="{php echo $this->createWebUrl('devicetypes');}" method="post">
                     <div class="form-group">
                         <label for="agent_search_result" class="col-md-2 control-label">所属代理商</label>
                         <div class="col-md-5">
@@ -93,7 +93,7 @@
                     <td>
                         {if $item['agent']}
                         {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
-                        <a href="{php echo $this->createWebUrl('devicetypes', ['op'=>'device_types', 'agent_openid'=>$item['agent']['openid']]);}">
+                        <a href="{php echo $this->createWebUrl('devicetypes', ['agent_openid'=>$item['agent']['openid']]);}">
                             <div class="agent" title="点击查看{$item['agent']['name']}的全部型号" style="display:inline-block;">
                                 {else}
                                 <div class="agent" style="display:inline-block;">
@@ -110,7 +110,7 @@
                             {if $s_agentId === 0}
                             <span style="color:gray;">&lt;平台&gt;</span>
                             {else}
-                            <a href="{php echo $this->createWebUrl('devicetypes', ['op'=>'device_types', 'agent_openid'=>-1]);}" title="查看平台的全部型号">
+                            <a href="{php echo $this->createWebUrl('devicetypes', ['agent_openid'=>-1]);}" title="查看平台的全部型号">
                                 <span style="color:gray;">&lt;平台&gt;</span>
                             </a>                            
                             {/if}

@@ -182,7 +182,7 @@
                     <td>
                         {if $item['agent']}
                         {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
-                        <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['op'=>'goods', 'agentId'=>$item['agent']['id']]);}">
+                        <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['agentId'=>$item['agent']['id']]);}">
                             <div class="agent" title="点击查看{$item['agent']['name']}全部商品" style="display:inline-block;">
                                 {else}
                                 <div class="agent" style="display:inline-block;">
@@ -197,7 +197,7 @@
                         {/if}
                         {else}
                             {if $s_agentId != -1}
-                            <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['op'=>'goods', 'agentId'=>-1]);}" title="点击查看所有平台商品">
+                            <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['agentId'=>-1]);}" title="点击查看所有平台商品">
                                 <span style="color:gray;">&lt;平台&gt;</span>
                             </a>
                             {else}

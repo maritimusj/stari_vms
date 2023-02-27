@@ -58,16 +58,16 @@
     <div class="panel panel-default nav-tab-item{if empty($w) || $w == 'all'} panel-first{/if}">
         <div class="heading">
             <span class="operate">
-                <a href="{php echo $this->createWebUrl('goods', ['op' => 'addGoods']);}">
+                <a href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods']);}">
                     <i class="fa fa-gift fa-fw" title="添加商品"></i>
                 </a>
                 {if \zovye\App::isLotteryGoodsSupported()}
-                <a href="{php echo $this->createWebUrl('goods', ['op' => 'addGoods', 'type' => 'lottery']);}">
+                <a href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'type' => 'lottery']);}">
                     <i class="fa fa-ticket fa-fw" title="添加固定货道商品"></i>
                 </a>                
                 {/if}
                 {if \zovye\App::isFuelingDeviceEnabled()}
-                <a href="{php echo $this->createWebUrl('goods', ['op' => 'addGoods', 'type' => 'fueling']);}">
+                <a href="{php echo $this->createWebUrl('goods', ['op' => 'editGoods', 'type' => 'fueling']);}">
                     <img src="{MODULE_URL}static/img/gas.svg" class="icon" title="添加尿素机商品">
                 </a>
                 {/if}
@@ -196,7 +196,7 @@
                     <td>
                         {if $item['agent']}
                         {if empty($s_agent) || $s_agent['id'] != $item['agent']['id']}
-                        <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['op'=>'goods', 'agentId'=>$item['agent']['id']]);}">
+                        <a filter data-name="agentId" data-val="{$item['agent']['id']}" href="{php echo $this->createWebUrl('goods', ['agentId'=>$item['agent']['id']]);}">
                             <div class="agent" title="点击查看{$item['agent']['name']}全部商品" style="display:inline-block;">
                                 {else}
                                 <div class="agent" style="display:inline-block;">
@@ -211,7 +211,7 @@
                         {/if}
                         {else}
                             {if $s_agentId != -1}
-                            <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['op'=>'goods', 'agentId'=>-1]);}" title="点击查看所有平台商品">
+                            <a filter data-name="agentId" data-val="-1" href="{php echo $this->createWebUrl('goods', ['agentId'=>-1]);}" title="点击查看所有平台商品">
                                 <span style="color:gray;">&lt;平台&gt;</span>
                             </a>
                             {else}

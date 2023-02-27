@@ -35,6 +35,10 @@ class Site extends WeModuleSite
             }
 
             $dir = $dir.$fn.'/';
+            $file = $dir.$fn.'.inc.php';
+            if (file_exists($file)) {
+                require $file;
+            }
 
             $op = request::op('default');
 

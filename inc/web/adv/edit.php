@@ -12,6 +12,7 @@ $id = request::int('id');
 $type = request::int('type', Advertising::SCREEN);
 
 $tpl_data = [
+    'op' => request::op(),
     'type' => $type,
     'media_data' => Advertising::getMediaData(),
     'wx_data' => Advertising::getWxData(),

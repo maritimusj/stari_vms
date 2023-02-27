@@ -23,7 +23,7 @@
 <div class="panel panel-default nav-tab-item">
     <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('adv', array('op'=>'add','type'=>zovye\Advertising::GOODS));}">
+            <a href="{php echo $this->createWebUrl('adv', array('op'=>'edit','type'=>zovye\Advertising::GOODS));}">
                 <i class="fa  fa-fw fa-image" title="添加商品推广广告"></i>
             </a>       
         </span>
@@ -156,11 +156,11 @@
     </div>
 </div>
 {template 'web/adv/foot'}
-{elseif $op == 'add' || $op == 'edit'}
+{elseif $op == 'edit'}
 <ul class="nav nav-tabs" id="navbar">
     <li role="presentation" class="active"><a href="#">
         <i class="fa {$media_data[$media]['icon']}"></i> 
-        {if $op=='edit'}编辑{else}添加{/if}{php echo zovye\Advertising::desc($type)}广告
+        {if $id > 0}编辑{else}添加{/if}{php echo zovye\Advertising::desc($type)}广告
     </a></li>
 </ul>
 <form action="{php echo $this->createWebUrl('adv', array('type'=>$type));}" method="post">
@@ -214,9 +214,8 @@
     </div> 
     <div class="form-btn">
         <input type="hidden" name="from_type" value="{$from_type}">
-        <input type="hidden" name="from_op" value="{$op}">
         <input type="hidden" name="op" value="save">
-        {if $op=='edit'}
+        {if $id > 0}
         <input type="hidden" name="id" value="{$id}">
         <button type="submit" class="btn btn-primary">保存</button>
         {else}

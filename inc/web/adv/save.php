@@ -10,7 +10,6 @@ $id = request::int('id');
 $type = request::int('type', Advertising::SCREEN);
 
 $from_type = request::trim('from_type', $type);
-$from_op = request::str('from_op');
 $from_media = request::str('media');
 
 $adv = null;
@@ -22,7 +21,7 @@ if ($id > 0) {
             '找不到指定的广告！',
             $this->createWebUrl(
                 'adv',
-                ['type' => $from_type, 'op' => $from_op, 'media' => $from_media]
+                ['type' => $from_type, 'media' => $from_media]
             ),
             'error'
         );
@@ -35,7 +34,7 @@ if (is_error($result)) {
         $result['message'],
         $this->createWebUrl(
             'adv',
-            ['type' => $from_type, 'op' => $from_op, 'media' => $from_media]
+            ['type' => $from_type, 'op' => 'edit', 'id' => $id, 'media' => $from_media]
         ),
         'error'
     );

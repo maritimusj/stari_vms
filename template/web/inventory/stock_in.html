@@ -237,7 +237,7 @@
         if (user) {
             api.showResult({op: 'detail', id: user.id, pagesize: 10});
         } else {
-            api.showResult({op: 'goods', pagesize: 10}, api.goodsApiUrl);
+            api.showResult({pagesize: 10}, api.goodsApiUrl);
         }        
     }
 

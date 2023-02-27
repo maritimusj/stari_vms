@@ -17,19 +17,22 @@ class Site extends WeModuleSite
 
         if ($isWeb || $isMobile) {
             $dir = IA_ROOT.'/addons/'.$this->modulename.'/inc/';
-            $fun = '';
+            $fn = '';
 
             if ($isWeb) {
                 $dir .= 'web/';
-                $fun = strtolower(substr($name, 5));
+                $fn = strtolower(substr($name, 5));
             }
 
             if ($isMobile) {
                 $dir .= 'mobile/';
-                $fun = strtolower(substr($name, 8));
+                $fn = strtolower(substr($name, 8));
             }
 
-            $file = $dir.$fun.'.inc.php';
+            $op = request::op('default');
+            $this->route($op);
+
+            $file = $dir.$fn.'.inc.php';
             if (file_exists($file)) {
                 require $file;
             } else {
@@ -37,6 +40,23 @@ class Site extends WeModuleSite
                     die($file.' not exists!');
                 }
             }
+        }
+    }
+
+    public function route($op)
+    {
+        $dir =  IA_ROOT.'/addons/'.$this->modulename.'/inc';
+        if ($this->inMobile) {
+            $dir .= '/mobile';
+        } else {
+            $dir .= '/web';
+        }
+
+        $dir .= '/' . $GLOBALS['_GPC']['do'];
+        $file = $dir . '/' . toSnakeCase(toCamelCase($op)) . '.php';
+
+        if (file_exists($file)) {
+            require($file);
         }
     }
 }

@@ -1,6 +1,5 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
-{php \zovye\url(true, CSS_ANIMATE_URL);}
 
 <ul class="nav nav-tabs" id="navbar">
   <li role="presentation" class="active"><a href="#">文章</a></li>
@@ -10,7 +9,7 @@
 <div class="panel panel-default panel-first nav-tab-item">
   <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('article', array('op'=>'art_add'));}"><i class="fa fa-pencil animate__bounceIn" title="添加文章"></i></a>
+            <a href="{php echo $this->createWebUrl('article', array('op'=>'art_edit'));}"><i class="fa fa-pencil" title="添加文章"></i></a>
         </span>
   </div>
   <div class="panel-body">

@@ -1,16 +1,15 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
-{php \zovye\url(true, CSS_ANIMATE_URL);}
 
 <ul class="nav nav-tabs" id="navbar">
-  <li role="presentation"><a href="{php echo $this->createWebUrl('article', array('op' => 'art'));}">文章</a></li>
+  <li role="presentation"><a href="{php echo $this->createWebUrl('article');}">文章</a></li>
   <li role="presentation" class="active"><a href="#">附件</a></li>
   <li role="presentation"><a href="{php echo $this->createWebUrl('article', array('op' => 'faq'));}">ＦＡＱ</a></li>
 </ul>
 <div class="panel panel-default  nav-tab-item">
-  <div class="heading" style="background-color:#fff;border-bottom:0px;">
+  <div class="heading">
         <span class="operate">
-            <a href="{php echo $this->createWebUrl('article', array('op'=>'files_add'));}"><i class="fa fa-plus animate__bounceIn" title="添加附加"></i></a>
+            <a href="{php echo $this->createWebUrl('article', array('op'=>'files_edit'));}"><i class="fa fa-plus" title="添加附加"></i></a>
         </span>
   </div>
   <div class="panel-body">

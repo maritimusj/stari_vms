@@ -1,9 +1,14 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
-
-<div class="panel panel-default">
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if empty($id)}<i class="fa fa-pencil"></i> 添加{else}<i class="fa fa-edit"></i> 编辑{/if}附件
+        </a>
+    </li>
+</ul>
+<div class="panel panel-default nav-tab-item panel-first">
     <div class="heading">
-        {if empty($id)}<i class="fa fa-pencil"></i> 添加{else}<i class="fa fa-edit"></i> 编辑{/if}附件
         <span class="operate">
             <a href="{php echo $this->createWebUrl('article', array('op'=>'files'));}"><i class="fa fa-reply" title="返回"></i></a>   
         </span>

@@ -16,15 +16,13 @@ $tpl_data = [
 
 $id = request::int('id');
 if ($id) {
-    $art = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => 'faq']));
-    if (empty($art)) {
+    $faq = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => 'faq']));
+    if (empty($faq)) {
         Util::itoast('找不到这条FAQ！', $this->createWebUrl('article', ['op' => 'faq']), 'error');
     }
 
-    $tpl_data['art'] = $art;
+    $tpl_data['id'] = $id;
+    $tpl_data['faq'] = $faq;
 }
 
-$tpl_data['id'] = $id;
-$tpl_data['type'] = 'faq';
-
-app()->showTemplate('web/doc/article_op', $tpl_data);
+app()->showTemplate('web/doc/faq_edit', $tpl_data);

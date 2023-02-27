@@ -7,154 +7,25 @@
 namespace zovye;
 
 use zovye\model\advertisingModelObj;
-use zovye\model\agentModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$media_data = [
-    'image' => [
-        'icon' => 'fa-image',
-        'title' => '图片',
-    ],
-    'video' => [
-        'icon' => 'fa-youtube-play',
-        'title' => '视频',
-    ],
-    'audio' => [
-        'icon' => 'fa-music',
-        'title' => '音频',
-    ],
-    'srt' => [
-        'icon' => 'fa-text-width',
-        'title' => '字幕',
-    ],
-];
 
-$wx_data = [
-    'image' => [
-        'title' => '图片',
-    ],
-    'mpnews' => [
-        'title' => '图文',
-    ],
-    'text' => [
-        'title' => '文本',
-    ],
-];
-
-$type = request::int('type', Advertising::SCREEN);
 $op = request::op('default');
 
-$tpl_data = [
-    'type' => $type,
-    'op' => $op,
-    'media_data' => $media_data,
-    'wx_data' => $wx_data,
-];
-
-if ($op == 'default') {
-
-
-
-} elseif ($op == 'refresh') {
+if ($op == 'add' || $op == 'edit') {
 
     $id = request::int('id');
+    $type = request::int('type', Advertising::SCREEN);
 
-    if ($id > 0) {
-        $adv = Advertising::get($id);
-    }
-
-    if (empty($adv)) {
-
-        JSON::fail('找不到这个广告！');
-
-    } elseif (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-
-        $assign_data = $adv->settings('assigned', []);
-        if ($assign_data) {
-            if (Advertising::notifyAll([], $assign_data)) {
-                JSON::success('已通知设备更新！');
-            }
-        }
-    }
-
-    JSON::fail('操作失败！');
-
-} elseif ($op == 'assign') {
-
-    $id = request::int('id');
-
-    $res = null;
-
-    if ($id > 0) {
-        $res = Advertising::get($id, $type);
-    }
-
-    if (empty($res)) {
-        Util::itoast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $type]), 'error');
-    }
-
-    $adv = [
-        'id' => $res->getId(),
-        'state' => intval($res->getState()),
-        'agentId' => intval($res->getAgentId()),
-        'type' => intval($res->getType()),
-        'type_formatted' => Advertising::desc(intval($res->getType())),
-        'title' => strval($res->getTitle()),
-        'createtime_formatted' => date('Y-m-d H:i:s', $res->getCreatetime()),
+    $tpl_data = [
+        'type' => $type,
+        'op' => $op,
+        'media_data' => Advertising::getMediaData(),
+        'wx_data' => Advertising::getWxData(),
     ];
 
-    if ($res->getType() == Advertising::SCREEN) {
-        $media = $res->getExtraData('media');
-        $adv['media'] = "{$media_data[$media]['title']}";
-        $adv['type_formatted'] .= "({$adv['media']})";
-    }
-
-    $assigned = $res->settings('assigned', []);
-    $assigned = isEmptyArray($assigned) ? [] : $assigned;
-
-    app()->showTemplate('web/adv/assign', [
-        'adv' => $adv,
-        'multi_mode' => settings('advs.assign.multi') ? 'true' : '',
-        'assign_data' => json_encode($assigned),
-        'agent_url' => $this->createWebUrl('agent'),
-        'group_url' => $this->createWebUrl('device', array('op' => 'group')),
-        'tag_url' => $this->createWebUrl('tags'),
-        'device_url' => $this->createWebUrl('device'),
-        'save_url' => $this->createWebUrl('adv', array('op' => 'saveAssignData')),
-        'back_url' => $this->createWebUrl('adv', ['type' => $res->getType()]),
-    ]);
-
-} elseif ($op == 'saveAssignData') {
-
-    $id = request::int('id');
-    $data = request::is_string('data') ? json_decode(htmlspecialchars_decode(request::str('data')), true) : request(
-        'data'
-    );
-
-    $adv = Advertising::get($id);
-    if (empty($adv)) {
-        JSON::fail('找不到这个广告，无法保存！');
-    }
-
-    $origin_data = $adv->settings('assigned', []);
-    if ($adv->updateSettings('assigned', $data) && Advertising::update($adv)) {
-        if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-            if (Advertising::notifyAll($origin_data, $data)) {
-                JSON::success('设置已经保存成功，已通知设备更新！');
-            } else {
-                JSON::success('设置已经保存成功，通知设备失败！');
-            }
-        } else {
-            JSON::success('设置已经保存成功！');
-        }
-    }
-
-    JSON::fail('保存失败！');
-
-} elseif ($op == 'add' || $op == 'edit') {
-
-    $id = request::int('id');
+    $tpl_data['navs'] = Advertising::getNavData();
 
     $tpl_data['id'] = $id;
     $tpl_data['media'] = request::trim('media');
@@ -263,150 +134,8 @@ if ($op == 'default') {
         }
     }
 
-} elseif ($op == 'save') {
-
-    $id = request::int('id');
-
-    $from_type = request::trim('from_type', $type);
-    $from_op = request::str('from_op');
-    $from_media = request::str('media');
-
-    $adv = null;
-
-    if ($id > 0) {
-        $adv = Advertising::get($id);
-        if (empty($adv)) {
-            Util::itoast(
-                '找不到指定的广告！',
-                $this->createWebUrl(
-                    'adv',
-                    ['type' => $from_type, 'op' => $from_op, 'media' => $from_media]
-                ),
-                'error'
-            );
-        }
-    }
-
-    $result = Advertising::createOrUpdate(null, $adv, request::all());
-    if (is_error($result)) {
-        Util::itoast(
-            $result['message'],
-            $this->createWebUrl(
-                'adv',
-                ['type' => $from_type, 'op' => $from_op, 'media' => $from_media]
-            ),
-            'error'
-        );
-    }
-    
-    Util::itoast($result['msg'], $this->createWebUrl('adv', ['op' => 'edit', 'type' => $adv->getType(), 'id' => $id]), 'success');
-
-} elseif ($op == 'remove') {
-
-    $id = request::int('id');
-    $type = request::int('type');
-    $from_type = request::int('from_type');
-
-    if ($id > 0 && $type > 0) {
-        /** @var advertisingModelObj $adv */
-        $adv = Advertising::query(['id' => $id, 'type' => $type])->findOne();
-        if (empty($adv)) {
-            Util::itoast('找不到这个广告！', $this->createWebUrl('adv', ['type' => $from_type]), 'error');
-        }
-
-        $assign_data = $adv->settings('assigned', []);
-
-        if (Advertising::update($adv) && $adv->destroy()) {
-
-            if ($adv->getType() == Advertising::SCREEN) {
-                //通知设备更新屏幕广告
-                Advertising::notifyAll($assign_data, []);
-            }
-
-            Util::itoast('删除成功！', $this->createWebUrl('adv', ['type' => $from_type]), 'success');
-        }
-    }
-
-    Util::itoast('删除失败！', $this->createWebUrl('adv', ['type' => $from_type]), 'error');
-
-} elseif ($op == 'ban') {
-
-    $id = request::int('id');
-    if ($id > 0) {
-        $adv = Advertising::get($id);
-        if (empty($adv)) {
-            JSON::fail('找不到这个广告！');
-        }
-
-        $state = $adv->getState() == Advertising::NORMAL ? Advertising::BANNED : Advertising::NORMAL;
-        if ($adv->setState($state) && Advertising::update($adv)) {
-            if (in_array($adv->getType(), [Advertising::SCREEN, Advertising::SCREEN_NAV])) {
-                //通知设备更新屏幕广告
-                $assign_data = $adv->settings('assigned', []);
-                Advertising::notifyAll($assign_data, []);
-            }
-
-            JSON::success([
-                'msg' => $adv->getState() == Advertising::NORMAL ? '已启用' : '已禁用',
-                'state' => intval($adv->getState()),
-            ]);
-        }
-    }
-
-    JSON::fail('操作失败！');
-
-} elseif ($op == 'wxmsg') {
-
-    $id = request::int('id');
-
-    $msg = [];
-
-    /** @var advertisingModelObj $adv */
-    $adv = Advertising::query(['type' => Advertising::PUSH_MSG, 'id' => $id])->findOne();
-    if ($adv) {
-        $msg = $adv->getExtraData('msg', []);
-    }
-
-    $typename = request::trim('typename');
-    $res = Util::getWe7Material($typename, request('page'), request('pagesize'));
-
-    $content = app()->fetchTemplate(
-        'web/adv/msg',
-        [
-            'typename' => $typename,
-            'media' => $msg,
-            'list' => $res['list'],
-        ]
-    );
-
-    JSON::success([
-        'title' => $res['title'],
-        'content' => $content,
-    ]);
-
-} elseif ($op == 'reviewpassed') {
-
-    $id = request::int('id');
-    $type = request::int('type');
-
-    if (Advertising::pass($id, _W('username'))) {
-        Util::itoast('广告已经通过审核！', $this->createWebUrl('adv', ['type' => $type]), 'success');
-    }
-
-    Util::itoast('审核操作失败！', $this->createWebUrl('adv', ['type' => $type]), 'error');
-
-} elseif ($op == 'reviewrejected') {
-
-    $id = request::int('id');
-    $type = request::int('type');
-
-    if (Advertising::reject($id)) {
-        Util::itoast('广告已经被设置为拒绝通过！', $this->createWebUrl('adv', ['type' => $type]), 'success');
-    }
-
-    Util::itoast('审核操作失败！', $this->createWebUrl('adv', ['type' => $type]), 'error');
-
+    $filename = Advertising::$names[$type];
+    app()->showTemplate("web/adv/$filename", $tpl_data);
 }
 
-$filename = Advertising::$names[$type];
-app()->showTemplate("web/adv/$filename", $tpl_data);
+

@@ -11,36 +11,8 @@ use zovye\model\agentModelObj;
 
 $type = request::int('type', Advertising::SCREEN);
 
-$media_data = [
-    'image' => [
-        'icon' => 'fa-image',
-        'title' => '图片',
-    ],
-    'video' => [
-        'icon' => 'fa-youtube-play',
-        'title' => '视频',
-    ],
-    'audio' => [
-        'icon' => 'fa-music',
-        'title' => '音频',
-    ],
-    'srt' => [
-        'icon' => 'fa-text-width',
-        'title' => '字幕',
-    ],
-];
-
-$wx_data = [
-    'image' => [
-        'title' => '图片',
-    ],
-    'mpnews' => [
-        'title' => '图文',
-    ],
-    'text' => [
-        'title' => '文本',
-    ],
-];
+$media_data = Advertising::getMediaData();
+$wx_data = Advertising::getWxData();
 
 $tpl_data = [
     'type' => $type,
@@ -49,52 +21,7 @@ $tpl_data = [
     'wx_data' => $wx_data,
 ];
 
-$tpl_data['navs'] = [
-    [
-        'type' => Advertising::SCREEN,
-        'title' => '设备屏幕',
-    ],
-    [
-        'type' => Advertising::SCREEN_NAV,
-        'title' => '屏幕引导图',
-    ],
-    [
-        'type' => Advertising::WELCOME_PAGE,
-        'title' => '关注页面',
-    ],
-    [
-        'type' => Advertising::GET_PAGE,
-        'title' => '领取页面',
-    ],
-    [
-        'type' => Advertising::REDIRECT_URL,
-        'title' => '网址转跳',
-    ],
-    [
-        'type' => Advertising::PUSH_MSG,
-        'title' => '消息推送',
-    ],
-    [
-        'type' => Advertising::LINK,
-        'title' => '链接推广',
-    ],
-    [
-        'type' => Advertising::GOODS,
-        'title' => '商品推荐',
-    ],
-    [
-        'type' => Advertising::QRCODE,
-        'title' => '推广二维码',
-    ],
-    [
-        'type' => Advertising::PASSWD,
-        'title' => '口令',
-    ],
-    [
-        'type' => Advertising::WX_APP_URL_CODE,
-        'title' => '小程序识别码',
-    ],
-];
+$tpl_data['navs'] = Advertising::getNavData();
 
 if (App::isSponsorAdEnabled()) {
     $tpl_data['navs'][] = [

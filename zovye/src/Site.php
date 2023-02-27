@@ -34,9 +34,18 @@ class Site extends WeModuleSite
                 require $file;
             }
 
+            $dir = $dir.$fn.'/';
+
             $op = request::op('default');
 
-            $file = $dir.$fn.'/'.$op.'.php';
+            $op = toCamelCase($op);
+            $file = $dir.$op.'.php';
+            if (file_exists($file)) {
+                require $file;
+            }
+
+            $op = toSnakeCase($op);
+            $file = $dir.$op.'.php';
             if (file_exists($file)) {
                 require $file;
             }

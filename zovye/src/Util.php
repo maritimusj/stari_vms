@@ -20,6 +20,7 @@ use we7\ihttp;
 use WeAccount;
 use zovye\base\modelObj;
 use zovye\model\accountModelObj;
+use zovye\model\commission_balanceModelObj;
 use zovye\model\keeperModelObj;
 use zovye\model\userModelObj;
 use zovye\model\deviceModelObj;
@@ -3094,5 +3095,37 @@ HTML_CONTENT;
         }
 
         return $navs;
+    }
+
+    public static function getAndCheckWithdraw($id)
+    {
+        /** @var commission_balanceModelObj $balance_obj */
+        $balance_obj = CommissionBalance::findOne(['id' => $id, 'src' => CommissionBalance::WITHDRAW]);
+        if (empty($balance_obj)) {
+            return error(State::ERROR, '操作失败，请刷新页面后再试！');
+        }
+
+        $openid = $balance_obj->getOpenid();
+        $user = User::get($openid, true);
+        if (empty($user)) {
+            return error(State::ERROR, '找不到这个用户！');
+        }
+
+        if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
+            return error(State::ERROR, '用户无法锁定，请重试！');
+        }
+
+        if ($balance_obj->getUpdatetime()) {
+            $state = $balance_obj->getExtraData('state');
+            if ($state === 'mchpay') {
+                $MCHPayResult = $balance_obj->getExtraData('mchpayResult');
+                if (empty($MCHPayResult['payment_no']) && $MCHPayResult['detail_status'] === 'FAIL') {
+                    return $balance_obj;
+                }
+            }
+            return error(State::ERROR, '操作失败，请刷新页面后再试！');
+        }
+
+        return $balance_obj;
     }
 }

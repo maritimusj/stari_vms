@@ -89,7 +89,7 @@ class mp
             $data['path'] = $account->getConfig('path', '');
             $data['delay'] = $account->getConfig('delay', 1);
         } elseif ($account->isFlashEgg()) {
-            $data['goods'] = $account->getGoodsData(true);
+            $data['goods'] = $account->getGoodsData();
             $data['media_type'] = $account->getMediaType();
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());

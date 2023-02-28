@@ -8,6 +8,7 @@ namespace zovye\api\wx;
 
 use Exception;
 use zovye\App;
+use zovye\FlashEgg;
 use zovye\Log;
 use zovye\We7;
 use zovye\Util;
@@ -502,6 +503,11 @@ class mp
                     'path' => request::trim('path'),
                     'delay' => request::int('delay', 1),
                 ]);
+            } elseif ($account->isFlashEgg()) {
+                $res = FlashEgg::createOrUpdate($account, $GLOBALS['_GPC']);
+                if (is_error($res)) {
+                    return $res;
+                }
             }
 
             return ['msg' => '保存成功！'];

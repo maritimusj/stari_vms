@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\accountModelObj;
+
 class FlashEgg
 {
     const DEBUG_API_URL = 'https://test-sdi-api.newposm.com/device/api/v1/triggerAdPlay';
@@ -74,6 +76,82 @@ class FlashEgg
         if ($res['code'] != 200) {
             return err($res['msg'] ?? '发生未知错误！');
         }
+
+        return true;
+    }
+
+    public static function createOrUpdate(accountModelObj $account, $params)
+    {
+        request::setData($params);
+
+        $type = request::str($params, 'mediaType', 'video');
+
+        $goods = $account->getGoods();
+        if (empty($goods)) {
+            $s1 = Goods::setFreeBitMask(0);
+            $s1 = Goods::setPayBitMask($s1);
+
+            $goods_data = [
+                'agent_id' => $account->getAgentId(),
+                'name' => $account->getTitle(),
+                'img' => request::trim('goodsImage'),
+                'sync' => 0,
+                'price' => intval(round(request::float('goodsPrice', 0, 2) * 100)),
+                's1' => $s1,
+                'extra' => [
+                    'unitTitle' => request::trim('goodsUnitTitle', '个'),
+                    'type' => Goods::FlashEgg,
+                    'accountId' => $account->getId(),
+                ],
+            ];
+
+            $gallery = request::array('gallery');
+            if ($gallery) {
+                $goods_data['extra']['detailImg'] = $gallery[0];
+                $goods_data['extra']['gallery'] = $gallery;
+            }
+
+            $goods = Goods::create($goods_data);
+            if (empty($goods)) {
+                return err('创建商品失败！');
+            }
+        } else {
+            $goods->setAgentId($account->getAgentId());
+            $goods->setImg(request::trim('goodsImage'));
+            $goods->setPrice(intval(round(request::float('goodsPrice', 0, 2) * 100)));
+            $goods->setUnitTitle(request::trim('goodsUnitTitle', '个'));
+
+            $gallery = request::array('gallery');
+            $goods->setGallery($gallery);
+            if ($gallery) {
+                $goods->setDetailImg($gallery[0]);
+            } else {
+                $goods->setDetailImg('');
+            }
+            $goods->save();
+        }
+
+        $config = [
+            'type' => Account::FlashEgg,
+            'ad' => [
+                'type' => $type,
+                'duration' => request::int('duration'),
+                'area' => request::trim('area'),
+            ],
+            'goods' => [
+                'id' => $goods->getId(),
+            ],
+        ];
+
+        if ($type == 'video') {
+            $config['ad']['video'] = [
+                'url' => request::trim('video'),
+            ];
+        } else {
+            $config['ad']['images'] = request::array('images');
+        }
+
+        $account->set('config', $config);
 
         return true;
     }

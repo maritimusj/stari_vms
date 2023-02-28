@@ -15,6 +15,8 @@ define('REQUEST_ID', Util::generateUID());
 Util::setErrorHandler();
 
 try {
+    Util::extraAjaxJsonData();
+    
     //设置request数据来源
     request::setData($GLOBALS['_GPC']);
 

@@ -11,9 +11,6 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\api\router;
 use zovye\JSON;
 use zovye\request;
-use zovye\Util;
-
-Util::extraAjaxJsonData();
 
 $op = ucfirst(request::op('default'));
 

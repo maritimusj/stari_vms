@@ -89,11 +89,11 @@ class FlashEgg
 
         //适配小程序端上传图片
         $parseImgUrl = function($url) {
-            $images = explode('@', $url, 2);
-            if (empty($images)) {
+            $result = explode('@', $url, 2);
+            if (empty($result)) {
                 return '';
             }
-            return count($images) == 2 ? $images[1] : $images[0];
+            return count($result) == 2 ? $result[1] : $result[0];
         };
 
         $gallery = [];

@@ -6,21 +6,6 @@
 
 namespace zovye;
 
-function _W(string $name, $default = null)
-{
-    return getArray($GLOBALS['_W'], $name, $default);
-}
-
-function setW(string $name, $val)
-{
-    setArray($GLOBALS['_W'], $name, $val);
-}
-
-function request(string $name, $default = null)
-{
-    return getArray($GLOBALS['_GPC'], $name, $default);
-}
-
 class request
 {
     private static $data = [];

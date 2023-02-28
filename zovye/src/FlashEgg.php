@@ -84,7 +84,7 @@ class FlashEgg
     {
         request::setData($params);
 
-        $type = request::str($params, 'mediaType', 'video');
+        $type = request::str('mediaType', 'video');
 
         $goods = $account->getGoods();
         if (empty($goods)) {

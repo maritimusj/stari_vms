@@ -29,6 +29,7 @@ class request
     {
         self::$data = $data;
     }
+
     public static function setDefault(string $key, $data)
     {
         setArray(self::$data, $key, $data);
@@ -112,24 +113,24 @@ class request
 
     public static function int(string $name, int $default = 0): int
     {
-        return intval(getArray($name, $default));
+        return intval(getArray(self::$data, $name, $default));
     }
 
     public static function float(string $name, float $default = 0, int $precision = -1): float
     {
-        $v = floatval(getArray($name, $default));
+        $v = floatval(getArray(self::$data, $name, $default));
 
         return $precision > -1 ? round($v, $precision) : $v;
     }
 
     public static function bool(string $name, bool $default = false): bool
     {
-        return boolval(getArray($name, $default));
+        return boolval(getArray(self::$data, $name, $default));
     }
 
     public static function str(string $name, string $default = '', $url_decode = false): string
     {
-        $str = strval(getArray($name, $default));
+        $str = strval(getArray(self::$data, $name, $default));
         if ($url_decode) {
             $str = urldecode($str);
         }

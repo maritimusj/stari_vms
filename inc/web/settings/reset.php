@@ -10,4 +10,5 @@ Migrate::reset();
 if (Migrate::detect()) {
     JSON::success(['redirect' => Util::url('migrate')]);
 }
+
 JSON::success('已重置！');

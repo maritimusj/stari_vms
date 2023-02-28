@@ -37,9 +37,9 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 });
 
 $settings = settings();
-$save_type = request::str('save_type');
+$page = request::str('page');
 
-if ($save_type == 'device') {
+if ($page == 'device') {
     $settings['device']['autoJoin'] = request::bool('newDeviceAutoJoin') ? 1 : 0;
     $settings['device']['errorDown'] = request::bool('errorDown') ? 1 : 0;
     $settings['device']['clearErrorCode'] = request::bool('clearErrorCode') ? 1 : 0;
@@ -93,7 +93,7 @@ if ($save_type == 'device') {
     $settings['device']['v-device']['enabled'] = request::bool('vDevice') ? 1 : 0;
     $settings['device']['lac']['enabled'] = request::bool('lacConfirm') ? 1 : 0;
 
-} elseif ($save_type == 'user') {
+} elseif ($page == 'user') {
 
     $settings['user']['verify']['enabled'] = request::bool('userVerify') ? 1 : 0;
     $settings['user']['verify']['maxtimes'] = max(1, request::int('maxtimes'));
@@ -116,7 +116,7 @@ if ($save_type == 'device') {
         ], true);
     }
 
-} elseif ($save_type == 'ctrl') {
+} elseif ($page == 'ctrl') {
     $url = request::trim('controlAddr');
     if (empty($url)) {
         $url = "http://127.0.0.1:8080";
@@ -313,7 +313,7 @@ if ($save_type == 'device') {
             }
         }
     }
-} elseif ($save_type == 'agent') {
+} elseif ($page == 'agent') {
 
     $settings['agent']['order']['refund'] = request::bool('allowAgentRefund') ? 1 : 0;
 
@@ -449,7 +449,7 @@ if ($save_type == 'device') {
         ],
     ], true);
 
-} elseif ($save_type == 'commission') {
+} elseif ($page == 'commission') {
     $settings['commission']['enabled'] = request::bool('commission') ? 1 : 0;
 
     if ($settings['commission']['enabled']) {
@@ -490,7 +490,7 @@ if ($save_type == 'device') {
         Config::balance('order.commission.val', (int)(request::float('balanceOrderPrice', 0, 2) * 100), true);
     }
 
-} elseif ($save_type == 'wxapp') {
+} elseif ($page == 'wxapp') {
 
     $settings['agentWxapp'] = [
         'title' => request::trim('WxAppTitle'),
@@ -526,7 +526,7 @@ if ($save_type == 'device') {
         'msgThumb' => request::trim('WxAppPushMsgThumb'),
     ], true);
 
-} elseif ($save_type == 'account') {
+} elseif ($page == 'account') {
 
     $settings['misc']['account']['priority'] = request::trim('accountPriority');
 
@@ -565,7 +565,7 @@ if ($save_type == 'device') {
     $settings['order']['retry']['last'] = request::int('orderRetryLastTime');
     $settings['order']['retry']['max'] = request::int('orderRetryMaxCount');
 
-} elseif ($save_type == 'notice') {
+} elseif ($page == 'notice') {
     $settings['notice'] = [
         'sms' => [
             'url' => 'https://v.juhe.cn/sms/send?',
@@ -616,7 +616,7 @@ if ($save_type == 'device') {
         }
     }
 
-} elseif ($save_type == 'misc') {
+} elseif ($page == 'misc') {
     $settings['misc']['redirect'] = [
         'success' => [
             'url' => request::trim('success_url'),
@@ -678,7 +678,7 @@ if ($save_type == 'device') {
         'key' => request::str('inventoryAccessKey'),
     ], true);
 
-} elseif ($save_type == 'payment') {
+} elseif ($page == 'payment') {
     $wx_enabled = request::bool('wx') ? 1 : 0;
     $settings['pay']['wx']['enable'] = $wx_enabled;
 
@@ -752,7 +752,7 @@ if ($save_type == 'device') {
         ]);
     }
 
-} elseif ($save_type == 'data_view') {
+} elseif ($page == 'data_view') {
     $db_arr = [];
     $res = m('data_view')->findAll();
     foreach ($res as $item) {
@@ -848,7 +848,7 @@ if ($save_type == 'device') {
     foreach ($need_inserted_arr as $key => $val) {
         $query->create(['k' => $key, 'v' => $val, 'createtime' => time()]);
     }
-} elseif ($save_type == 'balance') {
+} elseif ($page == 'balance') {
 
     if (App::isBalanceEnabled()) {
         Config::balance('sign.bonus', [
@@ -876,7 +876,7 @@ if ($save_type == 'device') {
 }
 
 if (app()->saveSettings($settings)) {
-    Util::itoast('设置保存成功！', $this->createWebUrl('settings', ['op' => $save_type]), 'success');
+    Util::itoast('设置保存成功！', $this->createWebUrl('settings', ['page' => $page]), 'success');
 }
 
-Util::itoast('设置保存失败！', $this->createWebUrl('settings', ['op' => $save_type]), 'error');
+Util::itoast('设置保存失败！', $this->createWebUrl('settings', ['page' => $page]), 'error');

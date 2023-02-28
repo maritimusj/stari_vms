@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     $v = m('version')->findOne(We7::uniacid(['id' => $id]));
     if ($v && $v->destroy()) {

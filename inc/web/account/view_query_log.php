@@ -10,7 +10,7 @@ use zovye\model\account_queryModelObj;
 
 $tpl_data = [];
 
-$id = request::int('id');
+$id = Request::int('id');
 $acc = Account::get($id);
 
 if (empty($acc)) {
@@ -21,8 +21,8 @@ $tpl_data['account'] = $acc->profile();
 
 $query = Account::logQuery($acc);
 
-if (request::has('device')) {
-    $device_id = request::int('device');
+if (Request::has('device')) {
+    $device_id = Request::int('device');
     $device = Device::get($device_id);
     if (empty($device)) {
         Util::itoast('找不到这个设备！', '', 'error');
@@ -31,8 +31,8 @@ if (request::has('device')) {
     $query->where(['device_id' => $device_id]);
 }
 
-if (request::has('user')) {
-    $user_id = request::int('user');
+if (Request::has('user')) {
+    $user_id = Request::int('user');
     $user = User::get($user_id);
     if (empty($user)) {
         Util::itoast('找不到这个用户！', '', 'error');
@@ -45,8 +45,8 @@ $total = $query->count();
 $list = [];
 
 if ($total > 0) {
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 

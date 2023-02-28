@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$app_key = request::str('appkey');
+$app_key = Request::str('appkey');
 if (empty($app_key) || $app_key !== settings('app.key')) {
     JSON::fail('appkey不正确！');
 }
@@ -16,8 +16,8 @@ if (empty($app_key) || $app_key !== settings('app.key')) {
 /**
  * 查询订单状态
  */
-if (request::has('orderUID')) {
-    $order_no = request::str('orderUID');
+if (Request::has('orderUID')) {
+    $order_no = Request::str('orderUID');
     $pay_log = Pay::getPayLog($order_no);
     if (empty($pay_log)) {
         JSON::fail('找不到这个订单的支付记录！');
@@ -57,7 +57,7 @@ if (request::has('orderUID')) {
     JSON::success($result);
 }
 
-$user_uid = request::str('user');
+$user_uid = Request::str('user');
 if (empty($user_uid)) {
     JSON::fail('没有指定用户uid！');
 }
@@ -80,7 +80,7 @@ if ($user->isBanned()) {
     JSON::fail('用户已禁用！');
 }
 
-$device_imei = request::str('device');
+$device_imei = Request::str('device');
 $device = Device::find($device_imei, ['imei', 'shadow_id']);
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
@@ -102,7 +102,7 @@ $data = [
     'orderUID' => $order_no,
 ];
 
-$price = request::int('price');
+$price = Request::int('price');
 if (empty($price)) {
     /**
      * 公众号免费出货
@@ -132,7 +132,7 @@ if (empty($price)) {
     /**
      * 第三方API收费订单
      */
-    $num = request::int('num', 1);
+    $num = Request::int('num', 1);
     if ($num < 1 || $num > App::getOrderMaxGoodsNum()) {
         JSON::fail("商品数量超出限制！");
     }
@@ -154,7 +154,7 @@ if (empty($goods) || $goods['num'] < $data['num']) {
 /**
  * 检查用户是否符合出货要求
  */
-if (request::bool('verify')) {
+if (Request::bool('verify')) {
     JSON::success('成功！');
 }
 

@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id > 0) {
     $adv = Advertising::get($id);
     if (empty($adv)) {

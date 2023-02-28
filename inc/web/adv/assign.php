@@ -8,8 +8,8 @@ namespace zovye;
 
 $media_data = Advertising::getMediaData();
 
-$id = request::int('id');
-$type = request::int('type', Advertising::SCREEN);
+$id = Request::int('id');
+$type = Request::int('type', Advertising::SCREEN);
 
 $res = null;
 

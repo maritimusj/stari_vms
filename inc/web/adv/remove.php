@@ -8,9 +8,9 @@ namespace zovye;
 
 use zovye\model\advertisingModelObj;
 
-$id = request::int('id');
-$type = request::int('type');
-$from_type = request::int('from_type');
+$id = Request::int('id');
+$type = Request::int('type');
+$from_type = Request::int('from_type');
 
 if ($id > 0 && $type > 0) {
     /** @var advertisingModelObj $adv */

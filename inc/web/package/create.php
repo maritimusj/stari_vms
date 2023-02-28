@@ -8,7 +8,7 @@ namespace zovye;
 
 use RuntimeException;
 
-$device_id = request::int('deviceId');
+$device_id = Request::int('deviceId');
 if ($device_id) {
     $device = Device::get($device_id);
     if (empty($device)) {
@@ -20,10 +20,10 @@ if ($device_id) {
 }
 
 $result = Util::transactionDo(function () use ($device_id) {
-    $title = request::trim('title');
-    $price = request::float('price', 0, 2);
+    $title = Request::trim('title');
+    $price = Request::float('price', 0, 2);
 
-    $goods_list = request::array('list');
+    $goods_list = Request::array('list');
 
     $package = Package::create([
         'device_id' => $device_id,

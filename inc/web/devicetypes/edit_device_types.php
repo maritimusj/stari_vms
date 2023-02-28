@@ -8,8 +8,8 @@ namespace zovye;
 
 $tpl_data = [];
 
-if (request::has('id')) {
-    $device_type = DeviceTypes::get(request::int('id'));
+if (Request::has('id')) {
+    $device_type = DeviceTypes::get(Request::int('id'));
     if (empty($device_type)) {
         JSON::fail('找不到这个设备型号！');
     }

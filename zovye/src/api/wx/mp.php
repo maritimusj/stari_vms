@@ -18,7 +18,7 @@ use zovye\Device;
 use zovye\DouYin;
 use zovye\Schema;
 use zovye\Account;
-use zovye\request;
+use zovye\Request;
 use zovye\WxPlatform;
 use function zovye\err;
 use function zovye\error;
@@ -41,7 +41,7 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $uid = request::trim('uid');
+        $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
@@ -155,8 +155,8 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $devices = request::is_array('devices') ? request::array('devices') : [];
-        $uid = request::trim('uid');
+        $devices = Request::is_array('devices') ? Request::array('devices') : [];
+        $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
@@ -167,7 +167,7 @@ class mp
 
             $assign_data = [$account];
 
-            if (request::bool('all')) {
+            if (Request::bool('all')) {
                 $assign_data[] = $user->isAgent() ? $user : $user->getPartnerAgent();
             } else {
                 foreach ($devices as $id) {
@@ -238,14 +238,14 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Account::query();
         $query->where(['agent_id' => $user->getAgentId()]);
 
-        if (request::has('keyword')) {
-            $keyword = request::trim('keyword');
+        if (Request::has('keyword')) {
+            $keyword = Request::trim('keyword');
             $query->whereOr([
                 'name LIKE' => "%$keyword%",
                 'title LIKE' => "%$keyword%",
@@ -290,7 +290,7 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $uid = request::trim('uid');
+        $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
             if ($account) {
@@ -324,7 +324,7 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $uid = request::trim('uid');
+        $uid = Request::trim('uid');
         $account = Account::findOneFromUID($uid);
         if (empty($account)) {
             return error(State::ERROR, '找不到指定的公众号！');
@@ -355,18 +355,18 @@ class mp
 
         $data = [
             'agent_id' => $user->getAgentId(),
-            'title' => request::trim('title'),
-            'descr' => request::str('descr'),
-            'group_name' => request::str('groupname'),
-            'order_no' => min(999, request::int('orderno')),
-            'clr' => request::has('clr') ? request::trim('clr') : 'gray',
-            'scname' => request::has('scname') ? request::trim('scname') : Schema::DAY,
-            'count' => request::int('count'),
-            'total' => request::int('total'),
+            'title' => Request::trim('title'),
+            'descr' => Request::str('descr'),
+            'group_name' => Request::str('groupname'),
+            'order_no' => min(999, Request::int('orderno')),
+            'clr' => Request::has('clr') ? Request::trim('clr') : 'gray',
+            'scname' => Request::has('scname') ? Request::trim('scname') : Schema::DAY,
+            'count' => Request::int('count'),
+            'total' => Request::int('total'),
         ];
 
-        if (request::has('uid')) {
-            $account = Account::findOneFromUID(request::str('uid'));
+        if (Request::has('uid')) {
+            $account = Account::findOneFromUID(Request::str('uid'));
             if ($account) {
                 if ($account->getAgentId() != $user->getAgentId()) {
                     return error(State::ERROR, '公众号帐号不能重复！');
@@ -378,29 +378,29 @@ class mp
             return error(State::ERROR, '领取频率只是每天/每周/每月！');
         }
 
-        if (request::has('qrcode')) {
+        if (Request::has('qrcode')) {
             $type = Account::NORMAL;
-            list($sha1val, $url) = explode('@', request::str('qrcode'), 2);
+            list($sha1val, $url) = explode('@', Request::str('qrcode'), 2);
             if (empty($sha1val) || empty($url) || sha1(App::uid().CLIENT_IP.$url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的二维码文件！');
             }
-        } elseif (request::has('media')) {
+        } elseif (Request::has('media')) {
             $type = Account::VIDEO;
-            list($sha1val, $url) = explode('@', request::str('media'), 2);
+            list($sha1val, $url) = explode('@', Request::str('media'), 2);
             if (empty($sha1val) || empty($url) || sha1(App::uid().CLIENT_IP.$url) != $sha1val) {
                 return error(State::ERROR, '请上传正确的视频文件！');
             }
-        } elseif (request::has('douyinUrl')) {
+        } elseif (Request::has('douyinUrl')) {
             $type = Account::DOUYIN;
-        } elseif (request::has('username')) {
+        } elseif (Request::has('username')) {
             $type = Account::WXAPP;
-        } elseif (request::has('mediaType')) {
+        } elseif (Request::has('mediaType')) {
             $type = Account::FlashEgg;
         } else {
             return error(State::ERROR, '请指定正确的文件网址！');
         }
 
-        list($sha1val, $img_url) = explode('@', request::str('img'), 2);
+        list($sha1val, $img_url) = explode('@', Request::str('img'), 2);
         if (empty($sha1val) || empty($img_url) || sha1(App::uid().CLIENT_IP.$img_url) != $sha1val) {
             return error(State::ERROR, '请上传正确的头像文件！');
         }
@@ -409,11 +409,11 @@ class mp
         $data['img'] = $img_url;
 
         $limits = [];
-        if (request::str('sex') == 'male') {
+        if (Request::str('sex') == 'male') {
             $limits['male'] = 1;
             $limits['female'] = 0;
             $limits['unknown_sex'] = 0;
-        } elseif (request::str('sex') == 'female') {
+        } elseif (Request::str('sex') == 'female') {
             $limits['male'] = 0;
             $limits['female'] = 1;
             $limits['unknown_sex'] = 0;
@@ -423,10 +423,10 @@ class mp
             $limits['unknown_sex'] = 1;
         }
 
-        if (request::str('os') == 'ios') {
+        if (Request::str('os') == 'ios') {
             $limits['ios'] = 1;
             $limits['android'] = 0;
-        } elseif (request::str('os') == 'android') {
+        } elseif (Request::str('os') == 'android') {
             $limits['ios'] = 0;
             $limits['android'] = 1;
         } else {
@@ -438,7 +438,7 @@ class mp
             $data['total'] = 1;
         }
 
-        $data['order_limits'] = request::int('orderlimits');
+        $data['order_limits'] = Request::int('orderlimits');
 
         if (isset($account)) {
             foreach ($data as $key => $val) {
@@ -481,29 +481,29 @@ class mp
         if ($account->save() && $account->set('limits', $limits) && Account::updateAccountData()) {
             if ($account->isAuth()) {
                 $account->updateSettings('config.open', [
-                    'timing' => request::int('OpenTiming'),
-                    'msg' => request::str('OpenMsg'),
+                    'timing' => Request::int('OpenTiming'),
+                    'msg' => Request::str('OpenMsg'),
                 ]);
             } elseif ($account->isVideo()) {
                 $account->set('config', [
                     'type' => Account::VIDEO,
                     'video' => [
-                        'duration' => request::int('duration', 1),
+                        'duration' => Request::int('duration', 1),
                     ],
                 ]);
             } elseif ($account->isDouyin()) {
                 $openid = $account->settings('config.openid', '');
                 $account->set('config', [
                     'type' => Account::DOUYIN,
-                    'url' => request::trim('douyinUrl'),
+                    'url' => Request::trim('douyinUrl'),
                     'openid' => $openid,
                 ]);
             } elseif ($account->isWxApp()) {
                 $account->set('config', [
                     'type' => Account::WXAPP,
-                    'username' => request::trim('username'),
-                    'path' => request::trim('path'),
-                    'delay' => request::int('delay', 1),
+                    'username' => Request::trim('username'),
+                    'path' => Request::trim('path'),
+                    'delay' => Request::int('delay', 1),
                 ]);
             } elseif ($account->isFlashEgg()) {
                 $res = FlashEgg::createOrUpdate($account, $GLOBALS['_GPC']);
@@ -524,7 +524,7 @@ class mp
 
         common::checkCurrentUserPrivileges('F_xf');
 
-        $uid = request::trim('uid');
+        $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
             $agent_id = $user->getAgentId();
@@ -535,11 +535,11 @@ class mp
 
             $assign_data = [$account];
 
-            if (request::bool('all')) {
+            if (Request::bool('all')) {
                 $assign_data[] = $user;
             } else {
 
-                $groups = request::is_array('groups') ? request::array('groups') : [];
+                $groups = Request::is_array('groups') ? Request::array('groups') : [];
 
                 foreach ($groups as $id) {
                     /** @var device_groupsModelObj $one */
@@ -589,7 +589,7 @@ class mp
 
     public static function getDouyinAuthQRCode(): array
     {
-        $account_uid = request::trim('uid');
+        $account_uid = Request::trim('uid');
         $url = Util::murl('douyin', [
             'op' => 'get_openid',
             'uid' => $account_uid,

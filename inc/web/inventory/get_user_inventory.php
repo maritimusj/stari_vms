@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\inventoryModelObj;
 
-$user_id = request::int('user_id');
+$user_id = Request::int('user_id');
 $user = User::get($user_id);
 if (empty($user)) {
     JSON::fail('找不到这个用户！');

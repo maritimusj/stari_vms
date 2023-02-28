@@ -6,10 +6,10 @@
  
 namespace zovye;
 
-$from = request::str('from') ?: 'partneradd';
+$from = Request::str('from') ?: 'partneradd';
 
-$agent_id = request::int('agentid');
-$user_id = request::int('userid');
+$agent_id = Request::int('agentid');
+$user_id = Request::int('userid');
 
 $agent = Agent::get($agent_id);
 if (empty($agent)) {
@@ -21,8 +21,8 @@ if (empty($user)) {
     Util::itoast('找不到这个用户！', $this->createWebUrl('agent', ['op' => 'partner', 'agentid' => $agent_id]), 'error');
 }
 
-$name = request::trim('name');
-$mobile = request::trim('mobile');
+$name = Request::trim('name');
+$mobile = Request::trim('mobile');
 
 $notice = [
     'agentApp' => request('agentApp') ? 1 : 0,

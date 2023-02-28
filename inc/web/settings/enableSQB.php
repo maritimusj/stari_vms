@@ -6,10 +6,10 @@
 
 namespace zovye;
 
-$app_id = request::trim('app_id');
-$vendor_sn = request::trim('vendor_sn');
-$vendor_key = request::trim('vendor_key');
-$code = request::trim('code');
+$app_id = Request::trim('app_id');
+$vendor_sn = Request::trim('vendor_sn');
+$vendor_key = Request::trim('vendor_key');
+$code = Request::trim('code');
 
 $result = SQB::activate($app_id, $vendor_sn, $vendor_key, $code);
 
@@ -29,8 +29,8 @@ if (false === Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
 
 if (updateSettings('pay.SQB', [
     'enable' => 1,
-    'wx' => request::bool('wx'),
-    'ali' => request::bool('ali'),
+    'wx' => Request::bool('wx'),
+    'ali' => Request::bool('ali'),
     'sn' => $result['terminal_sn'],
     'key' => $result['terminal_key'],
     'title' => $result['store_name'],

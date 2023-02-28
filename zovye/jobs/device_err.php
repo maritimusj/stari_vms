@@ -12,16 +12,16 @@ use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Log;
 use zovye\model\deviceModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $data = [
-    'id' => request::int('id'),
-    'errno' => request::int('errno'),
-    'message' => request::str('message'),
+    'id' => Request::int('id'),
+    'errno' => Request::int('errno'),
+    'message' => Request::str('message'),
 ];
 
 $log = [
@@ -30,11 +30,11 @@ $log = [
 
 if ($op == 'device_err' && CtrlServ::checkJobSign($data)) {
     /** @var deviceModelObj $device */
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if ($device) {
-        $error_msg = request::str('message');
+        $error_msg = Request::str('message');
         //设置设备错误码
-        $device->setError(request::int('errno'), $error_msg);
+        $device->setError(Request::int('errno'), $error_msg);
         $device->save();
 
         $tpl_id = settings('notice.deviceerr_tplid');

@@ -8,11 +8,11 @@ namespace zovye;
 
 use zovye\model\device_groupsModelObj;
 
-$title = request::trim('title');
+$title = Request::trim('title');
 $clr = request('clr');
-$agent_id = request::int('agentId');
+$agent_id = Request::int('agentId');
 
-$id = request::int('id') ?: time();
+$id = Request::int('id') ?: time();
 
 /** @var device_groupsModelObj $one */
 $one = Group::get($id);

@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$device = Device::get(request::int('id'));
+$device = Device::get(Request::int('id'));
 if (empty($device)) {
     Util::itoast('删除失败！', $this->createWebUrl('device'), 'error');
 }

@@ -8,10 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'default') {
-    if (request::bool('charging')) {
+    if (Request::bool('charging')) {
         Util::resultAlert('请关联充电桩小程序');
     }
     //检查设备
@@ -39,15 +39,15 @@ if ($op == 'default') {
         JSON::fail('找不到用户！');
     }
 
-    $device_imei = request::str('device');
+    $device_imei = Request::str('device');
     $device = Device::get($device_imei, true);
 
     if (!$device) {
         JSON::fail('找不到这台设备！');
     }
 
-    $text = request::trim('text');
-    $pics = request::array('pics');
+    $text = Request::trim('text');
+    $pics = Request::array('pics');
 
     if (empty($text)) {
         JSON::fail('请输入反馈内容！');
@@ -69,7 +69,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'detail') {
 
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
@@ -87,14 +87,14 @@ if ($op == 'default') {
 
 } elseif ($op == 'is_ready') {
 
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
     $is_ready = false;
 
-    $scene = request::str('scene');
+    $scene = Request::str('scene');
     if ($scene == 'online') {
         $is_ready = $device->isMcbOnline(false);
     } elseif ($scene == 'lock') {
@@ -113,13 +113,13 @@ if ($op == 'default') {
 
 } elseif ($op == 'goods') {
 
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
-    if (request::has('user')) {
-        $user = User::get(request::str('user'), true);
+    if (Request::has('user')) {
+        $user = User::get(Request::str('user'), true);
     } else {
         $user = Util::getCurrentUser();
     }
@@ -128,7 +128,7 @@ if ($op == 'default') {
         JSON::fail('找不到用户！');
     }
 
-    $type = request::str('type'); //free or pay or balance
+    $type = Request::str('type'); //free or pay or balance
 
     if ($type == 'exchange') {
         $result = $device->getGoodsList($user, [Goods::AllowBalance]);
@@ -143,7 +143,7 @@ if ($op == 'default') {
     JSON::success($result);
 
 } elseif ($op == 'choose_goods') {
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
@@ -153,8 +153,8 @@ if ($op == 'default') {
         JSON::fail('找不到用户！');
     }
 
-    $id = request::int('goods');
-    $num = request::int('num', 1);
+    $id = Request::int('goods');
+    $num = Request::int('num', 1);
 
     $goods = $device->getGoods($id);
     if (empty($goods)) {
@@ -175,7 +175,7 @@ if ($op == 'default') {
 } elseif ($op == 'get') {
 
     if (App::isCZTVEnabled()) {
-        $user = User::get(request::str('user'), true);
+        $user = User::get(Request::str('user'), true);
         if (empty($user) || $user->isBanned()) {
             JSON::fail('找不到用户！');
         }
@@ -185,7 +185,7 @@ if ($op == 'default') {
             JSON::fail('请重新扫描设备二维码！');
         }
     
-        $result = CZTV::get($user, $device->getUid(), request::int('goods'));
+        $result = CZTV::get($user, $device->getUid(), Request::int('goods'));
         JSON::result($result);
     }
 }

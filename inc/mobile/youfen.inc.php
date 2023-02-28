@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\account\YouFenAccount;
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'yf_auth') {
     $user = Util::getCurrentUser();
@@ -16,29 +16,29 @@ if ($op == 'yf_auth') {
         Util::resultAlert('请用微信打开！', 'error');
     }
 
-    $openid = request::str('YF-OPENID');
+    $openid = Request::str('YF-OPENID');
     $user->updateSettings('customData.yf', [
         'openid' => $openid,
         'createdAt' => time(),
     ]);
 
-    $device_uid = request::str('device');
+    $device_uid = Request::str('device');
 
     $url = Util::murl('entry', ['device' => $device_uid, 'from' => 'device']);
     Util::redirect($url);
 } else {
 
     Log::debug('youfen', [
-        'raw' => request::raw(),
+        'raw' => Request::raw(),
     ]);
 
     YouFenAccount::cb([
-        'request_id' => request::str('request_id'),
-        'openid' => request::str('openid'),
-        'sub_time' => request::int('sub_time'),
-        'wx_appid' => request::str('wx_appid'),
-        'notify_data' => request::str('notify_data', '', true),
-        'sub_type' => request::int('sub_type'),
+        'request_id' => Request::str('request_id'),
+        'openid' => Request::str('openid'),
+        'sub_time' => Request::int('sub_time'),
+        'wx_appid' => Request::str('wx_appid'),
+        'notify_data' => Request::str('notify_data', '', true),
+        'sub_type' => Request::int('sub_type'),
     ]);
 
     exit('success');

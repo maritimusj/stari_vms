@@ -10,7 +10,7 @@ use DateTimeImmutable;
 use Exception;
 use zovye\model\deviceModelObj;
 
-$agent_id = request::int('id');
+$agent_id = Request::int('id');
 $agent = Agent::get($agent_id);
 
 if (empty($agent)) {
@@ -18,8 +18,8 @@ if (empty($agent)) {
 }
 
 $month = '';
-if (request::has('month')) {
-    $month_str = request::str('month');
+if (Request::has('month')) {
+    $month_str = Request::str('month');
     try {
         $month = new DateTimeImmutable($month_str);
     } catch (Exception $e) {
@@ -29,15 +29,15 @@ if (request::has('month')) {
         return Statistics::deviceOrderMonth($device, $month);
     };
 } else {
-    $start = request::str('start');
-    $end = request::str('end');
+    $start = Request::str('start');
+    $end = Request::str('end');
     $fn = function ($device) use ($start, $end) {
         return Statistics::deviceOrder($device, $start, $end);
     };
 }
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = Device::query(['agent_id' => $agent->getId()]);
 

@@ -14,7 +14,7 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\Media;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use zovye\Util;
 use zovye\Wx;
@@ -22,10 +22,10 @@ use function zovye\is_error;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'adv_review' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $id = request::int('id');
+    $id = Request::int('id');
     $adv = Advertising::get($id);
     if (empty($adv)) {
         Log::fatal('adv_review', [

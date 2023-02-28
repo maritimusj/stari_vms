@@ -12,7 +12,7 @@ $result = [];
 
 $query = Device::query();
 
-$openid = request::trim('openid', '', true);
+$openid = Request::trim('openid', '', true);
 if ($openid) {
     $agent = Agent::get($openid, true);
     if ($agent) {
@@ -20,7 +20,7 @@ if ($openid) {
     }
 }
 
-$keyword = request::trim('keyword', '', true);
+$keyword = Request::trim('keyword', '', true);
 if ($keyword) {
     $query->whereOr([
         'imei LIKE' => "%$keyword%",
@@ -28,9 +28,9 @@ if ($keyword) {
     ]);
 }
 
-if (request::has('page')) {
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+if (Request::has('page')) {
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query->page($page, $page_size);
 } else {

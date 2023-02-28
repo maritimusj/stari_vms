@@ -8,23 +8,23 @@ namespace zovye;
 
 $res = Util::transactionDo(function () {
 
-    $id = request::int('id');
-    $name = request::str('name');
-    $qr_codes = request::array('qrcodes');
+    $id = Request::int('id');
+    $name = Request::str('name');
+    $qr_codes = Request::array('qrcodes');
 
     $data = [
-        'title' => request::str('title', $name),
-        'descr' => request::str('descr'),
-        'qrcode' => request::str('qrcode'),
-        'clr' => request::str('clr') ?: Util::randColor(),
-        'count' => max(0, request::int('count')),
-        'sccount' => max(0, request::int('sccount')),
-        'total' => max(0, request::int('total')),
-        'order_limits' => max(0, request::int('orderlimits')),
-        'order_no' => min(999, request::int('orderno')),
-        'group_name' => request::str('groupname'),
-        'scname' => request::str('scname', Schema::DAY),
-        'shared' => request::has('commission_share') ? 1 : 0,
+        'title' => Request::str('title', $name),
+        'descr' => Request::str('descr'),
+        'qrcode' => Request::str('qrcode'),
+        'clr' => Request::str('clr') ?: Util::randColor(),
+        'count' => max(0, Request::int('count')),
+        'sccount' => max(0, Request::int('sccount')),
+        'total' => max(0, Request::int('total')),
+        'order_limits' => max(0, Request::int('orderlimits')),
+        'order_no' => min(999, Request::int('orderno')),
+        'group_name' => Request::str('groupname'),
+        'scname' => Request::str('scname', Schema::DAY),
+        'shared' => Request::has('commission_share') ? 1 : 0,
     ];
 
     if (!Schema::has($data['scname'])) {
@@ -32,8 +32,8 @@ $res = Util::transactionDo(function () {
     }
 
     //这里的agentId是用户openid
-    if (request::isset('agentId')) {
-        $openid = request::str('agentId');
+    if (Request::isset('agentId')) {
+        $openid = Request::str('agentId');
         if (empty($openid)) {
             $data['agent_id'] = 0;
         } else {
@@ -61,9 +61,9 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('jfb');
             $account->set('config', [
                 'type' => Account::JFB,
-                'url' => request::trim('apiURL'),
-                'auth' => request::bool('authUser'),
-                'scene' => request::trim('scene'),
+                'url' => Request::trim('apiURL'),
+                'auth' => Request::bool('authUser'),
+                'scene' => Request::trim('scene'),
             ]);
         } elseif ($account->isMoscale()) {
             $data['name'] = Account::MOSCALE_NAME;
@@ -71,21 +71,21 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('moscale');
             $account->set('config', [
                 'type' => Account::MOSCALE,
-                'appid' => request::trim('appid'),
-                'appsecret' => request::trim('appsecret'),
+                'appid' => Request::trim('appid'),
+                'appsecret' => Request::trim('appsecret'),
             ]);
 
-            updateSettings('moscale.fan.key', request::trim('moscaleMachineKey'));
+            updateSettings('moscale.fan.key', Request::trim('moscaleMachineKey'));
             updateSettings(
                 'moscale.fan.label',
                 array_map(function ($e) {
                     return intval($e);
-                }, explode(',', request::trim('moscaleLabel')))
+                }, explode(',', Request::trim('moscaleLabel')))
             );
             updateSettings('moscale.fan.region', [
-                'province' => request::int('province_code'),
-                'city' => request::int('city_code'),
-                'area' => request::int('area_code'),
+                'province' => Request::int('province_code'),
+                'city' => Request::int('city_code'),
+                'area' => Request::int('area_code'),
             ]);
         } elseif ($account->isYunfenba()) {
             $data['name'] = Account::YUNFENBA_NAME;
@@ -94,8 +94,8 @@ $res = Util::transactionDo(function () {
             $account->set('config', [
                 'type' => Account::YUNFENBA,
                 'vendor' => [
-                    'uid' => request::trim('vendorUID'),
-                    'sid' => request::trim('vendorSubUID'),
+                    'uid' => Request::trim('vendorUID'),
+                    'sid' => Request::trim('vendorSubUID'),
                 ],
             ]);
         } elseif ($account->isAQiinfo()) {
@@ -104,8 +104,8 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('aqiinfo');
             $account->set('config', [
                 'type' => Account::AQIINFO,
-                'key' => request::trim('key'),
-                'secret' => request::trim('secret'),
+                'key' => Request::trim('key'),
+                'secret' => Request::trim('secret'),
             ]);
         } elseif ($account->isZJBao()) {
             $data['name'] = Account::ZJBAO_NAME;
@@ -113,8 +113,8 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('zjbao');
             $account->set('config', [
                 'type' => Account::ZJBAO,
-                'key' => request::trim('key'),
-                'secret' => request::trim('secret'),
+                'key' => Request::trim('key'),
+                'secret' => Request::trim('secret'),
             ]);
         } elseif ($account->isMeiPa()) {
             $data['name'] = Account::MEIPA_NAME;
@@ -122,13 +122,13 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('meipa');
             $account->set('config', [
                 'type' => Account::MEIPA,
-                'apiid' => request::trim('apiid'),
-                'appkey' => request::trim('appkey'),
+                'apiid' => Request::trim('apiid'),
+                'appkey' => Request::trim('appkey'),
                 'region' => [
                     'code' => [
-                        'province' => request::trim('province'),
-                        'city' => request::trim('city'),
-                        'area' => request::trim('area'),
+                        'province' => Request::trim('province'),
+                        'city' => Request::trim('city'),
+                        'area' => Request::trim('area'),
                     ],
                 ],
             ]);
@@ -138,8 +138,8 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('kingfans');
             $account->set('config', [
                 'type' => Account::KINGFANS,
-                'bid' => request::trim('bid'),
-                'key' => request::trim('key'),
+                'bid' => Request::trim('bid'),
+                'key' => Request::trim('key'),
             ]);
         } elseif ($account->isSNTO()) {
             $data['name'] = Account::SNTO_NAME;
@@ -147,9 +147,9 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('snto');
             $account->set('config', [
                 'type' => Account::SNTO,
-                'id' => request::trim('app_id'),
-                'key' => request::trim('app_key'),
-                'channel' => request::trim('channel'),
+                'id' => Request::trim('app_id'),
+                'key' => Request::trim('app_key'),
+                'channel' => Request::trim('channel'),
                 'data' => $account->settings('config.data', []),
             ]);
         } elseif ($account->isYFB()) {
@@ -158,10 +158,10 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('yfb');
             $account->set('config', [
                 'type' => Account::YFB,
-                'id' => request::trim('app_id'),
-                'secret' => request::trim('app_secret'),
-                'key' => request::trim('key'),
-                'scene' => request::trim('scene'),
+                'id' => Request::trim('app_id'),
+                'secret' => Request::trim('app_secret'),
+                'key' => Request::trim('key'),
+                'scene' => Request::trim('scene'),
             ]);
         } elseif ($account->isWxWork()) {
             $data['name'] = Account::WxWORK_NAME;
@@ -169,8 +169,8 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('wxwork');
             $account->set('config', [
                 'type' => Account::WxWORK,
-                'key' => request::trim('key'),
-                'secret' => request::trim('secret'),
+                'key' => Request::trim('key'),
+                'secret' => Request::trim('secret'),
             ]);
         } elseif ($account->isYouFen()) {
             $data['name'] = Account::YOUFEN_NAME;
@@ -178,10 +178,10 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('youfen');
             $account->set('config', [
                 'type' => Account::YOUFEN,
-                'app_number' => request::trim('app_number'),
-                'app_key' => request::trim('app_key'),
-                'followed_title' => request::trim('followed_title'),
-                'followed_description' => request::trim('followed_description'),
+                'app_number' => Request::trim('app_number'),
+                'app_key' => Request::trim('app_key'),
+                'followed_title' => Request::trim('followed_title'),
+                'followed_description' => Request::trim('followed_description'),
             ]);
         } elseif ($account->isMengMo()) {
             $data['name'] = Account::MENGMO_NAME;
@@ -189,8 +189,8 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('mengmo');
             $account->set('config', [
                 'type' => Account::MENGMO,
-                'app_no' => request::trim('app_no'),
-                'scene' => request::trim('scene'),
+                'app_no' => Request::trim('app_no'),
+                'scene' => Request::trim('scene'),
             ]);
         } elseif ($account->isYiDao()) {
             $data['name'] = Account::YIDAO_NAME;
@@ -198,10 +198,10 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('yidao');
             $account->set('config', [
                 'type' => Account::YIDAO,
-                'appid' => request::trim('appid'),
-                'app_secret' => request::trim('app_secret'),
-                'device_key' => request::trim('device_key'),
-                'scene' => request::trim('scene'),
+                'appid' => Request::trim('appid'),
+                'app_secret' => Request::trim('app_secret'),
+                'device_key' => Request::trim('device_key'),
+                'scene' => Request::trim('scene'),
             ]);
         } elseif ($account->isWeiSure()) {
             $data['name'] = Account::WEISURE_NAME;
@@ -210,9 +210,9 @@ $res = Util::transactionDo(function () {
             $data['total'] = 1;
             $config = [
                 'type' => Account::WEISURE,
-                'companyId' => request::trim('companyId'),
-                'wtagid' => request::trim('wtagid'),
-                'h5url' => request::trim('h5url'),
+                'companyId' => Request::trim('companyId'),
+                'wtagid' => Request::trim('wtagid'),
+                'h5url' => Request::trim('h5url'),
             ];
             if ($config['h5url']) {
                 $parsed_url = parse_url($config['h5url']);
@@ -227,47 +227,47 @@ $res = Util::transactionDo(function () {
             $data['url'] = Util::murl('cloudfi');
             $config = [
                 'type' => Account::CloudFI,
-                'key' => request::trim('key'),
-                'channel' => request::trim('channel'),
-                'scene' => request::trim('scene'),
-                'area' => request::trim('area'),
+                'key' => Request::trim('key'),
+                'channel' => Request::trim('channel'),
+                'scene' => Request::trim('scene'),
+                'area' => Request::trim('area'),
             ];
             $account->set('config', $config);
         } elseif ($account->isWxApp()) {
-            $data['img'] = request::trim('img');
+            $data['img'] = Request::trim('img');
             $account->set('config', [
                 'type' => Account::WXAPP,
-                'username' => request::trim('username'),
-                'path' => request::trim('path'),
-                'delay' => request::int('delay', 1),
+                'username' => Request::trim('username'),
+                'path' => Request::trim('path'),
+                'delay' => Request::int('delay', 1),
             ]);
         } elseif ($account->isAuth()) {
-            $data['img'] = request::trim('img');
-            $timing = request::int('OpenTiming');
+            $data['img'] = Request::trim('img');
+            $timing = Request::int('OpenTiming');
             if ($account->isSubscriptionAccount() || !$account->isVerified()) {
                 $timing = 1;
             }
             $config = [
                 'type' => Account::AUTH,
             ];
-            if (request::str('openMsgType') == 'text') {
+            if (Request::str('openMsgType') == 'text') {
                 $config['open'] = [
                     'timing' => $timing,
-                    'msg' => request::str('openTextMsg'),
+                    'msg' => Request::str('openTextMsg'),
                 ];
-            } elseif (request::str('openMsgType') == 'news') {
+            } elseif (Request::str('openMsgType') == 'news') {
                 $config['open'] = [
                     'timing' => $timing,
                     'news' => [
-                        'title' => request::trim('openNewsTitle'),
-                        'desc' => request::trim('openNewsDesc'),
-                        'image' => request::trim('openNewsImage'),
+                        'title' => Request::trim('openNewsTitle'),
+                        'desc' => Request::trim('openNewsDesc'),
+                        'image' => Request::trim('openNewsImage'),
                     ],
                 ];
             }
             $account->set('config', $config);
         } else {
-            $data['img'] = request::trim('img');
+            $data['img'] = Request::trim('img');
             //如果网站更换域名后，需要更新url
             $data['url'] = Account::createUrl($account->getUid(), ['from' => 'account']);
         }
@@ -322,9 +322,9 @@ $res = Util::transactionDo(function () {
 
         $data['uid'] = $uid;
         $data['name'] = $name;
-        $data['type'] = request::int('type');
-        $data['title'] = request::str('title');
-        $data['img'] = request::trim('img');
+        $data['type'] = Request::int('type');
+        $data['title'] = Request::str('title');
+        $data['img'] = Request::trim('img');
         $data['url'] = Account::createUrl($uid, ['from' => 'account']);
 
         $account = Account::create($data);
@@ -370,8 +370,8 @@ $res = Util::transactionDo(function () {
             'android' => 0,
         ];
 
-        if (request::has('limits')) {
-            $arr = request::array('limits');
+        if (Request::has('limits')) {
+            $arr = Request::array('limits');
             foreach ($limits as $name => &$v) {
                 if (in_array($name, $arr)) {
                     $v = 1;
@@ -381,8 +381,8 @@ $res = Util::transactionDo(function () {
 
         $account->set('limits', $limits);
 
-        if (request::isset('questionnaire')) {
-            $questionnaire_uid = request::trim('questionnaire');
+        if (Request::isset('questionnaire')) {
+            $questionnaire_uid = Request::trim('questionnaire');
             if ($questionnaire_uid) {
                 $questionnaire = Account::findOneFromUID($questionnaire_uid);
                 if ($questionnaire) {
@@ -407,37 +407,37 @@ $res = Util::transactionDo(function () {
             $account->set('config', [
                 'type' => Account::VIDEO,
                 'video' => [
-                    'duration' => request::int('duration', 1),
-                    'exclusive' => request::int('exclusive'),
+                    'duration' => Request::int('duration', 1),
+                    'exclusive' => Request::int('exclusive'),
                 ],
             ]);
         } elseif ($account->isDouyin()) {
             $account->set('config', [
                 'type' => Account::DOUYIN,
-                'url' => request::trim('url'),
-                'openid' => request::trim('openid'),
+                'url' => Request::trim('url'),
+                'openid' => Request::trim('openid'),
             ]);
         } elseif ($account->isWxApp()) {
             $account->set('config', [
                 'type' => Account::WXAPP,
-                'username' => request::trim('username'),
-                'path' => request::trim('path'),
-                'delay' => request::int('delay'),
+                'username' => Request::trim('username'),
+                'path' => Request::trim('path'),
+                'delay' => Request::int('delay'),
             ]);
         } elseif ($account->isTask()) {
             $account->set('config', [
                 'type' => Account::TASK,
-                'url' => request::trim('task_url'),
-                'qrcode' => request::trim('task_qrcode'),
-                'images' => request::array('task_images'),
-                'desc' => request::str('task_desc'),
+                'url' => Request::trim('task_url'),
+                'qrcode' => Request::trim('task_qrcode'),
+                'images' => Request::array('task_images'),
+                'desc' => Request::str('task_desc'),
             ]);
         } elseif ($account->isQuestionnaire()) {
-            $questions = json_decode(request::str('questionsJSON', '', true), true);
+            $questions = json_decode(Request::str('questionsJSON', '', true), true);
             $account->set('config', [
                 'type' => Account::QUESTIONNAIRE,
                 'questions' => $questions,
-                'score' => request::int('score'),
+                'score' => Request::int('score'),
             ]);
 
             $qrcode_url = Util::createQrcodeFile("question.{$account->getUid()}", $account->getUrl());
@@ -459,19 +459,19 @@ $res = Util::transactionDo(function () {
         $original_bonus_type = $account->getBonusType();
 
         if (App::isCommissionEnabled()) {
-            if (request::isset('commission_money')) {
-                $commission_data['money'] = request::float('commission_money', 0, 2) * 100;
-            } elseif (request::str('bonus_type') == Account::COMMISSION) {
-                $commission_data['money'] = request::float('amount', 0, 2) * 100;
+            if (Request::isset('commission_money')) {
+                $commission_data['money'] = Request::float('commission_money', 0, 2) * 100;
+            } elseif (Request::str('bonus_type') == Account::COMMISSION) {
+                $commission_data['money'] = Request::float('amount', 0, 2) * 100;
             }
         }
 
         // 积分
         if (App::isBalanceEnabled()) {
-            if (request::isset('balance')) {
-                $commission_data['balance'] = request::int('balance');
-            } elseif (request::str('bonus_type') == Account::BALANCE) {
-                $commission_data['balance'] = request::int('amount');
+            if (Request::isset('balance')) {
+                $commission_data['balance'] = Request::int('balance');
+            } elseif (Request::str('bonus_type') == Account::BALANCE) {
+                $commission_data['balance'] = Request::int('amount');
             }
         }
 
@@ -517,7 +517,7 @@ $res = Util::transactionDo(function () {
 if (is_error($res)) {
     Util::itoast($res['message'], We7::referer(), 'error');
 } else {
-    $id = request::int('id', $res['id']);
-    $back_url = $this->createWebUrl('account', ['op' => 'edit', 'id' => $id, 'from' => request::str('from')]);
+    $id = Request::int('id', $res['id']);
+    $back_url = $this->createWebUrl('account', ['op' => 'edit', 'id' => $id, 'from' => Request::str('from')]);
     Util::itoast($res['message'], $back_url, 'success');
 }

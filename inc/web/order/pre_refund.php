@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $order = Order::get($id);
 if (empty($order)) {

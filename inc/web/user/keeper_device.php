@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\keeper_devicesModelObj;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
@@ -18,8 +18,8 @@ if (empty($keeper)) {
     JSON::fail('这个用户不是运营人员！');
 }
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = Device::query(['keeper_id' => $keeper->getId()]);
 

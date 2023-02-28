@@ -8,21 +8,21 @@ namespace zovye;
 
 use zovye\model\accountModelObj;
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 
 $query = Account::query();
 
-$banned = request::bool('banned');
+$banned = Request::bool('banned');
 if ($banned) {
     $query->where(['state' => Account::BANNED]);
 } else {
     $query->where(['state' => Account::NORMAL]);
 }
 
-if (request::isset('type')) {
-    $type = request::int('type');
+if (Request::isset('type')) {
+    $type = Request::int('type');
     if ($type == -1) {
         $all = Account::getAllEnabledThirdPartyPlatform();
         if ($all) {
@@ -39,7 +39,7 @@ if (request::isset('type')) {
                 ],
             ]);
         } else {
-            $query->where(['type' => request::int('type')]);
+            $query->where(['type' => Request::int('type')]);
         }
     }
 } else {
@@ -51,14 +51,14 @@ if (request::isset('type')) {
     }
 }
 
-if (request::has('agentId')) {
-    $agent = Agent::get(request::int('agentId'));
+if (Request::has('agentId')) {
+    $agent = Agent::get(Request::int('agentId'));
     if ($agent) {
         $query->where(['agent_id' => $agent->getId()]);
     }
 }
 
-$keywords = request::trim('keywords', '', true);
+$keywords = Request::trim('keywords', '', true);
 if ($keywords) {
     $query->whereOr([
         'name LIKE' => "%$keywords%",

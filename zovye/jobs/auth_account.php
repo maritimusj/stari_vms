@@ -12,11 +12,11 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\agentModelObj;
-use zovye\request;
+use zovye\Request;
 
-$agent_id = request::str('agent');
-$accountUID = request::str('account');
-$total = request::int('total');
+$agent_id = Request::str('agent');
+$accountUID = Request::str('account');
+$total = Request::int('total');
 
 $params = [
     'agent' => $agent_id,
@@ -24,7 +24,7 @@ $params = [
     'total' => $total,
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'auth_account' && CtrlServ::checkJobSign($params)) {
 
     $acc = Account::findOneFromUID($accountUID);

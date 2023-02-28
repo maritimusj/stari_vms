@@ -9,7 +9,7 @@ namespace zovye;
 use zovye\model\advertisingModelObj;
 use zovye\model\agentModelObj;
 
-$type = request::int('type', Advertising::SCREEN);
+$type = Request::int('type', Advertising::SCREEN);
 
 $media_data = Advertising::getMediaData();
 $wx_data = Advertising::getWxData();
@@ -32,21 +32,21 @@ if (App::isSponsorAdEnabled()) {
 
 $url_params = [];
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 
 $query = Advertising::query(['type' => $type]);
 
-if (request::isset('status')) {
-    $query->where(['state' => request::int('status')]);
-    $url_params['state'] = request::int('status');
+if (Request::isset('status')) {
+    $query->where(['state' => Request::int('status')]);
+    $url_params['state'] = Request::int('status');
 } else {
     $query->where(['state <>' => Advertising::DELETED]);
 }
 
-if (request::isset('agentId')) {
-    $filter_agentId = request::int('agentId');
+if (Request::isset('agentId')) {
+    $filter_agentId = Request::int('agentId');
     if ($filter_agentId > 0) {
         $filter_agent = Agent::get($filter_agentId);
         if (empty($filter_agent)) {
@@ -61,14 +61,14 @@ if (request::isset('agentId')) {
     $tpl_data['filter_agentId'] = $filter_agentId;
 }
 
-$keywords = request::trim('keywords', '', true);
+$keywords = Request::trim('keywords', '', true);
 if ($keywords) {
     $query->where(['title LIKE' => "%$keywords%"]);
     $tpl_data['keywords'] = $keywords;
 }
 
 if ($type == Advertising::SCREEN) {
-    $filter_media = request::trim('media');
+    $filter_media = Request::trim('media');
     if (in_array($filter_media, ['image', 'video', 'audio', 'srt'])) {
         $len = strlen($filter_media);
         $query->where(['extra LIKE' => "%s:5:\"media\";s:$len:\"$filter_media\"%"]);
@@ -77,7 +77,7 @@ if ($type == Advertising::SCREEN) {
         $tpl_data['filter_media'] = $filter_media;
     }
 } elseif ($type == Advertising::PUSH_MSG) {
-    $filter_msg_type = request::trim('msgtype');
+    $filter_msg_type = Request::trim('msgtype');
     if (in_array($filter_msg_type, ['image', 'mpnews', 'text'])) {
         $query->where(['extra REGEXP' => "s:4:\"type\";s:.+:\"$filter_msg_type\""]);
 

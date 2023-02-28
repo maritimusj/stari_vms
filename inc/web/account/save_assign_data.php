@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $raw = request('data');
 $data = is_string($raw) ? json_decode(htmlspecialchars_decode($raw), true) : $raw;
 

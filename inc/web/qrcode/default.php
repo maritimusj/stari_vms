@@ -27,8 +27,8 @@ $tpl_data = [];
 
 $tpl_data['config'] = $qrcode;
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = Advertising::query(['type' => Advertising::ACTIVE_QRCODE, 'state !=' => Advertising::DELETED]);
 

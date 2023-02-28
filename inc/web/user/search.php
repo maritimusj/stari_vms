@@ -8,12 +8,12 @@ namespace zovye;
 
 use zovye\model\userModelObj;
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = User::query();
 
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if (!empty($keywords)) {
     $query->whereOr(
         [
@@ -23,7 +23,7 @@ if (!empty($keywords)) {
     );
 }
 
-$passport = request::trim('passport');
+$passport = Request::trim('passport');
 if (!empty($passport)) {
     $query->where(
         [

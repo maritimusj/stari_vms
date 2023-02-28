@@ -14,7 +14,7 @@ use zovye\model\commission_balanceModelObj;
 use zovye\CommissionBalance;
 use zovye\Device;
 use zovye\Goods;
-use zovye\request;
+use zovye\Request;
 use zovye\Job;
 use zovye\Order;
 use zovye\State;
@@ -288,7 +288,7 @@ class balance
                 return error(State::ERROR, '提现申请被拒绝，请联系管理员！');
             }
 
-            return balance::balanceWithdraw($agent, request::float('amount', 0, 2) * 100);
+            return balance::balanceWithdraw($agent, Request::float('amount', 0, 2) * 100);
         }
 
         return error(State::ERROR, '提现失败，请联系客服！');
@@ -434,9 +434,9 @@ class balance
         if ($agent) {
             return balance::getUserBalanceLog(
                 $agent,
-                request::str('type'),
-                request::int('page'),
-                request::int('pagesize')
+                Request::str('type'),
+                Request::int('page'),
+                Request::int('pagesize')
             );
         }
 
@@ -445,12 +445,12 @@ class balance
 
     public static function userBalanceLog(): array
     {
-        $user = agent::getUserByGUID(request::str('guid'));
+        $user = agent::getUserByGUID(Request::str('guid'));
         if ($user) {
 
-            $type = request::str('type');
-            $page = request::int('page');
-            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+            $type = Request::str('type');
+            $page = Request::int('page');
+            $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $page = max(1, $page);
             $page_size = max(1, $page_size);

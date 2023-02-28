@@ -39,13 +39,13 @@ $pages = [
     ],
 ];
 
-$id = request::int('id');
+$id = Request::int('id');
 $agent = Agent::get($id);
 if (empty($agent)) {
     Util::itoast('找不到这个代理商！', 'error');
 }
 
-$page_name = request::trim('page_name', 'default');
+$page_name = Request::trim('page_name', 'default');
 
 app()->showTemplate("web/agent/detail/$page_name", [
     'agent' => $agent,

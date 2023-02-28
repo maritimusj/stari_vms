@@ -8,30 +8,30 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'default') {
-    $order_no = request::str('orderNO');
-    $device = Device::get(request::int('deviceid'));
+    $order_no = Request::str('orderNO');
+    $device = Device::get(Request::int('deviceid'));
 
     app()->payResultPage($order_no, $device);
 
 } elseif ($op == 'SQB') {
 
-    if (request::trim('is_success') == 'T' && request::str('status') == 'SUCCESS') {
+    if (Request::trim('is_success') == 'T' && Request::str('status') == 'SUCCESS') {
         Util::resultAlert('支付成功！');
     }
 
-    Util::resultAlert(request::trim('error_message', '支付失败！'), 'error');
+    Util::resultAlert(Request::trim('error_message', '支付失败！'), 'error');
 
 } elseif ($op == 'notify') {
 
     Log::debug('payresult', [
         'from' => $_GET['from'],
-        'raw' => request::raw(),
+        'raw' => Request::raw(),
     ]);
 
-    $res = Pay::notify($_GET['from'], request::raw());
+    $res = Pay::notify($_GET['from'], Request::raw());
 
     exit($res);
 }

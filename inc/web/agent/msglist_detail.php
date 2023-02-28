@@ -9,7 +9,7 @@ namespace zovye;
 
 use zovye\model\msgModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 /** @var msgModelObj $msg */
 $msg = m('agent_msg')->findOne(We7::uniacid(['id' => $id]));
 if ($msg) {

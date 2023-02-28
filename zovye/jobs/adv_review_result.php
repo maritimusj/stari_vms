@@ -11,19 +11,19 @@ namespace zovye\job\advReviewResult;
 use zovye\Advertising;
 use zovye\CtrlServ;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 use zovye\ReviewResult;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $log = [
     'id' => request('id'),
 ];
 if ($op == 'adv_review_result' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $adv = Advertising::get(request::int('id'));
+    $adv = Advertising::get(Request::int('id'));
     if (empty($adv)) {
         $log['error'] = '广告不存在!';
         Log::fatal('adv_review_result', $log);

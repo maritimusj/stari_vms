@@ -12,10 +12,10 @@ use zovye\Agent;
 use zovye\CtrlServ;
 use zovye\Goods;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 use function zovye\request;
 
-$op = request::op('default');
+$op = Request::op('default');
 
 $log = [
     'id' => request('id'),

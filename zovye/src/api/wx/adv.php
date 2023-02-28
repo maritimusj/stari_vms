@@ -12,7 +12,7 @@ use zovye\Log;
 use zovye\model\advertisingModelObj;
 use zovye\Device;
 use zovye\model\device_groupsModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Media;
 use zovye\ReviewResult;
 use zovye\State;
@@ -36,7 +36,7 @@ class adv
 
         common::checkCurrentUserPrivileges('F_gg');
 
-        $guid = request::trim('id');
+        $guid = Request::trim('id');
         $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
         if (empty($adv)) {
@@ -52,7 +52,7 @@ class adv
         }
 
         $data = ['devices' => []];
-        $devices = request::is_array('devices') ? request::array('devices') : [];
+        $devices = Request::is_array('devices') ? Request::array('devices') : [];
 
         if ($devices) {
             //检查设备ID是否合法，并保存设备内部ＩＤ
@@ -87,12 +87,12 @@ class adv
 
         common::checkCurrentUserPrivileges('F_gg');
 
-        $type = request::int('type') ?: Advertising::SCREEN;
+        $type = Request::int('type') ?: Advertising::SCREEN;
 
         $query = Advertising::query(['state' => Advertising::NORMAL, 'type' => $type]);
 
-        if (request::has('deviceId')) {
-            $device = \zovye\api\wx\device::getDevice(request::int('deviceId'));
+        if (Request::has('deviceId')) {
+            $device = \zovye\api\wx\device::getDevice(Request::int('deviceId'));
             if ($device->getAgentId()) {
                 $query->where(['agent_id' => $device->getAgentId()]);
             }
@@ -102,8 +102,8 @@ class adv
 
         $total = $query->count();
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $result = [
             'page' => $page,
@@ -252,7 +252,7 @@ class adv
 
         $adv = null;
 
-        $guid = request::trim('id');
+        $guid = Request::trim('id');
         if (!empty($guid)) {
             $query = Advertising::query([
                 'agent_id' => $user->getAgentId(),
@@ -267,7 +267,7 @@ class adv
             }
         }
 
-        return Advertising::createOrUpdate($user, $adv, request::all());
+        return Advertising::createOrUpdate($user, $adv, Request::all());
     }
 
     /**
@@ -281,7 +281,7 @@ class adv
 
         common::checkCurrentUserPrivileges('F_gg');
 
-        $guid = request::trim('id');
+        $guid = Request::trim('id');
 
         /** @var advertisingModelObj $adv */
         $adv = Advertising::query(['state' => Advertising::NORMAL])
@@ -359,7 +359,7 @@ class adv
 
         common::checkCurrentUserPrivileges('F_gg');
 
-        $guid = request::trim('id');
+        $guid = Request::trim('id');
         $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
         if (empty($adv)) {
@@ -374,7 +374,7 @@ class adv
             return error(State::ERROR, '这个广告还没有通过审核，无法分配！');
         }
 
-        $groups = request::is_array('groups') ? request::array('groups') : [];
+        $groups = Request::is_array('groups') ? Request::array('groups') : [];
 
         $group_arr = [];
         $device_arr = [];

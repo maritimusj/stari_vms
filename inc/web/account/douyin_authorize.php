@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $account = Account::get($id);
 if (empty($account)) {

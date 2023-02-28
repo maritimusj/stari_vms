@@ -10,13 +10,13 @@ use zovye\model\goods_voucherModelObj;
 
 $query = GoodsVoucher::query();
 
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->where(['goods_name LIKE' => "%$keywords%"]);
 }
 
-$page = max(1, request::int('page'));
-$page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+$page = max(1, Request::int('page'));
+$page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
 $total = $query->count();
 if (ceil($total / $page_size) < $page) {

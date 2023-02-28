@@ -6,14 +6,14 @@
  
 namespace zovye;
 
-$user_id = request::int('id');
+$user_id = Request::int('id');
 $user = User::get($user_id);
 
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
 
-$val = request::float('val', 0, 2) * 100;
+$val = Request::float('val', 0, 2) * 100;
 
 if ($user->setCredit($val)) {
     JSON::success('已保存！');

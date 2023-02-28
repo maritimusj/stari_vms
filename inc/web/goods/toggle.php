@@ -6,14 +6,14 @@
  
 namespace zovye;
 
-$goods = Goods::get(request::int('id'));
+$goods = Goods::get(Request::int('id'));
 if (empty($goods)) {
     JSON::fail('找不到这个商品！');
 }
 
 $s1 = $goods->getS1();
 
-switch(request::trim('w')) {
+switch(Request::trim('w')) {
     case 'free': $s1 = Goods::setFreeBitMask($s1, !$goods->allowFree());break;
     case 'pay': $s1 = Goods::setPayBitMask($s1, !$goods->allowPay());break;
     case 'balance': $s1 = Goods::setBalanceBitMask($s1, !$goods->allowBalance());break;

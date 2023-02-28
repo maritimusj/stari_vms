@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\keeperModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $agent = Agent::get($id);
 if (empty($agent)) {

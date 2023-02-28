@@ -11,7 +11,7 @@ use zovye\model\pay_logsModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op === 'create') {
 
@@ -21,7 +21,7 @@ if ($op === 'create') {
         JSON::fail('找不到用户或者用户无法购买！');
     }
 
-    $device_uid = request::str('deviceUID');
+    $device_uid = Request::str('deviceUID');
     if (empty($device_uid)) {
         JSON::fail('参数错误，没有指定设备！');
     }
@@ -44,8 +44,8 @@ if ($op === 'create') {
     $discount = 0;
     $goods = [];
 
-    if (request::has('goodsID')) {
-        $goods_id = request::int('goodsID');
+    if (Request::has('goodsID')) {
+        $goods_id = Request::int('goodsID');
         if (empty($goods_id)) {
             JSON::fail('参数错误，没有指定商品！');
         }
@@ -55,7 +55,7 @@ if ($op === 'create') {
             JSON::fail('无法购买这个商品，请联系管理员！');
         }
 
-        $total = min(App::getOrderMaxGoodsNum(), max(request::int('total'), 1));
+        $total = min(App::getOrderMaxGoodsNum(), max(Request::int('total'), 1));
 
         if ($goods['num'] < $total) {
             JSON::fail('对不起，商品数量不足！');
@@ -65,9 +65,9 @@ if ($op === 'create') {
         $discount = User::getUserDiscount($user, $goods, $total);
         $price = $goods['price'] * $total - $discount;
 
-    } elseif (request::has('packageID')) {
+    } elseif (Request::has('packageID')) {
 
-        $package_id = request::int('packageID');
+        $package_id = Request::int('packageID');
         if (empty($package_id)) {
             JSON::fail('对不起，商品套餐不正确！');
         }
@@ -121,7 +121,7 @@ if ($op === 'create') {
 } elseif ($op == 'finished') {
 
     //完成付款操作
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
 
     $pay_log = Pay::getPayLog($order_no);
     if ($pay_log) {
@@ -134,7 +134,7 @@ if ($op === 'create') {
 } elseif ($op == 'cancel') {
 
     //取消支付
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
     if (Order::exists($order_no)) {
         JSON::fail('订单已生成，无法取消！');
     }
@@ -150,8 +150,8 @@ if ($op === 'create') {
 
 } elseif ($op == 'result') {
 
-    if (request::has('openid')) {
-        $user = User::get(request::str('openid'), true);
+    if (Request::has('openid')) {
+        $user = User::get(Request::str('openid'), true);
         if (empty($user) || $user->isBanned()) {
             JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
         }
@@ -168,7 +168,7 @@ if ($op === 'create') {
         }        
     }
 
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
 
     $order = Order::get($order_no, true);
     if ($order) {
@@ -233,7 +233,7 @@ if ($op === 'create') {
         JSON::success($response);
     }
 
-    if (request::bool('balance')) {
+    if (Request::bool('balance')) {
         JSON::success(['code' => 100, 'msg' => '正在查询订单，请稍等...']);
     }
 
@@ -287,7 +287,7 @@ if ($op === 'create') {
     }
 
     /** @var orderModelObj $order */
-    $order = Order::get(request::str('uid'), true);
+    $order = Order::get(Request::str('uid'), true);
     if (empty($order)) {
         JSON::fail('找不到这个订单！');
     }
@@ -300,7 +300,7 @@ if ($op === 'create') {
         JSON::fail('只能是免费订单！');
     }
 
-    $device = Device::findOne(['shadow_id' => request::trim('device')]);
+    $device = Device::findOne(['shadow_id' => Request::trim('device')]);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
@@ -338,8 +338,8 @@ if ($op === 'create') {
 } elseif ($op == 'list') {
 
     //手机  用户订单列表
-    if (request::has('user') && App::isCZTVEnabled()) {
-        $user = User::get(request::str('user'), true);
+    if (Request::has('user') && App::isCZTVEnabled()) {
+        $user = User::get(Request::str('user'), true);
     } else {
         $user = Util::getCurrentUser();
     }
@@ -360,9 +360,9 @@ if ($op === 'create') {
         $role_title = '普通会员';
     }
 
-    $way = request::str('way');
-    $page = request::int('page');
-    $page_size = request::int('pagesize');
+    $way = Request::str('way');
+    $page = Request::int('page');
+    $page_size = Request::int('pagesize');
 
     $result = Order::getList($user, $way, $page, $page_size);
 
@@ -380,8 +380,8 @@ if ($op === 'create') {
 } elseif ($op == 'detail') {
 
     //查询订单状态
-    if (request::has('user') && App::isCZTVEnabled()) {
-        $user = User::get(request::str('user'), true);
+    if (Request::has('user') && App::isCZTVEnabled()) {
+        $user = User::get(Request::str('user'), true);
     } else {
         $user = Util::getCurrentUser();
     }
@@ -390,7 +390,7 @@ if ($op === 'create') {
         JSON::fail(['code' => 401, 'msg' => '找不到用户或者用户无法领取！']);
     }
 
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
     $order = Order::get($order_no, true);
     if (empty($order)) {
         JSON::fail('找不到这个订单！');
@@ -416,7 +416,7 @@ if ($op === 'create') {
 
 } elseif ($op == 'jump') {
 
-    app()->orderPage(request::str('user'));
+    app()->orderPage(Request::str('user'));
 
 } elseif ($op == 'feedback') {
 

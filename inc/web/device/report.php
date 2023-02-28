@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$device = Device::get(request::int('id'));
+$device = Device::get(Request::int('id'));
 if ($device) {
     $code = $device->getProtocolV1Code();
     if ($code) {

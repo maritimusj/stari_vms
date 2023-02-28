@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\device_groupsModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 $tpl_data['id'] = $id;
 
 /** @var device_groupsModelObj $group */

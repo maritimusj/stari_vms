@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     $msg = m('msg')->findOne(We7::uniacid(['id' => $id]));
     if ($msg) {

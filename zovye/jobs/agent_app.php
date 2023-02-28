@@ -12,7 +12,7 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\agent_appModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use zovye\We7;
 use zovye\Wx;
@@ -21,7 +21,7 @@ use function zovye\m;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $log = [
     'id' => request('id'),
 ];
@@ -29,7 +29,7 @@ if ($op == 'agent_app' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $tpl_id = settings('notice.agentReq_tplid');
     if ($tpl_id) {
         /** @var agent_appModelObj $app */
-        $app = m('agent_app')->findOne(We7::uniacid(['id' => request::int('id')]));
+        $app = m('agent_app')->findOne(We7::uniacid(['id' => Request::int('id')]));
         if ($app) {
             $notify_data = $app->getTplMsgData();
             if (settings('notice.authorizedAdminUserId')) {

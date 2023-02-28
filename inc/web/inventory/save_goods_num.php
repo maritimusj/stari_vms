@@ -8,17 +8,17 @@ namespace zovye;
 
 use RuntimeException;
 
-$inventory = Inventory::get(request::int('id'));
+$inventory = Inventory::get(Request::int('id'));
 if (empty($inventory)) {
     JSON::fail('找不到这个仓库！');
 }
 
-$goods = Goods::get(request::int('goods'));
+$goods = Goods::get(Request::int('goods'));
 if (empty($goods)) {
     JSON::fail('找不到这个商品！');
 }
 
-$num = request::int('num');
+$num = Request::int('num');
 
 if (!$inventory->acquireLocker()) {
     JSON::fail('锁定仓库失败！');

@@ -8,14 +8,14 @@ namespace zovye;
 
 use zovye\model\agent_msgModelObj;
 
-$agent_id = request::isset('id') ? request::int('id') : request::int('agentid');
+$agent_id = Request::isset('id') ? Request::int('id') : Request::int('agentid');
 $agent = User::get($agent_id);
 if (empty($agent) || !($agent->isAgent() || $agent->isPartner())) {
     JSON::fail('找不到这个代理商！');
 }
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', 10);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', 10);
 $pager = '';
 
 $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $agent->getId()]));

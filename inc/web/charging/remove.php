@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $result = Util::transactionDo(function () use ($id) {
     $group = Group::get($id, Group::CHARGING);

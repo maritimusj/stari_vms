@@ -6,8 +6,8 @@
  
 namespace zovye;
 
-$from = request::trim('from') ?: 'user';
-$user_id = request::int('id');
+$from = Request::trim('from') ?: 'user';
+$user_id = Request::int('id');
 
 if ($user_id) {
     $res = Util::transactionDo(function () use ($user_id) {

@@ -10,14 +10,14 @@ use zovye\model\balanceModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'default') {
     //主公众号ＩＤ
-    $tid = request::str('tid');
+    $tid = Request::str('tid');
 
     //多个公众号情况下的的子公众号ＩＤ
-    $xid = request::str('xid');
+    $xid = Request::str('xid');
 
     //检查公众号信息
     if (empty($tid)) {
@@ -38,7 +38,7 @@ if ($op == 'default') {
         JSON::fail(['text' => '领取失败', 'msg' => '找不到用户或者用户无法领取']);
     }
 
-    $uid = request::trim('uid');
+    $uid = Request::trim('uid');
     $account = Account::findOneFromUID($uid);
     if (empty($account)) {
         JSON::fail(['msg' => '找不到这个广告！']);
@@ -48,14 +48,14 @@ if ($op == 'default') {
         JSON::fail(['msg' => '广告类型不正确！']);
     }
 
-    $seconds = request::int('seconds');
+    $seconds = Request::int('seconds');
     $duration = $account->getDuration();
 
-    $device = Device::get(request::trim('device'), true);
+    $device = Device::get(Request::trim('device'), true);
     if ($device) {
         $exclusive_locker = $account->settings('config.video.exclusive', false);
         if ($exclusive_locker) {
-            $serial = request::str('serial');
+            $serial = Request::str('serial');
             if ($seconds == 0) {
                 if (!Locker::try("account:video@{$device->getId()}", $serial, 0, 0, 2, $duration + 3, false)) {
                     JSON::fail([
@@ -105,7 +105,7 @@ if ($op == 'default') {
     }
 
     $ticket_data = [
-        'id' => request::str('serial'),
+        'id' => Request::str('serial'),
         'time' => time(),
         'deviceId' => $device->getId(),
         'shadowId' => $device->getShadowId(),
@@ -173,8 +173,8 @@ if ($op == 'default') {
         JSON::success([]);
     }
 
-    if (request::has('deviceId')) {
-        $device = Device::get(request::str('deviceId'), true);
+    if (Request::has('deviceId')) {
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             JSON::fail('找不到这个设备！');
         }
@@ -183,11 +183,11 @@ if ($op == 'default') {
     }
 
     $include = [];
-    if (request::bool('balance')) {
+    if (Request::bool('balance')) {
         $include[] = Account::BALANCE;
     }
 
-    if (request::bool('commission')) {
+    if (Request::bool('commission')) {
         $free_goods_list = $device->getGoodsList($user, [Goods::AllowFree]);
         $ok = false;
         foreach ($free_goods_list as $goods) {
@@ -206,21 +206,21 @@ if ($op == 'default') {
         $include = [];
     }
 
-    if (request::is_array('type')) {
-        $types = request::array('type');
+    if (Request::is_array('type')) {
+        $types = Request::array('type');
     } else {
-        if (request::str('type') == 'all') {
+        if (Request::str('type') == 'all') {
             $types = null;
         } else {
-            $type = request::int('type', Account::NORMAL);
+            $type = Request::int('type', Account::NORMAL);
             $types = [$type];
         }
     }
 
-    if (request::is_array('s_type')) {
-        $s_types = request::array('s_type');
+    if (Request::is_array('s_type')) {
+        $s_types = Request::array('s_type');
     } else {
-        if (request::str('s_type') == 'all') {
+        if (Request::str('s_type') == 'all') {
             $s_types = null;
         } else {
             $s_types = [];
@@ -233,8 +233,8 @@ if ($op == 'default') {
         'include' => $include,
     ];
 
-    if (request::has('max')) {
-        $params['max'] = request::int('max');
+    if (Request::has('max')) {
+        $params['max'] = Request::int('max');
     }
 
     $result = Account::getAvailableList($device, $user, $params);
@@ -274,12 +274,12 @@ if ($op == 'default') {
         JSON::fail('正忙，请稍后再试！');
     }
 
-    $device = Device::get(request::str('device'), true);
+    $device = Device::get(Request::str('device'), true);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
-    $account = Account::findOneFromUID(request::str('uid'));
+    $account = Account::findOneFromUID(Request::str('uid'));
     if (empty($account)) {
         JSON::fail('找不到这个小程序！');
     }
@@ -313,7 +313,7 @@ if ($op == 'default') {
         JSON::fail('未开启这个功能！');
     }
 
-    $account = Account::findOneFromUID(request::str('account'));
+    $account = Account::findOneFromUID(Request::str('account'));
     if (empty($account)) {
         JSON::fail('找不到这个公众号！');
     }
@@ -337,7 +337,7 @@ if ($op == 'default') {
         JSON::fail('无法获取用户信息！');
     }
 
-    $uid = request::str('uid');
+    $uid = Request::str('uid');
     $account = Account::findOneFromUID($uid);
     if (empty($account) || $account->isBanned()) {
         JSON::fail('任务不存在！');
@@ -368,7 +368,7 @@ if ($op == 'default') {
     }
 
     $device = null;
-    $device_uid = request::trim('device');
+    $device_uid = Request::trim('device');
     if ($device_uid) {
         $device = Device::find($device_uid, ['imei', 'shadow_id']);
         if (empty($device)) {
@@ -376,21 +376,21 @@ if ($op == 'default') {
         }
     }
 
-    $uid = request::str('uid');
+    $uid = Request::str('uid');
     $account = Account::findOneFromUID($uid);
     if (empty($account) || $account->isBanned()) {
         return err('任务不存在！');
     }
 
-    if (request::has('tid')) {
-        $tid = request::str('tid');
+    if (Request::has('tid')) {
+        $tid = Request::str('tid');
         $acc = Account::findOneFromUID($tid);
         if (empty($acc) || $acc->getConfig('questionnaire.uid') !== $uid) {
             JSON::fail('没有允许从这个公众号访问这个问卷！');
         }
     }
 
-    $answer = request::array('data');
+    $answer = Request::array('data');
 
     $v = $acc ?? $account;
 

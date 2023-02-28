@@ -11,18 +11,18 @@ namespace zovye\job\refund;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $log = [
     'id' => request('id'),
 ];
 if ($op == 'remain_warning' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if ($device) {
         $agent = $device->getAgent();
         if ($agent) {

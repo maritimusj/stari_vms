@@ -11,13 +11,13 @@ use zovye\account\YfbAccount;
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('yfb', [
-    'raw' => request::raw(),
-    'user' => request::json('openId'),
-    'device' => request::json('params'),
+    'raw' => Request::raw(),
+    'user' => Request::json('openId'),
+    'device' => Request::json('params'),
 ]);
 
 if (App::isYFBEnabled()) {
-    YfbAccount::cb(request::json());
+    YfbAccount::cb(Request::json());
 } else {
     Log::debug('yfb', [
         'error' => '粉丝宝没有启用！',

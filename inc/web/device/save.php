@@ -9,72 +9,72 @@ namespace zovye;
 use RuntimeException;
 use zovye\model\packageModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $device = null;
 $result = Util::transactionDo(function () use ($id, &$device) {
     $data = [
         'agent_id' => 0,
-        'name' => request::trim('name'),
-        'imei' => request::trim('IMEI'),
-        'group_id' => request::int('group'),
-        'capacity' => max(0, request::int('capacity')),
-        'remain' => max(0, request::int('remain')),
+        'name' => Request::trim('name'),
+        'imei' => Request::trim('IMEI'),
+        'group_id' => Request::int('group'),
+        'capacity' => max(0, Request::int('capacity')),
+        'remain' => max(0, Request::int('remain')),
     ];
 
-    $tags = request::trim('tags');
+    $tags = Request::trim('tags');
     $extra = [
-        'pushAccountMsg' => request::trim('pushAccountMsg'),
-        'isDown' => request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
-        'activeQrcode' => request::bool('activeQrcode') ? 1 : 0,
-        'address' => request::trim('address'),
+        'pushAccountMsg' => Request::trim('pushAccountMsg'),
+        'isDown' => Request::bool('isDown') ? Device::STATUS_MAINTENANCE : Device::STATUS_NORMAL,
+        'activeQrcode' => Request::bool('activeQrcode') ? 1 : 0,
+        'address' => Request::trim('address'),
         'grantloc' => [
             'lng' => floatval(request('location')['lng']),
             'lat' => floatval(request('location')['lat']),
         ],
-        'txt' => [request::trim('first_txt'), request::trim('second_txt'), request::trim('third_txt')],
-        'theme' => request::str('theme'),
+        'txt' => [Request::trim('first_txt'), Request::trim('second_txt'), Request::trim('third_txt')],
+        'theme' => Request::str('theme'),
     ];
 
     if (App::isDeviceWithDoorEnabled()) {
         $extra['door'] = [
-            'num' => request::int('doorNum', 1),
+            'num' => Request::int('doorNum', 1),
         ];
     }
 
     if (App::isMustFollowAccountEnabled()) {
         $extra['mfa'] = [
-            'enable' => request::int('mustFollow'),
+            'enable' => Request::int('mustFollow'),
         ];
     }
 
     if (App::isMoscaleEnabled()) {
         $extra['moscale'] = [
-            'key' => request::trim('moscaleMachineKey'),
+            'key' => Request::trim('moscaleMachineKey'),
             'label' => array_map(function ($e) {
                 return intval($e);
-            }, explode(',', request::trim('moscaleLabel'))),
+            }, explode(',', Request::trim('moscaleLabel'))),
             'region' => [
-                'province' => request::int('province_code'),
-                'city' => request::int('city_code'),
-                'area' => request::int('area_code'),
+                'province' => Request::int('province_code'),
+                'city' => Request::int('city_code'),
+                'area' => Request::int('area_code'),
             ],
         ];
     }
 
     if (App::isZeroBonusEnabled()) {
-        setArray($extra, 'custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
+        setArray($extra, 'custom.bonus.zero.v', min(100, Request::float('zeroBonus', -1, 2)));
     }
 
     if (App::isFlashEggEnabled()) {
-        setArray($extra, 'ad.device.uid', request::trim('adDeviceUID'));
+        setArray($extra, 'ad.device.uid', Request::trim('adDeviceUID'));
     }
 
     if (empty($data['name']) || empty($data['imei'])) {
         throw new RuntimeException('设备名称或IMEI不能为空！');
     }
 
-    $type_id = request::int('deviceType');
+    $type_id = Request::int('deviceType');
     if ($type_id) {
         $device_type = DeviceTypes::get($type_id);
         if (empty($device_type)) {
@@ -84,26 +84,26 @@ $result = Util::transactionDo(function () use ($id, &$device) {
 
     $data['device_type'] = $type_id;
 
-    if (App::isBluetoothDeviceSupported() && request::str('device_model') == Device::BLUETOOTH_DEVICE) {
+    if (App::isBluetoothDeviceSupported() && Request::str('device_model') == Device::BLUETOOTH_DEVICE) {
         $extra['bluetooth'] = [
-            'protocol' => request::str('blueToothProtocol'),
-            'uid' => request::trim('BUID'),
-            'mac' => request::trim('MAC'),
-            'motor' => request::int('Motor'),
-            'screen' => request::int('blueToothScreen') ? 1 : 0,
-            'power' => request::int('blueToothPowerSupply') ? 1 : 0,
-            'disinfectant' => request::int('blueToothDisinfectant') ? 1 : 0,
+            'protocol' => Request::str('blueToothProtocol'),
+            'uid' => Request::trim('BUID'),
+            'mac' => Request::trim('MAC'),
+            'motor' => Request::int('Motor'),
+            'screen' => Request::int('blueToothScreen') ? 1 : 0,
+            'power' => Request::int('blueToothPowerSupply') ? 1 : 0,
+            'disinfectant' => Request::int('blueToothDisinfectant') ? 1 : 0,
         ];
     }
 
-    if (App::isFuelingDeviceEnabled() && request::str('device_model') == Device::FUELING_DEVICE) {
-        $extra['pulse'] = request::int('pulse');
-        $extra['timeout'] = request::int('timeout');
-        $extra['solo'] = request::bool('solo') ? 1 : 0;
-        $extra['expiration'] = request::str('expiration');
+    if (App::isFuelingDeviceEnabled() && Request::str('device_model') == Device::FUELING_DEVICE) {
+        $extra['pulse'] = Request::int('pulse');
+        $extra['timeout'] = Request::int('timeout');
+        $extra['solo'] = Request::bool('solo') ? 1 : 0;
+        $extra['expiration'] = Request::str('expiration');
     }
 
-    $agent_id = request::int('agent_id');
+    $agent_id = Request::int('agent_id');
     if ($agent_id) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {
@@ -152,8 +152,8 @@ $result = Util::transactionDo(function () use ($id, &$device) {
             $device->setGroupId($data['group_id']);
         }
 
-        if (request::isset('volume')) {
-            $vol = max(0, min(100, request::int('volume')));
+        if (Request::isset('volume')) {
+            $vol = max(0, min(100, Request::int('volume')));
             if ($vol != $device->settings('extra.volume')) {
                 $extra['volume'] = $vol;
             }
@@ -164,7 +164,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
             throw new RuntimeException('创建失败！');
         }
 
-        $model = request::str('device_model');
+        $model = Request::str('device_model');
 
         $device->setDeviceModel($model);
 
@@ -193,7 +193,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
             throw new RuntimeException('设备类型不正确！');
         }
         $cargo_lanes = [];
-        for ($i = 0; $i < request::int('chargerNum'); $i++) {
+        for ($i = 0; $i < Request::int('chargerNum'); $i++) {
             $cargo_lanes[] = [];
         }
         $device_type->setExtraData('cargo_lanes', $cargo_lanes);
@@ -216,10 +216,10 @@ $result = Util::transactionDo(function () use ($id, &$device) {
             $old = $device_type->getExtraData('cargo_lanes', []);
 
             $cargo_lanes = [];
-            $capacities = request::array('capacities');
+            $capacities = Request::array('capacities');
             $is_fueling =  $device->isFuelingDevice();
 
-            foreach (request::array('goods') as $index => $goods_id) {
+            foreach (Request::array('goods') as $index => $goods_id) {
                 $cargo_lanes[] = [
                     'goods' => intval($goods_id),
                     'capacity' => $is_fueling ? intval(round($capacities[$index] * 100)) : intval($capacities[$index]),
@@ -250,15 +250,15 @@ $result = Util::transactionDo(function () use ($id, &$device) {
     $cargo_lanes = [];
     foreach ($type_data['cargo_lanes'] as $index => $lane) {
         if ( $is_fueling) {
-            $num = intval(request::float("lane{$index}_num", 0, 2) * 100);
+            $num = intval(Request::float("lane{$index}_num", 0, 2) * 100);
         } else {
-            $num = request::int("lane{$index}_num");
+            $num = Request::int("lane{$index}_num");
         }
         $cargo_lanes[$index] = [
             'num' => '@'.max(0, $num),
         ];
         if ($device_type->getDeviceId() == $device->getId()) {
-            $cargo_lanes[$index]['price'] = request::float("price$index", 0, 2) * 100;
+            $cargo_lanes[$index]['price'] = Request::float("price$index", 0, 2) * 100;
         }
     }
 
@@ -267,7 +267,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         throw new RuntimeException('保存设备库存数据失败！');
     }
 
-    $location = request::array('location');
+    $location = Request::array('location');
     $extra['location']['baidu']['lat'] = $location['lat'];
     $extra['location']['baidu']['lng'] = $location['lng'];
 
@@ -293,13 +293,13 @@ $result = Util::transactionDo(function () use ($id, &$device) {
     }
 
     $extra['location']['tencent'] = $device->settings('extra.location.tencent', []);
-    $extra['goodsList'] = request::trim('goodsList');
+    $extra['goodsList'] = Request::trim('goodsList');
 
     $extra['schedule'] = [
         'screen' => [
-            'enabled' => request::bool('screenSchedule') ? 1 : 0,
-            'on' => request::str('start'),
-            'off' => request::str('end'),
+            'enabled' => Request::bool('screenSchedule') ? 1 : 0,
+            'on' => Request::str('start'),
+            'off' => Request::str('end'),
         ],
     ];
 
@@ -338,7 +338,7 @@ $result = Util::transactionDo(function () use ($id, &$device) {
         //todo 暂无操作
     } else {
         if (App::isZJBaoEnabled()) {
-            $device->updateSettings('zjbao.scene', request::trim('ZJBao_Scene'));
+            $device->updateSettings('zjbao.scene', Request::trim('ZJBao_Scene'));
         }
 
         //更新公众号缓存
@@ -374,7 +374,7 @@ Util::itoast(
     $result['message'],
     $this->createWebUrl(
         'device',
-        ['op' => 'edit', 'id' => $device ? $device->getId() : $id, 'from' => request::str('from')]
+        ['op' => 'edit', 'id' => $device ? $device->getId() : $id, 'from' => Request::str('from')]
     ),
     $result['error'] ? 'warning' : 'success'
 );

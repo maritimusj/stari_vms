@@ -11,7 +11,7 @@ use zovye\Device;
 use zovye\model\device_recordModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\settings_userModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Keeper;
 use zovye\model\keeperModelObj;
 use zovye\State;
@@ -25,9 +25,9 @@ class maintenance
 {
     public static function createMaintainRecord($user, $user_id = 0): array
     {
-        $device_id = request::int('device_id');
+        $device_id = Request::int('device_id');
         $user_id = $user_id ?: $user->getId();
-        $cate = request::str('cate');
+        $cate = Request::str('cate');
 
         $agent_id = $user->getAgentId();
 
@@ -88,21 +88,21 @@ class maintenance
 
     public static function getMRList($agent): array
     {
-        $device = request::trim('device');
-        $keeper = request::int('keeper');
-        $cate = request::int('cate');
+        $device = Request::trim('device');
+        $keeper = Request::int('keeper');
+        $cate = Request::int('cate');
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        if (request::has('start')) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
+        if (Request::has('start')) {
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('start').' 00:00:00');
         } else {
             $s_date = new DateTime('first day of this month 00:00:00');
         }
 
-        if (request::has('end')) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end').' 00:00:00');
+        if (Request::has('end')) {
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('end').' 00:00:00');
             $e_date->modify('next day');
         } else {
             $e_date = new DateTime('first day of next month 00:00:00');

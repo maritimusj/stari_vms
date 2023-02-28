@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\versionModelObj;
 
-$device_id = request::int('id');
+$device_id = Request::int('id');
 $all = [];
 /** @var versionModelObj $entry */
 foreach (m('version')->findAll(We7::uniacid([])) as $entry) {
@@ -21,7 +21,7 @@ foreach (m('version')->findAll(We7::uniacid([])) as $entry) {
     ];
 }
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     $device_name = '';
     $lastUpgradeInfo = [];
     if ($device_id) {

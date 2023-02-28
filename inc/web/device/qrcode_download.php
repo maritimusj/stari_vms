@@ -18,7 +18,7 @@ $file_name = time().'_'.rand().'.zip';
 $file_path = $attach_prefix.$file_name;
 $zip->open($file_path, ZipArchive::CREATE);   //打开压缩包
 
-$ids = request::array('ids', []);
+$ids = Request::array('ids', []);
 $query = Device::query(['id' => $ids]);
 
 $addFile = function ($url) use ($zip, $url_prefix, $attach_prefix) {

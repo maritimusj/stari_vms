@@ -11,13 +11,13 @@ defined('IN_IA') or exit('Access Denied');
 
 $user = Util::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
-    if (request::is_ajax()) {
+    if (Request::is_ajax()) {
         JSON::fail('找不到这个用户！');
     }
     Util::resultAlert('用户不可用！', 'error');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'default') {
 
     app()->mallPage($user);
@@ -29,8 +29,8 @@ if ($op == 'default') {
 } elseif ($op == 'goods_list') {
 
     $result = Mall::getGoodsList([
-        'page' => request::int('page'),
-        'pagesize' => request::int('pagesize'),
+        'page' => Request::int('page'),
+        'pagesize' => Request::int('pagesize'),
     ]);
 
     JSON::success($result);
@@ -38,8 +38,8 @@ if ($op == 'default') {
 } elseif ($op == 'create_order') {
 
     $result = Mall::createOrder($user, [
-        'goods_id' => request::int('goods'),
-        'num' => request::int('num'),
+        'goods_id' => Request::int('goods'),
+        'num' => Request::int('num'),
     ]);
 
     JSON::result($result);
@@ -47,13 +47,13 @@ if ($op == 'default') {
 } elseif ($op == 'logs') {
 
     $params = [
-        'last_id' => request::int('lastId'),
-        'pagesize' => request::int('pagesize'),
+        'last_id' => Request::int('lastId'),
+        'pagesize' => Request::int('pagesize'),
         'user_id' => $user->getId(),
     ];
 
-    if (request::isset('status')) {
-        $params['status'] = request::int('status');
+    if (Request::isset('status')) {
+        $params['status'] = Request::int('status');
     }
 
     $result = Delivery::getList($params);
@@ -71,9 +71,9 @@ if ($op == 'default') {
 
 } elseif ($op == 'update_recipient') {
 
-    $name = request::trim('name');
-    $phone_num = request::trim('phoneNum');
-    $address = request::trim('address');
+    $name = Request::trim('name');
+    $phone_num = Request::trim('phoneNum');
+    $address = Request::trim('address');
 
     $result = $user->updateRecipientData($name, $phone_num, $address);
 

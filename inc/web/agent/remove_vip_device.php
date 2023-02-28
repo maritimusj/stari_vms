@@ -6,13 +6,13 @@
  
 namespace zovye;
 
-$vip_id = request::int('vip');
+$vip_id = Request::int('vip');
 $vip = VIP::get($vip_id);
 if (empty($vip)) {
     JSON::fail('找不到这个VIP用户！');
 }
 
-$device_id = request::int('id');
+$device_id = Request::int('id');
 
 $ids = $vip->getDeviceIds();
 

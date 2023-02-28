@@ -13,17 +13,17 @@ use zovye\Fueling;
 use zovye\Log;
 
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 
-$uid = request::str('uid');
-$time = request::int('time');
+$uid = Request::str('uid');
+$time = Request::int('time');
 
 $params = [
     'uid' => $uid,
     'time' => $time,
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'fueling_stop_timeout' && CtrlServ::checkJobSign($params)) {
 
     $order = Order::get($uid, true);

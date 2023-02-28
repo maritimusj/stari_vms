@@ -14,7 +14,7 @@ $tpl_data = [
     'archive_types' => settings('doc.types'),
 ];
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     $art = m('article')->findOne(We7::uniacid(['id' => $id, 'type' => 'article']));
     if (empty($art)) {

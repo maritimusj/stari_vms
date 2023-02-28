@@ -22,7 +22,7 @@ if (empty($user) || $user->isBanned() || !$user->isTester()) {
     Util::resultAlert('对不起，只有测试人员才能访问！', 'error');
 }
 
-$op = request::op();
+$op = Request::op();
 if (empty($op)) {
     app()->showTemplate('testing', [
         'api_url' => Util::murl('testing'),
@@ -30,7 +30,7 @@ if (empty($op)) {
     ]);
 } else {
     if ($op == "detail") {
-        $imei = request::trim('imei');
+        $imei = Request::trim('imei');
 
         $device = Device::get($imei, true);
         if ($device && $device->isVDevice()) {
@@ -57,8 +57,8 @@ if (empty($op)) {
         Util::resultJSON($detail['status'], $detail['data']);
     } else {
         if ($op == "test") {
-            $imei = request::trim('imei');
-            $channel = request::int('channel');
+            $imei = Request::trim('imei');
+            $channel = Request::int('channel');
 
             if ($imei) {
                 $x = Device::find($imei, ['imei', 'shadow_id']);

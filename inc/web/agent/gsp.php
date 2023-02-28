@@ -7,7 +7,7 @@
 namespace zovye;
 
 $result_msg = function ($msg, $status) {
-    if (request::is_ajax()) {
+    if (Request::is_ajax()) {
         if ($status) {
             JSON::success($msg);
         } else {
@@ -18,7 +18,7 @@ $result_msg = function ($msg, $status) {
     }
 };
 
-$agent = Agent::get(request::int('agentid'));
+$agent = Agent::get(Request::int('agentid'));
 if (empty($agent)) {
     $result_msg('找不到这个代理商！', false);
 }
@@ -28,18 +28,18 @@ if (empty($agent->isCommissionEnabled())) {
 }
 
 $tpl_data = [
-    'op' => request::op(),
+    'op' => Request::op(),
     'agent' => $agent,
 ];
 
 $back_url = $this->createWebUrl('agent', array('id' => $agent->getId(), 'op' => 'agent_commission'));
 $tpl_data['back_url'] = $back_url;
 
-$fn = request::trim('fn');
+$fn = Request::trim('fn');
 if ($fn == 'adduser' || $fn == 'edituser') {
-    $from = request::trim('from');
+    $from = Request::trim('from');
     if ($from == 'free') {
-        $user = User::get(request::int('id'));
+        $user = User::get(Request::int('id'));
         if (empty($user)) {
             $result_msg('找不到这个用户！', false);
         }
@@ -52,7 +52,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
                 'b' => 1,
                 'p' => 1,
             ];
-            $tpl_data['mode'] = request::str('mode', 'percent');
+            $tpl_data['mode'] = Request::str('mode', 'percent');
             if ($agent->settings("agentData.gsp.users.{$user->getOpenid()}")) {
                 $result_msg('用户已经是代理商的佣金分享用户！', false);
             }
@@ -74,9 +74,9 @@ if ($fn == 'adduser' || $fn == 'edituser') {
         app()->showTemplate('web/agent/free_edit_user', $tpl_data);
     } elseif ($from == 'mixed') {
         if ($fn == 'adduser') {
-            $user = User::get(request::int('id'));
+            $user = User::get(Request::int('id'));
         } else {
-            $entry = GSP::findOne(['agent_id' => $agent->getId(), 'id' => request::int('id')]);
+            $entry = GSP::findOne(['agent_id' => $agent->getId(), 'id' => Request::int('id')]);
             if (empty($entry)) {
                 $result_msg('找不到这个设置！', false);
             }
@@ -99,26 +99,26 @@ if ($fn == 'adduser' || $fn == 'edituser') {
     }
 } elseif ($fn == 'saveuser') {
 
-    $user = User::get(request::int('id'));
+    $user = User::get(Request::int('id'));
     if (empty($user)) {
         Util::message('找不到这个用户！', $back_url, 'error');
     }
 
-    $from = request::trim('from', 'free');
+    $from = Request::trim('from', 'free');
     if ($from == 'free') {
         $order_type = [
-            'f' => request::bool('freeOrder') ? 1 : 0,
-            'b' => request::bool('balanceOrder') ? 1 : 0,
-            'p' => request::bool('payOrder') ? 1 : 0,
+            'f' => Request::bool('freeOrder') ? 1 : 0,
+            'b' => Request::bool('balanceOrder') ? 1 : 0,
+            'p' => Request::bool('payOrder') ? 1 : 0,
         ];
 
         $key_name = "agentData.gsp.users.{$user->getOpenid()}";
 
         $agent->updateSettings("$key_name.order", $order_type);
 
-        $mode_type = request::trim('mode_type', 'percent');
+        $mode_type = Request::trim('mode_type', 'percent');
         if ($mode_type == 'percent') {
-            $percent = min(10000, max(0, request::float('val', 0, 2) * 100));
+            $percent = min(10000, max(0, Request::float('val', 0, 2) * 100));
             if ($agent->settings($key_name)) {
                 $agent->updateSettings("$key_name.percent", $percent);
             } else {
@@ -132,7 +132,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
             }
             $agent->updateSettings("$key_name.amount", []);
         } else {
-            $amount = request::float('val', 0, 2) * 100;
+            $amount = Request::float('val', 0, 2) * 100;
             if ($agent->settings($key_name)) {
                 $agent->updateSettings("$key_name.amount", $amount);
             } else {
@@ -161,16 +161,16 @@ if ($fn == 'adduser' || $fn == 'edituser') {
                      'b' => ['type' => 'balanceOrderType', 'val' => 'balanceOrderVal'],
                      'p' => ['type' => 'payOrderType', 'val' => 'payOrderVal'],
                  ] as $key => $v) {
-            if (request::isset($v['type'])) {
-                if (request::bool($v['type'])) {
+            if (Request::isset($v['type'])) {
+                if (Request::bool($v['type'])) {
                     $entries[$key] = [
                         'val_type' => 'percent',
-                        'val' => min(10000, max(0, request::float($v['val'], 0, 2) * 100)),
+                        'val' => min(10000, max(0, Request::float($v['val'], 0, 2) * 100)),
                     ];
                 } else {
                     $entries[$key] = [
                         'val_type' => 'amount',
-                        'val' => request::float($v['val'], 0, 2) * 100,
+                        'val' => Request::float($v['val'], 0, 2) * 100,
                     ];
                 }
             }
@@ -188,9 +188,9 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 
     Util::message('保存成功！', $back_url, 'success');
 } elseif ($fn == 'removeuser') {
-    $from = request::trim("from");
+    $from = Request::trim("from");
     if ($from == 'free') {
-        $user = User::get(request::int('id'));
+        $user = User::get(Request::int('id'));
         if (empty($user)) {
             $result_msg('找不到这个用户', 'error');
         }
@@ -200,7 +200,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
             }
         }
     } elseif ($from == 'mixed') {
-        $entry = GSP::findOne(['agent_id' => $agent->getId(), 'id' => request::int('id')]);
+        $entry = GSP::findOne(['agent_id' => $agent->getId(), 'id' => Request::int('id')]);
         if (empty($entry)) {
             $result_msg('找不到这个设置', 'error');
         }
@@ -223,7 +223,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 } elseif ($fn == 'add_role') {
     $tpl_data['agentId'] = $agent->getId();
 
-    $tpl_data['level'] = request::trim('level');
+    $tpl_data['level'] = Request::trim('level');
 
     $content = app()->fetchTemplate('web/agent/gsp_add_role', $tpl_data);
     JSON::success([
@@ -231,7 +231,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
         'content' => $content,
     ]);
 } elseif ($fn == 'get_role') {
-    $level = request::str('level');
+    $level = Request::str('level');
     if (!in_array($level, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3])) {
         JSON::fail('角色不正确！');
     }
@@ -252,7 +252,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
     }
     JSON::success($result);
 } elseif ($fn == 'save_role') {
-    $level = request::str('level');
+    $level = Request::str('level');
     if (!in_array($level, [GSP::LEVEL1, GSP::LEVEL2, GSP::LEVEL3])) {
         JSON::fail('角色不正确！');
     }
@@ -266,16 +266,16 @@ if ($fn == 'adduser' || $fn == 'edituser') {
                  'b' => ['type' => 'balanceOrderType', 'val' => 'balanceOrderVal'],
                  'p' => ['type' => 'payOrderType', 'val' => 'payOrderVal'],
              ] as $key => $v) {
-        if (request::isset($v['type'])) {
-            if (request::bool($v['type'])) {
+        if (Request::isset($v['type'])) {
+            if (Request::bool($v['type'])) {
                 $entries[$key] = [
                     'val_type' => 'percent',
-                    'val' => min(10000, max(0, request::float($v['val'], 0, 2) * 100)),
+                    'val' => min(10000, max(0, Request::float($v['val'], 0, 2) * 100)),
                 ];
             } else {
                 $entries[$key] = [
                     'val_type' => 'amount',
-                    'val' => request::float($v['val'], 0, 2) * 100,
+                    'val' => Request::float($v['val'], 0, 2) * 100,
                 ];
             }
         }
@@ -292,7 +292,7 @@ if ($fn == 'adduser' || $fn == 'edituser') {
 
     JSON::success('成功！');
 } elseif ($fn == 'get_data') {
-    $user = User::get(request::trim('openid'), true);
+    $user = User::get(Request::trim('openid'), true);
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }

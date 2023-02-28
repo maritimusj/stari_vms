@@ -7,7 +7,7 @@
 
 namespace zovye;
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'default') {
     $user = Util::getCurrentUser();
@@ -15,7 +15,7 @@ if ($op == 'default') {
         Util::resultAlert('请用微信打开！', 'error');
     }
 
-    $device_shadow_id = request::str('device');
+    $device_shadow_id = Request::str('device');
     if ($device_shadow_id) {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
@@ -29,7 +29,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个用户！');
     }
 
-    $max = request::int('max', 10);
+    $max = Request::int('max', 10);
 
     $result = Task::getList($user, $max);
 
@@ -42,7 +42,7 @@ if ($op == 'default') {
         JSON::fail('找不到这个用户！');
     }
 
-    $uid = request::str('uid');
+    $uid = Request::str('uid');
 
     $res = Task::detail($uid);
     if (is_error($res)) {
@@ -62,8 +62,8 @@ if ($op == 'default') {
         return err('用户无法锁定，请重试！');
     }
 
-    $uid = request::str('uid');
-    $data = request::array('data');
+    $uid = Request::str('uid');
+    $data = Request::array('data');
     if (empty($data)) {
         return err('提交的数据为空！');
     }

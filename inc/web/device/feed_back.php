@@ -9,7 +9,7 @@ namespace zovye;
 use DateTime;
 use zovye\model\device_feedbackModelObj;
 
-$date_limit = request::array('datelimit');
+$date_limit = Request::array('datelimit');
 if ($date_limit['start']) {
     $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
 } else {
@@ -28,7 +28,7 @@ $condition = [
     'createtime <' => $e_date->getTimestamp(),
 ];
 
-$device_id = request::int('device_id');
+$device_id = Request::int('device_id');
 
 if (!empty($device_id)) {
     $condition['device_id'] = $device_id;
@@ -36,8 +36,8 @@ if (!empty($device_id)) {
 
 $query = m('device_feedback')->query($condition);
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $total = $query->count();
 

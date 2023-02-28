@@ -8,10 +8,10 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op();
+$op = Request::op();
 
 if ($op == 'auth' || $op == 'get_openid') {
-    $code = request::str('code');
+    $code = Request::str('code');
     if (empty($code)) {
         Util::resultAlert('获取用户授权code失败！', 'error');
     }
@@ -21,16 +21,16 @@ if ($op == 'auth' || $op == 'get_openid') {
         Util::resultAlert('获取用户信息失败[02]', 'error');
     }
 
-    if (request::has('id')) {
-        $account = Account::get(request::int('id'));
+    if (Request::has('id')) {
+        $account = Account::get(Request::int('id'));
         if (empty($account)) {
             Util::resultAlert('找不到指定的吸粉广告！', 'error');
         }
         $account->updateSettings('config.openid', $user->getOpenid());
         Util::resultAlert('授权接入成功！');
 
-    } elseif (request::has('uid')) {
-        $account = Account::findOneFromUID(request::trim('uid'));
+    } elseif (Request::has('uid')) {
+        $account = Account::findOneFromUID(Request::trim('uid'));
         if (empty($account)) {
             Util::resultAlert('找不到指定的吸粉广告！', 'error');
         }
@@ -39,11 +39,11 @@ if ($op == 'auth' || $op == 'get_openid') {
     }
 
 } elseif ($op == 'account') {
-    $device = Device::findOne(['shadow_id' => request::str('device')]);
+    $device = Device::findOne(['shadow_id' => Request::str('device')]);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
-    $user = User::get(request::trim('user'), true);
+    $user = User::get(Request::trim('user'), true);
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
@@ -66,17 +66,17 @@ if ($op == 'auth' || $op == 'get_openid') {
     JSON::success($data);
 
 } elseif ($op == 'detail') {
-    $user = User::get(request::trim('user'), true);
+    $user = User::get(Request::trim('user'), true);
     if (empty($user)) {
         JSON::fail('找不到这个用户！');
     }
 
-    $device = Device::findOne(['shadow_id' => request::str('device')]);
+    $device = Device::findOne(['shadow_id' => Request::str('device')]);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }
 
-    $account = Account::findOneFromUID(request::trim('uid'));
+    $account = Account::findOneFromUID(Request::trim('uid'));
     if (empty($account)) {
         JSON::fail('找不到这个抖音号[01]');
     }
@@ -102,11 +102,11 @@ if ($op == 'auth' || $op == 'get_openid') {
     ]);
 }
 
-$from = request::str('from');
-$device_id = request::str('device');
+$from = Request::str('from');
+$device_id = Request::str('device');
 
 if (!App::isDouYinUser()) {
-    $retries = request::int('retries');
+    $retries = Request::int('retries');
     if ($retries > 3) {
         Util::resultAlert('获取用户信息失败[01]', 'error');
     }

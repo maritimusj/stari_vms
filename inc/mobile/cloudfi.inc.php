@@ -11,11 +11,11 @@ use zovye\account\CloudFIAccount;
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('cloudFI', [
-    'raw' => request::raw(),
+    'raw' => Request::raw(),
 ]);
 
 if (App::isCloudFIEnabled()) {
-    CloudFIAccount::cb(request::json());
+    CloudFIAccount::cb(Request::json());
 }
 
 exit(REQUEST_ID);

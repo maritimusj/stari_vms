@@ -11,7 +11,7 @@ $content = app()->fetchTemplate(
     [
         'chartid' => Util::random(10),
         'data' => Util::cachedCall(30, function () {
-            $n = request::int('n', 10);
+            $n = Request::int('n', 10);
 
             return Stats::chartDataOfAccounts($n);
         }),

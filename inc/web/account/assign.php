@@ -4,7 +4,7 @@ namespace zovye;
 
 $commission_enabled = App::isCommissionEnabled();
 
-$id = request::int('id');
+$id = Request::int('id');
 $account = Account::get($id);
 if (empty($account)) {
     Util::itoast('这个任务不存在！', $this->createWebUrl('account'), 'error');

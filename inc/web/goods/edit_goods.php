@@ -8,7 +8,7 @@ namespace zovye;
 
 $params = [];
 
-$goods_id = request::int('id');
+$goods_id = Request::int('id');
 if ($goods_id > 0) {
     $params['goods'] = Goods::data($goods_id, ['detail']);
     if (empty($params['goods'])) {
@@ -24,7 +24,7 @@ if ($goods_id > 0) {
     }
 }
 
-$type = request::str('type');
+$type = Request::str('type');
 if ($type == Goods::Lottery) {
     app()->showTemplate('web/goods/edit_lottery', $params);
 } elseif ($type == Goods::Fueling) {

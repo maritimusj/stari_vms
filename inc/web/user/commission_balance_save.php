@@ -6,18 +6,18 @@
  
 namespace zovye;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('没有找到这个用户！');
 }
 
-$total = intval(round(request::float('total', 0, 2) * 100));
+$total = intval(round(Request::float('total', 0, 2) * 100));
 if ($total == 0) {
     JSON::fail('金额不能为零！');
 }
 
 if ($user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-    $memo = request::str('memo');
+    $memo = Request::str('memo');
     $r = $user->commission_change(
         $total,
         CommissionBalance::ADJUST,

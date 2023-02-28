@@ -11,16 +11,16 @@ use zovye\account\WeiSureAccount;
 
 defined('IN_IA') or exit('Access Denied');
 
-if (request::is_post()) {
+if (Request::is_post()) {
     Log::debug('weisure', [
-        'raw' => request::raw(),
-        'userAction' => request::json('userAction', ''),
-        'actionTime' => request::json('actionTime', ''),
-        'outerUserId' => request::json('outerUserId', ''),
+        'raw' => Request::raw(),
+        'userAction' => Request::json('userAction', ''),
+        'actionTime' => Request::json('actionTime', ''),
+        'outerUserId' => Request::json('outerUserId', ''),
     ]);
 
     if (App::isWeiSureEnabled()) {
-        WeiSureAccount::cb(request::json());
+        WeiSureAccount::cb(Request::json());
     } else {
         Log::debug('weisure', [
             'error' => '微保没有启用！',
@@ -30,12 +30,12 @@ if (request::is_post()) {
     exit(WeiSureAccount::ResponseOk);
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'check') {
     //40s后执行超时任务
     CtrlServ::scheduleDelayJob('weisure_timeout', [
-        'user' => request::trim('user'),
-        'device' => request::trim('device'),
+        'user' => Request::trim('user'),
+        'device' => Request::trim('device'),
     ], 40);
 
     JSON::success('Ok');
@@ -51,7 +51,7 @@ if (empty($user)) {
 }
 
 if ($user->isBanned()) {
-    if (request::is_ajax()) {
+    if (Request::is_ajax()) {
         JSON::fail('用户暂时不可用！');
     }
     Util::resultAlert('用户暂时不可用！');

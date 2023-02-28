@@ -13,8 +13,8 @@ $tpl_data = [];
 $condition = We7::uniacid([]);
 $query = m('maintenance')->where($condition);
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $total = $query->count();
 
@@ -31,7 +31,7 @@ $join = $query
     ->on('m.device_id', 'd.imei');
 
 //搜索关键字
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $join->whereor("d.name LIKE", "%$keywords%")
         ->whereor("d.imei LIKE", "%$keywords%")

@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\team_memberModelObj;
 
-$user_id = request::int('id');
+$user_id = Request::int('id');
 $user = User::get($user_id);
 if (empty($user)) {
     Util::itoast('找不到这个用户！', $this->createWebUrl('user'), 'error');
@@ -21,8 +21,8 @@ if (empty($team)) {
 
 $tpl_data = [];
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = Team::findAllMember($team);
 $total = $query->count();

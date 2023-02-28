@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('没有找到这个用户！');
 }

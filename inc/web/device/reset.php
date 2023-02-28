@@ -8,7 +8,7 @@ namespace zovye;
 
 use RuntimeException;
 
-$id = request::int('id');
+$id = Request::int('id');
 $device = Device::get($id);
 if (empty($device)) {
     Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');
@@ -19,11 +19,11 @@ if (!$device->payloadLockAcquire(3)) {
 }
 
 $result = Util::transactionDo(function () use ($device) {
-    if (!request::isset('lane') || request::str('lane') == 'all') {
+    if (!Request::isset('lane') || Request::str('lane') == 'all') {
         $data = [];
     } else {
         $data = [
-            request::int('lane') => 0,
+            Request::int('lane') => 0,
         ];
     }
     $res = $device->resetPayload($data, '管理员重置商品数量');

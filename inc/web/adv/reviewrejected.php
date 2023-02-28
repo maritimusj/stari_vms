@@ -6,8 +6,8 @@
  
 namespace zovye;
 
-$id = request::int('id');
-$type = request::int('type');
+$id = Request::int('id');
+$type = Request::int('type');
 
 if (Advertising::reject($id)) {
     Util::itoast('广告已经被设置为拒绝通过！', $this->createWebUrl('adv', ['type' => $type]), 'success');

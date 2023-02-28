@@ -14,12 +14,12 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法购买！');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 
 //验证
 if ($op == 'default') {
 
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
     $device_id = '';
     if (!empty($order_no)) {
         $pay_log = $user->getPayLog($order_no);
@@ -40,14 +40,14 @@ if ($op == 'default') {
         JSON::fail('用户已经通过实名验证！');
     }
 
-    $name = request::trim('name');
-    $num = request::trim('num');
+    $name = Request::trim('name');
+    $num = Request::trim('num');
 
     if (empty($name) || strlen($num) != 18) {
         JSON::fail('请输入有效的姓名和身份证号码！');
     }
 
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
 
     $log = $user->settings('idcard.log', []);
     if ($log) {
@@ -104,7 +104,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'refund') {
 
-    $order_no = request::str('orderNO');
+    $order_no = Request::str('orderNO');
     Job::refund($order_no, '用户拒绝实名认证！');
     JSON::success(['code' => 201, 'msg' => '已发起退款请求，稍后自动退款！']);
 
@@ -114,12 +114,12 @@ if ($op == 'default') {
         JSON::success('用户已通过实名认证！');
     }
 
-    $name = request::trim('name');
+    $name = Request::trim('name');
     if ($name == '') {
         JSON::fail('请输入姓名！');
     }
 
-    $num = request::trim('num');
+    $num = Request::trim('num');
     if ($num == '') {
         JSON::fail('请输入身份证号码！');
     }

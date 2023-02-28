@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$member_id = request::int('id');
+$member_id = Request::int('id');
 
 $member = Team::getMember($member_id);
 if (empty($member)) {

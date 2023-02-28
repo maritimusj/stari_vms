@@ -7,7 +7,7 @@
 namespace zovye\api\wx;
 
 use zovye\App;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use function zovye\error;
 use function zovye\settings;
@@ -21,15 +21,15 @@ class goods
         common::checkCurrentUserPrivileges('F_sp');
 
         $params = [
-            'page' => request::int('page'),
-            'pagesize' => request::int('pagesize', DEFAULT_PAGE_SIZE),
-            'keywords' => request::trim('keywords', '', true),
+            'page' => Request::int('page'),
+            'pagesize' => Request::int('pagesize', DEFAULT_PAGE_SIZE),
+            'keywords' => Request::trim('keywords', '', true),
             'default_goods' => true,
         ];
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-        if (request::bool('all')) {
+        if (Request::bool('all')) {
             $params['agent_id'] = "*{$agent->getId()}";
         } else {
             $params['agent_id'] = $agent->getId();
@@ -50,7 +50,7 @@ class goods
 
         common::checkCurrentUserPrivileges('F_sp');
 
-        $goods_id = request::int('id');
+        $goods_id = Request::int('id');
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         $goods = \zovye\Goods::get($goods_id);
@@ -67,7 +67,7 @@ class goods
 
         common::checkCurrentUserPrivileges('F_sp');
 
-        $goods = \zovye\Goods::get(request::int('id'));
+        $goods = \zovye\Goods::get(Request::int('id'));
         if (empty($goods)) {
             return error(State::ERROR, '找不到指定的商品');
         }
@@ -92,20 +92,20 @@ class goods
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $s1 = 0;
-        if (request::bool(\zovye\Goods::AllowFree)) {
+        if (Request::bool(\zovye\Goods::AllowFree)) {
             $s1 = \zovye\Goods::setFreeBitMask($s1);
         }
-        if (request::bool(\zovye\Goods::AllowPay)) {
+        if (Request::bool(\zovye\Goods::AllowPay)) {
             $s1 = \zovye\Goods::setPayBitMask($s1);
         }
-        if (request::bool(\zovye\Goods::AllowBalance)) {
+        if (Request::bool(\zovye\Goods::AllowBalance)) {
             $s1 = \zovye\Goods::setBalanceBitMask($s1);
         }
-        if (request::bool(\zovye\Goods::AllowDelivery)) {
+        if (Request::bool(\zovye\Goods::AllowDelivery)) {
             $s1 = \zovye\Goods::setDeliveryBitMask($s1);
         }
 
-        $goods_id = request::int('goodsId');
+        $goods_id = Request::int('goodsId');
         if ($goods_id > 0) {
             $goods = \zovye\Goods::get($goods_id);
             if (empty($goods)) {
@@ -119,73 +119,73 @@ class goods
             }
 
             //固定货道商品商品指定货道
-            if (request::isset('goodsLaneID')) {
-                if (request::int('goodsLaneID') != $goods->getExtraData('lottery.size')) {
-                    $goods->setExtraData('lottery.size', request::int('goodsLaneID'));
+            if (Request::isset('goodsLaneID')) {
+                if (Request::int('goodsLaneID') != $goods->getExtraData('lottery.size')) {
+                    $goods->setExtraData('lottery.size', Request::int('goodsLaneID'));
                 }
             }
 
-            if (request::isset('goodsMcbIndex')) {
-                if (request::int('goodsMcbIndex') != $goods->getExtraData('lottery.index')) {
-                    $goods->setExtraData('lottery.index', request::int('goodsMcbIndex'));
+            if (Request::isset('goodsMcbIndex')) {
+                if (Request::int('goodsMcbIndex') != $goods->getExtraData('lottery.index')) {
+                    $goods->setExtraData('lottery.index', Request::int('goodsMcbIndex'));
                 }
             }
 
-            if (request::isset('costPrice')) {
-                $goods->setExtraData('costPrice', request::float('costPrice', 0, 2) * 100);
+            if (Request::isset('costPrice')) {
+                $goods->setExtraData('costPrice', Request::float('costPrice', 0, 2) * 100);
             }
 
-            if (request::str('goodsName') != $goods->getName()) {
-                $goods->setName(request::str('goodsName'));
+            if (Request::str('goodsName') != $goods->getName()) {
+                $goods->setName(Request::str('goodsName'));
             }
 
-            if (request::str('goodsImg') != $goods->getImg()) {
-                $goods->setImg(request::str('goodsImg'));
+            if (Request::str('goodsImg') != $goods->getImg()) {
+                $goods->setImg(Request::str('goodsImg'));
             }
 
-            if (request::has('detailImg')) {
-                $detailImg = request::trim('detailImg');
+            if (Request::has('detailImg')) {
+                $detailImg = Request::trim('detailImg');
                 if ($detailImg != $goods->getDetailImg()) {
                     $goods->setDetailImg($detailImg);
                     $goods->setGallery([$detailImg]);
                 }
-            } elseif (request::is_array('gallery')) {
-                $gallery = request::array('gallery');
+            } elseif (Request::is_array('gallery')) {
+                $gallery = Request::array('gallery');
                 if ($gallery) {
                     $goods->setDetailImg($gallery[0]);
                     $goods->setGallery($gallery);
                 }
             }
 
-            $price = request::float('goodsPrice', 0, 2) * 100;
+            $price = Request::float('goodsPrice', 0, 2) * 100;
             if ($price != $goods->getPrice()) {
                 $goods->setPrice($price);
             }
 
-            if (request::str('goodsUnitTitle') != $goods->getUnitTitle()) {
-                $goods->setUnitTitle(request::str('goodsUnitTitle'));
+            if (Request::str('goodsUnitTitle') != $goods->getUnitTitle()) {
+                $goods->setUnitTitle(Request::str('goodsUnitTitle'));
             }
         } else {
             $goods_data = [
-                'name' => request::trim('goodsName'),
-                'img' => request::trim('goodsImg'),
+                'name' => Request::trim('goodsName'),
+                'img' => Request::trim('goodsImg'),
                 's1' => $s1,
-                'price' => request::float('goodsPrice', 0, 2) * 100,
+                'price' => Request::float('goodsPrice', 0, 2) * 100,
                 'extra' => [
-                    'unitTitle' => request::trim('goodsUnitTitle'),
+                    'unitTitle' => Request::trim('goodsUnitTitle'),
                 ],
             ];
 
             $goods_data['agent_id'] = $agent->getId();
 
-            if (request::has('detailImg')) {
-                $detailImg = request::trim('detailImg');
+            if (Request::has('detailImg')) {
+                $detailImg = Request::trim('detailImg');
                 $goods_data['extra']['detailImg'] = $detailImg;
                 $goods_data['extra']['gallery'] = [$detailImg];
             }
 
-            if (request::is_array('gallery')) {
-                $gallery = request::array('gallery');
+            if (Request::is_array('gallery')) {
+                $gallery = Request::array('gallery');
                 if ($gallery) {
                     $goods_data['extra']['detailImg'] = $gallery[0];
                     $goods_data['extra']['gallery'] = $gallery;
@@ -193,17 +193,17 @@ class goods
             }
 
             //固定货道商品商品指定货道
-            if (request::is_string('goodsLaneID')) {
-                $goods_data['extra']['lottery']['size'] = request::int('goodsLaneID');
+            if (Request::is_string('goodsLaneID')) {
+                $goods_data['extra']['lottery']['size'] = Request::int('goodsLaneID');
             }
-            if (request::has('goodsMcbIndex')) {
-                $goods_data['extra']['lottery']['index'] = request::int('goodsMcbIndex');
+            if (Request::has('goodsMcbIndex')) {
+                $goods_data['extra']['lottery']['index'] = Request::int('goodsMcbIndex');
             }
-            if (request::isset('costPrice')) {
-                $goods_data['extra']['costPrice'] = request::float('costPrice', 0, 2) * 100;
+            if (Request::isset('costPrice')) {
+                $goods_data['extra']['costPrice'] = Request::float('costPrice', 0, 2) * 100;
             }
 
-            $goods_data['extra']['type'] = request::str('type');
+            $goods_data['extra']['type'] = Request::str('type');
 
             $goods = \zovye\Goods::create($goods_data);
         }

@@ -10,7 +10,7 @@ use zovye\account\WxWorkAccount;
 
 defined('IN_IA') or exit('Access Denied');
 
-$raw = request::raw();
+$raw = Request::raw();
 if (empty($raw)) {
     Util::resultAlert('请重新扫描设备二维码，谢谢！');
 }

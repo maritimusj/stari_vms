@@ -82,9 +82,9 @@ class FlashEgg
 
     public static function createOrUpdate(accountModelObj $account, $params)
     {
-        request::setData($params);
+        Request::setData($params);
 
-        $type = request::str('mediaType', 'video');
+        $type = Request::str('mediaType', 'video');
 
         $goods = $account->getGoods();
         if (empty($goods)) {
@@ -94,18 +94,18 @@ class FlashEgg
             $goods_data = [
                 'agent_id' => $account->getAgentId(),
                 'name' => $account->getTitle(),
-                'img' => request::trim('goodsImage'),
+                'img' => Request::trim('goodsImage'),
                 'sync' => 0,
-                'price' => intval(round(request::float('goodsPrice', 0, 2) * 100)),
+                'price' => intval(round(Request::float('goodsPrice', 0, 2) * 100)),
                 's1' => $s1,
                 'extra' => [
-                    'unitTitle' => request::trim('goodsUnitTitle', '个'),
+                    'unitTitle' => Request::trim('goodsUnitTitle', '个'),
                     'type' => Goods::FlashEgg,
                     'accountId' => $account->getId(),
                 ],
             ];
 
-            $gallery = request::array('gallery');
+            $gallery = Request::array('gallery');
             if ($gallery) {
                 $goods_data['extra']['detailImg'] = $gallery[0];
                 $goods_data['extra']['gallery'] = $gallery;
@@ -117,11 +117,11 @@ class FlashEgg
             }
         } else {
             $goods->setAgentId($account->getAgentId());
-            $goods->setImg(request::trim('goodsImage'));
-            $goods->setPrice(intval(round(request::float('goodsPrice', 0, 2) * 100)));
-            $goods->setUnitTitle(request::trim('goodsUnitTitle', '个'));
+            $goods->setImg(Request::trim('goodsImage'));
+            $goods->setPrice(intval(round(Request::float('goodsPrice', 0, 2) * 100)));
+            $goods->setUnitTitle(Request::trim('goodsUnitTitle', '个'));
 
-            $gallery = request::array('gallery');
+            $gallery = Request::array('gallery');
             $goods->setGallery($gallery);
             if ($gallery) {
                 $goods->setDetailImg($gallery[0]);
@@ -135,8 +135,8 @@ class FlashEgg
             'type' => Account::FlashEgg,
             'ad' => [
                 'type' => $type,
-                'duration' => request::int('duration'),
-                'area' => request::trim('area'),
+                'duration' => Request::int('duration'),
+                'area' => Request::trim('area'),
             ],
             'goods' => [
                 'id' => $goods->getId(),
@@ -145,10 +145,10 @@ class FlashEgg
 
         if ($type == 'video') {
             $config['ad']['video'] = [
-                'url' => request::trim('video'),
+                'url' => Request::trim('video'),
             ];
         } else {
-            $config['ad']['images'] = request::array('images');
+            $config['ad']['images'] = Request::array('images');
         }
 
         $account->set('config', $config);

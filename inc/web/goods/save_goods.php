@@ -7,7 +7,7 @@
 namespace zovye;
 
 $params = [];
-parse_str(request::raw(), $params);
+parse_str(Request::raw(), $params);
 
 if (empty($params['goodsName'])) {
     Util::itoast('商品名称不能为空！', '', 'error');

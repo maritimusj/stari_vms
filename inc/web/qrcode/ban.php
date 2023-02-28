@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     $qrcode = Advertising::get($id, Advertising::ACTIVE_QRCODE);
     if (empty($qrcode)) {

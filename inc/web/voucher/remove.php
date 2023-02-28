@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $voucher = GoodsVoucher::get($id);
 if ($voucher) {
     $res = Util::transactionDo(function () use ($voucher) {

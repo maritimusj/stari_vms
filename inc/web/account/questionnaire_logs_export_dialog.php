@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-$account = Account::get(request::int('id'));
+$account = Account::get(Request::int('id'));
 if (empty($account) || !$account->isQuestionnaire()) {
     JSON::fail('找不到这个问卷任务！');
 }

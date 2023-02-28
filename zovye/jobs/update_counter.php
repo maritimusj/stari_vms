@@ -13,14 +13,14 @@ use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Log;
 use zovye\OrderCounter;
-use zovye\request;
+use zovye\Request;
 use function zovye\app;
 
-$op = request::op('default');
+$op = Request::op('default');
 $data = [
-    'agent' => request::int('agent'),
-    'device' => request::str('device'),
-    'datetime' => request::str('datetime'),
+    'agent' => Request::int('agent'),
+    'device' => Request::str('device'),
+    'datetime' => Request::str('datetime'),
 ];
 
 $log = [

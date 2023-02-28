@@ -12,12 +12,12 @@ use zovye\model\userModelObj;
 
 $query = User::query();
 
-$user_types = request::array('types');
+$user_types = Request::array('types');
 if ($user_types) {
     $query->where(['app' => $user_types]);
 }
 
-$start = request::str('start');
+$start = Request::str('start');
 if ($start) {
     try {
         $s_date = new DateTime($start);
@@ -26,7 +26,7 @@ if ($start) {
     }
 }
 
-$end = request::str('end');
+$end = Request::str('end');
 if ($end) {
     try {
         $e_date = new DateTime($end);
@@ -35,7 +35,7 @@ if ($end) {
     }
 }
 
-$step = request::str('step');
+$step = Request::str('step');
 if (empty($step)) {
     $total = $query->count();
     $content = app()->fetchTemplate('web/common/export', [
@@ -50,7 +50,7 @@ if (empty($step)) {
     ]);
 }
 
-$serial = request::str('serial');
+$serial = Request::str('serial');
 if (empty($serial)) {
     JSON::fail("缺少serial");
 }
@@ -60,7 +60,7 @@ $dirname = "export/user/";
 $full_filename = Util::getAttachmentFileName($dirname, $filename);
 
 if ($step == 'load') {
-    $last_id = request::int('last');
+    $last_id = Request::int('last');
     $query =  $query->where(['id >' => $last_id])->limit(10)->orderBy('id asc');
 
     $result = [];

@@ -8,22 +8,22 @@ namespace zovye;
 
 use zovye\model\inventoryModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id > 0) {
     /** @var inventoryModelObj $inventory */
     $inventory = Inventory::get($id);
     if (empty($inventory)) {
         Util::itoast('找不到指定的仓库！', '', 'error');
     }
-    $inventory->setTitle(request::trim('title'));
+    $inventory->setTitle(Request::trim('title'));
     $inventory->save();
     Util::itoast('保存成功！', '', 'success');
 }
 
 $data = [];
-$data['title'] = request::trim('title');
+$data['title'] = Request::trim('title');
 
-$user_id = request::int('userId');
+$user_id = Request::int('userId');
 if ($user_id > 0) {
     $user = User::get($user_id);
     if (empty($user)) {
@@ -39,7 +39,7 @@ if ($user_id > 0) {
     ];
 }
 
-$parent_inventory_id = request::int('parentId');
+$parent_inventory_id = Request::int('parentId');
 if ($parent_inventory_id > 0) {
     $parent_inventory = Inventory::get($parent_inventory_id);
     if (empty($parent_inventory)) {

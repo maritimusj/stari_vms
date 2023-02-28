@@ -20,7 +20,7 @@ if (!$user->acquireLocker('get::x')) {
     JSON::fail(['text' => '领取失败', 'msg' => '用户锁定失败，请重试']);
 }
 
-$ticket = request::str('ticket');
+$ticket = Request::str('ticket');
 if (empty($ticket)) {
     JSON::fail(['text' => '领取失败', 'msg' => '请重新扫描设备二维码 [601]']);
 }
@@ -59,7 +59,7 @@ try {
 
     $goods_id = $ticket_data_saved['goodsId'];
     if (empty($goods_id)) {
-        $goods_id = request::int('goodsId');
+        $goods_id = Request::int('goodsId');
     }
 
     if (empty($goods_id)) {

@@ -15,13 +15,13 @@ if (!App::isFlashEggEnabled()) {
     Util::resultAlert('该功能没有启用，请联系管理员，谢谢！', 'error');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 
 //获取关注公众号二维码
 if ($op == 'qrcode') {
     $url = Wx::getTempQRCodeUrl(http_build_query([
         'app' => app::uid(),
-        'device' => request::trim('device'),
+        'device' => Request::trim('device'),
     ]));
     if ($url) {
         JSON::success(['url' => $url]);
@@ -47,7 +47,7 @@ $getUserFN = function () use (&$params) {
     return $user;
 };
 
-$device_uid = request::str('device');
+$device_uid = Request::str('device');
 if ($device_uid) {
     $device = Device::get($device_uid, true);
 }
@@ -99,8 +99,8 @@ if ($op == 'goods') {
     $payload = $device->getPayload(true);
     $result = $payload['cargo_lanes'] ?? [];
 
-    $allow_free = request::bool('free');
-    $allow_pay = request::bool('pay');
+    $allow_free = Request::bool('free');
+    $allow_pay = Request::bool('pay');
 
     $isLimitedFN = function ($goods_id) use ($user) {
         $goods = Goods::get($goods_id);
@@ -149,7 +149,7 @@ if ($op == 'goods') {
 //获取商品和广告详情
 if ($op == 'detail') {
 
-    $goods_id = request::int('id');
+    $goods_id = Request::int('id');
     $goods = Goods::get($goods_id);
     if (empty($goods) || $goods->isDeleted()) {
         JSON::fail('找不到这个商品！');
@@ -160,7 +160,7 @@ if ($op == 'detail') {
         JSON::fail('商品对应的广告不可用！');
     }
 
-    $device = Device::get(request::str('device'), true);
+    $device = Device::get(Request::str('device'), true);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
     }

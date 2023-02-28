@@ -15,7 +15,7 @@ use zovye\App;
 use zovye\CommissionBalance;
 use zovye\model\accountModelObj;
 use zovye\model\userModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Schema;
 use zovye\State;
 use zovye\Stats;
@@ -49,8 +49,8 @@ class commission
             }
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('account')->query();
         $query->where(
@@ -124,7 +124,7 @@ class commission
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
-        $uid = request::trim('uid');
+        $uid = Request::trim('uid');
         if ($uid) {
             $account = Account::findOneFromUID($uid);
 
@@ -135,9 +135,9 @@ class commission
             $assign_data = [$account];
             $params = [];
 
-            if (request::isset('all')) {
+            if (Request::isset('all')) {
                 $assign_data[] = $agent;
-                if (!request::has('all')) {
+                if (!Request::has('all')) {
                     $params['revert'] = true;
                 }
             }
@@ -162,7 +162,7 @@ class commission
         common::checkCurrentUserPrivileges(['F_cm', 'F_pt']);
 
         $agreement = settings('commission.agreement');
-        if (request::has('acquire')) {
+        if (Request::has('acquire')) {
             $userData = $user->settings('commissionAgreementData', []);
             if ($agreement['freq'] && $userData['version'] != $agreement['version']) {
                 return [
@@ -173,10 +173,10 @@ class commission
             }
 
             return ['must' => false];
-        } elseif (request::has('attitude')) {
-            $version = request::trim('version');
+        } elseif (Request::has('attitude')) {
+            $version = Request::trim('version');
 
-            if (request::str('attitude') == 'yes' && $version == $agreement['version']) {
+            if (Request::str('attitude') == 'yes' && $version == $agreement['version']) {
                 $user->updateSettings(
                     'commissionAgreementData',
                     [
@@ -201,9 +201,9 @@ class commission
     {
         common::checkCurrentUserPrivileges('F_cm');
 
-        $guid = request::trim('guid');
-        $val = min(10000, max(0, request::float('val', 0, 2) * 100));
-        $level = min(3, max(0, request::int('level')));
+        $guid = Request::trim('guid');
+        $val = min(10000, max(0, Request::float('val', 0, 2) * 100));
+        $level = min(3, max(0, Request::int('level')));
 
         $agent = agent::getUserByGUID($guid);
         if (empty($agent)) {
@@ -228,12 +228,12 @@ class commission
 
     public static function monthStat(): array
     {
-        $user = User::get(request::int('id'));
+        $user = User::get(Request::int('id'));
         if (empty($user)) {
             return err('找不到这个用户！');
         }
 
-        if (request::has('keeper')) {
+        if (Request::has('keeper')) {
             if (!$user->isKeeper()) {
                 return err('用户不是运营人员！');
             }
@@ -259,7 +259,7 @@ class commission
         $result  = [];
 
         try {
-            $month = new DateTimeImmutable(request::str('month') . '-01 00:00');
+            $month = new DateTimeImmutable(Request::str('month') . '-01 00:00');
 
             $sf = Stats::getDailyStats($agent, CommissionBalance::CHARGING_SERVICE_FEE, $month);
             $ef = Stats::getDailyStats($agent, CommissionBalance::CHARGING_ELECTRIC_FEE, $month);

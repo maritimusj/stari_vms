@@ -21,7 +21,7 @@ use zovye\model\deviceModelObj;
 use zovye\Goods;
 use zovye\Group as ZovyeGroup;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\JSON;
 use zovye\model\keeperModelObj;
 use zovye\LoginData;
@@ -160,10 +160,10 @@ class keeper
         common::checkCurrentUserPrivileges('F_yy');
 
         if ($user->isAgent() || $user->isPartner()) {
-            $id = request::int('id');
+            $id = Request::int('id');
 
-            $name = request::trim('name');
-            $mobile = request::trim('mobile');
+            $name = Request::trim('name');
+            $mobile = Request::trim('mobile');
 
             if (empty($name) || empty($mobile)) {
                 return error(State::ERROR, '请输入姓名和手机号码！');
@@ -223,7 +223,7 @@ class keeper
         common::checkCurrentUserPrivileges('F_yy');
 
         if ($user->isAgent() || $user->isPartner()) {
-            $id = request::int('id');
+            $id = Request::int('id');
 
             return Util::transactionDo(
                 function () use ($user, $id) {
@@ -268,8 +268,8 @@ class keeper
 
         common::checkCurrentUserPrivileges('F_yy');
 
-        if (request::has('deviceId')) {
-            $device = \zovye\api\wx\device::getDevice(request::int('deviceId'));
+        if (Request::has('deviceId')) {
+            $device = \zovye\api\wx\device::getDevice(Request::int('deviceId'));
 
             if (empty($device)) {
                 return [];
@@ -285,8 +285,8 @@ class keeper
         $keepers = [];
         $query = \zovye\Keeper::query(['agent_id' => $agent->getAgentId()]);
 
-        if (request::has('keyword')) {
-            $keyword = request::trim('keyword');
+        if (Request::has('keyword')) {
+            $keyword = Request::trim('keyword');
             if ($keyword) {
                 $query->whereOr([
                     'name LIKE' => "%$keyword%",
@@ -322,15 +322,15 @@ class keeper
 
         return Util::transactionDo(function () use ($user) {
 
-            $keeper_id = request::int('keeperid');
+            $keeper_id = Request::int('keeperid');
             $keeper = \zovye\Keeper::get($keeper_id);
             if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
                 return err('找不到这个运营人员！');
             }
 
             $device_ids = [];
-            if (request::is_array('devices')) {
-                $device_ids = array_values(request::array('devices'));
+            if (Request::is_array('devices')) {
+                $device_ids = array_values(Request::array('devices'));
             }
 
             if ($device_ids) {
@@ -368,12 +368,12 @@ class keeper
             if ($user->isAgent() || $user->isPartner()) {
 
                 $device_ids = [];
-                if (request::is_array('devices')) {
-                    $device_ids = array_values(request::array('devices'));
+                if (Request::is_array('devices')) {
+                    $device_ids = array_values(Request::array('devices'));
                 }
 
-                if (request::is_array('groups')) {
-                    $group_ids = array_values(request::array('groups'));
+                if (Request::is_array('groups')) {
+                    $group_ids = array_values(Request::array('groups'));
                     if ($group_ids) {
                         $query = Device::query(['group_id' => $group_ids, 'agent_id' => $user->getAgentId()]);
 
@@ -386,8 +386,8 @@ class keeper
                     }
                 }
 
-                if (request::has('commission')) {
-                    $commission = request::str('commission');
+                if (Request::has('commission')) {
+                    $commission = Request::str('commission');
 
                     //%结尾表示百分比，*表示固定金额
                     if (substr($commission, -1) == '%') {
@@ -412,10 +412,10 @@ class keeper
                 }
 
                 //way 分佣时机：Keeper::COMMISSION_RELOAD，补货时 Keeper::COMMISSION_ORDER，订单生成时
-                $way = request::int('way', -1);
-                $kind = request::int('kind', -1);
+                $way = Request::int('way', -1);
+                $kind = Request::int('kind', -1);
 
-                $keeper_id = request::int('keeperid');
+                $keeper_id = Request::int('keeperid');
                 $keeper = \zovye\Keeper::get($keeper_id);
                 if (empty($keeper) || $keeper->getAgentId() != $user->getAgentId()) {
                     return err('找不到这个运营人员！');
@@ -477,7 +477,7 @@ class keeper
                 return error(State::ERROR, '提现申请被拒绝，请联系代理商！');
             }
 
-            $total =  round(request::float('amount', 0, 2) * 100);
+            $total =  round(Request::float('amount', 0, 2) * 100);
 
             return balance::balanceWithdraw($user, $total);
         }
@@ -526,7 +526,7 @@ class keeper
             'agent_id' => $keeper->getAgentId(),
         ];
 
-        if (request::has('deviceid')) {
+        if (Request::has('deviceid')) {
             $device = \zovye\api\wx\device::getDevice(request('deviceid'));
             if (is_error($device)) {
                 return $device;
@@ -570,8 +570,8 @@ class keeper
             $result['balance_formatted'] = number_format($user->getCommissionBalance()->total() / 100, 2, '.', '');
         }
 
-        if (request::has('remain')) {
-            $remainWarning = max(1, request::int('remain'));
+        if (Request::has('remain')) {
+            $remainWarning = max(1, Request::int('remain'));
         } else {
             $remainWarning = settings('device.remainWarning', 0);
         }
@@ -656,11 +656,11 @@ class keeper
             }
 
             if (!isEmptyArray($cond['device_id'])) {
-                if (request::has('src')) {
-                    $cond['src'] = request::int('src');
+                if (Request::has('src')) {
+                    $cond['src'] = Request::int('src');
                 }
 
-                $w = request::str('w');
+                $w = Request::str('w');
 
                 if (empty($w) || $w == 'today') {
                     $result['today'] = agent::getUserTodayStats($user ? $user->getOpenid() : '', $cond);
@@ -707,9 +707,9 @@ class keeper
 
         if ($user) {
 
-            $type = request::str('type');
-            $page = max(1, request::int('page'));
-            $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+            $type = Request::str('type');
+            $page = max(1, Request::int('page'));
+            $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
             return balance::getUserBalanceLog($user, $type, $page, $page_size);
         }
@@ -726,14 +726,14 @@ class keeper
     {
         $keeper = keeper::getKeeper();
 
-        if (request::has('remain')) {
-            $remainWarning = max(1, request::int('remain'));
+        if (Request::has('remain')) {
+            $remainWarning = max(1, Request::int('remain'));
         } else {
             $remainWarning = App::getRemainWarningNum($keeper->getAgent());
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::keeper($keeper, \zovye\Keeper::OP)->where(['remain <' => $remainWarning]);
         $query->where(['agent_id' => $keeper->getAgentId()]);
@@ -779,8 +779,8 @@ class keeper
     {
         $keeper = keeper::getKeeper();
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::keeper($keeper, \zovye\Keeper::OP)->where(['error_code <>' => 0]);
         $query->where(['agent_id' => $keeper->getAgentId()]);
@@ -995,9 +995,9 @@ class keeper
             return true;
         };
 
-        if (request::isset('lane')) {
-            $lane = request::int('lane');
-            $num = request::int('num');
+        if (Request::isset('lane')) {
+            $lane = Request::int('lane');
+            $num = Request::int('num');
 
             if ($num != 0 && !$agent->allowReduceGoodsNum()) {
                 $laneData = $device->getLane($lane);
@@ -1089,7 +1089,7 @@ class keeper
             return error(State::ERROR, '没有权限！');
         }
 
-        $lane = request::int('lane');
+        $lane = Request::int('lane');
 
         //设置params['keeper']后，库存不会减少
         $res = Util::deviceTest(
@@ -1142,8 +1142,8 @@ class keeper
             return error(State::ERROR, '时间不正确！');
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $result = [
             'page' => $page,
@@ -1241,7 +1241,7 @@ class keeper
 
         common::checkCurrentUserPrivileges('F_yy');
 
-        $id = request::int('id');
+        $id = Request::int('id');
         if ($id) {
             /** @var keeperModelObj $keeper */
             $keeper = \zovye\Keeper::get($id);
@@ -1268,7 +1268,7 @@ class keeper
 
         $keeper = keeper::getKeeper();
 
-        $order_id =  request::int('orderid');
+        $order_id =  Request::int('orderid');
 
         $agent = $keeper->getAgent();
         $order = Order::get($order_id);
@@ -1285,7 +1285,7 @@ class keeper
             return error(State::ERROR, '代理商余额不足，无法退款！');
         }
 
-        $num = request::int('num');
+        $num = Request::int('num');
 
         $res = Order::refund($order->getOrderNO(), $num, ['msg' => '运营人员：' . $keeper->getName()]);
         if (is_error($res)) {

@@ -8,10 +8,10 @@ namespace zovye;
 
 use zovye\model\tagsModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     /** @var tagsModelObj $tag */
-    $tag = m('tags')->findOne(We7::uniacid(['id' => request::int('id')]));
+    $tag = m('tags')->findOne(We7::uniacid(['id' => Request::int('id')]));
     if (empty($tag)) {
         JSON::fail('找不到这个标签！');
     }

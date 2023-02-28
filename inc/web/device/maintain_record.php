@@ -14,12 +14,12 @@ use zovye\model\userModelObj;
 
 $is_export = request('is_export');
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-$device_id = request::int('device_id');
+$device_id = Request::int('device_id');
 
-$date_limit = request::array('datelimit');
+$date_limit = Request::array('datelimit');
 if ($date_limit['start']) {
     try {
         $s_date = new DateTime($date_limit['start'].'00:00');
@@ -38,8 +38,8 @@ if ($date_limit['end']) {
     $e_date = new DateTime('first day of next month 00:00');
 }
 
-$agent_openid = request::str('agent_openid');
-$nickname = request::trim('nickname');
+$agent_openid = Request::str('agent_openid');
+$nickname = Request::trim('nickname');
 
 $user_ids = [];
 if ($nickname != '') {
@@ -72,7 +72,7 @@ if (!empty($device_id)) {
     $condition['device_id'] = $device_id;
 }
 
-$cate = request::int('cate');
+$cate = Request::int('cate');
 if (!empty($cate)) {
     $condition['cate'] = $cate;
 }

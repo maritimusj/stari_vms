@@ -22,7 +22,7 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\GoodsVoucher;
 use zovye\Helper;
-use zovye\request;
+use zovye\Request;
 use zovye\Job;
 use zovye\JSON;
 use zovye\LoginData;
@@ -61,22 +61,22 @@ class common
 
         //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
         $h5_openid = '';
-        if (request::has('openId')) {
-            $h5_openid = request::str('openId');
+        if (Request::has('openId')) {
+            $h5_openid = Request::str('openId');
         }
 
         return self::doUserLogin(
             $res,
-            request::array('userInfo', []),
+            Request::array('userInfo', []),
             $h5_openid,
             '',
-            request::str('from')
+            Request::str('from')
         );
     }
 
     public static function getDeviceInfo(): array
     {
-        $imei = request::trim('imei');
+        $imei = Request::trim('imei');
         $res = Device::get($imei, true);
         if (empty($res)) {
             return error(State::ERROR, '没有数据！');
@@ -101,7 +101,7 @@ class common
      */
     public static function pageInfo(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
 
         $device = Device::get($imei, true);
         if (empty($device)) {
@@ -136,7 +136,7 @@ class common
      */
     public static function ads(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
 
         $device = Device::get($imei, true);
         if (empty($device)) {
@@ -172,7 +172,7 @@ class common
      */
     public static function onConnected(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
         $data = request('data');
 
         /** @var deviceModelObj $device */
@@ -209,7 +209,7 @@ class common
 
     public static function deviceStatus(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
 
         /** @var deviceModelObj $device */
         $device = Device::get($imei, true);
@@ -261,7 +261,7 @@ class common
      */
     public static function onDeviceData(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
         $data = request('data');
 
         /** @var deviceModelObj $device */
@@ -357,14 +357,14 @@ class common
      */
     public static function voucherGet(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
         $device = Device::get($imei, true);
         if (empty($device)) {
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        $goods_id = request::int('goodsId');
-        $code = request::str('code');
+        $goods_id = Request::int('goodsId');
+        $code = Request::str('code');
 
         /** @var goods_voucher_logsModelObj $v */
         $v = GoodsVoucher::getLogByCode($code);
@@ -433,7 +433,7 @@ class common
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $imei = request::str('device');
+        $imei = Request::str('device');
 
         $device = Device::get($imei, true);
         if (empty($device)) {
@@ -452,7 +452,7 @@ class common
             return err('设备正忙，请稍后再试！');
         }
 
-        $goods_id = request::int('goodsId');
+        $goods_id = Request::int('goodsId');
         if (empty($goods_id)) {
             return err('没有指定商品！');
         }
@@ -462,13 +462,13 @@ class common
 
     public static function orderGet(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
         $device = Device::get($imei, true);
         if (empty($device)) {
             return error(State::ERROR, '找不到这个设备！');
         }
 
-        $order_no = request::str('orderNO');
+        $order_no = Request::str('orderNO');
 
         $order = Order::getLastOrderOfDevice($device);
         if (empty($order)) {
@@ -504,7 +504,7 @@ class common
      */
     public static function orderStats(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
         $device = Device::get($imei, true);
         if (empty($device)) {
             return error(State::ERROR, '找不到这个设备！');
@@ -604,10 +604,10 @@ class common
 
     public static function deviceAdvs(): array
     {
-        $type = request::int('typeid');
-        $num = request::int('num', 10);
+        $type = Request::int('typeid');
+        $num = Request::int('num', 10);
 
-        $device = Device::get(request::str('deviceid'), true);
+        $device = Device::get(Request::str('deviceid'), true);
         if (empty($device)) {
             return error(State::ERROR, '找不到这个设备！');
         }
@@ -636,8 +636,8 @@ class common
             $device_keys[] = $item->getId();
         }
 
-        if (request::has('deviceid')) {
-            $d_id = request::int('deviceid');
+        if (Request::has('deviceid')) {
+            $d_id = Request::int('deviceid');
             if (in_array($d_id, $device_keys)) {
                 $condition['device_id'] = $d_id;
             } else {
@@ -645,12 +645,12 @@ class common
             }
         }
 
-        $order_no = request::trim('order');
+        $order_no = Request::trim('order');
         if ($order_no) {
             $condition['order_id LIKE'] = '%'.$order_no.'%';
         }
 
-        $way = request::trim('way');
+        $way = Request::trim('way');
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
                 $condition['src'] = [Order::ACCOUNT, Order::FREE, Order::BALANCE];
@@ -667,8 +667,8 @@ class common
             $condition['refund'] = 1;
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query->where($condition);
         $total = $query->count();
@@ -897,7 +897,7 @@ class common
         $user = self::getUser();
         $agent = $user->getAgent();
 
-        $date_limit = request::array('datelimit');
+        $date_limit = Request::array('datelimit');
         if ($date_limit['start']) {
             $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
         } else {
@@ -926,8 +926,8 @@ class common
             $device_keys[] = $item->getId();
         }
 
-        if (request::has('deviceid')) {
-            $d_id = request::int('deviceid');
+        if (Request::has('deviceid')) {
+            $d_id = Request::int('deviceid');
             if (in_array($d_id, $device_keys)) {
                 $condition['device_id'] = $d_id;
             } else {
@@ -1013,7 +1013,7 @@ class common
 
     public static function aliAuthCode(): array
     {
-        $auth_code = request::str('authcode');
+        $auth_code = Request::str('authcode');
 
         $aop = new AopClient();
         $aop->appId = settings('alixapp.id');
@@ -1084,12 +1084,12 @@ class common
 
         $condition['openid'] = $user->getOpenid();
 
-        $order_no = request::trim('order');
+        $order_no = Request::trim('order');
         if ($order_no) {
             $condition['order_id LIKE'] = '%'.$order_no.'%';
         }
 
-        $way = request::trim('way');
+        $way = Request::trim('way');
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
                 $condition['src'] = [Order::ACCOUNT, Order::FREE, Order::BALANCE];
@@ -1106,8 +1106,8 @@ class common
             $condition['refund'] = 1;
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query->where($condition);
         $total = $query->count();
@@ -1186,16 +1186,16 @@ class common
             return self::$user;
         }
 
-        if (request::has('token')) {
-            $login_data = LoginData::get(request::str('token'));
+        if (Request::has('token')) {
+            $login_data = LoginData::get(Request::str('token'));
             if (empty($login_data)) {
                 JSON::fail('请先登录后再请求数据！[101]');
             }
             self::$user = User::get($login_data->getUserId());
 
-        } elseif (request::has('user_id')) {
+        } elseif (Request::has('user_id')) {
 
-            $user_id = request::str('user_id');
+            $user_id = Request::str('user_id');
             self::$user = User::get($user_id, true, User::ALI);
 
         } else {
@@ -1338,8 +1338,8 @@ class common
             $params['type'] = $type;
         }
 
-        $params['page'] = max(1, request::int('page'));
-        $params['pagesize'] = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $params['page'] = max(1, Request::int('page'));
+        $params['pagesize'] = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $res = GoodsVoucher::logList($params);
         if (is_error($res)) {
@@ -1355,7 +1355,7 @@ class common
      */
     public static function getGoodsList(): array
     {
-        $imei = request::str('device');
+        $imei = Request::str('device');
 
         $device = Device::get($imei, true);
         if (empty($device)) {

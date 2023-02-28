@@ -11,11 +11,11 @@ use zovye\account\ZhiJinBaoAccount;
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('zjbao', [
-    'raw' => request::raw(),
+    'raw' => Request::raw(),
 ]);
 
 if (App::isZJBaoEnabled()) {
-    ZhiJinBaoAccount::cb(request::json());
+    ZhiJinBaoAccount::cb(Request::json());
 } else {
     Log::debug('yunfenba', [
         'error' => '纸巾宝没有启用！',

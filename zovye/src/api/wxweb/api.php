@@ -21,7 +21,7 @@ use zovye\Task;
 use zovye\User;
 use zovye\Util;
 use zovye\Device;
-use zovye\request;
+use zovye\Request;
 use zovye\api\wxx\common;
 use zovye\App;
 use zovye\Balance;
@@ -55,16 +55,16 @@ class api
 
         //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
         $h5_openid = '';
-        if (request::has('openId')) {
-            $h5_openid = request::str('openId');
+        if (Request::has('openId')) {
+            $h5_openid = Request::str('openId');
         }
 
         return common::doUserLogin(
             $res,
-            request::array('userInfo', []),
+            Request::array('userInfo', []),
             $h5_openid,
-            request::str('device'),
-            request::str('from')
+            Request::str('device'),
+            Request::str('from')
         );
     }
 
@@ -86,11 +86,11 @@ class api
      */
     public static function ads(): array
     {
-        $type = request::int('typeId');
-        $num = request::int('num', 10);
+        $type = Request::int('typeId');
+        $num = Request::int('num', 10);
 
-        if (request::has('deviceId')) {
-            $device = Device::get(request::str('deviceId'), true);
+        if (Request::has('deviceId')) {
+            $device = Device::get(Request::str('deviceId'), true);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
@@ -120,8 +120,8 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        if (request::has('deviceId')) {
-            $device = Device::get(request::str('deviceId'), true);
+        if (Request::has('deviceId')) {
+            $device = Device::get(Request::str('deviceId'), true);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
@@ -130,11 +130,11 @@ class api
         }
 
         $include = [];
-        if (request::bool('balance')) {
+        if (Request::bool('balance')) {
             $include[] = Account::BALANCE;
         }
 
-        if (request::bool('commission')) {
+        if (Request::bool('commission')) {
             $include[] = Account::COMMISSION;
         }
 
@@ -142,23 +142,23 @@ class api
             return [];
         }
 
-        if (request::is_array('type')) {
-            $types = request::array('type');
+        if (Request::is_array('type')) {
+            $types = Request::array('type');
         } else {
-            if (request::str('type') == 'all') {
+            if (Request::str('type') == 'all') {
                 $types = null;
-            } elseif (request::str('type') == 'normal') {
+            } elseif (Request::str('type') == 'normal') {
                 $types = [Account::NORMAL, Account::AUTH];
             } else {
-                $type = request::int('type', Account::VIDEO);
+                $type = Request::int('type', Account::VIDEO);
                 $types = [$type];
             }
         }
 
-        if (request::is_array('s_type')) {
-            $s_types = request::array('s_type');
+        if (Request::is_array('s_type')) {
+            $s_types = Request::array('s_type');
         } else {
-            if (request::str('s_type') == 'all') {
+            if (Request::str('s_type') == 'all') {
                 $s_types = null;
             } else {
                 $s_types = [];
@@ -171,8 +171,8 @@ class api
             'include' => $include,
         ];
 
-        if (request::has('max')) {
-            $params['max'] = request::int('max');
+        if (Request::has('max')) {
+            $params['max'] = Request::int('max');
         }
 
         return Account::getAvailableList($device, $user, $params);
@@ -182,12 +182,12 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
-        $type = request::str('type'); //free or pay or balance
+        $type = Request::str('type'); //free or pay or balance
 
         if ($type == 'balance' || $type == 'exchange') {
             $result = $device->getGoodsList($user, [Goods::AllowBalance]);
@@ -208,7 +208,7 @@ class api
             JSON::fail('无法锁定用户，请稍后再试！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -221,7 +221,7 @@ class api
             return err('设备位置不在允许的范围内！');
         }
 
-        $goods_id = request::int('goodsId');
+        $goods_id = Request::int('goodsId');
         if (empty($goods_id)) {
             $goods = $device->getGoodsByLane(0);
             if ($goods && $goods['num'] < 1) {
@@ -239,8 +239,8 @@ class api
             return err('商品数量不足！');
         }
 
-        if (request::has('uid')) {
-            $account = Account::findOneFromUID(request::str('uid'));
+        if (Request::has('uid')) {
+            $account = Account::findOneFromUID(Request::str('uid'));
             if (empty($account)) {
                 return err('找不到指定任务！');
             }
@@ -267,8 +267,8 @@ class api
                 return err('没有设置激励广告！');
             }
 
-            $orderUID = request::str('orderUID');
-            $code = request::str('code');
+            $orderUID = Request::str('orderUID');
+            $code = Request::str('code');
 
             if (empty($orderUID) || empty($code)) {
                 return err('缺少必要的参数！');
@@ -311,7 +311,7 @@ class api
             }
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -333,9 +333,9 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $device_uid = request::str('deviceId');
-        $goods_id = request::int('goodsId');
-        $num = request::int('num');
+        $device_uid = Request::str('deviceId');
+        $goods_id = Request::int('goodsId');
+        $num = Request::int('num');
 
         $res = Helper::exchange($user, $device_uid, $goods_id, $num);
         if (is_error($res)) {
@@ -353,7 +353,7 @@ class api
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -367,17 +367,17 @@ class api
         }
 
         $is_package = false;
-        if (request::has('goodsId')) {
-            $goods_or_package_id = request::int('goodsId');
+        if (Request::has('goodsId')) {
+            $goods_or_package_id = Request::int('goodsId');
             if (empty($goods_or_package_id)) {
                 return err('没有指定商品！');
             }
-            $num = min(App::getOrderMaxGoodsNum(), max(request::int('num'), 1));
+            $num = min(App::getOrderMaxGoodsNum(), max(Request::int('num'), 1));
             if ($num < 1) {
                 return err('购买数量不能小于1！');
             }
         } else {
-            $goods_or_package_id = request::int('packageId');
+            $goods_or_package_id = Request::int('packageId');
             if (empty($goods_or_package_id)) {
                 return err('没有指定套餐！');
             }
@@ -389,7 +389,7 @@ class api
 
     public static function orderStatus(): array
     {
-        $order = Order::get(request::str('uid'), true);
+        $order = Order::get(Request::str('uid'), true);
         if (empty($order)) {
             return [
                 'msg' => '正在查询订单',
@@ -439,7 +439,7 @@ class api
 
     public static function getJumpUserInfo(): array
     {
-        $openid = request::str('openid');
+        $openid = Request::str('openid');
 
         $user = User::get($openid, true);
         if (empty($user)) {
@@ -462,10 +462,10 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $imei = request::str('deviceId');
+        $imei = Request::str('deviceId');
 
-        $text = request::str('text');
-        $pics = request::array('pics');
+        $text = Request::str('text');
+        $pics = Request::array('pics');
 
         $device = Device::get($imei, true);
         if (empty($device)) {
@@ -506,7 +506,7 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $account = Account::findOneFromUID(request::str('uid'));
+        $account = Account::findOneFromUID(Request::str('uid'));
         if (empty($account)) {
             return err('找不到这个公众号！');
         }
@@ -637,12 +637,12 @@ class api
 
         $query = $user->getBalance()->log();
 
-        $last_id = request::int('lastId');
+        $last_id = Request::int('lastId');
         if ($last_id > 0) {
             $query->where(['id <' => $last_id]);
         }
 
-        $query->limit(request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $query->limit(Request::int('pagesize', DEFAULT_PAGE_SIZE));
         $query->orderBy('id DESC');
 
         $result = [];
@@ -657,9 +657,9 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $way = request::str('way');
-        $page = request::int('page');
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $way = Request::str('way');
+        $page = Request::int('page');
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         return Order::getList($user, $way, $page, $page_size);
     }
@@ -668,14 +668,14 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $max = request::int('max', 10);
+        $max = Request::int('max', 10);
 
         return Task::getList($user, $max);
     }
 
     public static function detail(): array
     {
-        $uid = request::str('uid');
+        $uid = Request::str('uid');
 
         $account = Account::findOneFromUID($uid);
         if ($account && $account->isQuestionnaire()) {
@@ -696,8 +696,8 @@ class api
             return err('用户无法锁定，请重试！');
         }
 
-        $uid = request::str('uid');
-        $data = request::array('data');
+        $uid = Request::str('uid');
+        $data = Request::array('data');
         if (empty($data)) {
             return err('提交的数据为空！');
         }
@@ -736,9 +736,9 @@ class api
     {
         $user = \zovye\api\wx\common::getUser();
 
-        $name = request::trim('name');
-        $phone_num = request::trim('phoneNum');
-        $address = request::trim('address');
+        $name = Request::trim('name');
+        $phone_num = Request::trim('phoneNum');
+        $address = Request::trim('address');
 
         $result = $user->updateRecipientData($name, $phone_num, $address);
 
@@ -754,13 +754,13 @@ class api
         $user = \zovye\api\wx\common::getUser();
 
         $params = [
-            'last_id' => request::int('lastId'),
-            'pagesize' => request::int('pagesize'),
+            'last_id' => Request::int('lastId'),
+            'pagesize' => Request::int('pagesize'),
             'user_id' => $user->getId(),
         ];
 
-        if (request::isset('status')) {
-            $params['status'] = request::int('status');
+        if (Request::isset('status')) {
+            $params['status'] = Request::int('status');
         }
 
         return Delivery::getList($params);
@@ -769,8 +769,8 @@ class api
     public static function getMallGoodsList(): array
     {
         return Mall::getGoodsList([
-            'page' => request::int('page'),
-            'pagesize' => request::int('pagesize'),
+            'page' => Request::int('page'),
+            'pagesize' => Request::int('pagesize'),
         ]);
     }
 
@@ -779,21 +779,21 @@ class api
         $user = \zovye\api\wx\common::getUser();
 
         return Mall::createOrder($user, [
-            'goods_id' => request::int('goods'),
-            'num' => request::int('num'),
+            'goods_id' => Request::int('goods'),
+            'num' => Request::int('num'),
         ]);
     }
 
     public static function validateLocation()
     {
         $user = \zovye\api\wx\common::getUser();
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
         if ($device->needValidateLocation()) {
-            $res = Helper::validateLocation($user, $device, request::float('lat'), request::float('lng'));
+            $res = Helper::validateLocation($user, $device, Request::float('lat'), Request::float('lng'));
             if (is_error($res)) {
                 return $res;
             }
@@ -836,7 +836,7 @@ class api
     public static function updateUserQRCode(): array
     {
         $user = \zovye\api\wx\common::getUser();
-        $type = request::str('type');
+        $type = Request::str('type');
 
         return \zovye\api\wx\common::updateUserQRCode($user, $type);
     }

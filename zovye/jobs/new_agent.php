@@ -11,7 +11,7 @@ use zovye\CtrlServ;
 use zovye\Goods;
 use zovye\Log;
 use zovye\model\goodsModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Wx;
 use zovye\YZShop;
 use function zovye\request;
@@ -19,14 +19,14 @@ use function zovye\settings;
 
 //代理申请通过微信推送通知
 
-$op = request::op('default');
+$op = Request::op('default');
 
 $log = [
     'id' => request('id'),
 ];
 
 if ($op == 'new_agent' && CtrlServ::checkJobSign(['id' => request('id')])) {
-    $id = request::int('id');
+    $id = Request::int('id');
     $agent = Agent::get($id);
     if ($agent) {
         if (YZShop::isInstalled()) {

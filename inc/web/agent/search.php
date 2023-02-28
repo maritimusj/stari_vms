@@ -9,17 +9,17 @@ namespace zovye;
 use zovye\model\userModelObj;
 
 $query = Principal::agent();
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     $query->where(['id <>' => $id]);
 }
 
-$openid = request::str('openid', '', true);
+$openid = Request::str('openid', '', true);
 if ($openid) {
     $query->where(['openid' => $openid]);
 }
 
-$keyword = request::str('keyword', '', true);
+$keyword = Request::str('keyword', '', true);
 if ($keyword) {
     $query->whereOr([
         'name REGEXP' => $keyword,

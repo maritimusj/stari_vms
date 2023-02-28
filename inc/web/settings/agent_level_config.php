@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$level = request::str('id');
+$level = Request::str('id');
 
 $content = app()->fetchTemplate(
     'web/settings/agent_level',

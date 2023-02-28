@@ -26,8 +26,8 @@ $priceFN = function ($is_floating, $data) {
     return $data;
 };
 
-$device_id = request::int('deviceid');
-$type_id = request::int('typeid');
+$device_id = Request::int('deviceid');
+$type_id = Request::int('typeid');
 
 if ($device_id) {
     $device = Device::get($device_id);

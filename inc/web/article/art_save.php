@@ -8,10 +8,10 @@ namespace zovye;
 
 use zovye\model\articleModelObj;
 
-$id = request::int('id');
-$type = request::str('type');
-$title = request::str('title');
-$content = request::str('content');
+$id = Request::int('id');
+$type = Request::str('type');
+$title = Request::str('title');
+$content = Request::str('content');
 
 if (empty($title)) {
     Util::itoast('文章标题不能为空！', We7::referer(), 'error');

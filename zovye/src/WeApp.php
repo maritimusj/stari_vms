@@ -2204,7 +2204,7 @@ CODE;
         }
 
         $url_params = ['op' => 'result', 'orderNO' => $order_no];
-        if (request::has('balance')) {
+        if (Request::has('balance')) {
             $url_params['balance'] = 1;
         }
 

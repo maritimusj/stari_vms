@@ -9,7 +9,7 @@ namespace zovye;
 use RuntimeException;
 
 $result = Util::transactionDo(function () {
-    $id = request::int('id');
+    $id = Request::int('id');
     $package = Package::get($id);
     if (empty($package)) {
         throw new RuntimeException('找不到这个套餐！');

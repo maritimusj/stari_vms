@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\device_feedbackModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 /** @var device_feedbackModelObj $res */
 $res = m('device_feedback')->findOne(['id' => $id]);

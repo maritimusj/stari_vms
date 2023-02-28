@@ -9,7 +9,7 @@ namespace zovye\api\wx;
 use zovye\Goods;
 use zovye\model\inventory_goodsModelObj;
 use zovye\model\inventory_logModelObj;
-use zovye\request;
+use zovye\Request;
 use function zovye\err;
 
 class inventory
@@ -33,8 +33,8 @@ class inventory
         ];
 
         if ($total > 0) {
-            $page = max(1, request::int('page'));
-            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+            $page = max(1, Request::int('page'));
+            $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $query->page($page, $page_size);
             $query->orderBy('id ASC');
@@ -73,8 +73,8 @@ class inventory
         ];
 
         if ($total > 0) {
-            $page = max(1, request::int('page'));
-            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+            $page = max(1, Request::int('page'));
+            $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $query->page($page, $page_size);
             $query->orderBy('id DESC');

@@ -804,8 +804,8 @@ class Device extends State
             $query = Device::query();
 
             //指定代理商
-            if (request::isset('agent_id')) {
-                $agent_id = request::int('agent_id');
+            if (Request::isset('agent_id')) {
+                $agent_id = Request::int('agent_id');
                 if ($agent_id == 0) {
                     $query->where(['agent_id' => 0]);
                 } else {
@@ -818,14 +818,14 @@ class Device extends State
             }
 
             //分组
-            if (request::isset('group_id')) {
-                $group_id = request::int('group_id');
+            if (Request::isset('group_id')) {
+                $group_id = Request::int('group_id');
                 $query->where(['group_id' => $group_id]);
             }
 
             //型号
-            if (request::isset('device_type')) {
-                $device_type_id = request::int('device_type');
+            if (Request::isset('device_type')) {
+                $device_type_id = Request::int('device_type');
                 if ($device_type_id == 0) {
                     $query->where(['device_type' => 0]);
                 } else {
@@ -840,11 +840,11 @@ class Device extends State
 
             //标签
             $tag_ids = [];
-            if (request::has('tag_ids')) {
-                $tag_ids = request::array('tag_ids');
+            if (Request::has('tag_ids')) {
+                $tag_ids = Request::array('tag_ids');
             }
-            if (request::has('tag_id')) {
-                $tag_ids[] = request::int('tag_id');
+            if (Request::has('tag_id')) {
+                $tag_ids[] = Request::int('tag_id');
             }
 
             $tag_ids = array_unique($tag_ids);
@@ -856,7 +856,7 @@ class Device extends State
             }
 
             //关键字
-            $keywords = request::trim('keywords');
+            $keywords = Request::trim('keywords');
             if (!empty($keywords)) {
                 $query->whereOr([
                     'name LIKE' => "%$keywords%",
@@ -867,65 +867,65 @@ class Device extends State
             }
 
             //只显示有问题设备
-            if (request::bool('error')) {
+            if (Request::bool('error')) {
                 $query->where(['error_code <>' => 0]);
             }
 
             //缺货设备
-            if (request::bool('low')) {
+            if (Request::bool('low')) {
                 $remain_warning = intval(settings('device.remainWarning', 1));
                 $query->where(['remain <' => $remain_warning]);
             }
 
             //位置已变化
-            if (request::bool('lac')) {
+            if (Request::bool('lac')) {
                 $query->where(['s1' => 1]);
             }
 
             $now = new DateTimeImmutable();
 
-            if (request::isset('online')) {
+            if (Request::isset('online')) {
                 $online_time = $now->modify('-15 min');
                 //在线状态
-                if (request::bool('online')) {
+                if (Request::bool('online')) {
                     $query->where(['last_ping >' => $online_time->getTimestamp()]);
-                } elseif (request::bool('offline')) {
+                } elseif (Request::bool('offline')) {
                     $query->where(['last_ping <' => $online_time->getTimestamp()]);
                 }
             }
 
             //长时间不在线
-            if (request::bool('lost')) {
+            if (Request::bool('lost')) {
                 $offset = intval(settings('device.lost', 1));
                 $offset_time = $now->modify("-$offset days");
                 $query->where(['last_online <' => $offset_time->getTimestamp()]);
             }
 
             //长时间不出货
-            if (request::bool('no_order')) {
+            if (Request::bool('no_order')) {
                 $offset = intval(settings('device.issuing', 1));
                 $offset_time = $now->modify("-$offset days");
                 $query->where(['last_order <' => $offset_time->getTimestamp()]);
             }
 
             //维护状态
-            if (request::bool('maintenance')) {
+            if (Request::bool('maintenance')) {
                 $query->where(['status' => Device::STATUS_MAINTENANCE]);
             }
 
             //App未绑定
-            if (request::bool('unbind')) {
+            if (Request::bool('unbind')) {
                 $query->where("(app_id IS NULL OR app_id='')");
             }
 
             //指定设备id获取设备列表
-            if (request::has('ids')) {
-                $ids = request::array('ids', []);
+            if (Request::has('ids')) {
+                $ids = Request::array('ids', []);
                 $query->where(['id' => $ids]);
             }
 
-            $page = max(1, request::int('page'));
-            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+            $page = max(1, Request::int('page'));
+            $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $total = $query->count();
             $total_page = ceil($total / $page_size);
@@ -939,8 +939,8 @@ class Device extends State
 
             $query->page($page, $page_size);
 
-            $sort_by = request::str('by', 'id');
-            $sort_dir = request::str('dir', 'desc');
+            $sort_by = Request::str('by', 'id');
+            $sort_dir = Request::str('dir', 'desc');
             if ($sort_by && $sort_dir) {
                 $query->orderBy("$sort_by $sort_dir");
             }

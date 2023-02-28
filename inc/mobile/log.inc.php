@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 Util::extraAjaxJsonData();
 
-$op = request::op('default');
+$op = Request::op('default');
 $payload = request('data');
 
 if ($op == 'log') {

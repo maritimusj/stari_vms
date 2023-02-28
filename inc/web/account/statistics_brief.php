@@ -9,7 +9,7 @@ namespace zovye;
 use DateTime;
 use Exception;
 
-$account_id = request::int('id');
+$account_id = Request::int('id');
 $account = Account::get($account_id);
 
 if (empty($account)) {

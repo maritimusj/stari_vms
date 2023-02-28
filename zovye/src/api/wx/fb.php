@@ -9,7 +9,7 @@ namespace zovye\api\wx;
 use Exception;
 use zovye\Device;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 use zovye\LoginData;
 use zovye\State;
 use zovye\User;
@@ -68,10 +68,10 @@ class fb
             return error(State::ERROR, '请先登录后再请求数据！[103]');
         }
 
-        $device_id = request::int('device');
+        $device_id = Request::int('device');
 
-        $text = request::str('text');
-        $pics = request::array('pics');
+        $text = Request::str('text');
+        $pics = Request::array('pics');
 
         $device = Device::get($device_id, true);
         $data = [

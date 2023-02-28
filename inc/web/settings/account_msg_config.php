@@ -11,7 +11,7 @@ $media = request('media') ?: [
     'val' => settings('misc.pushAccountMsg_val'),
 ];
 
-$typename = request::trim('typename');
+$typename = Request::trim('typename');
 
 $res = Util::getWe7Material($typename, request('page'), request('pagesize'));
 

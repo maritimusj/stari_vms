@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     JSON::result(Device::search());
 }
 
@@ -16,7 +16,7 @@ $tpl_data = [
 ];
 
 //指定代理商
-$agent_id = request::int('agentId');
+$agent_id = Request::int('agentId');
 if ($agent_id) {
     $agent = Agent::get($agent_id);
     if (empty($agent)) {
@@ -25,7 +25,7 @@ if ($agent_id) {
     $tpl_data['s_agent'] = $agent->profile();
 }
 
-$tags_id = request::int('tag_id');
+$tags_id = Request::int('tag_id');
 if ($tags_id) {
     $tag = m('tags')->findOne(['id' => $tags_id]);
     if (empty($tag)) {
@@ -40,8 +40,8 @@ if ($tags_id) {
     ];
 }
 
-if (request::has('types')) {
-    $type_id = request::int('types');
+if (Request::has('types')) {
+    $type_id = Request::int('types');
     $type = DeviceTypes::get($type_id);
     if (empty($type)) {
         Util::itoast('找不到这个型号！', $this->createWebUrl('device'), 'error');
@@ -55,7 +55,7 @@ if (request::has('types')) {
     ];
 }
 
-$tpl_data['page'] = request::int('page', 1);
+$tpl_data['page'] = Request::int('page', 1);
 $tpl_data['upload'] = (bool)settings('device.upload.url', '');
 $tpl_data['gate'] = CtrlServ::status();
 

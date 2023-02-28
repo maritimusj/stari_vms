@@ -10,12 +10,12 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
 use zovye\api\wxweb\fueling;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 
 Util::extraAjaxJsonData();
 
-$op = request::op('default');
+$op = Request::op('default');
 
 router::exec($op, [
     'login' => '\zovye\api\wxweb\api::login',

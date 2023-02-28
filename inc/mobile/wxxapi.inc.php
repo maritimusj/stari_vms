@@ -9,9 +9,9 @@ namespace zovye\wxxApi;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
-use zovye\request;
+use zovye\Request;
 
-$op = ucfirst(request::op('default'));
+$op = ucfirst(Request::op('default'));
 
 router::exec($op, [
     'Login' => '\zovye\api\wxx\common::login',

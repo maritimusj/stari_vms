@@ -6,14 +6,14 @@
  
 namespace zovye;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
 
 $title = "<b>{$user->getName()}</b>的积分记录";
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', 5);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', 5);
 
 $query = $user->getBalance()->log();
 

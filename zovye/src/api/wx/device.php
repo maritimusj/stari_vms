@@ -19,7 +19,7 @@ use zovye\DeviceTypes;
 use zovye\Goods;
 use zovye\Group as ZovyeGroup;
 use zovye\model\goods_stats_vwModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use zovye\Stats;
 use zovye\model\userModelObj;
@@ -350,13 +350,13 @@ class device
                 return error(State::ERROR, '设备正忙，请稍后再试！');
             }
 
-            $lane = request::int('lane');
+            $lane = Request::int('lane');
             $laneData = $device->getLane($lane);
             if (empty($laneData)) {
                 return error(State::ERROR, '货道不正确！');
             }
 
-            $num = request::int('num');
+            $num = Request::int('num');
 
             if ($user->isKeeper()) {
                 $agent = $device->getAgent();
@@ -402,7 +402,7 @@ class device
             return error(State::FAIL, '没有权限执行这个操作！');
         }
 
-        $date = request::trim('date');
+        $date = Request::trim('date');
         if (empty($date)) {
             $date = date('Y-m-d');
         }
@@ -630,7 +630,7 @@ class device
             'date' => request('date'),
             'guid' => request('guid'),
             'deviceid' => request('deviceid'),
-            'w' => request::str('w', 'goods'),
+            'w' => Request::str('w', 'goods'),
         ];
 
         return Util::cachedCall(6, function () use ($user, $params) {
@@ -640,9 +640,9 @@ class device
 
     public static function getDeviceOnline(): array
     {
-        if (request::has('id')) {
+        if (Request::has('id')) {
             /** @var deviceModelObj|array $device */
-            $device = \zovye\Device::find(request::str('id'), ['imei', 'shadow_id']);
+            $device = \zovye\Device::find(Request::str('id'), ['imei', 'shadow_id']);
             if (is_error($device)) {
                 return $device;
             }
@@ -670,12 +670,12 @@ class device
 
         $ids = [];
 
-        $mcbIDs = request::array('mcb');
+        $mcbIDs = Request::array('mcb');
         if ($mcbIDs) {
             $ids['mcb'] = $mcbIDs;
         }
 
-        $app_ids = request::array('app');
+        $app_ids = Request::array('app');
         if ($app_ids) {
             $ids['app'] = $app_ids;
         }
@@ -699,8 +699,8 @@ class device
      */
     public static function getDeviceList(userModelObj $user, modelObjFinder $query, bool $onlineStatus = null): array
     {
-        if (request::has('keyword')) {
-            $keyword = request::trim('keyword');
+        if (Request::has('keyword')) {
+            $keyword = Request::trim('keyword');
             if ($keyword) {
                 $query->whereOr([
                     'name LIKE' => "%$keyword%",
@@ -710,19 +710,19 @@ class device
         }
 
         //简单信息
-        $simple = request::bool('simple');
-        $date = request::trim('date', '');
-        $month = request::trim('month', '');
-        $keeper_id = request::int('keeperid');
+        $simple = Request::bool('simple');
+        $date = Request::trim('date', '');
+        $month = Request::trim('month', '');
+        $keeper_id = Request::int('keeperid');
 
         if (!isset($online_status)) {
-            $onlineStatus = request::bool('online');
+            $onlineStatus = Request::bool('online');
         }
 
         $total = $query->count();
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $result = [
             'total' => $total,
@@ -734,16 +734,16 @@ class device
         ];
 
         if ($total > 0) {
-            if (request::has('orderby') && in_array(
-                    strtolower(request::str('orderby')),
+            if (Request::has('orderby') && in_array(
+                    strtolower(Request::str('orderby')),
                     ['id', 'name', 'sig', 'createtime']
                 )) {
-                $order_by = strtolower(request::str('orderby'));
+                $order_by = strtolower(Request::str('orderby'));
                 if ($order_by == 'id') {
                     $order_by = 'imei';
                 }
-                $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(
-                    request::str('order')
+                $order = in_array(strtoupper(Request::str('order')), ['ASC', 'DESC']) ? strtoupper(
+                    Request::str('order')
                 ) : 'ASC';
                 $query->orderBy("$order_by $order");
             } else {
@@ -812,9 +812,9 @@ class device
         $user = common::getAgentOrPartner();
 
         $params = [
-            'page' => request::int('page'),
-            'pagesize' => request::int('pagesize'),
-            'keywords' => request::str('keywords'),
+            'page' => Request::int('page'),
+            'pagesize' => Request::int('pagesize'),
+            'keywords' => Request::str('keywords'),
             'goods' => false,
         ];
 
@@ -831,7 +831,7 @@ class device
 
         common::checkCurrentUserPrivileges('F_xh');
 
-        $device_type = DeviceTypes::get(request::int('id'));
+        $device_type = DeviceTypes::get(Request::int('id'));
         if (empty($device_type)) {
             return error(State::ERROR, '找不到这个设备型号！');
         }
@@ -850,7 +850,7 @@ class device
 
     public static function deviceTypeDetail(): array
     {
-        $device_type = DeviceTypes::get(request::int('id'));
+        $device_type = DeviceTypes::get(Request::int('id'));
         if (empty($device_type)) {
             return error(State::ERROR, '找不到这个设备型号！');
         }
@@ -860,7 +860,7 @@ class device
 
     public static function updateDeviceTypes(): array
     {
-        $data = request::is_string('data') ? json_decode(urldecode(request::str('data')), true) : [];
+        $data = Request::is_string('data') ? json_decode(urldecode(Request::str('data')), true) : [];
 
         $user = common::getAgentOrPartner();
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
@@ -939,7 +939,7 @@ class device
 
     public static function getDeviceInfo(): array
     {
-        $imei = request::trim('imei');
+        $imei = Request::trim('imei');
         $res = \zovye\Device::get($imei, true);
         if ($res) {
             $data = [
@@ -967,10 +967,10 @@ class device
         }
 
         //简单信息
-        $simple = request::bool('simple');
+        $simple = Request::bool('simple');
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $result = [
             'total' => 0,
@@ -988,8 +988,8 @@ class device
 
         $query = \zovye\Device::query(['agent_id' => $agent_ids]);
 
-        if (request::has('keyword')) {
-            $keyword = request::trim('keyword');
+        if (Request::has('keyword')) {
+            $keyword = Request::trim('keyword');
             $query->where([
                 'name LIKE' => "%$keyword%",
                 'imei LIKE' => "%$keyword%",
@@ -1002,16 +1002,16 @@ class device
             $result['total'] = $total;
             $result['totalpage'] = ceil($total / $page_size);
 
-            if (request::has('orderby') && in_array(
-                    strtolower(request::str('orderby')),
+            if (Request::has('orderby') && in_array(
+                    strtolower(Request::str('orderby')),
                     ['id', 'name', 'sig', 'createtime']
                 )) {
-                $order_by = strtolower(request::str('orderby'));
+                $order_by = strtolower(Request::str('orderby'));
                 if ($order_by == 'id') {
                     $order_by = 'imei';
                 }
-                $order = in_array(strtoupper(request::str('order')), ['ASC', 'DESC']) ? strtoupper(
-                    request::str('order')
+                $order = in_array(strtoupper(Request::str('order')), ['ASC', 'DESC']) ? strtoupper(
+                    Request::str('order')
                 ) : 'ASC';
                 $query->orderBy("$order_by $order");
             } else {
@@ -1077,7 +1077,7 @@ class device
         $user = common::getAgentOrPartner();
 
         common::checkCurrentUserPrivileges('F_sb');
-        $app_id = request::trim('id');
+        $app_id = Request::trim('id');
 
         if ($app_id) {
             $device = \zovye\Device::getFromAppId($app_id);
@@ -1104,7 +1104,7 @@ class device
         if ($user->isAgent() || $user->isPartner()) {
             common::checkCurrentUserPrivileges('F_sb');
             $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
-            $device = device::getDevice(request::str('id'), $agent);
+            $device = device::getDevice(Request::str('id'), $agent);
             if (is_error($device)) {
                 return $device;
             }
@@ -1123,7 +1123,7 @@ class device
             return err('没有权限管理这个设备！');
         }
 
-        $index = request::int('index', 1);
+        $index = Request::int('index', 1);
 
         $msg = $device->openDoor($index) ? '开锁指令已发送！' : '开锁指令发送失败！';
 
@@ -1135,7 +1135,7 @@ class device
         $user = common::getUser();
 
         $agent = $user->isAgent() ? $user->getAgent() : $user->getPartnerAgent();
-        $device = device::getDevice(request::str('id'), $agent);
+        $device = device::getDevice(Request::str('id'), $agent);
         if (is_error($device)) {
             return $device;
         }

@@ -37,7 +37,7 @@ class Site extends WeModuleSite
 
             $dir = $dir.$fn.'/';
 
-            $op = request::op('default');
+            $op = Request::op('default');
 
             $op = toCamelCase($op);
             $file = $dir.$op.'.php';

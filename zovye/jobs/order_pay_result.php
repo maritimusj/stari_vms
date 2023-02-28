@@ -14,12 +14,12 @@ use zovye\Job;
 use zovye\Log;
 use zovye\Order;
 use zovye\Pay;
-use zovye\request;
+use zovye\Request;
 use function zovye\is_error;
 
-$op = request::op('default');
-$order_no = request::str('orderNO');
-$start = request::int('start');
+$op = Request::op('default');
+$order_no = Request::str('orderNO');
+$start = Request::int('start');
 
 $log = [
     'orderNO' => $order_no,

@@ -12,11 +12,11 @@ $result = [];
 
 $query = Account::query();
 
-if (request::isset('type')) {
-    $query->where(['type' => request::int('type')]);
+if (Request::isset('type')) {
+    $query->where(['type' => Request::int('type')]);
 }
 
-$keyword = request::trim('keyword', '', true);
+$keyword = Request::trim('keyword', '', true);
 if ($keyword) {
     $query->whereOr([
         'name LIKE' => "%$keyword%",
@@ -24,7 +24,7 @@ if ($keyword) {
     ]);
 }
 
-$query->limit(request::int('limit', 100));
+$query->limit(Request::int('limit', 100));
 
 /** @var accountModelObj $entry */
 foreach ($query->findAll() as $entry) {

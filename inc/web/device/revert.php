@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$confirm_code = request::trim('code');
+$confirm_code = Request::trim('code');
 $device = Device::get(request('id'));
 if (empty($device)) {
     JSON::fail('找不到这个设备！');

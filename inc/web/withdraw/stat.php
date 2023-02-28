@@ -14,7 +14,7 @@ $query = CommissionBalance::query([
 ]);
 
 //统计
-$date_limit = request::array('datelimit');
+$date_limit = Request::array('datelimit');
 if ($date_limit['start']) {
     $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
 } else {
@@ -33,7 +33,7 @@ $query->where([
     'createtime <' => $e_date->getTimestamp(),
 ]);
 
-$agent_openid = request::str('agent_openid');
+$agent_openid = Request::str('agent_openid');
 if (!empty($agent_openid)) {
     $query->where(['openid' => $agent_openid]);
 }

@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     if (Advertising::remove($id, Advertising::ACTIVE_QRCODE)) {
         Util::itoast('删除成功！', $this->createWebUrl('qrcode'), 'success');

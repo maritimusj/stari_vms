@@ -10,7 +10,7 @@ use zovye\account\MoscaleAccount;
 
 defined('IN_IA') or exit('Access Denied');
 
-$data = request::raw();
+$data = Request::raw();
 Log::debug('moscale', $data);
 
 MoscaleAccount::cb(json_decode($data, true));

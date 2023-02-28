@@ -26,12 +26,12 @@ if (empty($user)) {
     Util::resultAlert('只能从微信中打开，谢谢！', 'error');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'save') {
 
     $result = Util::transactionDo(function () use ($user) {
-        $mobile = request::str('mobile');
+        $mobile = Request::str('mobile');
         if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
             throw new RuntimeException('请输入正确的手机号码！');
         }
@@ -120,7 +120,7 @@ if ($op == 'save') {
                 }
             }
 
-            $code = request::str('code');
+            $code = Request::str('code');
             if (App::isAgentReferralEnabled()) {
                 if (empty($code)) {
                     throw new RuntimeException('请填写推荐码！');
@@ -168,7 +168,7 @@ if ($op == 'save') {
     if ($op == 'check') {
         if (App::isAgentReferralEnabled()) {
 
-            $code = request::trim('code');
+            $code = Request::trim('code');
             if (!empty($code)) {
                 $superior = Referral::getAgent($code);
                 if ($superior) {
@@ -189,7 +189,7 @@ app()->mobilePage(
             [
                 'nickname' => $user->getNickname(),
                 'avatar' => $user->getAvatar(),
-                'mobile' => request::has('mobile') ? request::str('mobile') : $user->getMobile(),
+                'mobile' => Request::has('mobile') ? Request::str('mobile') : $user->getMobile(),
             ],
     ]
 );

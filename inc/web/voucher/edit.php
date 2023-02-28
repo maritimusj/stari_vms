@@ -6,14 +6,14 @@
  
 namespace zovye;
 
-$type = request::str('type');
+$type = Request::str('type');
 
 $tpl_data = [
     'type' => $type,
 ];
 
-if (request::has('id')) {
-    $tpl_data['voucher_id'] = request::int('id');
+if (Request::has('id')) {
+    $tpl_data['voucher_id'] = Request::int('id');
 }
 
 app()->showTemplate("web/goods_voucher/edit", $tpl_data);

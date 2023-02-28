@@ -392,9 +392,9 @@ class CtrlServ
         $data = array_merge(
             $params,
             [
-                'op' => request::trim('op'),
+                'op' => Request::trim('op'),
                 'm' => APP_NAME,
-                'serial' => request::str('serial'),
+                'serial' => Request::str('serial'),
                 'do' => 'job',
             ]
         );

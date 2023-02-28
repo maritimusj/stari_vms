@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $result = Util::transactionDo(function () use ($id) {
     $user = User::get($id);
     if (empty($user)) {

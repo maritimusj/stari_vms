@@ -8,8 +8,8 @@ namespace zovye;
 
 use DateTime;
 
-$user = User::get(request::int('id'));
-$year = request::str('year', (new DateTime())->format('Y'));
+$user = User::get(Request::int('id'));
+$year = Request::str('year', (new DateTime())->format('Y'));
 
 list($years, $data) = Stats::getUserMonthCommissionStatsOfYear($user, $year);
 

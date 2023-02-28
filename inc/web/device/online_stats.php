@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 
-$ids = request::has('id') ? [request::int('id')] : request('ids');
+$ids = Request::has('id') ? [Request::int('id')] : request('ids');
 
 if (is_string($ids)) {
     $ids = explode(',', $ids);

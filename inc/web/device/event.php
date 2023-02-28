@@ -15,22 +15,22 @@ if (empty($device)) {
 
 $query = $device->eventQuery();
 
-if (request::isset('enable')) {
-    $enable = request::bool('enable');
+if (Request::isset('enable')) {
+    $enable = Request::bool('enable');
     $device->setEventLogEnabled($enable);
     $device->save();
 }
 
 $tpl_data['enabled'] = $device->isEventLogEnabled();
 
-if (request::isset('event')) {
+if (Request::isset('event')) {
     $query->where(['event' => request('event')]);
 }
 
-$detail = request::bool('detail');
+$detail = Request::bool('detail');
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $total = $query->count();
 if (ceil($total / $page_size) < $page) {

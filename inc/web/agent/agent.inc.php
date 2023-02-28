@@ -11,13 +11,13 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\gsp_userModelObj;
 
-$op = request::op('default');
+$op = Request::op('default');
 if (in_array(
     $op,
     ['create', 'edit', 'agent_base', 'agent_funcs', 'agent_notice', 'agent_commission', 'agent_misc', 'agent_payment']
 )) {
 
-    $id = request::int('id');
+    $id = Request::int('id');
     $agent = null;
     if ($op == 'create') {
         $res = User::get($id);

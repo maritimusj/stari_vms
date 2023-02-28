@@ -9,12 +9,12 @@ namespace zovye;
 use DateTime;
 use Exception;
 
-$device = Device::get(request::int('id'));
+$device = Device::get(Request::int('id'));
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-$month_str = request::str('month');
+$month_str = Request::str('month');
 try {
     $month = new DateTime($month_str);
 } catch (Exception $e) {

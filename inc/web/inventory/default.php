@@ -8,13 +8,13 @@ namespace zovye;
 
 use zovye\model\inventoryModelObj;
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = Inventory::query();
 
 //搜索关键字
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->whereOr([
         'title LIKE' => "%$keywords%",
@@ -49,7 +49,7 @@ if ($total > 0) {
     }
 }
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     $content = app()->fetchTemplate(
         'web/inventory/choose',
         [

@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\inventory_goodsModelObj;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
@@ -26,8 +26,8 @@ $tpl_data = [
 
 $query = $inventory->query();
 
-if (request::has('agentId')) {
-    $agent = Agent::get(request::int('agentId'));
+if (Request::has('agentId')) {
+    $agent = Agent::get(Request::int('agentId'));
     if (empty($agent)) {
         JSON::fail('找不到这个代理商！');
     }
@@ -35,7 +35,7 @@ if (request::has('agentId')) {
 }
 
 //搜索关键字
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->whereOr([
         'name LIKE' => "%$keywords%",
@@ -46,8 +46,8 @@ $total = $query->count();
 $list = [];
 
 if ($total > 0) {
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 
@@ -68,7 +68,7 @@ if ($total > 0) {
 
 $tpl_data['list'] = $list;
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     $content = app()->fetchTemplate('web/inventory/choose', [
         'list' => $list,
         'pager' => $tpl_data['pager'],

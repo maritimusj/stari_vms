@@ -7,17 +7,17 @@
 namespace zovye;
 
 $params = [
-    'page' => request::int('page'),
-    'pagesize' => request::int('pagesize', 20),
+    'page' => Request::int('page'),
+    'pagesize' => Request::int('pagesize', 20),
 ];
 
-$keywords = request::trim('keywords', '', true);
+$keywords = Request::trim('keywords', '', true);
 if (!empty($keywords)) {
     $params['keywords'] = $keywords;
     $tpl_data['s_keywords'] = $keywords;
 }
 
-$w = request::str('w', 'all');
+$w = Request::str('w', 'all');
 if ($w == 'pay') {
     $params[] = Goods::AllowPay;
 }
@@ -32,9 +32,9 @@ if ($w == 'mall') {
 }
 
 $tpl_data['w'] = $w;
-$tpl_data['types'] = request::array('types', []);
+$tpl_data['types'] = Request::array('types', []);
 
-$agent_id = request::int('agentId');
+$agent_id = Request::int('agentId');
 if ($agent_id > 0) {
     $agent = Agent::get($agent_id);
     if (empty($agent)) {
@@ -54,7 +54,7 @@ $tpl_data['goods_list'] = $result['list'];
 $tpl_data['pager'] = We7::pagination($result['total'], $result['page'], $result['pagesize']);
 $tpl_data['backer'] = $keywords || $agent_id != 0;
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     $content = app()->fetchTemplate('web/goods/choose', $tpl_data);
 
     JSON::success([

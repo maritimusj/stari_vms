@@ -10,8 +10,8 @@ use zovye\account\MoscaleAccount;
 use zovye\account\ZhiJinBaoAccount;
 use zovye\model\device_groupsModelObj;
 
-$type = request::str('type');
-$id = request::int('id');
+$type = Request::str('type');
+$id = Request::int('id');
 $device_types = [];
 
 if ($id) {
@@ -116,7 +116,7 @@ foreach ($group_query->findAll() as $val) {
 
 $tpl_data['groups'] = $groups;
 $tpl_data['icon'] = $icon_html;
-$tpl_data['from'] = request::str('from', 'base');
+$tpl_data['from'] = Request::str('from', 'base');
 $tpl_data['is_normal_device'] = $type == '' || (isset($device) && $device->isNormalDevice());
 $tpl_data['is_bluetooth_device'] = $type == 'bluetooth_device' || (isset($device) && $device->isBlueToothDevice());
 $tpl_data['is_vdevice'] = $type == 'vd' || (isset($device) && $device->isVDevice());

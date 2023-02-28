@@ -10,11 +10,11 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\userModelObj;
 
-$from = request::str('from');
-$device_id = request::str('device');
-$account_id = request::str('account');
-$xid = request::str('xid');
-$tid = request::str('tid');
+$from = Request::str('from');
+$device_id = Request::str('device');
+$account_id = Request::str('account');
+$xid = Request::str('xid');
+$tid = Request::str('tid');
 
 if (Util::isAliAppContainer()) {
     $ali_entry_url = Util::murl('ali', [
@@ -123,7 +123,7 @@ if ($device_id) {
         };
     } else {
         //转跳回小程序
-        if (request::bool('jump')) {
+        if (Request::bool('jump')) {
             $cb = function(userModelObj $user) use($account) {
                 $user->setLastActiveAccount($account);
                 

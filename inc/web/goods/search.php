@@ -7,9 +7,9 @@
 namespace zovye;
 
 $params = [
-    'page' => request::int('page'),
-    'pagesize' => request::int('pagesize'),
-    'keywords' => request::trim('keywords', '', true),
+    'page' => Request::int('page'),
+    'pagesize' => Request::int('pagesize'),
+    'keywords' => Request::trim('keywords', '', true),
     'default_goods' => false,
 ];
 

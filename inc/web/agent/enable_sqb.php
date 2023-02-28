@@ -6,15 +6,15 @@
  
 namespace zovye;
 
-$agent = Agent::get(request::int('id'));
+$agent = Agent::get(Request::int('id'));
 if (empty($agent)) {
     JSON::fail('找不到这个代理商！');
 }
 
-$app_id = request::trim('app_id');
-$vendor_sn = request::trim('vendor_sn');
-$vendor_key = request::trim('vendor_key');
-$code = request::trim('code');
+$app_id = Request::trim('app_id');
+$vendor_sn = Request::trim('vendor_sn');
+$vendor_key = Request::trim('vendor_key');
+$code = Request::trim('code');
 
 $result = SQB::activate($app_id, $vendor_sn, $vendor_key, $code);
 

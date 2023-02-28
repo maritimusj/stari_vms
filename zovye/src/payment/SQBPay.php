@@ -12,7 +12,7 @@ use zovye\Contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 use function zovye\_W;
 use function zovye\err;
@@ -250,7 +250,7 @@ JS_CODE;
     {
         $SQB = $this->getSQB();
 
-        return $SQB->checkSign(request::raw(), request::header('HTTP_AUTHORIZATION'));
+        return $SQB->checkSign(Request::raw(), Request::header('HTTP_AUTHORIZATION'));
     }
 
     public function getResponse(bool $ok = true): string

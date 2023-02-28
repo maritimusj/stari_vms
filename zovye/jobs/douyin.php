@@ -14,16 +14,16 @@ use zovye\Job;
 use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use function zovye\is_error;
 
-$op = request::op('default');
+$op = Request::op('default');
 $data = [
-    'id' => request::int('id'),
-    'device' => request::int('device'),
-    'uid' => request::str('uid'),
-    'time' => request::int('time'),
+    'id' => Request::int('id'),
+    'device' => Request::int('device'),
+    'uid' => Request::str('uid'),
+    'time' => Request::int('time'),
 ];
 
 $log = [

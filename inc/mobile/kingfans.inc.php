@@ -11,11 +11,11 @@ use zovye\account\KingFansAccount;
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('kingfans', [
-    'raw' => request::raw(),
+    'raw' => Request::raw(),
 ]);
 
 if (App::isKingFansEnabled()) {
-    KingFansAccount::cb(request::json());
+    KingFansAccount::cb(Request::json());
 } else {
     Log::debug('kingfans', [
         'error' => '金粉吧没有启用！',

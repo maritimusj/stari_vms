@@ -37,87 +37,87 @@ if (isset(\$_SERVER['HTTP_STA_API']) || isset(\$_SERVER['HTTP_LLT_API'])) {
 });
 
 $settings = settings();
-$page = request::str('page');
+$page = Request::str('page');
 
 if ($page == 'device') {
-    $settings['device']['autoJoin'] = request::bool('newDeviceAutoJoin') ? 1 : 0;
-    $settings['device']['errorDown'] = request::bool('errorDown') ? 1 : 0;
-    $settings['device']['clearErrorCode'] = request::bool('clearErrorCode') ? 1 : 0;
-    $settings['device']['remainWarning'] = request::int('remainWarning');
-    $settings['device']['waitTimeout'] = max(10, request::int('waitTimeout'));
-    $settings['device']['lockRetries'] = request::int('lockRetries');
-    $settings['device']['lockRetryDelay'] = request::int('lockRetryDelay');
-    $settings['device']['lockTimeout'] = request::int('lockTimeout');
+    $settings['device']['autoJoin'] = Request::bool('newDeviceAutoJoin') ? 1 : 0;
+    $settings['device']['errorDown'] = Request::bool('errorDown') ? 1 : 0;
+    $settings['device']['clearErrorCode'] = Request::bool('clearErrorCode') ? 1 : 0;
+    $settings['device']['remainWarning'] = Request::int('remainWarning');
+    $settings['device']['waitTimeout'] = max(10, Request::int('waitTimeout'));
+    $settings['device']['lockRetries'] = Request::int('lockRetries');
+    $settings['device']['lockRetryDelay'] = Request::int('lockRetryDelay');
+    $settings['device']['lockTimeout'] = Request::int('lockTimeout');
 
     $settings['device']['get'] = [
-        'theme' => request::str('theme', 'default'),
+        'theme' => Request::str('theme', 'default'),
     ];
 
-    $settings['device']['lost'] = request::int('lost');
-    $settings['device']['issuing'] = request::int('issuing');
+    $settings['device']['lost'] = Request::int('lost');
+    $settings['device']['issuing'] = Request::int('issuing');
 
-    $settings['misc']['siteTitle'] = request::trim('siteTitle');
-    $settings['misc']['siteCopyrights'] = request::trim('siteCopyrights');
-    $settings['misc']['banner'] = request::trim('banner');
-    $settings['misc']['siteWarning'] = request::trim('siteWarning');
+    $settings['misc']['siteTitle'] = Request::trim('siteTitle');
+    $settings['misc']['siteCopyrights'] = Request::trim('siteCopyrights');
+    $settings['misc']['banner'] = Request::trim('banner');
+    $settings['misc']['siteWarning'] = Request::trim('siteWarning');
 
-    $settings['user']['location']['validate']['enabled'] = request::bool('userLocationEnabled') ? 1 : 0;
+    $settings['user']['location']['validate']['enabled'] = Request::bool('userLocationEnabled') ? 1 : 0;
 
     if ($settings['user']['location']['validate']['enabled']) {
         $settings['user']['location']['validate']['distance'] = min(
             5000,
-            max(1, request::int('userLocationDistance'))
+            max(1, Request::int('userLocationDistance'))
         );
         $settings['user']['location']['validate']['expired'] = min(
             720,
-            max(1, request::int('userLocationExpired'))
+            max(1, Request::int('userLocationExpired'))
         );
     }
 
-    $settings['user']['location']['appkey'] = request::trim('lbsKey', DEFAULT_LBS_KEY);
+    $settings['user']['location']['appkey'] = Request::trim('lbsKey', DEFAULT_LBS_KEY);
 
-    $settings['device']['shipment']['balanced'] = request::bool('shipmentBalance') ? 1 : 0;
+    $settings['device']['shipment']['balanced'] = Request::bool('shipmentBalance') ? 1 : 0;
 
-    $settings['order']['waitQueue']['enabled'] = request::bool('waitQueueEnabled') ? 1 : 0;
+    $settings['order']['waitQueue']['enabled'] = Request::bool('waitQueueEnabled') ? 1 : 0;
 
-    $settings['goods']['agent']['edit'] = request::bool('allowAgentEditGoods') ? 1 : 0;
+    $settings['goods']['agent']['edit'] = Request::bool('allowAgentEditGoods') ? 1 : 0;
 
     $settings['goods']['image']['proxy'] = [
-        'url' => request::trim('goodsImageProxyURL'),
-        'secret' => request::trim('goodsImageProxySecret'),
+        'url' => Request::trim('goodsImageProxyURL'),
+        'secret' => Request::trim('goodsImageProxySecret'),
     ];
 
-    $settings['order']['rollback']['enabled'] = request::bool('autoRollbackOrder') ? 1 : 0;
-    $settings['order']['goods']['maxNum'] = request::int('orderGoodsMaxNum');
+    $settings['order']['rollback']['enabled'] = Request::bool('autoRollbackOrder') ? 1 : 0;
+    $settings['order']['goods']['maxNum'] = Request::int('orderGoodsMaxNum');
 
-    $settings['device']['v-device']['enabled'] = request::bool('vDevice') ? 1 : 0;
-    $settings['device']['lac']['enabled'] = request::bool('lacConfirm') ? 1 : 0;
+    $settings['device']['v-device']['enabled'] = Request::bool('vDevice') ? 1 : 0;
+    $settings['device']['lac']['enabled'] = Request::bool('lacConfirm') ? 1 : 0;
 
 } elseif ($page == 'user') {
 
-    $settings['user']['verify']['enabled'] = request::bool('userVerify') ? 1 : 0;
-    $settings['user']['verify']['maxtimes'] = max(1, request::int('maxtimes'));
+    $settings['user']['verify']['enabled'] = Request::bool('userVerify') ? 1 : 0;
+    $settings['user']['verify']['maxtimes'] = max(1, Request::int('maxtimes'));
 
-    $settings['user']['verify18']['enabled'] = request::bool('userVerify18') ? 1 : 0;
-    $settings['user']['verify18']['Title'] = request::trim('userVerify18Title');
+    $settings['user']['verify18']['enabled'] = Request::bool('userVerify18') ? 1 : 0;
+    $settings['user']['verify18']['Title'] = Request::trim('userVerify18Title');
 
-    $settings['user']['discountPrice'] = request::float('discountPrice', 0, 2) * 100;
+    $settings['user']['discountPrice'] = Request::float('discountPrice', 0, 2) * 100;
 
     if (App::isMustFollowAccountEnabled()) {
         $settings['mfa'] = [
-            'enable' => request::bool('mustFollow') ? 1 : 0,
+            'enable' => Request::bool('mustFollow') ? 1 : 0,
         ];
     }
 
     if (App::isBalanceEnabled()) {
         Config::balance('user', [
-            'new' => request::int('newUser'),
-            'ref' => request::int('newUserRef'),
+            'new' => Request::int('newUser'),
+            'ref' => Request::int('newUserRef'),
         ], true);
     }
 
 } elseif ($page == 'ctrl') {
-    $url = request::trim('controlAddr');
+    $url = Request::trim('controlAddr');
     if (empty($url)) {
         $url = "http://127.0.0.1:8080";
     }
@@ -126,9 +126,9 @@ if ($page == 'device') {
     }
 
     $settings['ctrl']['url'] = $url;
-    $settings['ctrl']['appKey'] = request::trim('appKey');
-    $settings['ctrl']['appSecret'] = request::trim('appSecret');
-    $settings['ctrl']['checkSign'] = request::bool('checkSign') ? 1 : 0;
+    $settings['ctrl']['appKey'] = Request::trim('appKey');
+    $settings['ctrl']['appSecret'] = Request::trim('appSecret');
+    $settings['ctrl']['checkSign'] = Request::bool('checkSign') ? 1 : 0;
 
     if (empty($settings['ctrl']['signature'])) {
         $settings['ctrl']['signature'] = Util::random(32);
@@ -136,36 +136,36 @@ if ($page == 'device') {
 
     if (App::isChargingDeviceEnabled()) {
         Config::charging('server', [
-            'url' => request::trim('ChargingServerURL'),
-            'access_token' => request::trim('ChargingServerAccessToken'),
+            'url' => Request::trim('ChargingServerURL'),
+            'access_token' => Request::trim('ChargingServerAccessToken'),
         ], true);
     }
 
-    $settings['device']['v-device']['enabled'] = request::bool('vDevice') ? 1 : 0;
-    $settings['goods']['lottery']['enabled'] = request::bool('lotteryGoods') ? 1 : 0;
-    $settings['idcard']['verify']['enabled'] = request::bool('idCardVerify') ? 1 : 0;
+    $settings['device']['v-device']['enabled'] = Request::bool('vDevice') ? 1 : 0;
+    $settings['goods']['lottery']['enabled'] = Request::bool('lotteryGoods') ? 1 : 0;
+    $settings['idcard']['verify']['enabled'] = Request::bool('idCardVerify') ? 1 : 0;
     if (!$settings['idcard']['verify']['enabled']) {
         $settings['user']['verify']['enabled'] = 0;
     }
 
-    $settings['device']['bluetooth']['enabled'] = request::bool('bluetoothDevice') ? 1 : 0;
-    $settings['goods']['voucher']['enabled'] = request::bool('goodsVoucher') ? 1 : 0;
+    $settings['device']['bluetooth']['enabled'] = Request::bool('bluetoothDevice') ? 1 : 0;
+    $settings['goods']['voucher']['enabled'] = Request::bool('goodsVoucher') ? 1 : 0;
 
-    Config::api('enabled', request::bool('API', false), true);
+    Config::api('enabled', Request::bool('API', false), true);
 
-    $settings['custom']['mustFollow']['enabled'] = request::bool('mustFollow') ? 1 : 0;
-    $settings['custom']['useAccountQRCode']['enabled'] = request::bool('useAccountQRCode') ? 1 : 0;
-    $settings['custom']['bonus']['zero']['enabled'] = request::bool('zeroBonus') ? 1 : 0;
-    $settings['custom']['device']['brief-page']['enabled'] = request::bool('deviceBriefPage') ? 1 : 0;
-    $settings['custom']['smsPromo']['enabled'] = request::bool('smsPromoEnabled') ? 1 : 0;
-    $settings['custom']['team']['enabled'] = request::bool('teamEnabled') ? 1 : 0;
-    $settings['custom']['cztv']['enabled'] = request::bool('cztvEnabled') ? 1 : 0;
-    $settings['custom']['flashEgg']['enabled'] = request::bool('flashEggEnabled') ? 1 : 0;
+    $settings['custom']['mustFollow']['enabled'] = Request::bool('mustFollow') ? 1 : 0;
+    $settings['custom']['useAccountQRCode']['enabled'] = Request::bool('useAccountQRCode') ? 1 : 0;
+    $settings['custom']['bonus']['zero']['enabled'] = Request::bool('zeroBonus') ? 1 : 0;
+    $settings['custom']['device']['brief-page']['enabled'] = Request::bool('deviceBriefPage') ? 1 : 0;
+    $settings['custom']['smsPromo']['enabled'] = Request::bool('smsPromoEnabled') ? 1 : 0;
+    $settings['custom']['team']['enabled'] = Request::bool('teamEnabled') ? 1 : 0;
+    $settings['custom']['cztv']['enabled'] = Request::bool('cztvEnabled') ? 1 : 0;
+    $settings['custom']['flashEgg']['enabled'] = Request::bool('flashEggEnabled') ? 1 : 0;
 
-    Config::app('ad.sponsor.enabled', request::bool('sponsorAd'), true);
+    Config::app('ad.sponsor.enabled', Request::bool('sponsorAd'), true);
 
-    $settings['account']['wx']['platform']['enabled'] = request::bool('wxPlatform') ? 1 : 0;
-    $settings['account']['douyin']['enabled'] = request::bool('douyin') ? 1 : 0;
+    $settings['account']['wx']['platform']['enabled'] = Request::bool('wxPlatform') ? 1 : 0;
+    $settings['account']['douyin']['enabled'] = Request::bool('douyin') ? 1 : 0;
 
     $third_party_platform = [
         'jfbFAN' => [
@@ -234,7 +234,7 @@ if ($page == 'device') {
     $accounts_updated = false;
 
     foreach ($third_party_platform as $key => $v) {
-        $enabled = request::bool($key) ? 1 : 0;
+        $enabled = Request::bool($key) ? 1 : 0;
 
         /** @var accountModelObj $acc */
         $acc = call_user_func($v[0]);
@@ -258,11 +258,11 @@ if ($page == 'device') {
         setArray($settings, 'accounts.last_update', ''.microtime(true));
     }
 
-    $settings['custom']['DonatePay']['enabled'] = request::bool('DonatePay') ? 1 : 0;
-    $settings['agent']['wx']['app']['enabled'] = request::bool('agentWxApp') ? 1 : 0;
-    $settings['inventory']['enabled'] = request::bool('Inventory') ? 1 : 0;
+    $settings['custom']['DonatePay']['enabled'] = Request::bool('DonatePay') ? 1 : 0;
+    $settings['agent']['wx']['app']['enabled'] = Request::bool('agentWxApp') ? 1 : 0;
+    $settings['inventory']['enabled'] = Request::bool('Inventory') ? 1 : 0;
 
-    $balance_enabled = request::bool('UserBalance');
+    $balance_enabled = Request::bool('UserBalance');
     Config::balance('enabled', $balance_enabled ? 1 : 0, true);
     if ($balance_enabled) {
         if (empty(Config::balance('app.key'))) {
@@ -270,15 +270,15 @@ if ($page == 'device') {
         }
     }
 
-    Config::device('door.enabled', request::bool('DeviceWithDoor') ? 1 : 0, true);
-    Config::charging('enabled', request::bool('ChargingDeviceEnabled') ? 1 : 0, true);
-    Config::fueling('enabled', request::bool('FuelingDeviceEnabled') ? 1 : 0, true);
+    Config::device('door.enabled', Request::bool('DeviceWithDoor') ? 1 : 0, true);
+    Config::charging('enabled', Request::bool('ChargingDeviceEnabled') ? 1 : 0, true);
+    Config::fueling('enabled', Request::bool('FuelingDeviceEnabled') ? 1 : 0, true);
 
-    $settings['app']['first']['enabled'] = request::bool('ZovyeAppFirstEnable') ? 1 : 0;
+    $settings['app']['first']['enabled'] = Request::bool('ZovyeAppFirstEnable') ? 1 : 0;
 
-    $settings['app']['domain']['enabled'] = request::bool('MultiDomainEnable') ? 1 : 0;
-    $settings['app']['domain']['main'] = trim(request::trim('mainUrl'), '\\\/');
-    $settings['app']['domain']['bak'] = request::array('bakUrl');
+    $settings['app']['domain']['enabled'] = Request::bool('MultiDomainEnable') ? 1 : 0;
+    $settings['app']['domain']['main'] = trim(Request::trim('mainUrl'), '\\\/');
+    $settings['app']['domain']['bak'] = Request::array('bakUrl');
     foreach ($settings['app']['domain']['bak'] as $index => &$url) {
         $url = trim($url, " \t\n\r\0\x0B\\\/");
         if (empty($url)) {
@@ -315,52 +315,52 @@ if ($page == 'device') {
     }
 } elseif ($page == 'agent') {
 
-    $settings['agent']['order']['refund'] = request::bool('allowAgentRefund') ? 1 : 0;
+    $settings['agent']['order']['refund'] = Request::bool('allowAgentRefund') ? 1 : 0;
 
     if ($settings['inventory']['enabled']) {
-        $settings['inventory']['goods']['mode'] = request::bool('inventoryGoodsLack') ? 1 : 0;
+        $settings['inventory']['goods']['mode'] = Request::bool('inventoryGoodsLack') ? 1 : 0;
     }
 
-    $settings['agent']['msg_tplid'] = request::trim('agentMsg');
+    $settings['agent']['msg_tplid'] = Request::trim('agentMsg');
     $settings['agent']['levels'] = [
-        'level0' => ['clr' => request::trim('clr0'), 'title' => request::trim('level0')],
-        'level1' => ['clr' => request::trim('clr1'), 'title' => request::trim('level1')],
-        'level2' => ['clr' => request::trim('clr2'), 'title' => request::trim('level2')],
-        'level3' => ['clr' => request::trim('clr3'), 'title' => request::trim('level3')],
-        'level4' => ['clr' => request::trim('clr4'), 'title' => request::trim('level4')],
-        'level5' => ['clr' => request::trim('clr5'), 'title' => request::trim('level5')],
+        'level0' => ['clr' => Request::trim('clr0'), 'title' => Request::trim('level0')],
+        'level1' => ['clr' => Request::trim('clr1'), 'title' => Request::trim('level1')],
+        'level2' => ['clr' => Request::trim('clr2'), 'title' => Request::trim('level2')],
+        'level3' => ['clr' => Request::trim('clr3'), 'title' => Request::trim('level3')],
+        'level4' => ['clr' => Request::trim('clr4'), 'title' => Request::trim('level4')],
+        'level5' => ['clr' => Request::trim('clr5'), 'title' => Request::trim('level5')],
     ];
 
-    $settings['agent']['reg']['mode'] = request::bool(
+    $settings['agent']['reg']['mode'] = Request::bool(
         'agentRegMode'
     ) ? Agent::REG_MODE_AUTO : Agent::REG_MODE_NORMAL;
 
-    $settings['agent']['reg']['referral'] = request::bool('agentReferral') ? 1 : 0;
-    $settings['agent']['device']['unbind'] = request::bool('deviceUnbind') ? 1 : 0;
+    $settings['agent']['reg']['referral'] = Request::bool('agentReferral') ? 1 : 0;
+    $settings['agent']['device']['unbind'] = Request::bool('deviceUnbind') ? 1 : 0;
     $settings['agent']['device']['fee'] = [
-        'year' => intval(round(request::float('deviceFeeYear', 0.0, 2) * 100)),
+        'year' => intval(round(Request::float('deviceFeeYear', 0.0, 2) * 100)),
     ];
 
     if ($settings['agent']['reg']['mode'] == Agent::REG_MODE_AUTO) {
 
-        $settings['agent']['reg']['superior'] = request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
-        $settings['agent']['reg']['level'] = request::str('agentRegLevel');
-        $settings['agent']['reg']['commission_fee'] = round(request::float('agentCommissionFee', 0, 2) * 100);
-        $settings['agent']['reg']['commission_fee_type'] = request::bool('feeType') ? 1 : 0;
+        $settings['agent']['reg']['superior'] = Request::bool('YzshopSuperiorRelationship') ? 'yz' : 'n/a';
+        $settings['agent']['reg']['level'] = Request::str('agentRegLevel');
+        $settings['agent']['reg']['commission_fee'] = round(Request::float('agentCommissionFee', 0, 2) * 100);
+        $settings['agent']['reg']['commission_fee_type'] = Request::bool('feeType') ? 1 : 0;
 
         $settings['agent']['reg']['funcs'] = Util::parseAgentFNsFromGPC();
 
         if ($settings['commission']['enabled']) {
             //佣金分享
-            $settings['agent']['reg']['rel_gsp']['enabled'] = request::bool('agentRelGsp') ? 1 : 0;
-            $settings['agent']['reg']['gsp_mode_type'] = request::str('gsp_mode_type', 'percent');
+            $settings['agent']['reg']['rel_gsp']['enabled'] = Request::bool('agentRelGsp') ? 1 : 0;
+            $settings['agent']['reg']['gsp_mode_type'] = Request::str('gsp_mode_type', 'percent');
 
             if ($settings['agent']['reg']['rel_gsp']['enabled']) {
 
-                $rel_0 = request::float('rel_gsp_level0', 0, 2) * 100;
-                $rel_1 = request::float('rel_gsp_level1', 0, 2) * 100;
-                $rel_2 = request::float('rel_gsp_level2', 0, 2) * 100;
-                $rel_3 = request::float('rel_gsp_level3', 0, 2) * 100;
+                $rel_0 = Request::float('rel_gsp_level0', 0, 2) * 100;
+                $rel_1 = Request::float('rel_gsp_level1', 0, 2) * 100;
+                $rel_2 = Request::float('rel_gsp_level2', 0, 2) * 100;
+                $rel_3 = Request::float('rel_gsp_level3', 0, 2) * 100;
 
                 if ($settings['agent']['reg']['gsp_mode_type'] == 'amount') {
                     $rel_0 = intval(round($rel_0));
@@ -383,42 +383,42 @@ if ($page == 'device') {
                 $settings['agent']['reg']['rel_gsp']['level3'] = $rel_3;
 
                 $settings['agent']['reg']['rel_gsp']['order'] = [
-                    'f' => request::bool('freeOrderGSP') ? 1 : 0,
-                    'b' => request::bool('balanceOrderGSP') ? 1 : 0,
-                    'p' => request::bool('payOrderGSP') ? 1 : 0,
+                    'f' => Request::bool('freeOrderGSP') ? 1 : 0,
+                    'b' => Request::bool('balanceOrderGSP') ? 1 : 0,
+                    'p' => Request::bool('payOrderGSP') ? 1 : 0,
                 ];
             }
             //佣金奖励
-            $settings['agent']['reg']['bonus']['enabled'] = request::bool('agentBonusEnabled') ? 1 : 0;
+            $settings['agent']['reg']['bonus']['enabled'] = Request::bool('agentBonusEnabled') ? 1 : 0;
             if ($settings['agent']['reg']['bonus']['enabled']) {
-                $settings['agent']['reg']['bonus']['principal'] = request::trim(
+                $settings['agent']['reg']['bonus']['principal'] = Request::trim(
                     'principal',
                     CommissionBalance::PRINCIPAL_ORDER
                 );
                 $settings['agent']['reg']['bonus']['order'] = [
-                    'f' => request::bool('freeOrder') ? 1 : 0,
-                    'b' => request::bool('balanceOrder') ? 1 : 0,
-                    'p' => request::bool('payOrder') ? 1 : 0,
+                    'f' => Request::bool('freeOrder') ? 1 : 0,
+                    'b' => Request::bool('balanceOrder') ? 1 : 0,
+                    'p' => Request::bool('payOrder') ? 1 : 0,
                 ];
 
-                $settings['agent']['reg']['bonus']['level0'] = request::float('rel_bonus_level0', 0, 2) * 100;
-                $settings['agent']['reg']['bonus']['level1'] = request::float('rel_bonus_level1', 0, 2) * 100;
-                $settings['agent']['reg']['bonus']['level2'] = request::float('rel_bonus_level2', 0, 2) * 100;
-                $settings['agent']['reg']['bonus']['level3'] = request::float('rel_bonus_level3', 0, 2) * 100;
+                $settings['agent']['reg']['bonus']['level0'] = Request::float('rel_bonus_level0', 0, 2) * 100;
+                $settings['agent']['reg']['bonus']['level1'] = Request::float('rel_bonus_level1', 0, 2) * 100;
+                $settings['agent']['reg']['bonus']['level2'] = Request::float('rel_bonus_level2', 0, 2) * 100;
+                $settings['agent']['reg']['bonus']['level3'] = Request::float('rel_bonus_level3', 0, 2) * 100;
             }
         }
     }
 
-    $settings['agent']['yzshop']['goods_limits']['enabled'] = request::bool('YzshopGoodsLimits') ? 1 : 0;
+    $settings['agent']['yzshop']['goods_limits']['enabled'] = Request::bool('YzshopGoodsLimits') ? 1 : 0;
 
     if ($settings['agent']['yzshop']['goods_limits']['enabled']) {
-        $goods_id = request::int('goodsID');
+        $goods_id = Request::int('goodsID');
         if ($goods_id) {
             $settings['agent']['yzshop']['goods_limits']['id'] = $goods_id;
         }
 
-        $settings['agent']['yzshop']['goods_limits']['OR'] = max(1, request::int('goodsOR'));
-        $settings['agent']['yzshop']['goods_limits']['title'] = request::trim('restrictGoodsTitle');
+        $settings['agent']['yzshop']['goods_limits']['OR'] = max(1, Request::int('goodsOR'));
+        $settings['agent']['yzshop']['goods_limits']['title'] = Request::trim('restrictGoodsTitle');
 
         $settings['agent']['yzshop']['goods_limits']['order_status'] = [];
         if (request('goodsOrderState0')) {
@@ -440,156 +440,156 @@ if ($page == 'device') {
 
     Config::agent('agreement', [
         'agent' => [
-            'enabled' => request::bool('agent_agreement'),
-            'content' => request::trim('agent_agreement_content'),
+            'enabled' => Request::bool('agent_agreement'),
+            'content' => Request::trim('agent_agreement_content'),
         ],
         'keeper' => [
-            'enabled' => request::bool('keeper_agreement'),
-            'content' => request::trim('keeper_agreement_content'),
+            'enabled' => Request::bool('keeper_agreement'),
+            'content' => Request::trim('keeper_agreement_content'),
         ],
     ], true);
 
 } elseif ($page == 'commission') {
-    $settings['commission']['enabled'] = request::bool('commission') ? 1 : 0;
+    $settings['commission']['enabled'] = Request::bool('commission') ? 1 : 0;
 
     if ($settings['commission']['enabled']) {
         $settings['commission']['withdraw'] = [
-            'times' => request::int('withdraw_times'),
-            'min' => request::float('withdraw_min', 0, 2) * 100,
-            'max' => request::float('withdraw_max', 0, 2) * 100,
+            'times' => Request::int('withdraw_times'),
+            'min' => Request::float('withdraw_min', 0, 2) * 100,
+            'max' => Request::float('withdraw_max', 0, 2) * 100,
             'count' => [
-                'month' => request::int('withdraw_maxcount'),
+                'month' => Request::int('withdraw_maxcount'),
             ],
-            'pay_type' => request::int('withdraw_pay_type'),
+            'pay_type' => Request::int('withdraw_pay_type'),
             'fee' => [
-                'permille' => min(1000, max(0, request::int('withdraw_fee_permille'))),
-                'min' => max(0, round(request::int('withdraw_fee_min') * 100)),
-                'max' => max(0, round(request::int('withdraw_fee_max') * 100)),
+                'permille' => min(1000, max(0, Request::int('withdraw_fee_permille'))),
+                'min' => max(0, round(Request::int('withdraw_fee_min') * 100)),
+                'max' => max(0, round(Request::int('withdraw_fee_max') * 100)),
             ],
-            'bank_card' => request::int('withdraw_bank_card'),
+            'bank_card' => Request::int('withdraw_bank_card'),
         ];
 
-        if (request::isset('withdraw_fee_percent')) {
-            $settings['commission']['withdraw']['fee']['percent'] = min(100, max(0, request::int('percent')));
+        if (Request::isset('withdraw_fee_percent')) {
+            $settings['commission']['withdraw']['fee']['percent'] = min(100, max(0, Request::int('percent')));
         } else {
             $settings['commission']['withdraw']['fee']['percent'] = min(
                 100,
-                max(0, round(request::int('withdraw_fee_permille') / 10))
+                max(0, round(Request::int('withdraw_fee_permille') / 10))
             );
         }
     }
 
-    $settings['commission']['agreement']['freq'] = request::trim('commission_agreement');
+    $settings['commission']['agreement']['freq'] = Request::trim('commission_agreement');
 
     if ($settings['commission']['agreement']['freq']) {
-        $settings['commission']['agreement']['content'] = request::str('commission_agreement_content');
+        $settings['commission']['agreement']['content'] = Request::str('commission_agreement_content');
         $settings['commission']['agreement']['version'] = sha1($settings['commission']['agreement']['content']);
     }
 
     if (App::isBalanceEnabled()) {
-        Config::balance('order.commission.val', (int)(request::float('balanceOrderPrice', 0, 2) * 100), true);
+        Config::balance('order.commission.val', (int)(Request::float('balanceOrderPrice', 0, 2) * 100), true);
     }
 
 } elseif ($page == 'wxapp') {
 
     $settings['agentWxapp'] = [
-        'title' => request::trim('WxAppTitle'),
-        'name' => request::trim('WxAppName'),
-        'key' => request::trim('WxAppKey'),
-        'secret' => request::trim('WxAppSecret'),
-        'username' => request::trim('WxAppUsername'),
+        'title' => Request::trim('WxAppTitle'),
+        'name' => Request::trim('WxAppName'),
+        'key' => Request::trim('WxAppKey'),
+        'secret' => Request::trim('WxAppSecret'),
+        'username' => Request::trim('WxAppUsername'),
     ];
 
     if (App::isBalanceEnabled()) {
         $reward = Config::app('wxapp.advs.reward', []);
-        $reward['id'] = request::str('reward');
+        $reward['id'] = Request::str('reward');
         Config::app('wxapp.advs', [
             'banner' => [
-                'id' => request::str('banner'),
+                'id' => Request::str('banner'),
             ],
             'reward' => $reward,
             'interstitial' => [
-                'id' => request::str('interstitial'),
+                'id' => Request::str('interstitial'),
             ],
             'video' => [
-                'id' => request::str('video'),
+                'id' => Request::str('video'),
             ],
         ], true);
     }
 
     Config::app('wxapp.message-push', [
-        'token' => request::trim('WxAppPushMsgEncodingToken'),
-        'encodingAESkey' => request::trim('WxAppPushMsgEncodingAESKey'),
-        'msgEncodingType' => request::int('WxAppPushMsgEncodingType'),
-        'msgTitle' => request::trim('WxAppPushMsgTitle'),
-        'msgDesc' => request::trim('WxAppPushMsgDesc'),
-        'msgThumb' => request::trim('WxAppPushMsgThumb'),
+        'token' => Request::trim('WxAppPushMsgEncodingToken'),
+        'encodingAESkey' => Request::trim('WxAppPushMsgEncodingAESKey'),
+        'msgEncodingType' => Request::int('WxAppPushMsgEncodingType'),
+        'msgTitle' => Request::trim('WxAppPushMsgTitle'),
+        'msgDesc' => Request::trim('WxAppPushMsgDesc'),
+        'msgThumb' => Request::trim('WxAppPushMsgThumb'),
     ], true);
 
 } elseif ($page == 'account') {
 
-    $settings['misc']['account']['priority'] = request::trim('accountPriority');
+    $settings['misc']['account']['priority'] = Request::trim('accountPriority');
 
     if (App::isWxPlatformEnabled()) {
-        $settings['account']['wx']['platform']['config']['appid'] = request::trim('wxPlatformAppID');
-        $settings['account']['wx']['platform']['config']['secret'] = request::trim('wxPlatformAppSecret');
-        $settings['account']['wx']['platform']['config']['token'] = request::trim('wxPlatformToken');
-        $settings['account']['wx']['platform']['config']['key'] = request::trim('wxPlatformKey');
+        $settings['account']['wx']['platform']['config']['appid'] = Request::trim('wxPlatformAppID');
+        $settings['account']['wx']['platform']['config']['secret'] = Request::trim('wxPlatformAppSecret');
+        $settings['account']['wx']['platform']['config']['token'] = Request::trim('wxPlatformToken');
+        $settings['account']['wx']['platform']['config']['key'] = Request::trim('wxPlatformKey');
     }
 
     if (App::isDouyinEnabled()) {
         Config::douyin('client', [
-            'key' => request::trim('douyinClientKey'),
-            'secret' => request::trim('douyinClientSecret'),
+            'key' => Request::trim('douyinClientKey'),
+            'secret' => Request::trim('douyinClientSecret'),
         ], true);
     }
 
     if (App::isCZTVEnabled()) {
         Config::cztv('client', [
-            'appid' => request::trim('cztvAppId'),
-            'redirect_url' => request::trim('cztvRedirectURL'),
-            'account_uid' => request::trim('cztvAccountUID'),
+            'appid' => Request::trim('cztvAppId'),
+            'redirect_url' => Request::trim('cztvRedirectURL'),
+            'account_uid' => Request::trim('cztvAccountUID'),
         ], true);
     }
 
-    $settings['account']['log']['enabled'] = request::bool('accountQueryLog') ? 1 : 0;
+    $settings['account']['log']['enabled'] = Request::bool('accountQueryLog') ? 1 : 0;
 
-    $settings['misc']['pushAccountMsg_type'] = request::trim('pushAccountMsg_type');
-    $settings['misc']['pushAccountMsg_val'] = request::trim('pushAccountMsg_val');
-    $settings['misc']['pushAccountMsg_delay'] = request::int('pushAccountMsg_delay');
-    $settings['misc']['maxAccounts'] = request::int('maxAccounts');
-    $settings['user']['maxTotalFree'] = request::int('maxTotalFree');
-    $settings['user']['maxFree'] = request::int('maxFree');
-    $settings['misc']['accountsPromote'] = request::bool('accountsPromote') ? 1 : 0;
+    $settings['misc']['pushAccountMsg_type'] = Request::trim('pushAccountMsg_type');
+    $settings['misc']['pushAccountMsg_val'] = Request::trim('pushAccountMsg_val');
+    $settings['misc']['pushAccountMsg_delay'] = Request::int('pushAccountMsg_delay');
+    $settings['misc']['maxAccounts'] = Request::int('maxAccounts');
+    $settings['user']['maxTotalFree'] = Request::int('maxTotalFree');
+    $settings['user']['maxFree'] = Request::int('maxFree');
+    $settings['misc']['accountsPromote'] = Request::bool('accountsPromote') ? 1 : 0;
 
-    $settings['order']['retry']['last'] = request::int('orderRetryLastTime');
-    $settings['order']['retry']['max'] = request::int('orderRetryMaxCount');
+    $settings['order']['retry']['last'] = Request::int('orderRetryLastTime');
+    $settings['order']['retry']['max'] = Request::int('orderRetryMaxCount');
 
 } elseif ($page == 'notice') {
     $settings['notice'] = [
         'sms' => [
             'url' => 'https://v.juhe.cn/sms/send?',
-            'appkey' => request::trim('smsAppkey'),
-            'verify' => request::trim('smsVerify'),
+            'appkey' => Request::trim('smsAppkey'),
+            'verify' => Request::trim('smsVerify'),
         ],
-        'reload_smstplid' => request::trim('reloadSMSTplid'),
-        'order_tplid' => request::trim('order_tplid'),
-        'reload_tplid' => request::trim('reload_tplid'),
-        'agentReq_tplid' => request::trim('agentReqTplid'),
-        'deviceerr_tplid' => request::trim('deviceErrorTplid'),
-        'deviceOnline_tplid' => request::trim('deviceOnlineTplid'),
-        'agentresult_tplid' => request::trim('agentResultTplid'),
-        'withdraw_tplid' => request::trim('withdrawTplid'),
-        'advReviewTplid' => request::trim('advReviewTplid'),
-        'advReviewResultTplid' => request::trim('advReviewResultTplid'),
+        'reload_smstplid' => Request::trim('reloadSMSTplid'),
+        'order_tplid' => Request::trim('order_tplid'),
+        'reload_tplid' => Request::trim('reload_tplid'),
+        'agentReq_tplid' => Request::trim('agentReqTplid'),
+        'deviceerr_tplid' => Request::trim('deviceErrorTplid'),
+        'deviceOnline_tplid' => Request::trim('deviceOnlineTplid'),
+        'agentresult_tplid' => Request::trim('agentResultTplid'),
+        'withdraw_tplid' => Request::trim('withdrawTplid'),
+        'advReviewTplid' => Request::trim('advReviewTplid'),
+        'advReviewResultTplid' => Request::trim('advReviewResultTplid'),
         'delay' => [
-            'remainWarning' => request::int('remainWarningDelay') ?: 1,
-            'deviceerr' => request::int('deviceErrorDelay') ?: 1,
-            'deviceOnline' => request::int('deviceOnlineDelay') ?: 1,
+            'remainWarning' => Request::int('remainWarningDelay') ?: 1,
+            'deviceerr' => Request::int('deviceErrorDelay') ?: 1,
+            'deviceOnline' => Request::int('deviceOnlineDelay') ?: 1,
         ],
     ];
 
-    $reviewAdminUserId = request::int('reviewAdminUser');
+    $reviewAdminUserId = Request::int('reviewAdminUser');
 
     if ($reviewAdminUserId) {
         $user = User::get($reviewAdminUserId);
@@ -598,7 +598,7 @@ if ($page == 'device') {
         }
     }
 
-    $authorizedAdminUserId = request::int('authorizedAdminUser');
+    $authorizedAdminUserId = Request::int('authorizedAdminUser');
 
     if ($authorizedAdminUserId) {
         $user = User::get($authorizedAdminUserId);
@@ -607,7 +607,7 @@ if ($page == 'device') {
         }
     }
 
-    $withdrawAdminUserId = request::int('withdrawAdminUser');
+    $withdrawAdminUserId = Request::int('withdrawAdminUser');
 
     if ($withdrawAdminUserId) {
         $user = User::get($withdrawAdminUserId);
@@ -619,83 +619,83 @@ if ($page == 'device') {
 } elseif ($page == 'misc') {
     $settings['misc']['redirect'] = [
         'success' => [
-            'url' => request::trim('success_url'),
+            'url' => Request::trim('success_url'),
         ],
         'fail' => [
-            'url' => request::trim('fail_url'),
+            'url' => Request::trim('fail_url'),
         ],
     ];
 
-    $settings['we7credit']['enabled'] = request::bool('we7credit') ? 1 : 0;
+    $settings['we7credit']['enabled'] = Request::bool('we7credit') ? 1 : 0;
 
     if ($settings['we7credit']['enabled']) {
 
-        $settings['we7credit']['type'] = request::trim('credit_type');
-        $settings['we7credit']['val'] = request::int('credit_val');
-        $settings['we7credit']['require'] = request::int('credit_require');
+        $settings['we7credit']['type'] = Request::trim('credit_type');
+        $settings['we7credit']['val'] = Request::int('credit_val');
+        $settings['we7credit']['require'] = Request::int('credit_require');
     }
 
     $settings['advs']['assign'] = [
-        'multi' => request::bool('advsAssignMultilMode') ? 1 : 0,
+        'multi' => Request::bool('advsAssignMultilMode') ? 1 : 0,
     ];
 
-    $settings['misc']['qrcode']['default_url'] = request::trim('default_url');
+    $settings['misc']['qrcode']['default_url'] = Request::trim('default_url');
 
     $settings['api'] = [
-        'account' => request::trim('account'),
+        'account' => Request::trim('account'),
     ];
 
     $settings['device']['upload'] = [
-        'url' => request::trim('deviceUploadApiUrl'),
-        'key' => request::trim('deviceUploadAppKey'),
-        'secret' => request::trim('deviceUploadAppSecret'),
+        'url' => Request::trim('deviceUploadApiUrl'),
+        'key' => Request::trim('deviceUploadAppKey'),
+        'secret' => Request::trim('deviceUploadAppSecret'),
     ];
 
     if (App::isDonatePayEnabled()) {
         Config::donatePay('qsc', [
-            'title' => request::trim('donatePayTitle'),
-            'desc' => request::trim('donatePayDesc'),
-            'url' => request::trim('donatePayUrl'),
+            'title' => Request::trim('donatePayTitle'),
+            'desc' => Request::trim('donatePayDesc'),
+            'url' => Request::trim('donatePayUrl'),
         ], true);
     }
 
     if (App::isZeroBonusEnabled()) {
-        $settings['custom']['bonus']['zero']['v'] = min(100, request::float('zeroBonus', 0, 2));
+        $settings['custom']['bonus']['zero']['v'] = min(100, Request::float('zeroBonus', 0, 2));
         $settings['custom']['bonus']['zero']['order'] = [
-            'f' => request::bool('zeroBonusOrderFree') ? 1 : 0,
-            'p' => request::bool('zeroBonusOrderPay') ? 1 : 0,
+            'f' => Request::bool('zeroBonusOrderFree') ? 1 : 0,
+            'p' => Request::bool('zeroBonusOrderPay') ? 1 : 0,
         ];
     }
 
     Config::notify('order', [
-        'key' => request::str('orderNotifyAppKey'),
-        'url' => request::trim('orderNotifyUrl'),
-        'f' => request::bool('orderNotifyFree'),
-        'p' => request::bool('orderNotifyPay'),
+        'key' => Request::str('orderNotifyAppKey'),
+        'url' => Request::trim('orderNotifyUrl'),
+        'f' => Request::bool('orderNotifyFree'),
+        'p' => Request::bool('orderNotifyPay'),
     ], true);
 
     Config::notify('inventory', [
-        'key' => request::str('inventoryAccessKey'),
+        'key' => Request::str('inventoryAccessKey'),
     ], true);
 
 } elseif ($page == 'payment') {
-    $wx_enabled = request::bool('wx') ? 1 : 0;
+    $wx_enabled = Request::bool('wx') ? 1 : 0;
     $settings['pay']['wx']['enable'] = $wx_enabled;
 
     if ($wx_enabled) {
-        $settings['pay']['wx']['appid'] = request::trim('wxAppID');
-        $settings['pay']['wx']['wxappid'] = request::trim('wxxAppID');
-        $settings['pay']['wx']['key'] = request::trim('wxAppKey');
-        $settings['pay']['wx']['mch_id'] = request::trim('wxMCHID');
+        $settings['pay']['wx']['appid'] = Request::trim('wxAppID');
+        $settings['pay']['wx']['wxappid'] = Request::trim('wxxAppID');
+        $settings['pay']['wx']['key'] = Request::trim('wxAppKey');
+        $settings['pay']['wx']['mch_id'] = Request::trim('wxMCHID');
         $settings['pay']['wx']['pem'] = [
-            'cert' => request::trim('certPEM'),
-            'key' => request::trim('keyPEM'),
+            'cert' => Request::trim('certPEM'),
+            'key' => Request::trim('keyPEM'),
         ];
 
-        $settings['pay']['wx']['v3']['serial'] = request::trim('v3Serial');
+        $settings['pay']['wx']['v3']['serial'] = Request::trim('v3Serial');
         $settings['pay']['wx']['v3']['pem'] = [
-            'cert' => request::trim('V3cert'),
-            'key' => request::trim('V3key'),
+            'cert' => Request::trim('V3cert'),
+            'key' => Request::trim('V3key'),
         ];
 
         if (false === Util::createApiRedirectFile('payment/wx.php', 'payresult', [
@@ -709,16 +709,16 @@ if ($page == 'device') {
         }
     }
 
-    $lcsw_enabled = request::bool('lcsw') ? 1 : 0;
+    $lcsw_enabled = Request::bool('lcsw') ? 1 : 0;
     $settings['pay']['lcsw']['enable'] = $lcsw_enabled;
 
     if ($lcsw_enabled) {
-        $settings['pay']['lcsw']['wx'] = request::bool('lcsw_weixin');
-        $settings['pay']['lcsw']['ali'] = request::bool('lcsw_ali');
-        $settings['pay']['lcsw']['wxapp'] = request::bool('lcsw_wxapp');
-        $settings['pay']['lcsw']['merchant_no'] = request::trim('merchant_no');
-        $settings['pay']['lcsw']['terminal_id'] = request::trim('terminal_id');
-        $settings['pay']['lcsw']['access_token'] = request::trim('access_token');
+        $settings['pay']['lcsw']['wx'] = Request::bool('lcsw_weixin');
+        $settings['pay']['lcsw']['ali'] = Request::bool('lcsw_ali');
+        $settings['pay']['lcsw']['wxapp'] = Request::bool('lcsw_wxapp');
+        $settings['pay']['lcsw']['merchant_no'] = Request::trim('merchant_no');
+        $settings['pay']['lcsw']['terminal_id'] = Request::trim('terminal_id');
+        $settings['pay']['lcsw']['access_token'] = Request::trim('access_token');
 
         if (false === Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
                 'headers' => [
@@ -731,18 +731,18 @@ if ($page == 'device') {
         }
     }
 
-    $settings['ali']['appid'] = request::trim('ali_appid');
-    $settings['ali']['pubkey'] = request::trim('ali_pubkey');
-    $settings['ali']['prikey'] = request::trim('ali_prikey');
+    $settings['ali']['appid'] = Request::trim('ali_appid');
+    $settings['ali']['pubkey'] = Request::trim('ali_pubkey');
+    $settings['ali']['prikey'] = Request::trim('ali_prikey');
 
-    $settings['alixapp']['id'] = request::trim('alixapp_id');
-    $settings['alixapp']['pubkey'] = request::trim('alixapp_pubkey');
-    $settings['alixapp']['prikey'] = request::trim('alixapp_prikey');
+    $settings['alixapp']['id'] = Request::trim('alixapp_id');
+    $settings['alixapp']['pubkey'] = Request::trim('alixapp_pubkey');
+    $settings['alixapp']['prikey'] = Request::trim('alixapp_prikey');
 
     if ($settings['pay']['SQB']['enable']) {
-        $settings['pay']['SQB']['wx'] = request::bool('SQB_weixin');
-        $settings['pay']['SQB']['ali'] = request::bool('SQB_ali');
-        $settings['pay']['SQB']['wxapp'] = request::bool('SQB_wxapp');
+        $settings['pay']['SQB']['wx'] = Request::bool('SQB_weixin');
+        $settings['pay']['SQB']['ali'] = Request::bool('SQB_ali');
+        $settings['pay']['SQB']['wxapp'] = Request::bool('SQB_wxapp');
         Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
             'headers' => [
                 'HTTP_USER_AGENT' => 'SQB_notify',
@@ -827,7 +827,7 @@ if ($page == 'device') {
     $req_arr = [];
 
     foreach ($template_keys as $val) {
-        if (request::isset($val)) {
+        if (Request::isset($val)) {
             $req_arr[$val] = request($val);
         }
     }
@@ -852,24 +852,24 @@ if ($page == 'device') {
 
     if (App::isBalanceEnabled()) {
         Config::balance('sign.bonus', [
-            'enabled' => request::bool('dailySignInEnabled') ? 1 : 0,
-            'min' => request::int('dailySignInBonusMin'),
-            'max' => max(request::int('dailySignInBonusMin'), request::int('dailySignInBonusMax')),
+            'enabled' => Request::bool('dailySignInEnabled') ? 1 : 0,
+            'min' => Request::int('dailySignInBonusMin'),
+            'max' => max(Request::int('dailySignInBonusMin'), Request::int('dailySignInBonusMax')),
         ], true);
 
-        Config::balance('app.notify_url', request::trim('balanceNotifyUrl'), true);
-        Config::balance('order.as', request::str('balanceOrderAs'), true);
-        Config::balance('order.auto_rb', request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
+        Config::balance('app.notify_url', Request::trim('balanceNotifyUrl'), true);
+        Config::balance('order.as', Request::str('balanceOrderAs'), true);
+        Config::balance('order.auto_rb', Request::bool('autoRollbackOrderBalance') ? 1 : 0, true);
 
-        $promote_opts = request::array('accountPromoteBonusOption', []);
+        $promote_opts = Request::array('accountPromoteBonusOption', []);
         foreach (['third_platform', 'account', 'video', 'wxapp', 'douyin'] as $name) {
             Config::balance("account.promote_bonus.$name", in_array($name, $promote_opts) ? 1 : 0, true);
         }
 
-        Config::balance('account.promote_bonus.min', request::int('accountPromoteBonusMin'), true);
+        Config::balance('account.promote_bonus.min', Request::int('accountPromoteBonusMin'), true);
         Config::balance(
             'account.promote_bonus.max',
-            max(request::int('accountPromoteBonusMin'), request::int('accountPromoteBonusMax')),
+            max(Request::int('accountPromoteBonusMin'), Request::int('accountPromoteBonusMax')),
             true
         );
     }

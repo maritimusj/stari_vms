@@ -10,7 +10,7 @@ if (!App::isUseAccountQRCode()) {
     JSON::fail('未启用这个功能！');
 }
 
-$account = Account::get(request::int('id'));
+$account = Account::get(Request::int('id'));
 if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }

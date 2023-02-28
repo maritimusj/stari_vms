@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\commission_balanceModelObj;
 
-$balance_obj = Util::getAndCheckWithdraw(request::int('id'));
+$balance_obj = Util::getAndCheckWithdraw(Request::int('id'));
 if (is_error($balance_obj)) {
     JSON::fail($balance_obj);
 }

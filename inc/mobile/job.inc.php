@@ -10,7 +10,7 @@ use Exception;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 $job_filename = ZOVYE_CORE_ROOT."jobs/$op.php";
 
 try {

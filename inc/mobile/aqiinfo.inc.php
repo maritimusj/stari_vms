@@ -11,9 +11,9 @@ use zovye\account\AQIInfoAccount;
 defined('IN_IA') or exit('Access Denied');
 
 //如果是阿奇返回，则重新引导用户到设备页面
-if (request::str('appResult') == 'nomore') {
+if (Request::str('appResult') == 'nomore') {
 
-    $extra = request::str('extra');
+    $extra = Request::str('extra');
     if (empty($extra)) {
         Util::resultAlert('请重新扫描设备二维码，谢谢！', 'error');
     }
@@ -50,7 +50,7 @@ if (request::str('appResult') == 'nomore') {
     app()->devicePage($tpl_data);
 }
 
-$raw = request::raw();
+$raw = Request::raw();
 if (empty($raw)) {
     Util::resultAlert('请重新扫描设备二维码，谢谢！');
 }

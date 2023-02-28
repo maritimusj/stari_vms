@@ -6,13 +6,13 @@
 
 namespace zovye;
 
-$op = request::op('default');
-$from = request::str('from');
-$device_id = request::str('device');
+$op = Request::op('default');
+$from = Request::str('from');
+$device_id = Request::str('device');
 
 //获取支付宝用户信息
 if ($op == 'auth') {
-    $code = request::str('auth_code');
+    $code = Request::str('auth_code');
     if (empty($code)) {
         Util::resultAlert('获取用户auth_code失败！', 'error');
     }
@@ -22,7 +22,7 @@ if ($op == 'auth') {
 }
 
 if (!App::isAliUser()) {
-    $retries = request::int('retries');
+    $retries = Request::int('retries');
     if ($retries > 3) {
         Util::resultAlert('获取用户信息失败[01]', 'error');
     }

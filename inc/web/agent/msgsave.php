@@ -8,10 +8,10 @@ namespace zovye;
 
 use zovye\model\msgModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
-$title = request::trim('title');
-$content = request::str('content');
+$title = Request::trim('title');
+$content = Request::str('content');
 
 if ($id) {
     /** @var msgModelObj $msg */

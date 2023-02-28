@@ -8,16 +8,16 @@ namespace zovye;
 
 use zovye\model\userModelObj;
 
-$op = request::op('default');
-$app_key = request::str('appkey');
+$op = Request::op('default');
+$app_key = Request::str('appkey');
 
 function findApiUser() :? userModelObj {
-    if (request::has('id')) {
-        $user = User::get(request::int('id'));
-    } elseif (request::has('openid')) {
-        $user = User::get(request::str('openid'), true);
-    } elseif (request::has('mobile')) {
-        $user = User::findOne(['mobile' => request::str('mobile'), 'app' => request::int('app', User::WX)]);
+    if (Request::has('id')) {
+        $user = User::get(Request::int('id'));
+    } elseif (Request::has('openid')) {
+        $user = User::get(Request::str('openid'), true);
+    } elseif (Request::has('mobile')) {
+        $user = User::findOne(['mobile' => Request::str('mobile'), 'app' => Request::int('app', User::WX)]);
     }
     return $user ?? null;
 }
@@ -34,8 +34,8 @@ if ($op == 'default') {
 
     $query = User::query();
 
-    $page = request::int('page', 1);
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = Request::int('page', 1);
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
@@ -71,14 +71,14 @@ if ($op == 'default') {
         JSON::fail('用户不存在！');
     }
 
-    $val = request::int('val');
+    $val = Request::int('val');
     if (empty($val)) {
         JSON::fail('积分值不能为0！');
     }
 
     $result = $user->getBalance()->change($val, Balance::API_UPDATE, [
         'appkey' => $app_key,
-        'reason' => request::str('reason', '', true),
+        'reason' => Request::str('reason', '', true),
         'ip' => Util::getClientIp(),
     ]);
 

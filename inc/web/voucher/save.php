@@ -10,13 +10,13 @@ use DateTime;
 use Exception;
 
 $res = Util::transactionDo(function () {
-    $goods_id = request::int('goodsId');
+    $goods_id = Request::int('goodsId');
     $goods = Goods::get($goods_id);
     if (empty($goods)) {
         return error(State::ERROR, '要绑定的商品不存在！');
     }
 
-    $ids = request::is_array('goods') ? request::array('goods') : [];
+    $ids = Request::is_array('goods') ? Request::array('goods') : [];
     $ids = array_map(function ($id) {
         return intval($id);
     }, $ids);
@@ -40,11 +40,11 @@ $res = Util::transactionDo(function () {
         }
     }
 
-    $total = request::int('total');
+    $total = Request::int('total');
     $original_limit_goods_dds = [];
 
     if (request('id') > 0) {
-        $id = request::int('id');
+        $id = Request::int('id');
         $voucher = GoodsVoucher::get($id);
         if (empty($voucher)) {
             return error(State::ERROR, '找不到指定的提货码！');

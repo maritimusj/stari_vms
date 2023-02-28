@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $device = Device::get($id);
 if (!$device || !$device->isChargingDevice()) {
     JSON::fail('设备不正确！');

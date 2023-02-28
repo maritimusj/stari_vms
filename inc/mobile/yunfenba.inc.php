@@ -11,17 +11,17 @@ use zovye\account\YunfenbaAccount;
 defined('IN_IA') or exit('Access Denied');
 
 Log::debug('yunfenba', [
-    'raw' => request::raw(),
-    'user' => request::str('user'),
-    'device' => request::str('device'),
-    'wxid' => request::str('wxid'),
+    'raw' => Request::raw(),
+    'user' => Request::str('user'),
+    'device' => Request::str('device'),
+    'wxid' => Request::str('wxid'),
 ]);
 
 if (App::isYunfenbaEnabled()) {
     YunfenbaAccount::cb([
-        'user' => request::str('user'),
-        'device' => request::str('device'),
-        'wxid' => request::str('wxid'),
+        'user' => Request::str('user'),
+        'device' => Request::str('device'),
+        'wxid' => Request::str('wxid'),
     ]);
 } else {
     Log::debug('yunfenba', [

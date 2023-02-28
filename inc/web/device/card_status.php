@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$iccid = request::str('iccid');
+$iccid = Request::str('iccid');
 if (empty($iccid)) {
     JSON::fail('错误：iccid 为空！');
 }

@@ -7,7 +7,7 @@
 namespace zovye;
 
 
-$id = request::int('id');
+$id = Request::int('id');
 $voucher = GoodsVoucher::get($id);
 $limitGoodsIds = $voucher->getExtraData('limitGoods', []);
 

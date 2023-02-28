@@ -11,7 +11,7 @@ defined('IN_IA') or exit('Access Denied');
 use zovye\model\advs_statsModelObj;
 
 $user = Util::getCurrentUser();
-$adv = Advertising::get(request::int('advsid'));
+$adv = Advertising::get(Request::int('advsid'));
 
 if ($user && $adv) {
     $url = $adv->getExtraData('link');
@@ -23,8 +23,8 @@ if ($user && $adv) {
             [
                 'openid' => $user->getOpenid(),
                 'advs_id' => $adv->getId(),
-                'device_id' => request::int('deviceid'),
-                'account_id' => request::int('accountid'),
+                'device_id' => Request::int('deviceid'),
+                'account_id' => Request::int('accountid'),
                 'ip' => CLIENT_IP,
                 'count' => 1,
                 'extra' => serialize(

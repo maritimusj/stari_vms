@@ -13,7 +13,7 @@ use zovye\model\userModelObj;
 $s_user_list = [];
 
 $query = Principal::gspsor();
-$s_keyword = request::trim('keyword', '', true);
+$s_keyword = Request::trim('keyword', '', true);
 if ($s_keyword != '') {
     $query = $query->whereOr([
         'name REGEXP' => $s_keyword,
@@ -30,8 +30,8 @@ foreach ($query->findAll() as $val) {
 }
 
 $date_limit = [
-    'start' => request::str('start'),
-    'end' => request::str('end'),
+    'start' => Request::str('start'),
+    'end' => Request::str('end'),
 ];
 
 if ($date_limit['start']) {
@@ -47,7 +47,7 @@ if ($date_limit['end']) {
     $e_date = new DateTime('first day of next month 00:00:00');
 }
 
-$s_openid = request::str('agent_openid');
+$s_openid = Request::str('agent_openid');
 if ($s_openid) {
     $user = User::get($s_openid, true);
     if (empty($user)) {
@@ -61,7 +61,7 @@ $cond = [
 ];
 
 //是否导出
-if (request::bool('is_export')) {
+if (Request::bool('is_export')) {
     if (empty($user)) {
         Util::itoast('请指定用户！', '', 'error');
     }
@@ -235,8 +235,8 @@ $pager = '';
 if (!empty($user)) {
     $title = "<b>{$user->getName()}</b>的佣金记录";
 
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query = $user->getCommissionBalance()->log();
     $query->where($cond);

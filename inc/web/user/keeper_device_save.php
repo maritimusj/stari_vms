@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 
-$user = User::get(request::int('user'));
+$user = User::get(Request::int('user'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
@@ -21,7 +21,7 @@ if (empty($keeper)) {
 /** @var deviceModelObj $device */
 $device = Device::query([
     'keeper_id' => $keeper->getId(),
-    'id' => request::int('id'),
+    'id' => Request::int('id'),
 ])->findOne();
 
 if (empty($device)) {
@@ -29,12 +29,12 @@ if (empty($device)) {
 }
 
 $data = [
-    'kind' => request::int('kind'),
-    'way' => request::int('way'),
+    'kind' => Request::int('kind'),
+    'way' => Request::int('way'),
 ];
 
-$commission_val = request::float('val', 0, 2);
-$commission_type = request::str('type', 'fixed');
+$commission_val = Request::float('val', 0, 2);
+$commission_type = Request::str('type', 'fixed');
 
 if ($commission_type == 'fixed') {
     $data['fixed'] = max(0, intval($commission_val * 100));

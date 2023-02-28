@@ -24,11 +24,11 @@ if (empty($user)) {
     Util::resultAlert('只能从微信中打开，谢谢！', 'error');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'save') {
 
-    $mobile = trim(request::str('mobile'));
+    $mobile = trim(Request::str('mobile'));
     if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
         JSON::fail('请输入正确的手机号码！');
     }

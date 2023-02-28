@@ -8,7 +8,7 @@ namespace zovye\api\wx;
 
 use zovye\model\articleModelObj;
 use zovye\model\filesModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use zovye\We7;
 use function zovye\error;
@@ -26,7 +26,7 @@ class article
     {
         common::checkCurrentUserPrivileges('F_wd');
 
-        $id = request::int('id');
+        $id = Request::int('id');
         /** @var articleModelObj $article */
         $article = m('article')->findOne(We7::uniacid(['id' => $id]));
         if ($article) {
@@ -53,8 +53,8 @@ class article
     {
         common::checkCurrentUserPrivileges('F_wd');
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('article')->where(We7::uniacid(['type' => 'article']));
         $total = $query->count();
@@ -92,8 +92,8 @@ class article
         common::checkCurrentUserPrivileges('F_wd');
 
         $archive_types = settings('doc.types');
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('files')->where(We7::uniacid([]));
         $total = $query->count();
@@ -135,8 +135,8 @@ class article
     {
         common::checkCurrentUserPrivileges('F_wt');
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = m('article')->where(We7::uniacid(['type' => 'faq']));
         $total = $query->count();

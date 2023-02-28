@@ -6,18 +6,18 @@
  
 namespace zovye;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('没有找到这个用户！');
 }
 
-$total = request::int('total');
+$total = Request::int('total');
 if ($total == 0) {
     JSON::fail('积分数量不能为零！');
 }
 
 if ($user->acquireLocker(User::BALANCE_LOCKER)) {
-    $memo = request::str('memo');
+    $memo = Request::str('memo');
     $r = $user->getBalance()->change(
         $total,
         Balance::ADJUST,

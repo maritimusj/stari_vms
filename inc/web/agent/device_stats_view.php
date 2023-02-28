@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$agent_id = request::int('id');
+$agent_id = Request::int('id');
 $agent = Agent::get($agent_id);
 
 if (empty($agent)) {

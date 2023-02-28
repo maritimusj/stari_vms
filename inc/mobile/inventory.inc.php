@@ -10,10 +10,10 @@ use RuntimeException;
 
 defined('IN_IA') or exit('Access Denied');
 
-$mobile = request::str('mobile');
-$goods_id = request::int('goods');
-$num = request::int('num');
-$key = request::str('key');
+$mobile = Request::str('mobile');
+$goods_id = Request::int('goods');
+$num = Request::int('num');
+$key = Request::str('key');
 
 $access_key = Config::notify('inventory.key', '');
 if (empty($access_key) || $key != $access_key) {

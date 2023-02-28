@@ -9,15 +9,15 @@ namespace zovye;
 use DateTime;
 use Exception;
 
-$agent_id = request::int('id');
+$agent_id = Request::int('id');
 $agent = Agent::get($agent_id);
 
 if (empty($agent)) {
     JSON::fail('找不到这个代理商！');
 }
 
-$year_str = request::int('year');
-$month_str = request::int('month');
+$year_str = Request::int('year');
+$month_str = Request::int('month');
 
 try {
     $year = new DateTime(sprintf("%d-%02d-01", $year_str, $month_str));

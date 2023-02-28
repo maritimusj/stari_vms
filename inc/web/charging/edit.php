@@ -10,7 +10,7 @@ $tpl_data = [
     'lbs_key' => settings('user.location.appkey', DEFAULT_LBS_KEY),
 ];
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id > 0) {
     $group = Group::get($id, Group::CHARGING);
     if (!$group) {

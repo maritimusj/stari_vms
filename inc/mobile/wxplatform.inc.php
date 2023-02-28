@@ -8,7 +8,7 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == WxPlatform::AUTH_NOTIFY) {
 
     //微信授权通知
@@ -23,9 +23,9 @@ if ($op == WxPlatform::AUTH_NOTIFY) {
 
 } elseif ($op == WxPlatform::AUTH_REDIRECT_OP) {
 
-    $code = request::str('auth_code');
-    $expired = request::int('expires_in');
-    $agent_id = request::int('agent');
+    $code = Request::str('auth_code');
+    $expired = Request::int('expires_in');
+    $agent_id = Request::int('agent');
 
     //查询授权信息
     $auth_data = WxPlatform::getAuthData($code);

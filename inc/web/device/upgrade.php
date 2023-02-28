@@ -8,9 +8,9 @@ namespace zovye;
 
 use zovye\model\versionModelObj;
 
-$version_id = request::int('version');
+$version_id = Request::int('version');
 
-$device = Device::find(request::trim('id'), ['id', 'imei']);
+$device = Device::find(Request::trim('id'), ['id', 'imei']);
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }

@@ -10,12 +10,12 @@ use zovye\model\device_groupsModelObj;
 
 $query = Group::query(Group::NORMAL);
 
-$keyword = request::trim('keywords');
+$keyword = Request::trim('keywords');
 if ($keyword) {
     $query->where(['title REGEXP' => $keyword]);
 }
 
-$agent_id = request::int('agent');
+$agent_id = Request::int('agent');
 
 if ($agent_id) {
     $agent = Agent::get($agent_id);

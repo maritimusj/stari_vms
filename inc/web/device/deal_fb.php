@@ -9,8 +9,8 @@ namespace zovye;
 //处理反馈
 use zovye\model\device_feedbackModelObj;
 
-$id = request::int('id');
-$remark = request::trim('remark');
+$id = Request::int('id');
+$remark = Request::trim('remark');
 if (empty($remark)) {
     JSON::fail('请输入处理内容！');
 }

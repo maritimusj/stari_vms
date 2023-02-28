@@ -9,7 +9,7 @@ namespace zovye\api\wx;
 use Exception;
 use zovye\model\agentModelObj;
 use zovye\App;
-use zovye\request;
+use zovye\Request;
 use zovye\JSON;
 use zovye\Log;
 use zovye\model\keeperModelObj;
@@ -33,14 +33,14 @@ class common
 
     public static function getDecryptedWxUserData(): array
     {
-        $code = request::str('code');
+        $code = Request::str('code');
         if (empty($code)) {
             return err('缺少必要的请求参数！');
         }
 
         $config = settings('agentWxapp', []);
 
-        $vendorUID = request::trim('vendor');
+        $vendorUID = Request::trim('vendor');
         if (!empty($vendorUID) && $vendorUID != 'v1' && $vendorUID != $config['key']) {
             $app = WxApp::get($vendorUID, true);
             if (empty($app)) {
@@ -56,8 +56,8 @@ class common
             return err('小程序配置为空！');
         }
 
-        $iv = request::str('iv');
-        $encrypted_data = request::str('encryptedData');
+        $iv = Request::str('iv');
+        $encrypted_data = Request::str('encryptedData');
 
         $result = Wx::decodeWxAppData($code, $iv, $encrypted_data, $config);
         if (is_error($result)) {
@@ -71,7 +71,7 @@ class common
 
     public static function getToken(): string
     {
-        return request::str('token');
+        return Request::str('token');
     }
 
     public static function getWXAppUser(): ?userModelObj
@@ -319,13 +319,13 @@ class common
     public static function setUserBank(userModelObj $user): array
     {
         $bankData = [
-            'realname' => request::trim('realname'),
-            'bank' => request::trim('bank'),
-            'branch' => request::trim('branch'),
-            'account' => request::trim('account'),
+            'realname' => Request::trim('realname'),
+            'bank' => Request::trim('bank'),
+            'branch' => Request::trim('branch'),
+            'account' => Request::trim('account'),
             'address' => [
-                'province' => request::trim('province'),
-                'city' => request::trim('city'),
+                'province' => Request::trim('province'),
+                'city' => Request::trim('city'),
             ],
         ];
 

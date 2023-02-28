@@ -19,10 +19,10 @@ $agents = [
     'list' => [],
 ];
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', 10);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', 10);
 
-$sup_agent = Agent::get(request::int('id'));
+$sup_agent = Agent::get(Request::int('id'));
 
 $agent_ids = Agent::getAllSubordinates($sup_agent);
 if (!empty($agent_ids)) {

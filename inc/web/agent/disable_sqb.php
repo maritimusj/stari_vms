@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$agent = Agent::get(request::int('id'));
+$agent = Agent::get(Request::int('id'));
 if (empty($agent)) {
     JSON::fail('找不到这个代理商！');
 }

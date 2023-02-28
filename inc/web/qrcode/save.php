@@ -8,14 +8,14 @@ namespace zovye;
 
 use zovye\model\advertisingModelObj;
 
-$title = request::trim('title');
+$title = Request::trim('title');
 
 $extra = [
     'area' => request('area'),
-    'sex' => request::int('gender'),
-    'phoneos' => request::trim('phoneos'),
-    'url' => request::trim('url'),
-    'priority' => request::int('priority'),
+    'sex' => Request::int('gender'),
+    'phoneos' => Request::trim('phoneos'),
+    'url' => Request::trim('url'),
+    'priority' => Request::int('priority'),
 ];
 
 if (empty($title)) {
@@ -26,7 +26,7 @@ if (empty($extra['url'])) {
     Util::itoast('请填写目标网址！', We7::referer(), 'error');
 }
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     /** @var advertisingModelObj $adv */
     $adv = Advertising::findOne(['type' => Advertising::ACTIVE_QRCODE, 'id' => $id]);

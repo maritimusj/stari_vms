@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $result = Order::getCommissionDetail($id);
 if (is_error($result)) {
     JSON::fail($result);

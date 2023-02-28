@@ -8,7 +8,7 @@ namespace zovye;
 
 use RuntimeException;
 
-$id = request::int('id');
+$id = Request::int('id');
 $device = Device::get($id);
 if (empty($device)) {
     JSON::fail([]);

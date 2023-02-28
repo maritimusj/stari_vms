@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-$type = request::int('type', Account::NORMAL);
+$type = Request::int('type', Account::NORMAL);
 
 app()->showTemplate('web/account/edit_'.$type, [
     'clr' => Util::randColor(),

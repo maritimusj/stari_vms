@@ -10,16 +10,16 @@ use DateTime;
 use DateTimeImmutable;
 use Exception;
 
-$agent_id = request::int('id');
+$agent_id = Request::int('id');
 $agent = Agent::get($agent_id);
 
 if (empty($agent)) {
     JSON::fail('找不到这个代理商！');
 }
 
-$year_str = request::int('year');
-$month_str = request::int('month');
-$day_str = request::int('day');
+$year_str = Request::int('year');
+$month_str = Request::int('month');
+$day_str = Request::int('day');
 
 try {
     $month = new DateTimeImmutable(sprintf("%d-%02d-%02d", $year_str, $month_str, $day_str));

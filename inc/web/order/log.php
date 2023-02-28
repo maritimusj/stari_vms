@@ -8,8 +8,8 @@ namespace zovye;
 
 use zovye\model\user_logsModelObj;
 
-$page = max(1, request::str('page'));
-$page_size = request::is_ajax() ? 10 : max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+$page = max(1, Request::str('page'));
+$page_size = Request::is_ajax() ? 10 : max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
 $query = m('user_logs')->where([
     'level' => [

@@ -11,14 +11,14 @@ use zovye\Device;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\deviceModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 
 use function zovye\isEmptyArray;
 use function zovye\settings;
 
-$op = request::op('default');
-$lastId = request::int('lastId');
+$op = Request::op('default');
+$lastId = Request::int('lastId');
 $data = [
     'lastId' => $lastId,
 ];

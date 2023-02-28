@@ -11,7 +11,7 @@ use Exception;
 use zovye\App;
 use zovye\Goods;
 use zovye\model\userModelObj;
-use zovye\request;
+use zovye\Request;
 use function zovye\err;
 
 class misc
@@ -56,7 +56,7 @@ class misc
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
 
         $query = \zovye\Order::query();
-        if (request::bool('all')) {
+        if (Request::bool('all')) {
             $ids = \zovye\Agent::getAllSubordinates($agent);
             $ids[] = $agent->getId();
             $query->where(['agent_id' => $ids]);
@@ -64,13 +64,13 @@ class misc
             $query->where(['agent_id' => $agent->getId()]);
         }
 
-        $goods_id = request::int('goods');
+        $goods_id = Request::int('goods');
         if ($goods_id > 0) {
             $query->where(['goods_id' => $goods_id]);
         }
 
-        if (request::has('group')) {
-            $group = \zovye\Group::get(request::int('group'));
+        if (Request::has('group')) {
+            $group = \zovye\Group::get(Request::int('group'));
             if (empty($group) || $group->getAgentId() != $agent->getId()) {
                 return err('分组不存在！');
             }
@@ -85,18 +85,18 @@ class misc
             ]);
         }
 
-        if (request::has('start')) {
+        if (Request::has('start')) {
             try {
-                $start = new DateTime(request::trim('start'));
+                $start = new DateTime(Request::trim('start'));
                 $query->where(['createtime >=' => $start->getTimestamp()]);
             } catch (Exception $e) {
                 return err('起始时间不正确！');
             }
         }
 
-        if (request::has('end')) {
+        if (Request::has('end')) {
             try {
-                $end = new DateTime(request::trim('end'));
+                $end = new DateTime(Request::trim('end'));
                 $end->modify('next day 00:00');
                 $query->where(['createtime <' => $end->getTimestamp()]);
             } catch (Exception $e) {
@@ -113,7 +113,7 @@ class misc
             'amount' => intval($amount),
         ];
 
-        if (request::bool('detail')) {
+        if (Request::bool('detail')) {
             $list = [];
             $query->groupBy('goods_id');
             $res = $query->getAll(['goods_id', 'count(*) AS num', 'sum(price) AS price', 'sum(num) AS amount']);

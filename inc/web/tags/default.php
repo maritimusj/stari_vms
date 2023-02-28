@@ -9,9 +9,9 @@ namespace zovye;
 //分配设备控件查询标签详情
 use zovye\model\tagsModelObj;
 
-if (request::is_ajax() && request::has('id')) {
+if (Request::is_ajax() && Request::has('id')) {
     /** @var tagsModelObj $res */
-    $res = m('tags')->findOne(We7::uniacid(['id' => request::int('id')]));
+    $res = m('tags')->findOne(We7::uniacid(['id' => Request::int('id')]));
     if ($res) {
         $tag = [
             'id' => $res->getId(),
@@ -24,8 +24,8 @@ if (request::is_ajax() && request::has('id')) {
     JSON::fail('找不到这个标签');
 }
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = m('tags')->where(We7::uniacid([]));
 
@@ -36,7 +36,7 @@ if (!empty($ids)) {
 }
 
 //搜索关键字
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->where(['title LIKE' => "%$keywords%"]);
 }
@@ -70,7 +70,7 @@ if ($total > 0) {
     }
 }
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     $tags['serial'] = request('serial') ?: microtime(true).'';
     JSON::success($tags);
 }

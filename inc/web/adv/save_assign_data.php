@@ -6,8 +6,8 @@
  
 namespace zovye;
 
-$id = request::int('id');
-$data = request::is_string('data') ? json_decode(htmlspecialchars_decode(request::str('data')), true) : request(
+$id = Request::int('id');
+$data = Request::is_string('data') ? json_decode(htmlspecialchars_decode(Request::str('data')), true) : request(
     'data'
 );
 

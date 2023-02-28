@@ -8,8 +8,8 @@ namespace zovye;
 
 use zovye\model\articleModelObj;
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = m('article')->where(We7::uniacid(['type' => 'article']));
 

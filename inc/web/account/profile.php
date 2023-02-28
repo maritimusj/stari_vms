@@ -8,13 +8,13 @@ namespace zovye;
 
 use zovye\JSON;
 use zovye\Account;
-use zovye\request;
+use zovye\Request;
 
-if (request::has('uid')) {
-    $uid = request::str('uid');
+if (Request::has('uid')) {
+    $uid = Request::str('uid');
     $acc = Account::findOneFromUID($uid);
 } else {
-    $id = request::int('id');
+    $id = Request::int('id');
     $acc = Account::get($id);
 }
 

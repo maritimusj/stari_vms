@@ -16,12 +16,12 @@ use zovye\JobException;
 use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
 
-$order_no = request::str('orderNO');
+$order_no = Request::str('orderNO');
 
 $log = [
     'orderNO' => $order_no,

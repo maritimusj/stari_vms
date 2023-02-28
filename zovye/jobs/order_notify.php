@@ -15,7 +15,7 @@ use zovye\JobException;
 use zovye\Log;
 use zovye\model\pay_logsModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\UserCommissionBalanceCard;
 use zovye\Util;
 use zovye\VIPCard;
@@ -23,7 +23,7 @@ use zovye\Wx;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $log = [
     'id' => request('id'),
 ];
@@ -34,7 +34,7 @@ if ($op == 'order_notify' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $tpl_id = settings('notice.order_tplid');
     if ($tpl_id) {
 
-        $order = Order::get(request::int('id'));
+        $order = Order::get(Request::int('id'));
         if (empty($order)) {
             throw new JobException('找不到这个订单！', $log);
         }

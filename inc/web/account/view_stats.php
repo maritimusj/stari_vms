@@ -13,7 +13,7 @@ use zovye\Util;
 use zovye\Stats;
 use zovye\Account;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $acc = Account::get($id);
 if (empty($acc)) {
@@ -21,7 +21,7 @@ if (empty($acc)) {
 }
 
 $title = $acc->getTitle();
-$time_str = request::has('month') ? date('Y-').request::int('month').date('-01 00:00:00') : 'today';
+$time_str = Request::has('month') ? date('Y-').Request::int('month').date('-01 00:00:00') : 'today';
 
 try {
     $month = new DateTime($time_str);

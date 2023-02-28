@@ -12,23 +12,23 @@ $user = Util::getCurrentUser([
 ]);
 
 if (empty($user)) {
-    if (request::is_ajax()) {
+    if (Request::is_ajax()) {
         JSON::fail('找不到这个用户！');
     }
     Util::resultAlert('找不到这个用户！', 'error');
 }
 
 if ($user->isBanned()) {
-    if (request::is_ajax()) {
+    if (Request::is_ajax()) {
         JSON::fail('用户暂时不可用！');
     }
     Util::resultAlert('用户暂时不可用！');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'default') {
 
-    $device_shadow_id = request::str('device');
+    $device_shadow_id = Request::str('device');
     if ($device_shadow_id) {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
@@ -57,8 +57,8 @@ if ($op == 'default') {
 
 } elseif ($op == 'account') {
 
-    $type = request::int('type', Account::NORMAL);
-    $max = request::int('max', 10);
+    $type = Request::int('type', Account::NORMAL);
+    $max = Request::int('max', 10);
 
     $params = [
         'include' => [Account::BALANCE],
@@ -78,9 +78,9 @@ if ($op == 'default') {
 
 } elseif ($op == 'exchange') {
 
-    $device_uid = request::str('device');
-    $goods_id = request::int('goods');
-    $num = request::int('num');
+    $device_uid = Request::str('device');
+    $goods_id = Request::int('goods');
+    $num = Request::int('num');
 
     $res = Helper::exchange($user, $device_uid, $goods_id, $num);
     if (is_error($res)) {
@@ -95,11 +95,11 @@ if ($op == 'default') {
 } elseif ($op == 'logs') {
 
     $query = $user->getBalance()->log();
-    if (request::has('lastId')) {
-        $query->where(['id <' => request::int('lastId')]);
+    if (Request::has('lastId')) {
+        $query->where(['id <' => Request::int('lastId')]);
     }
 
-    $query->limit(request::int('pagesize', 20));
+    $query->limit(Request::int('pagesize', 20));
     $query->orderBy('createtime DESC');
 
     $result = [];

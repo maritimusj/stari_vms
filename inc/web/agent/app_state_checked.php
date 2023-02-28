@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\agent_appModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 /** @var agent_appModelObj $app */
 $app = m('agent_app')->findOne(We7::uniacid(['id' => $id]));
 if ($app) {

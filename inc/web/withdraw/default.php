@@ -19,13 +19,13 @@ $tpl_data = [
 
 $tpl_data['mch_pay_enabled'] = !empty(settings('pay.wx.pem'));
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query = CommissionBalance::query(['src' => CommissionBalance::WITHDRAW]);
 //$query->where('(updatetime IS NULL OR updatetime=0)');
 
-if (request::has('agentId')) {
+if (Request::has('agentId')) {
     $user_x = User::get(request('agentId'));
     if ($user_x) {
         $tpl_data['user'] = $user_x->profile();

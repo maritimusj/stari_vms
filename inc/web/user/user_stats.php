@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\userModelObj;
 
-$ids = request::isset('id') ? [request::int('id')] : request::array('ids');
+$ids = Request::isset('id') ? [Request::int('id')] : Request::array('ids');
 
 $result = [];
 

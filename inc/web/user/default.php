@@ -23,11 +23,11 @@ $tpl_data['balance_enabled'] = App::isBalanceEnabled();
 
 $credit_used = settings('we7credit.enabled');
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 //身份
-$s_principal = request::trim('s_principal');
+$s_principal = Request::trim('s_principal');
 if ($s_principal) {
     switch ($s_principal) {
         case User::AGENT:
@@ -53,7 +53,7 @@ if (empty($query)) {
 }
 
 //搜索用户名
-$s_keywords = urldecode(request::trim('s_keywords'));
+$s_keywords = urldecode(Request::trim('s_keywords'));
 if ($s_keywords) {
     if (in_array($s_principal, [User::AGENT, User::PARTNER, User::KEEPER, User::TESTER, User::GSPOR])) {
         $query->whereOr([
@@ -72,32 +72,32 @@ if ($s_keywords) {
 }
 
 $types = [];
-$s_type_wx = request::bool('s_type_wx');
+$s_type_wx = Request::bool('s_type_wx');
 if ($s_type_wx) {
     $types[] = User::WX;
 }
 
-$s_type_wxapp = request::bool('s_type_wxapp');
+$s_type_wxapp = Request::bool('s_type_wxapp');
 if ($s_type_wxapp) {
     $types[] = User::WxAPP;
 }
 
-$s_type_ali = request::bool('s_type_ali');
+$s_type_ali = Request::bool('s_type_ali');
 if ($s_type_ali) {
     $types[] = User::ALI;
 }
 
-$s_type_douyin = request::bool('s_type_douyin');
+$s_type_douyin = Request::bool('s_type_douyin');
 if ($s_type_douyin) {
     $types[] = User::DouYin;
 }
 
-$s_type_api = request::bool('s_type_api');
+$s_type_api = Request::bool('s_type_api');
 if ($s_type_api) {
     $types[] = User::API;
 }
 
-$s_type_third = request::bool('s_type_third');
+$s_type_third = Request::bool('s_type_third');
 if ($s_type_third) {
     $types[] = User::THIRD_ACCOUNT;
 }

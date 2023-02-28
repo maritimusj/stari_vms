@@ -18,7 +18,7 @@ use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\UserCommissionBalanceCard;
 use zovye\Util;
 use zovye\VIPCard;
@@ -28,14 +28,14 @@ use function zovye\request;
 use function zovye\settings;
 
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $log = [
     'id' => $id,
     'url' => $_SERVER['QUERY_STRING'],
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'order' && CtrlServ::checkJobSign(['id' => request('id')])) {
     $locker = Locker::try("order::statistics");
     if ($locker) {

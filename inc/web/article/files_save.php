@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\filesModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     /** @var filesModelObj $archive */
     $archive = m('files')->findOne(We7::uniacid(['id' => $id]));
@@ -19,11 +19,11 @@ if ($id) {
 
 $archive_types = settings('doc.types');
 
-$type = request::str('type');
+$type = Request::str('type');
 $data = We7::uniacid(
     [
-        'title' => request::str('title'),
-        'url' => request::str('url'),
+        'title' => Request::str('title'),
+        'url' => Request::str('url'),
         'type' => array_key_exists($type, $archive_types) ? $type : 'unknown',
     ]
 );

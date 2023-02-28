@@ -12,7 +12,7 @@ if (!YZShop::isInstalled()) {
     JSON::fail('刷新失败！');
 }
 
-$page = max(1, request::int('page'));
+$page = max(1, Request::int('page'));
 
 $query = Agent::query();
 

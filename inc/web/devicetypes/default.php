@@ -7,19 +7,19 @@
 namespace zovye;
 
 $params = [
-    'page' => request::int('page'),
-    'pagesize' => request::int('pagesize'),
-    'keywords' => request::str('keywords'),
+    'page' => Request::int('page'),
+    'pagesize' => Request::int('pagesize'),
+    'keywords' => Request::str('keywords'),
     'detail' => true,
 ];
 
-$keywords = request::trim('keywords', '', true);
+$keywords = Request::trim('keywords', '', true);
 if (!empty($keywords)) {
     $params['keywords'] = $keywords;
     $tpl_data['s_keywords'] = $keywords;
 }
 
-$agent_openid = request::str('agent_openid');
+$agent_openid = Request::str('agent_openid');
 if ($agent_openid) {
     if ($agent_openid == '-1') {
         $params['agent_id'] = 0;

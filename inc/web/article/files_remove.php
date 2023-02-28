@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id) {
     $archive = m('files')->findOne(We7::uniacid(['id' => $id]));
     if ($archive && $archive->destroy()) {

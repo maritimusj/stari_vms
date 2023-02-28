@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\advertisingModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 /** @var advertisingModelObj $adv */
 $adv = Advertising::query(['type' => Advertising::PUSH_MSG, 'id' => $id])->findOne();
@@ -18,7 +18,7 @@ if ($adv) {
     $msg = [];
 }
 
-$typename = request::trim('typename');
+$typename = Request::trim('typename');
 $res = Util::getWe7Material($typename, request('page'), request('pagesize'));
 
 $content = app()->fetchTemplate(

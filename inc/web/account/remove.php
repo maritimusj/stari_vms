@@ -7,7 +7,7 @@
 namespace zovye;
 
 $result = Util::transactionDo(function() {
-    $id = request::int('id');
+    $id = Request::int('id');
     if ($id) {
         $account = Account::get($id);
         if ($account) {

@@ -14,7 +14,7 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\Order;
 use zovye\Pay;
-use zovye\request;
+use zovye\Request;
 use zovye\Team;
 use zovye\User;
 use zovye\Util;
@@ -66,16 +66,16 @@ class charging
     {
         $query = Group::query(Group::CHARGING);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-        $keywords = request::trim('keywords');
+        $keywords = Request::trim('keywords');
         if ($keywords) {
             $query->where(['title REGEXP' => $keywords]);
         }
 
-        $lng = request::float('lng');
-        $lat = request::float('lat');
+        $lng = Request::float('lng');
+        $lat = Request::float('lat');
 
         if ($lng > 0 && $lat > 0) {
             $distanceFN = function ($loc) use ($lng, $lat) {
@@ -115,7 +115,7 @@ class charging
 
     public static function groupDetail(): array
     {
-        $id = request::int('id');
+        $id = Request::int('id');
         $group = Group::get($id, Group::CHARGING);
         if (empty($group)) {
             return err('找不到指定的分组信息！');
@@ -123,8 +123,8 @@ class charging
 
         $group_data = $group->format();
 
-        $lng = request::float('lng');
-        $lat = request::float('lat');
+        $lng = Request::float('lng');
+        $lat = Request::float('lat');
 
         if ($lng > 0 && $lat > 0) {
             $res = Util::cachedCall(10, function () use ($group_data, $lng, $lat) {
@@ -146,7 +146,7 @@ class charging
 
     public static function deviceList(): array
     {
-        $id = request::int('id');
+        $id = Request::int('id');
         $group = Group::get($id, Group::CHARGING);
         if (empty($group)) {
             return err('找不到指定的分组信息！');
@@ -154,7 +154,7 @@ class charging
 
         $query = Device::query(['group_id' => $group->getId()]);
 
-        $keywords = request::trim('keywords');
+        $keywords = Request::trim('keywords');
         if ($keywords) {
             $query->whereOr([
                 'name REGEXP' => $keywords,
@@ -162,8 +162,8 @@ class charging
             ]);
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         //列表数据
         $query->page($page, $page_size);
@@ -193,7 +193,7 @@ class charging
 
     public static function deviceDetail(): array
     {
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -206,8 +206,8 @@ class charging
 
         $result['chargerNum'] = $device->getChargerNum();
 
-        if (request::has('chargerID')) {
-            $chargerID = request::int('chargerID');
+        if (Request::has('chargerID')) {
+            $chargerID = Request::int('chargerID');
             $result['charger'] = $device->getChargerStatusData($chargerID);
             $result['charger']['index'] = $chargerID;
         }
@@ -228,14 +228,14 @@ class charging
             return err('对不起，用户暂时无法使用！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
         IotCharging::checkUnfinishedOrder($device);
 
-        $chargerID = request::int('chargerID');
+        $chargerID = Request::int('chargerID');
         $serial = $device->generateChargingSerial($chargerID);
 
         return IotCharging::start($serial, $user->getCommissionBalanceCard(), $device, $chargerID);
@@ -250,7 +250,7 @@ class charging
 
     public static function orderStatus(): array
     {
-        $serial = request::str('serial');
+        $serial = Request::str('serial');
 
         return IotCharging::orderStatus($serial);
     }
@@ -279,13 +279,13 @@ class charging
             'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
         ]);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         //列表数据
         $query->page($page, $page_size);
 
-        $keywords = request::trim('keywords');
+        $keywords = Request::trim('keywords');
         if ($keywords) {
             $query->where(['order_id REGEXP' => $keywords]);
         }
@@ -304,7 +304,7 @@ class charging
     {
         $user = common::getWXAppUser();
 
-        $serial = request::str('serial');
+        $serial = Request::str('serial');
 
         $order = Order::get($serial, true);
         if (empty($order)) {
@@ -337,7 +337,7 @@ class charging
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -350,14 +350,14 @@ class charging
             return err('设备不在线！');
         }
 
-        $chargerID = request::int('chargerID');
+        $chargerID = Request::int('chargerID');
 
         $charging_data = $device->chargingNOWData($chargerID);
         if (!empty($charging_data)) {
             return err('充电枪正在使用中！');
         }
 
-        $price = intval(round(request::float('price', 0, 2) * 100));
+        $price = intval(round(Request::float('price', 0, 2) * 100));
 
         return Helper::createChargingOrder($user, $device, $chargerID, $price, $device->generateChargingSerial($chargerID));
     }
@@ -366,9 +366,9 @@ class charging
     {
         $user = common::getWXAppUser();
 
-        $total = intval(round(request::float('amount', 0, 2) * 100));
+        $total = intval(round(Request::float('amount', 0, 2) * 100));
 
-        return balance::balanceWithdraw($user, $total, request::str('memo'), [
+        return balance::balanceWithdraw($user, $total, Request::str('memo'), [
             'charging' => true,
         ]);
     }

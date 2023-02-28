@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $voucher = GoodsVoucher::get($id);
 if ($voucher) {
     $data = is_string(request('data')) ? json_decode(htmlspecialchars_decode(request('data')), true) : request(

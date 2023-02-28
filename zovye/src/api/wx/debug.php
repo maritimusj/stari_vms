@@ -7,7 +7,7 @@
 
 namespace zovye\api\wx;
 
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use zovye\User;
 use zovye\Util;
@@ -30,7 +30,7 @@ class debug
     public static function login(): array
     {
         $data = include ZOVYE_ROOT.DIRECTORY_SEPARATOR.'debug.php';
-        if (!empty($data) && !empty($data['debug']) && $data['password'] === request::str('password')) {
+        if (!empty($data) && !empty($data['debug']) && $data['password'] === Request::str('password')) {
             $mobile = $data['phoneNumber'];
             $user = User::findOne(['mobile' => $mobile]);
             if ($user) {

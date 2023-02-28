@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-$id = request::int('account');
+$id = Request::int('account');
 $account = Account::get($id);
 if (empty($account) || !$account->isQuestionnaire()) {
     Util::resultAlert('找不到这个问卷！', 'error');
@@ -15,8 +15,8 @@ if (empty($account) || !$account->isQuestionnaire()) {
 $query = $account->logQuery(['level' => $account->getId()]);
 $total = $query->count();
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $pager = We7::pagination($total, $page, $page_size);
 

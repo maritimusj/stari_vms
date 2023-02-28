@@ -11,7 +11,7 @@ use zovye\model\deviceModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'default') {
 
     $js_sdk = Util::fetchJSSDK();
@@ -24,7 +24,7 @@ if ($op == 'default') {
         Util::resultAlert('请使用微信打开！', 'error');
     }
 
-    $device = Device::get(request::str('device'), true);
+    $device = Device::get(Request::str('device'), true);
 
     app()->userInfoPage($user, $device);
 
@@ -37,9 +37,9 @@ if ($op == 'default') {
 } elseif ($op == 'location') {
     //请求定位
 
-    $id = request::trim('id');
-    $lat = request::float('lat');
-    $lng = request::float('lng');
+    $id = Request::trim('id');
+    $lat = Request::float('lat');
+    $lng = Request::float('lng');
 
     if (empty($id) || empty($lng) || empty($lat)) {
         JSON::fail('无效的参数！');
@@ -70,8 +70,8 @@ if ($op == 'default') {
         Util::resultAlert('找不到这个用户或者用户已被禁用！', 'error');
     }
 
-    $adv_id = request::int('id');
-    if ($user->getId() != settings('notice.reviewAdminUserId') || request::str('sign') !== sha1(
+    $adv_id = Request::int('id');
+    if ($user->getId() != settings('notice.reviewAdminUserId') || Request::str('sign') !== sha1(
             App::uid().$user->getOpenid().$adv_id
         )) {
         Util::resultAlert('无效的请求！', 'error');
@@ -83,29 +83,29 @@ if ($op == 'default') {
     }
 
     if ($adv->getReviewResult() == ReviewResult::PASSED) {
-        request::is_ajax() ? JSON::success('已通过审核！') : Util::resultAlert('已通过审核！');
+        Request::is_ajax() ? JSON::success('已通过审核！') : Util::resultAlert('已通过审核！');
     }
 
     if ($adv->getReviewResult() == ReviewResult::REJECTED) {
-        request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！', 'warning');
+        Request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！', 'warning');
     }
 
-    $fn = request::str('fn');
+    $fn = Request::str('fn');
     if ($fn == 'pass') {
         if (Advertising::pass($adv_id, _W('username'))) {
-            request::is_ajax() ? JSON::success('广告已经通过审核！') : Util::resultAlert('广告已经通过审核！');
+            Request::is_ajax() ? JSON::success('广告已经通过审核！') : Util::resultAlert('广告已经通过审核！');
         }
-        request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
+        Request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
     } elseif ($fn == 'reject') {
         if (Advertising::reject($adv_id)) {
-            request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！');
+            Request::is_ajax() ? JSON::success('已拒绝！') : Util::resultAlert('已拒绝！');
         }
-        request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
+        Request::is_ajax() ? JSON::fail('审核操作失败！') : Util::resultAlert('审核操作失败！', 'error');
     }
 
     $tpl_data = [
         'id' => $adv->getId(),
-        'sign' => request::str('sign'),
+        'sign' => Request::str('sign'),
         'title' => $adv->getTitle(),
         'type' => Advertising::desc($adv->getType()),
     ];
@@ -114,7 +114,7 @@ if ($op == 'default') {
     if ($agent_id) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {
-            request::is_ajax() ? JSON::fail('找不到上传广告的代理商！') : Util::resultAlert('找不到上传广告的代理商！', 'error');
+            Request::is_ajax() ? JSON::fail('找不到上传广告的代理商！') : Util::resultAlert('找不到上传广告的代理商！', 'error');
         }
         $tpl_data['agent'] = $agent->profile();
     }
@@ -180,13 +180,13 @@ if ($op == 'default') {
 } elseif ($op == 'profile') {
     $user = Util::getCurrentUser();
     if ($user) {
-        if (request::has('sex')) {
-            $user->updateSettings('customData.sex', request::int('sex'));
+        if (Request::has('sex')) {
+            $user->updateSettings('customData.sex', Request::int('sex'));
         }
     }
     
     JSON::success([
-        'redirect_url' => Util::murl('entry', ['device' => request::str('device')]),
+        'redirect_url' => Util::murl('entry', ['device' => Request::str('device')]),
     ]);
     
 } elseif ($op == 'upload_pic') {
@@ -238,7 +238,7 @@ if ($op == 'default') {
         JSON::fail('用户已经是运营人员！');
     }
 
-    $token = request::str('token');
+    $token = Request::str('token');
 
     $original = api\wx\common::getUser($token);
     if (empty($original)) {
@@ -357,7 +357,7 @@ if ($op == 'default') {
     unset($_SESSION['oauth_acid']);
     unset($_SESSION['wx_user_id']);
 
-    $url = Util::murl(request::trim('entry', 'entry'), ['device' => request::str('device'), 'serial' => Util::random(10)]);
+    $url = Util::murl(Request::trim('entry', 'entry'), ['device' => Request::str('device'), 'serial' => Util::random(10)]);
     $_SESSION['dest_url'] = $url;
     
     JSON::success([

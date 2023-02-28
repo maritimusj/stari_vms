@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$device = Device::get(request::int('id'));
+$device = Device::get(Request::int('id'));
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }

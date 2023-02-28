@@ -9,7 +9,7 @@ namespace zovye;
 use DateTime;
 use zovye\model\deviceModelObj;
 
-$step = request::str('step');
+$step = Request::str('step');
 if (empty($step)) {
     $total = Device::query()->count();
 
@@ -25,7 +25,7 @@ if (empty($step)) {
     ]);
 }
 
-$serial = request::str('serial');
+$serial = Request::str('serial');
 if (empty($serial)) {
     JSON::fail("缺少serial");
 }
@@ -35,7 +35,7 @@ $dirname = "export/sim/";
 $full_filename = Util::getAttachmentFileName($dirname, $filename);
 
 if ($step == 'load') {
-    $last_id = request::int('last');
+    $last_id = Request::int('last');
 
     $result = [];
 

@@ -11,13 +11,13 @@ namespace zovye\job\DeviceOnline;
 use zovye\CtrlServ;
 use zovye\Device;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 use zovye\Wx;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $data = [
     'id' => request('id'),
     'event' => request('event'),
@@ -28,7 +28,7 @@ $log = [
 ];
 
 if ($op == 'device_online' && CtrlServ::checkJobSign($data)) {
-    $device = Device::get(request::int('id'));
+    $device = Device::get(Request::int('id'));
     if ($device) {
         $tpl_id = settings('notice.deviceOnline_tplid');
         if (!empty($tpl_id)) {

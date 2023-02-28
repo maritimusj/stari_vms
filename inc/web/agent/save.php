@@ -9,7 +9,7 @@ namespace zovye;
 use zovye\model\deviceModelObj;
 use zovye\model\keeperModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $result = Util::transactionDo(function() use ($id) {
 
@@ -29,9 +29,9 @@ $result = Util::transactionDo(function() use ($id) {
         }
     }
 
-    if (request::bool('agent_base')) {
+    if (Request::bool('agent_base')) {
 
-        $mobile = request::trim('mobile');
+        $mobile = Request::trim('mobile');
         if (empty($mobile) || !preg_match(REGULAR_TEL, $mobile)) {
             return err('手机号码无效！');
         }
@@ -40,16 +40,16 @@ $result = Util::transactionDo(function() use ($id) {
             return err('手机号码已经被其它用户使用！');
         }
 
-        $name = request::trim('name');
-        $company = request::trim('company');
-        $license = request::trim('license');
-        $level = request::trim('level');
+        $name = Request::trim('name');
+        $company = Request::trim('company');
+        $license = Request::trim('license');
+        $level = Request::trim('level');
         $area = array_intersect_key(request('area'), ['province' => '省', 'city' => '市', 'district' => '区']);
 
         //上级代理
         $superior_data = [];
 
-        $openid_s = request::trim('superior');
+        $openid_s = Request::trim('superior');
         if ($openid_s) {
             $superior = Agent::get($openid_s, true);
             if (empty($superior) || !$superior->isAgent() || $superior->getId() == $user->getId()) {
@@ -109,23 +109,23 @@ $result = Util::transactionDo(function() use ($id) {
         $user->setAgent($level);
         $user->setMobile($mobile);
 
-    } elseif (request::has('agent_notice')) {
+    } elseif (Request::has('agent_notice')) {
 
         if ($user->isAgent()) {
             $user->updateSettings(
                 'agentData.notice',
                 [
-                    'agentApp' => request::bool('agentApp') ? 1 : 0,
-                    'order' => request::bool('orderNotify') ? 1 : 0,
-                    'remainWarning' => request::bool('remainWarning') ? 1 : 0,
-                    'deviceError' => request::bool('deviceError') ? 1 : 0,
-                    'deviceOnline' => request::bool('deviceOnline') ? 1 : 0,
-                    'reviewResult' => request::bool('reviewResult') ? 1 : 0,
-                    'agentMsg' => request::bool('agentMsg') ? 1 : 0,
+                    'agentApp' => Request::bool('agentApp') ? 1 : 0,
+                    'order' => Request::bool('orderNotify') ? 1 : 0,
+                    'remainWarning' => Request::bool('remainWarning') ? 1 : 0,
+                    'deviceError' => Request::bool('deviceError') ? 1 : 0,
+                    'deviceOnline' => Request::bool('deviceOnline') ? 1 : 0,
+                    'reviewResult' => Request::bool('reviewResult') ? 1 : 0,
+                    'agentMsg' => Request::bool('agentMsg') ? 1 : 0,
                 ]
             );
         }
-    } elseif (request::has('agent_funcs')) {
+    } elseif (Request::has('agent_funcs')) {
 
         if ($user->isAgent()) {
             $data = Util::parseAgentFNsFromGPC();
@@ -133,43 +133,43 @@ $result = Util::transactionDo(function() use ($id) {
 
             if (App::isCustomWxAppEnabled()) {
                 $user->updateSettings('agentData.wx.app', [
-                    'key' => request::trim('WxAppKey'),
+                    'key' => Request::trim('WxAppKey'),
                 ]);
             }
         }
-    } elseif (request::has('agent_commission')) {
+    } elseif (Request::has('agent_commission')) {
 
         if ($user->isAgent()) {
 
-            $enabled = request::bool('commission');
+            $enabled = Request::bool('commission');
             $user->updateSettings('agentData.commission.enabled', $enabled);
             if ($enabled) {
-                $user->updateSettings('agentData.commission.fee_type', request::bool('feeType') ? 1 : 0);
-                $user->updateSettings('agentData.commission.fee', request::float('commission_fee', 0, 2) * 100);
+                $user->updateSettings('agentData.commission.fee_type', Request::bool('feeType') ? 1 : 0);
+                $user->updateSettings('agentData.commission.fee', Request::float('commission_fee', 0, 2) * 100);
                 $user->setPrincipal(User::GSPOR);
             }
 
             //佣金分享
-            $gsp_enabled = request::bool('gsp_enabled');
+            $gsp_enabled = Request::bool('gsp_enabled');
             $user->updateSettings('agentData.gsp.enabled', $gsp_enabled);
             if ($gsp_enabled) {
-                $gsp_mode = in_array(request::str('gsp_mode'), ['rel', 'free', 'mixed']) ? request::str(
+                $gsp_mode = in_array(Request::str('gsp_mode'), ['rel', 'free', 'mixed']) ? Request::str(
                     'gsp_mode'
                 ) : 'rel';
-                $gsp_mode_type = request::str('gsp_mode_type', 'percent');
+                $gsp_mode_type = Request::str('gsp_mode_type', 'percent');
                 $user->updateSettings('agentData.gsp.mode', $gsp_mode);
                 $user->updateSettings('agentData.gsp.mode_type', $gsp_mode_type);
 
                 if ($gsp_mode == 'rel') {
                     $user->updateSettings('agentData.gsp.order', [
-                        'f' => request::bool('freeOrderGSP') ? 1 : 0,
-                        'b' => request::bool('balanceOrderGSP') ? 1 : 0,
-                        'p' => request::bool('payOrderGSP') ? 1 : 0,
+                        'f' => Request::bool('freeOrderGSP') ? 1 : 0,
+                        'b' => Request::bool('balanceOrderGSP') ? 1 : 0,
+                        'p' => Request::bool('payOrderGSP') ? 1 : 0,
                     ]);
 
-                    $rel_1 = min(10000, max(0, request::float('rel_level1', 0, 2) * 100));
-                    $rel_2 = min(10000, max(0, request::float('rel_level2', 0, 2) * 100));
-                    $rel_3 = min(10000, max(0, request::float('rel_level3', 0, 2) * 100));
+                    $rel_1 = min(10000, max(0, Request::float('rel_level1', 0, 2) * 100));
+                    $rel_2 = min(10000, max(0, Request::float('rel_level2', 0, 2) * 100));
+                    $rel_3 = min(10000, max(0, Request::float('rel_level3', 0, 2) * 100));
 
                     $user->updateSettings(
                         'agentData.gsp.rel',
@@ -183,51 +183,51 @@ $result = Util::transactionDo(function() use ($id) {
             }
 
             //佣金奖励
-            $bonus_enabled = request::bool('agentBonusEnabled');
+            $bonus_enabled = Request::bool('agentBonusEnabled');
             $user->updateSettings('agentData.bonus.enabled', $bonus_enabled);
             if ($bonus_enabled) {
                 $user->updateSettings(
                     'agentData.bonus',
                     [
                         'enabled' => true,
-                        'principal' => request::trim('principal', CommissionBalance::PRINCIPAL_ORDER),
+                        'principal' => Request::trim('principal', CommissionBalance::PRINCIPAL_ORDER),
                         'order' => [
-                            'f' => request::bool('freeOrder') ? 1 : 0,
-                            'b' => request::bool('balanceOrder') ? 1 : 0,
-                            'p' => request::bool('payOrder') ? 1 : 0,
+                            'f' => Request::bool('freeOrder') ? 1 : 0,
+                            'b' => Request::bool('balanceOrder') ? 1 : 0,
+                            'p' => Request::bool('payOrder') ? 1 : 0,
                         ],
-                        'level0' => request::float('bonus_level0', 0, 2) * 100,
-                        'level1' => request::float('bonus_level1', 0, 2) * 100,
-                        'level2' => request::float('bonus_level2', 0, 2) * 100,
-                        'level3' => request::float('bonus_level3', 0, 2) * 100,
+                        'level0' => Request::float('bonus_level0', 0, 2) * 100,
+                        'level1' => Request::float('bonus_level1', 0, 2) * 100,
+                        'level2' => Request::float('bonus_level2', 0, 2) * 100,
+                        'level3' => Request::float('bonus_level3', 0, 2) * 100,
                     ]
                 );
             }
         }
-    } elseif (request::bool('agent_misc')) {
+    } elseif (Request::bool('agent_misc')) {
 
         if ($user->isAgent()) {
             $user->updateSettings(
                 'agentData.misc',
                 [
-                    'maxTotalFree' => request::int('maxTotalFree'),
-                    'maxFree' => request::int('maxFree'),
-                    'maxAccounts' => request::int('maxAccounts'),
-                    'pushAccountMsg' => request::trim('pushAccountMsg'),
-                    'siteTitle' => request::trim('siteTitle'),
-                    'siteLogo' => request::trim('image'),
-                    'power' => request::int('power'),
-                    'auto_ref' => request::int('auto_ref'),
+                    'maxTotalFree' => Request::int('maxTotalFree'),
+                    'maxFree' => Request::int('maxFree'),
+                    'maxAccounts' => Request::int('maxAccounts'),
+                    'pushAccountMsg' => Request::trim('pushAccountMsg'),
+                    'siteTitle' => Request::trim('siteTitle'),
+                    'siteLogo' => Request::trim('image'),
+                    'power' => Request::int('power'),
+                    'auto_ref' => Request::int('auto_ref'),
                 ]
             );
 
             $user->updateSettings(
                 'agentData.device',
                 [
-                    'theme' => request::str('theme'),
-                    'remainWarning' => request::int('remainWarning'),
+                    'theme' => Request::str('theme'),
+                    'remainWarning' => Request::int('remainWarning'),
                     'shipment' => [
-                        'balanced' => request::bool('shipmentBalance') ? 1 : 0,
+                        'balanced' => Request::bool('shipmentBalance') ? 1 : 0,
                     ],
                 ]
             );
@@ -235,22 +235,22 @@ $result = Util::transactionDo(function() use ($id) {
             $locationEnabled = request('locationEnabled') ? 1 : 0;
             $user->updateSettings('agentData.location.validate.enabled', $locationEnabled);
             if ($locationEnabled) {
-                $user->updateSettings('agentData.location.validate.distance', request::int('locationDistance'));
+                $user->updateSettings('agentData.location.validate.distance', Request::int('locationDistance'));
             }
 
             if (App::isMustFollowAccountEnabled()) {
                 $user->updateSettings('agentData.mfa', [
-                    'enable' => request::int('mustFollow'),
+                    'enable' => Request::int('mustFollow'),
                 ]);
             }
 
             $data = [
-                'kind' => request::int('kind'),
-                'way' => request::int('way'),
+                'kind' => Request::int('kind'),
+                'way' => Request::int('way'),
             ];
 
-            $commission_val = request::float('commissionVal', 0, 2);
-            $commission_type = request::str('type', 'fixed');
+            $commission_val = Request::float('commissionVal', 0, 2);
+            $commission_type = Request::str('type', 'fixed');
 
             if ($commission_type == 'fixed') {
                 $data['fixed'] = max(0, intval($commission_val * 100));
@@ -262,7 +262,7 @@ $result = Util::transactionDo(function() use ($id) {
 
             $user->updateSettings('agentData.keeper.data', $data);
 
-            if (request::bool('applyConfigToAll')) {
+            if (Request::bool('applyConfigToAll')) {
                 /** @var keeperModelObj $keeper */
                 foreach (Keeper::query(['agent_id' => $user->getId()])->findAll() as $keeper) {
                     $query = Device::query(['keeper_id' => $keeper->getId()]);
@@ -276,29 +276,29 @@ $result = Util::transactionDo(function() use ($id) {
             }
 
             $user->updateSettings('agentData.keeper.reductGoodsNum', [
-                'enabled' => request::int('reductGoodsNum'),
+                'enabled' => Request::int('reductGoodsNum'),
             ]);
 
             if (App::isZeroBonusEnabled()) {
-                $user->updateSettings('agentData.custom.bonus.zero.v', min(100, request::float('zeroBonus', -1, 2)));
+                $user->updateSettings('agentData.custom.bonus.zero.v', min(100, Request::float('zeroBonus', -1, 2)));
             }
         }
-    } elseif (request::bool('agent_payment')) {
+    } elseif (Request::bool('agent_payment')) {
         if ($user->isAgent()) {
             $data = $user->settings('agentData.pay', []);
 
             $wx_enabled = request('wx') ? 1 : 0;
             $data['wx']['enable'] = $wx_enabled;
             if ($wx_enabled) {
-                $data['wx']['mch_id'] = request::trim('wxMCHID');
+                $data['wx']['mch_id'] = Request::trim('wxMCHID');
             }
 
-            $lcsw_enabled = request::bool('lcsw');
+            $lcsw_enabled = Request::bool('lcsw');
             $data['lcsw']['enable'] = $lcsw_enabled;
             if ($lcsw_enabled) {
-                $data['lcsw']['merchant_no'] = request::trim('merchant_no');
-                $data['lcsw']['terminal_id'] = request::trim('terminal_id');
-                $data['lcsw']['access_token'] = request::trim('access_token');
+                $data['lcsw']['merchant_no'] = Request::trim('merchant_no');
+                $data['lcsw']['terminal_id'] = Request::trim('terminal_id');
+                $data['lcsw']['access_token'] = Request::trim('access_token');
 
                 //创建扫呗接口文件
                 Util::createApiRedirectFile('payment/lcsw.php', 'payresult', [
@@ -325,4 +325,4 @@ $result = Util::transactionDo(function() use ($id) {
     return err('保存失败！');
 });
 
-Util::itoast($result['message'], $this->createWebUrl('agent', ['op' => request::str('from'), 'id' => $id]), is_error($result) ? 'error' : 'success');
+Util::itoast($result['message'], $this->createWebUrl('agent', ['op' => Request::str('from'), 'id' => $id]), is_error($result) ? 'error' : 'success');

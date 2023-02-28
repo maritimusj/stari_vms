@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$promotion = request::array('promotion');
+$promotion = Request::array('promotion');
 
 $enabled = $promotion['enabled'] == 'true';
 

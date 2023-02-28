@@ -6,14 +6,14 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 
 $delivery = Delivery::get($id);
 if (!$delivery) {
     JSON::fail('找不到这个商城订单！');
 }
 
-$status = request::int('status');
+$status = Request::int('status');
 $delivery->setStatus($status);
 if ($delivery->save()) {
     JSON::success([

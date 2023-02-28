@@ -10,7 +10,7 @@ use zovye\model\articleModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$id = request::int('id');
+$id = Request::int('id');
 
 /** @var articleModelObj $archive */
 $archive = m('files')->findOne(We7::uniacid(['id' => $id]));

@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\inventory_logModelObj;
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
@@ -26,20 +26,20 @@ $tpl_data = [
 
 $query = $inventory->logQuery();
 
-if (request::isset('src')) {
-    $query->where(['src_inventory_id' => request::int('src')]);
+if (Request::isset('src')) {
+    $query->where(['src_inventory_id' => Request::int('src')]);
 }
 
-if (request::has('goods')) {
-    $query->where(['goods_id' => request::int('goods')]);
+if (Request::has('goods')) {
+    $query->where(['goods_id' => Request::int('goods')]);
 }
 
 $total = $query->count();
 $list = [];
 
 if ($total > 0) {
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
 

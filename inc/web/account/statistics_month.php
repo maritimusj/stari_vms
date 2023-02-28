@@ -10,16 +10,16 @@ use DateTime;
 use Exception;
 use DateTimeImmutable;
 
-$account_id = request::int('id');
+$account_id = Request::int('id');
 $account = Account::get($account_id);
 
 if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }
 
-$year_str = request::int('year');
-$month_str = request::int('month');
-$day_str = request::int('day');
+$year_str = Request::int('year');
+$month_str = Request::int('month');
+$day_str = Request::int('day');
 
 try {
     $month = new DateTimeImmutable(sprintf("%d-%02d-%02d", $year_str, $month_str, $day_str));

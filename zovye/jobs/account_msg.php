@@ -10,7 +10,7 @@ namespace zovye\job\accountMsg;
 
 use zovye\CtrlServ;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 use zovye\Wx;
 use function zovye\request;
 
@@ -21,7 +21,7 @@ $media = [
     'touser' => request('touser'),
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'account_msg' && CtrlServ::checkJobSign($media)) {
     $openid = $media['touser'];

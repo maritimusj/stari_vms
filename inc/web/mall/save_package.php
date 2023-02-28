@@ -6,15 +6,15 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $delivery = Delivery::get($id);
 if (!$delivery) {
     JSON::fail('找不到这个商城订单！');
 }
 
-$uid = request::trim('uid');
-$carrier = request::trim('carrier');
-$memo = request::trim('memo');
+$uid = Request::trim('uid');
+$carrier = Request::trim('carrier');
+$memo = Request::trim('memo');
 
 $package = [
     'uid' => $uid,

@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$type_id = request::int('id');
+$type_id = Request::int('id');
 $device_type = DeviceTypes::get($type_id);
 if (empty($device_type)) {
     JSON::fail('找不到这个设备型号！');

@@ -25,7 +25,7 @@ use zovye\model\device_groupsModelObj;
 use zovye\model\deviceModelObj;
 use zovye\DeviceTypes;
 use zovye\model\settings_userModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Job;
 use zovye\JSON;
 use zovye\Keeper;
@@ -295,8 +295,8 @@ class agent
     public
     static function application(): array
     {
-        $name = request::trim('name');
-        $mobile = request::trim('mobile');
+        $name = Request::trim('name');
+        $mobile = Request::trim('mobile');
 
         if (empty($name) || empty($mobile)) {
             return error(State::ERROR, '对不起，请填写姓名和手机号码！');
@@ -306,8 +306,8 @@ class agent
             [
                 'name' => $name,
                 'mobile' => $mobile,
-                'address' => htmlspecialchars(request::trim('address')),
-                'referee' => request::trim('referee'),
+                'address' => htmlspecialchars(Request::trim('address')),
+                'referee' => Request::trim('referee'),
                 'state' => 0,
             ]
         );
@@ -385,8 +385,8 @@ class agent
     {
         $user = common::getAgentOrPartner();
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $user->getAgentId()]));
 
@@ -428,7 +428,7 @@ class agent
     {
         $user = common::getAgentOrPartner();
 
-        $id = request::int('id');
+        $id = Request::int('id');
         if ($id) {
             /** @var agent_msgModelObj $msg */
             $msg = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $user->getAgentId(), 'id' => $id]));
@@ -453,7 +453,7 @@ class agent
     {
         $user = common::getAgentOrPartner();
 
-        $id = request::int('id');
+        $id = Request::int('id');
         if ($id) {
             $msg = m('agent_msg')->findOne(We7::uniacid(['agent_id' => $user->getAgentId(), 'id' => $id]));
             if ($msg) {
@@ -480,13 +480,13 @@ class agent
         common::checkCurrentUserPrivileges('F_sb');
 
         $query = Device::query();
-        $group_id = request::int('group_id');
+        $group_id = Request::int('group_id');
         if (!empty($group_id)) {
             $query->where(['group_id' => $group_id]);
         }
         $agent_id = $user->getAgentId();
-        if (request::has('agent')) {
-            $agent = agent::getUserByGUID(request::str('agent'));
+        if (Request::has('agent')) {
+            $agent = agent::getUserByGUID(Request::str('agent'));
             if ($agent) {
                 $agent_id = $agent->getId();
             }
@@ -503,7 +503,7 @@ class agent
 
         common::checkCurrentUserPrivileges('F_sb');
 
-        $keeperId = request::int('keeperid');
+        $keeperId = Request::int('keeperid');
         $keeper = Keeper::get($keeperId);
         if (empty($keeper) || $user->getAgentId() != $keeper->getAgentId()) {
             return error(State::ERROR, '找不到这个运营人员！');
@@ -511,8 +511,8 @@ class agent
 
         $query = Device::keeper($keeper);
 
-        if (request::has('keyword')) {
-            $keyword = request::trim('keyword');
+        if (Request::has('keyword')) {
+            $keyword = Request::trim('keyword');
             if ($keyword) {
                 $query->whereOr([
                     'name LIKE' => "%$keyword%",
@@ -521,8 +521,8 @@ class agent
             }
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $total = $query->count();
 
@@ -575,18 +575,18 @@ class agent
         }
 
         //修改设备名称
-        $name = request::trim('name');
+        $name = Request::trim('name');
         if ($name && $name != $device->getName()) {
             $device->setName($name);
         }
 
         //修改排序值
-        $rank = request::int('rank');
+        $rank = Request::int('rank');
         $device->setRank($rank);
 
         //指定group id
-        if (request::isset('group')) {
-            $group = request::int('group');
+        if (Request::isset('group')) {
+            $group = Request::int('group');
             $device->setGroupId($group);
         }
 
@@ -595,8 +595,8 @@ class agent
         $now = time();
         $payload = [];
 
-        if (request::isset('device_type')) {
-            $type_id = request::int('device_type');
+        if (Request::isset('device_type')) {
+            $type_id = Request::int('device_type');
 
             if ($type_id != $device->getDeviceType()) {
                 $payload[] = $device->resetPayload(['*' => '@0'], '代理商改变型号', $now);
@@ -612,8 +612,8 @@ class agent
                 $old = $device_type->getExtraData('cargo_lanes', []);
 
                 $cargo_lanes = [];
-                $capacities = request::array('capacities');
-                foreach (request::array('goods') as $index => $goods_id) {
+                $capacities = Request::array('capacities');
+                foreach (Request::array('goods') as $index => $goods_id) {
                     $cargo_lanes[] = [
                         'goods' => intval($goods_id),
                         'capacity' => intval($capacities[$index]),
@@ -641,10 +641,10 @@ class agent
             return error(State::ERROR, '获取型号失败！');
         }
 
-        if (request::isset('price') || request::isset('num')) {
+        if (Request::isset('price') || Request::isset('num')) {
             //货道商品数量和价格
-            $prices = request::array('price');
-            $num = request::array('num');
+            $prices = Request::array('price');
+            $num = Request::array('num');
 
             $type_data = DeviceTypes::format($device_type);
             $cargo_lanes = [];
@@ -674,12 +674,12 @@ class agent
         }
 
         if (App::isDeviceWithDoorEnabled()) {
-            setArray($extra, 'door.num', request::int('doorNum', 1));
+            setArray($extra, 'door.num', Request::int('doorNum', 1));
         }
 
         //修改位置信息
-        $location = request::is_array('location') ? request::array('location') :
-            json_decode(html_entity_decode(request::str('location')), true);
+        $location = Request::is_array('location') ? Request::array('location') :
+            json_decode(html_entity_decode(Request::str('location')), true);
         if ($location) {
             $location = array_intersect_key($location, ['lat' => 0, 'lng' => 0, 'address' => '', 'area' => '']);
         } else {
@@ -691,14 +691,14 @@ class agent
         }
 
         //音量
-        $volume = max(0, min(100, request::int('volume')));
+        $volume = max(0, min(100, Request::int('volume')));
         if ($volume !== $extra['volume']) {
             setArray($extra, 'volume', $volume);
             $device->updateAppVolume($volume);
         }
 
         //修改运营人员
-        $keeper_id = request::int('keeper');
+        $keeper_id = Request::int('keeper');
         if ($keeper_id) {
             $keeper = Keeper::findOne(['id' => $keeper_id]);
             if ($keeper) {
@@ -708,14 +708,14 @@ class agent
             unset($extra['keepers']);
         }
 
-        $extra['isDown'] = request::int('is_down');
+        $extra['isDown'] = Request::int('is_down');
 
         $msg = '保存成功';
 
         if ($device->isFuelingDevice()) {
-            $extra['pulse'] = request::int('pulse');
-            $extra['timeout'] = request::int('timeout');
-            $extra['solo'] = request::bool('solo') ? 1 : 0;
+            $extra['pulse'] = Request::int('pulse');
+            $extra['timeout'] = Request::int('timeout');
+            $extra['solo'] = Request::bool('solo') ? 1 : 0;
         } else {
             $msg .= '！';
         }
@@ -747,7 +747,7 @@ class agent
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(request::str('id'));
+        $device = \zovye\api\wx\device::getDevice(Request::str('id'));
         if (is_error($device)) {
             return $device;
         }
@@ -766,7 +766,7 @@ class agent
                     $result['group']['clr'] = $group->getClr();
                 }
 
-                if (request::bool('online', true)) {
+                if (Request::bool('online', true)) {
                     $detail = $device->getOnlineDetail();
                     if ($detail) {
                         $device->setSig(intval($detail['mcb']['RSSI']));
@@ -815,7 +815,7 @@ class agent
         common::checkCurrentUserPrivileges('F_sb');
 
         /** @var deviceModelObj|array $device */
-        $device = \zovye\api\wx\device::getDevice(request::trim('id'), $user);
+        $device = \zovye\api\wx\device::getDevice(Request::trim('id'), $user);
         if (is_error($device)) {
             return $device;
         }
@@ -873,7 +873,7 @@ class agent
             return error(State::FAIL, '没有权限执行这个操作！');
         }
 
-        $lane = request::int('lane');
+        $lane = Request::int('lane');
         $res = Util::deviceTest($user, $device, $lane);
 
         if (is_error($res)) {
@@ -920,10 +920,10 @@ class agent
             return error(State::ERROR, '设备正忙，请稍后再试！');
         }
 
-        if (request::isset('lane')) {
-            $num = request::int('num');
+        if (Request::isset('lane')) {
+            $num = Request::int('num');
             $data = [
-                request::int('lane') => $num > 0 ? '@'.$num : 0,
+                Request::int('lane') => $num > 0 ? '@'.$num : 0,
             ];
         } else {
             $data = [];
@@ -969,12 +969,12 @@ class agent
 
         $device_ids = [];
 
-        $device_id = request::trim('deviceid');
+        $device_id = Request::trim('deviceid');
         if (!empty($device_id)) {
             $device_ids[] = $device_id;
         }
 
-        $group_id = request::int('group');
+        $group_id = Request::int('group');
         if ($group_id > 0) {
             $query = Device::query([
                 'agent_id' => $user->getAgentId(),
@@ -1014,14 +1014,14 @@ class agent
 
         common::checkCurrentUserPrivileges('F_qz');
 
-        if (request::has('remain')) {
-            $remain_warning = max(1, request::int('remain'));
+        if (Request::has('remain')) {
+            $remain_warning = max(1, Request::int('remain'));
         } else {
             $remain_warning = settings('device.remainWarning', 0);
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::query([
             'remain <' => $remain_warning,
@@ -1069,12 +1069,12 @@ class agent
 
         common::checkCurrentUserPrivileges('F_gz');
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = Device::query(['agent_id' => $user->getAgentId()]);
 
-        $error_code = request::int('error');
+        $error_code = Request::int('error');
         if ($error_code > 0) {
             $query->where(['error_code' => $error_code]);
         } else {
@@ -1122,7 +1122,7 @@ class agent
             return error(State::ERROR, '不允许退款，请联系管理员！');
         }
 
-        $order = Order::get(request::int('orderid'));
+        $order = Order::get(Request::int('orderid'));
         if (empty($order) || $order->getAgentId() != $agent->getId()) {
             return error(State::ERROR, '找不到这个订单！');
         }
@@ -1131,7 +1131,7 @@ class agent
             return error(State::ERROR, '代理商余额不足，无法退款！');
         }
 
-        $num = request::int('num');
+        $num = Request::int('num');
 
         $res = Order::refund($order->getOrderNO(), $num, ['msg' => '代理商：'.$agent->getName()]);
         if (is_error($res)) {
@@ -1148,8 +1148,8 @@ class agent
 
         $query->where($condition);
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $total = $query->count();
         $result = [
@@ -1236,7 +1236,7 @@ class agent
 
         $condition = [];
 
-        if (request::has('deviceid')) {
+        if (Request::has('deviceid')) {
             $device = \zovye\api\wx\device::getDevice(request('deviceid'));
             if (is_error($device)) {
                 return $device;
@@ -1246,7 +1246,7 @@ class agent
             $condition['agent_id'] = $device->getAgentId();
         }
 
-        $user_id = request::int('userid');
+        $user_id = Request::int('userid');
         if ($user_id) {
             $condition['user_id'] = $user_id;
         }
@@ -1275,8 +1275,8 @@ class agent
             return error(State::ERROR, '没有权限执行这个操作！');
         }
 
-        $resultDesc = request::trim('desc');
-        $resultCode = request::int('code');
+        $resultDesc = Request::trim('desc');
+        $resultCode = Request::int('code');
 
         if ($resultCode !== 0) {
             $device->setError($resultCode, $resultDesc);
@@ -1318,12 +1318,12 @@ class agent
 
         common::checkCurrentUserPrivileges('F_xj');
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $query = User::query("LOCATE('agent',passport)>0");
 
-        $keyword = request::trim('keyword');
+        $keyword = Request::trim('keyword');
         if ($keyword) {
             $query->whereOr([
                 'name LIKE' => "%$keyword%",
@@ -1333,7 +1333,7 @@ class agent
 
         $superior_guid = '';
 
-        $guid = request::trim('guid');
+        $guid = Request::trim('guid');
         if (empty($guid)) {
             $query->where(['superior_id' => $user->getAgentId()]);
         } else {
@@ -1411,14 +1411,14 @@ class agent
     {
         common::getAgentOrPartner();
 
-        $guid = request::trim('guid');
+        $guid = Request::trim('guid');
 
         $res = agent::getUserByGUID($guid);
         if (empty($res)) {
             return error(State::ERROR, '用户不存在！');
         }
 
-        $name = request::trim('name');
+        $name = Request::trim('name');
         if ($name) {
             $res->updateSettings('agentData.name', $name);
         }
@@ -1485,13 +1485,13 @@ class agent
     {
         $result = [];
 
-        $w = request::str('w');
+        $w = Request::str('w');
 
         $cond = [];
         $cond['agent_id'] = $agent->getId();
 
-        if (request::has('src')) {
-            $cond['src'] = request::int('src');
+        if (Request::has('src')) {
+            $cond['src'] = Request::int('src');
         }
 
         if (empty($w) || $w == 'today') {
@@ -1518,8 +1518,8 @@ class agent
     {
         $agent = common::getAgentOrPartner();
 
-        if (request::has('guid')) {
-            $guid = request::trim('guid');
+        if (Request::has('guid')) {
+            $guid = Request::trim('guid');
 
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
@@ -1587,7 +1587,7 @@ class agent
             $result = [];
             if (!empty($agent_ids)) {
                 $query = \zovye\Agent::query();
-                $keyword = request::trim('keyword');
+                $keyword = Request::trim('keyword');
 
                 $query->where('id IN('.implode(',', $agent_ids).')');
 
@@ -1661,9 +1661,9 @@ class agent
         $agent = $user->isAgent() ? $user->Agent() : $user->getPartnerAgent();
 
         if ($agent) {
-            $agent->updateSettings('agentData.misc.siteTitle', request::trim('siteTitle'));
-            $agent->updateSettings('agentData.misc.auto_ref', request::trim('auto_ref'));
-            $agent->updateSettings('agentData.device.remainWarning', request::trim('remainWarning'));
+            $agent->updateSettings('agentData.misc.siteTitle', Request::trim('siteTitle'));
+            $agent->updateSettings('agentData.misc.auto_ref', Request::trim('auto_ref'));
+            $agent->updateSettings('agentData.device.remainWarning', Request::trim('remainWarning'));
         }
 
         if ($agent->save()) {
@@ -1811,7 +1811,7 @@ class agent
     public
     static function loginScan(): array
     {
-        $uniq = request::str('uniq');
+        $uniq = Request::str('uniq');
         if (empty($uniq)) {
             return error(State::ERROR, '参数错误！');
         }
@@ -1966,7 +1966,7 @@ class agent
     static function updateUserQRCode(): array
     {
         $user = common::getAgentOrKeeper();
-        $type = request::str('type');
+        $type = Request::str('type');
         if ($user instanceof keeperModelObj) {
             return common::updateUserQRCode($user->getUser(), $type);
         }
@@ -1977,7 +1977,7 @@ class agent
     public
     static function aliAuthCode()
     {
-        $auth_code = request::str('authcode');
+        $auth_code = Request::str('authcode');
 
         $aop = new AopClient();
         $aop->appId = settings('ali.appid');
@@ -2002,20 +2002,20 @@ class agent
     {
         $user = common::getAgentOrPartner();
         $agent_id = $user->getAgentId();
-        if (request::has('start')) {
-            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
+        if (Request::has('start')) {
+            $s_date = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('start').' 00:00:00');
         } else {
             $s_date = new DateTime('first day of this month 00:00:00');
         }
 
-        if (request::has('end')) {
-            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end').' 00:00:00');
+        if (Request::has('end')) {
+            $e_date = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('end').' 00:00:00');
             $e_date->modify('next day');
         } else {
             $e_date = new DateTime('first day of next month 00:00:00');
         }
 
-        $device_id = request::int('deviceid');
+        $device_id = Request::int('deviceid');
         if ($device_id > 0) {
             $device = Device::get($device_id);
             if (empty($device) || $device->getAgentId() != $agent_id) {
@@ -2267,7 +2267,7 @@ class agent
             ];
         }
 
-        if (Job::repairAgentMonthStats($agent->getId(), request::str('month'))) {
+        if (Job::repairAgentMonthStats($agent->getId(), Request::str('month'))) {
             $agent->updateSettings('repair', [
                 'status' => 'busy',
             ]);

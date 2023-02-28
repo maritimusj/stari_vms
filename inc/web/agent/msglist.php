@@ -8,14 +8,14 @@ namespace zovye;
 
 use zovye\model\agent_msgModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 $user = User::get($id);
 if (empty($user) || !($user->isAgent() || $user->isPartner())) {
     Util::itoast('用户不是代理商或者代理商合伙人！', We7::referer(), 'error');
 }
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', 10);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', 10);
 
 $query = m('agent_msg')->where(We7::uniacid(['agent_id' => $id]));
 
@@ -45,7 +45,7 @@ $tpl_data[] = [
     'messages' => $messages,
 ];
 
-$from = request::str('from');
+$from = Request::str('from');
 if ($from == 'agent') {
     $tpl_data['back_url'] = $this->createWebUrl('agent', ['id' => $id]);
 } elseif ($from == 'partner') {

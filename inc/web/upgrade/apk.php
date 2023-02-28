@@ -6,9 +6,9 @@
  
 namespace zovye;
 
-$title = request::trim('title');
-$url = request::trim('url');
-$version = request::trim('version');
+$title = Request::trim('title');
+$url = Request::trim('url');
+$version = Request::trim('version');
 
 if ($url && $version) {
     if (m('version')->create(

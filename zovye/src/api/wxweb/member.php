@@ -9,7 +9,7 @@ use zovye\model\orderModelObj;
 use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use zovye\Team;
 use zovye\User;
@@ -37,13 +37,13 @@ class member
                 return err('找不到车队或者创建车队失败！');
             }
 
-            $page = max(1, request::int('page'));
-            $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+            $page = max(1, Request::int('page'));
+            $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
             $query = Team::findAllMember($team);
 
-            if (request::has('keyword')) {
-                $keyword = request::trim('keyword');
+            if (Request::has('keyword')) {
+                $keyword = Request::trim('keyword');
                 $query->whereOr([
                     'mobile LIKE' => '%'.$keyword.'%',
                     'remark LIKE' => '%'.$keyword.'%',
@@ -114,7 +114,7 @@ class member
     {
         $user = common::getWXAppUser();
 
-        $mobile = request::str('mobile');
+        $mobile = Request::str('mobile');
 
         $team = Team::getOrCreateFor($user);
         if (empty($team)) {
@@ -125,7 +125,7 @@ class member
             return err('找不到车队或者创建车队失败！');
         }
 
-        $result = self::checkMember($team, $mobile, request::int('member'));
+        $result = self::checkMember($team, $mobile, Request::int('member'));
         if (is_error($result)) {
             return $result;
         }
@@ -151,15 +151,15 @@ class member
             return err('找不到车队或者创建车队失败！');
         }
 
-        $mobile = request::trim('mobile');
+        $mobile = Request::trim('mobile');
 
         $result = self::checkMember($team, $mobile);
         if (is_error($result)) {
             return $result;
         }
 
-        $name = request::str('name');
-        $remark = request::str('remark');
+        $name = Request::str('name');
+        $remark = Request::str('remark');
 
         $u = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         if ($u) {
@@ -181,7 +181,7 @@ class member
     {
         $user = common::getWXAppUser();
 
-        $id = request::int('id');
+        $id = Request::int('id');
         $member = Team::getMember($id);
         if (empty($member)) {
             return err('找不到这个车队队员！');
@@ -192,7 +192,7 @@ class member
             return err('没有权限管理这个队员');
         }
 
-        $mobile = request::trim('mobile');
+        $mobile = Request::trim('mobile');
         if (!empty($mobile)) {
             if ($mobile != $member->getMobile()) {
                 $result = self::checkMember($team, $mobile);
@@ -205,8 +205,8 @@ class member
             $member->setMobile('');
         }
 
-        $name = request::str('name');
-        $remark = request::str('remark');
+        $name = Request::str('name');
+        $remark = Request::str('remark');
 
         $member->setName($name);
         $member->setRemark($remark);
@@ -220,7 +220,7 @@ class member
     {
         $user = common::getWXAppUser();
 
-        $id = request::int('id');
+        $id = Request::int('id');
         $member = Team::getMember($id);
         if (empty($member)) {
             return err('找不到这个车队队员！');
@@ -250,8 +250,8 @@ class member
         }
 
         return Util::transactionDo(function () use ($user) {
-            $id = request::int('id');
-            $total = request::int('total');
+            $id = Request::int('id');
+            $total = Request::int('total');
             if ($total < 1) {
                 return err('转帐金额不正确！');
             }
@@ -321,8 +321,8 @@ class member
     {
         $user = common::getWXAppUser();
 
-        if (request::has('id')) {
-            $id = request::int('id');
+        if (Request::has('id')) {
+            $id = Request::int('id');
 
             $member = Team::getMember($id);
             if (empty($member)) {
@@ -365,13 +365,13 @@ class member
             'src' => [Order::CHARGING, Order::CHARGING_UNPAID],
         ]);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         //列表数据
         $query->page($page, $page_size);
 
-        $keywords = request::trim('keywords');
+        $keywords = Request::trim('keywords');
         if ($keywords) {
             $query->where(['order_id REGEXP' => $keywords]);
         }
@@ -397,7 +397,7 @@ class member
 
     public static function orderDetail(): array
     {
-        $serial = request::str('serial');
+        $serial = Request::str('serial');
 
         $order = Order::get($serial, true);
         if (empty($order)) {
@@ -422,7 +422,7 @@ class member
     {
         $user = common::getWXAppUser();
 
-        $id = request::int('id');
+        $id = Request::int('id');
         $member = Team::getMember($id);
         if (empty($member)) {
             return err('找不到这个车队队员！');
@@ -447,8 +447,8 @@ class member
             ],
         ]);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
         $query->page($page, $page_size);
 
         $query->orderBy('createtime DESC');

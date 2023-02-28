@@ -15,17 +15,17 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法领取');
 }
 
-if (request::has('typeid')) {
-    $type_id = request::int('typeid');
+if (Request::has('typeid')) {
+    $type_id = Request::int('typeid');
 } else {
-    $type = request::trim('type');
+    $type = Request::trim('type');
     $type_id = Advertising::getTypeId($type);
 }
 
-$num = request::int('num', 10);
+$num = Request::int('num', 10);
 
-if (request::has('deviceid')) {
-    $device = Device::get(request::str('deviceid'), true);
+if (Request::has('deviceid')) {
+    $device = Device::get(Request::str('deviceid'), true);
     if (empty($device)) {
         JSON::fail('找不到这个设备');
     }

@@ -8,7 +8,7 @@ namespace zovye\api\wx;
 
 use zovye\Helper;
 use zovye\model\vipModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use function zovye\err;
 
@@ -18,7 +18,7 @@ class vip
     {
         $agent = common::getAgent();
 
-        $mobile = request::trim('mobile');
+        $mobile = Request::trim('mobile');
         if (!preg_match(REGULAR_TEL, $mobile)) {
             return err('手机号码格式不正确！');
         }
@@ -43,20 +43,20 @@ class vip
     {
         $agent = common::getAgent();
 
-        if (request::has('user')) {
-            $user = User::get(request::int('user'), false, User::WxAPP);
+        if (Request::has('user')) {
+            $user = User::get(Request::int('user'), false, User::WxAPP);
             if (empty($user)) {
                 return err('找不到这个用户！');
             }
-        } elseif (request::has('mobile')) {
-            $mobile = request::str('mobile');
+        } elseif (Request::has('mobile')) {
+            $mobile = Request::str('mobile');
             if (!preg_match(REGULAR_TEL, $mobile)) {
                 return err('手机号码格式不正确！');
             }
             $user = User::findOne(['mobile' => $mobile, 'app' => User::WxAPP]);
         }
 
-        $name = request::str('name');
+        $name = Request::str('name');
 
         if (isset($user)) {
             if ($user->isBanned()) {
@@ -88,7 +88,7 @@ class vip
     {
         $agent = common::getAgent();
 
-        $vip = \zovye\VIP::get(request::int('id'));
+        $vip = \zovye\VIP::get(Request::int('id'));
         if (empty($vip)) {
             return err('找不到指定的vip用户！');
         }
@@ -147,13 +147,13 @@ class vip
     {
         $agent = common::getAgent();
 
-        $vip = \zovye\VIP::get(request::int('vip'));
+        $vip = \zovye\VIP::get(Request::int('vip'));
         if ($vip->getAgentId() != $agent->getId()) {
             return err('没有权限管理这个VIP用户！');
         }
 
         //ids 中包括的id是设备imei
-        $imei_list = request::array('ids');
+        $imei_list = Request::array('ids');
         $ids = [];
 
         foreach ($imei_list as $imei) {
@@ -181,7 +181,7 @@ class vip
     {
         $agent = common::getAgentOrPartner();
 
-        $device = \zovye\Device::get(request::str('id'), true);
+        $device = \zovye\Device::get(Request::str('id'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -196,6 +196,6 @@ class vip
             return err('找不到对应的小程序用户，无法创建支付！');
         }
 
-        return Helper::createForDeviceRenewal($user, $device, request::int('years', 1));
+        return Helper::createForDeviceRenewal($user, $device, Request::int('years', 1));
     }
 }

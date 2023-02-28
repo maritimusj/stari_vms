@@ -15,7 +15,7 @@ $tpl_data = [
     'commission_balance' => App::isCommissionEnabled(),
 ];
 
-$agent_openid = request::str('agent_openid');
+$agent_openid = Request::str('agent_openid');
 if (!empty($agent_openid)) {
     $agent = Agent::get($agent_openid, true);
     if ($agent) {
@@ -30,7 +30,7 @@ if (!empty($agent_openid)) {
     }
 }
 
-$device_id = request::int('device_id');
+$device_id = Request::int('device_id');
 if ($device_id) {
     $device = Device::get($device_id);
     if ($device) {
@@ -45,7 +45,7 @@ if ($device_id) {
     }
 }
 
-$user_id = request::int('user_id');
+$user_id = Request::int('user_id');
 if ($user_id) {
     $user = User::get($user_id);
     if ($user) {
@@ -56,14 +56,14 @@ if ($user_id) {
     }
 }
 
-if (request::has('account_id')) {
-    $account = Account::get(request::int('account_id'));
+if (Request::has('account_id')) {
+    $account = Account::get(Request::int('account_id'));
     if ($account) {
         $query->where(['account' => $account->getName()]);
     }
 }
 
-$way = request::str('way');
+$way = Request::str('way');
 if ($way == 'free') {
     $query->where(['src' => [Order::FREE, Order::ACCOUNT]]);
 } elseif ($way == 'pay') {
@@ -83,7 +83,7 @@ if ($way == 'free') {
     $query->where(['result_code >' => 0]);
 }
 
-$keyword = request::str('keyword');
+$keyword = Request::str('keyword');
 if ($keyword) {
     $query->whereOr([
         'nickname LIKE' => "%$keyword%",
@@ -93,7 +93,7 @@ if ($keyword) {
     $tpl_data['s_keyword'] = $keyword;
 }
 
-$order_no = request::str('order');
+$order_no = Request::str('order');
 if ($order_no) {
     $query->whereOr([
         'order_id LIKE' => "%$order_no%",
@@ -102,13 +102,13 @@ if ($order_no) {
     $tpl_data['s_order'] = $order_no;
 }
 
-$order_no = request::str('orderNO');
+$order_no = Request::str('orderNO');
 if ($order_no) {
     $query->where(['order_id' => $order_no]);
     $tpl_data['s_order'] = $order_no;
 }
 
-$limit = request::array('datelimit');
+$limit = Request::array('datelimit');
 if ($limit['start']) {
     $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'].' 00:00:00');
     if ($start) {
@@ -128,8 +128,8 @@ if ($limit['end']) {
 
 $total = $query->count();
 
-$page = max(1, request::int('page'));
-$page_size = request::is_ajax() ? 10 : request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::is_ajax() ? 10 : Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query->page($page, $page_size);
 $query->orderBy('id DESC');
@@ -261,11 +261,11 @@ if (stripos($pager, '&filter=1') === false) {
     $pager = preg_replace('#href="(.*?)"#', 'href="${1}&'.$params_str.'"', $pager);
 }
 
-if (request::is_ajax()) {
+if (Request::is_ajax()) {
     $data = [
         'isajax' => true,
         'orders' => $orders,
-        'user' => request::has('user_id'),
+        'user' => Request::has('user_id'),
         'accounts' => $accounts,
         'pager' => $pager,
     ];

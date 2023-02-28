@@ -12,14 +12,14 @@ use Exception;
 use zovye\account\WeiSureAccount;
 use zovye\CtrlServ;
 use zovye\Log;
-use zovye\request;
+use zovye\Request;
 
 $data = [
-    'user' => request::str('user'),
-    'device' => request::str('device'),
+    'user' => Request::str('user'),
+    'device' => Request::str('device'),
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'weisure_timeout' && CtrlServ::checkJobSign($data)) {
 

@@ -12,12 +12,12 @@ use zovye\Device;
 use zovye\Log;
 use zovye\model\accountModelObj;
 use zovye\model\deviceModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\Util;
 use function zovye\_W;
 use function zovye\is_error;
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'refresh_settings' && CtrlServ::checkJobSign()) {
 

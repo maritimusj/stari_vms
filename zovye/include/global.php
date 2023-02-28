@@ -18,7 +18,7 @@ try {
     Util::extraAjaxJsonData();
     
     //设置request数据来源
-    request::setData($GLOBALS['_GPC']);
+    Request::setData($GLOBALS['_GPC']);
 
     //初始化事件驱动
     EventBus::init();

@@ -13,7 +13,7 @@ use zovye\Helper;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use zovye\VIP;
 use function zovye\err;
@@ -43,7 +43,7 @@ class fueling
     {
         $user = common::getWXAppUser();
 
-        $device_id = request::str('deviceId');
+        $device_id = Request::str('deviceId');
         $device = Device::get($device_id, true);
         if (empty($device)) {
             return err('找不到这个设备！');
@@ -59,7 +59,7 @@ class fueling
             ];
         }
 
-        $chargerID = request::int('chargerID');
+        $chargerID = Request::int('chargerID');
         $deviceFuelingNOWData = $device->fuelingNOWData($chargerID);
         if ($deviceFuelingNOWData && $deviceFuelingNOWData['user'] != $user->getId()) {
             $data['fueling'] = [
@@ -88,12 +88,12 @@ class fueling
             return err('对不起，用户暂时无法使用！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
 
-        $chargerID = request::int('chargerID');
+        $chargerID = Request::int('chargerID');
 
         $card = self::isVIP($user, $device) ? $user->getVIPCard() : $user->getCommissionBalanceCard();
 
@@ -115,7 +115,7 @@ class fueling
      */
     public static function status(): array
     {
-        $serial = request::str('serial');
+        $serial = Request::str('serial');
 
         return \zovye\Fueling::orderStatus($serial);
     }
@@ -128,7 +128,7 @@ class fueling
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $device = Device::get(request::str('deviceId'), true);
+        $device = Device::get(Request::str('deviceId'), true);
         if (empty($device)) {
             return err('找不到这个设备！');
         }
@@ -141,14 +141,14 @@ class fueling
             return err('设备不在线！');
         }
 
-        $chargerID = request::int('chargerID');
+        $chargerID = Request::int('chargerID');
 
         $charging_data = $device->fuelingNOWData($chargerID);
         if (!empty($charging_data)) {
             return err('设备正在使用中！');
         }
 
-        $price = intval(round(request::float('price', 0, 2) * 100));
+        $price = intval(round(Request::float('price', 0, 2) * 100));
 
         return Helper::createFuelingOrder($user, $device, $chargerID, $price, Order::makeSerial($user));
     }
@@ -166,13 +166,13 @@ class fueling
             'src' => [Order::FUELING, Order::FUELING_UNPAID],
         ]);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         //列表数据
         $query->page($page, $page_size);
 
-        $keywords = request::trim('keywords');
+        $keywords = Request::trim('keywords');
         if ($keywords) {
             $query->where(['order_id REGEXP' => $keywords]);
         }
@@ -192,7 +192,7 @@ class fueling
      */
     public static function orderDetail(): array
     {
-        $serial = request::str('serial');
+        $serial = Request::str('serial');
         $user = common::getWXAppUser();
 
         $order = Order::get($serial, true);

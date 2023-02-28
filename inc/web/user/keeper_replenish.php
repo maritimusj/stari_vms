@@ -10,11 +10,11 @@ namespace zovye;
 use zovye\model\goodsModelObj;
 use zovye\model\replenishModelObj;
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 $pager = '';
 
-$user = User::get(request::int('id'));
+$user = User::get(Request::int('id'));
 $reps = [];
 $goods_assoc = [];
 if ($user->isKeeper()) {

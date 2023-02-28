@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$vip = VIP::get(request::int('id'));
+$vip = VIP::get(Request::int('id'));
 if (!$vip) {
     JSON::fail('找不到这个VIP用户！');
 }

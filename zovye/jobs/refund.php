@@ -16,15 +16,15 @@ use zovye\Locker;
 use zovye\Log;
 use zovye\model\orderModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use function zovye\error;
 use function zovye\is_error;
 use function zovye\request;
 
-$op = request::op('default');
-$order_no = request::str('orderNO');
-$num = request::int('num');
+$op = Request::op('default');
+$order_no = Request::str('orderNO');
+$num = Request::int('num');
 $reset_payload = request('reset');
 
 $log = [

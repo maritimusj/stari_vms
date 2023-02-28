@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $log = Questionnaire::log(['id' => $id])->findOne();
 
 if (empty($log)) {

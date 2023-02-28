@@ -10,7 +10,7 @@ use zovye\account\MeiPaAccount;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'meipa_auth') {
     $user = Util::getCurrentUser();
@@ -18,30 +18,30 @@ if ($op == 'meipa_auth') {
         Util::resultAlert('请用微信打开！', 'error');
     }
 
-    $openid = request::str('meipaopenid');
+    $openid = Request::str('meipaopenid');
     $user->updateSettings('customData.meipa', [
         'openid' => $openid,
         'createdAt' => time(),
     ]);
 
-    $device_uid = request::str('device');
+    $device_uid = Request::str('device');
 
     $url = Util::murl('entry', ['device' => $device_uid, 'from' => 'device']);
     Util::redirect($url);
 }
 
-if (request::is_get()) {
+if (Request::is_get()) {
     Util::resultAlert('出货成功，如果未领取到商品，请扫描二维码重试！');
 }
 
 MeiPaAccount::cb([
-    'time' => request::str('time'),
-    'apiid' => request::str('apiid'),
-    'openid' => request::str('openid'),
-    'carry_data' => request::str('carry_data'),
-    'subscribe' => request::str('subscribe'),
-    'order_sn' => request::str('order_sn'),
-    'sing' => request::str('sing'),
+    'time' => Request::str('time'),
+    'apiid' => Request::str('apiid'),
+    'openid' => Request::str('openid'),
+    'carry_data' => Request::str('carry_data'),
+    'subscribe' => Request::str('subscribe'),
+    'order_sn' => Request::str('order_sn'),
+    'sing' => Request::str('sing'),
 ]);
 
 exit(REQUEST_ID);

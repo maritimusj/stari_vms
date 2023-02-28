@@ -13,29 +13,29 @@ Util::extraAjaxJsonData();
 $op = 'default';
 $data = [];
 
-if (request::has('op')) {
-    $op = request::op();
-    $data = request::array('data');
-} elseif (request::has('extra')) {
-    $op = request::str('event');
-    $data = request::array('extra');
+if (Request::has('op')) {
+    $op = Request::op();
+    $data = Request::array('data');
+} elseif (Request::has('extra')) {
+    $op = Request::str('event');
+    $data = Request::array('extra');
 }
 
-$sign = request::header('HTTP_ZOVYE_SIGN');
-$no_str = request::header('HTTP_ZOVYE_NOSTR');
+$sign = Request::header('HTTP_ZOVYE_SIGN');
+$no_str = Request::header('HTTP_ZOVYE_NOSTR');
 
 //检查回调签名
 if (settings('ctrl.checkSign') && CtrlServ::makeNotifierSign(
         settings('ctrl.appKey'),
         settings('ctrl.appSecret'),
         $no_str,
-        request::raw()
+        Request::raw()
     ) !== $sign) {
     Log::fatal('ctrl', [
         'error' => '签名检验失败！',
         'op' => $op,
         'sign' => $sign,
-        'payload' => request::raw(),
+        'payload' => Request::raw(),
     ]);
 }
 

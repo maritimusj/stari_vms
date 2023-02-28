@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$id = request::int('id');
+$id = Request::int('id');
 $app = m('agent_app')->findOne(We7::uniacid(['id' => $id]));
 
 if ($app && $app->destroy()) {

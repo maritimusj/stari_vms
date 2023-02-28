@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$wxapp = WxApp::get(request::int('id'));
+$wxapp = WxApp::get(Request::int('id'));
 if (empty($wxapp)) {
     JSON::fail('找不到这个小程序！');
 }

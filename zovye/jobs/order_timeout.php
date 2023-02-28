@@ -15,10 +15,10 @@ use zovye\Log;
 use zovye\model\pay_logsModelObj;
 use zovye\Order;
 use zovye\Pay;
-use zovye\request;
+use zovye\Request;
 use function zovye\request;
 
-$op = request::op('default');
+$op = Request::op('default');
 $order_no = request('orderNO');
 $log = [
     'orderNO' => $order_no,

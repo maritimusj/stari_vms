@@ -11,7 +11,7 @@ use zovye\App;
 use zovye\Balance;
 use zovye\Device;
 use zovye\Goods;
-use zovye\request;
+use zovye\Request;
 use zovye\model\orderModelObj;
 use zovye\State;
 use zovye\User;
@@ -24,7 +24,7 @@ class order
 {
     public static function detail(): array
     {
-        $order_id = request::int('orderid');
+        $order_id = Request::int('orderid');
         $order = \zovye\Order::get($order_id);
         if (empty($order)) {
             return error(State::ERROR, '找不到这个订单!');
@@ -85,8 +85,8 @@ class order
 
     public static function default(): array
     {
-        if (request::has('guid')) {
-            $guid = request::str('guid');
+        if (Request::has('guid')) {
+            $guid = Request::str('guid');
             $user = agent::getUserByGUID($guid);
             if (empty($user)) {
                 return err('找不到这个用户！');
@@ -99,14 +99,14 @@ class order
 
         $query = \zovye\Order::query(['agent_id' => $agent->getId()]);
 
-        if (request::has('deviceid')) {
-            $device_id = request::int('deviceid');
+        if (Request::has('deviceid')) {
+            $device_id = Request::int('deviceid');
             $device = Device::get($device_id);
             if (empty($device)) {
                 return err('找不到这个设备！');
             }
-        } elseif (request::has('device')) {
-            $device_uid = request::str('device');
+        } elseif (Request::has('device')) {
+            $device_uid = Request::str('device');
             $device = Device::get($device_uid, true);
             if (empty($device)) {
                 return err('找不到这个设备！');
@@ -120,18 +120,18 @@ class order
             $query->where(['device_id' => $device->getId()]);
         }
 
-        if (request::has('start')) {
-            $begin = DateTime::createFromFormat('Y-m-d H:i:s', request::str('start').' 00:00:00');
+        if (Request::has('start')) {
+            $begin = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('start').' 00:00:00');
             $query->where(['createtime >=' => $begin->getTimestamp()]);
         }
 
-        if (request::has('end')) {
-            $end = DateTime::createFromFormat('Y-m-d H:i:s', request::str('end').' 00:00:00');
+        if (Request::has('end')) {
+            $end = DateTime::createFromFormat('Y-m-d H:i:s', Request::str('end').' 00:00:00');
             $end->modify('next day 00:00');
             $query->where(['createtime <' => $end->getTimestamp()]);
         }
 
-        $order_no = request::trim('order');
+        $order_no = Request::trim('order');
         if ($order_no) {
             $query->whereOr([
                 'order_id LIKE' => "%$order_no%",
@@ -140,7 +140,7 @@ class order
             //{$order_no}的括号不能去掉
         }
 
-        $way = request::trim('way');
+        $way = Request::trim('way');
         if ($way == 'free') {
             if (App::isBalanceEnabled() && Balance::isFreeOrder()) {
                 $query->where([
@@ -159,8 +159,8 @@ class order
             $query->where(['refund' => 1]);
         }
 
-        $page = max(1, request::int('page'));
-        $page_size = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+        $page = max(1, Request::int('page'));
+        $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
         $total = $query->count();
         if (ceil($total / $page_size) < $page) {
@@ -299,10 +299,10 @@ class order
 
         $params = [
             'agent_openid' => $agent->getOpenid(),
-            'account_id' => request::int('account_id'),
-            'device_uid' => request::str('device_uid'),
-            'start' => request::str('start'),
-            'end' => request::str('end'),
+            'account_id' => Request::int('account_id'),
+            'device_uid' => Request::str('device_uid'),
+            'start' => Request::str('start'),
+            'end' => Request::str('end'),
         ];
 
         $query = \zovye\Order::getExportQuery($params);
@@ -310,14 +310,14 @@ class order
             return $query;
         }
 
-        $step = request::str('step');
+        $step = Request::str('step');
         if (empty($step) || $step == 'init') {
             return [
                 'total' => $query->count(),
                 'serial' => $agent->getId() . (new DateTime())->format('YmdHis'),
             ];
         } else {
-            $serial = request::str('serial');
+            $serial = Request::str('serial');
             if (empty($serial)) {
                 return err("缺少serial");
             }
@@ -327,8 +327,8 @@ class order
             $full_filename = Util::getAttachmentFileName($dirname, $filename);
 
             if ($step == 'load') {
-                $query = $query->where(['id >' => request::int('last')])->limit(100)->orderBy('id asc');
-                $last_id = \zovye\Order::export($full_filename, $query, request::array('headers'));
+                $query = $query->where(['id >' => Request::int('last')])->limit(100)->orderBy('id asc');
+                $last_id = \zovye\Order::export($full_filename, $query, Request::array('headers'));
 
                 return [
                     'num' => 100,

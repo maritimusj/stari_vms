@@ -6,12 +6,12 @@
  
 namespace zovye;
 
-$inventory = Inventory::get(request::int('id'));
+$inventory = Inventory::get(Request::int('id'));
 if (empty($inventory)) {
     JSON::fail('找不到这个仓库！');
 }
 
-$res = $inventory->query(['goods_id' => request::int('goods')])->findOne();
+$res = $inventory->query(['goods_id' => Request::int('goods')])->findOne();
 if (empty($res)) {
     JSON::fail('找不到这个商品库存！');
 }

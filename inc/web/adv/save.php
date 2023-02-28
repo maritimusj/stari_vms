@@ -6,11 +6,11 @@
  
 namespace zovye;
 
-$id = request::int('id');
-$type = request::int('type', Advertising::SCREEN);
+$id = Request::int('id');
+$type = Request::int('type', Advertising::SCREEN);
 
-$from_type = request::trim('from_type', $type);
-$from_media = request::str('media');
+$from_type = Request::trim('from_type', $type);
+$from_media = Request::str('media');
 
 $adv = null;
 
@@ -28,7 +28,7 @@ if ($id > 0) {
     }
 }
 
-$result = Advertising::createOrUpdate(null, $adv, request::all());
+$result = Advertising::createOrUpdate(null, $adv, Request::all());
 if (is_error($result)) {
     Util::itoast(
         $result['message'],

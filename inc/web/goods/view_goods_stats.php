@@ -8,7 +8,7 @@ namespace zovye;
 
 use DateTime;
 
-$goods = Goods::get(request::int('id'));
+$goods = Goods::get(Request::int('id'));
 if (empty($goods)) {
     JSON::fail('找不到这个商品！');
 }

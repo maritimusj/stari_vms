@@ -6,8 +6,8 @@
  
 namespace zovye;
 
-$agent_id = request::int('agentid');
-$user_id = request::int('partnerid') ?: request::int('userid');
+$agent_id = Request::int('agentid');
+$user_id = Request::int('partnerid') ?: Request::int('userid');
 
 $back_url = $this->createWebUrl('agent', ['op' => 'partner', 'id' => $agent_id]);
 

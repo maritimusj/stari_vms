@@ -13,7 +13,7 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法领取');
 }
 
-$ticket = request::str('ticket');
+$ticket = Request::str('ticket');
 if (empty($ticket)) {
     JSON::fail('请重新扫描设备二维码 [701]');
 }
@@ -36,8 +36,8 @@ if (empty($device)) {
 $payload = $device->getPayload(true);
 $result = $payload['cargo_lanes'] ?? [];
 
-$allow_free = request::bool('free');
-$allow_pay = request::bool('pay');
+$allow_free = Request::bool('free');
+$allow_pay = Request::bool('pay');
 
 $goods = [];
 foreach ($result as $entry) {

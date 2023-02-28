@@ -24,8 +24,8 @@ $tpl_data = [
 
 $query = Delivery::query();
 
-if (request::has('keyword')) {
-    $keyword = request::trim('keyword');
+if (Request::has('keyword')) {
+    $keyword = Request::trim('keyword');
     $query->whereOr([
         'order_no LIKE' => "%$keyword%",
         'name LIKE' => "%$keyword%",
@@ -35,16 +35,16 @@ if (request::has('keyword')) {
     $tpl_data['s_keyword'] = $keyword;
 }
 
-if (request::isset('status')) {
-    $status = request::int('status');
+if (Request::isset('status')) {
+    $status = Request::int('status');
     if ($status >= 0) {
         $query->where(['status' => $status]);
     }
     $tpl_data['s_status'] = $status;
 }
 
-if (request::has('user_id')) {
-    $user_id = request::int('user_id');
+if (Request::has('user_id')) {
+    $user_id = Request::int('user_id');
     $user = User::get($user_id);
     if (empty($user)) {
         Util::resultAlert('找不到这个用户！', 'error');
@@ -56,7 +56,7 @@ if (request::has('user_id')) {
     $tpl_data['s_user_id'] = $user_id;
 }
 
-$limit = request::array('datelimit');
+$limit = Request::array('datelimit');
 if ($limit['start']) {
     $start = DateTime::createFromFormat('Y-m-d H:i:s', $limit['start'].' 00:00:00');
     if ($start) {
@@ -76,8 +76,8 @@ if ($limit['end']) {
 
 $total = $query->count();
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $query->page($page, $page_size);
 $query->orderBy('id DESC');

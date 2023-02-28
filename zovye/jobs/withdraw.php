@@ -10,14 +10,14 @@ use zovye\CtrlServ;
 use zovye\Job;
 use zovye\Log;
 use zovye\model\userModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use zovye\Wx;
 use function zovye\is_error;
 use function zovye\request;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 $data = [
     'id' => request('id'),
     'amount' => request('amount'),
@@ -30,7 +30,7 @@ $log = [
 if ($op == 'withdraw' && CtrlServ::checkJobSign($data)) {
     $tpl_id = settings('notice.withdraw_tplid');
     if ($tpl_id) {
-        $apply_user = User::get(request::int('id'));
+        $apply_user = User::get(Request::int('id'));
         if ($apply_user) {
 
             $notify_data = [

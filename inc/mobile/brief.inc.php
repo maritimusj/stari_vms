@@ -6,30 +6,30 @@
 
 namespace zovye;
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'data') {
     $query = Device::query();
     
-    if (request::isset('online')) {
-        $query->where(['mcb_online' => request::bool('online') ? 1 : 0]);
+    if (Request::isset('online')) {
+        $query->where(['mcb_online' => Request::bool('online') ? 1 : 0]);
     }
-    if (request::isset('error')) {
-        if (request::bool('error')) {
+    if (Request::isset('error')) {
+        if (Request::bool('error')) {
             $query->where(['error_code !=' => 0]);
         } else {
             $query->where(['error_code' => 0]);
         }
     }
 
-    if (request::isset('low')) {
-        $query->where(['s2' => request::bool('low') ? 1 : 0]);
+    if (Request::isset('low')) {
+        $query->where(['s2' => Request::bool('low') ? 1 : 0]);
     }
 
     $total = $query->count();
 
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
     $query->page($page, $page_size);
 

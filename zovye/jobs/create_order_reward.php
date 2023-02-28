@@ -17,7 +17,7 @@ use zovye\State;
 use zovye\Config;
 use zovye\Device;
 use zovye\Helper;
-use zovye\request;
+use zovye\Request;
 use zovye\CtrlServ;
 use zovye\EventBus;
 use RuntimeException;
@@ -28,15 +28,15 @@ use zovye\model\userModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 
-$op = request::op('default');
+$op = Request::op('default');
 
-$order_no = request::str('order_no');
-$device_id = request::int('device');
-$user_id = request::int('user');
-$goods_id = request::int('goods');
-$num = request::int('num');
-$ip = request::str('ip');
-$code = request::str('code');
+$order_no = Request::str('order_no');
+$device_id = Request::int('device');
+$user_id = Request::int('user');
+$goods_id = Request::int('goods');
+$num = Request::int('num');
+$ip = Request::str('ip');
+$code = Request::str('code');
 
 $log = [
     'op' => $op,

@@ -11,11 +11,11 @@ namespace zovye\job\getResult;
 use zovye\CtrlServ;
 use zovye\Log;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use function zovye\request;
 
-$op = request::op('default');
+$op = Request::op('default');
 $data = [
     'openid' => request('openid'),
     'orderNO' => request('orderNO'),

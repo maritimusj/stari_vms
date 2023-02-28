@@ -1174,7 +1174,7 @@ include './index.php';
     {
         header('Content-type: application/json; charset='._W('charset'));
 
-        if (request::has('callback')) {
+        if (Request::has('callback')) {
             echo request('callback').'('.json_encode(['status' => $status, 'data' => $data]).')';
         } else {
             echo json_encode(['status' => $status, 'data' => $data]);
@@ -2570,7 +2570,7 @@ HTML_CONTENT;
 
             if (App::isDeviceWithDoorEnabled() && empty($data['extra']['door'])) {
                 $extra['door'] = [
-                    'num' => request::int('doorNum', 1),
+                    'num' => Request::int('doorNum', 1),
                 ];
             }
 

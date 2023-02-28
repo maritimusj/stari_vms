@@ -64,10 +64,10 @@ class WxPlatform
         $platform = self::getPlatform();
         if ($platform) {
             $result = $platform->parseEncryptedData(
-                request::str('msg_signature'),
-                request::str('timestamp'),
-                request::str('nonce'),
-                request::raw()
+                Request::str('msg_signature'),
+                Request::str('timestamp'),
+                Request::str('nonce'),
+                Request::raw()
             );
 
             Log::debug('wxplatform', $result);
@@ -91,10 +91,10 @@ class WxPlatform
         $platform = self::getPlatform();
         if ($platform) {
             $result = $platform->parseEncryptedData(
-                request::str('msg_signature'),
-                request::str('timestamp'),
-                request::str('nonce'),
-                request::raw()
+                Request::str('msg_signature'),
+                Request::str('timestamp'),
+                Request::str('nonce'),
+                Request::raw()
             );
 
             Log::debug('wxplatform', $result);
@@ -466,7 +466,7 @@ class WxPlatform
             if ($result['InfoType'] === 'authorized' || $result['InfoType'] === 'updateauthorized') {
 
                 $res = Account::createOrUpdateFromWxPlatform(
-                    request::int('agent'),
+                    Request::int('agent'),
                     $result['AuthorizerAppid'],
                     $result
                 );

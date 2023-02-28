@@ -34,7 +34,7 @@
     {if $op == $nav_op}
     <li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\request::op('eid'), 'version_id' => \zovye\request::op('version_id')));}">{$nav_title}</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}">{$nav_title}</a></li>
     {/if}
     {/loop}
 </ul>

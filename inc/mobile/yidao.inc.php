@@ -12,14 +12,14 @@ use zovye\account\YiDaoAccount;
 defined('IN_IA') or exit('Access Denied');
 
 YiDaoAccount::cb([
-    'key' => request::str('key'),
-    'develop_appid' => request::str('develop_appid'),
-    'auth_open_id' => request::str('auth_open_id'),
-    'nickname' => request::str('nickname'),
-    'appid' => request::str('appid'),
-    'appname' => request::str('appname'),
-    'openid' => request::str('openid'),
-    'state' => request::str('state'),
+    'key' => Request::str('key'),
+    'develop_appid' => Request::str('develop_appid'),
+    'auth_open_id' => Request::str('auth_open_id'),
+    'nickname' => Request::str('nickname'),
+    'appid' => Request::str('appid'),
+    'appname' => Request::str('appname'),
+    'openid' => Request::str('openid'),
+    'state' => Request::str('state'),
 ]);
 
 echo REQUEST_ID;

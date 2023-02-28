@@ -11,7 +11,7 @@ use zovye\model\commission_balanceModelObj;
 use zovye\model\orderModelObj;
 
 //平台 统计
-$date_limit = request::array('datelimit');
+$date_limit = Request::array('datelimit');
 if ($date_limit['start']) {
     $s_date = DateTime::createFromFormat('Y-m-d H:i:s', $date_limit['start'].' 00:00:00');
 } else {

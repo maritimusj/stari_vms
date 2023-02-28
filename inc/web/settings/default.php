@@ -12,7 +12,7 @@ $settings = settings();
 
 $tpl_data['navs'] = Util::getSettingsNavs();
 
-$page = request::trim('page', 'device');
+$page = Request::trim('page', 'device');
 
 if (!(array_key_exists($page, $tpl_data['navs']) || $page == 'ctrl')) {
     Util::itoast('找不到这个配置页面！', $this->createWebUrl('settings'), 'error');
@@ -318,7 +318,7 @@ if ($page == 'device') {
         $res = json_decode($data, true);
         if ($res) {
             if ($res['status']) {
-                if (request::str('fn') == 'exec') {
+                if (Request::str('fn') == 'exec') {
                     if (empty($res['data']['download'])) {
                         Util::itoast('暂时没有任何文件需要更新！', $back_url, 'success');
                     } else {

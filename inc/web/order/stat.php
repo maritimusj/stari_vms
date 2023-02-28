@@ -10,10 +10,10 @@ namespace zovye;
 use DateTime;
 use zovye\model\orderModelObj;
 
-$agent_openid = request::str('agent_openid');
-$device_id = request::int('device_id');
+$agent_openid = Request::str('agent_openid');
+$device_id = Request::int('device_id');
 
-$date_limit = request::array('datelimit');
+$date_limit = Request::array('datelimit');
 $start = empty($date_limit['start']) ? new DateTime('00:00:00') : DateTime::createFromFormat(
     'Y-m-d H:i:s',
     $date_limit['start'].' 00:00:00'

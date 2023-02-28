@@ -24,7 +24,7 @@ if (empty($user)) {
     Util::resultAlert('只能从微信中打开，谢谢！', 'error');
 }
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'default') {
 

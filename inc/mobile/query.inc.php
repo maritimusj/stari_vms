@@ -8,9 +8,9 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::str('q');
-$ts = request::int('ts');
-$sign = request::str('sign');
+$op = Request::str('q');
+$ts = Request::int('ts');
+$sign = Request::str('sign');
 
 if (abs(time() - $ts) > 3600 || empty($sign) || empty($op)) {
     exit('invalid request.');
@@ -25,11 +25,11 @@ if ($sign != sha1("$op$ts$secret")) {
     exit('invalid sign.');
 }
 
-$op = request::str('q');
+$op = Request::str('q');
 
 //接口说明：请求指定用户的来源设备的运营人员信息
 if ($op == 'keeper') {
-    $mobile = request::trim('mobile');
+    $mobile = Request::trim('mobile');
     if (empty($mobile)) {
         JSON::fail('用户手机号码不正确！');
     }

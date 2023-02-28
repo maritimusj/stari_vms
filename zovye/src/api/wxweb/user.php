@@ -6,7 +6,7 @@ use zovye\api\wx\common;
 use zovye\CommissionBalance;
 use zovye\Helper;
 use zovye\Pay;
-use zovye\request;
+use zovye\Request;
 use function zovye\err;
 
 class user
@@ -19,7 +19,7 @@ class user
             return err('无法锁定用户，请稍后再试！');
         }
 
-        $price = intval(round(request::float('price', 0, 2) * 100));
+        $price = intval(round(Request::float('price', 0, 2) * 100));
         if ($price < 1) {
             return err('充值金额不正确！');
         }
@@ -29,7 +29,7 @@ class user
 
     public static function rechargeResult(): array
     {
-        $order_no = request::str('orderNO');
+        $order_no = Request::str('orderNO');
 
         $pay_log = Pay::getPayLog($order_no, LOG_RECHARGE);
         if (empty($pay_log)) {
@@ -76,8 +76,8 @@ class user
             ],
         ]);
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
         $query->page($page, $page_size);
 
         $query->orderBy('createtime DESC');

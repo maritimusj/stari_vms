@@ -12,7 +12,7 @@ if (empty($tp_lid)) {
 }
 
 $agent_ids = request('agentids');
-$id = request::int('id');
+$id = Request::int('id');
 
 if (empty($agent_ids) || empty($id)) {
     JSON::fail('请求参数不正确！');

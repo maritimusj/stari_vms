@@ -8,8 +8,8 @@ namespace zovye;
 
 $tpl_data = [];
 
-if (request::has('id')) {
-    $app = WxApp::get(request::int('id'));
+if (Request::has('id')) {
+    $app = WxApp::get(Request::int('id'));
     if (empty($app)) {
         JSON::fail('找不到这个小程序！');
     }

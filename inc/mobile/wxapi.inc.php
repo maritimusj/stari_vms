@@ -10,9 +10,9 @@ defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
 use zovye\JSON;
-use zovye\request;
+use zovye\Request;
 
-$op = ucfirst(request::op('default'));
+$op = ucfirst(Request::op('default'));
 
 $result = router::load('wx', $op);
 if (!is_null($result)) {

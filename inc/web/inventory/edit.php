@@ -9,7 +9,7 @@ namespace zovye;
 $tpl_data = [
 ];
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id > 0) {
     $inventory = Inventory::get($id);
     if (empty($inventory)) {

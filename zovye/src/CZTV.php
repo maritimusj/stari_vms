@@ -27,7 +27,7 @@ class CZTV
             return false;
         }
 
-        $token = request::str('sessionId');
+        $token = Request::str('sessionId');
         if (empty($token)) {
             app()->cztvPage(null, null, $config['redirect_url']);
             return false;
@@ -45,7 +45,7 @@ class CZTV
         $user = self::getUser($config, $token);
 
         Log::debug("cztv", [
-            'sessionid' => request::str('sessionid'),
+            'sessionid' => Request::str('sessionid'),
             'config' => $config,
             'result' => is_error($user) ? $user : $user->profile(),
         ]);

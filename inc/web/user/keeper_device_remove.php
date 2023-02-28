@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 
-$user = User::get(request::int('user'));
+$user = User::get(Request::int('user'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
@@ -21,7 +21,7 @@ if (empty($keeper)) {
 /** @var deviceModelObj $entry */
 $device = Device::query([
     'keeper_id' => $keeper->getId(),
-    'id' => request::int('id'),
+    'id' => Request::int('id'),
 ])->findOne();
 
 if (empty($device)) {

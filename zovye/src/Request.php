@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-class request
+class Request
 {
     private static $data = [];
 

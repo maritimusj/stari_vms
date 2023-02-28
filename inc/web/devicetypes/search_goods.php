@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$keywords = request::trim('keywords', '', true);
+$keywords = Request::trim('keywords', '', true);
 if (empty($keywords)) {
     $res = Goods::getList(['page' => 1, 'pagesize' => 100, 'default_goods' => true]);
 } else {
@@ -18,7 +18,7 @@ if (empty($keywords)) {
     $res = Goods::getList($params);
 }
 
-$id = request::trim('id');
+$id = Request::trim('id');
 $res['id'] = $id;
 
 JSON::success($res);

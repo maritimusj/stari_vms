@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\packageModelObj;
 
-$device_id = request::int('device');
+$device_id = Request::int('device');
 if ($device_id) {
     $device = Device::get($device_id);
     if (empty($device)) {

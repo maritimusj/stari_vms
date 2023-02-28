@@ -9,7 +9,7 @@ namespace zovye\api\wx;
 use zovye\Device;
 use zovye\Group as ZovyeGroup;
 use zovye\model\device_groupsModelObj;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use function zovye\error;
 
@@ -24,17 +24,17 @@ class group
     {
         $user = agent::getAgent();
 
-        $page = max(1, request::int('page'));
-        $page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+        $page = max(1, Request::int('page'));
+        $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
         $query = ZovyeGroup::query(ZovyeGroup::NORMAL);
 
-        $keyword = request::trim('keyword');
+        $keyword = Request::trim('keyword');
         if (!empty($keyword)) {
             $query->where(['title LIKE' => "%$keyword%"]);
         }
 
-        $guid = request::str('guid');
+        $guid = Request::str('guid');
         if (!empty($guid)) {
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
@@ -97,7 +97,7 @@ class group
         $user = agent::getAgent();
 
         //分组id
-        $group_id = request::int('id');
+        $group_id = Request::int('id');
 
         /** @var device_groupsModelObj $one */
         $one = ZovyeGroup::findOne([
@@ -124,8 +124,8 @@ class group
      */
     public static function create(): array
     {
-        $title = request::trim('title');
-        $clr = request::trim('clr');
+        $title = Request::trim('title');
+        $clr = Request::trim('clr');
 
         if (empty($title)) {
             return error(State::FAIL, '对不起，请填写分组名称！');
@@ -156,10 +156,10 @@ class group
      */
     public static function update(): array
     {
-        $title = request::trim('title');
-        $clr = request::trim('clr');
+        $title = Request::trim('title');
+        $clr = Request::trim('clr');
 
-        $group_id = request::int('id');
+        $group_id = Request::int('id');
 
         if (empty($title)) {
             return error(State::ERROR, '对不起，请填写分组名称！');
@@ -198,7 +198,7 @@ class group
 
         $user = agent::getAgent();
 
-        $group_id = request::trim('id');
+        $group_id = Request::trim('id');
 
         /** @var device_groupsModelObj $one */
         $one = ZovyeGroup::findOne([

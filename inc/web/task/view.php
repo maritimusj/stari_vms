@@ -12,7 +12,7 @@ $tpl_data = [];
 
 $query = Task::query();
 
-$account_id = request::int('account');
+$account_id = Request::int('account');
 if ($account_id > 0) {
     $account = Account::get($account_id);
     if ($account) {
@@ -21,8 +21,8 @@ if ($account_id > 0) {
     $query->where(['account_id' => $account_id]);
 }
 
-if (request::has('user')) {
-    $user_id = request::int('user');
+if (Request::has('user')) {
+    $user_id = Request::int('user');
     $user = User::get($user_id);
     if ($user) {
         $tpl_data['user'] = $user->profile();
@@ -30,8 +30,8 @@ if (request::has('user')) {
     $query->where(['user_id' => $user_id]);
 }
 
-if (request::isset('status')) {
-    $status = request::int('status');
+if (Request::isset('status')) {
+    $status = Request::int('status');
     $query->where(['s1' => $status]);
     $tpl_data['s_status'] = $status;
 }
@@ -39,8 +39,8 @@ if (request::isset('status')) {
 $total = $query->count();
 
 if ($total > 0) {
-    $page = max(1, request::int('page'));
-    $page_size = request::int('pagesize', 10);
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', 10);
 
     $query->page($page, $page_size);
     $query->orderBy('id desc');

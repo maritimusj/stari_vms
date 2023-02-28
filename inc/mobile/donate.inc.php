@@ -17,10 +17,10 @@ if (empty($user) || $user->isBanned()) {
 }
 
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'default') {
     //检查设备
-    $device_id = request::str('device');
+    $device_id = Request::str('device');
     if (empty($device_id)) {
         JSON::fail('请扫描设备二维码，谢谢！');
     }
@@ -56,7 +56,7 @@ if ($op == 'default') {
     JSON::success($donatePay);
 
 } elseif ($op == 'result') {
-    $order_no = request::trim('no');
+    $order_no = Request::trim('no');
     if (empty($order_no)) {
         Util::resultAlert('不正确的调用[101]！', 'error');
     }

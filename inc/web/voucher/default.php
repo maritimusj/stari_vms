@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$type = request::str('type');
+$type = Request::str('type');
 
 $tpl_data = [
     'type' => $type,

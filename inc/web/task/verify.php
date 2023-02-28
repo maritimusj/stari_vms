@@ -7,7 +7,7 @@
 namespace zovye;
 
 $result = Util::transactionDo(function () {
-    $task = Task::get(request::int('id'));
+    $task = Task::get(Request::int('id'));
 
     if (empty($task)) {
         return err('找不到这个记录！');
@@ -17,7 +17,7 @@ $result = Util::transactionDo(function () {
         return err('这个记录不需要审核！');
     }
 
-    $way = request::str('way');
+    $way = Request::str('way');
     if ($way == 'reject') {
         $task->setS1(Task::REJECT);
         if ($task->save()) {

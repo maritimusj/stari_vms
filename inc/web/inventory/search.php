@@ -10,7 +10,7 @@ use zovye\model\inventoryModelObj;
 
 $query = Inventory::query();
 //搜索关键字
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->whereOr([
         'title LIKE' => "%$keywords%",

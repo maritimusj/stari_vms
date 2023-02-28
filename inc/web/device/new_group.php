@@ -14,11 +14,11 @@ $tpl_data = [];
 //分组表
 $query = Group::query(Group::NORMAL);
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-if (request::isset('agent_id')) {
-    $agent_id = request::int('agent_id');
+if (Request::isset('agent_id')) {
+    $agent_id = Request::int('agent_id');
     if ($agent_id > 0) {
         $agent = Agent::get($agent_id);
         if (empty($agent)) {

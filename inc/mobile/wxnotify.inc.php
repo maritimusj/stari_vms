@@ -8,16 +8,16 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-if (request::is_get()) {
+if (Request::is_get()) {
     $data = [
-        'signature' => request::str('signature'),
-        'nonce' => request::str('nonce'),
-        'timestamp' => request::str('timestamp'),
+        'signature' => Request::str('signature'),
+        'nonce' => Request::str('nonce'),
+        'timestamp' => Request::str('timestamp'),
     ];
 
     $passed = WxAppMessagePush::verify($data);
     if ($passed) {
-        echo request::str('echostr');
+        echo Request::str('echostr');
         exit();
     }
     Log::error('wxnotify', [
@@ -27,7 +27,7 @@ if (request::is_get()) {
     exit();
 }
 
-$json_data = request::json();
+$json_data = Request::json();
 $result = WxAppMessagePush::handle($json_data);
 
 if (is_error($result)) {

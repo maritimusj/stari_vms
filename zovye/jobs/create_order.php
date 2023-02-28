@@ -22,7 +22,7 @@ use zovye\model\goods_voucher_logsModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Pay;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use zovye\User;
 use zovye\Util;
@@ -31,8 +31,8 @@ use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
 
-$op = request::op('default');
-$order_no = request::str('orderNO');
+$op = Request::op('default');
+$order_no = Request::str('orderNO');
 
 if ($op == 'create_order' && CtrlServ::checkJobSign(['orderNO' => $order_no])) {
     try {

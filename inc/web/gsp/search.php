@@ -10,7 +10,7 @@ use zovye\model\userModelObj;
 
 $query = Principal::gspsor();
 
-$s_keyword = request::trim('keyword');
+$s_keyword = Request::trim('keyword');
 if ($s_keyword) {
     $query->whereOr([
         'name REGEXP' => $s_keyword,

@@ -8,7 +8,7 @@ namespace zovye;
 
 use zovye\model\deviceModelObj;
 
-$id = request::int('id');
+$id = Request::int('id');
 $group = Group::get($id);
 
 if ($group && $group->destroy()) {

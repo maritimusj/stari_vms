@@ -9,8 +9,8 @@ namespace zovye;
 //分配设备控件查询代理详情
 use zovye\model\agent_vwModelObj;
 
-if (request::is_ajax() && request::has('id')) {
-    $agent = Agent::get(request::int('id'));
+if (Request::is_ajax() && Request::has('id')) {
+    $agent = Agent::get(Request::int('id'));
     if ($agent) {
         $data = [
             'id' => $agent->getId(),
@@ -48,8 +48,8 @@ $agents = [
     'list' => [],
 ];
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', 10);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', 10);
 
 $query = Principal::agent();
 
@@ -60,7 +60,7 @@ if (!empty($ids)) {
 }
 
 //搜索用户昵称或者手机号码
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->whereOr([
         'nickname LIKE' => "%$keywords%",
@@ -97,7 +97,7 @@ if ($total > 0) {
             'commission_enabled' => App::isCommissionEnabled() && $entry->isCommissionEnabled(),
         ];
 
-        if (request::is_ajax()) {
+        if (Request::is_ajax()) {
             $level_data = Agent::getLevels($entry->settings('agentData.level'))?: '';
             $data['agentData'] = [
                 'area' => $entry->settings('agentData.area', []),
@@ -134,8 +134,8 @@ if ($total > 0) {
     }
 }
 
-if (request::is_ajax()) {
-    $agents['serial'] = request::str('serial') ?: microtime(true).'';
+if (Request::is_ajax()) {
+    $agents['serial'] = Request::str('serial') ?: microtime(true).'';
     JSON::success($agents);
 }
 

@@ -8,18 +8,18 @@ namespace zovye;
 
 $params = [];
 
-$voucher_id = request::int('voucherId');
+$voucher_id = Request::int('voucherId');
 if ($voucher_id > 0) {
     $params['voucherId'] = $voucher_id;
 }
 
-$type = request::str('type');
+$type = Request::str('type');
 if ($type) {
     $params['type'] = $type;
 }
 
-$params['page'] = max(1, request::int('page'));
-$params['pagesize'] = max(1, request::int('pagesize', DEFAULT_PAGE_SIZE));
+$params['page'] = max(1, Request::int('page'));
+$params['pagesize'] = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
 $res = GoodsVoucher::logList($params);
 if (is_error($res)) {

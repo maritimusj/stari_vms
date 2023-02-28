@@ -9,15 +9,15 @@ namespace zovye;
 use DateTime;
 use Exception;
 
-$account_id = request::int('id');
+$account_id = Request::int('id');
 $account = Account::get($account_id);
 
 if (empty($account)) {
     JSON::fail('找不到这个任务！');
 }
 
-$year_str = request::int('year');
-$month_str = request::int('month');
+$year_str = Request::int('year');
+$month_str = Request::int('month');
 
 try {
     $year = new DateTime(sprintf("%d-%02d-01", $year_str, $month_str));

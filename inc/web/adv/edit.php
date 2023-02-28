@@ -8,11 +8,11 @@ namespace zovye;
 
 use zovye\model\advertisingModelObj;
 
-$id = request::int('id');
-$type = request::int('type', Advertising::SCREEN);
+$id = Request::int('id');
+$type = Request::int('type', Advertising::SCREEN);
 
 $tpl_data = [
-    'op' => request::op(),
+    'op' => Request::op(),
     'type' => $type,
     'media_data' => Advertising::getMediaData(),
     'wx_data' => Advertising::getWxData(),
@@ -21,8 +21,8 @@ $tpl_data = [
 $tpl_data['navs'] = Advertising::getNavData();
 
 $tpl_data['id'] = $id;
-$tpl_data['media'] = request::trim('media');
-$tpl_data['from_type'] = request::trim('from_type', $type);
+$tpl_data['media'] = Request::trim('media');
+$tpl_data['from_type'] = Request::trim('from_type', $type);
 
 if ($id > 0) {
     /** @var advertisingModelObj $adv */

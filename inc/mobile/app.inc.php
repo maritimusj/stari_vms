@@ -10,11 +10,11 @@ defined('IN_IA') or exit('Access Denied');
 
 header("Access-Control-Allow-Origin: *");
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'default') {
 
-    $app_id = request::trim('id');
+    $app_id = Request::trim('id');
 
     $device = Device::getFromAppId($app_id);
     if ($device) {
@@ -32,8 +32,8 @@ if ($op == 'default') {
 
 } elseif ($op == 'bind') {
 
-    $device_id = request::trim('id');
-    $app_id = request::trim('appId');
+    $device_id = Request::trim('id');
+    $app_id = Request::trim('appId');
 
     $result = Util::transactionDo(
         function () use ($device_id, $app_id) {
@@ -103,7 +103,7 @@ if ($op == 'default') {
 
 } elseif ($op == 'data_view') {
 
-    $type = request::str('type');
+    $type = Request::str('type');
     //title
     if ($type == 'title') {
         $query = m('data_view');

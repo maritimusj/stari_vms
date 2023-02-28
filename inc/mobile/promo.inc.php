@@ -11,20 +11,20 @@ use zovye\model\userModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'sms') {
     if (!App::isSmsPromoEnabled()) {
         JSON::fail('没有启用这个功能！');
     }
 
     $result = Util::transactionDo(function() {
-        $mobile = request::trim('mobile');
+        $mobile = Request::trim('mobile');
 
         if (empty($mobile)) {
             throw new RuntimeException('Invalid mobile phone number.');
         }
     
-        $device = Device::get(request::str('device'), true);
+        $device = Device::get(Request::str('device'), true);
         if (empty($device)) {
             throw new RuntimeException('Fail to get device info.');
         }
@@ -85,9 +85,9 @@ if ($op == 'sms') {
 
 } elseif ($op == 'verify') {
     
-    $mobile = request::str('mobile');
-    $code = request::str('code');
-    $num = request::int('num', 1);
+    $mobile = Request::str('mobile');
+    $code = Request::str('code');
+    $num = Request::int('num', 1);
 
     $config = Promo::getConfig();
 

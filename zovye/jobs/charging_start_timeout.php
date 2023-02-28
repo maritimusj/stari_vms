@@ -13,14 +13,14 @@ use zovye\Device;
 use zovye\Log;
 
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 
-$uid = request::str('uid');
-$chargerID = request::int('chargerID');
-$device_id = request::int('device');
-$user_id = request::int('user');
-$order_id = request::int('order');
-$time = request::int('time');
+$uid = Request::str('uid');
+$chargerID = Request::int('chargerID');
+$device_id = Request::int('device');
+$user_id = Request::int('user');
+$order_id = Request::int('order');
+$time = Request::int('time');
 
 $params = [
     'uid' => $uid,
@@ -31,7 +31,7 @@ $params = [
     'time' => $time,
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 if ($op == 'charging_start_timeout' && CtrlServ::checkJobSign($params)) {
     $order = Order::get($uid, true);
     if ($order) {

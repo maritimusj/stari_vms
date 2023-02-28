@@ -27,12 +27,12 @@ if ($device->isChargingDevice()) {
 }
 
 $query = $device->logQuery();
-if (request::isset('way')) {
-    $query->where(['level' => request::int('way')]);
+if (Request::isset('way')) {
+    $query->where(['level' => Request::int('way')]);
 }
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $total = $query->count();
 if (ceil($total / $page_size) < $page) {

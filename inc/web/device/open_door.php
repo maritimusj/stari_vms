@@ -10,13 +10,13 @@ if (!App::isDeviceWithDoorEnabled()) {
     JSON::fail('没有启用这个功能！');
 }
 
-$id = request::int('id');
+$id = Request::int('id');
 $device = Device::get($id);
 if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-$index = request::int('index', 1);
+$index = Request::int('index', 1);
 
 $result = $device->openDoor($index);
 if (is_error($result)) {

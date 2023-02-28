@@ -14,7 +14,7 @@ $result = [
     'tags' => [],
 ];
 
-$id = request::int('id');
+$id = Request::int('id');
 $account = Account::get($id);
 if ($account) {
     $data = $account->get('assigned', []);

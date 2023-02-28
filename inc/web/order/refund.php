@@ -6,17 +6,17 @@
  
 namespace zovye;
 
-$id = request::int('id');
-if (request::has('num')) {
-    $num = request::int('num');
+$id = Request::int('id');
+if (Request::has('num')) {
+    $num = Request::int('num');
 
     $res = Order::refund($id, $num, [
         'admin' => _W('username'),
         'ip' => CLIENT_IP,
         'message' => '管理员退款',
     ]);
-} elseif (request::has('price')) {
-    $price = request::int('price');
+} elseif (Request::has('price')) {
+    $price = Request::int('price');
 
     $res = Order::refund2($id, $price, [
         'admin' => _W('username'),

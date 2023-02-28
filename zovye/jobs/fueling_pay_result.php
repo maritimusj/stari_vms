@@ -16,11 +16,11 @@ use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
 use zovye\Pay;
-use zovye\request;
+use zovye\Request;
 use function zovye\is_error;
 
-$order_no = request::str('orderNO');
-$start = request::int('start');
+$order_no = Request::str('orderNO');
+$start = Request::int('start');
 
 $log = [
     'orderNO' => $order_no,
@@ -88,5 +88,5 @@ try {
     throw $e;
 }
 
-Log::debug(request::op('job'), $log);
+Log::debug(Request::op('job'), $log);
 

@@ -9,7 +9,7 @@ namespace zovye;
 use zovye\base\modelObj;
 use zovye\model\device_groupsModelObj;
 
-$agent_id = request::int('agent_id');
+$agent_id = Request::int('agent_id');
 if ($agent_id) {
     $agent = Agent::get($agent_id);
     if (!$agent) {
@@ -19,30 +19,30 @@ if ($agent_id) {
 
 $fee = [
     'l0' => [
-        'ef' => request::float('l0ef'),
-        'sf' => request::float('sf'),
+        'ef' => Request::float('l0ef'),
+        'sf' => Request::float('sf'),
     ],
     'l1' => [
-        'ef' => request::float('l1ef'),
-        'sf' => request::float('sf'),
+        'ef' => Request::float('l1ef'),
+        'sf' => Request::float('sf'),
     ],
     'l2' => [
-        'ef' => request::float('l2ef'),
-        'sf' => request::float('sf'),
+        'ef' => Request::float('l2ef'),
+        'sf' => Request::float('sf'),
     ],
     'l3' => [
-        'ef' => request::float('l3ef'),
-        'sf' => request::float('sf'),
+        'ef' => Request::float('l3ef'),
+        'sf' => Request::float('sf'),
     ],
     'ts' => array_map(function ($e) {
         return intval($e);
-    }, request::array('ts', [])),
+    }, Request::array('ts', [])),
 ];
 
-$id = request::int('id');
+$id = Request::int('id');
 
-$lng = request::float('lng');
-$lat = request::float('lat');
+$lng = Request::float('lng');
+$lat = Request::float('lat');
 
 if ($id) {
     $group = Group::get($id, Group::CHARGING);
@@ -53,10 +53,10 @@ if ($id) {
         $group->setAgentId($agent->getId());
     }
 
-    $group->setClr(request::trim('clr'));
-    $group->setAddress(request::trim('address'));
-    $group->setTitle(request::trim('title'));
-    $group->setDescription(request::trim('description'));
+    $group->setClr(Request::trim('clr'));
+    $group->setAddress(Request::trim('address'));
+    $group->setTitle(Request::trim('title'));
+    $group->setDescription(Request::trim('description'));
     $group->setLoc([
         'lng' => $lng,
         'lat' => $lat,
@@ -66,12 +66,12 @@ if ($id) {
     $data = [
         'agent_id' => isset($agent) ? $agent->getId() : 0,
         'type_id' => Group::CHARGING,
-        'title' => request::trim('title'),
-        'clr' => request::trim('clr'),
+        'title' => Request::trim('title'),
+        'clr' => Request::trim('clr'),
         'extra' => [
             'name' => App::uid(6).'-'.Util::random(16),
-            'description' => request::trim('description'),
-            'address' => request::trim('address'),
+            'description' => Request::trim('description'),
+            'address' => Request::trim('address'),
             'lng' => $lng,
             'lat' => $lat,
             'fee' => $fee,

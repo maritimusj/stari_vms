@@ -8,7 +8,7 @@ namespace zovye;
 
 use RuntimeException;
 
-$user = User::get(request::int('userid'));
+$user = User::get(Request::int('userid'));
 if (empty($user)) {
     JSON::fail('找不到这个用户！');
 }
@@ -24,9 +24,9 @@ if (!$inventory->acquireLocker()) {
 
 $result = Util::transactionDo(function () use ($inventory) {
 
-    $user_ids = request::array('user');
-    $goods_ids = request::array('goods');
-    $num_arr = request::array('num');
+    $user_ids = Request::array('user');
+    $goods_ids = Request::array('goods');
+    $num_arr = Request::array('num');
 
     $logs = [];
 

@@ -24,21 +24,21 @@ use zovye\model\deviceModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
-$op = request::op('default');
+$op = Request::op('default');
 
-$order_no = request::str('order_no');
-$user_id = request::int('user');
-$device_id = request::int('device');
-$goods_id = request::int('goods');
-$num = request::int('num');
-$ip = request::str('ip');
+$order_no = Request::str('order_no');
+$user_id = Request::int('user');
+$device_id = Request::int('device');
+$goods_id = Request::int('goods');
+$num = Request::int('num');
+$ip = Request::str('ip');
 
 $log = [
     'op' => $op,

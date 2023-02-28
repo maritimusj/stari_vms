@@ -16,7 +16,7 @@ use zovye\Log;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
 use zovye\Order;
-use zovye\request;
+use zovye\Request;
 use zovye\State;
 use zovye\User;
 use zovye\Util;
@@ -24,12 +24,12 @@ use zovye\ZovyeException;
 use function zovye\is_error;
 use function zovye\settings;
 
-$account_id = request::str('account');
-$device_id = request::str('device');
-$user_id = request::str('user');
-$goods_id = request::str('goods');
-$order_uid = request::str('orderUID');
-$ip = request::str('ip');
+$account_id = Request::str('account');
+$device_id = Request::str('device');
+$user_id = Request::str('user');
+$goods_id = Request::str('goods');
+$order_uid = Request::str('orderUID');
+$ip = Request::str('ip');
 
 $params = [
     'account' => $account_id,
@@ -40,7 +40,7 @@ $params = [
     'ip' => $ip,
 ];
 
-$op = request::op('default');
+$op = Request::op('default');
 
 if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
     try {
@@ -175,6 +175,6 @@ if ($op == 'create_order_account' && CtrlServ::checkJobSign($params)) {
     $params['error'] = '参数签名检验失败！';
 }
 
-$params['serial'] = request::str('serial');
+$params['serial'] = Request::str('serial');
 
 Log::debug('create_order_account', $params);

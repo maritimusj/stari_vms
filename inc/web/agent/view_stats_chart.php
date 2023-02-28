@@ -8,12 +8,12 @@ namespace zovye;
 
 use DateTime;
 
-$agent = Agent::get(request::int('id'));
+$agent = Agent::get(Request::int('id'));
 if (empty($agent)) {
     JSON::fail('找不到这个代理商！');
 }
 
-$day = DateTime::createFromFormat('Y年m月', request::trim('month'));
+$day = DateTime::createFromFormat('Y年m月', Request::trim('month'));
 if (!$day) {
     $day = new DateTime();
 }

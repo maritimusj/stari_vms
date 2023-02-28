@@ -10,15 +10,15 @@ use zovye\model\device_groupsModelObj;
 
 $query = Group::query(Group::NORMAL);
 
-$page = max(1, request::int('page'));
-$page_size = request::int('pagesize', DEFAULT_PAGE_SIZE);
+$page = max(1, Request::int('page'));
+$page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
 $total = $query->count();
 $total_page = ceil($total / $page_size);
 
 $query->page($page, $page_size);
 
-$keywords = request::trim('keywords');
+$keywords = Request::trim('keywords');
 if ($keywords) {
     $query->where(['title REGEXP' => $keywords]);
 }
@@ -46,6 +46,6 @@ foreach ($query->findAll() as $entry) {
     ];
 }
 
-$result['serial'] = request::trim('serial') ?: microtime(true).'';
+$result['serial'] = Request::trim('serial') ?: microtime(true).'';
 
 Util::resultJSON(true, $result);

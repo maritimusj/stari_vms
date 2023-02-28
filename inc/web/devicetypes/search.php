@@ -6,7 +6,7 @@
  
 namespace zovye;
 
-$keywords = request::trim('keywords', '', true);
+$keywords = Request::trim('keywords', '', true);
 $params = [
     'keywords' => $keywords,
 ];

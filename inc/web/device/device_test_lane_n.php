@@ -11,7 +11,7 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-$lane = max(0, request::int('lane'));
+$lane = max(0, Request::int('lane'));
 $res = Util::deviceTest(null, $device, $lane);
 
 Util::resultJSON(!is_error($res), ['msg' => $res['message']]);

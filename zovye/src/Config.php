@@ -11,6 +11,7 @@ namespace zovye;
  * Class Config
  * @package zovye
  * @method static mixed agent(string $key, $v = '', $update = false)
+ * @method static mixed location(string $key, $v = '', $update = false)
  * @method static mixed balance(string $key, $v = '', $update = false)
  * @method static mixed device(string $key, $v = '', $update = false)
  * @method static mixed charging(string $key, $v = '', $update = false)

@@ -3068,4 +3068,31 @@ HTML_CONTENT;
 
         return $result;
     }
+
+    public static function getSettingsNavs(): array
+    {
+        $navs = [
+            'device' => '设备',
+            'user' => '用户',
+            'agent' => '代理商',
+            'wxapp' => '小程序',
+            'commission' => '佣金',
+            'balance' => '积分',
+            'account' => '任务',
+            'notice' => '通知',
+            'payment' => '支付',
+            'misc' => '其它',
+            'upgrade' => '系统升级',
+        ];
+
+        if (!App::isBalanceEnabled()) {
+            unset($navs['balance']);
+        }
+
+        if (!settings('agent.wx.app.enabled') && !App::isBalanceEnabled()) {
+            unset($navs['wxapp']);
+        }
+
+        return $navs;
+    }
 }

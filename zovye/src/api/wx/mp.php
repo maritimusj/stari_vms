@@ -394,6 +394,8 @@ class mp
             $type = Account::DOUYIN;
         } elseif (request::has('username')) {
             $type = Account::WXAPP;
+        } elseif (request::has('mediaType')) {
+            $type = Account::FlashEgg;
         } else {
             return error(State::ERROR, '请指定正确的文件网址！');
         }

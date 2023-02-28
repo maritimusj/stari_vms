@@ -91,7 +91,7 @@
                                 </td>
                                 <td>
                                     <span class="text-muted">&lt;已隐藏&gt;</span>
-                                    <span class="operate text-url"><i class="fa fa-paste" title="复制网址" data-secret="{$item['secret']}"></i></span>
+                                    <span class="operate text-url"><i class="fa fa-paste" title="复制网址" data-text="{$item['secret']}"></i></span>
                                 </td>
                                 <td>{$item['createtime_formatted']}</td>
                                 <td class="operate">
@@ -229,7 +229,7 @@
                 if (!res.status) {
                     util.message(res.data.msg, "", 'error');
                 } else {
-                    util.message(res.data.msg, "{php echo $this->createWebUrl('settings', ['op' => 'wxapp']);}", 'success');
+                    util.message(res.data.msg, "{php echo $this->createWebUrl('settings', ['page' => 'wxapp']);}", 'success');
                 }       
             }
         });

@@ -32,13 +32,10 @@ class Site extends WeModuleSite
             $file = $dir.$fn.'.inc.php';
             if (file_exists($file)) {
                 require $file;
+                return;
             }
 
             $dir = $dir.$fn.'/';
-            $file = $dir.$fn.'.inc.php';
-            if (file_exists($file)) {
-                require $file;
-            }
 
             $op = request::op('default');
 
@@ -46,13 +43,23 @@ class Site extends WeModuleSite
             $file = $dir.$op.'.php';
             if (file_exists($file)) {
                 require $file;
+                return;
             }
 
             $op = toSnakeCase($op);
             $file = $dir.$op.'.php';
             if (file_exists($file)) {
                 require $file;
+                return;
             }
+
+            $file = $dir.$fn.'.inc.php';
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
+
+            trigger_error('invalid request.');
         }
     }
 }

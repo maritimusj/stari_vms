@@ -101,11 +101,11 @@ class mp
         $user = common::getAgentOrPartner();
 
         if ($more) {
-            $data['img_signatured'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
+            $data['img_signature'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
             if ($account->isVideo()) {
-                $data['media_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getMedia();
+                $data['media_signature'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getMedia();
             } else {
-                $data['qrcode_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getQrcode();
+                $data['qrcode_signature'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getQrcode();
             }
 
             $data['assigned'] = [];

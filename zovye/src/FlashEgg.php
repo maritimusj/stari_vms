@@ -38,6 +38,7 @@ class FlashEgg
     public function debug(): FlashEgg
     {
         $this->debug = true;
+
         return $this;
     }
 
@@ -50,7 +51,7 @@ class FlashEgg
     public function triggerAdPlay(string $uid, string $no)
     {
         $url = $this->debug ? self::DEBUG_API_URL : self::PRO_API_URL;
-        
+
         $data = [
             'devMac' => $uid,
             'triggerNo' => $no,
@@ -86,15 +87,28 @@ class FlashEgg
 
         $type = Request::str('mediaType', 'video');
 
+        //适配小程序端上传图片
+        $parseImgUrl = function($url) {
+            $images = explode('@', $url, 2);
+            if (empty($images)) {
+                return '';
+            }
+            return count($images) == 2 ? $images[1] : $images[0];
+        };
+
+        $gallery = [];
+        foreach (Request::array('gallery') as $url) {
+            $gallery[] = $parseImgUrl($url);
+        }
+
         $goods = $account->getGoods();
         if (empty($goods)) {
             $s1 = Goods::setFreeBitMask(0);
             $s1 = Goods::setPayBitMask($s1);
-
             $goods_data = [
                 'agent_id' => $account->getAgentId(),
                 'name' => $account->getTitle(),
-                'img' => Request::trim('goodsImage'),
+                'img' => $parseImgUrl(Request::str('goodsImage')),
                 'sync' => 0,
                 'price' => intval(round(Request::float('goodsPrice', 0, 2) * 100)),
                 's1' => $s1,
@@ -105,7 +119,6 @@ class FlashEgg
                 ],
             ];
 
-            $gallery = Request::array('gallery');
             if ($gallery) {
                 $goods_data['extra']['detailImg'] = $gallery[0];
                 $goods_data['extra']['gallery'] = $gallery;
@@ -117,11 +130,10 @@ class FlashEgg
             }
         } else {
             $goods->setAgentId($account->getAgentId());
-            $goods->setImg(Request::trim('goodsImage'));
+            $goods->setImg($parseImgUrl(Request::trim('goodsImage')));
             $goods->setPrice(intval(round(Request::float('goodsPrice', 0, 2) * 100)));
             $goods->setUnitTitle(Request::trim('goodsUnitTitle', '个'));
 
-            $gallery = Request::array('gallery');
             $goods->setGallery($gallery);
             if ($gallery) {
                 $goods->setDetailImg($gallery[0]);

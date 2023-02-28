@@ -1,0 +1,53 @@
+<?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
+ 
+namespace zovye;
+
+use zovye\model\deviceModelObj;
+
+$user = User::get(request::int('user'));
+if (empty($user)) {
+    JSON::fail('找不到这个用户！');
+}
+
+$keeper = $user->getKeeper();
+if (empty($keeper)) {
+    JSON::fail('这个用户不是运营人员！');
+}
+
+/** @var deviceModelObj $device */
+$device = Device::query([
+    'keeper_id' => $keeper->getId(),
+    'id' => request::int('id'),
+])->findOne();
+
+if (empty($device)) {
+    JSON::fail('找不到这个设备！');
+}
+
+$data = [
+    'kind' => request::int('kind'),
+    'way' => request::int('way'),
+];
+
+$commission_val = request::float('val', 0, 2);
+$commission_type = request::str('type', 'fixed');
+
+if ($commission_type == 'fixed') {
+    $data['fixed'] = max(0, intval($commission_val * 100));
+} else {
+    $data['percent'] = max(0, min(100, intval($commission_val)));
+}
+
+$device->setKeeper($keeper, $data);
+
+JSON::success([
+    'msg' => '保存成功！',
+    'way' => empty($data['way']) ? '销售分成' : '补货分成',
+    'kind' => $data['kind'],
+    'type' => $commission_type,
+    'val' => $commission_type == 'fixed' ? number_format($data['fixed'] / 100, 2, '.', '') . '元' : $data['percent'] . '%',
+]);

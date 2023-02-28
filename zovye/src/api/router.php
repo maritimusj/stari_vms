@@ -10,12 +10,35 @@ use zovye\api\wx\common;
 use zovye\JSON;
 use zovye\Util;
 use zovye\We7;
+use function zovye\error;
+use function zovye\toCamelCase;
+use function zovye\toSnakeCase;
 
 class router
 {
+    public static function load($w, $op)
+    {
+        $dir = ZOVYE_SRC . 'api' . DIRECTORY_SEPARATOR. $w . DIRECTORY_SEPARATOR;
+
+        $op = toCamelCase($op);
+        $file = $dir.$op.'.php';
+        if (file_exists($file)) {
+            return require $file;
+        }
+
+        $op = toSnakeCase($op);
+        $file = $dir.$op.'.php';
+        if (file_exists($file)) {
+            return require $file;
+        }
+
+        return null;
+    }
+
     public static function exec($op, $map)
     {
         $fn = $map[$op];
+
         if (is_callable($fn)) {
             $result = $fn();
         } else {
@@ -31,6 +54,7 @@ class router
                 }
             }
         }
+
         if (isset($result)) {
             JSON::result($result);
         }

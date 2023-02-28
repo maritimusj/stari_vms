@@ -9,12 +9,18 @@ namespace zovye\wxApi;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
+use zovye\JSON;
 use zovye\request;
 use zovye\Util;
 
 Util::extraAjaxJsonData();
 
 $op = ucfirst(request::op('default'));
+
+$result = router::load('wx', $op);
+if (!is_null($result)) {
+    JSON::result($result);
+}
 
 router::exec($op, [
     'DebugMode' => '\zovye\api\wx\debug::mode',

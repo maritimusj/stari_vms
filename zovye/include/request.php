@@ -23,14 +23,21 @@ function request(string $name, $default = null)
 
 class request
 {
-    public static function set(string $key, $data)
+    private static $data = [];
+
+    public static function setData($data = [])
     {
-        setArray($GLOBALS['_GPC'], $key, $data);
+        self::$data = $data;
+    }
+    public static function setDefault(string $key, $data)
+    {
+        setArray(self::$data, $key, $data);
     }
 
     public static function json(string $key = '', $default = [])
     {
         static $data = null;
+
         if (!isset($data)) {
             $res = json_decode(self::raw(), true);
             $data = $res ?: [];
@@ -41,32 +48,32 @@ class request
 
     public static function isset(string $name): bool
     {
-        return isset($GLOBALS['_GPC'][$name]);
+        return isset(self::$data[$name]);
     }
 
     public static function has(string $name): bool
     {
-        return !empty($GLOBALS['_GPC'][$name]);
+        return !empty(self::$data[$name]);
     }
 
     public static function is_string(string $name): bool
     {
-        return is_string($GLOBALS['_GPC'][$name]);
+        return is_string(self::$data[$name]);
     }
 
     public static function is_numeric(string $name): bool
     {
-        return is_numeric($GLOBALS['_GPC'][$name]);
+        return is_numeric(self::$data[$name]);
     }
 
     public static function is_array(string $name): bool
     {
-        return is_array($GLOBALS['_GPC'][$name]);
+        return is_array(self::$data[$name]);
     }
 
     public static function all(): array
     {
-        return (array)$GLOBALS['_GPC'];
+        return self::$data;
     }
 
     public static function raw(): string
@@ -105,24 +112,24 @@ class request
 
     public static function int(string $name, int $default = 0): int
     {
-        return intval(request($name, $default));
+        return intval(getArray($name, $default));
     }
 
     public static function float(string $name, float $default = 0, int $precision = -1): float
     {
-        $v = floatval(request($name, $default));
+        $v = floatval(getArray($name, $default));
 
         return $precision > -1 ? round($v, $precision) : $v;
     }
 
     public static function bool(string $name, bool $default = false): bool
     {
-        return boolval(request($name, $default));
+        return boolval(getArray($name, $default));
     }
 
     public static function str(string $name, string $default = '', $url_decode = false): string
     {
-        $str = strval(request($name, $default));
+        $str = strval(getArray($name, $default));
         if ($url_decode) {
             $str = urldecode($str);
         }
@@ -132,12 +139,12 @@ class request
 
     public static function trim(string $name, string $default = '', $url_decode = false): string
     {
-        return trim(request::str($name, $default, $url_decode)) ?: $default;
+        return trim(self::str($name, $default, $url_decode)) ?: $default;
     }
 
     public static function array(string $name, array $default = []): array
     {
-        return is_array($GLOBALS['_GPC'][$name]) ? $GLOBALS['_GPC'][$name] : $default;
+        return is_array(self::$data[$name]) ? self::$data[$name] : $default;
     }
 
     public static function op(string $default = ''): string

@@ -13,6 +13,8 @@ define('REQUEST_ID', Util::generateUID());
 
 Util::setErrorHandler();
 
+request::setData($GLOBALS['_GPC']);
+
 //初始化事件驱动
 EventBus::init();
 

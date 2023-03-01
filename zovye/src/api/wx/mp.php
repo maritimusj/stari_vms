@@ -68,6 +68,7 @@ class mp
             'groupname' => $account->getGroupName(),
             'clr' => $account->getClr(),
             'scname' => $account->getScname(),
+            'sccount' => $account->getSccount(),
             'count' => $account->getCount(),
             'total' => $account->getTotal(),
             'img' => Util::toMedia($account->getImg()),
@@ -91,7 +92,11 @@ class mp
         } elseif ($account->isFlashEgg()) {
             $data['goods'] = $account->getGoodsData();
             $data['_goods'] = $account->getGoodsData(false);
-            $data['media_type'] = $account->getMediaType();
+            $data['media'] = [
+                'type' => $account->getMediaType(),
+                'duration' => $account->getDuration(),
+                'area' => $account->getArea(),
+            ];
         } else {
             $data['qrcode'] = Util::toMedia($account->getQrcode());
         }

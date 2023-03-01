@@ -111,7 +111,7 @@ router::exec($op, [
     'Mpupload' => '\zovye\api\wx\mp::upload',
     'Mpaccounts' => '\zovye\api\wx\mp::accounts',
     'Mpban' => '\zovye\api\wx\mp::ban',
-    'Mpdelete' => '\zovye\api\wx\mp::delete',
+    'Mpdelete' => '@\zovye\api\wx\mp::delete',
     'Mpsave' => '\zovye\api\wx\mp::save',
     'MpGroupAssign' => '\zovye\api\wx\mp::groupAssign',
     'MpAuthUrl' => '\zovye\api\wx\mp::mpAuthUrl',

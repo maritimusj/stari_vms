@@ -76,6 +76,11 @@ class goods
         if ($goods->getAgentId() !== $agent->getId()) {
             return error(State::ERROR, '没有权限管理这个商品');
         }
+
+        if ($goods->isFlashEgg()) {
+            return ['msg' => '闪蛋商品不能单独删除！'];
+        }
+
         if ($goods->destroy()) {
             return ['msg' => '商品删除成功！'];
         }

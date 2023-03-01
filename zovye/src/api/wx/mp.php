@@ -9,6 +9,7 @@ namespace zovye\api\wx;
 use Exception;
 use zovye\App;
 use zovye\FlashEgg;
+use zovye\Goods;
 use zovye\Log;
 use zovye\We7;
 use zovye\Util;
@@ -348,6 +349,15 @@ class mp
 
         if ($account->getAgentId() != $user->getAgentId()) {
             return error(State::ERROR, '没有权限操作这个公众号！');
+        }
+
+        if ($account->isFlashEgg()) {
+            $goods = $account->getGoods();
+            if ($goods) {
+                if (!Goods::safeDelete($goods)) {
+                    return err('删除关联商品失败！');
+                }
+            }
         }
 
         $account->destroy();

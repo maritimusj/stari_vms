@@ -19,9 +19,7 @@ use zovye\Schema;
 use zovye\Stats;
 use zovye\User;
 use zovye\Util;
-use zovye\We7;
 use function zovye\err;
-use function zovye\m;
 use function zovye\settings;
 
 class commission
@@ -49,15 +47,10 @@ class commission
         $page = max(1, Request::int('page'));
         $page_size = max(1, Request::int('pagesize', DEFAULT_PAGE_SIZE));
 
-        $query = m('account')->query();
-        $query->where(
-            We7::uniacid(
-                [
-                    'shared' => 1,
-                    'state' => 1,
-                ]
-            )
-        );
+        $query = Account::query([
+            'shared' => 1,
+            'state' => 1,
+        ]);
 
         $total = $query->count();
         $result = [
@@ -253,10 +246,10 @@ class commission
 
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
-        $result  = [];
+        $result = [];
 
         try {
-            $month = new DateTimeImmutable(Request::str('month') . '-01 00:00');
+            $month = new DateTimeImmutable(Request::str('month').'-01 00:00');
 
             $sf = Stats::getDailyStats($agent, CommissionBalance::CHARGING_SERVICE_FEE, $month);
             $ef = Stats::getDailyStats($agent, CommissionBalance::CHARGING_ELECTRIC_FEE, $month);

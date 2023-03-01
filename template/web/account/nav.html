@@ -1,10 +1,13 @@
 <ul class="nav nav-tabs" id="navbar">
     {if $banned}
         {loop $navs $nav}
+        {if !isset($nav['enabled']) || $nav['enabled']}
         <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+        {/if}
         {/loop}
     {else}
         {loop $navs $nav}
+        {if !isset($nav['enabled']) || $nav['enabled']}
         {if $type === $nav['type']}
             {if $agent}
             <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
@@ -18,6 +21,7 @@
             {/if}
         {else}
         <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+        {/if}
         {/if}
         {/loop}
     {/if}

@@ -18,7 +18,7 @@ if ($device->getShadowId() != $confirm_code) {
 
 $res = Util::transactionDo(
     function () use ($device) {
-        return $device->resetAllData() ? true : error(State::FAIL, '清除失败！');
+        return $device->resetAllData() ? true : err('清除失败！');
     }
 );
 

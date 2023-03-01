@@ -14,7 +14,7 @@ if ($voucher) {
             return true;
         }
 
-        return error(State::ERROR, 'fail');
+        return err('fail');
     });
     if (!is_error($res)) {
         JSON::success('操作成功 ！');

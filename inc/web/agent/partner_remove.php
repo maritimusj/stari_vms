@@ -13,10 +13,10 @@ if ($user_id) {
     $res = Util::transactionDo(function () use ($user_id) {
         $user = User::get($user_id);
         if (empty($user)) {
-            return error(State::ERROR, '找不到这个用户！');
+            return err('找不到这个用户！');
         }
         if (!$user->isPartner()) {
-            return error(State::ERROR, '用户不是任何代理商的合伙人！');
+            return err('用户不是任何代理商的合伙人！');
         }
 
         $agent = $user->getPartnerAgent();
@@ -26,7 +26,7 @@ if ($user_id) {
             }
         }
 
-        return error(State::ERROR, '失败！');
+        return err('失败！');
     });
 
     if (!is_error($res)) {

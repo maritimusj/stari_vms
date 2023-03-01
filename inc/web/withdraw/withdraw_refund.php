@@ -17,7 +17,7 @@ $res = Util::transactionDo(
     function () use ($balance_obj) {
         $user = User::get($balance_obj->getOpenid(), true);
         if (empty($user)) {
-            return error(State::ERROR, '找不到这个用户！');
+            return err('找不到这个用户！');
         }
 
         $commission_balance = $user->getCommissionBalance();
@@ -32,7 +32,7 @@ $res = Util::transactionDo(
                 /** @var commission_balanceModelObj $cr */
                 $cr = CommissionBalance::findOne(['id' => $id]);
                 if (empty($cr) || $cr->getExtraData('gid') != $balance_obj->getId()) {
-                    return error(State::ERROR, '处理相关记录出错，请联系管理员！');
+                    return err('处理相关记录出错，请联系管理员！');
                 }
 
                 $total += abs($cr->getXVal());
@@ -51,7 +51,7 @@ $res = Util::transactionDo(
             );
 
             if (empty($r)) {
-                return error(State::ERROR, '创建退款记录失败！');
+                return err('创建退款记录失败！');
             }
 
             if (isset($crs)) {
@@ -65,7 +65,7 @@ $res = Util::transactionDo(
                         ],
                         true
                     )) {
-                        return error(State::ERROR, '更新相关记录出错，请联系管理员！');
+                        return err('更新相关记录出错，请联系管理员！');
                     }
                 }
             }
@@ -75,7 +75,7 @@ $res = Util::transactionDo(
             }
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 );
 

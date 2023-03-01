@@ -56,7 +56,7 @@ $res = Util::transactionDo(
             return true;
         }
 
-        return error(State::ERROR, 'fail');
+        return err('fail');
     }
 );
 

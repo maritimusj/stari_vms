@@ -20,7 +20,7 @@ $res = Util::transactionDo(
             }
         }
 
-        return error(State::ERROR, '失败');
+        return err('失败');
     }
 );
 

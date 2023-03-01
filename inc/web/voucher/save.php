@@ -13,7 +13,7 @@ $res = Util::transactionDo(function () {
     $goods_id = Request::int('goodsId');
     $goods = Goods::get($goods_id);
     if (empty($goods)) {
-        return error(State::ERROR, '要绑定的商品不存在！');
+        return err('要绑定的商品不存在！');
     }
 
     $ids = Request::is_array('goods') ? Request::array('goods') : [];
@@ -47,7 +47,7 @@ $res = Util::transactionDo(function () {
         $id = Request::int('id');
         $voucher = GoodsVoucher::get($id);
         if (empty($voucher)) {
-            return error(State::ERROR, '找不到指定的提货码！');
+            return err('找不到指定的提货码！');
         }
 
         $original_limit_goods_dds = (array)$voucher->getExtraData('limitGoods', []);
@@ -59,12 +59,12 @@ $res = Util::transactionDo(function () {
         $voucher->setExtraData('limitGoods', array_values($ids));
 
         if (!$voucher->save()) {
-            return error(State::ERROR, '保存失败！');
+            return err('保存失败！');
         }
     } else {
         $voucher = GoodsVoucher::create(null, $goods, $total, $begin, $end, $ids);
         if (empty($voucher)) {
-            return error(State::ERROR, '创建失败！');
+            return err('创建失败！');
         }
     }
 
@@ -81,7 +81,7 @@ $res = Util::transactionDo(function () {
             });
             $goods->setExtraData('vouchers', $x);
             if (!$goods->save()) {
-                return error(State::ERROR, '保存数据失败！');
+                return err('保存数据失败！');
             }
         }
     }
@@ -93,7 +93,7 @@ $res = Util::transactionDo(function () {
             $v[] = $voucher_id;
             $goods->setExtraData('vouchers', array_unique($v));
             if (!$goods->save()) {
-                return error(State::ERROR, '保存数据失败！');
+                return err('保存数据失败！');
             }
         }
     }

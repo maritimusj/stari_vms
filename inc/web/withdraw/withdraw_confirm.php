@@ -16,7 +16,7 @@ $result = Util::transactionDo(function () use ($balance_obj) {
         return true;
     }
 
-    return error(State::ERROR, '数据保存失败！');
+    return err('数据保存失败！');
 });
 
 if (is_error($result)) {

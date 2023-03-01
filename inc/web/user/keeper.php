@@ -10,15 +10,15 @@ $id = Request::int('id');
 $result = Util::transactionDo(function () use ($id) {
     $user = User::get($id);
     if (empty($user)) {
-        return error(State::ERROR, '找不到这个用户！');
+        return err('找不到这个用户！');
     }
 
     if (!$user->isKeeper()) {
-        return error(State::ERROR, '用户不是运营人员！');
+        return err('用户不是运营人员！');
     }
 
     if (!$user->setKeeper(false)) {
-        return error(State::ERROR, '取消身份失败！');
+        return err('取消身份失败！');
     }
 
     $keeper = $user->getKeeper();
@@ -28,7 +28,7 @@ $result = Util::transactionDo(function () use ($id) {
             $entry->destroy();
         }
         if (!$keeper->destroy()) {
-            return error(State::ERROR, '删除数据失败！');
+            return err('删除数据失败！');
         }
     }
 

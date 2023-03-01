@@ -40,7 +40,7 @@ if ($op == 'default') {
             if ($device_id && $app_id) {
                 $device = Device::getFromAppId($app_id);
                 if ($device) {
-                    return error(State::ERROR, 'appID已经被注册！');
+                    return err('appID已经被注册！');
                 }
 
                 $device = Device::find($device_id, ['id', 'imei']);
@@ -59,10 +59,10 @@ if ($op == 'default') {
 
                         $device = Device::create($data);
                         if (empty($device)) {
-                            return error(State::ERROR, '无法创建新设备！');
+                            return err('无法创建新设备！');
                         }
                     } else {
-                        return error(State::ERROR, '没有找到设备信息，无法创建设备！');
+                        return err('没有找到设备信息，无法创建设备！');
                     }
                 }
 
@@ -70,7 +70,7 @@ if ($op == 'default') {
                     if (empty($device->getAppId())) {
                         $device->setAppId($app_id);
                         if (!$device->save()) {
-                            return error(State::ERROR, '无法保存设置，注册失败！');
+                            return err('无法保存设置，注册失败！');
                         }
                     }
 
@@ -79,7 +79,7 @@ if ($op == 'default') {
                         $data = http_build_query(['appUID' => $app_id]);
                         $res = CtrlServ::query("device/{$device->getImei()}/bind", [], $data, '', 'PUT');
                         if (is_error($res)) {
-                            return error(State::ERROR, '控制中心无法绑定appID，注册失败！');
+                            return err('控制中心无法绑定appID，注册失败！');
                         }
                     }
                     $device->resetShadowId();
@@ -91,7 +91,7 @@ if ($op == 'default') {
                 }
             }
 
-            return error(State::ERROR, '参数错误，注册失败。deviceID:[ {$device_id} ], appID:[ {$app_id} ]！');
+            return err('参数错误，注册失败。deviceID:[ {$device_id} ], appID:[ {$app_id} ]！');
         }
     );
 

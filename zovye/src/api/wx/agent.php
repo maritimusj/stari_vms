@@ -218,6 +218,7 @@ class agent
                 'team' => App::isTeamEnabled(),
                 'charging' => App::isChargingDeviceEnabled(),
                 'fueling' => App::isFuelingDeviceEnabled(),
+                'flash_egg' => App::isFlashEggEnabled(),
             ],
             'wxapp' => [
                 'debug' => false,

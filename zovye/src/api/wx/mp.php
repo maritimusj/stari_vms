@@ -101,11 +101,11 @@ class mp
         $user = common::getAgentOrPartner();
 
         if ($more) {
-            $data['img_signature'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
+            $data['img_signatured'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
             if ($account->isVideo()) {
-                $data['media_signature'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getMedia();
+                $data['media_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getMedia();
             } else {
-                $data['qrcode_signature'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getQrcode();
+                $data['qrcode_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getQrcode();
             }
 
             $data['assigned'] = [];
@@ -217,14 +217,13 @@ class mp
                 try {
                     We7::file_remote_upload($filename);
                 } catch (Exception $e) {
-                    Log::error('doPageMpupload', $e->getMessage());
-
+                    Log::error('doPageMpUpload', [
+                        'file' => $filename,
+                        'error' => $e->getMessage(),
+                    ]);
                     return error(State::ERROR, $e->getMessage());
                 }
-
-                $x = sha1(App::uid().CLIENT_IP.$filename);
-
-                return ['file' => "$x@$filename", 'fullpath' => Util::toMedia($filename)];
+                return ['file' => $filename, 'fullpath' => Util::toMedia($filename)];
             }
         }
 

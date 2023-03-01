@@ -230,7 +230,7 @@ class mp
                     return error(State::ERROR, $e->getMessage());
                 }
 
-                return ['file' => $filename, 'fullpath' => Util::toMedia($filename)];
+                return ['file' =>Media::sign($filename), 'fullpath' => Util::toMedia($filename)];
             }
         }
 

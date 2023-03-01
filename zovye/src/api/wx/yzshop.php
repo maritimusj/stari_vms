@@ -6,9 +6,8 @@
 
 namespace zovye\api\wx;
 
-use zovye\State;
 use zovye\Stats;
-use function zovye\error;
+use function zovye\err;
 use function zovye\settings;
 
 class yzshop
@@ -55,7 +54,7 @@ class yzshop
             }
         }
 
-        return error(State::ERROR, '请求失败！');
+        return err('请求失败！');
     }
 
     /**

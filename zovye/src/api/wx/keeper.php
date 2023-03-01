@@ -26,12 +26,10 @@ use zovye\JSON;
 use zovye\model\keeperModelObj;
 use zovye\LoginData;
 use zovye\model\replenishModelObj;
-use zovye\State;
 use zovye\User;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\error;
 use function zovye\isEmptyArray;
 use function zovye\request;
 use function zovye\is_error;
@@ -74,7 +72,7 @@ class keeper
             $session_key = $res['session_key'];
 
             if (empty($mobile)) {
-                return error(State::ERROR, '获取手机号码失败，请稍后再试！');
+                return err('获取手机号码失败，请稍后再试！');
             }
 
             $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
@@ -85,7 +83,7 @@ class keeper
 
             $keepers = \zovye\Keeper::query(['mobile' => $mobile]);
             if (empty($keepers)) {
-                return error(State::ERROR, '找不到相应的运营人员信息！');
+                return err('找不到相应的运营人员信息！');
             }
 
             $keeper_data = [];
@@ -145,7 +143,7 @@ class keeper
             }
         }
 
-        return error(State::ERROR, '登录失败，请稍后再试！');
+        return err('登录失败，请稍后再试！');
     }
 
     /**
@@ -166,12 +164,12 @@ class keeper
             $mobile = Request::trim('mobile');
 
             if (empty($name) || empty($mobile)) {
-                return error(State::ERROR, '请输入姓名和手机号码！');
+                return err('请输入姓名和手机号码！');
             }
 
             if ($id) {
                 if (\zovye\Keeper::findOne(['mobile' => $mobile, 'id <>' => $id])) {
-                    return error(State::ERROR, '手机号码已经被其它运营人员使用！');
+                    return err('手机号码已经被其它运营人员使用！');
                 }
                 /** @var keeperModelObj $keeper */
                 $keeper = \zovye\Keeper::findOne(['id' => $id, 'agent_id' => $user->getAgentId()]);
@@ -185,7 +183,7 @@ class keeper
                 }
             } else {
                 if (\zovye\Keeper::findOne(['mobile' => $mobile])) {
-                    return error(State::ERROR, '手机号码已经被其它运营人员使用！');
+                    return err('手机号码已经被其它运营人员使用！');
                 }
                 /** @var keeperModelObj $keeper */
                 $keeper = \zovye\Keeper::create([
@@ -205,10 +203,10 @@ class keeper
                 return ['msg' => empty($id) ? '请联系运营人员登录并绑定手机号！' : '运营人员资料保存成功！'];
             }
 
-            return error(State::ERROR, '保存数据出错！');
+            return err('保存数据出错！');
         }
 
-        return error(State::ERROR, '只有代理商才能保存运营人员信息！');
+        return err('只有代理商才能保存运营人员信息！');
     }
 
     /**
@@ -234,13 +232,13 @@ class keeper
                         /** @var deviceModelObj $entry */
                         foreach ($query->findAll() as $entry) {
                             if (!$entry->removeKeeper($keeper)) {
-                                return error(State::ERROR, '删除失败！');
+                                return err('删除失败！');
                             }
                         }
                         $keeper_user = $keeper->getUser();
                         if ($keeper_user) {
                             if (!$keeper_user->setKeeper(false)) {
-                                return error(State::ERROR, '删除运营人员出错！');
+                                return err('删除运营人员出错！');
                             }
                         }
 
@@ -249,12 +247,12 @@ class keeper
                         }
                     }
 
-                    return error(State::ERROR, '删除运营人员出错！');
+                    return err('删除运营人员出错！');
                 }
             );
         }
 
-        return error(State::ERROR, '只有代理商才能删除运营人员信息！');
+        return err('只有代理商才能删除运营人员信息！');
     }
 
     /**
@@ -458,23 +456,23 @@ class keeper
         if ($user) {
             if (!empty(settings('commission.withdraw.bank_card'))) {
                 if (empty($user->settings('agentData.bank'))) {
-                    return error(State::ERROR, '请先绑定银行卡！');
+                    return err('请先绑定银行卡！');
                 }
             }
 
             //如果用户是运营人员，则需要检查对应代理商账户是否异常        
             $agent = $keeper->getAgent();
             if (empty($agent)) {
-                return error(State::ERROR, '检查身份失败！');
+                return err('检查身份失败！');
             }
 
             //如果运营人员补货导致代理商余额小于零，则不允许运营人员提现
             if ($agent->getCommissionBalance()->total() < 0) {
-                return error(State::ERROR, '代理商账户异常，请联系代理商！');
+                return err('代理商账户异常，请联系代理商！');
             }
 
             if ($agent->isPaymentConfigEnabled()) {
-                return error(State::ERROR, '提现申请被拒绝，请联系代理商！');
+                return err('提现申请被拒绝，请联系代理商！');
             }
 
             $total =  round(Request::float('amount', 0, 2) * 100);
@@ -482,7 +480,7 @@ class keeper
             return balance::balanceWithdraw($user, $total);
         }
 
-        return error(State::ERROR, '提现失败，请联系客服！');
+        return err('提现失败，请联系客服！');
     }
 
     /**
@@ -516,7 +514,7 @@ class keeper
             return common::setUserBank($user);
         }
 
-        return error(State::ERROR, '无法保存，请联系管理员！');
+        return err('无法保存，请联系管理员！');
     }
 
     public static function getOrders(): array
@@ -714,7 +712,7 @@ class keeper
             return balance::getUserBalanceLog($user, $type, $page, $page_size);
         }
 
-        return error(State::ERROR, '获取列表失败！');
+        return err('获取列表失败！');
     }
 
     /**
@@ -823,11 +821,11 @@ class keeper
 
         $device = Device::find(request('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if ($device->getAgentId() != $keeper->getAgentId() ||!$device->hasKeeper($keeper)) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $result = [
@@ -913,7 +911,7 @@ class keeper
 
         $device = Device::find(request('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (
@@ -921,12 +919,12 @@ class keeper
             !$device->hasKeeper($keeper) ||
             $device->getKeeperKind($keeper) != \zovye\Keeper::OP
         ) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $locker = $device->payloadLockAcquire();
         if (empty($locker)) {
-            return error(State::ERROR, '设备正忙，请稍后再试！');
+            return err('设备正忙，请稍后再试！');
         }
 
         $agent = $device->getAgent();
@@ -1078,7 +1076,7 @@ class keeper
 
         $device = Device::find(request('id'), ['imei', 'shadow_id']);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (
@@ -1086,7 +1084,7 @@ class keeper
             !$device->hasKeeper($keeper) ||
             $device->getKeeperKind($keeper) != \zovye\Keeper::OP
         ) {
-            return error(State::ERROR, '没有权限！');
+            return err('没有权限！');
         }
 
         $lane = Request::int('lane');
@@ -1139,7 +1137,7 @@ class keeper
 
         list($y, $m, $d) = explode('-', request('date'), 3);
         if (!checkdate($m, $d ?: 1, $y)) {
-            return error(State::ERROR, '时间不正确！');
+            return err('时间不正确！');
         }
 
         $page = max(1, Request::int('page'));
@@ -1246,24 +1244,24 @@ class keeper
             /** @var keeperModelObj $keeper */
             $keeper = \zovye\Keeper::get($id);
             if (empty($keeper)) {
-                return error(State::ERROR, '找不到这个运营人员！');
+                return err('找不到这个运营人员！');
             }
 
             if ($keeper->getAgentId() != $user->getAgentId()) {
-                return error(State::ERROR, '代理商不匹配！');
+                return err('代理商不匹配！');
             }
 
             return keeper::stats($keeper);
         }
 
-        return error(State::ERROR, '请求出错！');
+        return err('请求出错！');
     }
 
     public
     static function orderRefund(): array
     {
         if (!settings('agent.order.refund')) {
-            return error(State::ERROR, '不允许退款，请联系管理员！');
+            return err('不允许退款，请联系管理员！');
         }
 
         $keeper = keeper::getKeeper();
@@ -1273,23 +1271,23 @@ class keeper
         $agent = $keeper->getAgent();
         $order = Order::get($order_id);
         if (empty($order) || $order->getAgentId() != $agent->getId()) {
-            return error(State::ERROR, '找不到这个订单！');
+            return err('找不到这个订单！');
         }
 
         $device = $order->getDevice();
         if (empty($device) || !$device->hasKeeper($keeper) || $device->getKeeperKind($keeper) != \zovye\Keeper::OP) {
-            return error(State::ERROR, '没有权限管理这个订单！');
+            return err('没有权限管理这个订单！');
         }
 
         if ($agent->getCommissionBalance()->total() < $order->getPrice()) {
-            return error(State::ERROR, '代理商余额不足，无法退款！');
+            return err('代理商余额不足，无法退款！');
         }
 
         $num = Request::int('num');
 
         $res = Order::refund($order->getOrderNO(), $num, ['msg' => '运营人员：' . $keeper->getName()]);
         if (is_error($res)) {
-            return error(State::ERROR, $res['message']);
+            return err($res['message']);
         }
 
         return ['msg' => '退款成功！'];

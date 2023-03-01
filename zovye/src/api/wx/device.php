@@ -20,14 +20,12 @@ use zovye\Goods;
 use zovye\Group as ZovyeGroup;
 use zovye\model\goods_stats_vwModelObj;
 use zovye\Request;
-use zovye\State;
 use zovye\Stats;
 use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 use function zovye\isEmptyArray;
@@ -276,7 +274,7 @@ class device
     public static function getDevice($id, agentModelObj $owner = null)
     {
         if (empty($id)) {
-            return error(State::ERROR, '设备ID不正确！');
+            return err('设备ID不正确！');
         }
 
         //findDevice可以查找到使用shadowId的设备
@@ -291,7 +289,7 @@ class device
 
             $device = Util::activeDevice($id, $params);
             if (is_error($device)) {
-                return error(State::ERROR, '找不到这个设备，请重新扫描二维码！');
+                return err('找不到这个设备，请重新扫描二维码！');
             }
         }
 
@@ -299,7 +297,7 @@ class device
             if ($owner && !$owner->settings('agentData.misc.power')) {
                 $agent = $owner->isPartner() ? $owner->getPartnerAgent() : $owner;
                 if (!\zovye\Device::isOwner($device, $agent)) {
-                    return error(State::ERROR, '没有权限管理这个设备！');
+                    return err('没有权限管理这个设备！');
                 }
             }
         }
@@ -325,13 +323,13 @@ class device
                 return $device;
             }
             if (!$device->isOwnerOrSuperior($user)) {
-                return error(State::ERROR, '没有权限执行这个操作！');
+                return err('没有权限执行这个操作！');
             }
             $reason = '代理商补货';
         } elseif ($user->isKeeper()) {
             $device = \zovye\Device::find(request('id'), ['imei', 'shadow_id']);
             if (empty($device)) {
-                return error(State::ERROR, '找不到这个设备！');
+                return err('找不到这个设备！');
             }
             $keeper = $user->getKeeper();
             if (
@@ -340,20 +338,20 @@ class device
                 !$device->hasKeeper($keeper) ||
                 $device->getKeeperKind($keeper) != \zovye\Keeper::OP
             ) {
-                return error(State::ERROR, '没有权限执行这个操作！');
+                return err('没有权限执行这个操作！');
             }
             $reason = '运营人员补货';
         }
 
         if ($device) {
             if (!$device->payloadLockAcquire()) {
-                return error(State::ERROR, '设备正忙，请稍后再试！');
+                return err('设备正忙，请稍后再试！');
             }
 
             $lane = Request::int('lane');
             $laneData = $device->getLane($lane);
             if (empty($laneData)) {
-                return error(State::ERROR, '货道不正确！');
+                return err('货道不正确！');
             }
 
             $num = Request::int('num');
@@ -369,7 +367,7 @@ class device
 
             $res = $device->resetPayload([$lane => '@'.$num], $reason);
             if (is_error($res)) {
-                return error(State::ERROR, '保存库存失败！');
+                return err('保存库存失败！');
             }
 
             if (App::isInventoryEnabled()) {
@@ -383,7 +381,7 @@ class device
             return ['msg' => '设置成功！'];
         }
 
-        return error(State::ERROR, '找不到指定的设备！');
+        return err('找不到指定的设备！');
     }
 
     public static function deviceGoods(): array
@@ -399,7 +397,7 @@ class device
 
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
         if (!\zovye\Device::isOwner($device, $agent)) {
-            return error(State::FAIL, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $date = Request::trim('date');
@@ -498,14 +496,14 @@ class device
                 //具体哪天的时候需要设备出货列表
                 $result['devices'] = [];
             } else {
-                return error(State::ERROR, '日期不正确！');
+                return err('日期不正确！');
             }
 
             //指定了下级代理guid
             if ($params['guid']) {
                 $res = agent::getUserByGUID($params['guid']);
                 if (empty($res)) {
-                    return error(State::ERROR, '找不到这个用户！');
+                    return err('找不到这个用户！');
                 } else {
                     $agent = $res->isAgent() ? $res : $res->getPartnerAgent();
                 }
@@ -565,11 +563,11 @@ class device
             if ($params['deviceid']) {
                 $device = \zovye\Device::get($params['deviceid']);
                 if (empty($device)) {
-                    return error(State::ERROR, '找不到这个设备！');
+                    return err('找不到这个设备！');
                 }
 
                 if (!$device->isOwnerOrSuperior($agent)) {
-                    return error(State::ERROR, '没有权限管理这个设备！');
+                    return err('没有权限管理这个设备！');
                 }
 
                 $obj = $device;
@@ -833,16 +831,16 @@ class device
 
         $device_type = DeviceTypes::get(Request::int('id'));
         if (empty($device_type)) {
-            return error(State::ERROR, '找不到这个设备型号！');
+            return err('找不到这个设备型号！');
         }
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if ($device_type->getAgentId() != $agent->getId()) {
-            return error(State::ERROR, '没有权限管理');
+            return err('没有权限管理');
         }
 
         if (!$device_type->destroy()) {
-            return error(State::ERROR, '删除失败！');
+            return err('删除失败！');
         }
 
         return ['msg' => '删除成功！'];
@@ -852,7 +850,7 @@ class device
     {
         $device_type = DeviceTypes::get(Request::int('id'));
         if (empty($device_type)) {
-            return error(State::ERROR, '找不到这个设备型号！');
+            return err('找不到这个设备型号！');
         }
 
         return DeviceTypes::format($device_type);
@@ -875,21 +873,21 @@ class device
 
         $title = trim($data['title']);
         if (empty($title)) {
-            return error(State::ERROR, '型号名称不能为空！');
+            return err('型号名称不能为空！');
         }
 
         if (empty($data['cargo_lanes'])) {
-            return error(State::ERROR, '至少需要一个默认货道！');
+            return err('至少需要一个默认货道！');
         }
 
         if ($data['id']) {
             $device_type = DeviceTypes::get($data['id']);
             if (empty($device_type)) {
-                return error(State::ERROR, '找不到这个设备型号！');
+                return err('找不到这个设备型号！');
             }
 
             if ($device_type->getAgentId() != $agent->getId()) {
-                return error(State::ERROR, '没有权限');
+                return err('没有权限');
             }
 
             if ($title != $device_type->getTitle()) {
@@ -909,7 +907,7 @@ class device
             $device_type->setExtraData('cargo_lanes', $cargo_lanes);
 
             if (!$device_type->save()) {
-                return error(State::ERROR, '保存设备型号失败！');
+                return err('保存设备型号失败！');
             }
         } else {
             $types_data = [
@@ -930,7 +928,7 @@ class device
 
             $device_type = DeviceTypes::create($types_data);
             if (empty($device_type)) {
-                return error(State::ERROR, '创建设备型号失败！');
+                return err('创建设备型号失败！');
             }
         }
 
@@ -954,7 +952,7 @@ class device
 
             return ['data' => $data];
         } else {
-            return error(State::ERROR, '没有数据！');
+            return err('没有数据！');
         }
     }
 
@@ -1082,11 +1080,11 @@ class device
         if ($app_id) {
             $device = \zovye\Device::getFromAppId($app_id);
             if (empty($device)) {
-                return error(State::ERROR, '找不到设备！');
+                return err('找不到设备！');
             }
 
             if (!$device->isOwnerOrSuperior($user)) {
-                return error(State::ERROR, '没有权限管理这个设备！');
+                return err('没有权限管理这个设备！');
             }
 
             $device->appNotify('restart');
@@ -1094,7 +1092,7 @@ class device
             return ['msg' => 'APP重启消息已发送！'];
         }
 
-        return error(State::ERROR, '操作失败，请联系管理员！');
+        return err('操作失败，请联系管理员！');
     }
 
     public static function openDoor(): array
@@ -1109,7 +1107,7 @@ class device
                 return $device;
             }
             if (!\zovye\Device::isOwner($device, $agent)) {
-                return error(State::FAIL, '没有权限执行这个操作！');
+                return err('没有权限执行这个操作！');
             }
         } elseif ($user->isKeeper()) {
             $device = \zovye\Device::find(request('id'), ['imei', 'shadow_id']);

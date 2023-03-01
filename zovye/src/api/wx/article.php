@@ -9,9 +9,8 @@ namespace zovye\api\wx;
 use zovye\model\articleModelObj;
 use zovye\model\filesModelObj;
 use zovye\Request;
-use zovye\State;
 use zovye\We7;
-use function zovye\error;
+use function zovye\err;
 use function zovye\m;
 use function zovye\settings;
 
@@ -41,7 +40,7 @@ class article
             ];
         }
 
-        return error(State::ERROR, '找不到这篇文章！');
+        return err('找不到这篇文章！');
     }
 
     /**

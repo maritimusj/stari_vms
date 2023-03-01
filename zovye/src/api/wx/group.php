@@ -10,8 +10,7 @@ use zovye\Device;
 use zovye\Group as ZovyeGroup;
 use zovye\model\device_groupsModelObj;
 use zovye\Request;
-use zovye\State;
-use function zovye\error;
+use function zovye\err;
 
 class group
 {
@@ -38,7 +37,7 @@ class group
         if (!empty($guid)) {
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
-                return error(State::ERROR, '找不到这个用户！');
+                return err('找不到这个用户！');
             } else {
                 $query->where(['agent_id' => $res->getAgentId()]);
             }
@@ -106,7 +105,7 @@ class group
         ]);
 
         if (empty($one)) {
-            return error(State::ERROR, '找不到这个分组！');
+            return err('找不到这个分组！');
         }
 
         return [
@@ -128,7 +127,7 @@ class group
         $clr = Request::trim('clr');
 
         if (empty($title)) {
-            return error(State::FAIL, '对不起，请填写分组名称！');
+            return err('对不起，请填写分组名称！');
         }
 
         $agent = agent::getAgent();
@@ -146,7 +145,7 @@ class group
             return ['msg' => '创建成功'];
         }
 
-        return error(State::FAIL, '创建失败！');
+        return err('创建失败！');
     }
 
     /**
@@ -162,7 +161,7 @@ class group
         $group_id = Request::int('id');
 
         if (empty($title)) {
-            return error(State::ERROR, '对不起，请填写分组名称！');
+            return err('对不起，请填写分组名称！');
         }
 
         $user = agent::getAgent();
@@ -174,7 +173,7 @@ class group
         ]);
 
         if (empty($one)) {
-            return error(State::ERROR, '找不到这个分组！');
+            return err('找不到这个分组！');
         }
 
         $one->setTitle($title);
@@ -184,7 +183,7 @@ class group
             return ['msg' => '修改成功！'];
         }
 
-        return error(State::ERROR, '修改失败！');
+        return err('修改失败！');
     }
 
     /**
@@ -207,14 +206,14 @@ class group
         ]);
 
         if (empty($one)) {
-            return error(State::ERROR, '找不到这个分组！');
+            return err('找不到这个分组！');
         }
 
         if ($one->destroy()) {
             return ['msg' => "删除成功！"];
         }
 
-        return error(State::ERROR, '删除失败！');
+        return err('删除失败！');
     }
 
     public static function getDeviceGroup($id, $typeid = ZovyeGroup::NORMAL): array

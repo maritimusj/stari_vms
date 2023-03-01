@@ -14,11 +14,10 @@ use zovye\model\settings_userModelObj;
 use zovye\Request;
 use zovye\Keeper;
 use zovye\model\keeperModelObj;
-use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\We7;
-use function zovye\error;
+use function zovye\err;
 use function zovye\m;
 
 class maintenance
@@ -48,7 +47,7 @@ class maintenance
         if (m('device_record')->create($data)) {
             return ['msg' => '维护记录保存成功！'];
         } else {
-            return error(State::ERROR, '维护记录保存失败！');
+            return err('维护记录保存失败！');
         }
     }
 

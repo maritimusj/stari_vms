@@ -29,13 +29,11 @@ use zovye\LoginData;
 use zovye\model\goods_voucher_logsModelObj;
 use zovye\Order;
 use zovye\model\orderModelObj;
-use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
@@ -56,7 +54,7 @@ class common
         if (is_error($res)) {
             Log::error('wxapi', $res);
 
-            return error(State::ERROR, '用户登录失败，请稍后再试！[103]');
+            return err('用户登录失败，请稍后再试！[103]');
         }
 
         //如果小程序请求中携带了H5页面的openid，则使用该openid的H5用户登录小程序
@@ -79,7 +77,7 @@ class common
         $imei = Request::trim('imei');
         $res = Device::get($imei, true);
         if (empty($res)) {
-            return error(State::ERROR, '没有数据！');
+            return err('没有数据！');
         }
 
         $data = [
@@ -105,7 +103,7 @@ class common
 
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         $result = Util::getTplData();
@@ -140,7 +138,7 @@ class common
 
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         //广告列表
@@ -178,16 +176,16 @@ class common
         /** @var deviceModelObj $device */
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (!$device->isBlueToothDevice()) {
-            return error(State::ERROR, '不是蓝牙设备！');
+            return err('不是蓝牙设备！');
         }
 
         $proto = $device->getBlueToothProtocol();
         if (empty($proto)) {
-            return error(State::ERROR, '无法加载蓝牙协议！');
+            return err('无法加载蓝牙协议！');
         }
 
         $device->setBluetoothStatus(Device::BLUETOOTH_CONNECTED);
@@ -204,7 +202,7 @@ class common
             ];
         }
 
-        return error(State::ERROR, '无法获取指令！');
+        return err('无法获取指令！');
     }
 
     public static function deviceStatus(): array
@@ -214,20 +212,20 @@ class common
         /** @var deviceModelObj $device */
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (!$device->isBlueToothDevice()) {
-            return error(State::ERROR, '不是蓝牙设备！');
+            return err('不是蓝牙设备！');
         }
 
         $proto = $device->getBlueToothProtocol();
         if (empty($proto)) {
-            return error(State::ERROR, '无法加载蓝牙协议！');
+            return err('无法加载蓝牙协议！');
         }
 
         if ($device->isLowBattery()) {
-            return error(State::ERROR, '设备电量低，暂时无法购买！');
+            return err('设备电量低，暂时无法购买！');
         }
 
         if ($device->isBluetoothReady()) {
@@ -267,21 +265,21 @@ class common
         /** @var deviceModelObj $device */
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (!$device->isBlueToothDevice()) {
-            return error(State::ERROR, '不是蓝牙设备！');
+            return err('不是蓝牙设备！');
         }
 
         $proto = $device->getBlueToothProtocol();
         if (empty($proto)) {
-            return error(State::ERROR, '无法加载蓝牙协议！');
+            return err('无法加载蓝牙协议！');
         }
 
         $result = $proto->parseMessage($device->getBUID(), $data);
         if (empty($result)) {
-            return error(State::ERROR, '无法解析消息！');
+            return err('无法解析消息！');
         }
 
         if ($result->isOpenResultOk() || $result->isOpenResultFail()) {
@@ -360,7 +358,7 @@ class common
         $imei = Request::str('device');
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         $goods_id = Request::int('goodsId');
@@ -369,15 +367,15 @@ class common
         /** @var goods_voucher_logsModelObj $v */
         $v = GoodsVoucher::getLogByCode($code);
         if (empty($v)) {
-            return error(State::ERROR, '取货码不存在！');
+            return err('取货码不存在！');
         }
 
         if (!$v->isValid()) {
-            return error(State::ERROR, '无效的取货码!');
+            return err('无效的取货码!');
         }
 
         if ($v->getGoodsId() != $goods_id) {
-            return error(State::ERROR, '无法领取这个商品！');
+            return err('无法领取这个商品！');
         }
 
         $user = self::getUser();
@@ -387,7 +385,7 @@ class common
                     ['level' => LOG_GOODS_VOUCHER, $device, $user, $v, 'goodsId' => $goods_id, 'online' => false]
                 );
             } catch (Exception $e) {
-                return error(State::ERROR, $e->getMessage());
+                return err($e->getMessage());
             }
 
             if (is_error($result)) {
@@ -396,7 +394,7 @@ class common
 
             $order = Order::get($result['orderId']);
             if (empty($order)) {
-                return error(State::ERROR, '出货失败：找不到订单！');
+                return err('出货失败：找不到订单！');
             }
 
             //设置蓝牙出货标专为0，表示出货结果未确认!
@@ -406,7 +404,7 @@ class common
             ]);
 
             if (!$order->save()) {
-                return error(State::ERROR, '出货失败：无法保存订单数据！');
+                return err('出货失败：无法保存订单数据！');
             }
 
             return [
@@ -415,7 +413,7 @@ class common
             ];
         }
 
-        return error(State::ERROR, '出货失败：不是蓝牙主板！');
+        return err('出货失败：不是蓝牙主板！');
     }
 
     /**
@@ -437,11 +435,11 @@ class common
 
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (!$device->isBlueToothDevice()) {
-            return error(State::ERROR, '不是蓝牙设备！');
+            return err('不是蓝牙设备！');
         }
 
         if (!$device->isMcbOnline()) {
@@ -465,31 +463,31 @@ class common
         $imei = Request::str('device');
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         $order_no = Request::str('orderNO');
 
         $order = Order::getLastOrderOfDevice($device);
         if (empty($order)) {
-            return error(State::ERROR, '没有订单！');
+            return err('没有订单！');
         }
 
         if ($order->getOrderNO() != $order_no) {
-            return error(State::ERROR, '订单号不匹配！');
+            return err('订单号不匹配！');
         }
 
         if ($order->isBluetoothResultOk()) {
-            return error(State::ERROR, '订单已成功！');
+            return err('订单已成功！');
         }
 
         if ($order->isBluetoothResultFail()) {
-            return error(State::ERROR, '订单已失败！');
+            return err('订单已失败！');
         }
 
         $data = $order->getExtraData('pull.result', '');
         if (empty($data)) {
-            return error(State::ERROR, '出货加密凭证为空，请联系管理员！');
+            return err('出货加密凭证为空，请联系管理员！');
         }
 
         return [
@@ -507,20 +505,20 @@ class common
         $imei = Request::str('device');
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if (!$device->isBlueToothDevice()) {
-            return error(State::ERROR, '不是蓝牙设备！');
+            return err('不是蓝牙设备！');
         }
 
         $order = Order::getLastOrderOfDevice($device);
         if (empty($order)) {
-            return error(State::ERROR, '没有找到订单！');
+            return err('没有找到订单！');
         }
 
         if ($order->getBluetoothDeviceBUID() !== $device->getBUID()) {
-            return error(State::ERROR, '订单与设备不匹配！');
+            return err('订单与设备不匹配！');
         }
 
         /**
@@ -559,7 +557,7 @@ class common
         if (is_error($res)) {
             Log::error('FBPic', $res);
 
-            return error(State::ERROR, '上传失败！');
+            return err('上传失败！');
         }
 
         $filename = $res['path'];
@@ -567,7 +565,7 @@ class common
             try {
                 We7::file_remote_upload($filename);
             } catch (Exception $e) {
-                return error(State::ERROR, $e->getMessage());
+                return err($e->getMessage());
             }
         }
 
@@ -599,7 +597,7 @@ class common
             return ['msg' => '反馈成功！'];
         }
 
-        return error(State::ERROR, '反馈失败！');
+        return err('反馈失败！');
     }
 
     public static function deviceAdvs(): array
@@ -609,7 +607,7 @@ class common
 
         $device = Device::get(Request::str('deviceid'), true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         return Util::getDeviceAds($device, $type, $num);
@@ -1071,7 +1069,7 @@ class common
             return ['msg' => '保存成功！', 'status' => true];
         }
 
-        return error(State::ERROR, '保存失败!');
+        return err('保存失败!');
     }
 
     public static function userOrders(): array
@@ -1236,7 +1234,7 @@ class common
             ]);
 
             if (empty($user)) {
-                return error(State::ERROR, '创建用户失败！');
+                return err('创建用户失败！');
             }
 
             if ($ref_user_openid) {
@@ -1282,7 +1280,7 @@ class common
         if ($h5_openid) {
             $user = User::get($h5_openid, true, User::WX);
             if (empty($user)) {
-                return error(State::ERROR, '没有找到关联的微信用户！');
+                return err('没有找到关联的微信用户！');
             }
             if (isset($device)) {
                 $user->setLastActiveDevice($device);
@@ -1295,7 +1293,7 @@ class common
         }
 
         if ($user->isBanned()) {
-            return error(State::ERROR, '登录失败，请稍后再试！');
+            return err('登录失败，请稍后再试！');
         }
 
         //清除原来的登录信息
@@ -1318,7 +1316,7 @@ class common
             ];
         }
 
-        return error(State::ERROR, '登录失败，请稍后再试！');
+        return err('登录失败，请稍后再试！');
     }
 
     /**
@@ -1359,7 +1357,7 @@ class common
 
         $device = Device::get($imei, true);
         if (empty($device)) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         return ['goods' => $device->getGoodsList(null, [Goods::AllowPay])];

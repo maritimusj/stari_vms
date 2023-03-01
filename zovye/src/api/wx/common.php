@@ -16,14 +16,12 @@ use zovye\model\keeperModelObj;
 use zovye\LoginData;
 use zovye\User;
 use zovye\model\userModelObj;
-use zovye\State;
 use zovye\Util;
 use zovye\We7;
 use zovye\Wx;
 use zovye\WxApp;
 use function zovye\_W;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -370,6 +368,6 @@ class common
             return ['status' => 'success', 'msg' => '上传成功！'];
         }
         
-        return error(State::ERROR, '上传失败！');
+        return err('上传失败！');
     }
 }

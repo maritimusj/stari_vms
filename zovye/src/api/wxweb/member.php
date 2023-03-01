@@ -10,12 +10,10 @@ use zovye\model\team_memberModelObj;
 use zovye\model\teamModelObj;
 use zovye\Order;
 use zovye\Request;
-use zovye\State;
 use zovye\Team;
 use zovye\User;
 use zovye\Util;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 
 class member
@@ -246,7 +244,7 @@ class member
 
         //先锁定用户，防止恶意重复提交
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-            return error(State::ERROR, '锁定用户失败，请重试！');
+            return err('锁定用户失败，请重试！');
         }
 
         return Util::transactionDo(function () use ($user) {

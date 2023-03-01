@@ -15,11 +15,9 @@ use zovye\model\device_groupsModelObj;
 use zovye\Request;
 use zovye\Media;
 use zovye\ReviewResult;
-use zovye\State;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 
@@ -40,15 +38,15 @@ class adv
         $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
         if (empty($adv)) {
-            return error(State::ERROR, '找不到这条广告！');
+            return err('找不到这条广告！');
         }
 
         if ($adv->getAgentId() != $user->getAgentId()) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         if (!$adv->isReviewPassed()) {
-            return error(State::ERROR, '这个广告还没有通过审核，无法分配！');
+            return err('这个广告还没有通过审核，无法分配！');
         }
 
         $data = ['devices' => []];
@@ -73,7 +71,7 @@ class adv
             return ['msg' => '保存成功！？'];
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 
     /**
@@ -289,11 +287,11 @@ class adv
             ->findOne();
 
         if (empty($adv)) {
-            return error(State::ERROR, '找不到这条广告！');
+            return err('找不到这条广告！');
         }
 
         if ($adv->getAgentId() != $user->getAgentId()) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $title = $adv->getTitle();
@@ -305,7 +303,7 @@ class adv
             return ['msg' => "{$title}删除成功！"];
         }
 
-        return error(State::ERROR, "{$title}删除失败！");
+        return err("{$title}删除失败！");
     }
 
     /**
@@ -320,7 +318,7 @@ class adv
         common::checkCurrentUserPrivileges('F_gg');
 
         if (!($user->isAgent() || $user->isPartner())) {
-            return error(State::ERROR, '只有代理商能使用该功能！');
+            return err('只有代理商能使用该功能！');
         }
 
         $type = request('type') ?: Media::IMAGE;
@@ -340,7 +338,7 @@ class adv
                 } catch (Exception $e) {
                     Log::error('doPageUploadFile', $e->getMessage());
 
-                    return error(State::ERROR, $e->getMessage());
+                    return err($e->getMessage());
                 }
 
                 return [
@@ -350,7 +348,7 @@ class adv
             }
         }
 
-        return error(State::ERROR, '上传失败！');
+        return err('上传失败！');
     }
 
     public static function groupAssign(): array
@@ -363,15 +361,15 @@ class adv
         $adv = Advertising::findOne("SHA1(CONCAT(id,'{$user->getOpenid()}'))='$guid'");
 
         if (empty($adv)) {
-            return error(State::ERROR, '找不到这条广告！');
+            return err('找不到这条广告！');
         }
 
         if ($adv->getAgentId() != $user->getAgentId()) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         if (!$adv->isReviewPassed()) {
-            return error(State::ERROR, '这个广告还没有通过审核，无法分配！');
+            return err('这个广告还没有通过审核，无法分配！');
         }
 
         $groups = Request::is_array('groups') ? Request::array('groups') : [];
@@ -410,6 +408,6 @@ class adv
             }
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 }

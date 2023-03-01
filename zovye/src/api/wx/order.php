@@ -27,7 +27,7 @@ class order
         $order_id = Request::int('orderid');
         $order = \zovye\Order::get($order_id);
         if (empty($order)) {
-            return error(State::ERROR, '找不到这个订单!');
+            return err('找不到这个订单!');
         }
 
         $result = [];

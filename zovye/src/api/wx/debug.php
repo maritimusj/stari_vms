@@ -8,10 +8,9 @@
 namespace zovye\api\wx;
 
 use zovye\Request;
-use zovye\State;
 use zovye\User;
 use zovye\Util;
-use function zovye\error;
+use function zovye\err;
 
 class debug
 {
@@ -42,10 +41,10 @@ class debug
                     ]
                 );
             } else {
-                return error(State::ERROR, '找不到指定的用户！');
+                return err('找不到指定的用户！');
             }
         }
 
-        return error(State::ERROR, '参数不正确！');
+        return err('参数不正确！');
     }
 }

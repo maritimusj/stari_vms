@@ -14,16 +14,13 @@ use zovye\Account;
 use zovye\App;
 use zovye\CommissionBalance;
 use zovye\model\accountModelObj;
-use zovye\model\userModelObj;
 use zovye\Request;
 use zovye\Schema;
-use zovye\State;
 use zovye\Stats;
 use zovye\User;
 use zovye\Util;
 use zovye\We7;
 use function zovye\err;
-use function zovye\error;
 use function zovye\m;
 use function zovye\settings;
 
@@ -45,7 +42,7 @@ class commission
         if (settings('commission.agreement.freq')) {
             $agreement = $user->get('commissionAgreementData', []);
             if (empty($agreement['version']) || $agreement['version'] != settings('commission.agreement.version')) {
-                return error(State::ERROR, '用户必须要先同意平台协议后，才能使用该功能！');
+                return err('用户必须要先同意平台协议后，才能使用该功能！');
             }
         }
 
@@ -118,7 +115,7 @@ class commission
         if (settings('commission.agreement.freq')) {
             $agreement = $user->settings('commissionAgreementData', []);
             if (empty($agreement['version']) || $agreement['version'] != settings('commission.agreement.version')) {
-                return error(State::ERROR, '用户必须要先同意平台协议后，才能使用该功能！');
+                return err('用户必须要先同意平台协议后，才能使用该功能！');
             }
         }
 
@@ -129,7 +126,7 @@ class commission
             $account = Account::findOneFromUID($uid);
 
             if (!$account->getShared()) {
-                return error(State::ERROR, '公众号没有加入推广！');
+                return err('公众号没有加入推广！');
             }
 
             $assign_data = [$account];
@@ -147,7 +144,7 @@ class commission
             }
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 
     /**
@@ -194,7 +191,7 @@ class commission
             }
         }
 
-        return error(State::ERROR, '错误请求！');
+        return err('错误请求！');
     }
 
     public static function level(): array
@@ -207,7 +204,7 @@ class commission
 
         $agent = agent::getUserByGUID($guid);
         if (empty($agent)) {
-            return error(State::ERROR, '找不到这个代理商！');
+            return err('找不到这个代理商！');
         }
 
         $gsp = $agent->settings('agentData.gsp');
@@ -216,14 +213,14 @@ class commission
                 if ($agent->updateSettings("agentData.gsp.rel.level$level", $val)) {
                     return ['msg' => '设置成功！'];
                 } else {
-                    return error(State::ERROR, '保存失败，请与管理员联系！[101]');
+                    return err('保存失败，请与管理员联系！[101]');
                 }
             } else {
-                return error(State::ERROR, '设置失败，请与管理员联系！[102]');
+                return err('设置失败，请与管理员联系！[102]');
             }
         }
 
-        return error(State::ERROR, '未启用，请与管理员联系！[103]');
+        return err('未启用，请与管理员联系！[103]');
     }
 
     public static function monthStat(): array

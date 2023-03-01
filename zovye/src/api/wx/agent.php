@@ -34,14 +34,12 @@ use zovye\model\login_dataModelObj;
 use zovye\LoginData;
 use zovye\Order;
 use zovye\model\orderModelObj;
-use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use zovye\We7;
 use function zovye\_W;
 use function zovye\err;
-use function zovye\error;
 use function zovye\request;
 use function zovye\is_error;
 use function zovye\m;
@@ -111,7 +109,7 @@ class agent
         $session_key = $res['session_key'];
 
         if (empty($mobile)) {
-            return error(State::ERROR, '获取用户手机号码失败，请稍后再试！');
+            return err('获取用户手机号码失败，请稍后再试！');
         }
 
         //创建 or 更新该小程序用户
@@ -136,11 +134,11 @@ class agent
         $user = User::findOne(['mobile' => $mobile, 'app' => User::WX]);
         if ($user) {
             if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
-                return error(State::ERROR, '登录失败，无法使用这个小程序！');
+                return err('登录失败，无法使用这个小程序！');
             }
 
             if (!($user->isAgent() || $user->isPartner())) {
-                return error(State::ERROR, '您还不是我们的代理商，立即注册?');
+                return err('您还不是我们的代理商，立即注册?');
             }
 
             //清除原来的登录信息
@@ -198,11 +196,11 @@ class agent
 
                 return $result;
             } else {
-                return error(State::ERROR, '登录失败！[101]');
+                return err('登录失败！[101]');
             }
         }
 
-        return error(State::ERROR, '您还不是我们的代理商,立即注册?[102]');
+        return err('您还不是我们的代理商,立即注册?[102]');
     }
 
     public
@@ -299,7 +297,7 @@ class agent
         $mobile = Request::trim('mobile');
 
         if (empty($name) || empty($mobile)) {
-            return error(State::ERROR, '对不起，请填写姓名和手机号码！');
+            return err('对不起，请填写姓名和手机号码！');
         }
 
         $data = We7::uniacid(
@@ -319,7 +317,7 @@ class agent
             return ['msg' => '提交成功，请耐心等待管理员审核！'];
         }
 
-        return error(State::ERROR, '提交失败，请稍后重试！');
+        return err('提交失败，请稍后重试！');
     }
 
     /**
@@ -338,7 +336,7 @@ class agent
             }
         }
 
-        return error(State::ERROR, '无法保存，请联系管理员！');
+        return err('无法保存，请联系管理员！');
     }
 
     /**
@@ -440,7 +438,7 @@ class agent
             }
         }
 
-        return error(State::ERROR, '出错了，读取消息失败！');
+        return err('出错了，读取消息失败！');
     }
 
     /**
@@ -463,7 +461,7 @@ class agent
             }
         }
 
-        return error(State::ERROR, '出错了，删除消息出错！');
+        return err('出错了，删除消息出错！');
     }
 
     /**
@@ -506,7 +504,7 @@ class agent
         $keeperId = Request::int('keeperid');
         $keeper = Keeper::get($keeperId);
         if (empty($keeper) || $user->getAgentId() != $keeper->getAgentId()) {
-            return error(State::ERROR, '找不到这个运营人员！');
+            return err('找不到这个运营人员！');
         }
 
         $query = Device::keeper($keeper);
@@ -562,16 +560,16 @@ class agent
         }
 
         if (!$device->payloadLockAcquire(3)) {
-            return error(State::ERROR, '设备正忙，请稍后再试！');
+            return err('设备正忙，请稍后再试！');
         }
 
         if (empty($device->getAgentId())) {
-            return error(State::ERROR, '这个设备没有绑定代理商！');
+            return err('这个设备没有绑定代理商！');
         }
 
         //管理员登记不能修改设备参数
         if (!$device->isOwnerOrSuperior($user)) {
-            return error(State::ERROR, '没有权限管理这个设备！');
+            return err('没有权限管理这个设备！');
         }
 
         //修改设备名称
@@ -605,7 +603,7 @@ class agent
 
             $device_type = DeviceTypes::from($device);
             if (empty($device_type)) {
-                return error(State::ERROR, '设备类型不正确！');
+                return err('设备类型不正确！');
             }
 
             if ($device->isCustomizedType()) {
@@ -638,7 +636,7 @@ class agent
         }
 
         if (empty($device_type)) {
-            return error(State::ERROR, '获取型号失败！');
+            return err('获取型号失败！');
         }
 
         if (Request::isset('price') || Request::isset('num')) {
@@ -658,7 +656,7 @@ class agent
             }
             $res = $device->resetPayload($cargo_lanes, '代理商编辑设备', $now);
             if (is_error($res)) {
-                return error(State::ERROR, '保存设备库存数据失败！');
+                return err('保存设备库存数据失败！');
             }
             $payload[] = $res;
         }
@@ -731,7 +729,7 @@ class agent
             return ['msg' => $msg];
         }
 
-        return error(State::ERROR, '保存失败！');
+        return err('保存失败！');
     }
 
     /**
@@ -780,7 +778,7 @@ class agent
                     }
                 }
             } else {
-                return error(State::ERROR, '没有权限管理这个设备！');
+                return err('没有权限管理这个设备！');
             }
         } else {
             //未绑定设备
@@ -799,7 +797,7 @@ class agent
             return $result;
         }
 
-        return error(State::ERROR, '请求无法完成！');
+        return err('请求无法完成！');
     }
 
     /**
@@ -821,7 +819,7 @@ class agent
         }
 
         if (!$device->lockAcquire(3)) {
-            return error(State::ERROR, '锁定设备失败，请稍后再试！');
+            return err('锁定设备失败，请稍后再试！');
         }
 
         $agent = $user->getPartnerAgent() ?: $user;
@@ -834,12 +832,12 @@ class agent
                     return ['op' => 'bind', 'result' => true];
                 }
             } else {
-                return error(State::ERROR, '只能绑定到代理商帐号！');
+                return err('只能绑定到代理商帐号！');
             }
         } else {
             if (!$user->settings('agentData.misc.power')) {
                 if ($device->getAgentId() != $user->getAgentId()) {
-                    return error(State::ERROR, '没有权限管理这个设备！');
+                    return err('没有权限管理这个设备！');
                 }
             }
 
@@ -848,7 +846,7 @@ class agent
             }
         }
 
-        return error(State::ERROR, '操作失败，请稍后再试！');
+        return err('操作失败，请稍后再试！');
     }
 
     /**
@@ -870,14 +868,14 @@ class agent
         }
 
         if (!$device->isOwnerOrSuperior($user)) {
-            return error(State::FAIL, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $lane = Request::int('lane');
         $res = Util::deviceTest($user, $device, $lane);
 
         if (is_error($res)) {
-            return error(State::FAIL, $res['message']);
+            return err($res['message']);
         }
 
         $resp = ['id' => $device->getImei(), 'msg' => '出货成功！'];
@@ -912,12 +910,12 @@ class agent
         }
 
         if (!$device->isOwnerOrSuperior($user)) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $locker = $device->payloadLockAcquire(3);
         if (empty($locker)) {
-            return error(State::ERROR, '设备正忙，请稍后再试！');
+            return err('设备正忙，请稍后再试！');
         }
 
         if (Request::isset('lane')) {
@@ -931,7 +929,7 @@ class agent
 
         $res = $device->resetPayload($data, '代理商补货');
         if (is_error($res)) {
-            return error(State::ERROR, '保存库存失败！');
+            return err('保存库存失败！');
         }
 
         if (App::isInventoryEnabled()) {
@@ -964,7 +962,7 @@ class agent
 
         $target = agent::getUserByGUID(request('guid'));
         if (empty($target)) {
-            return error(State::ERROR, '用户不存在！');
+            return err('用户不存在！');
         }
 
         $device_ids = [];
@@ -995,7 +993,7 @@ class agent
             if (Device::bind($device, $target) && $device->save()) {
                 continue;
             } else {
-                return error(State::ERROR, '转移设备失败！');
+                return err('转移设备失败！');
             }
         }
 
@@ -1119,23 +1117,23 @@ class agent
         $agent = $user->isPartner() ? $user->getPartnerAgent() : $user;
 
         if (!settings('agent.order.refund')) {
-            return error(State::ERROR, '不允许退款，请联系管理员！');
+            return err('不允许退款，请联系管理员！');
         }
 
         $order = Order::get(Request::int('orderid'));
         if (empty($order) || $order->getAgentId() != $agent->getId()) {
-            return error(State::ERROR, '找不到这个订单！');
+            return err('找不到这个订单！');
         }
 
         if ($agent->getCommissionBalance()->total() < $order->getPrice()) {
-            return error(State::ERROR, '代理商余额不足，无法退款！');
+            return err('代理商余额不足，无法退款！');
         }
 
         $num = Request::int('num');
 
         $res = Order::refund($order->getOrderNO(), $num, ['msg' => '代理商：'.$agent->getName()]);
         if (is_error($res)) {
-            return error(State::ERROR, $res['message']);
+            return err($res['message']);
         }
 
         return ['msg' => '退款成功！'];
@@ -1272,7 +1270,7 @@ class agent
         }
 
         if (!$device->isOwnerOrSuperior($user)) {
-            return error(State::ERROR, '没有权限执行这个操作！');
+            return err('没有权限执行这个操作！');
         }
 
         $resultDesc = Request::trim('desc');
@@ -1303,7 +1301,7 @@ class agent
             ];
         }
 
-        return error(State::ERROR, '提交失败！');
+        return err('提交失败！');
     }
 
     /**
@@ -1339,7 +1337,7 @@ class agent
         } else {
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
-                return error(State::ERROR, '用户不存在！');
+                return err('用户不存在！');
             } else {
                 $query->where(['superior_id' => $res->getAgentId()]);
             }
@@ -1415,7 +1413,7 @@ class agent
 
         $res = agent::getUserByGUID($guid);
         if (empty($res)) {
-            return error(State::ERROR, '用户不存在！');
+            return err('用户不存在！');
         }
 
         $name = Request::trim('name');
@@ -1523,7 +1521,7 @@ class agent
 
             $res = agent::getUserByGUID($guid);
             if (empty($res)) {
-                return error(State::ERROR, '用户不存在！');
+                return err('用户不存在！');
             }
             return self::agentStatsData($res);
         }
@@ -1535,7 +1533,7 @@ class agent
             return self::agentStatsData($agent);
         }
 
-        return error(State::ERROR, '没有权限！');
+        return err('没有权限！');
     }
 
     public
@@ -1564,13 +1562,13 @@ class agent
                     }
                 }
 
-                return error(State::ERROR, empty($res['message']) ? '操作失败！' : $res['message']);
+                return err(empty($res['message']) ? '操作失败！' : $res['message']);
             }
 
-            return error(State::ERROR, '没有操作权限！');
+            return err('没有操作权限！');
         }
 
-        return error(State::ERROR, '只有代理商才能保存运营人员信息！');
+        return err('只有代理商才能保存运营人员信息！');
     }
 
     public
@@ -1651,7 +1649,7 @@ class agent
             return $result;
         }
 
-        return error(State::ERROR, '获取列表失败！');
+        return err('获取列表失败！');
     }
 
     public
@@ -1669,7 +1667,7 @@ class agent
         if ($agent->save()) {
             return ['status' => true, 'msg' => '操作成功！'];
         } else {
-            return error(State::ERROR, '操作失败！');
+            return err('操作失败！');
         }
     }
 
@@ -1813,36 +1811,36 @@ class agent
     {
         $uniq = Request::str('uniq');
         if (empty($uniq)) {
-            return error(State::ERROR, '参数错误！');
+            return err('参数错误！');
         }
 
         $res = common::getDecryptedWxUserData();
         if (is_error($res)) {
-            return error(State::ERROR, '系统错误！');
+            return err('系统错误！');
         }
 
         $mobile = $res['purePhoneNumber'] ?? $res['phoneNumber'];
         $session_key = $res['session_key'];
 
         if (empty($mobile)) {
-            return error(State::ERROR, '获取用户手机号码失败，请稍后再试！');
+            return err('获取用户手机号码失败，请稍后再试！');
         }
 
         $user = User::findONe(['mobile' => $mobile, 'app' => User::WX]);
         if (empty($user)) {
-            return error(State::ERROR, '用户不存在！');
+            return err('用户不存在！');
         }
 
         if ($res['config'] && !$user->isWxAppAllowed($res['config']['key'])) {
-            return error(State::ERROR, '登录失败，无法使用这个小程序！');
+            return err('登录失败，无法使用这个小程序！');
         }
 
         if ($user->isBanned()) {
-            return error(State::ERROR, '用户暂时无法登录！');
+            return err('用户暂时无法登录！');
         }
 
         if (!($user->isAgent() || $user->isPartner())) {
-            return error(State::ERROR, '您还不是我们的代理商??！');
+            return err('您还不是我们的代理商??！');
         }
 
         //清除原来的登录信息
@@ -1865,7 +1863,7 @@ class agent
             return (['msg' => '登录成功！']);
         }
 
-        return error(State::ERROR, '登录失败，无法创建登录数据！');
+        return err('登录失败，无法创建登录数据！');
     }
 
     public
@@ -1873,18 +1871,18 @@ class agent
     {
         $uniq = request('uniq');
         if (empty($uniq)) {
-            return error(State::ERROR, '参数错误！');
+            return err('参数错误！');
         }
 
         /** @var login_dataModelObj $res */
         $res = LoginData::findOne(['src' => LoginData::AGENT_WEB, 'openid_x' => $uniq]);
         if (empty($res)) {
-            return error(State::ERROR, '请先扫描网页二维码！');
+            return err('请先扫描网页二维码！');
         }
 
         $user = User::get($res->getUserId());
         if (empty($user) || $user->isBanned()) {
-            return error(State::ERROR, '暂时无法登录！');
+            return err('暂时无法登录！');
         }
 
         $res->setOpenidX($user->getOpenid());
@@ -1948,7 +1946,7 @@ class agent
             ];
         }
 
-        return error(State::ERROR, '获取列表失败！');
+        return err('获取列表失败！');
     }
 
     public
@@ -2276,6 +2274,6 @@ class agent
             return ['state' => 'busy', 'msg' => '已启动后台刷新任务，请耐心等待完成！'];
         }
 
-        return error(State::ERROR, '无法启动刷新任务，请联系管理员！');
+        return err('无法启动刷新任务，请联系管理员！');
     }
 }

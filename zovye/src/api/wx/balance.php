@@ -9,7 +9,6 @@ namespace zovye\api\wx;
 use DateTimeImmutable;
 use zovye\Account;
 use zovye\App;
-use zovye\Charging as IotCharging;
 use zovye\model\commission_balanceModelObj;
 use zovye\CommissionBalance;
 use zovye\Device;
@@ -17,12 +16,10 @@ use zovye\Goods;
 use zovye\Request;
 use zovye\Job;
 use zovye\Order;
-use zovye\State;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -102,24 +99,24 @@ class balance
     {
         //先锁定用户，防止恶意重复提交
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-            return error(State::ERROR, '锁定用户失败，请重试！');
+            return err('锁定用户失败，请重试！');
         }
 
         if ($user->isBanned()) {
-            return error(State::ERROR, '用户暂时无法提现！');
+            return err('用户暂时无法提现！');
         }
 
         if ($user->isBusyState()) {
-            return error(State::ERROR, '请等待订单结算完成后再试！');
+            return err('请等待订单结算完成后再试！');
         }
 
         if ($amount < 1) {
-            return error(State::ERROR, '提现金额不正确！');
+            return err('提现金额不正确！');
         }
 
         $balance = $user->getCommissionBalance();
         if ($amount > $balance->total()) {
-            return error(State::ERROR, '可用余额不足！');
+            return err('可用余额不足！');
         }
 
         $withdraw = settings('commission.withdraw', []);
@@ -134,20 +131,20 @@ class balance
             )->count();
 
             if ($count >= $withdraw['count']['month']) {
-                return error(State::ERROR, '本月可用提现次数已用完！');
+                return err('本月可用提现次数已用完！');
             }
         }
 
         if (!empty($withdraw['min']) && $amount < $withdraw['min']) {
             $min = number_format($withdraw['min'] / 100, 2);
 
-            return error(State::ERROR, "提现金额不能少于{$min}元");
+            return err("提现金额不能少于{$min}元");
         }
 
         if (!empty($withdraw['max']) && $amount > $withdraw['max']) {
             $max = number_format($withdraw['max'] / 100, 2);
 
-            return error(State::ERROR, "提现金额不能大于{$max}元");
+            return err("提现金额不能大于{$max}元");
         }
 
         $res = Util::transactionDo(
@@ -183,20 +180,20 @@ class balance
                     if ($fee + $amount > $balance_total) {
                         $amount -= ($fee + $amount - $balance_total);
                         if ($amount <= 0) {
-                            return error(State::ERROR, '扣除手续费后提现金额为零！');
+                            return err('扣除手续费后提现金额为零！');
                         }
                     }
 
                     $fee_rec = $balance->change(-$fee, CommissionBalance::FEE, []);
                     if (empty($fee_rec)) {
-                        return error(State::ERROR, '创建手续费失败！');
+                        return err('创建手续费失败！');
                     }
                 }
 
                 //整额提现
                 $times = settings('commission.withdraw.times', 0);
                 if ($times > 0 && $amount % ($times * 100) > 0) {
-                    return error(State::ERROR, "提现金额必须是{$times}的整倍数！");
+                    return err("提现金额必须是{$times}的整倍数！");
                 }
 
                 $r = $balance->change(
@@ -215,7 +212,7 @@ class balance
                 );
 
                 if (empty($r)) {
-                    return error(State::ERROR, '创建提现数据失败！');
+                    return err('创建提现数据失败！');
                 }
 
                 if ($fee_rec) {
@@ -224,7 +221,7 @@ class balance
                             'gcr' => [$fee_rec->getId()],
                         ]
                     )) {
-                        return error(State::ERROR, '更新提现手续费数据失败！');
+                        return err('更新提现手续费数据失败！');
                     }
 
                     if (!$fee_rec->update(
@@ -233,7 +230,7 @@ class balance
                             'gid' => $r->getId(), //gid => ground id,相关联的记录以主纪录ＩＤ为组ＩＤ
                         ]
                     )) {
-                        return error(State::ERROR, '更新手续费数据失败！');
+                        return err('更新手续费数据失败！');
                     }
                 }
 
@@ -245,7 +242,7 @@ class balance
                 if (settings('commission.withdraw.pay_type') == WITHDRAW_SYS) {
                     $result = CommissionBalance::MCHPay($r);
                     if (is_error($result)) {
-                        return error(State::ERROR, '自动打款失败，请联系管理员！');
+                        return err('自动打款失败，请联系管理员！');
                     } else {
                         $msg = '成功，提现已经完成，请注意确认收款！';
                     }
@@ -280,18 +277,18 @@ class balance
         if ($agent) {
             if (!empty(settings('commission.withdraw.bank_card'))) {
                 if (empty($agent->settings('agentData.bank'))) {
-                    return error(State::ERROR, '请先绑定银行卡！');
+                    return err('请先绑定银行卡！');
                 }
             }
 
             if ($agent->isPaymentConfigEnabled()) {
-                return error(State::ERROR, '提现申请被拒绝，请联系管理员！');
+                return err('提现申请被拒绝，请联系管理员！');
             }
 
             return balance::balanceWithdraw($agent, Request::float('amount', 0, 2) * 100);
         }
 
-        return error(State::ERROR, '提现失败，请联系客服！');
+        return err('提现失败，请联系客服！');
     }
 
     /**
@@ -440,7 +437,7 @@ class balance
             );
         }
 
-        return error(State::ERROR, '获取列表失败！');
+        return err('获取列表失败！');
     }
 
     public static function userBalanceLog(): array
@@ -458,6 +455,6 @@ class balance
             return self::getUserBalanceLog($user, $type, $page, $page_size);
         }
 
-        return error(State::ERROR, '获取列表失败！');
+        return err('获取列表失败！');
     }
 }

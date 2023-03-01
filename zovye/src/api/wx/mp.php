@@ -22,7 +22,6 @@ use zovye\Account;
 use zovye\Request;
 use zovye\WxPlatform;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 use zovye\model\agentModelObj;
 use function zovye\toCamelCase;
@@ -48,13 +47,13 @@ class mp
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
-                return error(State::ERROR, '没有权限操作！');
+                return err('没有权限操作！');
             }
 
             return self::formatAccountInfo($account, true);
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 
     public static function formatAccountInfo(accountModelObj $account, $more = false): array
@@ -178,7 +177,7 @@ class mp
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
-                return error(State::ERROR, '没有权限操作！');
+                return err('没有权限操作！');
             }
 
             $assign_data = [$account];
@@ -199,7 +198,7 @@ class mp
             }
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 
     /**
@@ -210,7 +209,7 @@ class mp
     public static function upload(): array
     {
         if (!common::checkCurrentUserPrivileges('F_xf', true) && !common::checkCurrentUserPrivileges('F_sp', true)) {
-            return error(State::ERROR, '没有权限上传文件，请联系管理员！');
+            return err('没有权限上传文件，请联系管理员！');
         }
 
         $media = $_FILES['pic'] ?? $_FILES['video'];
@@ -234,14 +233,14 @@ class mp
                         'error' => $e->getMessage(),
                     ]);
 
-                    return error(State::ERROR, $e->getMessage());
+                    return err($e->getMessage());
                 }
 
                 return ['file' => Media::sign($filename), 'fullpath' => Util::toMedia($filename)];
             }
         }
 
-        return error(state::ERROR, '上传失败！');
+        return err('上传失败！');
     }
 
     /**
@@ -327,7 +326,7 @@ class mp
             }
         }
 
-        return error(State::ERROR, '没有权限操作！');
+        return err('没有权限操作！');
     }
 
     /**
@@ -344,11 +343,11 @@ class mp
         $uid = Request::trim('uid');
         $account = Account::findOneFromUID($uid);
         if (empty($account)) {
-            return error(State::ERROR, '找不到指定的公众号！');
+            return err('找不到指定的公众号！');
         }
 
         if ($account->getAgentId() != $user->getAgentId()) {
-            return error(State::ERROR, '没有权限操作这个公众号！');
+            return err('没有权限操作这个公众号！');
         }
 
         if ($account->isFlashEgg()) {
@@ -395,26 +394,26 @@ class mp
             $account = Account::findOneFromUID(Request::str('uid'));
             if ($account) {
                 if ($account->getAgentId() != $user->getAgentId()) {
-                    return error(State::ERROR, '公众号帐号不能重复！');
+                    return err('公众号帐号不能重复！');
                 }
             }
         }
 
         if (!Schema::has($data['scname'])) {
-            return error(State::ERROR, '领取频率只是每天/每周/每月！');
+            return err('领取频率只是每天/每周/每月！');
         }
 
         if (Request::has('qrcode')) {
             $type = Account::NORMAL;
             $url = Media::strip(Request::str('qrcode'));
             if ($url === false) {
-                return error(State::ERROR, '请上传正确的二维码文件！');
+                return err('请上传正确的二维码文件！');
             }
         } elseif (Request::has('media')) {
             $type = Account::VIDEO;
             $url = Media::strip(Request::str('media'));
             if ($url === false) {
-                return error(State::ERROR, '请上传正确的视频文件！');
+                return err('请上传正确的视频文件！');
             }
         } elseif (Request::has('douyinUrl')) {
             $type = Account::DOUYIN;
@@ -423,12 +422,12 @@ class mp
         } elseif (Request::has('mediaType')) {
             $type = Account::FlashEgg;
         } else {
-            return error(State::ERROR, '请指定正确的文件网址！');
+            return err('请指定正确的文件网址！');
         }
 
         $img_url = Media::strip(Request::str('img'));
         if ($img_url === false) {
-            return error(State::ERROR, '请上传正确的头像文件！');
+            return err('请上传正确的头像文件！');
         }
 
         $data['qrcode'] = $url ?? '';
@@ -485,7 +484,7 @@ class mp
                 $account = Account::findOneFromName($data['name']);
                 if ($account) {
                     if ($account->getAgentId() != $user->getAgentId()) {
-                        return error(State::ERROR, '公众号帐号不能重复！');
+                        return err('公众号帐号不能重复！');
                     }
                 }
             }
@@ -496,7 +495,7 @@ class mp
         }
 
         if (empty($account)) {
-            return error(State::ERROR, '操作失败！');
+            return err('操作失败！');
         }
 
         $account->setExtraData('update', [
@@ -541,7 +540,7 @@ class mp
             return ['msg' => '保存成功！'];
         }
 
-        return error(State::ERROR, '保存数据失败！');
+        return err('保存数据失败！');
     }
 
     public static function groupAssign(): array
@@ -556,7 +555,7 @@ class mp
             $agent_id = $user->getAgentId();
 
             if (empty($account) || $account->getAgentId() != $agent_id) {
-                return error(State::ERROR, '没有权限操作这个公众号！');
+                return err('没有权限操作这个公众号！');
             }
 
             $assign_data = [$account];
@@ -592,7 +591,7 @@ class mp
             }
         }
 
-        return error(State::ERROR, '操作失败！');
+        return err('操作失败！');
     }
 
     public static function mpAuthUrl(): array

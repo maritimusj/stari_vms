@@ -11,10 +11,9 @@ use zovye\Device;
 use zovye\Log;
 use zovye\Request;
 use zovye\LoginData;
-use zovye\State;
 use zovye\User;
 use zovye\We7;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 use function zovye\m;
 
@@ -26,7 +25,7 @@ class fb
             $token = common::getToken();
         }
         if (empty($token)) {
-            return error(State::ERROR, '请先登录后再请求数据！[101]');
+            return err('请先登录后再请求数据！[101]');
         }
 
         We7::load()->func('file');
@@ -47,7 +46,7 @@ class fb
 
             return ['data' => $url];
         } else {
-            return error(State::ERROR, '上传失败！');
+            return err('上传失败！');
         }
     }
 
@@ -57,15 +56,15 @@ class fb
             $token = common::getToken();
         }
         if (empty($token)) {
-            return error(State::ERROR, '请先登录后再请求数据！[101]');
+            return err('请先登录后再请求数据！[101]');
         }
         $login_data = LoginData::get($token);
         if (empty($login_data)) {
-            return error(State::ERROR, '请先登录后再请求数据！[102]');
+            return err('请先登录后再请求数据！[102]');
         }
         $user = User::get($login_data->getUserId());
         if (empty($user)) {
-            return error(State::ERROR, '请先登录后再请求数据！[103]');
+            return err('请先登录后再请求数据！[103]');
         }
 
         $device_id = Request::int('device');
@@ -86,7 +85,7 @@ class fb
         if (m('device_feedback')->create($data)) {
             return ['msg' => '反馈成功！'];
         } else {
-            return error(State::ERROR, '反馈失败！');
+            return err('反馈失败！');
         }
 
     }

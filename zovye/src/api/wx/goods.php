@@ -8,8 +8,7 @@ namespace zovye\api\wx;
 
 use zovye\App;
 use zovye\Request;
-use zovye\State;
-use function zovye\error;
+use function zovye\err;
 use function zovye\settings;
 
 class goods
@@ -55,7 +54,7 @@ class goods
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         $goods = \zovye\Goods::get($goods_id);
         if (empty($goods) || $goods->getAgentId() !== $agent->getId()) {
-            return error(State::ERROR, '找不到这个商品！');
+            return err('找不到这个商品！');
         }
 
         return \zovye\Goods::data($goods_id, ['fullPath']);
@@ -69,12 +68,12 @@ class goods
 
         $goods = \zovye\Goods::get(Request::int('id'));
         if (empty($goods)) {
-            return error(State::ERROR, '找不到指定的商品');
+            return err('找不到指定的商品');
         }
 
         $agent = $user->isAgent() ? $user : $user->getPartnerAgent();
         if ($goods->getAgentId() !== $agent->getId()) {
-            return error(State::ERROR, '没有权限管理这个商品');
+            return err('没有权限管理这个商品');
         }
 
         if ($goods->isFlashEgg()) {
@@ -85,7 +84,7 @@ class goods
             return ['msg' => '商品删除成功！'];
         }
 
-        return error(State::ERROR, '商品删除失败！');
+        return err('商品删除失败！');
     }
 
     public static function create(): array
@@ -114,13 +113,13 @@ class goods
         if ($goods_id > 0) {
             $goods = \zovye\Goods::get($goods_id);
             if (empty($goods)) {
-                return error(State::ERROR, '找不到这个商品！');
+                return err('找不到这个商品！');
             }
 
             $goods->setS1($s1);
 
             if ($goods->getAgentId() !== $agent->getId()) {
-                return error(State::ERROR, '没有权限管理这个商品');
+                return err('没有权限管理这个商品');
             }
 
             //固定货道商品商品指定货道
@@ -217,6 +216,6 @@ class goods
             return ['msg' => '商品保存成功！'];
         }
 
-        return error(State::ERROR, '商品保存失败！');
+        return err('商品保存失败！');
     }
 }

@@ -90,11 +90,15 @@ class mp
             $data['path'] = $account->getConfig('path', '');
             $data['delay'] = $account->getConfig('delay', 1);
         } elseif ($account->isFlashEgg()) {
+            //完整url用于小程序端显示缩略图
             $data['goods'] = $account->getGoodsData();
+            //短url用于小程序端编辑时显示
             $data['_goods'] = $account->getGoodsData(false);
             $data['media'] = [
                 'type' => $account->getMediaType(),
+                //完整url用于小程序端显示缩略图
                 'files' => $account->getMedia(true),
+                //短url用于小程序端编辑时显示
                 '_files' => $account->getMedia(),
                 'duration' => $account->getDuration(),
                 'area' => $account->getArea(),

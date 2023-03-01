@@ -26,7 +26,6 @@ use zovye\Util;
 use zovye\Agent;
 use zovye\App;
 use zovye\Order;
-use zovye\State;
 use zovye\WxMCHPay;
 use zovye\LoginData;
 use zovye\We7credit;
@@ -42,7 +41,6 @@ use function zovye\isEmptyArray;
 use function zovye\m;
 use function zovye\tb;
 use function zovye\settings;
-use function zovye\error;
 use function zovye\is_error;
 
 /**
@@ -679,15 +677,15 @@ class userModelObj extends modelObj
     public function recharge(pay_logsModelObj $pay_log)
     {
         if (!$pay_log->isPaid()) {
-            return error(1, '未支付完成！');
+            return err('未支付完成！');
         }
 
         if ($pay_log->isRecharged()) {
-            return error(1, '支付记录已使用！');
+            return err('支付记录已使用！');
         }
 
         if ($pay_log->isCancelled() || $pay_log->isTimeout() || $pay_log->isRefund()) {
-            return error(1, '支付已无效!');
+            return err('支付已无效!');
         }
 
         return Util::transactionDo(function () use ($pay_log) {
@@ -731,7 +729,7 @@ class userModelObj extends modelObj
     {
         $params = Pay::getDefaultPayParams(Pay::WX);
         if (empty($params)) {
-            return error(State::ERROR, '没有配置微信打款信息！');
+            return err('没有配置微信打款信息！');
         }
 
         if (!isEmptyArray($params['v3'])) {
@@ -769,7 +767,7 @@ class userModelObj extends modelObj
         if ($trade_no && $n > 0) {
             $params = Pay::getDefaultPayParams(Pay::WX);
             if (empty($params)) {
-                return error(State::ERROR, '没有配置微信打款信息！');
+                return err('没有配置微信打款信息！');
             }
 
             if (!isEmptyArray($params['v3'])) {
@@ -780,7 +778,7 @@ class userModelObj extends modelObj
                 } elseif ($this->isWXAppUser()) {
                     $config['appid'] = $params['wxappid'];
                 } else {
-                    return error(State::ERROR, '只能给微信或微信小程序用户转账！');
+                    return err('只能给微信或微信小程序用户转账！');
                 }
 
                 $config['mch_id'] = $params['mch_id'];
@@ -816,10 +814,10 @@ class userModelObj extends modelObj
                 }
             } 
 
-            return error(State::ERROR, '打款失败！');
+            return err('打款失败！');
         }
 
-        return error(State::ERROR, '参数不正确！');
+        return err('参数不正确！');
     }
 
     public function cleanLastActiveData(): bool

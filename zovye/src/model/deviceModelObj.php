@@ -7,7 +7,6 @@
 
 namespace zovye\model;
 
-use DateTime;
 use Exception;
 use zovye\App;
 use zovye\Balance;
@@ -26,7 +25,6 @@ use zovye\Agent;
 use zovye\Goods;
 use zovye\Group;
 
-use zovye\State;
 use zovye\Topic;
 use zovye\Device;
 use zovye\Keeper;
@@ -1036,7 +1034,7 @@ class deviceModelObj extends modelObj
             return $this->resetPayload([$goods['cargo_lane'] => $delta], $reason);
         }
 
-        return error(State::ERROR, '找不到指定的商品！');
+        return err('找不到指定的商品！');
     }
 
     /**
@@ -2379,7 +2377,7 @@ class deviceModelObj extends modelObj
     public function pull(array $options = [])
     {
         if ($options['online'] && !$this->isMcbOnline()) {
-            return error(State::FAIL, '设备已关机！');
+            return err('设备已关机！');
         }
 
         $num = max(1, $options['num']);
@@ -2398,13 +2396,13 @@ class deviceModelObj extends modelObj
         $result = null;
 
         if ($this->isChargingDevice()) {
-            return error(State::ERROR, '设备不支持这个操作！');
+            return err('设备不支持这个操作！');
         }
         //蓝牙设备
         if ($this->isBlueToothDevice()) {
             $protocol = $this->getBlueToothProtocol();
             if (empty($protocol)) {
-                return error(State::ERROR, '未知的蓝牙协议！');
+                return err('未知的蓝牙协议！');
             }
 
             $motorNum = $this->getMotor();

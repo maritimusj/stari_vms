@@ -109,7 +109,7 @@ class Agent
 
             foreach ($partners as $partner_id => $data) {
                 if (!$agent->removePartner($partner_id)) {
-                    return error(State::ERROR, '移除合伙人失败！');
+                    return err('移除合伙人失败！');
                 }
                 $msg_owners[] = $partner_id;
             }

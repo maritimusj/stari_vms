@@ -8,7 +8,6 @@
 namespace zovye;
 
 use zovye\model\device_logsModelObj;
-use zovye\model\goodsModelObj;
 use zovye\model\orderModelObj;
 use zovye\model\deviceModelObj;
 use zovye\model\userModelObj;
@@ -280,7 +279,7 @@ class Helper
         if (!is_error($result)) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {
-                return error(State::ERROR, '设备正忙，请重试！');
+                return err('设备正忙，请重试！');
             }
             $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：{$order->getOrderNO()}");
             if (is_error($res)) {

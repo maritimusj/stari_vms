@@ -6,7 +6,6 @@
 
 namespace zovye;
 
-use zovye\model\pay_logsModelObj;
 use zovye\model\userModelObj;
 use zovye\model\commission_balanceModelObj;
 
@@ -86,7 +85,7 @@ class CommissionBalance extends State
     {
         $user = User::get($r->getOpenid(), true);
         if (empty($user)) {
-            return error(State::ERROR, '找不到这个用户');
+            return err('找不到这个用户');
         }
 
         $n = abs($r->getXVal());
@@ -116,7 +115,7 @@ class CommissionBalance extends State
             }
         }
 
-        return error(State::ERROR, '提现申请数据有误，请联系管理员核实！');
+        return err('提现申请数据有误，请联系管理员核实！');
     }
 
     /**

@@ -241,7 +241,7 @@ class Goods
 
                 $agent = Agent::get($agent_id);
                 if (empty($agent)) {
-                    return error(State::ERROR, '找不到这个代理商！');
+                    return err('找不到这个代理商！');
                 }
 
                 $query->where("agent_id=0 OR agent_id={$agent->getId()}");
@@ -249,7 +249,7 @@ class Goods
             } elseif ($params['agent_id'] > 0) {
                 $agent = Agent::get($params['agent_id']);
                 if (empty($agent)) {
-                    return error(State::ERROR, '找不到这个代理商！');
+                    return err('找不到这个代理商！');
                 }
                 $query->where(['agent_id' => $agent->getId()]);
             } else {

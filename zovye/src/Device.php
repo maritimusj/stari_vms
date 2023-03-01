@@ -112,7 +112,7 @@ class Device extends State
     {
         $app_id = strval($device->getAppId());
         if (empty($app_id)) {
-            return error(State::ERROR, '设备没有绑定appId!');
+            return err('设备没有绑定appId!');
         }
 
         $data = DeviceEventProcessor::onAppConfigMsg([

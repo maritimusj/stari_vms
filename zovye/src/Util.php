@@ -17,7 +17,7 @@ use QRcode;
 use RuntimeException;
 use Throwable;
 use we7\ihttp;
-use WeAccount;
+use WeAccount; //框架提供
 use zovye\base\modelObj;
 use zovye\model\accountModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -652,28 +652,28 @@ include './index.php';
             $limit_fn = [
                 'male' => function ($val) use ($user) {
                     if ($val == 0 && $user->settings('fansData.sex') == 1) {
-                        return error(State::FAIL, '不允许男性用户');
+                        return err('不允许男性用户');
                     }
 
                     return true;
                 },
                 'female' => function ($val) use ($user) {
                     if ($val == 0 && $user->settings('fansData.sex') == 2) {
-                        return error(State::FAIL, '不允许女性用户');
+                        return err('不允许女性用户');
                     }
 
                     return true;
                 },
                 'unknown_sex' => function ($val) use ($user) {
                     if ($val == 0 && $user->settings('fansData.sex') == 0) {
-                        return error(State::FAIL, '不允许未知性别用户');
+                        return err('不允许未知性别用户');
                     }
 
                     return true;
                 },
                 'ios' => function ($val) {
                     if ($val == 0 && Util::getUserPhoneOS() == 'ios') {
-                        return error(State::FAIL, '不允许ios手机');
+                        return err('不允许ios手机');
                     }
 
                     return true;
@@ -682,7 +682,7 @@ include './index.php';
                     if ($val == 0) {
                         $os = Util::getUserPhoneOS();
                         if ($os == 'android' || $os == 'unknown') {
-                            return error(State::FAIL, '不允许android手机');
+                            return err('不允许android手机');
                         }
                     }
 
@@ -703,7 +703,7 @@ include './index.php';
 
         if ($params['unfollow'] || in_array('unfollow', $params, true)) {
             if (self::checkLimit($account, $user, [], 1)) {
-                return error(State::ERROR, '您已经完成了该任务！');
+                return err('您已经完成了该任务！');
             }
         }
 
@@ -716,7 +716,7 @@ include './index.php';
         } elseif ($sc_name == Schema::MONTH) {
             $time = new DateTimeImmutable('first day of this month 00:00');
         } else {
-            return error(State::ERROR, '任务设置不正确！');
+            return err('任务设置不正确！');
         }
 
         //count，单个用户在每个周期内可领取数量
@@ -731,7 +731,7 @@ include './index.php';
             if (self::checkLimit($account, $user, [
                 'createtime >=' => $time->getTimestamp(),
             ], $count)) {
-                return error(State::ERROR, $desc[$sc_name]);
+                return err($desc[$sc_name]);
             }
         }
 
@@ -741,7 +741,7 @@ include './index.php';
             if (self::checkLimit($account, null, [
                 'createtime >=' => $time->getTimestamp(),
             ], $sc_count)) {
-                return error(State::ERROR, '任务免费额度已用完！');
+                return err('任务免费额度已用完！');
             }
         }
 
@@ -749,7 +749,7 @@ include './index.php';
         $total = $account->getTotal();
         if ($total > 0) {
             if (self::checkLimit($account, $user, [], $total)) {
-                return error(State::ERROR, '您已经完成这个任务了！');
+                return err('您已经完成这个任务了！');
             }
         }
 
@@ -757,7 +757,7 @@ include './index.php';
         $order_limits = $account->getOrderLimits();
         if ($order_limits > 0) {
             if (self::checkLimit($account, null, [], $order_limits)) {
-                return error(State::ERROR, '公众号免费额度已用完！！');
+                return err('公众号免费额度已用完！！');
             }
         }
 
@@ -798,7 +798,7 @@ include './index.php';
         if (empty($params['ignore_assigned'])) {
             $assign_data = $account->settings('assigned', []);
             if (!Util::isAssigned($assign_data, $device)) {
-                return error(State::ERROR, '没有允许从这个设备访问该公众号！');
+                return err('没有允许从这个设备访问该公众号！');
             }
         }
 
@@ -809,12 +809,12 @@ include './index.php';
     {
         //每日免费额度限制
         if (Util::getUserTodayFreeNum($user, $device) < 1) {
-            return error(State::ERROR, '今天领的太多了，明天再来吧！');
+            return err('今天领的太多了，明天再来吧！');
         }
 
         //全部免费额度限制
         if (Util::getUserFreeNum($user, $device) < 1) {
-            return error(State::ERROR, '您的免费额度已用完！');
+            return err('您的免费额度已用完！');
         }
 
         return true;
@@ -1149,7 +1149,7 @@ include './index.php';
      */
     public static function message($msg, string $redirect = '', string $type = ''): void
     {
-        We7::message($msg, $redirect ? \referer() : $redirect, $type);
+        We7::message($msg, $redirect ? We7::referer() : $redirect, $type);
     }
 
     /**
@@ -1593,7 +1593,7 @@ HTML_CONTENT;
             return "$dirname$filename";
         }
 
-        return error(State::ERROR, '创建文件失败！');
+        return err('创建文件失败！');
     }
 
     public static function download($url, $dirname, $filename): string
@@ -1662,11 +1662,11 @@ HTML_CONTENT;
                     return true;
                 }
 
-                return error(State::ERROR, $result['reason']);
+                return err($result['reason']);
             }
         }
 
-        return error(State::ERROR, '请先配置短信接口！');
+        return err('请先配置短信接口！');
     }
 
     /**
@@ -1686,7 +1686,7 @@ HTML_CONTENT;
         }
 
         if (!$device) {
-            return error(State::ERROR, '找不到这个设备！');
+            return err('找不到这个设备！');
         }
 
         if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
@@ -1723,7 +1723,7 @@ HTML_CONTENT;
         }
 
         if (!$device->lockAcquire()) {
-            return error(State::ERROR, '设备锁定失败，请重试！');
+            return err('设备锁定失败，请重试！');
         }
 
         $log_data = [
@@ -1747,11 +1747,11 @@ HTML_CONTENT;
         if (empty($params['keeper'])) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {
-                return error(State::ERROR, '设备正忙，请重试！');
+                return err('设备正忙，请重试！');
             }
             $payload = $device->resetPayload([$lane => -1], "设备测试，用户：{$data['userid']}");
             if (is_error($payload)) {
-                return error(State::ERROR, '保存库存失败！');
+                return err('保存库存失败！');
             }
             $locker->unlock();
             $device->updateAppRemain();
@@ -1788,7 +1788,7 @@ HTML_CONTENT;
         );
 
         if (empty($devices)) {
-            return error(State::ERROR, '设备为空');
+            return err('设备为空');
         }
 
         /** @var deviceModelObj $device */
@@ -1802,7 +1802,7 @@ HTML_CONTENT;
         );
 
         if (empty($users)) {
-            return error(State::ERROR, '用户为空');
+            return err('用户为空');
         }
 
         /** @var userModelObj $user */
@@ -1857,16 +1857,16 @@ HTML_CONTENT;
         $delay = intval(settings('device.lockRetryDelay', 1));
 
         if (!$device->lockAcquire($retries, $delay)) {
-            return error(State::ERROR_LOCK_FAILED, '设备被占用，请重新扫描设备二维码');
+            return err('设备被占用，请重新扫描设备二维码');
         }
 
         $goods = $device->getGoods($goods_id);
         if (empty($goods)) {
-            return error(State::ERROR, '找不到对应的商品');
+            return err('找不到对应的商品');
         }
 
         if ($goods['num'] < 1) {
-            return error(State::ERROR, '对不起，已经被领完了');
+            return err('对不起，已经被领完了');
         }
 
         //事件：设备已锁定
@@ -1886,7 +1886,7 @@ HTML_CONTENT;
         }
 
         if ($mcb_channel == Device::CHANNEL_INVALID) {
-            return error(State::ERROR, '商品货道配置不正确');
+            return err('商品货道配置不正确');
         }
 
         $log_data = [
@@ -1991,12 +1991,12 @@ HTML_CONTENT;
                         $order->{$setter}($val);
                     }
                     if (!$order->save()) {
-                        return error(State::ERROR, '领取失败，保存订单失败');
+                        return err('领取失败，保存订单失败');
                     }
                 } else {
                     $order = Order::create($order_data);
                     if (empty($order)) {
-                        return error(State::ERROR, '领取失败，创建订单失败');
+                        return err('领取失败，创建订单失败');
                     }
 
                     $params['order'] = $order;
@@ -2005,7 +2005,7 @@ HTML_CONTENT;
                         //事件：订单已经创建
                         EventBus::on('device.orderCreated', $params);
                     } catch (Exception $e) {
-                        return error(State::ERROR, $e->getMessage());
+                        return err($e->getMessage());
                     }
                 }
 
@@ -2013,7 +2013,7 @@ HTML_CONTENT;
 
                 foreach ($params as $entry) {
                     if ($entry && !$entry->save()) {
-                        return error(State::ERROR, '无法保存数据，请重试');
+                        return err('无法保存数据，请重试');
                     }
                 }
 
@@ -2064,11 +2064,11 @@ HTML_CONTENT;
                     if (isset($goods['cargo_lane'])) {
                         $locker = $device->payloadLockAcquire(3);
                         if (empty($locker)) {
-                            return error(State::ERROR, '设备正忙，请重试！');
+                            return err('设备正忙，请重试！');
                         }
                         $v = $device->resetPayload([$goods['cargo_lane'] => -1], "设备出货：{$order->getOrderNO()}");
                         if (is_error($v)) {
-                            return error(State::ERROR, '保存库存失败！');
+                            return err('保存库存失败！');
                         }
                         $locker->unlock();
                     }
@@ -2077,7 +2077,7 @@ HTML_CONTENT;
                         $voucher->setUsedUserId($user->getId());
                         $voucher->setUsedtime(time());
                         if (!$voucher->save()) {
-                            return error(State::ERROR, '出货失败：使用取货码失败！');
+                            return err('出货失败：使用取货码失败！');
                         }
                     }
                 }
@@ -2086,7 +2086,7 @@ HTML_CONTENT;
                 $order->setExtraData('pull.result', $res);
 
                 if (!$order->save()) {
-                    return error(State::ERROR, '无法保存订单数据！');
+                    return err('无法保存订单数据！');
                 }
 
                 $device->save();
@@ -2553,7 +2553,7 @@ HTML_CONTENT;
         //刷新域名转发缓存
         $url = str_replace('{imei}', urlencode($imei), settings('ctrl.qrcode.url', FLUSH_DEVICE_FORWARDER_URL));
         if (file_get_contents($url) === false) {
-            return error(State::ERROR, '刷新域名缓存失败！');
+            return err('刷新域名缓存失败！');
         }
 
         $device = Device::get($imei, true);
@@ -2583,7 +2583,7 @@ HTML_CONTENT;
 
             $device = Device::create($data);
             if (empty($device)) {
-                return error(State::ERROR, '创建设备失败！');
+                return err('创建设备失败！');
             }
 
             if ($extra) {
@@ -2947,12 +2947,12 @@ HTML_CONTENT;
         curl_close($ch);
 
         if (empty($response)) {
-            return error(State::ERROR, '请求失败或者返回空数据！');
+            return err('请求失败或者返回空数据！');
         }
 
         $result = json_decode($response, JSON_OBJECT_AS_ARRAY);
 
-        return $result ?? error(State::ERROR, '无法解析返回的数据！');
+        return $result ?? err('无法解析返回的数据！');
     }
 
     /**
@@ -3102,17 +3102,17 @@ HTML_CONTENT;
         /** @var commission_balanceModelObj $balance_obj */
         $balance_obj = CommissionBalance::findOne(['id' => $id, 'src' => CommissionBalance::WITHDRAW]);
         if (empty($balance_obj)) {
-            return error(State::ERROR, '操作失败，请刷新页面后再试！');
+            return err('操作失败，请刷新页面后再试！');
         }
 
         $openid = $balance_obj->getOpenid();
         $user = User::get($openid, true);
         if (empty($user)) {
-            return error(State::ERROR, '找不到这个用户！');
+            return err('找不到这个用户！');
         }
 
         if (!$user->acquireLocker(User::COMMISSION_BALANCE_LOCKER)) {
-            return error(State::ERROR, '用户无法锁定，请重试！');
+            return err('用户无法锁定，请重试！');
         }
 
         if ($balance_obj->getUpdatetime()) {
@@ -3123,7 +3123,7 @@ HTML_CONTENT;
                     return $balance_obj;
                 }
             }
-            return error(State::ERROR, '操作失败，请刷新页面后再试！');
+            return err('操作失败，请刷新页面后再试！');
         }
 
         return $balance_obj;

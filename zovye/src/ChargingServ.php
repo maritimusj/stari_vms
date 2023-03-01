@@ -36,14 +36,14 @@ class ChargingServ
         string $method = ''
     ) {
         if (!self::$http_client) {
-            return error(State::ERROR, '没有配置请求对象！');
+            return err('没有配置请求对象！');
         }
 
         $url = Config::charging('server.url');
         $access_token = Config::charging('server.access_token');
 
         if (empty($url) || empty($access_token)) {
-            return error(State::ERROR, '配置错误！');
+            return err('配置错误！');
         }
 
         $headers = [

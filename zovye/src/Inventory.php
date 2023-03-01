@@ -117,22 +117,22 @@ class Inventory
     {
         $inventory = self::for($user);
         if (empty($inventory)) {
-            return error(State::ERROR, '打开用户仓库失败！');
+            return err('打开用户仓库失败！');
         }
         if (!$inventory->acquireLocker()) {
-            return error(State::ERROR, '无法锁定用户仓库！');
+            return err('无法锁定用户仓库！');
         }
         $goods_lack = !settings('inventory.goods.mode');
         $clr = Util::randColor();
         foreach ($result as $entry) {
             if (empty($entry['goodsId'])) {
-                return error(State::ERROR, '请检查商品设置是否正确！');
+                return err('请检查商品设置是否正确！');
             }
             if ($entry['num'] > 0) {
                 if (!$goods_lack) {
                     $goods = $inventory->getGoods($entry['goodsId']);
                     if (empty($goods) || $goods->getNum() < $entry['num']) {
-                        return error(State::ERROR, '用户仓库商品库存不足！');
+                        return err('用户仓库商品库存不足！');
                     }
                 }
             }
@@ -144,7 +144,7 @@ class Inventory
                     'serial' => REQUEST_ID,
                 ]);
                 if (empty($log)) {
-                    return error(State::ERROR, '仓库商品操作失败！');
+                    return err('仓库商品操作失败！');
                 }
             }
         }

@@ -11,11 +11,10 @@ use zovye\App;
 use zovye\Contract\IPay;
 use zovye\Log;
 use zovye\model\deviceModelObj;
-use zovye\State;
 use zovye\model\userModelObj;
 use zovye\Util;
 use function zovye\_W;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 
 class LCSWPay implements IPay
@@ -345,7 +344,7 @@ JSCODE;
         }
 
         if ($total < 1 || $total > $res['total']) {
-            return error(State::ERROR, '退款金额不正确！');
+            return err('退款金额不正确！');
         }
 
         $lcsw = $this->getLCSW();
@@ -356,7 +355,7 @@ JSCODE;
         }
 
         if ($res['result_code'] !== '01') {
-            return error(State::FAIL, $res['return_msg']);
+            return err($res['return_msg']);
         }
 
         return $res;
@@ -388,11 +387,11 @@ JSCODE;
     {
         $data = json_decode($input, true);
         if (empty($data)) {
-            return error(State::FAIL, '数据为空！');
+            return err('数据为空！');
         }
 
         if ($data['result_code'] !== '01') {
-            return error(State::FAIL, $data['return_msg']);
+            return err($data['return_msg']);
         }
 
         return [

@@ -17,8 +17,7 @@ use zovye\Log;
 use zovye\model\orderModelObj;
 use zovye\Order;
 use zovye\Request;
-use zovye\State;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 use function zovye\request;
 
@@ -173,7 +172,7 @@ function resetPayload(orderModelObj $order, int $num = 0): array
         if ($locker) {
             $device->resetGoodsNum($goods_id, '+'.$total, "订单退款：{$order->getOrderNO()}");
         } else {
-            return error(State::ERROR, '锁定设备库存失败!');
+            return err('锁定设备库存失败!');
         }
 
         $locker->unlock();
@@ -191,7 +190,7 @@ function resetPayload2(orderModelObj $order): array
     if ($device) {
         $locker = $device->payloadLockAcquire(10);
         if (empty($locker)) {
-            return error(State::ERROR, '锁定设备库存失败!');
+            return err('锁定设备库存失败!');
         }
 
         $result = Helper::getOrderPullLog($order);

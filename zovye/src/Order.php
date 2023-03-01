@@ -363,7 +363,7 @@ class Order extends State
     {
         $order = self::get($id);
         if (empty($order)) {
-            return error(State::ERROR, "找不到这个订单！");
+            return err("找不到这个订单！");
         }
 
         $query = CommissionBalance::query([
@@ -394,7 +394,7 @@ class Order extends State
                 //尝试订单id查找订单
                 $order = Order::get(intval($order_no));
                 if (empty($order)) {
-                    return error(State::FAIL, '找不到这个订单!');
+                    return err('找不到这个订单!');
                 }
             }
 
@@ -407,7 +407,7 @@ class Order extends State
 
             $pay_log = Pay::getPayLog($order_no);
             if (empty($pay_log)) {
-                return error(State::FAIL, '找不到支付信息!');
+                return err('找不到支付信息!');
             }
 
             $percent = $total / $pay_log->getPrice();
@@ -420,7 +420,7 @@ class Order extends State
                     foreach ($commission['keepers'] as $entry) {
                         $keeperUser = User::get($entry['openid'], true);
                         if (empty($keeperUser)) {
-                            return error(State::ERROR, '找不到佣金用户，无法退款[201]');
+                            return err('找不到佣金用户，无法退款[201]');
                         }
                         $x_val = intval(round($entry['xval'] * $percent));
                         if ($x_val > 0) {
@@ -428,7 +428,7 @@ class Order extends State
 
                             $commission_balance = $keeperUser->getCommissionBalance();
                             if ($commission_balance->total() < $x_val) {
-                                return error(State::FAIL, "运营人员{$keeperUser->getName()}账户余额不足，无法退款！");
+                                return err("运营人员{$keeperUser->getName()}账户余额不足，无法退款！");
                             }
 
                             $r = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -437,7 +437,7 @@ class Order extends State
                             ]);
 
                             if (empty($r) || !$r->update([], true)) {
-                                return error(State::FAIL, '返还用户佣金失败！');
+                                return err('返还用户佣金失败！');
                             }
                         }
                     }
@@ -447,7 +447,7 @@ class Order extends State
                     foreach ($commission['gsp'] as $entry) {
                         $user = User::get($entry['openid'], true);
                         if (empty($user)) {
-                            return error(State::ERROR, '找不到佣金用户，无法退款[204]');
+                            return err('找不到佣金用户，无法退款[204]');
                         }
                         $x_val = intval(round($entry['xval'] * $percent));
                         if ($x_val > 0) {
@@ -455,7 +455,7 @@ class Order extends State
 
                             $commission_balance = $user->getCommissionBalance();
                             if ($commission_balance->total() < $x_val) {
-                                return error(State::FAIL, "{$user->getName()}账户余额不足，无法退款！");
+                                return err("{$user->getName()}账户余额不足，无法退款！");
                             }
 
                             $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -464,7 +464,7 @@ class Order extends State
                             ]);
 
                             if (empty($rx) || !$rx->update([], true)) {
-                                return error(State::FAIL, '返还用户佣金失败！');
+                                return err('返还用户佣金失败！');
                             }
                         }
                     }
@@ -478,12 +478,12 @@ class Order extends State
                         $openid = strval($commission['agent']['openid']);
                         $agent = User::get($openid, true);
                         if (empty($agent)) {
-                            return error(State::ERROR, '找不到设备代理商，无法退款[206]');
+                            return err('找不到设备代理商，无法退款[206]');
                         }
 
                         $commission_balance = $agent->getCommissionBalance();
                         if ($commission_balance->total() < $x_val) {
-                            return error(State::FAIL, '代理商账户余额不足，无法退款！');
+                            return err('代理商账户余额不足，无法退款！');
                         }
 
                         $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -492,7 +492,7 @@ class Order extends State
                         ]);
 
                         if (empty($rx) || !$rx->update([], true)) {
-                            return error(State::FAIL, '代理商返还佣金失败！');
+                            return err('代理商返还佣金失败！');
                         }
                     }
                 }
@@ -514,7 +514,7 @@ class Order extends State
                 return true;
             }
 
-            return error(State::FAIL, '退款失败!');
+            return err('退款失败!');
         });
     }
 
@@ -530,7 +530,7 @@ class Order extends State
         return Util::transactionDo(
             function () use ($order_no, $refund_data, $goods_num) {
                 if (empty($order_no)) {
-                    return error(State::ERROR, '订单号不正确!');
+                    return err('订单号不正确!');
                 }
 
                 $order = Order::get($order_no, true);
@@ -538,7 +538,7 @@ class Order extends State
                     //尝试订单id查找订单
                     $order = Order::get(intval($order_no));
                     if (empty($order)) {
-                        return error(State::FAIL, '找不到这个订单!');
+                        return err('找不到这个订单!');
                     }
                 }
 
@@ -546,11 +546,11 @@ class Order extends State
 
                 $pay_log = Pay::getPayLog($order_no);
                 if (empty($pay_log)) {
-                    return error(State::FAIL, '找不到支付信息!');
+                    return err('找不到支付信息!');
                 }
 
                 if ($pay_log->getData('refund')) {
-                    return error(State::FAIL, '此订单已退款!');
+                    return err('此订单已退款!');
                 }
 
                 $percent = 1;
@@ -570,7 +570,7 @@ class Order extends State
                         foreach ($commission['keepers'] as $entry) {
                             $keeperUser = User::get($entry['openid'], true);
                             if (empty($keeperUser)) {
-                                return error(State::ERROR, '找不到该用户，无法退款[201]');
+                                return err('找不到该用户，无法退款[201]');
                             }
                             $x_val = intval(round($entry['xval'] * $percent));
                             if ($x_val > 0) {
@@ -578,7 +578,7 @@ class Order extends State
 
                                 $commission_balance = $keeperUser->getCommissionBalance();
                                 if ($commission_balance->total() < $x_val) {
-                                    return error(State::FAIL, "运营人员{$keeperUser->getName()}账户余额不足，无法退款！");
+                                    return err("运营人员{$keeperUser->getName()}账户余额不足，无法退款！");
                                 }
 
                                 $r = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -587,7 +587,7 @@ class Order extends State
                                 ]);
 
                                 if (empty($r) || !$r->update([], true)) {
-                                    return error(State::FAIL, '返还用户佣金失败！');
+                                    return err('返还用户佣金失败！');
                                 }
                             }
                         }
@@ -597,7 +597,7 @@ class Order extends State
                         foreach ($commission['gsp'] as $entry) {
                             $user = User::get($entry['openid'], true);
                             if (empty($user)) {
-                                return error(State::ERROR, '找不到该用户，无法退款[204]');
+                                return err('找不到该用户，无法退款[204]');
                             }
                             $x_val = intval(round($entry['xval'] * $percent));
                             if ($x_val > 0) {
@@ -605,7 +605,7 @@ class Order extends State
 
                                 $commission_balance = $user->getCommissionBalance();
                                 if ($commission_balance->total() < $x_val) {
-                                    return error(State::FAIL, "{$user->getName()}账户余额不足，无法退款！");
+                                    return err("{$user->getName()}账户余额不足，无法退款！");
                                 }
 
                                 $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -614,7 +614,7 @@ class Order extends State
                                 ]);
 
                                 if (empty($rx) || !$rx->update([], true)) {
-                                    return error(State::FAIL, '返还用户佣金失败！');
+                                    return err('返还用户佣金失败！');
                                 }
                             }
                         }
@@ -628,12 +628,12 @@ class Order extends State
                             $openid = strval($commission['agent']['openid']);
                             $agent = User::get($openid, true);
                             if (empty($agent)) {
-                                return error(State::ERROR, '找不到设备代理商，无法退款[206]');
+                                return err('找不到设备代理商，无法退款[206]');
                             }
 
                             $commission_balance = $agent->getCommissionBalance();
                             if ($commission_balance->total() < $x_val) {
-                                return error(State::FAIL, '代理商账户余额不足，无法退款！');
+                                return err('代理商账户余额不足，无法退款！');
                             }
 
                             $rx = $commission_balance->change(0 - $x_val, CommissionBalance::ORDER_REFUND, [
@@ -642,7 +642,7 @@ class Order extends State
                             ]);
 
                             if (empty($rx) || !$rx->update([], true)) {
-                                return error(State::FAIL, '代理商返还佣金失败！');
+                                return err('代理商返还佣金失败！');
                             }
                         }
                     }
@@ -664,7 +664,7 @@ class Order extends State
                     return true;
                 }
 
-                return error(State::FAIL, '退款失败!');
+                return err('退款失败!');
             }
         );
     }

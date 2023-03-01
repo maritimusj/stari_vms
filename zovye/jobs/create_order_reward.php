@@ -13,7 +13,6 @@ use zovye\User;
 use zovye\Util;
 use zovye\Goods;
 use zovye\Order;
-use zovye\State;
 use zovye\Config;
 use zovye\Device;
 use zovye\Helper;
@@ -21,7 +20,7 @@ use zovye\Request;
 use zovye\CtrlServ;
 use zovye\EventBus;
 use RuntimeException;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 use zovye\model\userModelObj;
@@ -200,7 +199,7 @@ if ($op == 'create_order_reward' && CtrlServ::checkJobSign([
         } else {
             $order->setExtraData(
                 'pull.result',
-                $success > 0 ? error(State::FAIL, '部分商品出货失败！') : error(State::FAIL, '出货失败！')
+                $success > 0 ? err('部分商品出货失败！') : err('出货失败！')
             );
         }
 

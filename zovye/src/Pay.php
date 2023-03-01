@@ -131,7 +131,7 @@ class Pay
 
         $pay_log = self::createPayLog($user, $order_no, $pay_data);
         if (empty($pay_log)) {
-            return [error(State::ERROR, '无法保存支付信息！'), null];
+            return [err('无法保存支付信息！'), null];
         }
 
         return [$order_no, $pay_log];
@@ -172,7 +172,7 @@ class Pay
                 'data' => $pay_data,
                 'user' => $user->profile(),
             ]);
-            $res = error(State::ERROR, 'unknown pay function:'.$fn);
+            $res = err('unknown pay function:'.$fn);
         }
 
         if (is_error($res)) {
@@ -333,7 +333,7 @@ class Pay
     {
         $pay_log = self::getPayLog($order_no);
         if (empty($pay_log)) {
-            return error(State::ERROR, '找不到支付记录！');
+            return err('找不到支付记录！');
         }
 
         $device_id = $pay_log->getDeviceId();
@@ -343,7 +343,7 @@ class Pay
         } else {
             $device = Device::get($device_id);
             if (empty($device)) {
-                return error(State::ERROR, '找不到这个设备！');
+                return err('找不到这个设备！');
             }
         }
 
@@ -384,7 +384,7 @@ class Pay
         } else {
             $device = Device::get($device_id);
             if (empty($device)) {
-                return error(State::ERROR, '找不到这个设备！');
+                return err('找不到这个设备！');
             }
         }
 
@@ -406,7 +406,7 @@ class Pay
     {
         $pay_log = self::getPayLog($order_no);
         if (empty($pay_log)) {
-            return error(State::ERROR, '找不到支付记录！');
+            return err('找不到支付记录！');
         }
         return self::queryFor($pay_log);
     }
@@ -539,7 +539,7 @@ class Pay
         if (!empty($device) && is_string($device)) {
             $device = Device::get($device, true);
             if (empty($device)) {
-                return error(State::ERROR, '找不到这个设备！');
+                return err('找不到这个设备！');
             }
         }
 
@@ -634,10 +634,10 @@ class Pay
 
         //支付宝支付
         if ($name == self::ALI) {
-            return error(State::ERROR, '支付宝原生支付暂不可用！');
+            return err('支付宝原生支付暂不可用！');
         }
 
-        return error(State::ERROR, '不支持的支付类型！');
+        return err('不支持的支付类型！');
     }
 
 

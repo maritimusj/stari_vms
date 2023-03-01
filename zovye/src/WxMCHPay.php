@@ -29,7 +29,7 @@ class WxMCHPay
     public function transferTo($openid, $trade_no, $money, string $desc = ''): array
     {
         if ($money < MCH_PAY_MIN_MONEY) {
-            return error(State::ERROR, '提现金额不能小于'.number_format(MCH_PAY_MIN_MONEY / 100, 2).'元');
+            return err('提现金额不能小于'.number_format(MCH_PAY_MIN_MONEY / 100, 2).'元');
         }
 
         $data = array(
@@ -134,7 +134,7 @@ class WxMCHPay
     public function parseResult($req, $input): array
     {
         if (empty($input)) {
-            return error(State::ERROR, '通信失败，网络不通或者密钥文件有误？！');
+            return err('通信失败，网络不通或者密钥文件有误？！');
         }
 
         $result = We7::xml2array($input);
@@ -142,7 +142,7 @@ class WxMCHPay
         Log::debug('mchpay', array('req' => $req, 'resp' => $result));
 
         if (!is_array($result)) {
-            return error(State::ERROR, '数据解析失败！');
+            return err('数据解析失败！');
         }
 
         if ((isset($result['return_code']) && $result['return_code'] == 'SUCCESS') &&
@@ -151,7 +151,7 @@ class WxMCHPay
             return $result;
         }
 
-        return error(State::ERROR, $result['err_code_des']);
+        return err($result['err_code_des']);
     }
 
     /**

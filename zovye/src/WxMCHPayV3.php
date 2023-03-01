@@ -11,10 +11,6 @@ require MODULE_ROOT.'vendor/autoload.php';
 use Exception;
 
 use GuzzleHttp\Exception\RequestException;
-use WeChatPay\Builder;
-use WeChatPay\BuilderChainable;
-use WeChatPay\Crypto\Rsa;
-use WeChatPay\Util\PemUtil;
 
 class WxMCHPayV3
 {
@@ -71,7 +67,7 @@ class WxMCHPayV3
     public function transferTo($openid, $trade_no, $money, string $desc = ''): array
     {
         if ($money < MCH_PAY_MIN_MONEY) {
-            return error(State::ERROR, '提现金额不能小于'.number_format(MCH_PAY_MIN_MONEY / 100, 2).'元');
+            return err('提现金额不能小于'.number_format(MCH_PAY_MIN_MONEY / 100, 2).'元');
         }
 
         $data = [

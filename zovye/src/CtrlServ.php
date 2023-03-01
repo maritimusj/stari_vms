@@ -113,7 +113,7 @@ class CtrlServ
             $appKey = settings('ctrl.appKey');
 
             if (empty($ctrlServerUrl) || empty($appKey)) {
-                return error(State::ERROR, '控制中心配置错误！');
+                return err('控制中心配置错误！');
             }
 
             if ($ctrlServerUrl[strlen($ctrlServerUrl) - 1] != '/') {
@@ -174,7 +174,7 @@ class CtrlServ
             return self::$http_client->request($ctrlServerUrl, $method, $headers, $body);
         }
 
-        return error(State::ERROR, '没有配置请求对象！');
+        return err('没有配置请求对象！');
     }
 
     /**

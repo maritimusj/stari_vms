@@ -23,11 +23,10 @@ use zovye\model\userModelObj;
 use zovye\Order;
 use zovye\Pay;
 use zovye\Request;
-use zovye\State;
 use zovye\User;
 use zovye\Util;
 use zovye\ZovyeException;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -265,7 +264,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
 
     $order = Order::create($order_data);
     if (empty($order)) {
-        return [error(State::FAIL, '领取失败，创建订单失败'), null];
+        return [err('领取失败，创建订单失败'), null];
     }
 
     unset($params['src']);
@@ -277,14 +276,14 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         //事件：订单已经创建
         EventBus::on('device.orderCreated', $params);
     } catch (Exception $e) {
-        return [error(State::ERROR, $e->getMessage()), null];
+        return [err($e->getMessage()), null];
     }
 
     $user->remove('last');
 
     foreach ($params as $entry) {
         if ($entry instanceof modelObj && !$entry->save()) {
-            return [error(State::FAIL, '无法保存数据，请重试'), null];
+            return [err('无法保存数据，请重试'), null];
         }
     }
 
@@ -323,7 +322,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
     }
 
     if (!$order->save()) {
-        return [error(State::FAIL, '无法保存订单数据！'), null];
+        return [err('无法保存订单数据！'), null];
     }
 
     if (is_error($res)) {
@@ -336,11 +335,11 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
         if (isset($goods['cargo_lane'])) {
             $locker = $device->payloadLockAcquire(3);
             if (empty($locker)) {
-                return [error(State::ERROR, '设备正忙，请重试！')];
+                return [err('设备正忙，请重试！')];
             }
             $res = $device->resetPayload([$goods['cargo_lane'] => -1], "订单：$order_no");
             if (is_error($res)) {
-                return [error(State::ERROR, '保存库存变动失败！')];
+                return [err('保存库存变动失败！')];
             }
             $locker->unlock();
         }
@@ -350,7 +349,7 @@ function createOrder(array $params, string $order_no, array $goods, int $mcb_cha
             $voucher->setUsedUserId($user->getId());
             $voucher->setUsedtime(time());
             if (!$voucher->save()) {
-                return [error(State::ERROR, '使用取货码失败！'), null];
+                return [err('使用取货码失败！'), null];
             }
         }
     }

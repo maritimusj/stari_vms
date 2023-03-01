@@ -8,10 +8,9 @@ namespace lcsw;
 
 use we7\ihttp;
 use zovye\App;
-use zovye\State;
 
 use zovye\Util;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 
 class pay
@@ -61,15 +60,15 @@ class pay
 
         $content = json_decode($res['content'], true);
         if (empty($content)) {
-            return error(State::FAIL, '请求失败！');
+            return err('请求失败！');
         }
         
         if ($content['success'] === 'error') {
-            return error(State::FAIL, $content['msg']);
+            return err($content['msg']);
         }
 
         if ($content['return_code'] !== '01' || $content['result_code'] !== '01') {
-            return error(State::FAIL, $content['return_msg']);
+            return err($content['return_msg']);
         }
 
         return $content;

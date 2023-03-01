@@ -298,18 +298,18 @@ function isEmptyArray($arr): bool
  */
 function error(int $errno, string $message = ''): array
 {
-    return array(
+    return [
         'errno' => $errno,
         'message' => $message,
-    );
+    ];
 }
 
 function err(string $message = ''): array
 {
-    return array(
+    return [
         'errno' => State::ERROR,
         'message' => $message,
-    );
+    ];
 }
 
 /**

@@ -9,9 +9,7 @@ namespace SQB;
 use we7\ihttp;
 use zovye\App;
 use zovye\Log;
-use zovye\State;
 use function zovye\err;
-use function zovye\error;
 use function zovye\is_error;
 
 class pay
@@ -63,7 +61,7 @@ fwIDAQAB
 
         $content = json_decode($res['content'], true);
         if (empty($content)) {
-            return error(State::FAIL, '请求失败！');
+            return err('请求失败！');
         }
 
         if ($content['result_code'] !== '200') {

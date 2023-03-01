@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\SNTOAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\SNTOAccount;
 
 if (App::isSNTOEnabled()) {
 

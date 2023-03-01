@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //设备故障 提交列表
 
 $tpl_data = [];

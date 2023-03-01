@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\ZhiJinBaoAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\ZhiJinBaoAccount;
 
 Log::debug('zjbao', [
     'raw' => Request::raw(),

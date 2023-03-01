@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $agent_id = Request::int('id');
 $agent = Agent::get($agent_id);
 

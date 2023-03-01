@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $result = Util::createQrcodeFile('agent', Util::murl('mobile'));
 
 if (is_error($result)) {

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\agent_appModelObj;
 
 $page = max(1, Request::int('page'));

@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\YunfenbaAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\YunfenbaAccount;
 
 Log::debug('yunfenba', [
     'raw' => Request::raw(),

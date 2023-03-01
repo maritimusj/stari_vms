@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\user_logsModelObj;
 
 $page = max(1, Request::str('page'));

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //处理反馈
 use zovye\model\device_feedbackModelObj;
 

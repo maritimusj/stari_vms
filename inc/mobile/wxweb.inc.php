@@ -9,7 +9,6 @@ namespace zovye\wxWebApi;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\api\router;
-use zovye\api\wxweb\fueling;
 use zovye\Request;
 use zovye\Util;
 

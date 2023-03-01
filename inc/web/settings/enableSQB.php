@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $app_id = Request::trim('app_id');
 $vendor_sn = Request::trim('vendor_sn');
 $vendor_key = Request::trim('vendor_key');

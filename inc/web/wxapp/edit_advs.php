@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $tpl_data = [];
 
 $content = app()->fetchTemplate('web/wxapp/advs', $tpl_data);

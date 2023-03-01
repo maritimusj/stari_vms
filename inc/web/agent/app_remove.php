@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $id = Request::int('id');
 $app = m('agent_app')->findOne(We7::uniacid(['id' => $id]));
 

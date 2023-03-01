@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\WxWorkAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\WxWorkAccount;
 
 $raw = Request::raw();
 if (empty($raw)) {

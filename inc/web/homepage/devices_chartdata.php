@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $content = app()->fetchTemplate(
     'web/home/chart',
     [

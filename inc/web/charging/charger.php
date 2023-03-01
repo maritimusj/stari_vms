@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $id = Request::int('id');
 $device = Device::get($id);
 if (!$device || !$device->isChargingDevice()) {

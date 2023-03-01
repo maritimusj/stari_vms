@@ -6,8 +6,9 @@
  
 namespace zovye;
 
-$tpl_data = [
-];
+defined('IN_IA') or exit('Access Denied');
+
+$tpl_data = [];
 
 $id = Request::int('id');
 if ($id > 0) {

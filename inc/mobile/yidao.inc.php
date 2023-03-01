@@ -7,9 +7,9 @@
 
 namespace zovye;
 
-use zovye\account\YiDaoAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\YiDaoAccount;
 
 YiDaoAccount::cb([
     'key' => Request::str('key'),

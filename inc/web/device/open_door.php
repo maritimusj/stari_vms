@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (!App::isDeviceWithDoorEnabled()) {
     JSON::fail('没有启用这个功能！');
 }

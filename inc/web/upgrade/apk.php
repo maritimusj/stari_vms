@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $title = Request::trim('title');
 $url = Request::trim('url');
 $version = Request::trim('version');

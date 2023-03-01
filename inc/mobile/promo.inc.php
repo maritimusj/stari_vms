@@ -6,10 +6,10 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use RuntimeException;
 use zovye\model\userModelObj;
-
-defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op('default');
 if ($op == 'sms') {

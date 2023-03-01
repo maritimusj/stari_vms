@@ -7,9 +7,9 @@
 
 namespace zovye;
 
-use zovye\model\userModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\userModelObj;
 
 if (!App::isFlashEggEnabled()) {
     Util::resultAlert('该功能没有启用，请联系管理员，谢谢！', 'error');

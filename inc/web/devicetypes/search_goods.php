@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $keywords = Request::trim('keywords', '', true);
 if (empty($keywords)) {
     $res = Goods::getList(['page' => 1, 'pagesize' => 100, 'default_goods' => true]);

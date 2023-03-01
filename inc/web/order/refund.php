@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $id = Request::int('id');
 if (Request::has('num')) {
     $num = Request::int('num');

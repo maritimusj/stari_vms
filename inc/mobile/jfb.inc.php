@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\JfbAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\JfbAccount;
 
 $op = Request::op('default');
 

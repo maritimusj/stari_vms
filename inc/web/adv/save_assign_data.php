@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $id = Request::int('id');
 $data = Request::is_string('data') ? json_decode(htmlspecialchars_decode(Request::str('data')), true) : request(
     'data'

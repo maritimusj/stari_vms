@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $iccid = Request::str('iccid');
 if (empty($iccid)) {
     JSON::fail('错误：iccid 为空！');

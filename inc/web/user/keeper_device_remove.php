@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\deviceModelObj;
 
 $user = User::get(Request::int('user'));

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $tp_lid = settings('notice.agentReq_tplid');
 if (empty($tp_lid)) {
     JSON::fail('请先设置消息模板ID，否则无法推送通知!');

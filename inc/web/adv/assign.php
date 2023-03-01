@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $media_data = Advertising::getMediaData();
 
 $id = Request::int('id');

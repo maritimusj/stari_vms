@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $keywords = Request::trim('keywords', '', true);
 $params = [
     'keywords' => $keywords,

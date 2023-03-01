@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (Request::is_ajax()) {
     JSON::result(Device::search());
 }

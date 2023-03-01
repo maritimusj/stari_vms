@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //补货记录
 use zovye\model\goodsModelObj;
 use zovye\model\replenishModelObj;

@@ -6,7 +6,10 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use DateTime;
+use zovye\model\wx_appModelObj;
 
 $settings = settings();
 

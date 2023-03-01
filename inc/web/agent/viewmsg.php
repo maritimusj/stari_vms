@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\agent_msgModelObj;
 
 $agent_id = Request::isset('id') ? Request::int('id') : Request::int('agentid');

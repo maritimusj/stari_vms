@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $device = Device::get(Request::int('id'));
 if ($device) {
     JSON::success([

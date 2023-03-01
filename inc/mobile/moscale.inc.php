@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\MoscaleAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\MoscaleAccount;
 
 $data = Request::raw();
 Log::debug('moscale', $data);

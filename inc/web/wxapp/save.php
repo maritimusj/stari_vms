@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (!App::isCustomWxAppEnabled()) {
     JSON::fail('功能未启用！');
 }

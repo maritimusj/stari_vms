@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $goods = Goods::get(request('id'));
 if (empty($goods)) {
     JSON::fail('找不到这个商品！');

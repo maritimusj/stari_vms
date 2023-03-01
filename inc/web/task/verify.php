@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $result = Util::transactionDo(function () {
     $task = Task::get(Request::int('id'));
 

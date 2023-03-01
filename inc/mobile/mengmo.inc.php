@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\MengMoAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\MengMoAccount;
 
 MengMoAccount::cb([
     'open_id' => Request::str('open_id'),

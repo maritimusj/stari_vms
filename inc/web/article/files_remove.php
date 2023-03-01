@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $id = Request::int('id');
 if ($id) {
     $archive = m('files')->findOne(We7::uniacid(['id' => $id]));

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $inventory = Inventory::get(Request::int('id'));
 if (empty($inventory)) {
     JSON::fail('找不到这个仓库！');

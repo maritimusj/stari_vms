@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $vip = VIP::get(Request::int('id'));
 if (!$vip) {
     JSON::fail('找不到这个VIP用户！');

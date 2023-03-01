@@ -2,6 +2,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $commission_enabled = App::isCommissionEnabled();
 
 $id = Request::int('id');

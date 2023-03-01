@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $result_msg = function ($msg, $status) {
     if (Request::is_ajax()) {
         if ($status) {

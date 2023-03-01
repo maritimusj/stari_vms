@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $user_id = Request::int('id');
 $user = User::get($user_id);
 

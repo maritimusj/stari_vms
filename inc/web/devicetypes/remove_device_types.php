@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $device_type = DeviceTypes::get(request('id'));
 if (empty($device_type)) {
     JSON::fail('找不到这个设备型号！');

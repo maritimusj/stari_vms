@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $device = Device::get(request('id'));
 if (empty($device)) {
     Util::itoast('找不到这个设备！', $this->createWebUrl('device'), 'error');

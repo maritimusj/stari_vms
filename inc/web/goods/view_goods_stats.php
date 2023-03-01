@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use DateTime;
 
 $goods = Goods::get(Request::int('id'));

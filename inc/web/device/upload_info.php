@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $config = settings('device.upload', []);
 if (empty($config['url'])) {
     JSON::fail('没有配置第三方平台！');

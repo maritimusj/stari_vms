@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //新分组管理
 use zovye\model\device_groupsModelObj;
 

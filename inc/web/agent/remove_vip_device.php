@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $vip_id = Request::int('vip');
 $vip = VIP::get($vip_id);
 if (empty($vip)) {

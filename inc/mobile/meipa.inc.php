@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\MeiPaAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\MeiPaAccount;
 
 $op = Request::op('default');
 

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 Config::app('wxapp.advs.reward.bonus', [
     'level0' => [
         'max' => max(0, Request::int('numLevel0')),

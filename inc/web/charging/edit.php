@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $tpl_data = [
     'lbs_key' => settings('user.location.appkey', DEFAULT_LBS_KEY),
 ];

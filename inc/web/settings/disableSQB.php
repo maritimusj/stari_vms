@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (updateSettings('pay.SQB', [])) {
     JSON::success('成功！');
 }

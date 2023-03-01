@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $priceFN = function ($is_floating, $data) {
     if ($data['cargo_lanes']) {
         foreach ((array)$data['cargo_lanes'] as $index => $lane) {

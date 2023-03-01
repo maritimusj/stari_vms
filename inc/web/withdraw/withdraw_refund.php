@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\commission_balanceModelObj;
 
 $balance_obj = Util::getAndCheckWithdraw(Request::int('id'));

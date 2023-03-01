@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use Exception;
-
 defined('IN_IA') or exit('Access Denied');
+
+use Exception;
 
 $op = Request::op('default');
 $job_filename = ZOVYE_CORE_ROOT."jobs/$op.php";

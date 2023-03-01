@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $params = [
     'page' => Request::int('page'),
     'pagesize' => Request::int('pagesize', 20),

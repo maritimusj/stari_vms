@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $wxapp = WxApp::get(Request::int('id'));
 if (empty($wxapp)) {
     JSON::fail('找不到这个小程序！');

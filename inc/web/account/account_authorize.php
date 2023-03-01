@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $url = WxPlatform::getPreAuthUrl();
 if (empty($url)) {
     JSON::fail('暂时无法获取授权转跳网址！');

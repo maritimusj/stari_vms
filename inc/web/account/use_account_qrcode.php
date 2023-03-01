@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (!App::isUseAccountQRCode()) {
     JSON::fail('未启用这个功能！');
 }

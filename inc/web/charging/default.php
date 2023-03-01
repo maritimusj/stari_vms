@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //分组表
 use zovye\model\device_groupsModelObj;
 

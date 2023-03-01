@@ -6,10 +6,10 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\orderModelObj;
 use zovye\model\pay_logsModelObj;
-
-defined('IN_IA') or exit('Access Denied');
 
 $op = Request::op('default');
 

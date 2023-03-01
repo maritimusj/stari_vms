@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $type = Request::int('type', Account::NORMAL);
 
 app()->showTemplate('web/account/edit_'.$type, [

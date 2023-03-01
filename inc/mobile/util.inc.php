@@ -6,10 +6,9 @@
 
 namespace zovye;
 
-use Exception;
-use zovye\model\deviceModelObj;
-
 defined('IN_IA') or exit('Access Denied');
+
+use Exception;
 
 $op = Request::op('default');
 if ($op == 'default') {

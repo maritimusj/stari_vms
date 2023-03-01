@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //分配设备控件查询代理详情
 use zovye\model\agent_vwModelObj;
 

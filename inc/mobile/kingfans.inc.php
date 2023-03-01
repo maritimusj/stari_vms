@@ -6,9 +6,9 @@
 
 namespace zovye;
 
-use zovye\account\KingFansAccount;
-
 defined('IN_IA') or exit('Access Denied');
+
+use zovye\account\KingFansAccount;
 
 Log::debug('kingfans', [
     'raw' => Request::raw(),

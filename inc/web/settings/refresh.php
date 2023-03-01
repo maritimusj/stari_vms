@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 if (Job::refreshSettings()) {
     JSON::success('启动刷新任务成功！');
 }

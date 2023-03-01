@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $agent = Agent::get(Request::int('id'));
 if (empty($agent)) {
     JSON::fail('找不到这个代理商！');

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //简单的二维码导出功能
 use ZipArchive;
 use zovye\model\deviceModelObj;

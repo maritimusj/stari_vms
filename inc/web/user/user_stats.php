@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\model\userModelObj;
 
 $ids = Request::isset('id') ? [Request::int('id')] : Request::array('ids');

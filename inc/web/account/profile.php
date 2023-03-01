@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use zovye\JSON;
 use zovye\Account;
 use zovye\Request;

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $from = Request::str('from') ?: 'partneradd';
 
 $agent_id = Request::int('agentid');

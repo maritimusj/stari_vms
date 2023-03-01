@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $goods = Goods::get(request('id'));
 if ($goods && $goods->getType() !== Goods::FlashEgg) {
 

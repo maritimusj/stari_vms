@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $media = request('media') ?: [
     'type' => settings('misc.pushAccountMsg_type'),
     'val' => settings('misc.pushAccountMsg_val'),

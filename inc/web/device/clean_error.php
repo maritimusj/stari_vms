@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //清除所有设备的错误代码
 Device::cleanAllErrorCode();
 

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $confirm_code = Request::trim('code');
 $device = Device::get(request('id'));
 if (empty($device)) {

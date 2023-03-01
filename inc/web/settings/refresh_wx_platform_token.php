@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 JSON::success([
     'token' => Util::random(32),
 ]);

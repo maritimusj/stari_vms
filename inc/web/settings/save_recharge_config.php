@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $promotion = Request::array('promotion');
 
 $enabled = $promotion['enabled'] == 'true';

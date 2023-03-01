@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use DateTime;
 use Exception;
 use zovye\model\device_recordModelObj;

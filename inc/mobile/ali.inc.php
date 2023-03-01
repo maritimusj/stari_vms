@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $op = Request::op('default');
 $from = Request::str('from');
 $device_id = Request::str('device');

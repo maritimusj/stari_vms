@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 $user = User::get(Request::int('id'));
 if (empty($user)) {
     JSON::fail('没有找到这个用户！');

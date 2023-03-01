@@ -7,6 +7,7 @@
 namespace zovye\model;
 
 use zovye\Account;
+use zovye\Agent;
 use zovye\App;
 use zovye\base\modelObj;
 use zovye\base\modelObjFinder;
@@ -148,6 +149,14 @@ class accountModelObj extends modelObj
             'img' => $this->isThirdPartyPlatform() ? $this->getImg() : Util::toMedia($this->getImg(), true),
             'qrcode' => Util::toMedia($this->getQrcode(), true),
         ];
+    }
+
+    public function getAgent(): ?agentModelObj
+    {
+        if ($this->agent_id) {
+            return Agent::get($this->agent_id);
+        }
+        return null;
     }
 
     public function isBanned(): bool

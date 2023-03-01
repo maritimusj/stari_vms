@@ -178,6 +178,10 @@ class Goods
             $data['type'] = 'lottery';
         }
 
+        if ($entry->isFlashEgg()) {
+            $data['type'] = 'flash_egg';
+        }
+
         $cost_price = $entry->getCostPrice();
 
         if (!empty($cost_price)) {

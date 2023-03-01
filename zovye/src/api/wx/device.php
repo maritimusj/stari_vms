@@ -179,6 +179,10 @@ class device
             }
         }
 
+        if (App::isFlashEggEnabled()) {
+            $result['extra']['adDeviceUID'] = $device->getAdDeviceUID();
+        }
+
         $payload = $device->getPayload(true);
         if ($payload && is_array($payload['cargo_lanes'])) {
             $result['status']['cargo_lanes'] = array_map(function ($lane) {

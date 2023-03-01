@@ -719,6 +719,10 @@ class agent
             $msg .= '！';
         }
 
+        if (App::isFlashEggEnabled()) {
+            setArray($extra, 'ad.device.uid', Request::trim('adDeviceUID'));
+        }
+
         if ($device->set('extra', $extra) && $device->save()) {
             if ($device->isFuelingDevice() && $device->isMcbOnline()) {
                 $res = Fueling::config($device);

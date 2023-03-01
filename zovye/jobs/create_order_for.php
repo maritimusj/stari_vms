@@ -17,7 +17,7 @@ use zovye\Locker;
 use zovye\Log;
 use zovye\Order;
 use zovye\Request;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 use function zovye\settings;
 
@@ -73,7 +73,7 @@ try {
         'user' => $user,
     ]);
 } catch (Exception $e) {
-    $order->setExtraData('pull.result', error(1, $e->getMessage()));
+    $order->setExtraData('pull.result', err($e->getMessage()));
     $order->save();
     throw new JobException($e->getMessage(), $log);
 }
@@ -88,7 +88,7 @@ $total = $order->getNum();
 $goods = $device->getGoods($goods_id);
 
 if (empty($goods) || $goods['num'] < $total) {
-    $order->setExtraData('pull.result', error(1, '商品库存不足！'));
+    $order->setExtraData('pull.result', err('商品库存不足！'));
     $order->save();
     throw new JobException('商品库存不足！', $log);
 }
@@ -119,7 +119,7 @@ for ($i = 0; $i < $total; $i++) {
 }
 
 if ($fail > 0) {
-    $order->setExtraData('pull.result', error(1, '部分商品出货失败！'));
+    $order->setExtraData('pull.result', err('部分商品出货失败！'));
 } else {
     $order->setExtraData('pull.result', [
         'errno' => 0,

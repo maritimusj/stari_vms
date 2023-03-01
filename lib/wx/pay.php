@@ -9,7 +9,7 @@ namespace wx;
 use we7\ihttp;
 use zovye\Util;
 use zovye\We7;
-use function zovye\error;
+use function zovye\err;
 use function zovye\is_error;
 
 class pay
@@ -66,23 +66,23 @@ class pay
 
         $result = We7::xml2array($input);
         if (!is_array($result)) {
-            return error(-1, 'xml结构错误');
+            return err('xml结构错误');
         }
 
         if (isset($result['return_code']) && $result['return_code'] != 'SUCCESS') {
-            return error(-1, $result['return_msg'] ?: '接口返回失败！');
+            return err($result['return_msg'] ?: '接口返回失败！');
         }
 
         if (isset($result['result_code']) && $result['result_code'] != 'SUCCESS') {
-            return error(-1, $result['err_code_des'] ?: '接口返回失败！');
+            return err($result['err_code_des'] ?: '接口返回失败！');
         }
 
         if (isset($result['trade_state']) && $result['trade_state'] != 'SUCCESS') {
-            return error(-1, $result['trade_state_desc'] ?: '接口返回失败！');
+            return err($result['trade_state_desc'] ?: '接口返回失败！');
         }
 
         if (!empty($result['sign']) && $this->bulidsign($result) != $result['sign']) {
-            return error(-1, '验证签名出错！');
+            return err('验证签名出错！');
         }
 
         return $result;
@@ -162,24 +162,24 @@ class pay
     {
         //检测必填参数
         if (empty($params['out_trade_no'])) {
-            return error(-1, '缺少统一支付接口必填参数out_trade_no:商户订单号');
+            return err('缺少统一支付接口必填参数out_trade_no:商户订单号');
         }
         if (empty($params['body'])) {
-            return error(-1, '缺少统一支付接口必填参数body:商品描述');
+            return err('缺少统一支付接口必填参数body:商品描述');
         }
         if (empty($params['total_fee'])) {
-            return error(-1, '缺少统一支付接口必填参数total_fee:总金额');
+            return err('缺少统一支付接口必填参数total_fee:总金额');
         }
         if (empty($params['trade_type'])) {
-            return error(-1, '缺少统一支付接口必填参数trade_type:交易类型');
+            return err('缺少统一支付接口必填参数trade_type:交易类型');
         }
 
         //关联参数
         if ('JSAPI' == $params['trade_type'] && empty($params['openid'])) {
-            return error(-1, '统一支付接口中，缺少必填参数openid！交易类型为JSAPI时，openid为必填参数！');
+            return err('统一支付接口中，缺少必填参数openid！交易类型为JSAPI时，openid为必填参数！');
         }
         if ('NATIVE' == $params['trade_type'] && empty($params['product_id'])) {
-            return error(-1, '统一支付接口中，缺少必填参数product_id！交易类型为NATIVE时，product_id为必填参数！');
+            return err('统一支付接口中，缺少必填参数product_id！交易类型为NATIVE时，product_id为必填参数！');
         }
 
         if (empty($params['notify_url'])) {

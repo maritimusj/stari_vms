@@ -13,7 +13,6 @@ use zovye\model\accountModelObj;
 $page = max(1, Request::int('page'));
 $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
 
-
 $query = Account::query();
 
 $banned = Request::bool('banned');
@@ -161,7 +160,20 @@ if ($total > 0) {
     }
 }
 
+$navs = [
+    [ 'title' => '全部' ],
+    [ 'title' => '闪蛋','type' => Account::FlashEgg,'enabled' => App::isFlashEggEnabled() ],
+    [ 'title' => '第三方平台', 'type' => -1 ],
+    [ 'title' => '公众号', 'type' => Account::NORMAL ],
+    [ 'title' => '视频', 'type' => Account::VIDEO ],
+    [ 'title' => '抖音', 'type' => Account::DOUYIN, 'enabled' => App::isDouyinEnabled()],
+    [ 'title' => '小程序', 'type' => Account::WXAPP ],
+    [ 'title' => '问卷', 'type' => Account::QUESTIONNAIRE],
+    [ 'title' => '自定义任务', 'type' => Account::TASK, 'enabled' => App::isBalanceEnabled()],
+];
+
 app()->showTemplate('web/account/default', [
+    'navs' => $navs,
     'agent' => $agent ?? null,
     'accounts' => $accounts,
     'type' => $type ?? null,

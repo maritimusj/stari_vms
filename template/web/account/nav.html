@@ -1,0 +1,36 @@
+<ul class="nav nav-tabs" id="navbar">
+    {if $banned}
+        {loop $navs $nav}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+        {/loop}
+    {else}
+        {loop $navs $nav}
+        {if $type === $nav['type']}
+            {if $agent}
+            <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+            <li role="presentation" class="active">
+                <a href="#">{php echo $agent->getName()}
+                    <sup style="color: red;">*</sup>
+                </a>
+            </li>
+            {else}
+            <li role="presentation" class="active"><a href="#">{$nav['title']}</a></li>
+            {/if}
+        {else}
+        <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+        {/if}
+        {/loop}
+    {/if}
+
+    {if $agent && $banned}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['banned' => 1]);}">已隐藏的任务</a></li>
+    <li role="presentation"{if $banned} class="active"{/if}>
+        <a href="{php echo $this->createWebUrl('account', ['banned' => 1]);}">
+        {php echo $agent->getName()}
+        <sup style="color: red;">*</sup>
+        </a>
+    </li>
+    {else}
+    <li role="presentation"{if $banned} class="active"{/if}><a href="{php echo $this->createWebUrl('account', ['banned' => 1]);}">已隐藏的任务</a></li>
+    {/if}
+</ul>

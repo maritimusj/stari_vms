@@ -88,7 +88,7 @@ class FlashEgg
         $type = Request::str('mediaType', 'video');
 
         //适配小程序端上传图片
-        $parseImgUrl = function($url) {
+        $stripUrl = function($url) {
             $result = explode('@', $url, 2);
             if (empty($result)) {
                 return '';
@@ -96,9 +96,10 @@ class FlashEgg
             return count($result) == 2 ? $result[1] : $result[0];
         };
 
+        $goodsImg = $stripUrl(Request::str('goodsImage'));
         $gallery = [];
         foreach (Request::array('gallery') as $url) {
-            $gallery[] = $parseImgUrl($url);
+            $gallery[] = $stripUrl($url);
         }
 
         $goods = $account->getGoods();
@@ -108,7 +109,7 @@ class FlashEgg
             $goods_data = [
                 'agent_id' => $account->getAgentId(),
                 'name' => $account->getTitle(),
-                'img' => $parseImgUrl(Request::str('goodsImage')),
+                'img' => $goodsImg,
                 'sync' => 0,
                 'price' => intval(round(Request::float('goodsPrice', 0, 2) * 100)),
                 's1' => $s1,
@@ -130,7 +131,7 @@ class FlashEgg
             }
         } else {
             $goods->setAgentId($account->getAgentId());
-            $goods->setImg($parseImgUrl(Request::trim('goodsImage')));
+            $goods->setImg($goodsImg);
             $goods->setPrice(intval(round(Request::float('goodsPrice', 0, 2) * 100)));
             $goods->setUnitTitle(Request::trim('goodsUnitTitle', '个'));
 

@@ -20,4 +20,24 @@ class Media extends State
         self::VIDEO => '视频',
         self::SRT => '字幕',
     ];
+
+    public static function sign($url): string
+    {
+        return sha1(App::uid().Util::getClientIp().$url).'@'.$url;
+    }
+
+    public static function verify($signature_url): bool
+    {
+        list($sha1val, $url) = explode('@', $signature_url, 2);
+        return !empty($sha1val) && !empty($url) && sha1(App::uid().Util::getClientIp().$url) == $sha1val;
+    }
+
+    public static function strip($signature_url)
+    {
+        list($sha1val, $url) = explode('@', $signature_url, 2);
+        if (!empty($sha1val) && !empty($url) && sha1(App::uid().Util::getClientIp().$url) == $sha1val) {
+            return $url;
+        }
+        return false;
+    }
 }

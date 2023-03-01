@@ -101,11 +101,11 @@ class mp
         $user = common::getAgentOrPartner();
 
         if ($more) {
-            $data['img_signatured'] = sha1(App::uid().CLIENT_IP.$account->getImg()).'@'.$account->getImg();
+            $data['img_signatured'] = Media::sign($account->getImg());
             if ($account->isVideo()) {
-                $data['media_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getMedia();
+                $data['media_signatured'] = Media::sign($account->getMedia());
             } else {
-                $data['qrcode_signatured'] = sha1(App::uid().CLIENT_IP.$account->getQrcode()).'@'.$account->getQrcode();
+                $data['qrcode_signatured'] = Media::sign($account->getQrcode());
             }
 
             $data['assigned'] = [];
@@ -221,8 +221,10 @@ class mp
                         'file' => $filename,
                         'error' => $e->getMessage(),
                     ]);
+
                     return error(State::ERROR, $e->getMessage());
                 }
+
                 return ['file' => $filename, 'fullpath' => Util::toMedia($filename)];
             }
         }
@@ -383,14 +385,14 @@ class mp
 
         if (Request::has('qrcode')) {
             $type = Account::NORMAL;
-            list($sha1val, $url) = explode('@', Request::str('qrcode'), 2);
-            if (empty($sha1val) || empty($url) || sha1(App::uid().CLIENT_IP.$url) != $sha1val) {
+            $url = Media::strip(Request::str('qrcode'));
+            if ($url === false) {
                 return error(State::ERROR, '请上传正确的二维码文件！');
             }
         } elseif (Request::has('media')) {
             $type = Account::VIDEO;
-            list($sha1val, $url) = explode('@', Request::str('media'), 2);
-            if (empty($sha1val) || empty($url) || sha1(App::uid().CLIENT_IP.$url) != $sha1val) {
+            $url = Media::strip(Request::str('media'));
+            if ($url === false) {
                 return error(State::ERROR, '请上传正确的视频文件！');
             }
         } elseif (Request::has('douyinUrl')) {
@@ -403,8 +405,8 @@ class mp
             return error(State::ERROR, '请指定正确的文件网址！');
         }
 
-        list($sha1val, $img_url) = explode('@', Request::str('img'), 2);
-        if (empty($sha1val) || empty($img_url) || sha1(App::uid().CLIENT_IP.$img_url) != $sha1val) {
+        $img_url = Media::strip(Request::str('img'));
+        if ($img_url === false) {
             return error(State::ERROR, '请上传正确的头像文件！');
         }
 

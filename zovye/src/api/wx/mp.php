@@ -94,6 +94,8 @@ class mp
             $data['_goods'] = $account->getGoodsData(false);
             $data['media'] = [
                 'type' => $account->getMediaType(),
+                'files' => $account->getMedia(true),
+                '_files' => $account->getMedia(),
                 'duration' => $account->getDuration(),
                 'area' => $account->getArea(),
             ];

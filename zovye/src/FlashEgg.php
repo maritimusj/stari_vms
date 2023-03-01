@@ -158,14 +158,16 @@ class FlashEgg
 
         if ($type == 'video') {
             $config['ad']['video'] = [
-                'url' => Request::trim('video'),
+                'url' => $stripUrl(Request::trim('video')),
             ];
         } else {
-            $config['ad']['images'] = Request::array('images');
+            $images = [];
+            foreach (Request::array('images') as $url) {
+                $images[] = $stripUrl($url);
+            }
+            $config['ad']['images'] = $images;
         }
 
-        $account->set('config', $config);
-
-        return true;
+        return $account->set('config', $config);
     }
 }

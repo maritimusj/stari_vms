@@ -40,6 +40,9 @@ class giftModelObj extends modelObj
 	/** @var int */
 	protected $agent_id;
 
+	/** @var bool */
+	protected $enabled;
+
 	/** @var string */
 	protected $name;
 
@@ -93,6 +96,7 @@ class giftModelObj extends modelObj
 			'name' => $this->name,
 			'description' => $this->description,
 			'image' => $fullpath ? Util::toMedia($this->image, $fullpath) : $this->image,
+			'enabled' => $this->enabled,
 			'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
 		];
 	}

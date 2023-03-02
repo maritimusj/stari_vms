@@ -10,14 +10,16 @@ CREATE TABLE `ims_zovye_vms_gift`(
     `id` INT NOT NULL AUTO_INCREMENT,
     `uniacid` INT NOT NULL,
     `agent_id` INT NOT NULL,
+    `enabled` TINYINT(4) NOT NULL DEFAULT '0',
     `name` VARCHAR(100) NOT NULL,
     `description` VARCHAR(255) NOT NULL DEFAULT '',
     `image` VARCHAR(255) NOT NULL DEFAULT '',
     `extra` JSON NOT NULL,
     `createtime` INT NOT NULL,
     PRIMARY KEY(`id`),
-    INDEX(`uniacid`, `agent_id`)
+    INDEX(`uniacid`, `agent_id`, `enabled`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4; 
+
 CREATE TABLE `ims_zovye_vms_gift_log`(
     `id` INT NOT NULL AUTO_INCREMENT,
     `gift_id` INT NOT NULL,

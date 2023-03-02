@@ -24,6 +24,7 @@ $data = [
     'extra' => [
         'goods' => [],
     ],
+    'enabled' => Request::bool('enabled', false),
 ];
 
 $goods_ids = Request::array('goods');
@@ -51,6 +52,7 @@ if ($id > 0) {
     $gift->setDescription($data['description']);
     $gift->setImage($data['image']);
     $gift->setExtraData($data['extra']);
+    $gift->setEnabled($data['enabled']);
 
     if ($gift->save()) {
         Util::itoast('保存成功！', Util::url('account', ['op' => 'gift_edit', 'id' => $gift->getId()]), 'success');

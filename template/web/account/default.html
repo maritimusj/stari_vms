@@ -181,8 +181,13 @@
             </a>
             {if $type ==\zovye\Account::FlashEgg}
             <a href="{php echo $this->createWebUrl('account', array('op'=>'gift'));}">
-                <span class="state auth" title="集蛋活动">
-                    <img src="{php echo MODULE_URL . 'static/img/gift.svg'}">
+                <span class="state auth" title="闪蛋集蛋活动">
+                    <img src="{php echo MODULE_URL . 'static/img/egg_gift.svg'}">
+                </span>
+            </a>
+            <a href="{php echo $this->createWebUrl('account', array('op'=>'gift'));}">
+                <span class="state auth" title="闪蛋抽奖活动">
+                    <img src="{php echo MODULE_URL . 'static/img/egg_guess.svg'}">
                 </span>
             </a>
             {/if}

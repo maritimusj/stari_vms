@@ -24,6 +24,12 @@
     #flashGiftList .desc {
         max-width: 10em;
     }
+    #flashGiftList .fa-check {
+        color:#9e9e9e;
+    }
+    #flashGiftList .fa-check.enabled {
+        color: #4caf50;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -84,6 +90,9 @@
                     </td>
                     <td class="name">
                         {$item['name']}
+                        {if $item['enabled']}
+                        <i class="fa fa-check enabled" title="已启用"></i>
+                        {/if}
                     </td>
                     <td class="desc">
                         {$item['description']}

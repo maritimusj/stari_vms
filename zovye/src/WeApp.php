@@ -629,6 +629,18 @@ zovye_fn.balancePay = function(goods, num) {
 JSCODE;
         }
 
+        if (App::isFlashEggEnabled()) {
+            $gift_url = Util::url('account', [
+                'op' => 'gift_detail',
+                'device' => $device->getImei(),
+            ]);
+            $tpl['js']['code'] .= <<<JSCODE
+            zovye_fn.redirectToFlashEggGiftPage = function() {
+                window.location.href = "$gift_url";
+            }
+JSCODE;
+        }
+
         $tpl['js']['code'] .= "\r\n</script>";
 
         if (User::isSnapshot()) {
@@ -653,7 +665,6 @@ JSCODE;
             //尝试调起用户登录页面
             $tpl['js']['code'] = <<<JSCODE
 <script>
-    
 	const u = navigator.userAgent;
     const isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
     const isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
@@ -1948,6 +1959,12 @@ JSCODE;
         $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }
 
+    /**
+     * 闪蛋用户关注页面
+     * @param userModelObj $user
+     * @param deviceModelObj $device
+     * @return void
+     */
     public function followPage(userModelObj $user, deviceModelObj $device)
     {
         $tpl_data = Util::getTplData([
@@ -1977,9 +1994,53 @@ JSCODE;
 </script>
 JSCODE;
 
-    if (User::isSnapshot()) {
-        $tpl_data['js']['code'] .= $this->snapshotJs($device->getImei(), 'sample');
+        if (User::isSnapshot()) {
+            $tpl_data['js']['code'] .= $this->snapshotJs($device->getImei(), 'sample');
+        }
+
+        $filename = Theme::getThemeFile($device, 'qrcode');
+        $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }
+
+    /**
+     * 闪蛋活动详情面页面
+     * @param userModelObj $user
+     * @param deviceModelObj $device
+     * @return void
+     */
+    public function giftDetailPage(userModelObj $user, deviceModelObj $device)
+    {
+        $tpl_data = Util::getTplData([
+            'user' => $user->profile(),
+            'device' => $device->profile(),
+        ]);
+
+        $api_url = Util::murl('sample', ['device' => $device->getImei()]);
+        $jquery_url = JS_JQUERY_URL;
+
+        $tpl_data['js']['code'] = <<<JSCODE
+<script src="$jquery_url"></script>
+<script>
+
+    const zovye_fn = {
+        api_url: "$api_url",
+    }
+
+    zovye_fn.getQRCode = function() {
+        return $.getJSON(zovye_fn.api_url, {op: "qrcode"});
+    }
+    
+    zovye_fn.checkUser = function() {
+        return $.getJSON(zovye_fn.api_url, {op: "check"});
+    }
+    
+</script>
+JSCODE;
+
+        if (User::isSnapshot()) {
+            $tpl_data['js']['code'] .= $this->snapshotJs($device->getImei(), 'sample');
+        }
+
         $filename = Theme::getThemeFile($device, 'qrcode');
         $this->showTemplate($filename, ['tpl' => $tpl_data]);
     }

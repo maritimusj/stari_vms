@@ -18,6 +18,12 @@
         width: 64px;
         height: 64px;
     }
+    #flashGiftList .name {
+        max-width: 6em;
+    }
+    #flashGiftList .desc {
+        max-width: 10em;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -76,10 +82,10 @@
                     <td>
                         {php echo $index + 1}
                     </td>
-                    <td>
+                    <td class="name">
                         {$item['name']}
                     </td>
-                    <td>
+                    <td class="desc">
                         {$item['description']}
                     </td>
                     <td class="image">

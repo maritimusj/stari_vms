@@ -7,6 +7,7 @@
 namespace zovye;
 
 use zovye\base\modelFactory;
+use zovye\model\gift_logModelObj;
 use zovye\model\giftModelObj;
 use zovye\base\modelObjFinder;
 use zovye\model\accountModelObj;
@@ -177,5 +178,40 @@ class FlashEgg
     public static function gift(): modelFactory
     {
         return m('gift');
+    }
+
+    public static function getGift(int $id): ?giftModelObj
+    {
+        return self::gift()->findOne(['id' => $id]);
+    }
+
+    public static function createGift(array $data): ?giftModelObj
+    {
+        return self::gift()->create(We7::uniacid($data));
+    }
+
+    public static function giftQuery($cond = []): modelObjFinder
+    {
+        return self::gift()->query($cond);
+    }
+
+    public static function giftLog(): modelFactory
+    {
+        return m('gift_log');
+    }
+
+    public static function getGiftLog(int $id): ?gift_logModelObj
+    {
+        return self::giftLog()->findOne(['id' => $id]);
+    }
+
+    public static function createGiftLog(array $data): ?gift_logModelObj
+    {
+        return self::giftLog()->create($data);
+    }
+
+    public static function giftLogQuery($cond = []): modelObjFinder
+    {
+        return self::giftLog()->query($cond);
     }
 }

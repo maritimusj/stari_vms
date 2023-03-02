@@ -9,6 +9,12 @@ use function zovye\tb;
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
+/**
+ * @method setAgentId(int $param)
+ * @method setName(mixed $name)
+ * @method setDescription(mixed $description)
+ * @method setImage(mixed $image)
+ */
 class giftModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

@@ -31,7 +31,7 @@ CREATE TABLE `ims_zovye_vms_balance_logs` (
     `extra` TEXT NULL , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), INDEX (`user_id`, `account_id`, `createtime`)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
 }

@@ -15,7 +15,7 @@ CREATE TABLE `ims_zovye_vms_cache` (
     `updatetime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     UNIQUE (`uid`)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
 }

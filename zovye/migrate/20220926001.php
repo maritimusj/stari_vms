@@ -13,7 +13,7 @@ CREATE TABLE `ims_zovye_vms_team` (
     `name` VARCHAR(32) NOT NULL , 
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
-    INDEX (`uniacid`, `owner_id`)) ENGINE = InnoDB;
+    INDEX (`uniacid`, `owner_id`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `ims_zovye_vms_team_member` ( 
     `id` INT NOT NULL AUTO_INCREMENT , 
     `team_id` INT NOT NULL , 
@@ -24,7 +24,7 @@ CREATE TABLE `ims_zovye_vms_team_member` (
     `createtime` INT NOT NULL , 
     PRIMARY KEY (`id`), 
     INDEX (`team_id`, `user_id`), 
-    INDEX (`mobile`)) ENGINE = InnoDB;
+    INDEX (`mobile`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
 }

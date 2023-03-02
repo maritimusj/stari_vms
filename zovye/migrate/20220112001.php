@@ -27,7 +27,7 @@ CREATE TABLE `ims_zovye_vms_delivery` (
     INDEX `goods` (`uniacid`, `goods_id`, `status`),
     INDEX `createtime` (`uniacid`, `createtime`, `status`),
     INDEX `status` (`uniacid`, `status`)
-    ) ENGINE = InnoDB;
+    ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);
 }

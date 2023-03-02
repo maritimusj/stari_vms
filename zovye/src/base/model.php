@@ -68,21 +68,22 @@ class model
             $debug = DEBUG ? 'true' : 'false';
 
             $c = <<<DEBUG_MODE
-\tpublic static function debugMode()
+\tpublic static function debugMode(): bool
 \t{
 \t    return $debug;
 \t}
-
+\n
 DEBUG_MODE;
 
             foreach ($theme['fields'] as $field => $property) {
-                if (DEBUG) {
-                    $c .= '/*'.PHP_EOL.json_encode($property, JSON_PRETTY_PRINT).PHP_EOL.'*/'.PHP_EOL;
-                }
-                $c .= "\tprotected \$$field;".PHP_EOL;
+                // if (DEBUG) {
+                //     $c .= '/*'.PHP_EOL.json_encode($property, JSON_PRETTY_PRINT).PHP_EOL.'*/'.PHP_EOL;
+                // }
+                $c .= "\t/** @var {$property['type']} */".PHP_EOL;
+                $c .= "\tprotected \$$field;".PHP_EOL.PHP_EOL;
             }
 
-            if (isset($theme['fields']['extra']) && $theme['fields']['extra']['type'] == 'text') {
+            if (isset($theme['fields']['extra']) && ($theme['fields']['extra']['type'] == 'text' || $theme['fields']['extra']['type'] == 'json')) {
                 $c .= PHP_EOL."\tuse \zovye\\traits\ExtraDataGettersAndSetters;";
             }
             $result = file_put_contents(

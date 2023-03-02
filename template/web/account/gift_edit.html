@@ -1,0 +1,419 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<style>
+    th.fixed {
+        min-width: 200px;
+    }
+    th, td {
+        text-align: center;
+    }
+    #goodsList img {
+        width: 16px;
+        height: 16px;
+    }
+    #goodsList .name {
+        cursor: pointer;
+    }
+    #goodsList .name:hover {
+        color: green;
+    }
+    #goodsList .unknown:not(:hover) .name {
+        color:gray;
+    }
+    .editable {
+        width: 10em;
+        border: 0;
+        margin: 0 auto;
+        text-align: center;
+        display: inline;
+    }
+    [v-cloak] {
+        display: none;
+    }
+</style>
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if $id > 0}
+            <i class="fa fa-edit"></i> 编辑集蛋活动
+            {else}
+            <i class="fa fa-gift"></i> 新建集蛋活动
+            {/if}
+        </a>
+    </li>
+</ul>
+<form action="{php echo $this->createWebUrl('account', ['op' => 'gift_save']);}" method="post" class="form-horizontal" id="editFlashEggGiftForm">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-reply" title="返回" @click="backToList()"></i>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                <div class="col-md-5">
+                    <select name="agent_id" id="select_agent" style="width:100%;">
+                        {if $agent}
+                        <option value="{php echo $agent->getId()}">{php echo $agent->getName() . "，手机号码：" . $agent->getMobile()}</option>
+                        {/if}
+                        <option value="0">&lt;无&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_agent">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name" class="col-md-2 control-label">名称</label>
+                <div class="col-md-10">
+                  <input type="text" class="form-control" id="name" name="name" value="" required>
+                  <span class="help-block">* 活动名称</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="memo" class="col-md-2 control-label">说明</label>
+                <div class="col-md-10">
+                  <input type="text" class="form-control" id="memo" name="memo" value="">
+                  <span class="help-block">* 活动简介，说明</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">
+                    图片
+                </label>
+                <div class="col-md-10">
+                    {php echo tpl_form_field_image('image', $gift?$gift->getImage():'');}
+                    <span class="help-block">* 活动图片</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">
+                    商品列表
+                </label>
+                <div class="col-md-10">
+                    <table class="table table-bordered" id="goodsList">
+                        <thead>
+                            <th>#</th>
+                            <th>商品</th>
+                            <th class="fixed">价格</th>
+                            <th class="fixed">数量</th>
+                            <th>操作</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(goods, i) in (obj.list || [])" :class="{unknown: goods.id==0}">
+                                <td>{{ i + 1 }}</td>
+                                <td @click="chooseGoods(goods)" class="name">
+                                    <img :src="goods.img" v-if="goods.img != ''">
+                                    {{goods.name}}
+                                    <sup class="id" title="商品ID" v-if="goods.id>0">{{goods.id}}</sup>
+                                </td>
+                                <td>
+                                    <span v-if="goods.id > 0">
+                                        ¥{{goods.price}}元
+                                    </span>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control editable" 
+                                    :name="'num[' + i + ']'" 
+                                    v-model="goods.num" 
+                                    min="1"  v-if="goods.id > 0">
+                                    <input type="hidden" :name="'goods['+i+']'" :value="goods.id" v-if="goods.id > 0">
+                                </td>
+                                <td class="operate">
+                                    <i class="fa fa-trash" :class="{disabled: obj && obj.list.length <= 1}" title="删除" @click="remove(goods)"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="operate">
+                                    <i class="fa fa-plus" title="添加商品"  @click="add" :disabled="loading"></i>
+                                </td>
+                                <td colspan="4">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span class="help-block">* 用户需要收集的闪蛋商品列表及对应数量</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <input type="hidden" name="id" :value="obj.id">
+            <button type="submit" class="btn btn-primary">确定</button>
+            <button type="button" class="btn btn-default" @click="backToList()">返回</button>
+        </div>
+    </div>
+</form>
+<script>
+    const api = {
+        url: "{php echo $this->createWebUrl('goods');}",
+        dlg: null,
+    }
+
+    api.showResult = function(params, url, loading, cb) {
+        loading && util.loading();
+        $.getJSON(url || api.url, params).done(function(res){
+            loading && util.loaded();
+            if (res) {
+                if (typeof cb == 'function') {
+                    if(cb(res)) {
+                        return;
+                    }
+                }
+                if (res.status) {
+                    if (res.data && res.data.content) {
+                        api.dlg = util.dialog(res.data.title || '', res.data.content);
+                        api.dlg.modal('show');
+                    }
+                }
+                if (res.message && res.type) {
+                    util.message(res.message, '', res.type);
+                }
+                if (res.data && res.data.msg) {
+                    util.message(res.data.msg, '', res.status ? 'success' : 'error');
+                }
+            }
+        }).fail(function(){
+            loading && util.loaded();
+        })
+    }
+    
+    api.hide = function () {
+        if (api.dlg) {
+            api.dlg.modal('hide');
+        }
+    }
+
+    api.chooseGoods = function(params) {
+        api.showResult({pagesize: 10, ...params});
+    }
+
+    const vuejsUrl = "{php \zovye\url(false, JS_VUE_URL);}";
+    const zovyeJsUrl = "{php \zovye\url(false, 'static/js/zovye.min.js')}";
+    const apiUrl = "{php echo $this->createWebUrl('account');}";
+    const goodsApiUrl = "{php echo $this->createWebUrl('goods');}";
+
+    require(['jquery', 'util', vuejsUrl, zovyeJsUrl], function ($, util, Vue, zovye) {
+        const app = new Vue({
+            el: "#editFlashEggGiftForm",
+            data: {
+                loading: false,
+                error: null,
+                list: [],
+                obj: {
+                    id: 0,
+                    title: '',
+                    desc: '',
+                    image: '',
+                    list: [],
+                },
+                current: null,
+            },
+            mounted() {
+                zovye.enableOp();
+                zovye.setApiUrl(apiUrl);
+
+                const id = parseInt("{$id}");
+                if (id > 0) {
+                    this.getData(id);
+                } else {
+                    this.add();
+                }
+            },
+            methods: {
+                add() {
+                    this.obj.list.push({
+                        id: 0,
+                        name: '<请选择商品>',
+                        img: '',
+                        price: 0,
+                        num: 1,
+                    })
+                },
+                remove(goods) {
+                    if (this.obj.list.length > 1) {
+                        const i = this.obj.list.findIndex(e => e === goods);
+                        if (i !== -1) {
+                            this.obj.list.splice(i, 1);
+                        }
+                    }
+                },
+                getData(id) {
+                    const self = this;
+                    self.loading = true;
+                    $.getJSON(apiUrl, {op: 'detail', id}).then(function(res) {
+                        if (res && res.status) {
+                            self.obj = res.data;
+                        }
+                        self.loading = false;
+                    })
+                },
+                chooseGoods(goods) {
+                    this.current = goods;
+                    api.chooseGoods({types: ['flash_egg']});
+                },
+                setGoods(goods) {
+                    if (this.current) {
+                        api.hide();
+                        this.current.id = goods.id;
+                        this.current.name = goods.name;
+                        this.current.img = goods.img;
+                        this.current.unit_title = goods.unit_title;
+                        this.current.price = goods.price;
+                    }
+                },
+                backToList() {
+                    window.location.href = "{php echo $this->createWebUrl('account', ['op' => 'gift'])}";
+                }
+            }
+        })
+
+        $(function() {
+            $('body').on('click', '#goodslist tr:not(.disabled)[data-goods] .name', function(e) {
+                const tr = $(e.currentTarget).closest('tr');
+                const id = tr.data('goods');
+                const name = tr.data('name');
+                const img = tr.data('img');
+                const unit_title = tr.data('title');
+                const price = tr.data('price');
+                if (id) {       
+                    app.setGoods({id, name, img, unit_title, price});
+                }
+            })
+
+            const ownerId = parseInt("{php echo $gift?$gift->getAgentId() : 0}", 10);
+            $('#find_agent').click(function(){
+                const keyword = $('input[name=keyword_agent]').val();
+                let complete = false;
+                setTimeout(function(){
+                    if (!complete) {
+                        util.loading();
+                    }
+                }, 1000)
+                $.get("{php echo $this->createWebUrl('agent');}", {op:'search', keyword:keyword}, function(res){
+                    let html = '';
+                    if(res.status) {
+                        const list = res.data || [];
+                        list.forEach(function(e) {
+                            html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
+                                .replace('_1*', e.id)
+                                .replace('_2*', e.name)
+                                .replace('_3*', e.mobile)
+                                .replace('_**!_', e.id === ownerId ? 'selected' : '');
+                        })
+                    }
+                    html += '<option value="0"><无></option>';
+                    $('#select_agent').html(html);
+
+                }, 'json').complete(function(){
+                    complete = true;
+                    util.loaded();
+                })
+            })
+        })
+    })
+</script>
+<!-- 以下js用于商品搜索对话框 -->
+<script>
+    let backer = "";
+    let agentId = "";
+    $(function(){
+        function reload(url) {
+            api.showResult({}, url);
+        }
+        
+        $('body').on('click', '#search-bar', function () {
+            $(this).hide();
+            $('#search-form').show();
+            $('input[name=s_keywords]').focus();
+        })
+
+        $('body').on('click', '#search-form .btn-close', function (e) {
+            if (backer) {
+                api.chooseGoods();
+            } else {
+                $('#search-form').hide();
+                $('#search-bar').show();
+            }       
+            e.preventDefault();     
+         })
+
+        $('body').on('click', '#search_agent', function () {
+            const keyword = $('#search-form input[name=keyword_agent]').val();
+            $.get("{php echo $this->createWebUrl('agent');}", {
+                op: 'search',
+                keyword: keyword,
+            }, function (res) {
+                let html = '';
+                if (res.status) {
+                    const list = res.data || [];
+                    list.forEach(function (e) {
+                        html += '<option value="_1*" _4*>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_4*', '');
+                    })
+                }
+
+                html += '<option value=""><不限></option><option value="-1"><平台></option>';
+                $('#agent_search_result').html(html);
+
+            }, 'json');
+        })
+
+        function reloadPageWithFilter(fn) {
+            const params = new URLSearchParams();
+
+            const form = $("#search-form form");
+            const s_keywords = $.trim(form.find('input[name=s_keywords]').val());
+            if (s_keywords) {
+                params.append("keywords", s_keywords);
+            }
+            
+            const agentId = $.trim(form.find('select[name=agentId]').val());
+            if (agentId !== '') {
+                params.append("agentId", agentId);
+            }
+
+            if (typeof fn === 'function') {
+                fn(params);
+            }
+
+            params.append("pagesize", 10);
+            
+            reload(form.attr("action") + "&" + encodeURI(params.toString()));
+        }
+
+        $('body').on('submit', "#search-form form", function(e){
+            reloadPageWithFilter();            
+            e.preventDefault();
+        })
+
+        $('body').on('click', 'a[filter]', function (e) {
+            const self = this;
+            reloadPageWithFilter(function (params) {
+                const name = $(self).data('name');
+                const val = $(self).data('val');
+                if (name) {
+                    params.set(name, val);
+                }
+            });
+            e.preventDefault();
+        })
+
+        $('body').on('click', '.pagination li:not(.active) a', function (e) {
+            e.preventDefault();
+            const url = $(this).attr("href");
+            reload(url);
+        })
+    })
+</script>
+{template 'common/footer'}

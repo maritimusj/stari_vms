@@ -128,7 +128,7 @@
                 <tbody>
                 {loop $goods_list $index $item}
                 <tr 
-                {if $types && !in_array($item['type'], $types)}class="disabled"{/if}
+                {if $types && !in_array($item['type'], $types)}class="disabled" title="这个商品不可用！"{/if}
                 data-goods="{$item['id']}" 
                 data-name="{$item['name']}" 
                 data-title="{$item['unit_title']}" 

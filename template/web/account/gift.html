@@ -1,0 +1,63 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<style>
+    .operate .state.auth {
+        margin-left: 0px;
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }
+    .operate .state.auth:hover {
+        filter: grayscale(0);
+        opacity: 1;
+    }
+    .state.auth {
+        color: #4CAF50;
+        margin-left: 6px;
+    }
+    .state.auth img {
+        width: 16px;
+        height: 16px;
+    }
+</style>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
+          <div class="form-group">
+            <label for="keywords"></label>
+            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入帐号或名称搜索..." value="{$keywords}">
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+        </form>
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    {loop $navs $nav}
+    {if !isset($nav['enabled']) || $nav['enabled']}
+    {if $nav['active']}
+    <li role="presentation" class="active"><a href="#">{$nav['title']}</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+    {/if}
+    {/if}
+    {/loop}
+</ul>
+<div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
+    <div class="heading operate">
+        <div class="operate">
+            <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_edit'])}">
+                <i class="fa fa-pencil" title="新建" ></i>
+            </a>
+        </div>
+    </div>
+    <div class="panel-body">
+        
+    </div>
+</div>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
+        zovye.enableCopy();
+    })
+</script>
+{template 'common/footer'}

@@ -6,6 +6,9 @@
 
 namespace zovye;
 
+use zovye\base\modelFactory;
+use zovye\model\giftModelObj;
+use zovye\base\modelObjFinder;
 use zovye\model\accountModelObj;
 
 class FlashEgg
@@ -169,5 +172,10 @@ class FlashEgg
         }
 
         return $account->set('config', $config);
+    }
+
+    public static function gift(): modelFactory
+    {
+        return m('gift');
     }
 }

@@ -1,0 +1,49 @@
+<style>
+    #flashEggList img {
+        width: 32px;
+        height: 32px;
+    }
+</style>
+<table class="table" id="flashEggList">
+    <thead>
+        <th>#</th>
+        <th>名称</th>
+        <th>图片</th>
+        <th>所属代理商</th>
+        <th>创建时间</th>
+        <th></th>
+    </thead>
+    <tbody>
+        {loop $list $index $item}
+        <tr>
+            <td>
+                {php echo $index + 1}
+            </td>
+            <td>
+                {$item['title']}
+            </td>
+            <td>
+                <img src="{$item['img']}">
+            </td>
+            <td>
+                {if $item['agent']}
+                <div class="agent" title="点击查看{$item['agent']['name']}全部公众号" style="display:inline-block;">
+                    <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                        <img src="{$item['agent']['avatar']}">
+                        <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>
+                    </div>
+                </div>
+                {else}
+                <span style="color:gray;">&lt;平台&gt;</span>
+                {/if}
+            </td>
+            <td>
+                {$item['createtime_formatted']}
+            </td>
+            <td>
+                <i class="fa fa-edit"></i>
+            </td>
+        </tr>
+        {/loop}
+    </tbody>
+</table>

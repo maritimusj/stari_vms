@@ -33,7 +33,7 @@ class WeApp extends Settings
             $v = implode('_', $names);
             $file = ZOVYE_SRC . 'pages' . DIRECTORY_SEPARATOR . $v . '.php';
             if (is_file($file)) {
-                extract([$arguments]);
+                extract(['_tpl_' => $arguments]);
                 require $file;
             }
         }

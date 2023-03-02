@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use InvalidArgumentException;
 use QRcode;
 use RuntimeException;
 use Throwable;
@@ -43,6 +44,15 @@ class Util
         }
 
         return getArray($config, $sub);
+    }
+
+    public static function getTemplateVar($name, $throw_error = false)
+    {
+        $var = $GLOBALS['_tpl_'][$name];
+        if ($throw_error && is_null($var)) {
+            throw new InvalidArgumentException('缺少必须的模块参数！');
+        }
+        return $var;
     }
 
     /**

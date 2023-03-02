@@ -1,19 +1,27 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
 
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 use DateTimeImmutable;
+use zovye\model\deviceModelObj;
+use zovye\model\userModelObj;
+
+$params = Util::getTemplateVar('params');
 
 $tpl = is_array($params) ? $params : [];
 $tpl['slides'] = [];
 
 /** @var deviceModelObj $device */
 $device = $tpl['device']['_obj'];
-assert($device);
 
 /** @var userModelObj $user */
 $user = $tpl['user']['_obj'];
-assert($user);
 
 if (App::isAliUser()) {
     $tpl['accounts'] = [];

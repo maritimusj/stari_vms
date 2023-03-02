@@ -2,6 +2,7 @@
 namespace zovye;
 
 //以下为页面数据
+$params = Util::getTemplateVar('params');
 $tpl = is_array($params) ? $params : [];
 
 $token = Util::random(16);

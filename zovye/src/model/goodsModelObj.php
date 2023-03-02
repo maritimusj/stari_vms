@@ -12,6 +12,7 @@ use function zovye\tb;
 use zovye\base\modelObj;
 use zovye\Goods;
 use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\Util;
 
 /**
  * @method getAgentId()
@@ -138,9 +139,15 @@ class goodsModelObj extends modelObj
         return $this->setExtraData('detailImg', $url);
     }
 
-    public function getGallery()
+    public function getGallery($fullpath = false)
     {
-        return $this->getExtraData('gallery', []);
+        $gallery = $this->getExtraData('gallery', []);
+        if ($fullpath) {
+            foreach($gallery as &$url) {
+                $url = Util::toMedia($url, $fullpath);
+            }
+        }
+        return $gallery;
     }
 
     public function setGallery($images = [])

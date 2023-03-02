@@ -72,14 +72,14 @@
             <div class="form-group">
                 <label for="name" class="col-md-2 control-label">名称</label>
                 <div class="col-md-10">
-                  <input type="text" class="form-control" id="name" name="name" value="" required>
+                  <input type="text" class="form-control" id="name" name="name" value="{php echo $gift ? $gift->getName() : ''}" required>
                   <span class="help-block">* 活动名称</span>
                 </div>
             </div>
             <div class="form-group">
                 <label for="description" class="col-md-2 control-label">说明</label>
                 <div class="col-md-10">
-                  <input type="text" class="form-control" id="description" name="description" value="">
+                  <input type="text" class="form-control" id="description" name="description" value="{php echo $gift ? $gift->getDescription() : ''}">
                   <span class="help-block">* 活动简介，说明</span>
                 </div>
             </div>
@@ -88,7 +88,7 @@
                     图片
                 </label>
                 <div class="col-md-10">
-                    {php echo tpl_form_field_image('image', $gift?$gift->getImage():'');}
+                    {php echo tpl_form_field_image('image', $gift ? $gift->getImage(): '')}
                     <span class="help-block">* 活动图片</span>
                 </div>
             </div>
@@ -109,7 +109,7 @@
                             <tr v-for="(goods, i) in (obj.list || [])" :class="{unknown: goods.id==0}">
                                 <td>{{ i + 1 }}</td>
                                 <td @click="chooseGoods(goods)" class="name">
-                                    <img :src="goods.img" v-if="goods.img != ''">
+                                    <img :src="goods.image" v-if="goods.image != ''">
                                     {{goods.name}}
                                     <sup class="id" title="商品ID" v-if="goods.id>0">{{goods.id}}</sup>
                                 </td>
@@ -119,14 +119,13 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control editable" 
-                                    :name="'num[' + i + ']'" 
+                                    <input type="number" class="form-control editable" :name="'num[' + i + ']'" 
                                     v-model="goods.num" 
                                     min="1"  v-if="goods.id > 0">
                                     <input type="hidden" :name="'goods['+i+']'" :value="goods.id" v-if="goods.id > 0">
                                 </td>
                                 <td class="operate">
-                                    <i class="fa fa-trash" :class="{disabled: obj && obj.list.length <= 1}" title="删除" @click="remove(goods)"></i>
+                                    <i class="fa fa-trash" title="删除" @click="remove(goods)"></i>
                                 </td>
                             </tr>
                             <tr>
@@ -209,8 +208,8 @@
                 list: [],
                 obj: {
                     id: 0,
-                    title: '',
-                    desc: '',
+                    name: '',
+                    description: '',
                     image: '',
                     list: [],
                 },
@@ -219,20 +218,23 @@
             mounted() {
                 zovye.enableOp();
                 zovye.setApiUrl(apiUrl);
-
-                const id = parseInt("{$id}");
-                if (id > 0) {
-                    this.getData(id);
-                } else {
-                    this.add();
-                }
+                <!--
+                this.obj.id = {php echo $gift ? $gift->getId() : 0};
+                {if $goods_list}
+                {loop $goods_list $goods}
+                this.obj.list.push(JSON.parse(`{php echo json_encode($goods);}`))
+                {/loop}
+                {else}
+                this.add();
+                {/if}
+                -->
             },
             methods: {
                 add() {
                     this.obj.list.push({
                         id: 0,
                         name: '<请选择商品>',
-                        img: '',
+                        image: '',
                         price: 0,
                         num: 1,
                     })
@@ -243,17 +245,10 @@
                         if (i !== -1) {
                             this.obj.list.splice(i, 1);
                         }
+                    } else {
+                        this.obj.list = [];
+                        this.add();
                     }
-                },
-                getData(id) {
-                    const self = this;
-                    self.loading = true;
-                    $.getJSON(apiUrl, {op: 'detail', id}).then(function(res) {
-                        if (res && res.status) {
-                            self.obj = res.data;
-                        }
-                        self.loading = false;
-                    })
                 },
                 chooseGoods(goods) {
                     this.current = goods;
@@ -264,7 +259,7 @@
                         api.hide();
                         this.current.id = goods.id;
                         this.current.name = goods.name;
-                        this.current.img = goods.img;
+                        this.current.image = goods.image;
                         this.current.unit_title = goods.unit_title;
                         this.current.price = goods.price;
                     }
@@ -280,11 +275,11 @@
                 const tr = $(e.currentTarget).closest('tr');
                 const id = tr.data('goods');
                 const name = tr.data('name');
-                const img = tr.data('img');
+                const image = tr.data('img');
                 const unit_title = tr.data('title');
                 const price = tr.data('price');
                 if (id) {       
-                    app.setGoods({id, name, img, unit_title, price});
+                    app.setGoods({id, name, image, unit_title, price});
                 }
             })
 

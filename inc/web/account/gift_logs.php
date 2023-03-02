@@ -23,4 +23,4 @@ if ($id > 0) {
     $tpl_data['goods_list'] = $gift->getGoodsList(true);
 }
 
-app()->showTemplate('web/account/gift_edit', $tpl_data);
+app()->showTemplate('web/account/gift_logs', $tpl_data);

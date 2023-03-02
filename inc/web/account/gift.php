@@ -23,4 +23,29 @@ $tpl_data = [
     ],
 ];
 
+$query = FlashEgg::giftQuery();
+
+$total = $query->count();
+
+$list = [];
+if ($total > 0) {
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+    $query->page($page, $page_size);
+    $query->orderBy('id DESC');
+
+    foreach($query->findAll() as $entry) {
+        $data = $entry->profile(true);
+        $agent = $entry->getAgent();
+        if ($agent) {
+            $data['agent'] = $agent->profile(false);
+        }
+        $list[] = $data;
+    }
+
+    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+}
+
+$tpl_data['list'] = $list;
 app()->showTemplate('web/account/gift', $tpl_data);

@@ -12,6 +12,7 @@ CREATE TABLE `ims_zovye_vms_gift`(
     `agent_id` INT NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `description` VARCHAR(255) NOT NULL DEFAULT '',
+    `image` VARCHAR(255) NOT NULL DEFAULT '',
     `extra` JSON NOT NULL,
     `createtime` INT NOT NULL,
     PRIMARY KEY(`id`),

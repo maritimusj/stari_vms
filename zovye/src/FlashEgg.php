@@ -187,6 +187,10 @@ class FlashEgg
 
     public static function createGift(array $data): ?giftModelObj
     {
+        if ($data['extra']) {
+            $data['extra'] = giftModelObj::serializeExtra($data['extra']);
+        }
+
         return self::gift()->create(We7::uniacid($data));
     }
 
@@ -207,6 +211,9 @@ class FlashEgg
 
     public static function createGiftLog(array $data): ?gift_logModelObj
     {
+        if ($data['extra']) {
+            $data['extra'] = gift_logModelObj::serializeExtra($data['extra']);
+        }
         return self::giftLog()->create($data);
     }
 

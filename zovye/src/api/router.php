@@ -10,7 +10,6 @@ use zovye\api\wx\common;
 use zovye\JSON;
 use zovye\Util;
 use zovye\We7;
-use function zovye\error;
 use function zovye\toCamelCase;
 use function zovye\toSnakeCase;
 
@@ -22,13 +21,13 @@ class router
 
         $op = toCamelCase($op);
         $file = $dir.$op.'.php';
-        if (file_exists($file)) {
+        if (is_file($file)) {
             return require $file;
         }
 
         $op = toSnakeCase($op);
         $file = $dir.$op.'.php';
-        if (file_exists($file)) {
+        if (is_file($file)) {
             return require $file;
         }
 

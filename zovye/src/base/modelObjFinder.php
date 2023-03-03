@@ -291,10 +291,11 @@ class modelObjFinder extends SqlParser
     }
 
     /**
+     * @param string $select
      * @return string
      */
-    public function getSQL(): string
+    public function getSQL(string $select = ''): string
     {
-        return $this->makeSQL('id');
+        return $this->makeSQL($select);
     }
 }

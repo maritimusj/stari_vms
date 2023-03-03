@@ -20,6 +20,7 @@ $device = Util::getTemplateVar('device');
 $gift = Util::getTemplateVar('gift');
 
 $tpl_data = Util::getTplData([
+    'user' => $user->profile(false),
     'gift' => $gift,
 ]);
 
@@ -44,5 +45,5 @@ $tpl_data['js']['code'] = <<<JSCODE
 </script>
 JSCODE;
 
-$filename = Theme::getThemeFile(null, 'reg');
+$filename = Theme::getThemeFile($device, 'reg');
 app()->showTemplate($filename, ['tpl' => $tpl_data]);

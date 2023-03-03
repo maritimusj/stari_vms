@@ -102,7 +102,7 @@ if ($fn == 'data') {
         JSON::fail('领取失败，请联系管理员！');
     }
 
-    JSON::success(['msg' => '领取成功！']);
+    JSON::success(['msg' => '领取成功，请注意查收！']);
 }
 
 app()->giftDetailPage([

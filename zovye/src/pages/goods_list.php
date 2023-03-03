@@ -81,7 +81,7 @@ JSCODE;
 
 //闪蛋活动转跳
 if (App::isFlashEggEnabled()) {
-    $flash_gift_url = Util::url('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
+    $flash_gift_url = Util::murl('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
     $tpl_data['js']['code'] .= <<<JSCODE
     zovye_fn.redirectToGiftPage = function() {
         window.location.href= "$flash_gift_url";

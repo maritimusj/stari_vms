@@ -35,7 +35,7 @@ use zovye\model\weapp_configModelObj;
  * @method mobilePage(array $params)
  * @method taskPage(array $params)
  * @method payResultPage(array $params)
- * @method goodsListPage(array $params)
+ * @method giftGoodsListPage(array $params)
  * @method followPage(array $params)
  * @method userInfoPage(array $params)
  * @method moreAccountsPage(array $params)

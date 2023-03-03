@@ -30,6 +30,7 @@ $tpl_data = Util::getTplData([
 ]);
 
 $api_url = Util::murl('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
+$reg_url = Util::murl('account', ['op' => 'gift_detail', 'fn' => 'reg', 'device' => $device->getImei()]);
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE
@@ -43,8 +44,8 @@ $tpl_data['js']['code'] = <<<JSCODE
         return $.getJSON(zovye_fn.api_url, {fn: "data"});
     }
     
-    zovye_fn.regInfo = function(uid) {
-        return $.getJSON(zovye_fn.api_url, {fn: "reg", uid});
+    zovye_fn.redirectToRegPage = function(uid) {
+        window.location.href= "$reg_url";
     }
 </script>
 JSCODE;

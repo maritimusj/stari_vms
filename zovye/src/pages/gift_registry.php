@@ -30,9 +30,8 @@ $tpl_data['js']['code'] = <<<JSCODE
     const zovye_fn = {
         api_url: "$api_url",
     }
-
-    zovye_fn.save = function() {
-        return $.getJSON(zovye_fn.api_url);
+    zovye_fn.save = function(data) {
+        return $.getJSON(zovye_fn.api_url, data});
     }
 </script>
 JSCODE;

@@ -6,6 +6,8 @@
  
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 /** @var string $cb_url */
 $cb_url = Util::getTemplateVar('cb_url');
 

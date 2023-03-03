@@ -227,7 +227,7 @@ class FlashEgg
     public static function getUserGiftDetail(userModelObj $user, giftModelObj $gift): array
     {
         $goods_list = $gift->getGoodsList(true);
-        foreach ($goods_list as $goods) {
+        foreach ($goods_list as &$goods) {
             if ($goods['num'] > 0) {
                 $goods['acquired'] = Order::query([
                     'openid' => $user->getOpenid(),

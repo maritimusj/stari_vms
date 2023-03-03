@@ -13,15 +13,23 @@ use zovye\model\userModelObj;
 /** @var userModelObj $user */
 $user = Util::getTemplateVar('user');
 
+/** @var userModelObj $user */
+$device = Util::getTemplateVar('device');
+
 /** @var array $gift */
 $gift = Util::getTemplateVar('gift');
 
 $tpl_data = Util::getTplData([
-    'user' => $user->profile(),
     'gift' => $gift,
 ]);
 
-$api_url = Util::murl('account', ['op' => 'gift_detail', 'fn' => 'save', 'uid' => $gift['uid']]);
+$api_url = Util::murl('account', [
+    'op' => 'gift_detail', 
+    'fn' => 'save', 
+    'device' => $device->getImei(), 
+    'uid' => $gift['uid'],
+]);
+
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE

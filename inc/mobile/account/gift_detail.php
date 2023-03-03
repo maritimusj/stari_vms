@@ -48,6 +48,7 @@ if ($fn == 'data') {
 
     app()->giftRegistryPage([
         'user' => $user,
+        'device' => $device,
         'gift' => $detail,
     ]);
 
@@ -84,7 +85,7 @@ if ($fn == 'data') {
         JSON::fail('收件人电话不能为空！');
     }
     if (empty($address)) {
-        JSON::fail('收件人详情地址不能为空！');
+        JSON::fail('收件人详细地址不能为空！');
     }
 
     $log = FlashEgg::createGiftLog([

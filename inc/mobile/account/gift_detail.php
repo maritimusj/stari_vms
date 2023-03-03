@@ -73,7 +73,7 @@ if ($fn == 'data') {
     }
 
     $name = Request::trim('name');
-    $phone_num = Request::trim('phoneNum');
+    $phone_num = Request::trim('phoneNumber');
     $location = Request::trim('location');
     $address = Request::trim('address');
 

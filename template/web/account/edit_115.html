@@ -258,7 +258,7 @@
             </template>
             <button type="submit" class="btn btn-primary" v-else>创建</button>
             <input type="hidden" name="type" value="115">
-            <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account');}'">返回</button>
+            <button type="button" class="btn btn-default" onclick="location.href='{php echo $this->createWebUrl('account', ['type' => 115]);}'">返回</button>
         </div>
     </form>
 </div>

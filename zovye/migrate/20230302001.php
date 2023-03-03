@@ -26,6 +26,7 @@ CREATE TABLE `ims_zovye_vms_gift_log`(
     `user_id` INT NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `phone_num` VARCHAR(20) NOT NULL,
+    `location` VARCHAR(100) NOT NULL,
     `address` TEXT NOT NULL,
     `status` INT NOT NULL DEFAULT '0',
     `extra` JSON NOT NULL,

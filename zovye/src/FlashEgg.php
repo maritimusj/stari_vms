@@ -236,18 +236,32 @@ class FlashEgg
 
     public static function getUserGiftDetail(userModelObj $user, giftModelObj $gift): array
     {
+        $all_acquired = true;
         $goods_list = $gift->getGoodsList(true);
+
         foreach ($goods_list as &$goods) {
             if ($goods['num'] > 0) {
-                $goods['acquired'] = Order::query([
+
+                $num = Order::query([
                     'openid' => $user->getOpenid(),
                     'goods_id' => $goods['id'],
                 ])->limit($goods['num'])->count();
+
+                $goods['acquired'] = $num;
+
+                if ($num != $goods['num']) {
+                    $all_acquired = false;
+                }
             }
         }
 
         $data = $gift->profile(true);
+
+        unset($data['id']);
+        $data['uid'] = sha1($gift->getId() . $user->getId());
+
         $data['list'] = $goods_list;
+        $data['all_acquired'] = $all_acquired;
 
         return $data;
     }
@@ -265,7 +279,7 @@ class FlashEgg
 
         if ($id > 0) {
             $gift = self::getGift($id);
-            if ($gift && $gift->isEnabled()) {
+            if ($gift && $gift->isEnabled() && !self::isUserGiftLogExists($user, $gift)) {
                 return $gift;
             }
         }

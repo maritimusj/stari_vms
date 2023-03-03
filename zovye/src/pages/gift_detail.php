@@ -42,6 +42,10 @@ $tpl_data['js']['code'] = <<<JSCODE
     zovye_fn.getDetail = function() {
         return $.getJSON(zovye_fn.api_url, {fn: "data"});
     }
+    
+    zovye_fn.regInfo = function(uid) {
+        return $.getJSON(zovye_fn.api_url, {fn: "reg", uid});
+    }
 </script>
 JSCODE;
 

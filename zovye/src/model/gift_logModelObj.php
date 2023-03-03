@@ -31,6 +31,9 @@ class gift_logModelObj extends modelObj
 	/** @var string */
 	protected $phone_num;
 
+    /** @var string */
+    protected $location;
+
 	/** @var string */
 	protected $address;
 

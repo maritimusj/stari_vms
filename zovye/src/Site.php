@@ -17,43 +17,43 @@ class Site extends WeModuleSite
 
         if ($isWeb || $isMobile) {
             $dir = IA_ROOT.'/addons/'.$this->modulename.'/inc/';
-            $fn = '';
+            $do = '';
 
             if ($isWeb) {
                 $dir .= 'web/';
-                $fn = strtolower(substr($name, 5));
+                $do = strtolower(substr($name, 5));
             }
 
             if ($isMobile) {
                 $dir .= 'mobile/';
-                $fn = strtolower(substr($name, 8));
+                $do = strtolower(substr($name, 8));
             }
 
-            $file = $dir.$fn.'.inc.php';
-            if (file_exists($file)) {
-                require $file;
-                return;
-            }
-
-            $dir = $dir.$fn.'/';
+            $new_dir = $dir.$do.'/';
 
             $op = Request::op('default');
 
             $op = toCamelCase($op);
-            $file = $dir.$op.'.php';
+            $file = $new_dir.$op.'.php';
             if (file_exists($file)) {
                 require $file;
                 return;
             }
 
             $op = toSnakeCase($op);
-            $file = $dir.$op.'.php';
+            $file = $new_dir.$op.'.php';
             if (file_exists($file)) {
                 require $file;
                 return;
             }
 
-            $file = $dir.$fn.'.inc.php';
+            $file = $new_dir.$do.'.inc.php';
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
+
+            $file = $dir.$do.'.inc.php';
             if (file_exists($file)) {
                 require $file;
                 return;

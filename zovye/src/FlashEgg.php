@@ -94,11 +94,12 @@ class FlashEgg
         $type = Request::str('mediaType', 'video');
 
         //适配小程序端上传图片
-        $stripUrl = function($url) {
+        $stripUrl = function ($url) {
             $result = explode('@', $url, 2);
             if (empty($result)) {
                 return '';
             }
+
             return count($result) == 2 ? $result[1] : $result[0];
         };
 
@@ -216,12 +217,21 @@ class FlashEgg
         if ($data['extra']) {
             $data['extra'] = gift_logModelObj::serializeExtra($data['extra']);
         }
+
         return self::giftLog()->create($data);
     }
 
     public static function giftLogQuery($cond = []): modelObjFinder
     {
         return self::giftLog()->query($cond);
+    }
+
+    public static function isUserGiftLogExists(userModelObj $user, giftModelObj $gift): bool
+    {
+        return self::giftLogQuery([
+            'gift_id' => $gift->getId(),
+            'user_id' => $user->getId(),
+        ])->exists();
     }
 
     public static function getUserGiftDetail(userModelObj $user, giftModelObj $gift): array
@@ -265,9 +275,13 @@ class FlashEgg
             $query = self::giftQuery([
                 'agent_id' => $agent->getId(),
                 'enabled' => 1,
-            ])->orderBy('id desc')->limit(10);
+            ])->orderBy('id desc');
 
+            /** @var giftModelObj $item */
             foreach ($query->findAll() as $item) {
+                if (self::isUserGiftLogExists($user, $item)) {
+                    continue;
+                }
                 $list[] = $item;
             }
         }
@@ -276,9 +290,12 @@ class FlashEgg
             $query = self::giftQuery([
                 'agent_id' => 0,
                 'enabled' => 1,
-            ])->orderBy('id desc')->limit(10);
+            ])->orderBy('id desc');
 
             foreach ($query->findAll() as $item) {
+                if (self::isUserGiftLogExists($user, $item)) {
+                    continue;
+                }
                 $list[] = $item;
             }
         }

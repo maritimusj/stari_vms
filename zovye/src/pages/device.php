@@ -306,16 +306,6 @@ zovye_fn.balancePay = function(goods, num) {
 JSCODE;
 }
 
-//闪蛋活动转跳
-if (App::isFlashEggEnabled()) {
-    $flash_gift_url = Util::url('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
-    $tpl['js']['code'] .= <<<JSCODE
-zovye_fn.redirectToGiftPage = function() {
-    window.location.href= "$flash_gift_url";
-}
-JSCODE;
-}
-
 $tpl['js']['code'] .= "\r\n</script>";
 
 if (User::isSnapshot()) {

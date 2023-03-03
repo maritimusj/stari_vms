@@ -76,8 +76,20 @@ $tpl_data['js']['code'] .= <<<JSCODE
     zovye_fn.redirectToOrderPage = function() {
         window.location.href = "$order_jump_url";
     }
-</script>
+\r\n
 JSCODE;
+
+//闪蛋活动转跳
+if (App::isFlashEggEnabled()) {
+    $flash_gift_url = Util::url('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
+    $tpl_data['js']['code'] .= <<<JSCODE
+    zovye_fn.redirectToGiftPage = function() {
+        window.location.href= "$flash_gift_url";
+    }
+JSCODE;
+}
+
+$tpl_data['js']['code'] .= "\r\n</script>";
 
 $filename = Theme::getThemeFile($device, 'device');
 app()->showTemplate($filename, ['tpl' => $tpl_data]);

@@ -228,7 +228,7 @@ class modelObjFinder extends SqlParser
         if ($this->limit) {
             $sql .= parent::parseLimit($this->limit);
             if ($count_select ?? false) {
-                $sql .= ')';
+                $sql .= ') AS a';
             }
         }
 

@@ -20,4 +20,7 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
-app()->giftDetailPage($user, $device);
+app()->giftDetailPage([
+    'user' => $user,
+    'device' => $device,
+]);

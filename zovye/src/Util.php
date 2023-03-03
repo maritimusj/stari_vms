@@ -46,12 +46,23 @@ class Util
         return getArray($config, $sub);
     }
 
-    public static function getTemplateVar($name, $throw_error = false)
+    /**
+     * 获取页面参数
+     * @param $name string 如果指定参数是数组，则取回数组中指定键值
+     * @param $throw_error bool
+     * @return mixed
+     */
+    public static function getTemplateVar(string $name = '', bool $throw_error = false)
     {
-        $var = $GLOBALS['_tpl_'][$name];
+        $var = $GLOBALS['_tpl_var_'][0];
+        if ($name) {
+            $var = getArray($var, $name);
+        }
+
         if ($throw_error && is_null($var)) {
             throw new InvalidArgumentException('缺少必须的模块参数！');
         }
+
         return $var;
     }
 

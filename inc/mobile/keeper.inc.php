@@ -68,8 +68,7 @@ if ($op == 'save') {
     }
 }
 
-app()->keeperPage(
-    [
+app()->keeperPage([
         'user' =>
             [
                 'nickname' => $user->getNickname(),

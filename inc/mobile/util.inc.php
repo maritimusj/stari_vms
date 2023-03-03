@@ -25,7 +25,10 @@ if ($op == 'default') {
 
     $device = Device::get(Request::str('device'), true);
 
-    app()->userInfoPage($user, $device);
+    app()->userInfoPage([
+        'user' => $user,
+        'device' => $device,
+    ]);
 
 } elseif ($op == 'data') {
 

@@ -191,4 +191,7 @@ if ($from == 'device') {
     $user->remove('last');
 }
 
-app()->douyinPage($device, $user);
+app()->douyinPage([
+    'device' => $device,
+    'user' => $user,
+]);

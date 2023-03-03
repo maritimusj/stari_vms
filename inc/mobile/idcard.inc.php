@@ -29,7 +29,7 @@ if ($op == 'default') {
 
     app()->idCardPage(
         [
-            'deviceid' => $device_id,
+            'deviceId' => $device_id,
             'orderNO' => $order_no,
         ]
     );

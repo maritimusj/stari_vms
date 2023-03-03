@@ -35,7 +35,9 @@ if (!App::isAliUser()) {
         'retries' => $retries + 1,
     ]);
 
-    app()->aliAuthPage($cb_url);
+    app()->aliAuthPage([
+        'cb_url' => $cb_url,
+    ]);
 }
 
 //用户扫描设备，进入设备页面

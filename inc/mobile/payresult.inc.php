@@ -14,7 +14,10 @@ if ($op == 'default') {
     $order_no = Request::str('orderNO');
     $device = Device::get(Request::int('deviceid'));
 
-    app()->payResultPage($order_no, $device);
+    app()->payResultPage([
+        'order_no' => $order_no,
+        'device' => $device,
+    ]);
 
 } elseif ($op == 'SQB') {
 

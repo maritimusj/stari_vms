@@ -183,8 +183,7 @@ if ($op == 'save') {
     }
 }
 
-app()->mobilePage(
-    [
+app()->mobilePage([
         'user' =>
             [
                 'nickname' => $user->getNickname(),

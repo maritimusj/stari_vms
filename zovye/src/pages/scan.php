@@ -1,8 +1,15 @@
 <?php
+/**
+ * @author jin@stariture.com
+ * @url www.stariture.com
+ */
+
 namespace zovye;
 
+defined('IN_IA') or exit('Access Denied');
+
 //以下为页面数据
-$params = Util::getTemplateVar('params');
+$params = Util::getTemplateVar();
 $tpl = is_array($params) ? $params : [];
 
 $token = Util::random(16);

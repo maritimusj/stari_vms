@@ -86,12 +86,18 @@ if ($op == 'check') {
 }
 
 if (!User::isSubscribed($user)) {
-    app()->followPage($user, $device);
+    app()->followPage([
+        'user' => $user,
+        'device' => $device,
+    ]);
 }
 
 //默认显示商品列表
 if ($op == 'default') {
-    app()->goodsListPage($user, $device);
+    app()->goodsListPage([
+        'user' => $user,
+        'device' => $device,
+    ]);
 }
 
 //获取商品列表

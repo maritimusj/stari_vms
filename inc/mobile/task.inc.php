@@ -22,7 +22,10 @@ if ($op == 'default') {
         $device = Device::findOne(['shadow_id' => $device_shadow_id]);
     }
 
-    app()->taskPage($user, $device ?? null);
+    app()->taskPage([
+        'user' => $user,
+        'device' => $device ?? null,
+    ]);
 
 } elseif ($op == 'get_list') {
 

@@ -141,7 +141,10 @@ if ($device_id) {
         //如果公众号奖励为积分，显示获取积分页面
         elseif (App::isBalanceEnabled() && $account->getBonusType() == Account::BALANCE) {
             $cb = function (userModelObj $user) use ($account) {
-                app()->getBalanceBonusPage($user, $account);
+                app()->getBalanceBonusPage([
+                    'user' => $user,
+                    'account' => $account,
+                ]);
             };
         } else {
             /**
@@ -215,7 +218,10 @@ if ($from == 'device') {
 
     if ($account && $account->isQuestionnaire() && $account->getBonusType() == Account::BALANCE) {
         $user->cleanLastActiveData();
-        app()->fillQuestionnairePage($user, $account);
+        app()->fillQuestionnairePage([
+            'user' => $user,
+            'account' => $account,
+        ]);
     }
 }
 
@@ -269,7 +275,7 @@ if (empty($account)) {
     //设备首页
     app()->devicePage($tpl_data);
     //调试使用
-    //app()->douyinPage($device, $user);
+    //app()->douyinPage(['device' => $device, 'user' => $user]);
 }
 
 //处理多个关注二维码
@@ -284,7 +290,12 @@ if ($more_accounts) {
 }
 
 if ($account->isQuestionnaire()) {
-    app()->fillQuestionnairePage($user, $account, $device, $tid);
+    app()->fillQuestionnairePage([
+        'user' => $user,
+        'account' => $account,
+        'device' => $device,
+        'tid' => $tid,
+    ]);
 }
 
 $ticket_data = [

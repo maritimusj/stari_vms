@@ -29,7 +29,9 @@ class CZTV
 
         $token = Request::str('sessionId');
         if (empty($token)) {
-            app()->cztvPage(null, null, $config['redirect_url']);
+            app()->cztvPage([
+                'redirect_url' => $config['redirect_url'],
+            ]);
             return false;
         }
 
@@ -51,7 +53,9 @@ class CZTV
         ]);
 
         if (empty($user) || is_error($user)) {
-            app()->cztvPage(null, null,  $config['redirect_url']);
+            app()->cztvPage([
+                'redirect_url' => $config['redirect_url'],
+            ]);
             return false;
         }
 
@@ -67,7 +71,10 @@ class CZTV
             Util::resultAlert('没有关联公众号！', 'error');
         }
 
-        app()->cztvPage($device, $user);
+        app()->cztvPage([
+            'device' => $device,
+            'user' => $user,
+        ]);
 
         return true;
     }

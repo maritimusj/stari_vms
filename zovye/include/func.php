@@ -357,6 +357,12 @@ if (!function_exists('array_key_first')) {
     }
 }
 
+if (!function_exists('strexists')) {
+    function strexists($str, $search) {
+        return !(false === strpos($str, $search));
+    }
+}
+
 function hashFN(callable $fn, ...$val): string
 {
     try {

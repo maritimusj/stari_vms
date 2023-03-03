@@ -75,10 +75,10 @@
         <table class="table" id="flashGiftList">
             <thead>
                 <th>#</th>
+                <th>图片</th>
                 <th>名称</th>
                 <th>简介</th>
                 <th>备注</th>
-                <th>图片</th>
                 <th>所属代理商</th>
                 <th>创建时间</th>
                 <th></th>
@@ -88,6 +88,9 @@
                 <tr data-id="{$item['id']}">
                     <td>
                         {php echo $index + 1}
+                    </td>
+                    <td class="image">
+                        <img src="{$item['image']}">
                     </td>
                     <td class="name">
                         {$item['name']}
@@ -100,9 +103,6 @@
                     </td>
                     <td class="desc remark">
                         {$item['remark']}
-                    </td>
-                    <td class="image">
-                        <img src="{$item['image']}">
                     </td>
                     <td>
                         <div style="margin-bottom:10px;">

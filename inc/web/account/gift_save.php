@@ -23,8 +23,9 @@ $data = [
     'image' => Request::trim('image'),
     'extra' => [
         'goods' => [],
+        'remark' =>  Request::trim('remark'),
     ],
-    'enabled' => Request::bool('enabled', false),
+    'enabled' => Request::bool('enabled'),
 ];
 
 $goods_ids = Request::array('goods');

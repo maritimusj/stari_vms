@@ -19,6 +19,7 @@ use zovye\Util;
  * @method setDescription(mixed $description)
  * @method setImage(mixed $image)
  * @method bool isEnabled()
+ * @method setEnabled(mixed $enabled)
  */
 class giftModelObj extends modelObj
 {
@@ -68,6 +69,11 @@ class giftModelObj extends modelObj
 		return null;
 	}
 
+    public function getRemark(): string
+    {
+        return $this->getExtraData('remark', '');
+    }
+
 	public function getGoodsList($fullpath = false): array
 	{
 		$goods_list = $this->getExtraData('goods', []);
@@ -96,6 +102,7 @@ class giftModelObj extends modelObj
 			'id' => $this->id,
 			'name' => $this->name,
 			'description' => $this->description,
+            'remark' => $this->getRemark(),
 			'image' => $fullpath ? Util::toMedia($this->image, $fullpath) : $this->image,
 			'enabled' => $this->enabled,
 			'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),

@@ -77,10 +77,17 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="description" class="col-md-2 control-label">说明</label>
+                <label for="description" class="col-md-2 control-label">简介</label>
                 <div class="col-md-10">
                   <input type="text" class="form-control" id="description" name="description" value="{php echo $gift ? $gift->getDescription() : ''}">
-                  <span class="help-block">* 活动简介，说明</span>
+                  <span class="help-block">* 活动内容简介</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="remark" class="col-md-2 control-label">备注信息</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="remark" name="remark" value="{php echo $gift ? $gift->getRemark() : ''}">
+                    <span class="help-block">* 备注信息</span>
                 </div>
             </div>
             <div class="form-group">

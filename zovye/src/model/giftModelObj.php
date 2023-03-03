@@ -18,6 +18,7 @@ use zovye\Util;
  * @method setName(mixed $name)
  * @method setDescription(mixed $description)
  * @method setImage(mixed $image)
+ * @method bool isEnabled()
  */
 class giftModelObj extends modelObj
 {

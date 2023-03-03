@@ -29,31 +29,21 @@ $tpl_data = Util::getTplData([
     'device' => $device->profile(),
 ]);
 
-$api_url = Util::murl('sample', ['device' => $device->getImei()]);
+$api_url = Util::murl('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE
 <script src="$jquery_url"></script>
 <script>
-
     const zovye_fn = {
         api_url: "$api_url",
     }
 
-    zovye_fn.getQRCode = function() {
-        return $.getJSON(zovye_fn.api_url, {op: "qrcode"});
+    zovye_fn.getDetail = function() {
+        return $.getJSON(zovye_fn.api_url, {fn: "data"});
     }
-    
-    zovye_fn.checkUser = function() {
-        return $.getJSON(zovye_fn.api_url, {op: "check"});
-    }
-    
 </script>
 JSCODE;
 
-if (User::isSnapshot()) {
-    $tpl_data['js']['code'] .= app()->snapshotJs($device->getImei(), 'sample');
-}
-
-$filename = Theme::getThemeFile($device, 'qrcode');
+$filename = Theme::getThemeFile($device, 'gift');
 app()->showTemplate($filename, ['tpl' => $tpl_data]);

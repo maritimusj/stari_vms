@@ -7,10 +7,12 @@
 namespace zovye;
 
 use zovye\base\modelFactory;
+use zovye\model\deviceModelObj;
 use zovye\model\gift_logModelObj;
 use zovye\model\giftModelObj;
 use zovye\base\modelObjFinder;
 use zovye\model\accountModelObj;
+use zovye\model\userModelObj;
 
 class FlashEgg
 {
@@ -220,5 +222,74 @@ class FlashEgg
     public static function giftLogQuery($cond = []): modelObjFinder
     {
         return self::giftLog()->query($cond);
+    }
+
+    public static function giftDetail(userModelObj $user, giftModelObj $gift): array
+    {
+        $goods_list = $gift->getGoodsList(true);
+        foreach ($goods_list as $goods) {
+            if ($goods['num'] > 0) {
+                $goods['acquired'] = Order::query([
+                    'goods_id' => $goods['id'],
+                ])->limit($goods['num'])->count();
+            }
+        }
+
+        $data = $gift->profile(true);
+        $data['list'] = $goods_list;
+
+        return $data;
+    }
+
+    public static function selectGiftFor(userModelObj $user, deviceModelObj $device): ?giftModelObj
+    {
+        $key = $device->getId();
+        $agent = $device->getAgent();
+        if ($agent) {
+            $key .= ":agent:{$agent->getId()}";
+        } else {
+            $key .= ":agent:0";
+        }
+
+        $key = sha1($key);
+        $id =$user->settings('flash_gift.' . $key, 0);
+
+        $gift = self::getGift($id);
+        if ($gift && $gift->isEnabled()) {
+            return $gift;
+        }
+
+        $list = [];
+        if ($agent) {
+            $query = self::giftQuery([
+                'agent_id' => $agent->getId(),
+                'enabled' => 1,
+            ])->orderBy('id desc')->limit(10);
+
+            foreach ($query->findAll() as $item) {
+                $list[] = $item;
+            }
+        }
+
+        if (empty($list)) {
+            $query = self::giftQuery([
+                'enabled' => 1,
+                'agent_id' => 0,
+            ])->orderBy('id desc')->limit(10);
+
+            foreach ($query->findAll() as $item) {
+                $list[] = $item;
+            }
+        }
+
+        /** @var giftModelObj $gift */
+        $gift = array_rand($list);
+        if ($gift) {
+            $user->updateSettings($key, $gift->getId());
+        } else {
+            $user->removeSettings('flash_gift', $key);
+        }
+
+        return $gift;
     }
 }

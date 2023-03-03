@@ -126,68 +126,68 @@ const account_api_url = "$account_url";
 const device_api_url = "$device_api_url";
 
 if (typeof zovye_fn === 'undefined') {
-zovye_fn = {};
+    zovye_fn = {};
 }
 zovye_fn.closeWindow = function () {
-wx && wx.ready(function() {
-    wx.closeWindow();
-})
+    wx && wx.ready(function() {
+        wx.closeWindow();
+    })
 }
 zovye_fn.getAdvs = function(typeid, num, cb) {
-const params = {num};
-if (typeof typeid == 'number') {
-    params['typeid'] = typeid;
-} else {
-    params['type'] = typeid;
-}
-$.get(adv_api_url, params).then(function(res){
-    if (res && res.status) {
-        if (typeof cb === 'function') {
-            cb(res.data);
-        } else {
-            console.log(res.data);
-        }
+    const params = {num};
+    if (typeof typeid == 'number') {
+        params['typeid'] = typeid;
+    } else {
+        params['type'] = typeid;
     }
-})           
+    $.get(adv_api_url, params).then(function(res){
+        if (res && res.status) {
+            if (typeof cb === 'function') {
+                cb(res.data);
+            } else {
+                console.log(res.data);
+            }
+        }
+    })           
 }
 zovye_fn.play = function(uid, seconds, cb) {
-$.get(account_api_url, {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
-    if (cb) cb(res);
-})    
+    $.get(account_api_url, {op:'play', uid, seconds, device:'$device_imei', serial: '$requestID'}).then(function(res){
+        if (cb) cb(res);
+    })    
 }
 zovye_fn.redirectToUserPage = function() {
-window.location.href= "$user_home_page";
+    window.location.href= "$user_home_page";
 }
 zovye_fn.redirectToFeedBack = function() {
-window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
+    window.location.href= "$feedback_url&mobile=$mobile&device_name=$device_name&device_imei=$device_imei";
 }
 zovye_fn.getDetail = function (cb) {
-$.get(device_api_url, {op: 'detail'}).then(function (res) {
-    if (typeof cb === 'function') {
-        cb(res);
-    }
-})
+    $.get(device_api_url, {op: 'detail'}).then(function (res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    })
 }
 zovye_fn.getAccounts = function(type, cb, max = 0) {
-type = (type || []).length === 0 ? 'all' : type;
-$.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true, max}).then(function(res){
-    if (cb) cb(res);
-})
+    type = (type || []).length === 0 ? 'all' : type;
+    $.get(account_api_url, {op:'get_list', deviceId:'$device_imei', type: type, s_type: 'all', commission: true, max}).then(function(res){
+        if (cb) cb(res);
+    })
 }
 zovye_fn.redirectToAccountGetPage = function(uid) {
-$.get(account_api_url, {op:'get_url', uid, device:'$device_imei'}).then(function(res){
-   if (res) {
-       if (res.status && res.data.redirect) {
-           window.location.href = res.data.redirect;
-       } else {
-           if (res.data && res.data.message) {
-               alert(res.data.message);
+    $.get(account_api_url, {op:'get_url', uid, device:'$device_imei'}).then(function(res){
+       if (res) {
+           if (res.status && res.data.redirect) {
+               window.location.href = res.data.redirect;
+           } else {
+               if (res.data && res.data.message) {
+                   alert(res.data.message);
+               }
            }
+       } else {
+           alert('请求转跳网址失败！');
        }
-   } else {
-       alert('请求转跳网址失败！');
-   }
-})
+    })
 }
 zovye_fn.redirectToOrderPage = function() {
 window.location.href = "$order_jump_url";
@@ -196,27 +196,27 @@ JSCODE;
 if ($goods_list_FN) {
     $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.getGoodsList = function(cb, type = 'pay') {
-$.get("$device_api_url", {op: 'goods', type}).then(function(res) {
-if (typeof cb === 'function') {
-    cb(res);
-}
-});
+    $.get("$device_api_url", {op: 'goods', type}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
 }
 
 zovye_fn.getBalanceGoodsList = function(cb) {
-$.get("$device_api_url", {op: 'goods', type:'exchange'}).then(function(res) {
-if (typeof cb === 'function') {
-    cb(res);
-}
-});
+    $.get("$device_api_url", {op: 'goods', type:'exchange'}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
 }
 
 zovye_fn.chooseGoods = function(goods, num, cb) {
-$.get("$device_api_url", {op: 'choose_goods', goods, num}).then(function(res) {
-if (typeof cb === 'function') {
-    cb(res);
-}
-});
+    $.get("$device_api_url", {op: 'choose_goods', goods, num}).then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
 }
 
 JSCODE;
@@ -225,11 +225,11 @@ if (App::isDonatePayEnabled()) {
     $donate_url = Util::murl('donate', ['device' => $device->getShadowId()]);
     $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.getDonationInfo = function(cb) {
-$.get("$donate_url").then(function(res) {
-if (typeof cb === 'function') {
-    cb(res);
-}
-});
+    $.get("$donate_url").then(function(res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    });
 }
 JSCODE;
 }
@@ -237,7 +237,7 @@ if (empty($user->settings('fansData.sex'))) {
     $profile_url = Util::murl('util', ['op' => 'profile']);
     $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.saveUserProfile = function(data) {
-$.post("$profile_url", data);
+    $.post("$profile_url", data);
 }
 JSCODE;
 }
@@ -286,22 +286,32 @@ if (App::isBalanceEnabled()) {
 \r\n
 zovye_fn.wxapp_username = "$wxapp_username";
 zovye_fn.redirectToBonusPage = function() {
-window.location.href = "$bonus_url";
+    window.location.href = "$bonus_url";
 }
 zovye_fn.redirectToMallPage = function() {
-window.location.href = "$mall_url";
+    window.location.href = "$mall_url";
 }
 zovye_fn.user = JSON.parse(`$user_json_str`);
 zovye_fn.getUserInfo = function (cb) {
 if (typeof cb === 'function') {
-return cb(zovye_fn.user)
+    return cb(zovye_fn.user)
 }
 return new Promise((resolve, reject) => {
-resolve(zovye_fn.user);
+    resolve(zovye_fn.user);
 });
 }
 zovye_fn.balancePay = function(goods, num) {
-return $.get("$bonus_url", {op: 'exchange', device: '$device_imei', goods, num});
+    return $.get("$bonus_url", {op: 'exchange', device: '$device_imei', goods, num});
+}
+JSCODE;
+}
+
+//闪蛋活动转跳
+if (App::isFlashEggEnabled()) {
+    $flash_gift_url = Util::url('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
+    $tpl['js']['code'] .= <<<JSCODE
+zovye_fn.redirectToGiftPage = function() {
+    window.location.href= "$flash_gift_url";
 }
 JSCODE;
 }

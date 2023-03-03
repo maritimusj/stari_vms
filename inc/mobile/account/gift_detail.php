@@ -20,6 +20,17 @@ if (empty($device)) {
     JSON::fail('找不到这个设备！');
 }
 
+$fn = Request::trim('fn');
+
+if ($fn == 'data') {
+    $gift = FlashEgg::selectGiftFor($user, $device);
+    if (empty($gift)) {
+        JSON::fail('暂时没有活动可以参加！');
+    }
+    $detail = FlashEgg::giftDetail($user, $gift);
+    JSON::success($detail);
+}
+
 app()->giftDetailPage([
     'user' => $user,
     'device' => $device,

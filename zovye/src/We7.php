@@ -323,7 +323,6 @@ EOF;
         return !(false === strpos($string, $find));
     }
 
-
     /**
      * 判断是否为序列化字符串.
      *

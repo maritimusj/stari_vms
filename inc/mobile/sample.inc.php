@@ -94,7 +94,7 @@ if (!User::isSubscribed($user)) {
 
 //默认显示商品列表
 if ($op == 'default') {
-    app()->goodsListPage([
+    app()->giftGoodsListPage([
         'user' => $user,
         'device' => $device,
     ]);

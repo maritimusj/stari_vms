@@ -301,20 +301,19 @@ class FlashEgg
         }
 
         if (empty($list)) {
-            return null;
+            $gift = null;
+        } elseif (count($list) == 1) {
+            $gift = $list[0];
+        } else {
+            $gift = $list[array_rand($list)];
         }
 
-        if (count($list) == 1) {
-            return $list[0];
-        }
-
-        $gift = $list[array_rand($list)];
         if ($gift) {
-            $user->updateSettings($key, $gift->getId());
+            $user->updateSettings("flash_gift.$key", $gift->getId());
         } else {
             $user->removeSettings('flash_gift', $key);
         }
-
+        
         return $gift;
     }
 }

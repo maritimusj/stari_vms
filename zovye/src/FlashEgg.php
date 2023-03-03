@@ -230,6 +230,7 @@ class FlashEgg
         foreach ($goods_list as $goods) {
             if ($goods['num'] > 0) {
                 $goods['acquired'] = Order::query([
+                    'openid' => $user->getOpenid(),
                     'goods_id' => $goods['id'],
                 ])->limit($goods['num'])->count();
             }
@@ -243,20 +244,20 @@ class FlashEgg
 
     public static function selectGiftForUser(userModelObj $user, deviceModelObj $device): ?giftModelObj
     {
-        $key = $device->getId();
         $agent = $device->getAgent();
         if ($agent) {
-            $key .= ":agent:{$agent->getId()}";
+            $key = sha1("{$device->getId()}:agent:{$agent->getId()}");
         } else {
-            $key .= ":agent:0";
+            $key = sha1("{$device->getId()}:agent:0");
         }
 
-        $key = sha1($key);
-        $id =$user->settings('flash_gift.' . $key, 0);
+        $id = $user->settings("flash_gift.$key", 0);
 
-        $gift = self::getGift($id);
-        if ($gift && $gift->isEnabled()) {
-            return $gift;
+        if ($id > 0) {
+            $gift = self::getGift($id);
+            if ($gift && $gift->isEnabled()) {
+                return $gift;
+            }
         }
 
         $list = [];
@@ -273,8 +274,8 @@ class FlashEgg
 
         if (empty($list)) {
             $query = self::giftQuery([
-                'enabled' => 1,
                 'agent_id' => 0,
+                'enabled' => 1,
             ])->orderBy('id desc')->limit(10);
 
             foreach ($query->findAll() as $item) {
@@ -282,8 +283,15 @@ class FlashEgg
             }
         }
 
-        /** @var giftModelObj $gift */
-        $gift = array_rand($list);
+        if (empty($list)) {
+            return null;
+        }
+
+        if (count($list) == 1) {
+            return $list[0];
+        }
+
+        $gift = $list[array_rand($list)];
         if ($gift) {
             $user->updateSettings($key, $gift->getId());
         } else {

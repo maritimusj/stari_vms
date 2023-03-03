@@ -9,6 +9,7 @@ namespace zovye\base;
 use we7\SqlParser;
 use zovye\We7;
 use function zovye\is_error;
+use function zovye\strexists;
 
 class modelObjFinder extends SqlParser
 {
@@ -193,9 +194,13 @@ class modelObjFinder extends SqlParser
             $sql = 'DELETE FROM '.We7::tablename($objClassname::getTableName(modelObj::OP_WRITE));
         } else {
             $select = parent::parseSelect($fields);
-            $sql = "$select FROM ".We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+            $count_select = strexists($select, "COUNT(");
+            if ($count_select && $this->limit) {
+                $sql = "$select FROM (SELECT * FROM ".We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+            } else {
+                $sql = "$select FROM ".We7::tablename($objClassname::getTableName(modelObj::OP_READ));
+            }
         }
-
 
         if ($this->condition || $this->conditionOr) {
             if ($this->condition) {
@@ -223,6 +228,9 @@ class modelObjFinder extends SqlParser
 
         if ($this->limit) {
             $sql .= parent::parseLimit($this->limit);
+            if ($count_select ?? false) {
+                $sql .= ')';
+            }
         }
 
         //echo $sql;

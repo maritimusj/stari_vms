@@ -23,11 +23,11 @@ if (empty($device)) {
 $fn = Request::trim('fn');
 
 if ($fn == 'data') {
-    $gift = FlashEgg::selectGiftFor($user, $device);
+    $gift = FlashEgg::selectGiftForUser($user, $device);
     if (empty($gift)) {
         JSON::fail('暂时没有活动可以参加！');
     }
-    $detail = FlashEgg::giftDetail($user, $gift);
+    $detail = FlashEgg::getUserGiftDetail($user, $gift);
     JSON::success($detail);
 }
 

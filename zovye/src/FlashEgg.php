@@ -224,7 +224,7 @@ class FlashEgg
         return self::giftLog()->query($cond);
     }
 
-    public static function giftDetail(userModelObj $user, giftModelObj $gift): array
+    public static function getUserGiftDetail(userModelObj $user, giftModelObj $gift): array
     {
         $goods_list = $gift->getGoodsList(true);
         foreach ($goods_list as $goods) {
@@ -241,7 +241,7 @@ class FlashEgg
         return $data;
     }
 
-    public static function selectGiftFor(userModelObj $user, deviceModelObj $device): ?giftModelObj
+    public static function selectGiftForUser(userModelObj $user, deviceModelObj $device): ?giftModelObj
     {
         $key = $device->getId();
         $agent = $device->getAgent();

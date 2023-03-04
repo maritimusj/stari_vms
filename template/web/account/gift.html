@@ -78,6 +78,7 @@
                 <th>简介</th>
                 <th>备注</th>
                 <th>所属代理商</th>
+                <th>启用</th>
                 <th>创建时间</th>
                 <th></th>
             </thead>
@@ -90,13 +91,8 @@
                     <td class="image">
                         <img src="{$item['image']}">
                     </td>
-                    <td class="name operate">
+                    <td class="name">
                         {$item['name']}
-                        {if $item['enabled']}
-                        <i class="fa fa-check enabled" title="已启用" data-op="gift_enable"></i>
-                        {else}
-                        <i class="fa fa-check" title="已停用" data-op="gift_enable"></i>
-                        {/if}
                     </td>
                     <td class="desc">
                         {$item['description']}
@@ -117,6 +113,13 @@
                             <span style="color:gray;">&lt;平台&gt;</span>
                             {/if}
                         </div>
+                    </td>
+                    <td class="operate">
+                        {if $item['enabled']}
+                        <i class="fa fa-check enabled" title="已启用" data-op="gift_enable"></i>
+                        {else}
+                        <i class="fa fa-check" title="已停用" data-op="gift_enable"></i>
+                        {/if}
                     </td>
                     <td>
                         {$item['createtime_formatted']}
@@ -166,9 +169,9 @@
             next({id}, function(res) {
                 if (res && res.status) {
                     if (res.data.enabled) {
-                        tr.find('.name i').addClass('enabled').attr('title', '已启用');
+                        tr.find('.operate i.fa-check').addClass('enabled').attr('title', '已启用');
                     } else {
-                        tr.find('.name i').removeClass('enabled').attr('title', '已停用');
+                        tr.find('.operate i.fa-check').removeClass('enabled').attr('title', '已停用');
                     }
                }
             });

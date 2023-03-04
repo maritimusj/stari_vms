@@ -7,16 +7,21 @@
     }
     .gift .desc {
         color: #9e9e9e;
+        max-width: 30em;
     }
     .gift .remark {
         color: red;
         font-style: italic;
+        max-width: 30em;
     }
     .gift .name {
         font-weight: bolder;
     }
     .finished {
         color: #4caf50;
+    }
+    address {
+        max-width: 30em;
     }
 </style>
 <ul class="nav nav-tabs" id="navbar">
@@ -116,14 +121,14 @@
                     </address>
                 </td>
                 <td>
-                    <div class="status text-muted text-center">
-                        &lt;
+                    <div class="status text-center">
                         {if $item['status']}
-                        已完成
+                        <span class="finished">&lt;已完成&gt;</span>
                         {else}
-                        未发货
+                        <span class="text-muted">
+                            &lt;未发货&gt;
+                        </span>
                         {/if}
-                        &gt;
                     </div>
                 </td>
                 <td>
@@ -165,7 +170,7 @@
             next({id}, function(res) {
                 if (res && res.status) {
                     tr.find('.o').html(`<i class="fa fa-check finished" title="已发货"></i>`);
-                    tr.find('.status').html(`<已完成>`);
+                    tr.find('.status').html(`<span class="finished">&lt;已完成&gt;</span>`);
                }
             });
         })

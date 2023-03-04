@@ -56,5 +56,4 @@ if ($total > 0) {
 }
 
 $tpl_data['list'] = $list;
-
 app()->showTemplate('web/account/gift_logs', $tpl_data);

@@ -1,0 +1,40 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
+          <div class="form-group">
+            <label for="keywords"></label>
+            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入帐号或名称搜索..." value="{$keywords}">
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+        </form>
+    </div>
+</div>
+<ul class="nav nav-tabs" id="navbar">
+    {loop $navs $nav}
+    {if !isset($nav['enabled']) || $nav['enabled']}
+    {if $nav['active']}
+    <li role="presentation" class="active"><a href="#">{$nav['title']}</a></li>
+    {else}
+    <li role="presentation"><a href="{php echo $this->createWebUrl('account', ['type' => $nav['type']]);}">{$nav['title']}</a></li>
+    {/if}
+    {/if}
+    {/loop}
+</ul>
+
+<div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
+    <div class="heading operate">
+        <div class="operate">
+            <a href="{php echo $this->createWebUrl('account', ['op' => 'lucky_edit'])}">
+                <i class="fa fa-pencil" title="新建" ></i>
+            </a>
+            <a href="{php echo $this->createWebUrl('account', ['op' => 'lucky_logs'])}">
+                <i class="fa fa-list fa-fw" title="查看用户中奖记录"></i>
+            </a>
+        </div>
+    </div>
+    <div class="panel-body">
+    </div>
+</div>
+{template 'common/footer'}

@@ -30,6 +30,7 @@ $data = [
 
 $goods_ids = Request::array('goods');
 $num_arr = Request::array('num');
+
 foreach ($goods_ids as $index => $goods_id) {
     $goods = Goods::get($goods_id);
     if (empty($goods)) {

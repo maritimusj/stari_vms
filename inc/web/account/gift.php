@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\giftModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 $tpl_data = [
@@ -35,6 +37,7 @@ if ($total > 0) {
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 
+    /** @var giftModelObj $entry */
     foreach($query->findAll() as $entry) {
         $data = $entry->profile(true);
         $agent = $entry->getAgent();

@@ -1,0 +1,40 @@
+.flex {
+	display: flex;
+}
+
+.flex-row {
+	flex-direction: row;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.flex-center {
+	align-items: center;
+	justify-content: center;
+}
+
+.align-center {
+	align-items: center;
+}
+
+.justify-center {
+	justify-content: center;
+}
+
+.justify-end {
+	justify-content: flex-end;
+}
+
+.flex-1 {
+	flex: 1;
+}
+
+.flex-wrap {
+	flex-wrap: wrap;
+}
+
+.clickable:active {
+	opacity: 0.7;
+}

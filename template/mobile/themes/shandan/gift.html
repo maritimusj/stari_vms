@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>闪蛋</title>
+    <link rel="stylesheet" href="{MODULE_URL}static/m/shandan/css/style.css">
+    <style type="text/css">
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: #FFFCF1;
+            font-family: PingFang SC-Regular, PingFang SC;
+            font-size: 16px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            padding-bottom: calc(100px + constant(safe-area-inset-bottom));
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .header {
+            width: 100%;
+            height: 180px;
+            font-size: 26px;
+            background-color: #FED136;
+            position: relative;
+        }
+
+        .header .ribbon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .header .bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header .content {
+            z-index: 9;
+        }
+
+        .prize {
+            width: calc(100% - 16px);
+            border-radius: 10px;
+            padding: 20px 25px 25px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .prize .bg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: -1;
+        }
+
+        .prize .info {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .prize img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+        }
+
+        .prize .info .title {
+            width: 72px;
+            height: 28px;
+            background: #FF852E;
+            border-radius: 14px;
+        }
+
+        .prize .info .name {
+            margin-top: 4px;
+        }
+
+        .prize .info .desc {
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .list {
+            width: calc(100% - 32px);
+            margin-top: 8px;
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        .list .item {
+            padding: 20px;
+        }
+
+        .list .item:not(:last-child) {
+            border-bottom: 1px solid #eee;
+        }
+
+        .list .item .picture {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+        }
+
+        .list .item .info {
+            margin: 0 7px 0 10px;
+        }
+
+        .list .item .info .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        .list .item .info .complete {
+            margin-top: 4px;
+            color: #999;
+        }
+
+        .list .item .check img {
+            width: 24px;
+            height: 24px;
+            opacity: 0.5;
+        }
+
+        .list .item .check .checked {
+            opacity: 1;
+        }
+
+        button {
+            width: calc(100% - 32px);
+            height: 44px;
+            border-radius: 22px;
+            font-size: 18px;
+            position: fixed;
+            bottom: calc(20px + constant(safe-area-inset-bottom));
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            background: linear-gradient(180deg, #FEDE70 0%, #FF8E3E 100%);
+            color: #1C1C1C;
+            border: none;
+        }
+
+        .empty {
+            width: 200px;
+        }
+
+        .msg {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" class="flex flex-col align-center" v-cloak>
+        <div class="header flex flex-col flex-center">
+            <img class="ribbon" src="{MODULE_URL}static/m/shandan/img/ribbon.png">
+            <img class="bg" src="{MODULE_URL}static/m/shandan/img/gift_header_bg.png">
+            <div class="content flex flex-col align-center">
+                <span>集齐扭蛋</span>
+                <span style="margin-top: 8px;">获得大奖活动</span>
+            </div>
+        </div>
+        <template v-if="detail">
+            <div class="prize flex">
+                <img class="bg" src="{MODULE_URL}static/m/shandan/img/gift_bg.png">
+                <div class="info flex-1 flex flex-col">
+                    <div class="title flex flex-center">奖品</div>
+                    <span class="name">{{detail.name}}</span>
+                    <span class="desc">{{detail.description}}</span>
+                </div>
+                <img :src="detail.image">
+            </div>
+            <div class="list">
+                <div class="item flex flex-row" v-for="(item, index) in detail.list" :key="index">
+                    <img class="picture" :src="item.image">
+                    <div class="info flex-1 flex flex-col">
+                        <span class="name">{{item.name}}</span>
+                        <span class="complete">完成:{{item.acquired}}/{{item.num}}</span>
+                    </div>
+                    <div class="check flex flex-col justify-end">
+                        <img :class="{'checked': item.acquired >= item.num}"
+                            src="{MODULE_URL}static/m/shandan/svg/checked.svg">
+                    </div>
+                </div>
+            </div>
+            <button class="flex flex-center clickable" @click="onGet">点击领取大奖</button>
+        </template>
+        <template v-if="error">
+            <img class="empty" src="{MODULE_URL}static/m/shandan/img/no_data.png">
+            <span class="msg">{{error}}</span>
+        </template>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script type="text/javascript">
+        (function () {
+            window.alert = function (name) {
+                var iframe = document.createElement("IFRAME");
+                iframe.style.display = "none";
+                iframe.setAttribute("src", 'data:text/plain');
+                document.documentElement.appendChild(iframe);
+                window.frames[0].window.alert(name);
+                iframe.parentNode.removeChild(iframe);
+            }
+        })();
+        
+        var app = new Vue({
+            el: '#app',
+            data: {
+                detail: null,
+                error: ''
+            },
+            mounted () {
+                this.getDetail()
+            },
+            methods: {
+                getDetail () {
+                    zovye_fn.getDetail().then(res => {
+                        if (res.status) {
+                            this.detail = res.data
+                        } else {
+                            this.error = res.data.msg
+                        }
+                    })
+                },
+                onGet () {
+                    if (this.detail.all_acquired) {
+                        zovye_fn.redirectToRegPage()
+                    } else {
+                        alert('请集齐后再领取')
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

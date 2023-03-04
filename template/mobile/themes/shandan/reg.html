@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+    <title>领取奖品</title>
+    <link rel="stylesheet" href="{MODULE_URL}static/m/shandan/css/style.css">
+    <style type="text/css">
+        html,
+        body {
+            position: relative;
+            width: 100vw;
+        }
+
+        body {
+            background-color: white;
+            font-family: PingFang SC-Regular, PingFang SC;
+            font-size: 16px;
+            color: #1C1C1C;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+        #app {
+            padding-bottom: 100px;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .prize {
+            width: calc(100% - 32px);
+            margin-top: 10px;
+        }
+
+        .prize img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .prize .name {
+            margin-top: 10px;
+        }
+
+        .prize .desc {
+            color: #ACACAC;
+            margin-top: 4px;
+        }
+
+        .prize .price {
+            margin-top: 4px;
+            font-size: 14px;
+        }
+
+        .prize .price .value {
+            color: #FF6A01;
+        }
+
+        .prize .price .price-desc {
+            margin-left: 8px;
+            color: #ACACAC;
+        }
+
+        .tips {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 83px 0 16px;
+            margin-top: 10px;
+        }
+
+        .form {
+            width: calc(100% - 32px);
+            padding: 0 16px;
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            box-sizing: border-box;
+            box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.16);
+        }
+
+        .form .section {
+            padding: 20px 0;
+        }
+
+        .form .section:not(:last-child) {
+            border-bottom: 1px solid #eee;
+        }
+
+        .form .section .title {
+            width: 70px;
+            font-weight: bold;
+        }
+
+        .form .section * {
+            font-size: 16px;
+            outline: none;
+            border: none;
+            padding: 0;
+        }
+
+        .form .section input::placeholder,
+        .form .section .placeholder {
+            color: #ACACAC;
+        }
+
+        .form .section .arrow {
+            width: 20px;
+            height: 20px;
+        }
+
+        .submit {
+            width: calc(100% - 32px);
+            height: 44px;
+            border-radius: 22px;
+            font-size: 18px;
+            background: linear-gradient(180deg, #FEDE70 0%, #FF8E3E 100%);
+            color: #1C1C1C;
+            border: none;
+            margin-top: 20px;
+        }
+
+        .warning {
+            margin: 10px 59px 0 16px;
+            color: #FC2525;
+        }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .mask .close {
+            margin-top: 88px;
+            width: 22px;
+            height: 22px;
+            align-self: flex-end;
+            margin-right: 28px;
+        }
+
+        .mask .card,
+        .mask .success {
+            width: 320px;
+            border-radius: 10px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mask .card {
+            background-color: #FFFCF1;
+        }
+
+        .mask .success {
+            background-color: white;
+        }
+
+        .mask .card .light {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .mask .card .bg {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .mask .card .content {
+            z-index: 9;
+        }
+
+        .mask .card .content .picture {
+            width: 155px;
+            height: 155px;
+            border-radius: 50%;
+            margin-top: 41px;
+            border: 1px solid white;
+            box-sizing: border-box;
+        }
+
+        .mask .card .content .congratulations {
+            margin-top: -36px;
+            width: 223px;
+        }
+
+        .mask .card .content .name {
+            margin-top: 18px;
+        }
+
+        .mask .card .content .desc {
+            margin-top: 6px;
+            color: #ACACAC;
+        }
+
+        .mask .card .content .btn {
+            width: 166px;
+            height: 38px;
+            background: linear-gradient(90deg, #FED136 0%, #FF63A0 100%);
+            border-radius: 19px;
+            border: none;
+            margin-top: 23px;
+            margin-bottom: 32px;
+            font-size: 16px;
+            color: white;
+        }
+
+        .mask .success .picture {
+            width: 100%;
+            background-color: #FED136;
+            position: relative;
+        }
+
+        .mask .success .picture .image {
+            width: 188px;
+            margin-top: 16px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px 1px rgba(0, 0, 0, 0.16);
+            z-index: 2;
+        }
+
+        .mask .success .picture .wave {
+            width: 100%;
+            position: absolute;
+            bottom: -20px;
+            transform: rotateY(180deg);
+        }
+
+        .mask .success .text {
+            margin-top: 20px;
+        }
+
+        .mask .success button {
+            width: 217px;
+            height: 32px;
+            border-radius: 16px;
+            box-sizing: border-box;
+            background-color: #FF8E3E;
+            border: none;
+            color: white;
+            margin-top: 25px;
+            margin-bottom: 50px;
+            font-size: 16px;
+        }
+
+        .pcas {
+            width: 100%;
+            height: 75vh;
+            background-color: white;
+        }
+
+        .pcas .header {
+            width: 100%;
+            height: 40px;
+            position: relative;
+        }
+
+        .pcas .header .pcas-close {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            right: 20px;
+        }
+
+        .pcas .location {
+            width: 100%;
+            height: 40px;
+            border-bottom: 1px solid #eee;
+            overflow-x: auto;
+        }
+
+        .pcas .location .name {
+            min-width: 40px;
+            height: 100%;
+            margin: 0 16px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .pcas .location .selected {
+            color: #FF8E3E;
+            border-bottom: 1px solid #FF8E3E;
+        }
+
+        .pcas .chooser {
+            overflow-y: auto;
+        }
+
+        .pcas .chooser .list {
+            padding-bottom: 10px;
+        }
+
+        .pcas .chooser .list .item {
+            margin-top: 10px;
+            padding: 0 16px;
+        }
+
+        .pcas .chooser .list .item.selected {
+            color: #FF8E3E;
+        }
+
+        .v-enter,
+        .v-leave-to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .v-enter-active,
+        .v-leave-active {
+            transition: all .3s ease;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div id="app" class="flex flex-col align-center" v-cloak>
+        <div class="prize flex flex-col">
+            <img :src="gift.image">
+            <span class="name">{{gift.name}}</span>
+            <span class="desc">{{gift.description}}</span>
+            <div class="price" v-if="gift.remark">
+                <span class="value">{{gift.remark}}</span>
+                <span class="price-desc">建议零售价(非卖品)</span>
+            </div>
+        </div>
+        <span class="tips">为了奖品准确无误的发放，请您填写准确的收获地址信息</span>
+        <div class="form">
+            <div class="section flex flex-row align-center">
+                <span class="title">姓名</span>
+                <input class="flex-1" type="text" placeholder="姓名" v-model="name">
+            </div>
+            <div class="section flex flex-row align-center">
+                <span class="title">电话</span>
+                <input class="flex-1" type="tel" placeholder="电话" v-model="phoneNumber">
+            </div>
+            <div class="section flex flex-row align-center" @click="onChooseAddress">
+                <span class="title">地址</span>
+                <span class="flex-1" v-if="location">{{location}}</span>
+                <span class="flex-1 placeholder" v-else>地址</span>
+                <img class="arrow" src="{MODULE_URL}static/m/shandan/svg/arrow.svg">
+            </div>
+            <div class="section flex flex-row align-center">
+                <span class="title">详细地址</span>
+                <input class="flex-1" type="text" placeholder="详细地址" v-model="address">
+            </div>
+        </div>
+        <button class="submit flex flex-center clickable" @click="onSubmit">提交</button>
+        <span class="tips" style="margin-top: 20px;">以上信息仅用作扫码活动奖品使用</span>
+        <span class="warning">*中奖用户若因自己填写信息不实,无法收到奖品,将视为自动放弃奖品.</span>
+        <div class="mask flex flex-col align-center" v-if="gift.visible">
+            <img class="close" src="{MODULE_URL}static/m/shandan/svg/close_light.svg" @click="gift.visible = false">
+            <div class="card flex flex-col align-center">
+                <img class="light" src="{MODULE_URL}static/m/shandan/img/gift_winning_light.png">
+                <img class="bg" src="{MODULE_URL}static/m/shandan/img/gift_winning_bg.png">
+                <div class="content flex flex-col align-center">
+                    <img class="picture" :src="gift.image">
+                    <img class="congratulations" src="{MODULE_URL}static/m/shandan/img/congratulations.png">
+                    <span class="name">{{gift.name}}</span>
+                    <span class="desc">{{gift.description}}</span>
+                    <button class="btn clickable" @click="gift.visible = false">去看看</button>
+                </div>
+            </div>
+        </div>
+        <div class="mask flex flex-col align-center" v-if="gift.success.visible">
+            <img class="close" src="{MODULE_URL}static/m/shandan/svg/close_light.svg" @click="onBack">
+            <div class="success flex flex-col align-center">
+                <div class="picture flex flex-col align-center">
+                    <img class="image" :src="gift.image">
+                    <img class="wave" src="{MODULE_URL}static/m/shandan/img/wave.png">
+                </div>
+                <span class="text">{{gift.success.desc || '你的礼品已发放,请注意查收'}}</span>
+                <button class="clickable" @click="onBack">知道了</button>
+            </div>
+        </div>
+        <transition>
+            <div class="mask flex flex-col justify-end" v-if="pcas.visible" @click="pcas.visible = false">
+                <div class="pcas flex flex-col" @click.stop>
+                    <div class="header flex flex-center">
+                        <span>收获地址</span>
+                        <img class="pcas-close clickable" src="{MODULE_URL}static/m/shandan/svg/close_dark.svg"
+                            @click="pcas.visible = false">
+                    </div>
+                    <div class="location flex flex-row align-center">
+                        <div class="name flex flex-center" :class="{'selected': pcas.chooser.current === 0}"
+                            v-if="pcas.chooser.current >= 0" @click="pcas.chooser.current = 0">
+                            {{pcas.chooser.province.name || '请选择'}}
+                        </div>
+                        <div class="name flex flex-center" :class="{'selected': pcas.chooser.current === 1}"
+                            v-if="pcas.chooser.current >= 1" @click="pcas.chooser.current = 1">
+                            {{pcas.chooser.city.name || '请选择'}}
+                        </div>
+                        <div class="name flex flex-center" :class="{'selected': pcas.chooser.current === 2}"
+                            v-if="pcas.chooser.current >= 2" @click="pcas.chooser.current = 2">
+                            {{pcas.chooser.area.name || '请选择'}}
+                        </div>
+                        <div class="name flex flex-center" :class="{'selected': pcas.chooser.current === 3}"
+                            v-if="pcas.chooser.current >= 3">{{pcas.chooser.street.name || '请选择'}}</div>
+                    </div>
+                    <div class="chooser flex-1 flex flex-col">
+                        <div class="list" v-if="pcas.chooser.current === 0">
+                            <div class="item flex flex-row align-center"
+                                :class="{'selected': pcas.chooser.province.index === index}"
+                                v-for="(item, index) in pcas.chooser.province.list" @click="onChooseProvince(index)">
+                                <span v-if="pcas.chooser.province.index === index"
+                                    style="margin-right: 5px;">&rsaquo;</span>
+                                <span>{{item.name}}</span>
+                            </div>
+                        </div>
+                        <div class="list" v-else-if="pcas.chooser.current === 1">
+                            <div class="item flex flex-row align-center"
+                                :class="{'selected': pcas.chooser.city.index === index}"
+                                v-for="(item, index) in pcas.chooser.city.list" @click="onChooseCity(index)">
+                                <span v-if="pcas.chooser.city.index === index"
+                                    style="margin-right: 5px;">&rsaquo;</span>
+                                <span>{{item.name}}</span>
+                            </div>
+                        </div>
+                        <div class="list" v-else-if="pcas.chooser.current === 2">
+                            <div class="item flex flex-row align-center"
+                                :class="{'selected': pcas.chooser.area.index === index}"
+                                v-for="(item, index) in pcas.chooser.area.list" @click="onChooseArea(index)">
+                                <span v-if="pcas.chooser.area.index === index"
+                                    style="margin-right: 5px;">&rsaquo;</span>
+                                <span>{{item.name}}</span>
+                            </div>
+                        </div>
+                        <div class="list" v-else-if="pcas.chooser.current === 3">
+                            <div class="item flex flex-row align-center"
+                                :class="{'selected': pcas.chooser.street.index === index}"
+                                v-for="(item, index) in pcas.chooser.street.list" @click="onChooseStreet(index)">
+                                <span v-if="pcas.chooser.street.index === index"
+                                    style="margin-right: 5px;">&rsaquo;</span>
+                                <span>{{item.name}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+    {$tpl['js']['code']}
+    {php \zovye\url(true, JS_VUE_URL);}
+    <script src="{MODULE_URL}static/m/shandan/json/pcas.json"></script>
+    <script type="text/javascript">
+        (function () {
+            window.alert = function (name) {
+                var iframe = document.createElement("IFRAME");
+                iframe.style.display = "none";
+                iframe.setAttribute("src", 'data:text/plain');
+                document.documentElement.appendChild(iframe);
+                window.frames[0].window.alert(name);
+                iframe.parentNode.removeChild(iframe);
+            }
+        })();
+        
+        var app = new Vue({
+            el: '#app',
+            data: {
+                gift: {
+                    ...JSON.parse(`{php echo json_encode($tpl['gift'])}`),
+                    visible: false,
+                    success: {
+                        visible: false,
+                        desc: ''
+                    }
+                },
+                pcas: {
+                    visible: false,
+                    chooser: {
+                        province: {
+                            list: [],
+                            index: -1,
+                            name: ''
+                        },
+                        city: {
+                            list: [],
+                            index: -1,
+                            name: ''
+                        },
+                        area: {
+                            list: [],
+                            index: -1,
+                            name: ''
+                        },
+                        street: {
+                            list: [],
+                            index: -1,
+                            name: ''
+                        },
+                        current: 0
+                    }
+                },
+                name: '',
+                phoneNumber: '',
+                location: '',
+                address: ''
+            },
+            mounted () {
+                this.pcas.chooser.province.list = pcas
+            },
+            methods: {
+                onChooseAddress () {
+                    this.pcas.visible = true
+                },
+                onChooseProvince (index) {
+                    this.pcas.chooser.province.index = index
+                    const list = this.pcas.chooser.province.list
+                    this.pcas.chooser.province.name = list[index].name
+                    this.pcas.chooser.city.name = ''
+                    this.pcas.chooser.area.name = ''
+                    this.pcas.chooser.street.name = ''
+                    this.pcas.chooser.current++
+                    this.pcas.chooser.city.list = list[index].children
+                    this.pcas.chooser.city.index = -1
+                },
+                onChooseCity (index) {
+                    this.pcas.chooser.city.index = index
+                    const list = this.pcas.chooser.city.list
+                    this.pcas.chooser.city.name = list[index].name
+                    this.pcas.chooser.area.name = ''
+                    this.pcas.chooser.street.name = ''
+                    this.pcas.chooser.current++
+                    this.pcas.chooser.area.list = list[index].children
+                    this.pcas.chooser.area.index = -1
+                },
+                onChooseArea (index) {
+                    this.pcas.chooser.area.index = index
+                    const list = this.pcas.chooser.area.list
+                    this.pcas.chooser.area.name = list[index].name
+                    this.pcas.chooser.street.name = ''
+                    this.pcas.chooser.current++
+                    this.pcas.chooser.street.list = list[index].children
+                    this.pcas.chooser.street.index = -1
+                },
+                onChooseStreet (index) {
+                    this.pcas.chooser.street.index = index
+                    const list = this.pcas.chooser.street.list
+                    this.pcas.chooser.street.name = list[index].name
+                    this.pcas.visible = false
+                    this.location = this.pcas.chooser.province.name + ' ' + this.pcas.chooser.city.name + ' ' + this
+                        .pcas.chooser.area.name + ' ' + this.pcas.chooser.street.name
+                },
+                onSubmit () {
+                    const data = {
+                        name: this.name,
+                        phoneNumber: this.phoneNumber,
+                        location: this.location,
+                        address: this.address
+                    }
+                    zovye_fn.save(data).then(res => {
+                        if (res.status) {
+                            this.gift.success.visible = true
+                            this.gift.success.desc = res.data.msg
+                        } else {
+                            alert(res.data.msg)
+                        }
+                    })
+                },
+                onBack() {
+                    window.history.back()
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -553,54 +553,58 @@ class Device extends State
 
     public static function createBluetoothCmdLog(deviceModelObj $device, ICmd $cmd)
     {
-        $data = $cmd->getData();
-        if ($data) {
-            $str = is_string($data) ? $data : json_encode($data);
-            $data = We7::uniacid([
-                'event' => $cmd->getID(),
-                'device_uid' => $device->getUid(),
-                'extra' => json_encode([
-                    'id' => $cmd->getId(),
-                    'data' => base64_encode($str),
-                    'message' => $cmd->getMessage(),
-                    'raw' => $cmd->getEncoded(IBlueToothProtocol::HEX),
-                ]),
-            ]);
-
-            if (!m('device_events')->create($data)) {
-                Log::error('events', [
-                    'error' => 'create device log failed',
-                    'data' => $data,
+        if ($device->isEventLogEnabled()) {
+            $data = $cmd->getData();
+            if ($data) {
+                $str = is_string($data) ? $data : json_encode($data);
+                $data = We7::uniacid([
+                    'event' => $cmd->getID(),
+                    'device_uid' => $device->getUid(),
+                    'extra' => json_encode([
+                        'id' => $cmd->getId(),
+                        'data' => base64_encode($str),
+                        'message' => $cmd->getMessage(),
+                        'raw' => $cmd->getEncoded(IBlueToothProtocol::HEX),
+                    ]),
                 ]);
+
+                if (!m('device_events')->create($data)) {
+                    Log::error('events', [
+                        'error' => 'create device log failed',
+                        'data' => $data,
+                    ]);
+                }
             }
         }
     }
 
     public static function createBluetoothEventLog(deviceModelObj $device, IResult $result)
     {
-        if ($result->getRawData()) {
-            $data = We7::uniacid([
-                'event' => $result->getCode(),
-                'device_uid' => $device->getUid(),
-                'extra' => [
-                    'raw' => base64_encode($result->getRawData()),
-                    'code' => $result->getCode(),
-                    'message' => $result->getMessage(),
-                ],
-            ]);
-
-            $serial = $result->getSerial();
-            if ($serial) {
-                $data['extra']['serial'] = $serial;
-            }
-
-            $data['extra'] = json_encode($data['extra']);
-
-            if (!m('device_events')->create($data)) {
-                Log::error('events', [
-                    'error' => 'create device log failed',
-                    'data' => $data,
+        if ($device->isEventLogEnabled()) {
+            if ($result->getRawData()) {
+                $data = We7::uniacid([
+                    'event' => $result->getCode(),
+                    'device_uid' => $device->getUid(),
+                    'extra' => [
+                        'raw' => base64_encode($result->getRawData()),
+                        'code' => $result->getCode(),
+                        'message' => $result->getMessage(),
+                    ],
                 ]);
+
+                $serial = $result->getSerial();
+                if ($serial) {
+                    $data['extra']['serial'] = $serial;
+                }
+
+                $data['extra'] = json_encode($data['extra']);
+
+                if (!m('device_events')->create($data)) {
+                    Log::error('events', [
+                        'error' => 'create device log failed',
+                        'data' => $data,
+                    ]);
+                }
             }
         }
     }

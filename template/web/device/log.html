@@ -17,10 +17,10 @@
 </style>
 <ul class="nav nav-tabs" id="navbar">
     {loop $navs $nav_op $nav_title}
-    {if $op == $nav_op}
+    {if 'log' == $nav_op}
     <li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
     {else}
-    <li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}">{$nav_title}</a></li>
+    <li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0));}">{$nav_title}</a></li>
     {/if}
     {/loop}
 </ul>

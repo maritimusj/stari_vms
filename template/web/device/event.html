@@ -9,10 +9,10 @@
 
 <ul class="nav nav-tabs" id="navbar">
 {loop $navs $nav_op $nav_title}
-{if $op == $nav_op}
+{if 'event' == $nav_op}
 <li role="presentation"  class="active"><a href="#">{$nav_title}</a></li>
 {else}
-<li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}">{$nav_title}</a></li>
+<li role="presentation"><a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'id' => $device ? $device->getId() : 0));}">{$nav_title}</a></li>
 {/if}
 {/loop}
 </ul>
@@ -20,12 +20,12 @@
     <div class="heading">
         <span class="operate">
             {if $enabled}
-            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'enable'=>0, 'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}"><i class="fa fa-pause" title="停止记录消息报文" style="color: #f44336;"></i></a>
+            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'enable'=>0, 'id' => $device ? $device->getId() : 0));}"><i class="fa fa-pause" title="停止记录消息报文" style="color: #f44336;"></i></a>
             {else}
-            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'enable'=>1, 'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}"><i class="fa fa-play" title="开始记录消息报文" style="color: #4caf50;"></i></a>
+            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'enable'=>1, 'id' => $device ? $device->getId() : 0));}"><i class="fa fa-play" title="开始记录消息报文" style="color: #4caf50;"></i></a>
             {/if}
-            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'detail'=>1, 'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}"><i class="fa fa-cog" title="查看消息报文内容"></i></a>
-            <a href="{php echo $this->createWebUrl('device', array('op' => 'delete_logs', 'id' => $device ? $device->getId() : 0, 'eid' => \zovye\Request::op('eid'), 'version_id' => \zovye\Request::op('version_id')));}"><i class="fa fa-trash" title="清除日志"></i></a>
+            <a href="{php echo $this->createWebUrl('device', array('op' => $nav_op,  'detail'=>1, 'id' => $device ? $device->getId() : 0));}"><i class="fa fa-cog" title="查看消息报文内容"></i></a>
+            <a href="{php echo $this->createWebUrl('device', array('op' => 'delete_logs', 'id' => $device ? $device->getId() : 0));}"><i class="fa fa-trash" title="清除日志"></i></a>
         </span>        
     </div>
     <div class="panel-body">

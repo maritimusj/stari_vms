@@ -11,6 +11,9 @@ use function zovye\tb;
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
 
+/**
+ * @method setStatus(int $int)
+ */
 class gift_logModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

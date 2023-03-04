@@ -12,16 +12,16 @@ defined('IN_IA') or exit('Access Denied');
 
 $tpl_data = [
     'navs' => [
-        [ 'title' => '全部' ],
-        [ 'title' => '闪蛋','type' => Account::FlashEgg,'enabled' => App::isFlashEggEnabled() ],
-        [ 'title' => '集蛋活动 <span style="color: red;">*</span>', 'active' => true ],
-        [ 'title' => '第三方平台', 'type' => -1 ],
-        [ 'title' => '公众号', 'type' => Account::NORMAL ],
-        [ 'title' => '视频', 'type' => Account::VIDEO ],
-        [ 'title' => '抖音', 'type' => Account::DOUYIN, 'enabled' => App::isDouyinEnabled()],
-        [ 'title' => '小程序', 'type' => Account::WXAPP ],
-        [ 'title' => '问卷', 'type' => Account::QUESTIONNAIRE],
-        [ 'title' => '自定义任务', 'type' => Account::TASK, 'enabled' => App::isBalanceEnabled()],
+        ['title' => '全部'],
+        ['title' => '闪蛋', 'type' => Account::FlashEgg, 'enabled' => App::isFlashEggEnabled()],
+        ['title' => '集蛋活动 <span style="color: red;">*</span>', 'active' => true],
+        ['title' => '第三方平台', 'type' => -1],
+        ['title' => '公众号', 'type' => Account::NORMAL],
+        ['title' => '视频', 'type' => Account::VIDEO],
+        ['title' => '抖音', 'type' => Account::DOUYIN, 'enabled' => App::isDouyinEnabled()],
+        ['title' => '小程序', 'type' => Account::WXAPP],
+        ['title' => '问卷', 'type' => Account::QUESTIONNAIRE],
+        ['title' => '自定义任务', 'type' => Account::TASK, 'enabled' => App::isBalanceEnabled()],
     ],
 ];
 
@@ -38,7 +38,7 @@ if ($total > 0) {
     $query->orderBy('id DESC');
 
     /** @var giftModelObj $entry */
-    foreach($query->findAll() as $entry) {
+    foreach ($query->findAll() as $entry) {
         $data = $entry->profile(true);
         $agent = $entry->getAgent();
         if ($agent) {

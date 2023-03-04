@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $id = request::int('id');
 if ($id > 0) {
-    
+
     $gift = FlashEgg::getGift($id);
     if ($gift) {
 

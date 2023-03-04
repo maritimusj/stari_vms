@@ -11,6 +11,14 @@ use zovye\Util;
 
 use function zovye\tb;
 
+/**
+ * @method isEnabled()
+ * @method setEnabled(bool $param)
+ * @method setAgentId(mixed $agent_id)
+ * @method setName(mixed $name)
+ * @method setDescription(mixed $description)
+ * @method setImage(mixed $image)
+ */
 class luckyModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

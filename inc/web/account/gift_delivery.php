@@ -8,8 +8,6 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-$tpl_data = [];
-
 $id = request::int('id');
 if ($id > 0) {
     $log = FlashEgg::getGiftLog($id);

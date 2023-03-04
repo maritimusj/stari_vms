@@ -324,7 +324,7 @@ class FlashEgg
         $data = $gift->profile(true);
 
         unset($data['id']);
-        $data['uid'] = sha1($gift->getId() . $user->getId());
+        $data['uid'] = sha1($gift->getId().$user->getId());
 
         $data['list'] = $goods_list;
         $data['all_acquired'] = $all_acquired;
@@ -393,7 +393,7 @@ class FlashEgg
         } else {
             $user->removeSettings('flash_gift', $key);
         }
-        
+
         return $gift;
     }
 }

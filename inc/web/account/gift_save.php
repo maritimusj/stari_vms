@@ -23,7 +23,7 @@ $data = [
     'image' => Request::trim('image'),
     'extra' => [
         'goods' => [],
-        'remark' =>  Request::trim('remark'),
+        'remark' => Request::trim('remark'),
     ],
     'enabled' => Request::bool('enabled'),
 ];

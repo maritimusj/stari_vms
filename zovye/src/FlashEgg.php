@@ -12,6 +12,8 @@ use zovye\model\gift_logModelObj;
 use zovye\model\giftModelObj;
 use zovye\base\modelObjFinder;
 use zovye\model\accountModelObj;
+use zovye\model\lucky_logModelObj;
+use zovye\model\luckyModelObj;
 use zovye\model\userModelObj;
 
 class FlashEgg
@@ -183,9 +185,19 @@ class FlashEgg
         return m('gift');
     }
 
+    public static function lucky(): modelFactory
+    {
+        return m('lucky');
+    }
+
     public static function getGift(int $id): ?giftModelObj
     {
         return self::gift()->findOne(['id' => $id]);
+    }
+
+    public static function getLucky(int $id): ?luckyModelObj
+    {
+        return self::lucky()->findOne(['id' => $id]);
     }
 
     public static function createGift(array $data): ?giftModelObj
@@ -199,9 +211,25 @@ class FlashEgg
         return self::gift()->create($data);
     }
 
+    public static function createLucky(array $data): ?luckyModelObj
+    {
+        $data = We7::uniacid($data);
+
+        if ($data['extra']) {
+            $data['extra'] = luckyModelObj::serializeExtra($data['extra']);
+        }
+
+        return self::lucky()->create($data);
+    }
+
     public static function giftQuery($cond = []): modelObjFinder
     {
         return self::gift()->query(We7::uniacid($cond));
+    }
+
+    public static function luckyQuery($cond = []): modelObjFinder
+    {
+        return self::lucky()->query(We7::uniacid($cond));
     }
 
     public static function giftLog(): modelFactory
@@ -209,9 +237,19 @@ class FlashEgg
         return m('gift_log');
     }
 
+    public static function luckyLog(): modelFactory
+    {
+        return m('lucky_log');
+    }
+
     public static function getGiftLog(int $id): ?gift_logModelObj
     {
         return self::giftLog()->findOne(['id' => $id]);
+    }
+
+    public static function getLuckyLog(int $id): ?lucky_logModelObj
+    {
+        return self::luckyLog()->findOne(['id' => $id]);
     }
 
     public static function createGiftLog(array $data): ?gift_logModelObj
@@ -225,15 +263,39 @@ class FlashEgg
         return self::giftLog()->create($data);
     }
 
+    public static function createLuckyLog(array $data): ?lucky_logModelObj
+    {
+        $data = We7::uniacid($data);
+
+        if ($data['extra']) {
+            $data['extra'] = lucky_logModelObj::serializeExtra($data['extra']);
+        }
+
+        return self::luckyLog()->create($data);
+    }
+
     public static function giftLogQuery($cond = []): modelObjFinder
     {
         return self::giftLog()->query(We7::uniacid($cond));
+    }
+
+    public static function luckyLogQuery($cond = []): modelObjFinder
+    {
+        return self::luckyLog()->query(We7::uniacid($cond));
     }
 
     public static function isUserGiftLogExists(userModelObj $user, giftModelObj $gift): bool
     {
         return self::giftLogQuery([
             'gift_id' => $gift->getId(),
+            'user_id' => $user->getId(),
+        ])->exists();
+    }
+
+    public static function isUserLuckyLogExists(userModelObj $user, luckyModelObj $lucky): bool
+    {
+        return self::luckyLogQuery([
+            'lucky_id' => $lucky->getId(),
             'user_id' => $user->getId(),
         ])->exists();
     }

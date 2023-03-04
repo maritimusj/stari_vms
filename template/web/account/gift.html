@@ -30,10 +30,6 @@
     #flashGiftList .fa-check.enabled {
         color: #4caf50;
     }
-    #flashEggList img {
-        width: 32px;
-        height: 32px;
-    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -103,7 +99,7 @@
                     <td>
                         <div style="margin-bottom:10px;">
                             {if $item['agent']}
-                            <div class="agent" title="点击查看{$item['agent']['name']}全部公众号" style="display:inline-block;">
+                            <div class="agent" title="点击查看{$item['agent']['name']}全部活动" style="display:inline-block;">
                                 <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
                                     <img src="{$item['agent']['avatar']}">
                                     <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>

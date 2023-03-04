@@ -1,0 +1,132 @@
+{template 'common/header'}
+{php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<ul class="nav nav-tabs" id="navbar">
+    <li role="presentation" class="active">
+        <a href="#">
+            {if $id > 0}
+            <i class="fa fa-edit"></i> 编辑抽奖活动
+            {else}
+            <i class="fa fa-pencil"></i> 新建抽奖活动
+            {/if}
+        </a>
+    </li>
+</ul>
+<form action="{php echo $this->createWebUrl('account', ['op' => 'lucky_save']);}" method="post" class="form-horizontal" id="editFlashEggLuckyForm">
+    <div class="panel panel-default panel-first">
+        <div class="heading">
+            <span class="operate">
+                <i class="fa fa-reply" title="返回" onclick="backToList()"></i>
+            </span>
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label for="select_agent" class="col-md-2 control-label">所属代理商</label>
+                <div class="col-md-5">
+                    <select name="agent_id" id="select_agent" style="width:100%;">
+                        {if $agent}
+                        <option value="{php echo $agent->getId()}">{php echo $agent->getName() . "，手机号码：" . $agent->getMobile()}</option>
+                        {/if}
+                        <option value="0">&lt;无&gt;</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="keyword_agent" id="keyword_agent" placeholder="请输入手机号码或者名称查找">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-default" type="button" id="find_agent">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name" class="col-md-2 control-label">名称</label>
+                <div class="col-md-10">
+                  <input type="text" class="form-control" id="name" name="name" value="{php echo $lucky ? $lucky->getName() : ''}" required>
+                  <span class="help-block">* 活动名称</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description" class="col-md-2 control-label">简介</label>
+                <div class="col-md-10">
+                  <input type="text" class="form-control" id="description" name="description" value="{php echo $lucky ? $lucky->getDescription() : ''}">
+                  <span class="help-block">* 活动内容简介</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="remark" class="col-md-2 control-label">备注信息</label>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="remark" name="remark" value="{php echo $lucky ? $lucky->getRemark() : ''}">
+                    <span class="help-block">* 备注信息</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">
+                    图片
+                </label>
+                <div class="col-md-10">
+                    {php echo tpl_form_field_image('image', $lucky ? $lucky->getImage(): '')}
+                    <span class="help-block">* 活动图片</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="enabled" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="enabled" id="enabled" value="1" {if empty($lucky) || $lucky->isEnabled()}checked{/if}>
+                            启用
+                        </label>
+                        <span class="help-block">* 勾选则表示活动有效，否则不允许用户领取该活动奖励</span>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+            <input type="hidden" name="id" :value="{$id}">
+            <button type="submit" class="btn btn-primary">确定</button>
+            <button type="button" class="btn btn-default" onclick="backToList()">返回</button>
+        </div>
+    </div>
+</form>
+
+<!-- 以下js用于代理商搜索对话框 -->
+<script>
+    function backToList() {
+        window.location.href="{php echo $this->createWebUrl('account', ['op' => 'lucky'])}";
+    }
+    $(function() {
+        const ownerId = parseInt("{php echo $gift?$gift->getAgentId() : 0}", 10);
+        $('#find_agent').click(function(){
+            const keyword = $('input[name=keyword_agent]').val();
+            let complete = false;
+            setTimeout(function(){
+                if (!complete) {
+                    util.loading();
+                }
+            }, 1000)
+            $.get("{php echo $this->createWebUrl('agent');}", {op:'search', keyword:keyword}, function(res){
+                let html = '';
+                if(res.status) {
+                    const list = res.data || [];
+                    list.forEach(function(e) {
+                        html += '<option value="_1*" _**!_>_2*，手机号码：_3*</option>'
+                            .replace('_1*', e.id)
+                            .replace('_2*', e.name)
+                            .replace('_3*', e.mobile)
+                            .replace('_**!_', e.id === ownerId ? 'selected' : '');
+                    })
+                }
+                html += '<option value="0"><无></option>';
+                $('#select_agent').html(html);
+
+            }, 'json').complete(function(){
+                complete = true;
+                util.loaded();
+            })
+        })
+    })
+</script>
+{template 'common/footer'}

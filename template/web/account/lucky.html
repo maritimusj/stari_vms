@@ -1,5 +1,36 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<style>
+    .operate .state.auth {
+        margin-left: 0px;
+        filter: grayscale(100%);
+        opacity: 0.3;
+    }
+    .operate .state.auth:hover {
+        filter: grayscale(0);
+        opacity: 1;
+    }
+    .state.auth {
+        color: #4CAF50;
+        margin-left: 6px;
+    }
+    #flashLuckyList .image img {
+        width: 64px;
+        height: 64px;
+    }
+    #flashLuckyList .name {
+        max-width: 6em;
+    }
+    #flashLuckyList .desc {
+        max-width: 10em;
+    }
+    #flashLuckyList .fa-check {
+        color:#9e9e9e;
+    }
+    #flashLuckyList .fa-check.enabled {
+        color: #4caf50;
+    }
+</style>
 <div class="panel panel-default">
     <div class="panel-body">
         <form class="form-inline" action="{$search_url}" method="post" id="search-form">
@@ -35,6 +66,114 @@
         </div>
     </div>
     <div class="panel-body">
+        {if $list}
+        <table class="table" id="flashLuckyList">
+            <thead>
+                <th>#</th>
+                <th>图片</th>
+                <th>名称</th>
+                <th>简介</th>
+                <th>备注</th>
+                <th>所属代理商</th>
+                <th>启用</th>
+                <th>创建时间</th>
+                <th></th>
+            </thead>
+            <tbody>
+                {loop $list $index $item}
+                <tr data-id="{$item['id']}">
+                    <td>
+                        {php echo $index + 1}
+                    </td>
+                    <td class="image">
+                        <img src="{$item['image']}">
+                    </td>
+                    <td class="name">
+                        {$item['name']}
+                    </td>
+                    <td class="desc">
+                        {$item['description']}
+                    </td>
+                    <td class="desc remark">
+                        {$item['remark']}
+                    </td>
+                    <td>
+                        <div style="margin-bottom:10px;">
+                            {if $item['agent']}
+                            <div class="agent" title="点击查看{$item['agent']['name']}全部活动" style="display:inline-block;">
+                                <div class="profile" style="background-color:{$item['agent']['level']['clr']}">
+                                    <img src="{$item['agent']['avatar']}">
+                                    <div class="nickname">{php echo cutstr($item['agent']['name'], 10, true);}</div>
+                                </div>
+                            </div>
+                            {else}
+                            <span style="color:gray;">&lt;平台&gt;</span>
+                            {/if}
+                        </div>
+                    </td>
+                    <td class="operate">
+                        {if $item['enabled']}
+                        <i class="fa fa-check enabled" title="已启用" data-op="lucky_enable"></i>
+                        {else}
+                        <i class="fa fa-check" title="已停用" data-op="lucky_enable"></i>
+                        {/if}
+                    </td>
+                    <td>
+                        {$item['createtime_formatted']}
+                    </td>
+                    <td class="operate">
+                        <a href="{php echo $this->createWebUrl('account', ['op' => 'lucky_logs', 'id' => $item['id']])}">
+                            <i class="fa fa-list fa-fw" title="查看用户中奖记录"></i>
+                        </a>
+                        <i class="fa fa-download" title="下载中奖二维码" data-op="lucky_qrcodes"></i>
+                        <a href="{php echo $this->createWebUrl('account', ['op' => 'lucky_edit', 'id' => $item['id']])}">
+                            <i class="fa fa-edit fa-fw" title="编辑"></i>
+                        </a>
+                        <i class="fa fa-trash fa-fw" title= "删除" data-op="lucky_remove"></i>
+                    </td>
+                </tr>
+                {/loop}
+            </tbody>
+        </table>
+        <div class="pull-right">
+            {$pager}
+        </div>
+        {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何活动！
+        </div>
+        {/if}
     </div>
 </div>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
+        zovye.op('lucky_remove', function(self, next) {
+            if (!confirm('确定要删除这个活动吗？')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+                if (res && res.status) {
+                    tr.remove();
+               }
+            });
+        })
+        zovye.op('lucky_enable', function(self, next) {
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+                if (res && res.status) {
+                    if (res.data.enabled) {
+                        tr.find('.operate i.fa-check').addClass('enabled').attr('title', '已启用');
+                    } else {
+                        tr.find('.operate i.fa-check').removeClass('enabled').attr('title', '已停用');
+                    }
+               }
+            });
+        })
+    })
+</script>
 {template 'common/footer'}

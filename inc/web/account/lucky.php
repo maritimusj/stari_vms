@@ -6,7 +6,7 @@
 
 namespace zovye;
 
-use zovye\model\giftModelObj;
+use zovye\model\luckyModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
@@ -25,5 +25,33 @@ $tpl_data = [
     ],
 ];
 
+$query = FlashEgg::luckyQuery();
+
+$total = $query->count();
+
+$list = [];
+if ($total > 0) {
+    $page = max(1, Request::int('page'));
+    $page_size = Request::int('pagesize', DEFAULT_PAGE_SIZE);
+
+    $query->page($page, $page_size);
+    $query->orderBy('id DESC');
+
+    /** @var luckyModelObj $entry */
+    foreach($query->findAll() as $entry) {
+        $data = $entry->profile(true);
+
+        $agent = $entry->getAgent();
+        if ($agent) {
+            $data['agent'] = $agent->profile(false);
+        }
+        
+        $list[] = $data;
+    }
+
+    $tpl_data['pager'] = We7::pagination($total, $page, $page_size);
+}
+
+$tpl_data['list'] = $list;
 
 app()->showTemplate('web/account/lucky', $tpl_data);

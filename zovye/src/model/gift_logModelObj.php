@@ -70,6 +70,7 @@ class gift_logModelObj extends modelObj
             'phone_number' => $this->phone_num,
             'location' => $this->location,
             'address' => $this->address,
+            'status' => $this->status,
             'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
         ];
     }

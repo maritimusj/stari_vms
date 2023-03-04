@@ -1,9 +1,53 @@
 {template 'common/header'}
 {php \zovye\url(true, 'static/css/common.css?v=20220516');}
+<style>
+    #flashGiftLogs .image img {
+        width: 64px;
+        height: 64px;
+    }
+    .gift .desc {
+        color: #9e9e9e;
+    }
+    .gift .remark {
+        color: red;
+        font-style: italic;
+    }
+    .gift .name {
+        font-weight: bolder;
+    }
+    .finished {
+        color: #4caf50;
+    }
+</style>
 <ul class="nav nav-tabs" id="navbar">
-    <li role="presentation" class="active"><a href="#">领取记录</a></li>
+    {if $user}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">领取记录</a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="#">{if $user}<strong>{$user['name']}</strong>的{/if}领取记录 <span style="color:red;">*</span></a>
+    </li>
+    {else}
+    {if $gift}
+    <li role="presentation">
+        <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">领取记录</a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="#"><strong>{$gift['name']}</strong> <span style="color:red;">*</span></a>
+    </li>
+    {else}
+    <li role="presentation" class="active">
+        <a href="#">领取记录</a>
+    </li>
+    {/if}
+    {/if}
 </ul>
 <div class="panel panel-default panel-first nav-tab-item">
+    <div class="heading">
+        <span class="operate">
+            <a href="{php echo $this->createWebUrl('account', ['op' => 'gift'])}"><i class="fa fa-reply" title="返回"></i></a>
+        </span>
+    </div>
     <div class="panel-body">
         {if $list}
         <table class="table" id="flashGiftLogs">
@@ -13,9 +57,9 @@
             <th>名称</th>
             <th>用户</th>
             <th>收件人</th>
-            <th>状态</th>
+            <th class="text-center">状态</th>
             <th>创建时间</th>
-            <th></th>
+            <th>操作</th>
             </thead>
             <tbody>
             {loop $list $index $item}
@@ -27,19 +71,31 @@
                     <img src="{$item['gift']['image']}">
                 </td>
                 <td>
-                    {$item['gift']['name']}
+                    <div class="gift">
+                        <span class="name">
+                            {if empty($gift)}
+                            <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs', 'id' => $item['gift']['id']])}" title="查看记录">
+                            {$item['gift']['name']}
+                            </a>
+                            {else}
+                            {$item['gift']['name']} 
+                            {/if}
+                        </span><sup class="remark">{$item['gift']['remark']}</sup>
+                        <div class="desc">
+                            {$item['gift']['description']}
+                        </div>
+                    </div>
                 </td>
                 <td>
+                    <a href="{php echo $this->createWebUrl('account', array('op' => 'gift_logs', 'user_id' => $item['user']['id']));}" title="点击查看{php echo $item['user']['nickname']?:'&lt;匿名用户&gt;'}的记录">
                     <div class="profile">
-                        <img src="{$order['user']['avatar']}" />
+                        <img src="{$item['user']['headimgurl']}" />
                         <div>
                             <span class="nickname">
                                 {if $item['user']}
                                 {php echo $item['user']['nickname'] ?: '&lt;匿名用户&gt;'}
                                 {else}
-                                <a href="{php echo $this->createWebUrl('account', array('op' => 'gift_log', 'user_id' => $item['user']['id']));}" title="点击查看{php echo $item['user']['nickname']?:'&lt;匿名用户&gt;'}的记录">
                                     {php echo $item['user']['nickname'] ?: '&lt;匿名用户&gt;'}
-                                </a>
                                 {/if}
                             </span>
                             <div>
@@ -49,18 +105,38 @@
                             </div>
                         </div>
                     </div>
+                    </a>
                 </td>
                 <td>
-                    <div class="recipient">
-                        <div class="name">
-                            {$item['name']}
-                        </div>
-                        <div class="detail">
-                            <span class="phone_num">{$item['phone_number']}</span>
-                            <span class="location">{$item['location']}</span>
-                            <span class="address">{$item['address']}</span>
-                        </div>
+                    <address>
+                        <strong>{$item['name']}</strong><br>
+                        {if $item['phone_number']}{$item['phone_number']}<br>{/if}
+                        {if $item['location']}{$item['location']}<br>{/if}
+                        {if $item['address']}{$item['address']}<br>{/if}
+                    </address>
+                </td>
+                <td>
+                    <div class="status text-muted text-center">
+                        &lt;
+                        {if $item['status']}
+                        已完成
+                        {else}
+                        未发货
+                        {/if}
+                        &gt;
                     </div>
+                </td>
+                <td>
+                    {$item['createtime_formatted']}
+                </td>
+                <td class="o">
+                    {if $item['status']}
+                    <i class="fa fa-check finished" title="已发货"></i>
+                    {else}
+                    <div class="operate">
+                        <i class="fa fa-truck" data-op="gift_delivery" title="点击发货"></i>
+                    </div>
+                    {/if}
                 </td>
             </tr>
             {/loop}
@@ -76,4 +152,23 @@
         {/if}
     </div>
 </div>
+<script>
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+        zovye.enableOp();
+        zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
+        zovye.op('gift_delivery', function(self, next) {
+            if (!confirm('确定要更改成已发货状态吗？')) {
+                return;
+            }
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+                if (res && res.status) {
+                    tr.find('.o').html(`<i class="fa fa-check finished" title="已发货"></i>`);
+                    tr.find('.status').html(`<已完成>`);
+               }
+            });
+        })
+    })
+</script>
 {template 'common/footer'}

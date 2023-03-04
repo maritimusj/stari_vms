@@ -90,10 +90,12 @@
                     <td class="image">
                         <img src="{$item['image']}">
                     </td>
-                    <td class="name">
+                    <td class="name operate">
                         {$item['name']}
                         {if $item['enabled']}
-                        <i class="fa fa-check enabled" title="已启用"></i>
+                        <i class="fa fa-check enabled" title="已启用" data-op="gift_enable"></i>
+                        {else}
+                        <i class="fa fa-check" title="已停用" data-op="gift_enable"></i>
                         {/if}
                     </td>
                     <td class="desc">
@@ -155,6 +157,19 @@
             next({id}, function(res) {
                 if (res && res.status) {
                     tr.remove();
+               }
+            });
+        })
+        zovye.op('gift_enable', function(self, next) {
+            const tr = self.closest('tr');
+            const id = tr.data('id');
+            next({id}, function(res) {
+                if (res && res.status) {
+                    if (res.data.enabled) {
+                        tr.find('.name i').addClass('enabled').attr('title', '已启用');
+                    } else {
+                        tr.find('.name i').removeClass('enabled').attr('title', '已停用');
+                    }
                }
             });
         })

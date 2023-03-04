@@ -190,16 +190,18 @@ class FlashEgg
 
     public static function createGift(array $data): ?giftModelObj
     {
+        $data = We7::uniacid($data);
+
         if ($data['extra']) {
             $data['extra'] = giftModelObj::serializeExtra($data['extra']);
         }
 
-        return self::gift()->create(We7::uniacid($data));
+        return self::gift()->create($data);
     }
 
     public static function giftQuery($cond = []): modelObjFinder
     {
-        return self::gift()->query($cond);
+        return self::gift()->query(We7::uniacid($cond));
     }
 
     public static function giftLog(): modelFactory
@@ -214,6 +216,8 @@ class FlashEgg
 
     public static function createGiftLog(array $data): ?gift_logModelObj
     {
+        $data = We7::uniacid($data);
+
         if ($data['extra']) {
             $data['extra'] = gift_logModelObj::serializeExtra($data['extra']);
         }
@@ -223,7 +227,7 @@ class FlashEgg
 
     public static function giftLogQuery($cond = []): modelObjFinder
     {
-        return self::giftLog()->query($cond);
+        return self::giftLog()->query(We7::uniacid($cond));
     }
 
     public static function isUserGiftLogExists(userModelObj $user, giftModelObj $gift): bool

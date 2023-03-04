@@ -22,6 +22,7 @@ CREATE TABLE `ims_zovye_vms_gift`(
 
 CREATE TABLE `ims_zovye_vms_gift_log`(
     `id` INT NOT NULL AUTO_INCREMENT,
+    `uniacid` INT NOT NULL,
     `gift_id` INT NOT NULL,
     `user_id` INT NOT NULL,
     `name` VARCHAR(100) NOT NULL,
@@ -32,8 +33,8 @@ CREATE TABLE `ims_zovye_vms_gift_log`(
     `extra` JSON NOT NULL,
     `createtime` INT NOT NULL,
     PRIMARY KEY(`id`),
-    INDEX(`gift_id`),
-    INDEX(`user_id`)
+    INDEX(`uniacid`, `gift_id`),
+    INDEX(`uniacid`, `user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
     Migrate::execSQL($sql);

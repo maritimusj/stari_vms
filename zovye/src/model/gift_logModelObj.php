@@ -5,6 +5,8 @@
  */
 namespace zovye\model;
 
+use zovye\FlashEgg;
+use zovye\User;
 use function zovye\tb;
 use zovye\base\modelObj;
 use zovye\traits\ExtraDataGettersAndSetters;
@@ -18,6 +20,9 @@ class gift_logModelObj extends modelObj
 
 	/** @var int */
 	protected $id;
+
+    /** @var int */
+    protected $uniacid;
 
 	/** @var int */
 	protected $gift_id;
@@ -46,4 +51,42 @@ class gift_logModelObj extends modelObj
 	protected $createtime;
 
 	use ExtraDataGettersAndSetters;
+
+    public function getGift(): ?giftModelObj
+    {
+        return FlashEgg::getGift($this->gift_id);
+    }
+
+    public function getUser(): ?userModelObj
+    {
+        return User::get($this->user_id);
+    }
+
+    public function profile(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'phone_number' => $this->phone_num,
+            'location' => $this->location,
+            'address' => $this->address,
+            'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
+        ];
+    }
+
+    public function format($fullpath = false): array
+    {
+        $data = $this->profile();
+
+        $user = $this->getUser();
+        if ($user) {
+            $data['user'] = $user->profile(false);
+        }
+        $gift = $this->getGift();
+        if ($gift) {
+            $data['gift'] = $gift->profile($fullpath);
+        }
+
+        return $data;
+    }
 }

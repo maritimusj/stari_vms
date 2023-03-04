@@ -30,6 +30,10 @@
     #flashGiftList .fa-check.enabled {
         color: #4caf50;
     }
+    #flashEggList img {
+        width: 32px;
+        height: 32px;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -65,12 +69,6 @@
         </div>
     </div>
     <div class="panel-body">
-        <style>
-            #flashEggList img {
-                width: 32px;
-                height: 32px;
-            }
-        </style>
         {if $list}
         <table class="table" id="flashGiftList">
             <thead>
@@ -134,8 +132,13 @@
                 {/loop}
             </tbody>
         </table>
-        {$pager}
+        <div class="pull-right">
+            {$pager}
+        </div>
         {else}
+        <div class="text-center text-muted">
+            <i class="fa fa-question-circle"></i> 暂时还没有任何活动！
+        </div>
         {/if}
     </div>
 </div>

@@ -30,6 +30,10 @@
     #flashLuckyList .fa-check.enabled {
         color: #4caf50;
     }
+    .lucky img {
+        width: 32px;
+        height: 32px;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -53,7 +57,6 @@
     {/if}
     {/loop}
 </ul>
-
 <div class="panel panel-default{if empty($banned)} panel-first{/if} nav-tab-item"  id="accountlist">
     <div class="heading operate">
         <div class="operate">
@@ -146,7 +149,7 @@
     </div>
 </div>
 <script>
-    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
+    require(["{php \zovye\url(false, 'static/js/zovye.min.js')}", "util"], function (zovye, util) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
         zovye.op('lucky_remove', function(self, next) {
@@ -172,6 +175,19 @@
                         tr.find('.operate i.fa-check').removeClass('enabled').attr('title', '已停用');
                     }
                }
+            });
+        })
+        zovye.op('download_qrcodes', function(self, next) {
+            $('#modal-message').modal('hide');
+            util.loading();
+            const e = self.closest('[data-id]');
+            const id = e.data('id');
+            const num = $('#luckyQrcodesForm input[name=num]').val();
+            next({id, num}, function(res) {
+                util.loaded();
+                if (res && res.status && res.data.url) {
+                    window.location.href = res.data.url;
+                }
             });
         })
     })

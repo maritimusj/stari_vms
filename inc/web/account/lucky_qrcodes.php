@@ -21,6 +21,8 @@ if (empty($lucky)) {
 
 $tpl_data['id'] = $id;
 $tpl_data['agent'] = $lucky->getAgent();
-$tpl_data['lucky'] = $lucky;
+$tpl_data['lucky'] = $lucky->profile(true);
 
-app()->showTemplate('web/account/lucky_qrcodes', $tpl_data);
+$content = app()->fetchTemplate('web/account/lucky_qrcodes', $tpl_data);
+
+JSON::success(['title' => "抽奖活动二维码", 'content' => $content]);

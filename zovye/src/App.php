@@ -30,6 +30,11 @@ class App
         }, $len);
     }
 
+    public static function secret(): string
+    {
+        return _W('config.setting.authkey');
+    }
+
     public static function isApiEnabled(): bool
     {
         return onceCall(function () {

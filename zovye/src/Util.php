@@ -1566,6 +1566,52 @@ HTML_CONTENT;
         return $full_path;
     }
 
+    public static function renderTxt($file, $text)
+    {
+        $file_size = getimagesize($file);
+        $ext = $file_size['mime'];
+        if (strpos(strtolower($ext), 'jpeg') !== false || strpos(strtolower($ext), 'jpg') !== false) {
+            $im = imagecreatefromjpeg($file);
+        } elseif (strpos(strtolower($ext), 'png') !== false) {
+            $im = imagecreatefrompng($file);
+        } else {
+            return;
+        }
+
+        $i_w = imagesx($im);
+        $i_h = imagesy($im);
+
+        $x_offset = ($i_w + 44 - 18 * strlen($text)) / 2;
+        $n_w = $i_w + 44;
+        $n_h = $i_h + 44;
+
+        $im2 = imagecreatetruecolor($n_w, $n_h);
+        $background = imagecolorallocate($im2, 255, 255, 255);
+        imagefill($im2, 0, 0, $background);
+
+        imagecopyresized($im2, $im, 22, 0, 0, 0, floor($i_w), floor($i_h), floor($i_w), floor($i_h));
+        $black = imagecolorallocate($im2, 0, 0, 0);
+        imagefttext(
+            $im2,
+            24,
+            0,
+            $x_offset,
+            floor($i_h) + 24,
+            $black,
+            realpath(realpath(ZOVYE_CORE_ROOT.'../static/fonts/arial.ttf')),
+            $text
+        );
+
+        if (strpos(strtolower($ext), 'jpeg') !== false || strpos(strtolower($ext), 'jpg') !== false) {
+            imagejpeg($im2, $file);
+        } elseif (strpos(strtolower($ext), 'png') !== false) {
+            imagepng($im2, $file);
+        }
+
+        imagedestroy($im);
+        imagedestroy($im2);
+    }
+
     /**
      * 创建二维码 $id = type.uid形式指定.
      *

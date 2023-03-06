@@ -94,4 +94,5 @@ if ($fn == 'save') {
     }
 
     JSON::success(['msg' => '领取成功，请注意查收！']);
+
 }

@@ -21,6 +21,7 @@ $api_url = Util::murl('sample');
 $account_api_url = Util::murl('account');
 $feedback_url = Util::murl('order', ['op' => 'feedback']);
 $order_jump_url = Util::murl('order', ['op' => 'jump']);
+$user_home_page = Util::murl('bonus', ['op' => 'home']);
 
 $agent = $device->getAgent();
 $mobile = '';
@@ -75,6 +76,9 @@ $tpl_data['js']['code'] .= <<<JSCODE
     }
     zovye_fn.redirectToOrderPage = function() {
         window.location.href = "$order_jump_url";
+    }
+    zovye_fn.redirectToUserPage = function() {
+        window.location.href = "$user_home_page";
     }
 \r\n
 JSCODE;

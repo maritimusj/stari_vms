@@ -103,6 +103,7 @@ if ($fn == 'data') {
     }
 
     JSON::success(['msg' => '领取成功，请注意查收！']);
+
 }
 
 app()->giftDetailPage([

@@ -69,8 +69,19 @@ $js_sdk
     }
     zovye_fn.redirectToMallOrderPage = function() {
         window.location.href = "$mall_order_url";
-    }    
-</script>
+    }
+\r\n
 JSCODE;
+
+if (App::isFlashEggEnabled()) {
+    $flash_egg_url = Util::murl('account', ['op' => 'flash_egg']);
+    $tpl_data['js']['code'] = <<<JSCODE
+    zovye_fn.redirectToFlashEggPage = function() {
+        window.location.href = "$flash_egg_url";
+    }
+JSCODE;  
+}
+
+$tpl_data['js']['code'] .= "\r\n</script>";
 
 app()->showTemplate(Theme::file('user'), ['tpl' => $tpl_data]);

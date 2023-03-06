@@ -190,7 +190,10 @@ zovye_fn.redirectToAccountGetPage = function(uid) {
     })
 }
 zovye_fn.redirectToOrderPage = function() {
-window.location.href = "$order_jump_url";
+    window.location.href = "$order_jump_url";
+}
+zovye_fn.redirectToUserPage = function() {
+    window.location.href = "$user_home_page";
 }
 JSCODE;
 if ($goods_list_FN) {
@@ -202,7 +205,6 @@ if ($goods_list_FN) {
         }
     });
 }
-
 zovye_fn.getBalanceGoodsList = function(cb) {
     $.get("$device_api_url", {op: 'goods', type:'exchange'}).then(function(res) {
         if (typeof cb === 'function') {
@@ -210,7 +212,6 @@ zovye_fn.getBalanceGoodsList = function(cb) {
         }
     });
 }
-
 zovye_fn.chooseGoods = function(goods, num, cb) {
     $.get("$device_api_url", {op: 'choose_goods', goods, num}).then(function(res) {
         if (typeof cb === 'function') {
@@ -259,11 +260,11 @@ if ($retry['last'] > 0) {
             );
             $tpl['js']['code'] .= <<<JSCODE
 \r\nzovye_fn.retryOrder = function (cb) {
-$.get("$order_retry_url").then(function (res) {
-if (typeof cb === 'function') {
-    cb(res);
-}
-})
+    $.get("$order_retry_url").then(function (res) {
+        if (typeof cb === 'function') {
+            cb(res);
+        }
+    })
 }
 JSCODE;
         }
@@ -293,12 +294,12 @@ zovye_fn.redirectToMallPage = function() {
 }
 zovye_fn.user = JSON.parse(`$user_json_str`);
 zovye_fn.getUserInfo = function (cb) {
-if (typeof cb === 'function') {
-    return cb(zovye_fn.user)
-}
-return new Promise((resolve, reject) => {
-    resolve(zovye_fn.user);
-});
+    if (typeof cb === 'function') {
+        return cb(zovye_fn.user)
+    }
+    return new Promise((resolve, reject) => {
+        resolve(zovye_fn.user);
+    });
 }
 zovye_fn.balancePay = function(goods, num) {
     return $.get("$bonus_url", {op: 'exchange', device: '$device_imei', goods, num});

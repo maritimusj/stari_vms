@@ -66,4 +66,5 @@ if ($total > 0) {
 
 $tpl_data['list'] = $list;
 $tpl_data['search_url'] = Util::url('account', ['op' => 'lucky_logs']);
+
 app()->showTemplate('web/account/lucky_logs', $tpl_data);

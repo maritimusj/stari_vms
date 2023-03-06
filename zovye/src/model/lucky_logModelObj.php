@@ -11,6 +11,9 @@ use zovye\traits\ExtraDataGettersAndSetters;
 use zovye\User;
 use function zovye\tb;
 
+/**
+ * @method setStatus(int $int)
+ */
 class lucky_logModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string

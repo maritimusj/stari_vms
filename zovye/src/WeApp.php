@@ -42,6 +42,7 @@ use zovye\model\weapp_configModelObj;
  * @method douyinPage(array $params)
  * @method keeperPage(array $params)
  * @method giftRegistryPage(array $array)
+ * @method luckyRegistryPage(array $array)
  */
 class WeApp extends Settings
 {

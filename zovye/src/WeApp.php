@@ -43,6 +43,9 @@ use zovye\model\weapp_configModelObj;
  * @method keeperPage(array $params)
  * @method giftRegistryPage(array $array)
  * @method luckyRegistryPage(array $array)
+ * @method giftLogsPage(array $array)
+ * @method luckyLogsPage(array $array)
+ * @method flashEggPage(array $array)
  */
 class WeApp extends Settings
 {

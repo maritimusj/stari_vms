@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 use zovye\model\gift_logModelObj;
@@ -31,7 +31,7 @@ if ($fn == 'gift_logs') {
     app()->luckyLogsPage([
         'user' => $user,
     ]);
-    
+
 } elseif ($fn == 'get_gift_logs') {
 
     $query = FlashEgg::giftLogQuery([

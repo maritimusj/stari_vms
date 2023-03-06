@@ -75,11 +75,12 @@ JSCODE;
 
 if (App::isFlashEggEnabled()) {
     $flash_egg_url = Util::murl('account', ['op' => 'flash_egg']);
-    $tpl_data['js']['code'] = <<<JSCODE
+    $tpl_data['js']['code'] .= <<<JSCODE
     zovye_fn.redirectToFlashEggPage = function() {
         window.location.href = "$flash_egg_url";
     }
-JSCODE;  
+\r\n
+JSCODE;
 }
 
 $tpl_data['js']['code'] .= "\r\n</script>";

@@ -4,11 +4,11 @@
  * @url www.stariture.com
  */
  
- namespace zovye;
+namespace zovye;
 
- defined('IN_IA') or exit('Access Denied');
- 
- use zovye\model\userModelObj;
+defined('IN_IA') or exit('Access Denied');
+
+use zovye\model\userModelObj;
 
 /** @var userModelObj $user */
 $user = Util::getTemplateVar('user');

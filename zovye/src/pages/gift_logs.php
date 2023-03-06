@@ -6,6 +6,8 @@
 
 namespace zovye;
 
+use zovye\model\userModelObj;
+
 defined('IN_IA') or exit('Access Denied');
 
 /** @var userModelObj $user */

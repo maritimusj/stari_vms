@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $id = request::int('id');
 if ($id > 0) {
-    $log = FlashEgg::getGiftLog($id);
+    $log = FlashEgg::getLuckyLog($id);
     if ($log) {
         $log->setStatus(1);
         if ($log->save()) {

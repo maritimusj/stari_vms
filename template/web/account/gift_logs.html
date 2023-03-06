@@ -27,7 +27,7 @@
 <ul class="nav nav-tabs" id="navbar">
     {if $user}
     <li role="presentation">
-        <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">领取记录</a>
+        <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">集蛋活动领取记录</a>
     </li>
     <li role="presentation" class="active">
         <a href="#">{if $user}<strong>{$user['name']}</strong>的{/if}领取记录 <span style="color:red;">*</span></a>
@@ -35,14 +35,14 @@
     {else}
     {if $gift}
     <li role="presentation">
-        <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">领取记录</a>
+        <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">集蛋活动领取记录</a>
     </li>
     <li role="presentation" class="active">
         <a href="#"><strong>{$gift['name']}</strong> <span style="color:red;">*</span></a>
     </li>
     {else}
     <li role="presentation" class="active">
-        <a href="#">领取记录</a>
+        <a href="#">集蛋活动领取记录</a>
     </li>
     {/if}
     {/if}

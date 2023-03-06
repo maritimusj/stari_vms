@@ -69,6 +69,7 @@ class lucky_logModelObj extends modelObj
     {
         return [
             'id' => $this->id,
+			'serial' => $this->serial,
             'name' => $this->name,
             'phone_number' => $this->phone_num,
             'location' => $this->location,

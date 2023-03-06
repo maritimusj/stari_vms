@@ -194,10 +194,10 @@ class keeper
             }
 
             if ($keeper) {
-                $keeperUser = $keeper->getUser();
-                if ($keeperUser && !$keeperUser->isKeeper()) {
-                    $keeperUser->setKeeper();
-                    $keeperUser->save();
+                $keeper_user = $keeper->getUser();
+                if ($keeper_user && !$keeper_user->isKeeper()) {
+                    $keeper_user->setKeeper();
+                    $keeper_user->save();
                 }
 
                 if ($keeper->save()) {

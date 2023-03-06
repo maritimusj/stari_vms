@@ -37,6 +37,7 @@ CREATE TABLE `ims_zovye_vms_gift_log`(
     INDEX(`uniacid`, `user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
+    Migrate::execSQL($sql);
 }
 
 if (!We7::pdo_tableexists($tb_name.'_lucky')) {

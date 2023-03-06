@@ -191,16 +191,18 @@ class keeper
                     'name' => $name,
                     'mobile' => $mobile,
                 ]);
+            }
 
+            if ($keeper) {
                 $keeperUser = $keeper->getUser();
                 if ($keeperUser && !$keeperUser->isKeeper()) {
                     $keeperUser->setKeeper();
                     $keeperUser->save();
                 }
-            }
 
-            if ($keeper && $keeper->save()) {
-                return ['msg' => empty($id) ? '请联系运营人员登录并绑定手机号！' : '运营人员资料保存成功！'];
+                if ($keeper->save()) {
+                    return ['msg' => empty($id) ? '请联系运营人员登录并绑定手机号！' : '运营人员资料保存成功！'];
+                }
             }
 
             return err('保存数据出错！');

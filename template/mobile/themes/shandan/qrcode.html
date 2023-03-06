@@ -117,9 +117,7 @@
             },
             mounted () {
                 this.getQRCode()
-                setTimeout(() => {
-                    this.checkUser()
-                }, 3000)
+                this.checkUser()
             },
             methods: {
                 getQRCode () {

@@ -364,7 +364,7 @@
     <div id="app" v-cloak>
         <div class="header flex flex-row align-center">
             <span class="no flex-1">NO.{{imei.substr(imei.length - 6)}}</span>
-            <button class="flex flex-row align-center clickable" @click="onOrderClick">
+            <button class="flex flex-row align-center clickable" @click="onProfileClick">
                 <img src="{MODULE_URL}static/m/shandan/img/profile.png">
                 <span>我的</span>
             </button>
@@ -452,6 +452,17 @@
     <script src="https://cdn.staticfile.org/Swiper/7.1.0/swiper-bundle.min.js"></script>
     <script src="https://cdn.staticfile.org/video.js/4.1.0/video.js"></script>
     <script>
+        (function () {
+            window.alert = function (name) {
+                var iframe = document.createElement("IFRAME");
+                iframe.style.display = "none";
+                iframe.setAttribute("src", 'data:text/plain');
+                document.documentElement.appendChild(iframe);
+                window.frames[0].window.alert(name);
+                iframe.parentNode.removeChild(iframe);
+            }
+        })();
+
         const app = new Vue({
             el: '#app',
             data: {
@@ -528,8 +539,8 @@
                         }
                     })
                 },
-                onOrderClick () {
-                    if (zovye_fn.redirectToBonusPage) {
+                onProfileClick () {
+                    if (zovye_fn.redirectToUserPage) {
                         zovye_fn.redirectToUserPage()
                     } else {
                         zovye_fn.redirectToOrderPage()
@@ -576,6 +587,12 @@
                     }, time || 2000)
                 },
                 onGet () {
+                    if (this.tabs.active === 'free' && this.detail.data.limited) {
+                        this.showToast({
+                                desc: '无法领取'
+                            })
+                        return
+                    }
                     if (this.getLoading) {
                         return
                     }
@@ -599,26 +616,22 @@
                     })
                 },
                 playVideo (data) {
-                    const that = this
-                    if (!that.video.player) {
-                        that.video.data = data
-                        that.video.countdown = data.duration
-                        that.video.visible = true
+                    this.video.data = data
+                    this.video.countdown = data.duration
+                    this.video.visible = true
 
-                        this.$nextTick(() => {
-                            const options = {
-                                autoplay: true,
-                                sources: [{
-                                    type: "video/mp4",
-                                    src: data.media
-                                }]
-                            }
-                            that.video.player = videojs('player', options, function onPlayerReady () {
-                                this.play()
-                                that.onPlayVideo()
-                            })
+                    this.$nextTick(() => {
+                        const options = {
+                            autoplay: true,
+                            sources: [{
+                                type: "video/mp4",
+                                src: data.media
+                            }]
+                        }
+                        this.video.player = videojs('player', options, () => {
+                            this.onPlayVideo()
                         })
-                    }
+                    })
                 },
                 onPlayVideo () {
                     this.playRequest('video')
@@ -664,7 +677,6 @@
                                 key === 'video' && this.video.player.pause()
                                 clearInterval(this[key].interval)
                                 this[key].visible = false
-                                this.isHidden = true
                                 alert(res.data.msg || '播放出错！')
                             }
                             if (res.data && res.data.redirect) {
@@ -675,10 +687,14 @@
                                         goodsID: this.detail.data.id,
                                         total: this.detail.data.count
                                     }
-                                    zovye_fn.goods_wxpay(params).then(() => {
+                                    zovye_fn.goods_wxpay(params, () => {
                                         this.getLoading = false
-                                    }).catch(() => {
+                                    }, () => {
                                         this.getLoading = false
+                                        key === 'video' && this.video.player.pause()
+                                        this.video.player.dispose()
+                                        clearInterval(this[key].interval)
+                                        this[key].visible = false
                                     })
                                 }
                             } else if (res.status) {

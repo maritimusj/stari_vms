@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+		<title>我的活动</title>
+		<link rel="stylesheet" href="{MODULE_URL}static/m/shandan/css/style.css">
+		<style type="text/css">
+			html,
+			body {
+				position: relative;
+				width: 100vw;
+			}
+
+			body {
+				background-color: #F8F8F8;
+				font-family: PingFang SC-Regular, PingFang SC;
+				font-size: 16px;
+				color: #1C1C1C;
+				font-weight: 400;
+				margin: 0;
+				padding: 0;
+				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			}
+			
+			#app {
+				height: 100vh;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+			
+			.user {
+				width: 100%;
+				height: 150px;
+				background-color: #FED136;
+			}
+			
+			.user .info {
+				margin-top: 25px;
+			}
+			
+			.user .info .avatar {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				margin: 0 16px;
+			}
+			
+			.user .info .nickname {
+				font-size: 20px;
+				font-weight: bold;
+			}
+			
+			.menu {
+				width: calc(100% - 32px);
+				border-radius: 10px;
+				background-color: white;
+				margin-top: -45px;
+				margin-bottom: calc(36px + constant(safe-area-inset-bottom));
+				margin-bottom: calc(36px + env(safe-area-inset-bottom));
+			}
+			
+			.menu .header {
+				font-size: 18px;
+				font-weight: bold;
+				margin: 16px;
+			}
+			
+			.menu .item {
+				padding: 16px;
+				border-bottom: 1px solid #eee;
+			}
+			
+			.menu .item .icon {
+				width: 36px;
+				height: 36px;
+			}
+			
+			.menu .item .info {
+				margin: 0 16px;
+			}
+			
+			.menu .item .info .title {
+				color: #666;
+			}
+			
+			.menu .item .info .desc {
+				color: #ACACAC;
+				font-size: 14px;
+				margin-top: 4px;
+			}
+			
+			.menu .item .arrow {
+				width: 22px;
+				height: 22px;
+				align-self: flex-end;
+				transform: rotate(90deg) scale(0.7);
+			}
+		</style>
+	</head>
+	<body ontouchstart>
+		<div id="app" class="flex flex-col align-center" v-cloak>
+			<div class="user">
+				<div class="info flex flex-row align-center">
+					<img class="avatar" :src="userInfo.headimgurl">
+					<span class="nickname">{{userInfo.nickname}}</span>
+				</div>
+			</div>
+			<div class="menu flex-1">
+				<div class="header">我的活动</div>
+				<div class="item flex flex-row align-center clickable" @click="onClickLuckyLogs">
+					<img class="icon" src="{MODULE_URL}static/m/shandan/img/medal.png">
+					<div class="info flex-1 flex flex-col">
+						<span class="title">扫码领奖品活动</span>
+						<span class="desc">拿起手机扫一扫,中大奖</span>
+					</div>
+					<img class="arrow" src="{MODULE_URL}static/m/shandan/svg/arrow.svg">
+				</div>
+				<div class="item flex flex-row align-center clickable" @click="onClickGiftLogs">
+					<img class="icon" src="{MODULE_URL}static/m/shandan/img/cup.png">
+					<div class="info flex-1 flex flex-col">
+						<span class="title">集齐扭蛋领大奖</span>
+						<span class="desc">完成扭蛋收集可以兑换好礼</span>
+					</div>
+					<img class="arrow" src="{MODULE_URL}static/m/shandan/svg/arrow.svg">
+				</div>
+				<!-- <div class="item flex flex-row align-center clickable">
+					<img class="icon" src="{MODULE_URL}static/m/shandan/img/video.png">
+					<div class="info flex-1 flex flex-col">
+						<span class="title">观看视频获取大奖</span>
+						<span class="desc">看完视频可免费领取大奖</span>
+					</div>
+					<img class="arrow" src="{MODULE_URL}static/m/shandan/svg/arrow.svg">
+				</div> -->
+			</div>
+		</div>
+		{$tpl['js']['code']}
+    	{php \zovye\url(true, JS_VUE_URL);}
+		<script type="text/javascript">
+			var app = new Vue({
+				el: '#app',
+				data: {
+					userInfo: {
+						...JSON.parse(`{php echo json_encode($tpl['user'])}`)
+					}
+				},
+				methods: {
+					onClickLuckyLogs() {
+						zovye_fn.redirectLuckyLogsPage()
+					},
+					onClickGiftLogs() {
+						zovye_fn.redirectGiftLogsPage()
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

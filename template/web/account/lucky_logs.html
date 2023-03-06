@@ -24,6 +24,17 @@
         max-width: 30em;
     }
 </style>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form class="form-inline" action="{$search_url}" method="post" id="search-form">
+          <div class="form-group">
+            <label for="keywords"></label>
+            <input type="text" class="form-control" name="keywords" id="keywords" placeholder="请输入序列号或手机号码搜索..." value="{$keywords}">
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i>&nbsp;搜索</button>
+        </form>
+    </div>
+</div>
 <ul class="nav nav-tabs" id="navbar">
     {if $user}
     <li role="presentation">
@@ -173,6 +184,15 @@
                     tr.find('.status').html(`<span class="finished">&lt;已完成&gt;</span>`);
                }
             });
+        })
+    })
+    $(function() {
+        $('#search-form').submit(function(){
+            const url = $(this).attr("action");
+            const keywords = $(this).find("input[name=keywords]").val();
+            location.href = url + "&keywords=" + encodeURIComponent(keywords);
+
+            return false;
         })
     })
 </script>

@@ -35,6 +35,14 @@ if ($user_id > 0) {
     $query->where(['user_id' => $user->getId()]);
 }
 
+if (Request::has('keywords')) {
+    $keywords = Request::trim('keywords');
+    if ($keywords) {
+        $tpl_data['keywords'] = $keywords;
+        $query->where(['phone_num LIKE' => "%$keywords%"]);
+    }
+}
+
 $total = $query->count();
 
 $list = [];
@@ -54,4 +62,5 @@ if ($total > 0) {
 }
 
 $tpl_data['list'] = $list;
+$tpl_data['search_url'] = Util::url('account', ['op' => 'gift_logs']);
 app()->showTemplate('web/account/gift_logs', $tpl_data);

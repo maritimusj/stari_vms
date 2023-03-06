@@ -27,6 +27,16 @@ $tpl_data = [
 
 $query = FlashEgg::giftQuery();
 
+if (Request::has('keywords')) {
+    $keywords = Request::trim('keywords');
+    if ($keywords) {
+        $tpl_data['keywords'] = $keywords;
+        $query->whereOr([
+            'name LIKE' => "%$keywords%",
+        ]);
+    }
+}
+
 $total = $query->count();
 
 $list = [];
@@ -51,4 +61,6 @@ if ($total > 0) {
 }
 
 $tpl_data['list'] = $list;
+$tpl_data['search_url'] = Util::url('account', ['op' => 'gift']);
+
 app()->showTemplate('web/account/gift', $tpl_data);

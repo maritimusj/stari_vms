@@ -60,21 +60,22 @@ if ($page == 'device') {
 
     if (App::isWxPlatformEnabled()) {
         if (empty($settings['account']['wx']['platform']['config']['token']) || empty($settings['account']['wx']['platform']['config']['key'])) {
-    
+
             $settings['account']['wx']['platform']['config']['token'] = Util::random(32);
             $settings['account']['wx']['platform']['config']['key'] = Util::random(43);
-    
+
             updateSettings('account.wx.platform.config', $settings['account']['wx']['platform']['config']);
         }
-    
+
         $tpl_data['auth_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTH_NOTIFY]);
-        $tpl_data['msg_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTHORIZER_EVENT]).'&appid=/$APPID$';
+        $tpl_data['msg_notify_url'] = Util::murl('wxplatform', ['op' => WxPlatform::AUTHORIZER_EVENT]
+            ).'&appid=/$APPID$';
     }
-    
+
     if (App::isDouyinEnabled()) {
         $tpl_data['douyin'] = Config::douyin('client', []);
     }
-    
+
     if (App::isCZTVEnabled()) {
         $tpl_data['cztv'] = Config::cztv('client', []);
     }
@@ -107,7 +108,7 @@ if ($page == 'device') {
 
     if (App::isIDCardVerifyEnabled()) {
         $res = CtrlServ::getV2('idcard/balance');
-    
+
         if (!empty($res) && $res['status']) {
             $tpl_data['idcard_balance'] = $res['data']['balance'];
         } else {
@@ -120,7 +121,7 @@ if ($page == 'device') {
     if (App::isCustomWxAppEnabled()) {
         $query = WxApp::query();
         $query->orderBy('id desc');
-    
+
         $list = [];
         /** @var wx_appModelObj $app */
         foreach ($query->findAll() as $app) {
@@ -133,10 +134,10 @@ if ($page == 'device') {
             ];
             $list[] = $data;
         }
-    
+
         $tpl_data['list'] = $list;
     }
-    
+
     if (App::isBalanceEnabled()) {
         $tpl_data['advs_position'] = [
             'banner' => [
@@ -161,7 +162,7 @@ if ($page == 'device') {
                 'description' => '适用于信息流场景或固定位置，展示自动播放的视频广告',
             ],
         ];
-    
+
         $tpl_data['advsID'] = Config::app('wxapp.advs', []);
         $tpl_data['notify_url'] = Util::murl('wxnotify');
 
@@ -169,7 +170,7 @@ if ($page == 'device') {
         if (empty($config['token'])) {
             $config['token'] = Util::random(32);
         }
-    
+
         $tpl_data['config'] = $config;
     }
 } elseif ($page == 'data_view') {
@@ -186,12 +187,12 @@ if ($page == 'device') {
         'g9' => '商品九',
         'g10' => '商品十',
     ];
-    
+
     $provinces = Util::getProvinceList();
-    
+
     $tpl_data['goods'] = $goods;
     $tpl_data['provinces'] = $provinces;
-    
+
     $keys = [
         'title',
         'total_sale_init',
@@ -215,48 +216,48 @@ if ($page == 'device') {
         'income_wx',
         'income_ali',
     ];
-    
+
     $keys = array_merge($keys, array_keys($goods), array_keys($provinces));
-    
+
     $values = [];
     $diff = [];
-    
+
     $res = m('data_view')->findAll();
-    
+
     foreach ($res as $item) {
         if (in_array($item->getK(), $keys)) {
             $values[$item->getK()] = $item->getV();
             $diff[] = $item->getK();
         }
     }
-    
+
     $left_keys = array_diff($keys, $diff);
     /** @var string $key */
     foreach ($left_keys as $key) {
         $values[$key] = '';
     }
-    
+
     $tpl_data = array_merge($tpl_data, $values);
-    
+
     $dm = Util::murl('app', ['op' => 'data_view']);
-    
+
     $tpl_data['dm'] = $dm;
 
 } elseif ($page == 'ctrl') {
-    
+
     $tpl_data['navs'] = Util::getSettingsNavs();
 
     $tpl_data['is_locked'] = app()->isLocked();
     $tpl_data['cb_url'] = Util::getCtrlServCallbackUrl();
     $tpl_data['navs']['ctrl'] = '高级设置';
-    
+
     $res = CtrlServ::query();
     if (!is_error($res)) {
         $data = empty($res['data']) ? $res : $res['data'];
-    
+
         $tpl_data['version'] = $data['version'] ?: 'n/a';
         $tpl_data['build'] = $data['build'] ?: 'n/a';
-    
+
         if ($data['start']) {
             $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['start']);
         } else {
@@ -264,18 +265,18 @@ if ($page == 'device') {
                 $tpl_data['formatted_duration'] = Util::getFormattedPeriod($data['startTime']);
             }
         }
-    
+
         if ($data['now']) {
             $tpl_data['formatted_now'] = (new DateTime())->setTimestamp($data['now'])->format("Y-m-d H:i:s");
         }
         $tpl_data['queue'] = Config::app('queue', []);
     }
-    
+
     if (App::isChargingDeviceEnabled()) {
         $tpl_data['charging'] = [
             'server' => Config::charging('server', []),
         ];
-    
+
         $res = ChargingServ::GetVersion();
         if (is_error($res)) {
             $tpl_data['charging']['server']['version'] = 'n/a';
@@ -284,9 +285,9 @@ if ($page == 'device') {
             $tpl_data['charging']['server']['build'] = $res['build'];
         }
     }
-    
+
     $tpl_data['migrate'] = Migrate::detect();
-    
+
 } elseif ($page == 'notice') {
 
     if ($settings['notice']['reviewAdminUserId']) {
@@ -295,14 +296,14 @@ if ($page == 'device') {
             $settings['notice']['reviewAdminUser'] = ['id' => $user->getId(), 'nickname' => $user->getName()];
         }
     }
-    
+
     if ($settings['notice']['authorizedAdminUserId']) {
         $user = User::get($settings['notice']['authorizedAdminUserId']);
         if ($user) {
             $settings['notice']['authorizedAdminUser'] = ['id' => $user->getId(), 'nickname' => $user->getName()];
         }
     }
-    
+
     if ($settings['notice']['withdrawAdminUserId']) {
         $user = User::get($settings['notice']['withdrawAdminUserId']);
         if ($user) {
@@ -312,7 +313,6 @@ if ($page == 'device') {
 } elseif ($page == 'upgrade') {
 
     $tpl_data['upgrade'] = [];
-    $back_url = $this->createWebUrl('settings', ['op' => 'upgrade']);
 
     $data = Util::get(UPGRADE_URL);
     if (empty($data)) {
@@ -321,45 +321,31 @@ if ($page == 'device') {
         $res = json_decode($data, true);
         if ($res) {
             if ($res['status']) {
-                if (Request::str('fn') == 'exec') {
-                    if (empty($res['data']['download'])) {
-                        Util::itoast('暂时没有任何文件需要更新！', $back_url, 'success');
-                    } else {
-                        $data = Util::get(UPGRADE_URL.'/?op=exec');
-                        $res = json_decode($data, true);
-                        if ($res && $res['status']) {
-                            if (!Migrate::detect(true)) {
-                                Util::itoast('更新成功！', $back_url, 'success');
+                $tpl_data['upgrade']['settings'] = $res['data']['settings'];
+                $processFile = function ($arr) {
+                    $result = [];
+                    foreach ($arr as $filename) {
+                        $fi = [
+                            'filename' => $filename,
+                            'dest' => $filename,
+                        ];
+                        $local_file = MODULE_ROOT.$filename;
+                        if (file_exists($local_file)) {
+                            $stats = stat($local_file);
+                            if ($stats) {
+                                $fi['size'] = is_dir($local_file) ? '<文件夹>' : $stats[7];
+                                $fi['createtime'] = (new DateTime("@$stats[9]"))->format('Y-m-d H:i:s');
                             }
                         }
+                        $result[] = $fi;
                     }
-                } else {
-                    $tpl_data['upgrade']['settings'] = $res['data']['settings'];
-                    $processFile = function ($arr) {
-                        $result = [];
-                        foreach ($arr as $filename) {
-                            $fi = [
-                                'filename' => $filename,
-                                'dest' => $filename,
-                            ];
-                            $local_file = MODULE_ROOT.$filename;
-                            if (file_exists($local_file)) {
-                                $stats = stat($local_file);
-                                if ($stats) {
-                                    $fi['size'] = is_dir($local_file) ? '<文件夹>' : $stats[7];
-                                    $fi['createtime'] = (new DateTime("@$stats[9]"))->format('Y-m-d H:i:s');
-                                }
-                            }
-                            $result[] = $fi;
-                        }
 
-                        return $result;
-                    };
-                    $tpl_data['upgrade']['download'] = $processFile($res['data']['download']);
-                    $tpl_data['upgrade']['copy'] = $processFile($res['data']['copy']);
-                    $tpl_data['upgrade']['move'] = $processFile($res['data']['move']);
-                    $tpl_data['upgrade']['remove'] = $processFile($res['data']['remove']);
-                }
+                    return $result;
+                };
+                $tpl_data['upgrade']['download'] = $processFile($res['data']['download']);
+                $tpl_data['upgrade']['copy'] = $processFile($res['data']['copy']);
+                $tpl_data['upgrade']['move'] = $processFile($res['data']['move']);
+                $tpl_data['upgrade']['remove'] = $processFile($res['data']['remove']);
             } else {
                 $tpl_data['upgrade']['error'] = empty($res['data']['message']) ? '暂无无法检查升级！' : strval(
                     $res['data']['message']

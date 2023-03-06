@@ -1182,7 +1182,7 @@ class deviceModelObj extends modelObj
         $url = $this->getUrl();
 
         $qrcode_file = Util::createQrcodeFile("device.$this->imei", $url, function ($filename) {
-            $this->renderTxt($filename, $this->imei);
+            Util::renderTxt($filename, $this->imei);
         });
 
         if (is_error($qrcode_file)) {

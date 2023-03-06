@@ -54,7 +54,7 @@ if ($fn == 'data') {
 
 } elseif ($fn == 'save') {
 
-    if (!$user->acquireLocker('flash_egg:reg')) {
+    if (!$user->acquireLocker('flash_gift:reg')) {
         JSON::fail('用户正忙，请稍后再试！');
     }
 

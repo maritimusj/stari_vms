@@ -9,26 +9,26 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 use zovye\model\userModelObj;
+use zovye\model\luckyModelObj;
 
 /** @var userModelObj $user */
 $user = Util::getTemplateVar('user');
 
-/** @var userModelObj $user */
-$device = Util::getTemplateVar('device');
+/** @var luckyModelObj $lucky */
+$lucky = Util::getTemplateVar('lucky');
 
-/** @var array $gift */
-$gift = Util::getTemplateVar('gift');
+/** @var string $code */
+$code = Util::getTemplateVar('code');
 
 $tpl_data = Util::getTplData([
     'user' => $user->profile(false),
-    'gift' => $gift,
+    'lucky' => $lucky->profile(true),
 ]);
 
 $api_url = Util::murl('account', [
-    'op' => 'gift', 
+    'op' => 'lucky', 
     'fn' => 'save', 
-    'device' => $device->getImei(), 
-    'uid' => $gift['uid'],
+    'code' => $code,
 ]);
 
 $jquery_url = JS_JQUERY_URL;
@@ -45,5 +45,5 @@ $tpl_data['js']['code'] = <<<JSCODE
 </script>
 JSCODE;
 
-$filename = Theme::getThemeFile($device, 'reg');
+$filename = Theme::getThemeFile(null, 'reg');
 app()->showTemplate($filename, ['tpl' => $tpl_data]);

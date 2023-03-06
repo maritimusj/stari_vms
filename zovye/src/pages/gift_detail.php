@@ -29,8 +29,8 @@ $tpl_data = Util::getTplData([
     'device' => $device->profile(),
 ]);
 
-$api_url = Util::murl('account', ['op' => 'gift_detail', 'device' => $device->getImei()]);
-$reg_url = Util::murl('account', ['op' => 'gift_detail', 'fn' => 'reg', 'device' => $device->getImei()]);
+$api_url = Util::murl('account', ['op' => 'gift', 'device' => $device->getImei()]);
+$reg_url = Util::murl('account', ['op' => 'gift', 'fn' => 'reg', 'device' => $device->getImei()]);
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE

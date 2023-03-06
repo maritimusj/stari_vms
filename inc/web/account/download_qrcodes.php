@@ -35,7 +35,7 @@ for($i = 0; $i < $num; $i++ ) {
     $serial = sprintf('%s%04d', TIMESTAMP, $i + 1);
     $secret = hash_hmac('sha256',  "$id.$serial", App::secret());
 
-    $qrcode_url = Util::murl('account', ['op' => 'get_lucky', 'code' => base64_encode("$id:$serial:$secret")]);
+    $qrcode_url = Util::murl('account', ['op' => 'lucky', 'code' => base64_encode("$id:$serial:$secret")]);
 
     $qrcode_file = Util::createQrcodeFile("lucky.$serial", $qrcode_url, function ($filename) use($serial) {
         Util::renderTxt($filename,  $serial);

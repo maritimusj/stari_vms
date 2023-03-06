@@ -28,6 +28,9 @@ class lucky_logModelObj extends modelObj
 	protected $user_id;
 
 	/** @var string */
+	protected $serial;
+
+	/** @var string */
 	protected $name;
 
 	/** @var string */

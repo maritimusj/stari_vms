@@ -18,8 +18,10 @@ $tpl_data = Util::getTplData([
 ]);
 
 $api_url = Util::murl('account', ['op' => 'flash_egg', 'fn' => 'get_lucky_logs']);
+$jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] .= <<<JSCODE
+<script src="$jquery_url"></script>
 <script>
     const zovye_fn = {};
     zovye_fn.getList = function() {

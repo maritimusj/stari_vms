@@ -44,7 +44,7 @@ $tpl_data['js']['code'] = <<<JSCODE
         return $.getJSON(zovye_fn.api_url, {fn: "data"});
     }
     
-    zovye_fn.redirectToRegPage = function(uid) {
+    zovye_fn.redirectToRegPage = function() {
         window.location.href= "$reg_url";
     }
 </script>

@@ -23,13 +23,13 @@ $lucky_logs_url = Util::murl('account', ['op' => 'flash_egg', 'fn' => 'lucky_log
 $tpl_data['js']['code'] = <<<JSCODE
 <script>
     const zovye_fn = {}
-
+    
     zovye_fn.redirectGiftLogsPage = function() {
-        window.location.replace("$gift_logs_url");
+        window.location.href = "$gift_logs_url";
     }
-
+    
     zovye_fn.redirectLuckyLogsPage = function() {
-        window.location.replace("$lucky_logs_url");
+        window.location.href = "$lucky_logs_url";
     }
 </script>
 JSCODE;

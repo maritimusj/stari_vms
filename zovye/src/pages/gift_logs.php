@@ -21,7 +21,8 @@ $api_url = Util::murl('account', ['op' => 'flash_egg', 'fn' => 'get_gift_logs'])
 
 $tpl_data['js']['code'] .= <<<JSCODE
 <script>
-    zovye_fn.getList = function(fn) {
+    const zovye_fn = {};
+    zovye_fn.getList = function() {
         return $.getJSON("$api_url");
 </script>
 JSCODE;

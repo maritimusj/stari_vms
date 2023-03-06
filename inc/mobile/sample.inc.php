@@ -124,7 +124,6 @@ if ($op == 'goods') {
         }
 
         $res = Util::checkAccountLimits($user, $account);
-
         return is_error($res);
     };
 
@@ -169,11 +168,6 @@ if ($op == 'detail') {
     $device = Device::get(Request::str('device'), true);
     if (empty($device)) {
         JSON::fail('找不到这个设备！');
-    }
-
-    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
-    if (is_error($res)) {
-        JSON::fail($res);
     }
 
     //触发广告设备播放指定广告

@@ -143,6 +143,12 @@ if ($op == 'default') {
         Util::resultAlert('找不到指定的设备！', 'error');
     }
 
+    $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
+    if (is_error($res)) {
+        $user->setLastActiveData('ticket', []);
+        Util::resultAlert($res['message'], 'error');
+    }
+
     $tpl_data = Util::getTplData(
         [
             $user,

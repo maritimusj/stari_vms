@@ -8,21 +8,21 @@ namespace zovye;
 
 defined('IN_IA') or exit('Access Denied');
 
-use zovye\model\gift_logModelObj;
+use zovye\model\lucky_logModelObj;
 
 $tpl_data = [];
 
-$query = FlashEgg::giftLogQuery();
+$query = FlashEgg::luckyLogQuery();
 
 $id = Request::int('id');
 if ($id > 0) {
-    $gift = FlashEgg::getGift($id);
-    if (empty($gift)) {
+    $lucky = FlashEgg::getLucky($id);
+    if (empty($lucky)) {
         Util::resultAlert('找不到这个活动！', 'error');
     }
 
-    $tpl_data['gift'] = $gift->profile(true);
-    $query->where(['gift_id' => $id]);
+    $tpl_data['lucky'] = $lucky->profile(true);
+    $query->where(['lucky_id' => $id]);
 }
 
 $user_id = Request::int('user_id');
@@ -45,7 +45,7 @@ if ($total > 0) {
     $query->page($page, $page_size);
     $query->orderBy('id DESC');
 
-    /** @var gift_logModelObj $log */
+    /** @var lucky_logModelObj $log */
     foreach ($query->findAll() as $log) {
         $list[] = $log->format(true);
     }
@@ -54,4 +54,4 @@ if ($total > 0) {
 }
 
 $tpl_data['list'] = $list;
-app()->showTemplate('web/account/gift_logs', $tpl_data);
+app()->showTemplate('web/account/lucky_logs', $tpl_data);

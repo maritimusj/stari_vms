@@ -6,6 +6,9 @@
 namespace zovye\model;
 
 use zovye\base\modelObj;
+use zovye\FlashEgg;
+use zovye\traits\ExtraDataGettersAndSetters;
+use zovye\User;
 use function zovye\tb;
 
 class lucky_logModelObj extends modelObj
@@ -50,6 +53,44 @@ class lucky_logModelObj extends modelObj
 	/** @var int */
 	protected $createtime;
 
+	use ExtraDataGettersAndSetters;
 
-	use \zovye\traits\ExtraDataGettersAndSetters;
+    public function getLucky(): ?luckyModelObj
+    {
+        return FlashEgg::getLucky($this->lucky_id);
+    }
+
+    public function getUser(): ?userModelObj
+    {
+        return User::get($this->user_id);
+    }
+
+    public function profile(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'phone_number' => $this->phone_num,
+            'location' => $this->location,
+            'address' => $this->address,
+            'status' => $this->status,
+            'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
+        ];
+    }
+
+    public function format($fullpath = false): array
+    {
+        $data = $this->profile();
+
+        $user = $this->getUser();
+        if ($user) {
+            $data['user'] = $user->profile(false);
+        }
+        $lucky = $this->getLucky();
+        if ($lucky) {
+            $data['lucky'] = $lucky->profile($fullpath);
+        }
+
+        return $data;
+    }
 }

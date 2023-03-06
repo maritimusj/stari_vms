@@ -300,6 +300,13 @@ class FlashEgg
         ])->exists();
     }
 
+    public static function isLuckyLogExists(string $serial): bool
+    {
+        return self::luckyLogQuery([
+            'serial' => $serial,
+        ])->exists();
+    }
+
     public static function getUserGiftDetail(userModelObj $user, giftModelObj $gift): array
     {
         $all_acquired = true;

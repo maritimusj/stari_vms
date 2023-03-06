@@ -12,32 +12,41 @@ if (!App::isFlashEggEnabled()) {
 
 $user = Util::getCurrentUser();
 if (empty($user) || $user->isBanned()) {
-    JSON::fail('找不到用户或者用户无法领取');
+    Util::resultData(err('找不到用户或者用户无法领取！'));
 }
 
 $code = Request::str('code');
 if (empty($code)) {
-    Util::resultAlert('请求的中奖数据校验失败！', 'error');
+    Util::resultData(err('请求的中奖数据校验失败！'));
 }
 
 $str = base64_decode($code);
 if (empty($code)) {
-    Util::resultAlert('请求的中奖数据校验失败！', 'error');
+    Util::resultData(err('请求的中奖数据校验失败！'));
 }
 
 list($id, $serial, $secret) = explode(':', $str);
 
 if (empty($id) || empty($serial) || empty($secret) || hash_hmac('sha256', "$id.$serial", App::secret()) !== $secret) {
-    Util::resultAlert('请求的中奖数据校验失败！', 'error');
+    Util::resultData(err('请求的中奖数据校验失败！'));
 }
 
 $lucky = FlashEgg::getLucky($id);
 if (empty($lucky)) {
-    Util::resultAlert('对不起，找不到这个抽奖活动！', 'error');
+    Util::resultData(err('对不起，找不到这个抽奖活动！'));
+    Util::resultAlert('', 'error');
 }
 
 if (!$lucky->isEnabled()) {
-    Util::resultAlert('对不起，这个抽奖活动已停用！', 'error');
+    Util::resultData(err('对不起，这个抽奖活动已停用！'));
+}
+
+if (!Locker::try("lucky:$serial")) {
+    Util::resultData(err('无法锁定奖品，请稍后再试！'));
+}
+
+if (FlashEgg::isLuckyLogExists($serial)) {
+    Util::resultData(err('对不起，该奖品已经登记领取！'));
 }
 
 $fn = Request::trim('fn');
@@ -52,10 +61,6 @@ if (empty($fn)) {
 if ($fn == 'save') {
     if (!$user->acquireLocker('flash_lucky:reg')) {
         JSON::fail('用户正忙，请稍后再试！');
-    }
-
-    if (!Locker::try("lucky:$serial")) {
-        JSON::fail('无法锁定奖品，请稍后再试！');
     }
 
     $name = Request::trim('name');

@@ -1184,6 +1184,21 @@ include './index.php';
         We7::itoast($msg, $redirect, $type);
     }
 
+    public static function resultData($data)
+    {
+        if (Request::is_ajax()) {
+            JSON::result($data);
+        } else {
+            if (is_string($data)) {
+                self::resultAlert($data);
+            }
+            if (is_error($data)) {
+                self::resultAlert($data['message'], 'error');
+            }
+            self::resultAlert($data['message'] ?? '未知消息');
+        }
+    }
+
     /**
      * 返回JSON响应.
      *

@@ -22,7 +22,7 @@ $code = Util::getTemplateVar('code');
 
 $tpl_data = Util::getTplData([
     'user' => $user->profile(false),
-    'lucky' => $lucky->profile(true),
+    'gift' => $lucky->profile(true),
 ]);
 
 $api_url = Util::murl('account', [

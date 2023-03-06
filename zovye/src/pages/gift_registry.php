@@ -42,6 +42,9 @@ $tpl_data['js']['code'] = <<<JSCODE
     zovye_fn.save = function(data) {
         return $.getJSON(zovye_fn.api_url, data);
     }
+    zovye_fn.closeWindow = function () {
+        window.history.back();
+    }
 </script>
 JSCODE;
 

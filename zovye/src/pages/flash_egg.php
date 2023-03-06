@@ -17,13 +17,10 @@ $tpl_data = Util::getTplData([
     'user' => $user->profile(false),
 ]);
 
-$js_sdk = Util::fetchJSSDK();
-
 $gift_logs_url = Util::murl('account', ['op' => 'flash_egg', 'fn' => 'gift_logs']);
 $lucky_logs_url = Util::murl('account', ['op' => 'flash_egg', 'fn' => 'lucky_logs']);
 
 $tpl_data['js']['code'] = <<<JSCODE
-$js_sdk
 <script>
     const zovye_fn = {}
 
@@ -34,8 +31,6 @@ $js_sdk
     zovye_fn.redirectLuckyLogsPage = function() {
         window.location.replace("$lucky_logs_url");
     }
-
-    zovye_fn.scan = wx.scanQRCode;
 </script>
 JSCODE;
 

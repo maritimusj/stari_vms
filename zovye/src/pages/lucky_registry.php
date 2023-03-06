@@ -31,9 +31,11 @@ $api_url = Util::murl('account', [
     'code' => $code,
 ]);
 
+$js_sdk = Util::fetchJSSDK();
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE
+$js_sdk
 <script src="$jquery_url"></script>
 <script>
     const zovye_fn = {
@@ -41,6 +43,11 @@ $tpl_data['js']['code'] = <<<JSCODE
     }
     zovye_fn.save = function(data) {
         return $.getJSON(zovye_fn.api_url, data);
+    }
+    zovye_fn.closeWindow = function () {
+        wx && wx.ready(function() {
+            wx.closeWindow();
+        })
     }
 </script>
 JSCODE;

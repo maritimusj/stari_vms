@@ -24,6 +24,7 @@ $tpl_data['js']['code'] .= <<<JSCODE
     const zovye_fn = {};
     zovye_fn.getList = function() {
         return $.getJSON("$api_url");
+    }
 </script>
 JSCODE;
 

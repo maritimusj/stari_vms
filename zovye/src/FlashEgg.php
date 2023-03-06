@@ -204,7 +204,7 @@ class FlashEgg
     {
         $data = We7::uniacid($data);
 
-        if ($data['extra']) {
+        if (isset($data['extra'])) {
             $data['extra'] = giftModelObj::serializeExtra($data['extra']);
         }
 
@@ -215,7 +215,7 @@ class FlashEgg
     {
         $data = We7::uniacid($data);
 
-        if ($data['extra']) {
+        if (isset($data['extra'])) {
             $data['extra'] = luckyModelObj::serializeExtra($data['extra']);
         }
 

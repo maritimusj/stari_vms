@@ -69,7 +69,7 @@ CREATE TABLE `ims_zovye_vms_lucky_log`(
     `extra` JSON NOT NULL,
     `createtime` INT NOT NULL,
     PRIMARY KEY(`id`),
-    UNIQUE (`uniacid`, 'serial'),
+    UNIQUE (`uniacid`, `serial`),
     INDEX(`uniacid`, `lucky_id`),
     INDEX(`uniacid`, `user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;

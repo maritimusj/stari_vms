@@ -698,32 +698,6 @@ class Order extends State
         return null;
     }
 
-    /**
-     * @param orderModelObj $order
-     * @param int $result
-     * @param array $extra
-     * @return order_goodsModelObj|null
-     */
-    public static function createGoodsLog(orderModelObj $order, int $result, array $extra = []): ?order_goodsModelObj
-    {
-        return m('order_goods')->create([
-            'order_id' => $order->getId(),
-            'goods_id' => $order->getGoodsId(),
-            'result' => $result,
-            'extra' => json_encode($extra),
-        ]);
-    }
-
-    public static function goodsLogQuery(orderModelObj $order = null): base\modelFactory
-    {
-        $query = m('order_goods');
-        if ($order) {
-            $query->where(['order_id' => $order->getId()]);
-        }
-
-        return $query;
-    }
-
     public static function format(orderModelObj $order, bool $detail = false): array
     {
         $userCharacter = User::getUserCharacter($order->getOpenid());

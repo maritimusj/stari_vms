@@ -175,14 +175,6 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name.'_order_goods', 'order_id')) {
-    $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_order_goods` CHANGE `orderid` `order_id` INT(11) NOT NULL;
-ALTER TABLE `ims_zovye_vms_order_goods` CHANGE `goodsid` `goods_id` INT(11) NOT NULL;
-SQL;
-    Migrate::execSQL($sql);
-}
-
 if (!We7::pdo_fieldexists($tb_name.'_order', 'order_id')) {
     $sql = <<<SQL
 ALTER TABLE `ims_zovye_vms_order` CHANGE `orderId` `order_id` VARCHAR(32) NOT NULL;

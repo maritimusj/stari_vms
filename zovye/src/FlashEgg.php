@@ -339,6 +339,18 @@ class FlashEgg
         return $data;
     }
 
+    public static function getCollectingGiftList(userModelObj $user): array
+    {
+        $data = [];
+        foreach ($user->settings('flash_gift', []) as $id) {
+            $gift = self::getGift($id);
+            if ($gift && $gift->isEnabled() && !self::isUserGiftLogExists($user, $gift)) {
+                $data[] = $gift;
+            }
+        }
+        return $data;
+    }
+
     public static function selectGiftForUser(userModelObj $user, deviceModelObj $device): ?giftModelObj
     {
         $agent = $device->getAgent();

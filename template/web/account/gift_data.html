@@ -1,0 +1,53 @@
+<style>
+  #giftDataForm .gift img {
+    width: 32px;
+    height: 32px;
+  }
+  #giftDataForm .goods img {
+    width: 16px;
+    height: 16px;
+  }
+</style>
+<form class="form-horizontal" id="giftDataForm">
+  <div class="panel-body">
+    <table class="table">
+      {loop $list $gift $index}
+      <tr>
+        <td>{php echo $index + 1}</td>
+        <td class="gift">
+          <img src="{$gift['image']}">
+        </td>
+        <td>
+          {$gift['name']}
+        </td>
+        <td>
+          {loop $gift['list'] $item $i}
+          <div class="goods">
+            <div><img src="{$item['image']}"> </div>
+            <div>{$item['name']}</div>
+            <div>{$item['price']}</div>
+            <div>
+              {$item['acquired']}/{$item['num']}
+            </div>
+          </div>
+          {/loop}
+        </td>
+        <td>
+          &lt;
+          {if $gift['all_acquired']}
+          已完成
+          {else}
+          未达成
+          {/if}
+          &gt;
+        </td>
+      </tr>
+      {/loop}
+    </table>
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-10" style="text-align: right;">
+        <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+      </div>
+    </div>
+  </div>
+</form>

@@ -175,9 +175,11 @@ foreach ($query->findAll() as $user) {
         }
     }
 
-    $data_arr = $user->settings('verify_18');
-    if ($data_arr['verify']) {
-        $data['verified'] = 1;
+    if (App::isUserVerify18Enabled()) {
+        $data_arr = $user->settings('verify_18');
+        if ($data_arr['verify']) {
+            $data['verified'] = 1;
+        }
     }
 
     $data['type'] = User::getUserCharacter($user);
@@ -188,6 +190,13 @@ foreach ($query->findAll() as $user) {
 
     if ($fueling_device_enabled) {
         $data['fueling'] = $user->fuelingNOWData();
+    }
+
+    if (App::isFlashEggEnabled()) {
+        $gifts = $user->settings('flash_gift', []);
+        if (!isEmptyArray($gifts)) {
+            $data['flash_gifts'] = count($gifts);
+        }
     }
 
     $users[] = $data;

@@ -251,6 +251,9 @@
                     {if $item['fueling']}
                     <img src="{MODULE_URL}static/img/gun.svg" class="icon big" title="正在加注中" data-op="stopFueling">
                     {/if}
+                    {if $item['flash_gifts']}
+                    <img src="{MODULE_URL}static/img/egg_gift.svg" class="icon big" title="正在参加闪蛋集蛋活动" data-op="viewFlashEggGifts">
+                    {/if}
                 </div>
             </div>
         </td>
@@ -602,7 +605,9 @@
     api.stopFueling = function (userid) {
         api.showResult({op: 'stop_fueling', id: userid});
     }
-
+    api.viewFlashEggGifts = function (userid) {
+        api.showResult({op: 'flash_gifts', id: userid});
+    }
     $(function(){
         $('[data-url]').each(function(){
             util.clip(this, $(this).data('url'));

@@ -50,7 +50,9 @@ if ($fn == 'gift_logs') {
 
         /** @var gift_logModelObj $log */
         foreach ($query->findAll() as $log) {
-            $list[] = $log->format(true);
+            $data = $log->format(true);
+            unset($data['delivery']['memo']);
+            $list[] = $data;
         }
     }
 
@@ -74,7 +76,9 @@ if ($fn == 'gift_logs') {
 
         /** @var lucky_logModelObj $log */
         foreach ($query->findAll() as $log) {
-            $list[] = $log->format(true);
+            $data = $log->format(true);
+            unset($data['delivery']['memo']);
+            $list[] = $data;
         }
     }
 

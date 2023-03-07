@@ -161,13 +161,9 @@
                     {$item['createtime_formatted']}
                 </td>
                 <td class="o">
-                    {if $item['status']}
-                    <i class="fa fa-check finished" title="已发货"></i>
-                    {else}
                     <div class="operate">
-                        <i class="fa fa-truck" data-op="gift_delivery" title="点击发货"></i>
+                        <i class="fa fa-truck" data-op="gift_delivery" title="物流信息"></i>
                     </div>
-                    {/if}
                 </td>
             </tr>
             {/loop}
@@ -187,14 +183,14 @@
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
-        zovye.op('lucky_delivery_save', function(self, next) {
+        zovye.op('delivery_save', function(self, next) {
             const form = self.closest('form');
             const id = form.find('input[name=id]').val();
             const deliveryName = form.find('input[name=deliveryName]').val();
             const deliverySN = form.find('input[name=deliverySN]').val();
             const memo = form.find('input[name=memo]').val();
             const status = form.find('input[name=status]:checked').val();
-            next({id, deliveryName, deliverySN, memo, status, op: 'lucky_delivery', fn: 'save'}, function(res) {
+            next({id, deliveryName, deliverySN, memo, status, op: 'gift_delivery', fn: 'save'}, function(res) {
                 $('#modal-message').modal('hide');
                 if (res && res.status) {
                     const tr = $('#flashGiftLogs [data-id=' + id +']');

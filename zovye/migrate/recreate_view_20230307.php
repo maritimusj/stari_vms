@@ -33,6 +33,25 @@ SELECT u.*,p.name as `name`,p.createtime as `updatetime`
 FROM 
 `ims_zovye_vms_principal` p INNER JOIN `ims_zovye_vms_user` u ON p.user_id=u.id
 WHERE p.principal_id=5;
-SQL;
 
+CREATE OR REPLACE VIEW `ims_zovye_vms_inventory_goods_vw` AS
+SELECT s.*,g.agent_id,g.name,g.img,g.price FROM `ims_zovye_vms_inventory_goods` s INNER JOIN `ims_zovye_vms_goods` g ON s.goods_id=g.id;
+
+CREATE OR REPLACE VIEW `ims_zovye_vms_task_vw` AS 
+SELECT log.*,acc.state FROM `ims_zovye_vms_balance_logs` AS log INNER JOIN `ims_zovye_vms_account` as acc ON log.account_id=acc.id
+WHERE type=110;
+
+CREATE OR REPLACE VIEW `ims_zovye_vms_device_keeper_vw` AS 
+SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,k.commission_percent, k.commission_fixed,IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zovye_vms_device` d 
+LEFT JOIN `ims_zovye_vms_keeper_devices` k ON d.id=k.device_id WHERE 1;
+
+CREATE OR REPLACE VIEW `ims_zovye_vms_goods_stats_vw` AS 
+SELECT agent_id,device_id,goods_id AS id,name,sum(num) as total,FROM_UNIXTIME(createtime,'%Y-%m-%d') as date 
+FROM `ims_zovye_vms_order` GROUP BY device_id,goods_id,date;
+
+CREATE OR REPLACE VIEW `ims_zovye_vms_goods_voucher_vw` AS
+SELECT v.*,g.name AS goods_name
+FROM `ims_zovye_vms_goods_voucher` v
+LEFT JOIN  `ims_zovye_vms_goods` g ON v.goods_id=g.id;
+SQL;
 Migrate::execSQL($sql);

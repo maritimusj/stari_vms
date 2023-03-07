@@ -82,7 +82,7 @@ class Device extends State
         } else {
             $keeper_id = intval($keeper);
         }
-        $query = m('device_keeper_vw')->where(We7::uniacid([]))->where(['keeper_id' => $keeper_id]);
+        $query = m('device_keeper_vw')->where(We7::uniacid(['keeper_id' => $keeper_id]));
         if ($kind >= 0) {
             $query->where(['kind' => $kind]);
         }

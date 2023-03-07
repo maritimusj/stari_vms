@@ -26,7 +26,7 @@ class task_viewModelObj extends modelObj
 {
     public static function getTableName($readOrWrite): string
     {
-        return tb('task_view');
+        return tb('task_vw');
     }
 
     /** @var int */

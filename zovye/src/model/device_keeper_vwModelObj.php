@@ -9,7 +9,6 @@ namespace zovye\model;
 use zovye\Keeper;
 
 use function zovye\tb;
-use function zovye\m;
 
 /**
  * Class device_keeper_vwModelObj
@@ -35,7 +34,7 @@ class device_keeper_vwModelObj extends deviceModelObj
         if ($readOrWrite == self::OP_WRITE) {
             return parent::getTableName(self::OP_WRITE);
         } elseif ($readOrWrite == self::OP_READ) {
-            return tb('device_keeper_view');
+            return tb('device_keeper_vw');
         }
         trigger_error('user getTableName(...) miss op!');
 

@@ -42,7 +42,7 @@ class Task
 
     public static function query($condition = []): base\modelObjFinder
     {
-        return m('task_view')->query($condition);
+        return m('task_vw')->query($condition);
     }
 
     public static function get($id, bool $is_uid = false): ?task_viewModelObj

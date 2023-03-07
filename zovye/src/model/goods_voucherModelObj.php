@@ -57,7 +57,7 @@ class goods_voucherModelObj extends modelObj
         if ($readOrWrite == self::OP_WRITE) {
             return tb('goods_voucher');
         } elseif ($readOrWrite == self::OP_READ) {
-            return tb('goods_voucher_view');
+            return tb('goods_voucher_vw');
         }
 
         trigger_error('user getTableName(...) miss op!');

@@ -41,10 +41,6 @@ CREATE TABLE `ims_zovye_vms_inventory_log` (
     INDEX (`inventory_id`), 
     INDEX (`goods_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE OR REPLACE VIEW `ims_zovye_vms_inventory_goods_vw` AS
-SELECT s.*,g.agent_id,g.name,g.img,g.price FROM `ims_zovye_vms_inventory_goods` s INNER JOIN `ims_zovye_vms_goods` g ON s.goods_id=g.id;
-
 SQL;
     Migrate::execSQL($sql);
 }

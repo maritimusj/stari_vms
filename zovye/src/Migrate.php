@@ -113,7 +113,6 @@ class Migrate
                     'err' => $e->getMessage(),
                     'trace' => $e->getTrace(),
                 ]);
-
                 return err($e->getMessage());
             }
 

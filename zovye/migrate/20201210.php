@@ -54,22 +54,20 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_keeper_devices` (
   KEY `keeper` (`keeper_id`, `device_id`),
   KEY `device` (`device_id`, `keeper_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ;
-CREATE OR REPLACE VIEW `ims_zovye_vms_device_keeper_view` AS 
-SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,IFNULL(k.kind,0) kind FROM `ims_zovye_vms_device` d 
-LEFT JOIN `ims_zovye_vms_keeper_devices` k ON d.id=k.device_id WHERE 1
 SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_tableexists($tb_name.'_referal')) {
+if (!We7::pdo_tableexists($tb_name.'_referral')) {
     $sql = <<<SQL
-CREATE TABLE IF NOT EXISTS `ims_zovye_vms_referal` ( 
-`id` INT NOT NULL AUTO_INCREMENT , 
-`agent_id` INT NOT NULL DEFAULT '0' , 
-`code` VARCHAR(32) NOT NULL , 
-`createtime` INT NOT NULL DEFAULT '0' , 
-PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 ;
+CREATE TABLE IF NOT EXISTS `ims_zovye_vms_referral` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `agent_id` int(11) NOT NULL DEFAULT '0',
+  `code` varchar(32) NOT NULL,
+  `createtime` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `agent_id` (`agent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SQL;
     Migrate::execSQL($sql);
@@ -238,42 +236,8 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-$sql = <<<SQL
-CREATE OR REPLACE VIEW `ims_zovye_vms_device_view` AS
-SELECT *,
-(
-    SELECT SUM(o.num) FROM `ims_zovye_vms_order` o
-	  WHERE o.deviceId=d.id AND  DATE_FORMAT(now(),"%Y%m")=DATE_FORMAT(FROM_UNIXTIME(o.createtime),"%Y%m")
-) AS m_total,
-(
-    SELECT SUM(o.num) FROM `ims_zovye_vms_order` o
-	  WHERE o.deviceId=d.id AND DATE_FORMAT(now(),"%Y%m%d")=DATE_FORMAT(FROM_UNIXTIME(o.createtime),"%Y%m%d")
-) AS d_total
-FROM `ims_zovye_vms_device` d;
-
-CREATE OR REPLACE VIEW `ims_zovye_vms_agent_vw` AS
-SELECT *,
-(SELECT count(id) FROM `ims_zovye_vms_device` WHERE agentId=u.id) AS deviceTotal
-FROM `ims_zovye_vms_user` u
-WHERE locate('agent', u.passport)>0;
-
-CREATE OR REPLACE VIEW `ims_zovye_vms_goods_stats_vw` AS 
-SELECT agentId,deviceId,goodsId AS id,name,sum(num) as total,FROM_UNIXTIME(createtime,'%Y-%m-%d') as date 
-FROM `ims_zovye_vms_order` GROUP BY deviceId,goodsId,date;
-
-CREATE OR REPLACE VIEW `ims_zovye_vms_device_keeper_view` AS 
-SELECT d.*,IFNULL(k.keeper_id,0) keeper_id,k.commission_percent, k.commission_fixed,IFNULL(k.kind,0) kind,IFNULL(k.way,0) way FROM `ims_zovye_vms_device` d 
-LEFT JOIN `ims_zovye_vms_keeper_devices` k ON d.id=k.device_id WHERE 1;
-
-CREATE OR REPLACE VIEW `ims_zovye_vms_goods_voucher_view` AS
-SELECT v.*,g.name AS goods_name
-FROM `ims_zovye_vms_goods_voucher` v
-LEFT JOIN  `ims_zovye_vms_goods` g ON v.goodsId=g.id;
-SQL;
-
-Migrate::execSQL($sql);
-
-$sql = <<<SQL
+if (!We7::pdo_tableexists($tb_name.'_data_view')) {
+    $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
 `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `k` varchar(60) NOT NULL,
@@ -282,6 +246,8 @@ CREATE TABLE IF NOT EXISTS `ims_zovye_vms_data_view` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-Migrate::execSQL($sql);
+    Migrate::execSQL($sql);
+}
+
 
 

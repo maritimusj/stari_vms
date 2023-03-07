@@ -41,27 +41,27 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        .item {
+        .list .item {
             padding: 16px 0;
             border-bottom: 1px solid #eee;
         }
 
-        .name {
+        .list .item .name {
             margin: 0 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .status {
+        .list .item .status {
             margin: 0 8px;
         }
 
-        .orange {
+        .list .item .orange {
             color: #FF6A01;
         }
 
-        .red {
+        .list .item .red {
             color: #FC2525;
         }
 
@@ -70,18 +70,151 @@
             height: 200px;
             object-fit: contain;
         }
+
+        .mask {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .mask .close {
+            margin-top: 88px;
+            width: 22px;
+            height: 22px;
+            align-self: flex-end;
+            margin-right: 28px;
+        }
+
+        .mask .card {
+            width: calc(100% - 32px);
+            max-width: 320px;
+            border-radius: 10px;
+            margin-top: 40px;
+            background-color: white;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .mask .card .header {
+            width: 100%;
+        }
+
+        .mask .card .image {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+        }
+
+        .mask .card .info {
+            margin-left: 16px;
+        }
+
+        .mask .card .info .name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .mask .card .info .desc {
+            color: #ACACAC;
+            margin-top: 4px;
+        }
+
+        .mask .card .content {
+            margin-top: 16px;
+        }
+
+        .mask .card .content .divider::before,
+        .mask .card .content .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #eee;
+        }
+
+        .mask .card .content .divider span {
+            margin: 0 16px;
+        }
+
+        .mask .card .content .section {
+            margin-top: 8px;
+        }
+
+        .mask .card .content .section .title {
+            width: 88px;
+            color: #666;
+        }
+
+        .mask .card .content .section .value {
+            color: #333;
+        }
+
+        .mask .card button {
+            width: 100%;
+            height: 36px;
+            border-radius: 18px;
+            box-sizing: border-box;
+            background-color: #FF8E3E;
+            border: none;
+            color: white;
+            margin-top: 25px;
+            font-size: 16px;
+        }
     </style>
 </head>
 
 <body ontouchstart>
     <div id="app" class="flex flex-col align-center" v-cloak>
         <div class="list">
-            <div class="item flex flex-row align-center clickable" v-for="(item, index) in list" :key="index">
+            <div class="item flex flex-row align-center clickable" v-for="(item, index) in list" :key="index" @click="onClickItem(item)">
                 <span class="name flex-1">{{item.lucky.name}}</span>
                 <span class="status" :class="[item.status ? 'orange' : 'red']">{{item.status ? '已领取' : '待发货'}}</span>
             </div>
         </div>
         <img class="empty" src="{MODULE_URL}static/m/shandan/img/no_data.png" v-if="list && list.length === 0">
+        <div class="mask flex flex-col align-center" v-if="detail.visible">
+            <img class="close" src="{MODULE_URL}static/m/shandan/svg/close_light.svg" @click="onCloseMask">
+            <div class="card flex flex-col flex-center">
+                <div class="header flex flex-row align-center">
+                    <img class="image" :src="detail.data.lucky.image">
+                    <div class="info flex-1 flex flex-col">
+                        <span class="name">{{detail.data.lucky.name}}</span>
+                        <span class="desc">{{detail.data.lucky.description}}</span>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="divider flex flex-row align-center">
+                        <span>收件信息</span>
+                    </div>
+                    <div class="section flex flex-row">
+                        <span class="title">收件人：</span>
+                        <span class="value flex-1">{{detail.data.name}}</span>
+                    </div>
+                    <div class="section flex flex-row">
+                        <span class="title">联系电话：</span>
+                        <span class="value flex-1">{{detail.data.phone_number}}</span>
+                    </div>
+                    <div class="section flex flex-row">
+                        <span class="title">详细地址：</span>
+                        <span class="value flex-1">{{detail.data.location}} {{detail.data.address}}</span>
+                    </div>
+                    <template v-if="detail.data.delivery">
+                        <div class="section flex flex-row">
+                            <span class="title">快递单号：</span>
+                            <span class="value flex-1">{{detail.data.delivery.sn}}</span>
+                        </div>
+                        <div class="section flex flex-row">
+                            <span class="title">快递公司：</span>
+                            <span class="value flex-1">{{detail.data.delivery.name}}</span>
+                        </div>
+                    </template>
+                </div>
+                <button class="clickable" @click="onCloseMask">知道了</button>
+            </div>
+        </div>
     </div>
     {$tpl['js']['code']}
     {php \zovye\url(true, JS_VUE_URL);}
@@ -100,7 +233,11 @@
         var app = new Vue({
             el: '#app',
             data: {
-                list: null
+                list: null,
+                detail: {
+                    visible: false,
+                    data: null
+                }
             },
             mounted () {
                 this.getList()
@@ -114,6 +251,14 @@
                             alert(res.data.msg)
                         }
                     })
+                },
+                onClickItem(item) {
+                    console.log(item)
+                    this.detail.data = item
+                    this.detail.visible = true
+                },
+                onCloseMask() {
+                    this.detail.visible = false
                 }
             }
         })

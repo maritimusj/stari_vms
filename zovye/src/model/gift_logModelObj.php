@@ -13,6 +13,7 @@ use zovye\traits\ExtraDataGettersAndSetters;
 
 /**
  * @method setStatus(int $int)
+ * @method getStatus()
  */
 class gift_logModelObj extends modelObj
 {

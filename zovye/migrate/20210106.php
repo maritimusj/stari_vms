@@ -204,9 +204,9 @@ SQL;
     Migrate::execSQL($sql);
 }
 
-if (!We7::pdo_fieldexists($tb_name.'_settings_user', 'lock_uid')) {
+if (!We7::pdo_fieldexists($tb_name.'_settings_user', 'locked_uid')) {
     $sql = <<<SQL
-ALTER TABLE `ims_zovye_vms_settings_user` CHANGE `__lockedGUID` `lock_uid` VARCHAR(32) NULL DEFAULT 'n/a';
+ALTER TABLE `ims_zovye_vms_settings_user` CHANGE `__lockedGUID` `locked_uid` VARCHAR(32) NULL DEFAULT 'n/a';
 SQL;
     Migrate::execSQL($sql);
 }

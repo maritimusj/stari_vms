@@ -27,6 +27,4 @@ class settings_userModelObj extends modelObj
     protected $data;
     /** @var int */
     protected $createtime;
-    protected $lock_uid;
-
 }

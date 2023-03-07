@@ -169,7 +169,7 @@
 <body ontouchstart>
     <div id="app" class="flex flex-col align-center" v-cloak>
         <div class="list">
-            <div class="item flex flex-row align-center clickable" v-for="(item, index) in list" :key="index">
+            <div class="item flex flex-row align-center clickable" v-for="(item, index) in list" :key="index" @click="onClickItem(item)">
                 <span class="name flex-1">{{item.gift.name}}</span>
                 <span class="status" :class="[item.status ? 'orange' : 'red']">{{item.status ? '已领取' : '待发货'}}</span>
             </div>
@@ -179,10 +179,10 @@
             <img class="close" src="{MODULE_URL}static/m/shandan/svg/close_light.svg" @click="onCloseMask">
             <div class="card flex flex-col flex-center">
                 <div class="header flex flex-row align-center">
-                    <img class="image" :src="detail.data.lucky.image">
+                    <img class="image" :src="detail.data.gift.image">
                     <div class="info flex-1 flex flex-col">
-                        <span class="name">{{detail.data.lucky.name}}</span>
-                        <span class="desc">{{detail.data.lucky.description}}</span>
+                        <span class="name">{{detail.data.gift.name}}</span>
+                        <span class="desc">{{detail.data.gift.description}}</span>
                     </div>
                 </div>
                 <div class="content">

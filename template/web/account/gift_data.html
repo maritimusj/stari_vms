@@ -1,52 +1,85 @@
 <style>
   #giftDataForm .gift img {
-    width: 32px;
-    height: 32px;
+    width: 64px;
+    height: 64px;
+  }
+  #giftDataForm .goods {
+    display: flex;
+    align-items: center;
+  } 
+  #giftDataForm .goods div {
+    margin-right: 6px;
   }
   #giftDataForm .goods img {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
+  }
+  #giftDataForm .goods sup {
+    color: red;
+  }
+  #giftDataForm table.table#list td {
+    vertical-align: middle;
   }
 </style>
 <form class="form-horizontal" id="giftDataForm">
   <div class="panel-body">
-    <table class="table">
-      {loop $list $gift $index}
-      <tr>
-        <td>{php echo $index + 1}</td>
-        <td class="gift">
-          <img src="{$gift['image']}">
-        </td>
-        <td>
-          {$gift['name']}
-        </td>
-        <td>
-          {loop $gift['list'] $item $i}
-          <div class="goods">
-            <div><img src="{$item['image']}"> </div>
-            <div>{$item['name']}</div>
-            <div>{$item['price']}</div>
+    <table class="table" id="list">
+      <thead>
+        <th>
+          #
+        </th>
+        <th>图片</th>
+        <th>名称</th>
+        <th>详情</th>
+        <th>结果</th>
+      </thead>
+      <tbody>
+        {loop $list $index $gift}
+        <tr>
+          <td>{php echo $index + 1}</td>
+          <td class="gift">
+            <img src="{$gift['image']}">
+          </td>
+          <td>
             <div>
-              {$item['acquired']}/{$item['num']}
+              {$gift['name']}
             </div>
-          </div>
-          {/loop}
-        </td>
-        <td>
-          &lt;
-          {if $gift['all_acquired']}
-          已完成
-          {else}
-          未达成
-          {/if}
-          &gt;
-        </td>
-      </tr>
-      {/loop}
+            <div class="text-muted">
+              {$gift['description']}
+            </div>
+          </td>
+          <td>
+            {loop $gift['list'] $i $item}
+            <div class="goods">
+              <div><img src="{$item['image']}"> </div>
+              <div>
+                {$item['name']} <sup>¥{$item['price']}元</sup>
+              </div>
+              <div>
+                {if $item['acquired'] == $item['num']}
+                <span style="color:green;">{$item['acquired']}/{$item['num']}</span>
+                {else}
+                <span style="color:gray;">{$item['acquired']}/{$item['num']}</span>
+                {/if}
+              </div>
+            </div>
+            {/loop}
+          </td>
+          <td>
+            {if $gift['all_acquired']}
+            <span style="color: green;">&lt;已完成&gt;</span>
+            {else}
+            <span class="text-muted">&lt;未达成&gt;</span>
+            {/if}
+            
+          </td>
+        </tr>
+        {/loop}
+      </tbody>
     </table>
     <div class="form-group">
       <div class="col-md-offset-2 col-md-10" style="text-align: right;">
-        <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">退出</button>
       </div>
     </div>
   </div>

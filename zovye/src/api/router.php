@@ -15,25 +15,6 @@ use function zovye\toSnakeCase;
 
 class router
 {
-    public static function load($w, $op)
-    {
-        $dir = ZOVYE_SRC . 'api' . DIRECTORY_SEPARATOR. $w . DIRECTORY_SEPARATOR;
-
-        $op = toCamelCase($op);
-        $file = $dir.$op.'.php';
-        if (is_file($file)) {
-            return require $file;
-        }
-
-        $op = toSnakeCase($op);
-        $file = $dir.$op.'.php';
-        if (is_file($file)) {
-            return require $file;
-        }
-
-        return null;
-    }
-
     public static function exec($op, $map)
     {
         $fn = $map[$op];

@@ -50,7 +50,6 @@ if (isset($params['goodsId'])) {
     if (empty($goods)) {
         Util::itoast('找不到这个商品！', '', 'error');
     }
-
     if ($goods->getType() == Goods::FlashEgg) {
         $price = round(floatval($params['goodsPrice']) * 100);
         if ($price != $goods->getPrice()) {
@@ -72,6 +71,14 @@ if (isset($params['goodsId'])) {
         }
         if ($params['goodsUnitTitle'] != $goods->getUnitTitle()) {
             $goods->setUnitTitle($params['goodsUnitTitle']);
+        }
+
+        if (isset($params['costPrice'])) {
+            $goods->setExtraData('costPrice', floatval($params['costPrice'] * 100));
+        }
+
+        if (isset($params['discountPrice'])) {
+            $goods->setExtraData('discountPrice', round(floatval($params['discountPrice']) * 100));
         }
     } else {
         $goods->setS1($s1);
@@ -100,7 +107,7 @@ if (isset($params['goodsId'])) {
         }
 
         if (isset($params['costPrice'])) {
-            $goods->setExtraData('costPrice', round(floatval($params['costPrice']) * 100));
+            $goods->setExtraData('costPrice', floatval($params['costPrice'] * 100));
         }
 
         $goods->setExtraData('cw', empty($params['goodsCW']) ? 0 : 1);

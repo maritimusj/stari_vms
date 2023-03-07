@@ -146,13 +146,9 @@
                     {$item['createtime_formatted']}
                 </td>
                 <td class="o">
-                    {if $item['status']}
-                    <i class="fa fa-check finished" title="已发货"></i>
-                    {else}
                     <div class="operate">
                         <i class="fa fa-truck" data-op="lucky_delivery" title="点击发货"></i>
                     </div>
-                    {/if}
                 </td>
             </tr>
             {/loop}
@@ -172,19 +168,19 @@
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
-        zovye.op('lucky_delivery', function(self, next) {
-            if (!confirm('确定要更改成已发货状态吗？')) {
-                return;
-            }
-            const tr = self.closest('tr');
-            const id = tr.data('id');
-            next({id}, function(res) {
+        zovye.op('saveData', function(self, next) {
+            const form = self.closest('form');
+            const id = form.find('input[name=id]').val();
+            const deliveryName = form.find('input[name=deliveryName]').val();
+            const deliverySN = form.find('input[name=deliverySN]').val();
+            const memo = form.find('input[name=memo]').val();
+            next({id, deliveryName, deliverySN, memo, op: 'save'}, function(res) {
                 if (res && res.status) {
                     tr.find('.o').html(`<i class="fa fa-check finished" title="已发货"></i>`);
                     tr.find('.status').html(`<span class="finished">&lt;已完成&gt;</span>`);
-               }
+                }
             });
-        })
+        });
     })
     $(function() {
         $('#search-form').submit(function(){

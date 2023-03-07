@@ -13,6 +13,7 @@ use function zovye\tb;
 
 /**
  * @method setStatus(int $int)
+ * @method getStatus()
  */
 class lucky_logModelObj extends modelObj
 {

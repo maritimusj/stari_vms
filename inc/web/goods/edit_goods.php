@@ -21,7 +21,7 @@ if ($goods_id > 0) {
         $params['goods']['name'] = $params['goods']['name_original'];
     }
 
-    if ($params['goods']['type'] == Goods::FlashEgg) {
+    if ($params['goods']['type'] == 'flash_egg') {
         app()->showTemplate('web/goods/edit_flash_egg', $params);
     }
 }

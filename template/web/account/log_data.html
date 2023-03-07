@@ -3,19 +3,21 @@
         <div class="form-group">
             <label for="deliveryName" class="col-md-2 control-label">快递名称</label>
             <div class="col-md-10">
-                <input type="text" class="form-control" id="deliveryName" name="deliveryName" value="{php echo $log ? $log->getExtraData('delivery.name', '') : ''}">
+                <input type="text" class="form-control" id="deliveryName" name="deliveryName" value="{php echo $log->getExtraData('delivery.name', '')}">
+                <span class="help-block">* 请输入发货快递名称</span>
             </div>
         </div>
         <div class="form-group">
             <label for="deliverySN" class="col-md-2 control-label">快递单号</label>
             <div class="col-md-10">
-                <input type="text" class="form-control" id="deliverySN" name="deliverySN" value="{php echo $log ? $log->getExtraData('delivery.sn', '') : ''}">
+                <input type="text" class="form-control" id="deliverySN" name="deliverySN" value="{php echo $log->getExtraData('delivery.sn', '')}">
+                <span class="help-block">* 请输入发货快递单号</span>
             </div>
         </div>
         <div class="form-group">
             <label for="memo" class="col-md-2 control-label">备注信息</label>
             <div class="col-md-10">
-                <input type="text" class="form-control" id="memo" name="memo" value="{php echo $log ? $log->getExtraData('delivery.memo', '') : ''}">
+                <input type="text" class="form-control" id="memo" name="memo" value="{php echo $log->getExtraData('delivery.memo', '')}">
                 <span class="help-block">* 备注信息，只有管理员可见</span>
             </div>
         </div>
@@ -24,18 +26,19 @@
             <div class="col-md-10">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="status" id="status" value="1" {if $log && $log->getStatus()}checked{/if}>
+                        <input type="checkbox" name="status" id="status" value="1" {if $log->getStatus()}checked{/if}>
                         已完成
                     </label>
+                    <span class="help-block">* 设置状态为已完成</span>
                 </div>
             </div>
         </div>
     </div>
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10" style="text-align: right;">
-            <input type="hidden" name="id" value="{$id}">
-            <button type="button" class="btn btn-primary" data-op="saveData">保存</button>
-            <button type="button" class="btn btn-default">退出</button>
+            <input type="hidden" name="id" value="{php echo $log->getId()}">
+            <button type="button" class="btn btn-primary" data-op="lucky_delivery_save">保存</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">退出</button>
         </div>
     </div>
 </form>

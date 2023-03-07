@@ -24,22 +24,26 @@ if (empty($log)) {
 $fn = Request::trim('fn');
 if (empty($fn)) {
     $content = app()->fetchTemplate('web/account/log_data', [
-        'log' => $log->format(true),
+        'log' => $log,
     ]);
-    JSON::success(['title' => '', 'content' => $content]);
+    JSON::success(['title' => '物流信息', 'content' => $content]);
 }
 
 if ($fn == 'save') {
     $log->setStatus(Request::int('status'));
+
     $log->setExtraData('delivery', [
         'name' => Request::trim('deliveryName'),
         'sn' => Request::trim('deliverySN'),
         'memo' => Request::trim('memo'),
     ]);
+
+    $log->setStatus(Request::bool('status') ? 1 : 0);
+
     if ($log->save()) {
         JSON::success([
             'status' => $log->getStatus(),
-            'memo' => $log->getExtraData('delivery.memo', ''),
+            'delivery' => $log->getExtraData('delivery', []),
         ]);
     }
 }

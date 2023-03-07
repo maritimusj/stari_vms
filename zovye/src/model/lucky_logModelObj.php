@@ -79,6 +79,7 @@ class lucky_logModelObj extends modelObj
             'location' => $this->location,
             'address' => $this->address,
             'status' => $this->status,
+            'delivery' => $this->getExtraData('delivery', []),
             'createtime_formatted' => date('Y-m-d H:i:s', $this->createtime),
         ];
     }

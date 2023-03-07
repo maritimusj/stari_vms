@@ -23,6 +23,12 @@
     address {
         max-width: 30em;
     }
+    .delivery .name {
+        color: #9e9e9e;
+    }
+    .delivery .sn {
+        color: #9e9e9e;
+    }
 </style>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -73,6 +79,7 @@
             <th>名称</th>
             <th>用户</th>
             <th>收件人</th>
+            <th>备注</th>
             <th class="text-center">状态</th>
             <th>创建时间</th>
             <th>操作</th>
@@ -130,6 +137,14 @@
                         {if $item['location']}{$item['location']}<br>{/if}
                         {if $item['address']}{$item['address']}<br>{/if}
                     </address>
+                    <div class="delivery">
+                        <span class="name">{$item['delivery']['name']}</span> <span class="sn">{$item['delivery']['sn']}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="memo">
+                        {$item['delivery']['memo']}
+                    </div>
                 </td>
                 <td>
                     <div class="status text-center">
@@ -147,7 +162,7 @@
                 </td>
                 <td class="o">
                     <div class="operate">
-                        <i class="fa fa-truck" data-op="lucky_delivery" title="点击发货"></i>
+                        <i class="fa fa-truck" data-op="lucky_delivery" title="物流信息"></i>
                     </div>
                 </td>
             </tr>
@@ -168,18 +183,30 @@
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableOp();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
-        zovye.op('saveData', function(self, next) {
+        zovye.op('lucky_delivery_save', function(self, next) {
             const form = self.closest('form');
             const id = form.find('input[name=id]').val();
             const deliveryName = form.find('input[name=deliveryName]').val();
             const deliverySN = form.find('input[name=deliverySN]').val();
             const memo = form.find('input[name=memo]').val();
-            next({id, deliveryName, deliverySN, memo, op: 'save'}, function(res) {
+            const status = form.find('input[name=status]:checked').val();
+            next({id, deliveryName, deliverySN, memo, status, op: 'lucky_delivery', fn: 'save'}, function(res) {
+                $('#modal-message').modal('hide');
                 if (res && res.status) {
-                    tr.find('.o').html(`<i class="fa fa-check finished" title="已发货"></i>`);
-                    tr.find('.status').html(`<span class="finished">&lt;已完成&gt;</span>`);
+                    const tr = $('#flashLuckyLogs [data-id=' + id +']');
+                    if (res.data.status) {
+                        tr.find('.status').html(`<span class="finished">&lt;已完成&gt;</span>`);
+                    } else {
+                        tr.find('.status').html(`<span class="text-muted">&lt;未发货&gt;</span>`);
+                    }
+                    if (res.data.delivery) {
+                        tr.find('.delivery .name').html(res.data.delivery.name);
+                        tr.find('.delivery .sn').html(res.data.delivery.sn);
+                        tr.find('.memo').html(res.data.delivery.memo);
+                    }
                 }
             });
+
         });
     })
     $(function() {

@@ -373,7 +373,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <div v-if="!config.is_bluetooth_device && !config.is_fueling_device">
+                                <div v-if="config.goods_package_enabled && !config.is_bluetooth_device && !config.is_fueling_device">
                                     <button class="btn btn-success" 
                                     @click.prevent="newPackage" 
                                     :disabled="loading"
@@ -913,6 +913,7 @@
                 packages: [],
                 currentPackage: null,
                 config: {
+                    goods_package_enabled: `{php echo \zovye\App::isGoodsPackageEnabled()? 1 : ''}`,
                     is_normal_device: `{php echo $is_normal_device? 1 :''}`,
                     is_bluetooth_device: `{php echo $is_bluetooth_device? 1 :''}`,
                     is_vdevice: `{php echo $is_vdevice? 1 :''}`,
@@ -1027,11 +1028,13 @@
                     this.search();
                     this.addCargoLane();
                 }
-                $.getJSON(package_api_url, {op: 'list', device: this.deviceId}).then(res => {
-                    if (res && res.status) {
-                        this.packages = res.data;
-                    }
-                })
+                if (this.config.goods_package_enabled) {
+                    $.getJSON(package_api_url, {op: 'list', device: this.deviceId}).then(res => {
+                        if (res && res.status) {
+                            this.packages = res.data;
+                        }
+                    })
+                }
                 initLegacyJs();
             },
 

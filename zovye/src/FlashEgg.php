@@ -315,9 +315,11 @@ class FlashEgg
         foreach ($goods_list as &$goods) {
             if ($goods['num'] > 0) {
 
+                //统计活动创建之后关联商品对应的订单数量
                 $num = Order::query([
                     'openid' => $user->getOpenid(),
                     'goods_id' => $goods['id'],
+                    'createtime >=' => $gift->getCreatetime(),
                 ])->limit($goods['num'])->count();
 
                 $goods['acquired'] = $num;

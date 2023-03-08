@@ -27,4 +27,4 @@ $content = app()->fetchTemplate('web/account/gift_data', [
     'list' => $list,
 ]);
 
-JSON::success(['title' => "{$user->getNickname()} - 集蛋活动", 'content' => $content]);
+JSON::success(['title' => "{$user->getNickname()} - 正在参加的集蛋活动", 'content' => $content]);

@@ -59,6 +59,7 @@
             <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_edit'])}">
                 <i class="fa fa-pencil" title="新建" ></i>
             </a>
+            <i class="fa fa-share-alt fa-fw" data-url="{php echo $this->createMobileUrl('account', ['op' => 'gift'])}" title="点击复制活动入口地址"></i>
             <a href="{php echo $this->createWebUrl('account', ['op' => 'gift_logs'])}">
                 <i class="fa fa-list fa-fw" title="查看用户兑换记录"></i>
             </a>
@@ -146,6 +147,7 @@
 <script>
     require(["{php \zovye\url(false, 'static/js/zovye.min.js')}"], function (zovye) {
         zovye.enableOp();
+        zovye.enableCopy();
         zovye.setApiUrl("{php echo $this->createWebUrl('account');}");
         zovye.op('gift_remove', function(self, next) {
             if (!confirm('确定要删除这个活动吗？')) {

@@ -23,6 +23,7 @@
 </style>
 <form class="form-horizontal" id="giftDataForm">
   <div class="panel-body">
+    {if $list}
     <table class="table" id="list">
       <thead>
         <th>
@@ -77,10 +78,10 @@
         {/loop}
       </tbody>
     </table>
-    <div class="form-group">
-      <div class="col-md-offset-2 col-md-10" style="text-align: right;">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">退出</button>
-      </div>
-    </div>
+    {else}
+      <div class="text-center text-muted">
+        <i class="fa fa-question-circle"></i> 暂时没有任何活动数据！
+      </div> 
+    {/if}
   </div>
 </form>

@@ -34,6 +34,7 @@ use zovye\model\login_dataModelObj;
 use zovye\LoginData;
 use zovye\Order;
 use zovye\model\orderModelObj;
+use zovye\Schema;
 use zovye\User;
 use zovye\model\userModelObj;
 use zovye\Util;
@@ -721,6 +722,13 @@ class agent
 
         if (App::isFlashEggEnabled()) {
             setArray($extra, 'ad.device.uid', Request::trim('adDeviceUID'));
+            $extra['limit'] = [
+                'scname' => Request::trim('scname', Schema::DAY),
+                'count' => Request::int('count'),
+                'sccount' => Request::int('sccount'),
+                'total' => Request::int('total'),
+                'all' => Request::int('all'),
+            ];
         }
 
         if ($device->set('extra', $extra) && $device->save()) {

@@ -28,8 +28,19 @@ $tpl_data = Util::getTplData([
     'user' => $user->profile(),
 ]);
 
-$api_url = Util::murl('account', ['op' => 'gift', 'device' => isset($device) ? $device->getImei() : '']);
-$reg_url = Util::murl('account', ['op' => 'gift', 'fn' => 'reg', 'device' => isset($device) ? $device->getImei() : '']);
+$params = [
+    'op' => 'gift',
+];
+
+if ($device) {
+    $params['device'] = $device->getImei();
+}
+
+$api_url = Util::murl('account', $params);
+
+$params['fn'] = 'reg';
+$reg_url = Util::murl('account', $params);
+
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE

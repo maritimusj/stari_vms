@@ -10,7 +10,7 @@ defined('IN_IA') or exit('Access Denied');
 
 $tpl_data = [];
 
-$id = request::int('id');
+$id = Request::int('id');
 if ($id > 0) {
     $lucky = FlashEgg::getLucky($id);
 }

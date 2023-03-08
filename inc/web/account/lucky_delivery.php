@@ -10,7 +10,7 @@ use zovye\model\lucky_logModelObj;
 
 defined('IN_IA') or exit('Access Denied');
 
-$id = request::int('id');
+$id = Request::int('id');
 if (empty($id)) {
     Util::resultData(err('找不到这个记录！'));
 }

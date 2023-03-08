@@ -16,7 +16,7 @@ if (empty($user) || $user->isBanned()) {
 }
 
 $getDeviceFN = function () {
-    return Device::get(request::str('device'), true);
+    return Device::get(Request::str('device'), true);
 };
 
 $fn = Request::trim('fn');

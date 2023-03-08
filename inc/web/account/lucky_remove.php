@@ -9,7 +9,7 @@ namespace zovye;
 defined('IN_IA') or exit('Access Denied');
 
 $result = Util::transactionDo(function () {
-    $id = request::int('id');
+    $id = Request::int('id');
     if ($id > 0) {
         $lucky = FlashEgg::getLucky($id);
         if (empty($lucky)) {

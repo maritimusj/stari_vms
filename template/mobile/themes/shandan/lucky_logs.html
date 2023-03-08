@@ -201,16 +201,14 @@
                         <span class="title">详细地址：</span>
                         <span class="value flex-1">{{detail.data.location}} {{detail.data.address}}</span>
                     </div>
-                    <template v-if="detail.data.delivery">
-                        <div class="section flex flex-row">
-                            <span class="title">快递单号：</span>
-                            <span class="value flex-1">{{detail.data.delivery.sn}}</span>
-                        </div>
-                        <div class="section flex flex-row">
-                            <span class="title">快递公司：</span>
-                            <span class="value flex-1">{{detail.data.delivery.name}}</span>
-                        </div>
-                    </template>
+                    <div class="section flex flex-row" v-if="detail.data.delivery.name">
+                        <span class="title">快递公司：</span>
+                        <span class="value flex-1">{{detail.data.delivery.name}}</span>
+                    </div>
+                    <div class="section flex flex-row" v-if="detail.data.delivery.sn">
+                        <span class="title">快递单号：</span>
+                        <span class="value flex-1">{{detail.data.delivery.sn}}</span>
+                    </div>
                 </div>
                 <button class="clickable" @click="onCloseMask">知道了</button>
             </div>

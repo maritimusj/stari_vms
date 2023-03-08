@@ -555,7 +555,7 @@
                     <div class="form-group">
                         <label for="count" class="col-md-2 control-label">一个周期内<br/><b>单个用户</b>可领取数量</label>
                         <div class="col-md-10">
-                            <input type="number" class="form-control" name="count" id="count" value="{php echo $extra['limit']['count']??'1'}">
+                            <input type="number" class="form-control" name="count" id="count" value="{php echo $extra['limit']['count']??'0'}">
                             <span class="help-block">* 每个用户在这个设备上<b>每个周期</b>内最多可免费领取的商品总数，0表示不限制数量</span>
                         </div>
                     </div>

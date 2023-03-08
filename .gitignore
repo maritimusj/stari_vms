@@ -13,3 +13,4 @@ payment/*.php
 .vscode
 ./
 /vendor
+composer.lock

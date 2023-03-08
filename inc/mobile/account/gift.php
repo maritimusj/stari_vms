@@ -3,7 +3,7 @@
  * @author jin@stariture.com
  * @url www.stariture.com
  */
- 
+
 namespace zovye;
 
 if (!App::isFlashEggEnabled()) {
@@ -15,16 +15,16 @@ if (empty($user) || $user->isBanned()) {
     JSON::fail('找不到用户或者用户无法领取');
 }
 
-$device = Device::get(request::str('device'), true);
-if (empty($device)) {
-    JSON::fail('找不到这个设备！');
-}
+$getDeviceFN = function () {
+    return Device::get(request::str('device'), true);
+};
+
 
 $fn = Request::trim('fn');
 
 if ($fn == 'data') {
 
-    $gift = FlashEgg::selectGiftForUser($user, $device);
+    $gift = FlashEgg::selectGiftForUser($user, $getDeviceFN());
     if (empty($gift)) {
         JSON::fail('暂时没有活动可以参加！');
     }
@@ -34,7 +34,7 @@ if ($fn == 'data') {
 
 } elseif ($fn == 'reg') {
 
-    $gift = FlashEgg::selectGiftForUser($user, $device);
+    $gift = FlashEgg::selectGiftForUser($user, $getDeviceFN());
 
     if (empty($gift)) {
         Util::resultAlert('找不到这个活动！', 'error');
@@ -48,7 +48,7 @@ if ($fn == 'data') {
 
     app()->giftRegistryPage([
         'user' => $user,
-        'device' => $device,
+        'device' => $getDeviceFN(),
         'gift' => $detail,
     ]);
 
@@ -58,7 +58,7 @@ if ($fn == 'data') {
         JSON::fail('用户正忙，请稍后再试！');
     }
 
-    $gift = FlashEgg::selectGiftForUser($user, $device);
+    $gift = FlashEgg::selectGiftForUser($user, $getDeviceFN());
     if (empty($gift)) {
         JSON::fail('找不到这个活动！');
     }
@@ -103,10 +103,9 @@ if ($fn == 'data') {
     }
 
     JSON::success(['msg' => '领取成功，请注意查收！']);
-
 }
 
 app()->giftDetailPage([
     'user' => $user,
-    'device' => $device,
+    'device' =>  $getDeviceFN()
 ]);

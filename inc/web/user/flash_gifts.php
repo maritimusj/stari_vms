@@ -18,7 +18,8 @@ if (empty($user)) {
 $list = [];
 
 /** @var giftModelObj $gift */
-foreach (FlashEgg::getCollectingGiftList($user) as $gift) {
+$gift = FlashEgg::getUserActiveGift($user);
+if ($gift) {
     $list[] = FlashEgg::getUserGiftDetail($user, $gift);
 }
 

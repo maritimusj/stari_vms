@@ -344,28 +344,9 @@ class FlashEgg
         return $data;
     }
 
-    public static function getCollectingGiftList(userModelObj $user): array
+    public static function getUserActiveGift(userModelObj $user): ?giftModelObj
     {
-        $data = [];
-        foreach ($user->settings('flash_gift', []) as $id) {
-            $gift = self::getGift($id);
-            if ($gift && $gift->isEnabled() && !self::isUserGiftLogExists($user, $gift)) {
-                $data[] = $gift;
-            }
-        }
-        return $data;
-    }
-
-    public static function selectGiftForUser(userModelObj $user, deviceModelObj $device): ?giftModelObj
-    {
-        $agent = $device->getAgent();
-        if ($agent) {
-            $key = sha1("{$device->getId()}:agent:{$agent->getId()}");
-        } else {
-            $key = sha1("{$device->getId()}:agent:0");
-        }
-
-        $id = $user->settings("flash_gift.$key", 0);
+        $id = $user->settings("flash_gift.id", 0);
 
         if ($id > 0) {
             $gift = self::getGift($id);
@@ -373,20 +354,32 @@ class FlashEgg
                 return $gift;
             }
         }
+        return null;
+    }
+
+    public static function selectGiftForUser(userModelObj $user, deviceModelObj $device = null): ?giftModelObj
+    {
+        $gift = self::getUserActiveGift($user);
+        if ($gift) {
+            return $gift;
+        }
 
         $list = [];
-        if ($agent) {
-            $query = self::giftQuery([
-                'agent_id' => $agent->getId(),
-                'enabled' => 1,
-            ])->orderBy('id desc');
+        if ($device) {
+            $agent = $device->getAgent();
+            if ($agent) {
+                $query = self::giftQuery([
+                    'agent_id' => $agent->getId(),
+                    'enabled' => 1,
+                ])->orderBy('id desc');
 
-            /** @var giftModelObj $item */
-            foreach ($query->findAll() as $item) {
-                if (self::isUserGiftLogExists($user, $item)) {
-                    continue;
+                /** @var giftModelObj $item */
+                foreach ($query->findAll() as $item) {
+                    if (self::isUserGiftLogExists($user, $item)) {
+                        continue;
+                    }
+                    $list[] = $item;
                 }
-                $list[] = $item;
             }
         }
 
@@ -413,9 +406,9 @@ class FlashEgg
         }
 
         if ($gift) {
-            $user->updateSettings("flash_gift.$key", $gift->getId());
+            $user->updateSettings("flash_gift.id", $gift->getId());
         } else {
-            $user->removeSettings('flash_gift', $key);
+            $user->removeSettings('flash_gift', 'id');
         }
 
         return $gift;

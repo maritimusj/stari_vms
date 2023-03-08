@@ -26,11 +26,10 @@ $user = Util::getTemplateVar('user');
 
 $tpl_data = Util::getTplData([
     'user' => $user->profile(),
-    'device' => $device->profile(),
 ]);
 
-$api_url = Util::murl('account', ['op' => 'gift', 'device' => $device->getImei()]);
-$reg_url = Util::murl('account', ['op' => 'gift', 'fn' => 'reg', 'device' => $device->getImei()]);
+$api_url = Util::murl('account', ['op' => 'gift', 'device' => isset($device) ? $device->getImei() : '']);
+$reg_url = Util::murl('account', ['op' => 'gift', 'fn' => 'reg', 'device' => isset($device) ? $device->getImei() : '']);
 $jquery_url = JS_JQUERY_URL;
 
 $tpl_data['js']['code'] = <<<JSCODE

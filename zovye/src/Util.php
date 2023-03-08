@@ -18,7 +18,9 @@ use QRcode;
 use RuntimeException;
 use Throwable;
 use we7\ihttp;
-use WeAccount; //框架提供
+use WeAccount;
+
+//框架提供
 use zovye\base\modelObj;
 use zovye\model\accountModelObj;
 use zovye\model\commission_balanceModelObj;
@@ -395,7 +397,7 @@ class Util
             error_reporting(0);
         }
 
-        set_error_handler(function ($severity, $str, $file, $line,  $context) {
+        set_error_handler(function ($severity, $str, $file, $line, $context) {
             Log::error('app', [
                 'level' => $severity,
                 'str' => $str,
@@ -605,11 +607,19 @@ include './index.php';
         return false;
     }
 
+    /**
+     * 检查订单数量是否达到指定数量，true 表示已达到，false表示没有
+     * @param accountModelObj $account
+     * @param userModelObj|null $user
+     * @param array $params
+     * @param int $limit
+     * @return bool
+     */
     public static function checkLimit(
         accountModelObj $account,
         userModelObj $user = null,
-        $params = [],
-        $limit = 0
+        array $params = [],
+        int $limit = 0
     ): bool {
         $arr = [];
         if ($account->isTask()) {
@@ -821,6 +831,16 @@ include './index.php';
             if (!Util::isAssigned($assign_data, $device)) {
                 return err('没有允许从这个设备访问该公众号！');
             }
+        }
+
+        $totalPerDevice = $account->getTotalPerDevice();
+        if ($totalPerDevice > 0 && self::checkLimit(
+                $account,
+                $user,
+                ['device_id' => $device->getId()],
+                $totalPerDevice
+            )) {
+            return err('领取数量已经达到单台设备最大领取限制！');
         }
 
         return self::checkAccountLimits($user, $account, $params);
@@ -1778,6 +1798,7 @@ HTML_CONTENT;
             if (Fueling::test($device, 100)) {
                 return ['message' => '已发送测试请求！'];
             }
+
             return err('请求失败！');
         }
 
@@ -2361,10 +2382,10 @@ HTML_CONTENT;
      */
     public static function mustValidateLocation(userModelObj $user, deviceModelObj $device): bool
     {
-        return ($user->isWxUser() || $user->isWXAppUser() || $user->isDouYinUser()) 
-                && $device->needValidateLocation()
-                && time() - $user->getLastActiveData('location.time', 0) > settings('user.scanAlive', VISIT_DATA_TIMEOUT)
-                && !$user->getLastActiveData('location.validated');
+        return ($user->isWxUser() || $user->isWXAppUser() || $user->isDouYinUser())
+            && $device->needValidateLocation()
+            && time() - $user->getLastActiveData('location.time', 0) > settings('user.scanAlive', VISIT_DATA_TIMEOUT)
+            && !$user->getLastActiveData('location.validated');
     }
 
     /**
@@ -2541,18 +2562,20 @@ HTML_CONTENT;
         return '#'.implode('', $arr);
     }
 
-    public static function buildUrl($parsed_url) {
-        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
-        $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-        $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+    public static function buildUrl($parsed_url)
+    {
+        $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'].'://' : '';
+        $host = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+        $port = isset($parsed_url['port']) ? ':'.$parsed_url['port'] : '';
+        $user = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+        $pass = isset($parsed_url['pass']) ? ':'.$parsed_url['pass'] : '';
+        $pass = ($user || $pass) ? "$pass@" : '';
+        $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+        $query = isset($parsed_url['query']) ? '?'.$parsed_url['query'] : '';
+        $fragment = isset($parsed_url['fragment']) ? '#'.$parsed_url['fragment'] : '';
+
         return "$scheme$user$pass$host$port$path$query$fragment";
-      }
+    }
 
     /**
      * @param string $do
@@ -3205,6 +3228,7 @@ HTML_CONTENT;
                     return $balance_obj;
                 }
             }
+
             return err('操作失败，请刷新页面后再试！');
         }
 

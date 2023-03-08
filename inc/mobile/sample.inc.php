@@ -108,7 +108,7 @@ if ($op == 'goods') {
     $allow_free = Request::bool('free');
     $allow_pay = Request::bool('pay');
 
-    $isLimitedFN = function ($goods_id) use ($user) {
+    $isLimitedFN = function ($goods_id) use ($user, $device) {
         $goods = Goods::get($goods_id);
         if (empty($goods)) {
             return true;
@@ -123,7 +123,7 @@ if ($op == 'goods') {
             return true;
         }
 
-        $res = Util::checkAccountLimits($user, $account);
+        $res = Util::checkAvailable($user, $account, $device, ['ignore_assigned' => true]);
         return is_error($res);
     };
 

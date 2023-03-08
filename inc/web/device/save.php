@@ -70,6 +70,13 @@ $result = Util::transactionDo(function () use ($id, &$device) {
 
     if (App::isFlashEggEnabled()) {
         setArray($extra, 'ad.device.uid', Request::trim('adDeviceUID'));
+        $extra['limit'] = [
+            'scname' => Request::trim('scname', Schema::DAY),
+            'count' => Request::int('count'),
+            'sccount' => Request::int('sccount'),
+            'total' => Request::int('total'),
+            'all' => Request::int('all'),
+        ];
     }
 
     if (empty($data['name']) || empty($data['imei'])) {

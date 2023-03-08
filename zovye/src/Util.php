@@ -658,7 +658,7 @@ include './index.php';
 
         foreach ($arr as $query) {
             $query->limit($limit);
-            $count = $query->count();
+            $count = $query->sum('num');
             if ($count >= $limit) {
                 return true;
             }
@@ -832,25 +832,25 @@ include './index.php';
                 //单个用户周期内限制
                 if ($limit['count'] > 0) {
                     $query = Order::query([
-                        'src' => Order::FREE,
+                        'src' => [Order::FREE, Order::ACCOUNT],
                         'device_id' => $device->getId(),
                         'openid' => $user->getOpenid(),
                         'createtime >=' => $time->getTimestamp(),
                     ]);
                     $query->limit($limit['count']);
-                    if ($query->count() >= $limit['count']) {
+                    if ($query->sum('num') >= $limit['count']) {
                         return true;
                     }
                 }
                 //所有用户周期内限制
                 if ($limit['sccount'] > 0) {
                     $query = Order::query([
-                        'src' => Order::FREE,
+                        'src' => [Order::FREE, Order::ACCOUNT],
                         'device_id' => $device->getId(),
                         'createtime >=' => $time->getTimestamp(),
                     ]);
                     $query->limit($limit['sccount']);
-                    if ($query->count() >= $limit['sccount']) {
+                    if ($query->sum('num') >= $limit['sccount']) {
                         return true;
                     }
                 }
@@ -860,12 +860,12 @@ include './index.php';
         //单个用户累计限制
         if ($limit['total'] > 0) {
             $query = Order::query([
-                'src' => Order::FREE,
+                'src' => [Order::FREE, Order::ACCOUNT],
                 'device_id' => $device->getId(),
                 'openid' => $user->getOpenid(),
             ]);
             $query->limit($limit['total']);
-            if ($query->count() >= $limit['total']) {
+            if ($query->sum('num') >= $limit['total']) {
                 return true;
             }
         }
@@ -873,11 +873,11 @@ include './index.php';
         //所有用户累计限制
         if ($limit['all'] > 0) {
             $query = Order::query([
-                'src' => Order::FREE,
+                'src' => [Order::FREE, Order::ACCOUNT],
                 'device_id' => $device->getId(),
             ]);
             $query->limit($limit['all']);
-            if ($query->count() >= $limit['all']) {
+            if ($query->sum('num') >= $limit['all']) {
                 return true;
             }
         }

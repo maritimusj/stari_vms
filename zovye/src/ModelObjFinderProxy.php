@@ -29,6 +29,7 @@ use zovye\model\userModelObj;
  * @method get($m)
  * @method resetAll()
  * @method getAll(string[] $array)
+ * @method sum(string $string)
  */
 class ModelObjFinderProxy
 {

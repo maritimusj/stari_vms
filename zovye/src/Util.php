@@ -804,6 +804,83 @@ include './index.php';
         return self::checkAccountLimits($user, $account);
     }
 
+    /**
+     * 检查用户是否被限制，则返回true，否则返回false
+     * @param deviceModelObj $device
+     * @param userModelObj $user
+     * @return bool
+     */
+    public static function checkFlashEggDeviceLimit(deviceModelObj $device, userModelObj $user): bool
+    {
+        $limit = $device->settings('extra.limit', []);
+        if (isEmptyArray($limit)) {
+            return false;
+        }
+
+        if (in_array($limit['scname'], [Schema::DAY, Schema::WEEK, Schema::MONTH])) {
+            if ($limit['scname'] == Schema::DAY) {
+                $time = new DateTimeImmutable('00:00');
+            } elseif ($limit['scname'] == Schema::WEEK) {
+                $time = date('D') == 'Mon' ? new DateTimeImmutable('00:00') : new DateTimeImmutable('last Mon 00:00');
+            } elseif ($limit['scname'] == Schema::MONTH) {
+                $time = new DateTimeImmutable('first day of this month 00:00');
+            } else {
+                $time = null;
+            }
+
+            if ($time) {
+                //单个用户周期内限制
+                if ($limit['count'] > 0) {
+                    $query = Order::query([
+                        'device_id' => $device->getId(),
+                        'openid' => $user->getOpenid(),
+                        'createtime >=' => $time->getTimestamp(),
+                    ]);
+                    $query->limit($limit['count']);
+                    if ($query->count() >= $limit['count']) {
+                        return true;
+                    }
+                }
+                //所有用户周期内限制
+                if ($limit['sccount'] > 0) {
+                    $query = Order::query([
+                        'device_id' => $device->getId(),
+                        'createtime >=' => $time->getTimestamp(),
+                    ]);
+                    $query->limit($limit['sccount']);
+                    if ($query->count() >= $limit['sccount']) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        //单个用户累计限制
+        if ($limit['total'] > 0) {
+            $query = Order::query([
+                'device_id' => $device->getId(),
+                'openid' => $user->getOpenid(),
+            ]);
+            $query->limit($limit['total']);
+            if ($query->count() >= $limit['total']) {
+                return true;
+            }
+        }
+
+        //所有用户累计限制
+        if ($limit['all'] > 0) {
+            $query = Order::query([
+                'device_id' => $device->getId(),
+            ]);
+            $query->limit($limit['all']);
+            if ($query->count() >= $limit['all']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * 判断用户在指定公众号以及指定设备是否还有免费额度.
@@ -834,6 +911,9 @@ include './index.php';
         }
 
         if (App::isFlashEggEnabled()) {
+            if (self::checkFlashEggDeviceLimit($device, $user)) {
+                return err('领取数量趣过设备限制！');
+            }
             $totalPerDevice = $account->getTotalPerDevice();
             if ($totalPerDevice > 0 && self::checkLimit(
                     $account,

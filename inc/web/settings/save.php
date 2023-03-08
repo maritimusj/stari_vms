@@ -155,6 +155,7 @@ if ($page == 'device') {
 
     Config::api('enabled', Request::bool('API', false), true);
 
+    $settings['custom']['goodsPackage']['enabled'] = Request::bool('goodsPackage') ? 1 : 0;
     $settings['custom']['mustFollow']['enabled'] = Request::bool('mustFollow') ? 1 : 0;
     $settings['custom']['useAccountQRCode']['enabled'] = Request::bool('useAccountQRCode') ? 1 : 0;
     $settings['custom']['bonus']['zero']['enabled'] = Request::bool('zeroBonus') ? 1 : 0;

@@ -477,6 +477,13 @@ class App
         });
     }
 
+    public static function isGoodsPackageEnabled(): bool
+    {
+        return onceCall(function () {
+            return boolval(settings('custom.goodsPackage.enabled'));
+        });
+    }
+
     public static function isMustFollowAccountEnabled(): bool
     {
         return onceCall(function () {

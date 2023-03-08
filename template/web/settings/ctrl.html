@@ -432,6 +432,14 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
                             <label>
+                                <input type="checkbox" name="goodsPackage" id="goodsPackage" value="1" {if $settings['custom']['goodsPackage']['enabled']}checked{/if}>
+                                商品套餐功能（该功能需要手机端特定皮肤支持）
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label>
                                 <input type="checkbox" name="mustFollow" id="mustFollow" value="1" {if $settings['custom']['mustFollow']['enabled']}checked{/if}>
                                 购买商品需要先关注公众号（该功能需要手机端特定皮肤支持）
                             </label>

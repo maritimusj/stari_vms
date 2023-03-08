@@ -18,6 +18,18 @@
 <form action="{php echo $this->createWebUrl('settings');}" method="post">
     <div class="panel panel-default nav-tab-item">
         <div class="panel-body">
+            {if \zovye\App::isFlashEggEnabled()}
+            <div class="seg">
+                <div class="title">用户中心</div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">入口网址</label>
+                    <div class="col-md-10">
+                        <span class="form-control operate text-url"><i class="fa fa-paste" title="复制" data-url="{php echo $this->createMobileUrl('bonus', ['op' => 'home'])}"></i> {php echo $this->createMobileUrl('bonus', ['op' => 'home'])}   </span>
+                        <span class="help-block">* 直接进入用户中心的网址链接</span>
+                    </div>
+                </div>
+            </div>
+            {/if}
             {if \zovye\App::isIDCardVerifySupported()}
             <div class="seg">
                 <div class="title">实名认证</div>

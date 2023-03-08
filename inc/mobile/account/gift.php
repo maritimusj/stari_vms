@@ -19,7 +19,6 @@ $getDeviceFN = function () {
     return Device::get(request::str('device'), true);
 };
 
-
 $fn = Request::trim('fn');
 
 if ($fn == 'data') {

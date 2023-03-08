@@ -833,14 +833,16 @@ include './index.php';
             }
         }
 
-        $totalPerDevice = $account->getTotalPerDevice();
-        if ($totalPerDevice > 0 && self::checkLimit(
-                $account,
-                $user,
-                ['device_id' => $device->getId()],
-                $totalPerDevice
-            )) {
-            return err('领取数量已经达到单台设备最大领取限制！');
+        if (App::isFlashEggEnabled()) {
+            $totalPerDevice = $account->getTotalPerDevice();
+            if ($totalPerDevice > 0 && self::checkLimit(
+                    $account,
+                    $user,
+                    ['device_id' => $device->getId()],
+                    $totalPerDevice
+                )) {
+                return err('领取数量已经达到单台设备最大领取限制！');
+            }
         }
 
         return self::checkAccountLimits($user, $account, $params);

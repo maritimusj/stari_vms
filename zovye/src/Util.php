@@ -832,6 +832,7 @@ include './index.php';
                 //单个用户周期内限制
                 if ($limit['count'] > 0) {
                     $query = Order::query([
+                        'src' => Order::FREE,
                         'device_id' => $device->getId(),
                         'openid' => $user->getOpenid(),
                         'createtime >=' => $time->getTimestamp(),
@@ -844,6 +845,7 @@ include './index.php';
                 //所有用户周期内限制
                 if ($limit['sccount'] > 0) {
                     $query = Order::query([
+                        'src' => Order::FREE,
                         'device_id' => $device->getId(),
                         'createtime >=' => $time->getTimestamp(),
                     ]);
@@ -858,6 +860,7 @@ include './index.php';
         //单个用户累计限制
         if ($limit['total'] > 0) {
             $query = Order::query([
+                'src' => Order::FREE,
                 'device_id' => $device->getId(),
                 'openid' => $user->getOpenid(),
             ]);
@@ -870,6 +873,7 @@ include './index.php';
         //所有用户累计限制
         if ($limit['all'] > 0) {
             $query = Order::query([
+                'src' => Order::FREE,
                 'device_id' => $device->getId(),
             ]);
             $query->limit($limit['all']);

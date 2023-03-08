@@ -378,6 +378,16 @@ class accountModelObj extends modelObj
         return $this->settings('config.'.$path, $default);
     }
 
+    public function setTotalPerDevice(int $total)
+    {
+        return $this->setConfig('limit.totalPerDevice', $total);
+    }
+
+    public function getTotalPerDevice()
+    {
+        return $this->getConfig('limit.totalPerDevice', 0);
+    }
+
     public function checkAnswer(userModelObj $user, array $answer = []): array
     {
         $num = 0;

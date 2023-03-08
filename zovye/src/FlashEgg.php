@@ -163,6 +163,9 @@ class FlashEgg
             'goods' => [
                 'id' => $goods->getId(),
             ],
+            'limit' => [
+                'totalPerDevice' => Request::int('totalPerDevice'), //单台设备限制
+            ]
         ];
 
         if ($type == 'video') {

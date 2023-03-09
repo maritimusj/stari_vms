@@ -328,6 +328,7 @@
                     'code': $.trim($('input[name=code]').val()),
                     'wx': $('input[name=SQB_weixin]').is(':checked') ? 1 : 0,
                     'ali': $('input[name=SQB_ali]').is(':checked') ? 1 : 0,
+                    'wxapp': $('input[name=SQB_wxapp]').is(':checked') ? 1 : 0,
                 }
                 if (params['vendor_key'] === '') {
                     $('input[name=vendor_key').siblings('.inputMask').click()

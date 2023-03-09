@@ -32,6 +32,7 @@ if (false === Util::createApiRedirectFile('/payment/SQB.php', 'payresult', [
 if (updateSettings('pay.SQB', [
     'enable' => 1,
     'wx' => Request::bool('wx'),
+    'wxapp' => Request::bool('wxapp'),    
     'ali' => Request::bool('ali'),
     'sn' => $result['terminal_sn'],
     'key' => $result['terminal_key'],

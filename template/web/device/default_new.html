@@ -8,40 +8,40 @@
     <div class="panel panel-default" v-else>
         <div class="heading">
             <span class="operate">
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'edit'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'normal']);}">
                     <img src="{MODULE_URL}static/img/machine.svg" class="icon" title="添加新设备">
                 </a>
                 {if \zovye\App::isChargingDeviceEnabled()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'edit', 'type'=>'charging'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'charging']);}">
                     <img src="{MODULE_URL}static/img/charging.svg" class="icon" title="添加充电桩">
                 </a>
                 {/if}
                 {if \zovye\App::isFuelingDeviceEnabled()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'edit', 'type'=>'fueling'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'fueling']);}">
                     <img src="{MODULE_URL}static/img/fueling.svg" class="icon" title="添加尿素加注设备">
                 </a>
                 {/if}
                 {if \zovye\App::isVDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'edit', 'type'=>'vd'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'vd']);}">
                     <img src="{MODULE_URL}static/img/vdevice.svg" class="icon" title="添加虚拟设备">
                 </a>
                 {/if}
                 {if \zovye\App::isBluetoothDeviceSupported()}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'edit', 'type'=>'bluetooth_device'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'edit', 'model'=>'bluetooth']);}">
                     <img src="{MODULE_URL}static/img/bluetooth.svg" class="icon" title="添加蓝牙设备">
                 </a>
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'import_bluetooth_device_upload'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'import_bluetooth_device_upload']);}">
                     <img src="{MODULE_URL}static/img/upload_bluetooth.svg" class="icon" title="导入蓝牙设备">
                 </a>
                 {/if}
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'new_group'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'new_group']);}">
                     <img src="{MODULE_URL}static/img/group.svg" class="icon" title="分组管理">
                 </a>
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'report_list'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'report_list']);}">
                     <img src="{MODULE_URL}static/img/malfunction.svg" class="icon" title="故障报告列表">
                 </a>
                 <img src="{MODULE_URL}static/img/reload.svg" class="icon" title="通知所有设备刷新配置？"  onclick="api.refreshAll();">
-                <a href="{php echo $this->createWebUrl('device', array('op'=>'clean_error'));}">
+                <a href="{php echo $this->createWebUrl('device', ['op'=>'clean_error']);}">
                     <img src="{MODULE_URL}static/img/clear.svg" class="icon" title="清除所有设备错误代码">
                 </a>
                 {if $upload}

@@ -181,6 +181,7 @@ class device
 
         if (App::isFlashEggEnabled()) {
             $result['extra']['adDeviceUID'] = $device->getAdDeviceUID();
+            $result['extra']['limit'] = $device->settings('extra.limit', []);
         }
 
         $payload = $device->getPayload(true);

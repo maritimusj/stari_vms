@@ -214,9 +214,9 @@ class Charging
         $serial = $last_charging_data['serial'];
 
         if (!$device->mcbNotify('config', '', [
-            "req" => "stop",
-            "ch" => $chargerID,
-            "ser" => $last_charging_data['serial'],
+            'req' => 'stop',
+            'ch' => $chargerID,
+            'ser' => $last_charging_data['serial'],
         ])) {
             return err('设备通信失败，请重试！');
         }
@@ -371,7 +371,7 @@ class Charging
             }
 
             if ($user->chargingNOWData('serial', '') == $serial) {
-                $user->removeFuelingNOWData();
+                $user->removeChargingNOWData();
             }
 
             if ($cb != null) {
@@ -636,20 +636,21 @@ class Charging
         if (is_array($extra['record'])) {
             $serial = $extra['serial'] ?? '';
             $chargerID = intval($extra['chargerID']);
-
-            $res = Charging::settle($serial, $chargerID, $extra['record']);
-            if (is_error($res)) {
-                Log::error('charging', [
-                    'serial' => $serial,
-                    'chargerID' => $chargerID,
-                    'data' => $extra['record'],
-                    'error' => $res,
-                ]);
-            } else {
-                Log::info('charging', [
-                    'data' => $extra,
-                    'res' => $res,
-                ]);
+            if ($serial && $chargerID) {
+                $res = Charging::settle($serial, $chargerID, $extra['record']);
+                if (is_error($res)) {
+                    Log::error('charging', [
+                        'serial' => $serial,
+                        'chargerID' => $chargerID,
+                        'data' => $extra['record'],
+                        'error' => $res,
+                    ]);
+                } else {
+                    Log::info('charging', [
+                        'data' => $extra,
+                        'res' => $res,
+                    ]);
+                }
             }
         }
     }

@@ -617,7 +617,7 @@ class DeviceEventProcessor
 
             $device->save();
 
-            if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+            if ($device->isFuelingDevice()) {
                 Fueling::onEventOnline($device);
             }
         }
@@ -666,8 +666,7 @@ class DeviceEventProcessor
                 $extra = (array)$data['extra'];
                 if ($device->isChargingDevice()) {
                     Charging::onEventResult($device, $extra);
-                }
-                if ($device->isFuelingDevice()) {
+                } elseif ($device->isFuelingDevice()) {
                     Fueling::onEventResult($device, $extra);
                 }
             }
@@ -768,11 +767,9 @@ class DeviceEventProcessor
         if ($device->isNormalDevice()) {
             $device->updateMcbStatus($extra);
         } else {
-            if ($device->isChargingDevice() && App::isChargingDeviceEnabled()) {
+            if ($device->isChargingDevice()) {
                 Charging::onEventReport($device, $extra);
-            }
-
-            if ($device->isFuelingDevice() && App::isFuelingDeviceEnabled()) {
+            } elseif ($device->isFuelingDevice()) {
                 Fueling::onEventReport($device, $extra);
             }
         }
